@@ -1,0 +1,79 @@
+from typing import Tuple
+
+import logging
+
+from datetime import datetime, timedelta, timezone
+
+from fastapi import HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import jwt, JWTError
+from passlib.context import CryptContext
+from pydantic import BaseModel
+from starlette import status
+
+from bytes.config import settings
+
+logger = logging.getLogger(__name__)
+
+ALGORITHM = "HS256"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    expires_at: str
+
+
+def get_access_token(form_data: OAuth2PasswordRequestForm) -> Tuple[str, datetime]:
+    system_username = settings.bytes_username
+    hashed_password = pwd_context.hash(settings.bytes_password)
+
+    authenticated = form_data.username == system_username and pwd_context.verify(form_data.password, hashed_password)
+
+    if not authenticated:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return _create_access_token(form_data)
+
+
+def authenticate_token(token: str = Depends(oauth2_scheme)) -> str:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(token, settings.secret, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+
+        if username is None:
+            raise credentials_exception
+
+        return str(username)
+    except JWTError as error:
+        raise credentials_exception from error
+
+
+def _create_access_token(form_data: OAuth2PasswordRequestForm) -> Tuple[str, datetime]:
+    expire_time = _get_expire_time()
+    data = {
+        "sub": form_data.username,
+        "exp": expire_time,
+    }
+
+    access_token = jwt.encode(data.copy(), settings.secret, algorithm=ALGORITHM)
+
+    return access_token, expire_time
+
+
+def _get_expire_time() -> datetime:
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+
+    return datetime.now(timezone.utc) + access_token_expires

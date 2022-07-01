@@ -1,0 +1,92 @@
+#!/bin/bash
+set -e
+. /usr/share/debconf/confmodule
+
+APP_DIR=/usr/share/kat-bytes
+
+adduser --home /etc/kat --no-create-home --system --group kat || true
+
+python3 -m venv ${APP_DIR}/venv
+
+echo "Setting up bytes environment."
+${APP_DIR}/venv/bin/pip install --upgrade pip > /dev/null
+${APP_DIR}/venv/bin/pip install --requirement ${APP_DIR}/app/requirements.txt > /dev/null
+${APP_DIR}/venv/bin/pip install gunicorn uvicorn > /dev/null
+
+if [ ! -d /var/log/kat ]; then
+    mkdir /var/log/kat
+    chown kat:kat /var/log/kat
+    chmod 750 /var/log/kat
+fi
+
+# Create data dir for bytes
+if [ ! -d /var/lib/kat-bytes ]; then
+    mkdir /var/lib/kat-bytes
+    chown kat:kat /var/lib/kat-bytes
+    chmod 750 /var/lib/kat-bytes
+fi
+
+key=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 64)
+bytes_password=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
+sed -i "s/SECRET= *\$/SECRET=${key}/" /etc/kat/bytes.conf
+sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=${bytes_password}/" /etc/kat/bytes.conf
+
+ln -s /etc/kat/bytes.conf /usr/share/kat-bytes/app/.env || true
+
+db_get kat-bytes/enable-nginx-conf
+if [ "$RET" = "true" ] && [ -d /etc/nginx/sites-enabled ]; then
+    echo "Enabling nginx config for bytes"
+    ln -s /etc/nginx/sites-available/kat-bytes /etc/nginx/sites-enabled/kat-bytes || true
+    systemctl enable --now kat-bytes.service
+    systemctl reload nginx
+fi
+
+if [ ! -f /usr/share/kat-bytes/.db_initialized ]; then
+    db_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
+    sudo -u postgres psql -c 'CREATE DATABASE bytes_db;' > /dev/null
+    sudo -u postgres psql -c "CREATE USER bytes WITH ENCRYPTED PASSWORD '${db_pass}';" > /dev/null
+    # TODO: safe permissions by default
+    sudo -u postgres psql -c 'GRANT ALL ON DATABASE bytes_db TO bytes;' > /dev/null
+
+    db_uri="postgresql://bytes:${db_pass}@localhost/bytes_db"
+    sed -i "s|BYTES_DB_URI=.*\$|BYTES_DB_URI=${db_uri}|" /etc/kat/bytes.conf
+
+    # TODO: do this in separate script
+    working_dir=$(pwd)
+    cd /usr/share/kat-bytes/app
+    set -a
+    source /usr/share/kat-bytes/app/.env
+    /usr/share/kat-bytes/venv/bin/python -m alembic upgrade head
+    set +a
+    cd $working_dir
+
+    touch /usr/share/kat-bytes/.db_initialized
+else
+    working_dir=$(pwd)
+    cd /usr/share/kat-bytes/app
+    set -a
+    source /usr/share/kat-bytes/app/.env
+    /usr/share/kat-bytes/venv/bin/python -m alembic upgrade head
+    set +a
+    cd $working_dir
+fi
+
+if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
+    rabbitmqctl add_vhost kat
+    rabbitmqctl set_permissions -p "kat" "guest" ".*" ".*" ".*"
+fi
+
+db_stop || true
+
+chown kat:kat /etc/kat/bytes.conf
+chown -R root:kat /usr/share/kat-bytes
+chown root:kat /etc/kat
+chmod 640 /etc/kat/bytes.conf
+chmod 750 /etc/kat/
+chmod 750 /usr/share/kat-bytes
+chmod 750 /usr/lib/systemd/system/kat-bytes.service
+chmod 750 /usr/lib/systemd/system/kat-bytes.socket
+
+# Update number of workers for gunicorn
+num_workers=$(($(nproc) * 2 + 1))
+sed -i "s/workers =.*\$/workers=${num_workers}/" /etc/kat/gunicorn.bytes.conf.py
