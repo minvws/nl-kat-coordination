@@ -1,0 +1,14 @@
+{
+  "id": "website-similarity-job",
+  "module": "kat_website_similarity.website_similarity",
+  "organization": "_dev",
+  "arguments": {
+    "domain": "Hostname|internet|rijksoverheid.nl."
+  },
+  "dispatches": {
+    "normalizers": [
+      "kat-website-similarity.normalize"
+    ],
+    "boefjes": []
+  }
+}

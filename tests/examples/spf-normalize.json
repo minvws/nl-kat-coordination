@@ -1,0 +1,27 @@
+{
+  "id": "spf-job",
+  "boefje_meta": {
+    "id": "spf-job",
+    "boefje": {
+      "id": "spf-records",
+      "name": "SpfRecord"
+    },
+    "organization": "_dev",
+    "input_ooi": "Hostname|internet|example.nl",
+    "arguments": {
+      "hostname": "Hostname|internet|example.nl",
+      "value": "v=spf1 a ip4:185.73.32.14/30 ip4:185.73.32.3 ip6:2001:1af8:2100:b080:1::80/64 ip4:185.73.34.3 ip6:2a05:3f44::2:80 include:incre\"\"diblylonghostnamewhichhasbeenaddedtoincrease.nl include:thecharacterlengthofthisspfrecordandtoexceedthelimits.nl ~mx:innerheight.com -all",
+      "ttl": "1800"
+    },
+    "dispatches": [
+      {
+        "name": "kat_spf.normalize",
+        "version": null
+      }
+    ]
+  },
+  "normalizer": {
+    "name": "kat_spf.normalize",
+    "version": null
+  }
+}

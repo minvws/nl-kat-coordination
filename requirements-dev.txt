@@ -1,0 +1,16 @@
+alembic==1.7.7
+black==21.9b0
+click==8.0.3
+pytest==6.2.5
+dnspython==2.1.0
+pika==1.2.0
+pydantic==1.8.2
+docker==5.0.2
+requests==2.26.0
+celery==5.2.3
+fastapi==0.70.0
+uvicorn==0.15.0
+psycopg2-binary==2.9.3
+pylxd==2.3.1
+pynacl==1.5.0
+sqlalchemy==1.4.32

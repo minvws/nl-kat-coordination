@@ -1,0 +1,28 @@
+{
+  "id": "ipv6-nameserver-job",
+  "boefje_meta": {
+    "id": "ipv6-nameserver-job",
+    "boefje": {
+      "name": "IPv6 nameservers",
+      "version": null
+    },
+    "module": "kat_ipv6_nameservers.ipv6_nameservers",
+    "organization": "_dev",
+    "input_ooi": "Hostname|internet|rijksoverheid.nl.",
+    "arguments": {
+      "hostname": "rijksoverheid.nl.",
+      "pk": "Hostname|internet|rijksoverheid.nl.",
+      "dns_records": "[{\"hostname\": \"ns0.rijksoverheidnl.com.\", \"ip\": \"2a06:fb00:1::1:82\"}, {\"hostname\": \"ns1.rijksoverheidnl.nl.\", \"ip\": \"2a00:d00:3:6::130\"}]"
+    },
+    "dispatches": [
+      {
+        "name": "kat_ipv6_nameservers_normalize",
+        "version": null
+      }
+    ]
+  },
+  "normalizer": {
+  "name": "kat_ipv6_nameservers.normalize",
+  "version": null
+  }
+}

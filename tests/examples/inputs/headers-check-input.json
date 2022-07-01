@@ -1,0 +1,3 @@
+{
+  "header": "script-src 'self' https://css.example.nl https://piwik.example.nl https://api.tiles.mapbox.com https://api.mapbox.com;style-src 'self' https://css.example.nl https://api.tiles.mapbox.com;connect-src 'self' https://api.mapbox.com https://*.tiles.mapbox.com https://events.mapbox.com;frame-ancestors 'self';object-src 'none';default-src 'none';form-action 'self' https://customers.example.nl;img-src 'self' data: blob: https://*.tiles.mapbox.com https://css.example.nl;font-src 'self' https://css.example.nl;base-uri 'self'"
+}
