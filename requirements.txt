@@ -1,0 +1,14 @@
+pytest~=7.1.2
+requests~=2.27.1
+pydantic~=1.9.1
+fastapi~=0.75.0
+fastapi-utils~=0.2.1
+uvicorn~=0.17.6
+pika~=1.2.1
+requests-mock~=1.9.3
+PyYAML~=6.0
+setuptools~=62.3.2
+dnspython~=2.2.1
+kombu~=5.2.4
+celery~=5.2.7
+pyparsing~=3.0.9

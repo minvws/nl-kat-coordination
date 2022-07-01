@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  octopoes_unit:
+    image: python:3.8
+    volumes:
+      - .:/app/octopoes
+    command: sh -c
+      "
+        pip install -r /app/octopoes/requirements.txt &&
+        pip install /app/octopoes &&
+        python3 -m unittest discover /app/octopoes/tests
+      "
