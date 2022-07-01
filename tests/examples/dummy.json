@@ -1,0 +1,18 @@
+{
+  "id": "1",
+  "boefje": {
+    "name": "kat_test.test",
+    "version": null
+  },
+  "organization": "_dev",
+  "input_ooi": "Hostname|internet|rijksoverheid.nl.",
+  "arguments": {
+    "domain": "domain.com"
+  },
+  "dispatches": [
+    {
+      "name": "kat_test.test_normalize",
+      "version": null
+    }
+  ]
+}

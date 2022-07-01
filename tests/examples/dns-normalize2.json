@@ -1,0 +1,18 @@
+{
+  "id": "dns-lookup-job",
+  "module": "kat_dns.normalize",
+  "organization": "_dev",
+  "input_ooi": "Hostname|internet|www.example.nl.",
+  "arguments": {
+    "domain": "www.example.nl.",
+    "input": {
+        "name": "www.example.nl."
+      }
+  },
+  "dispatches": {
+    "normalizers": [
+      "kat_dns.normalize"
+    ],
+    "boefjes": []
+  }
+}

@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  katalogus_integration:
+    build:
+      context: ..
+      dockerfile: nl-rt-tim-abang-boefjes/Dockerfile
+    command: sh -c 'python -m pytest -vv katalogus/tests/integration'
+    depends_on:
+      - ci_katalogus
+      - ci_katalogus-db
+    env_file:
+      - .ci/.env.test
+    volumes:
+    - .:/app/boefjes
+
+  ci_katalogus:
+    build:
+      context: ..
+      dockerfile: nl-rt-tim-abang-boefjes/Dockerfile
+    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
+    depends_on:
+      - ci_katalogus-db
+    env_file:
+      - .ci/.env.test
+    environment:
+      - ENABLE_DB=false
+    volumes:
+      - .:/app/boefjes
+
+  ci_katalogus-db:
+    image: postgres:12.8
+    env_file:
+      - .ci/.env.test
