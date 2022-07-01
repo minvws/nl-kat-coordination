@@ -15,10 +15,10 @@ RUN adduser --disabled-password --gecos '' --uid 1000 --gid 1000 rocky
 USER rocky
 WORKDIR /app/rocky
 
-COPY nl-rt-tim-abang-rocky/requirements-dev.txt .
+COPY nl-kat-rocky/requirements-dev.txt .
 RUN pip3 install -r requirements-dev.txt
 
-COPY --chown=rocky nl-rt-tim-abang-octopoes /app/octopoes
+COPY --chown=rocky nl-kat-octopoes /app/octopoes
 RUN pip3 install /app/octopoes
 
-COPY nl-rt-tim-abang-rocky .
+COPY nl-kat-rocky .
