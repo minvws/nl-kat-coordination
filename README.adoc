@@ -1,7 +1,7 @@
 
 = Wat is OpenKAT? 
 
-OpenKAT heeft als doel het monitoren, registreren en analyseren van de status van informatiesystemen. OpenKAT scant netwerken, analyseert kwetsbaarheden en maakt toegankelijke rapporteren. Het integreert de meest gebruikte netwerktools en scansoftware in een modulair framework, heeft toegang tot externe databases zoals shodan en combineert de informatie uit al deze bronnen in overzichtelijke rapportages.
+OpenKAT heeft als doel het monitoren, registreren en analyseren van de status van informatiesystemen. OpenKAT scant netwerken, analyseert kwetsbaarheden en maakt toegankelijke rapporten. Het integreert de meest gebruikte netwerktools en scansoftware in een modulair framework, heeft toegang tot externe databases zoals shodan en combineert de informatie uit al deze bronnen in overzichtelijke rapportages.
 
 Een goed startpunt is de link:https://github.com/minvws/nl-kat-coordination/wiki/Algemene-uitleg-OpenKAT-en-bijbehorende-figuren[informatiebrochure]. 
 Alle informatie over OpenKAT en de functionaliteit van het pakket is te vinden link:https://github.com/minvws/nl-kat-coordination/wiki[op de wiki]. 
