@@ -1,0 +1,11 @@
+{% load i18n %}
+
+{% if field.errors %}
+  <p class="error" role="group" aria-label="{% translate 'error' %}">
+    <span>{% translate 'Error' %}:</span>
+    {% for error in field.errors %}
+      {{ error|escape }}
+    </br>
+  {% endfor %}
+</p>
+{% endif %}

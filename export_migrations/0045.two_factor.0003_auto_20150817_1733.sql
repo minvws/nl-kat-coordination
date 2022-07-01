@@ -1,0 +1,7 @@
+--
+-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:
+-- Raw Python operation
+--
+--
+-- Alter field number on phonedevice
+--

@@ -1,0 +1,29 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+	{% include 'header.html' %}
+
+	<main id="main-content">
+    <article>
+      <div class="form-view">
+        <h1>{% translate 'Add finding' %}:</h1>
+
+        <form action="{% url 'finding_add' %}" method="post" class="horizontal-view help">
+          {% csrf_token %}
+
+          {% translate 'Finding' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+
+          <button type="submit">{% translate 'Add' %} {% translate 'Finding' %}</button>
+        </form>
+      </div>
+    </article>
+	</main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+{% endblock %}

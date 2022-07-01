@@ -1,0 +1,28 @@
+{% extends 'partials/list_filters.html' %}
+{% load i18n %}
+
+{% block title %}
+{% translate 'Members' %}
+{% endblock %}
+
+{% block filter_form %}
+  <form method="get">
+    <fieldset>
+      <legend>{% translate "Shown types" %}</legend>
+        <div>
+          {% for checkbox in checkbox_filters %}
+            <div class="horizontal-view">
+              <input type="checkbox"
+                     id="checkbox-filter-{{ checkbox.value }}"
+                     name="client_status"
+                     value="{{ checkbox.value }}"
+                     {% if checkbox.checked %} checked{% endif %}>
+              <label for="checkbox-filter-{{ checkbox.value }}">{{ checkbox.label }}</label>
+            </div>
+          {% endfor %}
+        </div>
+    </fieldset>
+
+    <input type="submit" value="{% translate 'Update List' %}">
+  </form>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div class="form-view">
+        <h1>{% translate "Here, an indemnification can be given on behalf of your organization" %}:</h1>
+        <form action="{% url 'indemnification_add' %}"
+              method="post"
+              class="horizontal-view">
+          {% csrf_token %}
+          <fieldset>
+            <legend>
+              {% translate "Register an indemnification" %}
+            </legend>
+            {% for field in form %}
+              <div>
+                {{ field.label_tag }}
+                <div>
+                  {{ field }}
+                  {% if field.errors %}
+                    <p class="error" role="group" aria-label="{% translate 'error' %}">
+                      <span>{% translate 'Error' %}:</span>
+                      {% for error in field.errors %}
+                        {{ error|escape }}
+                        <br>
+                      {% endfor %}
+                    </p>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </fieldset>
+          <button type="submit">{% translate "Submit" %}</button>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

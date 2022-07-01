@@ -1,0 +1,10 @@
+{% load i18n %}
+
+<fieldset>
+  {% if legend %}<legend>{{ legend }}</legend>{% endif %}
+  {% for field in fields %}
+    {% if not fieldset or field.name in fieldset.split %}
+      {% include "partials/form/field_input_wrapper.html" %}
+    {% endif %}
+  {% endfor %}
+</fieldset>

@@ -1,0 +1,31 @@
+server {
+    listen 8000;
+
+    server_name rocky.local;
+
+    add_header X-Frame-Options Deny;
+    add_header X-Content-Type-Options nosniff;
+    #add_header Content-Security-Policy "default-src 'self'; object-src 'none'; child-src 'self'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content";
+    add_header Content-Security-Policy "default-src 'self'; object-src 'none'; child-src 'self'; frame-ancestors 'none';";
+    add_header X-Permitted-Cross-Domain-Policies none;
+    add_header Referrer-Policy no-referrer;
+    #add_header Clear-Site-Data '"cache","cookies","storage"';
+    add_header Cross-Origin-Embedder-Policy require-corp;
+    #add_header Cross-Origin-Opener-Policy same-origin;
+    add_header Cross-Origin-Resource-Policy same-origin;
+    add_header Permissions-Policy 'accelerometer=(),autoplay=(),camera=(),display-capture=(),document-domain=(),encrypted-media=(),fullscreen=(),geolocation=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),web-share=(),xr-spatial-tracking=()';
+    add_header Cache-Control 'no-store, max-age=0';
+    add_header Pragma no-cache;
+    add_header X-DNS-Prefetch-Control off;
+    add_header Expect-CT 'max-age=86400, enforce';
+
+    location /static/ {
+        rewrite ^/static(.*)$ $1 break;
+        root /usr/share/kat-rocky/app/static/;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/kat-rocky.sock;
+    }
+}

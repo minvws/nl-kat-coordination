@@ -1,0 +1,22 @@
+{% load ooi_extra %}
+
+{% if prop not in 'children,tree_meta' %}
+  <tr>
+    <td>{{ prop }}</td>
+    {% if prop == 'id' %}
+      <td><a href="{% ooi_url 'ooi_detail' item %}" title="Show details for {{ item }}">{{ item }}</a></td>
+    {% elif prop == 'ooi_type' %}
+      <td><a href="{% ooi_url 'ooi_tree' ooi_id ooi_type=item %}" title="Only show children of type {{ item }}">{{ item }}</a></td>
+    {% else %}
+      <td>{{ item }}</td>
+    {% endif %}
+  </tr>
+{% elif prop == 'children' and item|length %}
+  <tr>
+    <td colspan="2">
+      {% for listItem in item %}
+        {% include "partials/elements/ooi_tree_table.html" with list=listItem current_position=current_position|add:'-r'  %}
+      {% endfor %}
+    </td>
+  </tr>
+{% endif %}

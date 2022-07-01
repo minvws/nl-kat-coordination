@@ -1,0 +1,10 @@
+{% load i18n %}
+
+{% if form.errors and form.errors|get_item:'__all__' %}
+  <p class="error" role="group" aria-label="{% translate 'error' %}">
+    <span>{% translate 'Error' %}:</span>
+    {% for error in form.errors|get_item:'__all__' %}
+      {{ error }}
+    {% endfor %}
+  </p>
+{% endif %}

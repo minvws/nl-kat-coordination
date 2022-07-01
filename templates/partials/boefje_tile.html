@@ -1,0 +1,41 @@
+{% load i18n %}
+{% load static %}
+
+<div class="{% if item.required %}required{% endif %} {{ item|get_type_name|lower }}"
+     role="group"
+     aria-labelledby="{{ item.id }}">
+  {% if item.required %}
+    <span class="nota-bene" id="boefje_{{ item.id }}">This object type is required</span>
+  {% endif %}
+  {% if widget %}
+    {% include 'forms/widgets/checkbox_option.html' %}
+  {% endif %}
+
+  {% if widget %}
+    <span class="tile-label">
+      {{ item|get_type_name }}
+    </span>
+  {% endif %}
+  <img src="{% url 'boefje_cover' boefje_id=item.id %}"
+        alt="placeholder image for Boefje {{ item.name }}">
+  {% with scan_level=item.scan_level.label %}
+    <div class="horizontal-view scan-intensity">
+      <span class="de-emphasized">{% translate 'Scan intensity score:' %}</span>
+      {% include 'partials/scan_level_indicator.html' with scan_level=scan_level %}
+    </div>
+  {% endwith %}
+  <h1>{{ item.name }}</h1>
+  <p>
+    {{ item.description }}
+  </p>
+  <span class="de-emphasized">
+    {% translate 'Publisher' %}:
+    OpenKAT
+  </span>
+  <div class="action-buttons">
+    <a href="{% url 'katalogus_detail' id=item.id %}">{% translate 'See details' %}</a>
+    {% if not widget %}
+      {% enable_disable_boefje_button item perms.tools.can_enable_disable_boefje %}
+  {% endif %}
+  </div>
+</div>

@@ -1,0 +1,47 @@
+{% load i18n %}
+{% load ooi_extra %}
+{% translate object.id as object_id %}
+{% translate object.ooi_type as object_ooi_type %}
+{% translate object.tree_meta.child_count as child_count %}
+{% if not filtered_types or object.ooi_type in filtered_types or object.id == ooi_id %}
+  <tr class="tree-depth-{{ object.tree_meta.depth }} tree-{{ object.tree_meta.location }} type-{{ object.ooi_type }}">
+    <td style="padding-left: calc({{ object.tree_meta.depth }}rem * 2);">
+      {% if object.tree_meta.child_count != '0' %}<span class="icon ti-chevron-down"></span>{% endif %}
+      <a href="{% ooi_url 'ooi_detail' object.id query=mandatory_fields %}"
+         title="{% blocktranslate %}Show details for {{ object_id }}, with {{ child_count }} children.{% endblocktranslate %}">{% if object.tree_meta.child_count != '0' %}({{ object.tree_meta.child_count }}){% endif %}{{ object.human_readable }}</a>
+  </td>
+  <td>
+    <a href="{% ooi_url 'ooi_tree' object.id ooi_type=object.ooi_type %}"
+       title="{% blocktranslate %}Show tree for {{ object_id }} with only children of type {{ object_ooi_type }}{% endblocktranslate %}">{{ object.ooi_type }}</a>
+  </td>
+  <td class="actions">
+    <a href="{% ooi_url 'ooi_tree' object.id query=mandatory_fields %}"
+       class="icon ti-subtask button">{% translate "Tree" %}</a>
+  </td>
+  <td class="actions">
+    <a href="{% ooi_url 'ooi_graph' object.id query=mandatory_fields %}"
+       class="icon ti-affiliate button">{% translate 'Graph' %}</a>
+  </td>
+</tr>
+{% if object.children %}
+  {% for child in object.children %}
+    {% include 'partials/elements/ooi_tree_condensed_table_row.html' with object=child %}
+  {% endfor %}
+{% endif %}
+{% else %}
+{% if object.ooi_type != 'Job' %}
+  <tr class="folded">
+    <td style="padding-left: calc({{ object.tree_meta.depth }}rem * 2);">
+      <span class="icon ti-chevron-right"></span>
+      ({{ object.tree_meta.child_count }}) {{ object.human_readable }}
+      {% if object.tree_meta.child_ids %}> {{ object.tree_meta.child_ids|join:' > ' }}{% endif %}
+    </td>
+    <td colspan="3">
+      <a href="{% ooi_url 'ooi_tree' ooi_id query=mandatory_fields ooi_type=object.ooi_type %}" title="{% blocktranslate %}Unfold {{ object_id }} with {{ child_count }} children{% endblocktranslate %}: {% if object.tree_meta.child_ids %} > {{ object.tree_meta.child_ids|join:' > ' }}{% endif %}
+      ">{{ object.ooi_type }}
+      {% if object.tree_meta.child_ooi_types %}> {{ object.tree_meta.child_ooi_types|join:' > ' }}{% endif %}
+    </a>
+  </td>
+</tr>
+{% endif %}
+{% endif %}

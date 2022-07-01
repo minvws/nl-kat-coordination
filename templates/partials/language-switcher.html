@@ -1,0 +1,15 @@
+{% load i18n %}
+
+{% get_current_language as LANGUAGE_CODE %}
+<div class="language">
+  <form action="{% url 'set_language' %}" method="post">
+    {% csrf_token %}
+    <div class="horizontal-view">
+      {% for language in languages %}
+        <button type="submit" name="language" value={{ language }} {% if LANGUAGE_CODE == language %}aria-current="true"{% endif %}>
+          {{ language|upper }}
+        </button>
+      {% endfor %}
+    </div>
+  </form>
+</div>

@@ -1,0 +1,30 @@
+{% load i18n %}
+{% load ooi_extra %}
+
+{% spaceless %}
+  {% if inferences %}
+    <div class="horizontal-scroll">
+      <h2>{% translate 'Inferred by' %}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>{% translate 'Bit' %}</th>
+            <th>{% translate 'Source' %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inference in inferences %}
+            <tr>
+              <td>
+                <a href="{% url 'katalogus_detail' inference.origin.method %}">{{ inference.origin.method }}</a>
+              </td>
+              <td>
+                <a href="{% ooi_url 'ooi_detail' inference.origin.source %}">{{ inference.origin.source }}</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endspaceless %}

@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Crisis Room' %}</h1>
+        <p>
+          {% translate 'An overview of all (critical) findings KAT found. Check the detail section for additional severity information.' %}
+        </p>
+      </div>
+    </section>
+    <section>
+      <div>{% include 'partials/elements/ooi_report_settings.html' %}</div>
+    </section>
+    {% include 'crisis_room/crisis_room_findings_block.html' %}
+  </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/vendor/manon/expando-rows.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
+{% endblock %}

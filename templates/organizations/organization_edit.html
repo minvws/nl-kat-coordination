@@ -1,0 +1,44 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main>
+    {% include 'partials/notifications/notifications_block.html' %}
+    <section>
+      <div>
+        <h1>{% translate 'Edit organization' %}</h1>
+        <p>
+          {% translate object.name as name %}
+          {% url 'signal_qr' as url %}
+          {% blocktranslate %}
+            Set signal username for {{ name }}.<br>
+            You can register your signal username with the QR code here:<br>
+            <a href="{{ url }}">Signal QR Code</a>
+          {% endblocktranslate %}
+        </p>
+        <form method="post" class="horizontal-view">
+          {% csrf_token %}
+          <fieldset>
+            {% for field in form %}
+              {% include "partials/form/field_input_wrapper.html" %}
+            {% endfor %}
+          </fieldset>
+          <div class="horizontal-view">
+            <button type="submit">{% translate 'Save organization' %}</button>
+            <a class="button ghost"
+               href="{% url 'organization_detail' object.id %}">{% translate 'Cancel' %}</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+{% endblock %}

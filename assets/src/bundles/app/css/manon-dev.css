@@ -1,0 +1,4818 @@
+@charset "UTF-8";
+/*---------------------------------------------------------------*/
+/*------------------------- fonts.scss --------------------------*/
+/*---------------------------------------------------------------*/
+@font-face {
+  font-family: "BertSans";
+  font-weight: light;
+  font-style: normal;
+  src: url("../fonts/bertsanslight.ttf") format("ttf");
+}
+@font-face {
+  font-family: "BertSans";
+  font-weight: light;
+  font-style: italic;
+  src: url("../fonts/bertsanslightitalic.ttf") format("ttf");
+}
+@font-face {
+  font-family: "BertSans";
+  font-weight: normal;
+  font-style: normal;
+  src: url("../fonts/bertsansregular.ttf") format("ttf");
+}
+@font-face {
+  font-family: "BertSans";
+  font-weight: normal;
+  font-style: italic;
+  src: url("../fonts/bertsansitalic.ttf") format("ttf");
+}
+@font-face {
+  font-family: "BertSans";
+  font-weight: bold;
+  font-style: normal;
+  src: url("../fonts/bertsansbold.ttf") format("ttf");
+}
+@font-face {
+  font-family: "BertSans";
+  font-weight: bold;
+  font-style: italic;
+  src: url("../fonts/bertsansbolditalic.ttf") format("ttf");
+}
+/*----------------------------------------------------------------------------------*/
+/*---------------------- colors/critical-informational.scss ------------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  --critical-informational-critical: #42145f;
+  /* Purple */
+  --critical-informational-high: #d6293e;
+  /* Red */
+  --critical-informational-medium: #c36100;
+  /* Orange */
+  --critical-informational-low: #00519c;
+  /* Blue */
+  --critical-informational-informational: #13853e;
+  /* Green */
+}
+
+.critical,
+.high,
+.medium,
+.low,
+.informational {
+  color: #fff;
+}
+
+.critical {
+  background-color: var(--critical-informational-critical);
+}
+
+.high {
+  background-color: var(--critical-informational-high);
+}
+
+.medium {
+  background-color: var(--critical-informational-medium);
+}
+
+.low {
+  background-color: var(--critical-informational-low);
+}
+
+.informational {
+  background-color: var(--critical-informational-informational);
+}
+
+/*----------------------------------------------------------------------------------*/
+/*------------------ critical-informational-labels-variables.scss ------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  --critical-informational-labels-padding: 0 1rem;
+  --critical-informational-labels-min-width: 5rem;
+  --critical-informational-labels-text-align: center;
+}
+
+/*---------------------------------------------------------------*/
+/*----------- critical-informational-labels.scss ----------------*/
+/*---------------------------------------------------------------*/
+table .critical,
+table .high,
+table .medium,
+table .low,
+table .informational {
+  display: inline-block;
+  padding: var(--critical-informational-labels-padding);
+  min-width: var(--critical-informational-labels-min-width);
+  text-align: var(--critical-informational-labels-text-align);
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- states/disbled-variables.scss ---------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --disabled-cursor: not-allowed;
+  --disabled-opacity: 0.4;
+}
+
+/*---------------------------------------------------------------*/
+/*---------------------- states/disbled.scss --------------------*/
+/*---------------------------------------------------------------*/
+*:disabled,
+*.disabled {
+  cursor: var(--disabled-cursor) !important;
+  /* Overwriting more specific selectors e.g "a.button" */
+  opacity: var(--disabled-opacity);
+}
+*:disabled + label, *:disabled + label:before,
+*.disabled + label,
+*.disabled + label:before {
+  cursor: var(--disabled-cursor);
+  opacity: var(--disabled-opacity);
+}
+
+/*----------------------------------------------------------------------------------*/
+/*---------------- application-base/application-base-variables.scss ----------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  /* Application background color */
+  --application-base-background-color: #fff;
+  --application-base-text-color: #000;
+  --application-base-tint-1-background-color: #f5f5f5;
+  --application-base-tint-1-text-color: #000;
+  --application-base-font-family: "BertSans", sans-serif;
+  --application-base-font-size: 1rem;
+  /* Default text size */
+  --application-base-line-height: 1.5;
+  --application-base-font-weight: lighter;
+  --application-base-text-align: left;
+  /* Border radius */
+  /* You can use this variable to keep the  			*/
+  /* border radius consistent within your application */
+  /* Enable border radius for requested elements   	*/
+  /* within their element variable files.				*/
+  /* --application-base-border-radius: ; */
+  /* Accent color */
+  --application-base-accent-color: #262431;
+  --application-base-accent-color-text-color: #fff;
+  /* Accent color hover */
+  --application-base-accent-color-hover: hotpink;
+  --application-base-accent-color-hover-text-color: #fff;
+  /* Call to action color */
+  --cta-background-color: green;
+  --cta-text-color: #fff;
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- application-base.scss ---------------------*/
+/*---------------------------------------------------------------*/
+body {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  /* Set to always fill the page and the footer 		*/
+  /* will never be in the middle of the screen  		*/
+  min-height: 100vh;
+  /* Fallback set to a white because some browsers  	*/
+  /* (e.g: firefox on linux) do not use white as a 	*/
+  /* default color but this is often expected.		*/
+  background-color: var(--application-base-background-color, white);
+  color: var(--application-base-text-color, black);
+  font-family: var(--application-base-font-family);
+  font-size: var(--application-base-font-size, initial);
+  line-height: var(--application-base-line-height, initial);
+  font-weight: var(--application-base-font-weight, initial);
+  text-align: var(--application-base-text-align, initial);
+  /* When the page doesn't have enough content to 	*/
+  /* fill the screen height this will place the 		*/
+  /* footer at the bottom of the screen 				*/
+}
+body > main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/*--------------------------------------------------------------*/
+/*--------- mixins/icon/icon-base-variables.scss ---------------*/
+/*--------------------------------------------------------------*/
+:root {
+  --icon-base-font-family: "tabler-icons";
+  --icon-base-padding: 0.5rem;
+  --icon-base-width: 2.75rem;
+  --icon-base-height: 2.75rem;
+  --icon-base-min-width: 2.75rem;
+  --icon-base-min-height: 2.75rem;
+  --icon-base-font-size: 1.2rem;
+  /* Icon as :before */
+  --icon-base-before-font-size: var(--icon-base-font-size);
+  /* Image as icon */
+  --icon-base-image-width: var(--icon-base-width);
+  /* --icon-base-image-min-width: ; */
+  /* --icon-base-image-max-width: ; */
+  --icon-base-image-height: var(--icon-base-height);
+  /* --icon-base-image-min-height: ; */
+  /* --icon-base-image-max-height: ; */
+  --icon-base-image-padding: var(--icon-base-padding);
+}
+
+/*---------------------------------------------------------------------*/
+/*------------------------- icon-base.scss ----------------------------*/
+/*---------------------------------------------------------------------*/
+ul.icons li:before,
+ul.icons li :after, .icon:before,
+.icon :after {
+  position: static;
+  font-family: var(--icon-base-font-family);
+  font-size: var(--icon-base-font-size);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Firefox */
+  font-smoothing: antialiased;
+}
+
+.icon:before,
+.icon :after {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: var(--icon-base-before-font-size);
+}
+
+ul.icons li:before,
+ul.icons li :after {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: var(--icon-base-before-font-size);
+}
+
+img.icon {
+  object-position: center;
+  width: var(--icon-base-image-width);
+  min-width: var(--icon-base-image-min-width);
+  max-width: var(--icon-base-image-max-width);
+  height: var(--icon-base-image-height);
+  min-height: var(--icon-base-image-min-height);
+  max-height: var(--icon-base-image-max-height);
+  padding: var(--icon-base-image-padding);
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- text/headings-variables.scss --------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* h1 */
+  --headings-h1-font-size: 30px;
+  /* --headings-h1-text-color: ; */
+  /* --headings-h1-font-weight: ; */
+  /* --headings-h1-line-height: ; */
+  /* h2 */
+  --headings-h2-font-size: 1.5rem;
+  /* --headings-h2-text-color: ; */
+  /* --headings-h2-font-weight: ; */
+  /* --headings-h2-line-height: ; */
+  /* h3 */
+  --headings-h3-font-size: 1.25rem;
+  /* --headings-h3-text-color: ; */
+  /* --headings-h3-font-weight: ; */
+  /* --headings-h3-line-height: ; */
+  /* h4 */
+  --headings-h4-font-size: var(--application-base-font-size);
+  /* --headings-h4-text-color: ; */
+  /* --headings-h4-font-weight: ; */
+  /* --headings-h4-line-height: ; */
+  /* h5 */
+  --headings-h5-font-size: var(--application-base-font-size);
+  /* --headings-h5-text-color: ; */
+  /* --headings-h5-font-weight: ; */
+  /* --headings-h5-line-height: ; */
+  /* h6 */
+  --headings-h6-font-size: var(--application-base-font-size);
+  /* --headings-h6-text-color: ; */
+  /* --headings-h6-font-weight: ; */
+  /* --headings-h6-line-height: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*----------------------- headings.scss -------------------------*/
+/*---------------------------------------------------------------*/
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  hyphens: auto;
+  margin: 0;
+}
+
+h1,
+h1 > a {
+  font-size: var(--headings-h1-font-size, inherit);
+  color: var(--headings-h1-text-color, inherit);
+  font-weight: var(--headings-h1-font-weight, inherit);
+  line-height: var(--headings-h1-line-height, inherit);
+}
+
+h2,
+h2 > a {
+  font-size: var(--headings-h2-font-size, inherit);
+  color: var(--headings-h2-text-color, inherit);
+  font-weight: var(--headings-h2-font-weight, inherit);
+  line-height: var(--headings-h2-line-height, inherit);
+}
+
+h3,
+h3 > a {
+  font-size: var(--headings-h3-font-size, inherit);
+  color: var(--headings-h3-text-color, inherit);
+  font-weight: var(--headings-h3-font-weight, inherit);
+  line-height: var(--headings-h3-line-height, inherit);
+}
+
+h4,
+h4 > a {
+  font-size: var(--headings-h4-font-size, inherit);
+  color: var(--headings-h4-text-color, inherit);
+  font-weight: var(--headings-h4-font-weight, inherit);
+  line-height: var(--headings-h4-line-height, inherit);
+}
+
+h5,
+h5 > a {
+  font-size: var(--headings-h5-font-size);
+  color: var(--headings-h5-text-color);
+  font-weight: var(--headings-h5-font-weight);
+  line-height: var(--headings-h5-line-height, initial);
+}
+
+h6,
+h6 > a {
+  font-size: var(--headings-h6-font-size);
+  color: var(--headings-h6-text-color);
+  font-weight: var(--headings-h6-font-weight);
+  line-height: var(--headings-h6-line-height, initial);
+}
+
+/*----------------------------------------------------------------------------------*/
+/*----------------------------- p-variables.scss -----------------------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  --p-line-height: var(--application-base-line-height);
+  --p-font-size: var(--application-base-font-size);
+  --p-font-weight: var(--application-base-font-weight);
+  --p-text-color: var(--application-base-text-color);
+  --p-background-color: unset;
+}
+
+/*---------------------------------------------------------------*/
+/*---------------------------- p.scss ---------------------------*/
+/*---------------------------------------------------------------*/
+p {
+  margin: 0;
+  line-height: var(--p-line-height);
+  font-size: var(--p-font-size);
+  font-weight: var(--p-font-weight);
+  color: var(--p-text-color);
+  background-color: var(--p-background-color);
+}
+
+/*----------------------------------------------------------------------------------*/
+/*------------------------- text/emphasized-variables.scss -------------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  --emphasized-font-size: 1.25rem;
+  --emphasized-font-weight: bolder;
+  /* --emphasized-line-height: ; */
+  /* --emphasized-text-color: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------- text/de-emphasized.scss ------------------*/
+/*---------------------------------------------------------------*/
+.emphasized {
+  font-size: var(--emphasized-font-size, inherit);
+  font-weight: var(--emphasized-font-weight, inherit);
+  line-height: var(--emphasized-line-height, inherit);
+  color: var(--emphasized-text-color, inherit);
+}
+
+/*----------------------------------------------------------------------------------*/
+/*------------------------ text/de-emphasized-variables.scss -----------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  --de-emphasized-font-size: 0.8rem;
+  /* --de-emphasized-font-weight: ; */
+  /* --de-emphasized-line-height: ; */
+  --de-emphasized-text-color: #000;
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------- text/de-emphasized.scss ------------------*/
+/*---------------------------------------------------------------*/
+.de-emphasized {
+  font-size: var(--de-emphasized-font-size, inherit);
+  font-weight: var(--de-emphasized-font-weight, inherit);
+  line-height: var(--de-emphasized-line-height, inherit);
+  color: var(--de-emphasized-text-color, inherit);
+}
+
+/*----------------------------------------------------------------------------------*/
+/*-------------------------------- link-variables.scss -----------------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  /* Link */
+  --link-background-color: unset;
+  --link-text-color: #364abd;
+  --link-hover-text-color: #324dec;
+  /* Visted link */
+  --link-visited-text-color: #5f0e92;
+  --link-visited-hover-text-color: #781eb0;
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------------- link.scss -------------------------*/
+/*---------------------------------------------------------------*/
+a:visited > h1,
+a:visited > h2,
+a:visited > h3,
+a:visited > h4,
+a:visited > h5,
+a:visited > h6, a.visited > h1,
+a.visited > h2,
+a.visited > h3,
+a.visited > h4,
+a.visited > h5,
+a.visited > h6, a:visited, a.visited {
+  background-color: var(--link-background-color);
+  color: var(--link-visited-text-color, inherit);
+  /* States */
+}
+a:visited > h1:before,
+a:visited > h2:before,
+a:visited > h3:before,
+a:visited > h4:before,
+a:visited > h5:before,
+a:visited > h6:before, a.visited > h1:before,
+a.visited > h2:before,
+a.visited > h3:before,
+a.visited > h4:before,
+a.visited > h5:before,
+a.visited > h6:before, a:visited:before, a.visited:before {
+  color: inherit;
+}
+a:visited > h1:hover,
+a:visited > h2:hover,
+a:visited > h3:hover,
+a:visited > h4:hover,
+a:visited > h5:hover,
+a:visited > h6:hover, a.visited > h1:hover,
+a.visited > h2:hover,
+a.visited > h3:hover,
+a.visited > h4:hover,
+a.visited > h5:hover,
+a.visited > h6:hover, a:hover:visited, a.visited:hover, a:visited > h1.hover,
+a:visited > h2.hover,
+a:visited > h3.hover,
+a:visited > h4.hover,
+a:visited > h5.hover,
+a:visited > h6.hover, a.visited > h1.hover,
+a.visited > h2.hover,
+a.visited > h3.hover,
+a.visited > h4.hover,
+a.visited > h5.hover,
+a.visited > h6.hover, a.hover:visited, a.hover.visited {
+  color: var(--link-visited-hover-text-color, inherit);
+}
+
+a {
+  background-color: var(--link-background-color);
+  color: var(--link-text-color, inherit);
+  cursor: pointer;
+  white-space: break-spaces;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  /* states */
+}
+a > h1,
+a > h2,
+a > h3,
+a > h4,
+a > h5,
+a > h6 {
+  color: var(--link-text-color, inherit);
+}
+a:hover, a.hover {
+  color: var(--link-hover-text-color, inherit);
+}
+a:active, a.active {
+  outline: 1px dotted #ccc;
+  outline-offset: 0.25rem;
+  /* Adding some spacing between the content and the outline */
+  z-index: 1;
+  /* Laying the focussed area on top of any follow up messages */
+}
+/*----------------------------------------------------------------------------------*/
+/*----------------------- text/nota-bene-p-variables.scss --------------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  --nota-bene-line-height: var(--application-base-line-height);
+  --nota-bene-font-size: 0.8rem;
+  /* --nota-bene-font-weight: ; */
+  --nota-bene-text-color: #000;
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------- text/nota-bene.scss ---------------------*/
+/*---------------------------------------------------------------*/
+.nota-bene {
+  margin: 0;
+  line-height: var(--nota-bene-line-height, inherit);
+  font-size: var(--nota-bene-font-size, inherit);
+  font-weight: var(--nota-bene-font-weight, inherit);
+  color: var(--nota-bene-text-color, inherit);
+  background-color: var(--nota-bene-background-color, transparent);
+}
+
+/*------------------------------------------------------------------------*/
+/*------------- components/horizontal-view-variables.scss ----------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --horizontal-view-gap: 1rem;
+  --horizontal-view-justify-content: flex-start;
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*-------------------- horizontal-view.scss ---------------------*/
+/*---------------------------------------------------------------*/
+.horizontal-view-group > div,
+.horizontal-view {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: var(--horizontal-view-justify-content);
+  flex-wrap: wrap;
+  gap: var(--horizontal-view-gap);
+}
+@media (min-width: 50rem) {
+  .horizontal-view-group > div,
+.horizontal-view {
+    flex-wrap: nowrap;
+  }
+}
+
+/*---------------------------------------------------------------*/
+/*------------- components/horizontal-scroll.scss ----------------*/
+/*---------------------------------------------------------------*/
+.horizontal-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/*---------------------------------------------------------------*/
+/*--------------- components/centered-view.scss -----------------*/
+/*---------------------------------------------------------------*/
+.centered-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- components/focus-only.scss ------------------*/
+/*---------------------------------------------------------------*/
+*.focus-only,
+*.button.focus-only {
+  transform: scale(1, 1);
+  font-size: inherit;
+  padding: inherit;
+}
+*.focus-only:not(:focus),
+*.button.focus-only:not(:focus) {
+  transform: scale(1, 0);
+  font-size: 0;
+  padding: 0;
+  min-height: 0;
+}
+
+/*---------------------------------------------------------------*/
+/*------------------------- nowrap.scss -------------------------*/
+/*---------------------------------------------------------------*/
+.nowrap {
+  white-space: nowrap;
+}
+.nowrap a {
+  white-space: nowrap;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- layout-base-variables.scss ------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --layout-block-gap: 3rem;
+  --layout-base-max-width: 80rem;
+  --layout-base-padding-top: 2rem;
+  --layout-base-padding-right: 3%;
+  --layout-base-padding-bottom: 2rem;
+  --layout-base-padding-left: 3%;
+  /* Within content blocks */
+  --layout-base-content-block-gap: 1.5rem;
+  /* To set additional padding on the page  	*/
+  /* Which is usually set larger than between */
+  /* content blocks 							*/
+  --layout-base-main-padding-top: 5rem;
+  -layout-base-main-padding-top: 5rem;
+}
+
+/*---------------------------------------------------------------*/
+/*--------- layout-header-content-block-variables.scss ----------*/
+/*---------------------------------------------------------------*/
+:root {
+  --layout-header-content-block-gap: 0;
+  --layout-header-content-block-padding-top: 0;
+  --layout-header-content-block-padding-right: var(--layout-base-padding-right);
+  --layout-header-content-block-padding-bottom: 0;
+  --layout-header-content-block-padding-left: var(--layout-base-padding-left);
+  --layout-header-content-block-max-width: var(--layout-base-max-width);
+}
+
+/*---------------------------------------------------------------*/
+/*--------------- layout-header-content-block.scss --------------*/
+/*---------------------------------------------------------------*/
+body > header {
+  display: flex;
+  flex-direction: column;
+}
+body > header > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--layout-header-content-block-gap);
+  padding-top: var(--layout-header-content-block-padding-top);
+  padding-right: var(--layout-header-content-block-padding-right);
+  padding-bottom: var(--layout-header-content-block-padding-bottom);
+  padding-left: var(--layout-header-content-block-padding-left);
+  box-sizing: border-box;
+  width: 100%;
+  align-self: center;
+  max-width: var(--layout-header-content-block-max-width);
+}
+
+/*--------------------------------------------------------------*/
+/*----- layout-header-content-block-grouped-variables.scss -----*/
+/*--------------------------------------------------------------*/
+:root {
+  --layout-header-content-block-grouped-justify-content: space-between;
+  --layout-header-content-block-grouped-align-items: center;
+  --layout-header-content-block-grouped-gap: 1.5rem;
+}
+
+/*---------------------------------------------------------------*/
+/*--------- layout-header-content-block-grouped.scss ------------*/
+/*---------------------------------------------------------------*/
+body > header > div > div {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: var(--layout-header-content-block-grouped-justify-content);
+  align-items: var(--layout-header-content-block-grouped-align-items);
+  gap: var(--layout-header-content-block-grouped-gap);
+}
+body > header > div > div ul,
+body > header > div > div ol {
+  gap: var(--layout-header-content-block-grouped-gap);
+}
+
+/*------------------------------------------------------------------------*/
+/*--------------- layout-main-content-block-variables.scss ---------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --layout-main-gap: var(--layout-block-gap);
+  /* Content blocks */
+  --layout-main-content-block-gap: 1.5rem;
+  --layout-main-content-block-padding-top: var(--layout-base-padding-top);
+  --layout-main-content-block-padding-right: var(--layout-base-padding-right);
+  --layout-main-content-block-padding-bottom: var(--layout-base-padding-bottom);
+  --layout-main-content-block-padding-left: var(--layout-base-padding-left);
+  --layout-main-content-block-max-width: var(--layout-base-max-width);
+  /* First element */
+  --layout-main-content-block-first-padding-top: 5rem;
+  /* Last element */
+  --layout-main-content-block-last-padding-bottom: 5rem;
+}
+
+/*---------------------------------------------------------------*/
+/*---------------- layout-main-content-block.scss ---------------*/
+/*---------------------------------------------------------------*/
+body > main {
+  gap: var(--layout-main-gap);
+}
+body > main > section,
+body > main > article,
+body > main > div {
+  display: flex;
+  flex-direction: column;
+}
+body > main > section > div,
+body > main > article > div,
+body > main > div > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-main-content-block-gap);
+  padding-top: var(--layout-main-content-block-padding-top);
+  padding-right: var(--layout-main-content-block-padding-right);
+  padding-bottom: var(--layout-main-content-block-padding-bottom);
+  padding-left: var(--layout-main-content-block-padding-left);
+  box-sizing: border-box;
+  width: 100%;
+  align-self: center;
+  max-width: var(--layout-main-content-block-max-width);
+}
+body > main > section > div > div,
+body > main > article > div > div,
+body > main > div > div > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-main-content-block-gap);
+}
+body > main > section:first-child,
+body > main > article:first-child,
+body > main > div:first-child {
+  padding-top: var(--layout-main-content-block-first-padding-top);
+  box-sizing: border-box;
+}
+body > main > section:last-child,
+body > main > article:last-child,
+body > main > div:last-child {
+  padding-bottom: var(--layout-main-content-block-last-padding-bottom);
+  box-sizing: border-box;
+}
+
+/*---------------------------------------------------------------*/
+/*--------- layout-footer-content-block-variables.scss ----------*/
+/*---------------------------------------------------------------*/
+:root {
+  --layout-footer-content-block-gap: var(--layout-block-gap);
+  --layout-footer-content-block-padding-top: var(--layout-base-padding-top);
+  --layout-footer-content-block-padding-right: var(--layout-base-padding-right);
+  --layout-footer-content-block-padding-bottom: var(--layout-base-padding-bottom);
+  --layout-footer-content-block-padding-left: var(--layout-base-padding-left);
+  --layout-footer-content-block-max-width: var(--layout-base-max-width);
+}
+
+/*---------------------------------------------------------------*/
+/*------------ layout-footer-content-block.scss -----------------*/
+/*---------------------------------------------------------------*/
+footer {
+  display: flex;
+  flex-direction: column;
+}
+footer > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--layout-footer-content-block-gap);
+  padding-top: var(--layout-footer-content-block-padding-top);
+  padding-right: var(--layout-footer-content-block-padding-right);
+  padding-bottom: var(--layout-footer-content-block-padding-bottom);
+  padding-left: var(--layout-footer-content-block-padding-left);
+  box-sizing: border-box;
+  width: 100%;
+  align-self: center;
+  max-width: var(--layout-footer-content-block-max-width);
+}
+
+/*------------------------------------------------------------------------*/
+/*---------- components/layout-authentication-variables.scss -------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --layout-authentication-max-width: 40rem;
+  --layout-authentication-padding: var(--layout-authentication-padding);
+  /* --layout-authentication-background-color: ; */
+  /* --layout-authentiaction-text-color: ; */
+  /* After breakpoint 1 */
+  --layout-authentication-breakpoint-1-padding: var(--layout-authentication-padding);
+  /* After breakpoint 2 */
+  --layout-authentication-breakpoint-2-padding: var(--layout-authentication-breakpoint-1-padding);
+}
+
+/* Breakpoints */
+/*---------------------------------------------------------------*/
+/*---------- components/layout-authentication.scss --------------*/
+/*---------------------------------------------------------------*/
+section.layout-authentication,
+article.layout-authentication,
+header nav.layout-authentication,
+footer.layout-authentication,
+div.layout-authentication,
+form.layout-authentication {
+  padding: var(--layout-authentication-padding);
+  max-width: var(--layout-authentication-max-width);
+  margin: 0 auto;
+  background-color: var(--layout-authentication-background-color);
+  color: var(--layout-authentication-text-color);
+}
+@media (min-width: 24rem) {
+  section.layout-authentication,
+article.layout-authentication,
+header nav.layout-authentication,
+footer.layout-authentication,
+div.layout-authentication,
+form.layout-authentication {
+    padding: var(--layout-authentication-breakpoint-1-padding);
+  }
+}
+@media (min-width: 42rem) {
+  section.layout-authentication,
+article.layout-authentication,
+header nav.layout-authentication,
+footer.layout-authentication,
+div.layout-authentication,
+form.layout-authentication {
+    padding: var(--layout-authentication-breakpoint-2-padding);
+  }
+}
+
+/*------------------------------------------------------------------------*/
+/*-------- components/layout-one-third-two-thirds-variables.scss ---------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --layout-one-third-two-thirds-gap: var(--layout-base-content-block-gap);
+  --layout-one-third-two-thirds-breakpoint-1-gap: var(--layout-one-third-two-thirds-gap);
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*-------- components/layout-one-third-two-thirds.scss ----------*/
+/*---------------------------------------------------------------*/
+div.one-third-two-thirds,
+section.one-third-two-thirds,
+article.one-third-two-thirds,
+header nav.one-third-two-thirds,
+footer.one-third-two-thirds {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: var(--layout-one-third-two-thirds-gap);
+}
+div.one-third-two-thirds > *:first-child,
+section.one-third-two-thirds > *:first-child,
+article.one-third-two-thirds > *:first-child,
+header nav.one-third-two-thirds > *:first-child,
+footer.one-third-two-thirds > *:first-child {
+  width: 100%;
+}
+@media (min-width: 42rem) {
+  div.one-third-two-thirds,
+section.one-third-two-thirds,
+article.one-third-two-thirds,
+header nav.one-third-two-thirds,
+footer.one-third-two-thirds {
+    gap: var(--layout-one-third-two-thirds-breakpoint-1-gap);
+  }
+  div.one-third-two-thirds > *,
+section.one-third-two-thirds > *,
+article.one-third-two-thirds > *,
+header nav.one-third-two-thirds > *,
+footer.one-third-two-thirds > * {
+    width: 66.66%;
+  }
+  div.one-third-two-thirds > *:nth-child(odd),
+section.one-third-two-thirds > *:nth-child(odd),
+article.one-third-two-thirds > *:nth-child(odd),
+header nav.one-third-two-thirds > *:nth-child(odd),
+footer.one-third-two-thirds > *:nth-child(odd) {
+    width: calc(33.33% - var(--layout-one-third-two-thirds-gap));
+  }
+}
+
+/*------------------------------------------------------------------------*/
+/*-------- components/layout-one-third-two-thirds-variables.scss ---------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --layout-two-thirds-one-third-gap: var(--layout-base-content-block-gap);
+  --layout-two-thirds-one-third-breakpoint-1-gap: var(--layout-two-thirds-one-third-gap);
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*-------- components/layout-two-thirds-one-third.scss ----------*/
+/*---------------------------------------------------------------*/
+div.two-thirds-one-third,
+section.two-thirds-one-third,
+article.two-thirds-one-third,
+header nav.two-thirds-one-third,
+footer.two-thirds-one-third {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: var(--layout-two-thirds-one-third-gap);
+}
+div.two-thirds-one-third > *,
+section.two-thirds-one-third > *,
+article.two-thirds-one-third > *,
+header nav.two-thirds-one-third > *,
+footer.two-thirds-one-third > * {
+  width: 100%;
+}
+@media (min-width: 42rem) {
+  div.two-thirds-one-third,
+section.two-thirds-one-third,
+article.two-thirds-one-third,
+header nav.two-thirds-one-third,
+footer.two-thirds-one-third {
+    gap: var(--layout-two-thirds-one-third-breakpoint-1-gap);
+  }
+  div.two-thirds-one-third > *,
+section.two-thirds-one-third > *,
+article.two-thirds-one-third > *,
+header nav.two-thirds-one-third > *,
+footer.two-thirds-one-third > * {
+    width: 33.33%;
+  }
+  div.two-thirds-one-third > *:nth-child(odd),
+section.two-thirds-one-third > *:nth-child(odd),
+article.two-thirds-one-third > *:nth-child(odd),
+header nav.two-thirds-one-third > *:nth-child(odd),
+footer.two-thirds-one-third > *:nth-child(odd) {
+    width: calc(66.66% - var(--layout-two-thirds-one-third-gap));
+  }
+}
+
+/*------------------------------------------------------------------------*/
+/*-------------------- components/layout-fifty-fifty-variables.scss -------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --layout-fifty-fifty-gap: var(--layout-base-content-block-gap);
+  --layout-fifty-fifty-breakpoint-1-gap: var(--layout-fifty-fifty-gap);
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*---------------- components/layout-fifty-fifty.scss ------------------*/
+/*---------------------------------------------------------------*/
+section.fifty-fifty,
+article.fifty-fifty,
+header nav.fifty-fifty,
+footer.fifty-fifty,
+div.fifty-fifty {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: var(--layout-fifty-fifty-gap);
+  box-sizing: border-box;
+}
+section.fifty-fifty > *,
+article.fifty-fifty > *,
+header nav.fifty-fifty > *,
+footer.fifty-fifty > *,
+div.fifty-fifty > * {
+  width: 100%;
+}
+@media (min-width: 42rem) {
+  section.fifty-fifty,
+article.fifty-fifty,
+header nav.fifty-fifty,
+footer.fifty-fifty,
+div.fifty-fifty {
+    gap: var(--layout-fifty-fifty-breakpoint-1-gap, var(--layout-fifty-fifty-gap));
+  }
+  section.fifty-fifty > *,
+article.fifty-fifty > *,
+header nav.fifty-fifty > *,
+footer.fifty-fifty > *,
+div.fifty-fifty > * {
+    flex-grow: 1;
+    max-width: calc(50% - var(--layout-fifty-fifty-gap));
+  }
+}
+
+/*---------------------------------------------------------------*/
+/*--------- components/layout-column-2-variables.scss -----------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* --layout-column-2-gap: ; */
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*------------- components/layout-column-2.scss -----------------*/
+/*---------------------------------------------------------------*/
+.column-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 42rem) {
+  .column-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+/*---------------------------------------------------------------*/
+/*--------- components/layout-column-3-variables.scss -----------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* --layout-column-3-gap: ; */
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*------------- components/layout-column-3.scss -----------------*/
+/*---------------------------------------------------------------*/
+.column-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 42rem) {
+  .column-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (min-width: 60rem) {
+  .column-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+/*---------------------------------------------------------------*/
+/*--------- components/layout-column-4-variables.scss -----------*/
+/*---------------------------------------------------------------*/
+:root {
+  --layout-column-4-gap: var(--layout-base-content-block-gap) 1rem;
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*------------ comoponents/layout-column-4.scss -----------------*/
+/*---------------------------------------------------------------*/
+.column-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--layout-column-4-gap);
+}
+
+@media (min-width: 42rem) {
+  .column-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (min-width: 60rem) {
+  .column-4 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+@media (min-width: 70rem) {
+  .column-4 {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+/*---------------------------------------------------------------*/
+/*--------- components/layout-centered-variables.scss -----------*/
+/*---------------------------------------------------------------*/
+/*---------------------------------------------------------------*/
+/*------------- components/layout-centered.scss -----------------*/
+/*---------------------------------------------------------------*/
+.centered {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.centered > div,
+.centered > section,
+.centered > article {
+  width: auto;
+}
+
+/*--------------------------------------------------------------*/
+/*-------------------- header-variables.scss -------------------*/
+/*--------------------------------------------------------------*/
+:root {
+  --header-background-color: var(--application-base-accent-color);
+  --header-text-color: var(--application-base-accent-color-text-color);
+  /* --header-min-height: ; */
+  /* Header title */
+  --header-title-font-size: var(--headings-base-h1-font-size);
+  /* --header-title-text-color: ; */
+  /* --header-title-font-weight: ; */
+  /* Header subtitle */
+  --header-subtitle-font-size: var(--headings-base-h2-font-size);
+  /* --header-subtitle-text-color: ; */
+  /* --header-subtitle-font-weight: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*------------------------ header.scss --------------------------*/
+/*---------------------------------------------------------------*/
+body > header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: var(--header-min-height);
+  background-color: var(--header-background-color);
+  color: var(--header-text-color);
+  box-sizing: border-box;
+}
+body > header > div {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+body > header > section {
+  width: 100%;
+}
+body > header > section > div {
+  padding: 0;
+}
+body > header a,
+body > header a:visited {
+  color: inherit;
+}
+body > header h1 {
+  font-size: var(--header-title-font-size);
+  color: var(--header-title-text-color);
+  font-weight: var(--header-title-font-weight);
+}
+body > header h1 > a {
+  font-size: inherit;
+  color: inherit;
+  font-weight: inherit;
+}
+
+/*------------------------------------------------------------------------*/
+/*-------------------------- main-variables.scss -------------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --main-justify-content: flex-start;
+  /* --main-align-items: ; */
+  /* --main-padding-top: ; */
+  /* --main-padding-bottom: ; */
+  /* --main-background-color: ; */
+  /* --main-text-color: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------------- main.scss -------------------------*/
+/*---------------------------------------------------------------*/
+body > main {
+  display: flex;
+  justify-content: var(--main-justify-content);
+  align-items: var(--main-align-items);
+  padding-top: var(--main-padding-top);
+  padding-bottom: var(--main-padding-bottom);
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background-color: var(--main-background-color);
+  color: var(--main-text-color);
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- navigation-variables.scss -------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Navigation layout */
+  --navigation-gap: 1rem;
+  --navigation-align-content: flex-start;
+  /* --navigation-min-height: ; */
+  --navigation-width: 100%;
+  --navigation-max-width: 100%;
+  --navigation-padding-top: 1rem;
+  --navigation-padding-right: var(--layout-base-padding-right);
+  --navigation-padding-bottom: 1rem;
+  --navigation-padding-left: var(--layout-base-padding-left);
+  --navigation-margin: 0;
+  /* --navigation-background-color: var(--application-base-accent-color); */
+  /* --navigation-text-color: var(--application-base-accent-color-text-color); */
+  /* Content block - Usualy a div to match main content alignment */
+  --navigation-content-block-padding-top: var(--layout-base-content-block-padding-top);
+  --navigation-content-block-padding-right: var(--layout-base-content-block-padding-right);
+  --navigation-content-block-padding-bottom: var(--layout-base-content-block-padding-bottom);
+  --navigation-content-block-padding-left: var(--layout-base-content-block-padding-left);
+  --navigation-content-block-max-width: var(--layout-base-content-block-max-width);
+  /* List */
+  --navigation-list-gap: var(--navigation-gap);
+  --navigation-list-justify-content: flex-end;
+  /* List item */
+  /* --navigation-list-item-justify-content: center; */
+  /* --navigation-breadcrumbs-list-item-gap */
+  /* Link */
+  --navigation-link-text-decoration: none;
+  /* Link hover */
+  --navigation-link-hover-text-decoration: none;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- components/navigation.scss ------------------*/
+/*---------------------------------------------------------------*/
+body > header {
+  width: 100%;
+  box-sizing: border-box;
+}
+body > header nav {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: var(--navigation-align-content);
+  width: var(--navigation-width);
+  max-width: var(--navigation-max-width);
+  margin: var(--navigation-margin);
+  min-height: var(--navigation-min-height);
+  gap: var(--navigation-gap);
+  box-sizing: border-box;
+  background-color: var(--navigation-background-color);
+  padding-top: var(--navigation-padding-top);
+  padding-right: var(--navigation-padding-right);
+  padding-bottom: var(--navigation-padding-bottom);
+  padding-left: var(--navigation-padding-left);
+}
+body > header nav > div {
+  align-items: var(--navigation-align-content);
+  max-width: var(--navigation-content-block-max-width);
+  padding-top: var(--navigation-content-block-padding-top);
+  padding-right: var(--navigation-content-block-padding-right);
+  padding-bottom: var(--navigation-content-block-padding-bottom);
+  padding-left: var(--navigation-content-block-padding-left);
+}
+body > header nav ul,
+body > header nav ol {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 0;
+  gap: var(--navigation-list-gap, 0.5rem);
+  color: var(--navigation-text-color);
+  justify-content: var(--navigation-list-justify-content);
+  width: 100%;
+}
+body > header nav ul li,
+body > header nav ol li {
+  display: flex;
+  color: inherit;
+  list-style: none;
+  justify-content: var(--navigation-list-item-justify-content);
+}
+body > header nav ul li a,
+body > header nav ul li a:visited,
+body > header nav ol li a,
+body > header nav ol li a:visited {
+  color: inherit;
+  text-decoration: var(--navigation-link-text-decoration);
+}
+body > header nav ul li a:hover,
+body > header nav ul li a:visited:hover,
+body > header nav ol li a:hover,
+body > header nav ol li a:visited:hover {
+  text-decoration: var(--navigation-link-hover-text-decoration);
+  color: inherit;
+}
+
+/*------------------------------------------------------------------------*/
+/*--------------------- components/section-variables.scss ----------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --section-align-items: var(--layout-base-content-block-align-items);
+  --section-gap: 1.5rem;
+  /* --section-background-color: ; */
+  /* --section-text-color: ; */
+  /* Section title */
+  --section-title-margin: var(--layout-base-content-block-title-margin);
+  /* Section subtitle */
+  --section-subtitle-margin: var(--layout-base-content-block-subtitle-margin);
+  /* Content block within sections */
+  --section-content-block-gap: var(--section-gap);
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------- components/section.scss ------------------*/
+/*---------------------------------------------------------------*/
+main section {
+  display: flex;
+  flex-direction: column;
+  align-items: var(--section-align-items);
+  gap: var(--section-gap);
+  background-color: var(--section-background-color);
+  color: var(--section-text-color, inherit);
+  width: 100%;
+  box-sizing: border-box;
+}
+main section > div {
+  display: flex;
+  flex-direction: column;
+  align-items: var(--section-content-block-align-items);
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  gap: var(--section-content-block-gap);
+}
+main section > div h1 {
+  margin: var(--section-title-margin);
+}
+main section > div h2 {
+  margin: var(--section-subtitle-margin);
+}
+main section h1 {
+  margin: var(--section-title-margin);
+}
+main section h2 {
+  margin: var(--section-subtitle-margin);
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- footer-variables.scss ---------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* --footer-min-height: ; */
+  --footer-justify-content: center;
+  --footer-min-height: 15rem;
+  --footer-background-color: var(--application-base-accent-color);
+  --footer-text-color: #fff;
+  /* Links */
+  /* --footer-link-text-color: ; */
+  --footer-link-text-decoration: none;
+  /* Links hover */
+  --footer-link-hover-text-color: var(--footer-link-text-color);
+  --footer-link-hover-text-decoration: underline;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------------- footer.scss ---------------------------*/
+/*---------------------------------------------------------------*/
+body > footer {
+  display: flex;
+  justify-content: var(--footer-justify-content);
+  align-items: center;
+  min-height: var(--footer-min-height);
+  width: 100%;
+  background-color: var(--footer-background-color);
+  color: var(--footer-text-color);
+}
+body > footer a,
+body > footer a:visited {
+  color: var(--footer-link-text-color, inherit);
+  text-decoration: var(--footer-link-text-decoration);
+}
+body > footer a:before, body > footer a:hover,
+body > footer a:visited:before,
+body > footer a:visited:hover {
+  color: var(--footer-link-hover-text-color);
+}
+body > footer a:hover,
+body > footer a:visited:hover {
+  text-decoration: var(--footer-link-hover-text-decoration);
+}
+
+/*---------------------------------------------------------------*/
+/*------------------ footer-list-variables.scss -----------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* List */
+  --footer-list-gap: 0.5rem;
+  --footer-list-padding: 2rem 0 0 0;
+  --footer-list-flex-direction: column;
+  --footer-list-flex-wrap: wrap;
+  --footer-list-align-items: flex-start;
+  --footer-list-justify-content: flex-start;
+  /* List items */
+  --footer-list-item-list-style: none;
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------- footer-list.scss -------------------------*/
+/*---------------------------------------------------------------*/
+body > footer ul {
+  display: flex;
+  flex-direction: var(--footer-list-flex-direction);
+  align-items: var(--footer-list-align-items);
+  justify-content: var(--footer-list-justify-content);
+  flex-wrap: var(--footer-list-flex-wrap);
+  padding: var(--footer-list-padding);
+  gap: var(--footer-list-gap);
+  line-height: var(--footer-list-line-height, inherit);
+  font-size: var(--footer-list-font-size, inherit);
+  font-weight: var(--footer-list-font-weight, inherit);
+  color: var(--footer-list-text-color, inherit);
+}
+body > footer ul li {
+  list-style: var(--footer-list-item-list-style);
+  line-height: var(--footer-list-line-height, inherit);
+  font-size: var(--footer-list-font-size, inherit);
+  font-weight: var(--footer-list-font-weight, inherit);
+  color: var(--footer-list-text-color, inherit);
+}
+
+/*---------------------------------------------------------------*/
+/*--------- breadcrumb-bar-content-block-variables.scss ---------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Bar */
+  --breadcrumb-bar-background-color:
+  	var(--application-base-tint-1-background-color,
+  	var(--application-base-background-color));
+  --breadcrumb-bar-text-color:
+  	var(--application-base-tint-1-text-color,
+  	var(--application-base-text-color));
+  /* Bar content */
+  --breadcrumb-bar-content-block-padding-top: 1rem;
+  --breadcrumb-bar-content-block-padding-right: 3%;
+  --breadcrumb-bar-content-block-padding-bottom: 1rem;
+  --breadcrumb-bar-content-block-padding-left: 3%;
+  --breadcrumb-bar-content-block-gap: 1rem;
+  --layout-header-content-block-max-width: 80rem;
+  /* List */
+  --breadcrumb-bar-content-block-list-vertical-align: center;
+  --breadcrumb-bar-content-block-list-padding: 0;
+  --breadcrumb-bar-content-block-list-gap: 1rem;
+  /* List item */
+  --breadcrumb-bar-icon-font-family: var(--icon-base-font-family);
+  --breadcrumb-bar-content-block-list-item-gap: 1rem;
+  /* Icon */
+  --breadcrumb-bar-content-block-icon: "";
+  /* --breadcrumb-bar-content-block-icon-margin-left: ; */
+  /* --breadcrumb-bar-content-block-icon-margin-right: ; */
+  /* Last item */
+  --breadcrumb-bar-content-block-list-item-last-child-font-weight: bold;
+  /* Link */
+  --breadcrumb-bar-content-block-link-text-decoration: none;
+  /* Link hover */
+  --breadcrumb-bar-content-block-link-hover-text-decoration: none;
+}
+
+/*---------------------------------------------------------------*/
+/*------------- breadcrumb-bar-content-block.scss ---------------*/
+/*---------------------------------------------------------------*/
+.breadcrumb-bar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--breadcrumb-bar-background-color);
+  color: var(--breadcrumb-bar-text-color);
+  padding: 0;
+}
+.breadcrumb-bar > div {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding-top: var(--breadcrumb-bar-content-block-padding-top);
+  padding-right: var(--breadcrumb-bar-content-block-padding-right);
+  padding-bottom: var(--breadcrumb-bar-content-block-padding-bottom);
+  padding-left: var(--breadcrumb-bar-content-block-padding-left);
+  gap: var(--breadcrumb-bar-content-block-gap);
+  box-sizing: border-box;
+  align-self: center;
+  max-width: var(--layout-header-content-block-max-width);
+}
+.breadcrumb-bar > div ul,
+.breadcrumb-bar > div ol {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: var(--breadcrumb-bar-content-block-justify-content);
+  align-items: var(--breadcrumb-bar-content-block-list-vertical-align);
+  padding: var(--breadcrumb-bar-content-block-list-padding);
+  gap: var(--breadcrumb-bar-content-block-list-gap);
+  color: inherit;
+}
+.breadcrumb-bar > div ul li,
+.breadcrumb-bar > div ol li {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  list-style: none;
+  gap: var(--breadcrumb-bar-content-block-list-item-gap);
+}
+.breadcrumb-bar > div ul li:after,
+.breadcrumb-bar > div ol li:after {
+  font-family: var(--breadcrumb-bar-icon-font-family);
+  content: var(--breadcrumb-bar-content-block-icon);
+  margin-left: var(--breadcrumb-bar-content-block-icon-margin-left);
+  margin-right: var(--breadcrumb-bar-content-block-icon-margin-right);
+}
+.breadcrumb-bar > div ul li:hover,
+.breadcrumb-bar > div ol li:hover {
+  color: var(--breadcrumb-bar-content-block-hover-text-color);
+}
+.breadcrumb-bar > div ul li:hover:after,
+.breadcrumb-bar > div ol li:hover:after {
+  color: var(--breadcrumb-bar-content-block-text-color);
+}
+.breadcrumb-bar > div ul li:last-child,
+.breadcrumb-bar > div ol li:last-child {
+  font-weight: var(--breadcrumb-bar-content-block-list-item-last-child-font-weight);
+}
+.breadcrumb-bar > div ul li:last-child:after,
+.breadcrumb-bar > div ol li:last-child:after {
+  content: none;
+}
+.breadcrumb-bar > div ul li a,
+.breadcrumb-bar > div ol li a {
+  word-break: break-word;
+  /* Break words that won't fit the available space */
+  color: inherit;
+  text-decoration: var(--breadcrumb-bar-content-block-link-text-decoration);
+}
+.breadcrumb-bar > div ul li a:hover,
+.breadcrumb-bar > div ol li a:hover {
+  text-decoration: var(--breadcrumb-bar-content-block-link-hover-text-decoration);
+}
+.breadcrumb-bar > div ul li a:before,
+.breadcrumb-bar > div ol li a:before {
+  content: none;
+}
+
+/*--------------------------------------------------------------------*/
+/*- components/navigation/navigation-collapsible-menu-variables.scss -*/
+/*--------------------------------------------------------------------*/
+:root {
+  /* Navigation */
+  /* List */
+  /* List collapsed */
+  --navigation-collapsible-menu-list-collapsed-background-color: var(--application-base-accent-color-tint-2);
+  --navigation-collapsible-menu-list-collapsed-text-color: var(--application-base-accent-color-tint-2-text-color);
+  /* List item collapsed */
+  /* --navigation-collapsible-menu-list-item-collapsed-border-width: ; */
+  /* --navigation-collapsible-menu-list-item-collapsed-border-style: ; */
+  /* --navigation-collapsible-menu-list-item-collapsed-border-color: ; */
+  /* --navigation-collapsible-menu-list-item-collapsed-background-color: ; */
+  /* List item collapsed hover */
+  --navigation-collapsible-menu-list-item-collapsed-hover-background-color: var(--application-base-accent-color-tint-1);
+  --navigation-collapsible-menu-list-item-collapsed-hover-text-color: var(--application-base-accent-color-tint-1-text-color);
+  --navigation-collapsible-menu-list-item-collapsed-hover-background-color: #14131a;
+  /* Last list item border */
+  /* --navigation-collapsible-menu-list-item-last-child-collapsed-border-width: ; */
+  /* --navigation-collapsible-menu-list-item-last-child-collapsed-border-style: ; */
+  /* --navigation-collapsible-menu-list-item-last-child-collapsed-border-color: ; */
+  /* List item collapsed */
+  --navigation-collapsible-menu-list-item-collapsed-padding: 0.5rem 1rem;
+  --navigation-collapsible-menu-list-item-hover-background-color: var(--application-base-accent-color-tint-1);
+  --navigation-collapsible-menu-list-item-hover-text-color: var(--application-base-accent-color-tint-1-text-color);
+  /* Button */
+  --navigation-collapsible-menu-button-background-color: transparent;
+  /*--navigation-collapsible-menu-button-font-size: ; */
+  --navigation-collapsible-menu-button-height: var(--font-size-text-line-height, 1.5rem);
+  --navigation-collapsible-menu-button-min-height: var(--navigation-base-min-height);
+  --navigation-collapsible-menu-button-min-width: 2.75rem;
+  /* Icon */
+  --navigation-collapsible-menu-icon: "≡";
+  --navigation-collapsible-menu-icon-font-size: 1.5rem;
+  --navigation-collapsible-menu-icon-color: var(--application-base-accent-color-text-color);
+  /*--navigation-collapsible-menu-icon-font-size: ; */
+  /* Collapsed icon */
+  --navigation-collapsible-menu-icon-collapsed: "x";
+  --navigation-collapsible-menu-icon-collapsed-text-color: inherit;
+  /*--navigation-collapsible-menu-icon-collapsed-font-size: ; */
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*---- components/navigation/navigation-collapsible-menu.scss ---*/
+/*---------------------------------------------------------------*/
+.collapsible-menu {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding: 0;
+  /* Menu below breakpoint */
+}
+.collapsible-menu ul,
+.collapsible-menu ol {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin: 0;
+  padding: 0;
+  gap: var(--navigation-collapsible-menu-list-collapsed-gap);
+  background-color: var(--navigation-collapsible-menu-list-collapsed-background-color);
+  order: 2;
+}
+.collapsible-menu ul li,
+.collapsible-menu ol li {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: var(--navigation-collapsible-menu-list-collapsed-text-color);
+  border-width: var(--navigation-collapsible-menu-list-item-collapsed-border-width);
+  border-style: var(--navigation-collapsible-menu-list-item-collapsed-border-style);
+  border-color: var(--navigation-collapsible-menu-list-item-collapsed-border-color);
+  color: var(--navigation-collapsible-menu-list-collapsed-text-color);
+  background-color: var(--navigation-collapsible-menu-list-item-collapsed-background-color);
+}
+.collapsible-menu ul li:last-child,
+.collapsible-menu ol li:last-child {
+  border-width: var(--navigation-collapsible-menu-list-item-last-child-collapsed-border-width, var(--navigation-collapsible-menu-list-item-collapsed-border-width));
+  border-style: var(--navigation-collapsible-menu-list-item-last-child-collapsed-border-style, var(--navigation-collapsible-menu-list-item-collapsed-border-style));
+  border-color: var(--navigation-collapsible-menu-list-item-last-child-collapsed-border-color, var(--navigation-collapsible-menu-list-item-collapsed-border-color));
+}
+.collapsible-menu ul li:hover,
+.collapsible-menu ol li:hover {
+  background-color: var(--navigation-collapsible-menu-list-item-collapsed-hover-background-color);
+  color: var(--navigation-collapsible-menu-list-item-hover-text-color);
+}
+.collapsible-menu ul li [aria-current],
+.collapsible-menu ol li [aria-current] {
+  background-color: var(--navigation-collapsible-menu-list-item-hover-background-color);
+  color: var(--navigation-collapsible-menu-list-item-hover-text-color);
+}
+.collapsible-menu ul li a,
+.collapsible-menu ol li a {
+  width: 100%;
+  max-width: 100%;
+  padding: var(--navigation-collapsible-menu-list-item-collapsed-padding);
+  box-sizing: border-box;
+  text-decoration: var(--navigation-collapsible-link-text-decoration);
+}
+.collapsible-menu ul li a:hover,
+.collapsible-menu ol li a:hover {
+  color: var(--navigation-collapsible-menu-list-item-hover-text-color);
+}
+.collapsible-menu button.menu_toggle {
+  display: flex;
+}
+.collapsible-menu button.menu_toggle[aria-expanded=false] + ul, .collapsible-menu button.menu_toggle[aria-expanded=false] + ol {
+  display: none;
+}
+
+/* collapsible menu button.
+/* This button is only visisble when javascript is loaded. */
+/* Do not add the button to the html manually, JS will do this. */
+/* When JS isn't available the menu will be opened by default for accessibility. */
+button.menu_toggle {
+  display: flex;
+  order: 1;
+  margin-left: auto;
+  border: 0;
+  background-color: var(--navigation-collapsible-menu-button-background-color);
+  color: var(--navigation-collapsible-menu-icon-color);
+  font-size: var(--navigation-collapsible-menu-button-font-size, 0);
+  height: var(--navigation-collapsible-menu-button-height);
+  height: 100%;
+  min-height: var(--navigation-collapsible-menu-button-min-height);
+  min-width: var(--navigation-collapsible-menu-button-min-width);
+  /* JS menu collapsed behaviour */
+}
+button.menu_toggle:after {
+  content: var(--navigation-collapsible-menu-icon);
+  font-size: var(--navigation-collapsible-menu-icon-font-size);
+}
+button.menu_toggle[aria-expanded=true]:after {
+  content: var(--navigation-collapsible-menu-icon-collapsed);
+  color: var(--navigation-collapsible-menu-icon-collapsed-text-color);
+}
+button.menu_toggle[aria-expanded=false] + ul, button.menu_toggle[aria-expanded=false] + ol {
+  display: none;
+}
+
+/* Above breakpoint */
+body > header nav {
+  padding: var(--navigation-base-padding, 0 0.5rem);
+}
+body > header nav > div {
+  display: flex;
+}
+body > header nav ul {
+  background-color: transparent;
+  flex-direction: row;
+  align-items: flex-start;
+}
+body > header nav ul li {
+  display: flex;
+  justify-content: center;
+  height: auto;
+  box-sizing: border-box;
+  background-color: var(--navigation-collapsible-menu-list-item-background-color);
+  color: var(--navigation-collapsible-menu-list-item-text-color);
+  border: 0;
+}
+body > header nav ul li:hover {
+  background-color: var(--navigation-collapsible-menu-list-item-background-color-hover);
+  color: var(--navigation-collapsible-menu-list-item-hover-text-color);
+  border-color: var(--application-base-accent-color-tint-1);
+}
+body > header nav ul li a {
+  padding: var(--navigation-collapsible-menu-list-item-link-padding);
+}
+body > header nav ul li:last-child {
+  border: inherit;
+}
+body > header nav button.menu_toggle {
+  display: none;
+}
+body > header nav button.menu_toggle[aria-expanded=false] + ul, body > header nav button.menu_toggle[aria-expanded=false] + ol {
+  display: flex;
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- accordion-variables.scss ------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Item list */
+  --accordion-gap: 0.5rem;
+  /* Space between accordion items */
+  /* Button */
+  --accordion-button-padding: 0 1rem;
+  --accordion-button-justify-content: flex-start;
+  /*  --accordion-button-font-size: ; */
+  /* --accordion-button-font-weight: ; */
+  /* --accordion-button-line-height: ; */
+  --accordion-button-background-color: var(--button-base-background-color);
+  --accordion-button-text-color: var(--button-base-text-color);
+  /* Button icon */
+  /* Side menu button before */
+  --accordion-button-icon-before-font-size: 1rem;
+  /* --accordion-button-icon-before-font-weight: ; */
+  /* --accordion-button-icon-before-white-space: ; */
+  --accordion-button-icon-after-font-size: 1rem;
+  /* --accordion-button-icon-after-font-weight: ; */
+  /* --accordion-button-icon-after-white-space: ; */
+  /* add content within "", this could be text or a unicode for an icon*/
+  /* Choose before or after */
+  --accordion-button-icon-font-family: var(--icon-base-font-family);
+  /* content on the button when the menu is collapsed */
+  --accordion-button-icon-after-open-content: "";
+  /* content on the button when the menu is expanded */
+  /* --accordion-button-icon-before-close-content: "^"; */
+  --accordion-button-icon-after-close-content: "";
+  --accordion-button-icon-after-margin-left: auto;
+  /* Content */
+  --accordion-content-padding: 2rem 1rem;
+  --accordion-content-gap: 1.5rem;
+  /* --accordion-content-font-size: ; */
+  /* --accordion-content-font-weight: ; */
+  /* --accordion-content-line-height: ; */
+  --accordion-content-border-width: 1px;
+  --accordion-content-border-style: solid;
+  --accordion-content-border-color: #ccc;
+  --accordion-content-background-color: #f3f3f3;
+  --accordion-content-text-color: #000;
+}
+
+/*---------------------------------------------------------------*/
+/*---------------- components/accordion.scss --------------------*/
+/*---------------------------------------------------------------*/
+.accordion, ul.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--accordion-gap);
+}
+
+.accordion > div > button, ul.accordion > li > button {
+  width: 100%;
+  padding: var(--accordion-button-padding);
+  font-size: var(--accordion-font-size, inherit);
+  justify-content: var(--accordion-button-justify-content);
+  text-decoration: none;
+  line-height: var(--accordion-button-line-height, inherit);
+  color: var(--accordion-button-text-color, inherit);
+  background-color: var(--accordion-button-background-color, inherit);
+}
+
+.accordion > div > div, ul.accordion > li > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--accordion-content-gap);
+  padding: var(--accordion-content-padding);
+  font-size: var(--accordion-content-font-size, inherit);
+  font-weight: var(--accordion-content-font-weight, inherit);
+  line-height: var(--accordion-content-line-height, inherit);
+  border-width: var(--accordion-content-border-width);
+  border-style: var(--accordion-content-border-style);
+  border-color: var(--accordion-content-border-color);
+  background-color: var(--accordion-content-background-color);
+  color: var(--accordion-content-text-color, inherit);
+}
+
+ul.accordion {
+  padding-left: 0;
+  width: 100%;
+}
+ul.accordion > li {
+  list-style: none;
+  width: 100%;
+}
+section.accordion > div {
+  gap: 0;
+}
+
+.accordion {
+  /* Accordion item */
+}
+.accordion > div {
+  width: 100%;
+}
+/* The expanded state */
+/* Collapsed state (only when JavaScript is loaded) */
+.js-accordion-loaded {
+  /* The expanded state */
+}
+.js-accordion-loaded .accordion button[aria-expanded=false] {
+  /* Open icon */
+}
+.js-accordion-loaded .accordion button[aria-expanded=false]:before {
+  content: var(--accordion-button-icon-before-open-content, none);
+  font-family: var(--accordion-button-icon-font-family, inherit);
+  font-size: var(--accordion-button-icon-before-font-size);
+  font-weight: var(--accordion-button-icon-before-font-weight);
+  white-space: var(--accordion-button-icon-before-white-space);
+}
+.js-accordion-loaded .accordion button[aria-expanded=false]:after {
+  content: var(--accordion-button-icon-after-open-content, none);
+  font-family: var(--accordion-button-icon-font-family, inherit);
+  font-size: var(--accordion-button-icon-after-font-size);
+  font-weight: var(--accordion-button-icon-after-font-weight);
+  white-space: var(--accordion-button-icon-after-white-space);
+  margin-left: auto;
+}
+.js-accordion-loaded .accordion button[aria-expanded=false] + div {
+  display: none;
+}
+.js-accordion-loaded .accordion button[aria-expanded=true] {
+  /* Close icon */
+}
+.js-accordion-loaded .accordion button[aria-expanded=true]:before {
+  content: var(--accordion-button-icon-before-close-content, none);
+  font-family: var(--accordion-button-icon-font-family, inherit);
+  font-size: var(--accordion-button-icon-before-font-size);
+  font-weight: var(--accordion-button-icon-before-font-weight);
+  white-space: var(--accordion-button-icon-before-white-space);
+}
+.js-accordion-loaded .accordion button[aria-expanded=true]:after {
+  content: var(--accordion-button-icon-after-close-content, none);
+  font-family: var(--accordion-button-icon-font-family, inherit);
+  font-size: var(--accordion-button-icon-after-font-size);
+  font-weight: var(--accordion-button-icon-after-font-weight);
+  white-space: var(--accordion-button-icon-after-white-space);
+  margin-left: var(--accordion-button-icon-after-margin-left);
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------- filter-variables.scss -------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --filter-intro-padding: 0.5rem 0;
+  --filter-intro-border-width: 0 0 1px 0;
+  --filter-intro-border-style: solid;
+  --filter-intro-border-color: #ccc;
+  /* --filter-intro-font-size: ; */
+  --filter-intro-text-color: var(--application-base-text-color);
+  /* Span */
+  --filter-intro-span-font-size: 1.5rem;
+  --filter-intro-span-text-color: #000;
+  /* Button */
+  /* --filter-button-background-color: ; */
+  /* --filter-button-text-color: ; */
+  /* --filter-button-border-width: ; */
+  /* --filter-button-border-style: ; */
+  /* --filter-button-border-color: ; */
+  --filter-button-padding: 0 0.5rem;
+  /* --filter-button-min-height: ; */
+  --filter-button-margin-left: auto;
+  --filter-button-font-size: 0;
+  /* Button icon */
+  --filter-button-icon-font-family: var(--icon-base-font-family);
+  --filter-button-icon-font-size: var(--icon-base-font-size);
+  --filter-button-icon-font-weight: bold;
+  /* To center text within the button set the line-height to 1 */
+  --filter-button-icon-line-height: 1;
+  /* content on the button when the menu is collapsed */
+  --filter-button-icon-before-open-content: "";
+  /* content on the button when the menu is expanded */
+  --filter-button-icon-before-close-content: "";
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- components/filter.scss --------------------*/
+/*---------------------------------------------------------------*/
+.filter > form[hidden] {
+  display: none;
+}
+.filter > div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0;
+  width: 100%;
+  border-width: var(--filter-intro-border-width);
+  border-style: var(--filter-intro-border-style);
+  border-color: var(--filter-intro-border-color);
+  font-size: var(--filter-intro-font-size, inherit);
+  color: var(--filter-intro-text-color, inherit);
+}
+.filter > div p {
+  font-size: inherit;
+  color: inherit;
+}
+.filter > div p > span {
+  font-size: var(--filter-intro-span-font-size, inherit);
+  color: var(--filter-intro-span-text-color, inherit);
+}
+.filter > div button {
+  display: none;
+  background-color: var(--filter-button-background-color, inherit);
+  color: var(--filter-button-text-color, inherit);
+  border-width: var(--filter-button-border-width);
+  border-style: var(--filter-button-border-style);
+  border-color: var(--filter-button-border-color);
+  padding: var(--filter-button-padding);
+  min-height: var(--filter-button-min-height);
+  margin-left: var(--filter-button-margin-left);
+  font-size: var(--filter-button-font-size);
+  min-width: 0;
+}
+.filter > div button:after {
+  font-family: var(--filter-button-icon-font-family, inherit);
+  line-height: var(--filter-button-icon-line-height);
+  font-size: var(--filter-button-icon-font-size, inherit);
+  font-weight: var(--filter-button-icon-font-weight, inherit);
+}
+.filter > div button[aria-expanded=true]:after {
+  content: var(--filter-button-icon-before-close-content);
+}
+.filter > div button[aria-expanded=false]:after {
+  content: var(--filter-button-icon-before-open-content);
+}
+
+.js-filters-loaded .filter > div > button {
+  display: inline-flex;
+}
+
+/*---------------------------------------------------------------*/
+/*------------- description-list-variables.scss -----------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Description-list */
+  /* --description-list-width: auto; */
+  /* --description-list-max-width: ; */
+  /* Description list item */
+  --description-list-item-padding: 0.5rem 1rem;
+  --description-list-item-odd-background-color: var(--application-base-tint-1-background-color, #f0f0f0);
+  /* --description-list-item-gap: ; */
+  /* Description list item title (dt) */
+  /* --description-list-item-title-font-weight: ; */
+  /* --description-list-item-title-background-color: ; */
+  /* --description-list-item-title-text-color: ; */
+  /* Description list item title (dd) */
+  /* --description-list-item-data-background-color: ; */
+  /* --description-list-item-data-text-color: ; */
+}
+
+/* Breakpoint */
+/*----------------------------------------------------------------------------------*/
+/*---------------------------- description-list.scss -------------------------------*/
+/*----------------------------------------------------------------------------------*/
+dl {
+  width: var(--description-list-width, 100%);
+  max-width: var(--description-list-max-width);
+}
+dl > div {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--description-list-item-gap, 0 1rem);
+}
+dl > div:nth-child(odd) {
+  background-color: var(--description-list-item-odd-background-color);
+}
+dl dt,
+dl dd {
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: var(--description-list-item-padding, 0.5rem 0);
+  margin: 0;
+}
+dl dt {
+  font-weight: var(--description-list-item-title-font-weight, bolder);
+  background-color: var(--description-list-item-title-background-color);
+  color: var(--description-list-item-title-text-color);
+}
+dl dd {
+  background-color: var(--description-list-item-data-background-color);
+  color: var(--description-list-item-data-text-color);
+}
+@media (min-width: 24rem) {
+  dl div {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+/*----------------------------------------------------------------------------------*/
+/*-------------------------------- hero-variables.scss -----------------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  /* --hero-min-height: ; */
+  --hero-height: 30rem;
+  /* --hero-max-height: ; */
+  /* Title */
+  --hero-title-font-size: 2rem;
+  /* Image */
+  --hero-image-object-position: center;
+}
+
+/*----------------------------------------------------------------------------------*/
+/*---------------------------------- hero.scss -------------------------------------*/
+/*----------------------------------------------------------------------------------*/
+.hero {
+  display: flex;
+  width: 100%;
+  min-height: var(--hero-min-height);
+  height: var(--hero-height);
+  max-height: var(--hero-max-height);
+  position: relative;
+}
+.hero img {
+  object-fit: cover;
+  object-position: var(--hero-image-object-position);
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  z-index: -1;
+}
+.hero h1 {
+  font-size: var(--hero-title-font-size);
+}
+
+/*----------------------------------------------------------------------------------*/
+/*---------------------------- pagination-variables.scss ---------------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  --pagination-border-width: 1px 0 0 0;
+  --pagination-border-style: solid;
+  --pagination-border-color: #d7d7d7;
+  --pagination-padding-top: 0.5rem;
+  --pagination-gap: 0.25rem;
+  /* Item */
+  --pagination-item-height: 2rem;
+  --pagination-item-width: 2rem;
+  --pagination-item-padding: 0 0.5rem;
+  --pagination-item-text-color: var(--application-base-text-color);
+  /* --pagination-item-background-color: ; */
+  --pagination-item-text-decoration: none;
+  /* Selected - active item */
+  --pagination-item-active-background-color: var(--application-base-accent-color);
+  --pagination-item-active-text-color: var(--application-base-accent-color-text-color);
+}
+
+/*---------------------------------------------------------------*/
+/*---------------------- pagination.scss ------------------------*/
+/*---------------------------------------------------------------*/
+.pagination > ul {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+  padding-top: var(--pagination-padding-top);
+  border-width: var(--pagination-border-width);
+  border-style: var(--pagination-border-style);
+  border-color: var(--pagination-border-color);
+  gap: var(--pagination-gap);
+}
+.pagination > ul > li {
+  margin-top: -0.1rem;
+  /* fix for render issue; white space between this li and the parent ul border */
+  padding: 0;
+  list-style: none;
+}
+.pagination > ul > li > a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: var(--pagination-item-padding);
+  color: var(--pagination-item-text-color);
+  background-color: var(--pagination-item-background-color, transparent);
+  height: var(--pagination-item-height);
+  min-width: 2rem;
+  margin: 0;
+  text-decoration: var(--pagination-item-text-decoration);
+  white-space: nowrap;
+}
+.pagination > ul > li > a[aria-current] {
+  background-color: var(--pagination-item-active-background-color);
+  color: var(--pagination-item-active-text-color);
+}
+.pagination > ul > li > a::before {
+  content: none;
+}
+.pagination > ul > li:hover {
+  background-color: var(--pagination-item-active-background-color);
+}
+.pagination > ul > li:hover span,
+.pagination > ul > li:hover a {
+  color: var(--pagination-item-active-text-color);
+}
+
+/*----------------------------------------------------------------------------------*/
+/*------------------------------ tabs-variables.scss -------------------------------*/
+/*----------------------------------------------------------------------------------*/
+:root {
+  --tabs-border-width: 0 0 1px 0;
+  --tabs-border-style: solid;
+  --tabs-border-color: #808080;
+  /* --tabs-background-color: ; */
+  --tabs-gap: 1rem;
+  /* List item */
+  /* --tabs-item-border-width: ; */
+  /* --tabs-item-border-style: ; */
+  /* --tabs-item-border-color: ; */
+  --tabs-item-text-color: #808080;
+  /* --tabs-item-line-height: ; */
+  --tabs-item-padding: 0.5rem;
+  /* --tabs-item-background-color: ; */
+  --tabs-item-text-decoration: none;
+  /* List item hover */
+  --tabs-item-hover-border-width: 0 0 1px 0;
+  --tabs-item-hover-border-style: solid;
+  --tabs-item-hover-border-color: var(--application-base-accent-color);
+  --tabs-item-hover-text-color: var(--application-base-accent-color);
+  /* --tabs-item-hover-background-color: ; */
+  /* List item active */
+  --tabs-item-active-border-width: 0 0 1px 0;
+  --tabs-item-active-border-style: solid;
+  --tabs-item-active-border-color: var(--application-base-accent-color);
+  --tabs-item-active-text-color: var(--application-base-accent-color);
+  /* --tabs-item-active-background-color: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------------- tabs.scss --------------------------*/
+/*---------------------------------------------------------------*/
+.tabs {
+  overflow: hidden;
+  overflow-x: auto;
+  white-space: nowrap;
+  background-color: var(--tabs-background-color, transparent);
+}
+.tabs ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  border-width: var(--tabs-border-width);
+  border-style: var(--tabs-border-style);
+  border-color: var(--tabs-border-color);
+  gap: var(--tabs-gap);
+  padding-left: 0;
+}
+.tabs ul li {
+  list-style: none;
+}
+.tabs ul li > a {
+  border-width: var(--tabs-item-border-width);
+  border-style: var(--tabs-item-border-style);
+  border-color: var(--tabs-item-border-color);
+  color: var(--tabs-item-text-color, inherit);
+  line-height: var(--tabs-item-line-height, inherit);
+  padding: var(--tabs-item-padding);
+  background-color: var(--tabs-item-background-color, transparent);
+  text-decoration: var(--tabs-item-text-decoration);
+  white-space: nowrap;
+}
+.tabs ul li > a:hover {
+  border-width: var(--tabs-item-hover-border-width);
+  border-style: var(--tabs-item-hover-border-style);
+  border-color: var(--tabs-item-hover-border-color);
+  color: var(--tabs-item-hover-text-color, inherit);
+  background-color: var(--tabs-item-hover-background-color, transparent);
+}
+.tabs ul li[aria-current=page] > a {
+  border-width: var(--tabs-item-active-border-width);
+  border-style: var(--tabs-item-active-border-style);
+  border-color: var(--tabs-item-active-border-color);
+  color: var(--tabs-item-active-text-color, inherit);
+  background-color: var(--tabs-item-active-background-color, transparent);
+}
+
+/*----------------------------------------------------------------------*/
+/*----------------- components/code-base-variables.scss ----------------*/
+/*----------------------------------------------------------------------*/
+:root {
+  --code-base-base-background-color:
+  	var(--application-base-tint-1-background-color,
+  	var(--application-base-background-color));
+  --code-base-base-text-color:
+  	var(--application-base-tint-1-text-color,
+  	var(--application-base-text-color));
+  --code-base-font-size: inherit;
+  /* --code-base-width: ; */
+  /* --code-base-word-break: ; */
+  /* After breakpoint */
+  /* --code-base-breakpoint-1-word-break: ; */
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*------------------- components/code-base.scss -----------------*/
+/*---------------------------------------------------------------*/
+/* Code */
+code {
+  background-color: var(--code-base-background-color, inherit);
+  color: var(--code-base-text-color, inherit);
+  font-size: var(--code-base-font-size, inherit);
+  width: 100%;
+  word-break: var(--code-base-word-break, inherit);
+}
+@media (min-width: 24rem) {
+  code {
+    word-break: var(----code-base-breakpoint-1-word-break, break-word);
+  }
+}
+
+/*---------------------------------------------------------------*/
+/*----------- components/button-base-variables.scss -------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Button */
+  --button-base-flex: inline-flex;
+  --button-base-gap: 0.5rem;
+  --button-base-padding-top: 0.25rem;
+  --button-base-padding-right:1rem;
+  --button-base-padding-bottom: 0.25rem;
+  --button-base-padding-left: 1rem;
+  --button-base-justify-content: center;
+  --button-base-min-width: 8rem;
+  --button-base-min-height: 2.75rem;
+  --button-base-background-color: var(--application-base-accent-color);
+  --button-base-text-color: var(--application-base-accent-color-text-color);
+  /* --button-base-border-width: ; */
+  /* --button-base-border-style: ; */
+  /* --button-base-border-color: ; */
+  /* --button-base-font-size: ; */
+  --button-base-line-height: 1;
+  /* --button-base-font-weight: ; */
+  --button-base-text-decoration: none;
+  --button-base-border-radius: var(--application-base-border-radius);
+  /* Reset ios button styling */
+  /* --button-base-webkit-appearance: none; */
+  --button-base-align-self: flex-end;
+  /* Hover */
+  --button-base-hover-background-color: var(
+  	--application-base-accent-color-accent,
+  	var(--application-base-accent-color)
+  );
+  --button-base-hover-text-color: var(
+  	--application-base-accent-color-accent-text-color,
+  	var(--application-base-accent-color-text-color)
+  );
+  /* Active */
+  /* --button-base-active-outline-style: ; */
+  /* --button-base-active-outline-color: ; */
+  /* --button-base-active-outline-width: ; */
+  /* --button-base-active-outline-offset: ; */
+  /* --button-base-active-border-style: ; */
+  /* --button-base-active-border-color: ; */
+  /* --button-base-active-border-width: ; */
+  --button-base-active-background-color: var(
+  	--application-base-accent-color-accent,
+  	var(--application-base-accent-color)
+  );
+  --button-base-active-text-color: var(
+  	--application-base-accent-color-accent-text-color,
+  	var(--application-base-accent-color-text-color)
+  );
+  /* Focus */
+  /* --button-base-focus-outline-style: ; */
+  /* --button-base-focus-outline-color: ; */
+  /* --button-base-focus-outline-width: ; */
+  /* --button-base-focus-outline-offset: ; */
+  /* --button-base-focus-border-style: ; */
+  /* --button-base-focus-border-color: ; */
+  /* --button-base-focus-border-width: ; */
+  --button-base-focus-background-color: var(
+  	--application-base-accent-color-accent,
+  	var(--application-base-accent-color)
+  );
+  --button-base-focus-text-color: var(
+  	--application-base-accent-color-accent-text-color,
+  	var(--application-base-accent-color-text-color)
+  );
+  /* Selected */
+  /* --button-base-selected-outline-style: ; */
+  /* --button-base-selected-outline-color: ; */
+  /* --button-base-selected-outline-width: ; */
+  /* --button-base-selected-outline-offset: ; */
+  /* --button-base-selected-border-style: ; */
+  /* --button-base-selected-border-color: ; */
+  /* --button-base-selected-border-width: ; */
+  --button-base-selected-background-color: var(
+  	--application-base-accent-color-accent,
+  	var(--application-base-accent-color)
+  );
+  --button-base-selected-text-color: var(
+  	--application-base-accent-color-accent-text-color,
+  	var(--application-base-accent-color-text-color)
+  );
+  /* Active */
+  /* --button-base-active-outline-style: ; */
+  /* --button-base-active-outline-color: ; */
+  /* --button-base-active-outline-width: ; */
+  /* --button-base-active-outline-offset: ; */
+  /* --button-base-active-border-style: ; */
+  /* --button-base-active-border-color: ; */
+  /* --button-base-active-border-width: ; */
+  --button-base-active-background-color: var(
+  	--application-base-accent-color-accent,
+  	var(--application-base-accent-color)
+  );
+  --button-base-active-text-color: var(
+  	--application-base-accent-color-accent-text-color,
+  	var(--application-base-accent-color-text-color)
+  );
+}
+
+/*---------------------------------------------------------------*/
+/*-------------- components/buttons/base.scss -------------------*/
+/*---------------------------------------------------------------*/
+button,
+a.button,
+input[type=button],
+input[type=submit],
+input[type=reset] {
+  display: var(--button-base-flex);
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: var(--button-base-justify-content);
+  gap: var(--button-base-gap);
+  padding-top: var(--button-base-padding-top);
+  padding-right: var(--button-base-padding-right);
+  padding-bottom: var(--button-base-padding-bottom);
+  padding-left: var(--button-base-padding-left);
+  min-width: var(--button-base-min-width);
+  min-height: var(--button-base-min-height);
+  background-color: var(--button-base-background-color);
+  border-width: var(--button-base-border-width);
+  border-style: var(--button-base-border-style);
+  border-color: var(--button-base-border-color);
+  color: var(--button-base-text-color, inherit);
+  font-size: var(--button-base-font-size, inherit);
+  font-weight: var(--button-base-font-weight, inherit);
+  line-height: var(--button-base-line-height, inherit);
+  text-decoration: var(--button-base-text-decoration);
+  border-radius: var(--button-base-border-radius, inherit);
+  webkit-border-radius: var(--button-base-border-radius);
+  /* Reset ios button styling */
+  -webkit-appearance: var(--button-base-webkit-appearance);
+  /* Reset ios button styling */
+  cursor: pointer;
+  align-self: flex-start;
+}
+button:visited,
+a.button:visited,
+input[type=button]:visited,
+input[type=submit]:visited,
+input[type=reset]:visited {
+  color: var(--button-base-text-color);
+}
+button:hover, button.hover,
+a.button:hover,
+a.button.hover,
+input[type=button]:hover,
+input[type=button].hover,
+input[type=submit]:hover,
+input[type=submit].hover,
+input[type=reset]:hover,
+input[type=reset].hover {
+  background-color: var(--button-base-hover-background-color);
+  color: var(--button-base-hover-text-color);
+  border-color: var(--button-base-hover-background-color);
+}
+button:active, button.active,
+a.button:active,
+a.button.active,
+input[type=button]:active,
+input[type=button].active,
+input[type=submit]:active,
+input[type=submit].active,
+input[type=reset]:active,
+input[type=reset].active {
+  outline-style: var(--button-base-active-outline-style);
+  outline-color: var(--button-base-active-outline-color);
+  outline-width: var(--button-base-active-outline-width);
+  outline-offset: var(--button-base-active-outline-offset);
+  background-color: var(--button-base-active-background-color);
+  color: var(--button-base-active-text-color);
+  border-style: var(--button-base-active-border-style);
+  border-color: var(--button-base-active-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-base-active-border-width);
+}
+button:focus, button.focus,
+a.button:focus,
+a.button.focus,
+input[type=button]:focus,
+input[type=button].focus,
+input[type=submit]:focus,
+input[type=submit].focus,
+input[type=reset]:focus,
+input[type=reset].focus {
+  outline-style: var(--button-base-focus-outline-style);
+  outline-color: var(--button-base-focus-outline-color);
+  outline-width: var(--button-base-focus-outline-width);
+  outline-offset: var(--button-base-focus-outline-offset);
+  border-style: var(--button-base-focus-border-style);
+  border-color: var(--button-base-focus-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-base-focus-border-width);
+  background-color: var(--button-base-focus-background-color, var(--application-base-accent-color-accent));
+  color: var(--button-base-focus-text-color, var(--application-text-color-accent));
+}
+button.selected,
+a.button.selected,
+input[type=button].selected,
+input[type=submit].selected,
+input[type=reset].selected {
+  outline-style: var(--button-base-focus-outline-style);
+  outline-color: var(--button-base-focus-outline-color);
+  outline-width: var(--button-base-focus-outline-width);
+  outline-offset: var(--button-base-focus-outline-offset);
+  border-style: var(--button-base-focus-border-style);
+  border-color: var(--button-base-focus-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-base-focus-border-width);
+  background-color: var(--button-base-selected-background-color, var(--application-base-accent-color-accent));
+  color: var(--button-base-selected-text-color, var(--application-text-color-accent));
+}
+button.active,
+a.button.active,
+input[type=button].active,
+input[type=submit].active,
+input[type=reset].active {
+  outline-style: var(--button-base-active-outline-style);
+  outline-color: var(--button-base-active-outline-color);
+  outline-width: var(--button-base-active-outline-width);
+  outline-offset: var(--button-base-active-outline-offset);
+  border-style: var(--button-base-active-border-style);
+  border-color: var(--button-base-active-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-base-active-border-width);
+  background-color: var(--button-base-active-background-color, var(--application-base-accent-color-accent));
+  color: var(--button-base-active-text-color, var(--application-text-color-accent));
+}
+button > img,
+a.button > img,
+input[type=button] > img,
+input[type=submit] > img,
+input[type=reset] > img {
+  max-width: 30%;
+  /* Limiting the use of images within buttons for readability. */
+}
+
+/*---------------------------------------------------------------*/
+/*----------- components/button-ghost-variables.scss -------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Button */
+  /* --button-ghost-outline-style: ; */
+  /* --button-ghost-outline-color: ; */
+  /* --button-ghost-outline-width: ; */
+  /* --button-ghost-outline-offset: ; */
+  --button-ghost-background-color: transparent;
+  --button-ghost-text-color: var(--application-base-accent-color);
+  --button-ghost-border-width: 2px;
+  --button-ghost-border-style: solid;
+  --button-ghost-border-color: var(--application-base-accent-color);
+  --button-ghost-border-radius: var(--button-base-border-radius);
+  /* Hover */
+  /* --button-ghost-hover-outline-style: ; */
+  /* --button-ghost-hover-outline-color: ; */
+  /* --button-ghost-hover-outline-width: ; */
+  /* --button-ghost-hover-outline-offset: ; */
+  --button-ghost-hover-background-color: var(--application-base-accent-color);
+  --button-ghost-hover-text-color: var(--application-base-accent-color-text-color);
+  --button-ghost-hover-border-width: var(--button-ghost-border-width);
+  --button-ghost-hover-border-style: var(--button-ghost-border-style);
+  --button-ghost-hover-border-color: var(--button-ghost-border-color);
+  --button-ghost-hover-border-radius: var(--button-ghost-border-radius);
+  /* Active */
+  /* --button-ghost-active-outline-style: ; */
+  /* --button-ghost-active-outline-color: ; */
+  /* --button-ghost-active-outline-width: ; */
+  /* --button-ghost-active-outline-offset: ; */
+  --button-ghost-active-border-width: var(--button-ghost-border-width);
+  --button-ghost-active-border-style: var(--button-ghost-border-style);
+  --button-ghost-active-border-color: var(--button-ghost-border-color);
+  --button-ghost-active-background-color: var(--button-ghost-background-color);
+  --button-ghost-active-text-color: var(--button-ghost-text-color);
+  /* Focus */
+  /* --button-ghost-focus-outline-style: ; */
+  /* --button-ghost-focus-outline-color: ; */
+  /* --button-ghost-focus-outline-width: ; */
+  /* --button-ghost-focus-outline-offset: ; */
+  --button-ghost-focus-border-width: var(--button-ghost-border-width);
+  --button-ghost-focus-border-style: var(--button-ghost-border-style);
+  --button-ghost-focus-border-color: var(--button-ghost-border-color);
+  --button-ghost-focus-background-color: var(--button-ghost-background-color);
+  --button-ghost-focus-text-color: var(--button-ghost-text-color);
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------- button-ghost.scss -----------------------*/
+/*---------------------------------------------------------------*/
+button.ghost,
+a.button.ghost,
+input[type=button].ghost,
+input[type=submit].ghost,
+input[type=reset].ghost {
+  outline-style: var(--button-ghost-outline-style);
+  outline-color: var(--button-ghost-outline-color);
+  outline-width: var(--button-ghost-outline-width);
+  outline-offset: var(--button-ghost-outline-offset);
+  background-color: var(--button-ghost-background-color);
+  border-width: var(--button-ghost-border-width);
+  border-style: var(--button-ghost-border-style);
+  border-color: var(--button-ghost-border-color);
+  color: var(--button-ghost-text-color);
+  -webkit-appearance: none;
+  /* Reset ios button styling */
+  border-radius: var(--button-ghost-border-radius);
+  webkit-border-radius: var(--button-ghost-border-radius);
+  /* Reset ios button styling */
+}
+button.ghost:visited,
+a.button.ghost:visited,
+input[type=button].ghost:visited,
+input[type=submit].ghost:visited,
+input[type=reset].ghost:visited {
+  color: var(--button-ghost-text-color);
+}
+button.ghost:hover, button.ghost.hover,
+a.button.ghost:hover,
+a.button.ghost.hover,
+input[type=button].ghost:hover,
+input[type=button].ghost.hover,
+input[type=submit].ghost:hover,
+input[type=submit].ghost.hover,
+input[type=reset].ghost:hover,
+input[type=reset].ghost.hover {
+  outline-style: var(--button-ghost-hover-outline-style);
+  outline-color: var(--button-ghost-hover-outline-color);
+  outline-width: var(--button-ghost-hover-outline-width);
+  outline-offset: var(--button-ghost-hover-outline-offset);
+  background-color: var(--button-ghost-hover-background-color);
+  color: var(--button-ghost-hover-text-color);
+  border-style: var(--button-ghost-hover-border-style);
+  border-color: var(--button-ghost-hover-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-ghost-hover-border-width);
+}
+button.ghost:active, button.ghost.active,
+a.button.ghost:active,
+a.button.ghost.active,
+input[type=button].ghost:active,
+input[type=button].ghost.active,
+input[type=submit].ghost:active,
+input[type=submit].ghost.active,
+input[type=reset].ghost:active,
+input[type=reset].ghost.active {
+  outline-style: var(--button-ghost-active-outline-style);
+  outline-color: var(--button-ghost-active-outline-color);
+  outline-width: var(--button-ghost-active-outline-width);
+  outline-offset: var(--button-ghost-active-outline-offset);
+  background-color: var(--button-ghost-active-background-color);
+  color: var(--button-ghost-active-text-color);
+  border-style: var(--button-ghost-active-border-style);
+  border-color: var(--button-ghost-active-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-ghost-active-border-width);
+}
+button.ghost:focus, button.ghost.focus,
+a.button.ghost:focus,
+a.button.ghost.focus,
+input[type=button].ghost:focus,
+input[type=button].ghost.focus,
+input[type=submit].ghost:focus,
+input[type=submit].ghost.focus,
+input[type=reset].ghost:focus,
+input[type=reset].ghost.focus {
+  outline-style: var(--button-ghost-focus-outline-style);
+  outline-color: var(--button-ghost-focus-outline-color);
+  outline-width: var(--button-ghost-focus-outline-width);
+  outline-offset: var(--button-ghost-focus-outline-offset);
+  border-style: var(--button-ghost-focus-border-style);
+  border-color: var(--button-ghost-focus-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-ghost-focus-border-width);
+  background-color: var(--button-ghost-focus-background-color, var(--application-base-accent-color-accent));
+  color: var(--button-ghost-focus-text-color, var(--application-text-color-accent));
+}
+button.ghost > img,
+a.button.ghost > img,
+input[type=button].ghost > img,
+input[type=submit].ghost > img,
+input[type=reset].ghost > img {
+  max-width: 30%;
+  /* Limiting the use of images within buttons for readability. */
+}
+
+/*---------------------------------------------------------------*/
+/*----------- components/button-cta-variables.scss --------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Button */
+  /* --button-cta-active-outline-style: ; */
+  /* --button-cta-active-outline-color: ; */
+  /* --button-cta-active-outline-width: ; */
+  /* --button-cta-active-outline-offset: ; */
+  --button-cta-background-color: var(--cta-background-color);
+  --button-cta-text-color: var(--cta-text-color);
+  --button-cta-border-width: 2px;
+  --button-cta-border-style: solid;
+  --button-cta-border-color: var(--cta-background-color);
+  --button-cta-border-radius: var(--button-base-border-radius);
+  /* Hover */
+  /* --button-cta-active-outline-style: ; */
+  /* --button-cta-active-outline-color: ; */
+  /* --button-cta-active-outline-width: ; */
+  /* --button-cta-active-outline-offset: ; */
+  --button-cta-hover-background-color:
+  	var(--cta-background-color-accent,
+  	var(--button-cta-background-color)
+  );
+  --button-cta-hover-text-color:
+  	var(--cta-text-color,
+  	var(--button-cta-text-color)
+  );
+  --button-cta-hover-border-width: var(--button-cta-border-width);
+  --button-cta-hover-border-style: var(--button-cta-border-style);
+  --button-cta-hover-border-color: var(--button-cta-border-color);
+  --button-cta-hover-border-radius: var(--button-cta-border-radius);
+  /* Active */
+  /* --button-cta-active-outline-style: ; */
+  /* --button-cta-active-outline-color: ; */
+  /* --button-cta-active-outline-width: ; */
+  /* --button-cta-active-outline-offset: ; */
+  --button-cta-active-border-width: var(--button-cta-border-width);
+  --button-cta-active-border-style: var(--button-cta-border-style);
+  --button-cta-active-border-color: var(--button-cta-border-color);
+  --button-cta-active-background-color: var(--button-cta-background-color);
+  --button-cta-active-text-color: var(--button-cta-text-color);
+  /* Focus */
+  /* --button-cta-focus-outline-style: ; */
+  /* --button-cta-focus-outline-color: ; */
+  /* --button-cta-focus-outline-width: ; */
+  /* --button-cta-focus-outline-offset: ; */
+  --button-cta-focus-border-width: var(--button-cta-border-width);
+  --button-cta-focus-border-style: var(--button-cta-border-style);
+  --button-cta-focus-border-color: var(--button-cta-border-color);
+  --button-cta-focus-background-color: var(--button-cta-background-color);
+  --button-cta-focus-text-color: var(--button-cta-text-color);
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------- button-cta.scss -------------------------*/
+/*---------------------------------------------------------------*/
+button.cta,
+a.button.cta,
+input[type=button].cta,
+input[type=submit].cta,
+input[type=reset].cta {
+  outline-style: var(--button-cta-outline-style);
+  outline-color: var(--button-cta-outline-color);
+  outline-width: var(--button-cta-outline-width);
+  outline-offset: var(--button-cta-outline-offset);
+  background-color: var(--button-cta-background-color);
+  border-width: var(--button-cta-border-width);
+  border-style: var(--button-cta-border-style);
+  border-color: var(--button-cta-border-color);
+  color: var(--button-cta-text-color);
+  -webkit-appearance: none;
+  /* Reset ios button styling */
+  border-radius: var(--button-cta-border-radius);
+  webkit-border-radius: var(--button-cta-border-radius);
+  /* Reset ios button styling */
+}
+button.cta:visited,
+a.button.cta:visited,
+input[type=button].cta:visited,
+input[type=submit].cta:visited,
+input[type=reset].cta:visited {
+  color: var(--button-cta-text-color);
+}
+button.cta:hover, button.cta.hover,
+a.button.cta:hover,
+a.button.cta.hover,
+input[type=button].cta:hover,
+input[type=button].cta.hover,
+input[type=submit].cta:hover,
+input[type=submit].cta.hover,
+input[type=reset].cta:hover,
+input[type=reset].cta.hover {
+  outline-style: var(--button-cta-hover-outline-style);
+  outline-color: var(--button-cta-hover-outline-color);
+  outline-width: var(--button-cta-hover-outline-width);
+  outline-offset: var(--button-cta-hover-outline-offset);
+  background-color: var(--button-cta-hover-background-color);
+  color: var(--button-cta-hover-text-color);
+  border-style: var(--button-cta-hover-border-style);
+  border-color: var(--button-cta-hover-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-cta-hover-border-width);
+}
+button.cta:active, button.cta.active,
+a.button.cta:active,
+a.button.cta.active,
+input[type=button].cta:active,
+input[type=button].cta.active,
+input[type=submit].cta:active,
+input[type=submit].cta.active,
+input[type=reset].cta:active,
+input[type=reset].cta.active {
+  outline-style: var(--button-cta-active-outline-style);
+  outline-color: var(--button-cta-active-outline-color);
+  outline-width: var(--button-cta-active-outline-width);
+  outline-offset: var(--button-cta-active-outline-offset);
+  background-color: var(--button-cta-active-background-color);
+  color: var(--button-cta-active-text-color);
+  border-style: var(--button-cta-active-border-style);
+  border-color: var(--button-cta-active-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-cta-active-border-width);
+}
+button.cta:focus, button.cta.focus,
+a.button.cta:focus,
+a.button.cta.focus,
+input[type=button].cta:focus,
+input[type=button].cta.focus,
+input[type=submit].cta:focus,
+input[type=submit].cta.focus,
+input[type=reset].cta:focus,
+input[type=reset].cta.focus {
+  outline-style: var(--button-cta-focus-outline-style);
+  outline-color: var(--button-cta-focus-outline-color);
+  outline-width: var(--button-cta-focus-outline-width);
+  outline-offset: var(--button-cta-focus-outline-offset);
+  border-style: var(--button-cta-focus-border-style);
+  border-color: var(--button-cta-focus-border-color, var(--application-base-accent-color-accent));
+  border-width: var(--button-cta-focus-border-width);
+  background-color: var(--button-cta-focus-background-color, var(--application-base-accent-color-accent));
+  color: var(--button-cta-focus-text-color, var(--application-text-color-accent));
+}
+button.cta > img,
+a.button.cta > img,
+input[type=button].cta > img,
+input[type=submit].cta > img,
+input[type=reset].cta > img {
+  max-width: 30%;
+  /* Limiting the use of images within buttons for readability. */
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- button-icon-variables.scss ----------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Button */
+  --button-icon-min-width: 2.75rem;
+  /* --button-icon-max-width: ; */
+  --button-icon-min-height: 2.75rem;
+  /* --button-icon-max-height: ; */
+  /* --button-icon-font-size: ; */
+  /* Icon */
+  --button-icon-icon-font-size: 0.8rem;
+  /* --button-icon-icon-text-color: ; */
+  --button-icon-icon-width: 0.75rem;
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------- button-icon.scss -------------------------*/
+/*---------------------------------------------------------------*/
+button.icon,
+a.button.icon,
+input[type=button].icon,
+input[type=submit].icon,
+input[type=reset].icon {
+  font-size: 0;
+  gap: 0;
+  min-width: var(--button-icon-min-width);
+  max-width: var(--button-icon-max-width);
+  min-height: var(--button-icon-min-height);
+  max-height: var(--button-icon-max-height);
+}
+
+/*---------------------------------------------------------------*/
+/*--------- components/button-secondary-variables.scss ----------*/
+/*---------------------------------------------------------------*/
+/*---------------------------------------------------------------*/
+/*---------- components/button-secondary.scss -------------------*/
+/*---------------------------------------------------------------*/
+button.secondary,
+a.button.secondary,
+input[type=button].secondary,
+input[type=submit].secondary,
+input[type=reset].secondary {
+  /* border: 2px solid $app-background-color-tint-0; palegreen */
+  /* @include app-color-tint-0-light-bg; palegreen */
+}
+button.secondary:visited,
+a.button.secondary:visited,
+input[type=button].secondary:visited,
+input[type=submit].secondary:visited,
+input[type=reset].secondary:visited {
+  /* color: $app-background-color-tint-0; palegreen */
+}
+button.secondary:hover, button.secondary.hover,
+a.button.secondary:hover,
+a.button.secondary.hover,
+input[type=button].secondary:hover,
+input[type=button].secondary.hover,
+input[type=submit].secondary:hover,
+input[type=submit].secondary.hover,
+input[type=reset].secondary:hover,
+input[type=reset].secondary.hover {
+  /* @include app-color-tint-0; palegreen */
+  /* @include transition-background-color-ease; palegreen */
+}
+button.secondary:active, button.secondary.active,
+a.button.secondary:active,
+a.button.secondary.active,
+input[type=button].secondary:active,
+input[type=button].secondary.active,
+input[type=submit].secondary:active,
+input[type=submit].secondary.active,
+input[type=reset].secondary:active,
+input[type=reset].secondary.active {
+  /* @include app-color-tint-0; palegreen */
+  /* @include transition-background-color-ease; palegreen */
+}
+button.secondary.selected,
+a.button.secondary.selected,
+input[type=button].secondary.selected,
+input[type=submit].secondary.selected,
+input[type=reset].secondary.selected {
+  /* @include app-color-tint-0; palegreen */
+  /* @include transition-background-color-ease; palegreen */
+}
+
+/*---------------------------------------------------------------*/
+/*------------- components/list-base-variables.scss -------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* list */
+  /* --list-base-margin: ; */
+  /* --list-base-padding: ; */
+  /* --list-base-gap: ; */
+  --list-base-line-height: 2.25;
+  /* Increased line height for readabilty */
+  /* --list-base-font-size: ; */
+  /* --list-base-font-weight: ; */
+  /* --list-base-text-color: ; */
+  /* --list-base-background-color: ; */
+  /* List item */
+  /* --list-base-item-padding: ; */
+  /* --list-base-item-background-color: ; */
+  /* --list-base-item-border-width: ; */
+  /* --list-base-item-border-style: ; */
+  /* --list-base-item-border-color: ; */
+  /* --list-base-item-style: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- components/list-base.scss -----------------*/
+/*---------------------------------------------------------------*/
+ul,
+ol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--list-base-gap, 0.5rem);
+  padding: var(--list-base-padding, 0 0 0 2rem);
+  background-color: var(--list-base-background-color, inherit);
+  line-height: var(--list-base-line-height, inherit);
+  font-size: var(--list-base-font-size, inherit);
+  font-weight: var(--list-base-font-weight, inherit);
+  color: var(--list-base-text-color, inherit);
+  margin: 0;
+}
+ul li,
+ol li {
+  background-color: var(--list-base-item-background-color);
+  border-color: var(--list-base-item-border-color);
+  border-style: var(--list-base-item-border-style);
+  border-width: var(--list-base-item-border-width);
+  padding: var(--list-base-item-padding);
+  line-height: var(--list-base-line-height, inherit);
+  font-size: var(--list-base-font-size, inherit);
+  font-weight: var(--list-base-font-weight, inherit);
+  color: var(--list-base-text-color, inherit);
+}
+ul li a,
+ol li a {
+  line-height: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+ul > li {
+  list-style: var(--list-base-item-style, initial);
+}
+
+ol > li {
+  display: list-item;
+}
+
+/*-----------------------------------------------------------*/
+/*----- components/skip-to-content-base-variables.scss ------*/
+/*-----------------------------------------------------------*/
+:root {
+  /* --skip-to-content-base-display: ; */
+  /* --skip-to-content-base-top: ; */
+  /* --skip-to-content-base-right: ; */
+  /* --skip-to-content-base-bottom: ; */
+  /* --skip-to-content-base-left: ; */
+  --skip-to-content-base-background-color: var(--application-base-accent-color);
+  --skip-to-content-base-text-color: var(--application-base-accent-color-text-color);
+  /* --skip-to-content-base-text-align: ; */
+  /* --skip-to-content-base-padding: ; */
+  /* --skip-to-content-base-min-height: ; */
+  /* Default is set to a minimum of 2.75rem for accessibility */
+  /* Focus */
+  /* --skip-to-content-base-border-width: ; */
+  /* --skip-to-content-base-border-style: ; */
+  --skip-to-content-base-border-color: var(--application-base-accent-color);
+  /* Hover */
+  --skip-to-content-base-hover-background-color: var(--application-base-accent-color-hover);
+  --skip-to-content-base-hover-text-color: var(--application-base-accent-color-hover-text-color);
+  /* --skip-to-content-base-hover-border-width: ; */
+  /* --skip-to-content-base-hover-border-style: ; */
+  --skip-to-content-base-hover-border-color: var(--application-base-accent-color-hover);
+}
+
+/*---------------------------------------------------------------*/
+/*------------ components/skip-to-content-base.scss -------------*/
+/*---------------------------------------------------------------*/
+.skip-to-content,
+a.button.skip-to-content {
+  /* Visually removing the objects height. Without removing the object
+  from the flow. */
+  display: block;
+  min-height: 0;
+  font-size: 0;
+  padding: 0;
+  background-color: var(--skip-to-content-base-background-color);
+  color: var(--skip-to-content-base-text-color);
+}
+.skip-to-content:hover,
+a.button.skip-to-content:hover {
+  background-color: var(--skip-to-content-base-hover-background-color);
+  color: var(--skip-to-content-base-hover-text-color);
+  border-width: var(--skip-to-content-base-hover-border-width);
+  border-style: var(--skip-to-content-base-hover-border-style);
+  border-color: var(--skip-to-content-base-hover-border-color);
+}
+.skip-to-content:focus,
+a.button.skip-to-content:focus {
+  position: static;
+  display: flex;
+  height: auto;
+  width: auto;
+  padding: var(--skip-to-content-base-padding, 0.5rem);
+  text-align: var(--skip-to-content-base-text-align, center);
+  font-size: var(--text-base-font-size);
+  min-height: var(--skip-to-content-base-min-height, 2.75rem);
+  border-width: var(--skip-to-content-base-border-width);
+  border-style: var(--skip-to-content-base-border-style);
+  border-color: var(--skip-to-content-base-border-color);
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------- logo-variables.scss ---------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Logo */
+  --logo-min-width: 2.65rem;
+  /* --logo-width: ; */
+  /* --logo-max-width: ; */
+  /* Logo image */
+  /* --logo-img-height: ; */
+  --logo-img-min-height: 2rem;
+  /* --logo-img-height: ; */
+  /* --logo-img-min-height: ; */
+  --logo-img-max-width: 100%;
+  --logo-img-max-height: 2.5rem;
+  --logo-img-object-position: center;
+  --logo-img-object-fit: contain;
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------------- logo.scss -------------------------*/
+/*---------------------------------------------------------------*/
+.logo {
+  font-size: 0;
+  min-width: var(--logo-min-width);
+  width: var(--logo-width);
+  max-width: var(--logo-max-width);
+}
+.logo img {
+  min-height: var(--logo-img-min-height);
+  height: var(--logo-img-height);
+  min-width: var(--logo-img-min-width);
+  width: var(--logo-img-width);
+  max-width: var(--logo-img-max-width);
+  max-height: var(--logo-img-max-height);
+  object-position: var(--logo-img-object-position);
+  object-fit: var(--logo-img-object-fit);
+}
+
+/*---------------------------------------------------------------*/
+/*------------------------ image.scss ---------------------------*/
+/*---------------------------------------------------------------*/
+img {
+  max-width: 100%;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- components/tile-variables.scss --------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Tile */
+  --tile-background-color: #fff;
+  /* --tile-text-color: ; */
+  /* --tile-flex-direction: ; */
+  --tile-gap: 1rem;
+  --tile-padding-top: 1.5rem;
+  --tile-padding-right: 1.5rem;
+  --tile-padding-bottom: 1.5rem;
+  --tile-padding-left: 1.5rem;
+  --tile-border-width: 1px;
+  --tile-border-style: solid;
+  --tile-border-color: #ccc;
+  /* --tile-border-radius: ; */
+  /* Tile title */
+  /* --tile-title-text-color: ; */
+  --tile-title-font-size: var(--font-size-text);
+  /* Tile subtitle */
+  /* --tile-subtitle-text-color: ; */
+  --tile-subtitle-font-size: var(--font-size-text);
+  /* Group of tiles */
+  --tiles-align-items: stretch;
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------------- tile.scss --------------------------*/
+/*---------------------------------------------------------------*/
+ul.tiles > li, .tiles > div,
+.tile {
+  display: flex;
+  flex-direction: var(--tile-flex-direction, column);
+  gap: var(--tile-gap);
+  border-width: var(--tile-border-width);
+  border-style: var(--tile-border-style);
+  border-color: var(--tile-border-color);
+  box-sizing: border-box;
+  background-color: var(--tile-background-color);
+  color: var(--tile-text-color);
+  padding-top: var(--tile-padding-top);
+  padding-right: var(--tile-padding-right);
+  padding-bottom: var(--tile-padding-bottom);
+  padding-left: var(--tile-padding-left);
+  border-radius: var(--tile-border-radius);
+}
+ul.tiles > li > *, .tiles > div > *,
+.tile > * {
+  box-sizing: border-box;
+  width: 100%;
+  color: inherit;
+}
+ul.tiles > li h1, .tiles > div h1,
+.tile h1 {
+  font-size: var(--tile-title-font-size-text);
+  color: var(--tile-title-text-color, inherit);
+}
+ul.tiles > li h2, .tiles > div h2,
+.tile h2 {
+  font-size: var(--tile-subtitle-font-size-text);
+  color: var(--tile-subtitle-text-color, inherit);
+}
+ul.tiles > li ul, .tiles > div ul,
+.tile ul {
+  padding-left: 2rem;
+}
+
+.tiles {
+  align-items: var(--tiles-align-items);
+  /* render each div directly within a tiles group as a tile */
+}
+ul.tiles {
+  padding-left: 0;
+}
+ul.tiles > li > a {
+  color: var(--text-dark);
+  text-decoration: none;
+}
+
+/*---------------------------------------------------------------*/
+/*--------------- tile-image-cover-variables.scss ---------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* --tile-cover-image-object-position: ; */
+  --tile-image-cover-max-height: 12rem;
+  /* Overwriting any padding that the tile may have */
+  --tile-image-cover-margin-top: var(--tile-padding-top);
+  --tile-image-cover-margin-right: var(--tile-padding-right);
+  --tile-image-cover-margin-left: var(--tile-padding-left);
+}
+
+/*---------------------------------------------------------------*/
+/*--------------------- tile-image-cover.scss -------------------*/
+/*---------------------------------------------------------------*/
+.tiles.images-cover > div img,
+.tiles.images-cover li img, .tile.image-cover img {
+  object-position: var(--tile-image-cover-object-position, var(--image-cover-object-position));
+  max-height: var(--tile-image-cover-max-height);
+  width: calc(100% + var(--tile-padding-right) + var(--tile-padding-left));
+  max-width: unset;
+  /* Overwriting any padding that the tile may have */
+  margin-top: calc(-1 * var(--tile-image-cover-margin-top));
+  margin-right: calc(-1 * var(--tile-image-cover-margin-right));
+  margin-left: calc(-1 * var(--tile-image-cover-margin-left));
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- tile-groups-variables.scss ------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --tile-groups-flex-direction: row;
+  /* --tile-groups-gap: ; */
+  --tile-groups-border-width: 1px 0 0 0;
+  --tile-groups-border-style: solid;
+  --tile-groups-border-color: #f0f0f0;
+  --tile-groups-padding-top: 1rem;
+  --tile-groups-padding-right: 0;
+  --tile-groups-padding-bottom: 0;
+  --tile-groups-padding-left: 0;
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------------- tile-groups.scss -------------------*/
+/*---------------------------------------------------------------*/
+ul.tiles > li > div, .tiles > div > div,
+ul.tiles > li > section,
+.tiles > div > section,
+.tile > div,
+.tile > section {
+  display: flex;
+  flex-direction: var(--tile-groups-flex-direction, inherit);
+  gap: var(--tile-groups-gap, inherit);
+  border-width: var(--tile-groups-border-width);
+  border-style: var(--tile-groups-border-style);
+  border-color: var(--tile-groups-border-color);
+  padding-top: var(--tile-groups-padding-top);
+  padding-right: var(--tile-groups-padding-right);
+  padding-bottom: var(--tile-groups-padding-bottom);
+  padding-left: var(--tile-groups-padding-left);
+}
+ul.tiles > li img + div, .tiles > div img + div,
+ul.tiles > li img + section,
+.tiles > div img + section,
+.tile img + div,
+.tile img + section {
+  border-top: 0;
+}
+
+.tiles {
+  /* render each div directly within a tiles group as a tile */
+}
+/*---------------------------------------------------------------*/
+/*---------- components/table/table-base-variables.scss ---------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Table */
+  /* --table-base-font-size: ; */
+  /* --table-base-font-weight: ; */
+  /* --table-base-line-height: ; */
+  /* Use this variable to set a padding on all cells. */
+  --table-base-cells-padding: 0.25rem 1rem;
+  --table-base-background-color: #fff;
+  --table-base-text-color: var(--application-base-text-color);
+  /* --table-base-border-width: ; */
+  /* --table-base-border-style: ; */
+  /* --table-base-border-color: ; */
+  /* --table-base-text-align: ; */
+  /* Table head */
+  --table-base-head-background-color: var(--application-base-accent-color);
+  --table-base-head-text-color: var(--application-base-accent-color-text-color);
+  /* --table-base-head-border-width: ; */
+  /* --table-base-head-border-style: ; */
+  /* --table-base-head-border-color: ; */
+  /* Table head cell (th) */
+  /* --table-base-head-cell-border-width: ; */
+  /* --table-base-head-cell-border-style: ; */
+  /* --table-base-head-cell-border-color: ; */
+  --table-base-head-cell-padding: var(--table-base-cells-padding);
+  --table-base-head-cell-font-weight: bolder;
+  /* --table-base-head-cell-font-size: ; */
+  /* Table row */
+  /* Zebra striping with opacity to keep background color. e.g for warnings or errors */
+  --table-base-row-background-color-striping: rgba(148,148,148,0.1);
+  /* --table-base-row-border-width: ; */
+  /* --table-base-row-border-style: ; */
+  /* --table-base-row-border-color: ; */
+  /* Table cell (td) */
+  --table-base-cell-padding: var(--table-base-cells-padding);
+  /* --table-base-cell-gap: ; */
+  /* --table-base-cell-background-color: ; */
+  /* --table-base-cell-text-color: ; */
+  /* --table-base-cell-border-width: ; */
+  /* --table-base-cell-border-style: ; */
+  /* --table-base-cell-border-color: ; */
+  /* Table cells within the first row */
+  /* --table-base-first-row-cell-border-width: ; */
+  /* --table-base-first-row-cell-border-style: ; */
+  /* --table-base-first-row-cell-border-color: ; */
+  /* Table cells within the last row */
+  /* --table-base-last-row-cell-border-width: ; */
+  /* --table-base-last-row-cell-border-style: ; */
+  /* --table-base-last-row-cell-border-color: ; */
+  /* Table footer */
+  --table-base-foot-background-color: #f5f5f5;
+  --table-base-foot-padding: var(--table-base-cells-padding);
+  /* --table-base-foot-text-color: var(--table-base-text-color); */
+  /* --table-base-foot-font-weight: var(--table-base-font-weight); */
+  /* --table-base-foot-font-size: var(--table-base-font-size); */
+  /* --table-base-foot-border-width: var(--table-base-border-width); */
+  /* --table-base-foot-border-style: var(--table-base-border-style); */
+  /* --table-base-foot-border-color: var(--table-base-border-color); */
+  /* Table footer head */
+  --table-base-foot-header-padding: var(--table-base-foot-padding);
+  /* --table-base-foot-header-background-color: ; */
+  /* --table-base-foot-header-text-color: ; */
+  /* --table-base-foot-header-font-weight: ; */
+  /* --table-base-foot-header-font-size: ; */
+  /* --table-base-foot-header-border-width: ; */
+  /* --table-base-foot-header-border-style: ; */
+  /* --table-base-foot-header-border-color: ; */
+  /* Table footer cell styling */
+  --table-base-foot-cell-padding: var(--table-base-foot-padding);
+  --table-base-foot-cell-background-color: #f0f0f0;
+  /* --table-base-foot-cell-text-color: ; */
+  /* --table-base-foot-cell-font-weight: ; */
+  /* --table-base-foot-cell-font-size: ; */
+  /* --table-base-foot-cell-border-width: ; */
+  /* --table-base-foot-cell-border-style: ; */
+  /* --table-base-foot-cell-border-color: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*--------------- components/table/table-base.scss --------------*/
+/*---------------------------------------------------------------*/
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: var(--table-base-text-align, inherit);
+  overflow: auto;
+  margin: 0;
+  font-size: var(--table-base-font-size, inherit);
+  line-height: var(--table-base-line-height, inherit);
+  font-weight: var(--table-base-font-weight, inherit);
+  color: var(--table-base-text-color, inherit);
+  background-color: var(--table-base-background-color, transparent);
+  border-width: var(--table-base-border-width);
+  border-style: var(--table-base-border-style);
+  border-color: var(--table-base-border-color);
+}
+table thead {
+  background-color: var(--table-base-head-background-color, inherit);
+  color: var(--table-base-head-text-color, inherit);
+  border-width: var(--table-base-head-border-width);
+  border-style: var(--table-base-head-border-style);
+  border-color: var(--table-base-head-border-color);
+}
+table thead th {
+  padding: var(--table-base-head-cell-padding);
+  border-width: var(--table-base-head-cell-border-width);
+  border-style: var(--table-base-head-cell-border-style);
+  border-color: var(--table-base-head-cell-border-color);
+  font-weight: var(--table-base-head-cell-font-weight);
+  font-size: var(--table-base-head-cell-font-size);
+}
+table thead a,
+table thead a:visited,
+table thead a:hover {
+  color: inherit;
+}
+table thead a:before,
+table thead a:visited:before,
+table thead a:hover:before {
+  color: inherit;
+}
+table tr {
+  /* Zebra striping with opacity to keep background color. e.g for warnings or errors */
+}
+table tr:nth-child(even):not(.odd), table tr:nth-child(odd).even {
+  background-color: var(--table-base-row-background-color-striping, inherit);
+}
+table tr:first-of-type td {
+  border-width: var(--table-base-first-row-cell-border-width);
+  border-style: var(--table-base-first-row-cell-border-style);
+  border-color: var(--table-base-first-row-cell-border-color);
+}
+table tr:last-of-type td {
+  border-width: var(--table-base-last-row-cell-border-width);
+  border-style: var(--table-base-last-row-cell-border-style);
+  border-color: var(--table-base-last-row-cell-border-color);
+}
+table td {
+  padding: var(--table-base-cell-padding);
+  gap: var(--table-base-cell-gap);
+  background-color: var(--table-base-cell-background-color, inherit);
+  color: var(--table-base-cell-text-color, inherit);
+  border-width: var(--table-base-cell-border-width);
+  border-style: var(--table-base-cell-border-style);
+  border-color: var(--table-base-cell-border-color);
+}
+table tfoot {
+  background-color: var(--table-base-foot-background-color, inherit);
+  color: var(--table-base-foot-text-color, inherit);
+  font-size: var(--table-base-foot-font-size, inherit);
+  font-weight: var(--table-base-foot-font-weight, inherit);
+  padding: var(--table-base-foot-padding);
+  border-width: var(--table-base-foot-border-width);
+  border-style: var(--table-base-foot-border-style);
+  border-color: var(--table-base-foot-border-color);
+}
+table tfoot th {
+  background-color: var(--table-base-foot-header-background-color, inherit);
+  color: var(--table-base-foot-header-text-color, inherit);
+  border-width: var(--table-base-foot-header-border-width);
+  border-style: var(--table-base-foot-header-border-style);
+  border-color: var(--table-base-foot-header-border-color);
+  padding: var(--table-base-foot-header-padding);
+  font-weight: var(--table-base-foot-header-font-weight, inherit);
+  font-size: var(--table-base-foot-header-font-size, inherit);
+}
+table tfoot td {
+  background-color: var(--table-foot-cell-background-color, inherit);
+  color: var(--table-foot-cell-text-color, inherit);
+  border-width: var(--table-base-foot-cell-border-width);
+  border-style: var(--table-base-foot-cell-border-style);
+  border-color: var(--table-base-foot-cell-border-color);
+  padding: var(--table-base-foot-cell-padding);
+  font-weight: var(--table-base-foot-cell-font-weight, inherit);
+  font-size: var(--table-base-foot-cell-font-size, inherit);
+}
+
+/*---------------------------------------------------------------*/
+/*-------- components/expando-rows-render-issue.scss ------------*/
+/*---------------------------------------------------------------*/
+/* This bit of css solves a render issue that appears when a dl containing a
+dd is used within a expando row. 
+
+Issue:  
+When the width of the dd has been set as a 
+percentage, the rest of the table (th and td) will change their width when the 
+expando row is opened. 
+
+Cause/findings:
+There are a couple of issues found concerning this bug:
+- A table set to 100% width is rendered as 100% - 1px width
+  - Removing borders and adding box-sizing: border-box; or changing the table-layout 
+    do not seem to make a difference.
+- An element within the table set to 100% width is also rendered as 100% - 1px width
+- When using a calc(100% - 1px) the computed value is correct, however the
+width of the th and td still change. 
+- When setting a px or rem value the th's and td's keep their original width
+
+Using fixed values isn't ideal percentages would be less prone to issues when the width
+of parent elements are altered. Suggestions on how this bug can be solved instead of patched
+are welcome.
+*/
+table tr.expando-row td dl > div > dd,
+table.condensed tr.expando-row td dl > div > dd,
+table.sticky tr.expando-row td dl > div > dd {
+  max-width: 47rem;
+}
+
+article table tr.expando-row td dl > div > dd,
+article table.condensed tr.expando-row td dl > div > dd,
+article table.sticky tr.expando-row td dl > div > dd {
+  max-width: 30rem;
+}
+
+.auth table tr.expando-row td dl > div > dd,
+.auth table.condensed tr.expando-row td dl > div > dd,
+.auth table.sticky tr.expando-row td dl > div > dd {
+  max-width: 37rem;
+}
+
+.form-view table tr.expando-row td dl > div > dd,
+.form-view table.condensed tr.expando-row td dl > div > dd,
+.form-view table.sticky tr.expando-row td dl > div > dd {
+  max-width: 45rem;
+}
+
+/*---------------------------------------------------------------*/
+/*------------ table/expando-rows-variables.scss ----------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Table cell */
+  --expando-rows-table-cell-background-color: #e5e5e5;
+  --expando-rows-table-cell-padding: 2rem 1rem;
+  /* Table exando content title */
+  --expando-rows-table-content-title-font-size: 1.25rem;
+  --expando-rows-table-content-title-font-weight: bolder;
+  /* Table exando content subtitle */
+  --expando-rows-table-content-subtitle-font-size: var(--font-size-text-larger);
+  /* --expando-rows-table-content-subtitle-font-weight: ; */
+  /* After breakpoint */
+  --expando-rows-table-cell-after-breakpoint-padding: 2rem 3rem;
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*-------- components/table-component/expando-rows.scss ---------*/
+/*---------------------------------------------------------------*/
+table button.expando-button {
+  display: none;
+}
+table tr.expando-row {
+  display: table-layout;
+}
+table tr.expando-row td {
+  background-color: var(--expando-rows-table-cell-background-color);
+  padding: var(--expando-rows-table-cell-padding);
+  position: relative;
+}
+@media (min-width: 24rem) {
+  table tr.expando-row td {
+    padding: var(--expando-rows-table-cell-after-breakpoint-padding);
+  }
+}
+table tr.expando-row td h1 {
+  font-size: var(--expando-rows-table-content-title-font-size);
+  font-weight: var(--expando-rows-table-content-title-font-weight);
+}
+table tr.expando-row td h2 {
+  font-size: var(--expando-rows-table-content-subtitle-font-size);
+  font-weight: var(--expando-rows-table-content-subtitle-font-weight);
+}
+
+.js-expando-rows-loaded table tr.expando-row[hidden] {
+  display: none;
+}
+.js-expando-rows-loaded table button.expando-button:not([hidden]) {
+  display: inline-flex;
+}
+
+/*---------------------------------------------------------------*/
+/*------------------ table-caption-variables.scss ---------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Table caption */
+  /* --table-base-caption-background-color: ; */
+  --table-base-caption-text-color: var(--de-emphasized-text-color);
+  --table-base-caption-font-size: var(--de-emphasized-font-size);
+  --table-base-caption-line-height: var(--de-emphasized-line-height);
+  --table-base-caption-padding: 1rem 0 0.5rem 0;
+  --table-base-caption-text-align: left;
+}
+
+/*---------------------------------------------------------------*/
+/*---------------------- table-caption.scss ---------------------*/
+/*---------------------------------------------------------------*/
+table caption {
+  background-color: var(--table-base-caption-background-color);
+  color: var(--table-base-caption-text-color);
+  font-size: var(--table-base-caption-font-size);
+  text-align: var(--table-base-caption-text-align);
+  line-height: var(--table-base-caption-line-height);
+  padding: var(--table-base-caption-padding);
+}
+
+/*---------------------------------------------------------------*/
+/*-------------- table-action-buttons-variables.scss ------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Button - action icon */
+  --table-action-buttons-button-background-color: transparent;
+  --table-action-buttons-button-text-color: #6c6c6c;
+  --table-action-buttons-button-font-size: var(--icon-base-font-size);
+  --table-action-buttons-button-justify-content: center;
+  /* Hover */
+  --table-action-buttons-button-hover-background-color: transparent;
+  --table-action-buttons-button-hover-text-color: #000;
+}
+
+/*---------------------------------------------------------------*/
+/*---------------- table-action-buttons.scss --------------------*/
+/*---------------------------------------------------------------*/
+table.action-buttons button,
+table.action-buttons a.button,
+table.action-buttons input[type=button],
+table.action-buttons input[type=submit],
+table.action-buttons input[type=reset], table button.action-button,
+table a.button.action-button,
+table input[type=button].action-button,
+table input[type=submit].action-button,
+table input[type=reset].action-button {
+  /* Resetting button styling */
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-height: unset;
+  background: var(--table-action-buttons-button-background-color);
+  justify-content: var(--table-action-buttons-button-justify-content);
+}
+table.action-buttons button:before,
+table.action-buttons a.button:before,
+table.action-buttons input[type=button]:before,
+table.action-buttons input[type=submit]:before,
+table.action-buttons input[type=reset]:before, table button.action-button:before,
+table a.button.action-button:before,
+table input[type=button].action-button:before,
+table input[type=submit].action-button:before,
+table input[type=reset].action-button:before {
+  color: var(--table-action-buttons-button-text-color);
+  font-size: var(--table-action-buttons-button-font-size);
+}
+table.action-buttons button:hover,
+table.action-buttons a.button:hover,
+table.action-buttons input[type=button]:hover,
+table.action-buttons input[type=submit]:hover,
+table.action-buttons input[type=reset]:hover, table button.action-button:hover,
+table a.button.action-button:hover,
+table input[type=button].action-button:hover,
+table input[type=submit].action-button:hover,
+table input[type=reset].action-button:hover {
+  background: var(--table-action-buttons-button-hover-background-color);
+  border: 0;
+}
+table.action-buttons button:hover:before,
+table.action-buttons a.button:hover:before,
+table.action-buttons input[type=button]:hover:before,
+table.action-buttons input[type=submit]:hover:before,
+table.action-buttons input[type=reset]:hover:before, table button.action-button:hover:before,
+table a.button.action-button:hover:before,
+table input[type=button].action-button:hover:before,
+table input[type=submit].action-button:hover:before,
+table input[type=reset].action-button:hover:before {
+  color: var(--table-action-buttons-button-hover-text-color);
+}
+
+table {
+  /* Style a specific button within a table */
+  /* Style all buttons within a parent */
+}
+/*------------------------------------------------------------------------*/
+/*------------------------- form-base-variables.scss ---------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --form-base-flex-align-items: flex-start;
+  --form-base-justify-content: flex-start;
+  --form-base-padding-top: 2rem;
+  --form-base-padding-right: 2rem;
+  --form-base-padding-bottom: 2rem;
+  --form-base-padding-left: 2rem;
+  --form-base-background-color:
+  	var(--application-base-tint-1-background-color,
+  	var(--application-base-background-color));
+  --form-base-text-color:
+  	var(--application-base-tint-1-text-color,
+  	var(--application-base-text-color));
+  /* --form-base-font-size: ; */
+  /* --form-base-line-height: ; */
+  /* --form-base-font-weight: ; */
+  --form-base-gap: 1.25rem;
+  /* --form-base-border-width: ; */
+  /* --form-base-border-style: ; */
+  /* --form-base-border-color: ; */
+  /* Input fields shared styling */
+  --form-base-input-text-color: #000;
+  /* Button alignment */
+}
+
+/* Breakpoint */
+/*---------------------------------------------------------------*/
+/*----------------------- form-base.scss ------------------------*/
+/*---------------------------------------------------------------*/
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: var(--form-base-align-items);
+  justify-content: var(--form-base-justify-content);
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: var(--form-base-padding-top);
+  padding-right: var(--form-base-padding-right);
+  padding-bottom: var(--form-base-padding-bottom);
+  padding-left: var(--form-base-padding-left);
+  background-color: var(--form-base-background-color, inherit);
+  color: var(--form-base-text-color, inherit);
+  font-size: var(--form-base-font-size, inherit);
+  line-height: var(--form-base-line-height, inherit);
+  font-weight: var(--form-base-font-weight, inherit);
+  gap: var(--form-base-gap);
+  border-width: var(--form-base-border-width);
+  border-style: var(--form-base-border-style);
+  border-color: var(--form-base-border-color);
+}
+form div,
+form fieldset {
+  width: 100%;
+  box-sizing: border-box;
+}
+form div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--form-base-gap);
+}
+form input,
+form textarea {
+  color: var(--form-base-input-text-color, inherit);
+}
+
+/*------------------------------------------------------------------------*/
+/*------------------------- form-input-variables.scss ---------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --form-input-padding-top: 0.5rem;
+  --form-input-padding-right: 1rem;
+  --form-input-padding-bottom: 0.5rem;
+  --form-input-padding-left: 1rem;
+  --form-input-background-color: #fff;
+  /* --form-input-text-color: ; */
+  /* --form-input-font-size: ; */
+  /* --form-input-line-height: ; */
+  /* --form-input-font-weight: ; */
+  --form-input-min-height: 2.75rem;
+  --form-input-border-width: 1px;
+  --form-input-border-style: solid;
+  --form-input-border-color: #ccc;
+  /* --form-input-border-radius: var(--application-base-border-radius); */
+}
+
+/*---------------------------------------------------------------*/
+/*----------------------- form-input.scss ------------------------*/
+/*---------------------------------------------------------------*/
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: var(--form-input-padding-top);
+  padding-right: var(--form-input-padding-right);
+  padding-bottom: var(--form-input-padding-bottom);
+  padding-left: var(--form-input-padding-left);
+  background-color: var(--form-input-background-color);
+  color: var(--form-input-text-color, inherit);
+  font-size: var(--form-input-font-size, inherit);
+  line-height: var(--form-input-line-height, inherit);
+  font-weight: var(--form-input-font-weight, inherit);
+  min-height: var(--form-input-min-height, inherit);
+  border-width: var(--form-input-border-width);
+  border-style: var(--form-input-border-style);
+  border-color: var(--form-input-border-color);
+  border-radius: var(--form-input-border-radius);
+}
+
+/*------------------------------------------------------------------------*/
+/*---------------------- form-textarea-variables.scss --------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --form-textarea-width: 100%;
+  --form-textarea-resize: vertical;
+  --form-textarea-min-height: 2.75rem;
+  --form-textarea-padding: 0.75rem;
+  /* --form-textarea-font-size: ; */
+  /* --form-textarea-font-family: ; */
+  --form-textarea-text-color: var(--form-base-input-text-color);
+  --form-textarea-background-color: white;
+  --form-textarea-border-width: 1px;
+  --form-textarea-border-style: solid;
+  --form-textarea-border-color: #ccc;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- components/textarea.scss --------------------*/
+/*---------------------------------------------------------------*/
+form textarea {
+  width: var(--form-textarea-width);
+  resize: var(--form-textarea-resize);
+  box-sizing: border-box;
+  padding: var(--form-textarea-padding);
+  font-size: var(--form-textarea-font-size, inherit);
+  font-family: var(--form-textarea-font-family, inherit);
+  color: var(--form-textarea-text-color, inherit);
+  background-color: var(--form-textarea-background-color);
+  min-height: var(--form-textarea-min-height);
+  border-width: var(--form-textarea-border-width);
+  border-style: var(--form-textarea-border-style);
+  border-color: var(--form-textarea-border-color);
+}
+
+/*------------------------------------------------------------------------*/
+/*---------------------- form-checkbox-variables.scss --------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  /* --form-checkbox-margin-right: ; */
+  --form-checkbox-align-self: flex-start;
+  --form-checkbox-vertical-align: top;
+  --form-checkbox-width: 1.25rem;
+  --form-checkbox-height: 1.25rem;
+  --form-checkbox-cursor: pointer;
+}
+
+/*---------------------------------------------------------------*/
+/*---------------------- form-checkbox.scss ---------------------*/
+/*---------------------------------------------------------------*/
+form input[type=checkbox] {
+  margin: var(--form-checkbox-margin-right, 0);
+  padding: 0;
+  align-self: var(--form-checkbox-align-self);
+  vertical-align: var(--form-checkbox-vertical-align);
+  cursor: var(--form-checkbox-cursor);
+  width: 1.25rem;
+  height: 1.25rem;
+}
+form input[type=checkbox] + label {
+  width: auto;
+  cursor: pointer;
+  margin-top: 0;
+}
+form input[type=checkbox]:disabled {
+  cursor: not-allowed;
+}
+
+/*------------------------------------------------------------------------*/
+/*---------------------- form-select-variables.scss --------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --form-select-width: 100%;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- components/select.scss --------------------*/
+/*---------------------------------------------------------------*/
+form select {
+  width: var(--form-select-width);
+}
+
+/*------------------------------------------------------------------------*/
+/*---------------------- form-radio-variables.scss --------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  /* --form-radio-margin-right: ; */
+  --form-radio-align-self: flex-start;
+  --form-radio-vertical-align: top;
+  --form-radio-width: 1.25rem;
+  --form-radio-height: 1.25rem;
+  --form-radio-cursor: pointer;
+  --form-radio-background-color: var(--application-base-accent-color);
+}
+
+/*---------------------------------------------------------------*/
+/*---------------------- form-radio.scss ---------------------*/
+/*---------------------------------------------------------------*/
+form input[type=radio] {
+  margin: var(--form-radio-margin-right, 0);
+  padding: 0;
+  align-self: var(--form-radio-align-self);
+  vertical-align: var(--form-radio-vertical-align);
+  accent-color: var(--form-radio-background-color);
+  cursor: var(--form-radio-cursor);
+  width: 1.25rem;
+  height: 1.25rem;
+}
+form input[type=radio] + label {
+  width: auto;
+  cursor: pointer;
+  margin-top: 0;
+}
+form input[type=radio]:disabled {
+  cursor: not-allowed;
+}
+
+/*------------------------------------------------------------------------*/
+/*------------------- form-accent-color-variables.scss -------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --form-accent-color-color: var(--application-base-accent-color);
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------- form-accent-color.scss -------------------*/
+/*---------------------------------------------------------------*/
+form input[type=checkbox],
+form input[type=radio],
+form input[type=range],
+form progress {
+  accent-color: var(--form-accent-color-color, initial);
+}
+
+/*---------------------------------------------------------------*/
+/*------------- form-horizontal-view-variables.scss -------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --form-horizontal-view-justify-content: var(--form-base-flex-justify-content);
+  --form-horizontal-view-gap: var(--form-base-gap);
+  /* Labels */
+  --form-horizontal-view-label-max-width: 33.33%;
+  /* Input fields */
+  --form-horizontal-view-input-max-width: 66.66%;
+  /* Fieldset form fields */
+  /* Usually the same as form-base-gap, but it has to be a single value */
+  --form-horizontal-view-fieldset-fields-margin-bottom: 1.25rem;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- form-horizontal-view.scss -------------------*/
+/*---------------------------------------------------------------*/
+form.horizontal-view {
+  flex-direction: column;
+  gap: var(--form-horizontal-view-gap);
+}
+form.horizontal-view > div,
+form.horizontal-view > section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: var(--form-horizontal-view-justify-content);
+  flex-wrap: wrap;
+  gap: var(--form-horizontal-view-gap);
+}
+form.horizontal-view > div > *,
+form.horizontal-view > section > * {
+  flex-grow: 1;
+  box-sizing: border-box;
+}
+form.horizontal-view > div > button,
+form.horizontal-view > div > a.button,
+form.horizontal-view > div > input[type=button],
+form.horizontal-view > div > input[type=submit],
+form.horizontal-view > div > input[type=reset],
+form.horizontal-view > section > button,
+form.horizontal-view > section > a.button,
+form.horizontal-view > section > input[type=button],
+form.horizontal-view > section > input[type=submit],
+form.horizontal-view > section > input[type=reset] {
+  flex-grow: 0;
+}
+@media (min-width: 24rem) {
+  form.horizontal-view > div,
+form.horizontal-view > section {
+    flex-wrap: nowrap;
+  }
+  form.horizontal-view > div > *,
+form.horizontal-view > section > * {
+    max-width: var(--form-horizontal-view-input-max-width);
+  }
+  form.horizontal-view > div label,
+form.horizontal-view > section label {
+    max-width: var(--form-horizontal-view-label-max-width);
+  }
+}
+@media (min-width: 24rem) {
+  form.horizontal-view > div.horizontal-view {
+    max-width: var(--form-horizontal-view-input-max-width);
+    margin-left: auto;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  form.horizontal-view > div.horizontal-view > * {
+    width: 100%;
+    max-width: 100%;
+  }
+  form.horizontal-view > div.horizontal-view > button,
+form.horizontal-view > div.horizontal-view > a.button,
+form.horizontal-view > div.horizontal-view > input[type=button],
+form.horizontal-view > div.horizontal-view > input[type=submit],
+form.horizontal-view > div.horizontal-view > input[type=reset] {
+    flex-grow: 0;
+    width: auto;
+  }
+}
+
+/*------------------------------------------------------------------------*/
+/*------------------------- form-button-variables.scss -------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --form-button-min-width: var(--button-base-min-width);
+  --form-button-padding-top: var(--button-base-padding-top);
+  --form-button-padding-right: var(--button-base-padding-right);
+  --form-button-padding-bottom: var(--button-base-padding-bottom);
+  --form-button-padding-left: var(--button-base-padding-left);
+  --form-button-background-color: var(--button-base-background-color);
+  --form-button-color: var(--button-base-text-color);
+  --form-button-font-size: var(--text-base-font-size);
+  --form-button-line-height: var(--text-base-line-height);
+  --form-button-font-weight: var(--text-base-font-weight);
+  --form-button-border-width: var( --button-base-border-width);
+  --form-button-border-style: var( --button-base-border-style);
+  --form-button-border-color: var( --button-base-border-color);
+  --form-button-align-self: var(--button-base-align-self);
+}
+
+/*---------------------------------------------------------------*/
+/*----------------------- form-button.scss ----------------------*/
+/*---------------------------------------------------------------*/
+form button,
+form input[type=button],
+form input[type=submit],
+form input[type=reset] {
+  width: auto;
+  min-width: var(--form-button-min-width);
+  box-sizing: border-box;
+  padding-top: var(--form-button-padding-top);
+  padding-right: var(--form-button-padding-right);
+  padding-bottom: var(--form-button-padding-bottom);
+  padding-left: var(--form-button-padding-left);
+  background-color: var(--form-button-background-color);
+  color: var(--form-button-color);
+  font-size: var(--form-button-font-size);
+  line-height: var(--form-button-line-height);
+  font-weight: var(--form-button-font-weight);
+  border-width: var(--form-button-border-width);
+  border-style: var(--form-button-border-style);
+  border-color: var(--form-button-border-color);
+  align-self: var(--form-button-align-self);
+}
+
+/*------------------------------------------------------------------------*/
+/*-------------- form-button-grouped-horizontal-variables.scss -----------*/
+/*------------------------------------------------------------------------*/
+:root {
+  /* To align the grouped buttons to the right add a margin-left 	*/
+  /* set to "auto" to the first button. 							*/
+  /* To align the buttons to the left put this variable in a 		*/
+  /* comment or add "unset" 										*/
+  /* This is a bit of workaround until cleaner methods are found 	*/
+  --form-button-grouped-horizontal-first-child-margin-left: auto;
+}
+
+/*---------------------------------------------------------------*/
+/*------------- form-button-grouped-horizontal.scss -------------*/
+/*---------------------------------------------------------------*/
+form .horizontal-view button:first-child {
+  margin-left: var(--form-button-grouped-horizontal-first-child-margin-left);
+}
+
+/*------------------------------------------------------------------------*/
+/*----------------------- form-inline-variables.scss ---------------------*/
+/*------------------------------------------------------------------------*/
+:root {
+  --form-inline-text-color: var(--application-base-text-color);
+}
+
+/*---------------------------------------------------------------*/
+/*----------------------- form-inline.scss ----------------------*/
+/*---------------------------------------------------------------*/
+form.inline {
+  padding: 0;
+  background-color: transparent;
+  color: var(--form-inline-text-color);
+}
+form.inline button {
+  align-self: flex-start;
+}
+
+/*---------------------------------------------------------------*/
+/*------------------ form-combined-field.scss -------------------*/
+/*---------------------------------------------------------------*/
+.combined-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0;
+  flex-wrap: nowrap;
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- form-help-variables.scss ------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* form */
+  --form-help-padding-right: 3rem;
+  /* Button */
+  --form-help-button-width: 1rem;
+  --form-help-button-height: 1rem;
+  --form-help-button-padding-top: 0.5rem;
+  --form-help-button-padding-right: 0.5rem;
+  --form-help-button-padding-bottom: 0.5rem;
+  --form-help-button-padding-left: 0.5rem;
+  --form-help-button-top: 0.75rem;
+  --form-help-button-right: -2.5rem;
+  --form-help-button-border-width: 2px;
+  --form-help-button-border-style: solid;
+  --form-help-button-border-color: #3f51b5;
+  --form-help-button-border-radius: 50%;
+  --form-help-button-background-color: #3f51b5;
+  --form-help-button-text-color: #fff;
+  /* Hover */
+  --form-help-button-hover-background-color: var(--form-help-button-background-color);
+  --form-help-button-hover-text-color: var(--form-help-button-text-color);
+  /* Button icon */
+  --form-help-button-icon-content: "";
+  --form-help-button-icon-font-family: var(--icon-base-font-family);
+  --form-help-button-icon-font-size: 0.9rem;
+  --form-help-button-icon-font-weight: bold;
+  /* To center text within the button set the line-height to 1 */
+  --form-help-button-icon-line-height: 1;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------------- form-help.scss ------------------------*/
+/*---------------------------------------------------------------*/
+form.help {
+  position: relative;
+  padding-right: var(--form-help-padding-right, var(--form-base-padding-right));
+}
+form.help div {
+  position: relative;
+}
+form.help > div,
+form.help > fieldset {
+  position: relative;
+}
+form.help > div .help-button,
+form.help > fieldset .help-button {
+  position: absolute;
+  top: var(--form-help-button-top);
+  right: var(--form-help-button-right, auto);
+  padding-top: var(--form-help-button-padding-top);
+  padding-right: var(--form-help-button-padding-right);
+  padding-bottom: var(--form-help-button-padding-bottom);
+  padding-left: var(--form-help-button-padding-left);
+  box-sizing: border-box;
+  border-width: var(--form-help-button-border-width);
+  border-style: var(--form-help-button-border-style);
+  border-color: var(--form-help-button-border-color);
+  border-radius: var(--form-help-button-border-radius);
+  min-width: 0;
+  width: var(--form-help-button-width);
+  min-height: 0;
+  height: var(--form-help-button-height);
+  background-color: var(--form-help-button-background-color, inherit);
+  color: var(--form-help-button-text-color, inherit);
+}
+form.help > div .help-button:hover,
+form.help > fieldset .help-button:hover {
+  background-color: var(--form-help-button-hover-background-color);
+  color: var(--form-help-button-hover-text-color);
+}
+form.help > div .help-button:before,
+form.help > fieldset .help-button:before {
+  content: var(--form-help-button-icon-content);
+  font-family: var(--form-help-button-icon-font-family, inherit);
+  line-height: var(--form-help-button-icon-line-height);
+  font-size: var(--form-help-button-icon-font-size, inherit);
+  font-weight: var(--form-help-button-icon-font-weight, inherit);
+  vertical-align: middle;
+}
+form.help > div p.explanation.collapsed,
+form.help > div div.explanation.collapsed,
+form.help > fieldset p.explanation.collapsed,
+form.help > fieldset div.explanation.collapsed {
+  display: none;
+}
+form.help fieldset {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------- form-fieldset-variables.scss ----------------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Fields within the fieldset */
+  --form-fieldset-fields-margin-top: 1rem;
+  /* Legend */
+  --form-fieldset-legend-font-weight: bold;
+  --form-fieldset-legend-margin-bottom: 1rem;
+}
+
+/*---------------------------------------------------------------*/
+/*---------------------- form-fieldset.scss ---------------------*/
+/*---------------------------------------------------------------*/
+/* Fieldset styling is a bit different compared to the default form styling.
+This is because of a couple of styling restrictions and issues concerning fieldsets and it's children.
+- Fieldsets can't use flexbox 
+- When elements within the fieldset use flexbox, unwanted white-space appears at the bottom of the fieldset.
+The amount of whitespace depends on the length of the fieldset before flex positioning took place. And will not be removed after. 
+
+The usage of fieldsets is recommended because it is the semantically correct element to use for form grouping.
+As well as it improves the experience for users who are using a screenreader to navigate the form. 
+
+To prevent these issues to cause unexpected behaviour the fieldset and it's children within this set do no use flexbox for their positioning.
+But the alternative styling as you can see below.
+
+For more information on the bug see: https://github.com/philipwalton/flexbugs#9-some-html-elements-cant-be-flex-containers
+and: https://bugs.chromium.org/p/chromium/issues/detail?id=262679 */
+form > fieldset legend {
+  font-weight: var(--form-fieldset-legend-font-weight);
+  margin-bottom: var(--form-fieldset-legend-margin-bottom);
+}
+form > fieldset div {
+  display: block;
+  float: left;
+  /* used to re-render the div so long labels won't run out of the div */
+  width: 100%;
+}
+form > fieldset div > * {
+  float: left;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+form > fieldset > *,
+form > fieldset > fieldset {
+  margin-bottom: var(--form-fieldset-fields-margin-top);
+}
+form > fieldset > *:last-child,
+form > fieldset > fieldset:last-child {
+  margin-bottom: 0;
+}
+
+/*---------------------------------------------------------------*/
+/*------------ form-fieldset-visually-hidden.scss ---------------*/
+/*---------------------------------------------------------------*/
+form fieldset {
+  padding: 0;
+  border: 0;
+  margin: 0;
+  display: inline-block;
+  position: relative;
+}
+
+/*---------------------------------------------------------------*/
+/*--------- form-horizontal-view-fieldset-variables.scss --------*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Label */
+  --form-horizontal-view-fieldset-label-margin-top: 0.75rem;
+  /* Label required*/
+  --form-horizontal-view-fieldset-label-required-margin-top: 1.5rem;
+}
+
+/*---------------------------------------------------------------*/
+/*-------------- form-horizontal-view-fieldset.scss -------------*/
+/*---------------------------------------------------------------*/
+/* Fieldset styling is a bit different compared to the default form styling.
+This is because of a couple of styling restrictions and issues concerning fieldsets and it's children.
+- Fieldsets can't use flexbox 
+- When elements within the fieldset use flexbox, unwanted white-space appears at the bottom of the fieldset.
+The amount of whitespace depends on the length of the fieldset before flex positioning took place. And will not be removed after. 
+
+The usage of fieldsets is recommended because it is the semantically correct element to use for form grouping.
+As well as it improves the experience for users who are using a screenreader to navigate the form. 
+
+To prevent these issues to cause unexpected behaviour the fieldset and it's children within this set do no use flexbox for their positioning.
+But the alternative styling as you can see below.
+
+For more information on the bug see: https://github.com/philipwalton/flexbugs#9-some-html-elements-cant-be-flex-containers
+and: https://bugs.chromium.org/p/chromium/issues/detail?id=262679 */
+@media (min-width: 24rem) {
+  form.horizontal-view > fieldset > div > * {
+    width: var(--form-horizontal-view-input-max-width);
+  }
+  form.horizontal-view > fieldset > div label {
+    width: var(--form-horizontal-view-label-max-width);
+    padding-right: var(--form-horizontal-view-gap);
+    margin-top: var(--form-horizontal-view-fieldset-label-margin-top);
+  }
+}
+form.horizontal-view > fieldset .required label {
+  margin-top: var(--form-horizontal-view-fieldset-label-required-margin-top);
+}
+
+/*---------------------------------------------------------------*/
+/*------ form-fieldset-visually-hidden-horizontal-view.scss -----*/
+/*---------------------------------------------------------------*/
+/* Uses form-fieldset-visually-hidden */
+form.horizontal-view > fieldset > fieldset legend {
+  font-weight: inherit;
+  margin: 0;
+  box-sizing: border-box;
+  width: var(--form-horizontal-view-label-max-width);
+  float: left;
+  padding-right: var(--form-horizontal-view-gap);
+  margin-top: var(--form-horizontal-view-fieldset-label-margin-top);
+}
+@media (min-width: 24rem) {
+  form.horizontal-view > fieldset > fieldset > * {
+    width: var(--form-horizontal-view-input-max-width);
+    float: right;
+  }
+}
+
+/*---------------------------------------------------------------*/
+/*------- form-fieldset-visually-hidden-help-variables.scss -----*/
+/*---------------------------------------------------------------*/
+:root {
+  /* Help button */
+  --form-fieldset-visually-hidden-help-button-top: 2.25rem;
+}
+
+/*---------------------------------------------------------------*/
+/*------------- form-fieldset-visually-hidden-help.scss ---------*/
+/*---------------------------------------------------------------*/
+/* Uses form-fieldset-visually-hidden */
+form.help > fieldset > fieldset .help-button {
+  top: var(--form-fieldset-visually-hidden-help-button-top);
+}
+
+/*---------------------------------------------------------------*/
+/*--------------- notification-base-variables.scss --------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --notification-base-notification-text-color: #000;
+  --notification-base-width: 100%;
+  --notification-base-padding-top: 1.5rem;
+  --notification-base-padding-right: 1rem;
+  --notification-base-padding-bottom: 1.5rem;
+  --notification-base-padding-left: 1rem;
+  --notification-base-background-color: #f0f0f0;
+  --notification-base-border-width: 1px;
+  --notification-base-border-style: solid;
+  --notification-base-border-color: #a3a3a3;
+  /* Link */
+  --notification-base-link-text-color: var(--link-base-text-color);
+  --notification-base-link-hover-text-color: var(--link-base-hover-text-color);
+  --notification-base-link-visited-text-color: var(--link-base-visited-text-color);
+  --notification-base-link-visited-hover-text-color: var(--link-base-visited-hover-text-color);
+  /* Span */
+  --notification-base-span-font-weight: bold;
+}
+
+/*---------------------------------------------------------------*/
+/*--------------- components/notification-base.scss -------------*/
+/*---------------------------------------------------------------*/
+.system, .confirmation, .explanation, .warning, .error,
+.notification {
+  background-color: var(--notification-base-background-color);
+  color: var(--notification-base-notification-text-color);
+}
+.hidden.system, .hidden.confirmation, .hidden.explanation, .hidden.warning, .hidden.error,
+.notification.hidden {
+  display: none;
+}
+.system a, .confirmation a, .explanation a, .warning a, .error a,
+.notification a {
+  color: var(--notification-base-link-text-color);
+}
+.system a:hover, .confirmation a:hover, .explanation a:hover, .warning a:hover, .error a:hover,
+.notification a:hover {
+  color: var(--notification-base-link-hover-text-color);
+}
+.system a:visited, .confirmation a:visited, .explanation a:visited, .warning a:visited, .error a:visited,
+.notification a:visited {
+  color: var(--notification-base-link-visited-text-color);
+}
+.system a:visited:hover, .confirmation a:visited:hover, .explanation a:visited:hover, .warning a:visited:hover, .error a:visited:hover,
+.notification a:visited:hover {
+  color: var(--notification-base-link-visited-hover-text-color);
+}
+.system a:visited:before, .confirmation a:visited:before, .explanation a:visited:before, .warning a:visited:before, .error a:visited:before,
+.notification a:visited:before {
+  color: inherit;
+}
+
+table .error:before,
+table .warning:before,
+table .confirmation:before,
+table .explanation:before {
+  /* @extend %message-icon; */
+  display: block;
+  float: left;
+  width: 1.5rem;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  min-height: 1.5rem;
+}
+table .error:before {
+  background-position: 0 3rem;
+}
+table .confirmation:before {
+  background-position: 0 1.5rem;
+}
+table .explanation:before {
+  background-position: 0 4.5rem;
+}
+table thead tr.error:nth-child(even),
+table tbody tr.error:nth-child(even),
+table tfoot tr.error:nth-child(even) {
+  background-color: var(--notification-error-color-darker);
+}
+table thead tr.error th,
+table tbody tr.error th,
+table tfoot tr.error th {
+  /* @include error-intense; palegreen */
+}
+table thead tr.warning:nth-child(even),
+table tbody tr.warning:nth-child(even),
+table tfoot tr.warning:nth-child(even) {
+  background-color: var(--notification-warning-color-darker);
+}
+table thead tr.warning th,
+table tbody tr.warning th,
+table tfoot tr.warning th {
+  /* @include warning-intense; palegreen */
+}
+table thead tr.confirmation:nth-child(even),
+table tbody tr.confirmation:nth-child(even),
+table tfoot tr.confirmation:nth-child(even) {
+  background-color: var(--notification-confirmation-color-darker);
+}
+table thead tr.confirmation th,
+table tbody tr.confirmation th,
+table tfoot tr.confirmation th {
+  /* @include confirmation-intense; palegreen */
+}
+table thead tr.explanation:nth-child(even),
+table tbody tr.explanation:nth-child(even),
+table tfoot tr.explanation:nth-child(even) {
+  background-color: var(--notification-explanation-color-darker);
+}
+table thead tr.explanation th,
+table tbody tr.explanation th,
+table tfoot tr.explanation th {
+  /* @include explanation-intense; palegreen */
+}
+table thead th.error,
+table tbody th.error,
+table tfoot th.error {
+  /* @include error-intense; palegreen */
+}
+table thead th.error:before,
+table tbody th.error:before,
+table tfoot th.error:before {
+  background-image: url(../img/notification_icons_light.svg);
+}
+table thead th.warning,
+table tbody th.warning,
+table tfoot th.warning {
+  /* @include warning-intense; palegreen */
+}
+table thead th.warning:before,
+table tbody th.warning:before,
+table tfoot th.warning:before {
+  background-image: url(../img/notification_icons_dark.svg);
+}
+table thead th.confirmation,
+table tbody th.confirmation,
+table tfoot th.confirmation {
+  /* @include confirmation-intense; palegreen */
+}
+table thead th.confirmation:before,
+table tbody th.confirmation:before,
+table tfoot th.confirmation:before {
+  background-image: url(../img/notification_icons_light.svg);
+}
+table thead th.explanation,
+table tbody th.explanation,
+table tfoot th.explanation {
+  /* @include explanation-intense; palegreen */
+}
+table thead th.explanation:before,
+table tbody th.explanation:before,
+table tfoot th.explanation:before {
+  background-image: url(../img/notification_icons_light.svg);
+}
+
+input.error,
+select.error,
+textarea.error,
+input[type=checkbox]:not(:checked).error,
+input[type=radio]:not(:checked).error {
+  border-color: var(--notification-error-color-intense);
+}
+input.warning,
+select.warning,
+textarea.warning,
+input[type=checkbox]:not(:checked).warning,
+input[type=radio]:not(:checked).warning {
+  border-color: var(--notification-warning-color-intense);
+}
+input.confirmation,
+select.confirmation,
+textarea.confirmation,
+input[type=checkbox]:not(:checked).confirmation,
+input[type=radio]:not(:checked).confirmation {
+  border-color: var(--notification-confirmation-color-intense);
+}
+input.explanation,
+select.explanation,
+textarea.explanation,
+input[type=checkbox]:not(:checked).explanation,
+input[type=radio]:not(:checked).explanation {
+  border-color: var(--notification-explanation-color-intense);
+}
+
+input.error, input.warning, input.confirmation, input.explanation,
+select.error,
+select.warning,
+select.confirmation,
+select.explanation,
+textarea.error,
+textarea.warning,
+textarea.confirmation,
+textarea.explanation {
+  border-width: 1px;
+  border-style: solid;
+  background-color: #fff;
+}
+
+button.error, button.warning, button.confirmation, button.explanation,
+a.button.error,
+a.button.warning,
+a.button.confirmation,
+a.button.explanation,
+input[type=button].error,
+input[type=button].warning,
+input[type=button].confirmation,
+input[type=button].explanation,
+input[type=submit].error,
+input[type=submit].warning,
+input[type=submit].confirmation,
+input[type=submit].explanation,
+input[type=reset].error,
+input[type=reset].warning,
+input[type=reset].confirmation,
+input[type=reset].explanation {
+  color: var(--text-dark);
+}
+button.error,
+a.button.error,
+input[type=button].error,
+input[type=submit].error,
+input[type=reset].error {
+  /* @include error-intense; palegreen */
+}
+button.error:hover,
+a.button.error:hover,
+input[type=button].error:hover,
+input[type=submit].error:hover,
+input[type=reset].error:hover {
+  background-color: var(--notification-error-color-intense-darker);
+  border-color: var(--notification-error-color-intense-darker);
+}
+button.warning,
+a.button.warning,
+input[type=button].warning,
+input[type=submit].warning,
+input[type=reset].warning {
+  /* @include warning-intense; palegreen */
+}
+button.warning:hover,
+a.button.warning:hover,
+input[type=button].warning:hover,
+input[type=submit].warning:hover,
+input[type=reset].warning:hover {
+  background-color: var(--notification-warning-color-intense-darker);
+  border-color: var(--notification-warning-color-intense-darker);
+  color: var(--text-light);
+}
+button.confirmation,
+a.button.confirmation,
+input[type=button].confirmation,
+input[type=submit].confirmation,
+input[type=reset].confirmation {
+  /* @include confirmation-intense; palegreen */
+}
+button.confirmation:hover,
+a.button.confirmation:hover,
+input[type=button].confirmation:hover,
+input[type=submit].confirmation:hover,
+input[type=reset].confirmation:hover {
+  background-color: var(--notification-confirmation-color-intense-darker);
+  border-color: var(--notification-confirmation-color-intense-darker);
+}
+button.explanation,
+a.button.explanation,
+input[type=button].explanation,
+input[type=submit].explanation,
+input[type=reset].explanation {
+  /* @include explanation-intense; palegreen */
+}
+button.explanation:hover,
+a.button.explanation:hover,
+input[type=button].explanation:hover,
+input[type=submit].explanation:hover,
+input[type=reset].explanation:hover {
+  background-color: var(--notification-explanation-color-intense-darker);
+  border-color: var(--notification-explanation-color-intense-darker);
+  border-color: var(--notification-explanation-color-intense-darker);
+}
+
+/*---------------------------------------------------------------*/
+/*---------- notification-block-element-variables.scss ----------*/
+/*---------------------------------------------------------------*/
+:root {
+  --notification-block-element-flex-direction: column;
+  --notification-block-element-align-items: flex-start;
+  --notification-block-element-justify-content: flex-start;
+  --notification-block-element-position: relative;
+  --notification-block-element-width: var(--notification-base-width);
+  --notification-block-element-padding-top: 1.5rem;
+  --notification-block-element-padding-right: 1rem;
+  --notification-block-element-padding-bottom: 1.5rem;
+  --notification-block-element-padding-left: 1rem;
+  --notification-block-element-gap: 1rem;
+  --notification-block-element-text-color: #000;
+  /* Link */
+  --notification-block-element-link-text-color: var(--link-block-element-text-color);
+  --notification-block-element-link-hover-text-color: var(--link-block-element-hover-text-color);
+  --notification-block-element-link-visited-text-color: var(--link-block-element-visited-text-color);
+  --notification-block-element-link-visited-hover-text-color: var(--link-block-element-visited-hover-text-color);
+  /* Span */
+  --notification-block-element-span-font-weight: bold;
+}
+
+/*---------------------------------------------------------------*/
+/*------- components/notification/block-message.scss ------------*/
+/*---------------------------------------------------------------*/
+div.notification, div.error, div.warning, div.confirmation, div.explanation, div.system,
+section.notification,
+section.error,
+section.warning,
+section.confirmation,
+section.explanation,
+section.system {
+  display: flex;
+  flex-direction: var(--notification-block-element-flex-direction);
+  align-items: var(--notification-block-element-align-items);
+  justify-content: var(--notification-block-element-justify-content);
+  position: var(--notification-block-element-position);
+  width: var(--notification-block-element-width);
+  padding-top: var(--notification-block-element-padding-top);
+  padding-right: var(--notification-block-element-padding-right);
+  padding-bottom: var(--notification-block-element-padding-bottom);
+  padding-left: var(--notification-block-element-padding-left);
+  box-sizing: border-box;
+  gap: var(--notification-block-element-gap);
+  color: var(--notification-block-element-text-color);
+}
+
+/*{
+
+
+	&:before {
+		position: absolute;
+		margin-right: 0;
+	}
+
+	@media (min-width: 24rem) {
+		padding: 1.5rem 3% 1.5rem calc(3% + 3rem);
+	}
+
+	> * {
+		margin: 0;
+	}
+
+	h1 {
+		font-size: var(--font-heading-size-small);
+	}
+
+	@media (min-width: 24rem) {
+		margin: 2.5rem 0;
+		align-items: flex-start;
+	}
+}*/
+/*---------------------------------------------------------------*/
+/*------------ notification-paragraph-variables.scss ------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --notification-paragraph-width: var(--notification-base-width);
+  --notification-paragraph-padding-top: var(--notification-base-padding-top);
+  --notification-paragraph-padding-right: var(--notification-base-padding-right);
+  --notification-paragraph-padding-bottom: var(--notification-base-padding-bottom);
+  --notification-paragraph-padding-left: var(--notification-base-padding-left);
+  /* span */
+  --notification-paragraph-span-font-weight: var(--notification-base-span-font-weight);
+}
+
+/*---------------------------------------------------------------*/
+/*---------- components/notification-paragraph.scss -------------*/
+/*---------------------------------------------------------------*/
+p.notification, p.error, p.warning, p.confirmation, p.explanation, p.system {
+  display: inline-block;
+  box-sizing: border-box;
+  width: var(--notification-paragraph-width);
+  padding-top: var(--notification-paragraph-padding-top);
+  padding-right: var(--notification-paragraph-padding-right);
+  padding-bottom: var(--notification-paragraph-padding-bottom);
+  padding-left: var(--notification-paragraph-padding-left);
+}
+p.notification > span:first-of-type, p.error > span:first-of-type, p.warning > span:first-of-type, p.confirmation > span:first-of-type, p.explanation > span:first-of-type, p.system > span:first-of-type {
+  font-weight: var(--notification-paragraph-span-font-weight);
+}
+
+/*---------------------------------------------------------------*/
+/*----------- notification-table-head-variables.scss ------------*/
+/*---------------------------------------------------------------*/
+/*---------------------------------------------------------------*/
+/*---------------- notification-table-head.scss -----------------*/
+/*---------------------------------------------------------------*/
+/*---------------------------------------------------------------*/
+/*--------------- notification-error-variables.scss -------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --notification-error-background-color: #ffd9d9;
+  --notification-error-border-width: var(--notification-base-border-width);
+  --notification-error-border-style: var(--notification-base-border-style);
+  --notification-error-border-color: #d98383;
+  /* Icon as before or after */
+  /* --notification-error-icon-before-content: ; */
+  /* --notification-error-icon-before-content: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- notification-error.scss -------------------*/
+/*---------------------------------------------------------------*/
+.error {
+  background-color: var(--notification-error-background-color);
+  border-width: var(--notification-error-border-width);
+  border-style: var(--notification-error-border-style);
+  border-color: var(--notification-error-border-color);
+}
+.error:before {
+  content: var(--notification-error-icon-before-content);
+}
+.error:after {
+  content: var(--notification-error-icon-after-content);
+}
+
+/*---------------------------------------------------------------*/
+/*-------------- notification-warning-variables.scss ------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --notification-warning-background-color: #fff2d1;
+  --notification-warning-border-width: var(--notification-base-border-width);
+  --notification-warning-border-style: var(--notification-base-border-style);
+  --notification-warning-border-color: #f6cb5f;
+  /* Icon as before or after */
+  /* --notification-warning-icon-before-content: ; */
+  /* --notification-warning-icon-before-content: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*------------------- notification-warning.scss -----------------*/
+/*---------------------------------------------------------------*/
+.warning {
+  background-color: var(--notification-warning-background-color);
+  border-width: var(--notification-warning-border-width);
+  border-style: var(--notification-warning-border-style);
+  border-color: var(--notification-warning-border-color);
+}
+.warning:before {
+  content: var(--notification-warning-icon-before-content);
+}
+.warning:after {
+  content: var(--notification-warning-icon-after-content);
+}
+
+/*---------------------------------------------------------------*/
+/*---------- notification-explanation-variables.scss ------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --notification-explanation-background-color: #d9edff;
+  --notification-explanation-border-width: var(--notification-base-border-width);
+  --notification-explanation-border-style: var(--notification-base-border-style);
+  --notification-explanation-border-color: #a6c1d8;
+  /* Icon as before or after */
+  /* --notification-explanation-icon-before-content: ; */
+  /* --notification-explanation-icon-before-content: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*---------------- notification-explanation.scss ----------------*/
+/*---------------------------------------------------------------*/
+.explanation {
+  background-color: var(--notification-explanation-background-color);
+  border-width: var(--notification-explanation-border-width);
+  border-style: var(--notification-explanation-border-style);
+  border-color: var(--notification-explanation-border-color);
+}
+.explanation:before {
+  content: var(--notification-explanation-icon-before-content);
+}
+.explanation:after {
+  content: var(--notification-explanation-icon-after-content);
+}
+
+/*---------------------------------------------------------------*/
+/*---------- notification-confirmation-variables.scss -----------*/
+/*---------------------------------------------------------------*/
+:root {
+  --notification-confirmation-background-color: #deffdb;
+  --notification-confirmation-border-width: var(--notification-base-border-width);
+  --notification-confirmation-border-style: var(--notification-base-border-style);
+  --notification-confirmation-border-color: #9ac596;
+  /* Icon as before or after */
+  /* --notification-confirmation-icon-before-content: ; */
+  /* --notification-confirmation-icon-before-content: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*---------------- notification-confirmation.scss ---------------*/
+/*---------------------------------------------------------------*/
+.confirmation {
+  background-color: var(--notification-confirmation-background-color);
+  border-width: var(--notification-confirmation-border-width);
+  border-style: var(--notification-confirmation-border-style);
+  border-color: var(--notification-confirmation-border-color);
+}
+.confirmation:before {
+  content: var(--notification-confirmation-icon-before-content);
+}
+.confirmation:after {
+  content: var(--notification-confirmation-icon-after-content);
+}
+
+/*---------------------------------------------------------------*/
+/*------------- notification-system-variables.scss --------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --notification-system-background-color: #eee;
+  --notification-system-border-width: var(--notification-base-border-width);
+  --notification-system-border-style: var(--notification-base-border-style);
+  --notification-system-border-color: #c7c7c7;
+  /* Icon as before or after */
+  /* --notification-system-icon-before-content: ; */
+  /* --notification-system-icon-before-content: ; */
+}
+
+/*---------------------------------------------------------------*/
+/*-------------------- notification-system.scss -----------------*/
+/*---------------------------------------------------------------*/
+.system {
+  background-color: var(--notification-system-background-color);
+  border-width: var(--notification-system-border-width);
+  border-style: var(--notification-system-border-style);
+  border-color: var(--notification-system-border-color);
+}
+.system:before {
+  content: var(--notification-system-icon-before-content);
+}
+.system:after {
+  content: var(--notification-system-icon-after-content);
+}
+
+/*---------------------------------------------------------------*/
+/*------------------ login-meta-variables.scss ------------------*/
+/*---------------------------------------------------------------*/
+:root {
+  --login-meta-flex-direction: row;
+  --login-meta-justify-content: flex-end;
+  --login-meta-align-items: center;
+  --login-meta-padding-top: 0.5rem;
+  --login-meta-padding-right: 0.5rem;
+  --login-meta-padding-bottom: 0.5rem;
+  --login-meta-padding-left: 0.5rem;
+  --login-meta-gap: 1rem;
+  --login-meta-background-color: #eaeaea;
+  --login-meta-color: #000;
+}
+
+/*---------------------------------------------------------------*/
+/*----------------------- login-meta.scss -----------------------*/
+/*---------------------------------------------------------------*/
+.login-meta {
+  display: flex;
+  flex-direction: var(--login-meta-flex-direction);
+  justify-content: var(--login-meta-justify-content);
+  padding-top: var(--login-meta-padding-top);
+  padding-right: var(--login-meta-padding-right);
+  padding-bottom: var(--login-meta-padding-bottom);
+  padding-left: var(--login-meta-padding-left);
+  gap: var(--login-meta-gap);
+  width: 100%;
+  max-width: unset;
+  flex-grow: 1;
+  margin: 0;
+  background-color: var(--login-meta-background-color);
+  color: var(--login-meta-text-color);
+  box-sizing: border-box;
+}
+
+/*---------------------------------------------------------------*/
+/*------------------------- shared.scss -------------------------*/
+/*---------------------------------------------------------------*/
+/* Color sets */
+/* Fonts */
+/* Colors */
+/* Labels */
+/* States */
+/* Application style settings */
+/* Icon */
+/* Text */
+/* Helpers */
+/* Layout */
+/* Header */
+/* Main */
+/* Navigation */
+/* Article */
+/*@use "manon/article-base";*/
+/* Section */
+/* Footer */
+/* Components */
+/* Button */
+/* Images */
+/* Tiles */
+/* Table */
+/* Needs to be first of the set */
+/* Form */
+/* Fieldset */
+/* Notifications */
+/* Login meta */

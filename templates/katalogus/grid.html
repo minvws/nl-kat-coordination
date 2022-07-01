@@ -1,0 +1,17 @@
+{% extends "katalogus/katalogus.html" %}
+{% load i18n %}
+
+{% block katalogus-view %}
+  <section>
+    <div class="horizontal-view toolbar">
+      <a href="{{ request.path }}?view=list"
+         class="button icon ti-menu-2 ghost">{% translate 'Listview' %}</a>
+      <a href="{{ request.path }}" class="button icon ti-layout-grid">{% translate 'Gridview' %}</a>
+    </div>
+    <div class="column-4 tiles plugins images-cover">
+      {% for item in boefjes %}
+        {% include 'partials/boefje_tile.html' %}
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

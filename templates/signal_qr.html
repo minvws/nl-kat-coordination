@@ -1,0 +1,26 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% block content %}
+  {% include 'header.html' %}
+  <main>
+    {% include 'partials/notifications/notifications_block.html' %}
+    <section>
+      <div>
+        <h1>{% translate 'Signal QR' %}</h1>
+        {% if  signal_qr_base_64 %}
+          <p>
+            {% translate 'Scan this QR code to link Signal and add your number to registered users.' %}
+          </p>
+          <img src="{{ signal_qr_base_64 }}"
+               width="150"
+               height="150"
+               alt="{% translate 'Scan QR code' %}">
+        {% else %}
+          <p>
+            {% translate 'No QR code available.' %}
+          </p>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+{% endblock %}

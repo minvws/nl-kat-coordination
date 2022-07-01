@@ -1,0 +1,10 @@
+{% extends 'partials/list_filters.html' %}
+{% load i18n %}
+
+{% block title %}
+{% if count %}<span>{{ count }}</span> {% endif %}{{ title }}
+{% endblock %}
+
+{% block filter_form %}
+  {% include 'partials/elements/ooi_list_settings_form.html' %}
+{% endblock %}

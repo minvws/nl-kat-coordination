@@ -1,0 +1,39 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+{% include 'header.html' %}
+
+<main id="main-content">
+  <section class="hero">
+    <div class="one-third-two-thirds">
+      <div class="tile">
+        <h1>{% translate 'Summary for' %} {{ ooi.human_readable }} - <em>{{ ooi.get_ooi_type }}</em></h1>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div>
+      <p>
+        Below you can see findings that were found for <a href="{% ooi_url 'ooi_detail' ooi.primary_key %}">{{ ooi.human_readable }}</a>
+        and direct  children of this <em>{{ ooi.get_ooi_type }}</em>.
+      </p>
+
+      <p>
+        This <a href="{% ooi_url 'ooi_tree' ooi.primary_key depth=3 %}">tree view</a> of the <em>{{ ooi.get_ooi_type }}</em>
+        shows the same objects.
+      </p>
+    </div>
+  </section>
+
+  {% include "partials/ooi_summary_block.html" with tree_node=tree %}
+
+</main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+{% endblock %}

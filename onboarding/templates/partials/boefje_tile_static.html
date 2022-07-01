@@ -1,0 +1,18 @@
+{% load i18n %}
+{% load static %}
+
+{% for boefje in boefjes %}
+  <div role="group">
+    <img src="{{ boefje.tile_image }}" alt="placeholder image"/>
+    <div class="horizontal-view scan-intensity">
+      <span class="de-emphasized">{% translate 'Scan intensity score:' %}</span>
+      <ul class="level-indicator {{ boefje.scan_level }}">
+        {% for i in '1234'|make_list %}<li></li>{% endfor %}
+      </ul>
+    </div>
+    <h1>{{ boefje.name }}</h1>
+    <p>
+      {% translate boefje.description %}
+    </p>
+  </div>
+{% endfor %}

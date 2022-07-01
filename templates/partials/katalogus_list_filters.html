@@ -1,0 +1,47 @@
+{% extends 'partials/list_filters.html' %}
+{% load i18n %}
+
+{% block title %}
+{% if count %}<span>{{ count }}</span> {% endif %}{% translate 'Boefjes available' %}
+{% endblock %}
+
+{% block filter_form %}
+  <form method="get">
+    <fieldset>
+      <div class="column-2">
+        <div>
+          <legend>{% translate "Filter options" %}</legend>
+          <div>
+            {% for checkbox in checkbox_filters %}
+            <div class="horizontal-view">
+              <input type="checkbox"
+              id="checkbox-filter-{{ checkbox.value }}"
+              name="boefje_status_filter"
+              value="{{ checkbox.value }}"
+              {% if checkbox.checked %} checked{% endif %}>
+              <label for="checkbox-filter-{{ checkbox.value }}">{{ checkbox.label }}</label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div>
+          <legend>{% translate "Sorting options" %}</legend>
+          <div>
+            {% for option in radio_sorting %}
+            <div class="horizontal-view">
+              <input type="radio"
+              id="radio-sorting-{{ option.value }}"
+              name="katalogus_sorting"
+              value="{{ option.value }}"
+              {% if option.checked %} checked{% endif %}>
+              <label for="radio-sorting-{{ option.value }}">{%translate option.label %}</label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </fieldset>
+    <input type="submit" value="{% translate 'Update List' %}">
+  </form>
+{% endblock %}

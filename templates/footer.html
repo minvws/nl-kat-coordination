@@ -1,0 +1,20 @@
+{% load static %}
+{% load i18n %}
+
+<footer>
+  <div class="two-thirds-one-third">
+    <div>
+      <a href="/" class="kat-logo" title="KAT">
+        <img src="{% static 'img/kat_logo.png' %}" alt="logo Kwetsbaarheden Analyse Tool" />
+      </a>
+    </div>
+
+    <nav aria-labelledby="footer-nav-1">
+      <h1 id="footer-nav-1">Service</h1>
+      <ul>
+        <li><a href="{% url 'crisis_room' %}">KAT</a></li>
+        <li><a href="{% url 'privacy_statement' %}">{% translate "Privacy Statement" %}</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>

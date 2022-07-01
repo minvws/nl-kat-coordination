@@ -1,0 +1,45 @@
+name: Run the test suite
+
+
+on:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - 'develop'
+      - 'master'
+
+jobs:
+  Tests:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Configure git
+        env:
+          TOKEN: ${{ secrets.RDO_REPO_RO }}
+        run: git config --global url."https://${{ secrets.RDO_REPO_RO }}@github.com/".insteadOf "ssh://git@github.com/"
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: nl-rt-tim-abang-rocky
+
+      - name: Checkout octopoes
+        uses: actions/checkout@v2
+        with:
+          repository: minvws/nl-rt-tim-abang-octopoes
+          path: nl-rt-tim-abang-octopoes
+          token: ${{ secrets.RDO_REPO_RO }}
+
+      - name: Checkout boefjes
+        uses: actions/checkout@v2
+        with:
+          repository: minvws/nl-rt-tim-abang-boefjes
+          path: nl-rt-tim-abang-boefjes
+          token: ${{ secrets.RDO_REPO_RO }}
+          
+      - name: Run tests
+        run: docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
+        working-directory: nl-rt-tim-abang-rocky

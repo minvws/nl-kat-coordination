@@ -1,0 +1,16 @@
+{% load i18n %}
+
+{% spaceless %}
+  {% if help_text %}
+    <div 
+      id="explanation-{{ field.label.split|join:"-"|lower }}" 
+      class="explanation help_text"
+      data-open-label="{% translate 'Open explanation' %}"
+      data-close-label="{% translate 'Close explanation' %}"
+      aria-label="{% translate 'explanation' %}"
+      >
+      <span>{% translate 'Explanation' %}:</span>
+      {{ help_text }}
+    </div>
+  {% endif %}
+{% endspaceless %}

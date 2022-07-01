@@ -1,0 +1,67 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        {% if ooi_past_due %}
+          {% include 'oois/ooi_past_due_warning.html' with ooi_current=ooi_current %}
+        {% endif %}
+        {% include 'partials/ooi_head.html' with ooi=ooi view='ooi_detail' %}
+        {% include 'oois/ooi_detail_object.html' with ooi=ooi object_details=object_details %}
+      </div>
+      <div>
+        {% include 'oois/ooi_detail_origins_declarations.html' %}
+        {% include 'oois/ooi_detail_origins_observations.html' %}
+        {% include 'oois/ooi_detail_origins_inference.html' %}
+        {% include 'partials/ooi_detail_related_object.html' with query=mandatory_fields ooi_past_due=ooi_past_due related=related ooi=ooi %}
+      </div>
+      <div>
+        {% if not ooi|is_finding and not ooi|is_finding_type %}
+          {% include "oois/ooi_detail_findings_overview.html" with severity_summary=findings_severity_summary severity_summary_totals=severity_summary_totals %}
+        {% endif %}
+      </div>
+      <div>
+        {% if boefjes %}
+          <h2>{% translate 'Scan' %} {{ ooi.human_readable }} {% translate 'using boefjes' %}</h2>
+          <div class="horizontal-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>{% translate 'Boefje' %}</th>
+                  <th>{% translate 'Description' %}</th>
+                  <th>{% translate 'Scan profile' %}</th>
+                  <th>{% translate 'Scan' %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for boefje in boefjes %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'katalogus_detail' boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
+                    </td>
+                    <td>{{ boefje.description }}</td>
+                    <td>{% include 'partials/scan_level_indicator.html' with scan_level=boefje.scan_level.label %}</td>
+                    <td>
+                      {% include 'partials/form/single_action_form.html' with btn_text="Start Scan" action='start_scan' key='boefje_id' value=boefje.id %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT introduction' %}</h1>
+        <h2>{% translate 'DNS Report' %}</h2>
+        <p>
+          {% blocktranslate trimmed %}
+          These are the findings of a KAT-analysis ({{ observed_at }}).
+          Click a finding for more detailed information about the issue, its origin, severity and possible solutions.
+          {% endblocktranslate %}
+        </p>
+        {% include "partials/ooi_report_severity_totals.html" %}
+        {% include "partials/ooi_report_findings_block.html" %}
+        <section>
+          <div>
+            <h2>{% translate 'DNS Tree' %}</h2>
+            {% include "partials/elements/ooi_tree_condensed_table.html" with list=tree %}
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+{% endblock content %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/vendor/manon/expando-rows.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+{% endblock %}

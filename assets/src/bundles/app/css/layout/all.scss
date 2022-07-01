@@ -1,0 +1,22 @@
+div {
+    &.explanation {
+        &.help_text {
+            margin: 0 0 auto auto;
+            float: none;
+        }
+    }
+
+    &.confirmation {
+        margin-top: 0;
+    }
+}
+
+.page-meta {
+    .logged-in {
+        justify-content: space-between;
+    }
+}
+
+.qr-code-image {
+    background-color: #fff;
+}

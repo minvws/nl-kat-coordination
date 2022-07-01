@@ -1,0 +1,54 @@
+{% load ooi_extra %}
+
+{% if tree_node.tree_meta.has_findings %}
+<section>
+  <div>
+    {% if tree_node.tree_meta.has_findings and tree_node.tree_meta.depth > 1 %}
+      <h2>Findings for {{ tree_node.ooi_type }} {{ tree_node.human_readable }}</h2>
+    {% endif %}
+
+    {% for finding in tree_node.children %}
+      {% if finding.ooi_type == "Finding" %}
+        {% include "partials/ooi_summary_finding.html" with parent=ooi_tree finding=finding %}
+      {% endif  %}
+    {% endfor %}
+
+    {% if tree_node.tree_meta.depth > 1 %}
+      <h3>Details for {{ tree_node.ooi_type }} {{ tree_node.human_readable }}</h3>
+
+      <article class="is-indented">
+        <dl>
+        {% for key, value in tree_node.items %}
+          {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
+            <div>
+              <dt>{{ key }}</dt>
+              <dd>{{ value }}</dd>
+            </div>
+          {% endif %}
+        {% endfor %}
+        </dl>
+      </article>
+    {% endif %}
+
+    {% if "Job" in tree_node.tree_meta.child_ooi_types %}
+      <h3>Jobs that found {{ tree_node.human_readable }}</h3>
+      <article class="is-indented">
+        <p>These can include previous (older) jobs.</p>
+        <nav><ul>
+          {% for job in tree_node.children %}
+            {% if job.ooi_type == "Job" %}
+              <li><a href="{% ooi_url 'ooi_detail' 'Job|'|add:job.id %}" target="_blank">{{ job.human_readable }}</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul></nav>
+      </article>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+{% for child in tree_node.children %}
+  {% if child.ooi_type not in "Job,KATFindingType,CVEFindingType" %}
+    {% include "partials/ooi_summary_block.html" with tree_node=child %}
+  {% endif %}
+{% endfor %}

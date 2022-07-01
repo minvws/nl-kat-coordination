@@ -1,0 +1,25 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+
+{% block content %}
+{% include 'header.html' %}
+<main id="main-content" tabindex="-1">
+    <section>
+      <div>
+        <h1>Error code 404: Pagina niet gevonden</h1>
+        <p>De pagina die u wilde zien of het bestand dat u wilde bekijken is niet gevonden.</p>
+        <p>U kunt de informatie die u zoekt mogelijk vinden via de volgende pagina's:</p>
+        <ul>
+          <li><a href="{% url 'crisis_room' %}">Crisis Room</a></li>
+          <li><a href="{% url 'katalogus' %}">{% translate 'KAT-alogus' %}</a></li>
+          <li><a href="{% url 'finding_list' %}">{% translate 'Findings' %}</a></li>
+        </ul>
+
+        <p>Of ga terug naar de hoofdpagina</p>
+        <a href="../index.html" class="button"><span class=" icon ti-home"></span>Hoofdpagina</a>
+      </div>
+    </section>
+  </main>
+{% endblock %}

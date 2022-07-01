@@ -1,0 +1,44 @@
+/*
+
+Scan level indicator
+
+Markup:
+<ul class="level-indicator l2">
+    <li></li>
+</ul>
+(L2)
+
+*/
+
+$levels: l1, l2, l3, l4;
+
+%level-indicator--is-active {
+  // active state
+  background-image: url("../../../../img/paw-active.svg");
+}
+
+.level-indicator {
+  display: flex;
+  flex-direction: row;
+  line-height: 1em;
+  padding: 0;
+  gap: 0.25rem;
+  background-color: transparent;
+
+  li {
+    // inactive state
+    background-image: url("../../../../img/paw-inactive.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
+    display: inline-block;
+    min-width: 1rem;
+    min-height: 1rem;
+  }
+}
+
+@for $i from 1 through length($levels) {
+  $level: nth($levels, $i);
+  .level-indicator.#{$level} > li:nth-child(-n + #{$i}) {
+    @extend %level-indicator--is-active;
+  }
+}

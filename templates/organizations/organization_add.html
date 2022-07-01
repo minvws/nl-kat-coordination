@@ -1,0 +1,36 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block head %}
+  {{ block.super }}
+  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+{% endblock head %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Organization setup' %}</h1>
+        <strong>{% translate 'Organization' %}</strong>
+        <p>
+          {% blocktranslate trimmed %}
+            Please enter the following organization details.
+            These details can be edited within the organization
+            page within KAT when necesarry.
+         {% endblocktranslate %}
+        </p>
+        <form novalidate
+              action="{% url 'organization_add' %}"
+              method="post"
+              class="horizontal-view help">
+          {% csrf_token %}
+          {% translate 'Organization details' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+          <button type="submit">{% translate 'Submit' %}</button>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

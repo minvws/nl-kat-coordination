@@ -1,0 +1,37 @@
+{% extends "katalogus/katalogus.html" %}
+{% load i18n %}
+
+{% block katalogus-view %}
+  <div>
+    <div class="horizontal-view horizontal-scroll toolbar">
+      <a href="{{ request.path }}?view=list"
+         class="button icon ti-menu-2">{% translate 'Listview' %}</a>
+      <a href="{{ request.path }}"
+         class="button icon ti-layout-grid ghost">{% translate 'Gridview' %}</a>
+    </div>
+    <div class="horizontal-scroll">
+      <table>
+        <caption>{% translate 'Boefjes overview:' %}</caption>
+        <thead>
+          <tr>
+            <th>{% translate 'Boefje name' %}</th>
+            <th>{% translate 'Boefje description' %}</th>
+            <th colspan="2">{% translate 'Actions' %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for boefje in boefjes %}
+            <tr>
+              <td scope="row">{{ boefje.name }}</td>
+              <td>{{ boefje.description }}</td>
+              <td>
+                <a href="{% url 'katalogus_detail' id=boefje.id %}" class="nowrap">{% translate 'See details' %}</a>
+              </td>
+              <td>{% enable_disable_boefje_button boefje perms.tools.can_enable_disable_boefje %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

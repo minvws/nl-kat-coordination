@@ -1,0 +1,55 @@
+{% load i18n %}
+<table>
+  <tbody>
+    <tr>
+      <td>{% translate 'Organization name' %}</td>
+      <td>{{ organization.name }}</td>
+    </tr>
+    <tr>
+      <td>{% translate 'Organization code' %}</td>
+      <td>{{ organization.code }}</td>
+    </tr>
+    {% if miauw_api_enabled %}
+      <tr>
+        <td>{% translate 'Signal username' %}</td>
+        {% if organization.signal_username %}
+          <td>
+            <div>{{ organization.signal_username }}</div>
+            {% if actions_allowed.signal_group_create %}
+              <div>
+                {% translate 'Create signal group' as text %}
+                {% include 'partials/form/single_action_form.html' with btn_text=text action='signal_group_create' %}
+              </div>
+            {% endif %}
+          </td>
+        {% else %}
+          <td class="warning">
+            {% translate 'No registered group phone nr. A group phone is needed to create a signal group.' %}
+          </td>
+        {% endif %}
+      </tr>
+      {% if organization.signal_username is not None %}
+        <tr>
+          <td>{% translate 'Signal group ID' %}</td>
+          {% if signal_group.id and organization.signal_group_id == signal_group.id %}
+            <td>
+              <div>{{ organization.signal_group_id }}</div>
+              <div>
+                {% translate 'Send test message' as text %}
+                {% include 'partials/form/single_action_form.html' with btn_text=text action='signal_group_send_test_message' %}
+              </div>
+            </td>
+          {% elif organization.signal_group_id != signal_group.id %}
+            <td class="warning">
+              {% translate 'Mismatch stored and fetched ID' %}
+              <br>
+              (fetched: "{{ signal_group.id }}", stored: "{{ organization.signal_group_id }}")
+            </td>
+          {% else %}
+            <td class="warning">{% translate 'No group has been created for this organization.' %}</td>
+          {% endif %}
+        </tr>
+      {% endif %}
+    {% endif %}
+  </tbody>
+</table>

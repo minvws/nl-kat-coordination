@@ -1,0 +1,91 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+{% include 'header.html'%}
+
+<main id="main-content">
+  <section class="hero">
+    <img src="{% static 'img/keiko.jpg' %}" alt="Keiko image">
+    <div class="one-third-two-thirds">
+      <div class="tile">
+        <h1>{% translate 'Welcome to KAT' %}</h1>
+        <h2>{% translate 'Kwetsbaarheden Analyse Tool' %}</h2>
+      </div>
+    </div>
+  </section>
+  <section class="bg-color-offset condensed" id="KAT">
+    <div>
+      <h2>
+        {% translate 'What is KAT?' %}
+      </h2>
+      <p>
+        {% blocktranslate trimmed %}
+        KAT is a vulnerability analysis tool. 
+        An Open Source-project developed by the Ministry of Health, 
+        wellbeing and sports to make your and our world safer.
+        {% endblocktranslate %}
+      </p>
+    </div>
+    <div class="column-2">
+      <div>
+        <h3 class="icon ti-eye">
+          {% translate 'KAT sees' %}
+        </h3>
+          <p>
+            {% blocktranslate trimmed %}
+            Dozens of tools are integrated in KAT to view the world (digital and analog).
+            <br>Our motto is therefore: I see, I see, what you do not see.
+            {% endblocktranslate %}
+          </p>
+      </div>
+      <div>
+        <h3 class="icon ti-bulb">
+          {% translate 'KAT knows' %}
+        </h3>
+        <p>
+          {% blocktranslate trimmed %}
+          KAT does not forget (just like that), and can be queried without scanning again.
+          Also about a historical situation.
+          {% endblocktranslate %}
+        </p>
+      </div>
+      <div>
+        <h3 class="icon ti-lock">
+          {% translate 'KAT is secure' %}
+        </h3>
+        <p>
+          {% blocktranslate trimmed %}
+          Forensically secured storage of evidence is one of the basic ingredients of KAT.
+          {% endblocktranslate %}
+        </p>
+      </div>
+      <div>
+        <h3 class="icon ti-heart">
+          {% translate 'KAT is sweet' %}
+        </h3>
+        <p>
+          {% blocktranslate trimmed %}
+          KAT thinks about privacy, and stores what is necessary, 
+          within the rules of your organization and the law.
+          {% endblocktranslate %}
+        </p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div>
+      <h3>{% translate 'A wide playing field' %}</h3>
+      <p>
+        {% blocktranslate trimmed %}
+        KAT makes a copy of the actual reality by means of the integrated tools.
+        Within this copy you can search for answers to countless security and policy questions.
+        Expected and unexpected changes in the world are made visible,
+        and where necessary reported or made known directly to the right people.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load markdownify %}
+
+{% block head %}
+  {{ block.super }}
+  <script defer src="{% static '/js/vendor/manon/accordion.min.js' %}"></script>
+  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  {% include 'header.html' with breadcrumb_list=breadcrumb_list %}
+  <main id="main-content">
+    <section>
+      <div class="two-thirds-one-third">
+        <div>
+          <h1>
+            {{ boefje.name }}
+          </h1>
+          <p>
+            {{ boefje.description }}.
+          </p>
+          <h5>{% translate "Scan level" %}:</h5>
+          {% include 'partials/scan_level_indicator.html' with scan_level=boefje.scan_level.label %}
+          <p class="explanation"
+             data-open-label="Open uitleg"
+             data-close-label="Sluit uitleg">
+             <span>{% translate "Explanation" %}:</span>
+            {% blocktranslate trimmed with scan_level=boefje.scan_level.label %}
+                Scan level: This boefje will only scan objects with a corresponding scan level ({{ scan_level }})
+                or higher. There is no indemnification for this boefje to scan an OOI with a lower scan level.
+              {% endblocktranslate %}
+          </p>
+          <h5>{% translate "Produces" %}:</h5>
+          <ul>
+            {% for ooi in boefje.produces|ooi_types_to_strings %}
+              <li>
+                <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div>
+          <img src="{% url 'boefje_cover' boefje_id=boefje.id %}"
+          alt="boefje placeholder image">
+          <div class="horizontal-view toolbar">
+            {% enable_disable_boefje_button boefje perms.tools.can_enable_disable_boefje %}
+          </div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <div>
+        {% if description %}
+          <section class="accordion">
+            <div>
+              <button aria-expanded="false" id="readme-header">{% translate "Readme" %}</button>
+              <div aria-labelledby="readme-header">{{ description|markdownify }}</div>
+            </div>
+          </section>
+        {% else %}
+          <h2>Readme</h2>
+          {% with name=boefje.name %}
+            <p>
+              {% blocktranslate %}Readme not found for boefje '{{ name }}'.{% endblocktranslate %}
+            </p>
+          {% endwith %}
+        {% endif %}
+      </div>
+    </section>
+    <section>
+      <div>
+        {% translate 'Object list' as form_title %}
+        {% include 'partials/form/checkbox_group_table_form.html' with form_title=form_title btn_text='Start scan' btn_disabled=boefje_disabled key='boefje_id' value=boefje.id action="scan" %}
+      </div>
+    </section>
+  </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+{% endblock %}

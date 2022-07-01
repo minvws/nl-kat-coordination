@@ -1,0 +1,61 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+{% load ooi_extra %}
+
+{% block content %}
+  {% translate ooi.get_ooi_type as display_type %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>
+          {% blocktranslate with primary_key=ooi.primary_key %}Delete {{ primary_key }}{% endblocktranslate %}
+        </h1>
+        <p>
+          {% translate 'Are you sure?' %}
+        </p>
+        <p>
+          {% blocktranslate %}Here you can delete the {{ display_type }}.{% endblocktranslate %}
+        </p>
+        <div class="horizontal-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Key</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for key, value in props.items %}
+                <tr>
+                  <td>{{ key }}</td>
+                  <td>{{ value }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if not ooi|is_finding_type %}
+          <form class="inline" method="post">
+            {% csrf_token %}
+            <div class="horizontal-view">
+              <button type="submit">
+                {% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}
+              </button>
+              <a href="{% ooi_url 'ooi_detail' ooi.primary_key %}"
+                 class="button ghost">{% translate 'Cancel' %}</a>
+            </div>
+          </form>
+        {% else %}
+          <p>
+            {% translate 'Deletion not possible for types: KATFindingType and CVEFindingType' %}
+          </p>
+          <div class="horizontal-view">
+            <a href="{% ooi_url 'ooi_detail' ooi.primary_key %}"
+               class="button ghost">{% translate 'Cancel' %}</a>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+{% endblock %}
