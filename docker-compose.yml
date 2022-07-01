@@ -1,0 +1,204 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    restart: on-failure
+    image: "rabbitmq:3-management"
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      retries: 10
+    env_file:
+      - .env
+
+  crux:
+    image: juxt/xtdb-in-memory:1.20.0
+    restart: on-failure
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  octopoes_api:
+    restart: on-failure
+    depends_on:
+      - crux
+    ports:
+      - "127.0.0.1:8001:80"
+    build:
+      context: nl-kat-octopoes/
+    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
+    env_file:
+      - .env
+
+  octopoes_api_worker:
+    restart: on-failure
+    depends_on:
+      - crux
+      - rabbitmq
+    build:
+      context: nl-kat-octopoes/
+    command: celery -A octopoes.tasks.tasks worker --loglevel=INFO
+    env_file:
+      - .env
+
+  boefje:
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+      - bytes
+    build:
+      context: .
+      dockerfile: nl-kat-boefjes/Dockerfile
+    volumes:
+      - ./nl-kat-boefjes:/app/boefjes
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+    command: python3 -m bin.worker boefje
+    env_file:
+      - .env
+
+  normalizer:
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+      - bytes
+    build:
+      context: .
+      dockerfile: nl-kat-boefjes/Dockerfile
+    volumes:
+      - ./nl-kat-boefjes:/app/boefjes
+    deploy:
+      replicas: 1
+    command: python3 -m bin.worker normalizer
+    env_file:
+      - .env
+
+  rocky-db:
+    image: postgres:12.8
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - rocky-db-data:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env
+    environment:
+      - APP_DB=ROCKY_DB
+      - APP_DB_USER=ROCKY_DB_USER
+      - APP_DB_PASSWORD=ROCKY_DB_PASSWORD
+
+  bytes-db:
+    image: postgres:12.8
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - bytes-db-data:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env
+    environment:
+      - APP_DB=BYTES_DB
+      - APP_DB_USER=BYTES_DB_USER
+      - APP_DB_PASSWORD=BYTES_DB_PASSWORD
+
+  rocky:
+    restart: on-failure
+    depends_on:
+      - octopoes_api_worker
+      - octopoes_api
+      - rocky-db
+      - boefje
+      - normalizer
+      - flower
+      - katalogus
+      - scheduler
+    ports:
+      - "127.0.0.1:8000:80"
+    build:
+      context: .
+      dockerfile: nl-kat-rocky/Dockerfile
+    command: python3 manage.py runserver 0.0.0.0:80
+    volumes:
+      - ./nl-kat-rocky:/app/rocky
+    env_file:
+      - .env
+
+  bytes:
+    restart: on-failure
+    depends_on:
+      - bytes-db
+    ports:
+      - "127.0.0.1:8002:8000"
+    build:
+      context: nl-kat-bytes/
+    command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
+    volumes:
+      - ./nl-kat-bytes:/app/bytes
+    env_file:
+      - .env
+
+  flower:
+    image: mher/flower:latest
+    command: ["celery", "--workdir", "/flower", "--config", "celery_config", "flower", "--port=5555"]
+    env_file:
+      - .env
+    volumes:
+      - ./flower:/flower
+    ports:
+      - "127.0.0.1:5555:5555"
+    depends_on:
+      - rabbitmq
+
+  katalogus:
+    restart: on-failure
+    depends_on:
+      - katalogus-db
+    build:
+      context: .
+      dockerfile: nl-kat-boefjes/Dockerfile
+    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
+    volumes:
+      - ./nl-kat-boefjes:/app/boefjes
+    ports:
+      - "127.0.0.1:8003:8000"
+    env_file:
+      - .env
+
+  katalogus-db:
+    image: postgres:12.8
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - katalogus-db-data:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env
+    environment:
+      - APP_DB=KATALOGUS_DB
+      - APP_DB_USER=KATALOGUS_DB_USER
+      - APP_DB_PASSWORD=KATALOGUS_DB_PASSWORD
+
+  scheduler:
+    restart: on-failure
+    build:
+      context: nl-kat-mula/
+    command: python -m scheduler
+    ports:
+      - "127.0.0.1:8004:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./nl-kat-mula:/app/scheduler
+    depends_on:
+      - boefje
+      - normalizer
+      - octopoes_api
+      - katalogus
+
+volumes:
+  rocky-db-data:
+  bytes-db-data:
+  katalogus-db-data:
