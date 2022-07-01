@@ -1,0 +1,9 @@
+ALTER TABLE boefje_meta ALTER COLUMN boefje_id TYPE VARCHAR(32);
+ALTER TABLE boefje_meta ALTER COLUMN boefje_version TYPE VARCHAR(16);
+ALTER TABLE boefje_meta ALTER COLUMN organization TYPE VARCHAR(4);
+ALTER TABLE boefje_meta ALTER COLUMN input_ooi TYPE VARCHAR(128);
+ALTER TABLE raw_file ALTER COLUMN secure_hash TYPE VARCHAR(256);
+ALTER TABLE raw_file ALTER COLUMN hash_retrieval_link TYPE VARCHAR(128);
+ALTER TABLE raw_file ALTER COLUMN mime_types TYPE VARCHAR(64)[];
+ALTER TABLE normalizer_meta ALTER COLUMN normalizer_name TYPE VARCHAR(32);
+ALTER TABLE normalizer_meta ALTER COLUMN normalizer_version TYPE VARCHAR(16);

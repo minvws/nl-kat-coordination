@@ -1,0 +1,9 @@
+#!/bin/sh -e
+
+if [ -f /etc/nginx/sites-enabled/kat-bytes ]; then
+    rm /etc/nginx/sites-enabled/kat-bytes
+    systemctl reload nginx
+fi
+
+systemctl disable --now kat-bytes.socket
+systemctl disable --now kat-bytes.service

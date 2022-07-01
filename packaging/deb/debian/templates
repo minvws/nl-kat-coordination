@@ -1,0 +1,6 @@
+Template: kat-bytes/enable-nginx-conf
+Type: boolean
+Default: false
+Description: Enable Nginx virtual host for Bytes after installation.
+  Install and enable an Nginx config for bytes.
+

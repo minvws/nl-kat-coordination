@@ -1,0 +1,23 @@
+[tool.black]
+
+line-length = 120
+target-version = ['py38']
+
+
+[tool.mypy]
+
+python_version = 3.8
+strict = true
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+implicit_reexport = true
+exclude = "bytes-data"
+
+
+[tool.pylint.master]
+
+disable= ["missing-module-docstring", "missing-class-docstring", "missing-function-docstring", "too-few-public-methods"]
+fail-under=9.0
+max-line-length=120
+check-quote-consistency=true

@@ -1,0 +1,11 @@
+Source: kat-bytes
+Build-Depends: python3, debhelper-compat (= 12)
+Maintainer: OpenKAT <maintainer@openkat.nl>
+
+Package: kat-bytes
+Section: python
+Priority: optional
+Architecture: all
+Pre-Depends: python3, python3-venv, libpq-dev, python3-dev, rabbitmq-server, postgresql, sudo, ${misc:Depends}
+Depends: nginx
+Description: Bytes
