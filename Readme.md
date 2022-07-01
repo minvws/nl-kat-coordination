@@ -1,7 +1,7 @@
-## Rocky (nl-rt-tim-abang)
+## Rocky (nl-kat)
 
 Rocky is part of the openKAT project, made with Django.  
-See [nl-rt-tim-abang](https://github.com/minvws/nl-rt-tim-abang) for more details about openKAT.
+See [nl-kat](https://github.com/minvws/nl-kat) for more details about openKAT.
 
 ## Stack
 As said, Django is the framework for this project.  
@@ -14,7 +14,7 @@ You can find the Manon repository here: [https://github.com/minvws/nl-rdo-rijkso
 ## Running Rocky
 
 ### Containerized
-To run rocky from the docker container, from the parent directory `nl-rt-tim-abang`, just run:
+To run rocky from the docker container, from the parent directory `nl-kat`, just run:
 ```bash
 $ make kat
 ```
@@ -54,7 +54,7 @@ But first you will need to setup Cypress.
 ### Setting up Cypress
 Cypress is installed in a separate directory `roeltje`.
 You will need to run the django command `setup_test_users` to create users and credentials used in cypress  
-see: [cypress.json](https://github.com/minvws/nl-rt-tim-abang-rocky/blob/develop/roeltje/cypress.json).
+see: [cypress.json](https://github.com/minvws/nl-kat-rocky/blob/develop/roeltje/cypress.json).
 ```bash
 $ python manage.py setup_test_users
 $ yarn --cwd roeltje

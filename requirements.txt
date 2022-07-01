@@ -26,7 +26,7 @@ typing-extensions==3.10.0.0
 urllib3==1.26.5
 django-markdownify==0.9.1
 # Octopoes-core, specify a tagged version
-git+ssh://git@github.com/minvws/nl-rt-tim-abang-octopoes@v2.2.1
+git+ssh://git@github.com/minvws/nl-kat-octopoes@v1.0.0
 celery==5.2.2
 flower==1.0.0
 xhtml2pdf==0.2.5
