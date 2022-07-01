@@ -1,0 +1,489 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "FastAPI",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_health_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ServiceHealth"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schedulers": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_schedulers_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Method Schedulers Get",
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Scheduler"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/schedulers/{scheduler_id}": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_schedulers__scheduler_id__get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Scheduler Id",
+                            "type": "string"
+                        },
+                        "name": "scheduler_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Scheduler"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Method",
+                "operationId": "method_schedulers__scheduler_id__patch",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Scheduler Id",
+                            "type": "string"
+                        },
+                        "name": "scheduler_id",
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Scheduler"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Scheduler"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/queues": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_queues_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Method Queues Get",
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Queue"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/queues/{queue_id}": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_queues__queue_id__get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Queue Id",
+                            "type": "string"
+                        },
+                        "name": "queue_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Queue"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/queues/{queue_id}/pop": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_queues__queue_id__pop_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Queue Id",
+                            "type": "string"
+                        },
+                        "name": "queue_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QueuePrioritizedItem"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/queues/{queue_id}/push": {
+            "post": {
+                "summary": "Method",
+                "operationId": "method_queues__queue_id__push_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Queue Id",
+                            "type": "string"
+                        },
+                        "name": "queue_id",
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QueuePrioritizedItem"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "HTTPValidationError": {
+                "title": "HTTPValidationError",
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "title": "Detail",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            },
+            "Queue": {
+                "title": "Queue",
+                "required": [
+                    "id",
+                    "size",
+                    "maxsize",
+                    "allow_replace",
+                    "allow_updates",
+                    "allow_priority_updates",
+                    "pq"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string"
+                    },
+                    "size": {
+                        "title": "Size",
+                        "type": "integer"
+                    },
+                    "maxsize": {
+                        "title": "Maxsize",
+                        "type": "integer"
+                    },
+                    "allow_replace": {
+                        "title": "Allow Replace",
+                        "type": "boolean"
+                    },
+                    "allow_updates": {
+                        "title": "Allow Updates",
+                        "type": "boolean"
+                    },
+                    "allow_priority_updates": {
+                        "title": "Allow Priority Updates",
+                        "type": "boolean"
+                    },
+                    "pq": {
+                        "title": "Pq",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/QueueEntry"
+                        }
+                    }
+                },
+                "description": "Representation of an queue.PriorityQueue object. Used for unmarshalling\nof priority queues to a JSON representation."
+            },
+            "QueueEntry": {
+                "title": "QueueEntry",
+                "required": [
+                    "priority",
+                    "p_item",
+                    "state"
+                ],
+                "type": "object",
+                "properties": {
+                    "priority": {
+                        "title": "Priority",
+                        "type": "integer"
+                    },
+                    "p_item": {
+                        "$ref": "#/components/schemas/QueuePrioritizedItem"
+                    },
+                    "state": {
+                        "title": "State",
+                        "type": "string"
+                    }
+                },
+                "description": "Representation of an queue.Entry on the priority queue. Used for\nfor unmarshalling of priority queue entries to a JSON representation."
+            },
+            "QueuePrioritizedItem": {
+                "title": "QueuePrioritizedItem",
+                "required": [
+                    "priority"
+                ],
+                "type": "object",
+                "properties": {
+                    "priority": {
+                        "title": "Priority",
+                        "type": "integer"
+                    },
+                    "item": {
+                        "title": "Item"
+                    }
+                },
+                "description": "Representation of an queue.PrioritizedItem on the priority queue. Used\nfor unmarshalling of priority queue prioritized items to a JSON\nrepresentation."
+            },
+            "Scheduler": {
+                "title": "Scheduler",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string"
+                    },
+                    "populate_queue_enabled": {
+                        "title": "Populate Queue Enabled",
+                        "type": "boolean"
+                    },
+                    "priority_queue": {
+                        "title": "Priority Queue",
+                        "type": "object"
+                    }
+                },
+                "description": "Representation of a schedulers.Scheduler instance. Used for\nunmarshalling of schedulers to a JSON representation."
+            },
+            "ServiceHealth": {
+                "title": "ServiceHealth",
+                "required": [
+                    "service"
+                ],
+                "type": "object",
+                "properties": {
+                    "service": {
+                        "title": "Service",
+                        "type": "string"
+                    },
+                    "healthy": {
+                        "title": "Healthy",
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "version": {
+                        "title": "Version",
+                        "type": "string"
+                    },
+                    "additional": {
+                        "title": "Additional"
+                    },
+                    "results": {
+                        "title": "Results",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ServiceHealth"
+                        },
+                        "default": []
+                    },
+                    "externals": {
+                        "title": "Externals",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "boolean"
+                        },
+                        "default": {}
+                    }
+                },
+                "description": "ServiceHealth is used as response model for health check in the\nserver.Server for the health endpoint."
+            },
+            "ValidationError": {
+                "title": "ValidationError",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "type": "object",
+                "properties": {
+                    "loc": {
+                        "title": "Location",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "msg": {
+                        "title": "Message",
+                        "type": "string"
+                    },
+                    "type": {
+                        "title": "Error Type",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

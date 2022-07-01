@@ -1,0 +1,3 @@
+#!/bin/sh -e
+
+systemctl disable --now kat-mula.service

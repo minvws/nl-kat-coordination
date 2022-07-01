@@ -1,0 +1,29 @@
+[tool.black]
+line-length = 120
+target-version = ['py38']
+
+[tool.mypy]
+python_version = 3.8
+strict = false
+install_types = true
+non_interactive = true
+ignore_missing_imports = true
+implicit_reexport = true
+exclude = "alembic"
+
+[tool.pylint.master]
+fail-under=7.0
+max-line-length=120
+check-quote-consistency=true
+extension-pkg-whitelist = [
+    "pydantic",
+]
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "too-few-public-methods",
+    "cyclic-import",
+    "fixme",
+    "invalid-name",
+]

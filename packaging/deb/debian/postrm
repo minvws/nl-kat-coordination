@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+if [ -d /usr/share/kat-mula ]; then
+    rm -r /usr/share/kat-mula
+fi
+
+if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+    db_purge
+
+    rm /etc/kat/mula.conf || true
+    rm /etc/kat/logging.mula.json || true
+fi
