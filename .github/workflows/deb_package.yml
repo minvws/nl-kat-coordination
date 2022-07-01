@@ -1,0 +1,80 @@
+name: package octopoes for debian
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build_deb:
+
+    runs-on: ubuntu-20.04
+    env:
+      working_directory: /usr/share/kat-octopoes
+      pkg_name: kat-octopoes
+
+    steps:
+      - name: Set env
+        run: |
+          echo "RELEASE_TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v1
+
+      - name: Replace version number with release version
+        run: find . -type f -name 'version.py' -exec sed -ibak "s/__version__ = .*/__version__ = \"${RELEASE_TAG}\"/" {} \;
+
+      # TODO: proper deb package versions
+      - name: Create directories for .deb package
+        run: mkdir -p kat-octopoes_${{env.RELEASE_VERSION}}/{data/usr/share/kat-octopoes/app,debian}
+
+      - name: Move app files to .deb directory
+        run: |
+          PACKAGE_FILES=(bits
+          octopoes
+          .env-dist
+          logging.yml
+          prod.logging.yml
+          README.md
+          LICENSE
+          requirements.txt
+          )
+
+          for file in "${PACKAGE_FILES[@]}"; do
+            cp -r $file kat-octopoes_${{env.RELEASE_VERSION}}/data/usr/share/kat-octopoes/app/
+          done
+
+      - name: Copy static package files
+        run: |
+          cp -r ./packaging/deb/* kat-octopoes_${{env.RELEASE_VERSION}}/
+          sed -i "s/_VERSION_/${{env.RELEASE_VERSION}}/g" kat-octopoes_${{env.RELEASE_VERSION}}/debian/control
+
+      # TODO: generate proper changelog
+      - name: generate changelog
+        run: |
+          cat > debian/changelog << EOF
+          kat-octopoes (${{env.RELEASE_VERSION}}) unstable; urgency=low
+            * view changes: https://github.com/minvws/nl-rt-tim-abang-octopoes/releases/tag/${{env.RELEASE_TAG}}
+
+           -- OpenKAT <maintainer@openkat.nl>  $(LANG=C date -R)
+
+          EOF
+        working-directory: kat-octopoes_${{env.RELEASE_VERSION}}/
+
+      - name: generate copyright file
+        run: |
+          sed -i "s|__URL__|${{github.repositoryUrl}}|" kat-octopoes_${{env.RELEASE_VERSION}}/debian/copyright
+          cat LICENSE | sed 's/^/  /' >> kat-octopoes_${{env.RELEASE_VERSION}}/debian/copyright
+
+      - name: Install required packages for building
+        run: sudo apt install devscripts debhelper -y
+
+      - name: Create .deb
+        run: dpkg-buildpackage -us -uc -b
+        working-directory: kat-octopoes_${{env.RELEASE_VERSION}}/
+
+      - name: Upload .deb to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: kat-octopoes_${{ env.RELEASE_VERSION }}.deb
+          path: kat-octopoes_${{ env.RELEASE_VERSION }}_all.deb

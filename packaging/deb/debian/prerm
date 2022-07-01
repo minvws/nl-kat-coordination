@@ -1,0 +1,4 @@
+#!/bin/sh -e
+
+systemctl disable --now kat-octopoes.socket
+systemctl disable --now kat-octopoes.service
