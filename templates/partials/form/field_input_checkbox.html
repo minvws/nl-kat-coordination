@@ -1,0 +1,13 @@
+{% if field.field.widget.allow_multiple_selected %}
+  {% include 'partials/form/field_input.html' %}
+{% else %}
+  <div>
+    {{ field }}
+
+    {{ field.label_tag }}
+
+    {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
+
+    {% include 'partials/form/field_input_errors.html' %}
+  </div>
+{% endif %}

@@ -1,0 +1,15 @@
+--
+-- Alter field confirmed on phonedevice
+--
+--
+-- Alter field key on phonedevice
+--
+--
+-- Alter field method on phonedevice
+--
+--
+-- Alter field name on phonedevice
+--
+--
+-- Alter field user on phonedevice
+--

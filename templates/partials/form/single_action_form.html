@@ -1,0 +1,9 @@
+<form method="post" class="inline">{% csrf_token %}
+  <input type="hidden" name="action" value="{{ action }}">
+
+  {% if key %}
+    <input type="hidden" name="{{ key }}" value="{{ value }}">
+  {% endif %}
+
+  <button type="submit" class="{{ btn_class }}" {% if btn_disabled %}disabled{% endif %}>{{ btn_text }}</button>
+</form>

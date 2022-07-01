@@ -1,0 +1,49 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' with view_type="onboarding" %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Welcome to KAT' %}</h1>
+        <p>
+          {% blocktranslate trimmed %}
+            KAT is the "Kwetsbaarheden Analyse Tool" (Vulnerabilities Analysis Tool). An Open-Source-project developed by the
+            Ministery of Public Health, Wellbeing and Sports to make your and our world a safer place.
+         {% endblocktranslate %}
+        </p>
+        {% include 'partials/stepper.html' %}
+        <h2>{% translate "Let's get started" %}</h2>
+        <h3>{% translate 'How does KAT work' %}</h3>
+        <p>
+          {% blocktranslate trimmed %}
+            KAT is able to give insight into security risks on your online objects. For example,
+            your websites, mailservers or online data.
+          {% endblocktranslate %}
+        </p>
+        <p>
+          {% blocktranslate trimmed %}
+            KAT uses plugins to find and assess the area's that might be at risk and reports these back to you. Each plugin has its own skillset which could be scanning, normalizing or analyzing data.
+            As a user you decide which areas you would like to monitor or scan and which insight you would like to receive.
+          {% endblocktranslate %}
+        </p>
+        <p>
+          {% blocktranslate trimmed %}
+            Within KAT you can view the insights as well as all the data KAT has found. You can choose to browse through the data or view reports.
+          {% endblocktranslate %}
+        </p>
+        <p>
+          {% blocktranslate trimmed %}
+            During this introduction you will be guided through the steps to create a report.
+          {% endblocktranslate %}
+        </p>
+        <p>
+          <a href="{% url 'skip_onboarding' %}" class="button ghost">{% translate 'Skip onboarding' %}</a>
+          <a href="{% url 'step_choose_report_info' %}" class="button">{% translate "Let's get started" %}</a>
+        </p>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

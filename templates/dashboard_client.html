@@ -1,0 +1,68 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+<header>
+  {% include 'partials/skip-to-content.html' %}
+  {% include 'partials/page-meta.html' %}
+  
+  <a href="{% url 'crisis_room' %}" class="logo" title="KAT">
+    <img src="{% static 'img/kat_logo.png' %}" alt="KAT logo" />
+    Kwetsbaarheden Analyse Tool
+  </a>
+
+  <section>
+    <div>
+      <nav 
+        data-open-label="Menu" 
+        data-close-label="{% translate 'Close menu' %}" 
+        aria-label="{% translate 'Main navigation' %}"
+        data-media="(min-width: 42rem)"> <!-- Adjust breakpoint as needed to prevent main menu to break -->
+        <div>
+          <ul>
+            <li><a href="{% url 'crisis_room' %}">KAT</a></li>
+            <li><a href="{% url 'indemnification_add' %}">{% translate "Indemnifications" %}</a></li>
+            <li><a href="{% url 'katalogus' %}">{% translate 'KAT-alogus' %}</a></li>
+            <li><a href="{% url 'finding_list' %}">{% translate "Findings" %}</a></li>
+            <li><a href="{% url 'ooi_list' %}">{% translate "Objects" %}</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div>
+        <a class="button" href="{% url 'logout' %}">{% translate "Logout" %}</a>
+      </div>
+
+    </div>
+  </section>
+</header>
+
+
+<main id="main-content">
+  <section>
+    <div>
+      <h1>{% translate "Welcome" %}</h1>
+      <div class="horizontal-scroll">
+        <table>
+        <caption>{% translate 'User overview:' %}</caption>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Active organization</th>
+            <th>Code</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{ user.email }}</td>
+            <td>{{ active_organization.name }}</td>
+            <td>{{ active_organization.code }}</td>
+          </tr>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

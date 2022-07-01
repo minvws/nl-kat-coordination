@@ -1,0 +1,31 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block head %}
+  {{ block.super }}
+  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  {% include 'header.html' with breadcrumb_list=breadcrumb_list %}
+  <main id="main-content">
+    <section>
+      <div class="form-view">
+        <h1>{% translate 'FMEA effect and severity' %}</h1>
+        <form novalidate action="{% if editing_view %}{{ object.get_update_url }}{% else %}{% url 'fmea_failure_mode_effect_create' %}{% endif %}"  
+        method="post" 
+        class="horizontal-view help">
+          {% csrf_token %}
+          {% translate 'FMEA effect' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fieldset='effect severity_level' fields=form  %}
+          {% if editing_view %}
+              <button class="cta" type="submit">{% translate 'Save' %}</button>
+          {% else %}
+              <button type="submit">{% translate 'Submit' %}</button>
+          {% endif %}
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

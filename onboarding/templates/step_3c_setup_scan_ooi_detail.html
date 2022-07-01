@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' with view_type="onboarding" %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT introduction' %}</h1>
+        {% include 'partials/stepper.html' %}
+        <h2>{% translate 'Setup scan' %}</h2>
+        <h3>{% translate 'Creating an object' %}</h3>
+        <p>
+          {% blocktranslate trimmed %}
+            Based on the url you provided KAT added the necesarry additional
+            objects to create a url object.
+         {% endblocktranslate %}
+        </p>
+      </div>
+      <div>
+        <p>
+          {% translate 'URL' %}
+        </p>
+        <dl>
+          <div>
+            <dt>{% translate 'Type' %}</dt>
+            <dd>{{ ooi.ooi_type }}</dd>
+          </div>
+          <div>
+            <dt>{% translate 'Path' %}</dt>
+            <dd>{{ ooi.raw }}</dd>
+          </div>
+          <div>
+            <dt>{% translate 'Hostname' %}</dt>
+            <dd>{{ ooi.raw.host }}</dd>
+          </div>
+          <div>
+            <dt>{% translate 'scheme' %}</dt>
+            <dd>{{ ooi.raw.scheme }}</dd>
+          </div>
+          <div>
+            <dt>{% translate 'DNS Zone' %}</dt>
+            <dd>{{ ooi.raw.tld }}</dd>
+          </div>
+          <div>
+            <dt>{% translate 'Network' %}</dt>
+            <dd>{{ ooi.network }}</dd>
+          </div>
+        </dl>
+        <form method="post" class="inline">
+          {% csrf_token %}
+          <div class="horizontal-view">
+            <a href="{% url 'skip_onboarding' %}" class="button ghost">{% translate 'Skip onboarding' %}</a>
+            <button type="submit" class="button">{% translate 'Got it, generate my report' %}</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+{% endblock content %}

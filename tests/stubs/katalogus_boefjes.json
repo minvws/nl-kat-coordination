@@ -1,0 +1,114 @@
+[
+  {
+    "name": "BinaryEdge",
+    "module": "kat_binaryedge.scan",
+    "description": "Use BinaryEdge to find open ports with vulnerabilities that are found on that port",
+    "consumes": [
+      "IPAddressV4",
+      "IPAddressV6"
+    ],
+    "produces": [
+      "IPService",
+      "IPPort",
+      "KATFindingType",
+      "SoftwareInstance",
+      "Software",
+      "Finding",
+      "Service",
+      "CVEFindingType"
+    ],
+    "dispatches": {
+      "normalizers": [
+        "kat_binaryedge.normalizers.containers",
+        "kat_binaryedge.normalizers.databases",
+        "kat_binaryedge.normalizers.http_web",
+        "kat_binaryedge.normalizers.message_queues",
+        "kat_binaryedge.normalizers.protocols",
+        "kat_binaryedge.normalizers.remote_desktop",
+        "kat_binaryedge.normalizers.service_identification",
+        "kat_binaryedge.normalizers.services"
+      ],
+      "boefjes": []
+    },
+    "image": null
+  },
+  {
+    "name": "Check HTTP Headers",
+    "module": "kat_check_header.check_header",
+    "description": "Checks HTTP header for vulnerabilities",
+    "consumes": [
+      "HTTPHeader"
+    ],
+    "produces": [
+      "Finding",
+      "KATFindingType"
+    ],
+    "dispatches": {
+      "normalizers": [
+        "kat_check_header.normalize"
+      ],
+      "boefjes": []
+    },
+    "image": null
+  },
+  {
+    "name": "Nmap UDP (Full)",
+    "module": "kat_nmap.scan",
+    "description": "Scan all UDP ports. Including service detection",
+    "consumes": [
+      "IPAddressV4",
+      "IPAddressV6"
+    ],
+    "produces": [
+      "IPService",
+      "IPAddressV6",
+      "IPPort",
+      "IPAddressV4",
+      "Service"
+    ],
+    "dispatches": {
+      "normalizers": [
+        "kat_nmap.normalize"
+      ],
+      "boefjes": []
+    },
+    "image": null
+  },
+  {
+    "name": "SSLCertificates",
+    "module": "kat_ssl_certificates.scan",
+    "description": "Scan SSL certificates of websites",
+    "consumes": [
+      "Website"
+    ],
+    "produces": [
+      "Certificate"
+    ],
+    "dispatches": {
+      "normalizers": [
+        "kat_ssl_certificates.normalize"
+      ],
+      "boefjes": []
+    },
+    "image": "static/assets/kat_ssl_certificates/cover.png"
+  },
+  {
+    "name": "SSLScan",
+    "module": "kat_ssl_scan.scan",
+    "description": "Scan SSL/TLS versions of websites",
+    "consumes": [
+      "Website"
+    ],
+    "produces": [
+      "Finding",
+      "KATFindingType"
+    ],
+    "dispatches": {
+      "normalizers": [
+        "kat_ssl_scan.normalize"
+      ],
+      "boefjes": []
+    },
+    "image": null
+  }
+]

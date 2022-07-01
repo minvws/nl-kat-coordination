@@ -1,0 +1,48 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Organizations' %}</h1>
+        <p>{% translate 'You are using KAT as ' %}{{ active_organization.name }}</p>
+        <div class="horizontal-scroll">
+          <table>
+            <caption>{% translate 'Organization overview:' %}</caption>
+            <thead>
+              <tr>
+                <th>{% translate 'Name' %}</th>
+                <th>{% translate 'Code' %}</th>
+                <th>{% translate 'Number of members' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for organization in object_list %}
+                <tr {% if organization == active_organization %}aria-current="true"{% endif %}>
+                  <td>
+                    <a href="{% url 'organization_detail' organization.id %}">{{ organization.name }}</a>
+                    {% if organization == active_organization %}
+                      ({% translate 'active' %})
+                    {% endif %}
+                  </td>
+                  <td>{{ organization.code }}</td>
+                  <td>{{ organization.members.count }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+{% endblock %}

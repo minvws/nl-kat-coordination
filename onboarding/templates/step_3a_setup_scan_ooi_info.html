@@ -1,0 +1,48 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' with view_type="onboarding" %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT introduction' %}</h1>
+        {% include 'partials/stepper.html' %}
+        <h2>{% translate 'Setup scan' %}</h2>
+        <h3>{% translate 'Let KAT know what object to scan' %}</h3>
+        <p>
+          {% blocktranslate trimmed %}
+            Plugins scan and analyze objects. KAT needs to know which object(s) you would like to scan and analyze for the DNS-report. So it can tell you which plugins are available for the choosen object.
+         {% endblocktranslate %}
+        </p>
+        <h3>{% translate 'Understanding objects' %}</h3>
+        <p>
+          {% blocktranslate trimmed %}
+            A lot of things can be an object within the scope of KAT. 
+            For example a mailserver, an ip-address, a URL, a DNS record, 
+            a hostname or a network to name a few.  While these objects can 
+            be related to each other they are all objects within KAT that can be 
+            scanned to gain valuable insight. 
+         {% endblocktranslate %}
+        </p>
+        <h3>{% translate 'Creating, adding and editing objects' %}</h3>
+        <p>
+          {% blocktranslate trimmed %}
+            Within KAT you can view, add and edit objects from the organization’s object page. 
+          {% endblocktranslate %}
+        </p>
+        <p>
+          {% blocktranslate trimmed %}
+            Let’s add an object to scan for the DNS-Report. 
+            For this introduction we suggest adding a URL. 
+         {% endblocktranslate %}
+        </p>
+        <p>
+          <a href="{% url 'skip_onboarding' %}" class="button ghost">{% translate 'Skip onboarding' %}</a>
+          <a href="{% url 'step_setup_scan_ooi_add' 'URL' %}" class="button">{% translate 'Add URL' %}</a>
+        </p>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' with route_href="/indemnifications" route_name="Indemnifications" %}
+
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate "Indemnification" %}:</h1>
+
+        <p>{% translate "Indemnification present." %}</p>
+      </div>
+    </section>
+  </main>
+{% endblock %}

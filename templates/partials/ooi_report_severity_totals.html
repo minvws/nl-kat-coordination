@@ -1,0 +1,11 @@
+{% load i18n %}
+
+<section>
+  <div>
+    <h2>{% translate 'Summary' %}</h2>
+    <div class="column-2">{% include 'partials/ooi_report_severity_totals_table.html' with meta=findings_list.meta %}</div>
+    <div class="nota-bene">
+      see: <a href="https://nvd.nist.gov/vuln-metrics/cvss">https://nvd.nist.gov/vuln-metrics/cvss</a>
+    </div>
+  </div>
+</section>

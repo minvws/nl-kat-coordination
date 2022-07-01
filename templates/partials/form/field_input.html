@@ -1,0 +1,28 @@
+{% load i18n %}
+
+{% if form_view != 'vertical' %}
+  <div {% if field.field.required %} class="required"{% endif %}>
+    {{ field.label_tag }}
+    {% if field.field.required %}
+      <span class="nota-bene">{% translate 'This field is required' %}</span>
+    {% endif %}
+    <div>
+      {{ field }}
+      {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
+      {% include 'partials/form/field_input_errors.html' %}
+      {% if field.name == 'recover_email' %}
+        <a href="{% url 'recover_email' %}">{% translate 'Forgot email address?' %}</a>
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  {{ field.label_tag }}
+  <div {% if field.field.required %} class="required"{% endif %}>
+    {% if field.field.required %}
+      <span class="nota-bene">{% translate 'This field is required' %}</span>
+    {% endif %}
+    {{ field }}
+    {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
+    {% include 'partials/form/field_input_errors.html' %}
+  </div>
+{% endif %}

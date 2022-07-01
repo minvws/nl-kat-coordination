@@ -1,0 +1,58 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' with view_type="onboarding" %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT setup' %}</h1>
+        {% include 'partials/stepper.html' %}
+        <h2>{% translate 'Account setup' %}</h2>
+        <h3>{% translate 'Users' %}</h3>
+        <p>
+          {% translate 'Within KAT there are three types of user accounts. Each has its own functions.' %}
+        </p>
+        <ul>
+          <li>
+            <strong>{% translate 'Admin' %}</strong>
+            <span>{% translate 'Each organization must have an admin. The admin can create and manage user accounts as well as organization details.' %}</span>
+          </li>
+          <li>
+            <strong>{% translate 'Red teamer' %}</strong>
+            <span>{% translate 'A red teamer account can run scans and generate reports.' %}</span>
+          </li>
+          <li>
+            <strong>{% translate 'Client account' %}</strong>
+            <span>{% translate 'A client account can access reports.' %}</span>
+          </li>
+        </ul>
+        <h4>{% translate 'Accounts' %}</h4>
+        <h4>{% translate 'Organization setup with separate accounts:' %}</h4>
+        <p>
+          {% blocktranslate trimmed %}
+            Within KAT it is possible to create separate user accounts with the specific roles. 
+            Each with their own functionalities and permissions. 
+            This is useful when multiple people will be working with the same KAT-setup. 
+            You can choose to create the separate accounts during this introduction or when 
+            you’re ready from the KAT users page. 
+            {% endblocktranslate %}
+        </p>
+        <h4>{% translate 'Single account setup:' %}</h4>
+        <p>
+          {% blocktranslate trimmed %}
+          Alternatively it is also an option to run KAT from a single user account. 
+          Which is useful when you are the only user in the account.  
+          You will be able to access the functionality of the different roles from your account. 
+          You can always add additional user accounts If you’re team expands in the future.
+         {% endblocktranslate %}
+        </p>
+        <div class="horizontal-view">
+          <a href="{% url 'step_account_setup_admin' %}" class="button">{% translate 'Create separate accounts' %}</a>
+          <a href="{% url 'switch_kat_user' %}" class="button ">{% translate 'Continue with this account, onboard me!' %}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

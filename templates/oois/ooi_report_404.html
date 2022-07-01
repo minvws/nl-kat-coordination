@@ -1,0 +1,34 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+{% url "object" ooi.primary_key as ooi_detail_url %}
+
+{% include "header.html" with breadcrumbList=breadcrumbList %}
+
+<main class="report-tmp" id="main-content">
+  <section>
+    <div>
+      {% include 'partials/elements/ooi_report_settings_form.html' %}
+
+      <h1>{% blocktranslate trimmed with name=ooi.human_readable %}
+            A report for {{ name }} wasn't found.
+          {% endblocktranslate %}</h1>
+
+      <p>{% blocktranslate trimmed %}
+            Perhaps it never was, perhaps it just didn't exist on {{ observed_at }}<br>
+            Try some other dates!
+          {% endblocktranslate %}</p>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/vendor/manon/expando-rows.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+{% endblock %}

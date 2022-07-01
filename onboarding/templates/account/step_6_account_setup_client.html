@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block head %}
+  {{ block.super }}
+  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+{% endblock head %}
+
+{% block content %}
+  {% include 'header.html' with view_type="onboarding" %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT setup' %}</h1>
+        {% include 'partials/stepper.html' %}
+        <h2>{% translate 'Client account setup (optional)' %}</h2>
+        <strong>{% translate 'Client account' %}</strong>
+        <p>
+          {% blocktranslate trimmed %}
+            A client account can access reports.
+            Adding a client account to the organization is optional.
+         {% endblocktranslate %}
+        </p>
+        <form novalidate
+              action="{% url 'step_account_setup_client' %}"
+              method="post"
+              class="horizontal-view help">
+          {% csrf_token %}
+          {% translate 'User details' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fieldset='name email password' fields=form %}
+          <button type="submit">{% translate 'Submit' %}</button>
+        </form>
+        <p>
+          <a href="{% url 'step_account_setup_red_teamer' %}"
+             class="button ghost">{% translate 'Go back to previous step' %}</a>
+          <a href="{% url 'crisis_room' %}" class="button">{% translate 'Finish organization setup' %}</a>
+        </p>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

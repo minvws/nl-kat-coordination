@@ -1,0 +1,38 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block head %}
+  {{ block.super }}
+  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+{% endblock head %}
+
+{% block content %}
+  {% include 'header.html' with view_type="onboarding" %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT setup' %}</h1>
+        {% include 'partials/stepper.html' %}
+        <h2>{% translate 'Red teamer account setup' %}</h2>
+        <strong>{% translate 'Red teamer' %}</strong>
+        <p>
+          {% translate 'A red teamer account can run scans and generate reports.' %}
+        </p>
+        <form novalidate
+              action="{% url 'step_account_setup_red_teamer' %}"
+              method="post"
+              class="horizontal-view help">
+          {% csrf_token %}
+          {% translate 'Red teamer details' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fieldset='name email password' fields=form %}
+          <button type="submit">{% translate 'Submit' %}</button>
+        </form>
+        <p>
+          <a href="{% url 'step_account_setup_admin' %}" class="button ghost">{% translate 'Go back to previous step' %}</a>
+          <a href="{% url 'step_account_setup_client' %}" class="button ">{% translate 'Skip this step' %}</a>
+        </p>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

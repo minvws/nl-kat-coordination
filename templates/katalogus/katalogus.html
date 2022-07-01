@@ -1,0 +1,39 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+
+  <main id="main-content" tabindex="-1" class="katalogus">
+    <section>
+      <div>
+        <h1>{% translate 'KAT-alogus' %}</h1>
+
+        <p>
+          {% translate 'An overview of all available boefjes. Boefjes can be used to scan for vulnerablilities and security issues within specified objects. Each boefje has his own focus area and strengths.' %}
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div>
+        <h2>
+          {% translate 'All available boefjes' %}
+        </h2>
+
+        {% include 'partials/katalogus_list_filters.html' %}
+
+        {% block katalogus-view %}{% endblock %}
+      </div>
+    </section>
+
+  </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
+  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% load i18n %}
+
+{% with id=widget.attrs.id %}
+  <div{% if id %} id="{{ id }}"{% endif %} class="checkbox-group-table {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
+  {% for group, options, index in widget.optgroups %}
+    {% if group %}
+    <table>
+      <thead>
+        <tr>
+          <th>{% translate 'Select' %}</th>
+          <th>{{ group }}</th>
+        </tr>
+      </thead>
+    {% endif %}
+    {% for option in options %}
+      <tr>
+        <td>
+          {% include option.template_name with widget=option %}
+          {% if option.attrs.required %}
+            <span class="nota-bene">{% translate 'this field is required' %}</span>
+          {% endif %}
+        </td>
+        <td>
+          {% include 'forms/widgets/widget_label.html' with widget=option %}
+        </td>
+      </tr>
+    {% endfor %}
+    {% if options|length > 1 %}
+    <div class="horizontal-view toolbar">
+      <button type="button" onClick="toggleCheckboxes('{{ widget.name }}')">{% translate 'Toggle all' %}</button>
+    </div>
+    {% endif %}
+  {% endfor %}
+  </table>
+</div>
+{% endwith %}

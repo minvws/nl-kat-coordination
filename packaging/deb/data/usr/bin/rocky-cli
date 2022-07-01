@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+cd /usr/share/kat-rocky/app
+../venv/bin/python manage.py "$@"

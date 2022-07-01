@@ -1,0 +1,8 @@
+{% load i18n %}
+
+<div class="horizontal-view">
+  {% if cancel_url %}
+    <a href="{{ cancel_url }}" class="button ghost">{% trans "Cancel" %}</a>
+  {% endif %}
+  <button type="submit">{% trans "Submit" %}</button>
+</div>

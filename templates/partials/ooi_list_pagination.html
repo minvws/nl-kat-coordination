@@ -1,0 +1,54 @@
+{% load i18n %}
+
+{% if ooi_list.paginator.num_pages > 1 %}
+  <nav role="navigation"
+       class="pagination"
+       aria-label="{% translate 'Object list pagination' %}">
+    <ul>
+      {% if ooi_list.has_previous %}
+        <li>
+          <a aria-label="{% translate 'Previous Page' %}"
+             href="{% url 'ooi_list' %}?{% url_replace 'page' ooi_list.previous_page_number %}">
+            <span>{% translate 'Previous' %}</span>
+          </a>
+        </li>
+      {% endif %}
+      {% if ooi_list.number|add:'-4' > 1 %}
+        <li>
+          <a aria-label="{% translate 'Five Pages Back' %}"
+             href="{% url 'ooi_list' %}?{% url_replace 'page' ooi_list.number|add:'-5' %}">
+            &hellip;
+          </a>
+        </li>
+      {% endif %}
+      {% for i in ooi_list.paginator.page_range %}
+        {% if ooi_list.number == i %}
+          <li>
+            <a aria-label="{% translate 'Page' %} {{ i }}" aria-current="true">{{ ooi_list.number }}</a>
+          </li>
+        {% elif i > ooi_list.number|add:'-5' and i < ooi_list.number|add:'5' %}
+          <li>
+            <a aria-label="{% translate 'Page' %} {{ i }}"
+               href="{% url 'ooi_list' %}?{% url_replace 'page' i %}">{{ i }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      {% if ooi_list.paginator.num_pages > ooi_list.number|add:'4' %}
+        <li>
+          <a aria-label="{% translate 'Five Pages Forward' %}"
+             href="{% url 'ooi_list' %}?{% url_replace 'page' ooi_list.number|add:'5' %}">
+            &hellip;
+          </a>
+        </li>
+      {% endif %}
+      {% if ooi_list.has_next %}
+        <li>
+          <a aria-label="{% translate 'Next Page' %}"
+             href="{% url 'ooi_list' %}?{% url_replace 'page' ooi_list.next_page_number %}">
+            <span>{% translate 'Next' %}</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

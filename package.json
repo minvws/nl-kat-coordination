@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "dev": "parcel watch assets/src/bundles/*.js --dist-dir assets/dist --public-url ./ --no-cache",
+    "build": "parcel build assets/src/bundles/*.js --dist-dir assets/dist --public-url ./ --no-cache --no-scope-hoist",
+    "test": "yarn --cwd roeltje cypress open"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "2.6.2",
+    "parcel": "2.6.2"
+  },
+  "dependencies": {
+    "d3": "^7.4.3"
+  },
+  "browserslist": [
+    "last 1 Chrome version"
+  ]
+}

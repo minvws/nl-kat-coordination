@@ -1,0 +1,39 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' with view_type="onboarding" %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT introduction' %}</h1>
+        {% include 'partials/stepper.html' %}
+        <h2>{% translate 'Choose a report - Type' %}</h2>
+        <p>
+          {% blocktranslate trimmed %}
+            Within KAT you can view reports for each of your current objects. For specific reports you can choose one of the available report types and generate a report. Such as a pen-test, a DNS-report or a mail report to give some examples.
+          {% endblocktranslate %}
+        </p>
+        <p>
+          {% blocktranslate trimmed %}
+            For this tutorial we suggest a DNS-report to get you started.
+          {% endblocktranslate %}
+        </p>
+        <p>
+          {% blocktranslate trimmed %}
+            When you start to generate this report. KAT will guide you through the
+            necessary steps.
+          {% endblocktranslate %}
+        </p>
+        <div class="horizontal-view">
+          <a href="{% url 'skip_onboarding' %}" class="button ghost">{% translate 'Skip onboarding' %}</a>
+          <a href="{% url 'step_setup_scan_ooi_info' %}" class="button">{% translate 'DNS report' %}</a>
+          <a href="" class="button ghost disabled">Pen test</a>
+          <a href="" class="button ghost disabled">Mail report</a>
+          <a href="" class="button ghost disabled">DigiD</a>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

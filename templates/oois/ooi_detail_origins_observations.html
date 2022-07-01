@@ -1,0 +1,38 @@
+{% load i18n %}
+{% load ooi_extra %}
+
+{% spaceless %}
+  {% if observations %}
+    <div class="horizontal-scroll">
+      <h2>{% translate 'Observed by' %}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>{% translate 'Boefje' %}</th>
+            <th>{% translate 'Source' %}</th>
+            <th>{% translate 'Task ID' %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for observation in observations %}
+            <tr>
+              <td>
+                {% if observation.boefje.id %}
+                  <a href="{% url 'katalogus_detail' observation.boefje.id %}">{{ observation.boefje.name }}</a>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% ooi_url 'ooi_detail' observation.origin.source %}">{{ observation.origin.source }}</a>
+              </td>
+              <td>
+                {% if observation.normalizer.boefje_meta.id %}
+                  <a href="{% url 'bytes_raw' observation.normalizer.boefje_meta.id %}">{{ observation.normalizer.boefje_meta.id }}</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endspaceless %}
