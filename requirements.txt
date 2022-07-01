@@ -1,0 +1,7 @@
+celery==5.2.3
+fastapi==0.73.0
+pika==1.2.0
+pydantic==1.8.2
+python-dotenv==0.19.0
+requests==2.27.1
+uvicorn==0.17.1

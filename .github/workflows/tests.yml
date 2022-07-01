@@ -1,0 +1,29 @@
+name: Run the test suite
+
+on:
+  pull_request:
+    branches:
+      - '**'
+  push:
+    branches:
+      - 'develop'
+      - 'main'
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    env:
+      COMPOSE_FILE: .ci/docker-compose.yml
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build the images
+        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f base.yml -f .ci/docker-compose.yml build
+
+      - name: Run unit tests
+        run: make utest
+
+      - name: Run integration tests
+        run: make itest

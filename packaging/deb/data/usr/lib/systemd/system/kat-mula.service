@@ -1,0 +1,14 @@
+[Unit]
+Description=kat-mula daemon
+After=network.target
+
+[Service]
+User=kat
+Group=kat
+WorkingDirectory=/usr/share/kat-mula/app
+# TODO: don't load env here. It exposes the values over dbus IPC
+EnvironmentFile=/etc/kat/mula.conf
+ExecStart=/usr/share/kat-mula/venv/bin/python -m scheduler
+
+[Install]
+WantedBy=multi-user.target

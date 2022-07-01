@@ -1,0 +1,38 @@
+#!/bin/sh
+set -e
+. /usr/share/debconf/confmodule
+
+APP_DIR=/usr/share/kat-mula
+
+adduser --home /etc/kat --no-create-home --system --group kat || true
+
+python3 -m venv ${APP_DIR}/venv
+
+echo "Setting up mula environment."
+${APP_DIR}/venv/bin/pip install --upgrade pip > /dev/null
+${APP_DIR}/venv/bin/pip install --requirement ${APP_DIR}/app/requirements.txt > /dev/null
+
+if [ ! -f /etc/kat/logging.mula.json ]; then
+    cp /usr/share/kat-mula/app/logging.prod.json /etc/kat/logging.mula.json
+fi
+
+ln -s /etc/kat/mula.conf /usr/share/kat-mula/app/.env
+
+chown kat:kat /etc/kat/mula.conf
+chown kat:kat /etc/kat/logging.mula.json
+chown -R root:kat /usr/share/kat-mula
+chown root:kat /etc/kat
+chmod 750 /etc/kat/
+chmod 640 /etc/kat/mula.conf
+chmod 640 /etc/kat/logging.mula.json
+chmod 750 /usr/share/kat-mula
+chmod 750 /usr/lib/systemd/system/kat-mula.service
+
+if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
+    rabbitmqctl add_vhost kat
+    rabbitmqctl set_permissions -p "kat" "guest" ".*" ".*" ".*"
+fi
+
+systemctl enable --now kat-mula.service
+
+db_stop || true
