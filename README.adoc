@@ -33,7 +33,7 @@ Rocky is de frontend van OpenKAT. Rocky maakt gebruik van Manon Open voor de sch
 
 === link:https://github.com/minvws/nl-kat-bytes[NL-KAT-bytes]
 
-Bytes bevat de database met ruwe informatie en metadata, met externe signing voor de forensische borging
+Bytes bevat de database met ruwe informatie en metadata, met externe signing voor de forensische borging.
 
 === link:https://github.com/minvws/nl-kat-boefjes[NL-KAT-boefjes]
 
