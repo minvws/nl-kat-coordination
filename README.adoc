@@ -37,7 +37,7 @@ Bytes bevat de database met ruwe informatie en metadata, met externe signing voo
 
 === link:https://github.com/minvws/nl-kat-boefjes[NL-KAT-boefjes]
 
-Boefjes bevat de alle boefjes die scans uitvoeren en de whiskers die de data normaliseren en er objecten van maken. 
+Boefjes bevat twee onderdelen van OpenKAT: boefjes, de plugins die scans uitvoeren en whiskers, de normalizers die de data normaliseren en er objecten van maken. 
 
 == Hoe kan ik OpenKAT installeren en gebruiken? 
 
