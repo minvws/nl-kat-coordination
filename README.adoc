@@ -3,8 +3,11 @@
 
 OpenKAT heeft als doel het monitoren, registreren en analyseren van de status van informatiesystemen. OpenKAT scant netwerken, analyseert kwetsbaarheden en maakt toegankelijke rapporten. Het integreert de meest gebruikte netwerktools en scansoftware in een modulair framework, heeft toegang tot externe databases zoals shodan en combineert de informatie uit al deze bronnen in overzichtelijke rapportages.
 
-Een goed startpunt is de link:https://github.com/minvws/nl-kat-coordination/wiki/Algemene-uitleg-OpenKAT-en-bijbehorende-figuren[informatiebrochure]. 
-Alle informatie over OpenKAT en de functionaliteit van het pakket is te vinden link:https://github.com/minvws/nl-kat-coordination/wiki[op de wiki]. 
+OpenKAT scant, verzamelt, analyseert en rapporteert in een permanent proces: 
+
+image::https://user-images.githubusercontent.com/76487016/172068892-d8bb4552-5d4e-42d5-bd94-d1fb1b6d18b7.png[Flow van OpenKAT,640,]
+
+Wil je meer weten, lees dan de uitgebreide documentatie. Een toegankelijk startpunt is de link:https://github.com/minvws/nl-kat-coordination/wiki/Algemene-uitleg-OpenKAT-en-bijbehorende-figuren[informatiebrochure], waarin ook bovenstaand model wordt uitgelegd. Alle informatie over OpenKAT en de functionaliteit van het pakket is te vinden link:https://github.com/minvws/nl-kat-coordination/wiki[op de wiki]. 
 
 OpenKAT is nog volop in ontwikkeling. Hiervoor is input welkom!
 
@@ -12,12 +15,29 @@ OpenKAT is nog volop in ontwikkeling. Hiervoor is input welkom!
 
 OpenKAT omvat de volgende repositories: 
 
-* link:https://github.com/minvws/nl-kat-coordination[NL-KAT-Coordination]
-* link:https://github.com/minvws/nl-kat-mula[NL-KAT-mula]
-* link:https://github.com/minvws/nl-kat-octopoes[NL-KAT-octopoes]
-* link:https://github.com/minvws/nl-kat-rocky[NL-KAT-rocky]
-* link:https://github.com/minvws/nl-kat-bytes[NL-KAT-bytes]
-* link:https://github.com/minvws/nl-kat-boefjes[NL-KAT-boefjes]
+=== link:https://github.com/minvws/nl-kat-coordination[NL-KAT-Coordination]
+
+De centrale repo van OpenKAT bevat alle documentatie en informatie om OpenKAT zelf te installeren. 
+
+=== link:https://github.com/minvws/nl-kat-mula[NL-KAT-mula]
+
+Mula is de scheduler, die in OpenKAT de boefjes aanstuurt.
+
+=== link:https://github.com/minvws/nl-kat-octopoes[NL-KAT-octopoes]
+
+Octopoes is het datamodel met alle objecten. Octopoes omvat ook de XTDB, waarin alle objecten zijn opgeslagen. 
+
+=== link:https://github.com/minvws/nl-kat-rocky[NL-KAT-rocky]
+
+Rocky is de frontend van OpenKAT. Rocky maakt gebruik van Manon Open voor de scheiding van stijl en inhoud. 
+
+=== link:https://github.com/minvws/nl-kat-bytes[NL-KAT-bytes]
+
+Bytes bevat de database met ruwe informatie en metadata, met externe signing voor de forensische borging.
+
+=== link:https://github.com/minvws/nl-kat-boefjes[NL-KAT-boefjes]
+
+Boefjes bevat twee onderdelen van OpenKAT: boefjes, de plugins die scans uitvoeren en whiskers, de normalizers die de data normaliseren en er objecten van maken. 
 
 == Hoe kan ik OpenKAT installeren en gebruiken? 
 
