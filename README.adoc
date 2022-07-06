@@ -114,7 +114,7 @@ OpenKAT ondersteunt op dit moment de volgende talen:
 - Nederlands
 - Papiamento
 
-De meeste documentatie in de software zelf is in het Engels geschreven. De handleidingen en de wiki zijn in het Nederland, maar willen we graag ook in andere talen beschikbaar maken. 
+De meeste documentatie in de software zelf is in het Engels geschreven. De handleidingen en de wiki zijn in het Nederlands, maar willen we graag ook in andere talen beschikbaar maken. 
 
 = Contact met het team
 
