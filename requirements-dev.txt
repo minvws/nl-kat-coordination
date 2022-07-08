@@ -12,7 +12,7 @@ django-phonenumber-field==6.1.0
 django-two-factor-auth==1.14.0
 djlint==0.7.5
 idna==3.3
-lxml==4.6.5
+lxml==4.9.1
 phonenumbers==8.12.30
 psycopg2-binary==2.8.6
 pydantic==1.8.2
