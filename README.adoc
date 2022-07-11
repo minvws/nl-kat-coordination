@@ -1,6 +1,8 @@
 
 = Wat is OpenKAT? 
 
+test edit voor CLA-bot
+
 OpenKAT heeft als doel het monitoren, registreren en analyseren van de status van informatiesystemen. OpenKAT scant netwerken, analyseert kwetsbaarheden en maakt toegankelijke rapporten. Het integreert de meest gebruikte netwerktools en scansoftware in een modulair framework, heeft toegang tot externe databases zoals shodan en combineert de informatie uit al deze bronnen in overzichtelijke rapportages.
 
 OpenKAT scant, verzamelt, analyseert en rapporteert in een permanent proces: 
