@@ -46,18 +46,18 @@ up:
 	docker-compose up -d --force-recreate rocky
 
 clone:
-	-git clone https://github.com/minvws/minvws/nl-kat-boefjes.git
-	-git clone https://github.com/minvws/minvws/nl-kat-bytes.git
-	-git clone https://github.com/minvws/minvws/nl-kat-octopoes.git
-	-git clone https://github.com/minvws/minvws/nl-kat-mula.git
-	-git clone https://github.com/minvws/minvws/nl-kat-rocky.git
+	-git clone https://github.com/minvws/nl-kat-boefjes.git
+	-git clone https://github.com/minvws/nl-kat-bytes.git
+	-git clone https://github.com/minvws/nl-kat-octopoes.git
+	-git clone https://github.com/minvws/nl-kat-mula.git
+	-git clone https://github.com/minvws/nl-kat-rocky.git
 
 clone-main:
-	-git clone --branch main https://github.com/minvws/minvws/nl-kat-boefjes.git
-	-git clone --branch main https://github.com/minvws/minvws/nl-kat-bytes.git
-	-git clone --branch main https://github.com/minvws/minvws/nl-kat-octopoes.git
-	-git clone --branch main https://github.com/minvws/minvws/nl-kat-mula.git
-	-git clone --branch main https://github.com/minvws/minvws/nl-kat-rocky.git
+	-git clone --branch main https://github.com/minvws/nl-kat-boefjes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-bytes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-octopoes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-mula.git
+	-git clone --branch main https://github.com/minvws/nl-kat-rocky.git
 
 pull:
 	-git pull
