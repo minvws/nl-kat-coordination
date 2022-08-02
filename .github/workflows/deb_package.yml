@@ -74,7 +74,7 @@ jobs:
         run: |
           cat > debian/changelog << EOF
           kat-rocky (${{env.RELEASE_VERSION}}) unstable; urgency=low
-            * view changes: https://github.com/minvws/nl-kat-rocky/releases/tag/${{env.RELEASE_TAG}}
+            * view changes: https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}
 
            -- OpenKAT <maintainer@openkat.nl>  $(LANG=C date -R)
 
