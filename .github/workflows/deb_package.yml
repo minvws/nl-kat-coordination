@@ -74,19 +74,12 @@ jobs:
         run: |
           cat > debian/changelog << EOF
           kat-rocky (${{env.RELEASE_VERSION}}) unstable; urgency=low
-            * view changes: https://github.com/minvws/nl-rt-tim-abang-rocky/releases/tag/${{env.RELEASE_TAG}}
+            * view changes: https://github.com/minvws/nl-kat-rocky/releases/tag/${{env.RELEASE_TAG}}
 
            -- OpenKAT <maintainer@openkat.nl>  $(LANG=C date -R)
 
           EOF
         working-directory: kat-rocky_${{env.RELEASE_VERSION}}/
-
-      - name: Ship octopoes with package until it's publicly available
-        run: |
-          OCTOPOES_VER=$(grep git app/requirements.txt | awk -F '@' '{ print $3 }')
-          git clone --depth 1 --branch ${OCTOPOES_VER} https://${{ secrets.RDO_REPO_RO }}@github.com/minvws/nl-rt-tim-abang-octopoes.git
-          rm -r nl-rt-tim-abang-octopoes/{.git,.ci,.github,Dockerfile}
-        working-directory: kat-rocky_${{env.RELEASE_VERSION}}/data/usr/share/kat-rocky
 
       - name: generate copyright file
         run: |
