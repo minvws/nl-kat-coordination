@@ -23,11 +23,6 @@ python3 -m venv ${APP_DIR}/venv
 
 echo "Setting up rocky environment."
 ${APP_DIR}/venv/bin/pip install --upgrade pip > /dev/null
-
-# TODO: remove when octopoes is publicly available
-sed -i '/^.*octopoes.*$/d' ${APP_DIR}/app/requirements.txt
-${APP_DIR}/venv/bin/pip install ${APP_DIR}/nl-rt-tim-abang-octopoes > /dev/null
-
 ${APP_DIR}/venv/bin/pip install --requirement ${APP_DIR}/app/requirements.txt > /dev/null
 ${APP_DIR}/venv/bin/pip install gunicorn uvicorn > /dev/null
 
