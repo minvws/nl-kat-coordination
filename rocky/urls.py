@@ -1,7 +1,7 @@
 from django.urls import path, include
 from django.contrib import admin
 from two_factor.urls import urlpatterns as tf_urls
-
+from django.views.generic.base import TemplateView
 from crisis_room import views as crisis_room_views
 from . import views
 
@@ -10,16 +10,7 @@ handler404 = "rocky.views.handler404"
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("", views.LandingPageView.as_view(), name="landing_page"),
-    path("account/", views.AccountView.as_view(), name="account_detail"),
-    path(
-        "account/login/", views.LoginRockyView.as_view(), name="login"
-    ),  # Bypass the two_factor login
-    path(
-        "account/two_factor/qrcode/", views.QRGeneratorRockyView.as_view(), name="qr"
-    ),  # Bypass the two_factor QR generation to force verification before enabling TFA
-    path(
-        "account/two_factor/setup/", views.SetupRockyView.as_view(), name="setup"
-    ),  # Bypass the two_factor setup show that users have to be verified
+    path("account/", include("account.urls"), name="account"),
     path("", include(tf_urls)),
     path(
         "indemnifications/",
@@ -71,7 +62,6 @@ urlpatterns = [
         name="organization_member_edit",
     ),
     path("health/", views.health, name="health"),
-    path("logout/", views.LogoutRockyView.as_view(), name="logout"),
     path("objects/", views.OOIListView.as_view(), name="ooi_list"),
     path(
         "objects/add/", views.OOIAddTypeSelectView.as_view(), name="ooi_add_type_select"
@@ -112,6 +102,16 @@ urlpatterns = [
         name="katalogus_detail",
     ),
     path(
+        "kat-alogus/<id>/add-consumable-object",
+        views.BoefjeConsumableObjectType.as_view(),
+        name="boefje_add_consumable_type",
+    ),
+    path(
+        "kat-alogus/<id>/add-consumable-object/<add_ooi_type>",
+        views.BoefjeConsumableObjectAddView.as_view(),
+        name="boefje_add_consumable_object",
+    ),
+    path(
         "privacy-statement/",
         views.PrivacyStatementView.as_view(),
         name="privacy_statement",
@@ -121,7 +121,11 @@ urlpatterns = [
         crisis_room_views.CrisisRoomView.as_view(),
         name="crisis_room",
     ),
-    path("tasks/", views.task_list, name="task_list"),
+    path("tasks/", views.TaskListView.as_view(), name="task_list"),
     path("bytes/<boefje_meta_id>/raw", views.BytesRawView.as_view(), name="bytes_raw"),
     path("onboarding/", include("onboarding.urls"), name="onboarding"),
+    path(
+        "robots.txt",
+        TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
+    ),
 ]

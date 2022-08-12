@@ -1,24 +1,25 @@
+from typing import List, Type, Set, Optional, Tuple, Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from typing import List, Union, Type, Set, Optional
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference, OOI
+from octopoes.models import OOI
+
 from rocky.katalogus import Boefje
-from tools.models import SCAN_LEVEL
 from tools.forms import (
     BaseRockyForm,
     Choice,
     Choices,
-    ChoicesGroup,
-    ChoicesGroups,
     ObservedAtForm,
     CheckboxGroup,
-    CheckboxGroupTable,
+    CheckboxTable,
     DEPTH_DEFAULT,
     DEPTH_HELP_TEXT,
     DEPTH_MAX,
     BLANK_CHOICE,
+    LabeledCheckboxInput,
 )
+from tools.models import SCAN_LEVEL
 
 
 class OOIReportSettingsForm(ObservedAtForm):
@@ -54,49 +55,39 @@ class OoiTreeSettingsForm(OOIReportSettingsForm):
 class SelectOOIForm(BaseRockyForm):
     ooi = forms.MultipleChoiceField(
         label=_("Objects"),
-        widget=CheckboxGroupTable(),
+        widget=CheckboxTable(
+            column_names=("Type", "OOI", "Scan Level"),
+            column_templates=(None, None, "partials/scan_level_indicator.html"),
+        ),
     )
 
     def __init__(
         self,
-        boefje: Boefje,
-        connector: OctopoesAPIConnector,
-        ooi_reference: Optional[Reference],
+        oois: List[OOI],
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-
-        self.boefje = boefje
-        self.octopoes_connector = connector
-        self.ooi_reference = ooi_reference
-        self._build_form()
-
-    def _build_form(self) -> None:
-        self.set_choices_for_field("ooi", self._get_choices(self.boefje.consumes))
+        self.set_choices_for_field("ooi", [self._to_choice(ooi) for ooi in oois])
         if len(self.fields["ooi"].choices) == 1:
             self.fields["ooi"].initial = self.fields["ooi"].choices[0][0]
 
-    def _get_choices(self, types: Set[Type[OOI]]) -> Union[Choices, ChoicesGroups]:
-        if self.ooi_reference:
-            return [self._to_choice(self.ooi_reference)]
-
-        return self._choices_from_parameters(types)
-
-    def _choices_from_parameters(self, types: Set[Type[OOI]]) -> ChoicesGroups:
-        types = map(self._group_from_type, types)
-
-        return list(filter(lambda ooi_type: ooi_type[1], types))
-
-    def _group_from_type(self, ooi_type: Type[OOI]) -> ChoicesGroup:
-        refs = self.octopoes_connector.list({ooi_type}, limit=1000)
-        group_name = ooi_type.get_ooi_type()
-
-        return group_name, [self._to_choice(ref) for ref in refs]
-
     @staticmethod
-    def _to_choice(reference: Reference) -> Choice:
-        return str(reference), reference.human_readable
+    def _to_choice(ooi: OOI) -> Tuple[str, Any]:
+        return str(ooi), (
+            ooi.get_ooi_type(),
+            ooi.human_readable,
+            ooi.scan_profile.level,
+        )
+
+
+class SelectOOIFilterForm(BaseRockyForm):
+    show_all = forms.NullBooleanField(
+        widget=LabeledCheckboxInput(
+            label=_("Show objects that don't meet the Boefjes scan level"),
+            autosubmit=True,
+        ),
+    )
 
 
 class SetClearanceLevelForm(forms.Form):

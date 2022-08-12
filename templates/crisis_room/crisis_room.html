@@ -19,10 +19,3 @@
     {% include 'crisis_room/crisis_room_findings_block.html' %}
   </main>
 {% endblock %}
-
-{% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static '/js/vendor/manon/expando-rows.js' %}"></script>
-  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
-  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
-{% endblock %}

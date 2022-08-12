@@ -1,23 +1,23 @@
 .language {
-	width: 100%;
-    background-color: #f5f5f5;
+  width: 100%;
+  background-color: #f5f5f5;
 
-	form {
-		padding: 0.5rem;
-		background-color: transparent;
+  form {
+    padding: 0.5rem;
+    background-color: transparent;
 
-		button {
-			color: #000;
-			min-height: 0;
-			background-color: transparent;
-			min-width: 0;
-			padding: 0;
-			border-bottom: 2px solid transparent;
+    button {
+      color: #000;
+      min-height: 0;
+      background-color: transparent;
+      min-width: 0;
+      padding: 0;
+      border-bottom: 2px solid transparent;
 
-			&[aria-current="true"],
-			&:hover {
-				border-bottom: 2px solid #262431;
-			}
-		}
-	}
+      &[aria-current="true"],
+      &:hover {
+        border-bottom: 2px solid #262431;
+      }
+    }
+  }
 }

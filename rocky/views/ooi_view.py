@@ -24,7 +24,6 @@ from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations, get_collapsed_types, type_by_name
 from pydantic import ValidationError, BaseModel
 from two_factor.views.utils import class_view_decorator
-
 from rocky.bytes_client import get_bytes_client
 from rocky.katalogus import Boefje, get_katalogus
 from tools.forms import BaseRockyForm, ObservedAtForm, DEPTH_MAX, DEPTH_DEFAULT
@@ -41,7 +40,6 @@ from tools.view_helpers import (
     Breadcrumb,
 )
 
-User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
@@ -338,19 +336,12 @@ class MultipleOOIMixin(OctopoesMixin):
 class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, TemplateView):
     connector_form_class = ObservedAtForm
 
-    def format_scan_level(self, ooi_list):
-        for ooi in ooi_list:
-            for level, text_level in SCAN_LEVEL.choices:
-                if ooi.scan_profile.level == level:
-                    ooi.scan_profile.level = text_level
-        return ooi_list
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         observed_at = self.get_observed_at()
 
-        items_per_page = 10
+        items_per_page = 150
         paginator = Paginator(self.get_list(observed_at), items_per_page)
         page_number = self.request.GET.get("page")
 
@@ -363,7 +354,7 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, TemplateView):
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = observed_at
         try:
-            context["ooi_list"] = self.format_scan_level(page_obj)
+            context["ooi_list"] = page_obj
         except OctopoesAPIImproperlyConfigured as e:
             context["ooi_list"] = []
             messages.add_message(self.request, messages.ERROR, str(e))

@@ -1,8 +1,8 @@
 .affected-objects {
   span:not(:last-child) {
-      &:after{
-          content: "-";
-          display: inline-block;
-      }
-  } 
+    &:after {
+      content: "-";
+      display: inline-block;
+    }
+  }
 }

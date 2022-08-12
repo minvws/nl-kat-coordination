@@ -1,6 +1,5 @@
 import uuid
-
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -8,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 
 from tools.add_ooi_information import get_info, SEPARATOR
 from tools.validators import phone_validator
+
+User = get_user_model()
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"

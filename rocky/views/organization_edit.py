@@ -8,18 +8,19 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from rocky.settings import MIAUW_API_ENABLED
-from tools.forms import OrganizationForm
+from account.forms import OrganizationForm
 from tools.miauw_helpers import get_registered_usernames
 from tools.models import Organization
 
 
 @class_view_decorator(otp_required)
-class OrganizationEditView(UserPassesTestMixin, UpdateView):
+class OrganizationEditView(PermissionRequiredMixin, UpdateView):
     form_class = OrganizationForm
     model = Organization
     template_name = "organizations/organization_edit.html"
+    permission_required = "tools.change_organization"
 
     def get(self, request, *args, **kwargs):
         if not MIAUW_API_ENABLED:
@@ -70,9 +71,6 @@ class OrganizationEditView(UserPassesTestMixin, UpdateView):
         ]
 
         return context
-
-    def test_func(self):
-        return self.request.user.has_perm("tools.can_change_organization")
 
     def handle_no_permission(self):
         messages.add_message(

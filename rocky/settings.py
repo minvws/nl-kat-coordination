@@ -39,6 +39,7 @@ MIAUW_REQUEST_VALIDATE = os.getenv("MIAUW_REQUEST_VALIDATE", "True") == "True"
 OCTOPOES_API = os.getenv("OCTOPOES_API")
 
 FLOWER_API = os.getenv("FLOWER_API", "")
+SCHEDULER_API = os.getenv("SCHEDULER_API", "")
 
 KATALOGUS_API = os.getenv("KATALOGUS_API", "")
 
@@ -55,22 +56,28 @@ ALLOWED_HOSTS = ["*"]
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
 # -----------------------------
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
 EMAIL_FILE_PATH = os.getenv(
     "EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs"
 )  # directory to store output files
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
 EMAIL_HOST = os.getenv("EMAIL_HOST")  # localhost
-EMAIL_PORT = os.getenv("EMAIL_PORT")  # 25
+EMAIL_PORT = os.getenv("EMAIL_PORT", 25)  # 25
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL")
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX")  # "KAT - "
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", False)  # False
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", False)  # False
 # EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", False) # False
 EMAIL_SSL_CERTFILE = os.getenv("EMAIL_SSL_CERTFILE", None)  # None
 EMAIL_SSL_KEYFILE = os.getenv("EMAIL_SSL_KEYFILE", None)
 EMAIL_TIMEOUT = 30  # 30 seconds
 # ----------------------------
+
+HELP_DESK_EMAIL = os.getenv("HELP_DESK_EMAIL", "")
 
 # Application definition
 
@@ -87,6 +94,7 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
     "markdownify.apps.MarkdownifyConfig",
     "two_factor",
+    "account",
     "tools",
     "fmea",
     "crisis_room",
@@ -135,6 +143,9 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "rocky.wsgi.application"
 
+AUTH_USER_MODEL = "account.KATUser"
+
+
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 POSTGRES_USER = os.getenv("ROCKY_DB_USER")
@@ -165,7 +176,14 @@ if os.getenv("POSTGRES_SSL_ENABLED"):
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
+
 AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 12,
+        },
+    },
     {
         "NAME": "django_password_validators.password_character_requirements.password_validation.PasswordCharacterValidator",
         "OPTIONS": {
@@ -175,12 +193,6 @@ AUTH_PASSWORD_VALIDATORS = [
             "min_length_lower": 2,
             "min_length_upper": 2,
             "special_characters": "~!@#$%^&*()_+{}\":;'[]",
-        },
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": 12,
         },
     },
 ]
@@ -249,7 +261,6 @@ CSRF_COOKIE_HTTPONLY = True
 # Deny x-framing, which is standard since Django 3.0
 # There is no need to embed this in a frame anywhere, not desired.
 X_FRAME_OPTIONS = "DENY"
-
 # Send some legacy security headers
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True

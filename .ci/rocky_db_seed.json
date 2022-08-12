@@ -1,14 +1,12 @@
 [
   {
-    "model": "auth.user",
+    "model": "account.katuser",
     "pk": 1,
     "fields": {
       "password": "pbkdf2_sha256$260000$nfKdwbVTcIpGgpLoKmFIJK$QBW4HrqMoIc5G83381Y98FT7KYYFar3nx3usYxwVHRw=",
       "last_login": null,
       "is_superuser": false,
-      "username": "a@a.nl",
-      "first_name": "",
-      "last_name": "",
+      "full_name": "",
       "email": "a@a.nl",
       "is_staff": false,
       "is_active": true,
@@ -22,7 +20,9 @@
     "pk": 1,
     "fields": {
       "name": "test-organization",
-      "code": "_dev"
+      "code": "_dev",
+      "signal_username": null,
+      "signal_group_id": null
     }
   },
   {
@@ -31,11 +31,14 @@
     "fields": {
       "user": 1,
       "organization": 1,
+      "verified": false,
       "authorized": true,
       "status": "new",
       "member_name": "test-name",
       "member_role": "test-role",
-      "goal": "test-goal"
+      "goal": "test-goal",
+      "signal_username": null,
+      "onboarded": false
     }
   }
 ]

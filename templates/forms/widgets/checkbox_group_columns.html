@@ -15,7 +15,7 @@
 
   {% if widget.optgroups and toggle_all_button %}
   <div class="horizontal-view">
-    <input type="button" class="ghost" onClick="toggleCheckboxes('{{ widget.name }}')" value="{% translate "Toggle all" %}">
+    <input type="button" class="ghost" onClick="toggleCheckboxes(event, '{{ widget.name }}')" value="{% translate "Toggle all" %}">
   </div>
   {% endif %}
   </div>

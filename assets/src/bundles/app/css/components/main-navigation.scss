@@ -1,43 +1,43 @@
 body > header {
-	div.horizontal-view {
-		@media (max-width: 56rem) {
-			position: relative;
-			padding: 0;
+  div.horizontal-view {
+    @media (max-width: 56rem) {
+      position: relative;
+      padding: 0;
 
-			.logo {
-				position: absolute;
-				top: 0.75rem;
-				left: 0.5rem;
-			}
+      .logo {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.5rem;
+      }
 
-			.collapsible-menu {
-				padding-top: 1rem;
-				.secondary-menu {
-					width: 100%;
+      .collapsible-menu {
+        padding-top: 1rem;
+        .secondary-menu {
+          width: 100%;
 
-					&:hover {
-						background-color: transparent;
-					}
-				}
-			}
-		}
-	}
+          &:hover {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
 
-	nav:not(.breadcrumb-bar) {
-		min-height: 4rem;
-		padding-top: 1rem;
+  nav:not(.breadcrumb-bar) {
+    min-height: 4rem;
+    padding-top: 1rem;
 
-		a {
-			border-bottom: 1px solid transparent
-		}
+    a {
+      border-bottom: 1px solid transparent;
+    }
 
-		a[aria-current="page"],
-		a:hover {
-			border-bottom: 1px solid white;
-		}
+    a[aria-current="page"],
+    a:hover {
+      border-bottom: 1px solid white;
+    }
 
-		.secondary-menu {
-			margin-left: auto;
-		}
-	}
+    .secondary-menu {
+      margin-left: auto;
+    }
+  }
 }

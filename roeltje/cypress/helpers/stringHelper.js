@@ -1,14 +1,19 @@
 const stringHelper = () => {
-  const random = (length) => Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, length);
+  const random = (length) =>
+    Math.random()
+      .toString(36)
+      .replace(/[^a-z]+/g, "")
+      .substr(0, length);
 
-  const split = (splittable, separator = ',') => {
-    return splittable.split(separator)
-            .map(v => v.trim())
-            .filter(v => v.length > 0);
+  const split = (splittable, separator = ",") => {
+    return splittable
+      .split(separator)
+      .map((v) => v.trim())
+      .filter((v) => v.length > 0);
   };
 
   // formattin date easy-mode
-  const inputDate = date => new Date(date).toJSON().split("T")[0];
+  const inputDate = (date) => new Date(date).toJSON().split("T")[0];
 
   const dateToday = new Date();
   const dateYesterday = new Date().setDate(dateToday.getDate() - 1);
@@ -18,7 +23,7 @@ const stringHelper = () => {
   const today = inputDate(dateToday);
   const yesterday = inputDate(dateYesterday);
   const lastWeek = inputDate(dateLastWeek);
-  const lastYear  = inputDate(dateLastYear);
+  const lastYear = inputDate(dateLastYear);
 
   return {
     random,

@@ -7,14 +7,21 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 from django.contrib import messages
 from django.views.generic.edit import CreateView
-from tools.models import User, Organization
-from tools.forms import OrganizationMemberToGroupAddForm
+from django.contrib.auth import get_user_model
+from tools.models import Organization
+from account.forms import OrganizationMemberToGroupAddForm
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+
+User = get_user_model()
 
 
 @class_view_decorator(otp_required)
 class OrganizationMemberAddView(
-    UserPassesTestMixin, OrganizationMemberBreadcrumbsMixin, CreateView
+    UserPassesTestMixin,
+    PermissionRequiredMixin,
+    OrganizationMemberBreadcrumbsMixin,
+    CreateView,
 ):
     """
     View to create a new organization
@@ -23,6 +30,14 @@ class OrganizationMemberAddView(
     model = User
     template_name = "organizations/organization_member_add.html"
     form_class = OrganizationMemberToGroupAddForm
+    permission_required = "tools.add_organizationmember"
+
+    def test_func(self):
+        """
+        Cannot add member to an organization where user is not part of.
+        """
+        organization = Organization.objects.filter(pk=self.kwargs["pk"])
+        return self.request.user.organizationmember.organization in organization
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -62,9 +77,6 @@ class OrganizationMemberAddView(
     def add_success_notification(self):
         success_message = _("Member added succesfully.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
-
-    def test_func(self):
-        return self.request.user.has_perm("tools.add_organizationmember")
 
     def handle_no_permission(self):
         messages.add_message(

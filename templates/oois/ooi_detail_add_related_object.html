@@ -2,11 +2,6 @@
 {% load static %}
 {% load i18n %}
 
-{% block head %}
-  {{ block.super }}
-  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
-{% endblock %}
-
 {% block content %}
   {% translate type as display_type %}
   {% include 'header.html' %}

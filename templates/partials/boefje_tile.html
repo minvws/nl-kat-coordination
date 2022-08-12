@@ -18,10 +18,10 @@
   {% endif %}
   <img src="{% url 'boefje_cover' boefje_id=item.id %}"
         alt="placeholder image for Boefje {{ item.name }}">
-  {% with scan_level=item.scan_level.label %}
+  {% with scan_level=item.scan_level.value %}
     <div class="horizontal-view scan-intensity">
       <span class="de-emphasized">{% translate 'Scan intensity score:' %}</span>
-      {% include 'partials/scan_level_indicator.html' with scan_level=scan_level %}
+      {% include 'partials/scan_level_indicator.html' with value=scan_level %}
     </div>
   {% endwith %}
   <h1>{{ item.name }}</h1>
