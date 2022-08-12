@@ -14,6 +14,9 @@ def run(
     additional_oois: List,
 ) -> Iterator[OOI]:
 
+    if input_ooi.key.lower() not in ["location", "content-security-policy"]:
+        return
+
     network = Network(name="internet")
 
     urls_and_hostname = re.findall("(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", input_ooi.value)

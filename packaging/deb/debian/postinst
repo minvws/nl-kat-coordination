@@ -6,6 +6,11 @@ APP_DIR=/usr/share/kat-octopoes
 
 adduser --home /etc/kat --no-create-home --system --group kat || true
 
+chown kat:kat /etc/kat/octopoes.conf
+chown kat:kat /etc/kat/gunicorn.octopoes.conf.py
+chown -R root:kat /usr/share/kat-octopoes
+chown root:kat /etc/kat
+
 python3 -m venv ${APP_DIR}/venv
 
 echo "Setting up octopoes environment."
@@ -16,27 +21,22 @@ ${APP_DIR}/venv/bin/pip install gunicorn uvicorn > /dev/null
 ln -s /etc/kat/octopoes.conf /usr/share/kat-octopoes/app/.env
 
 db_get kat-octopoes/enable-nginx-conf
-if [ "$RET" = "true" ] && [ -d /etc/nginx/sites-enabled ]; then
+if [ "$RET" = "true" -a -d /etc/nginx/sites-enabled ]; then
     ln -s /etc/nginx/sites-available/kat-octopoes /etc/nginx/sites-enabled/kat-octopoes || true
     systemctl enable --now kat-octopoes.service
     systemctl reload nginx
 fi
 
-chown kat:kat /etc/kat/octopoes.conf
-chown kat:kat /etc/kat/gunicorn.octopoes.conf.py
-chown -R root:kat /usr/share/kat-octopoes
-chown root:kat /etc/kat
-chmod 640 /etc/kat/octopoes.conf
-chmod 640 /etc/kat/gunicorn.octopoes.conf.py
-chmod 750 /etc/kat/
-chmod 750 /usr/share/kat-octopoes
-chmod 750 /usr/lib/systemd/system/kat-octopoes.service
-chmod 750 /usr/lib/systemd/system/kat-octopoes-celery.service
-chmod 750 /usr/lib/systemd/system/kat-octopoes.socket
+configured_queue=$(cat /etc/kat/*.conf | grep -oP 'QUEUE_URI=\K.+' | head -n 1)
 
 if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
+    rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
     rabbitmqctl add_vhost kat
-    rabbitmqctl set_permissions -p "kat" "guest" ".*" ".*" ".*"
+    rabbitmqctl add_user kat ${rabbitmq_pass}
+    rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
+elif [ ! -z "$configured_queue" ]; then
+    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=${configured_queue}|" /etc/kat/*.conf
 fi
 
 # Update number of workers for gunicorn
