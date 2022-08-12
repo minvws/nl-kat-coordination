@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import pytest
@@ -5,6 +6,7 @@ import requests
 from requests import HTTPError
 
 from bytes.models import MimeType
+from bytes.rabbitmq import RabbitMQEventManager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter
 from tests.client import BytesAPIClient
 from tests.loading import get_normalizer_meta, get_boefje_meta
@@ -49,13 +51,18 @@ def test_filtered_boefje_meta(bytes_api_client: BytesAPIClient) -> None:
     assert second_boefje_meta == retrieved_boefje_metas[0]
 
 
-def test_normalizer_meta(bytes_api_client: BytesAPIClient) -> None:
+def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: RabbitMQEventManager) -> None:
     normalizer_meta = get_normalizer_meta()
     bytes_api_client.save_boefje_meta(normalizer_meta.boefje_meta)
     bytes_api_client.save_normalizer_meta(normalizer_meta)
     retrieved_normalizer_meta = bytes_api_client.get_normalizer_meta(normalizer_meta.id)
 
     assert normalizer_meta == retrieved_normalizer_meta
+
+    method, properties, body = event_manager.channel.basic_get("test__normalizer_meta_received")
+    event_manager.channel.basic_ack(method.delivery_tag)
+
+    assert normalizer_meta.id in body.decode()
 
 
 def test_normalizer_meta_no_raw_id_field_in_json(bytes_api_client: BytesAPIClient) -> None:
@@ -86,7 +93,7 @@ def test_normalizer_meta_pointing_to_raw_id(bytes_api_client: BytesAPIClient) ->
     assert normalizer_meta == retrieved_normalizer_meta
 
 
-def test_raw(bytes_api_client: BytesAPIClient) -> None:
+def test_raw(bytes_api_client: BytesAPIClient, event_manager: RabbitMQEventManager) -> None:
     boefje_meta = get_boefje_meta()
     bytes_api_client.save_boefje_meta(boefje_meta)
 
@@ -96,6 +103,11 @@ def test_raw(bytes_api_client: BytesAPIClient) -> None:
     retrieved_raw = bytes_api_client.get_raw(boefje_meta.id)
 
     assert retrieved_raw == raw
+
+    method, properties, body = event_manager.channel.basic_get("test__raw_file_received")
+    event_manager.channel.basic_ack(method.delivery_tag)
+
+    assert boefje_meta.id in body.decode()
 
 
 def test_raw_mime(bytes_api_client: BytesAPIClient) -> None:
