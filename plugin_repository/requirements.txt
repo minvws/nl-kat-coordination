@@ -1,4 +1,4 @@
-pydantic==1.9.0
+pydantic==1.8.2
 requests==2.27.1
 fastapi==0.75.0
 uvicorn==0.17.5
