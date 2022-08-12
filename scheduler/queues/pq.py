@@ -9,7 +9,7 @@ from typing import Any, Dict, Tuple, Type
 
 import pydantic
 
-from .errors import InvalidPrioritizedItemError, NotAllowedError
+from .errors import InvalidPrioritizedItemError, NotAllowedError, QueueEmptyError, QueueFullError
 
 
 class EntryState(str, Enum):
@@ -187,8 +187,8 @@ class PriorityQueue:
                 if entry.state is not EntryState.REMOVED:
                     del self.entry_finder[self.get_item_identifier(entry.p_item.item)]
                     return entry.p_item
-            except queue.Empty:
-                self.logger.warning("Queue %s is empty", self.pq_id)
+            except queue.Empty as exc:
+                raise QueueEmptyError(f"Queue {self.pq_id} is empty.") from exc
 
     def push(self, p_item: PrioritizedItem) -> None:
         """Push an item with priority into the queue. When timeout is set it
@@ -213,7 +213,7 @@ class PriorityQueue:
             raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
 
         if self.maxsize is not None and self.maxsize != 0 and self.pq.qsize() == self.maxsize:
-            raise queue.Full
+            raise QueueFullError(f"Queue {self.pq_id} is full.")
 
         on_queue = self.is_item_on_queue(p_item.item)
 

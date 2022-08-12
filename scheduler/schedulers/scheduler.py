@@ -1,16 +1,16 @@
 import abc
+import datetime
 import logging
 import threading
 from typing import Any, Callable, Dict, List
 
-from scheduler import context, dispatchers, models, queues, rankers, utils
+from scheduler import context, models, queues, rankers, utils
 from scheduler.utils import thread
 
 
 class Scheduler(abc.ABC):
-    """The Scheduler class combines the priority queue, ranker and dispatcher.
-    The scheduler is responsible for populating the queue, ranking, and
-    dispatching tasks.
+    """The Scheduler class combines the priority queue, and ranker.
+    The scheduler is responsible for populating the queue, and ranking tasks.
 
     An implementation of the Scheduler will likely implement the
     `populate_queue` method, with the strategy for populating the queue. By
@@ -29,8 +29,6 @@ class Scheduler(abc.ABC):
             A queues.PriorityQueue instance
         ranker:
             A rankers.Ranker instance.
-        dispatcher:
-            A dispatchers.Dispatcher instance.
         populate_queue_enabled:
             A boolean whether to populate the queue.
         threads:
@@ -49,7 +47,6 @@ class Scheduler(abc.ABC):
         scheduler_id: str,
         queue: queues.PriorityQueue,
         ranker: rankers.Ranker,
-        dispatcher: dispatchers.Dispatcher,
         populate_queue_enabled: bool = True,
     ):
         """Initialize the Scheduler.
@@ -64,8 +61,6 @@ class Scheduler(abc.ABC):
                 A queues.PriorityQueue instance
             ranker:
                 A rankers.Ranker instance.
-            dispatcher:
-                A dispatchers.Dispatcher instance.
             populate_queue:
                 A boolean whether to populate the queue.
         """
@@ -75,7 +70,6 @@ class Scheduler(abc.ABC):
         self.scheduler_id = scheduler_id
         self.queue: queues.PriorityQueue = queue
         self.ranker: rankers.Ranker = ranker
-        self.dispatcher: dispatchers.Dispatcher = dispatcher
         self.populate_queue_enabled = populate_queue_enabled
 
         self.threads: Dict[str, thread.ThreadRunner] = {}
@@ -85,7 +79,103 @@ class Scheduler(abc.ABC):
     def populate_queue(self) -> None:
         raise NotImplementedError
 
-    def add_p_items_to_queue(self, p_items: List[queues.PrioritizedItem]) -> None:
+    def post_push(self, p_item: queues.PrioritizedItem) -> None:
+        """When a boefje task is being added to the queue. We
+        persist a task to the datastore with the status QUEUED
+
+        Args:
+            p_item: The prioritized item to post-add to queue.
+        """
+        task = models.Task(
+            id=p_item.item.id,
+            hash=p_item.item.hash,
+            scheduler_id=self.scheduler_id,
+            task=models.QueuePrioritizedItem(**p_item.dict()),
+            status=models.TaskStatus.QUEUED,
+            created_at=datetime.datetime.now(),
+            modified_at=datetime.datetime.now(),
+        )
+
+        self.ctx.datastore.add_task(task)
+
+    def post_pop(self, p_item: queues.PrioritizedItem) -> None:
+        """When a boefje task is being removed from the queue. We
+        persist a task to the datastore with the status RUNNING
+
+        Args:
+            p_item: The prioritized item to post-pop from queue.
+        """
+        task = self.ctx.datastore.get_task_by_id(p_item.item.id)
+        if task is None:
+            self.logger.error(
+                "Task %s not found in datastore, not updating status [task_id = %s]",
+                p_item.item.id,
+                p_item.item.id,
+            )
+            return None
+
+        task.status = models.TaskStatus.DISPATCHED
+        self.ctx.datastore.update_task(task)
+
+        return None
+
+    def pop_item_from_queue(self) -> queues.PrioritizedItem:
+        """Pop an item from the queue.
+
+        Returns:
+            A PrioritizedItem instance.
+        """
+        try:
+            p_item = self.queue.pop()
+        except queues.QueueEmptyError as exc:
+            self.logger.warning(
+                "Queue %s is empty, not populating new tasks [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.pq_id,
+                self.queue.pq.qsize(),
+            )
+            raise exc
+
+        self.post_pop(p_item)
+
+        return p_item
+
+    def push_item_to_queue(self, p_item: queues.PrioritizedItem) -> None:
+        """Push an item to the queue.
+
+        Args:
+            item: The item to push to the queue.
+        """
+        try:
+            self.queue.push(p_item)
+        except queues.errors.NotAllowedError as exc:
+            self.logger.warning(
+                "Not allowed to push to queue %s [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.pq_id,
+                self.queue.pq.qsize(),
+            )
+            raise exc
+        except queues.errors.QueueFullError as exc:
+            self.logger.warning(
+                "Queue %s is full, not populating new tasks [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.pq_id,
+                self.queue.pq.qsize(),
+            )
+            raise exc
+        except queues.errors.InvalidPrioritizedItemError as exc:
+            self.logger.warning(
+                "Invalid prioritized item %s [queue_id=%s, qsize=%d]",
+                p_item,
+                self.queue.pq_id,
+                self.queue.pq.qsize(),
+            )
+            raise exc
+
+        self.post_push(p_item)
+
+    def push_items_to_queue(self, p_items: List[queues.PrioritizedItem]) -> None:
         """Add items to a priority queue.
 
         Args:
@@ -94,24 +184,9 @@ class Scheduler(abc.ABC):
         """
         count = 0
         for p_item in p_items:
-            if self.queue.full():
-                self.logger.warning(
-                    "Queue %s is full, not populating new tasks [queue_id=%s, qsize=%d]",
-                    self.queue.pq_id,
-                    self.queue.pq_id,
-                    self.queue.pq.qsize(),
-                )
-                break
-
             try:
-                self.queue.push(p_item)
-            except queues.errors.NotAllowedError:
-                self.logger.warning(
-                    "Not allowed to push to queue %s [queue_id=%s, qsize=%d]",
-                    self.queue.pq_id,
-                    self.queue.pq_id,
-                    self.queue.pq.qsize(),
-                )
+                self.push_item_to_queue(p_item)
+            except Exception:
                 continue
 
             count += 1
@@ -125,7 +200,7 @@ class Scheduler(abc.ABC):
                 count,
             )
 
-    def _run_in_thread(
+    def run_in_thread(
         self,
         name: str,
         func: Callable[[], Any],
@@ -158,18 +233,10 @@ class Scheduler(abc.ABC):
     def run(self) -> None:
         # Populator
         if self.populate_queue_enabled:
-            self._run_in_thread(
+            self.run_in_thread(
                 name="populator",
                 func=self.populate_queue,
                 interval=self.ctx.config.pq_populate_interval,
-            )
-
-        # Dispatcher
-        if self.dispatcher is not None:
-            self._run_in_thread(
-                name="dispatcher",
-                func=self.dispatcher.run,
-                interval=self.ctx.config.dsp_interval,
             )
 
     def dict(self) -> Dict[str, Any]:

@@ -47,6 +47,9 @@ SCHEDULER_DSP_BROKER_URL=
 # RabbitMQ host address
 SCHEDULER_RABBITMQ_DSN=
 
+# Database host address
+SCHEDULER_DB_DSN=
+
 # Host url's of external service connectors
 KATALOGUS_API=
 BYTES_API=
@@ -93,4 +96,6 @@ throttle how fast the tasks are dispatched. Default is `5`.
 
 `SCHEDULER_DSP_BROKER_URL` is the url of the celery broker to post tasks to.
 
-`SCHEDULER_RABBITMQ_DSN=` is the url of the RabbitMQ host.
+`SCHEDULER_RABBITMQ_DSN` is the url of the RabbitMQ host.
+
+`SCHEDULER_DB_DSN` is the locator of the database

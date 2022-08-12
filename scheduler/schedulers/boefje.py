@@ -1,14 +1,14 @@
 import time
-import uuid
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from typing import List
 
+import mmh3
 import pika
 import requests
 
-from scheduler import context, dispatchers, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation
+from scheduler import context, queues, rankers
+from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, TaskStatus
 
 from .scheduler import Scheduler
 
@@ -27,7 +27,6 @@ class BoefjeScheduler(Scheduler):
         scheduler_id: str,
         queue: queues.PriorityQueue,
         ranker: rankers.Ranker,
-        dispatcher: dispatchers.Dispatcher,
         organisation: Organisation,
         populate_queue_enabled: bool = True,
     ):
@@ -36,12 +35,12 @@ class BoefjeScheduler(Scheduler):
             scheduler_id=scheduler_id,
             queue=queue,
             ranker=ranker,
-            dispatcher=dispatcher,
             populate_queue_enabled=populate_queue_enabled,
         )
 
         self.organisation: Organisation = organisation
 
+    # TODO: Pylint R0912 too-many-branches
     def populate_queue(self) -> None:
         """Populate the PriorityQueue.
 
@@ -105,7 +104,7 @@ class BoefjeScheduler(Scheduler):
                 )
                 time.sleep(1)
 
-            self.add_p_items_to_queue(p_items)
+            self.push_items_to_queue(p_items)
         else:
             self.logger.warning(
                 "Boefjes queue is full, not populating with new tasks [qsize=%d, org_id=%s, scheduler_id=%s]",
@@ -173,7 +172,7 @@ class BoefjeScheduler(Scheduler):
                 )
                 time.sleep(1)
 
-            self.add_p_items_to_queue(p_items)
+            self.push_items_to_queue(p_items)
             tries = 0
         else:
             self.logger.warning(
@@ -184,6 +183,8 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
+    # TODO: Pylint R0912 too-many-branches
+    # TODO: Pylint R0915 too-many-statements
     def create_tasks_for_oois(self, oois: List[OOI]) -> List[queues.PrioritizedItem]:
         """For every provided ooi we will create available and enabled boefje
         tasks.
@@ -244,7 +245,6 @@ class BoefjeScheduler(Scheduler):
                     continue
 
                 task = BoefjeTask(
-                    id=uuid.uuid4().hex,
                     boefje=Boefje.parse_obj(boefje),
                     input_ooi=ooi.primary_key,
                     organization=self.organisation.id,
@@ -319,9 +319,32 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
-                # Boefjes should not run before the grace period ends, thus
-                # we will check when the combination boefje and ooi was last
-                # run.
+                # Boefje should not run when it is still being processed, we
+                # try to find the same combination of ooi, boefje, and
+                # organisation (hash) to make sure that the particular task
+                # isn't being processed. When it's None we haven't seen it
+                # before.
+                task_db = self.ctx.datastore.get_task_by_hash(
+                    mmh3.hash_bytes(f"{ooi.primary_key}-{boefje.id}-{self.organisation.id}").hex()
+                )
+                if task_db is not None and (
+                    task_db.status == TaskStatus.PENDING
+                    or task_db.status == TaskStatus.QUEUED
+                    or task_db.status == TaskStatus.DISPATCHED
+                    or task_db.status == TaskStatus.RUNNING
+                ):
+                    self.logger.debug(
+                        "Boefje: %s is still being processed [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s, status=%s]",
+                        boefje.id,
+                        boefje.id,
+                        ooi.primary_key,
+                        self.organisation.id,
+                        self.scheduler_id,
+                        task_db.status,
+                    )
+                    continue
+
+                # Get the latest run of a boefje from bytes
                 try:
                     last_run_boefje = self.ctx.services.bytes.get_last_run_boefje(
                         boefje_id=boefje.id,
@@ -329,7 +352,7 @@ class BoefjeScheduler(Scheduler):
                         organization_id=self.organisation.id,
                     )
                 except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
-                    self.logger.warning(
+                    self.logger.info(
                         "Could not get last run boefje for boefje: %s with ooi: %s [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
                         boefje.name,
                         ooi.primary_key,
@@ -340,10 +363,13 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
+                # Check if boefje is still running. NOTE: This is perhaps
+                # unnecessary because of the datastore check above. And that
+                # jobs that have started are not yet present in Bytes
                 if (
                     last_run_boefje is not None
                     and last_run_boefje.ended_at is None
-                    and last_run_boefje.start_time is not None
+                    and last_run_boefje.started_at is not None
                 ):
                     self.logger.debug(
                         "Boefje %s is already running [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
@@ -355,6 +381,9 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
+                # Boefjes should not run before the grace period ends, thus
+                # we will check when the combination boefje and ooi was last
+                # run.
                 if (
                     last_run_boefje is not None
                     and last_run_boefje.ended_at is not None
@@ -362,7 +391,7 @@ class BoefjeScheduler(Scheduler):
                     < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
                 ):
                     self.logger.debug(
-                        "Boefje: %s already run for input ooi %s [last_run_boefje=%s, org_id=%s, scheduler_id=%s]",
+                        "Boefje: %s already ran for input ooi %s within the grace period [last_run_boefje=%s, org_id=%s, scheduler_id=%s]",
                         boefje.id,
                         ooi.primary_key,
                         last_run_boefje,

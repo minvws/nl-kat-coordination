@@ -56,6 +56,31 @@ done: ## Prepare for a commit.
 	make check
 	make test
 
+sql: ## Generate raw sql for the migrations.
+	docker-compose exec scheduler \
+		alembic \
+		--config /app/scheduler/alembic.ini \
+		upgrade $(rev1):$(rev2) --sql
+
+migrations: ## Create migration.
+ifeq ($(m),)
+	$(HIDE) (echo "ERROR: Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
+else ifeq ($(revid),)
+	$(HIDE) (echo "ERROR: Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
+else
+	docker-compose \
+		run scheduler \
+		alembic --config /app/scheduler/alembic.ini \
+		revision --autogenerate \
+		-m "$(m)" --rev-id "$(revid)"
+endif
+
+migrate: ## Run migrations using alembic.
+	docker-compose \
+		run scheduler \
+		alembic --config /app/scheduler/alembic.ini \
+		upgrade head
+
 
 ##
 ##|------------------------------------------------------------------------|
