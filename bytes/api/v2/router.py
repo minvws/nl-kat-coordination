@@ -6,7 +6,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel
 
 from bytes.auth import authenticate_token
-from bytes.events.events import RawFileReceived
+from bytes.events.events import RawFileReceived, NormalizerMetaReceived
 from bytes.events.manager import EventManager
 from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataMeta
 from bytes.rabbitmq import create_event_manager
@@ -70,9 +70,16 @@ def get_boefje_meta(
 def create_normalizer_meta(
     normalizer_meta: NormalizerMeta,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
+    event_manager: EventManager = Depends(create_event_manager),
 ) -> Dict[str, str]:
     with meta_repository:
         meta_repository.save_normalizer_meta(normalizer_meta)
+
+    event = NormalizerMetaReceived(
+        organization=normalizer_meta.boefje_meta.organization,
+        normalizer_meta=normalizer_meta,
+    )
+    event_manager.publish(event)
 
     return {"status": "success"}
 
