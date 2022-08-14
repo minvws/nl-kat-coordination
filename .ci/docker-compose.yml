@@ -27,7 +27,8 @@ services:
     build:
       context: ..
       dockerfile: nl-kat-boefjes/Dockerfile
-    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
+    command:
+      ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
     volumes:
       - ../nl-kat-boefjes:/app/boefjes
     env_file:

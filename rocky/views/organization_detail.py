@@ -8,7 +8,7 @@ from django.views.generic import DetailView
 from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
 from two_factor.views.utils import class_view_decorator
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from rocky.settings import MIAUW_API_ENABLED
 from tools.miauw import SignalGroupResponse
 from tools.miauw_helpers import (
@@ -53,10 +53,24 @@ def get_allowed_actions(organization) -> Dict[str, bool]:
 
 
 @class_view_decorator(otp_required)
-class OrganizationDetailView(OrganizationBreadcrumbsMixin, DetailView):
+class OrganizationDetailView(
+    PermissionRequiredMixin,
+    OrganizationBreadcrumbsMixin,
+    DetailView,
+):
     model = Organization
     object: Organization = None  # type: ignore
     template_name = "organizations/organization_detail.html"
+    permission_required = "tools.view_organization"
+
+    def get_queryset(self):
+        """
+        List organization that only belongs to user that requests the list.
+        """
+        object = self.model.objects.filter(
+            code=self.request.user.organizationmember.organization.code
+        )
+        return object
 
     def build_breadcrumbs(self) -> List[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()

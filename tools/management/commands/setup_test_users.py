@@ -1,5 +1,4 @@
 from typing import Optional, Dict
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management import BaseCommand
@@ -27,13 +26,11 @@ class Command(BaseCommand):
         add_test_user("e2e-client", password, GROUP_CLIENT)
 
 
-def add_superuser(username: str, password: str):
+def add_superuser(email: str, password: str):
     user_kwargs = {
-        "username": username,
+        "email": email,
         "password": password,
-        "first_name": "End-to-end Superuser",
-        "last_name": username,
-        "email": "{}@openkat.nl".format(username),
+        "full_name": "End-to-end Superuser",
         "is_staff": True,
         "is_superuser": True,
     }
@@ -41,13 +38,11 @@ def add_superuser(username: str, password: str):
     add_user(user_kwargs)
 
 
-def add_test_user(username: str, password: str, group_name: Optional[str] = None):
+def add_test_user(email: str, password: str, group_name: Optional[str] = None):
     user_kwargs = {
-        "username": username,
+        "email": email,
         "password": password,
-        "first_name": "End-to-end user",
-        "last_name": username,
-        "email": "{}@openkat.nl".format(username),
+        "full_name": "End-to-end user",
     }
 
     add_user(user_kwargs, group_name)
@@ -62,15 +57,15 @@ def add_user(user_kwargs: Dict[str, str], group_name: Optional[str] = None):
         raise ValueError("Invalid group name")
 
     # get or create user
-    if User.objects.filter(username=user_kwargs["username"]).exists():
-        user = User.objects.get(username=user_kwargs["username"])
+    if User.objects.filter(email=user_kwargs["email"]).exists():
+        user = User.objects.get(email=user_kwargs["email"])
     else:
         user = User.objects.create_user(**user_kwargs)
 
     # add to group if group_name provided
     if group_name:
         group = Group.objects.get(name=group_name)
-        if not group.user_set.filter(username=user_kwargs["username"]).exists():
+        if not group.user_set.filter(email=user_kwargs["email"]).exists():
             group.user_set.add(user)
 
     # Setting OTP key for consistent secret
@@ -91,13 +86,13 @@ def add_user(user_kwargs: Dict[str, str], group_name: Optional[str] = None):
 
     organization, created = Organization.objects.get_or_create(code="_dev")
 
-    organization_member, created = OrganizationMember.objects.get_or_create(
+    organizationmember, created = OrganizationMember.objects.get_or_create(
         user=user,
         organization=organization,
     )
 
     if created:
-        organization_member.verified = True
-        organization_member.authorized = True
-        organization_member.status = OrganizationMember.STATUSES.ACTIVE
-        organization_member.save()
+        organizationmember.verified = True
+        organizationmember.authorized = True
+        organizationmember.status = OrganizationMember.STATUSES.ACTIVE
+        organizationmember.save()

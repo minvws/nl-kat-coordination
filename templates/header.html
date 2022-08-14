@@ -4,54 +4,62 @@
 <header>
   {% include 'partials/skip-to-content.html' %}
   {% include 'partials/page-meta.html' %}
-  <div class="horizontal-view">
+  <nav data-open-label="Menu"
+       data-close-label="Sluit menu"
+       data-media="(min-width: 56rem)"
+       aria-label="Hoofdnavigatie">
     <a href="{% url 'crisis_room' %}"
        class="logo"
        title="KAT"
        aria-label="{% translate 'KAT logo, go to the homepage of KAT' %}">
-      <img src="{% static 'img/kat_logo.png' %}"
-           alt="{% translate 'KAT' %}"/>
+      <img src="{% static 'img/kat_logo.png' %}" alt="{% translate 'KAT' %}"/>
       Kwetsbaarheden Analyse Tool
     </a>
-    <nav data-open-label="Menu" data-close-label="Sluit menu" data-media="(min-width: 56rem)" aria-label="Hoofdnavigatie">
-      <!-- Adjust breakpoint as needed -->
-      <ul>
-        <li>
-          {% if request.user.is_authenticated %}
-            <a href="{% url 'crisis_room' %}" {% if 'crisis-room' in request.path|urlencode %} aria-current="page"{% endif %}>{{ request.active_organization }}</a>
-          {% else %}
-            <a href="{% url 'landing_page' %}" {% if 'landing-page' in request.path|urlencode %} aria-current="page"{% endif %}>KAT</a>
-          {% endif %}
-        </li>
-        {% if request.user.is_authenticated and not view_type == "onboarding" %}
-          {% if perms.tools.can_scan_organization and not request.user.is_superuser %}
-            <li>
-              <a href="{% url 'indemnification_add' %}" {% if 'indemnifications' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Indemnifications' %}</a>
-            </li>
-          {% endif %}
-          <li>
-            <a href="{% url 'katalogus' %}" {% if 'kat-alogus' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'KAT-alogus' %}</a>
-          </li>
-          <li>
-            <a href="{% url 'finding_list' %}" {% if 'finding' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Findings' %}</a>
-          </li>
-          <li>
-            <a href="{% url 'ooi_list' %}" {% if 'objects' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Objects' %}</a>
-          </li>
-          <li>
-            <a href="{% url 'task_list' %}" {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Tasks' %}</a>
-          </li>
-          {% if perms.tools.view_organizationmember and not perms.tools.can_switch_organization %}
-            <li>
-              <a href="{% url 'organization_member_list' request.user.organizationmember.organization_id %}" {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Members' %}</a>
-            </li>
-          {% endif %}
+    <!-- Adjust breakpoint as needed -->
+    <ul>
+      <li>
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'crisis_room' %}"
+             {% if 'crisis-room' in request.path|urlencode %} aria-current="page"{% endif %}>{{ request.active_organization }}</a>
+        {% else %}
+          <a href="{% url 'landing_page' %}"
+             {% if 'landing-page' in request.path|urlencode %} aria-current="page"{% endif %}>KAT</a>
         {% endif %}
-        <li class="secondary-menu">{% include 'partials/secondary-menu.html' %}</li>
-      </ul>
-    </nav>
-  </div>
-  {% if request.user.is_authenticated and breadcrumbs %}
+      </li>
+      {% if request.user.is_authenticated and not view_type == "onboarding" %}
+        {% if perms.tools.can_scan_organization and not request.user.is_superuser %}
+          <li>
+            <a href="{% url 'indemnification_add' %}"
+               {% if 'indemnifications' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Indemnifications' %}</a>
+          </li>
+        {% endif %}
+        <li>
+          <a href="{% url 'katalogus' %}"
+             {% if 'kat-alogus' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'KAT-alogus' %}</a>
+        </li>
+        <li>
+          <a href="{% url 'finding_list' %}"
+             {% if 'finding' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Findings' %}</a>
+        </li>
+        <li>
+          <a href="{% url 'ooi_list' %}"
+             {% if 'objects' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Objects' %}</a>
+        </li>
+        <li>
+          <a href="{% url 'task_list' %}"
+             {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Tasks' %}</a>
+        </li>
+        {% if perms.tools.view_organizationmember and not perms.tools.can_switch_organization %}
+          <li>
+            <a href="{% url 'organization_member_list' request.user.organizationmember.organization_id %}"
+               {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Members' %}</a>
+          </li>
+        {% endif %}
+      {% endif %}
+      <li class="secondary-menu">{% include 'partials/secondary-menu.html' %}</li>
+    </ul>
+  </nav>
+  {% if breadcrumbs %}
     <nav class="breadcrumb-bar" aria-label="{% translate 'Breadcrumbs' %}">
       <div>
         <ul>

@@ -14,11 +14,6 @@
             <option disabled selected value="">
               -- {% translate 'Choose an object type to add' %} --
             </option>
-            {% if not ooi|is_finding and not ooi|is_finding_type %}
-              <option value="Finding">
-                {% translate 'Finding' %}
-              </option>
-            {% endif %}
             {% for option in ooi_types %}
               {% if option.text != "Finding" %}
                 <option value="{{ option.value }}">

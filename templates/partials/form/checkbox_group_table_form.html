@@ -1,15 +1,12 @@
 {% load i18n %}
 
-<h2>{{ form_title }}</h2>
-<form method="post" class="help inline">
+<form method="post" class="inline">
   <input type="hidden" name="action" value="{{ action }}">
   {% csrf_token %}
   {% if checkbox_group_table_form %}
     <div class="horizontal-scroll">
-      {% for field in checkbox_group_table_form %}
-        {% include 'partials/form/form_errors.html' with form=field %}
-        {% for choices in field %}{{ choices }}{% endfor %}
-      {% endfor %}
+      {% include 'partials/form/form_errors.html' with form=checkbox_group_table_form %}
+      {% for field in checkbox_group_table_form %}{{ field }}{% endfor %}
     </div>
   {% endif %}
   <input type="hidden" name="{{ key }}" value="{{ value }}">

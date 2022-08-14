@@ -40,5 +40,4 @@ class FlowerClient:
 
             return res.json()
         except Exception as ex:
-            logger.exception("API request to Flower failed.")
-            raise FlowerException() from ex
+            raise FlowerException("API request to Flower failed.") from ex

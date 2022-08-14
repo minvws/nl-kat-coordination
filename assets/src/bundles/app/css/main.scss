@@ -18,7 +18,8 @@ and frameworks – Normalize, Bootstrap, jQueryUI, FancyCarouselSliderjQueryPowe
 
 https://sass-guidelin.es/#vendors-folder
 */
-@import "manon-dev.css"; /* Dev file copied from kat theme folder within manon repository */
+@import "manon.scss";
+@import "manon-variables.scss";
 @import "./vendors/all.scss";
 @import "./vendor/two-factor.scss";
 

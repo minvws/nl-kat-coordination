@@ -1,6 +1,6 @@
-from django.shortcuts import resolve_url, redirect
+from django.shortcuts import redirect
 from django.urls.base import reverse
-from tools.models import User, OrganizationMember
+from tools.models import OrganizationMember
 from tools.user_helpers import is_red_team
 
 

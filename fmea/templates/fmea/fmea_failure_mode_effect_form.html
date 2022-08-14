@@ -2,11 +2,6 @@
 {% load static %}
 {% load i18n %}
 
-{% block head %}
-  {{ block.super }}
-  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
-{% endblock %}
-
 {% block content %}
   {% include 'header.html' with breadcrumb_list=breadcrumb_list %}
   <main id="main-content">

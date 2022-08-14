@@ -1,12 +1,14 @@
 import * as d3 from "d3";
 
-const treeData = JSON.parse(document.getElementById('tree-data').textContent);
+const treeData = JSON.parse(document.getElementById("tree-data").textContent);
 const graphOverlay = document.querySelector(".graph-overlay");
 
 function showOverlay(event, { data }) {
   const definitionListItems = Object.keys(data.overlay_data)
-    .map(key => `<div><dt>${key}</dt><dd>${data.overlay_data[key]}</dd></div>`)
-    .join('');
+    .map(
+      (key) => `<div><dt>${key}</dt><dd>${data.overlay_data[key]}</dd></div>`
+    )
+    .join("");
 
   const innerHtml = `
 		<b>${data.id}</b>
@@ -17,11 +19,11 @@ function showOverlay(event, { data }) {
 	`;
 
   graphOverlay.innerHTML = innerHtml;
-  graphOverlay.classList.remove('is-hidden');
+  graphOverlay.classList.remove("is-hidden");
 }
 
 function hideOverlay() {
-  graphOverlay.classList.add('is-hidden')
+  graphOverlay.classList.add("is-hidden");
 }
 
 function filterTree(treeData, filteredOoiTypes = []) {
@@ -31,20 +33,23 @@ function filterTree(treeData, filteredOoiTypes = []) {
 
   return {
     ...treeData,
-    children: filterBranch(treeData.children, filteredOoiTypes)
-  }
+    children: filterBranch(treeData.children, filteredOoiTypes),
+  };
 }
 
 function filterBranch(treeData, filteredOoiTypes) {
   return treeData
-    .filter(({ ooi_type }) => !filteredOoiTypes.length || filteredOoiTypes.includes(ooi_type))
-    .map(ooi => {
+    .filter(
+      ({ ooi_type }) =>
+        !filteredOoiTypes.length || filteredOoiTypes.includes(ooi_type)
+    )
+    .map((ooi) => {
       if (!ooi.children) {
         return ooi;
       }
       return {
         ...ooi,
-        children: filterBranch(ooi.children, filteredOoiTypes)
+        children: filterBranch(ooi.children, filteredOoiTypes),
       };
     });
 }
@@ -55,7 +60,7 @@ function filterBranch(treeData, filteredOoiTypes) {
  * @returns
  */
 const goToOoi = (event, d) => {
-  if (d.id === treeData['id']) {
+  if (d.id === treeData["id"]) {
     // don't do anything if clicked on root of tree
     return;
   }
@@ -63,7 +68,7 @@ const goToOoi = (event, d) => {
   // remove ooi_id from querystring
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
-  urlParams.delete('ooi_id');
+  urlParams.delete("ooi_id");
   const newQueryString = urlParams.toString();
 
   window.location.href = d.data.graph_url + "&" + urlParams.toString();
@@ -124,7 +129,7 @@ function update(source) {
 
   // Normalize for fixed-depth.
   nodes.forEach(function (d) {
-    d.y = d.depth * 180;
+    d.y = d.depth * 110;
   });
 
   // ****************** Nodes section ***************************
@@ -137,12 +142,17 @@ function update(source) {
   // Enter any new modes at the parent's previous position.
   var nodeEnter = node
     .enter()
+
     .append("g")
     .attr("class", "node")
-    .attr("id", function (d) { return d.data.id })
-    .attr("data-ooi-type", function (d) { return d.data.ooi_type })
+    .attr("id", function (d) {
+      return d.data.id;
+    })
+    .attr("data-ooi-type", function (d) {
+      return d.data.ooi_type;
+    })
     .attr("transform", function (d) {
-      return "translate(" + source.y0 + "," + source.x0 + ")";
+      return "translate(" + source.y0 + 20 + "," + source.x0 + 20 + ")";
     });
 
   // Add Circle for the nodes
@@ -150,7 +160,9 @@ function update(source) {
     .append("circle")
     .attr("class", "node")
     .attr("r", 1e-6)
-    .style("stroke", function (d) { return colorForOoi(d.data.ooi_type) })
+    .style("stroke", function (d) {
+      return colorForOoi(d.data.ooi_type);
+    })
     .style("fill", function (d) {
       return colorForOoi(d.data.ooi_type);
     })
@@ -169,7 +181,7 @@ function update(source) {
       return d.children || d._children ? "end" : "start";
     })
     .text(function (d) {
-      return truncateText(d.data.display_name, 25);
+      return truncateText(d.data.display_name, 15);
     })
     .on("mouseover", showOverlay)
     .on("mouseout", hideOverlay)
@@ -201,7 +213,7 @@ function update(source) {
     .transition()
     .duration(duration)
     .attr("transform", function (d) {
-      return "translate(" + source.y + "," + source.x + ")";
+      return "translate(" + source.y + "," + source.x + 400 + ")";
     })
     .remove();
 
@@ -278,4 +290,3 @@ function showHideChildren(event, d) {
   }
   update(d);
 }
-

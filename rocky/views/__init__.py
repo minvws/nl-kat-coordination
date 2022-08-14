@@ -1,5 +1,4 @@
 from .bytes_raw import *
-from .common import *
 from .finding_add import *
 from .finding_list import *
 from .finding_type_add import *
@@ -30,11 +29,5 @@ from .upload import *
 from .health import *
 from .tasks import *
 from .privacy_statement import *
-from .recover_email import *
-from .password_reset import *
-from .password_reset_done import *
-from .password_reset_confirm import *
-from .password_reset_complete import *
-from .account import *
 from .handler404 import *
 from .boefje import *

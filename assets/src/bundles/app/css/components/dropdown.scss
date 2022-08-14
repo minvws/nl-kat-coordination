@@ -1,55 +1,54 @@
 .dropdown {
-    span{
-        pointer-events: none
+  span {
+    pointer-events: none;
+  }
+
+  position: relative;
+
+  > ul {
+    padding: 0;
+    display: none;
+    background-color: $lightgrey;
+    border: 1px $grey solid;
+    list-style-type: disc;
+    margin-block-end: 0;
+    margin-block-start: 0;
+    padding-inline-start: 0;
+    position: absolute;
+    top: 2.875rem;
+    z-index: 1;
+    width: max-content;
+    gap: 0;
+
+    &[aria-expanded="true"] {
+      display: flex;
     }
-    
-    position: relative;
 
-    > ul {
-        padding: 0;
-        display: none;
-        background-color: $lightgrey;
-        border: 1px $grey solid;
-        list-style-type: disc;
-        margin-block-end: 0;
-        margin-block-start: 0;
-        padding-inline-start: 0;
-        position: absolute;
-        top: 2.875rem;
-        z-index: 1;
-        width: max-content;
+    li {
+      border-top: 1px $offwhite solid;
+      max-width: 12rem;
+      padding: 0;
 
-        &[aria-expanded=true]{
-            display: flex;
+      > a {
+        align-items: center;
+        color: black;
+        display: flex;
+        margin: 0;
+        padding: 0.5rem;
+        text-decoration: none;
+        &:hover {
+          color: black;
         }
-
-        li {
-            border-top: 1px $offwhite solid;
-            max-width: 12rem;
-            padding: 0;
-
-            > a {
-                align-items: center;
-                color: black;
-                display: flex;
-                margin: 0;
-                padding: 0.5rem;
-                text-decoration: none;
-                &:hover{
-                    color: black;
-                }
-
-            }
-            &::marker{
-                content: none;
-            }
-            &:first-child{
-                border-top: none;
-            }   
-            &:hover{
-                background-color: $grey;
-            }
-        }
-
+      }
+      &::marker {
+        content: none;
+      }
+      &:first-child {
+        border-top: none;
+      }
+      &:hover {
+        background-color: $grey;
+      }
     }
+  }
 }

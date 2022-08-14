@@ -1,9 +1,17 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
-from tools.models import User, Organization
-from tools.models import GROUP_ADMIN, GROUP_REDTEAM, GROUP_CLIENT
-from tools.models import SCAN_LEVEL
-from tools.forms import BLANK_CHOICE, OrganizationMemberAddForm
+from tools.models import (
+    Organization,
+    SCAN_LEVEL,
+    GROUP_ADMIN,
+    GROUP_REDTEAM,
+    GROUP_CLIENT,
+)
+from tools.forms import BLANK_CHOICE
+from account.forms import OrganizationMemberAddForm
+
+User = get_user_model()
 
 
 class ClearanceLevelSelect(forms.Select):

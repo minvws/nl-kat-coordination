@@ -16,7 +16,7 @@ from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
 from octopoes.models.types import type_by_name
 from two_factor.views.utils import class_view_decorator
-from tools.models import User
+from django.contrib.auth import get_user_model
 from onboarding.forms import (
     OnboardingCreateOrganizationForm,
     OnboardingCreateUserAdminForm,
@@ -32,8 +32,7 @@ from rocky.katalogus import get_katalogus
 from rocky.views import BaseOOIFormView
 from rocky.views.ooi_view import SingleOOITreeMixin, BaseOOIDetailView
 from tools.forms import SelectBoefjeForm
-from tools.models import Organization, User
-from tools.models import OrganizationMember
+from tools.models import Organization, OrganizationMember
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     get_or_create_ooi,
@@ -41,12 +40,13 @@ from tools.ooi_helpers import (
     filter_ooi_tree,
 )
 from tools.user_helpers import (
-    RedTeamUserRequiredMixin,
-    SuperOrAdminUserRequiredMixin,
     is_admin,
     is_red_team,
 )
+from onboarding.mixins import RedTeamUserRequiredMixin, SuperOrAdminUserRequiredMixin
 from tools.view_helpers import get_ooi_url, BreadcrumbsMixin, Breadcrumb
+
+User = get_user_model()
 
 
 class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
@@ -150,7 +150,7 @@ class OnboardingSetupScanSelectPluginsView(
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         # context["xxxboefjes"] = self.report.get_boefjes()
-        context["checkbox_group_table_form"] = (self.get_form(),)
+        context["select_boefjes_form"] = self.get_form()
         return context
 
 
