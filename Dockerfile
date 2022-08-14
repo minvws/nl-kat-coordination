@@ -1,9 +1,11 @@
 FROM python:3.8
 
 ARG PIP_PACKAGES=requirements.txt
+ARG USER_UID=1000
+ARG USER_GID=1000
 
-RUN groupadd --gid 1000 scheduler
-RUN adduser --disabled-password --gecos '' --uid 1000 --gid 1000 scheduler
+RUN groupadd --gid $USER_GID scheduler
+RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID scheduler
 
 USER scheduler
 ENV PATH=/home/scheduler/.local/bin:${PATH}

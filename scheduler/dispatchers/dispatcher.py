@@ -3,8 +3,8 @@ from typing import Any, Type
 
 import celery
 import pydantic
-import scheduler
-from scheduler import context, queues
+import scheduler as sdl
+from scheduler import context, queues, schedulers
 
 
 class Dispatcher:
@@ -29,7 +29,7 @@ class Dispatcher:
             should be dispatched, this helps with validation.
     """
 
-    def __init__(self, pq: queues.PriorityQueue, item_type: Type[pydantic.BaseModel]):
+    def __init__(self, scheduler: schedulers.Scheduler, item_type: Type[pydantic.BaseModel]):
         """Initialize the Dispatcher class
 
         Args:
@@ -40,7 +40,7 @@ class Dispatcher:
                 that should be dispatched, this helps with validation.
         """
         self.logger: logging.Logger = logging.getLogger(__name__)
-        self.pq: queues.PriorityQueue = pq
+        self.scheduler: schedulers.Scheduler = scheduler
         self.threshold: float = float("inf")
         self.item_type: Type[pydantic.BaseModel] = item_type
 
@@ -53,7 +53,7 @@ class Dispatcher:
             A boolean representing whether the item with the highest priority
             on the queue, should be dispatched.
         """
-        p_item = self.pq.peek(0).p_item
+        p_item = self.scheduler.queue.peek(0).p_item
         if float(p_item.priority) <= self.get_threshold():
             return True
 
@@ -94,25 +94,25 @@ class Dispatcher:
         Returns:
             None
         """
-        task_id = self.pq.get_item_identifier(p_item.item)
+        task_id = self.scheduler.queue.get_item_identifier(p_item.item)
         self.logger.info(
             "Dispatching task %s [task_id=%s, pq_id=%s]",
             task_id,
             task_id,
-            self.pq.pq_id,
+            self.scheduler.queue.pq_id,
         )
 
     def run(self) -> None:
         """Continuously dispatch items from the priority queue."""
-        if self.pq.empty():
-            self.logger.debug("Queue is empty, sleeping ... [pq_id=%s]", self.pq.pq_id)
+        if self.scheduler.queue.empty():
+            self.logger.debug("Queue is empty, sleeping ... [pq_id=%s]", self.scheduler.queue.pq_id)
             return
 
         if not self._can_dispatch():
             # self.logger.debug("Can't yet dispatch, threshold not reached")
             return
 
-        p_item = self.pq.pop()
+        p_item = self.scheduler.pop_item_from_queue()
 
         if not self._is_valid_item(p_item.item):
             raise ValueError(f"Item must be of type {self.item_type}")
@@ -136,7 +136,7 @@ class CeleryDispatcher(Dispatcher):
     def __init__(
         self,
         ctx: context.AppContext,
-        pq: queues.PriorityQueue,
+        scheduler: schedulers.Scheduler,
         item_type: Type[pydantic.BaseModel],
         celery_queue: str,
         task_name: str,
@@ -157,14 +157,14 @@ class CeleryDispatcher(Dispatcher):
             task_name:
                 A string describing the name of the Celery task
         """
-        super().__init__(pq=pq, item_type=item_type)
+        super().__init__(scheduler=scheduler, item_type=item_type)
 
         self.ctx = ctx
         self.celery_queue = celery_queue
         self.task_name = task_name
 
         self.app = celery.Celery(
-            name=f"scheduler-{scheduler.__version__}",
+            name=f"scheduler-{sdl.__version__}",
             broker=self.ctx.config.dsp_broker_url,
         )
 

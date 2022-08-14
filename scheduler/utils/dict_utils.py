@@ -14,21 +14,30 @@ class ExpiredError(Exception):
 
 
 class ExpiringDict:
-    def __init__(self, lifetime: int = 300):
+    """ExpiringDict enables us to create a Dict that expires after a certain
+    time. It will clear the cache when the expiration time is reached and
+    return an ExpiredError.
+    """
+
+    def __init__(self, lifetime: int = 300, start_time: datetime = datetime.now(timezone.utc)) -> None:
         self.lifetime: timedelta = timedelta(seconds=lifetime)
-        self.expiration_time: datetime = datetime.now(timezone.utc) + self.lifetime
+        self.start_time = start_time
+        self.expiration_time: datetime = start_time + self.lifetime
         self.lock: threading.Lock = threading.Lock()
         self.cache: Dict[str, Any] = {}
 
     def get(self, key: str, default: Any = None) -> Any:
         return self[key] if key in self else default
 
+    def _is_expired(self) -> bool:
+        return datetime.now(timezone.utc) > self.expiration_time
+
     def __getitem__(self, key: str) -> Any:
         with self.lock:
             if key not in self.cache:
                 raise KeyError(key)
 
-            if datetime.now(timezone.utc) > self.expiration_time:
+            if self._is_expired():
                 self.cache.clear()
                 self.expiration_time = datetime.now(timezone.utc) + self.lifetime
                 raise ExpiredError
@@ -38,7 +47,6 @@ class ExpiringDict:
     def __setitem__(self, key: str, value: Any) -> None:
         with self.lock:
             self.cache[key] = value
-            self.expiration_time = datetime.now(timezone.utc) + self.lifetime
 
     def __delitem__(self, key: str) -> None:
         with self.lock:

@@ -147,6 +147,228 @@
                 }
             }
         },
+        "/schedulers/{scheduler_id}/tasks": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_schedulers__scheduler_id__tasks_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Scheduler Id",
+                            "type": "string"
+                        },
+                        "name": "scheduler_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Status",
+                            "type": "string"
+                        },
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Offset",
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Limit",
+                            "type": "integer",
+                            "default": 10
+                        },
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_tasks_get",
+                "parameters": [
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Scheduler Id",
+                            "type": "string"
+                        },
+                        "name": "scheduler_id",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Status",
+                            "type": "string"
+                        },
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Offset",
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Limit",
+                            "type": "integer",
+                            "default": 10
+                        },
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/{task_id}": {
+            "get": {
+                "summary": "Method",
+                "operationId": "method_tasks__task_id__get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Task Id",
+                            "type": "string"
+                        },
+                        "name": "task_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Method",
+                "operationId": "method_tasks__task_id__patch",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Task Id",
+                            "type": "string"
+                        },
+                        "name": "task_id",
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Task"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Task"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/queues": {
             "get": {
                 "summary": "Method",
@@ -273,7 +495,7 @@
                     "required": true
                 },
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Successful Response",
                         "content": {
                             "application/json": {
@@ -307,6 +529,33 @@
                         "items": {
                             "$ref": "#/components/schemas/ValidationError"
                         }
+                    }
+                }
+            },
+            "PaginatedResponse": {
+                "title": "PaginatedResponse",
+                "required": [
+                    "count",
+                    "results"
+                ],
+                "type": "object",
+                "properties": {
+                    "count": {
+                        "title": "Count",
+                        "type": "integer"
+                    },
+                    "next": {
+                        "title": "Next",
+                        "type": "string"
+                    },
+                    "previous": {
+                        "title": "Previous",
+                        "type": "string"
+                    },
+                    "results": {
+                        "title": "Results",
+                        "type": "array",
+                        "items": {}
                     }
                 }
             },
@@ -457,6 +706,62 @@
                     }
                 },
                 "description": "ServiceHealth is used as response model for health check in the\nserver.Server for the health endpoint."
+            },
+            "Task": {
+                "title": "Task",
+                "required": [
+                    "id",
+                    "hash",
+                    "scheduler_id",
+                    "task",
+                    "status",
+                    "created_at",
+                    "modified_at"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "hash": {
+                        "title": "Hash",
+                        "type": "string"
+                    },
+                    "scheduler_id": {
+                        "title": "Scheduler Id",
+                        "type": "string"
+                    },
+                    "task": {
+                        "$ref": "#/components/schemas/QueuePrioritizedItem"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/TaskStatus"
+                    },
+                    "created_at": {
+                        "title": "Created At",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "modified_at": {
+                        "title": "Modified At",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "TaskStatus": {
+                "title": "TaskStatus",
+                "enum": [
+                    "pending",
+                    "queued",
+                    "dispatched",
+                    "running",
+                    "completed",
+                    "failed"
+                ],
+                "description": "Status of a task."
             },
             "ValidationError": {
                 "title": "ValidationError",

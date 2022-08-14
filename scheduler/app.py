@@ -47,8 +47,12 @@ class App:
         self.threads: Dict[str, thread.ThreadRunner] = {}
         self.stop_event: threading.Event = self.ctx.stop_event
 
+        # Initializer dispatchers
+        self.dispatchers: Dict[str, dispatchers.Dispatcher] = {}
+
         # Initialize schedulers
         self.schedulers: Dict[str, schedulers.Scheduler] = {}
+
         self.initialize_boefje_schedulers()
         self.initialize_normalizer_schedulers()
 
@@ -98,45 +102,6 @@ class App:
         )
         self.threads[name].start()
 
-    def initialize_normalizer_schedulers(self) -> None:
-        orgs = self.ctx.services.katalogus.get_organisations()
-        for org in orgs:
-            s = self.create_normalizer_scheduler(org)
-            self.schedulers[s.scheduler_id] = s
-
-    def create_normalizer_scheduler(self, org: Organisation) -> schedulers.NormalizerScheduler:
-        """Create a normalizer scheduler for the given organisation."""
-        queue = queues.NormalizerPriorityQueue(
-            pq_id=f"normalizer-{org.id}",
-            maxsize=self.ctx.config.pq_maxsize,
-            item_type=NormalizerTask,
-            allow_priority_updates=True,
-        )
-
-        dispatcher = dispatchers.NormalizerDispatcher(
-            ctx=self.ctx,
-            pq=queue,
-            item_type=NormalizerTask,
-            celery_queue="normalizers",
-            task_name="tasks.handle_normalizer",
-        )
-
-        ranker = rankers.NormalizerRanker(
-            ctx=self.ctx,
-        )
-
-        scheduler = schedulers.NormalizerScheduler(
-            ctx=self.ctx,
-            scheduler_id=f"normalizer-{org.id}",
-            queue=queue,
-            ranker=ranker,
-            dispatcher=dispatcher,
-            populate_queue_enabled=self.ctx.config.normalizer_populate,
-            organisation=org,
-        )
-
-        return scheduler
-
     def initialize_boefje_schedulers(self) -> None:
         """Initialize the schedulers for the Boefje tasks. We will create
         schedulers for all organisations in the Katalogus service.
@@ -146,25 +111,70 @@ class App:
             s = self.create_boefje_scheduler(org)
             self.schedulers[s.scheduler_id] = s
 
+            d = dispatchers.BoefjeDispatcher(
+                ctx=self.ctx,
+                scheduler=s,
+                item_type=BoefjeTask,
+                celery_queue="boefjes",
+                task_name="tasks.handle_boefje",
+            )
+
+            self.dispatchers[s.scheduler_id] = d
+
+    def initialize_normalizer_schedulers(self) -> None:
+        orgs = self.ctx.services.katalogus.get_organisations()
+        for org in orgs:
+            s = self.create_normalizer_scheduler(org)
+            self.schedulers[s.scheduler_id] = s
+
+            d = dispatchers.NormalizerDispatcher(
+                ctx=self.ctx,
+                scheduler=s,
+                item_type=NormalizerTask,
+                celery_queue="normalizers",
+                task_name="tasks.handle_normalizer",
+            )
+            self.dispatchers[s.scheduler_id] = d
+
+    def create_normalizer_scheduler(self, org: Organisation) -> schedulers.NormalizerScheduler:
+        """Create a normalizer scheduler for the given organisation."""
+        identifier = f"normalizer-{org.id}"
+
+        queue = queues.NormalizerPriorityQueue(
+            pq_id=identifier,
+            maxsize=self.ctx.config.pq_maxsize,
+            item_type=NormalizerTask,
+            allow_priority_updates=True,
+        )
+
+        ranker = rankers.NormalizerRanker(
+            ctx=self.ctx,
+        )
+
+        scheduler = schedulers.NormalizerScheduler(
+            ctx=self.ctx,
+            scheduler_id=identifier,
+            queue=queue,
+            ranker=ranker,
+            populate_queue_enabled=self.ctx.config.normalizer_populate,
+            organisation=org,
+        )
+
+        return scheduler
+
     def create_boefje_scheduler(self, org: Organisation) -> schedulers.BoefjeScheduler:
         """Create a scheduler for the given organisation.
 
         Args:
             org: The organisation to create a scheduler for.
         """
+        identifier = f"boefje-{org.id}"
+
         queue = queues.BoefjePriorityQueue(
-            pq_id=f"boefje-{org.id}",
+            pq_id=identifier,
             maxsize=self.ctx.config.pq_maxsize,
             item_type=BoefjeTask,
             allow_priority_updates=True,
-        )
-
-        dispatcher = dispatchers.BoefjeDispatcher(
-            ctx=self.ctx,
-            pq=queue,
-            item_type=BoefjeTask,
-            celery_queue="boefjes",
-            task_name="tasks.handle_boefje",
         )
 
         ranker = rankers.BoefjeRanker(
@@ -173,10 +183,9 @@ class App:
 
         scheduler = schedulers.BoefjeScheduler(
             ctx=self.ctx,
-            scheduler_id=f"boefje-{org.id}",
+            scheduler_id=identifier,
             queue=queue,
             ranker=ranker,
-            dispatcher=dispatcher,
             populate_queue_enabled=self.ctx.config.boefje_populate,
             organisation=org,
         )
@@ -221,19 +230,23 @@ class App:
             * api server
             * listeners
             * schedulers
-            * monitors
             * dispatchers
+            * monitors
         """
         # API Server
         self._run_in_thread(name="server", func=self.server.run, daemon=False)
 
         # Start the listeners
         for name, listener in self.listeners.items():
-            self._run_in_thread(name=name, func=listener.listen)
+            self._run_in_thread(name=f"listener_{name}", func=listener.listen)
 
         # Start the schedulers
         for scheduler in self.schedulers.values():
             scheduler.run()
+
+        # Start the dispatchers
+        for name, dispatcher in self.dispatchers.items():
+            self._run_in_thread(name=f"dispatcher_{name}", func=dispatcher.run, interval=self.ctx.config.dsp_interval)
 
         # Start monitors
         self._run_in_thread(name="monitor_organisations", func=self.monitor_organisations, interval=3600)

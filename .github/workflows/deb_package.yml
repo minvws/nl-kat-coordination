@@ -53,7 +53,7 @@ jobs:
         run: |
           cat > debian/changelog << EOF
           kat-mula (${{env.RELEASE_VERSION}}) unstable; urgency=low
-            * view changes: https://github.com/minvws/nl-rt-tim-abang-mula/releases/tag/${{env.RELEASE_TAG}}
+            * view changes: https://github.com/${{ github.repository }}/releases/tag/${{env.RELEASE_TAG}}
 
            -- OpenKAT <maintainer@openkat.nl>  $(LANG=C date -R)
 

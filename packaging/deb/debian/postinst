@@ -28,9 +28,16 @@ chmod 640 /etc/kat/logging.mula.json
 chmod 750 /usr/share/kat-mula
 chmod 750 /usr/lib/systemd/system/kat-mula.service
 
+configured_queue=$(cat /etc/kat/*.conf | grep -oP 'QUEUE_URI=\K.+' | head -n 1)
+
 if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
+    rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
     rabbitmqctl add_vhost kat
-    rabbitmqctl set_permissions -p "kat" "guest" ".*" ".*" ".*"
+    rabbitmqctl add_user kat ${rabbitmq_pass}
+    rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
+elif [ ! -z "$configured_queue" ]; then
+    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=${configured_queue}|" /etc/kat/*.conf
 fi
 
 systemctl enable --now kat-mula.service

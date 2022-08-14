@@ -1,3 +1,5 @@
+import datetime
+import json
 import unittest
 import uuid
 from unittest import mock
@@ -30,14 +32,6 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             allow_priority_updates=True,
         )
 
-        dispatcher = dispatchers.NormalizerDispatcher(
-            ctx=self.mock_ctx,
-            pq=queue,
-            item_type=models.NormalizerTask,
-            celery_queue="normalizers",
-            task_name="tasks.handle_ooi",
-        )
-
         ranker = rankers.NormalizerRanker(
             ctx=self.mock_ctx,
         )
@@ -46,9 +40,16 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
             queue=queue,
-            dispatcher=dispatcher,
             ranker=ranker,
             organisation=self.organisation,
+        )
+
+        dispatcher = dispatchers.NormalizerDispatcher(
+            ctx=self.mock_ctx,
+            scheduler=self.scheduler,
+            item_type=models.NormalizerTask,
+            celery_queue="normalizers",
+            task_name="tasks.handle_ooi",
         )
 
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
@@ -69,13 +70,19 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             boefje_meta=boefje_meta,
         )
 
+        latest_raw_data = models.RawDataReceivedEvent(
+            raw_data=raw_data,
+            organization=self.organisation.name,
+            created_at=datetime.datetime.now(),
+        )
+
         task = models.NormalizerTask(
             id=uuid.uuid4().hex,
             normalizer=PluginFactory(type="normalizer"),
             boefje_meta=boefje_meta,
         )
 
-        mock_get_latest_raw_data.side_effect = [raw_data, None]
+        mock_get_latest_raw_data.side_effect = [latest_raw_data, None]
         mock_get_normalizers.return_value = []
         mock_create_tasks_for_raw_data.side_effect = [
             [
