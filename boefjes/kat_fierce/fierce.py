@@ -167,7 +167,7 @@ def zone_transfer(address, domain):
 
 def get_class_c_network(ip):
     ip = int(ip)
-    floored = ipaddress.ip_address(ip - (ip % (2 ** 8)))
+    floored = ipaddress.ip_address(ip - (ip % (2**8)))
     class_c = ipaddress.IPv4Network("{}/24".format(floored))
 
     return class_c

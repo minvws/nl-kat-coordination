@@ -1,0 +1,14 @@
+[Unit]
+Description=kat-boefjes daemon
+After=network.target
+
+[Service]
+User=kat
+Group=kat
+WorkingDirectory=/usr/share/kat-boefjes/app
+# TODO: don't load env here
+EnvironmentFile=/etc/kat/boefjes.conf
+ExecStart=/usr/share/kat-boefjes/venv/bin/python -m bin.worker normalizer
+
+[Install]
+WantedBy=multi-user.target

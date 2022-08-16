@@ -43,12 +43,11 @@ def handle_boefje(job: Dict) -> Dict:
     )
     boefje_meta.arguments["input"] = serialize_ooi(input_ooi)
 
-    logger.info("Running remote boefje plugin")
-
     if "/" not in boefje_meta.boefje.id:
         boefjes = resolve_boefjes(BOEFJES_DIR)
         boefje = boefjes[boefje_meta.boefje.id]
 
+        logger.info("Running local boefje plugin")
         updated_job = handle_boefje_job(
             boefje_meta, LocalBoefjeJobRunner(boefje_meta, boefje, BOEFJES_DIR.name)
         )
@@ -62,6 +61,7 @@ def handle_boefje(job: Dict) -> Dict:
         boefje_meta.organization, repository, plugin_id, boefje_meta.boefje.version
     )
 
+    logger.info("Running remote boefje plugin")
     updated_job = handle_boefje_job(
         boefje_meta, LXDBoefjeJobRunner(boefje_meta, plugin)
     )

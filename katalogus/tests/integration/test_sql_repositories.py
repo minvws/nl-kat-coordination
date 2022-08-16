@@ -92,7 +92,7 @@ class TestRepositories(TestCase):
             repository_storage.get_by_id("wrong_id")
 
     def test_organisations_repositories(self):
-        org = Organisation(id="org-123", name="Test")
+        org = Organisation(id="org1", name="Test")
         repo = Repository(
             id="repo-123",
             name="Test",

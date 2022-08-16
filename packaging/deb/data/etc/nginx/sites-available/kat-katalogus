@@ -1,0 +1,10 @@
+server {
+    listen 127.0.0.1:8003;
+
+    server_name katalogus.local;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/kat-katalogus.sock;
+    }
+}

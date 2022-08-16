@@ -1,0 +1,11 @@
+[Unit]
+Description=kat-katalogus socket
+
+[Socket]
+ListenStream=/run/kat-katalogus.sock
+SocketUser=kat
+SocketGroup=www-data
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

@@ -76,20 +76,31 @@ def handle_boefje_job(
 ) -> BoefjeMeta:
     try:
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
-        updated_job_meta, job_output = job_runner.run()
+
+        try:
+            _, job_output = job_runner.run()
+            raw_output = job_output.data
+            mime_types = job_output.mime_types
+        except Exception as exc:
+            logger.info(
+                "Error while running boefje %s[%s]",
+                boefje_meta.boefje.id,
+                boefje_meta.id,
+            )
+            raw_output = str(exc)
+            mime_types = {"error/boefje"}
+            boefje_meta.ended_at = datetime.now(timezone.utc)
 
         bytes_api_client.save_boefje_meta(boefje_meta)
-        bytes_api_client.save_raw(
-            updated_job_meta.id, job_output.data, job_output.mime_types
-        )
+        bytes_api_client.save_raw(boefje_meta.id, raw_output, mime_types)
 
         logger.info(
             "Done with boefje for %s[%s]",
-            updated_job_meta.boefje.id,
-            updated_job_meta.id,
+            boefje_meta.boefje.id,
+            boefje_meta.id,
         )
 
-        return updated_job_meta
+        return boefje_meta
 
     except Exception as exc:
         logger.exception("Error while handling a boefje job")
