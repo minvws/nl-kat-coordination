@@ -31,14 +31,12 @@ jobs:
         with:
           repository: minvws/nl-kat-octopoes
           path: nl-kat-octopoes
-          token: ${{ secrets.RDO_REPO_RO }}
 
       - name: Checkout boefjes
         uses: actions/checkout@v2
         with:
           repository: minvws/nl-kat-boefjes
           path: nl-kat-boefjes
-          token: ${{ secrets.RDO_REPO_RO }}
           
       - name: Run tests
         run: docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
