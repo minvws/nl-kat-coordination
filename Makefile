@@ -38,9 +38,15 @@ rebuild:
 	make build
 	make up
 
+update:
+	-docker-compose down
+	make pull
+	make build
+	make up
+
 clean:
 	-docker-compose down
-	-docker volume rm nl-kat_rocky-db-data nl-kat_bytes-db-data nl-kat_katalogus-db-data
+	-docker volume rm nl-kat_rocky-db-data nl-kat_bytes-db-data nl-kat_katalogus-db-data nl-kat_xtdb-data
 
 up:
 	docker-compose up -d --force-recreate rocky
@@ -90,7 +96,11 @@ pull-reset:
 	-git -C nl-kat-rocky pull
 
 build:  # Build should prepare all other services: migrate them, seed them, etc.
-	docker-compose build
+ifeq ($(UNAME), Darwin)
+	docker-compose build --build-arg USER_UID="$$(id -u)"
+else
+	docker-compose build --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
+endif
 	docker-compose run --rm rocky make build
 	make -C nl-kat-boefjes build
 	make -C nl-kat-bytes build
