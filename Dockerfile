@@ -1,12 +1,13 @@
 FROM python:3.8
 
-WORKDIR /app/bytes
+ARG USER_UID=1000
+ARG USER_GID=1000
 
-RUN mkdir /home/bytes
-RUN groupadd --gid 1000 bytes
-RUN adduser --disabled-password --gecos '' --uid 1000 --gid 1000 bytes
-RUN chown bytes:bytes /home/bytes
+RUN groupadd --gid $USER_GID bytes
+RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID bytes
+
 USER bytes
+WORKDIR /app/bytes
 ENV PATH=/home/bytes/.local/bin:${PATH}
 
 COPY requirements-dev.txt .

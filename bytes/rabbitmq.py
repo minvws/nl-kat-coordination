@@ -23,7 +23,7 @@ class RabbitMQEventManager(EventManager):
 
     @staticmethod
     def _queue_name(event: Event) -> str:
-        return f"{event.organization}__raw_file_received"
+        return f"{event.organization}__{event._event_id}"
 
 
 class NullManager(EventManager):

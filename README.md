@@ -98,9 +98,16 @@ These proofs can be uploaded externally (a 3rd party) such that we can verify th
 
 Current implementations are
 - `EXT_HASH_SERVICE="IN_MEMORY"` (just a stub)
-- `EXT_HASH_SERVICE="PASTEBIN"`
-- `EXT_HASH_SERVICE="RFC3161"` (See https://www.ietf.org/rfc/rfc3161.txt)
-Adding an implementation means implementing the `bytes.repositories.hash_repository::HashRepository` interface.
+- `EXT_HASH_SERVICE="PASTEBIN"` (Needs pastebin API development key)
+- `EXT_HASH_SERVICE="RFC3161"`
+
+For the RFC3161 implementation, see https://www.ietf.org/rfc/rfc3161.txt and https://github.com/trbs/rfc3161ng as a reference.
+To use this implementation, set your environment to
+- `EXT_HASH_SERVICE=RFC3161`
+- `RFC3161_PROVIDER="https://freetsa.org/tsr"` (example)
+- `RFC3161_CERT_FILE="bytes/timestamping/certificates/freetsa.crt"` (example)
+
+Adding a new implementation means implementing the `bytes.repositories.hash_repository::HashRepository` interface.
 Bind your new implementation in `bytes.timestamping.provider::create_hash_repository`.
 
 The secure-hashing-algorithm can be specified with an env var: `HASHING_ALGORITHM="SHA512"`.

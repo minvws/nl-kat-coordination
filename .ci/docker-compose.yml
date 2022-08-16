@@ -15,7 +15,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: sh -c "sleep 1 && pytest -vv tests/integration"
+    command: sh -c "sleep ${SLEEP_TIME:-1} && pytest -vv tests/integration"
     depends_on:
       - ci_bytes
     env_file:
