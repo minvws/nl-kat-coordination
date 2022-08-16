@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
@@ -25,5 +25,5 @@ class BoefjeMeta(BaseModel):
     input_ooi: str
     arguments: Dict[str, Any]
     organization: str
-    started_at: datetime
-    ended_at: datetime
+    started_at: Optional[datetime.datetime]
+    ended_at: Optional[datetime.datetime]

@@ -71,14 +71,14 @@ $ tree -L 3 --dirsfirst
 ## Running / Developing
 
 Typically the scheduler will be run from the overarching
-[nl-kat](https://github.com/minvws/nl-kat) project. When
+[nl-kat-coordination](https://github.com/minvws/nl-kat-coordination) project. When
 you want to run and the scheduler individually you can use the following setup.
 We are using docker to setup our development environment, but you are free
 to use whatever you want.
 
 ### Prerequisites
 
-By the use of environment variables we load in the configuration of the 
+By the use of environment variables we load in the configuration of the
 scheduler. Look at the [.env-dist](.env-dist) file for the application
 configuration settings, to build a `.env` file. Refer to the
 [`configuration.md`](docs/configuration.md) file for more information on the

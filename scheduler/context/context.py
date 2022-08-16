@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import scheduler
 from scheduler.config import settings
 from scheduler.connectors import listeners, services
+from scheduler.datastores import Datastore, DatastoreType, SQLAlchemy
 
 
 class AppContext:
@@ -20,6 +21,9 @@ class AppContext:
             are used and need to be shared in the scheduler application.
         stop_event: A threading.Event object used for communicating a stop
             event across threads.
+        datastore:
+            A SQLAlchemy.SQLAlchemy object used for storing and retrieving
+            tasks.
     """
 
     def __init__(self) -> None:
@@ -56,6 +60,10 @@ class AppContext:
             dsn=self.config.host_raw_data,
         )
 
+        lst_normalizer_meta = listeners.NormalizerMeta(
+            dsn=self.config.host_normalizer_meta,
+        )
+
         # Register external services, SimpleNamespace allows us to use dot
         # notation
         self.services: SimpleNamespace = SimpleNamespace(
@@ -65,7 +73,10 @@ class AppContext:
                 services.Bytes.name: svc_bytes,
                 listeners.ScanProfile.name: lst_scan_profile,
                 listeners.RawData.name: lst_raw_data,
+                listeners.NormalizerMeta.name: lst_normalizer_meta,
             }
         )
 
         self.stop_event: threading.Event = threading.Event()
+
+        self.datastore: Datastore = SQLAlchemy(self.config.database_dsn, DatastoreType.SQLITE)

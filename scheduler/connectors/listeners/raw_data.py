@@ -11,11 +11,9 @@ class RawData(RabbitMQ):
     name = "raw_data"
 
     @exception_handler
-    def get_latest_raw_data(self, queue: str) -> Optional[RawDataModel]:
+    def get_latest_raw_data(self, queue: str) -> Optional[RawDataReceivedEvent]:
         response = self.get(queue)
         if response is None:
             return None
 
-        event = RawDataReceivedEvent(**response)
-
-        return event.raw_data
+        return RawDataReceivedEvent(**response)

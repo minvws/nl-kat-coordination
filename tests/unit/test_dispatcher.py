@@ -1,9 +1,18 @@
 import time
 import unittest
 import uuid
+from unittest import mock
 
 import pydantic
-from scheduler import dispatchers, queues
+from scheduler import config, dispatchers, models, queues, rankers, schedulers
+from tests.factories import (
+    BoefjeFactory,
+    BoefjeMetaFactory,
+    OOIFactory,
+    OrganisationFactory,
+    PluginFactory,
+    ScanProfileFactory,
+)
 
 
 def create_p_item(priority: int):
@@ -27,6 +36,11 @@ class TestDispatcher(dispatchers.Dispatcher):
 
 class DispatcherTestCase(unittest.TestCase):
     def setUp(self):
+        cfg = config.settings.Settings()
+
+        self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
+        self.mock_ctx.config = cfg
+
         self.pq = queues.PriorityQueue(
             pq_id="test",
             maxsize=10,
@@ -34,8 +48,22 @@ class DispatcherTestCase(unittest.TestCase):
         )
         self.pq.entry_finder = {}
 
+        self.organisation = OrganisationFactory()
+
+        ranker = rankers.BoefjeRanker(
+            ctx=self.mock_ctx,
+        )
+
+        scheduler = schedulers.BoefjeScheduler(
+            ctx=self.mock_ctx,
+            scheduler_id=self.organisation.id,
+            queue=self.pq,
+            ranker=ranker,
+            organisation=self.organisation,
+        )
+
         self.dispatcher = TestDispatcher(
-            pq=self.pq,
+            scheduler=scheduler,
             item_type=TestModel,
         )
         self.dispatcher.threshold = float("inf")
