@@ -438,5 +438,8 @@ $RECYCLE.BIN/
 .envrc
 deployment/github_config.sh
 **cache.db
+*.swp
 
 !/tests/test_spf.py
+
+!packaging/deb/data/usr/lib

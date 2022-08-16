@@ -1,0 +1,20 @@
+[Unit]
+Description=kat-katalogus daemon
+Requires=kat-katalogus.socket
+After=network.target
+
+[Service]
+User=kat
+Group=kat
+WorkingDirectory=/usr/share/kat-boefjes/app
+# TODO: don't load env here
+EnvironmentFile=/etc/kat/boefjes.conf
+ExecStart=/usr/share/kat-boefjes/venv/bin/gunicorn \
+          --access-logfile - \
+          -c /etc/kat/gunicorn.katalogus.conf.py \
+          --bind unix:/run/kat-katalogus.sock \
+          -k uvicorn.workers.UvicornWorker \
+          katalogus.api:app
+
+[Install]
+WantedBy=multi-user.target

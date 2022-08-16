@@ -62,14 +62,14 @@ class KATalogusTest(TestCase):
         )
 
     def test_get_dns_cover(self):
-        path = settings.base_dir / "tests" / "stubs" / "cover.png"
+        path = settings.base_dir / "boefjes" / "kat_dns" / "cover.png"
         response = self.client.get("/boefjes/dns-records/cover.png")
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(path.read_bytes(), response.content)
 
     def test_get_dns_description(self):
-        path = settings.base_dir / "tests" / "stubs" / "description.md"
+        path = settings.base_dir / "boefjes" / "kat_dns" / "description.md"
         response = self.client.get("/boefjes/dns-records/description.md")
 
         self.assertEqual(200, response.status_code)

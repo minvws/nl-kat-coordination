@@ -1,9 +1,16 @@
 from typing import List
-from unittest import TestCase
+from unittest import TestCase, mock
+
+from octopoes.models import Reference
+from octopoes.models.ooi.network import Network
 
 from job import BoefjeMeta
+from job_handler import handle_boefje_job
 from katalogus.models import Boefje, Normalizer, Bit, PluginType
-from tasks import normalizers_for_meta
+from runner import LocalBoefjeJobRunner
+from tasks import normalizers_for_meta, handle_boefje
+
+import boefjes.models
 
 
 class TaskTest(TestCase):
@@ -86,4 +93,35 @@ class TaskTest(TestCase):
             input_ooi="Hostname|internet|example.com",
             arguments={},
             organization="_dev",
+        ).copy()
+
+    @mock.patch("job_handler.bytes_api_client")
+    def test_handle_boefje_with_exception(
+        self,
+        mock_bytes_api_client,
+    ):
+        meta = BoefjeMeta(
+            id="some-random-job-id",
+            boefje={"id": "dummy-with-exception"},
+            input_ooi="Network|internet",
+            arguments={},
+            organization="_dev",
+        )
+        boefje = boefjes.models.Boefje(
+            id="dummy-with-exception",
+            repository_id="",
+            name="dummy",
+            module="modules.dummy_boefje_runtime_exception",
+            description="",
+            input_ooi={Network},
+            produces=set(),
+            consumes=set(),
+            dispatches={},
+        )
+
+        handle_boefje_job(meta, LocalBoefjeJobRunner(meta, boefje, "tests"))
+
+        mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
+        mock_bytes_api_client.save_raw.assert_called_once_with(
+            "some-random-job-id", "dummy error", {"error/boefje"}
         )

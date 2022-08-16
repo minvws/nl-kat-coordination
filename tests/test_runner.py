@@ -24,6 +24,17 @@ Dummy = Boefje(
     dispatches={},
 )
 
+DummyWithException = Boefje(
+    id="dummy",
+    name="dummy",
+    module="modules.dummy_boefje_runtime_exception",
+    description="",
+    input_ooi={},
+    produces=set(),
+    consumes=set(),
+    dispatches={},
+)
+
 
 class TestRunner(TestCase):
     def setUp(self) -> None:
