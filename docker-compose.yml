@@ -3,7 +3,7 @@ version: "3.9"
 services:
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3-management"
+    image: "rabbitmq:3.9-management"
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -15,10 +15,12 @@ services:
       - .env
 
   crux:
-    image: juxt/xtdb-in-memory:1.20.0
+    image: "juxt/xtdb-standalone-rocksdb:1.21.0"
     restart: on-failure
     ports:
       - "127.0.0.1:3000:3000"
+    volumes:
+      - xtdb-data:/usr/lib/xtdb/data
 
   octopoes_api:
     restart: on-failure
@@ -202,3 +204,4 @@ volumes:
   rocky-db-data:
   bytes-db-data:
   katalogus-db-data:
+  xtdb-data:
