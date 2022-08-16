@@ -10,8 +10,15 @@
       {{ field }}
       {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
       {% include 'partials/form/field_input_errors.html' %}
-      {% if field.name == 'recover_email' %}
-        <a href="{% url 'recover_email' %}">{% translate 'Forgot email address?' %}</a>
+      {% if form_name == 'login' and field.name == 'username' %}
+        <div class="input-link">
+          <a href="{% url 'recover_email' %}">{% translate 'Forgot email' %}</a>
+        </div>
+      {% endif %}
+      {% if form_name == 'login' and field.name == 'password' %}
+        <div class="input-link">
+          <a href="{% url 'password_reset' %}">{% translate 'Forgot password' %}</a>
+        </div>
       {% endif %}
     </div>
   </div>

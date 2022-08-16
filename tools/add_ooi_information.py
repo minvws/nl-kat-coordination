@@ -220,14 +220,14 @@ def table_to_2d(table_tag):
     rowspans = []  # track pending rowspans
     rows = table_tag.find_all("tr")
 
-    # first scan, see how many columns we need
+    # first scan, see how many column_names we need
     colcount = 0
     for r, row in enumerate(rows):
         cells = row.find_all(["td", "th"], recursive=False)
-        # count columns (including spanned).
+        # count column_names (including spanned).
         # add active rowspans from preceding rows
         # we *ignore* the colspan value on the last cell, to prevent
-        # creating 'phantom' columns with no actual cells, only extended
+        # creating 'phantom' column_names with no actual cells, only extended
         # colspans. This is achieved by hardcoding the last cell width as 1.
         # a colspan of 0 means “fill until the end” but can really only apply
         # to the last cell; ignore it elsewhere.
@@ -251,7 +251,7 @@ def table_to_2d(table_tag):
     # fill matrix from row data
     rowspans = {}  # track pending rowspans, column number mapping to count
     for row, row_elem in enumerate(rows):
-        span_offset = 0  # how many columns are skipped due to row and colspans
+        span_offset = 0  # how many column_names are skipped due to row and colspans
         for col, cell in enumerate(row_elem.find_all(["td", "th"], recursive=False)):
             # adjust for preceding row and colspans
             col += span_offset

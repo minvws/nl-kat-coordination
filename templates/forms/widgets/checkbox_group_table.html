@@ -1,36 +1,44 @@
 {% load i18n %}
 
 {% with id=widget.attrs.id %}
-  <div{% if id %} id="{{ id }}"{% endif %} class="checkbox-group-table {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
-  {% for group, options, index in widget.optgroups %}
-    {% if group %}
-    <table>
-      <thead>
-        <tr>
-          <th>{% translate 'Select' %}</th>
-          <th>{{ group }}</th>
-        </tr>
-      </thead>
-    {% endif %}
-    {% for option in options %}
+<div{% if id %} id="{{ id }}"{% endif %} class="checkbox-group-table {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
+
+  <table>
+    <thead>
       <tr>
-        <td>
-          {% include option.template_name with widget=option %}
-          {% if option.attrs.required %}
-            <span class="nota-bene">{% translate 'this field is required' %}</span>
-          {% endif %}
-        </td>
-        <td>
-          {% include 'forms/widgets/widget_label.html' with widget=option %}
-        </td>
+        <th>
+          {% if widget.options|length > 1 %}<input name="toggle-all" onClick="toggleCheckboxes(event, '{{ widget.name }}')" type="checkbox">{% endif %}
+        </th>
+        {% for column_name in widget.column_names %}
+          <th>{{ column_name }}</th>
+        {% endfor %}
       </tr>
-    {% endfor %}
-    {% if options|length > 1 %}
-    <div class="horizontal-view toolbar">
-      <button type="button" onClick="toggleCheckboxes('{{ widget.name }}')">{% translate 'Toggle all' %}</button>
-    </div>
-    {% endif %}
-  {% endfor %}
+    </thead>
+    <tbody>
+      {% for option in widget.options %}
+          <tr>
+            <td>
+              {% include option.template_name with widget=option %}
+              {% if option.attrs.required %}
+                <span class="nota-bene">{% translate 'this field is required' %}</span>
+              {% endif %}
+            </td>
+            {% for cell in option.label %}
+              <td>
+                <label{% if option.attrs.id %} for="{{ option.attrs.id }}"{% endif %}>
+                  {% with cell_template=widget.column_templates|index:forloop.counter0 %}
+                    {% if cell_template %}
+                      {% include cell_template with value=cell %}
+                    {% else %}
+                      {{ cell }}
+                    {% endif %}
+                  {% endwith %}
+                </label>
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
   </table>
 </div>
 {% endwith %}

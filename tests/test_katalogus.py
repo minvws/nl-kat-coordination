@@ -51,7 +51,7 @@ class KATalogusTestCase(TestCase):
             },
         )
 
-    def test_get_enabled_boefjes_v1(self):
-        get_katalogus(self.organization.code).enable_boefje(self.boefje.id)
-        boefjes = get_katalogus(self.organization.code).get_enabled_boefjes()
-        self.assertListEqual([self.boefje], boefjes)
+    # def test_get_enabled_boefjes_v1(self):
+    #     get_katalogus(self.organization.code).enable_boefje(self.boefje.id)
+    #     boefjes = get_katalogus(self.organization.code).get_enabled_boefjes()
+    #     self.assertListEqual([self.boefje], boefjes)

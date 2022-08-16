@@ -38,13 +38,7 @@
             <tbody>
               {% for member in members %}
                 <tr>
-                  <td>
-                    {% if request.user.is_superuser %}
-                      {{ member.user }}
-                    {% else %}
-                      {{ member.member_name }}
-                    {% endif %}
-                  </td>
+                  <td>{{ member.user }}</td>
                   <td>{{ member.status }}</td>
                   <td>{{ member.user.date_joined }}</td>
                   {% if miauw_api_enabled %}
@@ -64,7 +58,5 @@
 
 {% block html_at_end_body %}
   {{ block.super }}
-  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
-  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
   <script src="{% static '/js/checkboxToggler.js' %}"></script>
 {% endblock %}

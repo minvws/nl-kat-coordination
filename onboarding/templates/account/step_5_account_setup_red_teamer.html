@@ -2,11 +2,6 @@
 {% load i18n %}
 {% load static %}
 
-{% block head %}
-  {{ block.super }}
-  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
-{% endblock head %}
-
 {% block content %}
   {% include 'header.html' with view_type="onboarding" %}
   <main id="main-content">

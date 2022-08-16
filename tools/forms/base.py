@@ -1,6 +1,7 @@
 import datetime
 import pytz
 from django import forms
+from django.forms import Widget
 from django.utils.translation import gettext_lazy as _
 from typing import Dict, List, Union, Any, Optional
 from tools.forms import (
@@ -81,6 +82,22 @@ class ObservedAtForm(BaseRockyForm):
     )
 
 
+class LabeledCheckboxInput(forms.CheckboxInput):
+    template_name = "forms/widgets/checkbox_option.html"
+
+    def __init__(self, label: str = "", autosubmit: bool = False):
+        super().__init__()
+        self.label = label
+        self.autosubmit = autosubmit
+
+    def get_context(self, name, value, attrs):
+        context = super(LabeledCheckboxInput, self).get_context(name, value, attrs)
+        context["widget"]["wrap_label"] = True
+        context["widget"]["label"] = self.label
+        context["widget"]["attrs"]["onClick"] = "this.form.submit()"
+        return context
+
+
 class CheckboxGroup(forms.CheckboxSelectMultiple):
     input_type = "checkbox"
     template_name = "forms/widgets/checkbox_group_columns.html"
@@ -116,6 +133,88 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
         return value in self.required_options
 
 
-class CheckboxGroupTable(CheckboxGroup):
+class CheckboxTable(Widget):
+    input_type = "checkbox"
     template_name = "forms/widgets/checkbox_group_table.html"
+    checkbox_template_name = "forms/widgets/checkbox_option.html"
+    checked_attribute = {"checked": True}
+    option_inherits_attrs = False
+    add_id_index = False
+    allow_multiple_selected = True
     wrap_label = False
+
+    def __init__(self, attrs=None, column_names=(), choices=(), column_templates=()):
+        super().__init__(attrs)
+        self.choices = choices
+        self.column_names = column_names
+        self.column_templates = column_templates
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+
+        context["widget"]["options"] = []
+        for index, (choice_value, choice_label) in enumerate(self.choices):
+            selected = str(choice_value) in value if value is not None else False
+            context["widget"]["options"].append(
+                self.create_option(
+                    name,
+                    choice_value,
+                    choice_label,
+                    selected,
+                    index,
+                    attrs=attrs,
+                )
+            )
+
+        context["widget"]["column_names"] = self.column_names
+        context["widget"]["column_templates"] = self.column_templates
+        return context
+
+    def id_for_label(self, id_, index="0"):
+        """
+        Use an incremented id for each option where the main widget
+        references the zero index.
+        """
+        if id_ and self.add_id_index:
+            id_ = f"{id_}_{index}"
+        return id_
+
+    def create_option(self, name, value, label, selected, index, attrs=None):
+        index = str(index)
+        if attrs is None:
+            attrs = {}
+        option_attrs = (
+            self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
+        )
+        if selected:
+            option_attrs.update(self.checked_attribute)
+        if "id" in option_attrs:
+            option_attrs["id"] = self.id_for_label(option_attrs["id"], index)
+        return {
+            "name": name,
+            "value": value,
+            "label": label,
+            "selected": selected,
+            "index": index,
+            "attrs": option_attrs,
+            "type": self.input_type,
+            "template_name": self.checkbox_template_name,
+            "wrap_label": self.wrap_label,
+        }
+
+    def value_from_datadict(self, data, files, name):
+        getter = data.get
+        if self.allow_multiple_selected:
+            try:
+                getter = data.getlist
+            except AttributeError:
+                pass
+        return getter(name)
+
+    def format_value(self, value):
+        """Return selected values as a list."""
+        if value is None and self.allow_multiple_selected:
+            return []
+        if not isinstance(value, (tuple, list)):
+            value = [value]
+        return [str(v) if v is not None else "" for v in value]

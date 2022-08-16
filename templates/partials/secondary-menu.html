@@ -2,9 +2,10 @@
 
 <ul>
   {% if request.user.is_authenticated %}
-    {% if perms.tools.can_switch_organization and not view_type == "onboarding" %}
+    {% if request.user.is_superuser or perms.tools.view_organization and not view_type == "onboarding" %}
       <li>
-        <a href="{% url 'organization_list' %}" {% if 'organizations' in request.path|urlencode %} aria-current="page" {% endif %}>{% translate 'Organizations' %}</a>
+        <a href="{% url 'organization_list' %}"
+           {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Organizations' %}</a>
       </li>
     {% endif %}
     <li>
@@ -12,7 +13,8 @@
     </li>
   {% else %}
     <li>
-      <a href="{% url 'two_factor:login' %}" {% if 'login' in request.path|urlencode %} aria-current="page" {% endif %}>{% translate 'Login' %}</a>
+      <a href="{% url 'two_factor:login' %}"
+         {% if 'login' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Login' %}</a>
     </li>
   {% endif %}
 </ul>

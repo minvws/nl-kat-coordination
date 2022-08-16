@@ -1,0 +1,43 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+
+{% block content %}
+{% include 'header.html' %}
+<main id="main-content">
+  <section>
+    <div>
+      <h1>{% translate 'Account details' %}</h1>
+      {% comment %} <div class="horizontal-view toolbar">
+        <a href="{% url 'indemnification_add' %}" class="button ghost">{% translate 'Add indemnification' %}</a>
+      </div> {% endcomment %}
+      <dl>
+      <div>
+        <dt>{% translate 'Username' %}</dt>
+        <dd>{{ user }}</dd>
+      </div>
+      <div>
+        <dt>{% translate 'Full name' %}</dt>
+        <dd>{{ user.full_name }}</dd>
+      </div>
+      <div>
+        <dt>{% translate  'E-mail address' %}</dt>
+        <dd>{{ user.email }}</dd>
+      </div>
+      <div>
+          <dt>{% translate 'Organization' %}</dt>
+          <dd>{% spaceless %}
+            {% if user.organizationmember.organization %}
+              {{ user.organizationmember.organization }}
+            {% else %}
+              -
+            {% endif %}
+          {% endspaceless %}</dd>
+        </div>
+      </dl>
+      <a class="button" href="{% url 'password_reset' %}">{% translate 'Reset password' %}</a>
+    </div>
+  </section>
+</main>
+{% endblock %}

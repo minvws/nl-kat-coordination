@@ -27,7 +27,6 @@ table.tree-view tr.folded > td:first-child {
   width: 100%;
 }
 
-
 /*
 show/hide table body, easy-mode (NOT accessability complient)
 
@@ -49,7 +48,7 @@ Markup:
 </table>
 */
 .toggle-table-body:not(:checked) + table.tree-view tbody {
-  display: none
+  display: none;
 }
 
 .toggle-table-body + table.tree-view > thead label {

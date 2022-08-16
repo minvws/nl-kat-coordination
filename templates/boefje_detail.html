@@ -3,47 +3,53 @@
 {% load static %}
 {% load markdownify %}
 
-{% block head %}
-  {{ block.super }}
-  <script defer src="{% static '/js/vendor/manon/accordion.min.js' %}"></script>
-  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
-{% endblock %}
-
 {% block content %}
   {% include 'header.html' with breadcrumb_list=breadcrumb_list %}
   <main id="main-content">
     <section>
       <div class="two-thirds-one-third">
         <div>
-          <h1>
-            {{ boefje.name }}
-          </h1>
+          <h1>{{ boefje.name }}</h1>
           <p>
             {{ boefje.description }}.
           </p>
-          <h5>{% translate "Scan level" %}:</h5>
-          {% include 'partials/scan_level_indicator.html' with scan_level=boefje.scan_level.label %}
+          <h2>{% translate "Scan level" %}:</h2>
+          {% include 'partials/scan_level_indicator.html' with value=boefje.scan_level.value %}
           <p class="explanation"
              data-open-label="Open uitleg"
              data-close-label="Sluit uitleg">
-             <span>{% translate "Explanation" %}:</span>
+            <span>{% translate "Explanation" %}:</span>
             {% blocktranslate trimmed with scan_level=boefje.scan_level.label %}
                 Scan level: This boefje will only scan objects with a corresponding scan level ({{ scan_level }})
                 or higher. There is no indemnification for this boefje to scan an OOI with a lower scan level.
               {% endblocktranslate %}
           </p>
-          <h5>{% translate "Produces" %}:</h5>
-          <ul>
-            {% for ooi in boefje.produces|ooi_types_to_strings %}
-              <li>
-                <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
-              </li>
-            {% endfor %}
-          </ul>
+          <div class="column-2">
+            <div>
+              <h5>{% translate "Consumes" %}:</h5>
+              <ul>
+                {% for ooi in boefje.consumes|ooi_types_to_strings %}
+                  <li>
+                    <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+            <div>
+              <h5>{% translate "Produces" %}:</h5>
+              <ul>
+                {% for ooi in boefje.produces|ooi_types_to_strings %}
+                  <li>
+                    <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
         </div>
         <div>
           <img src="{% url 'boefje_cover' boefje_id=boefje.id %}"
-          alt="boefje placeholder image">
+               alt="boefje placeholder image">
           <div class="horizontal-view toolbar">
             {% enable_disable_boefje_button boefje perms.tools.can_enable_disable_boefje %}
           </div>
@@ -70,9 +76,43 @@
       </div>
     </section>
     <section>
+      {% translate 'Object list' as form_title %}
       <div>
-        {% translate 'Object list' as form_title %}
-        {% include 'partials/form/checkbox_group_table_form.html' with form_title=form_title btn_text='Start scan' btn_disabled=boefje_disabled key='boefje_id' value=boefje.id action="scan" %}
+        <h2>{{ form_title }}</h2>
+        <div class="horizontal-view toolbar">
+          <div>
+            <form method="get" class="inline">
+              <div class="horizontal-view">
+                {% include 'partials/form/form_errors.html' with form=select_ooi_filter_form %}
+                {% for field in select_ooi_filter_form %}{{ field }}{% endfor %}
+              </div>
+            </form>
+          </div>
+        </div>
+        {% if select_oois_form.fields.ooi.choices %}
+          {% include 'partials/form/checkbox_group_table_form.html' with checkbox_group_table_form=select_oois_form btn_text='Start scan' btn_disabled=boefje_disabled key='boefje_id' value=boefje.id action="scan" checkbox_group_table_filter_form=select_ooi_filter_form unique_id="" %}
+        {% else %}
+          {% if has_consumable_oois %}
+            {% blocktranslate %}
+              You currently don't have any objects that meet the scan level of {{ boefje.name }}. 
+              Add objects with a complying clearance level, or alter the clearance level of existing objects.
+            {% endblocktranslate %}
+          {% else %}
+            {% blocktranslate %}
+              You currently don't have scannable objects for {{ boefje.name }}. 
+              Add objects to use this boefje. This boefje is able to scan objects of the following types:
+            {% endblocktranslate %}
+          {% endif %}
+          <ul>
+            {% for ooi in boefje.consumes|ooi_types_to_strings %}
+              <li>
+                <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+          <a href="{% url 'boefje_add_consumable_type' id=boefje.id %}"
+             class="button">{% translate 'Add objects' %}</a>
+        {% endif %}
       </div>
     </section>
   </main>

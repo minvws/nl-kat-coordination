@@ -515,8 +515,8 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if all name servers, that have an AAAA record with IPv6 address, are reachable over IPv6. There are no IPv6 addresses available for this website.",
-        "recommendation": "Configure IPv6 addresses for the name servers.",
+        "description": "This webserver does not have an IPv6 address",
+        "recommendation": "Configure IPv6 addresses for this webserver.",
         "risk": "Low"
       },
       "consult_api": false
@@ -650,17 +650,17 @@
     }
   },
   {
-     "model": "tools.ooiinformation",
-     "pk": "KATFindingType|KAT-640",
-     "fields": {
-       "last_updated": "2021-09-29T14:46:09.835Z",
-       "data": {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-640",
+    "fields": {
+      "last_updated": "2021-09-29T14:46:09.835Z",
+      "data": {
         "description": "This software is known to be used as malware.",
         "recommendation": "You probably want to remove this software.",
         "risk": "High"
-       },
-       "consult_api": false
-     }
+      },
+      "consult_api": false
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -671,9 +671,9 @@
         "description": "This software should not be exposed to the Internet.",
         "recommendation": "You probably want to this port to be closed.",
         "risk": "Critical"
-       },
-       "consult_api": false
-     }
+      },
+      "consult_api": false
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -820,7 +820,7 @@
         "risk": "Critical"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -831,7 +831,7 @@
         "description": "A pass qualifier means that the SPF record designates the host to be allowed to send"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -842,7 +842,7 @@
         "description": "A pass qualifier means that the SPF record designates the host to be allowed to send"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -853,9 +853,9 @@
         "description": "A pass qualifier means that the SPF record designates the host to be allowed to send"
       },
       "consult_api": false
-      }
+    }
   },
-    {
+  {
     "model": "tools.ooiinformation",
     "pk": "DNSSPFMechanismIP|fail",
     "fields": {
@@ -864,7 +864,7 @@
         "description": "A fail qualifier means that the SPF record has designated the host as NOT being allowed to send"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -875,7 +875,7 @@
         "description": "A fail qualifier means that the SPF record has designated the host as NOT being allowed to send"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -886,9 +886,9 @@
         "description": "A fail qualifier means that the SPF record has designated the host as NOT being allowed to send"
       },
       "consult_api": false
-      }
+    }
   },
-      {
+  {
     "model": "tools.ooiinformation",
     "pk": "DNSSPFMechanismIP|softfail",
     "fields": {
@@ -897,7 +897,7 @@
         "description": "A softfail qualifier means that the SPF record has designated the host as NOT being allowed to send but is in transition"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -908,7 +908,7 @@
         "description": "A softfail qualifier means that the SPF record has designated the host as NOT being allowed to send but is in transition"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -919,7 +919,7 @@
         "description": "A softfail qualifier means that the SPF record has designated the host as NOT being allowed to send but is in transition"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -932,7 +932,7 @@
         "risk": "Critical"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -945,7 +945,7 @@
         "risk": "High"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -958,7 +958,7 @@
         "risk": "Medium"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -971,7 +971,7 @@
         "risk": "Low"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -984,7 +984,7 @@
         "risk": "Recommendation"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -997,7 +997,7 @@
         "risk": "Recommendation"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -1009,7 +1009,7 @@
         "risk": "Recommendation"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -1021,7 +1021,7 @@
         "risk": "Medium"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -1034,7 +1034,7 @@
         "risk": "Critical"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -1046,7 +1046,7 @@
         "risk": "Low"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -1058,7 +1058,7 @@
         "risk": "Recommendation"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",
@@ -1070,7 +1070,7 @@
         "risk": "Medium"
       },
       "consult_api": false
-      }
+    }
   },
   {
     "model": "tools.ooiinformation",

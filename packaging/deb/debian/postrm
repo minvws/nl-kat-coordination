@@ -1,13 +1,11 @@
 #!/bin/bash
 set -e
 
-if [ -d /usr/share/kat-rocky ]; then
-    rm -r /usr/share/kat-rocky
-fi
-
-if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then
-    . /usr/share/debconf/confmodule
-    db_purge
+if [ "$1" = "purge" ]; then
+    if [ -e /usr/share/debconf/confmodule ]; then
+        . /usr/share/debconf/confmodule
+        db_purge
+    fi
 
     if [ -f /etc/kat/rocky.conf ]; then
         rm /etc/kat/rocky.conf

@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load i18n %}
 {% load static %}
+{% load ooi_extra %}
 
 {% block content %}
   {% include 'header.html' %}
@@ -8,7 +9,7 @@
     <section class="error" role="group" aria-label="{% translate 'Explanation' %}">
       <div>
         <p>
-          {% translate 'No connection with the Octopoes API' %}
+          {% translate 'Error' %}: {{ error }}
         </p>
       </div>
     </section>
@@ -16,67 +17,110 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{% translate 'Tasks' %}</h1>
+        <h1>{% translate 'Boefjes' %}</h1>
         <p>
-          {% translate 'List of tasks for' %} {{ request.active_organization }}
+          {% translate 'List of boefjes for' %} {{ request.active_organization }}
         </p>
         <div class="horizontal-scroll">
           <table>
-            <caption>List of tasks for the current organization</caption>
+            <caption>{% translate 'List of tasks for the current organization' %}</caption>
             <thead>
               <tr>
-                <th scope="col">{% translate 'Task ID' %}</th>
+                <th scope="col">{% translate 'OOI' %}</th>
                 <th scope="col">{% translate 'Boefje' %}</th>
-                <th scope="col">{% translate 'State' %}</th>
+                <th scope="col">{% translate 'Status' %}</th>
                 <th scope="col">{% translate 'Time' %}</th>
                 <th scope="col">{% translate 'Details' %}</th>
               </tr>
             </thead>
             <tbody>
-              {% for id, task in tasks.items %}
+              {% for task in boefje_task_response.results %}
                 <tr>
-                  <td>{{ id }}</td>
-                  <td>{{ task.boefje }}</td>
-                  {% if task.state == 'SUCCESS' %}
-                    <td class="confirmation">{{ task.state }}</td>
-                  {% elif task.state == 'FAILURE' %}
-                    <td class="warning">{{ task.state }}</td>
+                  <td>{{ task.task.item.input_ooi }}</td>
+                  <td>{{ task.task.item.boefje.name }}</td>
+                  {% if task.status.value == 'completed' %}
+                    <td class="confirmation">{{ task.status.value|capfirst }}</td>
+                  {% elif task.status.value == 'failed' %}
+                    <td class="warning">{{ task.status.value|capfirst }}</td>
                   {% else %}
-                    <td>{{ task.state }}</td>
+                    <td>{{ task.status.value|capfirst }}</td>
                   {% endif %}
                   <td>
-                    {% if task.state == 'PENDING' %}
-                      {{ task.received|timesince }}
-                    {% elif task.state == 'STARTED' %}
-                      {{ task.started|timesince }}
-                    {% elif task.state == 'SUCCESS' %}
-                      {{ task.succeeded|timesince }}
-                    {% elif task.state == 'FAILURE' %}
-                      {{ task.failed|timesince }}
-                    {% endif %}
+                    {{ task.created_at|timesince }}
                     ago
                   </td>
                   <td>
                     <button class="expando-button"
-                            data-icon-open-class="icon ti-chevron-down" 
+                            data-icon-open-class="icon ti-chevron-down"
                             data-icon-close-class="icon ti-chevron-up"
-                            ata-close-label="{% translate 'Sluit details' %}">Arguments!</button>
+                            data-close-label="{% translate 'Close details' %}">
+                      {% translate 'Arguments!' %}
+                    </button>
                   </td>
                 </tr>
                 <tr class="expando-row">
                   <td colspan="6">
-                    <h4>{% translate 'Input' %}: {{ task.input_ooi.human_readable }} ({{ task.ooi.class_ }})</h4>
-                    <h4>{% translate 'Arguments' %}</h4>
-                    <ul>
-                      {% for key, value in task.arguments.items %}
-                        <li>{{ key }}</li>
-                        <ul>
-                          <li>{{ value }}</li>
-                        </ul>
-                      {% empty %}
-                        <li>{% translate 'No arguments' %}</li>
-                      {% endfor %}
-                    </ul>
+                    <h4>JSON</h4>
+                    <pre>{{ task.dict | pretty_json }}</pre>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section>
+      <div>
+        <h1>{% translate 'Normalizers' %}</h1>
+        <p>
+          {% translate 'List of normalizers for' %} {{ request.active_organization }}
+        </p>
+        <div class="horizontal-scroll">
+          <table>
+            <caption>{% translate 'List of tasks for the current organization' %}</caption>
+            <thead>
+              <tr>
+                <th scope="col">{% translate 'OOI' %}</th>
+                <th scope="col">{% translate 'Boefje' %}</th>
+                <th scope="col">{% translate 'Normalizer' %}</th>
+                <th scope="col">{% translate 'Status' %}</th>
+                <th scope="col">{% translate 'Time' %}</th>
+                <th scope="col">{% translate 'Details' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in normalizer_task_response.results %}
+                <tr>
+                  <td>{{ task.task.item.boefje_meta.input_ooi }}</td>
+                  <td>{{ task.task.item.boefje_meta.boefje.id }}</td>
+                  <td>{{ task.task.item.normalizer.name }}</td>
+                  {% if task.status.value == 'completed' %}
+                    <td class="confirmation">{{ task.status.value|capfirst }}</td>
+                  {% elif task.status.value == 'failed' %}
+                    <td class="warning">{{ task.status.value|capfirst }}</td>
+                  {% else %}
+                    <td>{{ task.status.value|capfirst }}</td>
+                  {% endif %}
+                  <td>
+                    {{ task.created_at|timesince }}
+                    ago
+                  </td>
+                  <td>
+                    <button class="expando-button"
+                            data-icon-open-class="icon ti-chevron-down"
+                            data-icon-close-class="icon ti-chevron-up"
+                            data-close-label="{% translate 'Close details' %}">
+                      {% translate 'Arguments!' %}
+                    </button>
+                  </td>
+                </tr>
+                <tr class="expando-row">
+                  <td colspan="6">
+                    <h4>
+                      JSON
+                    </h4>
+                    <pre>{{ task.dict | pretty_json }}</pre>
                   </td>
                 </tr>
               {% endfor %}
@@ -86,8 +130,4 @@
       </div>
     </section>
   </main>
-{% endblock %}
-{% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static '/js/vendor/manon/expando-rows.js' %}"></script>
 {% endblock %}

@@ -54,11 +54,10 @@ class OOIDetailView(
                     self.request.active_organization.code
                 ).get_boefje(boefje_id)
                 ooi = self.get_single_ooi(ooi_id)
-                _, success = self.run_boefje_for_oois(
+                self.run_boefje_for_oois(
                     boefje, [ooi], self.request.active_organization, self.api_connector
                 )
-
-                return success
+                return True
 
         except RequestException as exception:
             messages.add_message(

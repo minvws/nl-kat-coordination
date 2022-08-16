@@ -26,7 +26,7 @@
   width: 14rem;
 
   .tail {
-    left:2rem;
+    left: 2rem;
     position: absolute;
     top: 8rem;
   }
@@ -42,7 +42,6 @@
     top: 1rem;
   }
 
-  
   .paw {
     animation: paw 1s alternate infinite ease-in-out;
     left: 2.375rem;
@@ -55,7 +54,7 @@
     position: absolute;
     top: 11.5rem;
   }
-  .body{
+  .body {
     display: block;
     position: absolute;
     top: 4rem;
@@ -69,4 +68,3 @@
     position: absolute;
   }
 }
-  

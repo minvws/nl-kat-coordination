@@ -21,7 +21,7 @@
 		</fieldset>
 
 		{% if object_type_filters|length > 4 %}
-			<button type="button" class="ghost" onClick="toggleCheckboxes('ooi_type')">{% translate 'Toggle all' %}</button>
+			<button type="button" class="ghost" onClick="toggleCheckboxes(event, 'ooi_type')">{% translate 'Toggle all' %}</button>
 		{% endif %}
 
 		<input type="submit" value="{% translate 'Update List' %}">

@@ -45,7 +45,7 @@
                       <a href="{% url 'katalogus_detail' boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
                     </td>
                     <td>{{ boefje.description }}</td>
-                    <td>{% include 'partials/scan_level_indicator.html' with scan_level=boefje.scan_level.label %}</td>
+                    <td>{% include 'partials/scan_level_indicator.html' with value=boefje.scan_level.value %}</td>
                     <td>
                       {% include 'partials/form/single_action_form.html' with btn_text="Start Scan" action='start_scan' key='boefje_id' value=boefje.id %}
                     </td>
@@ -58,10 +58,4 @@
       </div>
     </section>
   </main>
-{% endblock %}
-
-{% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static '/js/vendor/manon/filters.min.js' %}"></script>
-  <script src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
 {% endblock %}

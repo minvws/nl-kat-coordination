@@ -2,11 +2,6 @@
 {% load i18n %}
 {% load static %}
 
-{% block head %}
-  {{ block.super }}
-  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
-{% endblock %}
-
 {% block content %}
   <h1>{% trans "Enable Two-Factor Authentication" %}</h1>
   {% if verified and wizard.steps.current == 'generator' %}
@@ -30,7 +25,7 @@
         </div>
         <div>
           <label>{% translate 'Setup key' %}</label>
-          <input type="text" value="{{ secret_key }}"/>
+          <input id="totp-input" type="text" value="{{ secret_key }}"/>
           <p class="explanation"
              data-open-label="Explanation of the secret key."
              data-close-label="Close explanation of the secret key">
@@ -46,10 +41,10 @@
     </form>
     <form action="" method="post" class="horizontal-view">
       {% csrf_token %}
-      {% include "two_factor/_wizard_forms.html" %}
+      {% include "two_factor/_wizard_forms.html" with step=wizard.steps.current %}
       {# hidden submit button to enable [enter] key #}
       <input type="submit" value="" class="d-none"/>
-      {% include "two_factor/_wizard_actions.html" %}
+      {% include "two_factor/_wizard_actions.html" with step=wizard.steps.current %}
     </form>
   {% else %}
     <p>

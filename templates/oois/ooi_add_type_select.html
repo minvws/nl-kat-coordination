@@ -2,11 +2,6 @@
 {% load i18n %}
 {% load static %}
 
-{% block head %}
-  {{ block.super }}
-  <script defer src="{% static '/js/vendor/manon/form-help.min.js' %}"></script>
-{% endblock %}
-
 {% block content %}
   {% url "object" ooi.primary_key as ooi_detail_url %}
   {% include "header.html" with breadcrumbList=breadcrumbList %}

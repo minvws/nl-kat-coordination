@@ -2,7 +2,7 @@ from django.urls.base import reverse_lazy
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
-from tools.forms import IndemnificationAddForm
+from account.forms import IndemnificationAddForm
 from tools.models import OrganizationMember, Indemnification
 
 
@@ -14,11 +14,11 @@ class IndemnificationAddView(FormView):
 
     def form_valid(self, form):
         user = self.request.user
-        organization_member = OrganizationMember.objects.get(user=user)
+        organizationmember = OrganizationMember.objects.get(user=user)
 
         Indemnification.objects.create(
             user=user,
-            organization=organization_member.organization,
+            organization=organizationmember.organization,
         )
 
         return super().form_valid(form)

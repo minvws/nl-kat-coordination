@@ -1,25 +1,35 @@
 from typing import List
-
 from django.views.generic import DetailView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from tools.models import Organization, OrganizationMember
-from tools.user_helpers import CanViewMembersMixin
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
 
 @class_view_decorator(otp_required)
 class OrganizationMemberListView(
-    OrganizationMemberBreadcrumbsMixin, CanViewMembersMixin, DetailView
+    PermissionRequiredMixin,
+    OrganizationMemberBreadcrumbsMixin,
+    DetailView,
 ):
     model = Organization
     template_name = "organizations/organization_member_list.html"
     filters_active: List[str] = []
+    permission_required = "tools.view_organizationmember"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.filters_active = self.get_filters_active()
+
+    def get_queryset(self):
+        """
+        List organization that only belongs to user that requests the list.
+        """
+        object = self.model.objects.filter(
+            code=self.request.user.organizationmember.organization.code
+        )
+        return object
 
     def get_filters_active(self):
         return self.request.GET.getlist("client_status", [])

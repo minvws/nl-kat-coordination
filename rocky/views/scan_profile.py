@@ -57,6 +57,14 @@ class ScanProfileDetailView(OOIDetailView, FormView):
             )
         return redirect(get_ooi_url("scan_profile_detail", self.ooi.primary_key))
 
+    def get_initial(self):
+        initial = super().get_initial()
+
+        if not isinstance(self.ooi.scan_profile, InheritedScanProfile):
+            initial["level"] = self.ooi.scan_profile.level
+
+        return initial
+
 
 class ScanProfileResetView(OOIDetailView):
     template_name = "scan_profiles/scan_profile_reset.html"

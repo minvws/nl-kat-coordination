@@ -34,3 +34,16 @@ django-password-validators==1.7.0
 
 # temp fix to pass build, remove later when https://github.com/xhtml2pdf/xhtml2pdf/issues/589 is solved
 reportlab==3.6.6
+
+# Robot Framework dependencies
+wheel
+PyNaCl
+Image
+numpy
+pyotp
+robotframework
+robotframework-browser
+robotframework-debuglibrary
+robotframework-otp
+robotframework-postgresqldb
+robotframework-tidy

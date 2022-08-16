@@ -3,10 +3,8 @@
 <form class="inline" method="post" class="help">
   {% csrf_token %}
   {% if checkbox_group_table_form %}
-    {% for field in checkbox_group_table_form %}
-      {% include 'partials/form/form_errors.html' with form=field %}
-      {% for choices in field %}{{ choices }}{% endfor %}
-    {% endfor %}
+    {% include 'partials/form/form_errors.html' with form=field %}
+    {% for choices in checkbox_group_table_form %}{{ choices }}{% endfor %}
   {% endif %}
   <div class="horizontal-view">
     {% if skip_onboarding == 'yes' %}

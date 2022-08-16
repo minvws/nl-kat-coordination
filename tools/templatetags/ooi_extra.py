@@ -1,3 +1,4 @@
+import json
 from typing import Any, List, Type, Set
 from urllib import parse
 
@@ -105,3 +106,8 @@ def index(indexable, i):
 @register.filter
 def has_group(user, group: str):
     return user.groups.filter(name=group).exists()
+
+
+@register.filter
+def pretty_json(obj: dict):
+    return json.dumps(obj, default=str, indent=4)

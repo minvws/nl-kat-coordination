@@ -16,7 +16,7 @@
           {% for inference in inferences %}
             <tr>
               <td>
-                <a href="{% url 'katalogus_detail' inference.origin.method %}">{{ inference.origin.method }}</a>
+                {{ inference.origin.method }}
               </td>
               <td>
                 <a href="{% ooi_url 'ooi_detail' inference.origin.source %}">{{ inference.origin.source }}</a>

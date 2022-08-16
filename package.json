@@ -2,13 +2,16 @@
   "scripts": {
     "dev": "parcel watch assets/src/bundles/*.js --dist-dir assets/dist --public-url ./ --no-cache",
     "build": "parcel build assets/src/bundles/*.js --dist-dir assets/dist --public-url ./ --no-cache --no-scope-hoist",
-    "test": "yarn --cwd roeltje cypress open"
+    "test": "yarn --cwd roeltje cypress open",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@parcel/transformer-sass": "2.6.2",
-    "parcel": "2.6.2"
+    "parcel": "2.6.2",
+    "prettier": "^2.7.1"
   },
   "dependencies": {
+    "@minvws/manon": "^1.0.0",
     "d3": "^7.4.3"
   },
   "browserslist": [

@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
-from logging import getLogger
-from pickle import DICT
-from typing import Any, Dict, List, Tuple
 from enum import Enum
-
+from logging import getLogger
+from typing import Any, Dict, List, Type, Optional
+from uuid import uuid4
 from django.contrib import messages
 from django.http import Http404, FileResponse, QueryDict
+from requests import HTTPError
+from two_factor.views.utils import class_view_decorator
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -14,19 +15,20 @@ from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, OOI, DeclaredScanProfile
-from two_factor.views.utils import class_view_decorator
-
-from rocky.boefjes import BoefjeTask, run_boefje
+from octopoes.models.types import type_by_name
 from rocky.katalogus import (
     Boefje,
     KATalogusBreadcrumbsMixin,
     get_katalogus,
-    KATalogusClientV1,
 )
-from rocky.views import OctopoesMixin
-from tools.forms import SelectOOIForm
+from tools.forms import SelectOOIForm, SelectOOIFilterForm
 from tools.models import Organization
-from tools.view_helpers import Breadcrumb, PageActionMixin
+from tools.view_helpers import Breadcrumb, PageActionMixin, existing_ooi_type
+from rocky.views import OctopoesMixin
+from rocky.views.ooi_view import BaseOOIFormView
+from rocky.katalogus import Boefje as KatalogusBoefje
+from rocky.scheduler import SchedulerClient, QueuePrioritizedItem, BoefjeTask, Boefje
+from rocky.settings import SCHEDULER_API
 
 logger = getLogger(__name__)
 
@@ -40,13 +42,45 @@ class BoefjeMixin(OctopoesMixin):
         super().setup(request, *args, **kwargs)
         self.api_connector = self.get_api_connector()
 
+    def run_boefje(
+        self, katalogus_boefje: KatalogusBoefje, ooi: OOI, organization: Organization
+    ) -> None:
+
+        boefje_queue_name = f"boefje-{organization.code}"
+        client = SchedulerClient(SCHEDULER_API)
+
+        boefje = Boefje(
+            id=katalogus_boefje.id,
+            name=katalogus_boefje.name,
+            description=katalogus_boefje.description,
+            repository_id=katalogus_boefje.repository_id,
+            version=None,
+            scan_level=katalogus_boefje.scan_level.value,
+            consumes={
+                ooi_class.get_ooi_type() for ooi_class in katalogus_boefje.consumes
+            },
+            produces={
+                ooi_class.get_ooi_type() for ooi_class in katalogus_boefje.produces
+            },
+        )
+
+        boefje_task = BoefjeTask(
+            id=uuid4().hex,
+            boefje=boefje,
+            input_ooi=ooi.reference,
+            organization=organization.code,
+        )
+
+        item = QueuePrioritizedItem(priority=1, item=boefje_task)
+        client.push_task(boefje_queue_name, item)
+
     def run_boefje_for_oois(
         self,
         boefje: Boefje,
         oois: List[OOI],
         organization: Organization,
         api_connector: OctopoesAPIConnector,
-    ) -> Tuple[List[BoefjeTask], bool]:
+    ) -> None:
 
         for ooi in oois:
             if ooi.scan_profile.level < boefje.scan_level:
@@ -57,23 +91,7 @@ class BoefjeMixin(OctopoesMixin):
                     ),
                     datetime.now(timezone.utc),
                 )
-
-        boefje_tasks = [
-            BoefjeTask(
-                boefje=boefje,
-                input_ooi=ooi.reference,
-                organization=organization.code,
-            )
-            for ooi in oois
-        ]
-
-        if not boefje_tasks:
-            return boefje_tasks, False
-
-        for boefje_task in boefje_tasks:
-            run_boefje(boefje_task, organization)
-
-        return boefje_tasks, True
+            self.run_boefje(boefje, ooi, organization)
 
     def boefje_enable(self, view_args) -> None:
         boefje_id = view_args.get("boefje_id")
@@ -122,11 +140,13 @@ class BoefjeMixin(OctopoesMixin):
         ooi_ids = view_args.getlist("ooi")
         oois = [self.get_single_ooi(ooi_id) for ooi_id in ooi_ids]
 
-        ran_boefjes, success = self.run_boefje_for_oois(
-            boefje, oois, self.request.active_organization, self.api_connector
-        )
-        if not success:
+        try:
+            self.run_boefje_for_oois(
+                boefje, oois, self.request.active_organization, self.api_connector
+            )
+        except HTTPError:
             return
+
         success_message = _(
             "Your scan is running successfully in the background. \n Results will be added to the object list when they are in. It may take some time, a refresh of the page may be needed to show the results."
         )
@@ -142,9 +162,10 @@ class BoefjeDetailView(
         BOEFJE_DISABLE = "boefje_disable"
         BOEFJE_ENABLE = "boefje_enable"
         START_SCAN = "scan"
+        FILTER_OBJECTS = "filter_objects"
 
     template_name = "boefje_detail.html"
-    boefje: Boefje = None
+    boefje: Optional[Boefje] = None
 
     def get_boefje(self, boefje_id: str) -> Boefje:
         try:
@@ -190,19 +211,33 @@ class BoefjeDetailView(
         return breadcrumbs
 
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        filter_form = SelectOOIFilterForm(self.request.GET)
+
+        # fetch ooi or oois
+        oois = []
         connector = self.get_api_connector()
 
-        ooi_reference = (
-            Reference.from_str(self.request.GET["ooi_id"])
-            if "ooi_id" in self.request.GET
-            else None
-        )
-        ooi = connector.get(ooi_reference) if ooi_reference else None
+        if "ooi_id" in self.request.GET:
+            oois.append(connector.get(Reference.from_str(self.request.GET["ooi_id"])))
+        else:
+            # TODO: Instead of this arbitrary limit add pagination.
+            oois = connector.list(self.boefje.consumes, limit=9999)
 
-        context = super().get_context_data(**kwargs)
-        context["checkbox_group_table_form"] = (
-            SelectOOIForm(self.boefje, connector, ooi),
-        )
+        has_consumable_oois = False
+        if len(oois) > 0:
+            has_consumable_oois = True
+
+        # filter by scan-level
+        if filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
+            oois = [
+                ooi for ooi in oois if ooi.scan_profile.level >= self.boefje.scan_level
+            ]
+
+        context["select_ooi_filter_form"] = filter_form
+        context["select_oois_form"] = SelectOOIForm(oois)
+        context["has_consumable_oois"] = has_consumable_oois
         context["boefje"] = self.boefje
         context["description"] = get_katalogus(
             self.request.active_organization.code
@@ -218,3 +253,100 @@ class BoefjeCoverView(View):
         return FileResponse(
             get_katalogus(self.request.active_organization.code).get_cover(boefje_id)
         )
+
+
+@class_view_decorator(otp_required)
+class BoefjeConsumableObjectType(TemplateView):
+    template_name = "oois/ooi_add_type_select.html"
+    boefje: Boefje = None
+
+    def get(self, request, *args, **kwargs):
+        self.boefje = self.get_boefje(kwargs["id"])
+
+        if "add_ooi_type" in request.GET and existing_ooi_type(
+            request.GET["add_ooi_type"]
+        ):
+            return redirect(
+                reverse(
+                    "boefje_add_consumable_object",
+                    kwargs={
+                        "id": self.boefje.id,
+                        "add_ooi_type": request.GET["add_ooi_type"],
+                    },
+                )
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def get_boefje(self, boefje_id: str) -> Boefje:
+        try:
+            return get_katalogus(self.request.active_organization.code).get_boefje(
+                boefje_id
+            )
+        except:
+            raise Http404("Boefje not found")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("katalogus_detail", args=[self.boefje.id]),
+                "text": self.boefje.name,
+            },
+            {"url": reverse("ooi_add_type_select"), "text": _("Add consumable object")},
+        ]
+        context["ooi_types"] = [
+            {"value": ooi_type.get_ooi_type(), "text": ooi_type.get_ooi_type()}
+            for ooi_type in self.boefje.consumes
+        ]
+        return context
+
+
+@class_view_decorator(otp_required)
+class BoefjeConsumableObjectAddView(BaseOOIFormView):
+    template_name = "oois/ooi_add.html"
+    boefje: Boefje = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.ooi_class = self.get_ooi_class()
+        self.initial = request.GET
+        self.boefje = self.get_boefje(kwargs["id"])
+
+    def get_boefje(self, boefje_id: str) -> Boefje:
+        try:
+            return get_katalogus(self.request.active_organization.code).get_boefje(
+                boefje_id
+            )
+        except:
+            raise Http404("Boefje not found")
+
+    def get_ooi_class(self) -> Type[OOI]:
+        try:
+            return type_by_name(self.kwargs["add_ooi_type"])
+        except KeyError:
+            raise Http404("OOI not found")
+
+    def get_success_url(self, ooi) -> str:
+        return reverse("katalogus_detail", args=[self.boefje.id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["type"] = self.ooi_class.get_ooi_type()
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("katalogus_detail", args=[self.boefje.id]),
+                "text": self.boefje.name,
+            },
+            {"url": reverse("ooi_add_type_select"), "text": _("Add consumable object")},
+            {
+                "url": reverse(
+                    "ooi_add", kwargs={"ooi_type": self.ooi_class.get_ooi_type()}
+                ),
+                "text": _("Add %(ooi_type)s")
+                % {"ooi_type": self.ooi_class.get_ooi_type()},
+            },
+        ]
+
+        return context
