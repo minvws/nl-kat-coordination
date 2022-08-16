@@ -38,26 +38,32 @@ rebuild:
 	make build
 	make up
 
+update:
+	-docker-compose down
+	make pull
+	make build
+	make up
+
 clean:
 	-docker-compose down
-	-docker volume rm nl-kat_rocky-db-data nl-kat_bytes-db-data nl-kat_katalogus-db-data
+	-docker volume rm nl-kat_rocky-db-data nl-kat_bytes-db-data nl-kat_katalogus-db-data nl-kat_xtdb-data
 
 up:
 	docker-compose up -d --force-recreate rocky
 
 clone:
-	-git clone git@github.com:minvws/nl-kat-boefjes.git
-	-git clone git@github.com:minvws/nl-kat-bytes.git
-	-git clone git@github.com:minvws/nl-kat-octopoes.git
-	-git clone git@github.com:minvws/nl-kat-mula.git
-	-git clone git@github.com:minvws/nl-kat-rocky.git
+	-git clone https://github.com/minvws/nl-kat-boefjes.git
+	-git clone https://github.com/minvws/nl-kat-bytes.git
+	-git clone https://github.com/minvws/nl-kat-octopoes.git
+	-git clone https://github.com/minvws/nl-kat-mula.git
+	-git clone https://github.com/minvws/nl-kat-rocky.git
 
 clone-main:
-	-git clone --branch main git@github.com:minvws/nl-kat-boefjes.git
-	-git clone --branch main git@github.com:minvws/nl-kat-bytes.git
-	-git clone --branch main git@github.com:minvws/nl-kat-octopoes.git
-	-git clone --branch main git@github.com:minvws/nl-kat-mula.git
-	-git clone --branch main git@github.com:minvws/nl-kat-rocky.git
+	-git clone --branch main https://github.com/minvws/nl-kat-boefjes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-bytes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-octopoes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-mula.git
+	-git clone --branch main https://github.com/minvws/nl-kat-rocky.git
 
 pull:
 	-git pull
@@ -90,7 +96,11 @@ pull-reset:
 	-git -C nl-kat-rocky pull
 
 build:  # Build should prepare all other services: migrate them, seed them, etc.
-	docker-compose build
+ifeq ($(UNAME), Darwin)
+	docker-compose build --build-arg USER_UID="$$(id -u)"
+else
+	docker-compose build --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
+endif
 	docker-compose run --rm rocky make build
 	make -C nl-kat-boefjes build
 	make -C nl-kat-bytes build
