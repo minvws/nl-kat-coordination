@@ -6,10 +6,10 @@ See [nl-kat-coordination](https://github.com/minvws/nl-kat-coordination) for mor
 ## Stack
 
 As said, Django is the framework for this project.
-To comply to government standards, use [Manon](https://github.com/minvws/nl-rdo-rijksoverheid-ui) for style and accessibility.
+To comply to government standards, use [Manon](https://github.com/minvws/nl-rdo-manon) for style and accessibility.
 Yarn is used as package manager and ParcelJS is used as bundler to compile the frontend (CSS and Javascript).
 For browsertests we are using [Cypress](https://www.cypress.io/).
-You can find the Manon repository here: [https://github.com/minvws/nl-rdo-rijksoverheid-ui](https://github.com/minvws/nl-rdo-rijksoverheid-ui)
+You can find the Manon repository here: [https://github.com/minvws/nl-rdo-manon](https://github.com/minvws/nl-rdo-manon)
 
 ## Running Rocky
 
