@@ -181,4 +181,4 @@ Er een aantal opties om contact te leggen het met team van OpenKAT:
 * Direct contact: meedoen@openkat.nl
 * Forum: link:https://github.com/minvws/nl-kat-coordination/discussions[Github Discussions] of de OpenKAT groep op link:https://www.linkedin.com/[Linkedin]
 * IRC: #openkat op irc.libera.chat
-
+* Signal: https://signal.group/#CjQKIIS4T1mDK1RcTqelkv-vDvnzrsU4b2qGj3xIPPrqWO8HEhDISi92dF_m4g7tXEB_QwN_
