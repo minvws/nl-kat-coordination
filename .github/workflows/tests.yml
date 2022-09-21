@@ -1,18 +1,16 @@
 name: Run the test suite
 
-
 on:
   pull_request:
     branches:
-      - '**'
+      - "**"
   push:
     branches:
-      - 'develop'
-      - 'master'
+      - "develop"
+      - "master"
 
 jobs:
   Tests:
-
     runs-on: ubuntu-20.04
 
     steps:
@@ -31,13 +29,15 @@ jobs:
         with:
           repository: minvws/nl-kat-octopoes
           path: nl-kat-octopoes
+          token: ${{ secrets.RDO_REPO_RO }}
 
       - name: Checkout boefjes
         uses: actions/checkout@v2
         with:
           repository: minvws/nl-kat-boefjes
           path: nl-kat-boefjes
-          
+          token: ${{ secrets.RDO_REPO_RO }}
+
       - name: Run tests
-        run: docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
+        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
         working-directory: nl-kat-rocky

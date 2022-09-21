@@ -1,0 +1,28 @@
+name: Check the code quality using linters and formatters
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "develop"
+      - "master"
+
+jobs:
+  Blacken: # Should be renamed once GitHub Actions no longer has a hard depend on this name
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install requirements-check.txt
+        run: pip install -r requirements-check.txt
+
+      - name: Run checks
+        run: make check
