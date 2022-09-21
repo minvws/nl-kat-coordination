@@ -1,10 +1,14 @@
+from pathlib import Path
+
+import sys
 from datetime import datetime, timedelta
+from os import environ
 from unittest import TestCase
 from unittest.mock import patch
 
-from boefjes.models import Boefje, Normalizer
-from job import BoefjeMeta, NormalizerMeta
-from runner import (
+from boefjes.plugins.models import Boefje, Normalizer
+from boefjes.job import BoefjeMeta, NormalizerMeta
+from boefjes.runner import (
     ModuleRunner,
     NormalizerJobRunner,
     NORMALIZER_SIGNATURE,
@@ -55,44 +59,59 @@ class TestRunner(TestCase):
             boefje_meta=self.boefje_meta,
             normalizer={"name": "dummy_normalizer", "version": "9"},
         )
+        sys.path.append(str(Path(__file__).parent))
 
     def test_module_runner_resolve_module_invalid(self):
         self.assertRaises(
             ModuleNotFoundError,
-            ModuleRunner("tests.modules.dummy", NORMALIZER_SIGNATURE).run,
+            ModuleRunner("tests.modules.dummy", NORMALIZER_SIGNATURE, {}).run,
             self.normalize_meta,
             "not existing",
         )
 
     def test_module_runner_validate_module(self):
-        ModuleRunner("tests.modules.dummy_boefje", OLD_BOEFJE_SIGNATURE).run(
+        ModuleRunner("tests.modules.dummy_boefje", OLD_BOEFJE_SIGNATURE, {}).run(
             self.boefje_meta
         )
 
     def test_module_runner_validate_module_invalid(self):
         module_runner = ModuleRunner(
-            "tests.modules.dummy_boefje_missing_run", OLD_BOEFJE_SIGNATURE
+            "tests.modules.dummy_boefje_missing_run", OLD_BOEFJE_SIGNATURE, {}
         )
         self.assertRaises(ModuleException, module_runner.run, self.boefje_meta)
 
     def test_boefje_module_runner_validate_module(self):
-        module_runner = ModuleRunner("tests.modules.dummy_boefje", OLD_BOEFJE_SIGNATURE)
+        module_runner = ModuleRunner(
+            "tests.modules.dummy_boefje", OLD_BOEFJE_SIGNATURE, {}
+        )
 
         module_runner.run(self.boefje_meta)
 
     def test_boefje_module_runner_validate_module_invalid(self):
         module_runner = ModuleRunner(
-            "tests.modules.dummy_boefje_invalid_signature", OLD_BOEFJE_SIGNATURE
+            "tests.modules.dummy_boefje_invalid_signature", OLD_BOEFJE_SIGNATURE, {}
         )
 
         self.assertRaises(ModuleException, module_runner.run, self.boefje_meta)
 
-    @patch("runner.datetime")
-    def test_boefje_job_runner(self, mock_datetime):
+    def test_module_runner_with_extra_environment_keys(self):
+        module_runner = ModuleRunner(
+            "tests.modules.dummy_boefje_environment",
+            OLD_BOEFJE_SIGNATURE,
+            {"hello": "world"},
+        )
+        _, output = module_runner.run(self.boefje_meta)
+
+        self.assertIn("hello", output.decode())
+        self.assertNotIn("hello", environ)
+
+    @patch("boefjes.runner.get_environment_settings", return_value={})
+    @patch("boefjes.runner.datetime")
+    def test_boefje_job_runner(self, mock_datetime, mock_get_environment_settings):
         mock_datetime.now.side_effect = [datetime(2020, 1, 1), datetime(2020, 1, 2)]
         job = self.boefje_meta.copy()
 
-        runner = LocalBoefjeJobRunner(job, self.boefje, "tests")
+        runner = LocalBoefjeJobRunner(job, self.boefje, {})
         _, raw = runner.run()
         self.assertEqual(b"dummy-data", raw.data)
         self.assertNotEqual(self.boefje_meta, runner.boefje_meta)
@@ -100,7 +119,7 @@ class TestRunner(TestCase):
 
     def test_normalizer_job_runner(self):
         job = self.normalize_meta
-        runner = NormalizerJobRunner(job, self.normalizer, "tests", b"test-network")
+        runner = NormalizerJobRunner(job, self.normalizer, b"test-network")
         runner.run()
 
         from octopoes.models.ooi.network import Network
@@ -113,7 +132,7 @@ class TestRunner(TestCase):
             "Network|test-network"  # Input OOI the same as the OOI in the result set
         )
 
-        runner = NormalizerJobRunner(job, self.normalizer, "tests", b"test-network")
+        runner = NormalizerJobRunner(job, self.normalizer, b"test-network")
         runner.run()
 
         self.assertListEqual([], runner.results)

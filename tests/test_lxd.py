@@ -1,8 +1,8 @@
 from unittest import TestCase, skip
 
-from job import BoefjeMeta, Boefje
-from katalogus.models import Boefje as PluginBoefje
-from lxd.lxd_runner import LXDBoefjeJobRunner
+from boefjes.job import BoefjeMeta, Boefje
+from boefjes.katalogus.models import Boefje as PluginBoefje
+from boefjes.lxd.lxd_runner import LXDBoefjeJobRunner
 
 EXAMPLE_JOB = BoefjeMeta(
     id="test-job",
@@ -20,7 +20,7 @@ class KATalogusTest(TestCase):
             PluginBoefje(
                 id=EXAMPLE_JOB.boefje.id,
                 repository_id="test-repo",
-                consumes="Network",
+                consumes={"Network"},
                 produces=["text/plain"],
             ),
         )
