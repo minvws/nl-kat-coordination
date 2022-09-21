@@ -3,7 +3,7 @@ debian:
 	docker run \
 	--env PKG_NAME=kat-octopoes \
 	--env BUILD_DIR=./build \
-	--env REPOSITORY=minvws/nl-rt-kat-octopoes \
+	--env REPOSITORY=minvws/nl-kat-octopoes \
 	--env RELEASE_VERSION=${RELEASE_VERSION} \
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
