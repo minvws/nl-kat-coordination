@@ -1,7 +1,7 @@
-__pycache__
-*.pyc
-*.pyo
-*.pyd
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
 .Python
 env
 .venv
@@ -21,3 +21,14 @@ coverage.xml
 .hypothesis
 Dockerfile
 bytes-data
+.dockerignore
+.github
+.env-dist
+.gitignore
+.ci
+Makefile
+packaging
+README.*
+pyproject.toml
+sql_migrations
+.dockerignore

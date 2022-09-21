@@ -1,6 +1,9 @@
 import uuid
 from datetime import timedelta
 
+import pytest
+from sqlalchemy.exc import DataError
+
 from bytes.models import RetrievalLink, SecureHash, MimeType
 from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter
 from bytes.sqlalchemy.sql_meta_repository import SQLMetaDataRepository
@@ -60,6 +63,20 @@ def test_save_boefje_meta(meta_repository: SQLMetaDataRepository) -> None:
         BoefjeMetaFilter(organization="test2", input_ooi=boefje_meta.input_ooi, descending=False)
     )
     assert wrong_organization == []
+
+
+def test_boefje_id_length(meta_repository: SQLMetaDataRepository) -> None:
+    boefje_meta = get_boefje_meta()
+
+    with meta_repository:
+        boefje_meta.boefje.id = 64 * "a"
+        meta_repository.save_boefje_meta(boefje_meta)
+
+    with pytest.raises(DataError):
+        with meta_repository:
+            boefje_meta.id = str(uuid.uuid4())
+            boefje_meta.boefje.id = 65 * "a"
+            meta_repository.save_boefje_meta(boefje_meta)
 
 
 def test_save_boefje_meta_hash(meta_repository: SQLMetaDataRepository) -> None:
@@ -126,6 +143,23 @@ def test_save_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:
 
     assert boefje_meta_from_db == normalizer_meta.boefje_meta
     assert normalizer_meta == normalizer_meta_from_db
+
+
+def test_normalizer_name_length(meta_repository: SQLMetaDataRepository) -> None:
+    normalizer_meta = get_normalizer_meta()
+
+    with meta_repository:
+        meta_repository.save_boefje_meta(normalizer_meta.boefje_meta)
+
+        normalizer_meta.id = str(uuid.uuid4())
+        normalizer_meta.normalizer.name = 64 * "a"
+        meta_repository.save_normalizer_meta(normalizer_meta)
+
+    with pytest.raises(DataError):
+        with meta_repository:
+            normalizer_meta.id = str(uuid.uuid4())
+            normalizer_meta.normalizer.name = 65 * "a"
+            meta_repository.save_normalizer_meta(normalizer_meta)
 
 
 def test_normalizer_meta_pointing_to_raw_id(meta_repository: SQLMetaDataRepository) -> None:

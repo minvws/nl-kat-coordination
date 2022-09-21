@@ -95,3 +95,24 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm bytes_integration
+
+
+##
+##|------------------------------------------------------------------------|
+##			Building
+##|------------------------------------------------------------------------|
+debian:
+	-mkdir ./build
+	docker run \
+	--env PKG_NAME=kat-bytes \
+	--env BUILD_DIR=./build \
+	--env REPOSITORY=minvws/nl-kat-bytes \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--workdir /app \
+	debian:latest \
+	packaging/scripts/build-debian-package.sh
+
+clean:
+	-rm -rf build/

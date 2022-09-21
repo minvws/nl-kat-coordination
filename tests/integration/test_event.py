@@ -17,10 +17,10 @@ def test_event_published_successfully(event_manager: RabbitMQEventManager) -> No
         created_at=datetime(2000, 10, 10, 10), organization=test_organization, raw_data=raw_data_meta
     )
     event_manager.publish(event)
-    method, properties, body = event_manager.channel.basic_get(event_manager._queue_name(event))
+    method, properties, body = event_manager.connection.channel().basic_get(event_manager._queue_name(event))
 
     response = json.loads(body)
-    event_manager.channel.basic_ack(method.delivery_tag)
+    event_manager.connection.channel().basic_ack(method.delivery_tag)
 
     assert response["organization"] == test_organization
     assert response["raw_data"] == json.loads(event.raw_data.json())

@@ -59,8 +59,8 @@ def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: Rabbit
 
     assert normalizer_meta == retrieved_normalizer_meta
 
-    method, properties, body = event_manager.channel.basic_get("test__normalizer_meta_received")
-    event_manager.channel.basic_ack(method.delivery_tag)
+    method, properties, body = event_manager.connection.channel().basic_get("test__normalizer_meta_received")
+    event_manager.connection.channel().basic_ack(method.delivery_tag)
 
     assert normalizer_meta.id in body.decode()
 
@@ -104,8 +104,8 @@ def test_raw(bytes_api_client: BytesAPIClient, event_manager: RabbitMQEventManag
 
     assert retrieved_raw == raw
 
-    method, properties, body = event_manager.channel.basic_get("test__raw_file_received")
-    event_manager.channel.basic_ack(method.delivery_tag)
+    method, properties, body = event_manager.connection.channel().basic_get("test__raw_file_received")
+    event_manager.connection.channel().basic_ack(method.delivery_tag)
 
     assert boefje_meta.id in body.decode()
 
