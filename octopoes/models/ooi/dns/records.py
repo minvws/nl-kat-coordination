@@ -81,7 +81,7 @@ class DNSNSRecord(DNSRecord):
     object_type: Literal["DNSNSRecord"] = "DNSNSRecord"
     dns_record_type: Literal["NS"] = "NS"
 
-    name_server_hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=2, max_inherit_scan_level=0)
+    name_server_hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=1, max_inherit_scan_level=0)
 
     _reverse_relation_names = {
         "hostname": "dns_ns_records",

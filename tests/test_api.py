@@ -82,3 +82,8 @@ class APITest(TestCase):
             },
             response.json(),
         )
+
+    def test_openapi_schema(self) -> None:
+        response = self.client.get("/openapi.json")
+
+        self.assertEqual(200, response.status_code)

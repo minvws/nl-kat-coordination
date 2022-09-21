@@ -1,19 +1,27 @@
 FROM python:3.8
 
+EXPOSE 8000
+
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-WORKDIR /app/octopoes_api
+WORKDIR /app/octopoes
 
 RUN groupadd --gid $USER_GID octopoes
 RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID octopoes
-RUN mkdir /var/log/unit && chown octopoes /var/log/unit
 
-USER octopoes
 ENV PATH=/home/octopoes/.local/bin:${PATH}
 
-COPY requirements.txt .
+# Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
+# dependencies
+ARG ENVIRONMENT
 
-RUN pip install -r requirements.txt
+COPY requirements.txt .
+RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
+    && pip install -r requirements.txt
 
 COPY . .
+
+USER octopoes
+
+CMD ["uvicorn", "octopoes.api.api:app", "--host", "0.0.0.0", "--port", "8000"]
