@@ -28,10 +28,7 @@ services:
       - crux
     ports:
       - "127.0.0.1:8001:80"
-    build:
-      context: nl-kat-octopoes/
-      args:
-        ENVIRONMENT: dev
+    image: "ghcr.io/minvws/nl-kat-octopoes:container-image"
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
     env_file:
       - .env
@@ -41,10 +38,7 @@ services:
     depends_on:
       - crux
       - rabbitmq
-    build:
-      context: nl-kat-octopoes/
-      args:
-        ENVIRONMENT: dev
+    image: "ghcr.io/minvws/nl-kat-octopoes:container-image"
     command: celery -A octopoes.tasks.tasks worker --loglevel=INFO
     env_file:
       - .env
@@ -54,17 +48,12 @@ services:
     depends_on:
       - rabbitmq
       - bytes
-    build:
-      context: .
-      dockerfile: nl-kat-boefjes/Dockerfile.dev
-      args:
-        ENVIRONMENT: dev
+    image: "ghcr.io/minvws/nl-kat-boefjes:container-image"
     volumes:
-      - ./nl-kat-boefjes:/app/boefjes
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 1
-    command: python3 -m boefjes boefje
+    command: python3 -m bin.worker boefje
     env_file:
       - .env
 
@@ -73,20 +62,15 @@ services:
     depends_on:
       - rabbitmq
       - bytes
-    build:
-      context: .
-      dockerfile: nl-kat-boefjes/Dockerfile.dev
-      args:
-        ENVIRONMENT: dev
-    volumes:
-      - ./nl-kat-boefjes:/app/boefjes
+    image: "ghcr.io/minvws/nl-kat-boefjes:container-image"
     deploy:
       replicas: 1
-    command: python3 -m boefjes normalizer
+    command: python3 -m bin.worker normalizer
     env_file:
       - .env
 
   rocky-db:
+    restart: on-failure
     image: postgres:12.8
     ports:
       - "127.0.0.1:5432:5432"
@@ -101,6 +85,7 @@ services:
       - APP_DB_PASSWORD=ROCKY_DB_PASSWORD
 
   bytes-db:
+    restart: on-failure
     image: postgres:12.8
     ports:
       - "127.0.0.1:5433:5432"
@@ -122,21 +107,16 @@ services:
       - rocky-db
       - boefje
       - normalizer
+      - flower
       - katalogus
       - scheduler
-      - keiko
     ports:
-      - "127.0.0.1:8000:80"
-    build:
-      context: .
-      dockerfile: nl-kat-rocky/Dockerfile.dev
-      args:
-        ENVIRONMENT: dev
-    command: python3 manage.py runserver 0.0.0.0:80
-    volumes:
-      - ./nl-kat-rocky:/app/rocky
+      - "127.0.0.1:8000:8000"
+    image: "ghcr.io/minvws/nl-kat-rocky:container-image"
     env_file:
       - .env
+    environment:
+      - DATABASE_MIGRATION=true
 
   bytes:
     restart: on-failure
@@ -144,34 +124,42 @@ services:
       - bytes-db
     ports:
       - "127.0.0.1:8002:8000"
-    build:
-      context: nl-kat-bytes/
-      args:
-        ENVIRONMENT: dev
-    command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
-    volumes:
-      - ./nl-kat-bytes:/app/bytes
+    image: "ghcr.io/minvws/nl-kat-bytes:container-image"
     env_file:
       - .env
+    environment:
+      - BYTES_DATA_DIR=/data
+    volumes:
+      - bytes-data:/data
+
+  flower:
+    restart: on-failure
+    image: mher/flower:latest
+    command: ["celery", "--workdir", "/flower", "--config", "celery_config", "flower", "--port=5555"]
+    env_file:
+      - .env
+    volumes:
+      - ./flower:/flower
+    ports:
+      - "127.0.0.1:5555:5555"
+    depends_on:
+      - rabbitmq
 
   katalogus:
     restart: on-failure
     depends_on:
       - katalogus-db
-    build:
-      context: .
-      dockerfile: nl-kat-boefjes/Dockerfile.dev
-      args:
-        ENVIRONMENT: dev
-    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "boefjes.katalogus.api:app"]
-    volumes:
-      - ./nl-kat-boefjes:/app/boefjes
+    image: "ghcr.io/minvws/nl-kat-boefjes:container-image"
+    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
       - .env
+    environment:
+      - DATABASE_MIGRATION=true
 
   katalogus-db:
+    restart: on-failure
     image: postgres:12.8
     ports:
       - "127.0.0.1:5434:5432"
@@ -187,36 +175,21 @@ services:
 
   scheduler:
     restart: on-failure
-    build:
-      context: nl-kat-mula/
-      args:
-        ENVIRONMENT: dev
+    image: "ghcr.io/minvws/nl-kat-mula:container-image"
     command: python -m scheduler
     ports:
       - "127.0.0.1:8004:8000"
     env_file:
       - .env
-    volumes:
-      - ./nl-kat-mula:/app/scheduler
     depends_on:
       - boefje
       - normalizer
       - octopoes_api
       - katalogus
 
-  keiko:
-    restart: on-failure
-    build:
-      context: nl-kat-keiko/
-    command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000
-    ports:
-      - "127.0.0.1:8005:8000"
-    env_file:
-      - .env
-
 volumes:
   rocky-db-data:
   bytes-db-data:
+  bytes-data:
   katalogus-db-data:
   xtdb-data:
-  scheduler-db-data:

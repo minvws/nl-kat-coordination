@@ -56,6 +56,7 @@ clone:
 	-git clone https://github.com/minvws/nl-kat-bytes.git
 	-git clone https://github.com/minvws/nl-kat-octopoes.git
 	-git clone https://github.com/minvws/nl-kat-mula.git
+	-git clone https://github.com/minvws/nl-kat-keiko.git
 	-git clone https://github.com/minvws/nl-kat-rocky.git
 
 clone-main:
@@ -63,6 +64,7 @@ clone-main:
 	-git clone --branch main https://github.com/minvws/nl-kat-bytes.git
 	-git clone --branch main https://github.com/minvws/nl-kat-octopoes.git
 	-git clone --branch main https://github.com/minvws/nl-kat-mula.git
+	-git clone --branch main https://github.com/minvws/nl-kat-keiko.git
 	-git clone --branch main https://github.com/minvws/nl-kat-rocky.git
 
 pull:
@@ -71,6 +73,7 @@ pull:
 	-git -C nl-kat-bytes pull
 	-git -C nl-kat-octopoes pull
 	-git -C nl-kat-mula pull
+	-git -C nl-kat-keiko pull
 	-git -C nl-kat-rocky pull
 
 env:  # Create .env file from the env-dist with randomly generated credentials from vars annotated by "{%EXAMPLE_VAR}"
@@ -80,6 +83,14 @@ ifeq ($(UNAME), Darwin)  # Different sed on MacOS
 else
 	$(HIDE) grep -o "{%\([_A-Z]*\)}" .env-dist | sort -u | while read v; do sed -i "s/$$v/$$(openssl rand -hex 25)/g" .env; done
 endif
+
+checkout: # Usage: `make checkout branch=develop`
+	-git checkout $(branch)
+	-git -C nl-kat-boefjes checkout $(branch)
+	-git -C nl-kat-bytes checkout $(branch)
+	-git -C nl-kat-octopoes checkout $(branch)
+	-git -C nl-kat-mula checkout $(branch)
+	-git -C nl-kat-rocky checkout $(branch)
 
 pull-reset:
 	-git reset --hard HEAD
@@ -92,6 +103,8 @@ pull-reset:
 	-git -C nl-kat-octopoes pull
 	-git -C nl-kat-mula reset --hard HEAD
 	-git -C nl-kat-mula pull
+	-git -C nl-kat-keiko reset --hard HEAD
+	-git -C nl-kat-keiko pull
 	-git -C nl-kat-rocky reset --hard HEAD
 	-git -C nl-kat-rocky pull
 
@@ -101,6 +114,7 @@ ifeq ($(UNAME), Darwin)
 else
 	docker-compose build --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
 endif
-	docker-compose run --rm rocky make build
+	docker-compose run --rm rocky make build-rocky
+	make -C nl-kat-rocky build-rocky-frontend
 	make -C nl-kat-boefjes build
 	make -C nl-kat-bytes build
