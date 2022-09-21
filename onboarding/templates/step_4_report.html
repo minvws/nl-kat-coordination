@@ -41,5 +41,5 @@
 
 {% block html_at_end_body %}
   {{ block.super }}
-  <script src="{% static '/js/enableButtonTimeout.js' %}"></script>
+  <script src="{% static '/js/enableButtonTimeout.js' %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

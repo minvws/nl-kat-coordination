@@ -43,7 +43,8 @@ class FailureModeForm(forms.ModelForm):
                 "From 1 to 5, how often does this failure mode occurs. 1: Almost unthinkable and 5: occurs daily."
             ),
             "detectability_level": _(
-                "Is this failure mode easy detectable? Give it a score from 1 to 5. 1: always detectable and 5: almost undetectable."
+                "Is this failure mode easy detectable? Give it a score from 1 to 5. 1: always detectable "
+                "and 5: almost undetectable."
             ),
         }
 

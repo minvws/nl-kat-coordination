@@ -3,10 +3,9 @@ from enum import Enum
 from logging import getLogger
 from typing import Any, Dict, List, Type, Optional
 from uuid import uuid4
+from django.views.generic.edit import FormView
 from django.contrib import messages
 from django.http import Http404, FileResponse, QueryDict
-from requests import HTTPError
-from two_factor.views.utils import class_view_decorator
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -16,26 +15,28 @@ from django_otp.decorators import otp_required
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference, OOI, DeclaredScanProfile
 from octopoes.models.types import type_by_name
-from rocky.katalogus import (
-    Boefje,
+from requests import HTTPError
+from two_factor.views.utils import class_view_decorator
+
+from katalogus.client import (
     KATalogusBreadcrumbsMixin,
     get_katalogus,
 )
+
+from rocky.scheduler import QueuePrioritizedItem, BoefjeTask, Boefje, client
+from rocky.views import OctopoesMixin
+from rocky.views.ooi_view import BaseOOIFormView
 from tools.forms import SelectOOIForm, SelectOOIFilterForm
 from tools.models import Organization
 from tools.view_helpers import Breadcrumb, PageActionMixin, existing_ooi_type
-from rocky.views import OctopoesMixin
-from rocky.views.ooi_view import BaseOOIFormView
-from rocky.katalogus import Boefje as KatalogusBoefje
-from rocky.scheduler import SchedulerClient, QueuePrioritizedItem, BoefjeTask, Boefje
-from rocky.settings import SCHEDULER_API
 
 logger = getLogger(__name__)
 
 
 class BoefjeMixin(OctopoesMixin):
     """
-    When a user wants to scan one or multiple OOI's, this mixin provides the methods to construct the boefjes for the OOI's and run them.
+    When a user wants to scan one or multiple OOI's,
+    this mixin provides the methods to construct the boefjes for the OOI's and run them.
     """
 
     def setup(self, request, *args, **kwargs):
@@ -43,11 +44,10 @@ class BoefjeMixin(OctopoesMixin):
         self.api_connector = self.get_api_connector()
 
     def run_boefje(
-        self, katalogus_boefje: KatalogusBoefje, ooi: OOI, organization: Organization
+        self, katalogus_boefje: Boefje, ooi: OOI, organization: Organization
     ) -> None:
 
         boefje_queue_name = f"boefje-{organization.code}"
-        client = SchedulerClient(SCHEDULER_API)
 
         boefje = Boefje(
             id=katalogus_boefje.id,
@@ -148,7 +148,9 @@ class BoefjeMixin(OctopoesMixin):
             return
 
         success_message = _(
-            "Your scan is running successfully in the background. \n Results will be added to the object list when they are in. It may take some time, a refresh of the page may be needed to show the results."
+            "Your scan is running successfully in the background. \n "
+            "Results will be added to the object list when they are in. "
+            "It may take some time, a refresh of the page may be needed to show the results."
         )
         messages.add_message(self.request, messages.SUCCESS, success_message)
         return

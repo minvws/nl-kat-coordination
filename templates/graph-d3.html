@@ -31,8 +31,8 @@
   {{ block.super }}
   {{ ooi_types|json_script:"ooi-types" }}
   {{ tree|json_script:"tree-data" }}
-  <script src="{% static '/js/stringHelpers.js' %}"></script>
-  <script src="{% static '/js/checkboxToggler.js' %}"></script>
-  <script src="{% static '/dist/graph.js' %}"></script>
+  <script src="{% static '/js/stringHelpers.js' %}" nonce="{{ request.csp_nonce }}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
+  <script src="{% static '/dist/graph.js' %}" nonce="{{ request.csp_nonce }}"></script>
   <link href="{% static '/dist/graph.css' %}" rel="stylesheet">
 {% endblock %}

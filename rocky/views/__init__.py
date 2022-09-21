@@ -25,7 +25,7 @@ from .scans import *
 from .signal import *
 from .scan_profile import *
 from .switch_client import *
-from .upload import *
+from .upload_csv import *
 from .health import *
 from .tasks import *
 from .privacy_statement import *

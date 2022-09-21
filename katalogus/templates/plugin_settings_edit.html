@@ -1,0 +1,25 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{{ name }}{% translate ' setting' %}</h1>
+        <p class="emphasized">
+          {% translate 'You are about to change the value for the setting with name: ' %}{{ name }}
+        </p>
+        <div class="form-view">
+          <form novalidate method="post" class="horizontal-view help">
+            {% csrf_token %}
+            {% translate 'Update setting' as fieldset_legend %}
+            {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+            <button class="cta" type="submit">{% translate 'Update setting' %}</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock %}

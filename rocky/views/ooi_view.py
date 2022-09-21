@@ -25,7 +25,7 @@ from octopoes.models.types import get_relations, get_collapsed_types, type_by_na
 from pydantic import ValidationError, BaseModel
 from two_factor.views.utils import class_view_decorator
 from rocky.bytes_client import get_bytes_client
-from rocky.katalogus import Boefje, get_katalogus
+from katalogus.client import Boefje, get_katalogus
 from tools.forms import BaseRockyForm, ObservedAtForm, DEPTH_MAX, DEPTH_DEFAULT
 from tools.models import SCAN_LEVEL, Organization
 from tools.ooi_form import OOIForm

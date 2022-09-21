@@ -28,7 +28,7 @@ from onboarding.view_helpers import (
     KatIntroductionStepsMixin,
     KatIntroductionAdminStepsMixin,
 )
-from rocky.katalogus import get_katalogus
+from katalogus.client import get_katalogus
 from rocky.views import BaseOOIFormView
 from rocky.views.ooi_view import SingleOOITreeMixin, BaseOOIDetailView
 from tools.forms import SelectBoefjeForm
@@ -45,6 +45,7 @@ from tools.user_helpers import (
 )
 from onboarding.mixins import RedTeamUserRequiredMixin, SuperOrAdminUserRequiredMixin
 from tools.view_helpers import get_ooi_url, BreadcrumbsMixin, Breadcrumb
+from rocky.views.ooi_report import Report, DNSReport, build_findings_list_from_store
 
 User = get_user_model()
 
@@ -53,9 +54,6 @@ class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
     breadcrumbs = [
         {"url": reverse_lazy("step_introduction"), "text": _("KAT introduction")},
     ]
-
-
-from rocky.views.ooi_report import Report, DNSReport, build_findings_list_from_store
 
 
 def index(request):

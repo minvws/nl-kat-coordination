@@ -66,8 +66,10 @@ class PasswordResetView(auth_views.PasswordResetView):
         messages.add_message(self.request, messages.ERROR, error_message)
 
     def add_success_notification(self):
-        success_message = """We've emailed you instructions for setting your password. 
-        You should receive the email shortly!"""
+        success_message = (
+            "We've emailed you instructions for setting your password. "
+            "You should receive the email shortly!"
+        )
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 

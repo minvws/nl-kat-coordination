@@ -1,22 +1,24 @@
 {% load i18n %}
-{% with id=widget.attrs.id %}
-  <div{% if id %} id="{{ id }}"{% endif %}{% if widget.attrs.class %} class="checkbox-group {{ widget.attrs.class }}"{% endif %}>
-  {% for group, options, index in widget.optgroups %}
-    {% if group %}
-      {{ group }}<div{% if id %} id="{{ id }}_{{ index }}"{% endif %}>
-    {% endif %}
-    {% for option in options %}
-      <div>
-        {% include option.template_name with widget=option %}
-      </div>
-    {% endfor %}
-    {% if group %}</div>{% endif %}
-  {% endfor %}
 
-  {% if widget.optgroups and toggle_all_button %}
-  <div class="horizontal-view">
-    <input type="button" class="ghost" onClick="toggleCheckboxes(event, '{{ widget.name }}')" value="{% translate "Toggle all" %}">
-  </div>
-  {% endif %}
-  </div>
-{% endwith %}
+{% with id=widget.attrs.id %}
+  <div {% if id %} id="{{ id }}"{% endif %}
+       {% if widget.attrs.class %} class="checkbox-group {{ widget.attrs.class }}"{% endif %}>
+    {% for group, options, index in widget.optgroups %}
+      {% if group %}
+        {{ group }}
+        <div {% if id %} id="{{ id }}_{{ index }}"{% endif %}>
+        {% endif %}
+        {% for option in options %}
+          <div>{% include option.template_name with widget=option %}</div>
+        {% endfor %}
+        {% if group %}</div>{% endif %}
+      {% endfor %}
+      {% if widget.optgroups and toggle_all_button %}
+        <div class="horizontal-view">
+          <input type="button"
+                 class="toggle-all-ooi-types ghost"
+                 value="{% translate "Toggle all" %}"/>
+        </div>
+      {% endif %}
+    </div>
+  {% endwith %}

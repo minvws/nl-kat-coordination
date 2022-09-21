@@ -1,35 +1,33 @@
 {% load i18n %}
 
 <form action="{% url request.resolver_match.url_name %}"
-  method="get"
-  class="help">
-
-  {% if ooi_id %}
-    <input type="hidden" name="ooi_id" value="{{ ooi_id }}">
-  {% endif %}
-
+      method="get"
+      class="help">
+  {% if ooi_id %}<input type="hidden" name="ooi_id" value="{{ ooi_id }}"/>{% endif %}
   {% include "partials/form/field_hidden_from_list.html" with list=mandatory_fields form=observed_at_form %}
-
   {% include 'partials/form/fieldset.html' with fields=observed_at_form %}
-
   {% if object_type_filters %}
-      <fieldset>
-        <legend>{% translate "Shown types" %}</legend>
-
-        <div class="column-4">
-          {% for checkbox in object_type_filters %}
-            <div class="horizontal-view">
-              <input type="checkbox" id="type-{{ checkbox.value }}" name="ooi_type" value="{{ checkbox.value }}" {% if checkbox.checked %} checked{% endif %}>
-              <label for="type-{{ checkbox.value }}">{{ checkbox.label }}</label>
-            </div>
-          {% endfor %}
-        </div>
-
-        {% if object_type_filters|length > 4 %}
-          <button type="button" class="ghost" onClick="toggleCheckboxes(event, 'ooi_type')">{% translate "Toggle all" %}</button>
-        {% endif %}
-      </fieldset>
+    <fieldset>
+      <legend>
+        {% translate "Shown types" %}
+      </legend>
+      <div class="column-4">
+        {% for checkbox in object_type_filters %}
+          <div class="horizontal-view">
+            <input type="checkbox"
+                   id="type-{{ checkbox.value }}"
+                   name="ooi_type"
+                   value="{{ checkbox.value }}"
+                   {% if checkbox.checked %} checked{% endif %}/>
+            <label for="type-{{ checkbox.value }}">{{ checkbox.label }}</label>
+          </div>
+        {% endfor %}
+      </div>
+      {% if object_type_filters|length > 4 %}
+        <button type="button" class="toggle-all-ooi-types ghost">{% translate "Toggle all" %}</button>
+      {% endif %}
+    </fieldset>
   {% endif %}
-
-  <input type="submit" value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}">
+  <input type="submit"
+         value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}"/>
 </form>

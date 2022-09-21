@@ -79,7 +79,8 @@ class Migration(migrations.Migration):
                             ),
                             (
                                 5,
-                                "5. Almost Undetectable. Faillure mode detection is very difficult or nearly impossible.",
+                                "5. Almost Undetectable. "
+                                "Failure mode detection is very difficult or nearly impossible.",
                             ),
                         ]
                     ),

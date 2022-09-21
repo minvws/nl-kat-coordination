@@ -1,29 +1,31 @@
 <h1>OUT OF ORDER</h1>
-
 {% load i18n %}
 {% load ooi_extra %}
 
 {% if object_type_filters %}
-	<form action="{% if request.resolver_match.url_name == 'ooi_tree' %}{% ooi_url 'ooi_tree' ooi_id %}{% else %}{% url request.resolver_match.url_name %}{% endif %}" method="get">
-		{% with 'ooi_type' as ignore_params %}
-			{% include 'partials/form/field_hidden_from_list.html' with list=mandatory_fields ignore_params=ignore_params.split %}
-		{% endwith %}
-
-		<fieldset class="column-4">
-			<legend>{% translate 'Shown types' %}</legend>
-
-	    {% for checkbox in object_type_filters %}
-          <div class="horizontal-view">
-            <input type="checkbox" id="type-{{ checkbox.value }}" name="ooi_type" value="{{ checkbox.value }}" {% if checkbox.checked %} checked{% endif %}>
-            <label for="type-{{ checkbox.value }}">{{ checkbox.label }}</label>
-          </div>
+  <form action="{% if request.resolver_match.url_name == 'ooi_tree' %}{% ooi_url 'ooi_tree' ooi_id %}{% else %}{% url request.resolver_match.url_name %}{% endif %}"
+        method="get">
+    {% with 'ooi_type' as ignore_params %}
+      {% include 'partials/form/field_hidden_from_list.html' with list=mandatory_fields ignore_params=ignore_params.split %}
+    {% endwith %}
+    <fieldset class="column-4">
+      <legend>
+        {% translate 'Shown types' %}
+      </legend>
+      {% for checkbox in object_type_filters %}
+        <div class="horizontal-view">
+          <input type="checkbox"
+                 id="type-{{ checkbox.value }}"
+                 name="ooi_type"
+                 value="{{ checkbox.value }}"
+                 {% if checkbox.checked %} checked{% endif %}/>
+          <label for="type-{{ checkbox.value }}">{{ checkbox.label }}</label>
+        </div>
       {% endfor %}
-		</fieldset>
-
-		{% if object_type_filters|length > 4 %}
-			<button type="button" class="ghost" onClick="toggleCheckboxes(event, 'ooi_type')">{% translate 'Toggle all' %}</button>
-		{% endif %}
-
-		<input type="submit" value="{% translate 'Update List' %}">
-	</form>
+    </fieldset>
+    {% if object_type_filters|length > 4 %}
+      <button type="button" class="toggle-all-ooi-types ghost">{% translate 'Toggle all' %}</button>
+    {% endif %}
+    <input type="submit" value="{% translate 'Update List' %}"/>
+  </form>
 {% endif %}

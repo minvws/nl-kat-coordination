@@ -1,0 +1,24 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Delete setting' %} {{ name }}</h1>
+        <p class="emphasized">
+          {% blocktranslate %}Are you sure you want to delete setting {{ name }} for the plugin {{ plugin_name }}?{% endblocktranslate %}
+        </p>
+        <form class="inline" method="post">
+          {% csrf_token %}
+          <div class="horizontal-view">
+            <button type="submit">{% translate 'Delete' %}</button>
+            <a href="{{ cancel_url }}" class="button ghost">{% translate 'Cancel' %}</a>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

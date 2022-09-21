@@ -8,14 +8,14 @@ from django.urls import reverse
 from requests import HTTPError
 
 from rocky.scheduler import PaginatedTasksResponse
-from rocky.views import TaskListView
+from rocky.views import BoefjesTaskListView, TASK_LIMIT
 from tools.models import Organization
 
 UUIDS = [uuid.uuid4() for _ in range(10)]
 User = get_user_model()
 
 
-@patch("rocky.views.tasks.scheduler_client")
+@patch("rocky.views.tasks.client")
 class TaskListTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -24,16 +24,16 @@ class TaskListTestCase(TestCase):
             email="admin@openkat.nl", password="TestTest123!!"
         )
         cls.organization = Organization.objects.create(name="Development", code="_dev")
-        cls.task_list = TaskListView.as_view()
+        cls.task_list = BoefjesTaskListView.as_view()
 
-    def test_tasks_view(self, mock_scheduler_client: MagicMock):
+    def test_boefjes_tasks(self, mock_scheduler_client: MagicMock):
         mock_scheduler_client.list_tasks.return_value = (
             PaginatedTasksResponse.parse_obj(
                 {"count": 0, "next": None, "previous": None, "results": []}
             )
         )
 
-        request = self.factory.get(reverse("task_list"))
+        request = self.factory.get(reverse("boefjes_task_list"))
         request.user = self.user
         request.user.is_verified = lambda: True
         request.active_organization = self.organization
@@ -41,7 +41,7 @@ class TaskListTestCase(TestCase):
         _ = self.task_list(request)
 
         mock_scheduler_client.list_tasks.assert_has_calls(
-            [call("boefje-_dev"), call("normalizer-_dev")]
+            [call("boefje-_dev", limit=TASK_LIMIT)]
         )
 
     def test_tasks_view_simple(self, mock_scheduler_client: MagicMock):
@@ -110,10 +110,10 @@ class TaskListTestCase(TestCase):
         self.assertContains(response, "Hostname|internet|mispo.es.")
 
         mock_scheduler_client.list_tasks.assert_has_calls(
-            [call("boefje-_dev"), call("normalizer-_dev")]
+            [call("boefje-_dev", limit=TASK_LIMIT)]
         )
 
-    def test_tasks_view_no_organization(self, mock_scheduler_client: MagicMock):
+    def test_tasks_view_no_organization(self, _: MagicMock):
         request = self.factory.get(reverse("task_list"))
         request.user = self.user
         request.user.is_verified = lambda: True

@@ -100,9 +100,6 @@ class FindingTypeAddForm(BaseRockyForm):
         return data
 
     def check_finding_type_existence(self, id):
-        finding_type = KATFindingType(
-            id=id,
-        )
         _, created = OOIInformation.objects.get_or_create(id=f"KATFindingType|{id}")
 
         if not created:

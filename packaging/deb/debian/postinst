@@ -17,6 +17,12 @@ python3 -m venv ${APP_DIR}/venv
 echo "Setting up rocky environment."
 ${APP_DIR}/venv/bin/pip install --upgrade pip > /dev/null
 
+# TODO: remove when octopoes is publicly available
+if [ -d ${APP_DIR}/octopoes ]; then
+    sed -i '/^.*octopoes.*$/d' ${APP_DIR}/app/requirements.txt
+    ${APP_DIR}/venv/bin/pip install ${APP_DIR}/octopoes > /dev/null
+fi
+
 ${APP_DIR}/venv/bin/pip install --requirement ${APP_DIR}/app/requirements.txt > /dev/null
 ${APP_DIR}/venv/bin/pip install gunicorn uvicorn > /dev/null
 
@@ -28,7 +34,9 @@ SECRET_KEY="foo" ${APP_DIR}/venv/bin/python3 ${APP_DIR}/app/manage.py compilemes
 key=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 64)
 sed -i "s/SECRET_KEY= *\$/SECRET_KEY=${key}/" /etc/kat/rocky.conf
 
-ln -s /etc/kat/rocky.conf /usr/share/kat-rocky/app/.env || true
+if [ ! -f /usr/share/kat-rocky/app/.env ]; then
+    ln -s /etc/kat/rocky.conf /usr/share/kat-rocky/app/.env
+fi
 
 if [ ! -f /etc/ssl/certs/rocky.local.crt ]; then
   openssl req -x509 -newkey rsa:4096 \
@@ -38,14 +46,16 @@ if [ ! -f /etc/ssl/certs/rocky.local.crt ]; then
 fi
 
 db_get kat-rocky/enable-nginx-conf
-if [ "$RET" = "true" -a -d /etc/nginx/sites-enabled ]; then
+if [ "$RET" = "true" -a -d /etc/nginx/sites-enabled ] && [ ! -f /etc/nginx/sites-enabled/kat-rocky ]; then
     echo "Enabling nginx config for rocky"
-    ln -s /etc/nginx/sites-available/kat-rocky /etc/nginx/sites-enabled/kat-rocky || true
-    systemctl enable --now kat-rocky.service
+    ln -s /etc/nginx/sites-available/kat-rocky /etc/nginx/sites-enabled/kat-rocky
     systemctl reload nginx
 fi
 
-if [ ! -f /usr/share/kat-rocky/.db_initialized ]; then
+db_out=$(sudo -u postgres psql --tuples-only -P format=unaligned -c "SELECT datname FROM pg_database WHERE datname='rocky_db';")
+if [ -n "$db_out" -a -z "$(grep ROCKY_DB_PASSWORD /etc/kat/rocky.conf | awk -F'=' '{ print $2}')" ]; then
+    echo '\n\n\tRocky db exists, but password unknown. Please configure ROCKY_DB_PASSWORD in /etc/kat/rocky.conf and then run `rocky-cli migrate`.\n\n'
+elif [ ! -f /usr/share/kat-rocky/.db_initialized ]; then
     db_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
     sudo -u postgres psql -c 'CREATE DATABASE rocky_db;' > /dev/null
     sudo -u postgres psql -c "CREATE USER rocky WITH ENCRYPTED PASSWORD '${db_pass}';" > /dev/null
@@ -59,10 +69,11 @@ if [ ! -f /usr/share/kat-rocky/.db_initialized ]; then
 
     touch /usr/share/kat-rocky/.db_initialized
 else
+    /usr/bin/rocky-cli makemigrations
     /usr/bin/rocky-cli migrate
 fi
 
-configured_queue=$(cat /etc/kat/*.conf | grep -oP 'QUEUE_URI=\K.+' | head -n 1)
+configured_queue=$(cat /etc/kat/*.conf | grep -oP '(QUEUE_URI|SCHEDULER_RABBITMQ_DSN)=\K.+' | head -n 1)
 
 if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
     rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
@@ -74,17 +85,7 @@ elif [ ! -z "$configured_queue" ]; then
     sed -i "s|QUEUE_URI= *\$|QUEUE_URI=${configured_queue}|" /etc/kat/*.conf
 fi
 
-systemctl enable --now kat-flower.service
-
-if [ ! -f /etc/systemd/system/nginx.service.d/with-kat-group.conf ]; then
-    mkdir /etc/systemd/system/nginx.service.d/
-    cat > /etc/systemd/system/nginx.service.d/with-kat-group.conf << EOF
-[Service]
-SupplementaryGroups=kat
-EOF
-
-    systemctl daemon-reload
-    systemctl restart nginx
-fi
+systemctl enable --now kat-rocky.service
+systemctl daemon-reload
 
 db_stop || true

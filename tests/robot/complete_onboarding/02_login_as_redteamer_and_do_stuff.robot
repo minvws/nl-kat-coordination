@@ -6,7 +6,7 @@ Suite Setup     Browser Setup
 
 *** Test Cases ***
 I want to login as the redteam user for the first time
-    Login As User For The First Time    redteamer@localhost    P@ssw00rdRedteam!
+    Login As User For The First Time    redteamer@localhost    P@SSw00rdRedteam!123456789
 
 I want generate my first report
     Generate First DNS Report
@@ -32,4 +32,4 @@ I want to logout
     Logout Normally
 
 I want to login again
-    Login As User Normally    redteamer@localhost    P@ssw00rdRedteam!
+    Login As User Normally    redteamer@localhost    P@SSw00rdRedteam!123456789

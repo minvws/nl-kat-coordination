@@ -49,7 +49,8 @@ class GroupAddForm(forms.Form):
 class IndemnificationAddForm(BaseRockyForm):
     may_scan = forms.CharField(
         label=_(
-            "I declare that KAT may scan the assets of my organization and I am aware of the risk the extra load on my systems will bring."
+            "I declare that KAT may scan the assets of my organization "
+            "and I am aware of the risk the extra load on my systems will bring."
         ),
         widget=forms.CheckboxInput(),
     )

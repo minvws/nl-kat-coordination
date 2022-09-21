@@ -19,7 +19,7 @@ server {
     add_header Content-Security-Policy "default-src 'self'; object-src 'none'; child-src 'self'; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content";
     add_header X-Permitted-Cross-Domain-Policies none;
     add_header Referrer-Policy no-referrer;
-    add_header Clear-Site-Data '"cache","cookies","storage"';
+    add_header Clear-Site-Data '"cache","storage"';
     add_header Cross-Origin-Embedder-Policy require-corp;
     add_header Cross-Origin-Opener-Policy same-origin;
     add_header Cross-Origin-Resource-Policy same-origin;

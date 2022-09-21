@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+if [ "$1" = "remove" -o "$1" = "purge" ] && [ -d /usr/share/kat-rocky ]; then
+    rm -r /usr/share/kat-rocky
+    # TODO: find way to remove kat user if no other kat components are installed
+    # gpasswd --delete www-data kat
+    # deluser kat || true
+    # delgroup kat || true
+fi
+
 if [ "$1" = "purge" ]; then
     if [ -e /usr/share/debconf/confmodule ]; then
         . /usr/share/debconf/confmodule

@@ -137,7 +137,8 @@ class SwitchToCustomUserModel(Operation):
                 "is_active",
                 models.BooleanField(
                     default=True,
-                    help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+                    help_text="Designates whether this user should be treated as active. "
+                    "Unselect this instead of deleting accounts.",
                     verbose_name="active",
                 ),
             ),
@@ -151,7 +152,8 @@ class SwitchToCustomUserModel(Operation):
                 "groups",
                 models.ManyToManyField(
                     blank=True,
-                    help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+                    help_text="The groups this user belongs to. "
+                    "A user will get all permissions granted to each of their groups.",
                     related_name="user_set",
                     related_query_name="user",
                     to="auth.Group",

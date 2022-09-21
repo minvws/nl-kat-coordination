@@ -26,8 +26,22 @@
         {% endif %}
       </div>
       <div>
-        {% if boefjes %}
           <h2>{% translate 'Scan' %} {{ ooi.human_readable }} {% translate 'using boefjes' %}</h2>
+
+
+          {% if enabled_boefjes_available %}
+              <div class="horizontal-view toolbar">
+                <div>
+                  <form method="get" class="inline">
+                    <input type="hidden" name="ooi_id" value="{{ ooi }}">
+                    {% include 'partials/form/form_errors.html' with form=possible_boefjes_filter_form %}
+                    {% for field in possible_boefjes_filter_form %}{{ field }}{% endfor %}
+                  </form>
+                </div>
+              </div>
+          {% endif %}
+
+      {% if boefjes %}
           <div class="horizontal-scroll">
             <table>
               <thead>
@@ -54,7 +68,20 @@
               </tbody>
             </table>
           </div>
-        {% endif %}
+      {% else %}
+          {% if not enabled_boefjes_available %}
+              <p>
+                {% translate 'There are no boefjes enabled to scan an OOI of type' %} "{{ ooi.get_ooi_type }}". {% translate 'See' %} <a href="{% url 'katalogus' %}">KAT-alogus</a> {% translate 'to find and enable boefjes that can scan within the current level.' %}
+              </p>
+          {% else %}
+              <p>
+                {% translate 'There are no boefjes available within the current clearance level of' %} "{{ ooi.human_readable }}". {% translate 'See' %} <a href="{% url 'katalogus' %}">KAT-alogus</a> {% translate 'to find and enable boefjes that can scan within the current level.' %}
+              </p>
+              <p>
+                {% translate 'Or if you have the authorization, upgrade the clearance level of' %} "{{ ooi.human_readable }}".
+              </p>
+          {% endif %}
+      {% endif %}
       </div>
     </section>
   </main>

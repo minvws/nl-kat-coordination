@@ -1,14 +1,20 @@
 {% load i18n %}
+{% load static %}
 
 <section class="filter">
   <div>
-    <p>{% block title %}{% endblock %}</p>
+    <p>
+      {% block title %}{% endblock %}
 
-    <button
-      aria-expanded="false"
-      data-hide-filters-label="{% block hide_text %}{% translate 'Hide filters' %}{% endblock %}"
-    >{% block show_text %}{% translate 'Show filters' %}{% endblock %}</button>
+    </p>
+    <button aria-expanded="false" data-hide-filters-label="{% block hide_text %}{% translate 'Hide filters' %}{% endblock %}
+       ">
+      {% block show_text %}
+        {% translate 'Show filters' %}
+      {% endblock %}
+
+    </button>
   </div>
-
   {% block filter_form %}{% endblock %}
+
 </section>
