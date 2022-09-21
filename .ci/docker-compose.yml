@@ -4,8 +4,10 @@ services:
   katalogus_integration:
     build:
       context: ..
-      dockerfile: nl-kat-boefjes/Dockerfile
-    command: sh -c 'python -m pytest -vv katalogus/tests/integration'
+      dockerfile: nl-kat-boefjes/Dockerfile.dev
+      args:
+        - ENVIRONMENT=dev
+    command: sh -c 'python -m pytest -vv boefjes/katalogus/tests/integration'
     depends_on:
       - ci_katalogus
       - ci_katalogus-db
@@ -17,8 +19,10 @@ services:
   ci_katalogus:
     build:
       context: ..
-      dockerfile: nl-kat-boefjes/Dockerfile
-    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
+      dockerfile: nl-kat-boefjes/Dockerfile.dev
+      args:
+        - ENVIRONMENT=dev
+    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "boefjes.katalogus.api:app"]
     depends_on:
       - ci_katalogus-db
     env_file:
