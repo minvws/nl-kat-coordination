@@ -76,7 +76,7 @@ ifdef OCTOPOES_DIR
 	docker run \
 	--env PKG_NAME=kat-boefjes \
 	--env BUILD_DIR=./build \
-	--env REPOSITORY=minvws/nl-rt-tim-abang-boefjes \
+	--env REPOSITORY=minvws/nl-kat-boefjes \
 	--env RELEASE_VERSION=${RELEASE_VERSION} \
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--env OCTOPOES_DIR=/octopoes \
@@ -89,7 +89,7 @@ else
 	docker run \
 	--env PKG_NAME=kat-boefjes \
 	--env BUILD_DIR=./build \
-	--env REPOSITORY=minvws/nl-rt-tim-abang-boefjes \
+	--env REPOSITORY=minvws/nl-kat-boefjes \
 	--env RELEASE_VERSION=${RELEASE_VERSION} \
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
