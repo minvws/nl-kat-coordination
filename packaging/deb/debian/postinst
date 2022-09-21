@@ -12,11 +12,9 @@ echo "Setting up mula environment."
 ${APP_DIR}/venv/bin/pip install --upgrade pip > /dev/null
 ${APP_DIR}/venv/bin/pip install --requirement ${APP_DIR}/app/requirements.txt > /dev/null
 
-if [ ! -f /etc/kat/logging.mula.json ]; then
-    cp /usr/share/kat-mula/app/logging.prod.json /etc/kat/logging.mula.json
+if [ ! -e /usr/share/kat-mula/app/.env ]; then
+    ln -s /etc/kat/mula.conf /usr/share/kat-mula/app/.env
 fi
-
-ln -s /etc/kat/mula.conf /usr/share/kat-mula/app/.env
 
 chown kat:kat /etc/kat/mula.conf
 chown kat:kat /etc/kat/logging.mula.json
@@ -35,9 +33,11 @@ if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
     rabbitmqctl add_vhost kat
     rabbitmqctl add_user kat ${rabbitmq_pass}
     rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
-    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
+    sed -i "s|SCHEDULER_RABBITMQ_DSN= *\$|SCHEDULER_RABBITMQ_DSN=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/mula.conf
+    sed -i "s|SCHEDULER_DSP_BROKER_URL= *\$|SCHEDULER_DSP_BROKER_URL=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/mula.conf
 elif [ ! -z "$configured_queue" ]; then
-    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=${configured_queue}|" /etc/kat/*.conf
+    sed -i "s|SCHEDULER_RABBITMQ_DSN= *\$|SCHEDULER_RABBITMQ_DSN=${configured_queue}|" /etc/kat/mula.conf
+    sed -i "s|SCHEDULER_DSP_BROKER_URL= *\$|SCHEDULER_DSP_BROKER_URL=${configured_queue}|" /etc/kat/mula.conf
 fi
 
 systemctl enable --now kat-mula.service

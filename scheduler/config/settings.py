@@ -37,9 +37,5 @@ class Settings(BaseSettings):
     pq_populate_interval: int = Field(60, env="SCHEDULER_PQ_INTERVAL")
     pq_populate_grace_period: int = Field(86400, env="SCHEDULER_PQ_GRACE")
 
-    # Dispatcher settings
-    dsp_interval: int = Field(5, env="SCHEDULER_DSP_INTERVAL")
-    dsp_broker_url: str = Field(..., env="SCHEDULER_DSP_BROKER_URL")
-
     # Database settings
     database_dsn: str = Field(..., env="SCHEDULER_DB_DSN")

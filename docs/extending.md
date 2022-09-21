@@ -38,17 +38,3 @@ priority the task should have on the priority queue.
 Additionally, you'll have access to the `context.AppContext` object, which
 allows you to reference additional information in order to make your own
 ranking algorithm.
-
-## Dispatching
-
-Sub-classing the `dispatchers.Dispatcher` class allows us to manage when to pop
-off tasks from the queue and dispatch them to be handled by the workers. As
-with the schedulers and rankers, you can inspect the default implementations
-in the [`dispatchers/`](dispatchers/) folder in either the `boefje.py` or
-`normalizer.py` file.
-
-Take note here of the `get_threshold` method, this allows us to dispatch tasks
-of a certain priority (called here a threshold), to the workers. By default
-this is set to `float("inf")` meaning all the items on the queue are allowed to
-be dispatched.
-

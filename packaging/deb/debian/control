@@ -6,5 +6,5 @@ Package: kat-mula
 Section: python
 Priority: optional
 Architecture: all
-Pre-Depends: python3, python3-venv, ${misc:Depends}
+Pre-Depends: python3, python3-venv, python3-dev, g++, ${misc:Depends}
 Description: mula

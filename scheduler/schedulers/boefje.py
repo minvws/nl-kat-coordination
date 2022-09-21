@@ -1,14 +1,14 @@
 import time
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import List
+from typing import List, Optional
 
 import mmh3
 import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, TaskStatus
+from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, TaskStatus
 
 from .scheduler import Scheduler
 
@@ -40,7 +40,6 @@ class BoefjeScheduler(Scheduler):
 
         self.organisation: Organisation = organisation
 
-    # TODO: Pylint R0912 too-many-branches
     def populate_queue(self) -> None:
         """Populate the PriorityQueue.
 
@@ -183,8 +182,6 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-    # TODO: Pylint R0912 too-many-branches
-    # TODO: Pylint R0915 too-many-statements
     def create_tasks_for_oois(self, oois: List[OOI]) -> List[queues.PrioritizedItem]:
         """For every provided ooi we will create available and enabled boefje
         tasks.
@@ -193,226 +190,283 @@ class BoefjeScheduler(Scheduler):
             oois: A list of OOIs.
 
         Returns:
-            A list of BoefjeTasks.
+            A list of BoefjeTask of type PrioritizedItem.
         """
-        p_items: List[queues.PrioritizedItem] = []
+        tasks: List[queues.PrioritizedItem] = []
         for ooi in oois:
-            try:
-                boefjes = self.ctx.services.katalogus.get_boefjes_by_type_and_org_id(
-                    ooi.object_type,
-                    self.organisation.id,
-                )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
-                self.logger.warning(
-                    "Could not get boefjes for object_type: %s [object_type=%s, org_id=%s, scheduler_id=%s]",
-                    ooi.object_type,
-                    ooi.object_type,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                continue
+            tasks_for_ooi = self.create_tasks_for_ooi(ooi)
+            tasks.extend(tasks_for_ooi)
 
-            if boefjes is None:
-                self.logger.debug(
-                    "No boefjes found for type: %s [ooi=%s, org_id=%s, scheduler_id=%s]",
-                    ooi.object_type,
-                    ooi,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                continue
+        return tasks
 
+    def create_tasks_for_ooi(self, ooi: OOI) -> List[queues.PrioritizedItem]:
+        """For an ooi we will create available and enabled boefje tasks.
+
+        Args:
+            ooi: The ooi to create tasks for.
+
+        Returns:
+            A list of BoefjeTask of type PrioritizedItem.
+        """
+        boefjes: List[Plugin] = self.get_boefjes_for_ooi(ooi)
+        if boefjes is None or len(boefjes) == 0:
             self.logger.debug(
-                "Found %s boefjes for ooi: %s [ooi=%s, boefjes=%s, org_id=%s, scheduler_id=%s]",
-                len(boefjes),
-                ooi,
-                ooi,
-                [boefje.id for boefje in boefjes],
+                "No boefjes for ooi: %s [org_id=%s, scheduler_id=%s]",
+                ooi.name,
                 self.organisation.id,
                 self.scheduler_id,
             )
+            return []
 
-            for boefje in boefjes:
-                if boefje.enabled is False:
-                    self.logger.debug(
-                        "Boefje: %s is disabled [org_id=%s, boefje_id=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.name,
-                        self.organisation.id,
-                        boefje.id,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        p_items = self.create_p_items_for_boefjes(boefjes, ooi)
+        return p_items
 
-                task = BoefjeTask(
-                    boefje=Boefje.parse_obj(boefje),
-                    input_ooi=ooi.primary_key,
-                    organization=self.organisation.id,
-                )
+    def get_boefjes_for_ooi(self, ooi) -> List[Plugin]:
+        """Get available all boefjes (enabled and disabled) for an ooi.
 
-                if ooi.scan_profile is None:
-                    self.logger.debug(
-                        "No scan_profile found for ooi: %s [ooi_id=%s, scan_profile=%s, org_id=%s, scheduler_id=%s]",
-                        ooi.primary_key,
-                        ooi,
-                        ooi.scan_profile,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        Args:
+            ooi: The models.OOI to get boefjes for.
 
-                ooi_scan_level = ooi.scan_profile.level
-                if ooi_scan_level is None:
-                    self.logger.warning(
-                        "No scan level found for ooi: %s [ooi_id=%s, org_id=%s, scheduler_id=%s]",
-                        ooi.primary_key,
-                        ooi,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        Returns:
+            A list of Plugin of type Boefje that can be run on the ooi.
+        """
+        try:
+            boefjes = self.ctx.services.katalogus.get_boefjes_by_type_and_org_id(
+                ooi.object_type,
+                self.organisation.id,
+            )
+        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            self.logger.warning(
+                "Could not get boefjes for object_type: %s [object_type=%s, org_id=%s, scheduler_id=%s]",
+                ooi.object_type,
+                ooi.object_type,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return []
 
-                boefje_scan_level = boefje.scan_level
-                if boefje_scan_level is None:
-                    self.logger.warning(
-                        "No scan level found for boefje: %s [boefje_id=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.id,
-                        boefje.id,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        if boefjes is None:
+            self.logger.debug(
+                "No boefjes found for type: %s [ooi=%s, org_id=%s, scheduler_id=%s]",
+                ooi.object_type,
+                ooi,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return []
 
-                # Boefje intensity score ooi clearance level, range
-                # from 0 to 4. 4 being the highest intensity, and 0 being
-                # the lowest. OOI clearance level defines what boefje
-                # intesity is allowed to run on.
-                if boefje_scan_level > ooi_scan_level:
-                    self.logger.debug(
-                        "Boefje: %s scan level %s is too intense for ooi: %s scan level %s [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.id,
-                        boefje_scan_level,
-                        ooi.primary_key,
-                        ooi_scan_level,
-                        boefje.id,
-                        ooi.primary_key,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        self.logger.debug(
+            "Found %s boefjes for ooi: %s [ooi=%s, boefjes=%s, org_id=%s, scheduler_id=%s]",
+            len(boefjes),
+            ooi,
+            ooi,
+            [boefje.id for boefje in boefjes],
+            self.organisation.id,
+            self.scheduler_id,
+        )
 
-                # We don't want the populator to add/update tasks to the
-                # queue, when they are already on there. However, we do
-                # want to allow the api to update the priority. So we
-                # created the queue with allow_priority_updates=True
-                # regardless. When the ranker is updated to correctly rank
-                # tasks, we can allow the populator to also update the
-                # priority. Then remove the following:
-                if self.queue.is_item_on_queue(task):
-                    self.logger.debug(
-                        "Boefje: %s is already on queue [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.id,
-                        boefje.id,
-                        ooi.primary_key,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        return boefjes
 
-                # Boefje should not run when it is still being processed, we
-                # try to find the same combination of ooi, boefje, and
-                # organisation (hash) to make sure that the particular task
-                # isn't being processed. When it's None we haven't seen it
-                # before.
-                task_db = self.ctx.datastore.get_task_by_hash(
-                    mmh3.hash_bytes(f"{ooi.primary_key}-{boefje.id}-{self.organisation.id}").hex()
-                )
-                if task_db is not None and (
-                    task_db.status == TaskStatus.PENDING
-                    or task_db.status == TaskStatus.QUEUED
-                    or task_db.status == TaskStatus.DISPATCHED
-                    or task_db.status == TaskStatus.RUNNING
-                ):
-                    self.logger.debug(
-                        "Boefje: %s is still being processed [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s, status=%s]",
-                        boefje.id,
-                        boefje.id,
-                        ooi.primary_key,
-                        self.organisation.id,
-                        self.scheduler_id,
-                        task_db.status,
-                    )
-                    continue
+    def create_p_items_for_boefjes(self, boefjes: List[Plugin], ooi: OOI) -> List[queues.PrioritizedItem]:
+        """For an ooi and its associated boefjes we will create tasks that
+        can be pushed onto the queue.
 
-                # Get the latest run of a boefje from bytes
-                try:
-                    last_run_boefje = self.ctx.services.bytes.get_last_run_boefje(
-                        boefje_id=boefje.id,
-                        input_ooi=ooi.primary_key,
-                        organization_id=self.organisation.id,
-                    )
-                except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
-                    self.logger.info(
-                        "Could not get last run boefje for boefje: %s with ooi: %s [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.name,
-                        ooi.primary_key,
-                        boefje.id,
-                        ooi.primary_key,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        Args:
+            boefjes: A list of Boefje objects.
+            ooi: The OOI for which the tasks need to be created.
 
-                # Check if boefje is still running. NOTE: This is perhaps
-                # unnecessary because of the datastore check above. And that
-                # jobs that have started are not yet present in Bytes
-                if (
-                    last_run_boefje is not None
-                    and last_run_boefje.ended_at is None
-                    and last_run_boefje.started_at is not None
-                ):
-                    self.logger.debug(
-                        "Boefje %s is already running [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.id,
-                        boefje.id,
-                        ooi.primary_key,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        Returns:
+            A list of Boefje tasks of type PrioritizedItem.
+        """
+        p_items: List[queues.PrioritizedItem] = []
+        for boefje in boefjes:
+            p_item = self.create_p_item_for_boefje(boefje, ooi)
+            if p_item is None:
+                continue
 
-                # Boefjes should not run before the grace period ends, thus
-                # we will check when the combination boefje and ooi was last
-                # run.
-                if (
-                    last_run_boefje is not None
-                    and last_run_boefje.ended_at is not None
-                    and datetime.now(timezone.utc) - last_run_boefje.ended_at
-                    < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
-                ):
-                    self.logger.debug(
-                        "Boefje: %s already ran for input ooi %s within the grace period [last_run_boefje=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.id,
-                        ooi.primary_key,
-                        last_run_boefje,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
-
-                score = self.ranker.rank(SimpleNamespace(last_run_boefje=last_run_boefje, task=task))
-                if score < 0:
-                    self.logger.warning(
-                        "Score too low for boefje: %s and input ooi: %s [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.id,
-                        ooi.primary_key,
-                        boefje.id,
-                        ooi.primary_key,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
-
-                p_items.append(queues.PrioritizedItem(priority=score, item=task))
+            p_items.append(p_item)
 
         return p_items
+
+    def create_p_item_for_boefje(self, boefje: Plugin, ooi: OOI) -> Optional[queues.PrioritizedItem]:
+        """For an ooi and its associated boefjes we will create tasks that
+        can be pushed onto the queue. It will check:
+
+            * If the boefje is enabled
+            * Is allowed to run on the ooi (scan level / profile)
+            * If the boefje is already running on the ooi
+            * If the boefje has already run within the grace period
+
+        Args:
+            boefjes: A list of Boefje objects.
+            ooi: The OOI for which the tasks need to be created.
+
+        Returns:
+            A Boefje tasks of type PrioritizedItem.
+        """
+        if boefje.enabled is False:
+            self.logger.debug(
+                "Boefje: %s is disabled [org_id=%s, boefje_id=%s, org_id=%s, scheduler_id=%s]",
+                boefje.name,
+                self.organisation.id,
+                boefje.id,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        task = BoefjeTask(
+            boefje=Boefje.parse_obj(boefje),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        if ooi.scan_profile is None:
+            self.logger.debug(
+                "No scan_profile found for ooi: %s [ooi_id=%s, scan_profile=%s, org_id=%s, scheduler_id=%s]",
+                ooi.primary_key,
+                ooi,
+                ooi.scan_profile,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        ooi_scan_level = ooi.scan_profile.level
+        if ooi_scan_level is None:
+            self.logger.warning(
+                "No scan level found for ooi: %s [ooi_id=%s, org_id=%s, scheduler_id=%s]",
+                ooi.primary_key,
+                ooi,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        boefje_scan_level = boefje.scan_level
+        if boefje_scan_level is None:
+            self.logger.warning(
+                "No scan level found for boefje: %s [boefje_id=%s, org_id=%s, scheduler_id=%s]",
+                boefje.id,
+                boefje.id,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        # Boefje intensity score ooi clearance level, range
+        # from 0 to 4. 4 being the highest intensity, and 0 being
+        # the lowest. OOI clearance level defines what boefje
+        # intesity is allowed to run on.
+        if boefje_scan_level > ooi_scan_level:
+            self.logger.debug(
+                "Boefje: %s scan level %s is too intense for ooi: %s scan level %s [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
+                boefje.id,
+                boefje_scan_level,
+                ooi.primary_key,
+                ooi_scan_level,
+                boefje.id,
+                ooi.primary_key,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        # We don't want the populator to add/update tasks to the
+        # queue, when they are already on there. However, we do
+        # want to allow the api to update the priority. So we
+        # created the queue with allow_priority_updates=True
+        # regardless. When the ranker is updated to correctly rank
+        # tasks, we can allow the populator to also update the
+        # priority. Then remove the following:
+        if self.queue.is_item_on_queue(task):
+            self.logger.debug(
+                "Boefje: %s is already on queue [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
+                boefje.id,
+                boefje.id,
+                ooi.primary_key,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        # Boefje should not run when it is still being processed, we
+        # try to find the same combination of ooi, boefje, and
+        # organisation (hash) to make sure that the particular task
+        # isn't being processed.
+        task_db = self.ctx.datastore.get_task_by_hash(
+            mmh3.hash_bytes(f"{ooi.primary_key}-{boefje.id}-{self.organisation.id}").hex()
+        )
+        if task_db is not None and (task_db.status != TaskStatus.COMPLETED or task_db.status == TaskStatus.FAILED):
+            self.logger.debug(
+                "Boefje: %s is still being processed [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
+                boefje.id,
+                boefje.id,
+                ooi.primary_key,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        # Boefjes should not run before the grace period ends, thus
+        # we will check when the combination boefje and ooi was last
+        # run.
+        try:
+            last_run_boefje = self.ctx.services.bytes.get_last_run_boefje(
+                boefje_id=boefje.id,
+                input_ooi=ooi.primary_key,
+                organization_id=self.organisation.id,
+            )
+        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            self.logger.warning(
+                "Could not get last run boefje for boefje: %s with ooi: %s [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
+                boefje.name,
+                ooi.primary_key,
+                boefje.id,
+                ooi.primary_key,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        if last_run_boefje is not None and last_run_boefje.ended_at is None and last_run_boefje.started_at is not None:
+            self.logger.debug(
+                "Boefje %s is already running [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
+                boefje.id,
+                boefje.id,
+                ooi.primary_key,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        if (
+            last_run_boefje is not None
+            and last_run_boefje.ended_at is not None
+            and datetime.now(timezone.utc) - last_run_boefje.ended_at
+            < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+        ):
+            self.logger.debug(
+                "Boefje: %s already run for input ooi %s [last_run_boefje=%s, org_id=%s, scheduler_id=%s]",
+                boefje.id,
+                ooi.primary_key,
+                last_run_boefje,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        score = self.ranker.rank(SimpleNamespace(last_run_boefje=last_run_boefje, task=task))
+        if score < 0:
+            self.logger.warning(
+                "Score too low for boefje: %s and input ooi: %s [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
+                boefje.id,
+                ooi.primary_key,
+                boefje.id,
+                ooi.primary_key,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return None
+
+        return queues.PrioritizedItem(score, task)

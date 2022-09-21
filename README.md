@@ -4,8 +4,7 @@
 
 The scheduler is responsible for scheduling the execution of tasks. The
 execution of those tasks are being prioritized / scored by a ranker. The tasks
-are then pushed onto a priority queue. A dispatcher pop's tasks of the queue
-and send those tasks to a worker to be picked up.
+are then pushed onto a priority queue.
 
 Within the project of KAT, the scheduler is tasked with scheduling boefje and
 normalizer tasks.
@@ -14,7 +13,7 @@ normalizer tasks.
 
 See [design](docs/design.md) document for the architecture and the
 [extending](docs/extending.md) document for the extending the scheduler with
-your own custom schedulers, rankers, and dispatchers.
+your own custom schedulers, and rankers.
 
 ### Stack, packages and libraries
 
@@ -49,7 +48,6 @@ $ tree -L 3 --dirsfirst
 │   │   ├── services                # rest api connectors
 │   │   └── __init__.py
 │   ├── context/                    # shared application context
-│   ├── dispatchers/                # queue task dispatcher
 │   ├── models/                     # internal model definitions
 │   ├── queues/                     # priority queue
 │   ├── rankers/                    # priority/score calculations
@@ -78,7 +76,7 @@ to use whatever you want.
 
 ### Prerequisites
 
-By the use of environment variables we load in the configuration of the
+By the use of environment variables we load in the configuration of the 
 scheduler. Look at the [.env-dist](.env-dist) file for the application
 configuration settings, to build a `.env` file. Refer to the
 [`configuration.md`](docs/configuration.md) file for more information on the
