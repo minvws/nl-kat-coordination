@@ -71,7 +71,7 @@ else
     cd $working_dir
 fi
 
-configured_queue=$(cat /etc/kat/*.conf | grep -oP 'QUEUE_URI=\K.+' | head -n 1)
+configured_queue=$(cat /etc/kat/*.conf | grep -oP '(QUEUE_URI|SCHEDULER_RABBITMQ_DSN)=\K.+' | head -n 1)
 
 if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
     rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)

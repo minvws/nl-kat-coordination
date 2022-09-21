@@ -3,6 +3,8 @@ version: "3.9"
 services:
   bytes_unit:
     build:
+      args:
+        ENVIRONMENT: dev
       context: .
       dockerfile: Dockerfile
     command: pytest -v tests/unit
@@ -15,6 +17,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        ENVIRONMENT: dev
     command: sh -c "sleep ${SLEEP_TIME:-1} && pytest -vv tests/integration"
     depends_on:
       - ci_bytes
@@ -27,6 +31,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0
     depends_on:
       - ci_bytes-db
