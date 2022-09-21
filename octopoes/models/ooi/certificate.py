@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Optional, Literal
 
 from octopoes.models import OOI, Reference
+from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.web import Website
 from octopoes.models.persistence import ReferenceField
 
@@ -46,4 +47,20 @@ class Certificate(OOI):
         return f"{reference.tokenized.subject} ({reference.tokenized.issuer})"
 
 
+class CertificateSubjectAlternativeName(OOI):
+    object_type: Literal["CertificateSubjectAlternativeName"] = "CertificateSubjectAlternativeName"
+
+    certificate: Reference = ReferenceField(Certificate, max_issue_scan_level=0, max_inherit_scan_level=1)
+    hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=1, max_inherit_scan_level=0)
+
+    _natural_key_attrs = ["certificate", "hostname"]
+
+    _reverse_relation_names = {"certificate": "subject_alternative_names", "hostname": "certificates"}
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"{reference.tokenized.certificate.subject} ({reference.tokenized.certificate.issuer}) contains {reference.tokenized.hostname.name}"
+
+
 Certificate.update_forward_refs()
+CertificateSubjectAlternativeName.update_forward_refs()

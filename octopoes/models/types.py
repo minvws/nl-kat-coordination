@@ -5,7 +5,7 @@ from typing import Type, Dict, Set, Iterator, Union
 from pydantic.fields import ModelField
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.certificate import Certificate
+from octopoes.models.ooi.certificate import Certificate, CertificateSubjectAlternativeName
 from octopoes.models.ooi.dns.records import (
     DNSARecord,
     DNSAAAARecord,
@@ -51,7 +51,7 @@ from octopoes.models.ooi.web import (
     HTTPHeaderHostname,
 )
 
-CertificateType = Union[Certificate]
+CertificateType = Union[Certificate, CertificateSubjectAlternativeName]
 DnsType = Union[DNSZone, Hostname]
 DnsRecordType = Union[
     DNSARecord,

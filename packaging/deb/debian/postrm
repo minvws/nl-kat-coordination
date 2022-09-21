@@ -1,24 +1,18 @@
-#!/bin/bash
-set -e
+#!/bin/bash -e
 
-if [ -d /usr/share/kat-octopoes ]; then
-    rm -r /usr/share/kat-octopoes
+if [ "$1" = "remove" -o "$1" = "purge" ]; then
+    if [ -d /usr/share/kat-octopoes ]; then
+        rm -r /usr/share/kat-octopoes
+    fi
 fi
 
-if [ -f /etc/nginx/sites-enabled/kat-octopoes ]; then
-    rm /etc/nginx/sites-enabled/kat-octopoes
-    systemctl reload nginx
-fi
-
-if [ -f /etc/nginx/sites-available/kat-octopoes ]; then
-    rm /etc/nginx/sites-available/kat-octopoes
-fi
-
-if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then
-    . /usr/share/debconf/confmodule
-    db_purge
+if [ "$1" = "purge" ]; then
+    if [ -e /usr/share/debconf/confmodule ]; then
+        . /usr/share/debconf/confmodule
+        db_purge
+    fi
 
     if [ -f /etc/kat/octopoes.conf ]; then
-        rm /etc/kat/octopoes.conf || true
+        rm /etc/kat/octopoes.conf
     fi
 fi

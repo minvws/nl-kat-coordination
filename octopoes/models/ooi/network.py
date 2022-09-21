@@ -105,7 +105,7 @@ class NetBlock(OOI):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return reference.tokenized.mask
+        return f"{reference.tokenized.start_ip.address}/{reference.tokenized.mask}"
 
 
 class IPV6NetBlock(NetBlock):

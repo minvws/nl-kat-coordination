@@ -18,16 +18,11 @@ ${APP_DIR}/venv/bin/pip install --upgrade pip > /dev/null
 ${APP_DIR}/venv/bin/pip install --requirement ${APP_DIR}/app/requirements.txt > /dev/null
 ${APP_DIR}/venv/bin/pip install gunicorn uvicorn > /dev/null
 
-ln -s /etc/kat/octopoes.conf /usr/share/kat-octopoes/app/.env
-
-db_get kat-octopoes/enable-nginx-conf
-if [ "$RET" = "true" -a -d /etc/nginx/sites-enabled ]; then
-    ln -s /etc/nginx/sites-available/kat-octopoes /etc/nginx/sites-enabled/kat-octopoes || true
-    systemctl enable --now kat-octopoes.service
-    systemctl reload nginx
+if [ ! -e /usr/share/kat-octopoes/app/.env ]; then
+    ln -s /etc/kat/octopoes.conf /usr/share/kat-octopoes/app/.env
 fi
 
-configured_queue=$(cat /etc/kat/*.conf | grep -oP 'QUEUE_URI=\K.+' | head -n 1)
+configured_queue=$(cat /etc/kat/*.conf | grep -oP '(QUEUE_URI|SCHEDULER_RABBITMQ_DSN)=\K.+' | head -n 1)
 
 if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
     rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
@@ -38,9 +33,5 @@ if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
 elif [ ! -z "$configured_queue" ]; then
     sed -i "s|QUEUE_URI= *\$|QUEUE_URI=${configured_queue}|" /etc/kat/*.conf
 fi
-
-# Update number of workers for gunicorn
-num_workers=$(($(nproc) * 2 + 1))
-sed -i "s/workers =.*\$/workers=${num_workers}/" /etc/kat/gunicorn.octopoes.conf.py
 
 db_stop || true

@@ -5,7 +5,5 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-db_input high kat-octopoes/enable-nginx-conf || true
-
-db_go || echo nogo
+db_go || true
 
