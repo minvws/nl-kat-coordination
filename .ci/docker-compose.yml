@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  ci_keiko:
+    build:
+      context: .
+      args:
+        - ENVIRONMENT=dev
+    ports:
+        - "29005:8000"

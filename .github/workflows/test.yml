@@ -1,0 +1,28 @@
+name: Run the unit tests
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "develop"
+      - "master"
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install requirements-dev.txt
+        run: pip install -r requirements-dev.txt
+
+      - name: Run unit tests
+        run: make test
