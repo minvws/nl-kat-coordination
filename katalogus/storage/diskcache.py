@@ -57,30 +57,6 @@ class RepositoryStorageDisk(RepositoryStorage):
         del self._repositories[id_]
 
 
-class SettingsStorageDisk(SettingsStorage):
-    def __init__(self, directory: Union[str, Path]):
-        self._cache = Cache(Path(directory).as_posix())
-        if "settings" not in self._cache:
-            self._cache["settings"] = {}
-
-        self._settings = self._cache["settings"]
-
-    def get_by_key(self, key: str, organisation_id: str) -> str:
-        return self._settings[key]
-
-    def get_all(self, organisation_id: str) -> Dict[str, str]:
-        return self._settings
-
-    def create(self, key: str, value: str, organisation_id: str) -> None:
-        self._settings[key] = value
-
-    def update_by_key(self, key: str, value: str, organisation_id: str) -> None:
-        self._settings[key] = value
-
-    def delete_by_key(self, key: str, organisation_id: str) -> None:
-        del self._settings[key]
-
-
 class PluginStatesStorageDisk(PluginEnabledStorage):
     def __init__(self, directory: Union[str, Path]):
         self._cache = Cache(Path(directory).as_posix())

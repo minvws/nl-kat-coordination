@@ -4,10 +4,13 @@ from typing import Dict
 
 from fastapi import APIRouter, status, Depends
 
-from katalogus.dependencies.organisations import get_organisations_store
-from katalogus.models import Organisation
-from katalogus.storage.interfaces import OrganisationStorage
-from sql.db import ObjectNotFoundException
+from boefjes.katalogus.dependencies.organisations import get_organisations_store
+from boefjes.katalogus.models import Organisation
+from boefjes.katalogus.storage.interfaces import (
+    OrganisationStorage,
+    OrganisationNotFound,
+)
+from boefjes.sql.db import ObjectNotFoundException
 
 router = APIRouter(prefix="/organisations", tags=["organisations"])
 
@@ -17,11 +20,16 @@ def check_organisation_exists(
     storage: OrganisationStorage = Depends(get_organisations_store),
 ) -> None:
     """
-    Raises OrganisationNotFound when the organisation_id does not exist, which in turn
-    is handled by the organisation_not_found_handler()
+    Checks if an organisation exists, if not, creates it.
     """
     with storage as store:
-        store.get_by_id(organisation_id)
+        try:
+            store.get_by_id(organisation_id)
+        except OrganisationNotFound:
+            add_organisation(
+                Organisation(id=organisation_id, name=organisation_id), storage
+            )
+            storage.get_by_id(organisation_id)
 
 
 @router.get("", response_model=Dict[str, Organisation])

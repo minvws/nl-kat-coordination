@@ -5,20 +5,20 @@ from unittest import TestCase, skipIf
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 
-from config import settings
-from katalogus.local_repository import LocalPluginRepository
-from katalogus.models import Organisation, Repository, Boefje
-from katalogus.storage.interfaces import (
+from boefjes.config import settings
+from boefjes.katalogus.models import Organisation, Repository, Boefje
+from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
     PluginNotFound,
     SettingNotFound,
     RepositoryNotFound,
+    StorageError,
 )
-from sql.db import get_engine, SQL_BASE
-from sql.organisation_storage import SQLOrganisationStorage
-from sql.repository_storage import SQLRepositoryStorage
-from sql.setting_storage import SQLSettingsStorage
-from sql.plugin_enabled_storage import SQLPluginEnabledStorage
+from boefjes.sql.db import get_engine, SQL_BASE
+from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from boefjes.sql.repository_storage import SQLRepositoryStorage
+from boefjes.sql.setting_storage import SQLSettingsStorage
+from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -131,25 +131,42 @@ class TestRepositories(TestCase):
 
     def test_settings_storage(self):
         organisation_id = "test"
+        plugin_id = 64 * "a"
 
         org = Organisation(id=organisation_id, name="Test")
         with self.organisation_storage as storage:
             storage.create(org)
 
         with self.settings_storage as settings_storage:
-            settings_storage.create("TEST_SETTING", "123.9", organisation_id)
+            settings_storage.create("TEST_SETTING", "123.9", organisation_id, plugin_id)
 
-        returned_settings = settings_storage.get_by_key("TEST_SETTING", organisation_id)
+        returned_settings = settings_storage.get_by_key(
+            "TEST_SETTING", organisation_id, plugin_id
+        )
         self.assertEqual("123.9", returned_settings)
 
         with self.assertRaises(SettingNotFound):
-            settings_storage.get_by_key("no setting!", organisation_id)
+            settings_storage.get_by_key("no setting!", organisation_id, plugin_id)
 
         with self.assertRaises(SettingNotFound):
-            settings_storage.get_by_key("TEST_SETTING", "no organisation!")
+            settings_storage.get_by_key("TEST_SETTING", "no organisation!", plugin_id)
 
-        self.assertEqual({"TEST_SETTING": "123.9"}, settings_storage.get_all(org.id))
-        self.assertEqual(dict(), settings_storage.get_all("wrong"))
+        self.assertEqual(
+            {"TEST_SETTING": "123.9"}, settings_storage.get_all(org.id, plugin_id)
+        )
+        self.assertEqual(dict(), settings_storage.get_all(org.id, "wrong"))
+        self.assertEqual(dict(), settings_storage.get_all("wrong", plugin_id))
+
+        with self.settings_storage as settings_storage:
+            settings_storage.delete_by_key("TEST_SETTING", org.id, plugin_id)
+
+        self.assertEqual(dict(), settings_storage.get_all(org.id, plugin_id))
+
+        with self.assertRaises(StorageError):
+            with self.settings_storage as settings_storage:
+                settings_storage.create(
+                    "TEST_SETTING", "123.9", organisation_id, 65 * "a"
+                )
 
     def test_plugin_enabled_storage(self):
         with self.organisation_storage as storage:

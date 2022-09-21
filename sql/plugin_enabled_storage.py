@@ -3,12 +3,16 @@ from typing import Optional
 
 from sqlalchemy.orm import sessionmaker, Session
 
-from config import Settings, settings
-from katalogus.models import Plugin
-from katalogus.storage.interfaces import PluginEnabledStorage, PluginNotFound
-from sql.db import get_engine, ObjectNotFoundException
-from sql.db_models import PluginStateInDB, OrganisationInDB, RepositoryInDB
-from sql.session import SessionMixin
+from boefjes.config import Settings, settings
+from boefjes.katalogus.storage.interfaces import (
+    PluginEnabledStorage,
+    PluginNotFound,
+    OrganisationNotFound,
+    RepositoryNotFound,
+)
+from boefjes.sql.db import get_engine, ObjectNotFoundException
+from boefjes.sql.db_models import PluginStateInDB, OrganisationInDB, RepositoryInDB
+from boefjes.sql.session import SessionMixin
 
 logger = logging.getLogger(__name__)
 
@@ -87,11 +91,22 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
             .filter(OrganisationInDB.id == organisation_id)
             .first()
         )
+
+        if organisation is None:
+            raise OrganisationNotFound(organisation_id) from ObjectNotFoundException(
+                OrganisationInDB, id=organisation_id
+            )
+
         repository = (
             self.session.query(RepositoryInDB)
             .filter(RepositoryInDB.id == repository_id)
             .first()
         )
+
+        if repository is None:
+            raise RepositoryNotFound(repository_id) from ObjectNotFoundException(
+                RepositoryInDB, repository_id=repository_id
+            )
 
         return PluginStateInDB(
             plugin_id=plugin_id,

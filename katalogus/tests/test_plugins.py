@@ -92,3 +92,25 @@ class TestPlugins(TestCase):
             },
             {plugin["id"]: plugin["enabled"] for plugin in res.json()},
         )
+
+    def test_patching_enabled_state_non_existing_org(self):
+        res = self.client.patch(
+            "/v1/organisations/non-existing-org/repositories/test-repo/plugins/test-boefje-1",
+            json={"enabled": False},
+        )
+
+        self.assertEqual(200, res.status_code)
+
+        res = self.client.get("/v1/organisations/non-existing-org/plugins")
+        self.assertEqual(200, res.status_code)
+        self.assertEqual(
+            {
+                "test-boefje-1": False,
+                "test-boefje-2": False,
+                "test-bit-1": True,
+                "test-normalizer-1": True,
+                "kat_test": False,
+                "kat_test_normalize": True,
+            },
+            {plugin["id"]: plugin["enabled"] for plugin in res.json()},
+        )

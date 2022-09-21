@@ -28,10 +28,10 @@ class SettingsService:
     def get_by_key(self, key: str, organisation_id: str) -> str:
         return self.encryption.decode(self.storage.get_by_key(key, organisation_id))
 
-    def get_all(self, organisation_id: str) -> Dict[str, str]:
+    def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         return {
             k: self.encryption.decode(v)
-            for k, v in self.storage.get_all(organisation_id).items()
+            for k, v in self.storage.get_all(organisation_id, plugin_id).items()
         }
 
     def create(self, key: str, value: str, organisation_id: str) -> None:

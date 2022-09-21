@@ -1,0 +1,2 @@
+ALTER TABLE setting ALTER COLUMN plugin_id TYPE VARCHAR(64);
+ALTER TABLE plugin_state ALTER COLUMN plugin_id TYPE VARCHAR(64);

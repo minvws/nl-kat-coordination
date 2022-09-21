@@ -95,7 +95,7 @@ class SettingsStorage(ABC):
     def get_by_key(self, key: str, organisation_id: str) -> str:
         raise NotImplementedError
 
-    def get_all(self, organisation_id: str) -> Dict[str, str]:
+    def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         raise NotImplementedError
 
     def create(self, key: str, value: str, organisation_id: str) -> None:

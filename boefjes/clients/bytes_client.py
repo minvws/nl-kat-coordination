@@ -1,3 +1,4 @@
+import logging
 import typing
 from functools import wraps
 from typing import Callable, Dict, Union, Any, Set
@@ -5,9 +6,10 @@ from typing import Callable, Dict, Union, Any, Set
 import requests
 from requests.models import HTTPError
 
-from job import BoefjeMeta, NormalizerMeta
+from boefjes.job import BoefjeMeta, NormalizerMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
+logger = logging.getLogger(__name__)
 
 
 class BytesAPISession(requests.Session):
@@ -56,7 +58,7 @@ class BytesAPIClient:
     @staticmethod
     def _verify_response(response: requests.Response) -> None:
         if response.status_code != 200:
-            print(response.text)
+            logger.error(response.text)
         response.raise_for_status()
 
     def _get_authentication_headers(self) -> Dict[str, str]:

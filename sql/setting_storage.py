@@ -23,11 +23,12 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
 
         return instance.value
 
-    def get_all(self, organisation_id: str) -> Dict[str, str]:
+    def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         query = (
             self.session.query(SettingInDB)
             .join(OrganisationInDB)
             .filter(SettingInDB.organisation_pk == OrganisationInDB.pk)
+            .filter(SettingInDB.plugin_id == plugin_id)
             .filter(OrganisationInDB.id == organisation_id)
         )
         return {setting.key: setting.value for setting in query.all()}

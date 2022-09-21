@@ -1,19 +1,30 @@
 import logging
 from datetime import datetime, timezone, timedelta
 from enum import Enum
-from typing import Any
+from typing import Any, Union
 
 from octopoes.api.models import Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
+from requests import RequestException
 
-from boefjes.models import Normalizer
-from bytes_client import BytesAPIClient
-from config import settings
-from job import BoefjeMeta, NormalizerMeta
-from runner import NormalizerJobRunner, BoefjeJobRunner
+from boefjes.runtime import ItemHandler
+from boefjes.katalogus.boefjes import resolve_boefjes, resolve_normalizers
+from boefjes.lxd.lxd_runner import LXDBoefjeJobRunner
+
+from boefjes.plugins.models import Normalizer, BOEFJES_DIR
+from boefjes.clients.bytes_client import BytesAPIClient
+from boefjes.config import settings
+from boefjes.job import BoefjeMeta, NormalizerMeta
+from boefjes.runner import (
+    NormalizerJobRunner,
+    BoefjeJobRunner,
+    get_environment_settings,
+    LocalBoefjeJobRunner,
+    get_plugin,
+)
 
 logger = logging.getLogger(__name__)
 bytes_api_client = BytesAPIClient(
@@ -71,28 +82,84 @@ def serialize_ooi(ooi: OOI):
     return serialized_oois
 
 
+class BoefjeMetaHandler(ItemHandler):
+    def handle(self, item: BoefjeMeta):
+        return handle_boefje_meta(item)
+
+
+class NormalizerMetaHandler(ItemHandler):
+    def handle(self, item: NormalizerMeta):
+        return handle_normalizer_meta(item)
+
+
+def handle_boefje_meta(boefje_meta: BoefjeMeta):
+    input_ooi = _find_ooi_in_past(
+        Reference.from_str(boefje_meta.input_ooi),
+        get_octopoes_api_connector(boefje_meta.organization),
+    )
+    boefje_meta.arguments["input"] = serialize_ooi(input_ooi)
+
+    if "/" not in boefje_meta.boefje.id:
+        boefjes = resolve_boefjes(BOEFJES_DIR)
+        boefje = boefjes[boefje_meta.boefje.id]
+
+        logger.info("Running local boefje plugin")
+
+        try:
+            environment = get_environment_settings(boefje_meta, boefje)
+        except RequestException:
+            logger.error("Error getting environment settings", exc_info=True)
+            environment = {}
+
+        job_runner = LocalBoefjeJobRunner(boefje_meta, boefje, environment)
+        return handle_boefje_job(boefje_meta, job_runner).dict()
+
+    repository, plugin_id = boefje_meta.boefje.id.split("/")
+    plugin = get_plugin(
+        boefje_meta.organization, repository, plugin_id, boefje_meta.boefje.version
+    )
+
+    logger.info("Running remote boefje plugin")
+    updated_job = handle_boefje_job(
+        boefje_meta, LXDBoefjeJobRunner(boefje_meta, plugin)
+    )
+
+    return updated_job.dict()
+
+
 def handle_boefje_job(
     boefje_meta: BoefjeMeta, job_runner: BoefjeJobRunner
 ) -> BoefjeMeta:
     try:
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
+        mime_types = {
+            boefje_meta.boefje.id,
+            f"boefje/{boefje_meta.boefje.id}",
+            f"boefje/{boefje_meta.boefje.id}-{boefje_meta.parameterized_arguments_hash}",
+        }
+
+        if boefje_meta.boefje.version is not None:
+            mime_types.add(
+                f"boefje/{boefje_meta.boefje.id}-{boefje_meta.boefje.version}",
+            )
+            mime_types.add(
+                f"boefje/{boefje_meta.boefje.id}-{boefje_meta.parameterized_arguments_hash}-{boefje_meta.boefje.version}",
+            )
+
         try:
             _, job_output = job_runner.run()
-            raw_output = job_output.data
-            mime_types = job_output.mime_types
         except Exception as exc:
-            logger.info(
-                "Error while running boefje %s[%s]",
-                boefje_meta.boefje.id,
-                boefje_meta.id,
-            )
-            raw_output = str(exc)
-            mime_types = {"error/boefje"}
-            boefje_meta.ended_at = datetime.now(timezone.utc)
+            output = str(exc)
+            logger.exception("Boefje failed.")
+            mime_types.add("error/boefje")
+        else:
+            output = job_output.data
+            mime_types.update(job_output.mime_types)
 
+        logger.info("Saving to Bytes")
         bytes_api_client.save_boefje_meta(boefje_meta)
-        bytes_api_client.save_raw(boefje_meta.id, raw_output, mime_types)
+        bytes_api_client.save_raw(boefje_meta.id, output, mime_types)
 
         logger.info(
             "Done with boefje for %s[%s]",
@@ -107,8 +174,15 @@ def handle_boefje_job(
         raise exc
 
 
+def handle_normalizer_meta(normalizer_meta: NormalizerMeta):
+    normalizers = resolve_normalizers(BOEFJES_DIR)
+    normalizer = normalizers[normalizer_meta.normalizer.name]
+
+    handle_normalizer_job(normalizer_meta, normalizer)
+
+
 def handle_normalizer_job(
-    normalizer_meta: NormalizerMeta, normalizer: Normalizer, package: str
+    normalizer_meta: NormalizerMeta, normalizer: Normalizer
 ) -> None:
     try:
         logger.info(
@@ -120,7 +194,7 @@ def handle_normalizer_job(
         bytes_api_client.login()
         raw = bytes_api_client.get_raw(normalizer_meta.boefje_meta.id)
 
-        job_runner = NormalizerJobRunner(normalizer_meta, normalizer, package, raw)
+        job_runner = NormalizerJobRunner(normalizer_meta, normalizer, raw)
         job_runner.run()
 
         reference = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)

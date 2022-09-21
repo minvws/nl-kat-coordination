@@ -9,14 +9,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from sql.db import SQL_BASE
+from boefjes.sql.db import SQL_BASE
 
 
 organisation_repo_association_table = Table(
     "organisation_repository",
     SQL_BASE.metadata,
-    Column("organisation_pk", ForeignKey("organisation.pk")),
-    Column("repository_pk", ForeignKey("repository.pk")),
+    Column("organisation_pk", ForeignKey("organisation.pk"), nullable=False),
+    Column("repository_pk", ForeignKey("repository.pk"), nullable=False),
 )
 
 
@@ -24,7 +24,7 @@ class OrganisationInDB(SQL_BASE):
     __tablename__ = "organisation"
 
     pk = Column(Integer, primary_key=True, autoincrement=True)
-    id = Column(String(length=4), unique=True)
+    id = Column(String(length=4), unique=True, nullable=False)
     name = Column(String(length=64), nullable=False)
 
     repositories = relationship(
@@ -36,32 +36,46 @@ class RepositoryInDB(SQL_BASE):
     __tablename__ = "repository"
 
     pk = Column(Integer, primary_key=True, autoincrement=True)
-    id = Column(String(length=32), unique=True)
+    id = Column(String(length=32), unique=True, nullable=False)
     name = Column(String(length=64), nullable=False)
     base_url = Column(String(length=128), nullable=False)
 
 
 class SettingInDB(SQL_BASE):
     __tablename__ = "setting"
+    __table_args__ = (
+        UniqueConstraint(
+            "key",
+            "organisation_pk",
+            "plugin_id",
+            name="unique_keys_per_organisation_per_plugin",
+        ),
+    )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    key = Column(String(length=32), nullable=False)
-    value = Column(String(length=64), nullable=False)
+    key = Column(String(length=128), nullable=False)
+    value = Column(String(length=128), nullable=False)
+    plugin_id = Column(String(length=64), nullable=False)
     organisation_pk = Column(
         Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False
     )
 
     organisation = relationship("OrganisationInDB")
-    UniqueConstraint(
-        "key", "organisation_id", name="unique_setting_keys_per_organisation"
-    )
 
 
 class PluginStateInDB(SQL_BASE):
     __tablename__ = "plugin_state"
+    __table_args__ = (
+        UniqueConstraint(
+            "plugin_id",
+            "organisation_pk",
+            "repository_pk",
+            name="unique_plugin_per_repo_per_org",
+        ),
+    )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    plugin_id = Column(String(length=32), nullable=False)
+    plugin_id = Column(String(length=64), nullable=False)
     enabled = Column(Boolean, nullable=False)
     organisation_pk = Column(
         Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False
@@ -72,9 +86,3 @@ class PluginStateInDB(SQL_BASE):
 
     organisation = relationship("OrganisationInDB")
     repository = relationship("RepositoryInDB")
-    UniqueConstraint(
-        "plugin_id",
-        "organisation_pk",
-        "repository_pk",
-        name="unique_plugin_per_repo_per_org",
-    )

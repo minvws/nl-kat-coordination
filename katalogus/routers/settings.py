@@ -15,9 +15,11 @@ router = APIRouter(
 
 @router.get("", response_model=Dict[str, str])
 def list_settings(
-    organisation_id: str, settings: SettingsService = Depends(get_settings_service)
+    organisation_id: str,
+    plugin_id: str,
+    settings: SettingsService = Depends(get_settings_service),
 ):
-    return settings.get_all(organisation_id)
+    return settings.get_all(organisation_id, plugin_id)
 
 
 @router.get("/{key}", response_model=str)

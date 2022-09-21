@@ -25,10 +25,11 @@ python3 -m venv ${APP_DIR}/venv
 echo "Setting up boefjes environment."
 ${APP_DIR}/venv/bin/pip install --upgrade pip > /dev/null
 
-# TODO: remove this when octopoes is publicly available
-sed -i '/octopoes/d' ${APP_DIR}/app/requirements.txt
-find ${APP_DIR}/app -name requirements.txt | xargs -L1 sed -i '/octopoes/d'
-${APP_DIR}/venv/bin/pip install ${APP_DIR}/nl-kat-octopoes > /dev/null
+# TODO: remove when octopoes is publicly available
+if [ -d ${APP_DIR}/octopoes ]; then
+    sed -i '/^.*octopoes.*$/d' ${APP_DIR}/app/requirements.txt
+    ${APP_DIR}/venv/bin/pip install ${APP_DIR}/octopoes > /dev/null
+fi
 
 ${APP_DIR}/venv/bin/pip install --requirement ${APP_DIR}/app/requirements.txt > /dev/null
 find ${APP_DIR}/app -name requirements.txt | xargs -I{} ${APP_DIR}/venv/bin/pip install -r {} > /dev/null
@@ -61,7 +62,7 @@ if [ ! -f /usr/share/kat-boefjes/.db_initialized ]; then
     set -a
     source /usr/share/kat-boefjes/app/.env
     /usr/share/kat-boefjes/venv/bin/python -m alembic upgrade head
-    /usr/share/kat-boefjes/venv/bin/python -m seed
+    /usr/share/kat-boefjes/venv/bin/python -m boefjes.seed
     set +a
     cd $working_dir
 
@@ -76,7 +77,7 @@ else
     cd $working_dir
 fi
 
-configured_queue=$(cat /etc/kat/*.conf | grep -oP 'QUEUE_URI=\K.+' | head -n 1)
+configured_queue=$(cat /etc/kat/*.conf | grep -oP '(QUEUE_URI|SCHEDULER_RABBITMQ_DSN)=\K.+' | head -n 1)
 
 if [ -z "$(rabbitmqctl list_vhosts | grep '^kat$')" ]; then
     rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)

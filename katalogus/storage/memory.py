@@ -1,7 +1,7 @@
 from typing import Dict
 
-from katalogus.models import Organisation, Repository
-from katalogus.storage.interfaces import (
+from boefjes.katalogus.models import Organisation, Repository
+from boefjes.katalogus.storage.interfaces import (
     OrganisationStorage,
     RepositoryStorage,
     SettingsStorage,
@@ -10,9 +10,6 @@ from katalogus.storage.interfaces import (
 
 # key = organisation id; value = organisation
 organisations: Dict[str, Organisation] = {}
-
-# key = organisation, environment key; value = environment value
-environment_settings: Dict[str, Dict[str, str]] = {}
 
 # key = organisation, repository/plugin id; value = enabled/ disabled
 plugins_state: Dict[str, Dict[str, bool]] = {}
@@ -70,27 +67,32 @@ class SettingsStorageMemory(SettingsStorage):
         organisation: str,
         defaults: Dict[str, str] = None,
     ):
-        self._data = (
-            environment_settings.setdefault(organisation, {})
-            if defaults is None
-            else defaults
-        )
+        defaults = defaults or {}
+        self._data = {organisation: defaults}
         self._organisation = organisation
 
-    def get_by_key(self, key: str, organisation_id: str) -> str:
-        return self._data[key]
+    def get_by_key(self, key: str, organisation_id: str, plugin_id: str) -> str:
+        return self._data[organisation_id][f"{plugin_id}.{key}"]
 
-    def get_all(self, organisation_id: str) -> Dict[str, str]:
-        return self._data
+    def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
+        return {
+            k.split(".", maxsplit=1)[1]: v
+            for k, v in self._data[organisation_id].items()
+            if plugin_id in k
+        }
 
-    def create(self, key: str, value: str, organisation_id: str) -> None:
-        self._data[key] = value
+    def create(
+        self, key: str, value: str, organisation_id: str, plugin_id: str
+    ) -> None:
+        self._data[organisation_id][f"{plugin_id}.{key}"] = value
 
-    def update_by_key(self, key: str, value: str, organisation_id: str) -> None:
-        self._data[key] = value
+    def update_by_key(
+        self, key: str, value: str, organisation_id: str, plugin_id: str
+    ) -> None:
+        self._data[organisation_id][f"{plugin_id}.{key}"] = value
 
-    def delete_by_key(self, key: str, organisation_id: str) -> None:
-        del self._data[key]
+    def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
+        del self._data[organisation_id][f"{plugin_id}.{key}"]
 
 
 class PluginStatesStorageMemory(PluginEnabledStorage):
