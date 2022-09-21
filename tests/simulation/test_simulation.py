@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, dispatchers, models, queues, rankers, schedulers
+from scheduler import config, connectors, models, queues, rankers, schedulers
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -35,14 +35,6 @@ class SimulationTestCase(unittest.TestCase):
             allow_priority_updates=True,
         )
 
-        normalizer_dispatcher = dispatchers.NormalizerDispatcher(
-            ctx=self.mock_ctx,
-            pq=normalizer_queue,
-            item_type=models.NormalizerTask,
-            celery_queue="normalizers",
-            task_name="tasks.handle_ooi",
-        )
-
         normalizer_ranker = rankers.NormalizerRanker(
             ctx=self.mock_ctx,
         )
@@ -51,7 +43,6 @@ class SimulationTestCase(unittest.TestCase):
             ctx=self.mock_ctx,
             scheduler_id=organisation.id,
             queue=normalizer_queue,
-            dispatcher=normalizer_dispatcher,
             ranker=normalizer_ranker,
             organisation=organisation,
         )
@@ -64,14 +55,6 @@ class SimulationTestCase(unittest.TestCase):
             allow_priority_updates=True,
         )
 
-        boefje_dispatcher = dispatchers.BoefjeDispatcher(
-            ctx=self.mock_ctx,
-            pq=boefje_queue,
-            item_type=models.BoefjeTask,
-            celery_queue="boefje",
-            task_name="tasks.handle_boefje",
-        )
-
         boefje_ranker = rankers.BoefjeRanker(
             ctx=self.mock_ctx,
         )
@@ -80,7 +63,6 @@ class SimulationTestCase(unittest.TestCase):
             ctx=self.mock_ctx,
             scheduler_id=organisation.id,
             queue=boefje_queue,
-            dispatcher=boefje_dispatcher,
             ranker=boefje_ranker,
             organisation=organisation,
         )

@@ -95,13 +95,18 @@ class NormalizerScheduler(Scheduler):
                     self.scheduler_id,
                 )
 
-            # Check status of the job and update status of boefje tasks
+            # Check status of the job and update status of boefje tasks, and
+            # stop creating normalizer tasks.
             if boefje_task_db is not None:
                 status = TaskStatus.COMPLETED
+
                 for mime_type in latest_raw_data.raw_data.mime_types:
                     if mime_type.get("value", "").startswith("error/"):
                         status = TaskStatus.FAILED
-                        break
+                        boefje_task_db.status = status
+
+                        self.ctx.datastore.update_task(boefje_task_db)
+                        return
 
                 boefje_task_db.status = status
                 self.ctx.datastore.update_task(boefje_task_db)

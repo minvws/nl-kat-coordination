@@ -307,11 +307,8 @@ class Server:
 
         try:
             p_item = s.pop_item_from_queue()
-        except _queue.Empty as exc_empty:
-            raise fastapi.HTTPException(
-                status_code=400,
-                detail="queue is empty",
-            ) from exc_empty
+        except queues.QueueEmptyError as exc_empty:
+            return None
 
         return models.QueuePrioritizedItem(**p_item.dict())
 

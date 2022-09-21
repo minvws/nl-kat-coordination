@@ -8,11 +8,6 @@ from scheduler import models
 from sqlalchemy import create_engine, orm, pool
 
 
-class DatastoreType(Enum):
-    SQLITE = 1
-    POSTGRES = 2
-
-
 class Datastore(abc.ABC):
     def __init__(self) -> None:
         self.logger: logging.Logger = logging.getLogger(__name__)
@@ -40,37 +35,52 @@ class Datastore(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def update_task(self, task: models.Task) -> Optional[models.Task]:
+    def update_task(self, task: models.Task) -> None:
         raise NotImplementedError
 
 
 class SQLAlchemy(Datastore):
-    def __init__(self, dsn: str, datastore_type: DatastoreType) -> None:
+    """SQLAlchemy datastore implementation
+
+    Note on using sqlite:
+
+    By default SQLite will only allow one thread to communicate with it,
+    assuming that each thread would handle an independent request. This is to
+    prevent accidentally sharing the same connection for different things (for
+    different requests). But within the scheduler more than one thread could
+    interact with the database. So we need to make SQLite know that it should
+    allow that with
+
+    Also, we will make sure each request gets its own database connection
+    session.
+
+    See: https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#using-a-memory-database-in-multiple-threads
+    """
+
+    def __init__(self, dsn: str) -> None:
         super().__init__()
 
         self.engine = None
 
-        if datastore_type == DatastoreType.POSTGRES:
-            self.engine = create_engine(
-                dsn,
-                pool_pre_ping=True,
-                pool_size=25,
-                json_serializer=lambda obj: json.dumps(obj, default=str),
-            )
-        elif datastore_type == DatastoreType.SQLITE:
-            # See: https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#using-a-memory-database-in-multiple-threads
+        if dsn.startswith("sqlite"):
             self.engine = create_engine(
                 dsn,
                 connect_args={"check_same_thread": False},
                 poolclass=pool.StaticPool,
                 json_serializer=lambda obj: json.dumps(obj, default=str),
             )
-
-        if self.engine is None:
-            raise Exception("Invalid datastore type")
+        else:
+            self.engine = create_engine(
+                dsn,
+                pool_pre_ping=True,
+                pool_size=25,
+                json_serializer=lambda obj: json.dumps(obj, default=str),
+            )
 
         models.Base.metadata.create_all(self.engine)
 
+        # Within the methods below, we use the session context manager to
+        # ensure that the session is closed
         self.session = orm.sessionmaker(
             bind=self.engine,
         )
@@ -88,21 +98,19 @@ class SQLAlchemy(Datastore):
                 query = query.filter(models.TaskORM.status == models.TaskStatus(status).name)
 
             count = query.count()
+
             tasks_orm = query.order_by(models.TaskORM.created_at.desc()).offset(offset).limit(limit).all()
 
-            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
-
-        return tasks, count
+            return [models.Task.from_orm(task_orm) for task_orm in tasks_orm], count
 
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.session.begin() as session:
             task_orm = session.query(models.TaskORM).filter(models.TaskORM.id == task_id).first()
+
             if task_orm is None:
                 return None
 
-            task = models.Task.from_orm(task_orm)
-
-        return task
+            return models.Task.from_orm(task_orm)
 
     def get_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
         with self.session.begin() as session:
@@ -116,24 +124,15 @@ class SQLAlchemy(Datastore):
             if task_orm is None:
                 return None
 
-            task = models.Task.from_orm(task_orm)
-
-        return task
+            return models.Task.from_orm(task_orm)
 
     def add_task(self, task: models.Task) -> Optional[models.Task]:
         with self.session.begin() as session:
             task_orm = models.TaskORM(**task.dict())
             session.add(task_orm)
 
-            created_task = models.Task.from_orm(task_orm)
+            return models.Task.from_orm(task_orm)
 
-        return created_task
-
-    def update_task(self, task: models.Task) -> Optional[models.Task]:
+    def update_task(self, task: models.Task) -> None:
         with self.session.begin() as session:
-            task_orm = session.query(models.TaskORM).get(task.id)
-            task_orm.status = task.status
-
-            updated_task = models.Task.from_orm(task_orm)
-
-        return updated_task
+            session.query(models.TaskORM).filter_by(id=task.id).update(task.dict())

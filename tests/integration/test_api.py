@@ -5,14 +5,13 @@ from unittest import mock
 
 import requests
 from fastapi.testclient import TestClient
-from scheduler import config, connectors, datastores, dispatchers, models, queues, rankers, schedulers, server
+from scheduler import config, connectors, datastores, models, queues, rankers, schedulers, server
 from tests.factories import BoefjeFactory, OOIFactory, OrganisationFactory, ScanProfileFactory
 
 
 def create_p_item(organisation_id: str, priority: int) -> models.QueuePrioritizedItem:
     scan_profile = ScanProfileFactory(level=0)
     ooi = OOIFactory(scan_profile=scan_profile)
-    item_id = uuid.uuid4().hex
     item = models.QueuePrioritizedItem(
         priority=priority,
         item=models.BoefjeTask(
@@ -32,9 +31,7 @@ class APITestCase(unittest.TestCase):
         self.mock_ctx.config = cfg
 
         # Datastore
-        self.mock_ctx.datastore = datastores.SQLAlchemy(
-            dsn="sqlite:///", datastore_type=datastores.DatastoreType.SQLITE
-        )
+        self.mock_ctx.datastore = datastores.SQLAlchemy(dsn="sqlite:///")
         models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
 
         # Scheduler
@@ -57,14 +54,6 @@ class APITestCase(unittest.TestCase):
             queue=queue,
             ranker=ranker,
             organisation=self.organisation,
-        )
-
-        dispatcher = dispatchers.BoefjeDispatcher(
-            ctx=self.mock_ctx,
-            scheduler=self.scheduler,
-            item_type=models.BoefjeTask,
-            celery_queue="boefjes",
-            task_name="tasks.handle_boefje",
         )
 
         self.server = server.Server(self.mock_ctx, {self.scheduler.scheduler_id: self.scheduler})
