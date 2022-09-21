@@ -1,6 +1,6 @@
 [Unit]
 Description=kat-octopoes daemon
-Requires=kat-octopoes.socket kat-octopoes-celery.service
+Requires=kat-octopoes-celery.service
 After=network.target
 
 [Service]
@@ -11,7 +11,6 @@ EnvironmentFile=/etc/kat/octopoes.conf
 ExecStart=/usr/share/kat-octopoes/venv/bin/gunicorn \
           --access-logfile - \
           -c /etc/kat/gunicorn.octopoes.conf.py \
-          --bind unix:/run/kat-octopoes.sock \
           -k uvicorn.workers.UvicornWorker \
           octopoes.api.api:app
 

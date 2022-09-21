@@ -7,5 +7,4 @@ Section: python
 Priority: optional
 Architecture: all
 Pre-Depends: python3, python3-venv, rabbitmq-server, ${misc:Depends}
-Depends: nginx
 Description: Octopoes

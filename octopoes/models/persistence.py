@@ -15,6 +15,8 @@ def ReferenceField(
     max_inherit_scan_level: Optional[int] = None,
     **kwargs,
 ) -> FieldInfo:
+    if not isinstance(object_type, str):
+        object_type = object_type.get_object_type()
     kwargs.update(
         {
             "object_type": object_type,
