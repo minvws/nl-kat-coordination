@@ -42,7 +42,6 @@ class SQLMetaDataRepository(MetaDataRepository):
     def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:
         logger.info("Committing session")
         self.session.commit()
-        logger.info("Committed session")
 
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Inserting meta: %s", boefje_meta.json())
@@ -182,7 +181,7 @@ def create_meta_data_repository(
     try:
         yield repository
     except Exception as error:
-        logger.error("An error occured: %s. Rolling back session", error, exc_info=True)
+        logger.exception("An error occured: %s. Rolling back session", error)
         session.rollback()
         raise error
     finally:

@@ -9,7 +9,7 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
     __tablename__ = "boefje_meta"
 
     id = Column(UUID, primary_key=True)
-    boefje_id = Column(String(length=32), nullable=False)
+    boefje_id = Column(String(length=64), nullable=False)
     boefje_version = Column(String(length=16))
     organization = Column(String(length=4), nullable=False)
     input_ooi = Column(String(length=128), nullable=False)
@@ -36,7 +36,7 @@ class NormalizerMetaInDB(SQL_BASE):  # type: ignore
     __tablename__ = "normalizer_meta"
 
     id = Column(UUID, primary_key=True)
-    normalizer_name = Column(String(length=32), nullable=False)
+    normalizer_name = Column(String(length=64), nullable=False)
     normalizer_version = Column(String(length=16))
     started_at = Column(DateTime(timezone=True))
     ended_at = Column(DateTime(timezone=True))
