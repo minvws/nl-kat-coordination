@@ -1,13 +1,22 @@
 #!/bin/bash
 set -e
 
-if [ -d /usr/share/kat-boefjes ]; then
-    rm -r /usr/share/kat-boefjes
+if [ "$1" = "remove" -o "$1" = "purge" ]; then
+    if [ -d /usr/share/kat-boefjes ]; then
+        rm -r /usr/share/kat-boefjes
+    fi
+
+    if [ -f /etc/nginx/sites-enabled/kat-katalogus ]; then
+        rm /etc/nginx/sites-enabled/kat-katalogus
+        systemctl reload nginx
+    fi
 fi
 
-if [ "$1" = "purge" -a -e /usr/share/debconf/confmodule ]; then
-    . /usr/share/debconf/confmodule
-    db_purge
+if [ "$1" = "purge" ]; then
+    if [ -e /usr/share/debconf/confmodule ]; then
+        . /usr/share/debconf/confmodule
+        db_purge
+    fi
 
     if [ -f /etc/kat/boefjes ]; then
         rm /etc/kat/boefjes.conf

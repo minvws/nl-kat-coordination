@@ -1,7 +1,7 @@
 from ipaddress import IPv4Address, IPv6Address
 from unittest import TestCase
 
-from job_handler import serialize_ooi
+from boefjes.job_handler import serialize_ooi
 
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import (
@@ -16,15 +16,10 @@ from octopoes.models.ooi.dns.records import (
 from octopoes.models.ooi.dns.zone import Hostname, DNSZone
 from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
 
-from boefjes.kat_dns.normalize import run
-from boefjes.kat_dns_zone.normalize import run as run_zone_normalizer
-from config import settings
-from job import NormalizerMeta, BoefjeMeta, Normalizer, Boefje
-
-
-def get_dummy_data(filename: str) -> bytes:
-    path = settings.base_dir / "tests" / "examples" / filename
-    return path.read_bytes()
+from boefjes.plugins.kat_dns.normalize import run
+from boefjes.plugins.kat_dns_zone.normalize import run as run_zone_normalizer
+from boefjes.job import NormalizerMeta, BoefjeMeta, Normalizer, Boefje
+from tests.stubs import get_dummy_data
 
 
 class DnsTest(TestCase):

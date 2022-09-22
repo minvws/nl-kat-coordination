@@ -1,0 +1,35 @@
+{
+  "priority": 1,
+  "item": {
+    "id": "70da7d4ff41f4940901bd98a92e9014b",
+    "boefje": {
+      "id": "dns-records",
+      "name": "DnsRecords",
+      "description": "Fetch the DNS record(s) of a hostname",
+      "version": null,
+      "scan_level": 1,
+      "consumes": [
+        "Hostname"
+      ],
+      "produces": [
+        "DNSAAAARecord",
+        "IPAddressV6",
+        "NXDOMAIN",
+        "Hostname",
+        "Network",
+        "DNSNSRecord",
+        "DNSTXTRecord",
+        "IPAddressV4",
+        "DNSMXRecord",
+        "DNSZone",
+        "DNSARecord",
+        "DNSSOARecord",
+        "DNSCNAMERecord"
+      ],
+      "dispatches": null
+    },
+    "input_ooi": "Hostname|internet|test.test.",
+    "organization": "_dev",
+    "dispatches": []
+  }
+}

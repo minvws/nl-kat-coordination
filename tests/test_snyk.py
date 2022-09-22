@@ -7,14 +7,9 @@ from octopoes.models.types import (
 )
 from octopoes.models.ooi.findings import SnykFindingType
 
-from boefjes.kat_snyk.normalize import run
-from config import settings
-from job import NormalizerMeta
-
-
-def get_dummy_data(filename: str) -> bytes:
-    path = settings.base_dir / "tests" / "examples" / filename
-    return path.read_bytes()
+from boefjes.plugins.kat_snyk.normalize import run
+from boefjes.job import NormalizerMeta
+from tests.stubs import get_dummy_data
 
 
 class DnsTest(TestCase):
