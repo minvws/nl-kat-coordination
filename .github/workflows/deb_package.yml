@@ -35,7 +35,7 @@ jobs:
         run: find . -type f -name 'version.py' -exec sed -ibak "s/__version__ = .*/__version__ = \"${RELEASE_TAG}\"/" {} \;
 
       - name: Clone octopoes
-        run: git clone https://${{ secrets.RDO_REPO_RO }}@github.com/minvws/nl-rt-tim-abang-octopoes.git /tmp/octopoes
+        run: git clone https://github.com/minvws/nl-kat-octopoes.git /tmp/octopoes
 
       - name: Run Debian package build script
         run: packaging/scripts/build-debian-package.sh

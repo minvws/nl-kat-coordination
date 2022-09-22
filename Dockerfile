@@ -25,7 +25,7 @@ COPY --from=boefjes-requirements /tmp/boefjes-requirements.txt /tmp/boefjes-requ
 COPY requirements-dev.txt .
 
 RUN --mount=type=cache,target=/root/.cache --mount=type=secret,id=github_token \
-    git config --global url."https://`cat /run/secrets/github_token`@github.com/".insteadOf "ssh://git@github.com/" \
+    git config --global url."https://github.com/".insteadOf "ssh://git@github.com/" \
     && pip install --upgrade pip \
     && pip install -r /tmp/boefjes-requirements.txt \
     && rm /tmp/boefjes-requirements.txt \
