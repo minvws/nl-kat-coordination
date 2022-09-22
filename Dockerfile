@@ -32,7 +32,7 @@ ARG ENVIRONMENT
 
 COPY requirements.txt requirements-check.txt requirements-dev.txt .
 RUN --mount=type=cache,target=/root/.cache --mount=type=secret,id=github_token \
-    git config --global url."https://`cat /run/secrets/github_token`@github.com/".insteadOf "ssh://git@github.com/" \
+    git config --global url."https://github.com/".insteadOf "ssh://git@github.com/" \
     && pip install --upgrade pip \
     && pip install -r requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-check.txt -r requirements-dev.txt; fi \
