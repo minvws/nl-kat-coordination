@@ -15,9 +15,7 @@ jobs:
 
     steps:
       - name: Configure git
-        env:
-          TOKEN: ${{ secrets.RDO_REPO_RO }}
-        run: git config --global url."https://${{ secrets.RDO_REPO_RO }}@github.com/".insteadOf "ssh://git@github.com/"
+        run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -29,14 +27,12 @@ jobs:
         with:
           repository: minvws/nl-kat-octopoes
           path: nl-kat-octopoes
-          token: ${{ secrets.RDO_REPO_RO }}
 
       - name: Checkout boefjes
         uses: actions/checkout@v2
         with:
           repository: minvws/nl-kat-boefjes
           path: nl-kat-boefjes
-          token: ${{ secrets.RDO_REPO_RO }}
 
       - name: Run tests
         run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
