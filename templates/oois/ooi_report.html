@@ -9,6 +9,14 @@
 
 <main class="report-tmp" id="main-content">
   <section>
+
+    <div class="horizontal-view toolbar">
+
+        <a href="{% ooi_url 'ooi_pdf_report' ooi.primary_key query=mandatory_fields %}"
+           class="button ghost">{% translate 'Download PDF' %}</a>
+    </div>
+
+
     <div>
       {% include 'partials/elements/ooi_report_settings.html' %}
 
@@ -32,5 +40,5 @@
 
 {% block html_at_end_body %}
   {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

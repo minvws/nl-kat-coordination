@@ -117,7 +117,7 @@ ROCKY_DB_PASSWORD=
 ```mermaid
 sequenceDiagram
     participant r as Rocky
-    participant c as Celery
+    participant c as Scheduler
     participant q as RabbitMQ
     participant b as Boefje
     participant n as Normalizer

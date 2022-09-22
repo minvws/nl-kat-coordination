@@ -1,0 +1,60 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Health Checks' %}</h1>
+        <div class="horizontal-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{% translate 'Service' %}</th>
+                <th scope="col">{% translate 'Healthy' %}</th>
+                <th scope="col">{% translate 'Version' %}</th>
+                <th scope="col">{% translate 'Additional' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for service in health_checks %}
+                <tr>
+                  <td>
+                    {% if service.service %}
+                      {{ service.service }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td class="{% if service.healthy %}confirmation{% else %}error{% endif %}">
+                    {% if service.healthy %}
+                      {{ service.healthy }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if service.version %}
+                      {{ service.version }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if service.additional %}
+                      {{ service.additional }}
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock %}

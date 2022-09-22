@@ -13,7 +13,6 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from fmea.forms import FailureModeForm
-from fmea.models import FailureMode
 from fmea.views.view_helpers import FailureModeBreadcrumbsMixin
 
 

@@ -96,7 +96,6 @@ class FindingAddView(BaseOOIFormView):
 
         # Create finding for each finding type
         ooi_ref = Reference.from_str(ooi_id)
-        oois = []
 
         for f_id in finding_type_ids:
             finding_type = get_finding_type_from_id(f_id)

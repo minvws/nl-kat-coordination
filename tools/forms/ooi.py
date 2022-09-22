@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 
-from rocky.katalogus import Boefje
+from katalogus.client import Boefje
 from tools.forms import (
     BaseRockyForm,
     Choice,
@@ -85,6 +85,15 @@ class SelectOOIFilterForm(BaseRockyForm):
     show_all = forms.NullBooleanField(
         widget=LabeledCheckboxInput(
             label=_("Show objects that don't meet the Boefjes scan level"),
+            autosubmit=True,
+        ),
+    )
+
+
+class PossibleBoefjesFilterForm(BaseRockyForm):
+    show_all = forms.NullBooleanField(
+        widget=LabeledCheckboxInput(
+            label=_("Show Boefjes that exceed the OOI's scan level"),
             autosubmit=True,
         ),
     )

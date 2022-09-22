@@ -6,4 +6,4 @@ class FMEAConfig(AppConfig):
     name = "fmea"
 
     def ready(self):
-        import fmea.signals
+        import fmea.signals  # noqa: F401

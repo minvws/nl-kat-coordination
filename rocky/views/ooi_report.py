@@ -1,9 +1,14 @@
+import re
+from datetime import datetime
 from typing import Dict, List, Set, Type, Optional
 
 from django.contrib import messages
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.views import View
+from django_otp.decorators import otp_required
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSARecord,
@@ -17,9 +22,17 @@ from octopoes.models.ooi.findings import (
     Finding,
     FindingType,
 )
+from requests import HTTPError
+from two_factor.views.utils import class_view_decorator
 
-from rocky.katalogus import get_katalogus
-from rocky.views.ooi_view import BaseOOIDetailView, OOIBreadcrumbsMixin
+from katalogus.client import get_katalogus
+from rocky.keiko import keiko_client
+from rocky.views.ooi_view import (
+    BaseOOIDetailView,
+    OOIBreadcrumbsMixin,
+    ConnectorFormMixin,
+    SingleOOITreeMixin,
+)
 from tools.forms import OOIReportSettingsForm
 from tools.models import Organization
 from tools.ooi_helpers import (
@@ -156,6 +169,7 @@ def build_findings_list_from_store(
     }
 
 
+@class_view_decorator(otp_required)
 class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
     template_name = "oois/ooi_report.html"
     connector_form_class = OOIReportSettingsForm
@@ -185,6 +199,67 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
         context["observed_at_form"] = self.get_connector_form()
         context["findings_list"] = findings_list
         return context
+
+
+@class_view_decorator(otp_required)
+class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
+    connector_form_class = OOIReportSettingsForm
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.api_connector = self.get_api_connector()
+        self.depth = self.get_depth()
+
+    def get(self, request, *args, **kwargs):
+        self.setup(request, *args, **kwargs)
+        self.ooi = self.get_ooi()
+
+        # reuse existing dict structure
+        report_data = build_findings_list_from_store(self.tree.store)
+        report_data["valid_time"] = str(self.get_observed_at())
+        report_data["ooi"] = get_ooi_dict(self.ooi)
+
+        # request pdf from keiko
+        try:
+            report_id = keiko_client.generate_report(
+                "bevindingenrapport", report_data, "dutch.hiero.csv"
+            )
+        except HTTPError as e:
+            messages.error(self.request, _("Error generating report: {}").format(e))
+            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key))
+
+        if report_id is None:
+            messages.error(self.request, _("Error generating report: Timeout reached"))
+            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key))
+
+        # generate file name
+        report_name = "bevindingenrapport"
+        org_code = self.request.active_organization.code
+        ooi_id = self.ooi.primary_key
+        valid_time = self.get_observed_at().isoformat()
+        current_time = datetime.now(timezone.utc).isoformat()
+        language = "nl"
+        report_file_name = "_".join(
+            [
+                report_name,
+                language,
+                org_code,
+                ooi_id,
+                valid_time,
+                current_time,
+            ]
+        )
+        # allow alphanumeric characters, dashes and underscores, replace rest with underscores
+        report_file_name = re.sub("[^0-9a-zA-Z-]", "_", report_file_name)
+        report_file_name = f"{report_file_name}.pdf"
+
+        # open pdf as attachment
+        response = HttpResponse(
+            keiko_client.get_report(report_id),
+            content_type="application/pdf",
+        )
+        response["Content-Disposition"] = f'attachment; filename="{report_file_name}"'
+        return response
 
 
 """

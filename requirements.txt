@@ -26,13 +26,13 @@ typing-extensions==3.10.0.0
 urllib3==1.26.5
 django-markdownify==0.9.1
 # Octopoes-core, specify a tagged version
-git+https://github.com/minvws/nl-kat-octopoes@v1.1.0
-celery==5.2.2
-flower==1.0.0
+git+https://git@github.com/minvws/nl-kat-octopoes@v1.2.0
 xhtml2pdf==0.2.5
 dnspython~=2.1.0
 django-password-validators==1.7.0
 colorama==0.4.5
+django-csp==3.7
+uwsgi==2.0.20
 
 # temp fix to pass build, remove later when https://github.com/xhtml2pdf/xhtml2pdf/issues/589 is solved
 reportlab==3.6.6

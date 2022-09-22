@@ -20,9 +20,7 @@ jobs:
         run: find . -type f -name 'version.py' -exec sed -ibak "s/__version__ = .*/__version__ = \"${RELEASE_VERSION}\"/" {} \;
 
       - name: Configure git
-        env:
-          TOKEN: ${{ secrets.RDO_REPO_RO }}
-        run: git config --global url."https://${{ secrets.RDO_REPO_RO }}@github.com/".insteadOf "ssh://git@github.com/"
+        run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: prep
         run: sudo mkdir -p /var/www/html

@@ -9,7 +9,7 @@
     <section>
       <div>
         {% include 'partials/ooi_head.html' with ooi=ooi view='scan_profile_detail' %}
-        <h1>{% translate 'Clearance level' %}: {{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}</h1>
+        <h1 rf-selector="clearance-header">{% translate 'Clearance level' %}: {{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}</h1>
         {% if ooi.scan_profile.scan_profile_type == 'declared' %}
           <h2>{% translate 'Declared' %}</h2>
           <p>

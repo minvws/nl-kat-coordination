@@ -1,25 +1,21 @@
 name: Run the test suite
 
-
 on:
   pull_request:
     branches:
-      - '**'
+      - "**"
   push:
     branches:
-      - 'develop'
-      - 'master'
+      - "develop"
+      - "master"
 
 jobs:
   Tests:
-
     runs-on: ubuntu-20.04
 
     steps:
       - name: Configure git
-        env:
-          TOKEN: ${{ secrets.RDO_REPO_RO }}
-        run: git config --global url."https://${{ secrets.RDO_REPO_RO }}@github.com/".insteadOf "ssh://git@github.com/"
+        run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: Checkout code
         uses: actions/checkout@v2
@@ -37,7 +33,7 @@ jobs:
         with:
           repository: minvws/nl-kat-boefjes
           path: nl-kat-boefjes
-          
+
       - name: Run tests
-        run: docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
+        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
         working-directory: nl-kat-rocky

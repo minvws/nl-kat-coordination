@@ -9,7 +9,7 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from rocky.views.boefje import BoefjeMixin
-from rocky.katalogus import Boefje, get_katalogus
+from katalogus.client import Boefje, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin, PageActionMixin
 
 BOEFJE_STATUSES = [

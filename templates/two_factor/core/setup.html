@@ -39,7 +39,7 @@
         </div>
       </fieldset>
     </form>
-    <form action="" method="post" class="horizontal-view">
+    <form action="" method="post" class="horizontal-view help">
       {% csrf_token %}
       {% include "two_factor/_wizard_forms.html" with step=wizard.steps.current %}
       {# hidden submit button to enable [enter] key #}

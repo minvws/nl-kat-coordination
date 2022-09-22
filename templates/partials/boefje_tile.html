@@ -4,20 +4,13 @@
 <div class="{% if item.required %}required{% endif %} {{ item|get_type_name|lower }}"
      role="group"
      aria-labelledby="{{ item.id }}">
-  {% if item.required %}
-    <span class="nota-bene" id="boefje_{{ item.id }}">This object type is required</span>
-  {% endif %}
+  {% if item.required %}<span class="nota-bene" id="boefje_{{ item.id }}">This object type is required</span>{% endif %}
   {% if widget %}
     {% include 'forms/widgets/checkbox_option.html' %}
   {% endif %}
-
-  {% if widget %}
-    <span class="tile-label">
-      {{ item|get_type_name }}
-    </span>
-  {% endif %}
+  {% if widget %}<span class="tile-label">{{ item|get_type_name }}</span>{% endif %}
   <img src="{% url 'boefje_cover' boefje_id=item.id %}"
-        alt="placeholder image for Boefje {{ item.name }}">
+       alt="placeholder image for Boefje {{ item.name }}">
   {% with scan_level=item.scan_level.value %}
     <div class="horizontal-view scan-intensity">
       <span class="de-emphasized">{% translate 'Scan intensity score:' %}</span>
@@ -36,6 +29,6 @@
     <a href="{% url 'katalogus_detail' id=item.id %}">{% translate 'See details' %}</a>
     {% if not widget %}
       {% enable_disable_boefje_button item perms.tools.can_enable_disable_boefje %}
-  {% endif %}
+    {% endif %}
   </div>
 </div>

@@ -36,9 +36,9 @@ MIAUW_BASE_URL = os.getenv("MIAUW_BASE_URL", "")
 MIAUW_USERNAME = os.getenv("MIAUW_USERNAME", "")
 MIAUW_PASSWORD = os.getenv("MIAUW_PASSWORD", "")
 MIAUW_REQUEST_VALIDATE = os.getenv("MIAUW_REQUEST_VALIDATE", "True") == "True"
+
 OCTOPOES_API = os.getenv("OCTOPOES_API")
 
-FLOWER_API = os.getenv("FLOWER_API", "")
 SCHEDULER_API = os.getenv("SCHEDULER_API", "")
 
 KATALOGUS_API = os.getenv("KATALOGUS_API", "")
@@ -46,6 +46,8 @@ KATALOGUS_API = os.getenv("KATALOGUS_API", "")
 BYTES_API = os.getenv("BYTES_API", "")
 BYTES_USERNAME = os.getenv("BYTES_USERNAME", "")
 BYTES_PASSWORD = os.getenv("BYTES_PASSWORD", "")
+
+KEIKO_API = os.getenv("KEIKO_API", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
@@ -99,6 +101,7 @@ INSTALLED_APPS = [
     "fmea",
     "crisis_room",
     "onboarding",
+    "katalogus",
     "django_password_validators",
     "django_password_validators.password_history",
 ]
@@ -181,18 +184,19 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {
-            "min_length": 12,
+            "min_length": int(os.getenv("PASSWORD_MIN_LENGTH", 12)),
         },
     },
     {
-        "NAME": "django_password_validators.password_character_requirements.password_validation.PasswordCharacterValidator",
+        "NAME": "django_password_validators.password_character_requirements"
+        ".password_validation.PasswordCharacterValidator",
         "OPTIONS": {
-            "min_length_digit": 2,
-            "min_length_alpha": 2,
-            "min_length_special": 2,
-            "min_length_lower": 2,
-            "min_length_upper": 2,
-            "special_characters": "~!@#$%^&*()_+{}\":;'[]",
+            "min_length_digit": int(os.getenv("PASSWORD_MIN_DIGIT", 2)),
+            "min_length_alpha": int(os.getenv("PASSWORD_MIN_ALPHA", 2)),
+            "min_length_special": int(os.getenv("PASSWORD_MIN_SPECIAL", 2)),
+            "min_length_lower": int(os.getenv("PASSWORD_MIN_LOWER", 2)),
+            "min_length_upper": int(os.getenv("PASSWORD_MIN_UPPER", 2)),
+            "special_characters": " ~!@#$%^&*()_+{}\":;'[]",
         },
     },
 ]
@@ -265,6 +269,23 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
+CSP_HEADER = os.getenv("CSP_HEADER", "True") == "True"
+
+if CSP_HEADER:
+    MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
+    INSTALLED_APPS += ["csp"]
+
+CSP_DEFAULT_SRC = ["'none'"]
+CSP_IMG_SRC = ["'self'"]
+CSP_FONT_SRC = ["'self'"]
+CSP_STYLE_SRC = ["'self'"]
+CSP_FRAME_ANCESTORS = ["'none'"]
+CSP_BASE = ["'none'"]
+CSP_FORM_ACTION = ["'self'"]
+CSP_INCLUDE_NONCE_IN = ["script-src"]
+
+CSP_BLOCK_ALL_MIXED_CONTENT = True
+
 # MarkDownify settings
 # see https://django-markdownify.readthedocs.io/en/latest/settings.html
 MARKDOWNIFY = {
@@ -305,13 +326,3 @@ MARKDOWNIFY = {
         },
     }
 }
-
-# Celery
-broker_url = QUEUE_URI
-result_backend = f"rpc://{QUEUE_URI}"
-
-task_serializer = "pickle"
-result_serializer = "pickle"
-event_serializer = "json"
-accept_content = ["application/json", "application/x-python-serialize"]
-result_accept_content = ["application/json", "application/x-python-serialize"]

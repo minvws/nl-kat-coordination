@@ -1,7 +1,6 @@
 from django.test import SimpleTestCase
-
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
-from rocky.katalogus import _parse_boefje_v1
+from katalogus.client import _parse_boefje_v1
 
 
 class KATalogusTestCase(SimpleTestCase):
