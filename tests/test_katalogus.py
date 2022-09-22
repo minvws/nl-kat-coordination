@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
-import katalogus.api
-from config import settings
-from katalogus.api import app
+import boefjes.katalogus.api
+from boefjes.config import settings
+from boefjes.katalogus.api import app
 
 
 class KATalogusTest(TestCase):
@@ -22,7 +22,7 @@ class KATalogusTest(TestCase):
         self.assertGreater(len(response.json()), 0)
 
     def test_list_empty_boefjes(self):
-        with patch.object(katalogus.api, "BOEFJES_DIR", Path("non-existing")):
+        with patch.object(boefjes.katalogus.api, "BOEFJES_DIR", Path("non-existing")):
             response = self.client.get("/boefjes")
 
             self.assertEqual(200, response.status_code)
@@ -62,14 +62,14 @@ class KATalogusTest(TestCase):
         )
 
     def test_get_dns_cover(self):
-        path = settings.base_dir / "boefjes" / "kat_dns" / "cover.png"
+        path = settings.base_dir / "plugins" / "kat_dns" / "cover.png"
         response = self.client.get("/boefjes/dns-records/cover.png")
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(path.read_bytes(), response.content)
 
     def test_get_dns_description(self):
-        path = settings.base_dir / "boefjes" / "kat_dns" / "description.md"
+        path = settings.base_dir / "plugins" / "kat_dns" / "description.md"
         response = self.client.get("/boefjes/dns-records/description.md")
 
         self.assertEqual(200, response.status_code)

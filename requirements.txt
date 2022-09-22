@@ -12,4 +12,4 @@ psycopg2-binary==2.9.3
 pylxd==2.3.1
 pynacl==1.5.0
 sqlalchemy==1.4.32
-git+https://github.com/minvws/nl-kat-octopoes@v1.1.0
+git+https://github.com/minvws/nl-kat-octopoes@v1.2.0

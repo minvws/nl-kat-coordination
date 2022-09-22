@@ -31,7 +31,7 @@ help: ## Show this help.
 build: migrate seed
 
 seed:  # Seed the katalogus database
-	-docker-compose run katalogus python -m seed
+	-docker-compose run katalogus python -m boefjes.seed
 
 ##
 ##|------------------------------------------------------------------------|
@@ -67,5 +67,36 @@ test: itest ## Run all tests.
 
 itest: ## Run the integration tests.
 	$(ci-docker-compose) build
-	$(ci-docker-compose) down
-	$(ci-docker-compose) run --rm katalogus_integration; $(ci-docker-compose) down
+	$(ci-docker-compose) down --remove-orphans
+	$(ci-docker-compose) run --rm katalogus_integration
+
+debian:
+	-mkdir ./build
+ifdef OCTOPOES_DIR
+	docker run \
+	--env PKG_NAME=kat-boefjes \
+	--env BUILD_DIR=./build \
+	--env REPOSITORY=minvws/nl-kat-boefjes \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--env OCTOPOES_DIR=/octopoes \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--mount type=bind,src=${OCTOPOES_DIR},dst=/octopoes \
+	--workdir /app \
+	debian:latest \
+	packaging/scripts/build-debian-package.sh
+else
+	docker run \
+	--env PKG_NAME=kat-boefjes \
+	--env BUILD_DIR=./build \
+	--env REPOSITORY=minvws/nl-kat-boefjes \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--workdir /app \
+	debian:latest \
+	packaging/scripts/build-debian-package.sh
+endif
+
+clean:
+	-rm -rf build
