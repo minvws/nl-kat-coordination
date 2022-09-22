@@ -179,7 +179,7 @@ flowchart TB
             push_queue[["push_queue()<br/>[api endpoint]"]]
         end
 
-        Datastore[("SQLite<br/>[datastore]<br/>(in-memory)")]
+        Datastore[("SQL database<br/>[datastore]<br/>")]
 
     end
 ```

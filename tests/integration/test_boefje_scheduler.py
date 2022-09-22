@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, datastores, dispatchers, models, queues, rankers, schedulers
+from scheduler import config, connectors, datastores, models, queues, rankers, schedulers
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -53,9 +53,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.services.bytes = self.mock_bytes
 
         # Datastore
-        self.mock_ctx.datastore = datastores.SQLAlchemy(
-            dsn="sqlite:///", datastore_type=datastores.DatastoreType.SQLITE
-        )
+        self.mock_ctx.datastore = datastores.SQLAlchemy(dsn="sqlite:///")
         models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
 
         # Scheduler
@@ -78,14 +76,6 @@ class SchedulerTestCase(unittest.TestCase):
             queue=queue,
             ranker=ranker,
             organisation=self.organisation,
-        )
-
-        self.dispatcher = dispatchers.BoefjeDispatcher(
-            ctx=self.mock_ctx,
-            scheduler=self.scheduler,
-            item_type=models.BoefjeTask,
-            celery_queue="boefjes",
-            task_name="tasks.handle_boefje",
         )
 
     @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
@@ -342,42 +332,6 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.scheduler.populate_queue()
         self.assertEqual(1, self.scheduler.queue.qsize())
-
-    def test_dispatcher(self):
-        """When a task is dispatched, it should be added to the queue"""
-        organisation = OrganisationFactory()
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        task = models.BoefjeTask(
-            id=uuid.uuid4().hex,
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=organisation.id,
-        )
-        self.scheduler.push_item_to_queue(queues.PrioritizedItem(0, task))
-
-        d = self.dispatcher
-        d.app.send_task = mock.Mock()
-
-        # Get item and dispatch it
-        p_item = d.scheduler.pop_item_from_queue()
-        d.dispatch(p_item)
-
-        # Test the celery implementation
-        item_dict = p_item.item.dict()
-        d.app.send_task.assert_called_once_with(
-            name="tasks.handle_boefje",
-            args=(item_dict,),
-            queue="boefjes",
-            task_id=item_dict.get("id"),
-        )
-
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-        # When a task is dispatched, its status should be updated
-        task_db = self.mock_ctx.datastore.get_task_by_id(task.id)
-        self.assertEqual(task_db.id.hex, task.id)
-        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
     @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")

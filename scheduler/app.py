@@ -4,7 +4,7 @@ import threading
 import time
 from typing import Any, Callable, Dict
 
-from scheduler import context, dispatchers, queues, rankers, schedulers, server
+from scheduler import context, queues, rankers, schedulers, server
 from scheduler.connectors import listeners
 from scheduler.models import BoefjeTask, NormalizerTask, Organisation
 from scheduler.utils import thread
@@ -46,9 +46,6 @@ class App:
         self.ctx: context.AppContext = ctx
         self.threads: Dict[str, thread.ThreadRunner] = {}
         self.stop_event: threading.Event = self.ctx.stop_event
-
-        # Initializer dispatchers
-        self.dispatchers: Dict[str, dispatchers.Dispatcher] = {}
 
         # Initialize schedulers
         self.schedulers: Dict[str, schedulers.Scheduler] = {}
@@ -111,30 +108,11 @@ class App:
             s = self.create_boefje_scheduler(org)
             self.schedulers[s.scheduler_id] = s
 
-            d = dispatchers.BoefjeDispatcher(
-                ctx=self.ctx,
-                scheduler=s,
-                item_type=BoefjeTask,
-                celery_queue="boefjes",
-                task_name="tasks.handle_boefje",
-            )
-
-            self.dispatchers[s.scheduler_id] = d
-
     def initialize_normalizer_schedulers(self) -> None:
         orgs = self.ctx.services.katalogus.get_organisations()
         for org in orgs:
             s = self.create_normalizer_scheduler(org)
             self.schedulers[s.scheduler_id] = s
-
-            d = dispatchers.NormalizerDispatcher(
-                ctx=self.ctx,
-                scheduler=s,
-                item_type=NormalizerTask,
-                celery_queue="normalizers",
-                task_name="tasks.handle_normalizer",
-            )
-            self.dispatchers[s.scheduler_id] = d
 
     def create_normalizer_scheduler(self, org: Organisation) -> schedulers.NormalizerScheduler:
         """Create a normalizer scheduler for the given organisation."""
@@ -230,7 +208,6 @@ class App:
             * api server
             * listeners
             * schedulers
-            * dispatchers
             * monitors
         """
         # API Server
@@ -243,10 +220,6 @@ class App:
         # Start the schedulers
         for scheduler in self.schedulers.values():
             scheduler.run()
-
-        # Start the dispatchers
-        for name, dispatcher in self.dispatchers.items():
-            self._run_in_thread(name=f"dispatcher_{name}", func=dispatcher.run, interval=self.ctx.config.dsp_interval)
 
         # Start monitors
         self._run_in_thread(name="monitor_organisations", func=self.monitor_organisations, interval=3600)

@@ -37,13 +37,6 @@ SCHEDULER_PQ_INTERVAL=
 # default: 86400
 SCHEDULER_PQ_GRACE=
 
-# Interval in seconds of the execution of the `dispatch` method of the
-# `dispatchers.Dispatcher` class, default: 5
-SCHEDULER_DSP_INTERVAL=
-
-# Dispatcher celery queue to post tasks to
-SCHEDULER_DSP_BROKER_URL=
-
 # RabbitMQ host address
 SCHEDULER_RABBITMQ_DSN=
 
@@ -89,12 +82,6 @@ to be running again. E.g. a task can be considered to be put onto the queue
 again when it just has been dispatched. With this setting we can avoid that
 tasks are put onto the queue again when they are not allowed to be dispatched
 again. Default is `86400`.
-
-`SCHEDULER_DSP_INTERVAL` is the interval in seconds of the execution of the
-`dispatch` method of the`dispatchers.Dispatcher` class. This allows us to 
-throttle how fast the tasks are dispatched. Default is `5`.
-
-`SCHEDULER_DSP_BROKER_URL` is the url of the celery broker to post tasks to.
 
 `SCHEDULER_RABBITMQ_DSN` is the url of the RabbitMQ host.
 
