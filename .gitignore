@@ -342,10 +342,6 @@ ipython_config.py
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
 # SageMath parsed files
 *.sage.py
 
@@ -457,4 +453,4 @@ assets/bytes/
 # don't ignore debian package files
 !packaging/deb/data/usr/lib
 # robot framework
-tests/robot_framework/results
+tests/robot/results*
