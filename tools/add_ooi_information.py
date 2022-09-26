@@ -209,7 +209,8 @@ def service_info(value) -> Tuple[str, str]:
     descriptions = []
     for service in services:
         descriptions.append(
-            f"Service is usually on port {service.port}, with protocol {service.transport_protocol}: {service.description}"
+            f"Service is usually on port {service.port}, "
+            f"with protocol {service.transport_protocol}: {service.description}"
         )
 
     return ". ".join(descriptions), source

@@ -23,7 +23,6 @@ override_dh_fixperms:
 	chmod 750 $(DESTDIR)/etc/kat/
 	chmod 750 $(DESTDIR)/usr/share/kat-rocky
 	chmod 750 $(DESTDIR)/usr/lib/systemd/system/kat-rocky.service
-	chmod 750 $(DESTDIR)/usr/lib/systemd/system/kat-flower.service
 	chmod 750 $(DESTDIR)/usr/lib/systemd/system/kat-rocky.socket
 
 #override_dh_install:

@@ -25,6 +25,9 @@ urlpatterns = [
     ),
     path("objects/graph/", views.OOIGraphView.as_view(), name="ooi_graph"),
     path("objects/report/", views.OOIReportView.as_view(), name="ooi_report"),
+    path(
+        "objects/report/pdf/", views.OOIReportPDFView.as_view(), name="ooi_pdf_report"
+    ),
     path("objects/summary/", views.OOISummaryView.as_view(), name="ooi_summary"),
     path("objects/tree/", views.OOITreeView.as_view(), name="ooi_tree"),
     path("objects/findings/", views.OOIFindingListView.as_view(), name="ooi_findings"),
@@ -62,6 +65,11 @@ urlpatterns = [
         name="organization_member_edit",
     ),
     path("health/", views.health, name="health"),
+    path(
+        "health/v1/",
+        views.HealthChecks.as_view(),
+        name="health_beautified",
+    ),
     path("objects/", views.OOIListView.as_view(), name="ooi_list"),
     path(
         "objects/add/", views.OOIAddTypeSelectView.as_view(), name="ooi_add_type_select"
@@ -88,28 +96,16 @@ urlpatterns = [
     ),
     path("scans/", views.ScanListView.as_view(), name="scan_list"),
     path("admin/", admin.site.urls),
-    path("upload/", views.upload, name="upload"),
+    path(
+        "upload/csv/",
+        views.UploadCSV.as_view(),
+        name="upload_csv",
+    ),
     path("signal_qr/", views.SignalQRView.as_view(), name="signal_qr"),
-    path("kat-alogus/", views.KATalogusListView.as_view(), name="katalogus"),
     path(
         "plugins/<boefje_id>/cover.png",
         views.BoefjeCoverView.as_view(),
         name="boefje_cover",
-    ),
-    path(
-        "kat-alogus/<id>/",
-        views.BoefjeDetailView.as_view(),
-        name="katalogus_detail",
-    ),
-    path(
-        "kat-alogus/<id>/add-consumable-object",
-        views.BoefjeConsumableObjectType.as_view(),
-        name="boefje_add_consumable_type",
-    ),
-    path(
-        "kat-alogus/<id>/add-consumable-object/<add_ooi_type>",
-        views.BoefjeConsumableObjectAddView.as_view(),
-        name="boefje_add_consumable_object",
     ),
     path(
         "privacy-statement/",
@@ -121,9 +117,23 @@ urlpatterns = [
         crisis_room_views.CrisisRoomView.as_view(),
         name="crisis_room",
     ),
-    path("tasks/", views.TaskListView.as_view(), name="task_list"),
+    path("tasks/", views.BoefjesTaskListView.as_view(), name="task_list"),
+    path(
+        "tasks/boefjes", views.BoefjesTaskListView.as_view(), name="boefjes_task_list"
+    ),
+    path(
+        "tasks/normalizers",
+        views.NormalizersTaskListView.as_view(),
+        name="normalizers_task_list",
+    ),
+    path(
+        "tasks/<task_id>/download/",
+        views.DownloadTaskDetail.as_view(),
+        name="download_task_meta",
+    ),
     path("bytes/<boefje_meta_id>/raw", views.BytesRawView.as_view(), name="bytes_raw"),
     path("onboarding/", include("onboarding.urls"), name="onboarding"),
+    path("kat-alogus/", include("katalogus.urls"), name="katalogus"),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),

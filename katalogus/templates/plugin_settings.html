@@ -1,0 +1,62 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{{ plugin_name }}{% translate ' settings' %}</h1>
+        {% if not object_list %}
+          <p class="emphasized">
+            {% translate 'There are currently no settings defined. Use the button below to add a new setting.' %}
+          </p>
+          <a class="button"
+             href="{% url 'plugin_settings_add' plugin_type=plugin_type plugin_id=plugin_id %}">{% translate 'Add setting' %}</a>
+        {% else %}
+          <p class="emphasized">
+            {% translate 'This is an overview of all settings set for ' %}{{ plugin_name }}
+          </p>
+          <div class="horizontal-view toolbar">
+            <a class="button"
+               href="{% url 'plugin_settings_add' plugin_type=plugin_type plugin_id=plugin_id %}">{% translate 'Add setting' %}</a>
+          </div>
+          <div class="horizontal-scroll">
+            <table>
+              <caption>{% translate 'Settings:' %}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{% translate 'Name' %}</th>
+                  <th scope="col">{% translate 'Value' %}</th>
+                  <th scope="col">{% translate 'Edit' %}</th>
+                  <th scope="col">{% translate 'Delete' %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for setting in object_list %}
+                  <tr>
+                    {% for name, value in setting.items %}
+                      <td>{{ name }}</td>
+                      <td>{{ value }}</td>
+                      <td>
+                        <a href="{% url 'plugin_settings_edit' plugin_type=plugin_type plugin_id=plugin_id name=name %}">{% translate 'Edit' %}</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'plugin_settings_delete' plugin_type=plugin_type plugin_id=plugin_id name=name %}">{% translate 'Delete' %}</a>
+                      </td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% include 'partials/pagination.html' %}
+          </div>
+        </div>
+        <div role="group"></div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+</main>
+{% endblock %}

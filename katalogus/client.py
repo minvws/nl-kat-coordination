@@ -60,6 +60,43 @@ class KATalogusClientV1(KATalogusClientInterface):
         self.base_uri = base_uri
         self.organization_uri = f"{base_uri}/v1/organisations/{organization}"
 
+    def get_all_settings(self) -> Dict[str, str]:
+        response = requests.get(f"{self.organization_uri}/settings")
+        return response.json()
+
+    def get_plugin_settings(self, plugin_id: str) -> Dict[str, str]:
+        response = requests.get(f"{self.organization_uri}/{plugin_id}/settings")
+        return response.json()
+
+    def add_plugin_setting(self, plugin_id: str, name: str, value: str) -> None:
+        body = {"value": value}
+        response = requests.post(
+            f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body
+        )
+        response.raise_for_status()
+
+    def get_plugin_setting(self, plugin_id: str, key: str) -> str:
+        response = requests.get(f"{self.organization_uri}/{plugin_id}/settings/{key}")
+        return response.json()
+
+    def add_setting(self, name: str, value: str) -> None:
+        body = {"value": value}
+        response = requests.post(f"{self.organization_uri}/settings/{name}", json=body)
+        response.raise_for_status()
+
+    def update_plugin_setting(self, plugin_id: str, name: str, value: str) -> None:
+        body = {"value": value}
+        response = requests.put(
+            f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body
+        )
+        response.raise_for_status()
+
+    def delete_plugin_setting(self, plugin_id: str, name: str) -> None:
+        response = requests.delete(
+            f"{self.organization_uri}/{plugin_id}/settings/{name}"
+        )
+        return response
+
     def health(self) -> ServiceHealth:
         response = requests.get(f"{self.base_uri}/health")
         response.raise_for_status()

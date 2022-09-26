@@ -4,7 +4,8 @@
 {% spaceless %}
   <div class="horizontal-view toolbar">
     <div class="dropdown">
-      <button aria-controls="export-add" class="dropdown-button ghost">{% translate 'Add' %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+      <button aria-controls="export-add" class="dropdown-button ghost">
+        {% translate 'Add' %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
       </button>
       <ul id="export-add" aria-expanded="false" class="dropdown-list">
         <li>
@@ -14,7 +15,7 @@
           <a href="{% url 'scan_list' %}">{% translate 'Scan for objects' %}</a>
         </li>
         <li>
-          <a href="{% url 'upload' %}">{% translate 'Upload CSV' %}</a>
+          <a href="{% url 'upload_csv' %}">{% translate 'Upload CSV' %}</a>
         </li>
       </ul>
     </div>

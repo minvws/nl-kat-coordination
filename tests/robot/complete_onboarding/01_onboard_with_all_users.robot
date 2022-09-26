@@ -15,13 +15,13 @@ I want to onboard and create all optional users
     Get Title    equal    KAT - step_account_setup_admin
 
 I want to create a secondary admin account
-    Create A User While Onboarding    Admin    admin@localhost    P@ssw00rdAdmin!
+    Create A User While Onboarding    Admin    admin@localhost    P@SSw00rdAdmin!123456789
 
 I want to create a redteamer account
-    Create A User While Onboarding    Redteamer    redteamer@localhost    P@ssw00rdRedteam!
+    Create A User While Onboarding    Redteamer    redteamer@localhost    P@SSw00rdRedteam!123456789
 
 I want to create a client account
-    Create A User While Onboarding    Client    client@localhost    P@ssw00rdClient!
+    Create A User While Onboarding    Client    client@localhost    P@SSw00rdClient!123456789
 
 I am on the Crisis Room page
     Get Title    equal    KAT - crisis_room

@@ -3,6 +3,7 @@ from django.contrib.auth.views import LogoutView
 from django.http import HttpResponseServerError
 from django.shortcuts import resolve_url
 from django.urls import reverse
+from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
@@ -10,13 +11,14 @@ from two_factor.forms import MethodForm
 from two_factor.utils import default_device
 from two_factor.views import LoginView, QRGeneratorView, SetupView
 from two_factor.views.utils import class_view_decorator
-from two_factor.forms import MethodForm, AuthenticationTokenForm, BackupTokenForm
-from django.shortcuts import resolve_url
-from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from rocky.settings import LOGIN_REDIRECT_URL
 from tools.models import OrganizationMember
-from account.forms import LoginForm
+from account.forms import (
+    LoginForm,
+    TwoFactorSetupTokenForm,
+    TwoFactorVerifyTokenForm,
+    TwoFactorBackupTokenForm,
+)
 
 User = get_user_model()
 
@@ -26,12 +28,30 @@ User = get_user_model()
 class LoginRockyView(LoginView):
     form_list = (
         ("auth", LoginForm),
-        ("token", AuthenticationTokenForm),
-        ("backup", BackupTokenForm),
+        ("token", TwoFactorVerifyTokenForm),
+        ("backup", TwoFactorBackupTokenForm),
     )
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def get_form(self, step=None, **kwargs):
+        """
+        Returns the form for the step
+        """
+        form = super().get_form(step=step, **kwargs)
+        if (step or self.steps.current) == "token":
+            form = TwoFactorVerifyTokenForm(
+                user=self.get_user(), initial_device=self.get_device(), **kwargs
+            )
+        elif (step or self.steps.current) == "backup":
+            form = TwoFactorBackupTokenForm(
+                user=self.get_user(), initial_device=self.get_device(), **kwargs
+            )
+        if self.show_timeout_error:
+            form.cleaned_data = getattr(form, "cleaned_data", {})
+            form.add_error(
+                None,
+                ValidationError(_("Your session has timed out. Please login again.")),
+            )
+        return form
 
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form, **kwargs)
@@ -60,9 +80,6 @@ class LoginRockyView(LoginView):
 @class_view_decorator(sensitive_post_parameters())
 @class_view_decorator(never_cache)
 class QRGeneratorRockyView(QRGeneratorView):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def get(self, request, *args, **kwargs):
         # We only allow enabling TFA for verified users to shield new organization members before we approve them
         if not is_verified(self.request.user):
@@ -75,10 +92,10 @@ class QRGeneratorRockyView(QRGeneratorView):
 @class_view_decorator(never_cache)
 class SetupRockyView(SetupView):
     # This is set to skip the extra welcome form which is for KAT a redundant step.
-    form_list = (("method", MethodForm),)
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    form_list = (
+        ("method", MethodForm),
+        ("generator", TwoFactorSetupTokenForm),
+    )
 
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form, **kwargs)

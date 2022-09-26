@@ -4,34 +4,37 @@
 
 {% block content %}
   {% include 'header.html' %}
-
   <main id="main-content" tabindex="-1" class="katalogus">
     <section>
       <div>
-        <h1>{% translate 'KAT-alogus' %}</h1>
-
-        <p>
-          {% translate 'An overview of all available boefjes. Boefjes can be used to scan for vulnerablilities and security issues within specified objects. Each boefje has his own focus area and strengths.' %}
-        </p>
+        <div class="column-2">
+          <div role="group">
+            <h1>{% translate 'KAT-alogus' %}</h1>
+            <p class="emphasized">
+              {% blocktranslate %}
+                An overview of all available boefjes.
+                Boefjes can be used to scan for vulnerablilities and security issues within specified objects.
+                Each boefje has his own focus area and strengths.
+              {% endblocktranslate %}
+            </p>
+            <a class="button" href={% url 'katalogus_settings' %}>{% translate 'Settings' %}</a>
+          </div>
+          <div role="group"></div>
+        </div>
       </div>
     </section>
-
     <section>
       <div>
-        <h2>
-          {% translate 'All available boefjes' %}
-        </h2>
-
+        <h2>{% translate 'All available boefjes' %}</h2>
         {% include 'partials/katalogus_list_filters.html' %}
-
         {% block katalogus-view %}{% endblock %}
+
       </div>
     </section>
-
   </main>
 {% endblock %}
 
 {% block html_at_end_body %}
   {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

@@ -94,7 +94,7 @@ class LabeledCheckboxInput(forms.CheckboxInput):
         context = super(LabeledCheckboxInput, self).get_context(name, value, attrs)
         context["widget"]["wrap_label"] = True
         context["widget"]["label"] = self.label
-        context["widget"]["attrs"]["onClick"] = "this.form.submit()"
+        context["widget"]["attrs"]["class"] = "submit-on-click"
         return context
 
 
@@ -203,6 +203,7 @@ class CheckboxTable(Widget):
         }
 
     def value_from_datadict(self, data, files, name):
+        del files
         getter = data.get
         if self.allow_multiple_selected:
             try:

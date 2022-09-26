@@ -7,72 +7,76 @@
   {% include 'header.html' with breadcrumb_list=breadcrumb_list %}
   <main id="main-content">
     <section>
-      <div class="two-thirds-one-third">
+      <div class="one-third-two-thirds">
         <div>
+          <img src="{% url 'boefje_cover' boefje_id=boefje.id %}"
+               alt="boefje placeholder image"/>
+        </div>
+        <div>
+          <div class="horizontal-view toolbar">
+            {% enable_disable_boefje_button boefje perms.tools.can_enable_disable_boefje %}
+            <a class="button"
+               href="{% url 'plugin_settings_list' plugin_type='boefjes' plugin_id=boefje.id %}">{% translate 'Settings' %}</a>
+          </div>
           <h1>{{ boefje.name }}</h1>
-          <p>
-            {{ boefje.description }}.
-          </p>
-          <h2>{% translate "Scan level" %}:</h2>
-          {% include 'partials/scan_level_indicator.html' with value=boefje.scan_level.value %}
+          <div class="horizontal-view scan-intensity">
+            <span class="de-emphasized">{% translate 'Scan level' %}</span>
+            {% include 'partials/scan_level_indicator.html' with value=boefje.scan_level.value %}
+          </div>
           <p class="explanation"
              data-open-label="Open uitleg"
              data-close-label="Sluit uitleg">
             <span>{% translate "Explanation" %}:</span>
             {% blocktranslate trimmed with scan_level=boefje.scan_level.label %}
-                Scan level: This boefje will only scan objects with a corresponding scan level ({{ scan_level }})
-                or higher. There is no indemnification for this boefje to scan an OOI with a lower scan level.
-              {% endblocktranslate %}
+             Scan level: This boefje will only scan objects with a corresponding scan level ({{ scan_level }})
+             or higher. There is no indemnification for this boefje to scan an OOI with a lower scan level.
+           {% endblocktranslate %}
           </p>
-          <div class="column-2">
-            <div>
-              <h5>{% translate "Consumes" %}:</h5>
-              <ul>
-                {% for ooi in boefje.consumes|ooi_types_to_strings %}
-                  <li>
-                    <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
-            <div>
-              <h5>{% translate "Produces" %}:</h5>
-              <ul>
-                {% for ooi in boefje.produces|ooi_types_to_strings %}
-                  <li>
-                    <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
+          {{ boefje.description }}.
+          <div>
+            {% if description %}
+              <section class="accordion">
+                <div>
+                  <button aria-expanded="false" id="readme-header">{% translate "Readme" %}</button>
+                  <div aria-labelledby="readme-header">{{ description|markdownify }}</div>
+                </div>
+              </section>
+            {% else %}
+              <h2>Readme</h2>
+              {% with name=boefje.name %}
+                <p>
+                  {% blocktranslate %}Readme not found for boefje '{{ name }}'.{% endblocktranslate %}
+                </p>
+              {% endwith %}
+            {% endif %}
           </div>
         </div>
         <div>
-          <img src="{% url 'boefje_cover' boefje_id=boefje.id %}"
-               alt="boefje placeholder image">
-          <div class="horizontal-view toolbar">
-            {% enable_disable_boefje_button boefje perms.tools.can_enable_disable_boefje %}
+          <p>
+          </p>
+        </div>
+        <div class="column-2">
+          <div>
+            <h5>{% translate "Consumes" %}:</h5>
+            <ul>
+              {% for ooi in boefje.consumes|ooi_types_to_strings %}
+                <li>
+                  <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div>
+            <h5>{% translate "Produces" %}:</h5>
+            <ul>
+              {% for ooi in boefje.produces|ooi_types_to_strings %}
+                <li>
+                  <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
+                </li>
+              {% endfor %}
+            </ul>
           </div>
         </div>
-      </div>
-    </section>
-    <section>
-      <div>
-        {% if description %}
-          <section class="accordion">
-            <div>
-              <button aria-expanded="false" id="readme-header">{% translate "Readme" %}</button>
-              <div aria-labelledby="readme-header">{{ description|markdownify }}</div>
-            </div>
-          </section>
-        {% else %}
-          <h2>Readme</h2>
-          {% with name=boefje.name %}
-            <p>
-              {% blocktranslate %}Readme not found for boefje '{{ name }}'.{% endblocktranslate %}
-            </p>
-          {% endwith %}
-        {% endif %}
       </div>
     </section>
     <section>
@@ -90,18 +94,18 @@
           </div>
         </div>
         {% if select_oois_form.fields.ooi.choices %}
-          {% include 'partials/form/checkbox_group_table_form.html' with checkbox_group_table_form=select_oois_form btn_text='Start scan' btn_disabled=boefje_disabled key='boefje_id' value=boefje.id action="scan" checkbox_group_table_filter_form=select_ooi_filter_form unique_id="" %}
+          {% include 'partials/form/checkbox_group_table_form.html' with checkbox_group_table_form=select_oois_form btn_text='Start scan' btn_disabled=boefje_disabled key='boefje_id'   value=boefje.id action="scan" checkbox_group_table_filter_form=select_ooi_filter_form unique_id="" %}
         {% else %}
           {% if has_consumable_oois %}
             {% blocktranslate %}
-              You currently don't have any objects that meet the scan level of {{ boefje.name }}. 
-              Add objects with a complying clearance level, or alter the clearance level of existing objects.
-            {% endblocktranslate %}
+                You currently don't have any objects that meet the scan level of {{ boefje.name }}.
+                Add objects with a complying clearance level, or alter the clearance level of existing objects.
+              {% endblocktranslate %}
           {% else %}
             {% blocktranslate %}
-              You currently don't have scannable objects for {{ boefje.name }}. 
-              Add objects to use this boefje. This boefje is able to scan objects of the following types:
-            {% endblocktranslate %}
+                You currently don't have scannable objects for {{ boefje.name }}.
+                Add objects to use this boefje. This boefje is able to scan objects of the following types:
+              {% endblocktranslate %}
           {% endif %}
           <ul>
             {% for ooi in boefje.consumes|ooi_types_to_strings %}
@@ -120,5 +124,6 @@
 
 {% block html_at_end_body %}
   {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}"></script>
+  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
+  <script src="{% static '/js/autoSubmit.js' %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

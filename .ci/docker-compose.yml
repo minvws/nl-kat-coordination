@@ -6,7 +6,7 @@ services:
   rocky_integration:
     build:
       context: ..
-      dockerfile: nl-kat-rocky/Dockerfile
+      dockerfile: nl-kat-rocky/Dockerfile.dev
     command: bash /app/run_rocky.sh
     depends_on:
       - ci_rocky-db
@@ -26,7 +26,7 @@ services:
   ci_katalogus:
     build:
       context: ..
-      dockerfile: nl-kat-boefjes/Dockerfile
+      dockerfile: nl-kat-boefjes/Dockerfile.dev
     command:
       ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
     volumes:

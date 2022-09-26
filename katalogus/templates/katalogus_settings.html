@@ -1,0 +1,51 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT-alogus Settings' %}</h1>
+        {% if not object_list %}
+          <p class="emphasized">
+            {% translate 'There are currently no settings defined. Add settings at plugin detail page.' %}
+          </p>
+          <a class="button" href="{% url 'katalogus' %}">{% translate 'Go back' %}</a>
+        {% else %}
+          <p class="emphasized">
+            {% translate 'This is an overview of the latest settings of all plugins.' %}
+          </p>
+          <div class="horizontal-scroll">
+            <table>
+              <caption>{% translate 'Latest plugin settings:' %}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{% translate 'Plugin' %}</th>
+                  <th scope="col">{% translate 'Name' %}</th>
+                  <th scope="col">{% translate 'Value' %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for setting in object_list %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'plugin_settings_list' plugin_type=plugin_type plugin_id=setting.plugin_id %}">{{ setting.plugin_name }}</a>
+                    </td>
+                    <td>{{ setting.name }}</td>
+                    <td>{{ setting.value }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% include 'partials/pagination.html' %}
+          </div>
+        </div>
+        <div role="group"></div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+</main>
+{% endblock %}

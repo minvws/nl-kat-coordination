@@ -1,0 +1,19 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div class="form-view">
+        <form novalidate method="post" class="horizontal-view help">
+          {% csrf_token %}
+          {% translate 'Add setting' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+          <button type="submit">{% translate 'Add setting' %}</button>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

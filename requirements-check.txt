@@ -1,0 +1,11 @@
+# Python linters
+flake8==5.0.4
+mypy==0.971
+pylint==2.13
+vulture==2.5
+
+# Python formatter
+black==22.6
+
+# Robot formatter
+robotframework-tidy==3.2

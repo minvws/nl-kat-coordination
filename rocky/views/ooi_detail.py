@@ -8,12 +8,12 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import OOI
 from requests.exceptions import RequestException
-
-from rocky.katalogus import get_enabled_boefjes_for_ooi_class, get_katalogus
+from katalogus.client import get_enabled_boefjes_for_ooi_class, get_katalogus
 from rocky.views.boefje import BoefjeMixin
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView, OOIBreadcrumbsMixin
 from tools.forms import ObservedAtForm
+from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.ooi_helpers import format_display
 from tools.view_helpers import Breadcrumb
 
@@ -39,7 +39,11 @@ class OOIDetailView(
         if not action_success:
             return self.get(request, *args, **kwargs)
 
-        success_message = "Your scan is running successfully in the background. \n Results will be added to the object list when they are in. It may take some time, a refresh of the page may be needed to show the results."
+        success_message = (
+            "Your scan is running successfully in the background. \n "
+            "Results will be added to the object list when they are in. "
+            "It may take some time, a refresh of the page may be needed to show the results."
+        )
         messages.add_message(request, messages.SUCCESS, success_message)
 
         return redirect("task_list")
@@ -81,10 +85,23 @@ class OOIDetailView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        filter_form = PossibleBoefjesFilterForm(self.request.GET)
+
         # List from katalogus
         boefjes = get_enabled_boefjes_for_ooi_class(
             self.ooi.__class__, self.request.active_organization
         )
+
+        if boefjes:
+            context["enabled_boefjes_available"] = True
+
+        # Filter boefjes on scan level <= OOI clearance level
+        if filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
+            boefjes = [
+                boefje
+                for boefje in boefjes
+                if boefje.scan_level.value <= self.ooi.scan_profile.level
+            ]
 
         context["boefjes"] = boefjes
         context["ooi"] = self.ooi
@@ -108,5 +125,7 @@ class OOIDetailView(
         context["findings_severity_summary"] = self.findings_severity_summary()
         context["severity_summary_totals"] = self.get_findings_severity_totals()
         context["breadcrumbs"] = self.build_breadcrumbs()
+
+        context["possible_boefjes_filter_form"] = filter_form
 
         return context

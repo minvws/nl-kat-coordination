@@ -1,21 +1,19 @@
 {% load i18n %}
 
 {% with id=widget.attrs.id %}
-<div{% if id %} id="{{ id }}"{% endif %} class="checkbox-group-table {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
-
-  <table>
-    <thead>
-      <tr>
-        <th>
-          {% if widget.options|length > 1 %}<input name="toggle-all" onClick="toggleCheckboxes(event, '{{ widget.name }}')" type="checkbox">{% endif %}
-        </th>
-        {% for column_name in widget.column_names %}
-          <th>{{ column_name }}</th>
-        {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for option in widget.options %}
+  <div {% if id %} id="{{ id }}"{% endif %}
+       class="checkbox-group-table {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
+    <table>
+      <thead>
+        <tr>
+          <th>
+            {% if widget.options|length > 1 %}<input name="toggle-all" type="checkbox"/>{% endif %}
+          </th>
+          {% for column_name in widget.column_names %}<th>{{ column_name }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for option in widget.options %}
           <tr>
             <td>
               {% include option.template_name with widget=option %}
@@ -25,7 +23,7 @@
             </td>
             {% for cell in option.label %}
               <td>
-                <label{% if option.attrs.id %} for="{{ option.attrs.id }}"{% endif %}>
+                <label {% if option.attrs.id %} for="{{ option.attrs.id }}"{% endif %}>
                   {% with cell_template=widget.column_templates|index:forloop.counter0 %}
                     {% if cell_template %}
                       {% include cell_template with value=cell %}
@@ -39,6 +37,6 @@
           </tr>
         {% endfor %}
       </tbody>
-  </table>
-</div>
+    </table>
+  </div>
 {% endwith %}

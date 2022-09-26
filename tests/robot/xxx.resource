@@ -17,7 +17,7 @@ Login As User For The First Time
     Fill Text    css=#id_auth-password    ${password}
     Click    "Log in"
     ${otp-raw}    Get Attribute    css=#totp-input    value
-    Set Suite Variable    ${otp-raw-global}    ${otp-raw}
+    Set Global Variable    ${otp-raw-global}    ${otp-raw}
     ${otp-code}    get otp    ${otp-raw-global}
     Fill Text    css=#id_generator-token    ${otp-code}
     Click    "Authenticate"
@@ -31,7 +31,7 @@ Login As User Normally
     Fill Text    css=#id_auth-password    ${password}
     Click    "Log in"
     ${otp-code}    get otp    ${otp-raw-global}
-    Fill Text    css=#id_token-otp_token    ${otp-code}
+    Fill Text    id=id_otp_token    ${otp-code}
     Click    "Submit"
     Get Text    .login-meta    contains    Logged in as:    error login failed
 
@@ -57,3 +57,10 @@ Generate First DNS Report
     ...    contains
     ...    These are the findings of a KAT-analysis
     ...    error login failed
+
+Reload The Page Until Element Contains    # For the desired effect, should be called through: Wait Until Keyword Succeeds    60s    2s    Reload The Page Until Element Contains    url    selector    keyword
+    [Arguments]    ${url}    ${selector}    ${keyword}
+    Go to    ${url}
+    Reload
+    ${result}    Get Text    ${selector}    contains    ${keyword}    ${selector} does not contain ${keyword}
+    Should Contain    ${result}    ${keyword}
