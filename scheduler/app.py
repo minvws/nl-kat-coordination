@@ -178,7 +178,10 @@ class App:
         katalogus_orgs = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
+        self.logger.debug(f"Organisations to add: {additions}")
+
         removals = scheduler_orgs.difference(katalogus_orgs)
+        self.logger.debug(f"Organisations to remove: {removals}")
 
         for org_id in removals:
             for s in self.schedulers.values():
@@ -222,7 +225,11 @@ class App:
             scheduler.run()
 
         # Start monitors
-        self._run_in_thread(name="monitor_organisations", func=self.monitor_organisations, interval=3600)
+        self._run_in_thread(
+            name="monitor_organisations",
+            func=self.monitor_organisations,
+            interval=self.ctx.config.monitor_organisations_interval,
+        )
 
         # Main thread
         while not self.stop_event.is_set():

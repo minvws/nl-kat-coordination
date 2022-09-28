@@ -37,6 +37,12 @@ SCHEDULER_PQ_INTERVAL=
 # default: 86400
 SCHEDULER_PQ_GRACE=
 
+# Interval in seconds of the execution of the `monitor_organisations` method
+# of the scheduler application to check newly created or removed organisations
+# from katalogus. It updates the organisations, their plugins, and the
+# creation of their schedulers.
+SCHEDULER_MONITOR_ORGANISATIONS_INTERVAL=
+
 # RabbitMQ host address
 SCHEDULER_RABBITMQ_DSN=
 
@@ -82,6 +88,11 @@ to be running again. E.g. a task can be considered to be put onto the queue
 again when it just has been dispatched. With this setting we can avoid that
 tasks are put onto the queue again when they are not allowed to be dispatched
 again. Default is `86400`.
+
+Interval in seconds of the execution of the `monitor_organisations` method
+of the scheduler application to check newly created or removed organisations
+from katalogus. It updates the organisations, their plugins, and the
+creation of their schedulers. Default is `60`.
 
 `SCHEDULER_RABBITMQ_DSN` is the url of the RabbitMQ host.
 

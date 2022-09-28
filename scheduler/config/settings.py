@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     # Application settings
     boefje_populate: bool = Field(False, env="SCHEDULER_BOEFJE_POPULATE")
     normalizer_populate: bool = Field(True, env="SCHEDULER_NORMALIZER_POPULATE")
+    monitor_organisations_interval: int = Field(60, env="SCHEDULER_MONITOR_ORGANISATIONS_INTERVAL")
 
     # External services settings
     host_katalogus: str = Field(..., env="KATALOGUS_API")
