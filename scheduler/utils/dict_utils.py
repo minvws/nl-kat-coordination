@@ -27,20 +27,23 @@ class ExpiringDict:
         self.cache: Dict[str, Any] = {}
 
     def get(self, key: str, default: Any = None) -> Any:
-        return self[key] if key in self else default
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
 
     def _is_expired(self) -> bool:
         return datetime.now(timezone.utc) > self.expiration_time
 
     def __getitem__(self, key: str) -> Any:
         with self.lock:
-            if key not in self.cache:
-                raise KeyError(key)
-
             if self._is_expired():
                 self.cache.clear()
                 self.expiration_time = datetime.now(timezone.utc) + self.lifetime
                 raise ExpiredError
+
+            if key not in self.cache:
+                raise KeyError(key)
 
             return self.cache[key]
 
