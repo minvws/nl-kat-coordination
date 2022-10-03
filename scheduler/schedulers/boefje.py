@@ -8,7 +8,8 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, TaskStatus
+from scheduler.models import (OOI, Boefje, BoefjeTask, Organisation, Plugin,
+                              TaskStatus)
 
 from .scheduler import Scheduler
 
@@ -53,6 +54,7 @@ class BoefjeScheduler(Scheduler):
         while not self.queue.full():
             time.sleep(1)
 
+            latest_ooi = None
             try:
                 latest_ooi = self.ctx.services.scan_profile.get_latest_object(
                     queue=f"{self.organisation.id}__scan_profile_increments",
@@ -72,10 +74,30 @@ class BoefjeScheduler(Scheduler):
                 if self.stop_event.is_set():
                     raise e
 
-                time.sleep(60)
-                return
+            if latest_ooi is not None:
+                # From ooi's create prioritized items (tasks) to push onto queue
+                # continue with the next object (when there are more objects)
+                # to see if there are more tasks to add.
+                p_items = self.create_tasks_for_oois([latest_ooi])
+                if len(p_items) == 0:
+                    continue
 
-            if latest_ooi is None:
+                # NOTE: maxsize 0 means unlimited
+                while len(p_items) > (self.queue.maxsize - self.queue.pq.qsize()) and self.queue.maxsize != 0:
+                    self.logger.debug(
+                        "Waiting for queue to have enough space, not adding %d tasks to queue [qsize=%d, maxsize=%d, org_id=%s, scheduler_id=%s]",
+                        len(p_items),
+                        self.queue.pq.qsize(),
+                        self.queue.maxsize,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    time.sleep(1)
+
+                self.push_items_to_queue(p_items)
+            else:
+                # Stop the loop when we've processed everything from the
+                # messaging queue, so we can continue to the next step.
                 self.logger.debug(
                     "No latest oois for organisation: %s [org_id=%s, scheduler_id=%s]",
                     self.organisation.name,
@@ -83,27 +105,6 @@ class BoefjeScheduler(Scheduler):
                     self.scheduler_id,
                 )
                 break
-
-            # From ooi's create prioritized items (tasks) to push onto queue
-            # continue with the next object (when there are more objects)
-            # to see if there are more tasks to add.
-            p_items = self.create_tasks_for_oois([latest_ooi])
-            if len(p_items) == 0:
-                continue
-
-            # NOTE: maxsize 0 means unlimited
-            while len(p_items) > (self.queue.maxsize - self.queue.pq.qsize()) and self.queue.maxsize != 0:
-                self.logger.debug(
-                    "Waiting for queue to have enough space, not adding %d tasks to queue [qsize=%d, maxsize=%d, org_id=%s, scheduler_id=%s]",
-                    len(p_items),
-                    self.queue.pq.qsize(),
-                    self.queue.maxsize,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                time.sleep(1)
-
-            self.push_items_to_queue(p_items)
         else:
             self.logger.warning(
                 "Boefjes queue is full, not populating with new tasks [qsize=%d, org_id=%s, scheduler_id=%s]",
