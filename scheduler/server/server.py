@@ -21,7 +21,6 @@ class Server:
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.schedulers: Dict[str, schedulers.Scheduler] = s
-        self.queues: Dict[str, queues.PriorityQueue] = {k: s.queue for k, s in self.schedulers.items()}
 
         self.api = fastapi.FastAPI()
 
@@ -285,10 +284,17 @@ class Server:
         return updated_task
 
     def get_queues(self) -> Any:
-        return [models.Queue(**q.dict()) for q in self.queues.values()]
+        return [models.Queue(**s.queue.dict()) for s in self.schedulers.values()]
 
     def get_queue(self, queue_id: str) -> Any:
-        q = self.queues.get(queue_id)
+        s = self.schedulers.get(queue_id)
+        if s is None:
+            raise fastapi.HTTPException(
+                status_code=404,
+                detail="scheduler not found, by queue_id",
+            )
+
+        q = s.queue
         if q is None:
             raise fastapi.HTTPException(
                 status_code=404,

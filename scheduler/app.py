@@ -188,6 +188,7 @@ class App:
                 if s.organisation.id != org_id:
                     continue
 
+                s.stop()
                 del self.schedulers[s.scheduler_id]
                 break
 
@@ -198,9 +199,11 @@ class App:
 
             scheduler_normalizer = self.create_normalizer_scheduler(org)
             self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
+            scheduler_normalizer.run()
 
             scheduler_boefje = self.create_boefje_scheduler(org)
             self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
+            scheduler_boefje.run()
 
         self.logger.info("Added %s organisations to scheduler [org_ids=%s]", len(additions), additions)
 
