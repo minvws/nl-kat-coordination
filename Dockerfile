@@ -13,6 +13,8 @@ RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID bytes
 WORKDIR /app/bytes
 ENV PATH=/home/bytes/.local/bin:${PATH}
 
+RUN mkdir /data && chown bytes: /data
+
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
 # dependencies
 ARG ENVIRONMENT
