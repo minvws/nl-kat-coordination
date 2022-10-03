@@ -8,8 +8,7 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import (OOI, Boefje, BoefjeTask, Organisation, Plugin,
-                              TaskStatus)
+from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, TaskStatus
 
 from .scheduler import Scheduler
 
