@@ -13,7 +13,7 @@ class Katalogus(HTTPService):
     def __init__(self, host: str, source: str, timeout: int = 5):
         super().__init__(host, source, timeout)
 
-        self.organisations_plugin_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict()
+        self.organisations_plugin_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
         self.organisations_boefje_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
         self.organisations_normalizer_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
 
@@ -22,6 +22,7 @@ class Katalogus(HTTPService):
         self._flush_organisations_boefje_type_cache()
 
     def _flush_organisations_plugin_cache(self) -> None:
+        self.logger.debug("flushing plugin cache [cache=%s]", self.organisations_plugin_cache.cache)
         orgs = self.get_organisations()
 
         for org in orgs:
@@ -31,6 +32,7 @@ class Katalogus(HTTPService):
 
     def _flush_organisations_boefje_type_cache(self) -> None:
         """boefje.consumes -> plugin type boefje"""
+        self.logger.debug("flushing boefje cache [cache=%s]", self.organisations_boefje_type_cache.cache)
         orgs = self.get_organisations()
 
         for org in orgs:
@@ -51,6 +53,7 @@ class Katalogus(HTTPService):
 
     def _flush_organisations_normalizer_type_cache(self) -> None:
         """normalizer.consumes -> plugin type normalizer"""
+        self.logger.debug("flushing normalizer cache [cache=%s]", self.organisations_normalizer_type_cache.cache)
         orgs = self.get_organisations()
 
         for org in orgs:

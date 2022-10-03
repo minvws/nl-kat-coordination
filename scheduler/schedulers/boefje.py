@@ -78,7 +78,7 @@ class BoefjeScheduler(Scheduler):
                 # continue with the next object (when there are more objects)
                 # to see if there are more tasks to add.
                 p_items = self.create_tasks_for_oois([latest_ooi])
-                if len(p_items) == 0:
+                if not p_items:
                     continue
 
                 # NOTE: maxsize 0 means unlimited
