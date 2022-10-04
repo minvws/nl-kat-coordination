@@ -28,7 +28,7 @@ services:
       - crux
     ports:
       - "127.0.0.1:8001:80"
-    image: "ghcr.io/minvws/nl-kat-octopoes:container-image"
+    image: "ghcr.io/minvws/nl-kat-octopoes:latest"
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
     env_file:
       - .env
@@ -38,7 +38,7 @@ services:
     depends_on:
       - crux
       - rabbitmq
-    image: "ghcr.io/minvws/nl-kat-octopoes:container-image"
+    image: "ghcr.io/minvws/nl-kat-octopoes:latest"
     command: celery -A octopoes.tasks.tasks worker --loglevel=INFO
     env_file:
       - .env
@@ -48,12 +48,12 @@ services:
     depends_on:
       - rabbitmq
       - bytes
-    image: "ghcr.io/minvws/nl-kat-boefjes:container-image"
+    image: "ghcr.io/minvws/nl-kat-boefjes:latest"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 1
-    command: python3 -m bin.worker boefje
+    command: python3 -m boefjes boefje
     env_file:
       - .env
 
@@ -62,10 +62,10 @@ services:
     depends_on:
       - rabbitmq
       - bytes
-    image: "ghcr.io/minvws/nl-kat-boefjes:container-image"
+    image: "ghcr.io/minvws/nl-kat-boefjes:latest"
     deploy:
       replicas: 1
-    command: python3 -m bin.worker normalizer
+    command: python3 -m boefjes normalizer
     env_file:
       - .env
 
@@ -107,12 +107,11 @@ services:
       - rocky-db
       - boefje
       - normalizer
-      - flower
       - katalogus
       - scheduler
     ports:
       - "127.0.0.1:8000:8000"
-    image: "ghcr.io/minvws/nl-kat-rocky:container-image"
+    image: "ghcr.io/minvws/nl-kat-rocky:latest"
     env_file:
       - .env
     environment:
@@ -124,7 +123,7 @@ services:
       - bytes-db
     ports:
       - "127.0.0.1:8002:8000"
-    image: "ghcr.io/minvws/nl-kat-bytes:container-image"
+    image: "ghcr.io/minvws/nl-kat-bytes:latest"
     env_file:
       - .env
     environment:
@@ -132,25 +131,12 @@ services:
     volumes:
       - bytes-data:/data
 
-  flower:
-    restart: on-failure
-    image: mher/flower:latest
-    command: ["celery", "--workdir", "/flower", "--config", "celery_config", "flower", "--port=5555"]
-    env_file:
-      - .env
-    volumes:
-      - ./flower:/flower
-    ports:
-      - "127.0.0.1:5555:5555"
-    depends_on:
-      - rabbitmq
-
   katalogus:
     restart: on-failure
     depends_on:
       - katalogus-db
-    image: "ghcr.io/minvws/nl-kat-boefjes:container-image"
-    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
+    image: "ghcr.io/minvws/nl-kat-boefjes:latest"
+    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "boefjes.katalogus.api:app"]
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
@@ -175,7 +161,7 @@ services:
 
   scheduler:
     restart: on-failure
-    image: "ghcr.io/minvws/nl-kat-mula:container-image"
+    image: "ghcr.io/minvws/nl-kat-mula:latest"
     command: python -m scheduler
     ports:
       - "127.0.0.1:8004:8000"
@@ -186,6 +172,15 @@ services:
       - normalizer
       - octopoes_api
       - katalogus
+
+  keiko:
+    restart: on-failure
+    image: "ghcr.io/minvws/nl-kat-keiko:latest"
+    command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000
+    ports:
+      - "127.0.0.1:8005:8000"
+    env_file:
+      - .env
 
 volumes:
   rocky-db-data:
