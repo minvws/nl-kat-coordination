@@ -28,7 +28,7 @@ services:
       - crux
     ports:
       - "127.0.0.1:8001:80"
-    image: "ghcr.io/minvws/nl-kat-octopoes:latest"
+    image: "ghcr.io/minvws/nl-kat-octopoes:v1.2.3"
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
     env_file:
       - .env
@@ -38,7 +38,7 @@ services:
     depends_on:
       - crux
       - rabbitmq
-    image: "ghcr.io/minvws/nl-kat-octopoes:latest"
+    image: "ghcr.io/minvws/nl-kat-octopoes:v1.2.3"
     command: celery -A octopoes.tasks.tasks worker --loglevel=INFO
     env_file:
       - .env
@@ -48,7 +48,7 @@ services:
     depends_on:
       - rabbitmq
       - bytes
-    image: "ghcr.io/minvws/nl-kat-boefjes:latest"
+    image: "ghcr.io/minvws/nl-kat-boefjes:v1.2.3"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
@@ -62,7 +62,7 @@ services:
     depends_on:
       - rabbitmq
       - bytes
-    image: "ghcr.io/minvws/nl-kat-boefjes:latest"
+    image: "ghcr.io/minvws/nl-kat-boefjes:v1.2.3"
     deploy:
       replicas: 1
     command: python3 -m boefjes normalizer
@@ -111,7 +111,7 @@ services:
       - scheduler
     ports:
       - "127.0.0.1:8000:8000"
-    image: "ghcr.io/minvws/nl-kat-rocky:latest"
+    image: "ghcr.io/minvws/nl-kat-rocky:v1.2.3"
     env_file:
       - .env
     environment:
@@ -123,7 +123,7 @@ services:
       - bytes-db
     ports:
       - "127.0.0.1:8002:8000"
-    image: "ghcr.io/minvws/nl-kat-bytes:latest"
+    image: "ghcr.io/minvws/nl-kat-bytes:v1.2.3"
     env_file:
       - .env
     environment:
@@ -135,7 +135,7 @@ services:
     restart: on-failure
     depends_on:
       - katalogus-db
-    image: "ghcr.io/minvws/nl-kat-boefjes:latest"
+    image: "ghcr.io/minvws/nl-kat-boefjes:v1.2.3"
     command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "boefjes.katalogus.api:app"]
     ports:
       - "127.0.0.1:8003:8000"
@@ -161,7 +161,7 @@ services:
 
   scheduler:
     restart: on-failure
-    image: "ghcr.io/minvws/nl-kat-mula:latest"
+    image: "ghcr.io/minvws/nl-kat-mula:v1.2.3"
     command: python -m scheduler
     ports:
       - "127.0.0.1:8004:8000"
@@ -175,7 +175,7 @@ services:
 
   keiko:
     restart: on-failure
-    image: "ghcr.io/minvws/nl-kat-keiko:latest"
+    image: "ghcr.io/minvws/nl-kat-keiko:v1.2.3"
     command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000
     ports:
       - "127.0.0.1:8005:8000"
