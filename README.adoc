@@ -17,7 +17,7 @@ Wil je meer weten over de werking van OpenKAT, lees dan de uitgebreide documenta
 
 == Actuele release
 
-De actuele release van OpenKAT is 1.10. De link:https://github.com/minvws/nl-kat-coordination/wiki/Changelog-1.10[changelog van versie 1.10] is te vinden op de link:https://github.com/minvws/nl-kat-coordination/wiki[wiki]. 
+De actuele release van OpenKAT zie je bij de releasetags op github. Op de link:https://github.com/minvws/nl-kat-coordination/wiki[wiki] tref je ook de releasenotes aan.
 
 == Hoe is OpenKAT ontstaan?
 
