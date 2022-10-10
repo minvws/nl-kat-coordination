@@ -3,7 +3,6 @@ from typing import Tuple, Union
 
 import censys
 
-#from censys.config import settings
 from censys.search import CensysHosts
 from boefjes.job import BoefjeMeta
 

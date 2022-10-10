@@ -7,7 +7,8 @@ Censys = Boefje(
         "NEEDS API KEY IN ENV - Use Censys to discover open ports, services, certificates"
     ),
     consumes={"IPAddressV4", "IPAddressV6"},
-    produces={"IPPort"},
+    produces={"IPPort", "Certificate", "SoftwareInstance", "Hostname"},
+    environment_keys=["CENSYS_API_ID", "CENSYS_API_SECRET"]
 )
 
 
