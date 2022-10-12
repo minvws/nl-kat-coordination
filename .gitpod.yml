@@ -1,0 +1,10 @@
+# Reference: https://www.gitpod.io/docs/references/gitpod-yml
+
+tasks:
+  - init: make
+
+ports:
+  - port: 8000
+    onOpen: open-preview
+
+
