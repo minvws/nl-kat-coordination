@@ -68,6 +68,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 )
             else:
                 cert_subject = "n/a"
+            # todo: link certificate properly. Currently there is no website, because it will be returned for an ip
             yield Certificate(
                 subject=cert_subject,
                 issuer=certificate["leaf_data"]["issuer_dn"],
@@ -100,16 +101,18 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             and "headers" in scan["http"]["response"]
         ):
             headers = scan["http"]["response"]["headers"]
-            for header in headers:
-                # values starting with _ seem to be censys specific and not really part of the response headers
-                if header[0] is not "_":
+            for header, values in headers.items():
+                if header.startswith("_"):
+                    # values starting with _ seem to be censys specific and not really part of the response headers
+                    continue
+                else:
                     header_field = header.lower().replace("_", "-")
                     # this is always an array. when there are multiple values it means it was set multiple times
-                    for header_value in headers[header]:
-                        # todo: fix resource reference
+                    for value in values:
+                        # todo: fix resource reference when it is clear to what it can be linked
                         http_header = HTTPHeader(
                             resource=ip_port.reference,
                             key=header_field,
-                            value=header_value,
+                            value=value,
                         )
                         yield http_header
