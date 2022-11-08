@@ -162,6 +162,14 @@ Als je wilt dat je boefje wordt opgenomen in de KAT-alogus geldt er een aparte r
 
 OpenKAT gaat er vanuit dat je ubuntu of debian gebruikt, maar de community manager kreeg het onder Mac OS X zo aan de gang. Probeer het dus gerust, en help ons vooral met fixes en documentatie voor de installatie op je favoriete systeem!
 
+== Testen of ontwikkelen via GitPod ==
+
+Via gitpod kan iedereen (met een github, gitlab account) snel een OpenKAT omgeving opstarten en testen. Tijdens deze installatie kun je zelf een gebruikersnaam en wachtwoord invoeren.
+
+https://gitpod.io/#github.com/atduarte/nl-kat-coordination/tree/gitpodification
+
+Eenmaal opgestart zal de Rocky interface beschikbaar zijn op de dienst die op poort 8000 draait.
+
 = Internationalisatie
 
 == In welke talen is OpenKAT beschikbaar?
