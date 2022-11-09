@@ -166,7 +166,7 @@ OpenKAT gaat er vanuit dat je ubuntu of debian gebruikt, maar de community manag
 
 Via gitpod kan iedereen (met een github, gitlab account) snel een OpenKAT omgeving opstarten en testen. Tijdens deze installatie kun je zelf een gebruikersnaam en wachtwoord invoeren.
 
-https://gitpod.io/#github.com/atduarte/nl-kat-coordination/tree/gitpodification
+https://gitpod.io/#github.com/minvws/nl-kat-coordination
 
 Eenmaal opgestart zal de Rocky interface beschikbaar zijn op de dienst die op poort 8000 draait.
 
