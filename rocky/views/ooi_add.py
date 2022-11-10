@@ -29,12 +29,8 @@ class OOIAddTypeSelectView(TemplateView):
     template_name = "oois/ooi_add_type_select.html"
 
     def get(self, request, *args, **kwargs):
-        if "add_ooi_type" in request.GET and existing_ooi_type(
-            request.GET["add_ooi_type"]
-        ):
-            return redirect(
-                reverse("ooi_add", kwargs={"ooi_type": request.GET["add_ooi_type"]})
-            )
+        if "add_ooi_type" in request.GET and existing_ooi_type(request.GET["add_ooi_type"]):
+            return redirect(reverse("ooi_add", kwargs={"ooi_type": request.GET["add_ooi_type"]}))
 
         return super().get(request, *args, **kwargs)
 
@@ -73,11 +69,8 @@ class OOIAddView(BaseOOIFormView):
             {"url": reverse("ooi_list"), "text": _("Objects")},
             {"url": reverse("ooi_add_type_select"), "text": _("Type select")},
             {
-                "url": reverse(
-                    "ooi_add", kwargs={"ooi_type": self.ooi_class.get_ooi_type()}
-                ),
-                "text": _("Add %(ooi_type)s")
-                % {"ooi_type": self.ooi_class.get_ooi_type()},
+                "url": reverse("ooi_add", kwargs={"ooi_type": self.ooi_class.get_ooi_type()}),
+                "text": _("Add %(ooi_type)s") % {"ooi_type": self.ooi_class.get_ooi_type()},
             },
         ]
 

@@ -14,9 +14,7 @@ from tools.forms import BaseRockyForm
 
 
 class OOIForm(BaseRockyForm):
-    def __init__(
-        self, ooi_class: Type[OOI], connector: OctopoesAPIConnector, *args, **kwargs
-    ):
+    def __init__(self, ooi_class: Type[OOI], connector: OctopoesAPIConnector, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ooi_class = ooi_class
         self.api_connector = connector
@@ -75,28 +73,18 @@ def generate_select_ooi_field(
     is_multiselect = field.shape == SHAPE_LIST
     option_label = default_attrs.get("label", _("option"))
 
-    option_text = (
-        "-- "
-        + _("Optionally choose a {option_label}").format(option_label=option_label)
-        + " --"
-    )
+    option_text = "-- " + _("Optionally choose a {option_label}").format(option_label=option_label) + " --"
 
     if field.required:
-        option_text = (
-            "-- "
-            + _("Please choose a {option_label}").format(option_label=option_label)
-            + " --"
-        )
+        option_text = "-- " + _("Please choose a {option_label}").format(option_label=option_label) + " --"
 
     # Generate select options
     select_options = [] if is_multiselect else [("", option_text)]
-    oois = api_connector.list({related_ooi_type}, limit=1000)
+    oois = api_connector.list({related_ooi_type}).items
     select_options.extend([(ooi.primary_key, ooi.primary_key) for ooi in oois])
 
     if is_multiselect:
-        return forms.MultipleChoiceField(
-            widget=forms.SelectMultiple(), choices=select_options, **default_attrs
-        )
+        return forms.MultipleChoiceField(widget=forms.SelectMultiple(), choices=select_options, **default_attrs)
 
     return forms.CharField(widget=forms.Select(choices=select_options), **default_attrs)
 

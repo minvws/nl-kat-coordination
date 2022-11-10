@@ -29,10 +29,9 @@ from katalogus.client import get_katalogus
 from rocky.keiko import keiko_client
 from rocky.views.ooi_view import (
     BaseOOIDetailView,
-    OOIBreadcrumbsMixin,
     ConnectorFormMixin,
-    SingleOOITreeMixin,
 )
+from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
 from tools.forms import OOIReportSettingsForm
 from tools.models import Organization
 from tools.ooi_helpers import (
@@ -42,7 +41,7 @@ from tools.ooi_helpers import (
     get_finding_type_from_finding,
     RiskLevelSeverity,
 )
-from tools.view_helpers import get_ooi_url
+from tools.view_helpers import get_ooi_url, convert_date_to_datetime
 
 
 def build_meta(findings: List[Dict]) -> Dict:
@@ -71,12 +70,8 @@ def build_meta(findings: List[Dict]) -> Dict:
         finding_type_id = finding["finding_type"]["id"]
         severity = finding["finding_type"]["risk_level_severity"]
 
-        meta["total_by_severity"][severity] = (
-            meta["total_by_severity"].get(severity, 0) + 1
-        )
-        meta["total_by_finding_type"][finding_type_id] = (
-            meta["total_by_finding_type"].get(finding_type_id, 0) + 1
-        )
+        meta["total_by_severity"][severity] = meta["total_by_severity"].get(severity, 0) + 1
+        meta["total_by_finding_type"][finding_type_id] = meta["total_by_finding_type"].get(finding_type_id, 0) + 1
 
         # count and append finding type id if not already present
         if finding_type_id not in finding_type_ids:
@@ -98,29 +93,17 @@ def build_finding_dict(
 
     finding_type_ooi = get_finding_type_from_finding(finding_ooi)
 
-    knowledge_base.update(
-        {
-            finding_type_ooi.get_information_id(): get_knowledge_base_data_for_ooi(
-                finding_type_ooi
-            )
-        }
-    )
+    knowledge_base.update({finding_type_ooi.get_information_id(): get_knowledge_base_data_for_ooi(finding_type_ooi)})
 
     finding_type_dict = build_finding_type_dict(finding_type_ooi, knowledge_base)
 
-    finding_dict["ooi"] = (
-        get_ooi_dict(ooi_store[str(finding_ooi.ooi)])
-        if str(finding_ooi.ooi) in ooi_store
-        else None
-    )
+    finding_dict["ooi"] = get_ooi_dict(ooi_store[str(finding_ooi.ooi)]) if str(finding_ooi.ooi) in ooi_store else None
     finding_dict["finding_type"] = finding_type_dict
 
     return finding_dict
 
 
-def build_finding_type_dict(
-    finding_type_ooi: FindingType, knowledge_base: Dict
-) -> Dict:
+def build_finding_type_dict(finding_type_ooi: FindingType, knowledge_base: Dict) -> Dict:
     finding_type_dict = get_ooi_dict(finding_type_ooi)
 
     if knowledge_base[finding_type_ooi.get_information_id()]:
@@ -131,9 +114,7 @@ def build_finding_type_dict(
     return finding_type_dict
 
 
-def build_findings_list_from_store(
-    ooi_store: Dict, finding_filter: Optional[List[str]] = None
-) -> Dict:
+def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[List[str]] = None) -> Dict:
     knowledge_base = get_knowledge_base_data_for_ooi_store(ooi_store)
 
     findings = [
@@ -143,15 +124,9 @@ def build_findings_list_from_store(
     ]
 
     if finding_filter is not None:
-        findings = [
-            finding
-            for finding in findings
-            if finding["finding_type"]["id"] in finding_filter
-        ]
+        findings = [finding for finding in findings if finding["finding_type"]["id"] in finding_filter]
 
-    findings = sorted(
-        findings, key=lambda k: k["finding_type"]["risk_level_score"], reverse=True
-    )
+    findings = sorted(findings, key=lambda k: k["finding_type"]["risk_level_score"], reverse=True)
 
     findings_grouped = {}
     for finding in findings:
@@ -175,12 +150,12 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
     connector_form_class = OOIReportSettingsForm
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_observed_at() > timezone.now():
+        if self.get_observed_at() > convert_date_to_datetime(datetime.now(timezone.utc)):
             messages.error(
                 request,
                 _("You can't generate a report for an OOI on a date in the future."),
             )
-            return redirect(get_ooi_url("ooi_report", self.request.GET.get("ooi_id")))
+            return redirect(get_ooi_url("ooi_detail", self.request.GET.get("ooi_id")))
         return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request, *args, **kwargs):
@@ -221,9 +196,7 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
 
         # request pdf from keiko
         try:
-            report_id = keiko_client.generate_report(
-                "bevindingenrapport", report_data, "dutch.hiero.csv"
-            )
+            report_id = keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
         except HTTPError as e:
             messages.error(self.request, _("Error generating report: {}").format(e))
             return redirect(get_ooi_url("ooi_report", self.ooi.primary_key))

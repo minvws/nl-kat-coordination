@@ -1,4 +1,5 @@
 {% load i18n %}
+
 <table>
   <tbody>
     <tr>
@@ -18,7 +19,7 @@
             {% if actions_allowed.signal_group_create %}
               <div>
                 {% translate 'Create signal group' as text %}
-                {% include 'partials/form/single_action_form.html' with btn_text=text action='signal_group_create' %}
+                {% include 'partials/single_action_form.html' with btn_text=text action='signal_group_create' %}
               </div>
             {% endif %}
           </td>
@@ -36,7 +37,7 @@
               <div>{{ organization.signal_group_id }}</div>
               <div>
                 {% translate 'Send test message' as text %}
-                {% include 'partials/form/single_action_form.html' with btn_text=text action='signal_group_send_test_message' %}
+                {% include 'partials/single_action_form.html' with btn_text=text action='signal_group_send_test_message' %}
               </div>
             </td>
           {% elif organization.signal_group_id != signal_group.id %}

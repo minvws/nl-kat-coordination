@@ -40,7 +40,5 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def handle_no_permission(self):
-        messages.add_message(
-            self.request, messages.ERROR, _("You are not allowed to add organizations.")
-        )
+        messages.add_message(self.request, messages.ERROR, _("You are not allowed to add organizations."))
         return redirect("organization_list")

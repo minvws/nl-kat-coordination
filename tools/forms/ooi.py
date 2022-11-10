@@ -1,15 +1,9 @@
-from typing import List, Type, Set, Optional, Tuple, Any
-
+from typing import List, Tuple, Any
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
-
-from katalogus.client import Boefje
 from tools.forms import (
     BaseRockyForm,
-    Choice,
-    Choices,
     ObservedAtForm,
     CheckboxGroup,
     CheckboxTable,
@@ -34,7 +28,7 @@ class OOIReportSettingsForm(ObservedAtForm):
 
 class OoiTreeSettingsForm(OOIReportSettingsForm):
     ooi_type = forms.MultipleChoiceField(
-        label=_("filter types"),
+        label=_("Filter types"),
         widget=CheckboxGroup(toggle_all_button=True),
         required=False,
     )
@@ -56,7 +50,7 @@ class SelectOOIForm(BaseRockyForm):
     ooi = forms.MultipleChoiceField(
         label=_("Objects"),
         widget=CheckboxTable(
-            column_names=("Type", "OOI", "Scan Level"),
+            column_names=(_("Type"), "OOI", _("Clearance Level")),
             column_templates=(None, None, "partials/scan_level_indicator.html"),
         ),
     )

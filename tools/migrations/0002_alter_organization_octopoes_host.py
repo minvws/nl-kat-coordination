@@ -13,8 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="organization",
             name="octopoes_host",
-            field=models.CharField(
-                default=None, max_length=126, null=True, unique=True
-            ),
+            field=models.CharField(default=None, max_length=126, null=True, unique=True),
         ),
     ]

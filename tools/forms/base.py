@@ -23,20 +23,14 @@ class BaseRockyForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""  # Removes : as label suffix
 
-    def set_choices_for_field(
-        self, field: str, choices: Union[Choices, ChoicesGroups]
-    ) -> None:
+    def set_choices_for_field(self, field: str, choices: Union[Choices, ChoicesGroups]) -> None:
         if field in self.fields:
             self.fields[field].choices = choices
 
-    def set_choices_for_widget(
-        self, field: str, choices: Union[Choices, ChoicesGroups]
-    ) -> None:
+    def set_choices_for_widget(self, field: str, choices: Union[Choices, ChoicesGroups]) -> None:
         self.fields[field].widget.choices = choices
 
-    def set_required_options_for_widget(
-        self, field: str, required_options: List[str]
-    ) -> None:
+    def set_required_options_for_widget(self, field: str, required_options: List[str]) -> None:
         """For multiselect widgets, set the required options."""
         self.fields[field].widget.required_options = required_options
 
@@ -183,9 +177,7 @@ class CheckboxTable(Widget):
         index = str(index)
         if attrs is None:
             attrs = {}
-        option_attrs = (
-            self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
-        )
+        option_attrs = self.build_attrs(self.attrs, attrs) if self.option_inherits_attrs else {}
         if selected:
             option_attrs.update(self.checked_attribute)
         if "id" in option_attrs:

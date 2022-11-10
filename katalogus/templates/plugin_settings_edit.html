@@ -7,16 +7,15 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{{ name }}{% translate ' setting' %}</h1>
+        <h1>{% translate 'Edit setting' %} - {{ setting_name }}</h1>
         <p class="emphasized">
-          {% translate 'You are about to change the value for the setting with name: ' %}{{ name }}
+          {% translate 'Settings' %}
         </p>
         <div class="form-view">
           <form novalidate method="post" class="horizontal-view help">
             {% csrf_token %}
-            {% translate 'Update setting' as fieldset_legend %}
-            {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
-            <button class="cta" type="submit">{% translate 'Update setting' %}</button>
+            {% include 'partials/form/fieldset.html' with legend=name fields=form %}
+            <button class="button" type="submit">{% translate 'Update setting' %}</button>
           </form>
         </div>
       </div>

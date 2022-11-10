@@ -51,7 +51,7 @@ class MiauwAPISession(requests.Session):
             auth=HTTPBasicAuth(self._username, self._password),
             headers=headers,
             verify=MIAUW_REQUEST_VALIDATE,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -69,9 +69,7 @@ class MiauwAPIClient:
 
     def get_linking_qr(self, device_name: str) -> Response:
         """Link signal account with a QRcode"""
-        response = self._session.get(
-            MIAUW_PATH_LINKING_QR, data={"device_name": device_name}
-        )
+        response = self._session.get(MIAUW_PATH_LINKING_QR, data={"device_name": device_name})
         self._verify_response(response)
 
         return response
@@ -85,16 +83,12 @@ class MiauwAPIClient:
 
     def get_all_groups(self, signal_username: str) -> List[SignalGroupResponse]:
         """Get a list of all groups from user"""
-        response = self._session.get(
-            MIAUW_PATH_GROUPS_INDEX, params={"username": signal_username}
-        )
+        response = self._session.get(MIAUW_PATH_GROUPS_INDEX, params={"username": signal_username})
         self._verify_response(response)
 
         return SignalGroupListResponse.parse_obj(response.json()).__root__
 
-    def get_group(
-        self, signal_username: str, signal_group_id: str
-    ) -> SignalGroupResponse:
+    def get_group(self, signal_username: str, signal_group_id: str) -> SignalGroupResponse:
         """Get information from a specified signal group"""
         response = self._session.get(
             MIAUW_PATH_GROUPS_SHOW,
@@ -104,9 +98,7 @@ class MiauwAPIClient:
 
         return SignalGroupResponse.parse_obj(response.json())
 
-    def create_group(
-        self, signal_username: str, group_name: str
-    ) -> SignalGroupResponse:
+    def create_group(self, signal_username: str, group_name: str) -> SignalGroupResponse:
         """Create a new group for organization"""
 
         params = {
@@ -122,9 +114,7 @@ class MiauwAPIClient:
 
         return SignalGroupResponse.parse_obj(response.json())
 
-    def group_add_members(
-        self, signal_username: str, group_id: str, members: list
-    ) -> SignalGroupResponse:
+    def group_add_members(self, signal_username: str, group_id: str, members: list) -> SignalGroupResponse:
         """
         Add (a) member(s) to a group
         When adding a member to a group, make sure you have the correct permissions for the group
@@ -137,9 +127,7 @@ class MiauwAPIClient:
 
         return SignalGroupResponse.parse_obj(response.json())
 
-    def message_send(
-        self, member_signal_username: str, recipient: str, message: str
-    ) -> None:
+    def message_send(self, member_signal_username: str, recipient: str, message: str) -> None:
         """Send a message to single recipient (group ID)"""
         params = {
             "username": member_signal_username,
@@ -153,7 +141,5 @@ class MiauwAPIClient:
 
     def receive(self, signal_username: str) -> None:
         """Receiving data is required in regular intervals"""
-        response = self._session.get(
-            MIAUW_PATH_RECEIVE, params={"username": signal_username}
-        )
+        response = self._session.get(MIAUW_PATH_RECEIVE, params={"username": signal_username})
         self._verify_response(response)

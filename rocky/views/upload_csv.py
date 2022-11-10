@@ -23,16 +23,10 @@ from tools.forms.upload_csv import (
 )
 
 CSV_CRITERIAS = [
-    _(
-        "Do not add column titles and only 1 column is required. Each value on a new line."
-    ),
-    _(
-        "For URL object type, a column with URL values is required, starting with http:// or https://"
-    ),
+    _("Do not add column titles and only 1 column is required. Each value on a new line."),
+    _("For URL object type, a column with URL values is required, starting with http:// or https://"),
     _("For Hostname object type, a column with hostnames values is required."),
-    _(
-        "For IPAddressV4 and IPAddressV6 object types, a column of ip addresses is required."
-    ),
+    _("For IPAddressV4 and IPAddressV6 object types, a column of ip addresses is required."),
 ]
 
 
@@ -76,9 +70,7 @@ class UploadCSV(PermissionRequiredMixin, FormView):
 
     def _save_ooi(self, ooi, organization) -> None:
         connector = OctopoesAPIConnector(OCTOPOES_API, organization)
-        connector.save_declaration(
-            Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc))
-        )
+        connector.save_declaration(Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc)))
 
     def form_valid(self, form):
         if not self.proccess_csv(form):
@@ -99,9 +91,7 @@ class UploadCSV(PermissionRequiredMixin, FormView):
         csv_data = io.StringIO(csv_file.read().decode("UTF-8"))
         rows_with_error = []
         try:
-            for rownumber, row in enumerate(
-                csv.reader(csv_data, delimiter=",", quotechar='"')
-            ):
+            for rownumber, row in enumerate(csv.reader(csv_data, delimiter=",", quotechar='"')):
                 rownumber += 1  # start at 1 and not 0
                 if len(row) == 1:
                     object_type_value = row[0]
@@ -113,9 +103,7 @@ class UploadCSV(PermissionRequiredMixin, FormView):
                 else:
                     return self.add_error_notification(CSV_ERRORS["bad_columns"])
             if rows_with_error:
-                message = _(
-                    "Object(s) could not be created for line number(s): "
-                ) + ", ".join(rows_with_error)
+                message = _("Object(s) could not be created for line number(s): ") + ", ".join(rows_with_error)
                 return self.add_error_notification(message)
             else:
                 self.add_success_notification(_("Object(s) successfully added."))

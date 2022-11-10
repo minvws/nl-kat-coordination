@@ -287,7 +287,7 @@
       "data": {
         "description": "HTTP header 'X-Frame-Options' is missing. It is possible that the website can be loaded via an <iframe>.",
         "impact": "There is a change that clickjacking is possible. This is an attack technique in which the website is invisibly loaded. On top of the original website, another malicious website is loaded that contains specially placed buttons or links. When the victim clicks on those buttons or links, the mouse click and thus its corresponding action is performed on the original website (which is made invisible). If the victim is logged in, then this click can perform an unauthorized action.",
-        "recommendation": "1. Set the HTTP header X-Frame- Options with value deny (safest) or sameorigin in every HTTP answer for older browsers. 2. Set the frame-ancestors variable in the Content-Security-Policy header for modern browsers. 3. Add JavaScript code to all pages to ensure that these web pages may not be loaded within an <iframe>. In this manner also very old browsers are protected that do not support the HTTP header X-Frame-Options.",
+        "recommendation": "1. Set the HTTP header <c>X-Frame- Options</c> with value deny (safest) or sameorigin in every HTTP answer for older browsers. 2. Set the frame-ancestors variable in the Content-Security-Policy header for modern browsers. 3. Add JavaScript code to all pages to ensure that these web pages may not be loaded within an <iframe>. In this manner also very old browsers are protected that do not support the HTTP header X-Frame-Options.",
         "source": "https://en.wikipedia.org/wiki/Clickjacking",
         "risk": "Very low"
       },
@@ -357,9 +357,9 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "The HTTP header X-Content-Type- Options is not set. Internet Explorer and Chrome apply MIME type sniffing in order to guess the content type of a document served and ignore the file extension.",
-        "impact": "A malicious user of the system could upload a legitimate file containing HTML code to the website (if such functionality exists) with a file extension such as .jpg or .png. If the victim uses Internet Explorer or Chrome and downloads the malicious file, the uploaded HTML code will be executed, even though the file contains an image extension and the server would return an image header such as Content-Type: image/jpeg. This may include a <i>cross-site scripting</i> vulnerability.",
-        "recommendation": "Set the HTTP header X-Content-Type- Options: nosniff in at least all web pages that contain user input (and uploads).",
+        "description": "The HTTP header <c>X-Content-Type- Options</c> is not set. Internet Explorer and Chrome apply MIME type sniffing in order to guess the content type of a document served and ignore the file extension.",
+        "impact": "A malicious user of the system could upload a legitimate file containing HTML code to the website (if such functionality exists) with a file extension such as <c>.jpg</c> or <c>.png</c>. If the victim uses Internet Explorer or Chrome and downloads the malicious file, the uploaded HTML code will be executed, even though the file contains an image extension and the server would return an image header such as <c>Content-Type: image/jpeg</c>. This may include a <i>cross-site scripting</i> vulnerability.",
+        "recommendation": "Set the HTTP header <c>X-Content-Type- Options: nosniff</c> in at least all web pages that contain user input (and uploads).",
         "source": "http://www.owasp.org/index.php/Cross-site_Scripting_(XSS)",
         "risk": "Very low"
       },

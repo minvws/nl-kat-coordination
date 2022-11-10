@@ -40,9 +40,7 @@ def add_member_to_signal_group_for_organization(
     )
 
 
-def send_message_to_signal_group_for_organization(
-    organization: Organization, message: str
-) -> None:
+def send_message_to_signal_group_for_organization(organization: Organization, message: str) -> None:
     client.message_send(
         organization.signal_username,
         organization.signal_group_id,

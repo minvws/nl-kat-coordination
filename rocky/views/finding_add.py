@@ -84,15 +84,9 @@ class FindingAddView(BaseOOIFormView):
 
         s: str = form_data["finding_type_ids"]
         finding_type_ids = s.replace(",", "\n").splitlines()
-        finding_type_ids = [
-            x.strip()
-            for x in finding_type_ids
-            if x.strip().startswith(("KAT-", "CVE-", "CWE-"))
-        ]
+        finding_type_ids = [x.strip() for x in finding_type_ids if x.strip().startswith(("KAT-", "CVE-", "CWE-"))]
 
-        observed_at = datetime.combine(
-            form_data.get("date"), datetime.min.time(), tzinfo=timezone.utc
-        )
+        observed_at = datetime.combine(form_data.get("date"), datetime.min.time(), tzinfo=timezone.utc)
 
         # Create finding for each finding type
         ooi_ref = Reference.from_str(ooi_id)
@@ -106,19 +100,15 @@ class FindingAddView(BaseOOIFormView):
                 description=form_data.get("description"),
                 reproduce=form_data.get("reproduce"),
             )
-            self.api_connector.save_declaration(
-                Declaration(ooi=finding, valid_time=observed_at)
-            )
-            self.api_connector.save_declaration(
-                Declaration(ooi=finding_type, valid_time=observed_at)
-            )
+            self.api_connector.save_declaration(Declaration(ooi=finding, valid_time=observed_at))
+            self.api_connector.save_declaration(Declaration(ooi=finding_type, valid_time=observed_at))
 
         return redirect(get_ooi_url("ooi_detail", ooi_id))
 
     def get_ooi_options(self) -> List[Dict[str, str]]:
         # Query to render form options
         ooi_set = set(OOI_TYPES.values()).difference({Finding, FindingType})
-        objects = self.api_connector.list(ooi_set)
+        objects = self.api_connector.list(ooi_set).items
 
         # generate options
         options = [(o.primary_key, o.get_ooi_type()) for o in objects]

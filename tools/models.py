@@ -1,12 +1,9 @@
 import uuid
-from typing import Optional
-
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from requests.exceptions import HTTPError
 
 from tools.add_ooi_information import get_info, SEPARATOR
 from tools.validators import phone_validator
@@ -29,9 +26,7 @@ class SCAN_LEVEL(models.IntegerChoices):
 class Organization(models.Model):
     name = models.CharField(max_length=126, unique=True)
     code = models.CharField(max_length=8, unique=True, default=None, null=True)
-    signal_username = models.CharField(
-        validators=[phone_validator], max_length=126, unique=True, blank=True, null=True
-    )
+    signal_username = models.CharField(validators=[phone_validator], max_length=126, unique=True, blank=True, null=True)
     signal_group_id = models.CharField(max_length=126, blank=True, null=True)
 
     def __str__(self):
@@ -61,14 +56,10 @@ class OrganizationMember(models.Model):
         BLOCKED = "blocked", _("blocked")
 
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
-    organization = models.ForeignKey(
-        Organization, on_delete=models.SET_NULL, null=True, related_name="members"
-    )
+    organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, related_name="members")
     verified = models.BooleanField(default=False)
     authorized = models.BooleanField(default=False)
-    status = models.CharField(
-        choices=STATUSES.choices, max_length=64, default=STATUSES.NEW
-    )
+    status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
     member_name = models.CharField(max_length=126)
     member_role = models.CharField(max_length=126)
     goal = models.CharField(max_length=256)
@@ -118,12 +109,9 @@ class OOIInformation(models.Model):
         return SEPARATOR.join(self.id.split(SEPARATOR)[1:])
 
     @property
-    def description(self) -> Optional[str]:
+    def description(self):
         if self.data["description"] == "":
-            try:
-                self.get_internet_description()
-            except HTTPError:
-                return None
+            self.get_internet_description()
         return self.data["description"]
 
     def get_internet_description(self):

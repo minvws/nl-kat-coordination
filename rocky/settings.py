@@ -58,12 +58,8 @@ ALLOWED_HOSTS = ["*"]
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
 # -----------------------------
-EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
-)
-EMAIL_FILE_PATH = os.getenv(
-    "EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs"
-)  # directory to store output files
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+EMAIL_FILE_PATH = os.getenv("EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs")  # directory to store output files
 EMAIL_HOST = os.getenv("EMAIL_HOST")  # localhost
 EMAIL_PORT = os.getenv("EMAIL_PORT", 25)  # 25
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")

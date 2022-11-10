@@ -27,9 +27,7 @@ class FailureModeEffectCreateView(FailureModeEffectBreadcrumbsMixin, CreateView)
     form_class = FailureModeEffectForm
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "fmea_failure_mode_effect_detail", kwargs={"pk": self.object.id}
-        )
+        return reverse_lazy("fmea_failure_mode_effect_detail", kwargs={"pk": self.object.id})
 
     def form_valid(self, form):
         self.add_success_notification()
@@ -62,9 +60,7 @@ class FailureModeEffectUpdateView(FailureModeEffectBreadcrumbsMixin, UpdateView)
     template_name = "fmea/fmea_failure_mode_effect_form.html"
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "fmea_failure_mode_effect_detail", kwargs={"pk": self.object.id}
-        )
+        return reverse_lazy("fmea_failure_mode_effect_detail", kwargs={"pk": self.object.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -77,9 +73,7 @@ class FailureModeEffectUpdateView(FailureModeEffectBreadcrumbsMixin, UpdateView)
         breadcrumbs.append(
             {
                 "text": self.object.effect,
-                "url": reverse(
-                    "fmea_failure_mode_effect_detail", kwargs={"pk": self.kwargs["pk"]}
-                ),
+                "url": reverse("fmea_failure_mode_effect_detail", kwargs={"pk": self.kwargs["pk"]}),
             }
         )
         breadcrumbs.append(
@@ -110,9 +104,7 @@ class FailureModeEffectDetailView(FailureModeEffectBreadcrumbsMixin, DetailView)
         breadcrumbs.append(
             {
                 "text": self.object.effect,
-                "url": reverse(
-                    "fmea_failure_mode_detail", kwargs={"pk": self.kwargs["pk"]}
-                ),
+                "url": reverse("fmea_failure_mode_detail", kwargs={"pk": self.kwargs["pk"]}),
             }
         )
 

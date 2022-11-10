@@ -9,11 +9,11 @@
     {% include 'forms/widgets/checkbox_option.html' %}
   {% endif %}
   {% if widget %}<span class="tile-label">{{ item|get_type_name }}</span>{% endif %}
-  <img src="{% url 'boefje_cover' boefje_id=item.id %}"
+  <img src="{% url 'plugin_cover' plugin_id=item.id %}"
        alt="placeholder image for Boefje {{ item.name }}">
   {% with scan_level=item.scan_level.value %}
     <div class="horizontal-view scan-intensity">
-      <span class="de-emphasized">{% translate 'Scan intensity score:' %}</span>
+      <span class="de-emphasized">{% translate 'Scan level:' %}</span>
       {% include 'partials/scan_level_indicator.html' with value=scan_level %}
     </div>
   {% endwith %}
@@ -26,9 +26,7 @@
     OpenKAT
   </span>
   <div class="action-buttons">
-    <a href="{% url 'katalogus_detail' id=item.id %}">{% translate 'See details' %}</a>
-    {% if not widget %}
-      {% enable_disable_boefje_button item perms.tools.can_enable_disable_boefje %}
-    {% endif %}
+    <a href="{% url 'plugin_detail' plugin_type="boefje" plugin_id=item.id %}">{% translate 'See details' %}</a>
+    {% if not widget %}{{ item }}{% endif %}
   </div>
 </div>

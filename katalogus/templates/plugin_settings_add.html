@@ -6,13 +6,18 @@
   {% include 'header.html' %}
   <main id="main-content">
     <section>
-      <div class="form-view">
-        <form novalidate method="post" class="horizontal-view help">
-          {% csrf_token %}
-          {% translate 'Add setting' as fieldset_legend %}
-          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
-          <button type="submit">{% translate 'Add setting' %}</button>
-        </form>
+      <div>
+        <h1>{% translate 'Add setting - ' %}{{ setting_name }}</h1>
+        <p class="emphasized">
+          {% translate 'Setting' %}
+        </p>
+        <div class="form-view">
+          <form novalidate method="post" class="horizontal-view help">
+            {% csrf_token %}
+            {% include 'partials/form/fieldset.html' with legend=name fields=form %}
+            <button type="submit">{% translate 'Add setting' %}</button>
+          </form>
+        </div>
       </div>
     </section>
   </main>

@@ -4,7 +4,7 @@ from django.http import HttpResponse, Http404
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.types import get_collapsed_types
+from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.views import BaseOOIListView
 from tools.view_helpers import BreadcrumbsMixin
 
@@ -35,7 +35,12 @@ class OOIListExportView(OOIListView):
         file_type = request.GET.get("file_type")
         observed_at = self.get_observed_at()
         filters = self.get_ooi_types_display()
-        ooi_list = self.get_list(observed_at)
+
+        ooi_types = self.ooi_types
+        if self.filtered_ooi_types:
+            ooi_types = {type_by_name(t) for t in self.filtered_ooi_types}
+
+        ooi_list = self.get_api_connector().list(ooi_types, observed_at).items
         exports = [
             {
                 "observed_at": str(observed_at),
@@ -57,11 +62,7 @@ class OOIListExportView(OOIListView):
             response = HttpResponse(
                 json.dumps(exports),
                 content_type="application/json",
-                headers={
-                    "Content-Disposition": "attachment; filename=ooi_list_"
-                    + str(observed_at)
-                    + ".json"
-                },
+                headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(observed_at) + ".json"},
             )
 
             return response
@@ -70,11 +71,7 @@ class OOIListExportView(OOIListView):
 
             response = HttpResponse(
                 content_type="text/csv",
-                headers={
-                    "Content-Disposition": "attachment; filename=ooi_list_"
-                    + str(observed_at)
-                    + ".csv"
-                },
+                headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(observed_at) + ".csv"},
             )
 
             writer = csv.writer(response)

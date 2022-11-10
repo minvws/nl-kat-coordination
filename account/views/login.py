@@ -38,13 +38,9 @@ class LoginRockyView(LoginView):
         """
         form = super().get_form(step=step, **kwargs)
         if (step or self.steps.current) == "token":
-            form = TwoFactorVerifyTokenForm(
-                user=self.get_user(), initial_device=self.get_device(), **kwargs
-            )
+            form = TwoFactorVerifyTokenForm(user=self.get_user(), initial_device=self.get_device(), **kwargs)
         elif (step or self.steps.current) == "backup":
-            form = TwoFactorBackupTokenForm(
-                user=self.get_user(), initial_device=self.get_device(), **kwargs
-            )
+            form = TwoFactorBackupTokenForm(user=self.get_user(), initial_device=self.get_device(), **kwargs)
         if self.show_timeout_error:
             form.cleaned_data = getattr(form, "cleaned_data", {})
             form.add_error(

@@ -40,9 +40,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UpdateView):
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse(
-            "organization_detail", kwargs={"pk": self.object.organization_id}
-        )
+        return reverse("organization_detail", kwargs={"pk": self.object.organization_id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -50,15 +48,11 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UpdateView):
         context["breadcrumbs"] = [
             {"url": reverse("organization_list"), "text": "Organizations"},
             {
-                "url": reverse(
-                    "organization_detail", kwargs={"pk": self.object.organization_id}
-                ),
+                "url": reverse("organization_detail", kwargs={"pk": self.object.organization_id}),
                 "text": self.object.organization.name,
             },
             {
-                "url": reverse(
-                    "organization_member_edit", kwargs={"pk": self.object.id}
-                ),
+                "url": reverse("organization_member_edit", kwargs={"pk": self.object.id}),
                 "text": _("Edit member"),
             },
         ]
@@ -74,8 +68,6 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UpdateView):
         organization = self.get_object()
 
         if self.request.user.has_perm("tools.view_organization"):
-            return redirect(
-                reverse("organization_detail", kwargs={"pk": organization.id})
-            )
+            return redirect(reverse("organization_detail", kwargs={"pk": organization.id}))
 
         return redirect("crisis_room")

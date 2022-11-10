@@ -95,7 +95,7 @@ The DnsRecords boefje is completed
     ...    "Status"
     ...    "Hostname|internet|mispo.es"
     Wait Until Keyword Succeeds
-    ...    60s
+    ...    90s
     ...    2s
     ...    Reload The Page Until Element Contains
     ...    ${ROOT_URL}/tasks
@@ -108,9 +108,25 @@ The DnsRecords boefje is normalized
     ...    "Status"
     ...    "Hostname|internet|mispo.es"
     Wait Until Keyword Succeeds
-    ...    60s
+    ...    90s
     ...    2s
     ...    Reload The Page Until Element Contains
     ...    ${ROOT_URL}/tasks
     ...    ${e}
     ...    Completed
+
+Download the mispo.es pdf report
+    Go to    ${ROOT_URL}/objects/detail/?ooi_id=Hostname%7Cinternet%7Cmispo.es
+    Click    'Generate report'
+    Set Browser Timeout    30s
+    ${dl_promise}    Promise To Wait For Download
+    Click    'Download PDF'
+    ${file_obj}    Wait For    ${dl_promise}
+    Set Suite Variable    ${REPORT_FILE}    ${file_obj}
+    Log To Console    ${REPORT_FILE}
+
+A valid pdf is downloaded
+    File Should Exist    ${REPORT_FILE}[saveAs]    Cannot find downloaded file
+    ${filesize}    Get File Size    ${REPORT_FILE}[saveAs]
+    Should Be True    ${filesize} > 50000    The downloaded file is uncharacteristically small
+    Should End With    ${REPORT_FILE}[suggestedFilename]    .pdf    File is not advertised as a pdf

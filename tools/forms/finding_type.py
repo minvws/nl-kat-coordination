@@ -34,15 +34,11 @@ class FindingTypeAddForm(BaseRockyForm):
     title = forms.CharField(
         label=_("Title"),
         max_length=120,
-        widget=forms.TextInput(
-            attrs={"placeholder": _("Give the finding type a fitting title")}
-        ),
+        widget=forms.TextInput(attrs={"placeholder": _("Give the finding type a fitting title")}),
     )
     description = forms.CharField(
         label=_("Description"),
-        widget=forms.Textarea(
-            attrs={"placeholder": _("Desribe the finding type"), "rows": 3}
-        ),
+        widget=forms.Textarea(attrs={"placeholder": _("Desribe the finding type"), "rows": 3}),
     )
     risk = forms.CharField(
         label=_("Risk"),
@@ -51,9 +47,7 @@ class FindingTypeAddForm(BaseRockyForm):
     )
     solution = forms.CharField(
         label=_("Solution"),
-        widget=forms.Textarea(
-            attrs={"placeholder": _("How can this be solved?"), "rows": 3}
-        ),
+        widget=forms.Textarea(attrs={"placeholder": _("How can this be solved?"), "rows": 3}),
         required=False,
         help_text=_("Describe how this type of finding can be solved"),
     )
@@ -70,9 +64,7 @@ class FindingTypeAddForm(BaseRockyForm):
     )
     impact_description = forms.CharField(
         label=_("Impact description"),
-        widget=forms.Textarea(
-            attrs={"placeholder": _("Describe the solutions impact"), "rows": 3}
-        ),
+        widget=forms.Textarea(attrs={"placeholder": _("Describe the solutions impact"), "rows": 3}),
         required=False,
     )
     solution_chance = forms.CharField(
@@ -109,9 +101,7 @@ class FindingTypeAddForm(BaseRockyForm):
 class FindingAddForm(BaseRockyForm):
     ooi_id = forms.CharField(
         label="OOI",
-        widget=DataListInput(
-            attrs={"placeholder": _("Click to select one of the available options")}
-        ),
+        widget=DataListInput(attrs={"placeholder": _("Click to select one of the available options")}),
     )
     finding_type_ids = forms.CharField(
         label=_("Finding types"),
@@ -128,16 +118,12 @@ CVE-2021-00000""",
     )
     proof = forms.CharField(
         label=_("Proof"),
-        widget=forms.Textarea(
-            attrs={"placeholder": _("Provide evidence of your finding"), "rows": 3}
-        ),
+        widget=forms.Textarea(attrs={"placeholder": _("Provide evidence of your finding"), "rows": 3}),
         required=False,
     )
     description = forms.CharField(
         label=_("Description"),
-        widget=forms.Textarea(
-            attrs={"placeholder": _("Describe your finding"), "rows": 3}
-        ),
+        widget=forms.Textarea(attrs={"placeholder": _("Describe your finding"), "rows": 3}),
     )
     reproduce = forms.CharField(
         label=_("Reproduce finding"),
@@ -175,9 +161,7 @@ CVE-2021-00000""",
 
         # date should not be in the future
         if data > datetime.datetime.now(tz=pytz.UTC):
-            raise ValidationError(
-                _("Doc! I'm from the future, I'm here to take you back!")
-            )
+            raise ValidationError(_("Doc! I'm from the future, I'm here to take you back!"))
 
         return data
 

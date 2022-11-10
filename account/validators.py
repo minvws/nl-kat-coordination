@@ -22,11 +22,5 @@ def get_password_validators_help_texts():
         str(validators["min_length_lower"]) + _(" lower case letters"),
         str(validators["min_length_upper"]) + _(" upper case letters"),
     ]
-    help_text_builder = format_html_join(
-        "", "<li>{}</li>", ((help_text,) for help_text in help_texts)
-    )
-    return (
-        format_html("<p>{}</p><ul>{}</ul>", explanation, help_text_builder)
-        if help_text_builder
-        else ""
-    )
+    help_text_builder = format_html_join("", "<li>{}</li>", ((help_text,) for help_text in help_texts))
+    return format_html("<p>{}</p><ul>{}</ul>", explanation, help_text_builder) if help_text_builder else ""

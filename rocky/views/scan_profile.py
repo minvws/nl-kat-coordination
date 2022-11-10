@@ -75,9 +75,9 @@ class ScanProfileResetView(OOIDetailView):
             messages.add_message(
                 self.request,
                 messages.WARNING,
-                _(
-                    "Can not reset scan level. Scan level of {ooi_name} not declared"
-                ).format(ooi_name=self.ooi.human_readable),
+                _("Can not reset scan level. Scan level of {ooi_name} not declared").format(
+                    ooi_name=self.ooi.human_readable
+                ),
             )
             return redirect(get_ooi_url("scan_profile_detail", self.ooi.primary_key))
 

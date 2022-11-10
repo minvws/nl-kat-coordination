@@ -80,9 +80,7 @@ class FailureModeUpdateView(FailureModeBreadcrumbsMixin, UpdateView):
         breadcrumbs.append(
             {
                 "text": self.object.failure_mode,
-                "url": reverse(
-                    "fmea_failure_mode_detail", kwargs={"pk": self.kwargs["pk"]}
-                ),
+                "url": reverse("fmea_failure_mode_detail", kwargs={"pk": self.kwargs["pk"]}),
             }
         )
         breadcrumbs.append(
@@ -119,9 +117,7 @@ class FailureModeDetailView(FailureModeBreadcrumbsMixin, DetailView):
         breadcrumbs.append(
             {
                 "text": self.object.failure_mode,
-                "url": reverse(
-                    "fmea_failure_mode_detail", kwargs={"pk": self.kwargs["pk"]}
-                ),
+                "url": reverse("fmea_failure_mode_detail", kwargs={"pk": self.kwargs["pk"]}),
             }
         )
 

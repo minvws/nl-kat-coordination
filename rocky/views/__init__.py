@@ -3,7 +3,6 @@ from .finding_add import *
 from .finding_list import *
 from .finding_type_add import *
 from .indemnification_add import *
-from .katalogus import *
 from .landing_page import *
 from .ooi_add import *
 from .ooi_edit import *
@@ -30,4 +29,3 @@ from .health import *
 from .tasks import *
 from .privacy_statement import *
 from .handler404 import *
-from .boefje import *

@@ -22,9 +22,7 @@ class Command(BaseCommand):
 
     def setup_dev_organization_and_member(self):
 
-        dev_org, _ = Organization.objects.get_or_create(
-            name="Development Organization", code="_dev"
-        )
+        dev_org, _ = Organization.objects.get_or_create(name="Development Organization", code="_dev")
 
         dev_user = User.objects.last()
         OrganizationMember.objects.create(
@@ -44,19 +42,13 @@ class Command(BaseCommand):
                     permission = Permission.objects.get(codename=codename)
                     permission_objects.append(permission.id)
                 except:
-                    raise ObjectDoesNotExist(
-                        "Permission:" + str(permission) + " does not exist."
-                    )
+                    raise ObjectDoesNotExist("Permission:" + str(permission) + " does not exist.")
         return permission_objects
 
     def setup_kat_groups(self):
-        self.group_admin, self.group_admin_created = Group.objects.get_or_create(
-            name=GROUP_ADMIN
-        )
+        self.group_admin, self.group_admin_created = Group.objects.get_or_create(name=GROUP_ADMIN)
 
-        self.group_redteam, self.group_redteam_created = Group.objects.get_or_create(
-            name=GROUP_REDTEAM
-        )
+        self.group_redteam, self.group_redteam_created = Group.objects.get_or_create(name=GROUP_REDTEAM)
 
         Group.objects.get_or_create(name=GROUP_CLIENT)
 

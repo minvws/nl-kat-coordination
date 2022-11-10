@@ -34,8 +34,9 @@ COPY nl-kat-rocky/requirements-check.txt nl-kat-rocky/requirements-dev.txt .
 RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
     && pip install -r requirements-dev.txt
 
-COPY nl-kat-octopoes /app/octopoes
-RUN pip3 install /app/octopoes
+COPY nl-kat-octopoes/ /tmp/octopoes
+RUN cd /tmp/octopoes && python setup.py bdist_wheel
+RUN pip install /tmp/octopoes/dist/octopoes*.whl
 
 COPY nl-kat-rocky .
 

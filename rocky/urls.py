@@ -2,8 +2,7 @@ from django.urls import path, include
 from django.contrib import admin
 from two_factor.urls import urlpatterns as tf_urls
 from django.views.generic.base import TemplateView
-from crisis_room import views as crisis_room_views
-from . import views
+from rocky import views
 
 handler404 = "rocky.views.handler404"
 
@@ -20,20 +19,14 @@ urlpatterns = [
     path("switch_client/", views.switch_client, name="switch_client"),
     path("findings/", views.FindingListView.as_view(), name="finding_list"),
     path("findings/add/", views.FindingAddView.as_view(), name="finding_add"),
-    path(
-        "finding_type/add/", views.FindingTypeAddView.as_view(), name="finding_type_add"
-    ),
+    path("finding_type/add/", views.FindingTypeAddView.as_view(), name="finding_type_add"),
     path("objects/graph/", views.OOIGraphView.as_view(), name="ooi_graph"),
     path("objects/report/", views.OOIReportView.as_view(), name="ooi_report"),
-    path(
-        "objects/report/pdf/", views.OOIReportPDFView.as_view(), name="ooi_pdf_report"
-    ),
+    path("objects/report/pdf/", views.OOIReportPDFView.as_view(), name="ooi_pdf_report"),
     path("objects/summary/", views.OOISummaryView.as_view(), name="ooi_summary"),
     path("objects/tree/", views.OOITreeView.as_view(), name="ooi_tree"),
     path("objects/findings/", views.OOIFindingListView.as_view(), name="ooi_findings"),
-    path(
-        "organizations/", views.OrganizationListView.as_view(), name="organization_list"
-    ),
+    path("organizations/", views.OrganizationListView.as_view(), name="organization_list"),
     path(
         "organizations/add/",
         views.OrganizationAddView.as_view(),
@@ -71,9 +64,7 @@ urlpatterns = [
         name="health_beautified",
     ),
     path("objects/", views.OOIListView.as_view(), name="ooi_list"),
-    path(
-        "objects/add/", views.OOIAddTypeSelectView.as_view(), name="ooi_add_type_select"
-    ),
+    path("objects/add/", views.OOIAddTypeSelectView.as_view(), name="ooi_add_type_select"),
     path(
         "objects/add-related/",
         views.OOIRelatedObjectAddView.as_view(),
@@ -103,24 +94,14 @@ urlpatterns = [
     ),
     path("signal_qr/", views.SignalQRView.as_view(), name="signal_qr"),
     path(
-        "plugins/<boefje_id>/cover.png",
-        views.BoefjeCoverView.as_view(),
-        name="boefje_cover",
-    ),
-    path(
         "privacy-statement/",
         views.PrivacyStatementView.as_view(),
         name="privacy_statement",
     ),
-    path(
-        "crisis-room/",
-        crisis_room_views.CrisisRoomView.as_view(),
-        name="crisis_room",
-    ),
+    path("onboarding/", include("onboarding.urls"), name="onboarding"),
+    path("crisis-room/", include("crisis_room.urls"), name="crisis_room"),
     path("tasks/", views.BoefjesTaskListView.as_view(), name="task_list"),
-    path(
-        "tasks/boefjes", views.BoefjesTaskListView.as_view(), name="boefjes_task_list"
-    ),
+    path("tasks/boefjes", views.BoefjesTaskListView.as_view(), name="boefjes_task_list"),
     path(
         "tasks/normalizers",
         views.NormalizersTaskListView.as_view(),

@@ -12,10 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name="boefjeconfig",
-            options={
-                "permissions": [
-                    ("can_enable_disable_boefje", "Can enable or disable boefje")
-                ]
-            },
+            options={"permissions": [("can_enable_disable_boefje", "Can enable or disable boefje")]},
         ),
     ]

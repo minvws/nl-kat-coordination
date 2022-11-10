@@ -38,32 +38,6 @@
           </p>
         {% elif ooi.scan_profile.scan_profile_type == 'inherited' %}
           <h2>{% translate 'Inherited' %}</h2>
-          <div class="horizontal-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>{% translate 'Scan level' %}</th>
-                  <th>{% translate 'Inherited from' %}</th>
-                  <th>{% translate 'Inheritance source' %}</th>
-                  <th>{% translate 'Inheritance depth' %}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for inheritance in ooi.scan_profile.inheritances %}
-                  <tr>
-                    <td>{{ inheritance.human_readable }}</td>
-                    <td>
-                      <a href="{% ooi_url 'scan_profile_detail' inheritance.parent %}"> {{ inheritance.parent.class_ }}: {{ inheritance.parent.human_readable }} </a>
-                    </td>
-                    <td>
-                      <a href="{% ooi_url 'scan_profile_detail' inheritance.source %}">{{ inheritance.source.class_ }}: {{ inheritance.source.human_readable }}</a>
-                    </td>
-                    <td>{{ inheritance.depth }}</td>
-                  {% endfor %}
-                </tr>
-              </tbody>
-            </table>
-          </div>
         {% endif %}
         <form novalidate
               action="{% ooi_url 'scan_profile_detail' ooi.primary_key %}"

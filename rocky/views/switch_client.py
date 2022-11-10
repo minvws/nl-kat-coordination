@@ -13,9 +13,7 @@ from tools.user_helpers import can_switch_organization
 
 def get_organization(request: HttpRequest):
     if "client_id" in request.GET:
-        return get_object_or_404(
-            OrganizationMember, pk=request.GET.get("client_id")
-        ).organization
+        return get_object_or_404(OrganizationMember, pk=request.GET.get("client_id")).organization
 
     return get_object_or_404(Organization, pk=request.GET.get("organization_id"))
 
@@ -26,13 +24,9 @@ def switch_client(request: HttpRequest):
     organization = get_organization(request)
 
     if request.session["active_organization_id"] == organization.id:
-        messages.add_message(
-            request, messages.WARNING, "Could not switch. Already using organization."
-        )
+        messages.add_message(request, messages.WARNING, "Could not switch. Already using organization.")
     else:
-        messages.add_message(
-            request, messages.INFO, "Switched to: " + organization.name
-        )
+        messages.add_message(request, messages.INFO, "Switched to: " + organization.name)
 
     request.session["active_organization_id"] = organization.id
 

@@ -29,9 +29,7 @@ class FailureModeAffectedObjectCreateView(AffectedObjectBreadcrumbsMixin, Create
     form_class = FailureModeAffectedObjectForm
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "fmea_failure_mode_affected_object_detail", kwargs={"pk": self.object.id}
-        )
+        return reverse_lazy("fmea_failure_mode_affected_object_detail", kwargs={"pk": self.object.id})
 
     def form_valid(self, form):
         self.add_success_notification()
@@ -66,9 +64,7 @@ class FailureModeAffectedObjectUpdateView(AffectedObjectBreadcrumbsMixin, Update
     success_url = reverse_lazy("fmea_failure_mode_affected_object_list")
 
     def get_object(self, *args, **kwargs):
-        failure_mode_affected_objects = get_object_or_404(
-            self.model, pk=self.kwargs["pk"]
-        )
+        failure_mode_affected_objects = get_object_or_404(self.model, pk=self.kwargs["pk"])
         return failure_mode_affected_objects
 
     def get_context_data(self, **kwargs):
@@ -140,9 +136,7 @@ class FMEATreeObjectView(View):
         if department and selected_oois:
             for selected_ooi in selected_oois:
                 try:
-                    fmea_tree_object = FailureModeTreeObject(
-                        tree_object=selected_ooi, affected_department=department
-                    )
+                    fmea_tree_object = FailureModeTreeObject(tree_object=selected_ooi, affected_department=department)
                     fmea_tree_object.save()
                 except ValidationError:
                     self.add_error_notification()

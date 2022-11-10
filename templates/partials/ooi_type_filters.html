@@ -24,7 +24,11 @@
       {% endfor %}
     </fieldset>
     {% if object_type_filters|length > 4 %}
-      <button type="button" class="toggle-all-ooi-types ghost">{% translate 'Toggle all' %}</button>
+      <button type="button"
+              class="toggle-all toggle-on ghost"
+              data-toggle-target="ooi_type">
+        {% translate 'Toggle all' %}
+      </button>
     {% endif %}
     <input type="submit" value="{% translate 'Update List' %}"/>
   </form>

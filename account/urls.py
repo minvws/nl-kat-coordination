@@ -3,9 +3,7 @@ from account import views
 
 urlpatterns = [
     path("", views.AccountView.as_view(), name="account_detail"),
-    path(
-        "login/", views.LoginRockyView.as_view(), name="login"
-    ),  # Bypass the two_factor login
+    path("login/", views.LoginRockyView.as_view(), name="login"),  # Bypass the two_factor login
     path("logout/", views.LogoutRockyView.as_view(), name="logout"),
     path(
         "two_factor/qrcode/", views.QRGeneratorRockyView.as_view(), name="qr"

@@ -20,14 +20,10 @@ class OrganizationListView(
         """
         List organization that only belongs to user that requests the list.
         """
-        object = self.model.objects.filter(
-            code=self.request.user.organizationmember.organization.code
-        )
+        object = self.model.objects.filter(code=self.request.user.organizationmember.organization.code)
         return object
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["active_organization"] = self.model.objects.get(
-            pk=self.request.session["active_organization_id"]
-        )
+        context["active_organization"] = self.model.objects.get(pk=self.request.session["active_organization_id"])
         return context

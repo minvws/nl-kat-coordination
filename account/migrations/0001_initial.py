@@ -55,9 +55,7 @@ def check_consistent_history(self, connection):
 
 
 MigrationLoader.check_consistent_history = check_consistent_history
-ProjectState.apps = cached_property(
-    lambda self: StateApps(self.real_apps, self.models, ignore_swappable=True)
-)
+ProjectState.apps = cached_property(lambda self: StateApps(self.real_apps, self.models, ignore_swappable=True))
 # Normally this is done when created the class and cached_property requires this
 ProjectState.apps.__set_name__(ProjectState, "apps")
 
@@ -99,15 +97,11 @@ class SwitchToCustomUserModel(Operation):
             (
                 "username",
                 models.CharField(
-                    error_messages={
-                        "unique": "A user with that username already exists."
-                    },
+                    error_messages={"unique": "A user with that username already exists."},
                     help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
                     max_length=150,
                     unique=True,
-                    validators=[
-                        django.contrib.auth.validators.UnicodeUsernameValidator()
-                    ],
+                    validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
                     verbose_name="username",
                 ),
             ),
@@ -121,9 +115,7 @@ class SwitchToCustomUserModel(Operation):
             ),
             (
                 "email",
-                models.EmailField(
-                    blank=True, max_length=254, verbose_name="email address"
-                ),
+                models.EmailField(blank=True, max_length=254, verbose_name="email address"),
             ),
             (
                 "is_staff",
@@ -144,9 +136,7 @@ class SwitchToCustomUserModel(Operation):
             ),
             (
                 "date_joined",
-                models.DateTimeField(
-                    default=django.utils.timezone.now, verbose_name="date joined"
-                ),
+                models.DateTimeField(default=django.utils.timezone.now, verbose_name="date joined"),
             ),
             (
                 "groups",
@@ -196,9 +186,7 @@ class SwitchToCustomUserModel(Operation):
             # The table doesn't exist, so we aren't upgrading, create the table
             to_state = from_state.clone()
             self.create_user_model_operation.state_forwards(app_label, to_state)
-            self.create_user_model_operation.database_forwards(
-                app_label, schema_editor, from_state, to_state
-            )
+            self.create_user_model_operation.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
         # This is used to describe what the operation does in console output.
@@ -404,16 +392,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="katuser",
             name="full_name",
-            field=models.CharField(
-                blank=True, max_length=150, verbose_name="full name"
-            ),
+            field=models.CharField(blank=True, max_length=150, verbose_name="full name"),
         ),
         migrations.AlterField(
             model_name="katuser",
             name="email",
-            field=account.models.LowercaseEmailField(
-                max_length=254, unique=True, verbose_name="email"
-            ),
+            field=account.models.LowercaseEmailField(max_length=254, unique=True, verbose_name="email"),
         ),
         migrations.RunPython(set_full_name),
     ]
