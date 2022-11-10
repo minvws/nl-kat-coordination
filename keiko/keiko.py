@@ -3,6 +3,7 @@ Keiko report generation module
 """
 
 import csv
+import os
 import shutil
 import subprocess
 import tempfile
@@ -109,6 +110,13 @@ def generate_report(
         preprocessed_tex = Path(tmp_dirname) / tex_output_file_name
         preprocessed_tex.write_text(out_document)
 
+        # copy preprocessed tex file if debug is enabled
+        if debug or settings.debug:
+            shutil.copyfile(
+                Path(tmp_dirname) / tex_output_file_name,
+                Path(settings.reports_folder) / tex_output_file_name,
+            )
+
         # run pdflatex
         cmd = [
             "pdflatex",
@@ -116,7 +124,8 @@ def generate_report(
             "-interaction=nonstopmode",
             tex_output_file_name,
         ]
-        output = subprocess.run(cmd, cwd=tmp_dirname, capture_output=True, check=True)
+        env = {**os.environ, "TEXMFVAR": tmp_dirname}
+        output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
         logger.info(
             "pdflatex run. [report_id=%s] [template=%s] [command=%s]",
             report_id,
@@ -125,8 +134,10 @@ def generate_report(
         )
         logger.debug(output.stdout.decode("utf-8"))
         logger.debug(output.stderr.decode("utf-8"))
+        if output.returncode:
+            raise Exception("Error running pdflatex")
 
-        output = subprocess.run(cmd, cwd=tmp_dirname, capture_output=True, check=True)
+        output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
         logger.info(
             "pdflatex run. [report_id=%s] [template=%s] [command=%s]",
             report_id,
@@ -135,6 +146,8 @@ def generate_report(
         )
         logger.debug(output.stdout.decode("utf-8"))
         logger.debug(output.stderr.decode("utf-8"))
+        if output.returncode:
+            raise Exception("Error running pdflatex")
 
         # copy result back to output folder
         Path(settings.reports_folder).mkdir(parents=True, exist_ok=True)
@@ -149,13 +162,6 @@ def generate_report(
             Path(settings.reports_folder) / pdf_output_file_name,
         )
 
-        # also copy preprocessed tex file if debug is enabled
-        if debug:
-            shutil.copyfile(
-                Path(tmp_dirname) / tex_output_file_name,
-                Path(settings.reports_folder) / tex_output_file_name,
-            )
-
     # ...tempfiles are deleted automatically when leaving the context
 
 
@@ -168,5 +174,8 @@ def read_glossary(glossary: str) -> Dict[str, Tuple[str, str]]:
         # skip header
         _ = next(csvreader)
         for row in csvreader:
-            glossary_entries[baretext(row[0])] = (row[0], row[1])
+            # only allow words with baretext representation
+            bare_word = baretext(row[0])
+            if bare_word != "":
+                glossary_entries[baretext(row[0])] = (row[0], row[1])
     return glossary_entries

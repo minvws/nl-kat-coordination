@@ -56,7 +56,6 @@ def construct_api() -> FastAPI:
             debug=parameters.debug,
         )
 
-        # return id
         return ReportResponse(report_id=report_id)
 
     @app.get("/health")

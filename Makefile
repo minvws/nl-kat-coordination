@@ -26,7 +26,6 @@ check: ## Check the code style using black, mypy, flake8 and pylint.
 	black --diff --check .
 	flake8 keiko
 	pylint --recursive=y keiko
-	mypy keiko
 	vulture --min-confidence=90 keiko
 
 check-latex:

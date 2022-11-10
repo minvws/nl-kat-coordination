@@ -24,16 +24,16 @@ class Finding(OOI):
 
 
 class FindingTypeBase(OOI):
-    risk_level_source: str
+    risk_level_source: Optional[str]
     risk_level_score: float
     risk_level_severity: str
     Information: Optional[str]
-    description: str
+    description: Optional[str]
 
 
 class KATFindingType(FindingTypeBase):
     ooi_type: Literal["KATFindingType"]
-    risk: str
+    risk: Optional[str]
     recommendation: Optional[str]
 
 
@@ -41,13 +41,13 @@ class CVEFindingType(FindingTypeBase):
     ooi_type: Literal["CVEFindingType"]
     cvss: str
     source: str
-    information_updated: str = Field(..., alias="information updated")
+    information_updated: Optional[str] = Field(..., alias="information updated")
 
 
 class RetireJSFindingType(FindingTypeBase):
     ooi_type: Literal["RetireJSFindingType"]
     source: str
-    information_updated: str = Field(..., alias="information updated")
+    information_updated: Optional[str] = Field(..., alias="information updated")
 
 
 FindingType = Union[KATFindingType, CVEFindingType, RetireJSFindingType]
