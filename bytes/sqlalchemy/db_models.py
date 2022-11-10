@@ -36,7 +36,7 @@ class NormalizerMetaInDB(SQL_BASE):  # type: ignore
     __tablename__ = "normalizer_meta"
 
     id = Column(UUID, primary_key=True)
-    normalizer_name = Column(String(length=64), nullable=False)
+    normalizer_id = Column(String(length=64), nullable=False)
     normalizer_version = Column(String(length=16))
     started_at = Column(DateTime(timezone=True))
     ended_at = Column(DateTime(timezone=True))

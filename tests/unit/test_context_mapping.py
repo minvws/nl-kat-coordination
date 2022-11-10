@@ -38,7 +38,7 @@ def test_context_mapping_normalizer() -> None:
 
     assert isinstance(normalizer_meta_in_db, NormalizerMetaInDB)
     assert normalizer_meta.id == normalizer_meta_in_db.id
-    assert normalizer_meta.normalizer.name == normalizer_meta_in_db.normalizer_name
+    assert normalizer_meta.normalizer.id == normalizer_meta_in_db.normalizer_id
     assert normalizer_meta.normalizer.version == normalizer_meta_in_db.normalizer_version
     assert normalizer_meta.started_at == normalizer_meta_in_db.started_at
     assert normalizer_meta.ended_at == normalizer_meta_in_db.ended_at

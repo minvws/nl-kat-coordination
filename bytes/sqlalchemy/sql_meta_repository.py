@@ -222,7 +222,7 @@ def to_boefje_meta(boefje_meta_in_db: BoefjeMetaInDB) -> BoefjeMeta:
 def to_normalizer_meta_in_db(normalizer_meta: NormalizerMeta) -> NormalizerMetaInDB:
     return NormalizerMetaInDB(
         id=normalizer_meta.id,
-        normalizer_name=normalizer_meta.normalizer.name,
+        normalizer_id=normalizer_meta.normalizer.id,
         normalizer_version=normalizer_meta.normalizer.version,
         started_at=normalizer_meta.started_at,
         ended_at=normalizer_meta.ended_at,
@@ -237,7 +237,7 @@ def to_normalizer_meta(normalizer_meta_in_db: NormalizerMetaInDB) -> NormalizerM
     return NormalizerMeta(
         id=normalizer_meta_in_db.id,
         normalizer=Normalizer(
-            name=normalizer_meta_in_db.normalizer_name,
+            id=normalizer_meta_in_db.normalizer_id,
             version=normalizer_meta_in_db.normalizer_version,
         ),
         started_at=normalizer_meta_in_db.started_at,
