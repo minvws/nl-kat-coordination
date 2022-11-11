@@ -1,6 +1,5 @@
 {
   "id": "wpscan-job",
-  "module": "kat_wpscan.main",
   "organization": "_dev",
   "arguments": {
     "url": "https://zorg4ons.nl"

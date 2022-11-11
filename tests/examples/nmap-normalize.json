@@ -1,6 +1,5 @@
 {
   "id": "nmap",
-  "module": "kat_nmap.normalize",
   "organization": "_dev",
   "arguments": {
   },

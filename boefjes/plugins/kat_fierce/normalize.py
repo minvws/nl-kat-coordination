@@ -7,7 +7,7 @@ from octopoes.models.ooi.dns.records import DNSARecord, DNSAAAARecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
 
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

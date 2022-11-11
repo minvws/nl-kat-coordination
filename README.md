@@ -50,7 +50,7 @@ These can be encrypted by setting the `ENCRYPTION_MIDDLEWARE=NACL_SEALBOX`, and 
 More info about the encryption scheme can be found here: https://pynacl.readthedocs.io/en/latest/public/.
 Currently, the settings are encrypted when stored, and returned decrypted.
 This could be changed in the future when the boefje-runner/plugin-code can decrypt the secrets itself,
-although this would be more complicated. 
+although this would be more complicated.
 
 ## Environment variables
 
@@ -84,8 +84,8 @@ To run a boefje and normalizer worker as a docker container, you can run
 
 ```bash
 docker build . -t boefje
-docker run --rm -d --name boefje boefje python -m worker --host localhost boefje
-docker run --rm -d --name normalizer boefje python -m worker --host localhost normalizer
+docker run --rm -d --name boefje boefje python -m boefjes boefje
+docker run --rm -d --name normalizer boefje python -m boefjes normalizer
 ```
 
 Note: the worker needs a running Bytes API and RabbitMQ. The service locations can be specified with environment variables
@@ -93,13 +93,12 @@ Note: the worker needs a running Bytes API and RabbitMQ. The service locations c
 
 ### Running the worker directly
 
-To start the worker process listening on the job queue, use the `python -m bin.worker` module.
+To start the worker process listening on the job queue, use the `python -m boefjes` module.
 ```bash
-$ python -m bin.worker --help
-Usage: python -m bin.worker [OPTIONS] {boefje|normalizer}
+$ python -m boefjes --help
+Usage: python -m boefjes [OPTIONS] {boefje|normalizer}
 
 Options:
-  --broker TEXT                   A broker URI. (e.g. "amqp://localhost")
   --log-level [DEBUG|INFO|WARNING|ERROR]
                                   Log level
   --help                          Show this message and exit.
@@ -107,8 +106,8 @@ Options:
 
 So to start either a `boefje` worker or `normalizer` worker, run:
 
-- `python -m bin.worker boefje`
-- `python -m bin.worker normalizer`
+- `python -m boefjes boefje`
+- `python -m boefjes normalizer`
 
 Again, service locations can be specified with environment variables.
 
@@ -150,7 +149,7 @@ Example structure:
 ```shell
 $ tree boefjes/kat_dns
 ├── boefje.py
-├── cover.png
+├── cover.jpg
 ├── description.md
 ├── __init__.py
 ├── main.py
@@ -171,7 +170,7 @@ To lint the code using black, run:
 $ python -m black .
 ```
 
-## Your first Boefje 
+## Your first Boefje
 On designing the functionality of your first Boefje addon for KAT, and writing it.
 
 KAT allows developers to add logic to it on various levels. Part of this logic is what we call “Boefjes”, its usually the code that goes out into the world, and looks for new input. This input is then handed to “Normalizers” which take the gathered raw information and try to make sense of it. By making sense, we mean creating new Objects of Interest or “OOI’s” which match the modeling that KAT provides.
@@ -204,7 +203,7 @@ the scheduler will try to make sense of this by keeping track of historical resu
 ### Create
 
 Once your boefje has returned its output to the runner it will be stored, saved and signed for forensic safe-keeping complete with the network traffic that your boefje might have needed to produce the output.
-The next step is to Create new Objects from this output. This job is done by the normalizers. 
+The next step is to Create new Objects from this output. This job is done by the normalizers.
 A normalizer’s job is to take raw input and go search for things that It thinks fit the already present Models in KAT.
 This might be done in a few ways. As the normalizer is given the raw output from a boefje, its also given the mime-type (as far as the boefje could tell), and the name of the originating boefje and its version.
 This might allow the normalizer to make an informed decision on how to parse the input.
@@ -226,7 +225,7 @@ Or, a bit more complex:
 “if there’s an ipv6 and an ipv4 address linked to a hostname, both should carry the same website content, of not, add finding.”
 Building these rules comes down to looking at the graph, and deciding which objects, lack of objects or combinations of objects does not fit the check you are building.
 The result for a check would most of the time be that you add a new finding, but it might also be that you can create new other OOI’s from the logic that you applied to the graph.
-Just like normalizers might run on the output of various Boefjes, Bits can also apply to anything already present in the graph. 
+Just like normalizers might run on the output of various Boefjes, Bits can also apply to anything already present in the graph.
 Combined with local and remote data-sources, Bits are a powerful tool to check for example the current situation in the graph against an agreed on list of allowed software.
 Bits will be automatically applied when the output set of their input queries changes, and should take effect almost immediately.
 Objects that have been added by a Bit run at some point will also automatically be removed when the new run of that Bit no longer produces them.

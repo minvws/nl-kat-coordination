@@ -14,7 +14,7 @@ from boefjes.plugins.kat_snyk import check_version
 
 logger = logging.getLogger(__name__)
 
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

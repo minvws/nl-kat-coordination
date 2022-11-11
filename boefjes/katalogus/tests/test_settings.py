@@ -6,41 +6,34 @@ from nacl.public import PrivateKey
 
 from boefjes.katalogus.api import app
 from boefjes.katalogus.dependencies.encryption import (
-    IdentityMiddleware,
     NaclBoxMiddleware,
 )
 from boefjes.katalogus.dependencies.organisations import get_organisations_store
-from boefjes.katalogus.dependencies.settings import (
-    SettingsService,
-    get_settings_service,
-)
+from boefjes.katalogus.dependencies.plugins import get_plugin_service
 from boefjes.katalogus.models import Organisation, Base64Str
 from boefjes.katalogus.storage.memory import (
     OrganisationStorageMemory,
-    SettingsStorageMemory,
 )
+from boefjes.katalogus.tests.test_plugin_service import mock_plugin_service
 
 
 class TestSettings(TestCase):
     def setUp(self) -> None:
         self.client = TestClient(app)
-        self.storage = SettingsStorageMemory("test")
-        self.storage.create("DUMMY_VAR", "123", "test", "test_plugin")
-
-        def _mocked_get_settings_service(organisation_id: str):
-            return SettingsService(
-                storage=self.storage,
-                encryption=IdentityMiddleware(),
-            )
-
         self._store = OrganisationStorageMemory(
             {"test": Organisation(id="test", name="Test")}
         )
+        plugin_service = mock_plugin_service("test")
+
+        def wrapped_mock_plugin_service(organisation_id: str):
+            return plugin_service
+
+        self.plugin_service = plugin_service
         app.dependency_overrides[get_organisations_store] = lambda: self._store
-        app.dependency_overrides[get_settings_service] = _mocked_get_settings_service
+        app.dependency_overrides[get_plugin_service] = wrapped_mock_plugin_service
 
     def tearDown(self) -> None:
-        self.storage._data = {}
+        self.plugin_service.settings_storage._data = {}
 
     def test_list(self):
         res = self.client.get("/v1/organisations/test/test_plugin/settings")

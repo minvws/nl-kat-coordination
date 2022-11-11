@@ -8,7 +8,7 @@ from octopoes.models.types import (
 from octopoes.models.ooi.findings import SnykFindingType
 
 from boefjes.plugins.kat_snyk.normalize import run
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 from tests.stubs import get_dummy_data
 
 

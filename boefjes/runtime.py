@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Union
 
-from boefjes.job import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
 
 
 class ItemHandler:

@@ -1,0 +1,16 @@
+{
+    "id": "kat_leakix_normalize",
+    "consumes": [
+        "leakix"
+    ],
+    "produces": [
+        "KATFindingType",
+        "SoftwareInstance",
+        "Service",
+        "IPPort",
+        "Finding",
+        "Software",
+        "IPService",
+        "CVEFindingType"
+    ]
+}

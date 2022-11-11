@@ -11,7 +11,7 @@
   },
   "dispatches": [
     {
-      "name": "kat_dns_normalize",
+      "id": "kat_dns_normalize",
       "version": null
     }
   ]

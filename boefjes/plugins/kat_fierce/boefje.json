@@ -1,0 +1,17 @@
+{
+    "id": "fierce",
+    "name": "Fierce",
+    "description": "Use a Fierce scan to find subdomains (with their ip)",
+    "consumes": [
+        "Hostname"
+    ],
+    "produces": [
+        "IPAddressV6",
+        "DNSARecord",
+        "Hostname",
+        "DNSAAAARecord",
+        "IPAddressV4"
+    ],
+    "environment_keys": [],
+    "scan_level": 2
+}

@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from typing import Union, NewType, Optional, List, Literal, Set
 
-from pydantic import BaseModel, AnyHttpUrl
+from pydantic import BaseModel, AnyHttpUrl, Field
 
 
 class Repository(BaseModel):
@@ -24,7 +24,7 @@ class Plugin(BaseModel):
     authors: Optional[List[str]]
     created: Optional[datetime.datetime]
     description: Optional[str]
-    environment_keys: Optional[List[str]]
+    environment_keys: List[str] = Field(default_factory=list)
     related: Optional[List[str]]
     enabled: bool = False
 

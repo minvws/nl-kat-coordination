@@ -11,6 +11,13 @@ class StorageError(Exception):
         self.message = message
 
 
+class SettingsNotConformingToSchema(StorageError):
+    def __init__(self, organisation_id: str, plugin_id: str, validation_error: str):
+        super().__init__(
+            f"Settings for organisation {organisation_id} and plugin {plugin_id} are not conform the plugin schema: {validation_error}"
+        )
+
+
 class NotFound(StorageError):
     """Generic exception for when objects are not found"""
 

@@ -1,11 +1,22 @@
+from importlib import import_module
+from inspect import signature, isfunction
+
+import json
+
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Set, List, Union
+from typing import Set, Union, Protocol
 
 from pydantic import BaseModel, StrictBytes
-from pydantic.fields import Field
+
+from boefjes.katalogus.models import Boefje, Normalizer
 
 BOEFJES_DIR = Path(__file__).parent
+
+BOEFJE_DEFINITION_FILE = "boefje.json"
+NORMALIZER_DEFINITION_FILE = "normalizer.json"
+ENTRYPOINT_BOEFJES = "main.py"
+ENTRYPOINT_NORMALIZERS = "normalize.py"
 
 
 class SCAN_LEVEL(Enum):
@@ -16,22 +27,51 @@ class SCAN_LEVEL(Enum):
     L4 = 4
 
 
-class Boefje(BaseModel):
-    id: str
-    name: str
-    module: Optional[str]
-    description: Optional[str] = None
-    consumes: Set[str]
-    produces: Set[str]
-    environment_keys: List[str] = Field(default_factory=list)
-    scan_level: SCAN_LEVEL = SCAN_LEVEL.L1
+class ModuleException(Exception):
+    """General error for modules"""
 
 
-class Normalizer(BaseModel):
-    name: str
-    module: str
-    consumes: Optional[List[str]] = Field(default_factory=list)
-    produces: Optional[Set[str]] = Field(default_factory=set)
+class Runnable(Protocol):
+    def run(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+class BoefjeResource:
+    def __init__(self, path: Path, package: str, repository_id: str):
+        self.path = path
+
+        item = json.loads((path / BOEFJE_DEFINITION_FILE).read_text())
+        self.boefje = Boefje(**item, repository_id=repository_id)
+
+        import_statement = package + "." + ENTRYPOINT_BOEFJES.rstrip(".py")
+        module: Runnable = import_module(import_statement)
+
+        if not hasattr(module, "run") or not isfunction(module.run):
+            raise ModuleException(f"Module {module} does not define a run function")
+
+        if len(signature(module.run).parameters) != 1:
+            raise ModuleException("Module entrypoint has wrong amount of parameters")
+
+        self.module = module
+
+
+class NormalizerResource:
+    def __init__(self, path: Path, package: str, repository_id: str):
+        self.path = path
+
+        item = json.loads((path / NORMALIZER_DEFINITION_FILE).read_text())
+        self.normalizer = Normalizer(**item, repository_id=repository_id)
+
+        import_statement = package + "." + ENTRYPOINT_NORMALIZERS.rstrip(".py")
+        module: Runnable = import_module(import_statement)
+
+        if not hasattr(module, "run") or not isfunction(module.run):
+            raise ModuleException(f"Module {module} does not define a run function")
+
+        if len(signature(module.run).parameters) != 2:
+            raise ModuleException("Module entrypoint has wrong amount of parameters")
+
+        self.module = module
 
 
 class RawData(BaseModel):

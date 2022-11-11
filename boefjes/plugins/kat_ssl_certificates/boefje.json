@@ -1,0 +1,13 @@
+    {
+        "id": "ssl-certificates",
+        "name": "SSLCertificates",
+        "description": "Scan SSL certificates of websites",
+        "consumes": [
+            "Website"
+        ],
+        "produces": [
+            "Certificate"
+        ],
+        "environment_keys": [],
+        "scan_level": 1
+    }

@@ -35,7 +35,7 @@
       "dispatches": []
     },
     "normalizer": {
-      "name": "kat_dns_normalize"
+      "id": "kat_dns_normalize"
     }
   }
 }

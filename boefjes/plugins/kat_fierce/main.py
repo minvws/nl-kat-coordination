@@ -2,7 +2,7 @@ import json
 from typing import Tuple, Union
 
 from boefjes.plugins.kat_fierce.fierce import fierce, parse_args
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:

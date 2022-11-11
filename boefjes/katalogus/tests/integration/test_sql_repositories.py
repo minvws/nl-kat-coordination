@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 
 from boefjes.config import settings
+from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
 from boefjes.katalogus.models import Organisation, Repository, Boefje
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
@@ -40,7 +41,7 @@ class TestRepositories(TestCase):
         session = sessionmaker(bind=self.engine)()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
         self.repository_storage = SQLRepositoryStorage(session, settings)
-        self.settings_storage = SQLSettingsStorage(session, settings)
+        self.settings_storage = SQLSettingsStorage(session, IdentityMiddleware())
         self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
 
     def tearDown(self) -> None:

@@ -13,7 +13,7 @@ from octopoes.models.ooi.certificate import (
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 
 
 def find_between(s: str, first: str, last: str) -> str:

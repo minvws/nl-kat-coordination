@@ -1,0 +1,14 @@
+    {
+        "id": "log4shell",
+        "name": "Log4Shell",
+        "description": "Check for Log4j vulnerability. This boefje will not create a finding. We will contact you if needed.",
+        "consumes": [
+            "Hostname"
+        ],
+        "produces": [
+            "Finding",
+            "CVEFindingType"
+        ],
+        "environment_keys": [],
+        "scan_level": 3
+    }

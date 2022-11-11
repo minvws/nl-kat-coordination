@@ -20,7 +20,7 @@ from octopoes.models.ooi.network import (
 )
 from octopoes.models.ooi.software import Software, SoftwareInstance
 
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

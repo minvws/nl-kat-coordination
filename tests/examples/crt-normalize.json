@@ -1,6 +1,5 @@
 {
   "id": "crt-scan-job",
-  "module": "kat_crt_sh.normalize",
   "organization": "_dev",
   "arguments": {
     "fqdn": "fundacionladulce.org.ar."

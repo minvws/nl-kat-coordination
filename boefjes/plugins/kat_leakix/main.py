@@ -1,12 +1,12 @@
 import json
 import re
+from os import getenv
 from typing import Tuple, Union
 from urllib.parse import quote_plus
 
 import requests
 
-from boefjes.config import settings
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
@@ -28,7 +28,7 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
             want_next_result = False
             response = requests.get(
                 f"https://leakix.net/search?scope={type}&q={dork}&page={page_counter}",
-                headers={"Accept": "application/json", "api-key": settings.leakix_api},
+                headers={"Accept": "application/json", "api-key": getenv("LEAKIX_API")},
             )
             page_counter += 1
             if not response:

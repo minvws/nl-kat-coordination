@@ -1,8 +1,10 @@
 import logging
 
 from pathlib import Path
-from typing import Dict, Iterable, List, Iterator
+from typing import Dict, Iterable, List, Iterator, Optional
 
+from jsonschema.exceptions import ValidationError
+from jsonschema.validators import validate
 from sqlalchemy.orm import Session
 
 from boefjes.config import settings
@@ -19,14 +21,18 @@ from boefjes.katalogus.storage.interfaces import (
     RepositoryStorage,
     PluginEnabledStorage,
     NotFound,
+    SettingsNotConformingToSchema,
+    SettingsStorage,
 )
 from boefjes.katalogus.storage.memory import (
     PluginStatesStorageMemory,
     RepositoryStorageMemory,
+    SettingsStorageMemory,
 )
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
 from boefjes.sql.repository_storage import create_repository_storage
+from boefjes.sql.setting_storage import create_setting_storage
 
 logger = logging.getLogger(__name__)
 
@@ -36,12 +42,14 @@ class PluginService:
         self,
         plugin_enabled_store: PluginEnabledStorage,
         repository_storage: RepositoryStorage,
+        settings_storage: SettingsStorage,
         client: PluginRepositoryClientInterface,
         local_repo: LocalPluginRepository,
     ):
-        self.plugin_client = client
-        self.repository_storage = repository_storage
         self.plugin_enabled_store = plugin_enabled_store
+        self.repository_storage = repository_storage
+        self.settings_storage = settings_storage
+        self.plugin_client = client
         self.local_repo = local_repo
 
     def __enter__(self):
@@ -80,9 +88,43 @@ class PluginService:
             if plugin.id == plugin_id:
                 return plugin
 
-        raise KeyError(f"Plugin {plugin_id} not found with")
+        raise KeyError(f"Plugin {plugin_id} not found for {organisation_id}")
 
-    # These two methods should return this static info from remote repositories as well in the future
+    def get_all_settings(self, organisation_id: str, plugin_id: str):
+        return self.settings_storage.get_all(organisation_id, plugin_id)
+
+    def get_setting_by_key(self, key: str, organisation_id: str, plugin_id: str):
+        return self.settings_storage.get_by_key(key, organisation_id, plugin_id)
+
+    def create_setting(
+        self, key: str, value: str, organisation_id: str, plugin_id: str
+    ):
+        return self.settings_storage.create(key, value, organisation_id, plugin_id)
+
+    def delete_setting_by_key(self, key: str, organisation_id: str, plugin_id: str):
+        self.settings_storage.delete_by_key(key, organisation_id, plugin_id)
+
+        try:
+            self._assert_settings_match_schema(organisation_id, plugin_id)
+        except SettingsNotConformingToSchema:
+            logger.warning(
+                f"Removing setting disabled {plugin_id} for {organisation_id} (if it was enabled before)"
+            )
+
+            plugin = self.by_plugin_id(plugin_id, organisation_id)
+            self.update_by_id(plugin.repository_id, plugin_id, organisation_id, False)
+
+    def update_setting_by_key(
+        self, key: str, value: str, organisation_id: str, plugin_id: str
+    ):
+        return self.settings_storage.update_by_key(
+            key, value, organisation_id, plugin_id
+        )
+
+    # These three methods should return this static info from remote repositories as well in the future
+
+    def schema(self, plugin_id: str) -> Optional[Dict]:
+        return self.local_repo.schema(plugin_id)
 
     def cover(self, plugin_id: str) -> Path:
         try:
@@ -123,6 +165,9 @@ class PluginService:
     def update_by_id(
         self, repository_id: str, plugin_id: str, organisation_id: str, enabled: bool
     ):
+        if enabled:
+            self._assert_settings_match_schema(organisation_id, plugin_id)
+
         self.plugin_enabled_store.update_or_create_by_id(
             plugin_id,
             repository_id,
@@ -155,6 +200,18 @@ class PluginService:
 
         return plugins
 
+    def _assert_settings_match_schema(self, organisation_id: str, plugin_id: str):
+        all_settings = self.settings_storage.get_all(organisation_id, plugin_id)
+        schema = self.schema(plugin_id)
+
+        if schema:  # No schema means that there is nothing to assert
+            try:
+                validate(instance=all_settings, schema=schema)
+            except ValidationError as e:
+                raise SettingsNotConformingToSchema(
+                    organisation_id, plugin_id, e.message
+                ) from e
+
     def _set_plugin_enabled(
         self, plugin: PluginType, organisation_id: str
     ) -> PluginType:
@@ -179,13 +236,20 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
         client = PluginRepositoryClient()
         local_repo = get_local_repository()
 
-        yield PluginService(store, repository_storage, client, local_repo)
+        yield PluginService(
+            store,
+            repository_storage,
+            SettingsStorageMemory(organisation_id),
+            client,
+            local_repo,
+        )
         return
 
     def closure(session: Session):
         return PluginService(
             create_plugin_enabled_storage(session),
             create_repository_storage(session),
+            create_setting_storage(organisation_id, session),
             PluginRepositoryClient(),
             get_local_repository(),
         )

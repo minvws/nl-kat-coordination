@@ -1,6 +1,5 @@
 {
   "id": "ssl-scan-job",
-  "module": "kat_ssl_scan.scan",
   "organization": "_dev",
   "arguments": {
     "domain": "example.nl"

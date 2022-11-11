@@ -1,6 +1,5 @@
 {
   "id": "whois-job",
-  "module": "kat_whois.main",
   "organization": "_dev",
   "arguments": {
     "domain": "tweakers.net"

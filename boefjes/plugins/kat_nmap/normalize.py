@@ -13,7 +13,7 @@ from octopoes.models.ooi.network import (
 )
 from octopoes.models.ooi.service import Service, IPService
 
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 
 
 def get_ports_and_service(host: NmapHost) -> Iterator[OOI]:

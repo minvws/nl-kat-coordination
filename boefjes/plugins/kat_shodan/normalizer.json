@@ -1,0 +1,11 @@
+{
+    "id": "kat_shodan_normalize",
+    "consumes": [
+        "shodan"
+    ],
+    "produces": [
+        "Finding",
+        "IPPort",
+        "CVEFindingType"
+    ]
+}

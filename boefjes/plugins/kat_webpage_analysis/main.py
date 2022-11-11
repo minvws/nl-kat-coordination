@@ -1,6 +1,6 @@
 import json
 from typing import Tuple, Union
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 import requests
 from urllib.parse import urlparse, urlunsplit

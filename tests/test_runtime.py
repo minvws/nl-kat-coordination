@@ -9,7 +9,7 @@ from pydantic import parse_raw_as
 from boefjes.app import SchedulerRuntimeManager
 from boefjes.clients.scheduler_client import SchedulerClientInterface, Task, Queue
 from boefjes.config import Settings
-from boefjes.job import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime import ItemHandler, StopWorking, RuntimeManager
 from tests.stubs import get_dummy_data
 
@@ -142,4 +142,4 @@ class RuntimeTest(TestCase):
 
         items = self.item_handler.get_all()
         self.assertEqual(1, len(items))
-        self.assertEqual("kat_dns_normalize", items[0].normalizer.name)
+        self.assertEqual("kat_dns_normalize", items[0].normalizer.id)

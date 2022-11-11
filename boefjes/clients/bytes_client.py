@@ -6,7 +6,7 @@ from typing import Callable, Dict, Union, Any, Set
 import requests
 from requests.models import HTTPError
 
-from boefjes.job import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
 logger = logging.getLogger(__name__)
