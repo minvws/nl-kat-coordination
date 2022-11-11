@@ -51,6 +51,9 @@ clean:
 up:
 	docker-compose up -d --force-recreate rocky
 
+down:
+       docker-compose down
+
 clone:
 	-git clone https://github.com/minvws/nl-kat-boefjes.git
 	-git clone https://github.com/minvws/nl-kat-bytes.git
