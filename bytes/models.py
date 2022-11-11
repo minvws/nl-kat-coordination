@@ -56,7 +56,7 @@ class Boefje(BaseModel):
 
 
 class Normalizer(BaseModel):
-    name: str
+    id: str
     version: Optional[str]
 
 

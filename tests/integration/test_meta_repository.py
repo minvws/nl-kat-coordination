@@ -145,20 +145,20 @@ def test_save_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:
     assert normalizer_meta == normalizer_meta_from_db
 
 
-def test_normalizer_name_length(meta_repository: SQLMetaDataRepository) -> None:
+def test_normalizer_id_length(meta_repository: SQLMetaDataRepository) -> None:
     normalizer_meta = get_normalizer_meta()
 
     with meta_repository:
         meta_repository.save_boefje_meta(normalizer_meta.boefje_meta)
 
         normalizer_meta.id = str(uuid.uuid4())
-        normalizer_meta.normalizer.name = 64 * "a"
+        normalizer_meta.normalizer.id = 64 * "a"
         meta_repository.save_normalizer_meta(normalizer_meta)
 
     with pytest.raises(DataError):
         with meta_repository:
             normalizer_meta.id = str(uuid.uuid4())
-            normalizer_meta.normalizer.name = 65 * "a"
+            normalizer_meta.normalizer.id = 65 * "a"
             meta_repository.save_normalizer_meta(normalizer_meta)
 
 
