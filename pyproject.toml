@@ -5,20 +5,28 @@ description = "KAT report engine using LateX to generate PDF"
 authors = [""]
 license = "EUPL"
 
+[tool.vulture]
+min_confidence = 90
+paths = ["keiko"]
+
 [tool.pylint.format]
 max-line-length = "120"
 
 [tool.pylint."MESSAGES CONTROL"]
-disable = ["R0914","W1514"] # Ignore too-many-local-variables and unspecified encodings
+disable = ["R0914","W1514", "R0903", "E0401"] # Ignore too-many-local-variables; unspecified encodings; too-few-public-methods; import-error
 extension-pkg-whitelist = "pydantic" # Ignore pydantic import checks
 
 [tool.black]
-line-length = 120
+line-length = 119
 target-version = ['py38']
+
+[tool.pydocstyle]
 
 [tool.mypy]
 python_version = "3.8"
 strict = true
+ignore_missing_imports = true
+follow_imports = "skip"
 
 [tool.poetry.dependencies]
 python = "^3.8"

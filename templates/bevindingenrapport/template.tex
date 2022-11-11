@@ -4,7 +4,7 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{fancyhdr}
-\usepackage{graphicx} 
+\usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{longtable}
 \usepackage[utf8]{inputenc}
@@ -17,7 +17,7 @@
 \hypersetup{
 	colorlinks=true,
 	linkcolor=blue,
-	filecolor=magenta,      
+	filecolor=magenta,
 	urlcolor=cyan,
 	pdftitle={KEIKO Document by KAT},
 }
@@ -47,14 +47,14 @@
 	\cfoot{\includegraphics[width=0.1\textwidth]{keiko.png}}
 	\rfoot{\thepage{}\hspace{1pt} van~\pageref{LastPage}}
 	\lfoot{\tlpbox}
-	
-	
+
+
 	\renewcommand{\headrulewidth}{0pt}
-	
+
 	\chead{\includegraphics[width=0.05\textwidth]{keiko.png}}
 	\lhead{\tlpbox}
 	\rhead{\tlpbox}
-	\renewcommand{\headrulewidth}{0pt}	
+	\renewcommand{\headrulewidth}{0pt}
 }
 
 
@@ -149,7 +149,9 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 			CVSS & @@{occurrence.finding_type.cvss}@@ \\
 		{% endif %}
 		Ernst & @@{occurrence.finding_type.risk_level_severity|capitalize}@@ \\
-		Beschrijving & @@{occurrence.finding_type.description}@@ \\
+    {% if occurrence.finding_type.description %}
+		  Beschrijving & @@{occurrence.finding_type.description}@@ \\
+    {% endif %}
 		{% if occurrence.finding_type.Information %}
 			Informatie & @@{occurrence.finding_type.Information}@@ \\
 		{% endif %}
@@ -182,4 +184,4 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 	\bottomrule
 \end{longtable}
 
-\end{document}          
+\end{document}
