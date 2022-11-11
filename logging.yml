@@ -14,7 +14,7 @@ handlers:
     stream: ext://sys.stdout
 
 root:
-    level: INFO
+    level: WARN
     handlers: [console]
 
 loggers:
@@ -30,4 +30,7 @@ loggers:
     LEVEL: INFO
     handlers: [console]
     propagate: 0
-
+  octopoes:
+    level: INFO
+    handlers: [console]
+    propagate: 0

@@ -44,7 +44,7 @@ class EventManager:
             event_data = json.dumps(
                 {
                     "reference": event.new_data.reference,
-                    "ooi_type": event.new_data.reference.class_,
+                    "object_type": event.new_data.reference.class_,
                     "level": event.new_data.level,
                 }
             )

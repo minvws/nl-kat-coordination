@@ -11,6 +11,7 @@ from octopoes.connector import RemoteException
 from octopoes.models import Reference, OOI, ScanProfile
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import Origin
+from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 
@@ -69,8 +70,8 @@ class OctopoesAPIConnector:
         types: Set[Type[OOI]],
         valid_time: Optional[datetime] = None,
         offset: int = 0,
-        limit: int = 20,
-    ) -> List[OOI]:
+        limit: int = 5000,
+    ) -> Paginated[OOIType]:
         params = {
             "types": [t.__name__ for t in types],
             "valid_time": valid_time,
@@ -78,7 +79,7 @@ class OctopoesAPIConnector:
             "limit": limit,
         }
         res = self.session.get("/objects", params=params)
-        return parse_obj_as(List[OOIType], res.json())
+        return Paginated[OOIType].parse_obj(res.json())
 
     def get(self, reference: Reference, valid_time: Optional[datetime] = None) -> OOI:
         res = self.session.get(

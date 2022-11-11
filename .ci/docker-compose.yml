@@ -7,7 +7,7 @@ services:
       - .:/app/octopoes
     command: sh -c
       "
-        pip install -r /app/octopoes/requirements.txt &&
+        pip install -r /app/octopoes/requirements-dev.txt &&
         pip install /app/octopoes &&
         python3 -m unittest discover /app/octopoes/tests
       "

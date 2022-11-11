@@ -1,5 +1,4 @@
 import json
-import uuid
 from datetime import datetime
 from logging import getLogger
 from typing import List, Optional, Callable, Set, Dict, Type
@@ -12,26 +11,23 @@ from octopoes.events.events import (
     OriginParameterDBEvent,
     ScanProfileDBEvent,
     DBEvent,
-    CalculateScanLevelTask,
 )
 from octopoes.models import (
     OOI,
     Reference,
-    ScanProfileBase,
-    InheritedScanProfile,
-    DeclaredScanProfile,
-    Inheritance,
     EmptyScanProfile,
+    DeclaredScanProfile,
+    InheritedScanProfile,
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import Origin, OriginType, OriginParameter
-from octopoes.models.path import get_max_scan_level_inheritance, get_max_scan_level_issuance, Path
+from octopoes.models.pagination import Paginated
+from octopoes.models.path import get_max_scan_level_issuance, get_paths_to_neighours
 from octopoes.models.tree import ReferenceTree
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
-from octopoes.tasks.app import app as celery_app
 
 logger = getLogger(__name__)
 
@@ -61,22 +57,6 @@ class OctopoesService:
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
 
-    def _dispatch_calculate_scan_profile(self, reference: Reference, client: str, valid_time: datetime) -> None:
-        task = CalculateScanLevelTask(
-            reference=reference,
-            valid_time=valid_time,
-            client=client,
-        )
-
-        logger.info("Dispatching CalculateScanLevelTask event: %s", task.json())
-
-        celery_app.send_task(
-            "octopoes.tasks.tasks.calculate_scan_profile",
-            (json.loads(task.json()),),
-            queue="octopoes",
-            task_id=str(uuid.uuid4()),
-        )
-
     def _populate_scan_profiles(self, oois: List[OOI], valid_time: datetime) -> List[OOI]:
         logger.info("Populating scan profiles for %s oois", len(oois))
 
@@ -99,8 +79,10 @@ class OctopoesService:
         valid_time: datetime,
         limit: int = 1000,
         offset: int = 0,
-    ) -> List[OOI]:
-        return self._populate_scan_profiles(self.ooi_repository.list(types, valid_time, limit, offset), valid_time)
+    ) -> Paginated[OOI]:
+        paginated = self.ooi_repository.list(types, valid_time, limit, offset)
+        self._populate_scan_profiles(paginated.items, valid_time)
+        return paginated
 
     def get_ooi_tree(
         self,
@@ -145,155 +127,119 @@ class OctopoesService:
         self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
-    def _calculate_inheritances_from_neighbours(
-        ooi: OOI, grouped_neighbours: Dict[Path, List[OOI]], source_scan_levels: Dict[Reference, DeclaredScanProfile]
-    ) -> Dict[str, Inheritance]:
+    def check_path_level(path_level: Optional[int], current_level: int):
+        return path_level is not None and path_level >= current_level
 
-        all_inheritances: List[Inheritance] = []
+    def recalculate_scan_profiles(self, valid_time: datetime) -> None:
 
-        for path, neighbours in grouped_neighbours.items():
-            relation_max_inheritance = get_max_scan_level_inheritance(path.segments[0])
+        # fetch all scan profiles
+        all_scan_profiles = self.scan_profile_repository.list(None, valid_time=valid_time)
 
-            # undefined inheritance, means no inheritance
-            if relation_max_inheritance is None:
+        # cache all declared
+        all_declared_scan_profiles = {
+            scan_profile for scan_profile in all_scan_profiles if isinstance(scan_profile, DeclaredScanProfile)
+        }
+        # cache all inherited
+        inherited_scan_profiles = {
+            scan_profile.reference: scan_profile
+            for scan_profile in all_scan_profiles
+            if isinstance(scan_profile, InheritedScanProfile)
+        }
+
+        # track all scan level assignments
+        assigned_scan_levels: Dict[Reference, int] = {
+            scan_profile.reference: scan_profile.level for scan_profile in all_declared_scan_profiles
+        }
+
+        for current_level in range(4, 0, -1):
+
+            # start point: all scan profiles with current level + all higher scan levels
+            start_ooi_references = {
+                profile.reference for profile in all_declared_scan_profiles if profile.level == current_level
+            } | {reference for reference, level in assigned_scan_levels.items() if level > current_level}
+            next_ooi_set = {ooi for ooi in self.ooi_repository.get_bulk(start_ooi_references, valid_time).values()}
+
+            while next_ooi_set:
+
+                # prepare next iteration, group oois per type
+                ooi_types = {ooi.__class__ for ooi in next_ooi_set}
+                grouped_per_type: Dict[Type[OOI], Set[OOI]] = {
+                    ooi_type: {ooi for ooi in next_ooi_set if isinstance(ooi, ooi_type)} for ooi_type in ooi_types
+                }
+
+                temp_next_ooi_set = set()
+                for ooi_type_ in grouped_per_type.keys():
+
+                    current_ooi_set = grouped_per_type[ooi_type_]
+
+                    # find paths to neighbours higher or equal than current processing level
+                    paths = get_paths_to_neighours(ooi_type_)
+                    paths = {
+                        path
+                        for path in paths
+                        if self.check_path_level(get_max_scan_level_issuance(path.segments[0]), current_level)
+                    }
+
+                    # If there are no paths at the current level we can go the next type
+                    if not paths:
+                        continue
+
+                    # find all neighbours
+                    references = {ooi.reference for ooi in current_ooi_set}
+                    next_level = self.ooi_repository.list_neighbours(references, paths, valid_time)
+
+                    # assign scan levels to newly found oois and add to next iteration
+                    for ooi in next_level:
+                        if ooi.reference not in assigned_scan_levels:
+                            assigned_scan_levels[ooi.reference] = current_level
+                            temp_next_ooi_set.add(ooi)
+
+                logger.info("Assigned scan levels [level=%i] [len=%i]", current_level, len(temp_next_ooi_set))
+                next_ooi_set = temp_next_ooi_set
+
+        scan_level_aggregates = {i: 0 for i in range(1, 5)}
+        for scan_level in assigned_scan_levels.values():
+            scan_level_aggregates.setdefault(scan_level, 0)
+            scan_level_aggregates[scan_level] += 1
+
+        logger.info("Assigned scan levels [len=%i]", len(assigned_scan_levels.keys()))
+        logger.info(json.dumps(scan_level_aggregates, indent=4))
+
+        # Save all assigned scan levels
+        update_count = 0
+        source_scan_profile_references = {sp.reference for sp in all_declared_scan_profiles}
+        for reference, scan_level in assigned_scan_levels.items():
+            # Skip source scan profiles
+            if reference in source_scan_profile_references:
                 continue
 
-            for neighbour in neighbours:
+            new_scan_profile = InheritedScanProfile(reference=reference, level=scan_level)
 
-                # can't inherit from self
-                if neighbour.reference == ooi.reference:
-                    continue
-
-                # neighbour is empty, don't inherit
-                if isinstance(neighbour.scan_profile, EmptyScanProfile):
-                    continue
-
-                max_relation_inheritance_level = min(relation_max_inheritance, neighbour.scan_profile.level)
-
-                # neighbour is declared, direct inheritance
-                if isinstance(neighbour.scan_profile, DeclaredScanProfile):
-                    all_inheritances.append(
-                        Inheritance(
-                            source=neighbour.reference,
-                            parent=neighbour.reference,
-                            level=max_relation_inheritance_level,
-                            depth=1,
-                        )
-                    )
-                    continue
-
-                # neighbour is inheriting, calculate inheritance
-                if isinstance(neighbour.scan_profile, InheritedScanProfile):
-
-                    for neighbouring_inheritance in neighbour.scan_profile.inheritances:
-
-                        if neighbouring_inheritance.parent == ooi.reference:
-                            continue
-
-                        # when the source level is not found, don't inherit
-                        if neighbouring_inheritance.source not in source_scan_levels:
-                            logger.warning("Inheritance source not found: %s", neighbouring_inheritance.source)
-                            continue
-
-                        actual_source_level = source_scan_levels[neighbouring_inheritance.source]
-
-                        # inherit neighbour inheritance, but not higher than source, and now higher than max relation level
-                        actual_inheriting_level = min(
-                            max_relation_inheritance_level,
-                            actual_source_level.level,
-                            neighbouring_inheritance.level,
-                        )
-
-                        all_inheritances.append(
-                            Inheritance(
-                                source=neighbouring_inheritance.source,
-                                parent=neighbour.reference,
-                                level=actual_inheriting_level,
-                                depth=neighbouring_inheritance.depth + 1,
-                            )
-                        )
-
-        # group inheritances per source
-        inheritances_per_source: Dict[Reference, List[Inheritance]] = {}
-        for inheritance in all_inheritances:
-            inheritances_per_source.setdefault(inheritance.source, []).append(inheritance)
-
-        result_inheritances: Dict[str, Inheritance] = {}
-        for source, inheritances in inheritances_per_source.items():
-
-            # always pick declared over inherited
-            declared = [inheritance for inheritance in inheritances if inheritance.parent == inheritance.source]
-            if declared:
-                result_inheritances[str(source)] = next(iter(declared))
+            # Save new inherited scan profile
+            if reference not in inherited_scan_profiles:
+                self.scan_profile_repository.save(None, new_scan_profile, valid_time)
+                update_count += 1
                 continue
 
-            # filter by highest level
-            highest_level = max([x.level for x in inheritances])
-            filtered_inheritances = [inheritance for inheritance in inheritances if inheritance.level == highest_level]
+            # Diff with old scan profile
+            old_scan_profile = inherited_scan_profiles[reference]
+            if old_scan_profile.level != scan_level:
+                self.scan_profile_repository.save(old_scan_profile, new_scan_profile, valid_time)
+                update_count += 1
 
-            # filter by lowest depth
-            lowest_depth = min([x.depth for x in filtered_inheritances])
-            filtered_inheritances = [
-                inheritance for inheritance in filtered_inheritances if inheritance.depth == lowest_depth
-            ]
+        logger.info("Updated inherited scan profiles [count=%i]", update_count)
 
-            # sort by parent to make sure the order is consistent in the case of draws
-            filtered_inheritances = sorted(filtered_inheritances, key=lambda x: str(x.parent))
+        set_scan_profile_references = {
+            scan_profile.reference for scan_profile in all_scan_profiles if scan_profile.level > 0
+        }
+        references_to_reset = (
+            set_scan_profile_references - set(assigned_scan_levels.keys()) - source_scan_profile_references
+        )
+        for reference in references_to_reset:
+            old_scan_profile = inherited_scan_profiles[reference]
+            self.scan_profile_repository.save(old_scan_profile, EmptyScanProfile(reference=reference), valid_time)
 
-            # add first to result
-            result_inheritances[str(source)] = next(iter(filtered_inheritances))
-
-        return result_inheritances
-
-    def _calculate_scan_profile(self, ooi: OOI, current_scan_profile: ScanProfileBase, valid_time: datetime):
-
-        if isinstance(current_scan_profile, DeclaredScanProfile):
-            return
-
-        if ooi.primary_key == "DNSZone|internet|minvws.nl.":
-            print(ooi.primary_key)
-
-        neighbours_by_path = self.ooi_repository.get_neighbours(ooi.reference, valid_time)
-
-        # flatten oois and load scan profiles
-        neighbouring_oois = [ooi for neighbours in neighbours_by_path.values() for ooi in neighbours]
-        self._populate_scan_profiles(neighbouring_oois, valid_time)
-
-        # get sources to execute equation
-
-        # extract from neighbours
-        sources: Dict[Reference, DeclaredScanProfile] = {}
-        for path, neighbours in neighbours_by_path.items():
-            for neighbour in neighbours:
-                if isinstance(neighbour.scan_profile, DeclaredScanProfile):
-                    sources[neighbour.reference] = neighbour.scan_profile
-
-        # query remaining sources
-        for path, neighbours in neighbours_by_path.items():
-            for neighbour in neighbours:
-                if isinstance(neighbour.scan_profile, InheritedScanProfile):
-                    for inheritance in neighbour.scan_profile.inheritances:
-                        if inheritance.source not in sources:
-                            try:
-                                source = self.scan_profile_repository.get(inheritance.source, valid_time)
-                                if isinstance(source, DeclaredScanProfile):
-                                    sources[source.reference] = source
-                            except ObjectNotFoundException:
-                                pass
-        # calculate inheritance
-        inheritances = self._calculate_inheritances_from_neighbours(ooi, neighbours_by_path, sources)
-
-        # determine new scan profile
-        if not inheritances:
-            new_scan_profile = EmptyScanProfile(reference=ooi.reference)
-        else:
-            new_scan_profile = InheritedScanProfile(
-                reference=ooi.reference,
-                level=max([inheritance.level for inheritance in inheritances.values()]),
-                inheritances=list(inheritances.values()),
-            )
-
-        self.scan_profile_repository.save(new_scan_profile, valid_time=valid_time)
+        logger.info("Resetted scan profiles [len=%i]", len(references_to_reset))
 
     def process_event(self, event: DBEvent):
         logger.info("Received event: %s", event.json())
@@ -315,6 +261,7 @@ class OctopoesService:
             self.scan_profile_repository.get(ooi.reference, event.valid_time)
         except ObjectNotFoundException:
             self.scan_profile_repository.save(
+                None,
                 EmptyScanProfile(reference=ooi.reference),
                 valid_time=event.valid_time,
             )
@@ -338,9 +285,13 @@ class OctopoesService:
                 if isinstance(ooi, additional_param.ooi_type):
 
                     path_parts = additional_param.relation_path.split(".")
-                    tree = self.ooi_repository.get_tree(
-                        ooi.reference, valid_time=event.valid_time, depth=len(path_parts)
-                    )
+                    try:
+                        tree = self.ooi_repository.get_tree(
+                            ooi.reference, valid_time=event.valid_time, depth=len(path_parts)
+                        )
+                    except ObjectNotFoundException:
+                        # ooi is already removed, probably in parallel
+                        return
                     bit_ancestor = find_relation_in_tree(additional_param.relation_path, tree)
 
                     if bit_ancestor:
@@ -416,42 +367,13 @@ class OctopoesService:
 
     # Scan profile events
     def _on_create_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        self._dispatch_calculate_scan_profile(event.new_data.reference, event.client, event.valid_time)
+        ...
 
     def _on_update_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        try:
-            ooi = self.ooi_repository.get(event.new_data.reference, event.valid_time)
-            neighbours_by_path = self.ooi_repository.get_neighbours(ooi.reference, event.valid_time)
-
-            # load scan profiles efficiently
-            neighbouring_oois = [ooi for neighbours in neighbours_by_path.values() for ooi in neighbours]
-            self._populate_scan_profiles(neighbouring_oois, event.valid_time)
-
-            # recalculate scan profile for affected neighbours
-            for path, neighbours in neighbours_by_path.items():
-
-                relation_max_issuance = get_max_scan_level_issuance(path.segments[0])
-
-                # undefined inheritance, means no inheritance
-                if relation_max_issuance is None:
-                    continue
-
-                for neighbour in neighbours:
-
-                    # don't follow self-references
-                    if neighbour.reference == ooi.reference:
-                        continue
-
-                    self._dispatch_calculate_scan_profile(neighbour.reference, event.client, event.valid_time)
-
-        except ObjectNotFoundException:
-            return None
+        ...
 
     def _on_delete_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        old_ooi_reference = event.old_data.reference
-        child_scan_levels = self.scan_profile_repository.list_by_parent(old_ooi_reference, event.valid_time)
-        for child in child_scan_levels:
-            self._dispatch_calculate_scan_profile(child.reference, event.client, event.valid_time)
+        ...
 
     def list_random_ooi(self, amount: int, valid_time: datetime) -> List[OOI]:
         oois = self.ooi_repository.list_random(amount, valid_time)

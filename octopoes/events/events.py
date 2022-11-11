@@ -47,9 +47,3 @@ class ScanProfileDBEvent(DBEvent):
 
 
 EVENT_TYPE = Union[OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent]
-
-
-class CalculateScanLevelTask(BaseModel):
-    reference: Reference
-    valid_time: datetime
-    client: str

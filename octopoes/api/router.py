@@ -13,6 +13,7 @@ from octopoes.models import OOI, Reference, ScanProfileBase, ScanProfile
 from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import Origin, OriginType
+from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
@@ -106,7 +107,7 @@ def list_objects(
     types: Set[Type[OOI]] = Depends(extract_types),
     offset: int = 0,
     limit: int = 20,
-) -> List[OOI]:
+) -> Paginated[OOI]:
     objects = octopoes.list_ooi(types, valid_time, offset, limit)
     return objects
 
@@ -209,14 +210,17 @@ def save_scan_profile(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_required_valid_time),
 ):
-    octopoes.scan_profile_repository.save(scan_profile, valid_time)
+    try:
+        old_scan_profile = octopoes.scan_profile_repository.get(scan_profile.reference, valid_time)
+    except ObjectNotFoundException:
+        old_scan_profile = None
+
+    octopoes.scan_profile_repository.save(old_scan_profile, scan_profile, valid_time)
 
 
 @router.get("/scan_profiles/recalculate")
-def recalculate_scan_profile(
+def recalculate_scan_profiles(
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_valid_time),
-    reference: Reference = Depends(extract_reference),
+    valid_time: datetime = Depends(extract_required_valid_time),
 ):
-    ooi = octopoes.get_ooi(reference, valid_time)
-    octopoes._calculate_scan_profile(ooi, ooi.scan_profile, valid_time)
+    octopoes.recalculate_scan_profiles(valid_time)

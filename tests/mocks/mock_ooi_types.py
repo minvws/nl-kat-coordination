@@ -69,7 +69,7 @@ class MockIPPort(OOI):
 
     address: Reference = ReferenceField(MockIPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
     protocol: MockProtocol
-    port: conint(gt=0, lt=2 ** 16)
+    port: conint(gt=0, lt=2**16)
     state: Optional[MockPortState]
 
     _natural_key_attrs = ["address", "protocol", "port"]

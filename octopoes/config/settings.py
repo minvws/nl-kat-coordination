@@ -21,3 +21,7 @@ class Settings(BaseSettings):
     queue_uri: str = "amqp://guest:guest@rabbitmq:5672/%2fkat"
     xtdb_uri: str = "http://crux:3000"
     xtdb_type: XTDBType = XTDBType.CRUX
+
+    katalogus_api: str = "http://localhost:8003"
+
+    scan_level_recalculation_interval: int = 60

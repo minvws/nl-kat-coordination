@@ -66,7 +66,7 @@ class IPPort(OOI):
 
     address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
     protocol: Protocol
-    port: conint(gt=0, lt=2 ** 16)
+    port: conint(gt=0, lt=2**16)
     state: Optional[PortState]
 
     _natural_key_attrs = ["address", "protocol", "port"]

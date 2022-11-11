@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from octopoes.api.api import app
 from octopoes.api.router import xtdb_client
 from octopoes.xtdb.client import XTDBHTTPClient
+from octopoes.version import __version__
 
 
 class APITest(TestCase):
@@ -41,7 +42,7 @@ class APITest(TestCase):
             {
                 "service": "octopoes",
                 "healthy": True,
-                "version": "0.0.1-development",
+                "version": __version__,
                 "additional": None,
                 "results": [
                     {
@@ -68,7 +69,7 @@ class APITest(TestCase):
             {
                 "service": "octopoes",
                 "healthy": False,
-                "version": "0.0.1-development",
+                "version": __version__,
                 "additional": None,
                 "results": [
                     {

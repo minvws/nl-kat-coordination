@@ -28,6 +28,9 @@ class ScanProfileBase(BaseModel, abc.ABC):
             return self.reference == other.reference and self.level == other.level
         return False
 
+    def __hash__(self):
+        return hash(self.reference)
+
     @property
     def human_readable(self) -> str:
         return f"L{self.level}"
@@ -43,23 +46,8 @@ class DeclaredScanProfile(ScanProfileBase):
     level: conint(ge=0, le=4)
 
 
-class Inheritance(BaseModel):
-    parent: Reference
-    source: Reference
-    level: conint(ge=0, le=4)
-    depth: int
-
-    @property
-    def human_readable(self) -> str:
-        return f"L{self.level}"
-
-
 class InheritedScanProfile(ScanProfileBase):
     scan_profile_type: Literal["inherited"] = "inherited"
-    inheritances: List[Inheritance] = Field(default_factory=list)
-
-    def __eq__(self, other):
-        return super().__eq__(other) and self.inheritances == other.inheritances
 
 
 ScanProfile = Annotated[
@@ -166,6 +154,9 @@ class OOI(BaseModel, abc.ABC):
     def traversable(cls) -> bool:
         return cls._traversable
 
+    def __hash__(self):
+        return hash(self.primary_key)
+
 
 OOIClassType = TypeVar("OOIClassType")
 
@@ -266,5 +257,4 @@ def build_token_tree(ooi_class: Type[OOI]) -> Dict:
 
 DeclaredScanProfile.update_forward_refs()
 InheritedScanProfile.update_forward_refs()
-Inheritance.update_forward_refs()
 EmptyScanProfile.update_forward_refs()
