@@ -92,6 +92,17 @@ With docker-compose you would run this as:
 docker-compose -f docker-compose.release-example.yml exec rocky python3 manage.py setup_dev_account
 ```
 
+## Container commands
+
+We have two container images that are used to run multiple containers. What the container runs is be specified by overriding the CMD of the container.
+
+| Container image | CMD         | Description                                                                       |
+| boefjes         | boefje      | Boefjes runtime                                                                   |
+| boefjes         | normalizer  | Normalizers runtime                                                               |
+| boefjes         | katalogus   | Katalogus API                                                                     |
+| octopoes        | web         | Octopoes API                                                                      |
+| octopoes        | worker-beat | Celery worker running beat. There must only be exactly one container of this type |
+| octopoes        | worker      | Celery worker. Use this if you need to more than one work container for scaling   |
 
 ## Env variables
 
