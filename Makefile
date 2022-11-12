@@ -90,9 +90,11 @@ check: ## Check the code style using robotidy, black, mypy, flake8, pylint, and 
 	robotidy --diff --check tests/robot
 	black --diff --check .
 	flake8 .
-	#pylint --recursive=y .
-	#mypy .
-	vulture --min-confidence 90 .
+	vulture .
+
+	## Would be nice if we could get these working one module at a time
+	#pylint --recursive=y rocky/middleware
+	#mypy rocky/middleware
 
 install-rf:
 	pip3 install -r requirements-dev.txt
@@ -100,7 +102,7 @@ install-rf:
 
 test-prepare:
 	python3 manage.py flush --no-input
-	python3 manage.py makemigrations
+	#python3 manage.py makemigrations
 	python3 manage.py migrate
 	DJANGO_SUPERUSER_PASSWORD=robotpassword python3 manage.py createsuperuser --email robot@localhost --noinput
 	python3 manage.py loaddata OOI_database_seed.json
@@ -108,7 +110,7 @@ test-prepare:
 
 test-finish:
 	python3 manage.py flush --no-input
-	python3 manage.py makemigrations
+	#python3 manage.py makemigrations
 	python3 manage.py migrate
 	python3 manage.py createsuperuser
 	python3 manage.py loaddata OOI_database_seed.json

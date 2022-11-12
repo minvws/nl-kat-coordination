@@ -44,18 +44,14 @@ class OrganizationMemberAddView(
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "organization_member_list", kwargs={"pk": self.kwargs["pk"]}
-        )
+        return reverse_lazy("organization_member_list", kwargs={"pk": self.kwargs["pk"]})
 
     def build_breadcrumbs(self):
         self.set_breadcrumb_object(self.get_organization())
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(
             {
-                "url": reverse(
-                    "organization_member_add", kwargs={"pk": self.kwargs["pk"]}
-                ),
+                "url": reverse("organization_member_add", kwargs={"pk": self.kwargs["pk"]}),
                 "text": _("Create"),
             }
         )

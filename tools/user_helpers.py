@@ -33,9 +33,7 @@ def can_scan_organization(user: User, organization: Organization) -> bool:
         return True
 
     # Ensure the user is scanning its own organization
-    if not OrganizationMember.objects.filter(
-        user=user, organization=organization
-    ).exists():
+    if not OrganizationMember.objects.filter(user=user, organization=organization).exists():
         return False
 
     return indemnification_present(user)

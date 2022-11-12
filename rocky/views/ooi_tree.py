@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 from fmea.models import DEPARTMENTS
 from rocky.views import BaseOOIDetailView
-from rocky.views.ooi_view import OOIBreadcrumbsMixin
 from tools.forms import OoiTreeSettingsForm
 from tools.ooi_helpers import (
     get_ooi_types_from_tree,
@@ -12,6 +11,7 @@ from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
 )
 from tools.view_helpers import get_ooi_url, Breadcrumb
+from rocky.views.mixins import OOIBreadcrumbsMixin
 
 
 class OOITreeView(OOIBreadcrumbsMixin, BaseOOIDetailView):

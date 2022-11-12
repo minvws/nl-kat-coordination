@@ -38,7 +38,7 @@
                       <a href="{% ooi_url 'ooi_detail' task.task.item.boefje_meta.input_ooi %}">{{ task.task.item.boefje_meta.input_ooi }}</a>
                     </td>
                     <td>{{ task.task.item.boefje_meta.boefje.id }}</td>
-                    <td>{{ task.task.item.normalizer.name }}</td>
+                    <td>{{ task.task.item.normalizer.id }}</td>
                     {% if task.status.value == 'completed' %}
                       <td class="confirmation">{{ task.status.value|capfirst }}</td>
                     {% elif task.status.value == 'failed' %}

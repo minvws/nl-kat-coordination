@@ -7,8 +7,7 @@ from django_otp.decorators import otp_required
 from octopoes.api.models import Declaration
 from octopoes.models.ooi.findings import KATFindingType
 from two_factor.views.utils import class_view_decorator
-
-from rocky.views.ooi_view import OctopoesMixin
+from rocky.views.mixins import OctopoesMixin
 from tools.models import OOIInformation
 from tools.forms import FindingTypeAddForm
 from tools.view_helpers import get_ooi_url
@@ -34,9 +33,7 @@ class FindingTypeAddView(OctopoesMixin, FormView):
         form_data = form.cleaned_data
         # set data
         finding_type = KATFindingType(id=form_data["id"])
-        info, created = OOIInformation.objects.get_or_create(
-            id=f'KATFindingType|{form_data["id"]}'
-        )
+        info, created = OOIInformation.objects.get_or_create(id=f'KATFindingType|{form_data["id"]}')
         info.data = {
             "title": form_data["title"],
             "description": form_data["description"],
@@ -51,8 +48,6 @@ class FindingTypeAddView(OctopoesMixin, FormView):
 
         info.save()
 
-        self.api_connector.save_declaration(
-            Declaration(ooi=finding_type, valid_time=datetime.now(timezone.utc))
-        )
+        self.api_connector.save_declaration(Declaration(ooi=finding_type, valid_time=datetime.now(timezone.utc)))
 
         return redirect(get_ooi_url("ooi_detail", finding_type.primary_key))

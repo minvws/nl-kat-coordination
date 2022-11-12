@@ -24,9 +24,7 @@ def recalculate_risk_class(instance, delete=False):
                 severity_levels.append(effect.severity_level)
         if severity_levels:
             severity_level = max(severity_levels)
-        risk_class = calculate_risk_class(
-            frequency_level, detectability_level, severity_level
-        )
+        risk_class = calculate_risk_class(frequency_level, detectability_level, severity_level)
         failure_mode.risk_class = risk_class.value
         failure_mode.save()
 

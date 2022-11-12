@@ -69,7 +69,7 @@
       "normalizers": ["kat_ssl_certificates.normalize"],
       "boefjes": []
     },
-    "image": "static/assets/kat_ssl_certificates/cover.png"
+    "image": "static/assets/kat_ssl_certificates/cover.jpg"
   },
   {
     "name": "SSLScan",

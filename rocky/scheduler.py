@@ -105,21 +105,15 @@ class SchedulerClient:
 
     def list_tasks(self, queue_name: str, limit: int) -> PaginatedTasksResponse:
         params = {"limit": limit}
-        res = self.session.get(
-            f"{self._base_uri}/schedulers/{queue_name}/tasks", params=params
-        )
+        res = self.session.get(f"{self._base_uri}/schedulers/{queue_name}/tasks", params=params)
         return PaginatedTasksResponse.parse_raw(res.text)
 
     def get_task_details(self, task_id):
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
         return res.json()
 
-    def push_task(
-        self, queue_name: str, prioritized_item: QueuePrioritizedItem
-    ) -> None:
-        res = self.session.post(
-            f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json()
-        )
+    def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
+        res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
         res.raise_for_status()
 
     def health(self) -> ServiceHealth:

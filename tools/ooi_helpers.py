@@ -53,9 +53,7 @@ def get_knowledge_base_data_for_ooi_store(ooi_store) -> Dict[str, Dict]:
     for ooi in ooi_store.values():
         # build knowledge base
         if ooi.get_information_id() not in knowledge_base:
-            knowledge_base[ooi.get_information_id()] = get_knowledge_base_data_for_ooi(
-                ooi
-            )
+            knowledge_base[ooi.get_information_id()] = get_knowledge_base_data_for_ooi(ooi)
 
     return knowledge_base
 
@@ -225,9 +223,7 @@ def get_tree_meta(tree_node: Dict, depth: int, location: str) -> Dict:
     if "children" in tree_node:
         tree_meta["child_count"] = str(len(tree_node["children"]))
         tree_meta["child_ids"] = [child["id"] for child in tree_node["children"]]
-        tree_meta["child_ooi_types"] = [
-            child["ooi_type"] for child in tree_node["children"]
-        ]
+        tree_meta["child_ooi_types"] = [child["ooi_type"] for child in tree_node["children"]]
 
         for ooi_type in tree_meta["child_ooi_types"]:
             if ooi_type in ["Finding"]:
@@ -269,9 +265,7 @@ def create_object_tree_item_from_ref(
                 continue
             child_position = child_position + 1
             children.append(
-                create_object_tree_item_from_ref(
-                    child, ooi_store, knowledge_base, depth, child_position, location
-                )
+                create_object_tree_item_from_ref(child, ooi_store, knowledge_base, depth, child_position, location)
             )
 
     if children:
@@ -305,9 +299,7 @@ def filter_ooi_tree(ooi_node: Dict, show_types=[], hide_types=[]) -> Dict:
     return res[0]
 
 
-def filter_ooi_tree_item(
-    ooi_node, show_types, hide_types, self_excluded_from_filter=False
-):
+def filter_ooi_tree_item(ooi_node, show_types, hide_types, self_excluded_from_filter=False):
     def include_type(ooi_type):
         # hiding type takes precedence over showing type
         if hide_types and ooi_type in hide_types:
@@ -322,9 +314,7 @@ def filter_ooi_tree_item(
 
     if "children" in ooi_node:
         for child_ooi_node in ooi_node.get("children", []):
-            children.extend(
-                filter_ooi_tree_item(child_ooi_node, show_types, hide_types)
-            )
+            children.extend(filter_ooi_tree_item(child_ooi_node, show_types, hide_types))
 
         # no duplicates
         child_ids = set()
@@ -357,9 +347,7 @@ def get_finding_type_from_finding(finding: Finding) -> FindingType:
 
 
 _EXCLUDED = [Finding] + FindingType.__subclasses__()
-OOI_TYPES_WITHOUT_FINDINGS = [
-    name for name, cls_ in OOI_TYPES.items() if cls_ not in _EXCLUDED
-]
+OOI_TYPES_WITHOUT_FINDINGS = [name for name, cls_ in OOI_TYPES.items() if cls_ not in _EXCLUDED]
 
 
 def get_or_create_ooi(
@@ -379,9 +367,7 @@ def get_or_create_ooi(
         return ooi, datetime.now(timezone.utc)
 
 
-def create_ooi(
-    api_connector: OctopoesAPIConnector, ooi: OOI, observed_at: datetime = None
-) -> None:
+def create_ooi(api_connector: OctopoesAPIConnector, ooi: OOI, observed_at: datetime = None) -> None:
     if observed_at is None:
         observed_at = datetime.now(timezone.utc)
 

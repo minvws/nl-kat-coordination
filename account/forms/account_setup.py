@@ -55,9 +55,7 @@ class IndemnificationAddForm(BaseRockyForm):
         widget=forms.CheckboxInput(),
     )
     am_authorized = forms.CharField(
-        label=_(
-            "I declare that I am authorized to give this indemnification within my organization."
-        ),
+        label=_("I declare that I am authorized to give this indemnification within my organization."),
         widget=forms.CheckboxInput(),
     )
 
@@ -127,13 +125,9 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         if "organization_name" in kwargs:
-            self.organization = self.get_organization_with_name(
-                kwargs.pop("organization_name")
-            )
+            self.organization = self.get_organization_with_name(kwargs.pop("organization_name"))
         elif "organization_id" in kwargs:
-            self.organization = self.get_organization_with_id(
-                kwargs.pop("organization_id")
-            )
+            self.organization = self.get_organization_with_id(kwargs.pop("organization_id"))
         return super().__init__(*args, **kwargs)
 
     def get_organization_with_id(self, id):
@@ -203,9 +197,7 @@ class OrganizationForm(forms.ModelForm):
 
         # you can only change signal_username when no group has been created yet
         if data != self.instance.signal_username and self.instance.signal_group_id:
-            raise ValidationError(
-                _("Unable to change signal username, once a group has been created.")
-            )
+            raise ValidationError(_("Unable to change signal username, once a group has been created."))
 
         return data
 

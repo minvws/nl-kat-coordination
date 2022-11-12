@@ -1,31 +1,14 @@
 import json
 from typing import Any, List, Type, Set
 from urllib import parse
-
 from django import template
 from django.utils.translation import gettext_lazy as _
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType
-
-from rocky.views import KATalogusListView
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN
 from tools.view_helpers import get_ooi_url
 
 register = template.Library()
-
-
-@register.inclusion_tag("partials/form/single_action_form.html")
-def enable_disable_boefje_button(boefje, has_permission):
-    return {
-        "action": KATalogusListView.PageActions.BOEFJE_DISABLE.value
-        if boefje.enabled
-        else KATalogusListView.PageActions.BOEFJE_ENABLE.value,
-        "btn_text": _("Disable") if boefje.enabled else _("Enable"),
-        "btn_class": "ghost" if boefje.enabled else None,
-        "btn_disabled": not has_permission,
-        "key": "boefje_id",
-        "value": boefje.id,
-    }
 
 
 @register.filter

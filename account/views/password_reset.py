@@ -54,21 +54,14 @@ class PasswordResetView(auth_views.PasswordResetView):
 
     def add_error_notification(self):
         if HELP_DESK_EMAIL:
-            error_message = _(
-                "We couldn't send a password reset link. Contact "
-                + HELP_DESK_EMAIL
-                + " for support."
-            )
+            error_message = _("We couldn't send a password reset link. Contact " + HELP_DESK_EMAIL + " for support.")
         else:
-            error_message = _(
-                "We couldn't send a password reset link. Contact your system administrator."
-            )
+            error_message = _("We couldn't send a password reset link. Contact your system administrator.")
         messages.add_message(self.request, messages.ERROR, error_message)
 
     def add_success_notification(self):
         success_message = (
-            "We've emailed you instructions for setting your password. "
-            "You should receive the email shortly!"
+            "We've emailed you instructions for setting your password. " "You should receive the email shortly!"
         )
         messages.add_message(self.request, messages.SUCCESS, success_message)
 

@@ -14,9 +14,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("app", action="store", type=str, help="Django app")
-        parser.add_argument(
-            "from_id", action="store", type=int, help="Migration id to start from"
-        )
+        parser.add_argument("from_id", action="store", type=int, help="Migration id to start from")
         parser.add_argument(
             "--output-folder",
             action="store",
@@ -57,8 +55,5 @@ class Command(BaseCommand):
             sql_statements = loader.collect_sql(plan)
 
             # Write SQL to file
-            output_file = (
-                output_folder
-                / f"{migration.id:04d}.{migration.app}.{migration.name}.sql"
-            )
+            output_file = output_folder / f"{migration.id:04d}.{migration.app}.{migration.name}.sql"
             output_file.write_text("\n".join(sql_statements))

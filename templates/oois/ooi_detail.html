@@ -26,22 +26,23 @@
         {% endif %}
       </div>
       <div>
-          <h2>{% translate 'Scan' %} {{ ooi.human_readable }} {% translate 'using boefjes' %}</h2>
-
-
-          {% if enabled_boefjes_available %}
-              <div class="horizontal-view toolbar">
-                <div>
-                  <form method="get" class="inline">
-                    <input type="hidden" name="ooi_id" value="{{ ooi }}">
-                    {% include 'partials/form/form_errors.html' with form=possible_boefjes_filter_form %}
-                    {% for field in possible_boefjes_filter_form %}{{ field }}{% endfor %}
-                  </form>
-                </div>
-              </div>
-          {% endif %}
-
-      {% if boefjes %}
+        <h2>{% translate 'Scan' %} {{ ooi.human_readable }} {% translate 'using boefjes' %}</h2>
+        {% if enabled_boefjes_available %}
+          <div class="horizontal-view">
+            <div>
+              <form method="get" class="inline">
+                <input type="hidden" name="ooi_id" value="{{ ooi }}">
+                {% include 'partials/form/form_errors.html' with form=possible_boefjes_filter_form %}
+                {% for field in possible_boefjes_filter_form %}
+                  <fieldset>
+                    {{ field }}
+                  </fieldset>
+                {% endfor %}
+              </form>
+            </div>
+          </div>
+        {% endif %}
+        {% if boefjes %}
           <div class="horizontal-scroll">
             <table>
               <thead>
@@ -56,33 +57,38 @@
                 {% for boefje in boefjes %}
                   <tr>
                     <td>
-                      <a href="{% url 'katalogus_detail' boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
+                      <a href="{% url 'plugin_detail' plugin_type="boefje" plugin_id=boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
                     </td>
                     <td>{{ boefje.description }}</td>
                     <td>{% include 'partials/scan_level_indicator.html' with value=boefje.scan_level.value %}</td>
                     <td>
-                      {% include 'partials/form/single_action_form.html' with btn_text="Start Scan" action='start_scan' key='boefje_id' value=boefje.id %}
+                      {% include 'partials/single_action_form.html' with btn_text="Start Scan" action='start_scan' key='boefje_id' value=boefje.id %}
                     </td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
-      {% else %}
+        {% else %}
           {% if not enabled_boefjes_available %}
-              <p>
-                {% translate 'There are no boefjes enabled to scan an OOI of type' %} "{{ ooi.get_ooi_type }}". {% translate 'See' %} <a href="{% url 'katalogus' %}">KAT-alogus</a> {% translate 'to find and enable boefjes that can scan within the current level.' %}
-              </p>
+            <p>
+              {% translate 'There are no boefjes enabled to scan an OOI of type' %} "{{ ooi.get_ooi_type }}". {% translate 'See' %} <a href="{% url 'katalogus' %}">KAT-alogus</a> {% translate 'to find and enable boefjes that can scan within the current level.' %}
+            </p>
           {% else %}
-              <p>
-                {% translate 'There are no boefjes available within the current clearance level of' %} "{{ ooi.human_readable }}". {% translate 'See' %} <a href="{% url 'katalogus' %}">KAT-alogus</a> {% translate 'to find and enable boefjes that can scan within the current level.' %}
-              </p>
-              <p>
-                {% translate 'Or if you have the authorization, upgrade the clearance level of' %} "{{ ooi.human_readable }}".
-              </p>
+            <p>
+              {% translate 'There are no boefjes available within the current clearance level of' %} "{{ ooi.human_readable }}". {% translate 'See' %} <a href="{% url 'katalogus' %}">KAT-alogus</a> {% translate 'to find and enable boefjes that can scan within the current level.' %}
+            </p>
+            <p>
+              {% translate 'Or if you have the authorization, upgrade the clearance level of' %} "{{ ooi.human_readable }}".
+            </p>
           {% endif %}
-      {% endif %}
+        {% endif %}
       </div>
     </section>
   </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/autoSubmit.js' %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

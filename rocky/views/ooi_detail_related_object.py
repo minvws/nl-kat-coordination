@@ -82,9 +82,7 @@ class OOIFindingManager(SingleOOITreeMixin):
 
     def get_finding_details_sorted_by_score_desc(self):
         finding_details = self.get_finding_details()
-        sorted_finding_details = sorted(
-            finding_details, key=lambda x: x["risk_level_score"], reverse=True
-        )
+        sorted_finding_details = sorted(finding_details, key=lambda x: x["risk_level_score"], reverse=True)
         return sorted_finding_details
 
     def get_finding_details(self) -> List[Dict[str, Union[str, int]]]:
@@ -145,8 +143,7 @@ class OOIRelatedObjectAddView(OOIRelatedObjectManager, OOIFindingManager, Templa
         datamodel = {}
         for ooi_name, ooi_ in OOI_TYPES.items():
             datamodel[ooi_name] = {
-                property_name: to_concrete({ooi_type})
-                for property_name, ooi_type in get_relations(ooi_).items()
+                property_name: to_concrete({ooi_type}) for property_name, ooi_type in get_relations(ooi_).items()
             }
         return datamodel
 

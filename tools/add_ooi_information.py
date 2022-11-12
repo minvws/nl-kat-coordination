@@ -14,9 +14,7 @@ from cwe import Database
 
 from rocky.settings import BASE_DIR
 
-RETIREJS_SOURCE = (
-    "https://github.com/RetireJS/retire.js/blob/master/repository/jsrepository.json"
-)
+RETIREJS_SOURCE = "https://github.com/RetireJS/retire.js/blob/master/repository/jsrepository.json"
 
 SEPARATOR = "|"
 
@@ -46,9 +44,7 @@ def cve_info(cve_id: str) -> dict:
             "description": cve_information.get("summary"),
             "cvss": cve_information.get("cvss"),
             "source": f"https://cve.circl.lu/cve/{cve_id}",
-            "information updated": datetime.datetime.now().strftime(
-                "%d-%m-%Y %H:%M:%S"
-            ),
+            "information updated": datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         }
 
     return {"description": "Not found"}
@@ -64,9 +60,7 @@ def snyk_info(snyk_id: str) -> dict:
             "risk": snyk_information.get("risk"),
             "source": f"https://snyk.io/vuln/{snyk_id}",
             "affected versions": snyk_information.get("affected_versions"),
-            "information updated": datetime.datetime.now().strftime(
-                "%d-%m-%Y %H:%M:%S"
-            ),
+            "information updated": datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         }
 
     return {"description": "Not found"}
@@ -78,12 +72,8 @@ def _snyk_search(snyk_id: str) -> Dict:
     soup = BeautifulSoup(page.content, "html.parser")
     return {
         "risk": soup.select("[data-snyk-test-score]")[0].attrs["data-snyk-test-score"],
-        "affected_versions": soup.select("[data-snyk-test='vuln versions']")[
-            0
-        ].text.strip(),
-        "summary": soup.findAll("h2", text=re.compile(r"Overview"))[0]
-        .parent.text.strip()
-        .split("\n")[2],
+        "affected_versions": soup.select("[data-snyk-test='vuln versions']")[0].text.strip(),
+        "summary": soup.findAll("h2", text=re.compile(r"Overview"))[0].parent.text.strip().split("\n")[2],
     }
 
 
@@ -98,28 +88,17 @@ def retirejs_info(retirejs_id: str) -> dict:
     software = [
         brand
         for brand in data
-        if name
-        == brand.lower()
-        .replace(" ", "")
-        .replace("_", "")
-        .replace("-", "")
-        .replace(".", "")
+        if name == brand.lower().replace(" ", "").replace("_", "").replace("-", "").replace(".", "")
     ][0]
     issues = data[software]["vulnerabilities"]
-    finding = [
-        issue
-        for issue in issues
-        if _hash_identifiers(issue["identifiers"]) == hashed_id
-    ]
+    finding = [issue for issue in issues if _hash_identifiers(issue["identifiers"]) == hashed_id]
 
     if finding:
         return {
             "description": _create_description(finding[0]),
             "severity": finding[0]["severity"],
             "source": RETIREJS_SOURCE,
-            "information updated": datetime.datetime.now().strftime(
-                "%d-%m-%Y %H:%M:%S"
-            ),
+            "information updated": datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         }
 
     return {"description": "Not found"}
@@ -156,9 +135,7 @@ def cwe_info(cwe_id: str) -> dict:
         return {
             "description": weakness.description,
             "source": "https://cwe.mitre.org/index.html",
-            "information updated": datetime.datetime.now().strftime(
-                "%d-%m-%Y %H:%M:%S"
-            ),
+            "information updated": datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         }
     return {"description": "Not found"}
 
@@ -199,10 +176,7 @@ def iana_service_table(search_query: str) -> List[_Service]:
 def service_info(value) -> Tuple[str, str]:
     """Provides information about IP Services such as common assigned ports for certain protocols and descriptions"""
     services = iana_service_table(value)
-    source = (
-        "https://www.iana.org/assignments/service-names-port-numbers/"
-        "service-names-port-numbers.xhtml"
-    )
+    source = "https://www.iana.org/assignments/service-names-port-numbers/" "service-names-port-numbers.xhtml"
     if not services:
         return f"No description found for {value}", "No source found"
 
@@ -234,9 +208,7 @@ def table_to_2d(table_tag):
         # to the last cell; ignore it elsewhere.
         colcount = max(
             colcount,
-            sum(int(c.get("colspan", 1)) or 1 for c in cells[:-1])
-            + len(cells[-1:])
-            + len(rowspans),
+            sum(int(c.get("colspan", 1)) or 1 for c in cells[:-1]) + len(cells[-1:]) + len(rowspans),
         )
         # update rowspan bookkeeping; 0 is a span to the bottom.
         rowspans += [int(c.get("rowspan", 1)) or len(rows) - r for c in cells]
@@ -286,9 +258,7 @@ def _map_usage_value(value: str):
 
 
 def wiki_port_tables() -> List[_PortInfo]:
-    response = requests.get(
-        "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers"
-    )
+    response = requests.get("https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers")
     soup = BeautifulSoup(response.text, "html.parser")
 
     rows = []
@@ -342,18 +312,14 @@ def get_info(ooi_type: str, natural_key: str) -> dict:
         return {
             "description": description,
             "source": source,
-            "information updated": datetime.datetime.now().strftime(
-                "%d-%m-%Y %H:%M:%S"
-            ),
+            "information updated": datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         }
     if ooi_type == "Service":
         description, source = service_info(natural_key)
         return {
             "description": description,
             "source": source,
-            "information updated": datetime.datetime.now().strftime(
-                "%d-%m-%Y %H:%M:%S"
-            ),
+            "information updated": datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         }
     if ooi_type == "CVEFindingType":
         return cve_info(natural_key)

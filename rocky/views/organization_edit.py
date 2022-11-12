@@ -81,8 +81,6 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
 
         if self.request.user.has_perm("tools.can_view_organization"):
             organization = self.get_object()
-            return redirect(
-                reverse("organization_detail", kwargs={"pk": organization.id})
-            )
+            return redirect(reverse("organization_detail", kwargs={"pk": organization.id}))
 
         return redirect("crisis_room")

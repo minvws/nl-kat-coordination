@@ -20,17 +20,13 @@ class TaskListTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.factory = RequestFactory()
-        cls.user = User.objects.create_user(
-            email="admin@openkat.nl", password="TestTest123!!"
-        )
+        cls.user = User.objects.create_user(email="admin@openkat.nl", password="TestTest123!!")
         cls.organization = Organization.objects.create(name="Development", code="_dev")
         cls.task_list = BoefjesTaskListView.as_view()
 
     def test_boefjes_tasks(self, mock_scheduler_client: MagicMock):
-        mock_scheduler_client.list_tasks.return_value = (
-            PaginatedTasksResponse.parse_obj(
-                {"count": 0, "next": None, "previous": None, "results": []}
-            )
+        mock_scheduler_client.list_tasks.return_value = PaginatedTasksResponse.parse_obj(
+            {"count": 0, "next": None, "previous": None, "results": []}
         )
 
         request = self.factory.get(reverse("boefjes_task_list"))
@@ -40,9 +36,7 @@ class TaskListTestCase(TestCase):
 
         _ = self.task_list(request)
 
-        mock_scheduler_client.list_tasks.assert_has_calls(
-            [call("boefje-_dev", limit=TASK_LIMIT)]
-        )
+        mock_scheduler_client.list_tasks.assert_has_calls([call("boefje-_dev", limit=TASK_LIMIT)])
 
     def test_tasks_view_simple(self, mock_scheduler_client: MagicMock):
         mock_scheduler_client.list_tasks.return_value = PaginatedTasksResponse.parse_raw(
@@ -109,9 +103,7 @@ class TaskListTestCase(TestCase):
         self.assertContains(response, "1b20f85f")
         self.assertContains(response, "Hostname|internet|mispo.es.")
 
-        mock_scheduler_client.list_tasks.assert_has_calls(
-            [call("boefje-_dev", limit=TASK_LIMIT)]
-        )
+        mock_scheduler_client.list_tasks.assert_has_calls([call("boefje-_dev", limit=TASK_LIMIT)])
 
     def test_tasks_view_no_organization(self, _: MagicMock):
         request = self.factory.get(reverse("task_list"))

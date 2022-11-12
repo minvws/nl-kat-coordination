@@ -2,12 +2,14 @@
 Library     OTP
 Library     Browser
 Library     DebugLibrary
+Library     OperatingSystem
 
 
 *** Keywords ***
 Browser Setup
     Set Suite Variable    ${ROOT_URL}    localhost:8000
-    New Browser    chromium    headless=${headless}
+    New Browser    chromium    headless=${headless}    downloadsPath=/tmp
+    New Context    acceptDownloads=True
     New Page    ${ROOT_URL}
 
 Login As User For The First Time

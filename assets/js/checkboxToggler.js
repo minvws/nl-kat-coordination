@@ -1,30 +1,17 @@
-function toggleCheckboxesOn(name) {
-  var checkbox = document.getElementsByName(name);
-  for (var i = 0; i < checkbox.length; i++) {
-    if (checkbox[i].type == 'checkbox')
-      checkbox[i].checked = true;
-  }
+const toggle_all_btn = document.querySelectorAll(".toggle-all");
+for (var i = 0; i < toggle_all_btn.length; i++) {
+  var toggle_target = toggle_all_btn[i].dataset.toggleTarget;
+  toggle_all_btn[i].addEventListener("click", function () {
+    toggleCheckboxes(toggle_target, !this.classList.contains('toggle-on'));
+    this.classList.toggle('toggle-on');
+  })
+};
+
+function toggleCheckboxes(name, value) {
+  var checkboxes = document.getElementsByName(name);
+  for (var i = 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].type == 'checkbox') {
+      checkboxes[i].checked = value;
+    }
+  };
 }
-
-function toggleCheckboxesOff(name) {
-  var checkbox = document.getElementsByName(name);
-  for (var i = 0; i < checkbox.length; i++) {
-    if (checkbox[i].type == 'checkbox')
-      checkbox[i].checked = false;
-  }
-}
-
-
-const toggle_all_ooi_types_btn = document.querySelector(".toggle-all-ooi-types");
-toggle_all_ooi_types_btn.addEventListener("click", function () {
-  if (toggle_all_ooi_types_btn.classList.contains("toggle-on")) {
-    toggle_all_ooi_types_btn.classList.remove("toggle-on")
-    toggleCheckboxesOff('ooi_type')
-  } else {
-    toggle_all_ooi_types_btn.classList.add("toggle-on")
-    toggleCheckboxesOn('ooi_type')
-  }
-
-})
-
-

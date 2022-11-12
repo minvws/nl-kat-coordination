@@ -10,5 +10,10 @@
     </div>
   {% endif %}
   <input type="hidden" name="{{ key }}" value="{{ value }}">
-  <button type="submit" class="{{ btn_class }}" {% if btn_disabled %}disabled{% endif %}>{{ btn_text }}</button>
+  <button type="submit"
+          class="{{ btn_class }}"
+          {% if not plugin_enabled %}disabled{% endif %}>{{ btn_text }}</button>
+  {% if not plugin_enabled %}
+    <span class="de-emphasized">{% translate 'Please enable plugin to start scanning' %}</span>
+  {% endif %}
 </form>

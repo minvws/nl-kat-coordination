@@ -1,20 +1,14 @@
 from typing import List, Dict
-
-from rocky.views.boefje import BoefjeMixin
-from rocky.views.ooi_view import BaseOOIDetailView, OOIBreadcrumbsMixin
+from katalogus.views.mixins import BoefjeMixin
+from rocky.views.ooi_view import BaseOOIDetailView
+from rocky.views.mixins import OOIBreadcrumbsMixin
 from tools.forms import ObservedAtForm
-from tools.ooi_helpers import (
-    get_finding_type_from_finding,
-    get_knowledge_base_data_for_ooi,
-)
 from rocky.views.ooi_detail_related_object import OOIFindingManager
 from tools.view_helpers import Breadcrumb, get_ooi_url
 from django.utils.translation import gettext_lazy as _
 
 
-class OOIFindingListView(
-    OOIFindingManager, BoefjeMixin, BaseOOIDetailView, OOIBreadcrumbsMixin
-):
+class OOIFindingListView(OOIFindingManager, BoefjeMixin, BaseOOIDetailView, OOIBreadcrumbsMixin):
     template_name = "oois/ooi_findings.html"
     connector_form_class = ObservedAtForm
 

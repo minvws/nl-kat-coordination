@@ -104,9 +104,7 @@ class PageActionMixin:
 
     def handle_page_action(self, page_action: str) -> None:
         if not self.is_allowed_page_action(page_action):
-            messages.add_message(
-                self.request, messages.WARNING, f"Action not allowed: {page_action}"
-            )
+            messages.add_message(self.request, messages.WARNING, f"Action not allowed: {page_action}")
             return self.get(self.request)
 
         # Does the page_action exist?
@@ -121,18 +119,13 @@ class PageActionMixin:
         try:
             getattr(self, page_action)(self.get_page_action_args(page_action))
         except Exception as e:
-            messages.add_message(
-                self.request, messages.ERROR, f"{page_action} failed: '{e}'"
-            )
+            messages.add_message(self.request, messages.ERROR, f"{page_action} failed: '{e}'")
 
     def get_page_action_args(self, page_action) -> QueryDict:
         return self.request.POST
 
     def get_page_actions(self) -> List[Dict[str, bool]]:
-        return [
-            {page_action.value: self.is_allowed_page_action(page_action)}
-            for page_action in self.PageActions
-        ]
+        return [{page_action.value: self.is_allowed_page_action(page_action)} for page_action in self.PageActions]
 
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -169,9 +162,7 @@ class StepsMixin:
 
 
 class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
-    breadcrumbs = [
-        {"url": reverse_lazy("organization_list"), "text": _("Organizations")}
-    ]
+    breadcrumbs = [{"url": reverse_lazy("organization_list"), "text": _("Organizations")}]
 
 
 class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
@@ -185,9 +176,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
             breadcrumbs = [
                 {"url": reverse("organization_list"), "text": _("Organizations")},
                 {
-                    "url": reverse(
-                        "organization_detail", kwargs={"pk": self.breadcrumb_object.pk}
-                    ),
+                    "url": reverse("organization_detail", kwargs={"pk": self.breadcrumb_object.pk}),
                     "text": self.breadcrumb_object.name,
                 },
             ]
@@ -201,9 +190,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
 
         breadcrumbs.append(
             {
-                "url": reverse(
-                    "organization_member_list", kwargs={"pk": self.breadcrumb_object.pk}
-                ),
+                "url": reverse("organization_member_list", kwargs={"pk": self.breadcrumb_object.pk}),
                 "text": _("Members"),
             }
         )

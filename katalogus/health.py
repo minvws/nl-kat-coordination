@@ -10,9 +10,7 @@ logger = logging.getLogger(__name__)
 
 def get_katalogus_health() -> ServiceHealth:
     try:
-        katalogus_client = get_katalogus(
-            ""
-        )  # For the health endpoint the organization has no effect
+        katalogus_client = get_katalogus("")  # For the health endpoint the organization has no effect
         katalogus_health = katalogus_client.health()
     except RequestException as ex:
         logger.exception(ex)

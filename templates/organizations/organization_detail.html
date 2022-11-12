@@ -51,7 +51,7 @@
                       <td>
                         <div>
                           {% translate 'Add to signal group' as text %}
-                          {% include 'partials/form/single_action_form.html' with btn_text=text action='signal_group_add_member' key='signal_username' value=member.signal_username %}
+                          {% include 'partials/single_action_form.html' with btn_text=text action='signal_group_add_member' key='signal_username' value=member.signal_username %}
                         </div>
                       </td>
                     {% endif %}

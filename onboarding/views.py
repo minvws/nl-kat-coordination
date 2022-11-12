@@ -114,14 +114,9 @@ class OnboardingSetupScanSelectPluginsView(
             "boefjes": [
                 boefje
                 for boefje in boefjes
-                if boefje["boefje"].scan_level
-                <= int(self.request.session["clearance_level"])
+                if boefje["boefje"].scan_level <= int(self.request.session["clearance_level"])
             ],
-            "initial": {
-                "boefje": [
-                    item["id"] for item in boefjes if item.get("required", False)
-                ]
-            },
+            "initial": {"boefje": [item["id"] for item in boefjes if item.get("required", False)]},
         }
         if self.request.method in ("POST", "PUT"):
             kwargs.update(
@@ -138,11 +133,7 @@ class OnboardingSetupScanSelectPluginsView(
             if "boefje" in request.POST:
                 data = form.cleaned_data
                 request.session["selected_boefjes"] = data
-            return redirect(
-                get_ooi_url(
-                    "step_setup_scan_ooi_detail", self.request.GET.get("ooi_id")
-                )
-            )
+            return redirect(get_ooi_url("step_setup_scan_ooi_detail", self.request.GET.get("ooi_id")))
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
@@ -169,12 +160,7 @@ class OnboardingOOIForm(OOIForm):
     """
 
     def __init__(
-        self,
-        hidden_fields: Dict[str, str],
-        ooi_class: Type[OOI],
-        connector: OctopoesAPIConnector,
-        *args,
-        **kwargs
+        self, hidden_fields: Dict[str, str], ooi_class: Type[OOI], connector: OctopoesAPIConnector, *args, **kwargs
     ):
         self.hidden_ooi_fields = hidden_fields
         super().__init__(ooi_class, connector, *args, **kwargs)
@@ -279,9 +265,7 @@ class OnboardingSetupScanOOIDetailView(
         self.api_connector = self.get_api_connector()
         ooi = self.get_ooi()
         self.api_connector.save_scan_profile(
-            DeclaredScanProfile(
-                reference=ooi.reference, level=self.request.session["clearance_level"]
-            ),
+            DeclaredScanProfile(reference=ooi.reference, level=self.request.session["clearance_level"]),
             valid_time=datetime.now(timezone.utc),
         )
 
@@ -317,9 +301,7 @@ class OnboardingSetClearanceLevelView(
         return context
 
     def get_success_url(self, **kwargs):
-        return get_ooi_url(
-            "step_setup_scan_select_plugins", self.request.GET.get("ooi_id")
-        )
+        return get_ooi_url("step_setup_scan_select_plugins", self.request.GET.get("ooi_id"))
 
     def form_valid(self, form):
         self.request.session["clearance_level"] = form.data["level"]
@@ -331,7 +313,7 @@ class OnboardingSetClearanceLevelView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def get_boefje_cover_img(self, boefje_id):
-        return reverse("boefje_cover", kwargs={"boefje_id": boefje_id})
+        return reverse("plugin_cover", kwargs={"plugin_id": boefje_id})
 
     def get_boefjes_tiles(self):
         tiles = [
@@ -362,9 +344,7 @@ class OnboardingReportView(
     current_step = 4
 
     def get(self, request, *args, **kwargs):
-        self.set_current_stepper_url(
-            get_ooi_url("step_report", self.request.GET.get("ooi_id"))
-        )
+        self.set_current_stepper_url(get_ooi_url("step_report", self.request.GET.get("ooi_id")))
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -388,9 +368,7 @@ class BaseReportView(RedTeamUserRequiredMixin, BaseOOIDetailView):
         return filter_ooi_tree(tree_dict, self.report.get_ooi_type_filter())
 
     def get_findings_list(self):
-        return build_findings_list_from_store(
-            self.tree.store, self.report.get_finding_filter()
-        )
+        return build_findings_list_from_store(self.tree.store, self.report.get_finding_filter())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -456,9 +434,7 @@ class OrganizationSessionMixin:
 
     def get_organization_id(self):
         try:
-            organization = self.model.objects.get(
-                name=self.request.session["organization_name"]
-            )
+            organization = self.model.objects.get(name=self.request.session["organization_name"])
         except:
             return None
         return organization.id
@@ -514,9 +490,7 @@ class OnboardingOrganizationSetupView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def add_message(self):
-        message = _(
-            "Hello, admin. You are already part of an organization. Early step is skipped."
-        )
+        message = _("Hello, admin. You are already part of an organization. Early step is skipped.")
         messages.add_message(self.request, messages.INFO, message)
 
 
@@ -565,24 +539,17 @@ def skip_onboarding(request):
 
 
 @class_view_decorator(otp_required)
-class OnboardingAccountSetupIntroView(
-    SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView
-):
+class OnboardingAccountSetupIntroView(SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
     template_name = "account/step_3_account_setup_intro.html"
     current_step = 3
 
 
 @class_view_decorator(otp_required)
-class OnboardingAccountCreationMixin(
-    SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, CreateView
-):
+class OnboardingAccountCreationMixin(SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
     current_step = 3
 
     def dispatch(self, request, *args, **kwargs):
-        if (
-            "organization_name" not in self.request.session
-            and self.request.user.is_superuser
-        ):
+        if "organization_name" not in self.request.session and self.request.user.is_superuser:
             self.add_error_notification()
             return redirect("step_organization_setup")
         else:
@@ -647,9 +614,7 @@ class OnboardingAccountSetupRedTeamerView(
 
 
 @class_view_decorator(otp_required)
-class OnboardingAccountSetupClientView(
-    RegistrationBreadcrumbsMixin, OnboardingAccountCreationMixin
-):
+class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingAccountCreationMixin):
     """
     View to create a client account
     """

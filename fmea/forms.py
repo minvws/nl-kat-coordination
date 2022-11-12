@@ -35,9 +35,7 @@ class FailureModeForm(forms.ModelForm):
         }
 
         help_texts = {
-            "failure_mode": _(
-                "Describe in one sentence what type of failure mode you are creating."
-            ),
+            "failure_mode": _("Describe in one sentence what type of failure mode you are creating."),
             "description": _("Describe the failure mode in details."),
             "frequency_level": _(
                 "From 1 to 5, how often does this failure mode occurs. 1: Almost unthinkable and 5: occurs daily."
@@ -59,9 +57,7 @@ class FailureModeForm(forms.ModelForm):
             "description": forms.Textarea(
                 attrs={
                     "rows": 2,
-                    "placeholder": _(
-                        "Describe in more detail what the failure mode is about."
-                    ),
+                    "placeholder": _("Describe in more detail what the failure mode is about."),
                     "aria-describedby": _("explanation-description"),
                 }
             ),
@@ -102,13 +98,9 @@ class FailureModeForm(forms.ModelForm):
         ):
             frequency_level = self.cleaned_data["frequency_level"]
             detectability_level = self.cleaned_data["detectability_level"]
-            all_severity_levels = [
-                effect.severity_level for effect in self.cleaned_data["effect"]
-            ]
+            all_severity_levels = [effect.severity_level for effect in self.cleaned_data["effect"]]
             highest_severity_level = max(all_severity_levels)
-            risk_class = calculate_risk_class(
-                frequency_level, detectability_level, highest_severity_level
-            )
+            risk_class = calculate_risk_class(frequency_level, detectability_level, highest_severity_level)
             self.cleaned_data["risk_class"] = risk_class.value
         return self.cleaned_data
 
@@ -133,12 +125,8 @@ class FailureModeAffectedObjectForm(forms.ModelForm):
         }
         help_texts = {
             "failure_mode": _("Choose a failure mode which applies to "),
-            "affected_department": _(
-                "When this failure mode occurs, which department is affected?"
-            ),
-            "affected_ooi_type": _(
-                "Which objects does this failure mode affect when it occurs?"
-            ),
+            "affected_department": _("When this failure mode occurs, which department is affected?"),
+            "affected_ooi_type": _("Which objects does this failure mode affect when it occurs?"),
         }
         widgets = {
             "affected_ooi_type": forms.Select(
@@ -161,12 +149,8 @@ class FailureModeEffectForm(forms.ModelForm):
         }
 
         help_texts = {
-            "effect": _(
-                "Name a possible effect of any type of failure mode that can occur."
-            ),
-            "severity_level": _(
-                "Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
-            ),
+            "effect": _("Name a possible effect of any type of failure mode that can occur."),
+            "severity_level": _("Describe the severity of this effect ex. 1: not severe and 5: catastrophic"),
         }
 
         widgets = {

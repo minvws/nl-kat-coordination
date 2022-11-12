@@ -38,23 +38,19 @@ class FailureModeReportView(FMEABreadcrumbsMixin, DetailView):
         breadcrumbs.append(
             {
                 "text": _("Report"),
-                "url": reverse(
-                    "fmea_failure_mode_report", kwargs={"pk": self.kwargs["pk"]}
-                ),
+                "url": reverse("fmea_failure_mode_report", kwargs={"pk": self.kwargs["pk"]}),
             }
         )
         return breadcrumbs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context[
-            "failure_mode_affected_departments"
-        ] = self.get_failure_mode_affected_object(**kwargs).values(
+        context["failure_mode_affected_departments"] = self.get_failure_mode_affected_object(**kwargs).values(
             "affected_department"
         )
-        context[
-            "failure_mode_affected_ooi_types"
-        ] = self.get_failure_mode_affected_object(**kwargs).values("affected_ooi_type")
+        context["failure_mode_affected_ooi_types"] = self.get_failure_mode_affected_object(**kwargs).values(
+            "affected_ooi_type"
+        )
         return context
 
 
@@ -90,9 +86,7 @@ class FMEADepartmentHeatmapView(FMEABreadcrumbsMixin, TemplateView):
 
     def build_breadcrumbs(self) -> List[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
-        breadcrumbs.append(
-            {"text": _("Heatmap"), "url": reverse("fmea_department_heatmap")}
-        )
+        breadcrumbs.append({"text": _("Heatmap"), "url": reverse("fmea_department_heatmap")})
         return breadcrumbs
 
     def get_context_data(self, **kwargs):

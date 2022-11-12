@@ -5,17 +5,17 @@ from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
-
 from octopoes.models import OOI
 from requests.exceptions import RequestException
 from katalogus.client import get_enabled_boefjes_for_ooi_class, get_katalogus
-from rocky.views.boefje import BoefjeMixin
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
-from rocky.views.ooi_view import BaseOOIDetailView, OOIBreadcrumbsMixin
+from rocky.views.ooi_view import BaseOOIDetailView
+from rocky.views.mixins import OOIBreadcrumbsMixin
 from tools.forms import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.ooi_helpers import format_display
 from tools.view_helpers import Breadcrumb
+from katalogus.views.mixins import BoefjeMixin
 
 
 class PageActions(Enum):
@@ -54,19 +54,13 @@ class OOIDetailView(
                 boefje_id = self.request.POST.get("boefje_id")
                 ooi_id = self.request.GET.get("ooi_id")
 
-                boefje = get_katalogus(
-                    self.request.active_organization.code
-                ).get_boefje(boefje_id)
+                boefje = get_katalogus(self.request.active_organization.code).get_boefje(boefje_id)
                 ooi = self.get_single_ooi(ooi_id)
-                self.run_boefje_for_oois(
-                    boefje, [ooi], self.request.active_organization, self.api_connector
-                )
+                self.run_boefje_for_oois(boefje, [ooi], self.request.active_organization, self.api_connector)
                 return True
 
         except RequestException as exception:
-            messages.add_message(
-                self.request, messages.ERROR, f"{action} failed: '{exception}'"
-            )
+            messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
 
     def get_current_ooi(self) -> OOI:
         # self.ooi is already the current state of the OOI
@@ -88,20 +82,14 @@ class OOIDetailView(
         filter_form = PossibleBoefjesFilterForm(self.request.GET)
 
         # List from katalogus
-        boefjes = get_enabled_boefjes_for_ooi_class(
-            self.ooi.__class__, self.request.active_organization
-        )
+        boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.request.active_organization)
 
         if boefjes:
             context["enabled_boefjes_available"] = True
 
         # Filter boefjes on scan level <= OOI clearance level
         if filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
-            boefjes = [
-                boefje
-                for boefje in boefjes
-                if boefje.scan_level.value <= self.ooi.scan_profile.level
-            ]
+            boefjes = [boefje for boefje in boefjes if boefje.scan_level.value <= self.ooi.scan_profile.level]
 
         context["boefjes"] = boefjes
         context["ooi"] = self.ooi
@@ -117,9 +105,7 @@ class OOIDetailView(
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.get_observed_at()
-        context["ooi_past_due"] = (
-            context["observed_at"].date() < datetime.utcnow().date()
-        )
+        context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects()
         context["ooi_current"] = self.get_current_ooi()
         context["findings_severity_summary"] = self.findings_severity_summary()
