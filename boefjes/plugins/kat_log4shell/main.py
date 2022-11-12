@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 import requests
 import urllib3
 
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)

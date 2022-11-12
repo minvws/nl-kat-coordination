@@ -1,0 +1,11 @@
+{
+    "id": "kat_dns_zone_normalize",
+    "consumes": [
+        "dns-zone"
+    ],
+    "produces": [
+        "Hostname",
+        "DNSZone",
+        "DNSSOARecord"
+    ]
+}

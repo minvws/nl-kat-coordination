@@ -1,6 +1,6 @@
 from unittest import TestCase, skip
 
-from boefjes.job import BoefjeMeta, Boefje
+from boefjes.job_models import BoefjeMeta, Boefje
 from boefjes.katalogus.models import Boefje as PluginBoefje
 from boefjes.lxd.lxd_runner import LXDBoefjeJobRunner
 

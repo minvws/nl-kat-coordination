@@ -1,0 +1,9 @@
+{
+    "id": "kat_ssl_certificates_normalize",
+    "consumes": [
+        "ssl-certificates"
+    ],
+    "produces": [
+        "Certificate"
+    ]
+}

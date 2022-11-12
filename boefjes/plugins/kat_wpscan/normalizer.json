@@ -1,0 +1,10 @@
+{
+    "id": "kat_wpscan_normalize",
+    "consumes": [
+        "wp-scan"
+    ],
+    "produces": [
+        "Finding",
+        "CVEFindingType"
+    ]
+}

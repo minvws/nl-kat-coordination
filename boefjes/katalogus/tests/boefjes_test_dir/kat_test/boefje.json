@@ -1,0 +1,14 @@
+{
+    "id": "kat_test",
+    "name": "Kat test name",
+    "description": "Testing KAT",
+    "consumes": [
+        "DNSZone"
+    ],
+    "produces": [
+        "Certificate",
+        "Hostname"
+    ],
+    "environment_keys": [],
+    "scan_level": 1
+}

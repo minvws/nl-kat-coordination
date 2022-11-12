@@ -3,10 +3,9 @@
   "boefje_meta": {
     "id": "ip-v6-webserver-job",
     "boefje": {
-      "name": "IPv6 webservers",
+      "id": "IPv6 webservers",
       "version": null
     },
-    "module": "kat_ipv6_webservers.ipv6_webservers",
     "organization": "_dev",
     "input_ooi": "Hostname|internet|rijksoverheid.nl.",
     "arguments": {
@@ -15,13 +14,13 @@
     },
     "dispatches": [
       {
-        "name": "kat_ipv6_webservers_normalize",
+        "id": "kat_ipv6_webservers_normalize",
         "version": null
       }
     ]
   },
   "normalizer": {
-  "name": "kat_ipv6_webservers.normalize",
+  "id": "kat_ipv6_webservers.normalize",
   "version": null
   }
 }

@@ -2,7 +2,7 @@ from typing import Dict, List
 
 from fastapi import APIRouter, Depends, Body, HTTPException
 from requests import HTTPError
-from starlette.responses import FileResponse, Response
+from starlette.responses import FileResponse, Response, JSONResponse
 from starlette.status import HTTP_404_NOT_FOUND
 
 from boefjes.katalogus.dependencies.plugins import PluginService, get_plugin_service
@@ -89,7 +89,21 @@ def update_plugin_state(
         raise HTTPException(ex.response.status_code)
 
 
-@router.get("/plugins/{plugin_id}/cover.png", include_in_schema=False)
+@router.get("/plugins/{plugin_id}/schema.json", include_in_schema=False)
+def get_plugin_cover(
+    plugin_id: str,
+    plugin_service: PluginService = Depends(get_plugin_service),
+) -> JSONResponse:  # TODO: support for plugin covers in plugin repositories (?)
+    try:
+        with plugin_service as p:
+            return JSONResponse(p.schema(plugin_id))
+    except KeyError:
+        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+    except HTTPError as ex:
+        raise HTTPException(ex.response.status_code)
+
+
+@router.get("/plugins/{plugin_id}/cover.jpg", include_in_schema=False)
 def get_plugin_cover(
     plugin_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),

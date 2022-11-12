@@ -1,6 +1,5 @@
 {
   "id": "nmap",
-  "module": "kat_nmap.scan",
   "organization": "_dev",
   "arguments": {
     "host": "213.239.154.31"

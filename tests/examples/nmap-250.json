@@ -1,6 +1,5 @@
 {
   "id": "nmap-250",
-  "module": "kat_nmap_top250.scan",
   "organization": "_dev",
   "arguments": {
     "host": "213.239.154.31"

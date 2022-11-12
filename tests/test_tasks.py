@@ -4,9 +4,7 @@ import sys
 from typing import List
 from unittest import TestCase, mock
 
-from octopoes.models.ooi.network import Network
-
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 from boefjes.job_handler import handle_boefje_job
 from boefjes.katalogus.models import Boefje, Normalizer, Bit, PluginType
 from boefjes.runner import LocalBoefjeJobRunner
@@ -96,16 +94,10 @@ class TaskTest(TestCase):
             arguments={},
             organization="_dev",
         )
-        boefje = boefjes.plugins.models.Boefje(
-            id="dummy-with-exception",
-            repository_id="",
-            name="dummy",
-            module="modules.dummy_boefje_runtime_exception",
-            description="",
-            input_ooi={Network},
-            produces=set(),
-            consumes=set(),
-            dispatches={},
+        boefje = boefjes.plugins.models.BoefjeResource(
+            Path(__file__).parent / "modules/dummy_boefje_runtime_exception",
+            "modules.dummy_boefje_runtime_exception",
+            "",
         )
 
         handle_boefje_job(meta, LocalBoefjeJobRunner(meta, boefje, {}))

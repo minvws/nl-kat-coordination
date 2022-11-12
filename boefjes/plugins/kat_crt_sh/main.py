@@ -3,7 +3,7 @@ from typing import Tuple, Union
 
 import requests
 
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 CRT_SH_API = "https://crt.sh/"
 MATCHES = ("=", "ILIKE", "LIKE", "single", "any", "FTS")

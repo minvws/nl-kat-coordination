@@ -1,8 +1,9 @@
 import logging
 from datetime import datetime, timezone, timedelta
 from enum import Enum
-from typing import Any, Union
+from typing import Any
 
+from boefjes.katalogus.local_repository import LocalPluginRepository
 from octopoes.api.models import Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -11,13 +12,12 @@ from octopoes.models.exception import ObjectNotFoundException
 from requests import RequestException
 
 from boefjes.runtime import ItemHandler
-from boefjes.katalogus.boefjes import resolve_boefjes, resolve_normalizers
 from boefjes.lxd.lxd_runner import LXDBoefjeJobRunner
 
-from boefjes.plugins.models import Normalizer, BOEFJES_DIR
+from boefjes.plugins.models import NormalizerResource, BOEFJES_DIR
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
-from boefjes.job import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runner import (
     NormalizerJobRunner,
     BoefjeJobRunner,
@@ -100,18 +100,22 @@ def handle_boefje_meta(boefje_meta: BoefjeMeta):
     boefje_meta.arguments["input"] = serialize_ooi(input_ooi)
 
     if "/" not in boefje_meta.boefje.id:
-        boefjes = resolve_boefjes(BOEFJES_DIR)
-        boefje = boefjes[boefje_meta.boefje.id]
+        local_repo = LocalPluginRepository(BOEFJES_DIR)
+        boefjes = local_repo.resolve_boefjes()
+        boefje_resource = boefjes[boefje_meta.boefje.id]
 
         logger.info("Running local boefje plugin")
 
         try:
-            environment = get_environment_settings(boefje_meta, boefje)
+            environment = get_environment_settings(
+                boefje_meta,
+                local_repo.by_id(boefje_resource.boefje.id).environment_keys,
+            )
         except RequestException:
             logger.error("Error getting environment settings", exc_info=True)
             environment = {}
 
-        job_runner = LocalBoefjeJobRunner(boefje_meta, boefje, environment)
+        job_runner = LocalBoefjeJobRunner(boefje_meta, boefje_resource, environment)
         return handle_boefje_job(boefje_meta, job_runner).dict()
 
     repository, plugin_id = boefje_meta.boefje.id.split("/")
@@ -175,19 +179,19 @@ def handle_boefje_job(
 
 
 def handle_normalizer_meta(normalizer_meta: NormalizerMeta):
-    normalizers = resolve_normalizers(BOEFJES_DIR)
-    normalizer = normalizers[normalizer_meta.normalizer.name]
+    normalizers = LocalPluginRepository(BOEFJES_DIR).resolve_normalizers()
+    normalizer = normalizers[normalizer_meta.normalizer.id]
 
     handle_normalizer_job(normalizer_meta, normalizer)
 
 
 def handle_normalizer_job(
-    normalizer_meta: NormalizerMeta, normalizer: Normalizer
+    normalizer_meta: NormalizerMeta, normalizer: NormalizerResource
 ) -> None:
     try:
         logger.info(
             "Starting normalizer %s[%s]",
-            normalizer_meta.normalizer.name,
+            normalizer_meta.normalizer.id,
             normalizer_meta.id,
         )
 
@@ -200,7 +204,7 @@ def handle_normalizer_job(
         reference = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
 
         observation = Observation(
-            method=normalizer_meta.normalizer.name,
+            method=normalizer_meta.normalizer.id,
             source=reference,
             task_id=normalizer_meta.id,
             valid_time=normalizer_meta.boefje_meta.ended_at,
@@ -214,7 +218,7 @@ def handle_normalizer_job(
 
         logger.info(
             "Done with normalizer %s[%s]",
-            normalizer_meta.normalizer.name,
+            normalizer_meta.normalizer.id,
             normalizer_meta.id,
         )
 

@@ -10,7 +10,6 @@ class Settings(BaseSettings):
     worker_concurrency: int = 10
 
     # Worker configuration
-    use_scheduler: bool = True
     pool_size: int = 2
     poll_interval: float = 1.0
 
@@ -32,10 +31,6 @@ class Settings(BaseSettings):
     bytes_username: str = "test"
     bytes_password: str = "secret"
 
-    wp_scan_api: str = ""
-    shodan_api: str = ""
-    binaryedge_api: str = ""
-    leakix_api: str = ""
     remote_ns: str = "8.8.8.8"
 
     lxd_endpoint: str = ""

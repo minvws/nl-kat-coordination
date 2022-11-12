@@ -1,6 +1,5 @@
 {
   "id": "ssl-certificates-job",
-  "module": "kat_ssl_certificates.scan",
   "organization": "_dev",
   "arguments": {
     "domain": "example.nl"

@@ -3,8 +3,16 @@ from typing import Dict
 
 from sqlalchemy.orm import Session
 
-from boefjes.config import Settings, settings
+from boefjes.config import settings
+from boefjes.katalogus.dependencies.context import get_context
+from boefjes.katalogus.dependencies.encryption import (
+    EncryptMiddleware,
+    IdentityMiddleware,
+    NaclBoxMiddleware,
+)
+from boefjes.katalogus.models import EncryptionMiddleware
 from boefjes.katalogus.storage.interfaces import SettingsStorage, SettingNotFound
+from boefjes.katalogus.storage.memory import SettingsStorageMemory
 from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.db_models import SettingInDB, OrganisationInDB
 from boefjes.sql.session import SessionMixin
@@ -13,15 +21,15 @@ logger = logging.getLogger(__name__)
 
 
 class SQLSettingsStorage(SessionMixin, SettingsStorage):
-    def __init__(self, session: Session, app_settings: Settings):
-        self.app_settings = app_settings
+    def __init__(self, session: Session, encryption: EncryptMiddleware):
+        self.encryption = encryption
 
         super().__init__(session)
 
     def get_by_key(self, key: str, organisation_id: str, plugin_id: str) -> str:
         instance = self._db_instance_by_id(key, organisation_id, plugin_id)
 
-        return instance.value
+        return self.encryption.decode(instance.value)
 
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         query = (
@@ -31,7 +39,10 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
             .filter(SettingInDB.plugin_id == plugin_id)
             .filter(OrganisationInDB.id == organisation_id)
         )
-        return {setting.key: setting.value for setting in query.all()}
+        return {
+            setting.key: self.encryption.decode(setting.value)
+            for setting in query.all()
+        }
 
     def create(
         self, key: str, value: str, organisation_id: str, plugin_id: str
@@ -40,7 +51,9 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
             "Saving setting: %s: %s for organisation %s", key, value, organisation_id
         )
 
-        setting_in_db = self.to_setting_in_db(key, value, organisation_id, plugin_id)
+        setting_in_db = self.to_setting_in_db(
+            key, self.encryption.encode(value), organisation_id, plugin_id
+        )
         self.session.add(setting_in_db)
 
     def update_by_key(
@@ -48,7 +61,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
     ) -> None:
         instance = self._db_instance_by_id(key, organisation_id, plugin_id)
 
-        instance.value = value
+        instance.value = self.encryption.encode(value)
 
     def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
         instance = self._db_instance_by_id(key, organisation_id, plugin_id)
@@ -91,5 +104,15 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
         )
 
 
-def create_setting_storage(session: Session) -> SQLSettingsStorage:
-    return SQLSettingsStorage(session, settings)
+def create_setting_storage(organisation_id: str, session) -> SettingsStorage:
+    if not settings.enable_db:
+        return SettingsStorageMemory(organisation_id)
+
+    encrypter = IdentityMiddleware()
+    if get_context().env.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
+        encrypter = NaclBoxMiddleware(
+            get_context().env.katalogus_private_key_b64,
+            get_context().env.katalogus_public_key_b64,
+        )
+
+    return SQLSettingsStorage(session, encrypter)

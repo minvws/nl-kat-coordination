@@ -10,7 +10,7 @@ from octopoes.models.ooi.dns.records import (
 from octopoes.models.ooi.dns.zone import Hostname, DNSZone
 from octopoes.models.ooi.network import Network
 
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

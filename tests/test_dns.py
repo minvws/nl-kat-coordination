@@ -18,7 +18,7 @@ from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
 
 from boefjes.plugins.kat_dns.normalize import run
 from boefjes.plugins.kat_dns_zone.normalize import run as run_zone_normalizer
-from boefjes.job import NormalizerMeta, BoefjeMeta, Normalizer, Boefje
+from boefjes.job_models import NormalizerMeta, BoefjeMeta, Normalizer, Boefje
 from tests.stubs import get_dummy_data
 
 
@@ -167,7 +167,7 @@ class DnsTest(TestCase):
 
         meta = NormalizerMeta(
             id="",
-            normalizer=Normalizer(name="kat_dns_normalize"),
+            normalizer=Normalizer(id="kat_dns_normalize"),
             boefje_meta=BoefjeMeta(
                 id="1234",
                 boefje=Boefje(id="dns-records"),
@@ -255,7 +255,7 @@ class DnsTest(TestCase):
 
         meta = NormalizerMeta(
             id="",
-            normalizer=Normalizer(name="kat_dns_normalize"),
+            normalizer=Normalizer(id="kat_dns_normalize"),
             boefje_meta=BoefjeMeta(
                 id="1234",
                 boefje=Boefje(id="dns-records"),
@@ -316,7 +316,7 @@ redir.example.nl. 14400 IN MX 0 .
 
         meta = NormalizerMeta(
             id="",
-            normalizer=Normalizer(name="kat_dns_normalize"),
+            normalizer=Normalizer(id="kat_dns_normalize"),
             boefje_meta=BoefjeMeta(
                 id="1234",
                 boefje=Boefje(id="dns-records"),
@@ -444,7 +444,7 @@ redir.example.nl. 14400 IN MX 0 .
 
         meta = NormalizerMeta(
             id="",
-            normalizer=Normalizer(name="kat_dns_normalize"),
+            normalizer=Normalizer(id="kat_dns_normalize"),
             boefje_meta=BoefjeMeta(
                 id="1234",
                 boefje=Boefje(id="dns-records"),

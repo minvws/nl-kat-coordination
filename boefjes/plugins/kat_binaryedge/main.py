@@ -1,28 +1,28 @@
 import json
 import math
+from os import getenv
 from typing import Tuple, Union, Dict, List
 
 from pybinaryedge import BinaryEdge
 
-from boefjes.config import settings
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
 
-    be = BinaryEdge(settings.binaryedge_api)
+    be = BinaryEdge(getenv("BINARYEDGE_API"))
     results: Dict[str, List] = {"results": []}
 
     input_ = boefje_meta.arguments["input"]
 
-    if input_["ooi_type"] in ["IPAddressV4", "IPAddressV6"]:
+    if input_["object_type"] in ["IPAddressV4", "IPAddressV6"]:
         ip = input_["address"]
         result = be.host(ip)
 
         # create same result-structure as netblock
         for event in result["events"]:
             results["results"].extend(event["results"])
-    elif input_["ooi_type"] in ["IPV4NetBlock", "IPV6NetBlock"]:
+    elif input_["object_type"] in ["IPV4NetBlock", "IPV6NetBlock"]:
         netblock = input_["mask"]
         dork = f'ip:"{netblock}"'
 

@@ -1,10 +1,10 @@
 """Boefje script for scanning wordpress sites using wpscan"""
+from os import getenv
 from typing import Union, Tuple
 
 import docker
 
-from boefjes.config import settings
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 WPSCAN_IMAGE = "wpscanteam/wpscan:latest"
 
@@ -38,7 +38,7 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
             "--plugins-version-detection",
             "aggressive",
             "--api-token",
-            settings.wp_scan_api,
+            getenv("WP_SCAN_API"),
         ],
         detach=True,
     )

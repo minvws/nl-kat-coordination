@@ -2,7 +2,7 @@ from typing import Tuple, Union
 
 import docker
 
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 SSLSCAN_IMAGE = "breezethink/sslscan:latest"
 

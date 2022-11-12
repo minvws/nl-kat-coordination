@@ -2,7 +2,7 @@ from typing import Union, Tuple
 
 import docker
 
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 WAPPALYZER_IMAGE = "noamblitz/wappalyzer:latest"
 

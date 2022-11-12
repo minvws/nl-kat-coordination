@@ -23,7 +23,6 @@ LeakIX currently outputs the following OOIs:
 ```json
 {
   "id": "leakix-scan-job",
-  "module": "kat_leakix.scan",
   "organization": "_dev",
   "arguments": {
     "host": "1.1.1.1",

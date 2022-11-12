@@ -6,7 +6,7 @@ from typing import Tuple, Union
 import docker
 
 from boefjes.config import settings
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 DNSSEC_IMAGE = "noamblitz/drill:latest"
 

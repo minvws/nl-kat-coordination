@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from boefjes.plugins.kat_snyk import check_version
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:

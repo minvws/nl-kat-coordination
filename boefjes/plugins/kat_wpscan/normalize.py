@@ -5,7 +5,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, CVEFindingType
 from wpscan_out_parse import WPScanJsonParser
 
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

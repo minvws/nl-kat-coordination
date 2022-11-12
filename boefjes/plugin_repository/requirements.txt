@@ -1,7 +1,7 @@
 pydantic==1.8.2
-requests==2.27.1
-fastapi==0.75.0
-uvicorn==0.17.5
+requests==2.28.1
+fastapi==0.85.1
+uvicorn==0.19.0
 pyyaml==6.0
 python-multipart==0.0.5
 diskcache==5.4.0

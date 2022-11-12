@@ -18,13 +18,13 @@
     },
     "dispatches": [
       {
-        "name": "kat_snyk_normalize",
+        "id": "kat_snyk_normalize",
         "version": null
       }
     ]
   },
   "normalizer": {
-    "name": "kat_snyk.normalize",
+    "id": "kat_snyk.normalize",
     "version": null
   }
 }

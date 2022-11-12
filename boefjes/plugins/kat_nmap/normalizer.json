@@ -1,0 +1,13 @@
+{
+    "id": "kat_nmap_normalize",
+    "consumes": [
+        "nmap-tcp-top250"
+    ],
+    "produces": [
+        "IPAddressV6",
+        "Service",
+        "IPPort",
+        "IPAddressV4",
+        "IPService"
+    ]
+}

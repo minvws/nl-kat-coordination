@@ -1,0 +1,9 @@
+{
+    "id": "kat_webpage_analysis_headers_normalize",
+    "consumes": [
+        "webpage-analysis"
+    ],
+    "produces": [
+        "HTTPHeader"
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "id": "kat_dnssec_normalize",
+    "consumes": [
+        "dns-sec"
+    ],
+    "produces": [
+        "KATFindingType",
+        "Finding"
+    ]
+}

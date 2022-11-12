@@ -6,7 +6,7 @@ import dns.resolver
 from dns.name import Name
 from dns.resolver import Answer
 
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
 

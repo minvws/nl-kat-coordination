@@ -21,7 +21,6 @@ Log4shell outputs the following OOIs:
 ```json
 {
   "id": "random-uuid",
-  "module": "kat_log4shell.log4jcheck",
   "organization": "_dev",
   "input_ooi":"URL|internet|127.0.0.1|tcp|443|http|internet|test.test.test.|/",
   "arguments": {

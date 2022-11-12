@@ -1,4 +1,3 @@
-import sys
 from unittest import TestCase
 
 from boefjes.config import settings
@@ -6,9 +5,11 @@ from boefjes.katalogus.clients import MockPluginRepositoryClient
 from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Boefje, Normalizer, Bit, Repository
+from boefjes.katalogus.storage.interfaces import SettingsNotConformingToSchema
 from boefjes.katalogus.storage.memory import (
     PluginStatesStorageMemory,
     RepositoryStorageMemory,
+    SettingsStorageMemory,
 )
 
 
@@ -23,7 +24,7 @@ def get_plugin_seed():
                 authors=None,
                 created=None,
                 description="Just a dummy boefje for demonstration purposes",
-                environment_keys=None,
+                environment_keys=[],
                 related=None,
                 type="boefje",
                 scan_level=1,
@@ -39,7 +40,7 @@ def get_plugin_seed():
                 authors=None,
                 created=None,
                 description="Just a dummy boefje for demonstration purposes",
-                environment_keys=None,
+                environment_keys=[],
                 related=None,
                 type="boefje",
                 scan_level=1,
@@ -57,7 +58,7 @@ def get_plugin_seed():
                 authors=None,
                 created=None,
                 description="Just a dummy bit for demonstration purposes",
-                environment_keys=None,
+                environment_keys=[],
                 related=None,
                 type="bit",
                 consumes="WebPage",
@@ -73,7 +74,7 @@ def get_plugin_seed():
                 authors=None,
                 created=None,
                 description="Just a dummy normalizer for demonstration purposes",
-                environment_keys=None,
+                environment_keys=[],
                 related=None,
                 type="normalizer",
                 consumes=["text/html"],
@@ -85,6 +86,9 @@ def get_plugin_seed():
 
 
 def mock_plugin_service(organisation_id: str) -> PluginService:
+    storage = SettingsStorageMemory("test")
+    storage.create("DUMMY_VAR", "123", "test", "test_plugin")
+
     repo_store = RepositoryStorageMemory(organisation_id)
     _mocked_repositories = {
         "test-repo": Repository(
@@ -102,6 +106,7 @@ def mock_plugin_service(organisation_id: str) -> PluginService:
     return PluginService(
         PluginStatesStorageMemory(organisation_id),
         repo_store,
+        storage,
         MockPluginRepositoryClient(get_plugin_seed()),
         LocalPluginRepository(test_boefjes_dir),
     )
@@ -115,7 +120,7 @@ class TestPluginsService(TestCase):
     def test_get_plugins(self):
         plugins = self.service.get_all(self.organisation)
 
-        self.assertEqual(len(plugins), 6)
+        self.assertEqual(len(plugins), 8)
         self.assertIn("test-boefje-1", [plugin.id for plugin in plugins])
         self.assertIn("test-repo", [plugin.repository_id for plugin in plugins])
         self.assertIn("Test Normalizer 1", [plugin.name for plugin in plugins])
@@ -130,7 +135,6 @@ class TestPluginsService(TestCase):
             filter(lambda x: x.id == "kat_test_normalize", plugins)
         ).pop()
         self.assertIn("kat_test_normalize", kat_test_norm.id)
-        self.assertEqual("kat_test_normalize", kat_test_norm.name)
         self.assertListEqual(["text/html"], kat_test_norm.consumes)
         self.assertListEqual([], kat_test_norm.produces)
 
@@ -158,4 +162,61 @@ class TestPluginsService(TestCase):
             "test-repo-2", "test-normalizer-1", self.organisation
         )
         self.assertIn("Normalizer 1", plugin.name)
+        self.assertFalse(plugin.enabled)
+
+    def test_update_by_id_bad_schema(self):
+        plugin_id = "kat_test"
+
+        with self.assertRaises(SettingsNotConformingToSchema) as ctx:
+            self.service.update_by_id("LOCAL", plugin_id, self.organisation, True)
+
+        msg = "Settings for organisation test and plugin kat_test are not conform the plugin schema: 'api_key' is a required property"
+        self.assertEqual(ctx.exception.message, msg)
+
+        self.service.settings_storage.update_by_key(
+            "api_key", 128 * "a", self.organisation, plugin_id
+        )
+        self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
+
+        value = 129 * "a"
+        self.service.settings_storage.update_by_key(
+            "api_key", value, self.organisation, plugin_id
+        )
+        with self.assertRaises(SettingsNotConformingToSchema) as ctx:
+            self.service.update_by_id("LOCAL", plugin_id, self.organisation, True)
+
+        msg = f"Settings for organisation test and plugin kat_test are not conform the plugin schema: '{value}' is too long"
+        self.assertEqual(ctx.exception.message, msg)
+
+    def test_get_schema(self):
+        schema = self.service.schema("kat_test")
+        self.assertDictEqual(
+            {
+                "title": "Arguments",
+                "type": "object",
+                "properties": {
+                    "api_key": {"title": "Api Key", "maxLength": 128, "type": "string"}
+                },
+                "required": ["api_key"],
+            },
+            schema,
+        )
+
+        schema = self.service.schema("test-boefje-1")
+        self.assertIsNone(schema)
+
+    def test_removing_mandatory_setting_disables_plugin(self):
+        plugin_id = "kat_test"
+
+        self.service.settings_storage.update_by_key(
+            "api_key", 128 * "a", self.organisation, plugin_id
+        )
+        self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
+
+        plugin = self.service.by_plugin_id(plugin_id, self.organisation)
+        self.assertTrue(plugin.enabled)
+
+        self.service.delete_setting_by_key("api_key", self.organisation, plugin_id)
+
+        plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertFalse(plugin.enabled)

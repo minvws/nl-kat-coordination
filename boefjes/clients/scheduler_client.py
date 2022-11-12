@@ -3,7 +3,7 @@ from typing import Union, List, Optional
 import requests
 from pydantic import BaseModel, parse_obj_as
 
-from boefjes.job import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
 
 
 class Queue(BaseModel):

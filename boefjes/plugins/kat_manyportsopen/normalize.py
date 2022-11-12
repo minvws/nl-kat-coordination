@@ -7,7 +7,7 @@ from octopoes.models.ooi.findings import KATFindingType, Finding
 from octopoes.models.ooi.network import IPPort
 
 from boefjes.config import settings
-from boefjes.job import NormalizerMeta
+from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

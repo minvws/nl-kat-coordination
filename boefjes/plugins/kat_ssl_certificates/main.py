@@ -2,7 +2,7 @@ from typing import Tuple, Union
 
 import docker
 
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 OPENSSL_IMAGE = "securefab/openssl:latest"
 
@@ -11,6 +11,8 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
     client = docker.from_env()
     input_ = boefje_meta.arguments["input"]
     hostname = input_["hostname"]["name"]
+    ip_address = input_["ip_service"]["ip_port"]["address"]["address"]
+    port = input_["ip_service"]["ip_port"]["port"]
 
     try:
         output = client.containers.run(
@@ -18,9 +20,9 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
             [
                 "s_client",
                 "-host",
-                hostname,
+                ip_address,
                 "-port",
-                "443",
+                port,
                 "-prexit",
                 "-showcerts",
                 "-servername",

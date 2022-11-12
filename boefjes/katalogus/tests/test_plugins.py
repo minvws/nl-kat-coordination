@@ -28,7 +28,9 @@ class TestPlugins(TestCase):
                 "test-bit-1",
                 "test-normalizer-1",
                 "kat_test",
+                "kat_test_2",
                 "kat_test_normalize",
+                "kat_test_normalize_2",
             },
             set([x["id"] for x in res.json()]),
         )
@@ -88,7 +90,9 @@ class TestPlugins(TestCase):
                 "test-bit-1": True,
                 "test-normalizer-1": True,
                 "kat_test": False,
+                "kat_test_2": False,
                 "kat_test_normalize": True,
+                "kat_test_normalize_2": True,
             },
             {plugin["id"]: plugin["enabled"] for plugin in res.json()},
         )
@@ -110,7 +114,9 @@ class TestPlugins(TestCase):
                 "test-bit-1": True,
                 "test-normalizer-1": True,
                 "kat_test": False,
+                "kat_test_2": False,
                 "kat_test_normalize": True,
+                "kat_test_normalize_2": True,
             },
             {plugin["id"]: plugin["enabled"] for plugin in res.json()},
         )

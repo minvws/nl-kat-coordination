@@ -28,8 +28,9 @@ RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
     && rm /tmp/boefjes-requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
 
-COPY nl-kat-octopoes/ /app/octopoes
-RUN pip install /app/octopoes
+COPY nl-kat-octopoes/ /tmp/octopoes
+RUN cd /tmp/octopoes && python setup.py bdist_wheel
+RUN pip install /tmp/octopoes/dist/octopoes*.whl
 
 COPY nl-kat-boefjes/boefjes ./boefjes
 

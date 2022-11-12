@@ -10,7 +10,7 @@ import requests
 
 from boefjes.plugins.models import RawData
 from boefjes.config import settings
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.models import PluginType
 from boefjes.runner import BoefjeJobRunner, get_environment_settings
 

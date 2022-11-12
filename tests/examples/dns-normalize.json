@@ -15,13 +15,13 @@
     },
     "dispatches": [
       {
-        "name": "kat_dns.normalize",
+        "id": "kat_dns.normalize",
         "version": null
       }
     ]
   },
   "normalizer": {
-    "name": "kat_dns.normalize",
+    "id": "kat_dns.normalize",
     "version": null
   }
 }

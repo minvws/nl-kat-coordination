@@ -1,17 +1,18 @@
+from pathlib import Path
+
 import logging
 from datetime import datetime, timezone
-from importlib import import_module
-from inspect import signature, Signature, isfunction
 import os
-from typing import Union, Any, Tuple, Iterator, List, Protocol, cast, Dict, Optional
+from typing import Union, Tuple, List, Dict
 
 import pydantic
 import requests
+
 from octopoes.models import OOI
 
-from boefjes.plugins.models import Boefje, Normalizer, RawData
+from boefjes.plugins.models import BoefjeResource, NormalizerResource, RawData
 from boefjes.config import settings
-from boefjes.job import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.katalogus.models import PluginType
 
 logger = logging.getLogger(__name__)
@@ -29,15 +30,13 @@ class TemporaryEnvironment:
 
 
 def get_environment_settings(
-    boefje_meta: BoefjeMeta, boefje_resource: Boefje
+    boefje_meta: BoefjeMeta, environment_keys: List[str]
 ) -> Dict[str, str]:
     environment = requests.get(
         f"{settings.katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
     ).json()
 
-    return {
-        k: v for k, v in environment.items() if k in boefje_resource.environment_keys
-    }
+    return {k: v for k, v in environment.items() if k in environment_keys}
 
 
 def get_plugin(
@@ -50,10 +49,6 @@ def get_plugin(
     return pydantic.parse_raw_as(PluginType, res.content)
 
 
-class ModuleException(Exception):
-    """General error for modules"""
-
-
 class BoefjeJobRunner:
     def run(self) -> Tuple[BoefjeMeta, RawData]:
         raise NotImplementedError()
@@ -63,29 +58,27 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
     def __init__(
         self,
         boefje_meta: BoefjeMeta,
-        boefje: Boefje,
+        boefje: BoefjeResource,
         extra_environment: Dict[str, str],
     ):
         self.boefje_meta = boefje_meta
-        self.boefje = boefje
+        self.boefje_resource = boefje
         self.environment = extra_environment
 
     def run(self) -> Tuple[BoefjeMeta, RawData]:
         self.boefje_meta.started_at = datetime.now(timezone.utc)
 
         try:
-            module_runner = ModuleRunner(
-                self.boefje.module,
-                OLD_BOEFJE_SIGNATURE,
-                self.environment,
-            )
-
-            self.boefje_meta, output = module_runner.run(self.boefje_meta)
+            with TemporaryEnvironment() as temporary_environment:
+                temporary_environment.update(self.environment)
+                self.boefje_meta, output = self.boefje_resource.module.run(
+                    self.boefje_meta
+                )
 
         except Exception as exc:
             logger.exception(
                 "Error while running boefje module %s[%s]",
-                self.boefje.id,
+                self.boefje_meta.boefje.id,
                 self.boefje_meta.id,
                 exc_info=True,
             )
@@ -94,7 +87,9 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
         finally:
             self.boefje_meta.ended_at = datetime.now(timezone.utc)
 
-        return self.boefje_meta, RawData(data=output, mime_types={self.boefje.id})
+        return self.boefje_meta, RawData(
+            data=output, mime_types={self.boefje_meta.boefje.id}
+        )
 
     def __str__(self):
         return f"BoefjeJobRunner {self.boefje_meta.id}"
@@ -104,7 +99,7 @@ class NormalizerJobRunner:
     def __init__(
         self,
         normalizer_meta: NormalizerMeta,
-        normalizer: Normalizer,
+        normalizer: NormalizerResource,
         raw: Union[str, bytes],
     ):
         self.normalizer_meta = normalizer_meta
@@ -112,13 +107,17 @@ class NormalizerJobRunner:
 
         self.raw = raw
         self.results: List[OOI] = []
-        self._module_runner = ModuleRunner(
-            self.normalizer.module, NORMALIZER_SIGNATURE, {}
-        )
 
     def run(self):
         self.normalizer_meta.started_at = datetime.now(timezone.utc)
-        self.results = list(self._module_runner.run(self.normalizer_meta, self.raw))
+
+        try:
+            self.results = list(
+                self.normalizer.module.run(self.normalizer_meta, self.raw)
+            )
+        except Exception as exc:
+            logger.exception(f"Normalizer {self.normalizer_meta=} failed")
+            raise exc
 
         # Do not add the input OOI to the results to properly handle deletion propagation.
         input_ooi = self.normalizer_meta.boefje_meta.input_ooi
@@ -128,54 +127,3 @@ class NormalizerJobRunner:
 
     def __str__(self):
         return f"NormalizerJobRunner {self.normalizer_meta.id}"
-
-
-class Runnable(Protocol):
-    def run(self, *args, **kwargs) -> Any:
-        ...
-
-
-class ModuleRunner:
-    def __init__(self, module: str, sign: Signature, environment: Dict[str, str]):
-        self.module = module
-        self.signature = sign
-        self.environment = environment
-
-    def run(self, *args, **kwargs) -> Any:
-        module = import_module(self.module)
-        module = cast(Runnable, module)
-
-        if not hasattr(module, "run") or not isfunction(module.run):
-            raise ModuleException(f"Module {module} does not define a run function")
-
-        if signature(module.run).return_annotation != self.signature.return_annotation:
-            raise ModuleException(
-                f"Invalid run function return ann   otation, expected '{self.signature.return_annotation}'"
-            )
-
-        with TemporaryEnvironment() as temporary_environment:
-            temporary_environment.update(self.environment)
-            return module.run(*args, **kwargs)
-
-
-def _old_boefje_run_signature(
-    boefje_meta: BoefjeMeta,
-) -> Tuple[BoefjeMeta, Union[str, bytes]]:
-    pass
-
-
-def _boefje_run_signature(
-    _: Dict,
-) -> Union[str, bytes]:
-    pass
-
-
-def _normalizer_run_signature(
-    normalizer_meta: NormalizerMeta, raw: Union[bytes, str]
-) -> Iterator[OOI]:
-    pass
-
-
-NORMALIZER_SIGNATURE = signature(_normalizer_run_signature)
-OLD_BOEFJE_SIGNATURE = signature(_old_boefje_run_signature)
-NEW_BOEFJE_SIGNATURE = signature(_boefje_run_signature)

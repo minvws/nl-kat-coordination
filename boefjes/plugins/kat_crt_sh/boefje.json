@@ -1,0 +1,14 @@
+{
+    "id": "certificate-search",
+    "name": "CRT",
+    "description": "Certificate search",
+    "consumes": [
+        "DNSZone"
+    ],
+    "produces": [
+        "Hostname",
+        "Certificate"
+    ],
+    "environment_keys": [],
+    "scan_level": 1
+}

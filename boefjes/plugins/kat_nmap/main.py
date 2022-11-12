@@ -4,7 +4,7 @@ from typing import List, Tuple, Union, Optional
 
 import docker
 
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 NMAP_IMAGE = "instrumentisto/nmap:latest"
 

@@ -33,7 +33,6 @@ Nmap outputs the following OOIs:
 ```json
 {
   "id": "nmap-scan-job",
-  "module": "kat_nmap.scan",
   "organization": "_dev",
   "arguments": {
     "host": "1.1.1.1"
@@ -55,3 +54,5 @@ boefjes/tools/kat_nmap
 ├── scan.py
 └── requirements.txt
 ```
+
+**Cat name**: Elsje

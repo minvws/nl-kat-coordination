@@ -3,13 +3,13 @@ from typing import Tuple, Union
 
 import shodan
 
-from boefjes.config import settings
-from boefjes.job import BoefjeMeta
+from os import getenv
+from boefjes.job_models import BoefjeMeta
 
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
 
-    api = shodan.Shodan(settings.shodan_api)
+    api = shodan.Shodan(getenv("SHODAN_API"))
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
     results = api.host(ip)
