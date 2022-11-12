@@ -32,7 +32,7 @@ services:
       context: nl-kat-octopoes/
       args:
         ENVIRONMENT: dev
-    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
+    command: web
     env_file:
       - .env
 
@@ -45,7 +45,7 @@ services:
       context: nl-kat-octopoes/
       args:
         ENVIRONMENT: dev
-    command: celery -A octopoes.tasks.tasks worker --loglevel=INFO
+    command: worker-beat
     env_file:
       - .env
 
@@ -64,7 +64,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 1
-    command: python3 -m boefjes boefje
+    command: boefje
     env_file:
       - .env
 
@@ -82,7 +82,7 @@ services:
       - ./nl-kat-boefjes:/app/boefjes
     deploy:
       replicas: 1
-    command: python3 -m boefjes normalizer
+    command: normalizer
     env_file:
       - .env
 
@@ -163,7 +163,7 @@ services:
       dockerfile: nl-kat-boefjes/Dockerfile.dev
       args:
         ENVIRONMENT: dev
-    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "boefjes.katalogus.api:app"]
+    command: katalogus
     volumes:
       - ./nl-kat-boefjes:/app/boefjes
     ports:
@@ -191,7 +191,6 @@ services:
       context: nl-kat-mula/
       args:
         ENVIRONMENT: dev
-    command: python -m scheduler
     ports:
       - "127.0.0.1:8004:8000"
     env_file:
@@ -208,7 +207,6 @@ services:
     restart: on-failure
     build:
       context: nl-kat-keiko/
-    command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000
     ports:
       - "127.0.0.1:8005:8000"
     env_file:
