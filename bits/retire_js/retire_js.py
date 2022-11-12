@@ -46,9 +46,10 @@ def run(
 def _check_vulnerabilities(name, package_version: str, known_vulnerabilities: Dict) -> Dict[str, List[str]]:
     vulnerabilities: Dict[str, List[str]] = {"CVE": [], "RetireJS": []}
     processed_name = _process_name(name)
-    brand = [brand for brand in known_vulnerabilities if processed_name == _process_name(brand)][0]
+    found_brands = [brand for brand in known_vulnerabilities if processed_name == _process_name(brand)]
 
-    if brand:
+    if found_brands:
+        brand = found_brands[0]
         for known_vulnerability in known_vulnerabilities[brand]["vulnerabilities"]:
             if _check_versions(package_version, known_vulnerability):
                 identifiers = known_vulnerability["identifiers"]

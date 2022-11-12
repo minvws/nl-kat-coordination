@@ -26,8 +26,11 @@ python3 -m uvicorn octopoes.api.api:app [--port 8000]
 
 ### Run the event processor
 ```bash
-python3 -m celery -A octopoes.tasks.tasks worker --loglevel=WARNING
+python3 -m celery -A octopoes.tasks.tasks worker -B -s /tmp/celerybeat-schedule --loglevel=WARNING
 ```
+_Note: The `-B` flag instructs celery start the Celery Beat scheduler in the same process_  
+_Note: The `-s` flag is used to specify the beat schedule location and should be writeable by the user the process runs in_
+
 
 
 ## Healthcheck

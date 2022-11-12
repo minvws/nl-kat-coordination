@@ -114,7 +114,7 @@ def get_paths_to_neighours(source_type: Type[OOI]) -> Set[Path]:
     return relation_paths
 
 
-def get_max_scan_level_inheritance(segment: Segment) -> int:
+def get_max_scan_level_inheritance(segment: Segment) -> Optional[int]:
     if segment.direction == Direction.INCOMING:
         return segment.target_type.__fields__[segment.property_name].field_info.extra.get("max_issue_scan_level", None)
     else:
@@ -123,7 +123,7 @@ def get_max_scan_level_inheritance(segment: Segment) -> int:
         )
 
 
-def get_max_scan_level_issuance(segment: Segment) -> int:
+def get_max_scan_level_issuance(segment: Segment) -> Optional[int]:
     if segment.direction == Direction.INCOMING:
         return segment.target_type.__fields__[segment.property_name].field_info.extra.get(
             "max_inherit_scan_level", None

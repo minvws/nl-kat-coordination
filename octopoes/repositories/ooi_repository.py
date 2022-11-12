@@ -13,12 +13,13 @@ from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, datetime, Reference
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path, get_paths_to_neighours, Direction, Segment
 from octopoes.models.tree import ReferenceTree, ReferenceNode
 from octopoes.models.types import get_relations, type_by_name, to_concrete, get_concrete_types, get_relation
 from octopoes.xtdb import FieldSet, Datamodel, ForeignKey
 from octopoes.xtdb.client import XTDBSession, OperationType as XTDBOperationType
-from octopoes.xtdb.query_builder import generate_pull_query
+from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
 logger = logging.getLogger(__name__)
@@ -62,10 +63,13 @@ class OOIRepository:
         valid_time: datetime,
         limit: int = 1000,
         offset: int = 0,
-    ) -> List[OOI]:
+    ) -> Paginated[OOI]:
         raise NotImplementedError
 
     def list_random(self, amount: int, valid_time: datetime) -> List[OOI]:
+        raise NotImplementedError
+
+    def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
         raise NotImplementedError
 
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
@@ -189,8 +193,24 @@ class XTDBOOIRepository(OOIRepository):
         offset: int = 0,
         limit: int = 20,
         random: Optional[int] = None,
-    ) -> List[OOI]:
+    ) -> Paginated[OOI]:
         types = to_concrete(types)
+
+        query = """
+                {{
+                    :query {{
+                        :find [(count ?e )]
+                        :in [[_object_type ...]]
+                        :where [[?e :object_type _object_type]]
+                    }}
+                    :in-args [[{object_types}]]
+                }}
+                """.format(
+            object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types))
+        )
+
+        res_count = self.session.client.query(query, valid_time)
+        count = res_count[0][0] if res_count else 0
 
         query = generate_pull_query(
             self.xtdb_type,
@@ -200,7 +220,11 @@ class XTDBOOIRepository(OOIRepository):
             limit,
         )
         res = self.session.client.query(query, valid_time)
-        return [self.deserialize(x[0]) for x in res]
+        oois = [self.deserialize(x[0]) for x in res]
+        return Paginated(
+            count=count,
+            items=oois,
+        )
 
     def list_random(self, amount: int, valid_time: datetime) -> List[OOI]:
         query = """
@@ -359,8 +383,32 @@ class XTDBOOIRepository(OOIRepository):
 
         return query
 
+    @classmethod
+    def construct_neighbour_query_multi(cls, references: Set[Reference], paths: Set[Path]) -> str:
+
+        encoded_segments = [cls.encode_segment(path.segments[0]) for path in sorted(paths)]
+        segment_query_sections = [f"{{:{s} [*]}}" for s in encoded_segments]
+
+        query = """{{
+                        :query {{
+                            :find [
+                                (pull ?e [
+                                    :crux.db/id
+                                    {related_fields}
+                                ])
+                            ]
+                            :in [[ _crux_db_id ... ]]
+                            :where [[?e :crux.db/id _crux_db_id]]
+                        }}
+                        :in-args [[{reference}]]
+                    }}""".format(
+            reference=" ".join(map(str_val, references)), related_fields=" ".join(segment_query_sections)
+        )
+
+        return query
+
     def get_neighbours(
-        self, reference: Reference, valid_time: datetime, paths: Optional[Set[Path]] = None
+        self, reference: Reference, valid_time: datetime, paths: Set[Path] = None
     ) -> Dict[Path, List[OOI]]:
 
         query = self.construct_neighbour_query(reference, paths)
@@ -383,6 +431,31 @@ class XTDBOOIRepository(OOIRepository):
                 ret[path] = [self.deserialize(value)]
 
         return ret
+
+    def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
+
+        query = self.construct_neighbour_query_multi(references, paths)
+
+        response = self.session.client.query(query, valid_time=valid_time)
+
+        neighbours = set()
+
+        for row in response:
+            col = row[0]
+            for value in col.values():
+                try:
+                    if value:
+                        if isinstance(value, list):
+                            for serialized in value:
+                                neighbours.add(self.deserialize(serialized))
+                        else:
+                            neighbours.add(self.deserialize(value))
+                except ValueError:
+                    # is not an error, old crux versions return the foreign key as a string,
+                    # when related object is not found
+                    logger.info(f"Could not deserialize value [value=%s]", value)
+
+        return neighbours
 
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
 

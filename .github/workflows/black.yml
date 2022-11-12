@@ -24,10 +24,10 @@ jobs:
           python-version: 3.8
 
       - name: Install Black
-        run: pip install black==21.9b0
+        run: pip install black==22.10.0
         
       - name: Upgrade Click (Black dependency)
         run: pip install --upgrade click==8.0.2
 
       - name: Run black
-        run: black --check -l 120 .
+        run: black --check .

@@ -1,3 +1,6 @@
+import timeit
+import uuid
+from datetime import timezone, datetime
 from logging import getLogger, config
 from typing import Dict
 
@@ -5,9 +8,9 @@ import yaml
 from pydantic import parse_obj_as
 
 from octopoes.config.settings import Settings
+from octopoes.connector.katalogus import KATalogusClientV1
 from octopoes.core.app import bootstrap_octopoes
-from octopoes.events.events import EVENT_TYPE, DBEvent, CalculateScanLevelTask
-from octopoes.models.exception import ObjectNotFoundException
+from octopoes.events.events import EVENT_TYPE, DBEvent
 from octopoes.tasks.app import app
 
 settings = Settings()
@@ -37,19 +40,32 @@ def handle_event(event: Dict):
 
 
 @app.task(queue=settings.queue_name_octopoes)
-def calculate_scan_profile(task: Dict):
+def schedule_scan_profile_recalculations():
+    orgs = KATalogusClientV1(settings.katalogus_api).get_organisations()
 
-    task = CalculateScanLevelTask.parse_obj(task)
+    for org in orgs:
+        app.send_task(
+            "octopoes.tasks.tasks.recalculate_scan_profiles",
+            (org,),
+            queue=settings.queue_name_octopoes,
+            task_id=str(uuid.uuid4()),
+        )
+        logger.info("Scheduled scan profile recalculation [org=%s]", org)
 
-    octopoes, _, session, rabbit_connection = bootstrap_octopoes(settings, task.client)
 
-    try:
-        ooi = octopoes.get_ooi(task.reference, task.valid_time)
+@app.task(queue=settings.queue_name_octopoes)
+def recalculate_scan_profiles(org: str, *args, **kwargs):
 
-        octopoes._calculate_scan_profile(ooi, ooi.scan_profile, task.valid_time)
+    # bootstrap octopoes
+    octopoes, _, session, rabbit_connection = bootstrap_octopoes(settings, org)
 
-        session.commit()
-    except ObjectNotFoundException:
-        ...
-    finally:
-        rabbit_connection.close()
+    # timer
+    timer = timeit.default_timer()
+
+    octopoes.recalculate_scan_profiles(datetime.now(timezone.utc))
+
+    # teardown octopoes
+    session.commit()
+    rabbit_connection.close()
+
+    logger.info("Finished scan profile recalculation [org=%s] [dur=%.2fs]", org, timeit.default_timer() - timer)

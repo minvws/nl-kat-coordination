@@ -29,7 +29,9 @@ class ScanProfileRepository:
     def get(self, ooi_reference: Reference, valid_time: datetime) -> ScanProfileBase:
         raise NotImplementedError
 
-    def save(self, scan_profile: ScanProfileBase, valid_time: datetime) -> None:
+    def save(
+        self, old_scan_profile: Optional[ScanProfileBase], new_scan_profile: ScanProfileBase, valid_time: datetime
+    ) -> None:
         raise NotImplementedError
 
     def list(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
@@ -39,9 +41,6 @@ class ScanProfileRepository:
         raise NotImplementedError
 
     def get_bulk(self, references: Set[Reference], valid_time: datetime) -> List[ScanProfileBase]:
-        raise NotImplementedError
-
-    def list_by_parent(self, parent_ooi_reference: Reference, valid_time: datetime) -> List[ScanProfileBase]:
         raise NotImplementedError
 
 
@@ -99,23 +98,18 @@ class XTDBScanProfileRepository(ScanProfileRepository):
             else:
                 raise e
 
-    def save(self, scan_profile: ScanProfileBase, valid_time: datetime) -> None:
-        old_scan_profile = None
-        try:
-            old_scan_profile = self.get(scan_profile.reference, valid_time)
-        except ObjectNotFoundException:
-            pass
-
-        if old_scan_profile == scan_profile:
+    def save(
+        self, old_scan_profile: Optional[ScanProfileBase], new_scan_profile: ScanProfileBase, valid_time: datetime
+    ) -> None:
+        if old_scan_profile == new_scan_profile:
             return
-
-        self.session.add((XTDBOperationType.PUT, self.serialize(scan_profile), valid_time))
+        self.session.add((XTDBOperationType.PUT, self.serialize(new_scan_profile), valid_time))
 
         event = ScanProfileDBEvent(
             operation_type=OperationType.CREATE if old_scan_profile is None else OperationType.UPDATE,
             valid_time=valid_time,
             old_data=old_scan_profile,
-            new_data=scan_profile,
+            new_data=new_scan_profile,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -134,23 +128,3 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         query = generate_pull_query(self.xtdb_type, FieldSet.ALL_FIELDS, {"type": self.object_type(), "reference": ids})
         res = self.session.client.query(query, valid_time)
         return [self.deserialize(x[0]) for x in res]
-
-    def list_by_parent(self, parent_ooi_reference: Reference, valid_time: datetime) -> List[ScanProfileBase]:
-        query = """
-        {{
-            :query {{
-                :find [(pull ?e [*])]
-                :in [parent]
-                :where [
-                    [?e :inheritances inheritances]
-                    [(get-in inheritances [:parent]) parent]
-                ]
-            }}
-            :in-args ["{parent}"]
-        }}
-        """.format(
-            parent=str(parent_ooi_reference)
-        )
-
-        results = self.session.client.query(query, valid_time=valid_time)
-        return [self.deserialize(r[0]) for r in results]

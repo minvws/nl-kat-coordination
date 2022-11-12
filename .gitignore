@@ -439,3 +439,4 @@ $RECYCLE.BIN/
 deployment/github_config.sh
 
 !packaging/deb/data/usr/lib
+reports

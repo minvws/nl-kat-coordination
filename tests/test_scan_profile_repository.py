@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from octopoes.models import Reference, DeclaredScanProfile, InheritedScanProfile, Inheritance
+from octopoes.models import Reference, DeclaredScanProfile, InheritedScanProfile
 from octopoes.repositories.scan_profile_repository import XTDBScanProfileRepository
 from tests.mocks.mock_ooi_types import (
     ALL_OOI_TYPES,
@@ -35,14 +35,6 @@ class ScanProfileRepositoryTest(TestCase):
         scan_profile = InheritedScanProfile(
             reference=ip.reference,
             level=2,
-            inheritances=[
-                Inheritance(
-                    parent=network.reference,
-                    source=network.reference,
-                    level=2,
-                    depth=1,
-                )
-            ],
         )
         serialized = XTDBScanProfileRepository.serialize(scan_profile)
 
@@ -50,17 +42,6 @@ class ScanProfileRepositoryTest(TestCase):
         self.assertEqual("ScanProfile", serialized["type"])
         self.assertEqual("inherited", serialized["scan_profile_type"])
         self.assertEqual(2, serialized["level"])
-        self.assertListEqual(
-            [
-                {
-                    "parent": "MockNetwork|internet",
-                    "source": "MockNetwork|internet",
-                    "level": 2,
-                    "depth": 1,
-                },
-            ],
-            serialized["inheritances"],
-        )
 
     def test_deserialize_declared(
         self,
@@ -78,7 +59,7 @@ class ScanProfileRepositoryTest(TestCase):
         self.assertEqual("declared", scan_profile.scan_profile_type)
         self.assertEqual(1, scan_profile.level)
 
-    def test_deserialize_inherited(
+    def test_deserialize_inherited_legacy(
         self,
     ):
         serialized = {
@@ -101,8 +82,3 @@ class ScanProfileRepositoryTest(TestCase):
         self.assertEqual(Reference.from_str("MockIPAddressV4|internet|1.1.1.2"), scan_profile.reference)
         self.assertEqual("inherited", scan_profile.scan_profile_type)
         self.assertEqual(2, scan_profile.level)
-        inheritance = next(iter(scan_profile.inheritances))
-        self.assertEqual(Reference.from_str("MockNetwork|internet2"), inheritance.parent)
-        self.assertEqual(Reference.from_str("MockNetwork|internet2"), inheritance.source)
-        self.assertEqual(2, inheritance.level)
-        self.assertEqual(1, inheritance.depth)
