@@ -1,0 +1,61 @@
+= Infrastructuur: 3 opties
+
+Als je OpenKAT wilt gaan gebruiken zijn er een aantal mogelijkheden. 
+
+* Er is een standaard build met dockers, die ook als ontwikkelomgeving wordt gebruikt. Deze is ook geschikt om 'te proeven' wat het pakket doet. Er zijn ook https://github.com/dekkers/nl-kat-coordination/blob/container-image/docs/containers.md[pre-built docker images] beschikbaar, op dit moment nog als work-in-progress.
+
+* https://github.com/minvws/nl-kat-coordination/wiki/Installatiehandleiding-met-debian-packages[Debian packages] zijn binnenkort beschikbaar. 
+
+* Een productieomgeving kent veel variabelen. Daarom hebben we een algemene voorbeeldomgeving opgenomen gebaseerd op de eigen ervaringen. 
+
+Naast de link:Installatiehandleiding-KAT[installatiehandleiding] zijn er ook link:Installatiehandleiding:-hardening[hardening tips] die relevant zijn voor het opbouwen van de omgeving. 
+
+== Standaard build met dockers
+
+De standaard build van OpenKAT met dockers is geschikt als ontwikkelomgeving. Wil je dockers in productie gebruiken check dan eerst de volgende informatie: 
+
+* https://docs.docker.com/compose/production/
+* https://docs.docker.com/develop/dev-best-practices/
+
+Een standaard docker installatie levert de volgende modules op, zoals gespecificeerd in de docker-compose.yml: 
+
+* RabbitMQ (messagequeue) 
+* CRUX (xtdb)
+* Octopoes API met Octopoes API Worker
+* boefje (worker)
+* normalizer (worker)
+* rocky-db (postgres)
+* bytes-db (postgres)
+* rocky (front end)
+* bytes
+* flower (celery, taskmanager)
+* katalogus
+* katalogus-db
+* scheduler (mula)
+
+RabbitMQ is de messagequeue, de taskmanager is Celery die in de vorm van flower een eigen front end heeft. Bij Rocky hoort een django interface voor de configuratie. Zie voor de hardening tips de installatiehandleiding. 
+
+De volgende volumes worden aangemaakt: 
+
+* rocky-db-data
+* bytes-db-data
+* katalogus-db-data
+
+== Debian packages
+
+De debian packages komen binnenkort beschikbaar. Met de debian packages draai je alle componenten op een (1) host. 
+
+== Voorbeeld infrastructuur
+
+Een grotere installatie van KAT kan zowel horizontaal als verticaal schalen. De inrichting is afhankelijk van de eigen voorkeuren en mogelijkheden. 
+
+Een voorbeeld hiervan is opgenomen in het onderstaande diagram. OpenKAT draait achter een proxy met firewalls, waarbij Rocky als front end toegankelijk is. Vanuit rocky wordt via een tweede proxy verbinding gemaakt met de componenten van OpenKAT. De meeste componenten kunnen dubbel uitgevoerd worden om zo de load te verdelen en de beschikbaarheid te verzekeren. De pijlen in de tekening geven de richting aan waarmee de verbindingen geinitieerd worden. 
+
+Aan de achterkant kan een management interface worden toegevoegd, aangepast aan de situatie waarin OpenKAT wordt gebruikt. 
+
+Backups zijn met name relevant voor de ruwe data in Bytes en de userdata, eventueel voor de snelheid de objecten in Octopoes. Op basis van Bytes en de userdata is het systeem in principe opnieuw uit te rollen en te herstellen. 
+
+image::https://user-images.githubusercontent.com/76487016/176674372-a3fac68b-901c-4e35-b165-4e3171739b53.png[OpenKAT diagram]
+
+
+

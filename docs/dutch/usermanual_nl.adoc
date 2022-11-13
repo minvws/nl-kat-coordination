@@ -1,0 +1,194 @@
+= Gebruikershandleiding OpenKAT
+:sectnums:
+:sectnumlevels: 3
+
+De gebruikershandleiding voor OpenKAT is bedoeld voor mensen die het systeem willen gebruiken om rapportages te maken. De belangrijkste concepten van OpenKAT zijn beschreven in de link:https://github.com/minvws/nl-kat-coordination/wiki/Functionele-documentatie[functionele documentatie], die voor het bedienen van de gebruikersinterface door deze pagina's wordt aangevuld. 
+
+De handleiding doorloopt de stappen in de front end van OpenKAT, laat zien hoe je met accounts kunt omgaan, hoe je rapportages opvraagt en hoe je op basis van het bestaande datamodel vragen kunt beantwoorden. OpenKAT is een systeem met veel configuratieopties. Geen installatie zal volledig hetzelfde zijn, dus deze handleiding richt zich op de hoofdlijn van het systeem. 
+
+image::https://user-images.githubusercontent.com/76487016/173245799-036e559f-2bf4-4e34-9714-930e8f0ce879.jpg[OpenKAT: Home]
+
+== De eerste keer inloggen 
+
+Een lokale instance van OpenKAT is benaderbaar via http://localhost:8000. 
+
+=== Admin account aanmaken
+
+Bij de eerste keer inloggen wordt een admin account met tweefactor authenticatie aangemaakt, worden andere gebruikers en een of meerdere organisaties aangemaakt en start de onboarding procedure. 
+
+image::https://user-images.githubusercontent.com/76487016/173245873-adf3f25e-1bbc-4a14-8ba5-35e6a4d208f5.jpeg[OpenKAT: login]
+
+Stel tweefactor authenticatie in met een OTP applicatie van je keuze. Het is mogelijk de QR code te scannen of de code over te nemen. 
+
+image::https://user-images.githubusercontent.com/76487016/173246670-26d328e7-4c8e-4086-8a37-a99cb4a9efc6.png[OpenKAT: OTP]
+
+Voeg de contactgegevens toe die bij de account horen. 
+
+image::https://user-images.githubusercontent.com/76487016/173246816-96f35d6c-84cd-4e2e-9c33-fa8c549b92ef.jpg[OpenKAT: account setup]
+
+
+=== Organisatie aanmaken
+
+Nadat de admin account is aangemaakt worden de organisaties aangemaakt. Elke organisatie heeft een eigen database met informatie, die apart moet worden aangemaakt. Hierdoor is de informatie die OpenKAT voor een bepaalde organisatie of gedeelte daarvan verzamelt gescheiden van anderen. Deze functie is nuttig indien OpenKAT gebruikt wordt om meerdere organisaties te scannen. Is dit niet het geval dan kan met een (1) organisatie worden volstaan. 
+
+image::https://user-images.githubusercontent.com/76487016/173246897-d825f3ea-7e13-4069-af54-5605a9be490b.jpeg[OpenKAT: organisatie]
+
+=== Gebruikers aanmaken 
+
+OpenKAT kent twee typen gebruikers waarvoor accounts kunnen worden aangemaakt: 
+
+* Red Teamer: scans en rapportages
+* Client: rapportages
+
+Het onderscheid tussen de twee accounttypen is de mogelijkheid om scans uit te voeren. De Red Teamer kan besluiten nemen over de vrijwaring en scope van scans die door OpenKAT worden uitgevoerd. De Client kan alleen rapportages opvragen op basis van bestaande data. 
+
+image::https://user-images.githubusercontent.com/76487016/173247019-bda43be6-df52-4f9f-9f11-7b1e6e12eb6c.jpeg[OpenKAT: users]
+
+== Gebruikersflow: wat wil je weten? 
+
+De gebruikersflow in OpenKAT begint met de vraag naar informatie over een bepaald systeem of object. Op basis hiervan wordt een rapport gekozen, een object geselecteerd, een vrijwaring aangegeven en worden de scans uitgezocht en uitgevoerd. Als het systeem eenmaal draait wordt het datamodel ingevuld. 
+
+image::https://user-images.githubusercontent.com/76487016/173247153-feb5a8a7-a741-40cb-b388-83a6f702ab64.jpg[OpenKAT: get started]
+
+=== Select report
+
+Selecteer het rapport dat past bij de vraag. Het systeem begint met de basics en breidt de informatie uit op basis van het datamodel en de beschikbare vrijwaring. 
+
+image::https://user-images.githubusercontent.com/76487016/173247238-3fb49bad-4338-4391-b0a3-e4948b78e226.jpg[OpenKAT: select report]
+
+=== Setup scan
+
+Een scan begint met het toevoegen van een object dat in het datamodel past. Dit object is bijvoorbeeld de hostname van een systeem. 
+
+image::https://user-images.githubusercontent.com/76487016/173247488-b3ffae40-38f0-4318-ab55-cac66773d52d.jpg[OpenKAT: add object] 
+
+=== Set clearance level
+
+Het clearance level bepaalt hoe indringend een scan mag zijn. Het clearance level wordt binnen het systeem doorgegeven: voor het eerste object is het aangegeven, voor alle afgeleide objecten werkt het met overerving. Dit is richtingsgevoelig, dus alles wat onder het object valt krijgt hetzelfde niveau mee, alles daarboven een lager niveau. Hiermee wordt voorkomen dat systemen van derden zonder toestemming intensief gescand worden. 
+
+image::https://user-images.githubusercontent.com/76487016/173247749-d797c4a1-2234-431f-8a58-1c68142e2666.jpg[OpenKAT: vrijwaring]
+
+=== Select plugins 
+
+Informatie kan op meerdere manieren worden verzameld. Selecteer de geschikte boefjes of plugins om de informatie te verzamelen. Voor OpenKAT maakt het niet uit welke tool gebruikt wordt om bepaalde informatie te verzamelen, als dit maar past binnen het datamodel en de beschikbare vrijwaring.
+
+In de frontend worden boefjes aangegeven die passen bij het object en de gekozen vrijwaring. Het complete overzicht van beschikbare boefjes is te vinden via het menu item KATalogus.
+
+image::https://user-images.githubusercontent.com/76487016/173247912-a01fda41-5f27-43e5-8d8d-8a74028c35ba.jpg[OpenKAT: select boefjes] 
+
+=== OpenKAT scans
+
+Nadat het rapport is gekozen, het eerste object is aangemaakt, de vrijwaring is afgegeven en de plugins zijn geselecteerd laat OpenKAT de relevante informatie voor de scan zien ter bevestiging. Daarna gaat OpenKAT scannen. Dit proces loopt op de achtergrond door. 
+
+Er zijn drie manieren waarop OpenKAT scant: door directe user input, op basis van objecten en relaties in het datamodel en op basis van tijd (herhaling). 
+
+image::https://user-images.githubusercontent.com/76487016/173247998-91b84a38-f01a-4539-ac30-c222463dd695.jpg[OpenKAT: object detail]
+
+=== Rapport
+
+Als het rapport klaar is kan het worden ingezien. De bevindingen in het rapport zijn ook als bevindingen in OpenKAT te raadplegen, via het menu Findings. 
+
+image::https://user-images.githubusercontent.com/76487016/173248450-5e499c9f-497b-4671-8fd3-69ea187ce445.jpg[OpenKAT: DNS report] 
+
+== Menus in OpenKAT
+
+De standaardinstallatie van OpenKAT kent een eenvoudige menustructuur waar de belangrijkste onderdelen mee toegankelijk zijn: de KATalogus, Findings, Objects, Tasks en Organizations. 
+
+=== KATalogus
+
+In de KATalogus staan alle boefjes, met de beschrijving, vrijwaringsniveau, voorbeelcode enzovoorts. Het is een eenvoudig en compleet overzicht van wat de tool doet. 
+
+image::https://user-images.githubusercontent.com/76487016/173248684-e0e0a608-4e58-4e6f-b975-a55056eb11d9.jpeg[OpenKAT: KAT-alogus]
+
+Elk boefje heeft een eigen pagina met zo compleet mogelijke informatie over het boefje en de manier waarop het gebruikt kan worden. Elk boefje heeft een aantal objecten waar het mee verbonden is, via de normalizers die deze objecten uit de opgehaalde informatie halen. 
+
+image::https://user-images.githubusercontent.com/76487016/173248858-79878bd7-ee66-4634-b5ee-eac6750a1cf6.jpeg[OpenKAT: boefje details]
+
+=== Findings
+
+De bevindingen van OpenKAT zijn zichtbaar in de crisisroom, te vinden via het menu Findings. Hier zijn het aantal bevindingen te zien per organisatie en is een overzicht opgenomen van organisaties met de meeste bevindingen. Dit overzicht is via [show settings] aanpasbaar. 
+
+image::https://user-images.githubusercontent.com/76487016/173248824-db8ac740-1062-4ee2-8b6f-724b1bea8574.jpeg[OpenKAT: crisisroom]
+
+Het is mogelijk bevindingen toe te voegen, zodat specifieke analyse of informatie vanuit externe bronnen ook in het systeem kan worden opgenomen. Indien een bekende CVE wordt toegevoegd haalt OpenKAT ook de bijpassende informatie op. 
+
+Het is ook mogelijk een KAT-XXX finding code te gebruiken. Deze kunnen apart worden toegevoegd. Zorg dat de finding code bestaat voordat je een bevinding toevoegt die deze code wil gebruiken. 
+
+image::https://user-images.githubusercontent.com/76487016/173248912-1fc6e043-0b9e-4bbf-9967-0926bfcd3abf.jpeg[OpenKAT: add finding type] 
+
+Als de finding code bestaat kan de finding worden toegevoegd. 
+
+image::https://user-images.githubusercontent.com/76487016/173248931-ff90154b-bb34-4c10-9ea4-c10da31b729d.jpeg[OpenKAT: add finding] 
+
+=== Objects
+
+Objecten bestaan in het datamodel en zijn te bekijken via het menu Objects. Dankzij de filteropties op deze pagina is het mogelijk om te selecteren en in te zoomen op specifieke objecten en tijdstippen. Ook is het mogelijk om het object aan te passen of te wissen. 
+
+image::https://user-images.githubusercontent.com/76487016/173249019-c42be4ae-921f-471c-9ace-acc88a20a9e3.jpeg[OpenKAT: object list]
+
+Per object is een overzicht beschikbaar, de positie in het datamodel en de visuele weergave daarvan als tree en eventuele findings. Ook hier zijn filtermogelijkheden beschikbaar, zodat kan worden ingezoomd op specifieke aspecten van het object. 
+
+image::https://user-images.githubusercontent.com/76487016/173249040-fb783f52-d338-4e58-a4b7-d40886f1f238.jpeg[OpenKAT object]
+
+De object list kan ook schematisch worden weergegeven, waardoor de verbanden tussen de verschillende objecten zichtbaar worden. 
+
+image::https://user-images.githubusercontent.com/76487016/173249209-08dcedfc-c199-41dd-9673-30882626d5fc.jpg[OpenKAT graph] 
+
+Een nieuw object kan direct worden aangemaakt als input voor OpenKAT. Dit heeft een vergelijkbaar effect als bij de onboarding: het start nieuwe scans naar het object en naar de objecten die ermee in het datamodel verbonden zijn. 
+
+image::https://user-images.githubusercontent.com/76487016/173249416-f4905195-8d73-475f-802f-27a82dc22fb1.jpeg[OpenKAT: new object]
+
+Voor het scannen van een specifiek object worden de beschikbare boefjes aangegeven. Ze kunnen ook voor een handmatige scan worden ingezet.
+
+image::https://user-images.githubusercontent.com/76487016/173249386-f6cf3369-6084-43d9-9685-ae2a1694a46c.jpg[OpenKAT: new boefjes]
+
+Het is mogelijk om objecten via een .CSV bestand toe te voegen, zodat een heel systeem in een keer opgenomen kan worden in OpenKAT. Het format van de CSV wordt op de pagina zelf gespecificeerd. 
+
+image::https://user-images.githubusercontent.com/76487016/173249136-13e2db2d-ea77-4fdd-9e59-186249714067.jpg[OpenKAT csv upload]
+
+Onderdeel van het object is de vrijwaring of het clearance level. Dit is per object instelbaar. Een vrijwaring verkregen van een ander object is 'inhereted', een vrijwaring die is gegeven is 'declared'. Het is mogelijk om voor een object een aanvullende vrijwaring aan te geven. 
+
+image::https://user-images.githubusercontent.com/76487016/173249292-71e7969b-b0a0-4992-a0b4-a4d9619b7612.jpeg[OpenKAT clearance level]
+
+Bevindingen die bij het object horen zijn zichtbaar via het Findings menu in de menubalk, maar worden als Findings Report ook direct bij het object getoond. 
+
+image::https://user-images.githubusercontent.com/76487016/173249328-400e9d6e-280d-4d4b-95bd-287fe2f13617.jpg[OpenKAT: object with findings]
+
+Het bewijsmateriaal op basis waarvan het object is gemaakt kan worden opgevraagd via het task-id. Dit levert de directe output op van de scantool, waar te normalizer het object mee heeft gemaakt of waarvan het is afgeleid. 
+
+image::https://user-images.githubusercontent.com/76487016/173249360-995631dc-151b-4a68-b03b-8e63af0c887e.jpg[OpenKAT: original data] 
+
+=== Tasks
+
+De lijst met taken die OpenKAT uitvoert geeft inzicht in de taken die zijn afgerond. 
+
+image::https://user-images.githubusercontent.com/76487016/173249472-456f0240-6534-40b5-af3a-b200284faf59.jpg[OpenKAT: tasks]
+
+=== Organizations
+
+Elke organisatie heeft een eigen database. Het scherm organizations laat zien welke organisatie en dus database wordt bekeken. Indien er meerdere organisaties zijn aangemaakt kan hier van organisatie worden gewisseld. 
+
+image::https://user-images.githubusercontent.com/76487016/173249518-836e1cbe-0cd9-4394-92b3-36615334616f.png[OpenKAT: organizations] 
+
+== Ik wil meer!
+
+OpenKAT heeft meer mogelijkheden dan via de frontend toegankelijk zijn. Het is mogelijk om per module van OpenKAT aanvullende configuratie te doen en dataanalyse uit te voeren door direct met de API te communiceren. Hiervoor is samenwerking met de admin van OpenKAT nodig. Als er sprake is van een lokale installatie zijn de onderdelen van OpenKAT via de docker interface te traceren, zodat je hier een goed beeld van kunt krijgen. De Docker-GUI plugin voor Chrome kan hierbij een handige tool zijn. 
+
+image::https://user-images.githubusercontent.com/76487016/173249596-ce07bfc9-4a63-407c-aa6b-d51979892c12.png[OpenKAT docker plugin]
+
+Voor bepaalde vormen van data analyse kan het interessant zijn direct naar de ruwe data of in het datamodel te kijken. Via de API's van Octopoes en Bytes is dit mogelijk. Ook zijn er in het systeem configuratiemogelijkheden die voor de gemiddelde gebruiker minder relevant zijn en die niet via de front end bereikbaar zijn. 
+
+Relevante ingangen zijn in elk geval: 
+
+* Het DJANGO configuratie menu voor de frontend
+* XTDB web frontend
+* Octopoes, Bytes, KATalogus APIs (met fastAPI documentatie)
+
+image::https://user-images.githubusercontent.com/76487016/173249564-3727d340-8859-4ddc-8cb9-b5d339b26fa7.png[OpenKAT django]
+
+image::https://user-images.githubusercontent.com/76487016/173249586-531182b7-6bbf-49dc-8e87-4ab556822370.jpg[OpenKAT XTDB]
+
+image::https://user-images.githubusercontent.com/76487016/173249618-46d9218d-d3c7-4113-bce4-de711323301c.jpg[OpenKAT fastAPI] 
+
+
+

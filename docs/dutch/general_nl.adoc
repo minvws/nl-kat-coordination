@@ -1,0 +1,20 @@
+= Algemene uitleg OpenKAT
+
+De algemene toelichting op OpenKAT is te vinden link:files/introductie_OpenKAT_V20220621.pdf[in deze brochure (PDF)] en in link:https://github.com/minvws/nl-kat-coordination/wiki/Functionele-documentatie[de functionele documentatie].
+
+De actuele versie van de brochure is van 21 juni 2022.
+
+image::https://user-images.githubusercontent.com/76487016/176947568-08b935c7-6bdf-492e-b765-00b370341079.png[brochure]
+
+== Infografieken OpenKAT
+
+De infografieken zijn opgenomen in de algemene documentatie over OpenKAT en hier apart als PDF te downloaden. 
+
+link:files/AANSTURING_KAT_V2.pdf[AANSTURING KAT V2.pdf]
+
+link:files/MODULES_KAT.pdf[MODULES KAT.pdf]
+
+link:files/FLOW_KAT_V2.pdf[FLOW KAT.pdf]
+
+
+

@@ -1,0 +1,43 @@
+
+= Manon Open
+
+De frontend van OpenKAT maakt net als veel andere sites die zijn gebouwd tijdens de pandemie gebruik van 'Manon', een sterk framework voor het snel bouwen en eenvoudig beheren van rijkshuisstijl conforme websites. Net zoals OpenKAT een aanpassing is van KAT is voor Manon een 'Manon Open' beschikbaar, zodat dit framework beschikbaar komt voor een grotere groep gebruikers. 
+
+== Repository op Github
+
+Manon heeft haar eigen repository op Github, waar alle bestanden en de uitgebreide documentatie te vinden zijn. Het pakket kan worden gebuild en aangepast aan de specifieke situatie. Zo is er een uitgebreide catalogus opgenomen met componenten, variabelen en mogelijkheden, uitgeschreven om direct toegepast te worden in de eigen huisstijl. 
+
+https://github.com/minvws/nl-rdo-manon (op korte termijn ook toegankelijk)
+
+== Scheiding van content en styles
+
+Uitgangspunt bij het bouwen van een website is de scheiding tussen content, markup, beeld, CSS en eventueel javascript. Hoe strikter deze gescheiden zijn, des te eenvoudiger is het om een toegankelijke en goed te beheren website te bouwen. Het is niet eenvoudig om een goed framework te vinden waarin dit consequent wordt toegepast. Hiervoor is 'Manon Open' geschreven, dat een strikte scheiding hanteert tussen de content, markup en styles. 
+
+== Ontstaan
+
+Tijdens de vaccinatiecampagne werden er in korte tijd veel websites gelanceerd en in beheer genomen. Met strikte huisstijlvoorschriften vanuit de rijksoverheid, de wens om toegankelijke websites te leveren en gezien de dynamiek van de pandemie voldeden de bestaande oplossingen niet. Daarom is door het Ministerie van VWS in korte tijd een framework gebouwd om het bouwen en beheren van een rijkshuisstijl conforme website te vereenvoudigen. Dit pakket is aangepast om het voor een breder publiek bruikbaar te maken. 
+
+Het verschil tussen de Manon Rijk met de rijkshuisstijl en Manon Open voor algemeen gebruik is dat het pakket variabel en instelbaar is gemaakt. Waar de eerste versie van Manon een pakket was dat als geheel werd geimplementeerd is Manon Open geschreven zodat je zelf kan uitkiezen welke componenten en welke stukken css je wilt toevoegen. Hierdoor hoef je weinig overrides te doen en krijg je een zo klein mogelijk css bestand. 
+
+== Bouwproces
+
+Het scheiden van style en content maakt de ontwikkeling van websites op een aantal manieren eenvoudiger. Niet alleen voor de gebruiker is het voordelig, omdat de website in potentie toegankelijker en gestructureerder is. Ook in het ontwikkelproces laat het een scheiding tussen frontend en backend toe, waarbij met eenvoudige front end templates snel kan worden gewerkt. 
+
+== Onderhoudbaarheid websites
+
+Een ander voordeel is de onderhoudbaarheid van de code van een website. Aanpassingen in de visuele weergave hoeven nu niet op verschillende plekken in de classes gedaan te worden, maar op een locatie. Dit maakt het toevoegen en aanpassen van huisstijlen efficient en onderhoudsvriendelijk. De kans op inconsistente styling is daarmee ook kleiner. 
+
+== Toegankelijkheidsverklaring
+
+De overheid wil dat informatie toegankelijk is, voor zoveel mogelijk mensen. Het scheiden van content en stijl helpt bij het verkrijgen van de toegankelijkheidsverklaring en zorgt ervoor dat de hulpmiddelen van bijvoorbeeld slechtzienden en blinden goed functioneren. Op deze manier bereikt een website een breder publiek en worden geen onnodige nieuwe barrieres opgeworpen. 
+
+== Packages
+
+Het team werkt aan een praktisch npm package voor Manon Open. 
+
+== EU PL 1.2 licentie
+
+Manon is net als OpenKAT beschikbaar onder de EU PL 1.2 licentie. Op deze manier wordt het werk dat tijdens de pandemie is verricht publiek beschikbaar gemaakt. Manon of aanpassingen aan Manon kunnen alleen onder deze of een vergelijkbare licentie verder worden verspreid. Hierdoor kan het framework groeien met bijdragen van gebruikers, die als vorm van wederkerigheid Manon helpen verbeteren. 
+
+
+

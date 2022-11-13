@@ -1,0 +1,424 @@
+= Overzicht van Boefjes
+:sectnums:
+:sectnumlevels: 2
+
+Dit overzicht van boefjes geeft een indruk van de mogelijkheden van de standaard installatie van OpenKAT. De informatie komt uit de readme's per boefje. Het actuele overzicht van boefjes is te vinden in link:https://github.com/minvws/nl-kat-boefjes[de boefjes repository op github]. 
+
+Er zijn link:Plugins-maken:-Boefjes,-Whiskers-en-Bits[handige templates] om zelf aan de gang te gaan. Hiermee kun je snel nieuwe plugins ontwikkelen: het zipbestand dat je kunt downloaden bevat alle bestanden en een eerste aanzet om aan de slag te gaan. 
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_binaryedge[Binary edge]
+
+
+Maakt gebruik van de binaryedge database. Er zijn uitgebreide normalizers voor het verwerken van alle informatie uit deze database. 
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_crt_sh[CRT SH]
+
+Haalt certificaten op en checkt of de gegevens correct zijn. 
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_dicom[DICOM]
+
+Het DICOM boefje zoekt naar toegankelijke DICOM servers, een standaard die voor de verwerking van medische foto's wordt gebruikt. 
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_dns[DNS]
+
+The DNS lookup tool fetches all the DNS records for a domain. To do that it uses the dsnpython package. Currently, only
+A, AAAA, ans MX records are modelled.
+
+==== Input OOIs
+
+DNS scan expects a Hostname object as input.
+
+==== Output OOIs
+
+The normalizer outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+|OOI type
+|Description
+
+|Hostname
+|Hostnames of nameservers of input OOI, one of which will be the the SOA
+
+|DnsZone
+|DnsZone of the input OOI, found nameservers will be added as DnsNameServerHostnames
+
+|IpAddress
+|IpAddresses of input Hostname, can be IpAddressV4 or IpAddressV6
+
+|DnsRecord
+|DnsRecord that couples the input Hostname to the output IpAddresses, can be DnsARecord or DnsAaaaRecord
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_dns_zone[DNS ZONE]
+
+Fetch the parent DNS zone of a DNS zone
+-> description.md is niet correct! 
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_dnssec[DNSSEC]
+
+Validates DNSSec of a hostname
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_fierce[Fierce]
+
+Fierce is a semi-lightweight scanner that helps locate non-contiguous IP space and hostnames against specified domains. It's really meant as a pre-cursor to nmap, unicornscan, nessus, nikto, etc, since all of those require that you already know what IP space you are looking for. This does not perform exploitation and does not scan the whole internet indiscriminately. It is meant specifically to locate likely targets both inside and outside a corporate network. Because it uses DNS primarily you will often find mis-configured networks that leak internal address space. That's especially useful in targeted malware. KAT uses fierce with the module from https://github.com/mschwager/fierce.
+
+==== Options
+
+There are three lists of common subdomains that can be used to scan:
+Name 	Length 	Description
+default.txt 	1594 	A short list for fast scanning
+5000.txt 	5000 	A list with the 5000 most common subdomains
+20000.txt 	20000 	A list with all known common subdomains
+
+Easy switching between lists is currently not possible, switching has to be done in the code of the Boefje.
+
+==== Input OOIs
+
+Fierce expects a hostname without a subdomain as input. All hostnames can be given as input, but nameservers or subdomains do not yield results.
+
+==== Output OOIs
+
+Fierce outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+| Hostname
+| Subdomain of the Hostname input OOI
+
+| IpAddress
+| IpAddress of subdomain, can be IpAddressV4 or IpAddressV6
+
+| DnsRecord
+| DnsRecord that couples the output Hostname to the output IpAddress, can be DnsARecord or DnsAaaaRecord
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_green_hosting[Green Hosting]
+
+Use the Green Web Foundation Partner API to check whether the website is hosted on a green server. Meaning it runs on renewable energy and/or offsets its carbon footprint
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_ipv6_nameservers[IPV6 Nameservers]
+
+The IPv6 name server tool checks if the provided hostname has name servers that are accessible via IPv6 and if there are at least two name servers that can be reached via IPv6. The linux tool 'dig' is used for this analysis.
+
+==== Input OOIs
+
+IPv6 name server boefje expects a Hostname object as input. To be able to analyse the provided hostname first the dns 
+records need to be gathered for this hostname and its name servers.
+
+==== Output OOIs
+
+The IPv6 name server boefje outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+| Finding
+|Finding if ports are open that should not be open (TEMP!)
+
+| KATFindingType 
+|FindingType if ports are open that should not be open (TEMP!)|
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_ipv6_webservers[IPV6 Webservers]
+
+The IPv6 web server tool checks if the provided hostname has web servers that are accessible via IPv6 and if there are
+at least one web server that can be reached via IPv6. The python package 'socket' is used for this analysis.
+
+==== Input OOIs
+
+IPv6 web server boefje expects a Hostname object as input. To be able to analyse the provided hostname first the dns records need to be gathered for this hostname.
+
+==== Output OOIs
+
+THe IPv6 web server boefje outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+| Finding        
+| Finding if ports are open that should not be open (TEMP!)
+
+| KATFindingType 
+| FindingType if ports are open that should not be open (TEMP!)
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_leakix[Leakix]
+
+LeakIX is a project that goes around the Internet and finds services to index them. It gathers information on the Internet on the most common security misconfigurations currently open.
+
+==== Input OOIs
+
+LeakIX expects an IpAddress as input.
+
+==== Output OOIs
+
+LeakIX currently outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+|IpPort
+|Open IpPort found on input OOI
+
+|Software
+|Known software behind IpPort, sometimes with software version
+
+|CveFindingType
+|Known vulnerability of software behind IpPort|
+
+|Finding
+|Finding
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_log4shell[LOG4shell]
+
+Log4shell is a popular name for [CVE-2021-44228](https://nvd.nist.gov/vuln/detail/CVE-2021-44228).
+This vulnerability allows attackers to perform remote code execution (RCE).
+This Boefje tries to inject very low impact payload to check whether your application is exposed.
+
+==== Input OOIs
+
+Log4shell scan expects a URL object as input.
+
+==== Output OOIs
+
+Log4shell outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+| Finding
+| Finding if RCE is possible
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_manyportsopen[Manyportsopen]
+
+Check if there are many ports open that were not before
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_nmap[NMAP]
+
+Nmap is a network scanning tool that uses IP packets to identify all the devices connected to a network and to provide
+information on the services and operating systems they are running. In KAT, a Python wrapper around Nmap is used to find
+open ports with their services of an IpAddress. 
+
+==== Options
+
+This Nmap has the following hardcoded options:
+
+For TCP ports:
+
+``"-T4", "-Pn", "-r", "-v10", "-sV", "-sS", "-p-"``
+
+For UDP ports:
+
+``"-T4", "-Pn", "-r", "-v10", "-sV", "-sU"``
+
+==== Input OOIs
+
+Nmap expects an IpAddress as input which can be of type IpAddressV4 or IpAddressV6.
+
+==== Output OOIs
+
+Nmap outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+|IpPort
+|Open ports of IpAddress
+
+|Service
+|Services that are found
+
+|IpService
+|IpService that couples a service to an open port
+
+|Finding
+|Finding if ports are open that should not be open (TEMP!)
+
+|KatFindingType
+|FindingType if ports are open that should not be open (TEMP!)
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_shodan[Shodan]
+
+
+Shodan is a search engine that lets users search for various types of servers (webcams, routers, servers, etc.) connected to the internet using a variety of filters. Shodan collects data mostly on web servers (HTTP or HTTPS – ports 80, 8080, 443, 8443), as well as FTP (port 21), SSH (port 22), Telnet (port 23), SNMP (port 161), IMAP (ports 143, or (
+encrypted) 993), SMTP (port 25), SIP (port 5060), and Real Time Streaming Protocol (RTSP, port 554). The latter can be used to access webcams and their video stream. KAT currently uses Shodan to scan an IpAddress for open ports with software with known vulnerabilities.
+
+==== Input OOIs
+
+Shodan expects an IpAddress as input.
+
+==== Output OOIs
+
+Shodan currently outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+| IpPort
+| Open IpPort found on input OOI
+
+| CveFindingType
+| Known vulnerability of software behind IpPort
+
+| Finding
+| Finding
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_snyk[Snyk]
+
+According to the website snyk.io: Find and automatically fix vulnerabilities in your code, open source dependencies, containers, and infrastructure as code — all powered by Snyk’s industry-leading security intelligence.
+
+This boefje uses the vulnerability database to search for vulnerabilities, based on a Software version.
+
+==== Input OOIs
+
+Snyk expects an Software as input.
+
+==== Output OOIs
+
+Snyk currently outputs the following OOIs:
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+| KATFinding
+| Known vulnerabilty of software
+
+|===
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_spf[SPF (under construction)]
+
+Fetch the DNS record(s) of a host
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_ssl_certificates[SSL Certificates]
+
+Scan SSL certificates of websites
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_ssl_scan[SSL Scan]
+
+Scan SSL/TLS versions of websites
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_webpage_analysis[Webpage analysis]
+
+Downloads a resource and uses several different normalizers to analyze. 
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_website_similarity[Website Similarity]
+
+Check if the websites hosted on IPv4 and IPv6 are the same
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_website_software[Website Software]
+
+Scan for software on websites using Wappalyzer
+
+'''
+
+=== link:https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes/kat_wpscan[WP Scan]
+
+The WPScan is a black box WordPress security scanner written for security professionals and blog maintainers to test the security of their WordPress sites. The WPScan tool uses a database of 23,679 WordPress vulnerabilities. WPScan requires an API key when performing less than 25 scans per day.
+
+==== Input OOIs
+
+Shodan expects a Url object of a WordPress website as input. Performing the WPScan on a non-WordPress website yields no results.
+
+==== Output OOIs
+
+WPScan outputs the following OOIs:
+
+
+[cols="1,1", options="header"]
+|===
+
+| OOI type
+| Description
+
+|CveFindingType
+|Known vulnerability of WordPress or WordPress plugins on the input Url
+
+|Finding
+|Finding
+
+|===
+
+

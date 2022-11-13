@@ -1,0 +1,461 @@
+= Functionele documentatie
+
+Deze documentatie hangt samen met link:general_nl.adoc[de algemene informatiebrochure over OpenKAT]. Na een algemene uitleg en toelichting op de belangrijkste concepten worden de modules toegelicht. 
+
+== OpenKAT: algemene toelichting
+
+OpenKAT heeft als doel het monitoren, registreren en analyseren van de status van informatiesystemen. OpenKAT scant netwerken, analyseert kwetsbaarheden en maakt toegankelijke rapporteren. Het integreert de meest gebruikte netwerktools en scansoftware in een modulair framework, heeft toegang tot externe databases zoals shodan en combineert de informatie uit al deze bronnen in overzichtelijke rapportages. 
+
+Wat OpenKAT toevoegt aan de beschikbare security en monitoringstools is het vermogen om de output van verschillende bronnen te combineren ten behoeve van de analyse. Dankzij het objectgeoriënteerde datamodel en de forensisch geborgde database bevat OpenKAT een compleet overzicht en een tijdlijn van de bewaakte systemen. Hiermee is de ontwikkeling door de tijd inzichtelijk te maken voor analyse en bewijsbaar voor audits en controles. 
+
+OpenKAT is de publiek beschikbare versie van KAT, de Kwetsbaarheden Analyse Tool van het Ministerie van Volksgezondheid, Welzijn en Sport (VWS). KAT ontstond toen tijdens de coronapandemie een groot aantal systemen moest worden beveiligd. De kern van dit systeem wordt nu als OpenKAT publiek beschikbaar gemaakt, zodat het door iedereen kan worden gebruikt.
+
+OpenKAT is een framework waarmee je informatie kunt verzamelen, opslaan en over tijd kunt analyseren. OpenKAT is objectgeoriënteerd en maakt gebruik van een configureer­baar datamodel. Alle informatie wordt vertaald in objecten, die worden opgeslagen in de database. Hierin zijn zowel de originele informatie als de objecten opgenomen. De analyse wordt gedaan op de database op basis van business rules, waarbij veranderingen worden opgemerkt. OpenKAT levert bevindingen in een dashboard of via rapportagesoftware.
+
+De basisinstallatie van OpenKAT bevat een datamodel geba­seerd op netwerken en informatiesystemen, voortvloeiend uit de toepassing tijdens de vaccinatiecampagne. Het systeem beschikt over scan software om netwerken in kaart te brengen, te analyseren en erover te rapporteren. Hiervoor is het direct bruikbaar. De kracht van OpenKAT is dat het modulair en eenvoudig uit te breiden is. Dit kan op basis van het bestaande datamodel, aangevuld met bijvoorbeeld specifieke toepassingen zoals IoT of M2M communicatie. Het kan ook worden uitgebreid naar andere domeinen, bijvoorbeeld op het gebied van complian­ce, zolang er maar sprake is van een logische samenhang van informatie.
+
+Het huidige systeem is bedoeld om een bijdrage te leveren aan informatiebeveiliging en gebaseerd op de gedachte dat dit allereerst neerkomt op zorgen dat de basis geregeld is. Het gaat om weten wat je hebt en om het controleren van de belangrijkste aspecten van de configuratie, toegankelijkheid en aanwezigheid van kwetsbaarheden. Daarnaast is het uitgangspunt dat veranderingen opgemerkt moeten worden: een verandering is immers een bijzonderheid, die een veiligheidsrisico kan signaleren. De temporal database die OpenKAT gebruikt maakt het ook mogelijk om terug te kijken, dus 'vanaf wanneer tot wanneer' een bepaalde situatie zich heeft voorgedaan. 
+
+OpenKAT wordt onder de EU Public Licence beschikbaar gesteld als open source software. Dit houdt in dat de software vrij beschikbaar is, aangepast mag worden en verder kan worden verspreid binnen de voorwaarden van de licentie. Hierdoor kunnen toevoegingen eenvoudig publiek gemaakt worden en zijn ze bruikbaar voor de hele community van OpenKAT gebruikers.
+
+image::https://user-images.githubusercontent.com/76487016/172068834-c18ced23-0fb5-4c34-907e-0b8d5973675f.png[FLOW OpenKAT]
+
+== Basisconcepten
+
+Centraal in OpenKAT zijn de objecten en het datamodel. Objecten ontstaan door het verzamelen en analyseren van informatie. De gevonden objecten worden aan de hand van business rules geanalyseerd, wat tot bevindingen leidt die als objecten in het datamodel worden opgenomen. Het datamodel helpt bij het speuren naar meer informatie, door de logische samenhang van objecten. Aan de hand van nieuwe objecten wordt weer naar informatie gezocht, waarmee de cirkel rond is.
+
+=== Objecten, het datamodel en recursiviteit
+
+De informatie die OpenKAT verzamelt wordt opgeslagen als objecten. Deze objecten zijn onderdeel van een datamodel. Het datamodel is de logische samenhang van alle objecten en biedt de basis voor analyse en rapportages. Bij OpenKAT zit een datamodel geschikt voor informatiebeveiliging, maar het kan worden uitgebreid of aangepast voor andere toepas­singen. Een object is bijvoorbeeld ‘een IP adres’ of ‘een hostname’. Als er een hostname is, verwacht OpenKAT op basis van het datamodel ook een IP-adres en mogelijke open poorten. Afhankelijk van de vrijwaring die gegeven is wordt hier vervolgens op gescand, wat weer meer informatie oplevert, die weer aanleiding kan zijn voor nieuwe scans. Dit proces gaat door tot OpenKAT het gehele datamodel voor deze hostname heeft afge­zocht. Hoe ver OpenKAT gaat met zoeken hangt af van de vrijwaringen.
+
+image::https://user-images.githubusercontent.com/76487016/172068892-d8bb4552-5d4e-42d5-bd94-d1fb1b6d18b7.png[Aansturing OpenKAT]
+
+=== Vrijwaringen
+
+OpenKAT werkt met een systeem van vrijwarin­gen voor het scannen, gekoppeld aan ‘intrusion levels’. Hiermee wordt voor een context (b.v. een organisatie) een vrijwaring en de intensiteit van de scan bepaald. Per boefje wordt het level aangegeven, om zo te voorkomen dat onver­hoopt een productiesysteem in de problemen komt. Hier zit een balans in: als OpenKAT een risico vormt dan geldt dat voor alle actoren die toegang hebben tot dit betreffende systeem en is dat al een bevinding waard.
+
+Intrusion levels of vrijwaringen:
+* L1 is ‘niet aanraken’
+* L2 is ‘aanraken op het niveau normale gebruiker’
+* L3 is ‘detecteerbaar scannen’
+* L4 is ‘intensief scannen’
+
+=== Gebruikers en organisaties
+
+Het scannen en rapporteren zijn in OpenKAT verschillende systemen met aparte gebruikers. Er is een red team user, die het systeem een bepaalde opdracht en vrijwaring geeft (‘scan dit netwerk, met dit intrusion level’). Op basis hiervan verzamelt OpenKAT informatie en worden objecten aangemaakt en opgeslagen in de database.
+
+De rapportages worden gemaakt door een aparte rapportage-user met leesrechten op de database met objecten. Deze user heeft toe­gang tot de objecten, kan door de tijd kijken naar de scans die gedaan zijn en ziet welke bevindingen het systeem heeft aangemaakt.
+
+=== Database
+Indien OpenKAT gebruikt wordt voor verschil­lende organisaties krijgt elke organisatie een eigen database. Zo is er tussen de organisaties een volledige scheiding mogelijk. OpenKAT kan wel over meerdere databases zoeken, om bijvoorbeeld een compleet beeld te krijgen van het gebruik van bepaalde software of bij specifieke kwetsbaarheden.
+
+== Systeemopbouw
+
+Het systeem kent vier delen: informatieverzameling, opslag, analyse en rapportage.
+
+image::https://user-images.githubusercontent.com/76487016/172068915-d48ba828-2775-42f3-8e39-8788f4873c9a.png[Modules OpenKAT]
+
+=== Verzamelen: Boefjes en Whiskers 
+
+Boefjes verzamelen de informatie voor OpenKAT. Het zijn scripts die een tool kunnen aanroepen of zelf informatie verzamelen. Ze geven het resul­taat aan Whiskers, de normalizer die er objecten uit probeert te filteren. Deze objecten passen in het datamodel dat wordt gebruikt. Boefjes leven in de KAT-alogus en worden afhankelijk van de situatie ingezet. De scheduler zet boefjes in afhankelijk van de vraag, de beschikbare vrijwa­ring (het ‘intrusion level’) en de gevonden infor­matie. Zo leidt een scan tot nieuwe gegevens, die op basis van de business rules bevindingen opleveren. Dat kan weer tot nieuwe inzet van boefjes leiden, die aanvullende delen van een systeem scannen.
+
+=== Opslag: Bytes en Octopoes
+
+De objecten worden opgeslagen in Octopoes, de database met objecten die voor analyse toegankelijk is. Hier zijn objecten in logisch verband en in de tijd te bekijken. Alle originele informatie wordt samen met metadata apart opgeslagen in Bytes. Dit kan gebruikt worden om de totstandkoming van objecten en bevin­dingen te controleren.
+
+Het datamodel is onderdeel van Octopoes en wordt ook wel aangeduid als de ‘knowledge graph’ of het geweten van OpenKAT. In de standaard installatie is een datamodel opgeno­men dat geschikt is voor informatiebeveiliging. Dit kan worden aangevuld of aangepast aan de specifieke situatie waarin OpenKAT wordt gebruikt. In de ontwikkelfase zijn al partijen betrokken die OpenKAT willen benutten voor het controleren van bepaalde administratieve aspecten van certificering, wat goed aansluit op de huidige toepassing.
+
+Bytes slaat alle originele informatie op inclusief de volledige metadata in ondertekende records. De observatie door OpenKAT en het proces dat leidde tot een object en eventuele conclusies is hiermee reproduceerbaar en herleidbaar, wat ook forensische borging genoemd wordt. In de metadata zit bijvoorbeeld ook de softwareversie van OpenKAT, van het boefje en van de eventuele externe scantools, zodat te traceren is waarom bepaalde waarnemingen wel of niet gedaan zijn.
+
+=== Analyse: Bits
+
+De objecten in de database kunnen worden geanalyseerd aan de hand van business rules, die zijn opgenomen in Bits. Zo is een lijst met open poorten die bij een IP adres hoort in de ene situatie prima, maar leidt het in een andere situatie tot een bevinding. Een bevinding bij een bepaald object wordt ook als object in Octopoes opgeslagen, en kan leiden tot meer scans of andere acties. Bits zijn net als Boefjes en Whiskers modulair, aanpasbaar en eenvoudig toe te voegen. Een Bit kan leiden tot nieuwe bevindingen en kan meer Boefjes op pad sturen. Dat wil zeggen dat een bevinding op basis van een business rule kan leiden tot aanvullende scans of acties vanuit OpenKAT.
+
+=== Rapportages
+
+Rapportages kunnen op een paar manieren worden gemaakt. In de standaard installatie van OpenKAT zitten een aantal opties om rapportages te maken:
+
+* Bevindingenrapport met alle bevindingen op basis van de business rules zoals:
+** configuraties
+** oude software
+** ports
+** ontbrekende headers
+** SSL problemen en certificaten
+** SPF en mail configuratie
+* Specifieke rapportages:
+** DNS rapportage
+** Internet.nl (gedeeltelijk)
+** SSL report met certificaten
+* GraphQL
+** Eenvoudige ingang voor zoekopdrachten
+
+== Drie concepten: het datamodel, objecten en vrijwaringen
+
+=== Datamodel: uitwerking
+
+Het datamodel of de knowledge graph beschrijft objecten en hun onderlinge relaties. Het maken van een model is een abstractie van de werkelijkheid. Het model dat bij OpenKAT wordt geleverd is beperkt tot het digitale domein en dan specifiek tot informatiesystemen. Aan de hand hiervan leggen we de werking van OpenKAT uit. Een datamodel kan worden uitgebreid of aangepast, OpenKAT is zo opgebouwd dat het niet uitmaakt welke informatie je verzamelt, als het maar digitaal beschikbaar is. 
+
+In het datamodel zijn objecten omschreven, met de relevante connecties naar andere objecten. Zo kun je uit een hostname een IP adres afleiden, DNS servers etc. Als je een object aantreft verwacht OpenKAT ook alle logisch samenhangende objecten aan te treffen en worden daar boefjes op ingezet. Dus uit een hostname volgt een IP adres, wordt naar DNS servers gezocht en gekeken of er eventueel open poorten zijn. Dit wordt beperkt door de scope van de vrijwaring, die apart wordt toegelicht. 
+
+De omschrijving van een object bevat de primary key, die de objectnaam en de informatie bevat. Het doel is ongeacht de bron steeds hetzelfde object te kunnen maken, zodat je via verschillende routes hetzelfde object kunt maken. Of je een open poort nu via shodan of nmap tegenkomt - de route is compleet anders maar de beschrijving ervan is hetzelfde. 
+
+Een omschrijving van een object in het datamodel, in dit geval een IPPort, ziet er als volgt uit: 
+
+....
+class IPPort(OOI):
+    object_type: Literal["IPPort"] = "IPPort"
+
+    address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
+    protocol: Protocol
+    port: conint(gt=0, lt=2 ** 16)
+    state: Optional[PortState]
+
+    _natural_key_attrs = ["address", "protocol", "port"]
+    _reverse_relation_names = {"address": "ports"}
+    _information_value = ["protocol", "port"]
+....
+
+Hier is gedefinieerd dat bij een IPPort een IPadress hoort, een Protocol en een PortState. Ook is er aangegeven hoe de scan levels door dit object voortvloeien en zijn de attributen die de primary/natural key opmaken aangegeven: "_natural_key_attrs = ["address", "protocol", "port"]". Over scan levels / vrijwaringen volgt verderop in dit document meer uitleg. 
+
+De PortState die wordt aangeroepen is apart gedefinieerd. Dit kan bij informatie die een heel specifiek karakter heeft zodat je dit kunt omschrijven. 
+
+....
+class PortState(Enum):
+    OPEN = "open"
+    CLOSED = "closed"
+    FILTERED = "filtered"
+    UNFILTERED = "unfiltered"
+    OPEN_FILTERED = "open|filtered"
+    CLOSED_FILTERED = "closed|filtered"
+....
+
+Het complete model dat bij OpenKAT beschikbaar is kan bekeken worden via de model explorer: https://mispo.es/model-explorer/model-explorer.html. Een grotere versie van een knowledge graph is te vinden op https://system.com/graph, waar een poging gedaan wordt om de volledige wereld te modelleren. Voor toepassing binnen OpenKAT is dit een interessant perspectief, maar vooralsnog te complex.
+
+=== Objecten: uitwerking
+
+Ruwe data uit de boefjes wordt opgeslagen in Bytes, en nieuwe data leidt tot de toepassing van whiskers, de normalizers. Deze analyseren de ruwe data en halen de relevante objecten eruit. Een IPPort kan worden gevonden via de boefjes die de tools nmap of shodan inzetten en wordt op basis van de output van de normalizers opgenomen in Octopoes, de database met objecten.  
+
+Een object bestaat in een context en leidt op basis van het datamodel en de relevante bits, de business rules die voor de analyse worden ingezet, tot nieuwe objecten. Zo wordt een nieuw object in Octopoes geanalyseerd door de bits. Een IPPort met PortState open is in sommige gevallen iets positiefs (de website is bereikbaar), in andere gevallen is het negatief. Afhankelijk van de business rules leidt een open poort tot een bevinding, die ook weer als object in Octopoes wordt opgenomen. 
+
+Het voorbeeld van een IPPort object in Octopoes laat dit zien. Hier zijn het objecttype, de state, primary key en de relevante verwante objecten opgenomen, het object heeft zo de eigen context. Dit leidt wel tot de situatie dat wanneer het model wordt aangepast, het nodig kan zijn om de objecten opnieuw aan te maken op basis van de beschikbare informatie in Bytes.  
+
+....
+{
+:IPPort/port 443
+:object_type "IPPort"
+:IPPort/state "open"
+:IPPort/primary_key "IPPort|internet|192.168.1.1|tcp|443"
+:IPPort/address "IPAddressV4|internet|192.168.1.1"
+:IPPort/protocol "tcp"
+:xt/id "IPPort|internet|192.168.1.1|tcp|443"
+}
+....
+
+Een nieuw object leidt via afleiding op basis van het datamodel tot andere objecten en via de bits tot bevindingen. Omdat objecten worden gemaakt op basis van de ruwe data is het mogelijk om deze data bij de introductie van nieuwe boefjes nogmaals te analyseren. Dan ontstaat de situatie dat er meer informatie uit de ruwe data gehaald kan worden dan tot dan toe het geval is. 
+
+Objecten hebben twee tijdlijnen: de eerste is gerelateerd aan de tijd van de observatie, dwz de ruwe data die in Bytes zit. De tweede tijdlijn is het moment waarop het object ontstaat en Octopoes weet dat dit bestaat. Op dit moment ontstaan de bevindingen, en 'weet' degene die OpenKAT bedient dat de situatie zich heeft voorgedaan. Dit maakt het mogelijk om het feit zelf en het moment dat dit in de analyse duidelijk is te scheiden. Het is ook mogelijk om terug in de tijd te gaan: van wanneer tot wanneer bijvoorbeeld een bepaalde IPPort open stond is terug te halen. 
+
+=== Vrijwaringen 
+
+De vrijwaring geeft de scope van het onderzoek dat OpenKAT kan doen. Bij het starten van OpenKAT geef je een object een bepaalde vrijwaring mee voor het uitvoeren van scans. De vrijwaring heeft vier levels, van 1 tot en met 4 toenemend in intensiteit. Het niveau bepaalt de inzet van boefjes, niet alleen voor het object zelf maar ook voor alle afgeleide objecten die ontstaan vanuit het eerste object. 
+
+De directe vrijwaringen komen van een gebruiker die het scan profiel van een object aangeeft. De tweede soort vrijwaringen zijn afgeleid hiervan. In het geval van een IPPort is de vrijwaring gebaseerd op die van de hostname of het IP adres. De vrijwaring wordt overgenomen voor alle elementen dieper in het systeem en gereduceerd voor alle onderdelen waarvan niet vanzelfsprekend is dat deze tot het systeem behoren. Zo wordt voorkomen dat bijvoorbeeld DNS servers waarvoor geen toestemming is ook worden gescand. 
+
+Intrusion levels of vrijwaringen worden in het systeem Scan Profile genoemd. Het niveau bepaalt de mate van indringendheid van een boefje. NMAP is bijvoorbeeld in verschillende boefjes opgenomen, steeds met een andere configuratie die is aangepast aan het vrijwaringsniveau.
+
+* L1 is ‘niet aanraken’
+* L2 is ‘aanraken op het niveau normale gebruiker’
+* L3 is ‘detecteerbaar scannen’
+* L4 is ‘intensief scannen’
+
+Het L1 is voor het bepalen van restrisicos in een netwerk. Er zijn bijvoorbeeld geen rechten om specifieke systemen te scannen, dus er moet op basis van afgeleide informatie worden gewerkt. Shodan is zo'n bron, die gebruikt kan worden als NMAP voor een bepaalde host niet toegestaan is vanuit de omgeving waar OpenKAT draait. De overige levels worden per boefje bepaald: het is een vrij kwalitatieve beoordeling op basis van de impact die een scan heeft op het productieproces. 
+
+Een aanvullende toelichting is hier opgenomen: link:scanlevels[Toelichting scanlevels]
+
+Denkbaar maar nog niet geïmplementeerd is een soort federated OpenKAT installatie waarbij organisaties voor die delen van het netwerk die met elkaar in contact komen en waar binnen de organisatie vrijwaringen voor bestaan de informatie op het niveau van Bytes uitwisselen. Indien er gebruik gemaakt wordt van hetzelfde datamodel is zo informatie uit te wisselen zonder dat OpenKAT op netwerkgedeeltes komt waar dat niet wenselijk is. 
+
+== Modules
+
+De functionaliteit van OpenKAT is te verdelen in vier categorieen: verzamelen, opslaan, analyseren en rapporteren. De onderdelen van OpenKAT worden aan de hand van deze indeling toegelicht. De aansturing van OpenKAT wordt gedaan door de scheduler, die met de verschillende onderdelen communiceert. 
+
+=== Verzamelen: Boefjes en Whiskers
+
+Boefjes verzamelen de informatie voor OpenKAT. Het zijn scripts die een tool kunnen aanroepen of zelf informatie verzamelen. Ze geven het resul­taat aan Whiskers, de normalizer die er objecten uit probeert te filteren. Deze objecten passen in het datamodel dat wordt gebruikt. Boefjes leven in de KAT-alogus en worden afhankelijk van de situatie ingezet. De KAT-alogus is nog niet dynamisch, op dit moment is het een overzicht van boefjes in de betreffende repo die wordt meegenomen bij de start van de Katalogus-API. 
+
+De repo met het volledige overzicht van alle boefjes: https://github.com/minvws/nl-kat-boefjes
+
+De scheduler 'Mula' zet boefjes in afhankelijk van de vraag, de beschikbare vrijwa­ring (het ‘intrusion level’) en de gevonden infor­matie. Zo leidt een scan tot nieuwe gegevens, die op basis van de business rules bevindingen opleveren. Dat kan weer tot nieuwe inzet van boefjes leiden, die aanvullende delen van een systeem scannen.
+
+==== Voorbeeld: het boefje voor shodan
+
+Een boefje is opgebouwd uit een basisset aan bestanden en code. Het boefje dat shodan aanroept kan als voorbeeld dienen en omvat de volgende bestanden. 
+
+* __init.py__, dat leeg blijft, 
+* boefje.py, met de normalizers en de objecten in het datamodel,
+* cover.png, met een bijpassende kattenfoto ten behoeve van de KAT-alogus
+* description.md, eenvoudige documentatie van het boefje
+* main.py, het eigenlijke boefje
+* normalize.py, de normalizer (whiskers)
+* requirements.txt, met de benodigdheden voor dit boefje
+
+===== boefje.py 
+
+boefje.py is de definitie van het boefje, met de positie in het datamodel, de bijbehorende normzalizer, de objecten en de bevindingen die de combinatie van boefje en normalizer kan aanleveren. 
+
+De objecten die bij dit boefje horen zijn IPAddressV4, IPAddressV6, Finding, CVEFindingType. Dit boefje consumeert IP-adressen en produceert findings over de open poorten, aangevuld met de informatie over deze poorten.
+
+....
+from Octopoes.models.types import IPAddressV4, IPAddressV6, IPPort, Finding, CVEFindingType
+
+from boefjes.models import Boefje, Normalizer
+
+Shodan = Boefje(
+    id="shodan",
+    name="Shodan",
+    description=(
+        "Use Shodan to find open ports with vulnerabilities that are found on that port"
+    ),
+    consumes={"IPAddressV4", "IPAddressV6"},
+    produces={"IPPort", "Finding", "CVEFindingType"},
+)
+
+
+BOEFJES = [Shodan]
+NORMALIZERS = [
+    Normalizer(
+        name="kat_shodan_normalize",
+        module="kat_shodan.normalize",
+        consumes=[Shodan.id],
+        produces=Shodan.produces,
+    )
+]
+....
+
+
+==== main.py 
+
+Het boefje zelf pakt de shodan api, geeft daar een IP adres aan en accepteert de output. Deze output gaat naar Bytes en wordt door de normalizer geanalyseerd. 
+
+....
+import json
+from typing import Tuple, Union
+
+import shodan
+
+from config import settings
+from job import BoefjeMeta
+
+
+def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+
+    api = shodan.Shodan(settings.shodan_api)
+    input_ = boefje_meta.arguments["input"]
+    ip = input_["address"]
+    results = api.host(ip)
+
+    return boefje_meta, json.dumps(results)
+....
+
+===== normalizer.py
+
+De normalizer importeert de informatie uit Bytes. Hier worden de objecten IPPort, Protocol en PortState toegevoegd. Deze objecten gaan samen met de Findings en CVEFindingType naar Octopoes. Shodan levert zelf findings mee dus die kunnen direct als objecten worden meegegeven aan Octopoes. 
+
+....
+import json
+from typing import Iterator, Union
+
+from Octopoes.models import OOI, Reference
+from Octopoes.models.ooi.findings import CVEFindingType, Finding
+from Octopoes.models.ooi.network import IPPort, Protocol, PortState
+
+from job import NormalizerMeta
+
+
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+    results = json.loads(raw)
+    ooi = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+
+    for scan in results["data"]:
+        port_nr = scan["port"]
+        transport = scan["transport"]
+
+        ip_port = IPPort(
+            address=ooi,
+            protocol=Protocol(transport),
+            port=int(port_nr),
+            state=PortState("open"),
+        )
+        yield ip_port
+
+        if "vulns" in scan:
+            for cve, _ in scan["vulns"].items():
+                ft = CVEFindingType(id=cve)
+                f = Finding(finding_type=ft.reference, ooi=ip_port.reference)
+                yield ft
+                yield f
+....
+
+==== Schedulers: de motor achter OpenKAT
+
+Het verzamelen van informatie in OpenKAT wordt aangestuurd door Mula, de scheduler. Er zijn twee schedulers in actie, een die bepaalt wanneer er boefjes draaien en een die normalizers inzet. Hierbij zijn een aantal cycli van toepassing: 
+
+* Inzet boefjes op basis van nieuwe objecten in Octopoes, leidt tot input voor Bytes
+* Inzet normalizers op basis van nieuwe informatie in Bytes, leidt tot objecten
+* Bits (business rules) werken als state machine op basis van nieuwe objecten, leidt tot objecten
+* Inzet boefjes op basis van tijd (herhaling van scans)
+
+Hiernaast is het mogelijk om vanuit de user interface direct een boefje af te vuren op een bepaald object. De scheduler geeft hieraan de hoogste prioriteit. De loadbalancing die de scheduler doet voorkomt dat er een enorme vloedgolf van scans over een systeem heen rolt als OpenKAT eenmaal een vrijwaring heeft. Prioriteit krijgt de handmatige invoer, daarna de boefjes op basis van nieuwe objecten en daarna de boefjes die worden ingezet om eerder gedane scans te herhalen. 
+
+Als er een hostname wordt ingevoerd in OpenKAT leidt dat via de inzet van een boefje en een DNS record tot een IP adress in Octopoes, waarop de scheduler voor de boefjes zoekt naar een passend boefje, gekoppeld aan de beschikbare vrijwaring. De inzet van het boefje voor shodan uit het voorbeeld leidt weer tot een overzicht met IPPorts, met de specifieke PortState en eventuele bevindingen. Op basis hiervan kunnen boefjes worden ingezet die nagaan welke services er draaien, welke softwareversie etc. 
+
+Nog niet geïmplementeerd maar wel interessant is het scannen op basis van bevindingen, waarbij objecten die regelmatig tot nieuwe bevindingen leiden vaker worden gescand. Deze functionaliteit wordt relevanter als je grotere systemen gaat scannen en kan als een vorm van loadbalancing of 'mixed scanning' gebruikt worden. Hierbij wordt een algemeen overzicht van het systeem gemaakt, waarna specifieke scans worden ingezet. 
+
+De scheduler die de normalizer aanstuurt reageert op nieuwe bestanden in Bytes. Op basis hiervan worden normalizers ingezet die aansluiten bij het mime-type dat ze kunnen verwerken. Op dit moment zijn de normalizers in het boefje gedefinieerd, het is echter de bedoeling dit volledig los te koppelen. Afhankelijk van de output van de normalizer gaat de informatie naar Octopoes of wordt deze door andere normalizers verder bewerkt. Zo is de normalizer die een .zip bestand uitpakt een tussenstap op weg naar de inzet van andere normalizers, die uit de individuele bestanden weer objecten kunnen halen. 
+
+De repo met Mula: https://github.com/minvws/nl-kat-mula
+
+=== Opslag
+
+OpenKAT kent twee databases voor gegevensopslag: Bytes voor de ruwe data en Octopoes voor de objecten. De data die de boefjes aanleveren wordt in Bytes opgeslagen en voorzien van een hash met een timestamp van een externe signing service. Octopoes is een XTDB, een objectgeorienteerd databaseformaat dat aansluit op de object- en modelmatige werkwijze in OpenKAT. 
+
+==== Bytes: opslag ruw data
+
+Alle ruwe data uit OpenKAT wordt via een API opgeslagen in Bytes, gelabeld met een mime-type en gesigned. De signing levert een forensische borging op die de data in OpenKAT meerwaarde geeft als bewijsmateriaal.
+
+Op basis van de data en de metadata wordt een hash gemaakt, die bij een externe service van een timestamp wordt voorzien. Er wordt op dit moment gewerkt aan een onafhankelijke signing service voor de overheid, maar het is ook mogelijk om andere externe dienstverleners te gebruiken. Dit is een env variable van Bytes en kan per install gewijzigd worden. Zolang de partij die OpenKAT draait geen invloed heeft op de server die de timestamp geeft is er genoeg basis voor de borging. 
+
+De labelling van alle ruwe data aan de hand van mime-types maakt het herkenbaar voor de scheduler, die hiermee normalizers kan inzetten. De mime-types en normalizers zijn nu gekoppeld aan een boefje, zodat de herkenbaarheid eenvoudig is. Het is niet geïmplementeerd, maar het idee is om dit volledig te scheiden en zo nog meer flexibiliteit in de datastroom te brengen. De verbinding tussen normalizer en boefje is nu hardcoded in het boefje, maar kan dan volledig via het mime-type verlopen. 
+
+De repo met Bytes: https://github.com/minvws/nl-kat-bytes
+
+==== Octopoes 
+
+Octopoes is een XTDB, een objectgeorienteerd databaseformaat dat aansluit op de object- en modelmatige werkwijze in OpenKAT. Het is de combinatie van het datamodel met alle objecten zoals hierboven beschreven. De Octopoes API zorgt voor alle communicatie met de database. 
+
+Elk object in Octopoes heeft zijn basis in observaties die zijn opgeslagen in Bytes of is hiervan afgeleid op basis van business rules. Waar Bytes de eigenlijke informatie bevat is Octopoes een overzicht van objecten die hieruit zijn geselecteerd, en beperkt tot objecten die in het datamodel passen. Elk object in de database heeft een levensduur en een tijdstip van ontstaan, het is een 'bitemporal' database. Daarnaast is er informatie over de observatie die aan het object ten grondslag ligt. Via de API van Octopoes of via de front end is het mogelijk om bij een object alle bewijsstukken op te vragen. 
+
+Als het datamodel wordt aangepast is het mogelijk om Bytes opnieuw te raadplegen en de objecten aan te vullen. Zo is het ook mogelijk om nieuwe analyses te doen op oudere data, als bijvoorbeeld een nieuwe kwetsbaarheid aan het licht komt. 
+
+De repo met Octopoes: https://github.com/minvws/nl-kat-Octopoes
+
+De werking van Octopoes en de Octopoes API wordt hier nader toegelicht: 
+https://github.com/minvws/nl-kat-Octopoes/blob/main/README.md
+
+Meer informatie over de XTDB: 
+https://docs.xtdb.com/concepts/what-is-xtdb/
+
+Achtergrond over de knowledge graph:
+https://en.wikipedia.org/wiki/Key%E2%80%93value_database
+https://en.wikipedia.org/wiki/Graph_database
+https://system.com/graph
+
+== Analyse 
+
+OpenKAT kent voor de analyse van de verzamelde objecten een modulaire opbouw met business rules. Deze zijn opgenomen in bits, die zelf beschrijven welke input ze nodig hebben. Zijn er nieuwe objecten die aan deze input voldoen dan worden de betreffende bits toegepast. Bits kunnen ook gebruik maken van een externe knowledge base, bijvoorbeeld een lijst met CVE's. Als deze lijst wijzigt worden de bits opnieuw toegepast. 
+
+Bits draaien als state machine direct na het ontstaan van nieuwe objecten. Ze worden nu geladen bij het opstarten van de Octopoes API. Deze kijkt naar de objecten en matcht ze met de bits. Een nieuw object leidt tot een check op de lijst met bits. Nog niet geïmplementeerd is een model waarin ook het toevoegen van bits dynamisch is, dus waarin tijdens het functioneren van OpenKAT bits kunnen worden toegevoegd. 
+
+Voor de ontwikkeling van een bit is kennis van het datamodel en de werkelijkheid achter het model nodig. Bij het analyseren van complexe vraagstukken geldt net als bij de toepassing van boefjes en normalizers het belang van het opknippen van het vraagstuk in kleinere stapjes, zodanig dat elk bitje een stukje analyseert. 
+
+De structuur en opbouw van een bit wordt duidelijk aan de hand van een voorbeeld, in dit geval de bit voor het object IPPort, aansluitend bij de eerdere voorbeelden. De bit die voor de analyse van openstaande poorten gebruikt wordt bestaat uit drie bestanden: 
+
+* __init.py__, een leeg bestand
+* bit.py, dat de structuur definieert
+* port_classification.py, dat de business rules bevat
+
+Bit.py geeft de structuur van de bit, met de input en de business rules waartegen wordt getoetst. Een voorbeeld is hieronder opgenomen. De bit accepteert input die hoort bij de objecten IPPort en IPAddress. Vervolgens wordt de module port_classification aangeroepen, waar de business rules in staan.
+
+....
+from bits.definitions import BitParameterDefinition, BitDefinition
+from Octopoes.models.ooi.network import IPPort, IPAddress
+
+BIT = BitDefinition(
+    id="port-classification",
+    consumes=IPPort,
+    parameters=[],
+    module="bits.port_classification.port_classification",
+)
+....
+
+De business rules zijn opgenomen in de module port_classification, in het bestand port_classification.py. Deze bit pakt het object IPPort en levert de objecten KATFindingType en Finding. De business rules onderscheiden in dit geval drie typen poorten: de COMMON_TCP_PORTS die open mogen staan, SA_PORTS die voor beheersdoeleinden zijn en dicht horen te staan en DB_PORTS die op de aanwezigheid van bepaalde databases wijzen en dicht horen te staan. 
+
+De specificatie voor een bit is ruim, maar beperkt door het datamodel. Boefjes halen extern informatie op, bits kijken alleen naar de objecten in Octopoes. Aan de hand van de analyse van de informatie kunnen vervolgens nieuwe objecten worden aangemaakt, zoals de KATFindingTypes die weer corresponderen met een reeks aan specifieke meldingen in OpenKAT. De lijst hiervoor is te vinden op YXZ LIJST TOEVOEGEN. 
+
+....
+from typing import List, Iterator
+
+from Octopoes.models import OOI
+from Octopoes.models.ooi.findings import KATFindingType, Finding
+from Octopoes.models.ooi.network import IPPort
+
+COMMON_TCP_PORTS = [25, 53, 110, 143, 993, 995, 80, 443]
+SA_PORTS = [21, 22, 23, 3389, 5900]
+DB_PORTS = [1433, 1434, 3050, 3306, 5432]
+
+
+def run(
+    input_ooi: IPPort,
+    additional_oois: List,
+) -> Iterator[OOI]:
+
+    port = input_ooi.port
+    if port in SA_PORTS:
+        open_sa_port = KATFindingType(id="KAT-560")
+        yield open_sa_port
+        yield Finding(
+            finding_type=open_sa_port.reference,
+            ooi=input_ooi.reference,
+            description=f"Port {port} is a system administrator port and should not be open.",
+        )
+
+    if port in DB_PORTS:
+        ft = KATFindingType(id="KAT-561")
+        yield ft
+        yield Finding(
+            finding_type=ft.reference,
+            ooi=input_ooi.reference,
+            description=f"Port {port} is a database port and should not be open.",
+        )
+
+    if port not in COMMON_TCP_PORTS and port not in SA_PORTS and port not in DB_PORTS:
+        kat = KATFindingType(id="KAT-562")
+        yield kat
+        yield Finding(
+            finding_type=kat.reference,
+            ooi=input_ooi.reference,
+            description=f"Port {port} is not a common port and should possibly not be open.",
+        )
+....
+
+Bits kunnen patronen herkennen en daaruit objecten afleiden. De Bit voor internet.nl kan zo uit een serie objecten afleiden of een bepaalde site aan de eisen van internet.nl voldoet of niet. Deze bit haalt uit een reeks items de findings op en trekt op basis daarvan conclusies. De analyse die hieraan ten grondslag ligt wordt opgebouwd uit kleine stappen, die in OpenKAT een aantal keer rondgaan voordat er genoeg informatie beschikbaar is om de juiste conclusies te trekken. 
+
+....
+from bits.definitions import BitParameterDefinition, BitDefinition
+from Octopoes.models.ooi.dns.zone import Hostname
+from Octopoes.models.ooi.findings import Finding
+from Octopoes.models.ooi.web import Website
+
+BIT = BitDefinition(
+    id="internet-nl",
+    consumes=Hostname,
+    parameters=[
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi"),  # findings on hostnames
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.website.hostname"),  # findings on resources
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.resource.website.hostname"),  # findings on headers
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.hostname"),  # findings on websites
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.netloc"),  # findings on weburls
+        BitParameterDefinition(ooi_type=Website, relation_path="hostname"),  # only websites have to comply
+    ],
+    module="bits.internetnl.internetnl",
+)
+....
+
+Een compleet overzicht van beschikbare bits is te vinden in de repo van Octopoes onder bits (directe link naar de develop branch): 
+
+https://github.com/minvws/nl-kat-Octopoes/tree/main/bits
+
+== Rapportage
+
+OpenKAT biedt een front end met rapportagemogelijkheden. De gedane tests en bevindingen kunnen worden weergegeven en er is een eenvoudige download optie voor een PDF met een bevindingenrapport.
+
+

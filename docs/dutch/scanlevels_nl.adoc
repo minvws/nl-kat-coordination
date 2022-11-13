@@ -1,0 +1,90 @@
+= Scan levels en vrijwaringen
+
+OpenKAT kent een systeem van scan levels en vrijwaringen om de toestemming voor het uitvoeren van scans te regelen en te voorkomen dat er schade ontstaat aan de te testen systemen. 
+
+== Scans en risicobeheersing
+
+Bij het scannen van systemen door KAT worden verschillende type scanners gebruikt. Deze zijn qua intensiviteit verschillend van aard: sommige scanners zijn passief en crawlen statisch content van servers, zoals ook een gebruiker dat zou doen. Andere scanners zijn actiever van aard, en proberen door eigen berichten (requests) naar services te achterhalen of een service bv. kwetsbaar is. In de praktijk blijkt dat incidenteel services niet goed om kunnen gaan met deze onverwachte berichten, en daardoor continuïteitsrisico’s kunnen ontstaan. 
+
+
+== Scanlevels
+
+KAT probeert continuïteitsrisico's zoveel mogelijk te beperken, door met scanlevels te werken. Per object is aan te geven hoe diepgravend gescand mag worden. Een toestemming en vrijwaringsverklaring is nodig vanuit de gebruiker, dat wil zeggen een akkoord met de risico’s van de scans en toestemming voor het opslaan van de vergaarde informatie over deze systemen.
+
+Er wordt gewerkt met scanlevels van niveau 1 tot en met niveau 4, van 'niet aanraken' tot 'zeer indringend'. De scanlevels worden in het datamodel verspreid, via overerving of door verklaringen van de gebruiker. 
+
+=== Intrusion levels of vrijwaringen: 
+
+De verschillende niveaus zijn kwalitatief van aard. L1 'niet aanraken' is duidelijk, maar het verschil tussen L2 'normale gebruiker' en L3 'detecteerbaar scannen' is aan de beoordeling van de ontwikkelaar en beheerder. Het gebruik van NMAP bijvoorbeeld, valt hier tussenin en hangt sterk af van de argumenten die de tool meekrijgt. 
+
+[cols="1,1", options="header"]
+|===
+
+|Level
+|Omschrijving
+
+|L1
+|‘niet aanraken’
+ 
+|L2
+|‘aanraken op het niveau normale gebruiker’ 
+
+|L3
+|‘detecteerbaar scannen’
+
+|L4
+|‘intensief scannen’
+
+|===
+
+
+=== Verklaring 
+
+De verklaring van de gebruiker geldt als een vrijwaring voor het scannen van een bepaald object. Hiermee wordt toestemming verkregen voor de scans en het opslaan van de informatie. De verklaring wordt gegeven in de front end van OpenKAT bij de start van een nieuwe scan of specifiek voor bepaalde objecten. 
+
+=== Overerving
+
+Objecten zijn in het datamodel gekoppeld aan andere objecten. Onderliggende objecten krijgen hetzelfde vrijwaringsniveau, bovenliggende objecten een lager niveau. Een hostname heeft bijvoorbeeld een ip adres waarvoor hetzelfde vrijwaringsniveau geldt, maar ook een DNS server die buiten het domein van de organisatie kan liggen en een lager niveau krijgt. 
+
+=== Uitgebreide profielen:
+
+==== L0: Niet scannen
+
+De gebruiker kan expliciet aangeven dat bepaalde systemen niet gescand mogen worden. Bijvoorbeeld omdat hij hier niet de eigenaar van is.
+
+==== L1: Niet aanraken
+
+OpenSource en passieve dataverzameling. Voor dit profiel worden de objecten via diverse vrij via het internet beschikbare data en bronnen bekeken. Dit kunnen bronnen zijn waar geen expliciete toestemming voor is verleend (bv LinkedIn, DNS, gelekte wachtwoord databases). Het doel hier is publieke informatie op te sporen die een risico voor de klant kunnen zijn: informatie die door een aanvaller misbruikt kan worden in een gerichte aanval. 
+
+Voorbeelden van gebruikte bronnen/tools:
+* Shodan (heeft API)
+* The Harvester
+* Maltego
+* HaveIbeenPnwed
+* DNS
+
+==== L2: Aanraken op het niveau normale gebruiker
+
+Gerichte scans, beperkt intrusief. De scan zal gedoseerd worden uitgevoerd en bekende gevoelige scans overslaan. Het gescande target blijft doorgaans zonder problemen functioneren. 
+
+Voorbeeld van hiervoor bruikbare scantools:
+
+* Nmap
+* Nikto
+* Burp passive scanner
+
+==== L3: Detecteerbaar scannen
+
+Deze scan zal intrusiever te werk gaan: connecten naar services om versies te achterhalen, proberen in te loggen met veelgebruikte (standaard) logingegevens, geautomatiseerd testen van gevonden zwakheden of deze kwetsbaar zijn, intensiever raden van urls en intensiever crawlen van webpagina’s.
+
+Er zal een grotere aantal scans per tijdseenheid worden uitgevoerd, waardoor een duidelijke piek in het dataverkeer terug te zien is. Mogelijk is de infrastructuur hier niet op berekend.
+      
+Voorbeeld van bruikbare scantools en methoden:
+
+* Nessus, Nexpose, Acunetix
+* Burp Intruder, active scanner
+
+==== L4: Intensief scannen
+
+Het uitgangspunt van het testprofiel is verifiëren of een aanvaller kwetsbaarheden kan misbruiken om zichzelf uitgebreidere toegang tot de geteste omgeving te geven. Zo wordt bekende exploitcode toegepast in dit level. 
+
