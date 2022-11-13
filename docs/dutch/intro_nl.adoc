@@ -1,0 +1,77 @@
+= Wat is OpenKAT?
+
+OpenKAT heeft als doel het monitoren, registreren en analyseren van de status van informatiesystemen. OpenKAT scant netwerken, analyseert kwetsbaarheden en maakt toegankelijke rapporteren. Het integreert de meest gebruikte netwerktools en scansoftware in een modulair framework, heeft toegang tot externe databases zoals shodan en combineert de informatie uit al deze bronnen in overzichtelijke rapportages. 
+
+== Algemene documentatie
+
+Meer informatie over de concepten die aan OpenKAT ten grondslag liggen is te vinden in de functionele documentatie en in de algemene brochure. 
+
+* link:functional_nl.adoc[Functionele documentatie]
+
+* link:general_nl.adoc[Brochures en infografieken]
+
+== Is er ook een TL;DR? 
+
+Zeker! Voor iedereen met belangstelling voor OpenKAT is er link:https://github.com/minvws/nl-kat-coordination/files/9497295/OpenKAT.handout.pdf[een handout met de belangrijkste informatie]. 
+
+== Everything is in Dutch, help!
+
+Most of the high level documentation is oriented at Dutch policy makers, but we know the world is larger than just the Netherlands. Most of the docs included in the sourcecode and the repos are already in English. Work on a full translation is ongoing.  
+
+For those who want to understand the basic concept of OpenKAT, link:https://github.com/minvws/nl-kat-coordination/files/9754453/OpenKAT.handout_ENG.pdf[the TL;DR is also available in the English language.] 
+
+
+== Versies en changelog
+
+De actuele versie van OpenKAT staat op https://github.com/minvws/nl-kat-coordination/[NL-KAT-Coordination]
+
+== Installatie van OpenKAT
+
+Met de installatiehandleiding kan OpenKAT direct worden geïnstalleerd op een lokale machine, zodat het pakket gebruikt kan worden voor een eerste kennismaking met de software. De stap naar productie vraagt om keuzes met betrekking tot infrastructuur, beveiliging en configuratie die in de installatiehandleiding worden toegelicht. 
+
+De standaard installatie van OpenKAT is geschikt om te experimenteren. Voor toepassing in productie of op systemen die direct verbonden zijn met het internet moeten keuzes gemaakt worden met betrekking tot de configuratie, het inrichten van de databases en de aansluiting op de bestaande infrastructuur. 
+
+* link:installation_nl.md[Installatiehandleiding]
+
+Gebruik ook de instellingen voor de hardening (het veilig maken) van de default installatie: 
+
+* https://github.com/minvws/nl-kat-coordination/wiki/Installatiehandleiding:-hardening[Hardening settings]
+
+De infrastructuur die een installatie oplevert wordt op hoofdlijnen hier beschreven: 
+
+* link:infra_options_nl.adoc[Infrastructuur en voorbeeldinstallatie]
+
+Er wordt gewerkt aan pre-built docker images die direct uit te rollen zijn: 
+
+* https://github.com/dekkers/nl-kat-coordination/blob/container-image/docs/containers.md[Docker containers (work in progress)]
+
+== Gebruikershandleiding
+
+De bediening van OpenKAT is heel eenvoudig. Tegelijkertijd bevat de frontend talloze filteropties waar je mee aan de slag kunt om specifieke vragen te beantwoorden. De hoofdlijnen worden in de gebruikershandleiding uitgelegd. 
+
+* link:usermanual_nl.adoc[Gebruikershandleiding]
+
+== KAT-alogus: welke boefjes zijn er?
+
+Het overzicht met boefjes die in de standaard installatie zijn opgenomen is te vinden in de github-repo. De readme's uit deze repo zijn hier in een handig overzicht opgenomen, zodat een goed beeld ontstaat van de mogelijkheden van de standaard installatie: 
+
+* link:overview_boefjes_nl.adoc[Boefjes overzicht]
+
+== Zelf plugins toevoegen
+
+In het document 'Plugins maken: Boefjes, Whiskers en Bits' wordt uitgelegd hoe deze verschillende soorten plugins werken en hoe je ze zelf kunt maken. 
+
+* link:makeyourownboefje_nl.adoc[Zelf plugins maken]
+
+== Frontend en vormgeving
+
+De voorbeelden in de documentatie zijn gebaseerd op OpenKAT in de huisstijl van de rijksoverheid. De versie die publiek gemaakt wordt kan voor de eigen organisatie worden geconfigureerd. Hiervoor is documentatie beschikbaar in de github van Rocky. OpenKAT kent een strikte scheiding tussen functionaliteit en vorm, waardoor aanpassingen eenvoudig mogelijk zijn. 
+
+* link:https://github.com/minvws/nl-kat-rocky[Rocky, de frontend van OpenKAT]
+
+== Framework voor de frontend
+
+Om de scheiding tussen content en stijl mogelijk te maken, maakt OpenKAT gebruik van een apart framework genaamd 'Manon Open'. Dit framework is niet alleen geschikt voor OpenKAT, maar kan breder worden toegepast voor eenvoudig beheer en het bouwen van toegankelijke websites. 
+
+* link:manon_frontend.adoc[Manon Open]
+
