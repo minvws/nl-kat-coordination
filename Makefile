@@ -46,13 +46,13 @@ update:
 
 clean:
 	-docker-compose down
-       -docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
+	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
 
 up:
-	docker-compose up -d --force-recreate rocky
+	-docker-compose up -d --force-recreate rocky
 
 down:
-       docker-compose down
+	-docker-compose down
 
 clone:
 	-git clone https://github.com/minvws/nl-kat-boefjes.git
