@@ -46,7 +46,7 @@ update:
 
 clean:
 	-docker-compose down
-	-docker volume rm nl-kat_rocky-db-data nl-kat_bytes-db-data nl-kat_katalogus-db-data nl-kat_xtdb-data
+       -docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
 
 up:
 	docker-compose up -d --force-recreate rocky
