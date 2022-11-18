@@ -1,0 +1,21 @@
+{
+    "id": "cencys",
+    "name": "Cencys",
+    "description": "Use Censys to discover open ports, services and certificates",
+    "consumes": [
+        "IPAddressV4",
+        "IPAddressV6"
+    ],
+    "produces": [
+        "IPPort",
+        "Certificate",
+        "SoftwareInstance",
+        "ResolvedHostname",
+        "HTTPHeader"
+    ],
+    "environment_keys": [
+        "CENSYS_API_ID",
+        "CENSYS_API_SECRET"
+    ],
+    "scan_level": 1
+}
