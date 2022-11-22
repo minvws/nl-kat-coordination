@@ -4,7 +4,7 @@ from typing import Tuple, Union
 import censys
 
 from censys.search import CensysHosts
-from boefjes.job import BoefjeMeta
+from boefjes.job_models import BoefjeMeta
 
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
