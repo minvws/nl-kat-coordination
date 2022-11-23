@@ -1,9 +1,8 @@
 import json
 from typing import Tuple, Union
 
-import censys
-
 from censys.search import CensysHosts
+
 from boefjes.job_models import BoefjeMeta
 
 
