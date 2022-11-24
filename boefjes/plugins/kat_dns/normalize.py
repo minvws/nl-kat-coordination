@@ -168,7 +168,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     yield from hostname_store.values()
     yield from record_store.values()
 
-    #DKIM
+    # DKIM
     dkim_results = results["dkim_response"]
     if "rcode NOERROR" in dkim_results.split("\n"):
         yield DKIMExists(

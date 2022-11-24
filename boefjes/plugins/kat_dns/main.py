@@ -66,7 +66,7 @@ def get_parent_zone_soa(name: Name) -> Answer:
             raise ZoneNotFoundException
 
 
-def get_email_security_records(hostname: str, record_subdomain: str) -> Union[str, bool]:
+def get_email_security_records(hostname: str, record_subdomain: str) -> str:
     try:
         answer = dns.resolver.resolve(f"{record_subdomain}.{hostname}", "TXT")
         return answer.response.to_text()
