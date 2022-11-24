@@ -1,3 +1,4 @@
+import json
 from ipaddress import IPv4Address, IPv6Address
 from typing import Iterator, Union, List, Dict
 
@@ -24,6 +25,7 @@ from octopoes.models.ooi.dns.records import (
 )
 from octopoes.models.ooi.dns.zone import Hostname, DNSZone
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
+from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
 
 from boefjes.job_models import NormalizerMeta
 
@@ -31,14 +33,16 @@ from boefjes.job_models import NormalizerMeta
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     internet = Network(name="internet")
 
-    if raw.decode() == "NXDOMAIN":
+    results = json.loads(raw)
+
+    if results["dns_records"] == "NXDOMAIN":
         yield NXDOMAIN(
             hostname=Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
         )
         return
 
     # parse raw data into dns.response.Message
-    sections = raw.decode().split("\n\n")
+    sections = results["dns_records"].split("\n\n")
     responses: List[Message] = []
     for section in sections:
         lines = section.split("\n")
@@ -163,3 +167,23 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         yield zone
     yield from hostname_store.values()
     yield from record_store.values()
+
+    #DKIM
+    dkim_results = results["dkim_response"]
+    if "rcode NOERROR" in dkim_results.split("\n"):
+        yield DKIMExists(
+            hostname=input_hostname.reference,
+        )
+
+    # DMARC
+    dmarc_results = results["dmarc_response"]
+    if dmarc_results not in ["NXDOMAIN", "NoAnswer", "Timeout"]:
+        for rrset in from_text(dmarc_results).answer:
+            for rr in rrset:
+                rr: Rdata
+                if isinstance(rr, TXT):
+                    yield DMARCTXTRecord(
+                        hostname=input_hostname.reference,
+                        value=str(rr).strip('"'),
+                        ttl=rrset.ttl,
+                    )
