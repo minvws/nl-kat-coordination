@@ -1,5 +1,7 @@
 import json
 import logging
+
+from os import getenv
 from base64 import b64encode
 from typing import Tuple, Union, Optional, Dict
 from urllib.parse import urlparse
@@ -13,7 +15,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
 
 TIMEOUT = 15
-REPLY_FQDN = "cve.stillekat.nl"
+REPLY_FQDN = getenv("REPLY_FQDN")  # "cve.stillekat.nl"
 
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
