@@ -183,7 +183,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 rr: Rdata
                 if isinstance(rr, TXT):
                     yield DMARCTXTRecord(
-                        hostname=input_hostname.reference,
+                        hostname=input_hostname.fqdn,
                         value=str(rr).strip('"'),
                         ttl=rrset.ttl,
                     )
