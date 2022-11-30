@@ -177,7 +177,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
     # DMARC
     dmarc_results = results["dmarc_response"]
-    if dmarc_results not in ["NXDOMAIN", "NoAnswer", "Timeout"]:
+    if dmarc_results not in ["NXDOMAIN", "Timeout"]:
         for rrset in from_text(dmarc_results).answer:
             for rr in rrset:
                 rr: Rdata
