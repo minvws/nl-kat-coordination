@@ -1,11 +1,14 @@
 import json
 import logging
+
+from os import getenv
 from base64 import b64encode
 from typing import Tuple, Union, Optional, Dict
 from urllib.parse import urlparse
 
 import requests
 import urllib3
+import validators
 
 from boefjes.job_models import BoefjeMeta
 
@@ -13,7 +16,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
 
 TIMEOUT = 15
-REPLY_FQDN = "cve.stillekat.nl"
+REPLY_FQDN = getenv("REPLY_FQDN", "invalid")  # "cve.stillekat.nl"
 
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
@@ -24,10 +27,14 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
 
     schemes = ["http", "https"]
 
+    reply_fqdn = REPLY_FQDN.lower()
+    if not (reply_fqdn == "localhost" or validators.domain(reply_fqdn)):
+        raise ValueError(f"{REPLY_FQDN} is not a valid fully qualified domain name")
+
     output = {}
     for scheme in schemes:
         url = f"{scheme}://{host}/"
-        payloads = get_payloads(url, REPLY_FQDN, identifier)
+        payloads = get_payloads(url, reply_fqdn, identifier)
 
         checks = [check(url, payload, TIMEOUT) for payload in payloads.values()]
         header_checks = [

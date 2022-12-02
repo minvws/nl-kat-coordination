@@ -9,6 +9,8 @@
             "Finding",
             "CVEFindingType"
         ],
-        "environment_keys": [],
+        "environment_keys": [
+            "REPLY_FQDN"
+        ],
         "scan_level": 3
     }
