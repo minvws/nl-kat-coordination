@@ -1,6 +1,6 @@
 {
-    "id": "cencys",
-    "name": "Cencys",
+    "id": "censys",
+    "name": "Censys",
     "description": "Use Censys to discover open ports, services and certificates",
     "consumes": [
         "IPAddressV4",
