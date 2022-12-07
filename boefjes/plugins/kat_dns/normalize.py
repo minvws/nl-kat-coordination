@@ -33,13 +33,13 @@ from boefjes.job_models import NormalizerMeta
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     internet = Network(name="internet")
 
-    results = json.loads(raw)
-
-    if results["dns_records"] == "NXDOMAIN":
+    if raw == "NXDOMAIN":
         yield NXDOMAIN(
             hostname=Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
         )
         return
+
+    results = json.loads(raw)
 
     # parse raw data into dns.response.Message
     sections = results["dns_records"].split("\n\n")
