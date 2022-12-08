@@ -26,7 +26,9 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
     reply_fqdn_env = getenv("REPLY_FQDN", "invalid")
     reply_fqdn = reply_fqdn_env.lower()
     if not (reply_fqdn == "localhost" or validators.domain(reply_fqdn)):
-        raise ValueError(f"{reply_fqdn_env} is not a valid fully qualified domain name")
+        raise ValueError(
+            f'"{reply_fqdn_env}" is not a valid fully qualified domain name'
+        )
 
     output = {}
     for scheme in schemes:
