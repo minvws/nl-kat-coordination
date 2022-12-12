@@ -15,30 +15,29 @@ from boefjes.job_models import BoefjeMeta
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
 
-TIMEOUT = 15
-REPLY_FQDN = getenv("REPLY_FQDN", "invalid")  # "cve.stillekat.nl"
-
 
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
     input_ = boefje_meta.arguments["input"]
     host = input_["name"]
-
     identifier = boefje_meta.id
-
     schemes = ["http", "https"]
+    timeout = 15
 
-    reply_fqdn = REPLY_FQDN.lower()
+    reply_fqdn_env = getenv("REPLY_FQDN", "invalid")
+    reply_fqdn = reply_fqdn_env.lower()
     if not (reply_fqdn == "localhost" or validators.domain(reply_fqdn)):
-        raise ValueError(f"{REPLY_FQDN} is not a valid fully qualified domain name")
+        raise ValueError(
+            f'"{reply_fqdn_env}" is not a valid fully qualified domain name'
+        )
 
     output = {}
     for scheme in schemes:
         url = f"{scheme}://{host}/"
         payloads = get_payloads(url, reply_fqdn, identifier)
 
-        checks = [check(url, payload, TIMEOUT) for payload in payloads.values()]
+        checks = [check(url, payload, timeout) for payload in payloads.values()]
         header_checks = [
-            check_with_header(url, "User-Agent", payload, TIMEOUT)
+            check_with_header(url, "User-Agent", payload, timeout)
             for payload in payloads.values()
         ]
 
