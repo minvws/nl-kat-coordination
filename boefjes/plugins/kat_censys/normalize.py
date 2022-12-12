@@ -27,7 +27,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     results = json.loads(raw)
     ip_ooi_reference = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
 
-    network_reference = Network(name="internet").reference
+    network_reference = Network(name=ip_ooi_reference.tokenized.network.name).reference
     ip = results["ip"]
 
     if "dns" in results and "names" in results["dns"]:
