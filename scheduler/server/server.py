@@ -1,11 +1,11 @@
 import logging
 import queue as _queue
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 import fastapi
 import scheduler
 import uvicorn
-from scheduler import context, models, queues, schedulers
+from scheduler import context, models, queues, schedulers, version
 
 from .pagination import PaginatedResponse, paginate
 
@@ -115,7 +115,7 @@ class Server:
             path="/queues/{queue_id}/pop",
             endpoint=self.pop_queue,
             methods=["GET"],
-            response_model=models.QueuePrioritizedItem,
+            response_model=Optional[models.PrioritizedItem],
             status_code=200,
         )
 
@@ -133,7 +133,7 @@ class Server:
         response = models.ServiceHealth(
             service="scheduler",
             healthy=True,
-            version=scheduler.__version__,
+            version=version.__version__,
         )
 
         for service in self.ctx.services.__dict__.values():
@@ -172,7 +172,8 @@ class Server:
 
         updated_scheduler = stored_scheduler_model.copy(update=patch_data)
 
-        # Update the patched attributes
+        # We update the patched attributes, since the schedulers are kept
+        # in memory.
         for attr, value in patch_data.items():
             try:
                 setattr(s, attr, value)
@@ -193,7 +194,7 @@ class Server:
         limit: int = 10,
     ) -> Any:
         try:
-            results, count = self.ctx.datastore.get_tasks(
+            results, count = self.ctx.task_store.get_tasks(
                 scheduler_id=scheduler_id,
                 status=status,
                 offset=offset,
@@ -215,7 +216,7 @@ class Server:
 
     def get_task(self, task_id: str) -> Any:
         try:
-            task = self.ctx.datastore.get_task_by_id(task_id)
+            task = self.ctx.task_store.get_task_by_id(task_id)
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=400,
@@ -237,7 +238,7 @@ class Server:
 
     def patch_task(self, task_id: str, item: models.Task) -> Any:
         try:
-            task_db = self.ctx.datastore.get_task_by_id(task_id)
+            task_db = self.ctx.task_store.get_task_by_id(task_id)
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=400,
@@ -274,14 +275,14 @@ class Server:
 
         # update task in database
         try:
-            updated_task = self.ctx.datastore.update_task(task_db)
+            self.ctx.task_store.update_task(task_db)
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=500,
                 detail="failed to update task",
             ) from exc
 
-        return updated_task
+        return models.Task(**task_db.dict())
 
     def get_queues(self) -> Any:
         return [models.Queue(**s.queue.dict()) for s in self.schedulers.values()]
@@ -303,7 +304,7 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str) -> Any:
+    def pop_queue(self, queue_id: str, filters: List[models.Filter] = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -312,13 +313,19 @@ class Server:
             )
 
         try:
-            p_item = s.pop_item_from_queue()
+            p_item = s.pop_item_from_queue(filters)
         except queues.QueueEmptyError as exc_empty:
             return None
 
-        return models.QueuePrioritizedItem(**p_item.dict())
+        if p_item is None:
+            raise fastapi.HTTPException(
+                status_code=404,
+                detail="could not pop item from queue, check your filters",
+            )
 
-    def push_queue(self, queue_id: str, item: models.QueuePrioritizedItem) -> Any:
+        return models.PrioritizedItem(**p_item.dict())
+
+    def push_queue(self, queue_id: str, item: models.PrioritizedItem) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -327,11 +334,14 @@ class Server:
             )
 
         try:
-            p_item = queues.PrioritizedItem(**item.dict())
+            p_item = models.PrioritizedItem(**item.dict())
+            if p_item.scheduler_id is None:
+                p_item.scheduler_id = s.scheduler_id
+
             if s.queue.item_type == models.BoefjeTask:
-                p_item.item = models.BoefjeTask(**p_item.item)
+                p_item.data = models.BoefjeTask(**p_item.data).dict()
             elif s.queue.item_type == models.NormalizerTask:
-                p_item.item = models.NormalizerTask(**p_item.item)
+                p_item.data = models.NormalizerTask(**p_item.data).dict()
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=400,
@@ -340,7 +350,7 @@ class Server:
 
         try:
             s.push_item_to_queue(p_item)
-        except _queue.Full as exc_full:
+        except queues.QueueFullError as exc_full:
             raise fastapi.HTTPException(
                 status_code=400,
                 detail="queue is full",
@@ -356,7 +366,7 @@ class Server:
                 detail="not allowed",
             ) from exc_not_allowed
 
-        return models.QueuePrioritizedItem(**p_item.dict())
+        return models.PrioritizedItem(**p_item.dict())
 
     def run(self) -> None:
         uvicorn.run(

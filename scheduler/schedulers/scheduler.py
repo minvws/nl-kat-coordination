@@ -2,7 +2,8 @@ import abc
 import datetime
 import logging
 import threading
-from typing import Any, Callable, Dict, List
+import traceback
+from typing import Any, Callable, Dict, List, Optional
 
 from scheduler import context, models, queues, rankers, utils
 from scheduler.utils import thread
@@ -36,7 +37,6 @@ class Scheduler(abc.ABC):
             concurrently.
         stop_event: A threading.Event object used for communicating a stop
             event across threads.
-
     """
 
     organisation: models.Organisation
@@ -79,68 +79,78 @@ class Scheduler(abc.ABC):
     def populate_queue(self) -> None:
         raise NotImplementedError
 
-    def post_push(self, p_item: queues.PrioritizedItem) -> None:
+    def post_push(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being added to the queue. We
         persist a task to the datastore with the status QUEUED
 
         Args:
             p_item: The prioritized item to post-add to queue.
         """
+        # NOTE: we set the id of the task the same as the p_item, for easier
+        # lookup.
         task = models.Task(
-            id=p_item.item.id,
-            hash=p_item.item.hash,
+            id=p_item.id,
+            hash=p_item.hash,
             scheduler_id=self.scheduler_id,
-            task=models.QueuePrioritizedItem(**p_item.dict()),
+            p_item=p_item,
             status=models.TaskStatus.QUEUED,
-            created_at=datetime.datetime.now(),
-            modified_at=datetime.datetime.now(),
+            created_at=datetime.datetime.now(datetime.timezone.utc),
+            modified_at=datetime.datetime.now(datetime.timezone.utc),
         )
 
-        self.ctx.datastore.add_task(task)
+        task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))
+        if task_db is not None:
+            self.ctx.task_store.update_task(task)
+            return
 
-    def post_pop(self, p_item: queues.PrioritizedItem) -> None:
+        self.ctx.task_store.create_task(task)
+
+    def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
         persist a task to the datastore with the status RUNNING
 
         Args:
             p_item: The prioritized item to post-pop from queue.
         """
-        task = self.ctx.datastore.get_task_by_id(p_item.item.id)
+        # NOTE: we set the id of the task the same as the p_item, for easier
+        # lookup.
+        task = self.ctx.task_store.get_task_by_id(str(p_item.id))
         if task is None:
             self.logger.error(
                 "Task %s not found in datastore, not updating status [task_id = %s]",
-                p_item.item.id,
-                p_item.item.id,
+                p_item.data.get("id"),
+                p_item.data.get("id"),
             )
             return None
 
         task.status = models.TaskStatus.DISPATCHED
-        self.ctx.datastore.update_task(task)
+        self.ctx.task_store.update_task(task)
 
         return None
 
-    def pop_item_from_queue(self) -> queues.PrioritizedItem:
+    def pop_item_from_queue(self, filters: List[models.Filter] = None) -> Optional[models.PrioritizedItem]:
         """Pop an item from the queue.
 
         Returns:
             A PrioritizedItem instance.
         """
         try:
-            p_item = self.queue.pop()
+            p_item = self.queue.pop(filters)
         except queues.QueueEmptyError as exc:
             self.logger.warning(
                 "Queue %s is empty, not populating new tasks [queue_id=%s, qsize=%d]",
                 self.queue.pq_id,
                 self.queue.pq_id,
-                self.queue.pq.qsize(),
+                self.queue.qsize(),
             )
             raise exc
 
-        self.post_pop(p_item)
+        if p_item is not None:
+            self.post_pop(p_item)
 
         return p_item
 
-    def push_item_to_queue(self, p_item: queues.PrioritizedItem) -> None:
+    def push_item_to_queue(self, p_item: models.PrioritizedItem) -> None:
         """Push an item to the queue.
 
         Args:
@@ -153,7 +163,7 @@ class Scheduler(abc.ABC):
                 "Not allowed to push to queue %s [queue_id=%s, qsize=%d]",
                 self.queue.pq_id,
                 self.queue.pq_id,
-                self.queue.pq.qsize(),
+                self.queue.qsize(),
             )
             raise exc
         except queues.errors.QueueFullError as exc:
@@ -161,7 +171,7 @@ class Scheduler(abc.ABC):
                 "Queue %s is full, not populating new tasks [queue_id=%s, qsize=%d]",
                 self.queue.pq_id,
                 self.queue.pq_id,
-                self.queue.pq.qsize(),
+                self.queue.qsize(),
             )
             raise exc
         except queues.errors.InvalidPrioritizedItemError as exc:
@@ -169,13 +179,21 @@ class Scheduler(abc.ABC):
                 "Invalid prioritized item %s [queue_id=%s, qsize=%d]",
                 p_item,
                 self.queue.pq_id,
-                self.queue.pq.qsize(),
+                self.queue.qsize(),
             )
             raise exc
 
+        self.logger.debug(
+            "Pushed item to queue %s [queue_id=%s, qsize=%d, item=%s]",
+            self.queue.pq_id,
+            self.queue.pq_id,
+            self.queue.qsize(),
+            p_item,
+        )
+
         self.post_push(p_item)
 
-    def push_items_to_queue(self, p_items: List[queues.PrioritizedItem]) -> None:
+    def push_items_to_queue(self, p_items: List[models.PrioritizedItem]) -> None:
         """Add items to a priority queue.
 
         Args:
@@ -186,8 +204,29 @@ class Scheduler(abc.ABC):
         for p_item in p_items:
             try:
                 self.push_item_to_queue(p_item)
-            except Exception:
+            except (
+                queues.errors.NotAllowedError,
+                queues.errors.QueueFullError,
+                queues.errors.InvalidPrioritizedItemError,
+            ):
+                self.logger.debug(
+                    "Unable to push item to queue %s [queue_id=%s, qsize=%d, item=%s, exc=%s]",
+                    self.queue.pq_id,
+                    self.queue.pq_id,
+                    self.queue.qsize(),
+                    p_item,
+                    traceback.format_exc(),
+                )
                 continue
+            except Exception as exc:
+                self.logger.error(
+                    "Unable to push item to queue %s [queue_id=%s, qsize=%d, item=%s]",
+                    self.queue.pq_id,
+                    self.queue.pq_id,
+                    self.queue.qsize(),
+                    p_item,
+                )
+                raise exc
 
             count += 1
 
@@ -246,7 +285,7 @@ class Scheduler(abc.ABC):
             "priority_queue": {
                 "id": self.queue.pq_id,
                 "maxsize": self.queue.maxsize,
-                "qsize": self.queue.pq.qsize(),
+                "qsize": self.queue.qsize(),
                 "allow_replace": self.queue.allow_replace,
                 "allow_updates": self.queue.allow_updates,
                 "allow_priority_updates": self.queue.allow_priority_updates,

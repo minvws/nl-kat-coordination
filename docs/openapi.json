@@ -445,13 +445,26 @@
                         "in": "path"
                     }
                 ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "title": "Filters",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Filter"
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Successful Response",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/QueuePrioritizedItem"
+                                    "$ref": "#/components/schemas/PrioritizedItem"
                                 }
                             }
                         }
@@ -488,7 +501,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/QueuePrioritizedItem"
+                                "$ref": "#/components/schemas/PrioritizedItem"
                             }
                         }
                     },
@@ -519,6 +532,50 @@
     },
     "components": {
         "schemas": {
+            "Filter": {
+                "title": "Filter",
+                "required": [
+                    "field",
+                    "operator",
+                    "value"
+                ],
+                "type": "object",
+                "properties": {
+                    "field": {
+                        "title": "Field",
+                        "type": "string"
+                    },
+                    "operator": {
+                        "title": "Operator",
+                        "enum": [
+                            "eq",
+                            "ne",
+                            "lt",
+                            "le",
+                            "gt",
+                            "ge",
+                            "in_",
+                            "notin_"
+                        ],
+                        "type": "string"
+                    },
+                    "value": {
+                        "title": "Value",
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "string",
+                                "format": "date"
+                            }
+                        ]
+                    }
+                }
+            },
             "HTTPValidationError": {
                 "title": "HTTPValidationError",
                 "type": "object",
@@ -559,12 +616,55 @@
                     }
                 }
             },
+            "PrioritizedItem": {
+                "title": "PrioritizedItem",
+                "required": [
+                    "scheduler_id",
+                    "data"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "scheduler_id": {
+                        "title": "Scheduler Id",
+                        "type": "string"
+                    },
+                    "hash": {
+                        "title": "Hash",
+                        "type": "string"
+                    },
+                    "priority": {
+                        "title": "Priority",
+                        "type": "integer"
+                    },
+                    "data": {
+                        "title": "Data",
+                        "type": "object"
+                    },
+                    "created_at": {
+                        "title": "Created At",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "modified_at": {
+                        "title": "Modified At",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "description": "Representation of an queue.PrioritizedItem on the priority queue. Used\nfor unmarshalling of priority queue prioritized items to a JSON\nrepresentation."
+            },
             "Queue": {
                 "title": "Queue",
                 "required": [
                     "id",
                     "size",
                     "maxsize",
+                    "item_type",
                     "allow_replace",
                     "allow_updates",
                     "allow_priority_updates",
@@ -584,6 +684,10 @@
                         "title": "Maxsize",
                         "type": "integer"
                     },
+                    "item_type": {
+                        "title": "Item Type",
+                        "type": "string"
+                    },
                     "allow_replace": {
                         "title": "Allow Replace",
                         "type": "boolean"
@@ -600,51 +704,11 @@
                         "title": "Pq",
                         "type": "array",
                         "items": {
-                            "$ref": "#/components/schemas/QueueEntry"
+                            "$ref": "#/components/schemas/PrioritizedItem"
                         }
                     }
                 },
                 "description": "Representation of an queue.PriorityQueue object. Used for unmarshalling\nof priority queues to a JSON representation."
-            },
-            "QueueEntry": {
-                "title": "QueueEntry",
-                "required": [
-                    "priority",
-                    "p_item",
-                    "state"
-                ],
-                "type": "object",
-                "properties": {
-                    "priority": {
-                        "title": "Priority",
-                        "type": "integer"
-                    },
-                    "p_item": {
-                        "$ref": "#/components/schemas/QueuePrioritizedItem"
-                    },
-                    "state": {
-                        "title": "State",
-                        "type": "string"
-                    }
-                },
-                "description": "Representation of an queue.Entry on the priority queue. Used for\nfor unmarshalling of priority queue entries to a JSON representation."
-            },
-            "QueuePrioritizedItem": {
-                "title": "QueuePrioritizedItem",
-                "required": [
-                    "priority"
-                ],
-                "type": "object",
-                "properties": {
-                    "priority": {
-                        "title": "Priority",
-                        "type": "integer"
-                    },
-                    "item": {
-                        "title": "Item"
-                    }
-                },
-                "description": "Representation of an queue.PrioritizedItem on the priority queue. Used\nfor unmarshalling of priority queue prioritized items to a JSON\nrepresentation."
             },
             "Scheduler": {
                 "title": "Scheduler",
@@ -711,12 +775,9 @@
                 "title": "Task",
                 "required": [
                     "id",
-                    "hash",
                     "scheduler_id",
-                    "task",
-                    "status",
-                    "created_at",
-                    "modified_at"
+                    "p_item",
+                    "status"
                 ],
                 "type": "object",
                 "properties": {
@@ -725,16 +786,12 @@
                         "type": "string",
                         "format": "uuid"
                     },
-                    "hash": {
-                        "title": "Hash",
-                        "type": "string"
-                    },
                     "scheduler_id": {
                         "title": "Scheduler Id",
                         "type": "string"
                     },
-                    "task": {
-                        "$ref": "#/components/schemas/QueuePrioritizedItem"
+                    "p_item": {
+                        "$ref": "#/components/schemas/PrioritizedItem"
                     },
                     "status": {
                         "$ref": "#/components/schemas/TaskStatus"

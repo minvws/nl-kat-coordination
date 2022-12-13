@@ -15,3 +15,7 @@ class InvalidPrioritizedItemError(ValueError):
 
 class QueueFullError(Full):
     pass
+
+
+class PrioritizedItemNotFoundError(Exception):
+    pass

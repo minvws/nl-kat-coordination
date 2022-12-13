@@ -6,7 +6,7 @@ from .normalizer import Normalizer
 from .ooi import OOI
 from .organisation import Organisation
 from .plugin import Plugin
-from .queue import Queue, QueueEntry, QueuePrioritizedItem
+from .queue import Filter, PrioritizedItem, PrioritizedItemORM, Queue
 from .scan_profile import ScanProfile
 from .scheduler import Scheduler
 from .tasks import BoefjeTask, NormalizerTask, Task, TaskORM, TaskStatus

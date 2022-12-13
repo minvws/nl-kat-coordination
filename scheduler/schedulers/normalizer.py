@@ -1,15 +1,12 @@
-import datetime
 import time
-import uuid
 from types import SimpleNamespace
 from typing import List
 
-import mmh3
 import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import NormalizerTask, Organisation, RawData, TaskStatus
+from scheduler.models import NormalizerTask, Organisation, PrioritizedItem, RawData, TaskStatus
 
 from .scheduler import Scheduler
 
@@ -82,13 +79,20 @@ class NormalizerScheduler(Scheduler):
                 )
                 break
 
-            # When receiving this, it means the item on boefje queue has been
-            # processed, update the status of that task.
-            boefje_task_db = self.ctx.datastore.get_task_by_id(
+            self.logger.debug(
+                "Received latest raw data [raw_data=%s, org_id=%s, scheduler_id=%s]",
+                latest_raw_data,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+
+            # Find the associated BoefjeTask (if any), the item on boefje queue
+            # has been processed, update the status of that task.
+            boefje_task_db = self.ctx.task_store.get_task_by_id(
                 latest_raw_data.raw_data.boefje_meta.id,
             )
             if boefje_task_db is None:
-                self.logger.warning(
+                self.logger.debug(
                     "Could not find boefje task in database [raw_data_id=%s, org_id=%s, scheduler_id=%s]",
                     latest_raw_data.raw_data.boefje_meta.id,
                     self.organisation.id,
@@ -99,28 +103,42 @@ class NormalizerScheduler(Scheduler):
             # stop creating normalizer tasks.
             if boefje_task_db is not None:
                 status = TaskStatus.COMPLETED
-
                 for mime_type in latest_raw_data.raw_data.mime_types:
                     if mime_type.get("value", "").startswith("error/"):
                         status = TaskStatus.FAILED
-                        boefje_task_db.status = status
-
-                        self.ctx.datastore.update_task(boefje_task_db)
-                        return
+                        break
 
                 boefje_task_db.status = status
-                self.ctx.datastore.update_task(boefje_task_db)
+                self.ctx.task_store.update_task(boefje_task_db)
+
+                self.logger.info(
+                    "Updated boefje task status to %s in datastore [boefje_task_id=%s, status=%s, org_id=%s, scheduler_id=%s]",
+                    status,
+                    boefje_task_db.id,
+                    status,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+
+                if status == TaskStatus.FAILED:
+                    self.logger.info(
+                        "Boefje task failed, stop creating normalizer tasks [boefje_task_id=%s, org_id=%s, scheduler_id=%s]",
+                        boefje_task_db.id,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    continue
 
             p_items = self.create_tasks_for_raw_data(latest_raw_data.raw_data)
             if not p_items:
                 continue
 
             # NOTE: maxsize 0 means unlimited
-            while len(p_items) > (self.queue.maxsize - self.queue.pq.qsize()) and self.queue.maxsize != 0:
+            while len(p_items) > (self.queue.maxsize - self.queue.qsize()) and self.queue.maxsize != 0:
                 self.logger.debug(
                     "Waiting for queue to have enough space, not adding %d tasks to queue [qsize=%d, maxsize=%d, org_id=%s, scheduler_id=%s]",
                     len(p_items),
-                    self.queue.pq.qsize(),
+                    self.queue.qsize(),
                     self.queue.maxsize,
                     self.organisation.id,
                     self.scheduler_id,
@@ -131,17 +149,17 @@ class NormalizerScheduler(Scheduler):
         else:
             self.logger.warning(
                 "Normalizer queue is full, not populating with new tasks [qsize=%d, org_id=%s, scheduler_id=%s]",
-                self.queue.pq.qsize(),
+                self.queue.qsize(),
                 self.organisation.id,
                 self.scheduler_id,
             )
             return
 
-    def create_tasks_for_raw_data(self, raw_data: RawData) -> List[queues.PrioritizedItem]:
+    def create_tasks_for_raw_data(self, raw_data: RawData) -> List[PrioritizedItem]:
         """Create normalizer tasks for every boefje that has been processed,
         and created raw data in Bytes.
         """
-        p_items: List[queues.PrioritizedItem] = []
+        p_items: List[PrioritizedItem] = []
 
         for mime_type in raw_data.mime_types:
             try:
@@ -194,10 +212,10 @@ class NormalizerScheduler(Scheduler):
 
                 task = NormalizerTask(
                     normalizer=normalizer,
-                    boefje_meta=raw_data.boefje_meta,
+                    raw_data=raw_data,
                 )
 
-                if self.queue.is_item_on_queue(task):
+                if self.queue.is_item_on_queue(PrioritizedItem(scheduler_id=self.scheduler_id, data=task)):
                     self.logger.debug(
                         "Normalizer task: %s is already on queue [normalizer_id=%s, boefje_meta_id=%s, org_id=%s, scheduler_id=%s]",
                         normalizer.name,
@@ -209,7 +227,17 @@ class NormalizerScheduler(Scheduler):
                     continue
 
                 score = self.ranker.rank(SimpleNamespace(raw_data=raw_data, task=task))
-                p_items.append(queues.PrioritizedItem(priority=score, item=task))
+                p_items.append(PrioritizedItem(id=task.id, scheduler_id=self.scheduler_id, priority=score, data=task))
+
+                self.logger.debug(
+                    "Created normalizer task: %s [normalizer_task_id=%s, normalizer_id=%s, boefje_meta_id=%s, org_id=%s, scheduler_id=%s]",
+                    normalizer.name,
+                    task.id,
+                    normalizer.id,
+                    raw_data.boefje_meta.id,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
 
         return p_items
 
@@ -233,7 +261,7 @@ class NormalizerScheduler(Scheduler):
             if self.stop_event.is_set():
                 raise e
 
-            time.sleep(60)
+            time.sleep(10)
             return
 
         if latest_normalizer_meta is None:
@@ -243,23 +271,41 @@ class NormalizerScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            time.sleep(60)
+            time.sleep(10)
             return
 
-        normalizer_task_db = self.ctx.datastore.get_task_by_id(
+        self.logger.debug(
+            "Received normalizer meta %s [normalizer_meta_id=%s, latest_normalizer_meta=%s, org_id=%s, scheduler_id=%s]",
+            latest_normalizer_meta.normalizer_meta.id,
+            latest_normalizer_meta.normalizer_meta.id,
+            latest_normalizer_meta,
+            self.organisation.id,
+            self.scheduler_id,
+        )
+
+        normalizer_task_db = self.ctx.task_store.get_task_by_id(
             latest_normalizer_meta.normalizer_meta.id,
         )
         if normalizer_task_db is None:
             self.logger.warning(
-                "Could not find normalizer task in database [normalizer_meta_id=%s, org_id=%s, scheduler_id=%s]",
+                "Could not find normalizer task in database [normalizer_meta_id=%s, latest_normalizer_meta=%s, org_id=%s, scheduler_id=%s]",
                 latest_normalizer_meta.normalizer_meta.id,
+                latest_normalizer_meta,
                 self.organisation.id,
                 self.scheduler_id,
             )
             return
 
         normalizer_task_db.status = TaskStatus.COMPLETED
-        self.ctx.datastore.update_task(normalizer_task_db)
+        self.ctx.task_store.update_task(normalizer_task_db)
+
+        self.logger.info(
+            "Updated normalizer task status to completed in datastore [normalizer_meta_id=%s, latest_normalizer_meta=%s, org_id=%s, scheduler_id=%s]",
+            latest_normalizer_meta.normalizer_meta.id,
+            latest_normalizer_meta,
+            self.organisation.id,
+            self.scheduler_id,
+        )
 
     def run(self) -> None:
         super().run()

@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, datastores, models, queues, rankers, schedulers
+from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -12,6 +12,7 @@ from tests.factories import (
     PluginFactory,
     ScanProfileFactory,
 )
+from tests.utils import functions
 
 
 class SchedulerTestCase(unittest.TestCase):
@@ -53,8 +54,13 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.services.bytes = self.mock_bytes
 
         # Datastore
-        self.mock_ctx.datastore = datastores.SQLAlchemy(dsn="sqlite:///")
+        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy("sqlite:///")
         models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
+        self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
+        self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
+
+        self.mock_ctx.pq_store = self.pq_store
+        self.mock_ctx.task_store = self.task_store
 
         # Scheduler
         self.organisation = OrganisationFactory()
@@ -64,6 +70,7 @@ class SchedulerTestCase(unittest.TestCase):
             maxsize=cfg.pq_maxsize,
             item_type=models.BoefjeTask,
             allow_priority_updates=True,
+            pq_store=self.pq_store,
         )
 
         ranker = rankers.BoefjeRanker(
@@ -84,7 +91,7 @@ class SchedulerTestCase(unittest.TestCase):
     def test_populate_boefjes_queue_get_latest_object(
         self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_latest_object
     ):
-        """When oois are available, and no random oois"""
+        """When oois are available from octopoes api, and no random oois."""
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         task = models.BoefjeTask(
@@ -97,17 +104,12 @@ class SchedulerTestCase(unittest.TestCase):
         mock_get_latest_object.side_effect = [ooi, None]
         mock_get_random_objects.return_value = []
         mock_create_tasks_for_oois.side_effect = [
-            [
-                queues.PrioritizedItem(
-                    priority=0,
-                    item=task,
-                )
-            ],
+            [functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=0, data=task)],
         ]
 
         self.scheduler.populate_queue()
         self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(task, self.scheduler.queue.peek(0).p_item.item)
+        self.assertEqual(task, self.scheduler.queue.peek(0).data)
 
     # TODO
     def test_populate_boefjes_queue_overflow(self):
@@ -133,12 +135,12 @@ class SchedulerTestCase(unittest.TestCase):
         mock_get_latest_object.return_value = None
         mock_get_random_objects.side_effect = [[ooi], [], [], []]
         mock_create_tasks_for_oois.return_value = [
-            queues.PrioritizedItem(0, task),
+            functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=0, data=task),
         ]
 
         self.scheduler.populate_queue()
         self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(task, self.scheduler.queue.peek(0).p_item.item)
+        self.assertEqual(task, self.scheduler.queue.peek(0).data)
 
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
@@ -303,6 +305,29 @@ class SchedulerTestCase(unittest.TestCase):
         tasks = self.scheduler.create_tasks_for_oois([ooi])
         self.assertEqual(0, len(tasks))
 
+    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
+    @mock.patch("scheduler.context.AppContext.services.datastore.get_task_by_hash")
+    def test_create_task_task_not_found_in_bytes(self, mock_get_last_run_boefje, mock_get_task_by_hash):
+        """When a task is not found in bytes, but is found in the datastore
+        and completed. It should not create a task.
+        """
+        # Create task in datastore, that is completed
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        task = models.BoefjeTask(
+            id=uuid.uuid4().hex,
+            boefje=BoefjeFactory(),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+            status=models.TaskStatus.COMPLETED,
+        )
+
+        mock_get_task_by_hash.return_value = task
+        mock_get_last_run_boefje.return_value = None
+
+        tasks = self.scheduler.create_tasks_for_oois([ooi])
+        self.assertEqual(0, len(tasks))
+
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
     def test_populate_boefjes_queue_qsize(self, mock_get_boefjes_by_type_and_org_id):
         """When the boefje queue is full, it should not return a boefje task"""
@@ -314,6 +339,7 @@ class SchedulerTestCase(unittest.TestCase):
             maxsize=1,
             item_type=models.BoefjeTask,
             allow_priority_updates=True,
+            pq_store=self.pq_store,
         )
 
         # Add a task to the queue to make it full
@@ -325,7 +351,7 @@ class SchedulerTestCase(unittest.TestCase):
             input_ooi=ooi.primary_key,
             organization=organisation.id,
         )
-        queue.push(queues.PrioritizedItem(0, task))
+        queue.push(functions.create_p_item(scheduler_id=organisation.id, priority=0, data=task))
 
         self.scheduler.queue = queue
 
@@ -341,7 +367,6 @@ class SchedulerTestCase(unittest.TestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         task = models.BoefjeTask(
-            id=uuid.uuid4().hex,
             boefje=BoefjeFactory(),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
@@ -349,21 +374,18 @@ class SchedulerTestCase(unittest.TestCase):
 
         mock_get_latest_object.side_effect = [ooi, None]
         mock_get_random_objects.return_value = []
+
+        p_item = functions.create_p_item(scheduler_id=self.organisation.id, priority=0, data=task)
         mock_create_tasks_for_oois.side_effect = [
-            [
-                queues.PrioritizedItem(
-                    priority=0,
-                    item=task,
-                )
-            ],
+            [p_item],
         ]
 
         self.scheduler.populate_queue()
         self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(task, self.scheduler.queue.peek(0).p_item.item)
+        self.assertEqual(task, self.scheduler.queue.peek(0).data)
 
-        task_db = self.mock_ctx.datastore.get_task_by_id(task.id)
-        self.assertEqual(task_db.id.hex, task.id)
+        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
@@ -374,7 +396,6 @@ class SchedulerTestCase(unittest.TestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         task = models.BoefjeTask(
-            id=uuid.uuid4().hex,
             boefje=BoefjeFactory(),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
@@ -382,18 +403,22 @@ class SchedulerTestCase(unittest.TestCase):
 
         mock_get_latest_object.side_effect = [ooi, None]
         mock_get_random_objects.return_value = []
+
+        p_item = functions.create_p_item(scheduler_id=self.organisation.id, priority=0, data=task)
         mock_create_tasks_for_oois.side_effect = [
-            [
-                queues.PrioritizedItem(
-                    priority=0,
-                    item=task,
-                )
-            ],
+            [p_item],
         ]
 
         self.scheduler.populate_queue()
         self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(task, self.scheduler.queue.peek(0).p_item.item)
+        self.assertEqual(task, self.scheduler.queue.peek(0).data)
 
-        task_db = self.mock_ctx.datastore.get_task_by_id(task.id)
-        self.assertEqual(task_db.id.hex, task.id)
+        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        self.scheduler.pop_item_from_queue()
+
+        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)

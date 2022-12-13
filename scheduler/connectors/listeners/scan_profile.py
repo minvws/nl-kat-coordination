@@ -16,14 +16,7 @@ class ScanProfile(RabbitMQ):
         if response is None:
             return None
 
-        scan_profile = ScanProfileModel(**response)
-        ooi = OOI(
-            primary_key=scan_profile.reference,
-            ooi_type=scan_profile.ooi_type,
-            scan_profile=scan_profile,
-        )
-
-        return ooi
+        return OOI(**response)
 
     @exception_handler
     def get_latest_objects(self, queue: str, n: int) -> Optional[List[OOI]]:

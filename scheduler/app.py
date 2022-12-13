@@ -76,7 +76,7 @@ class App:
         # Source: https://stackoverflow.com/a/1489838/1346257
         os._exit(1)
 
-    def _run_in_thread(
+    def run_in_thread(
         self,
         name: str,
         func: Callable[[], Any],
@@ -109,6 +109,9 @@ class App:
             self.schedulers[s.scheduler_id] = s
 
     def initialize_normalizer_schedulers(self) -> None:
+        """Initialize the schedulers for the Normalizer tasks. We will create
+        schedulers for all organisations in the Katalogus service.
+        """
         orgs = self.ctx.services.katalogus.get_organisations()
         for org in orgs:
             s = self.create_normalizer_scheduler(org)
@@ -123,6 +126,7 @@ class App:
             maxsize=self.ctx.config.pq_maxsize,
             item_type=NormalizerTask,
             allow_priority_updates=True,
+            pq_store=self.ctx.pq_store,
         )
 
         ranker = rankers.NormalizerRanker(
@@ -153,6 +157,7 @@ class App:
             maxsize=self.ctx.config.pq_maxsize,
             item_type=BoefjeTask,
             allow_priority_updates=True,
+            pq_store=self.ctx.pq_store,
         )
 
         ranker = rankers.BoefjeRanker(
@@ -178,22 +183,25 @@ class App:
         katalogus_orgs = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
-        self.logger.debug(f"Organisations to add: {additions}")
+        self.logger.debug("Organisations to add: %s", len(additions))
 
         removals = scheduler_orgs.difference(katalogus_orgs)
-        self.logger.debug(f"Organisations to remove: {removals}")
+        self.logger.debug("Organisations to remove: %s", len(removals))
 
-        for org_id in removals:
-            for s in self.schedulers.values():
-                if s.organisation.id != org_id:
-                    continue
+        # Get scheduler ids for removals
+        removal_scheduler_ids = []
+        for s in self.schedulers.values():
+            if s.organisation.id in removals:
+                removal_scheduler_ids.append(s.scheduler_id)
 
-                s.stop()
-                del self.schedulers[s.scheduler_id]
-                break
+        # Remove schedulers for organisation
+        for scheduler_id in removal_scheduler_ids:
+            self.schedulers[scheduler_id].stop()
+            self.schedulers.pop(scheduler_id)
 
         self.logger.info("Removed %s organisations from scheduler [org_ids=%s]", len(removals), removals)
 
+        # Add schedulers for organisation
         for org_id in additions:
             org = self.ctx.services.katalogus.get_organisation(org_id)
 
@@ -217,18 +225,18 @@ class App:
             * monitors
         """
         # API Server
-        self._run_in_thread(name="server", func=self.server.run, daemon=False)
+        self.run_in_thread(name="server", func=self.server.run, daemon=False)
 
         # Start the listeners
         for name, listener in self.listeners.items():
-            self._run_in_thread(name=f"listener_{name}", func=listener.listen)
+            self.run_in_thread(name=f"listener_{name}", func=listener.listen)
 
         # Start the schedulers
         for scheduler in self.schedulers.values():
             scheduler.run()
 
         # Start monitors
-        self._run_in_thread(
+        self.run_in_thread(
             name="monitor_organisations",
             func=self.monitor_organisations,
             interval=self.ctx.config.monitor_organisations_interval,

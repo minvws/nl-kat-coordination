@@ -3,9 +3,9 @@
 ## Purpose
 
 The *scheduler* is tasked with populating and maintaining a priority queue of
-items that are ranked, and can be popped off (through api calls), or dispatched.
+items that are ranked, and can be popped off (through api calls).
 The scheduler is designed to be extensible, such that you're able to create
-your own rules for the population, prioritization and dispatching of tasks.
+your own rules for the population, and prioritization of tasks.
 
 The *scheduler* implements a priority queue for prioritization of tasks to be
 performed by the worker(s). In the implementation of the scheduler within KAT
@@ -44,9 +44,9 @@ graph TB
     Octopoes["Octopoes<br/>[graph database]"]
     Katalogus["Katalogus<br/>[software system]"]
     Bytes["Bytes<br/>[software system]"]
-    Boefjes["Boefjes<br/>[software system]"]
-    Scheduler["Scheduler<br/>[system]"]
     RabbitMQ["RabbitMQ<br/>[message broker]"]
+    Scheduler["Scheduler<br/>[system]"]
+    TaskRunner["Task Runner<br/>[software system]"]
 
     Rocky--"Create object"-->Octopoes
     Rocky--"Create scan job<br/>HTTP POST"--->Scheduler
@@ -58,13 +58,12 @@ graph TB
     Katalogus--"Get available plugins<br/>HTTP GET"-->Scheduler
     Bytes--"Get last run boefje<br/>HTTP GET"-->Scheduler
 
-    Scheduler--"Send task<br/>CELERY send_task"-->Boefjes
-    Scheduler--"Send task<br/>CELERY send_task"-->Normalizers
+    Scheduler--"Pop task of queue"-->TaskRunner
 ```
 
 * The `Scheduler` system combines data from the `Octopoes`, `Katalogus`,
 `Bytes` and `RabbitMQ` systems. With these data it determines what tasks should
-be created and dispatched.
+be created and run.
 
 * The `Scheduler` system implements multiple `schedulers` per organisation.
 
@@ -91,10 +90,10 @@ flowchart TB
     %% External services
     Rocky["Rocky<br/>[webapp]"]
     Octopoes["Octopoes<br/>[graph database]"]
-    Katalogus["Katalogus<br/>[software system]"]
-    Boefjes["Boefjes<br/>[software system]"]
-    Normalizers["Normalizers<br/>[software system]"]
-    Bytes["Bytes<br/>[software system]"]
+    %% Katalogus["Katalogus<br/>[software system]"]
+    %% Boefjes["Boefjes<br/>[software system]"]
+    %% Normalizers["Normalizers<br/>[software system]"]
+    %% Bytes["Bytes<br/>[software system]"]
     RabbitMQ["RabbitMQ<br/>[message broker]"]
 
     %% Rocky flow
@@ -104,9 +103,9 @@ flowchart TB
     push_queue--"Push job with highest priority"-->NormalizerPriorityQueue
     
     %% External services flow
-    Bytes--"Check last run of boefje and ooi<br/>HTTP GET"-->create_tasks_for_ooi
-    Katalogus--"Get available boefjes<br/>HTTP GET"--->create_tasks_for_ooi
-    Katalogus--"Get availalble normalizers<br/>HTTP GET"-->create_tasks_for_raw_data
+    %% Bytes--"Check last run of boefje and ooi<br/>HTTP GET"-->create_tasks_for_ooi
+    %% Katalogus--"Get available boefjes<br/>HTTP GET"--->create_tasks_for_ooi
+    %% Katalogus--"Get availalble normalizers<br/>HTTP GET"-->create_tasks_for_raw_data
     Octopoes--"Get random ooi"--->get_random_objects
     RabbitMQ--"Get latest created object<br/>(scan level increase)"-->get_latest_object
     RabbitMQ--"Get latest raw data file<br/>(boefje finished)"-->get_latest_raw_data
@@ -116,16 +115,12 @@ flowchart TB
     push_boefje-->post_push_boefje
     push_boefje--> BoefjePriorityQueue
     post_push_boefje-->Datastore
-    post_pop_boefje-->Datastore
-    BoefjeDispatcher--"Send task to Boefjes"-->Boefjes    
     
     %% Normalizer flow
     get_latest_raw_data-->create_tasks_for_raw_data-->rank_normalizer-->push_normalizer
     push_normalizer-->post_push_normalizer
     push_normalizer-->NormalizerPriorityQueue
     post_push_normalizer-->Datastore
-    post_pop_normalizer-->Datastore
-    NormalizerDispatcher--"Send task to Normalizers"-->Normalizers
 
     subgraph Scheduler["SchedulerApp [system]"]
 
@@ -139,19 +134,10 @@ flowchart TB
             end
 
             post_push_boefje[["post_push()<br/><br/>add tasks to database"]]
-            post_pop_boefje[["post_pop()<br/><br/>update tasks in database"]]
 
             BoefjePriorityQueue(["PriorityQueue"])
-            BoefjePriorityQueue-->BoefjeDispatcher
-            
-            BoefjeDispatcher[["Dispatcher"]]
+            BoefjePriorityQueue
         end
-
-        subgraph BoefjeDispatcher["BoefjeDispatcher [class]"]
-            boefje_dispatch[["dispatch()"]]
-        end
-        boefje_dispatch-->post_pop_boefje
-
 
         subgraph NormalizerScheduler["NormalizerScheduler [class]"]
             subgraph NormalizerPopulateQueue["populate_queue() [method]"]
@@ -162,18 +148,9 @@ flowchart TB
             end
 
             post_push_normalizer[["post_push()<br/><br/>add tasks to database"]]
-            post_pop_normalizer[["post_pop()<br/><br/>update tasks in database"]]
             
             NormalizerPriorityQueue(["PriorityQueue"])
-            NormalizerPriorityQueue-->NormalizerDispatcher
-
-            NormalizerDispatcher[["NormalizerDispatcher"]]
         end
-
-        subgraph NormalizerDispatcher["NormalizerDispatcher [class]"]
-            normalizer_dispatch[["dispatch()"]]
-        end
-        normalizer_dispatch-->post_pop_normalizer
 
         subgraph Server
             push_queue[["push_queue()<br/>[api endpoint]"]]
@@ -249,7 +226,6 @@ classDiagram
         +AppContext ctx
         +Dict[str, ThreadRunner] threads
         +Dict[str, Scheduler] schedulers
-        +Dict[str, Dispatcher] dispatchers
         +Dict[str, Listener] listeners
         +Server server
         run()
@@ -271,22 +247,34 @@ classDiagram
     }
 
     class PriorityQueue{
-        +PriorityQueue[Entry] pq
+        <<abstract>>
+        +PriorityQueueStore pq_store
         pop()
         push()
         peek()
         remove()
+        empty()
+        qsize()
+        full()
+        is_item_on_queue()
+        get_p_item_by_identifier()
+        create_hash()
+        dict()
+        _is_valid_item()
     }
 
-    class Entry {
-        +int priority
-        +PrioritizedItem p_item
-        +EntryState state
-    }
-
-    class PrioritizedItem {
-        +int priority
-        +Any item
+    class PriorityQueueStore{
+        +Datastore datastore
+        pop()
+        push()
+        peek()
+        update()
+        remove()
+        get()
+        empty()
+        qsize()
+        get_item_by_hash()
+        get_items_by_scheduler_id()
     }
 
     class Ranker {
@@ -295,27 +283,18 @@ classDiagram
         rank()
     }
 
-    class Dispatcher {
-        +AppContext ctx
-        +Scheduler scheduler
-        dispatch()
-        run()
-    }
 
     class Listener {
         listen()
     }
 
     App --|> "many" Scheduler : Implements
-    App --|> "many" Dispatcher : Has
     App --|> "many" Listener : Has
 
     Scheduler --|> "1" PriorityQueue : Has
     Scheduler --|> "1" Ranker : Has
 
-    PriorityQueue --|> "many" Entry : Has
-
-    Entry --|> "1" PrioritizedItem : Has
+    PriorityQueue --|> PriorityQueueStore: References
 ```
 
 The following describes the main components of the scheduler application:
@@ -323,9 +302,9 @@ The following describes the main components of the scheduler application:
 * `App` - The main application class, which is responsible for starting the
   schedulers. It also contains the server, which is responsible for handling
   the rest api requests. The `App` implements multiple `Scheduler` instances.
-  The `run()` method starts the schedulers, the listeners, the monitors,
-  the dispatchers, and the server in threads. The `run()` method is the main
-  thread of the application.
+  The `run()` method starts the schedulers, the listeners, the monitors, and
+  the server in threads. The `run()` method is the main thread of the
+  application.
 
 * `Scheduler` - And implementation of a `Scheduler` class is responsible for
   populating the queue with tasks. Contains has a `PriorityQueue` and a
@@ -337,12 +316,6 @@ The following describes the main components of the scheduler application:
 
 * `Ranker` - The ranker class, which is responsible for ranking the tasks,
   and can be called from the `Scheduler` class in order to rank the tasks.
-
-* `Dispatcher` - The dispatcher class, which is responsible for dispatching
-  the tasks. A `Dispatcher` has a `Scheduler` instance, which it will
-  reference on pop off tasks from to be executed. The `run()` method will
-  continuously dispatch tasks from the queue. The `run()` method is run in a
-  thread.
 
 * `Server` - The server class, which is responsible for handling the HTTP
   requests.
