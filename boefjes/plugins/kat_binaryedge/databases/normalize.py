@@ -19,7 +19,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
@@ -74,25 +74,23 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         elif module == "elasticsearch" or module == "memcached":
             if "version" in scan.get("result", {}).get("data", {}):
                 software_version = scan["result"]["data"]["version"]
-            # (potential) TODO: jvm.version, jvm.vm_version, jvm.vm_vendor
+            # TODO: jvm.version, jvm.vm_version, jvm.vm_vendor
         elif module == "mongodb":
             if "version" in scan.get("result", {}).get("data", {}).get("serverInfo"):
                 software_version = scan["result"]["data"]["serverInfo"]["version"]
-            # (potential) TODO: 'serverInfo.OpenSSLVersion, scan['result']['data']['serverInfo']['openssl']{running,compiled}
-            # (potential) TODO: buildEnvironment.cc
+            # TODO: 'serverInfo.OpenSSLVersion, scan['result']['data']['serverInfo']['openssl']{running,compiled}
+            # TODO: buildEnvironment.cc
         elif module == "redis":
             if "redis_version" in scan.get("result", {}).get("data", {}):
                 software_version = scan["result"]["data"]["redis_version"]
-            # (potential) TODO: data.gccversion
+            # TODO: data.gccversion
 
         if software_version:
             software_ooi = Software(name=module, version=software_version)
         else:
             software_ooi = Software(name=module)
         yield software_ooi
-        software_instance_ooi = SoftwareInstance(
-            ooi=ip_port_ooi.reference, software=software_ooi.reference
-        )
+        software_instance_ooi = SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         yield software_instance_ooi
 
         kat_ooi = KATFindingType(id="KAT-641")

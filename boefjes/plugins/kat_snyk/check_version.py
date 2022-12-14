@@ -87,15 +87,13 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
     lowerbound_versioncheck = None
 
     # Check if lowerbound is < or <=
-    if re.search("^[\[(]", lowerbound):
+    if re.search("^[[(]", lowerbound):
         # Example: "(1.1,1.4]"  # https://snyk.io/vuln/maven%3Aorg.apache.nifi%3Anifi-security-utils
         upperbound = all_versions.pop(0).strip()
-        end_bracket = re.search("[\])]$", upperbound)
+        end_bracket = re.search("[])]$", upperbound)
         if not upperbound or not end_bracket:
             # Unexpected input: there is no closing-bracket
-            logger.warning(
-                f"Unexpected input, missing closing bracket for {lowerbound},{upperbound}. Ignoring input."
-            )
+            logger.warning(f"Unexpected input, missing closing bracket for {lowerbound},{upperbound}. Ignoring input.")
             return False, None
         if lowerbound[0] == "(":
             lowerbound_versioncheck = VersionCheck.GREATER
@@ -174,9 +172,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
 
 
 def check_version_in(version: str, versions: str):
-    all_versions = versions.split(
-        ","
-    )  # Example: https://snyk.io/vuln/composer%3Awoocommerce%2Fwoocommerce-blocks
+    all_versions = versions.split(",")  # Example: https://snyk.io/vuln/composer%3Awoocommerce%2Fwoocommerce-blocks
     in_range = False
     while not in_range and all_versions:
         in_range, all_versions = check_version_agains_versionlist(version, all_versions)

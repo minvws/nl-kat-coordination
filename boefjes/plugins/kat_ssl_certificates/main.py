@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 
 import docker
 
@@ -7,7 +7,7 @@ from boefjes.job_models import BoefjeMeta
 OPENSSL_IMAGE = "securefab/openssl:latest"
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     client = docker.from_env()
     input_ = boefje_meta.arguments["input"]
     hostname = input_["hostname"]["name"]
@@ -33,4 +33,4 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
     except docker.errors.ContainerError as e:
         output = f"error {str(e)}"
 
-    return boefje_meta, output
+    return [(set(), output)]

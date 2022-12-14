@@ -18,7 +18,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
@@ -59,12 +59,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         )
         yield ip_port_ooi
 
-        # (potential) TODO: result.data.server_info {openssl_cipher_string_supported,highest_ssl_version_supported,ja3,ja3_digest}
-        # (potential) TODO: version
-        # (potential) TODO: jarm
-        for cert_chain in (
-            scan.get("data", {}).get("cert_info", {}).get("certificate_chain", [])
-        ):
+        # TODO: result.data.server_info {openssl_cipher_string_supported,highest_ssl_version_supported,ja3,ja3_digest}
+        # TODO: version
+        # TODO: jarm
+        for cert_chain in scan.get("data", {}).get("cert_info", {}).get("certificate_chain", []):
             pass
             # yield Certificate(
             #     subject = cert_chain['as_dict']['subject']['common_name'],
@@ -84,7 +82,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             yield Finding(
                 finding_type=kat_ooi.reference,
                 ooi=ip_port_ooi.reference,
-                description=f"SSL is set to support compression, but it is advised to disable this.",
+                description="SSL is set to support compression, but it is advised to disable this.",
             )
         if vulns.get("fallback", {}).get("supports_fallback_scsv"):
             kat_ooi = KATFindingType(id="KAT-642")
@@ -92,7 +90,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             yield Finding(
                 finding_type=kat_ooi.reference,
                 ooi=ip_port_ooi.reference,
-                description=f"SSL is set to support fallback scsv, but it is advised to disable this.",
+                description="SSL is set to support fallback scsv, but it is advised to disable this.",
             )
         if "heartbleed" in vulns and vulns["heartbleed"]["is_vulnerable_to_heartbleed"]:
             kat_ooi = KATFindingType(id="KAT-642")
@@ -100,40 +98,32 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             yield Finding(
                 finding_type=kat_ooi.reference,
                 ooi=ip_port_ooi.reference,
-                description=f"It is confirmed this connection is vulnerable to Heartbleed, it is advised to adopt the fix.",
+                description="It is confirmed this connection is vulnerable to Heartbleed, it is advised to adopt "
+                "the fix.",
             )
-        if (
-            "openssl_ccs" in vulns
-            and vulns["openssl_ccs"]["is_vulnerable_to_ccs_injection"]
-        ):
+        if "openssl_ccs" in vulns and vulns["openssl_ccs"]["is_vulnerable_to_ccs_injection"]:
             kat_ooi = KATFindingType(id="KAT-642")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
                 ooi=ip_port_ooi.reference,
-                description=f"It is verified this connection is vulnerable to the OpenSSL CSS Injection Vulnerability.",
+                description="It is verified this connection is vulnerable to the OpenSSL CSS Injection Vulnerability.",
             )
-        if (
-            "renegotiation" in vulns
-            and vulns["renegotiation"]["accepts_client_renegotiation"]
-        ):
+        if "renegotiation" in vulns and vulns["renegotiation"]["accepts_client_renegotiation"]:
             kat_ooi = KATFindingType(id="KAT-642")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
                 ooi=ip_port_ooi.reference,
-                description=f"This SSL accepts client renegotiation, but i can be used in a DOS attack.",
+                description="This SSL accepts client renegotiation, but i can be used in a DOS attack.",
             )
-        if (
-            "renegotiation" in vulns
-            and vulns["renegotiation"]["supports_secure_renegotiation"]
-        ):
+        if "renegotiation" in vulns and vulns["renegotiation"]["supports_secure_renegotiation"]:
             kat_ooi = KATFindingType(id="KAT-642")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
                 ooi=ip_port_ooi.reference,
-                description=f"This SSL accepts secure renegotiation, but i can be used in a DOS attack.",
+                description="This SSL accepts secure renegotiation, but i can be used in a DOS attack.",
             )
         if "robot_result_enum" in vulns.get("robot", {}):
             robot = vulns["robot"]["robot_result_enum"]
