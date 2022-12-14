@@ -136,7 +136,7 @@ class BoefjeHandler(Handler):
             boefje_results = self.job_runner.run(boefje_meta, environment)
         except Exception as exc:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id, exc_info=True)
-            boefje_results = [({"error/boefje"}, f"{traceback.format_exc()}\n" + str(exc))]
+            boefje_results = [({"error/boefje"}, f"{traceback.format_exc()}\n{str(exc)}")]
         finally:
             boefje_meta.ended_at = now()
 

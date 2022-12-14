@@ -84,22 +84,14 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         if "software" in scan:
             for sw in scan["software"]:
                 if "version" in sw:
-                    software_ooi = Software(
-                        name=sw["product"].upper(), version=sw["version"]
-                    )
+                    software_ooi = Software(name=sw["product"].upper(), version=sw["version"])
                 else:
                     software_ooi = Software(name=sw["product"].upper())
 
                 yield software_ooi
-                yield SoftwareInstance(
-                    ooi=ip_port.reference, software=software_ooi.reference
-                )
+                yield SoftwareInstance(ooi=ip_port.reference, software=software_ooi.reference)
 
-        if (
-            "http" in scan
-            and "response" in scan["http"]
-            and "headers" in scan["http"]["response"]
-        ):
+        if "http" in scan and "response" in scan["http"] and "headers" in scan["http"]["response"]:
             headers = scan["http"]["response"]["headers"]
             for header, values in headers.items():
                 if header.startswith("_"):

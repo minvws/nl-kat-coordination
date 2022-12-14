@@ -110,9 +110,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         software_ooi = None
         software_name = event.get("service", {}).get("software", {}).get("name")
         software_version = event.get("service", {}).get("software", {}).get("version")
-        software_fingerprint = (
-            event.get("service", {}).get("software", {}).get("fingerprint")
-        )
+        software_fingerprint = event.get("service", {}).get("software", {}).get("fingerprint")
         if software_name:
             if software_version:
                 software_ooi = Software(name=software_name, version=software_version)
@@ -122,9 +120,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             software_ooi = Software(name=software_fingerprint)
         if software_ooi:
             yield software_ooi
-            software_instance_ooi = SoftwareInstance(
-                ooi=event_ooi, software=software_ooi.reference
-            )
+            software_instance_ooi = SoftwareInstance(ooi=event_ooi, software=software_ooi.reference)
             yield software_instance_ooi
             event_ooi = software_instance_ooi.reference
         # Potential TODO: add vendor
@@ -136,9 +132,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         if leak_severity or leak_stage:
             #  Got the differen severities from: https://pkg.go.dev/github.com/LeakIX/l9format#pkg-constants
             leak_infected = event.get("leak", {}).get("dataset", {}).get("infected")
-            leak_ransomnote = (
-                event.get("leak", {}).get("dataset", {}).get("ransom_notes")
-            )
+            leak_ransomnote = event.get("leak", {}).get("dataset", {}).get("ransom_notes")
             if leak_severity == "critical" or leak_infected or leak_ransomnote:
                 kat_number = "KAT-645"
             elif leak_severity == "high":

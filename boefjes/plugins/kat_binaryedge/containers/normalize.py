@@ -19,7 +19,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
@@ -62,9 +62,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
         software_ooi = Software(name=module.capitalize())
         yield software_ooi
-        software_instance_ooi = SoftwareInstance(
-            ooi=ip_port_ooi.reference, software=software_ooi.reference
-        )
+        software_instance_ooi = SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         yield software_instance_ooi
 
         kat_ooi = KATFindingType(id="KAT-642")
@@ -75,4 +73,4 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             description=f"Container {module.capitalize()} is accessable from the internet, check if this intended.",
         )
 
-        # (potential) TODO: use auth_required=False to determine urgency/impact
+        # TODO: use auth_required=False to determine urgency/impact

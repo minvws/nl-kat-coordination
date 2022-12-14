@@ -61,11 +61,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         yield ip_port_ooi
 
         service_name = ""
-        if (
-            module == "rdp"
-            and scan.get("result", {}).get("data", {}).get("security", "").lower()
-            == "ssl"
-        ):
+        if module == "rdp" and scan.get("result", {}).get("data", {}).get("security", "").lower() == "ssl":
             service_name = "ssl/rdp"
         elif module == "rdp" or module == "rdpeudp" or module == "bluekeep":
             service_name = "rdp"
@@ -75,9 +71,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         service_ooi = Service(name=service_name)
         yield service_ooi
 
-        ip_service_ooi = IPService(
-            ip_port=ip_port_ooi.reference, service=service_ooi.reference
-        )
+        ip_service_ooi = IPService(ip_port=ip_port_ooi.reference, service=service_ooi.reference)
         yield ip_service_ooi
 
         kat_641_ooi = KATFindingType(id="KAT-641")
@@ -88,11 +82,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             description=f"{module.upper()} should not be exposed to the internet.",
         )
 
-        if (
-            module == "bluekeep"
-            and scan.get("result", {}).get("data", {}).get("status", "").lower()
-            == "vulnerable"
-        ):
+        if module == "bluekeep" and scan.get("result", {}).get("data", {}).get("status", "").lower() == "vulnerable":
             kat_642_ooi = KATFindingType(id="KAT-642")
             yield kat_642_ooi
             yield Finding(
