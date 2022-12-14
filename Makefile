@@ -6,7 +6,7 @@ HIDE:=$(if $(VERBOSE),,@)
 UNAME := $(shell uname)
 
 
-.PHONY: kat, kat-stable, clone, migrate, build, itest
+.PHONY: kat kat-stable clone migrate build itest debian-build-image ubuntu-build-image
 
 # Export Docker buildkit options
 export DOCKER_BUILDKIT=1
@@ -49,7 +49,7 @@ clean:
 	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
 
 up:
-	-docker-compose up -d --force-recreate rocky
+	docker-compose up -d --force-recreate rocky
 
 down:
 	-docker-compose down
@@ -93,6 +93,7 @@ checkout: # Usage: `make checkout branch=develop`
 	-git -C nl-kat-bytes checkout $(branch)
 	-git -C nl-kat-octopoes checkout $(branch)
 	-git -C nl-kat-mula checkout $(branch)
+	-git -C nl-kat-keiko checkout $(branch)
 	-git -C nl-kat-rocky checkout $(branch)
 
 pull-reset:
@@ -121,3 +122,9 @@ endif
 	make -C nl-kat-rocky build-rocky-frontend
 	make -C nl-kat-boefjes build
 	make -C nl-kat-bytes build
+
+debian-build-image:
+	docker build -t kat-debian-build-image packaging/debian
+
+ubuntu-build-image:
+	docker build -t kat-ubuntu-build-image packaging/ubuntu

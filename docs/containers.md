@@ -35,7 +35,7 @@ make env
 This will create an .env file with the default values. You can edit this file to change the default values. Now you can pull and start the containers using the following command:
 
 ```shell
-docker-compose -f docker-compose.release-example.yml up -d 
+docker-compose -f docker-compose.release-example.yml up -d
 ```
 
 
@@ -155,11 +155,12 @@ See also https://github.com/minvws/nl-kat-bytes#configuration
 
 ## Octopoes
 
-| Environment variable | Required | Default Value | Format           | Description    |
-|----------------------|----------|---------------|------------------|----------------|
-| `XTDB_URI`           | yes      |               | http://crux:3000 | XTDB uri       |
-| `XTDB_TYPE`          | no       | crux          |                  | crux or xtdb   |
-| `QUEUE_URI`          | yes      |               |                  | RabbitMQ queue |
+| Environment variable | Required | Default Value | Format                | Description               |
+|----------------------|----------|---------------|-----------------------|---------------------------|
+| `XTDB_URI`           | yes      |               | http://crux:3000      | XTDB uri                  |
+| `XTDB_TYPE`          | no       | crux          |                       | crux or xtdb              |
+| `QUEUE_URI`          | yes      |               |                       | RabbitMQ queue            |
+| `KATALOGUS_API`      | yes      |               | http://katalogus:8000 | URI for the Katalogus API |
 
 See also https://github.com/minvws/nl-kat-octopoes#environment-variables
 
