@@ -6,7 +6,7 @@ HIDE:=$(if $(VERBOSE),,@)
 UNAME := $(shell uname)
 
 
-.PHONY: kat, kat-stable, clone, migrate, build, itest
+.PHONY: kat kat-stable clone migrate build itest debian-build-image ubuntu-build-image
 
 # Export Docker buildkit options
 export DOCKER_BUILDKIT=1
@@ -46,29 +46,29 @@ update:
 
 clean:
 	-docker-compose down
-	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
+	-docker volume rm nl-kat_rocky-db-data nl-kat_bytes-db-data nl-kat_katalogus-db-data nl-kat_xtdb-data
 
 up:
-	-docker-compose up -d --force-recreate rocky
+	docker-compose up -d --force-recreate rocky
 
 down:
 	-docker-compose down
 
 clone:
-	-git clone https://github.com/minvws/nl-kat-boefjes.git
-	-git clone https://github.com/minvws/nl-kat-bytes.git
-	-git clone https://github.com/minvws/nl-kat-octopoes.git
-	-git clone https://github.com/minvws/nl-kat-mula.git
-	-git clone https://github.com/minvws/nl-kat-keiko.git
-	-git clone https://github.com/minvws/nl-kat-rocky.git
+	-git clone git@github.com:minvws/nl-kat-boefjes.git
+	-git clone git@github.com:minvws/nl-kat-bytes.git
+	-git clone git@github.com:minvws/nl-kat-octopoes.git
+	-git clone git@github.com:minvws/nl-kat-mula.git
+	-git clone git@github.com:minvws/nl-kat-keiko.git
+	-git clone git@github.com:minvws/nl-kat-rocky.git
 
 clone-main:
-	-git clone --branch main https://github.com/minvws/nl-kat-boefjes.git
-	-git clone --branch main https://github.com/minvws/nl-kat-bytes.git
-	-git clone --branch main https://github.com/minvws/nl-kat-octopoes.git
-	-git clone --branch main https://github.com/minvws/nl-kat-mula.git
-	-git clone --branch main https://github.com/minvws/nl-kat-keiko.git
-	-git clone --branch main https://github.com/minvws/nl-kat-rocky.git
+	-git clone --branch main git@github.com:minvws/nl-kat-boefjes.git
+	-git clone --branch main git@github.com:minvws/nl-kat-bytes.git
+	-git clone --branch main git@github.com:minvws/nl-kat-octopoes.git
+	-git clone --branch main git@github.com:minvws/nl-kat-mula.git
+	-git clone --branch main git@github.com:minvws/nl-kat-keiko.git
+	-git clone --branch main git@github.com:minvws/nl-kat-rocky.git
 
 pull:
 	-git pull
@@ -93,6 +93,7 @@ checkout: # Usage: `make checkout branch=develop`
 	-git -C nl-kat-bytes checkout $(branch)
 	-git -C nl-kat-octopoes checkout $(branch)
 	-git -C nl-kat-mula checkout $(branch)
+	-git -C nl-kat-keiko checkout $(branch)
 	-git -C nl-kat-rocky checkout $(branch)
 
 pull-reset:
@@ -121,3 +122,9 @@ endif
 	make -C nl-kat-rocky build-rocky-frontend
 	make -C nl-kat-boefjes build
 	make -C nl-kat-bytes build
+
+debian-build-image:
+	docker build -t kat-debian-build-image packaging/debian
+
+ubuntu-build-image:
+	docker build -t kat-ubuntu-build-image packaging/ubuntu
