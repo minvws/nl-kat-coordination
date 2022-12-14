@@ -46,7 +46,7 @@ update:
 
 clean:
 	-docker-compose down
-	-docker volume rm nl-kat_rocky-db-data nl-kat_bytes-db-data nl-kat_katalogus-db-data nl-kat_xtdb-data
+	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
 
 up:
 	docker-compose up -d --force-recreate rocky
@@ -55,20 +55,20 @@ down:
 	-docker-compose down
 
 clone:
-	-git clone git@github.com:minvws/nl-kat-boefjes.git
-	-git clone git@github.com:minvws/nl-kat-bytes.git
-	-git clone git@github.com:minvws/nl-kat-octopoes.git
-	-git clone git@github.com:minvws/nl-kat-mula.git
-	-git clone git@github.com:minvws/nl-kat-keiko.git
-	-git clone git@github.com:minvws/nl-kat-rocky.git
+	-git clone https://github.com/minvws/nl-kat-boefjes.git
+	-git clone https://github.com/minvws/nl-kat-bytes.git
+	-git clone https://github.com/minvws/nl-kat-octopoes.git
+	-git clone https://github.com/minvws/nl-kat-mula.git
+	-git clone https://github.com/minvws/nl-kat-keiko.git
+	-git clone https://github.com/minvws/nl-kat-rocky.git
 
 clone-main:
-	-git clone --branch main git@github.com:minvws/nl-kat-boefjes.git
-	-git clone --branch main git@github.com:minvws/nl-kat-bytes.git
-	-git clone --branch main git@github.com:minvws/nl-kat-octopoes.git
-	-git clone --branch main git@github.com:minvws/nl-kat-mula.git
-	-git clone --branch main git@github.com:minvws/nl-kat-keiko.git
-	-git clone --branch main git@github.com:minvws/nl-kat-rocky.git
+	-git clone --branch main https://github.com/minvws/nl-kat-boefjes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-bytes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-octopoes.git
+	-git clone --branch main https://github.com/minvws/nl-kat-mula.git
+	-git clone --branch main https://github.com/minvws/nl-kat-keiko.git
+	-git clone --branch main https://github.com/minvws/nl-kat-rocky.git
 
 pull:
 	-git pull
