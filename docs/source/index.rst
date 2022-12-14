@@ -1,16 +1,12 @@
 Welcome to the OpenKAT documentation!
 =====================================
 
+.. This should contain some nice introduction.
+
 .. toctree::
    :maxdepth: 4
-   :caption: Contents:
+   :caption: Contents
 
-   readme
-   containers
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   guidelines/index
+   templates/index
+   technical_design/index
