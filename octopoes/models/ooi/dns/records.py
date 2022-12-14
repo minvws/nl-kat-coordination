@@ -171,7 +171,10 @@ class DNSSPFMechanismIP(DNSSPFMechanism):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.mock_hostname.name} to {reference.tokenized.qualifier} {reference.tokenized.ip.address}"
+        return (
+            f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.mock_hostname.name} to "
+            + f"{reference.tokenized.qualifier} {reference.tokenized.ip.address}"
+        )
 
 
 class DNSSPFMechanismHostname(DNSSPFMechanism):
@@ -187,7 +190,10 @@ class DNSSPFMechanismHostname(DNSSPFMechanism):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.mock_hostname.name} to {reference.tokenized.qualifier} {reference.tokenized.hostname.name}"
+        return (
+            f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.mock_hostname.name} "
+            + f"to {reference.tokenized.qualifier} {reference.tokenized.hostname.name}"
+        )
 
 
 class DNSSPFMechanismNetBlock(DNSSPFMechanism):
@@ -203,7 +209,11 @@ class DNSSPFMechanismNetBlock(DNSSPFMechanism):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.mock_hostname.name} to {reference.tokenized.qualifier} {reference.tokenized.netblock.start_ip}/{reference.tokenized.netblock.mask}"
+        return (
+            f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.mock_hostname.name} to "
+            + f"{reference.tokenized.qualifier} "
+            + f"{reference.tokenized.netblock.start_ip}/{reference.tokenized.netblock.mask}"
+        )
 
 
 class NXDOMAIN(OOI):
@@ -219,13 +229,3 @@ class NXDOMAIN(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"NXDOMAIN response on {reference.tokenized.hostname.name}"
-
-
-# class DNSNTA7516Record(DNSRecord):
-#     expiry: Optional[datetime]
-
-# class DNSDKIMRecord(DNSRecord):
-#     pass
-
-# class DNSDMARCRecord(DNSRecord):
-#     pass

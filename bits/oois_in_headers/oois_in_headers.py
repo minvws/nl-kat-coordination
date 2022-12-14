@@ -19,7 +19,7 @@ def run(
 
     network = Network(name="internet")
 
-    urls_and_hostname = re.findall("(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", input_ooi.value)
+    urls_and_hostname = re.findall(r"(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", input_ooi.value)
 
     for object in urls_and_hostname:
         try:

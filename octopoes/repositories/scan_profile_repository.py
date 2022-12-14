@@ -125,6 +125,8 @@ class XTDBScanProfileRepository(ScanProfileRepository):
 
     def get_bulk(self, references: Set[Reference], valid_time: datetime) -> List[ScanProfileBase]:
         ids = list(map(str, references))
-        query = generate_pull_query(self.xtdb_type, FieldSet.ALL_FIELDS, {"type": self.object_type(), "reference": ids})
+        query = generate_pull_query(
+            self.xtdb_type, FieldSet.ALL_FIELDS, {"type": self.object_type(), "reference": ids}
+        )
         res = self.session.client.query(query, valid_time)
         return [self.deserialize(x[0]) for x in res]

@@ -34,3 +34,7 @@ loggers:
     level: INFO
     handlers: [console]
     propagate: 0
+  celery:
+    level: WARNING
+    handlers: [console]
+    propagate: 0

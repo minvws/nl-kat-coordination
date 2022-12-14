@@ -24,8 +24,11 @@ def run(
         findings.append("127.0.0.1 should not be used in the CSP settings of an HTTP Header.")
 
     # checks for a wildcard in domains in the header
-    # one or more non-whitespace, wildcard. (second-level domain), 2 or 3 non-whitespace characters (top-level domain), end with either a space, a ';', a :port or the end of the string
-    # \S+                         \*\.                             \S{2,3}                                              ([\s]+|$|;)
+    # 1: one or more non-whitespace
+    # 2: wildcard
+    # 3: second-level domain
+    # 4: end with either a space, a ';', a :port or the end of the string
+    #              {1}{ 2}{  3  }{         4       }
     if re.search(r"\S+\*\.\S{2,3}([\s]+|$|;|:[0-9]+)", header.value):
         findings.append("The wildcard * for the scheme and host part of any URL should never be used in CSP settings.")
 
@@ -57,7 +60,9 @@ def run(
             if ("'none'" not in policy and "'self'" not in policy) or not _source_valid(policy[2:]):
                 findings.append(f"{policy[0]} has not been correctly defined.")
 
-        if (policy[0] == "default-src" or policy[0] == "object-src" or policy[0] == "script-src") and "data:" in policy:
+        if (
+            policy[0] == "default-src" or policy[0] == "object-src" or policy[0] == "script-src"
+        ) and "data:" in policy:
             findings.append(
                 "'Data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
             )

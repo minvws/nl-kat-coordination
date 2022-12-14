@@ -17,5 +17,5 @@ def run(
         yield Finding(
             finding_type=nxdomain.reference,
             ooi=input_ooi.reference,
-            description=f"The domain does not exist.",
+            description="The domain does not exist.",
         )

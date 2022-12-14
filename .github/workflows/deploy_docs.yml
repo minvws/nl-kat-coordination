@@ -1,0 +1,61 @@
+name: Compile and deploy documentation to Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches:
+      - "develop"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install requirements.txt
+        run: pip install -r requirements.txt
+
+      - name: Install sphinx dependencies
+        run: pip install sphinx sphinx_rtd_theme sphinxcontrib-mermaid myst-parser
+
+      - name: Generate apidocs
+        run: sphinx-apidoc octopoes -o docs/source/_generated
+
+      - name: Compile static HTML
+        run: sphinx-build -b html docs/source docs/_build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'docs/_build'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1

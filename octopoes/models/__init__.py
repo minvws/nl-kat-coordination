@@ -218,6 +218,13 @@ class Reference(str):
         return cls(ref_str)
 
 
+def format_id_short(id_: str) -> str:
+    """Format the id in a short way. > 33 characters, interpolate with ..."""
+    if len(id_) > 33:
+        return f"{id_[:15]}...{id_[-15:]}"
+    return id_
+
+
 class PrimaryKeyToken(BaseModel):
     __root__: Dict[str, Union[str, PrimaryKeyToken]]
 

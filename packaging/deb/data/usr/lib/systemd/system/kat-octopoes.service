@@ -1,18 +1,21 @@
 [Unit]
 Description=kat-octopoes daemon
-Requires=kat-octopoes-celery.service
+Requires=kat-octopoes-worker.service
 After=network.target
 
 [Service]
 User=kat
 Group=kat
-WorkingDirectory=/usr/share/kat-octopoes/app
+SyslogIdentifier=kat-octopoes
+WorkingDirectory=/opt/venvs/kat-octopoes
 EnvironmentFile=/etc/kat/octopoes.conf
-ExecStart=/usr/share/kat-octopoes/venv/bin/gunicorn \
+ExecStart=/opt/venvs/kat-octopoes/bin/python -m gunicorn \
           --access-logfile - \
-          -c /etc/kat/gunicorn.octopoes.conf.py \
+          -c /etc/kat/octopoes.gunicorn.conf.py \
           -k uvicorn.workers.UvicornWorker \
           octopoes.api.api:app
+Restart=on-failure
+RestartSec=3s
 
 [Install]
 WantedBy=multi-user.target

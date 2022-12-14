@@ -1,101 +1,161 @@
 *** Settings ***
-Library     OperatingSystem
-Library     RequestsLibrary
-Library     DateTime
+Library             OperatingSystem
+Library             RequestsLibrary
+Library             DateTime
+Library             String
+Resource            robot.resource
 
-*** Variables ***
-${HOSTNAME_OOI}   Hostname|internet|example.com
-${IPADDR_OOI}    IPAddressV4|internet|1.1.1.1
-${RESOLVED_HOSTNAME_OOI}    ResolvedHostname|internet|example.com|internet|1.1.1.1
-${TZ}    +00:00
-${OCTOPOES_URI}
-
-*** Keywords ***
-Get Valid Time
-    ${valid_time}   Get Current Date    time_zone=utc    result_format=%Y-%m-%dT%H:%M:%S.%f
-    [return]        ${valid_time}${TZ}
-
-Get Valid Time Params
-    ${valid_time}   Get Valid Time
-    ${valid_time_params}    Create Dictionary    valid_time=${valid_time}
-    [return]        ${valid_time_params}
+Test Setup          Setup Test
+Test Teardown       Teardown Test
 
 
 *** Test Cases ***
-I want to save an origin
-    ${norm_output_json}    Get File    tests/fixtures/normalizer_output.json
-    ${response}    Post    ${OCTOPOES_URI}/observations    ${norm_output_json}
-    Should Be Equal As Integers    ${response.status_code}    200
+Inheritance Of Two Declared Scan Profiles
+    Declare Scan Profile    ${REF_HOSTNAME}    ${4}
+    Declare Scan Profile    ${REF_IPADDR}    ${2}
+    Await Sync
+    Recalculate Scan Profiles
+    Verify Scan Level    ${REF_HOSTNAME}    ${4}
+    Verify Scan Level    ${REF_IPADDR}    ${2}
+    Verify Scan Level    ${REF_RESOLVEDHOSTNAME}    ${4}
+    Verify Scan Profile Increment Queue    ${REF_HOSTNAME}    ${4}
+    Verify Scan Profile Increment Queue    ${REF_IPADDR}    ${2}
+    Verify Scan Profile Increment Queue    ${REF_RESOLVEDHOSTNAME}    ${4}
+    Verify Scan LeveL Filter    ge    0    ${6}
+    Verify Scan LeveL Filter    gt    0    ${4}
+    Verify Scan LeveL Filter    le    0    ${2}
+    Verify Scan LeveL Filter    le    2    ${4}
+    Verify Scan LeveL Filter    le    4    ${6}
+    Verify Scan LeveL Filter    lt    2    ${2}
+    Verify Scan LeveL Filter    eq    2    ${2}
+    Verify Scan LeveL Filter    ne    2    ${4}
+    Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[4]}}
+    Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[2]}}
+    Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[4]}}
 
-I want to save a scan profile on Hostname
-    ${params}   Get Valid Time Params
-    ${scan_profile_json}    Get File    tests/fixtures/declared_scan_profile1.json
+Recalculate Inheritance After Modification
+    Declare Scan Profile    ${REF_HOSTNAME}    ${4}
+    Declare Scan Profile    ${REF_IPADDR}    ${2}
+    Recalculate Scan Profiles
+    Set Scan Profile To Empty    ${REF_HOSTNAME}
+    Recalculate Scan Profiles
+    Verify Scan Level    ${REF_HOSTNAME}    ${0}
+    Verify Scan Level    ${REF_IPADDR}    ${2}
+    Verify Scan Level    ${REF_RESOLVEDHOSTNAME}    ${0}
+    Verify Scan Profile Increment Queue    ${REF_HOSTNAME}    ${4}
+    Verify Scan Profile Increment Queue    ${REF_IPADDR}    ${2}
+    Verify Scan Profile Increment Queue    ${REF_RESOLVEDHOSTNAME}    ${4}
+    Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[4, 0]}}
+    Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[2]}}
+    Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[4, 0]}}
+
+Empty Scan Profiles
+    Recalculate Scan Profiles
+    Verify Scan Level    ${REF_HOSTNAME}    ${0}
+    Verify Scan Level    ${REF_IPADDR}    ${0}
+    Verify Scan Level    ${REF_RESOLVEDHOSTNAME}    ${0}
+    Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[0]}}
+    Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[0]}}
+    Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[0]}}
+
+
+*** Keywords ***
+Setup Test
+    Start Monitoring    ${QUEUE_URI}
+    Insert Normalizer Output
+    Await Sync
+
+Teardown Test
+    Cleanup
+    Await Sync
+    Stop Monitoring
+
+Declare Scan Profile
+    [Arguments]    ${reference}    ${scan_level}
+    ${params}    Get Valid Time Params
+    ${data}    Create Dictionary    reference=${reference}    level=${scan_level}    scan_profile_type=declared
     ${response}    Put
     ...    ${OCTOPOES_URI}/scan_profiles
-    ...    ${scan_profile_json}
+    ...    json=${data}
     ...    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
 
-I want to save a scan profile on IP Address
-    ${params}   Get Valid Time Params
-    ${scan_profile_json}    Get File    tests/fixtures/declared_scan_profile2.json
+Set Scan Profile To Empty
+    [Arguments]    ${reference}
+    ${params}    Get Valid Time Params
+    ${data}    Create Dictionary    reference=${reference}    scan_profile_type=empty
     ${response}    Put
     ...    ${OCTOPOES_URI}/scan_profiles
-    ...    ${scan_profile_json}
+    ...    json=${data}
     ...    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
 
-I want to trigger a scan level recalculation
-    Sleep   1s
-    ${params}   Get Valid Time Params
+Recalculate Scan Profiles
+    ${params}    Get Valid Time Params
     ${response}    Get
     ...    ${OCTOPOES_URI}/scan_profiles/recalculate
     ...    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
-    Sleep   1s
+    Await Sync
 
-I want to read the Hostname and its scan profile
-    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${HOSTNAME_OOI}
+Verify Scan Level
+    [Arguments]    ${reference}    ${scan_level}
+    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${reference}
     Should Be Equal As Integers    ${response.status_code}    200
     Should Be Equal    ${response.headers["content-type"]}    application/json
     ${response_data}    Set Variable    ${response.json()}
-    Should Be Equal    ${response_data["primary_key"]}    ${HOSTNAME_OOI}
-    Should Be Equal As Integers    ${response_data["scan_profile"]["level"]}    ${4}
+    Should Be Equal    ${response_data["primary_key"]}    ${reference}
+    Should Be Equal As Integers
+    ...    ${response_data["scan_profile"]["level"]}
+    ...    ${scan_level}
+    ...    Scan Level of ${reference} should be ${scan_level} in the database
 
-I want to read the IPAddress and its scan profile
-    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${IPADDR_OOI}
+Verify Scan Profile Increment Queue
+    [Arguments]    ${reference}    ${scan_level}
+    ${messages}    Get Messages From Queue    ${SCAN_PROFILE_INCREMENT_QUEUE}    ack_requeue_true
+    FOR    ${message}    IN    @{messages}
+        ${payload}    Evaluate    json.loads("""${message["payload"]}""")    json
+        IF    "${payload['primary_key']}" == "${reference}"
+            Should Be Equal As Integers
+            ...    ${payload["scan_profile"]["level"]}
+            ...    ${scan_level}
+            ...    Scan Level of ${reference} should be ${scan_level} in the increment queue
+            @{reference_parts}    Split String    ${reference}    |
+            Should Be Equal    ${payload["object_type"]}    ${reference_parts}[0]
+            RETURN
+        END
+    END
+    Fail    Scan Level of ${reference} should be incremented to ${scan_level}
+
+Verify Scan LeveL Filter
+    [Arguments]    ${operator}    ${scan_level}    ${expected_count}
+    ${params}    Get Valid Time Params
+    ${params}    Create Dictionary
+    ...    scan_level_operator=${operator}
+    ...    scan_level=${scan_level}
+    ...    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/objects    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
-    Should Be Equal    ${response.headers["content-type"]}    application/json
     ${response_data}    Set Variable    ${response.json()}
-    Should Be Equal    ${response_data["primary_key"]}    ${IPADDR_OOI}
-    Should Be Equal As Integers    ${response_data["scan_profile"]["level"]}    ${2}
+    Should Be Equal As Integers    ${response_data["count"]}    ${expected_count}
+    Length Should Be    ${response_data["items"]}    ${expected_count}
 
-I want to reset the Hostname's scan profile
-    ${params}   Get Valid Time Params
-    ${scan_profile_json}    Get File    tests/fixtures/empty_scan_profile1.json
-    ${response}    Put
-    ...    ${OCTOPOES_URI}/scan_profiles
-    ...    ${scan_profile_json}
-    ...    params=${params}
-    Should Be Equal As Integers    ${response.status_code}    200
+Verify Scan Profile Mutation Queue
+    [Arguments]    ${reference}    ${scan_levels}
+    ${messages}    Get Messages From Queue    ${SCAN_PROFILE_MUTATION_QUEUE}    ack_requeue_true
+    FOR    ${message}    IN    @{messages}
+        ${payload}    Evaluate    json.loads("""${message["payload"]}""")    json
+        IF    "${payload['primary_key']}" == "${reference}"
+            ${expected_scan_level}    Remove From List    ${scan_levels}    0
 
-I want to retrigger a scan level recalculation
-    Sleep   1s
-    ${params}   Get Valid Time Params
-    ${response}    Get
-    ...    ${OCTOPOES_URI}/scan_profiles/recalculate
-    ...    params=${params}
-    Should Be Equal As Integers    ${response.status_code}    200
-    Sleep   1s
+            Should Be Equal As Integers
+            ...    ${payload["value"]["scan_profile"]["level"]}
+            ...    ${expected_scan_level}
+            ...    Scan Level of ${reference} should be ${expected_scan_level} in the mutation queue
+            @{reference_parts}    Split String    ${reference}    |
+            Should Be Equal    ${payload["value"]["object_type"]}    ${reference_parts}[0]
 
-I want to read the Hostname and its (now empty) scan profile
-    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${HOSTNAME_OOI}
-    ${response_data}    Set Variable    ${response.json()}
-    Should Be Equal    ${response_data["primary_key"]}    ${HOSTNAME_OOI}
-    Should Be Equal As Integers    ${response_data["scan_profile"]["level"]}    ${0}
-
-I want to read the ResolvedHostname and its (now empty) scan profile
-    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${RESOLVED_HOSTNAME_OOI}
-    ${response_data}    Set Variable    ${response.json()}
-    Should Be Equal    ${response_data["primary_key"]}    ${RESOLVED_HOSTNAME_OOI}
-    Should Be Equal As Integers    ${response_data["scan_profile"]["level"]}    ${0}
+            IF    ${scan_levels} == []    RETURN
+        END
+    END
+    Fail    Scan Level of ${reference} should be mutated to ${scan_levels}[0]

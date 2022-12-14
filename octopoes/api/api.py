@@ -29,7 +29,7 @@ add_timing_middleware(app, record=logger.debug, prefix="app")
 
 
 @app.exception_handler(RequestValidationError)
-def http_exception_handler(request: Request, exc: RequestException):
+def http_validation_exception_handler(request: Request, exc: RequestException) -> JSONResponse:
     logger.critical(exc)
     return JSONResponse(
         {
@@ -40,7 +40,7 @@ def http_exception_handler(request: Request, exc: RequestException):
 
 
 @app.exception_handler(RequestException)
-def http_exception_handler(request: Request, exc: RequestException):
+def http_exception_handler(request: Request, exc: RequestException) -> JSONResponse:
     logger.critical(exc)
     return JSONResponse(
         {
@@ -51,7 +51,7 @@ def http_exception_handler(request: Request, exc: RequestException):
 
 
 @app.exception_handler(ObjectNotFoundException)
-def not_found_exception_handler(request: Request, exc: ObjectNotFoundException):
+def not_found_exception_handler(request: Request, exc: ObjectNotFoundException) -> JSONResponse:
     logger.info(exc)
     return JSONResponse(
         {
@@ -62,7 +62,7 @@ def not_found_exception_handler(request: Request, exc: ObjectNotFoundException):
 
 
 @app.exception_handler(Exception)
-def uncaught_exception_handler(request: Request, exc: Exception):
+def uncaught_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     logger.critical(exc)
     return JSONResponse(
         {

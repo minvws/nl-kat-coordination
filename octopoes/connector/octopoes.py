@@ -10,6 +10,7 @@ from octopoes.api.models import Observation, Declaration, ServiceHealth
 from octopoes.connector import RemoteException
 from octopoes.models import Reference, OOI, ScanProfile
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.filter import FilterOperator
 from octopoes.models.origin import Origin
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
@@ -63,7 +64,7 @@ class OctopoesAPIConnector:
         self.session = OctopoesAPISession(base_uri, client)
 
     def health(self) -> ServiceHealth:
-        return ServiceHealth.parse_obj(self.session.get(f"/health").json())
+        return ServiceHealth.parse_obj(self.session.get("/health").json())
 
     def list(
         self,
@@ -71,12 +72,16 @@ class OctopoesAPIConnector:
         valid_time: Optional[datetime] = None,
         offset: int = 0,
         limit: int = 5000,
+        scan_level: int = 0,
+        scan_level_operator: FilterOperator = FilterOperator.GREATER_THAN_OR_EQUAL_TO,
     ) -> Paginated[OOIType]:
         params = {
             "types": [t.__name__ for t in types],
             "valid_time": valid_time,
             "offset": offset,
             "limit": limit,
+            "scan_level": scan_level,
+            "scan_level_operator": scan_level_operator.value,
         }
         res = self.session.get("/objects", params=params)
         return Paginated[OOIType].parse_obj(res.json())

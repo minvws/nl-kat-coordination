@@ -151,7 +151,9 @@ class QueryNodeTest(TestCase):
         dns_a_record_node = address_node.relations_in[("DnsARecord", "IpAddressV4", "DnsARecord/_IpAddressV4")]
         self.assertEqual({"DnsARecord"}, dns_a_record_node.object_types)
 
-        dns_aaaa_record_node = address_node.relations_in[("DnsAaaaRecord", "IpAddressV6", "DnsAaaaRecord/_IpAddressV6")]
+        dns_aaaa_record_node = address_node.relations_in[
+            ("DnsAaaaRecord", "IpAddressV6", "DnsAaaaRecord/_IpAddressV6")
+        ]
         self.assertEqual({"DnsAaaaRecord"}, dns_aaaa_record_node.object_types)
 
         finding_node = address_node.relations_in[("Finding", "OOI", "Finding/_OOI")]
@@ -205,8 +207,14 @@ class QueryNodeTest(TestCase):
             field_node=field_node,
         )
 
+        expected_query = (
+            "{:query {:find [(pull ?e [* {(:DnsARecord/_IpAddressV4 {:as DnsARecord/_IpAddressV4}) [*]} "
+            + "{(:Finding/_OOI {:as Finding/_OOI}) [*]} {(:IpAddressV4/Network {:as Network}) [*]} "
+            + "{(:IpPort/_IpAddress {:as IpPort/_IpAddress}) [*]} {(:Job/_oois {:as Job/_oois}) [*]}])] "
+            + ':in [_db_crux_id] :where [[?e :db.crux/id _db_crux_id]]   } :in-args [ "IpAddressV4|internet|1.1.1.1" ]}'
+        )
         self.assertEqual(
-            '{:query {:find [(pull ?e [* {(:DnsARecord/_IpAddressV4 {:as DnsARecord/_IpAddressV4}) [*]} {(:Finding/_OOI {:as Finding/_OOI}) [*]} {(:IpAddressV4/Network {:as Network}) [*]} {(:IpPort/_IpAddress {:as IpPort/_IpAddress}) [*]} {(:Job/_oois {:as Job/_oois}) [*]}])] :in [_db_crux_id] :where [[?e :db.crux/id _db_crux_id]]   } :in-args [ "IpAddressV4|internet|1.1.1.1" ]}',
+            expected_query,
             query,
         )
 
@@ -217,7 +225,11 @@ class QueryNodeTest(TestCase):
             where={"attr_1": 'test_value_with_quotes" and injection'},
         )
 
+        expected_query = (
+            "{:query {:find [(pull ?e [*])] :in [_attr_1] :where [[?e :attr_1 _attr_1]]   } "
+            + ':in-args [ "test_value_with_quotes\\" and injection" ]}'
+        )
         self.assertEqual(
-            '{:query {:find [(pull ?e [*])] :in [_attr_1] :where [[?e :attr_1 _attr_1]]   } :in-args [ "test_value_with_quotes\\" and injection" ]}',
+            expected_query,
             query,
         )

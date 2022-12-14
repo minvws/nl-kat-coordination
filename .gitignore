@@ -316,8 +316,8 @@ instance/
 .scrapy
 
 # Sphinx documentation
+docs/source/_*/
 docs/_build/
-doc/_build/
 
 # PyBuilder
 target/
@@ -440,3 +440,17 @@ deployment/github_config.sh
 
 !packaging/deb/data/usr/lib
 reports
+
+# debian build artifacts
+debhelper-build-stamp
+*.debhelper
+*.deb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.substvars
+debian/*/
+debian/*.log
+debian/files
+debian/changelog

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-set -e
-#set -v
-
-. /usr/share/debconf/confmodule
-
-db_go || true
-

@@ -34,7 +34,7 @@ class XTDBHTTPSession(requests.Session):
         super().__init__()
 
         self._base_url = base_url
-        self.headers["Accept"] = f"application/json"
+        self.headers["Accept"] = "application/json"
 
     def request(self, method: str, url: Union[str, bytes], **kwargs) -> requests.Response:
         return super().request(method, self._base_url + str(url), **kwargs)
@@ -90,9 +90,8 @@ class XTDBHTTPClient:
         return res.json()
 
     def await_transaction(self, transaction_id: int) -> None:
-        logger.debug(f"Awaiting transaction {transaction_id}")
-        self._session.get(f"/await-tx", params={"txId": transaction_id})
-        logger.debug(f"Transaction {transaction_id} done")
+        self._session.get("/await-tx", params={"txId": transaction_id})
+        logger.info("Transaction completed [txId=%s]", transaction_id)
 
     def submit_transaction(self, operations: List[Operation]) -> None:
         res = self._session.post(
@@ -116,17 +115,15 @@ class XTDBSession:
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:
+    def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         self.commit()
 
     def add(self, operation: Operation):
         self._operations.append(operation)
 
-    def commit(self):
+    def commit(self) -> None:
         if self._committed:
             raise RuntimeError("Session already committed")
-
-        logger.debug("commiting session")
 
         if self._operations:
             logger.debug(self._operations)

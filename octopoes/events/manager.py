@@ -1,16 +1,29 @@
 import json
 import logging
 import uuid
-from typing import cast
+from typing import Optional
 
 import pika
 from celery import Celery
 from pika.adapters.blocking_connection import BlockingChannel
+from pydantic import BaseModel
 
-from octopoes.events.events import DBEvent, OOIDBEvent, OperationType, ScanProfileDBEvent
-
+from octopoes.events.events import DBEvent, OperationType, ScanProfileDBEvent
+from octopoes.models import ScanProfile, format_id_short
 
 logger = logging.getLogger(__name__)
+
+
+class AbstractOOI(BaseModel):
+    primary_key: str
+    object_type: str
+    scan_profile: ScanProfile
+
+
+class ScanProfileMutation(BaseModel):
+    operation: OperationType
+    primary_key: str
+    value: Optional[AbstractOOI]
 
 
 class EventManager:
@@ -21,10 +34,9 @@ class EventManager:
         self.channel = channel
 
         channel.queue_declare(queue=f"{client}__scan_profile_increments", durable=True)
+        channel.queue_declare(queue=f"{client}__scan_profile_mutations", durable=True)
 
     def publish(self, event: DBEvent) -> None:
-        logger.info("Publishing event %s", event.json())
-
         event.client = self.client
 
         # schedule celery event processor
@@ -35,40 +47,69 @@ class EventManager:
             task_id=str(uuid.uuid4()),
         )
 
-        # publish increased scan-level to scheduler
-        if (
-            isinstance(event, ScanProfileDBEvent)
-            and event.operation_type == OperationType.UPDATE
-            and event.new_data.level > event.old_data.level
-        ):
-            event_data = json.dumps(
-                {
-                    "reference": event.new_data.reference,
-                    "object_type": event.new_data.reference.class_,
-                    "level": event.new_data.level,
-                }
+        logger.info(
+            "Published handle_event task [operation_type=%s] [primary_key=%s] [client=%s]",
+            event.operation_type,
+            format_id_short(event.primary_key),
+            event.client,
+        )
+
+        if isinstance(event, ScanProfileDBEvent):
+
+            incremented = (event.operation_type == OperationType.CREATE and event.new_data.level > 0) or (
+                event.operation_type == OperationType.UPDATE and event.new_data.level > event.old_data.level
             )
-            logger.info("Publishing ScanProfileDBEvent to RabbitMQ: %s", event_data)
+            if incremented:
+
+                ooi = json.dumps(
+                    {
+                        "primary_key": event.new_data.reference,
+                        "object_type": event.new_data.reference.class_,
+                        "scan_profile": event.new_data.dict(),
+                    }
+                )
+
+                self.channel.basic_publish(
+                    "",
+                    f"{event.client}__scan_profile_increments",
+                    ooi.encode(),
+                    properties=pika.BasicProperties(
+                        delivery_mode=pika.DeliveryMode.Persistent,
+                    ),
+                )
+
+                logger.info(
+                    "Published scan_profile_increment [primary_key=%s] [level=%s]",
+                    format_id_short(event.primary_key),
+                    event.new_data.level,
+                )
+
+            # publish mutations
+            mutation = ScanProfileMutation(
+                operation=event.operation_type,
+                primary_key=event.primary_key,
+            )
+
+            if event.operation_type != OperationType.DELETE:
+                mutation.value = AbstractOOI(
+                    primary_key=event.new_data.reference,
+                    object_type=event.new_data.reference.class_,
+                    scan_profile=event.new_data,
+                )
 
             self.channel.basic_publish(
                 "",
-                f"{event.client}__scan_profile_increments",
-                event_data.encode(),
+                f"{event.client}__scan_profile_mutations",
+                mutation.json().encode(),
                 properties=pika.BasicProperties(
                     delivery_mode=pika.DeliveryMode.Persistent,
                 ),
             )
 
-        # notify rocky
-        if event.entity_type == "ooi" and event.operation_type == OperationType.CREATE:
-            event = cast(OOIDBEvent, event)
-            logger.info("Publishing OOIDBEvent for Rocky: %s", event.json())
-
-            self.channel.basic_publish(
-                "",
-                "create_events",
-                json.dumps({"reference": str(event.new_data.reference), "organization": event.client}).encode(),
-                properties=pika.BasicProperties(
-                    delivery_mode=pika.DeliveryMode.Persistent,
-                ),
+            level = mutation.value.scan_profile.level if mutation.value != OperationType.DELETE else None
+            logger.info(
+                "Published scan profile mutation [operation_type=%s] [primary_key=%s] [level=%s]",
+                mutation.operation,
+                format_id_short(event.primary_key),
+                level,
             )

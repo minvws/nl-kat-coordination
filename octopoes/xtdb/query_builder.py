@@ -8,13 +8,6 @@ from octopoes.xtdb.related_field_generator import (
 )
 
 
-# def join_csv(values: Iterator[Any]) -> str:
-#     output = io.StringIO()
-#     writer = csv.writer(output, quoting=csv.QUOTE_NONNUMERIC)
-#     writer.writerow(values)
-#     return output.getvalue()
-
-
 def join_csv(values: Iterator[any]) -> str:
     return " ".join(values)
 

@@ -62,12 +62,12 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
     def deserialize(cls, data: Dict[str, Any]) -> OriginParameter:
         return OriginParameter.parse_obj(data)
 
-    def get(self, id_: str, valid_time: datetime) -> OriginParameter:
+    def get(self, origin_parameter_id: str, valid_time: datetime) -> OriginParameter:
         try:
-            return self.deserialize(self.session.client.get_entity(id_, valid_time))
+            return self.deserialize(self.session.client.get_entity(origin_parameter_id, valid_time))
         except HTTPError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
-                raise ObjectNotFoundException(id_)
+                raise ObjectNotFoundException(origin_parameter_id)
             else:
                 raise e
 

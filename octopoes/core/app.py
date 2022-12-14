@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import pika
 from pika import BlockingConnection
@@ -23,10 +23,11 @@ def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTP
 
 
 def bootstrap_octopoes(
-    settings: Settings, client: str
+    settings: Settings, client: str, xtdb_session: Optional[XTDBSession] = None
 ) -> Tuple[OctopoesService, XTDBHTTPClient, XTDBSession, BlockingConnection]:
     xtdb_client = get_xtdb_client(settings.xtdb_uri, client, settings.xtdb_type)
-    xtdb_session = XTDBSession(xtdb_client)
+    if xtdb_session is None:
+        xtdb_session = XTDBSession(xtdb_client)
 
     rabbit_connection = pika.BlockingConnection(pika.URLParameters(settings.queue_uri))
     channel = rabbit_connection.channel()

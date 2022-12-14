@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime
 from http import HTTPStatus
 from typing import Type, List, Optional, Set, Dict, Union, Any, Tuple
 
@@ -11,8 +12,9 @@ from requests import HTTPError
 from octopoes.config.settings import XTDBType
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
-from octopoes.models import OOI, datetime, Reference
+from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.filter import FilterOperator
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path, get_paths_to_neighours, Direction, Segment
 from octopoes.models.tree import ReferenceTree, ReferenceNode
@@ -61,8 +63,10 @@ class OOIRepository:
         self,
         types: Set[Type[OOI]],
         valid_time: datetime,
-        limit: int = 1000,
         offset: int = 0,
+        limit: int = 20,
+        scan_level_operator: FilterOperator = FilterOperator.GREATER_THAN_OR_EQUAL_TO,
+        scan_level: int = 0,
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
@@ -85,6 +89,9 @@ class OOIRepository:
         search_types: Optional[Set[Type[OOI]]] = None,
         depth: Optional[int] = 1,
     ) -> ReferenceTree:
+        raise NotImplementedError
+
+    def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
         raise NotImplementedError
 
 
@@ -171,6 +178,17 @@ class XTDBOOIRepository(OOIRepository):
         stripped = {key.split("/")[1]: value for key, value in data.items()}
         return object_cls.parse_obj(stripped)
 
+    @staticmethod
+    def operator_to_xtdb_operator(operator: FilterOperator) -> str:
+        return {
+            FilterOperator.EQUAL_TO: "=",
+            FilterOperator.NOT_EQUAL_TO: "!=",
+            FilterOperator.LESS_THAN: "<",
+            FilterOperator.LESS_THAN_OR_EQUAL_TO: "<=",
+            FilterOperator.GREATER_THAN: ">",
+            FilterOperator.GREATER_THAN_OR_EQUAL_TO: ">=",
+        }[operator]
+
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
@@ -192,34 +210,77 @@ class XTDBOOIRepository(OOIRepository):
         valid_time: datetime,
         offset: int = 0,
         limit: int = 20,
-        random: Optional[int] = None,
+        scan_level_operator: FilterOperator = FilterOperator.GREATER_THAN_OR_EQUAL_TO,
+        scan_level: int = 0,
     ) -> Paginated[OOI]:
         types = to_concrete(types)
 
-        query = """
+        count_query = """
                 {{
                     :query {{
                         :find [(count ?e )]
                         :in [[_object_type ...]]
-                        :where [[?e :object_type _object_type]]
+                        :where [[?e :object_type _object_type]
+                                (or-join [?e]
+                                  (and
+                                    [?scan_profile :type "ScanProfile"]
+                                    [?scan_profile :reference ?e]
+                                    [?scan_profile :level ?level]
+                                    [({scan_level_operator} ?level {scan_level_value})]
+                                  )
+                                  (and
+                                      (not-join [?e]
+                                          [?scan_profile :type "ScanProfile"]
+                                          [?scan_profile :reference ?e])
+                                      [({scan_level_operator} 0 {scan_level_value})]
+                                  )
+                          )]
                     }}
                     :in-args [[{object_types}]]
                 }}
                 """.format(
-            object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types))
+            object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
+            scan_level_operator=self.operator_to_xtdb_operator(scan_level_operator),
+            scan_level_value=scan_level,
         )
 
-        res_count = self.session.client.query(query, valid_time)
+        res_count = self.session.client.query(count_query, valid_time)
         count = res_count[0][0] if res_count else 0
 
-        query = generate_pull_query(
-            self.xtdb_type,
-            FieldSet.ALL_FIELDS,
-            {"object_type": [t.__name__ for t in types]},
-            offset,
-            limit,
+        data_query = """
+                {{
+                    :query {{
+                        :find [(pull ?e [*])]
+                        :in [[_object_type ...]]
+                        :where [[?e :object_type _object_type]
+                                (or-join [?e]
+                                      (and
+                                        [?scan_profile :type "ScanProfile"]
+                                        [?scan_profile :reference ?e]
+                                        [?scan_profile :level ?level]
+                                        [({scan_level_operator} ?level {scan_level_value})]
+                                      )
+                                      (and
+                                          (not-join [?e]
+                                              [?scan_profile :type "ScanProfile"]
+                                              [?scan_profile :reference ?e])
+                                          [({scan_level_operator} 0 {scan_level_value})]
+                                      )
+                              )]
+                        :limit {limit}
+                        :offset {offset}
+                    }}
+                    :in-args [[{object_types}]]
+                }}
+        """.format(
+            object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
+            scan_level_operator=self.operator_to_xtdb_operator(scan_level_operator),
+            scan_level_value=scan_level,
+            limit=limit,
+            offset=offset,
         )
-        res = self.session.client.query(query, valid_time)
+
+        res = self.session.client.query(data_query, valid_time)
         oois = [self.deserialize(x[0]) for x in res]
         return Paginated(
             count=count,
@@ -322,7 +383,9 @@ class XTDBOOIRepository(OOIRepository):
 
         # Query next level
         exclude.update(references)
-        deeper_result = self._get_tree_level(deeper_references, depth=depth - 1, exclude=exclude, valid_time=valid_time)
+        deeper_result = self._get_tree_level(
+            deeper_references, depth=depth - 1, exclude=exclude, valid_time=valid_time
+        )
 
         # Replace flat results with recursed results
         deeper_lookup = {node.reference: node for node in deeper_result}
@@ -453,7 +516,7 @@ class XTDBOOIRepository(OOIRepository):
                 except ValueError:
                     # is not an error, old crux versions return the foreign key as a string,
                     # when related object is not found
-                    logger.info(f"Could not deserialize value [value=%s]", value)
+                    logger.info("Could not deserialize value [value=%s]", value)
 
         return neighbours
 
@@ -505,3 +568,13 @@ class XTDBOOIRepository(OOIRepository):
             old_data=ooi,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
+
+    def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
+        query = """
+            {:query {
+             :find [?ooi]
+             :where [[?ooi :object_type ?t]
+                    (not-join [?ooi] [?scan_profile :reference ?ooi] [?scan_profile :type "ScanProfile"])] }}
+        """
+        response = self.session.client.query(query, valid_time=valid_time)
+        return {Reference.from_str(row[0]) for row in response}
