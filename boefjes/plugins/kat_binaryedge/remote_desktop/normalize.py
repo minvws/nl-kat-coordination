@@ -19,7 +19,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.boefje_meta.boefje_meta
     input_ = boefje_meta.arguments["input"]
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
@@ -98,5 +98,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             yield Finding(
                 finding_type=kat_642_ooi.reference,
                 ooi=ip_service_ooi.reference,
-                description=f"It is verified that this Remote Desktop server is vulnerable to the Bluekeep vulnerability.",
+                description="It is verified that this Remote Desktop server is vulnerable to the Bluekeep "
+                "vulnerability.",
             )

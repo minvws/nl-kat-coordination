@@ -1,13 +1,13 @@
 import json
 import logging
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 
 from pynetdicom import AE
 
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
 
@@ -37,4 +37,4 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
 
     ae.remove_requested_context("1.2.840.10008.1.1")
 
-    return boefje_meta, json.dumps(results)
+    return [(set(), json.dumps(results))]

@@ -3,7 +3,7 @@ import logging
 
 from os import getenv
 from base64 import b64encode
-from typing import Tuple, Union, Optional, Dict
+from typing import Tuple, Union, Optional, Dict, List
 from urllib.parse import urlparse
 
 import requests
@@ -16,7 +16,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     host = input_["name"]
     identifier = boefje_meta.id
@@ -46,7 +46,7 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
             "header_checks": dict(zip(payloads.keys(), header_checks)),
         }
 
-    return boefje_meta, json.dumps(output).encode()
+    return [(set(), json.dumps(output).encode())]
 
 
 def check_with_header(

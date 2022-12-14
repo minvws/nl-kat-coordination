@@ -1,9 +1,8 @@
-from typing import Union, List, Optional
+from typing import List, Optional, Union
 
 import requests
-from pydantic import BaseModel, parse_obj_as
-
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from pydantic import BaseModel, parse_obj_as
 
 
 class Queue(BaseModel):
@@ -13,7 +12,7 @@ class Queue(BaseModel):
 
 class Task(BaseModel):
     # This works because Pydantic cannot parse NormalizerMeta data to a BoefjeMeta
-    item: Union[BoefjeMeta, NormalizerMeta]
+    data: Union[BoefjeMeta, NormalizerMeta]
 
 
 class SchedulerClientInterface:

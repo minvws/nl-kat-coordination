@@ -15,17 +15,13 @@ router = APIRouter(
 )
 
 
-@router.get(
-    "", response_model=Dict[str, Repository], response_model_exclude={0: {0: False}}
-)
+@router.get("", response_model=Dict[str, Repository], response_model_exclude={0: {0: False}})
 def list_repositories(storage: RepositoryStorage = Depends(get_repository_store)):
     return storage.get_all()
 
 
 @router.get("/{repository_id}", response_model=Repository)
-def get_repository(
-    repository_id: str, storage: RepositoryStorage = Depends(get_repository_store)
-):
+def get_repository(repository_id: str, storage: RepositoryStorage = Depends(get_repository_store)):
     try:
         return storage.get_by_id(repository_id)
     except KeyError:

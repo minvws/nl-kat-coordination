@@ -26,14 +26,15 @@ from boefjes.job_models import NormalizerMeta
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
 
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
 
     for event in results:
-        # Future TODO: add event["time"] to results. This is the time the event was first seen. Date of last scan is not included in the result.
-        # Future TODO: LeakIX want to include a confidence per plugin, since some plugins have more false positives than others
-        # Potential TODO: ssh, ssl
+        # TODO: add event["time"] to results. This is the time the event was first seen. Date of last scan is not
+        #  included in the result.
+        # TODO: LeakIX want to include a confidence per plugin, since some plugins have more false positives than others
+        # TODO: ssh, ssl
 
         # Get general information
         ip = event["ip"]
@@ -168,9 +169,9 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             else:
                 kat_info.append(f'Plugin = "{event_source}"')
             if leak_infected:
-                kat_info.append(f"Found evidence of external activity.")
+                kat_info.append("Found evidence of external activity.")
             if leak_ransomnote:
-                kat_info.append(f"Found a ransom note.")
+                kat_info.append("Found a ransom note.")
 
             if leak_stage:
                 kat_info.append(f"Stage of the leak is {leak_stage}.")

@@ -63,21 +63,14 @@ class PluginService:
         self.plugin_enabled_store.__exit__(exc_type, exc_val, exc_tb)
 
     def get_all(self, organisation_id: str) -> List[PluginType]:
-        all_plugins = self._plugins_for_repos(
-            self.repository_storage.get_all().values(), organisation_id
-        )
+        all_plugins = self._plugins_for_repos(self.repository_storage.get_all().values(), organisation_id)
 
         flat = []
 
         for plugins in all_plugins.values():
             flat.extend(plugins.values())
 
-        flat.extend(
-            [
-                self._set_plugin_enabled(plugin, organisation_id)
-                for plugin in self.local_repo.get_all()
-            ]
-        )
+        flat.extend([self._set_plugin_enabled(plugin, organisation_id) for plugin in self.local_repo.get_all()])
 
         return flat
 
@@ -96,9 +89,7 @@ class PluginService:
     def get_setting_by_key(self, key: str, organisation_id: str, plugin_id: str):
         return self.settings_storage.get_by_key(key, organisation_id, plugin_id)
 
-    def create_setting(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ):
+    def create_setting(self, key: str, value: str, organisation_id: str, plugin_id: str):
         return self.settings_storage.create(key, value, organisation_id, plugin_id)
 
     def delete_setting_by_key(self, key: str, organisation_id: str, plugin_id: str):
@@ -107,19 +98,13 @@ class PluginService:
         try:
             self._assert_settings_match_schema(organisation_id, plugin_id)
         except SettingsNotConformingToSchema:
-            logger.warning(
-                f"Removing setting disabled {plugin_id} for {organisation_id} (if it was enabled before)"
-            )
+            logger.warning(f"Removing setting disabled {plugin_id} for {organisation_id} (if it was enabled before)")
 
             plugin = self.by_plugin_id(plugin_id, organisation_id)
             self.update_by_id(plugin.repository_id, plugin_id, organisation_id, False)
 
-    def update_setting_by_key(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ):
-        return self.settings_storage.update_by_key(
-            key, value, organisation_id, plugin_id
-        )
+    def update_setting_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str):
+        return self.settings_storage.update_by_key(key, value, organisation_id, plugin_id)
 
     # These three methods should return this static info from remote repositories as well in the future
 
@@ -144,27 +129,19 @@ class PluginService:
             logger.error("Plugin not found: %s", plugin_id)
             return ""
 
-    def repository_plugins(
-        self, repository_id: str, organisation_id: str
-    ) -> Dict[str, PluginType]:
-        return self._plugins_for_repos(
-            [self.repository_storage.get_by_id(repository_id)], organisation_id
-        ).get(repository_id, {})
+    def repository_plugins(self, repository_id: str, organisation_id: str) -> Dict[str, PluginType]:
+        return self._plugins_for_repos([self.repository_storage.get_by_id(repository_id)], organisation_id).get(
+            repository_id, {}
+        )
 
-    def repository_plugin(
-        self, repository_id: str, plugin_id: str, organisation_id: str
-    ) -> PluginType:
+    def repository_plugin(self, repository_id: str, plugin_id: str, organisation_id: str) -> PluginType:
         plugin = self.repository_plugins(repository_id, organisation_id).get(plugin_id)
         if plugin is None:
-            raise KeyError(
-                f"Plugin '{plugin_id}' not found in repository '{repository_id}'"
-            )
+            raise KeyError(f"Plugin '{plugin_id}' not found in repository '{repository_id}'")
 
         return plugin
 
-    def update_by_id(
-        self, repository_id: str, plugin_id: str, organisation_id: str, enabled: bool
-    ):
+    def update_by_id(self, repository_id: str, plugin_id: str, organisation_id: str, enabled: bool):
         if enabled:
             self._assert_settings_match_schema(organisation_id, plugin_id)
 
@@ -187,16 +164,10 @@ class PluginService:
             try:
                 plugins[repository.id] = {}
 
-                for plugin_id, plugin in self.plugin_client.get_plugins(
-                    repository
-                ).items():
-                    plugins[repository.id][plugin_id] = self._set_plugin_enabled(
-                        plugin, organisation_id
-                    )
-            except:
-                logger.exception(
-                    "Getting plugins from repository with id %s failed", repository.id
-                )
+                for plugin_id, plugin in self.plugin_client.get_plugins(repository).items():
+                    plugins[repository.id][plugin_id] = self._set_plugin_enabled(plugin, organisation_id)
+            except:  # noqa
+                logger.exception("Getting plugins from repository with id %s failed", repository.id)
 
         return plugins
 
@@ -208,17 +179,11 @@ class PluginService:
             try:
                 validate(instance=all_settings, schema=schema)
             except ValidationError as e:
-                raise SettingsNotConformingToSchema(
-                    organisation_id, plugin_id, e.message
-                ) from e
+                raise SettingsNotConformingToSchema(organisation_id, plugin_id, e.message) from e
 
-    def _set_plugin_enabled(
-        self, plugin: PluginType, organisation_id: str
-    ) -> PluginType:
+    def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
         try:
-            plugin.enabled = self.plugin_enabled_store.get_by_id(
-                plugin.id, plugin.repository_id, organisation_id
-            )
+            plugin.enabled = self.plugin_enabled_store.get_by_id(plugin.id, plugin.repository_id, organisation_id)
         except (KeyError, NotFound):
             pass
 

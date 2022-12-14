@@ -141,9 +141,7 @@ class TestRepositories(TestCase):
         with self.settings_storage as settings_storage:
             settings_storage.create("TEST_SETTING", "123.9", organisation_id, plugin_id)
 
-        returned_settings = settings_storage.get_by_key(
-            "TEST_SETTING", organisation_id, plugin_id
-        )
+        returned_settings = settings_storage.get_by_key("TEST_SETTING", organisation_id, plugin_id)
         self.assertEqual("123.9", returned_settings)
 
         with self.assertRaises(SettingNotFound):
@@ -152,9 +150,7 @@ class TestRepositories(TestCase):
         with self.assertRaises(SettingNotFound):
             settings_storage.get_by_key("TEST_SETTING", "no organisation!", plugin_id)
 
-        self.assertEqual(
-            {"TEST_SETTING": "123.9"}, settings_storage.get_all(org.id, plugin_id)
-        )
+        self.assertEqual({"TEST_SETTING": "123.9"}, settings_storage.get_all(org.id, plugin_id))
         self.assertEqual(dict(), settings_storage.get_all(org.id, "wrong"))
         self.assertEqual(dict(), settings_storage.get_all("wrong", plugin_id))
 
@@ -165,9 +161,7 @@ class TestRepositories(TestCase):
 
         with self.assertRaises(StorageError):
             with self.settings_storage as settings_storage:
-                settings_storage.create(
-                    "TEST_SETTING", "123.9", organisation_id, 65 * "a"
-                )
+                settings_storage.create("TEST_SETTING", "123.9", organisation_id, 65 * "a")
 
     def test_plugin_enabled_storage(self):
         with self.organisation_storage as storage:
@@ -192,17 +186,13 @@ class TestRepositories(TestCase):
                 produces=["text/html"],
                 enabled=True,
             )
-            plugin_state_storage.create(
-                plugin.id, plugin.repository_id, plugin.enabled, org.id
-            )
+            plugin_state_storage.create(plugin.id, plugin.repository_id, plugin.enabled, org.id)
 
         returned_state = plugin_state_storage.get_by_id(plugin.id, repo.id, org.id)
         self.assertTrue(returned_state)
 
         with self.plugin_state_storage as plugin_state_storage:
-            plugin_state_storage.update_or_create_by_id(
-                plugin.id, repo.id, False, org.id
-            )
+            plugin_state_storage.update_or_create_by_id(plugin.id, repo.id, False, org.id)
 
         returned_state = plugin_state_storage.get_by_id(plugin.id, repo.id, org.id)
         self.assertFalse(returned_state)

@@ -20,9 +20,7 @@ from boefjes.katalogus.tests.test_plugin_service import mock_plugin_service
 class TestSettings(TestCase):
     def setUp(self) -> None:
         self.client = TestClient(app)
-        self._store = OrganisationStorageMemory(
-            {"test": Organisation(id="test", name="Test")}
-        )
+        self._store = OrganisationStorageMemory({"test": Organisation(id="test", name="Test")})
         plugin_service = mock_plugin_service("test")
 
         def wrapped_mock_plugin_service(organisation_id: str):
@@ -62,9 +60,7 @@ class TestSettings(TestCase):
         self.assertListEqual(["123", "new value"], list(res.json().values()))
 
     def test_delete_key(self):
-        res = self.client.delete(
-            "/v1/organisations/test/test_plugin/settings/DUMMY_VAR"
-        )
+        res = self.client.delete("/v1/organisations/test/test_plugin/settings/DUMMY_VAR")
         self.assertEqual(200, res.status_code)
 
         res = self.client.get("/v1/organisations/test/test_plugin/settings")
@@ -88,9 +84,7 @@ class TestSettingsEncryption(TestCase):
         sk = PrivateKey.generate()
         sk_b64 = base64.b64encode(bytes(sk)).decode()
         pub_b64 = base64.b64encode(bytes(sk.public_key)).decode()
-        self.encryption = NaclBoxMiddleware(
-            private_key=Base64Str(sk_b64), public_key=Base64Str(pub_b64)
-        )
+        self.encryption = NaclBoxMiddleware(private_key=Base64Str(sk_b64), public_key=Base64Str(pub_b64))
 
     def test_encode_decode(self):
         msg = "The president is taking the underpass"

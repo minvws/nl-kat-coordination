@@ -2,7 +2,7 @@
 
 Nmap is a network scanning tool that uses IP packets to identify all the devices connected to a network and to provide
 information on the services and operating systems they are running. In KAT, a Python wrapper around Nmap is used to find
-open ports with their services of an IpAddress. 
+open ports with their services of an IpAddress.
 ### Options
 
 This Nmap has the following hardcoded options:

@@ -65,17 +65,11 @@ class PluginStatesStorageDisk(PluginEnabledStorage):
 
         self._plugins_states = self._cache["plugins_states"]
 
-    def get_by_id(
-        self, plugin_id: str, repository_id: str, organisation_id: str
-    ) -> bool:
+    def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
         return self._plugins_states[plugin_id]
 
-    def create(
-        self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str
-    ) -> None:
+    def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
         self._plugins_states[plugin_id] = enabled
 
-    def update_or_create_by_id(
-        self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str
-    ) -> None:
+    def update_or_create_by_id(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
         self._plugins_states[plugin_id] = enabled

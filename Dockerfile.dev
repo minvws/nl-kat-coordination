@@ -21,7 +21,7 @@ ENV PATH=/home/nonroot/.local/bin:${PATH}
 ARG ENVIRONMENT
 
 COPY --from=boefjes-requirements /tmp/boefjes-requirements.txt /tmp/boefjes-requirements.txt
-COPY nl-kat-boefjes/requirements-dev.txt .
+COPY nl-rt-tim-abang-boefjes/requirements-dev.txt .
 
 RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
     && pip install -r /tmp/boefjes-requirements.txt \

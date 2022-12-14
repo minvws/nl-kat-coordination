@@ -1,7 +1,7 @@
 """Add KATalogus models.
 
 Revision ID: 0001
-Revises: 
+Revises:
 Create Date: 2022-05-18 14:19:15.882901
 
 """
@@ -52,9 +52,7 @@ def upgrade() -> None:
         sa.Column("key", sa.String(length=32), nullable=False),
         sa.Column("value", sa.String(length=64), nullable=False),
         sa.Column("organisation_pk", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["organisation_pk"], ["organisation.pk"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["organisation_pk"], ["organisation.pk"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
@@ -64,12 +62,8 @@ def upgrade() -> None:
         sa.Column("enabled", sa.Boolean(), nullable=False),
         sa.Column("organisation_pk", sa.Integer(), nullable=False),
         sa.Column("repository_pk", sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["organisation_pk"], ["organisation.pk"], ondelete="CASCADE"
-        ),
-        sa.ForeignKeyConstraint(
-            ["repository_pk"], ["repository.pk"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["organisation_pk"], ["organisation.pk"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["repository_pk"], ["repository.pk"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("plugin_id"),
     )

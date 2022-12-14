@@ -1,6 +1,0 @@
-Template: kat-boefjes/enable-nginx-conf
-Type: boolean
-Default: false
-Description: Enable Nginx virtual host for katalogus after installation.
-  Install and enable an Nginx config for katalogus.
-

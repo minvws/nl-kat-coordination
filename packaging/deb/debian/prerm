@@ -1,6 +1,0 @@
-#!/bin/sh -e
-
-systemctl disable --now kat-katalogus.socket
-systemctl disable --now kat-katalogus.service
-systemctl disable --now kat-boefjes.service
-systemctl disable --now kat-normalizers.service

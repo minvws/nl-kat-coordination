@@ -15,6 +15,7 @@ from boefjes.plugins.models import (
     NORMALIZER_DEFINITION_FILE,
     ENTRYPOINT_BOEFJES,
     ENTRYPOINT_NORMALIZERS,
+    ModuleException,
 )
 from boefjes.katalogus.models import PluginType, Boefje, Normalizer
 
@@ -29,13 +30,8 @@ class LocalPluginRepository:
         self.path = path
 
     def get_all(self) -> List[PluginType]:
-        all_plugins = [
-            self._boefje_to_plugin(boefje) for boefje in self.resolve_boefjes().values()
-        ]
-        normalizers = [
-            self._normalizer_to_plugin(normalizer)
-            for normalizer in self.resolve_normalizers().values()
-        ]
+        all_plugins = [self._boefje_to_plugin(boefje) for boefje in self.resolve_boefjes().values()]
+        normalizers = [self._normalizer_to_plugin(normalizer) for normalizer in self.resolve_normalizers().values()]
 
         all_plugins += normalizers
 
@@ -95,13 +91,14 @@ class LocalPluginRepository:
         return boefjes[id_].path / "description.md"
 
     def resolve_boefjes(self) -> Dict[str, BoefjeResource]:
-        paths_and_packages = self._find_packages_in_path_containing_files(
-            [BOEFJE_DEFINITION_FILE, ENTRYPOINT_BOEFJES]
-        )
-        boefje_resources = [
-            BoefjeResource(path, package, LocalPluginRepository.RESERVED_ID)
-            for path, package in paths_and_packages
-        ]
+        paths_and_packages = self._find_packages_in_path_containing_files([BOEFJE_DEFINITION_FILE, ENTRYPOINT_BOEFJES])
+        boefje_resources = []
+
+        for path, package in paths_and_packages:
+            try:
+                boefje_resources.append(BoefjeResource(path, package, LocalPluginRepository.RESERVED_ID))
+            except ModuleException as exc:
+                logger.exception(exc)
 
         return {resource.boefje.id: resource for resource in boefje_resources}
 
@@ -110,15 +107,12 @@ class LocalPluginRepository:
             [NORMALIZER_DEFINITION_FILE, ENTRYPOINT_NORMALIZERS]
         )
         normalizer_resources = [
-            NormalizerResource(path, package, LocalPluginRepository.RESERVED_ID)
-            for path, package in paths_and_packages
+            NormalizerResource(path, package, LocalPluginRepository.RESERVED_ID) for path, package in paths_and_packages
         ]
 
         return {resource.normalizer.id: resource for resource in normalizer_resources}
 
-    def _find_packages_in_path_containing_files(
-        self, files: List[str]
-    ) -> List[Tuple[Path, str]]:
+    def _find_packages_in_path_containing_files(self, files: List[str]) -> List[Tuple[Path, str]]:
         prefix = self.create_relative_import_statement_from_cwd(self.path)
         paths = []
 
@@ -131,9 +125,7 @@ class LocalPluginRepository:
             not_present_files = [file for file in files if not (path / file).exists()]
 
             if not_present_files:
-                logging.debug(
-                    "Files %s not found for %s", not_present_files, package.name
-                )
+                logging.debug("Files %s not found for %s", not_present_files, package.name)
                 continue
 
             paths.append((path, package.name))
@@ -142,13 +134,9 @@ class LocalPluginRepository:
 
     @staticmethod
     def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
-        relative_path = str(package_dir.absolute()).replace(
-            os.getcwd(), ""
-        )  # e.g. "/boefjes/plugins"
+        relative_path = str(package_dir.absolute()).replace(os.getcwd(), "")  # e.g. "/boefjes/plugins"
 
-        return (
-            relative_path[1:].replace("/", ".") + "."
-        )  # Turns into "boefjes.plugins."
+        return f"{relative_path[1:].replace('/', '.')}."  # Turns into "boefjes.plugins."
 
     @staticmethod
     def _boefje_to_plugin(boefje: BoefjeResource) -> Boefje:

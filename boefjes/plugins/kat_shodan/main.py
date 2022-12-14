@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 
 import shodan
 
@@ -10,7 +10,7 @@ from ipaddress import ip_address
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     api = shodan.Shodan(getenv("SHODAN_API"))
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
@@ -26,4 +26,4 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
                 raise
             logging.info(e)
 
-    return boefje_meta, json.dumps(results)
+    return [(set(), json.dumps(results))]

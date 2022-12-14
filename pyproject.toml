@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta:__legacy__"
+
+[tool.setuptools_scm]
+version_scheme = "python-simplified-semver"
+local_scheme = "no-local-version"
+
+[tool.black]
+line-length = 120
+target-version = ["py38"]
+
+[tool.vulture]
+paths = ["boefjes/"]
+min_confidence = 90
+sort_by_size = true
+
+[tool.flynt]
+line-length = 120
+transform-concats = true

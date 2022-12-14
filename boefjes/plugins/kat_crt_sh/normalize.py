@@ -11,7 +11,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    input_ = normalizer_meta.boefje_meta.arguments["input"]
+    input_ = normalizer_meta.raw_data.boefje_meta.arguments["input"]
     fqdn = input_["hostname"]["name"]
     current = f".{fqdn.lower()}"
     if current.endswith("."):

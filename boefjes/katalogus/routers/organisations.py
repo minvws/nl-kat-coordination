@@ -26,9 +26,7 @@ def check_organisation_exists(
         try:
             store.get_by_id(organisation_id)
         except OrganisationNotFound:
-            add_organisation(
-                Organisation(id=organisation_id, name=organisation_id), storage
-            )
+            add_organisation(Organisation(id=organisation_id, name=organisation_id), storage)
             storage.get_by_id(organisation_id)
 
 
