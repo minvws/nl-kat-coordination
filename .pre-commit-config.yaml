@@ -1,0 +1,18 @@
+exclude: docs/source/conf.py
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+      - id: detect-private-key
+      - id: check-case-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+  - repo: https://github.com/rstcheck/rstcheck
+    rev: v6.1.1
+    hooks:
+      - id: rstcheck
+        additional_dependencies: ["rstcheck[sphinx]"]
+        exclude: "docs/source/_generated" # exclude apidoc generated files
