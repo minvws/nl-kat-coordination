@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: nl-rt-tim-abang-kat-ubuntu-build-image
+  IMAGE_NAME: nl-kat-ubuntu-build-image
 
 jobs:
   build-ubuntu-image:
