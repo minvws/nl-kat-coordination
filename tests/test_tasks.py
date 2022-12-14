@@ -105,14 +105,15 @@ class TaskTest(TestCase):
         expected_meta.ended_at = MOCKED_NOW
 
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(expected_meta)
-        mock_bytes_api_client.save_raw.assert_called_once_with(
-            "some-random-job-id",
-            "dummy error",
-            {
-                "error/boefje",
-                "dummy_boefje_runtime_exception",
-                "boefje/dummy_boefje_runtime_exception",
-                f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
-            },
-        )
+        
+        save_raw_call = mock_bytes_api_client.save_raw.call_args_list[0]
 
+        self.assertEqual("some-random-job-id", save_raw_call[0])
+        self.assertIn("Traceback", save_raw_call[1])
+        self.assertEqual({
+            "error/boefje",
+            "dummy_boefje_runtime_exception",
+            "boefje/dummy_boefje_runtime_exception",
+            f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
+        }, save_raw_call[2])
+        
