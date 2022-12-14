@@ -211,6 +211,8 @@ services:
       - "127.0.0.1:8005:8000"
     env_file:
       - .env
+    volumes:
+      - ./nl-kat-keiko:/app/keiko
 
 volumes:
   rocky-db-data:
