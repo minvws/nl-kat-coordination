@@ -1,0 +1,34 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'KAT setup' %}</h1>
+        {% include 'partials/stepper.html' %}
+        <h2>{% translate 'Organization setup' %}</h2>
+        <strong>{% translate 'Organization' %}</strong>
+        <p>
+          {% blocktranslate trimmed %}
+            Please enter the following organization details.
+            These details can be edited within the organization
+            page within KAT when necesarry.
+         {% endblocktranslate %}
+        </p>
+        <form novalidate
+              action="{% url 'step_organization_update' object.id %}"
+              method="post"
+              class="horizontal-view help">
+          {% csrf_token %}
+          {% translate 'Organization details' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+          <button type="submit" class="ghost">{% translate 'Submit changes' %}</button>
+        </form>
+        <a class="button" href="{% url 'step_indemnification_setup' %}">{% translate 'Continue to indemnification' %}</a>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

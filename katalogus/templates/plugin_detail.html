@@ -5,15 +5,6 @@
 {% block content %}
   {% include 'header.html' %}
   <main id="main-content">
-    <p class="warning"
-       role="group"
-       aria-label="{% translate 'scan level warning' %}">
-      <span>Warning scan level:</span>
-      {% blocktranslate trimmed with scan_level=plugin.scan_level %}
-        This boefje will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
-        or higher. There is no indemnification for this boefje to scan an OOI with a lower clearance level then <strong>L{{ scan_level }}</strong>.
-      {% endblocktranslate %}
-    </p>
     <section>
       <div class="one-third-two-thirds">
         <div>

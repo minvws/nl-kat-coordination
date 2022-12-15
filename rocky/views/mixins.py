@@ -18,7 +18,7 @@ from pydantic import BaseModel
 from rocky.bytes_client import get_bytes_client
 from katalogus.client import Plugin, get_katalogus
 from tools.forms import ObservedAtForm, DEPTH_MAX, DEPTH_DEFAULT
-from tools.models import Organization
+from tools.models import Organization, Indemnification, OrganizationMember
 from tools.ooi_helpers import (
     get_knowledge_base_data_for_ooi_store,
 )
@@ -300,3 +300,11 @@ class SingleOOITreeMixin(SingleOOIMixin):
         self.tree = self.get_ooi_tree(pk, self.depth, observed_at)
 
         return self.tree.store[str(self.tree.root.reference)]
+
+
+class OrganizationIndemnificationMixin:
+    def get_organization_indemnification(self):
+        user = self.request.user
+        organizationmember = OrganizationMember.objects.get(user=user)
+
+        return Indemnification.objects.filter(organization=organizationmember.organization).exists()

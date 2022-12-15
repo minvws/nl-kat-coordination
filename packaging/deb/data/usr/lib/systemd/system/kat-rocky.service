@@ -1,19 +1,19 @@
 [Unit]
 Description=kat-rocky daemon
-Requires=kat-rocky.socket
 After=network.target
 
 [Service]
 User=kat
 Group=kat
-WorkingDirectory=/usr/share/kat-rocky/app
+SyslogIdentifier=kat-rocky
+WorkingDirectory=/opt/venvs/kat-rocky/
 EnvironmentFile=/etc/kat/rocky.conf
-ExecStart=/usr/share/kat-rocky/venv/bin/gunicorn \
-          --access-logfile - \
-          -c /etc/kat/gunicorn.rocky.conf.py \
-          --bind unix:/run/kat-rocky.sock \
-          -k uvicorn.workers.UvicornWorker \
-          rocky.asgi:application
+ExecStart=/opt/venvs/kat-rocky/bin/uwsgi --ini /etc/kat/rocky.uwsgi.ini
+Restart=on-failure
+RestartSec=3s
+KillSignal=SIGQUIT
+Type=notify
+NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target

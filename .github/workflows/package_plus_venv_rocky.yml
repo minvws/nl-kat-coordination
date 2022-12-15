@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-20.04
 
     steps:
@@ -66,7 +65,7 @@ jobs:
         run: SECRET_KEY="boeitniet" /var/www/html/.venv/bin/python3.8 manage.py compilemessages
 
       - name: Create rocky release
-        run:  tar -cvzf ../rocky_${{ env.RELEASE_VERSION }}.tar.gz --exclude node_modules --exclude rocky_venv* --exclude=.git* --exclude .parcel-cache --exclude Dockerfile .
+        run: tar -cvzf ../rocky_${{ env.RELEASE_VERSION }}.tar.gz --exclude node_modules --exclude rocky_venv* --exclude=.git* --exclude .parcel-cache --exclude Dockerfile .
 
       - name: Upload rocky tar
         uses: actions/upload-artifact@v1
@@ -79,4 +78,3 @@ jobs:
         with:
           name: rocky_venv_${{ env.RELEASE_VERSION }}
           path: ../rocky_venv_${{ env.RELEASE_VERSION }}.tar.gz
-

@@ -1,0 +1,66 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        {% include 'tasks/partials/tab_navigation.html' with view="normalizers_tasks" %}
+        <h1>{% translate 'Normalizers' %}</h1>
+        {% if not object_list %}
+          <p class="emphasized">
+            {% translate 'There are no tasks for normalizers' %}
+          </p>
+        {% else %}
+          <p class="emphasized">
+            {% translate 'List of tasks for normalizers' %}
+          </p>
+          <div class="horizontal-scroll">
+            <table rf-selector="table-normalizers">
+              <caption>{% translate 'List of tasks for ' %}{{ request.active_organization }}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{% translate 'OOI' %}</th>
+                  <th scope="col">{% translate 'Boefje' %}</th>
+                  <th scope="col">{% translate 'Normalizer' %}</th>
+                  <th scope="col">{% translate 'Status' %}</th>
+                  <th scope="col">{% translate 'Created date' %}</th>
+                  <th scope="col">{% translate 'Download task details' %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for task in object_list %}
+                  <tr>
+                    <td>
+                      <a href="{% ooi_url 'ooi_detail' task.p_item.data.raw_data.boefje_meta.input_ooi %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                    </td>
+                    <td>{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</td>
+                    <td>{{ task.p_item.data.normalizer.id }}</td>
+                    {% if task.status.value == 'completed' %}
+                      <td class="confirmation">{{ task.status.value|capfirst }}</td>
+                    {% elif task.status.value == 'failed' %}
+                      <td class="warning">{{ task.status.value|capfirst }}</td>
+                    {% else %}
+                      <td>{{ task.status.value|capfirst }}</td>
+                    {% endif %}
+                    <td>{{ task.created_at }}</td>
+                    <td>
+                      {% if task.status.value == 'completed' %}
+                        <a href="{% url 'bytes_raw' task.p_item.data.raw_data.boefje_meta.id %}">{% translate 'Download meta and raw data' %}</a>
+                      {% else %}
+                        <a href="{% url 'download_task_meta' task.id %}">{% translate 'Download meta data' %}</a>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+{% endblock %}

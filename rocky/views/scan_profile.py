@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from typing import Dict, Any, List
-
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
@@ -8,7 +7,6 @@ from django.views.generic import FormView
 from django_otp.decorators import otp_required
 from octopoes.models import InheritedScanProfile, EmptyScanProfile, DeclaredScanProfile
 from two_factor.views.utils import class_view_decorator
-
 from rocky.views import OOIDetailView
 from tools.forms import SetClearanceLevelForm
 from tools.view_helpers import (
@@ -36,6 +34,7 @@ class ScanProfileDetailView(OOIDetailView, FormView):
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
+        context["organization_indemnification"] = self.get_organization_indemnification()
         return context
 
     def post(self, request, *args, **kwargs):

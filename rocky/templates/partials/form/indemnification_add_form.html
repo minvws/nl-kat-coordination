@@ -1,0 +1,32 @@
+{% load i18n %}
+
+<div class="form-view">
+  <h1>{% translate "Here, an indemnification can be given on behalf of your organization" %}:</h1>
+
+  <p>
+    {% blocktranslate trimmed %}
+      Some scans are lightweight while others might be a bit
+      more agressive with their scanning.
+      KAT requires you to set a clearance level
+      for each object to prevent you from unintentionally
+      running agressive scans. For example you might have the
+      right to run any type of scan on your own server but you
+      probably don’t have the right to do so for objects owned
+      by other people of companies.
+    {% endblocktranslate %}
+  </p>
+
+  <p>
+    {% blocktranslate trimmed %}
+      Before you're able to add assets to KAT and to assign clearance levels,
+      you have to give indemnification on the organization and declare that you as a person can be held accountable.
+    {% endblocktranslate %}
+  </p>
+
+  <form method="post">
+    {% csrf_token %}
+    {% translate 'Register an indemnification' as fieldset_legend %}
+    {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+    <button type="submit">{% translate 'Submit' %}</button>
+  </form>
+</div>

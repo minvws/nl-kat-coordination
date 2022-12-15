@@ -1,13 +1,6 @@
 name: Run the test suite
 
-on:
-  pull_request:
-    branches:
-      - "**"
-  push:
-    branches:
-      - "develop"
-      - "master"
+on: [push]
 
 jobs:
   Tests:
@@ -15,6 +8,8 @@ jobs:
 
     steps:
       - name: Configure git
+        env:
+          TOKEN: ${{ secrets.RDO_REPO_RO }}
         run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: Checkout code

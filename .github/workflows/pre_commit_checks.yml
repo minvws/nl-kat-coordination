@@ -1,0 +1,47 @@
+name: Check code quality
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "develop"
+      - "main"
+
+jobs:
+  pre-commit:
+    strategy:
+      fail-fast: false
+      matrix:
+        hook: [ "black", "robotidy", "vulture", "eradicate",  "flake8" ]
+        # include an extra pre-commit config file (specify a hook to run or keep it empty for running al hooks
+        include:
+          - hook: ""
+            config: ".ci/ci-pre-commit-config.yaml"
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        id: py38
+        with:
+          python-version: 3.8
+          cache: pip
+
+      - name: Install pre-commit
+        run: pip install pre-commit==2.20.0
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit|${{ steps.py38.outputs.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - if: ${{ matrix.hook }}
+        name: Run pre-commit (${{ matrix.hook }})
+        run: pre-commit run --all-files --show-diff-on-failure --color always ${{ matrix.hook }}
+
+      - if: ${{ matrix.config }}
+        name: Run pre-commit with configuration (${{ matrix.config }})
+        run: pre-commit run --config ${{ matrix.config }} --all-files --show-diff-on-failure --color always ${{ matrix.hook }}

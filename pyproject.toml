@@ -1,3 +1,11 @@
+[build-system]
+requires = ["setuptools>=62.2", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta:__legacy__"
+
+[tool.setuptools_scm]
+version_scheme = "python-simplified-semver"
+local_scheme = "no-local-version"
+
 [tool.black]
 target-version = ['py38']
 line-length = 120
@@ -7,19 +15,16 @@ python_version = "3.8"
 exclude = [".git", "__pycache__", "old", "build", "dist", "venv"]
 strict = true
 ignore_missing_imports = true # Required as third-party modules may not come with type stubs
+follow_imports = "skip"
 
 [tool.vulture]
 exclude = [".git", "__pycache__", "old", "build", "dist", "venv"]
+paths = ["./"]
 min_confidence = 90
 
 [tool.pylint.format]
-max-line-length = "120"
+max-line-length = 120
 
 [tool.pylint."MESSAGES CONTROL"]
 extension-pkg-whitelist = "pydantic" # Ignore pydantic import checks
-
-# This is our goal
-# disable = ["R0914","W1514"] # Ignore too-many-local-variables and unspecified encodings
-
-# This is a conservative baseline setting, ignores bare excepts and unused imports
-disable = ["E0203","E0266","E0501","W0503","F0403","F0401","E0722"]
+disable = ["E0203", "F0401", "R0914", "W1514", "R0903", "E0401"]

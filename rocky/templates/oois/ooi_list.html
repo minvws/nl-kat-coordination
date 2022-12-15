@@ -1,0 +1,70 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Object List' %}</h1>
+        <p>
+          {% blocktranslate trimmed %}
+        An overview of your object list. Objects can be added manually or by running boefjes. Click an object for additional information.
+      {% endblocktranslate %}
+        </p>
+        <p class="de-emphasized">
+          <strong>{% translate 'Currently filtered on:' %}</strong> {{ types_display }}
+        </p>
+        {% include 'partials/ooi_list_toolbar.html' %}
+        {% translate 'Object list' as filter_title %}
+        {% include 'partials/ooi_list_filters.html' with title=filter_title %}
+        <div class="horizontal-scroll">
+          <table class="action-buttons nowrap">
+            <caption>{% translate 'Showing ' %}{{ ooi_list|length }} {% translate 'of' %} {{ total_oois }} {% translate 'objects' %}</caption>
+            <thead>
+              <tr>
+                <th>{% translate 'Key' %}</th>
+                <th>{% translate 'Type' %}</th>
+                <th>{% translate 'Clearance level' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% with 'ooi_type' as ignore_params %}
+                {% for object in ooi_list %}
+                  {% spaceless %}
+                    <tr>
+                      <td>
+                        <a href="{% ooi_url 'ooi_detail' object.primary_key query=mandatory_fields %}"
+                           title="{% blocktranslate trimmed with name=object.human_readable %} Show details for {{ name }} {% endblocktranslate %}">{{ object.human_readable }}</a>
+                      </td>
+                      <td>
+                        <a href="{% url 'ooi_list' %}?ooi_type={{ object.ooi_type }}&{% include 'partials/elements/href_querystring_from_list.html' with list=mandatory_fields %}"
+                           title="{% blocktranslate trimmed with type=object.ooi_type %} Only show objects of type {{ type }} {% endblocktranslate %}">{{ object.ooi_type }}</a>
+                      </td>
+                      <td class="actions">
+                        {% if object.scan_profile %}
+                          {% include 'partials/scan_level_indicator.html' with value=object.scan_profile.level %}
+                        {% else %}
+                          <span class="disabled">{% translate 'N/A' %}</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endspaceless %}
+                {% endfor %}
+              {% endwith %}
+            </tbody>
+          </table>
+        </div>
+        {% include 'partials/ooi_list_pagination.html' %}
+      </div>
+    </section>
+  </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
+  <script src="{% static '/js/dropdown.js' %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock %}

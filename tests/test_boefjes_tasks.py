@@ -1,5 +1,5 @@
 import uuid
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, call, patch
 
 from django.contrib.auth import get_user_model
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -8,7 +8,7 @@ from django.urls import reverse
 from requests import HTTPError
 
 from rocky.scheduler import PaginatedTasksResponse
-from rocky.views import BoefjesTaskListView, TASK_LIMIT
+from rocky.views import TASK_LIMIT, BoefjesTaskListView
 from tools.models import Organization
 
 UUIDS = [uuid.uuid4() for _ in range(10)]
@@ -50,9 +50,11 @@ class TaskListTestCase(TestCase):
                     "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
                     "hash": "19ed51514b37d42f79c5e95469956b05",
                     "scheduler_id": "boefje-_dev",
-                    "task": {
+                    "p_item": {
+                        "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
+                        "hash": "19ed51514b37d42f79c5e95469956b05",
                         "priority": 1,
-                        "item": {
+                        "data": {
                             "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
                             "boefje": {
                                 "id": "dns-records",

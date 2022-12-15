@@ -1,8 +1,11 @@
 import datetime
 from enum import Enum
-from typing import List, Optional, Any, Dict, Set, Union
+from typing import Any, Dict, List, Optional, Set, Union
+
 import requests
+import uuid
 from pydantic import BaseModel, Field
+
 from rocky.health import ServiceHealth
 from rocky.settings import SCHEDULER_API
 
@@ -32,6 +35,14 @@ class BoefjeMeta(BaseModel):
     ended_at: Optional[datetime.datetime]
 
 
+class RawData(BaseModel):
+    id: Optional[str]
+    boefje_meta: BoefjeMeta
+    mime_types: List[Dict[str, str]]
+    secure_hash: Optional[str]
+    hash_retrieval_link: Optional[str]
+
+
 class Normalizer(BaseModel):
     """Normalizer representation."""
 
@@ -45,7 +56,7 @@ class NormalizerTask(BaseModel):
 
     id: Optional[str]
     normalizer: Normalizer
-    boefje_meta: BoefjeMeta
+    raw_data: RawData
 
 
 class BoefjeTask(BaseModel):
@@ -63,8 +74,10 @@ class QueuePrioritizedItem(BaseModel):
     representation.
     """
 
+    id: uuid.UUID
     priority: int
-    item: Union[BoefjeTask, NormalizerTask]
+    hash: Optional[str]
+    data: Union[BoefjeTask, NormalizerTask]
 
 
 class TaskStatus(Enum):
@@ -80,9 +93,8 @@ class TaskStatus(Enum):
 
 class Task(BaseModel):
     id: str
-    hash: str
     scheduler_id: str
-    task: QueuePrioritizedItem  # FIXME: p_item?
+    p_item: QueuePrioritizedItem
     status: TaskStatus
     created_at: datetime.datetime
     modified_at: datetime.datetime
@@ -118,6 +130,7 @@ class SchedulerClient:
 
     def health(self) -> ServiceHealth:
         health_endpoint = self.session.get(f"{self._base_uri}/health")
+        health_endpoint.raise_for_status()
         return ServiceHealth.parse_raw(health_endpoint.content)
 
 

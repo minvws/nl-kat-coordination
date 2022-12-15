@@ -1,0 +1,17 @@
+{% load i18n %}
+
+{% if field.field.widget.allow_multiple_selected %}
+  {% include 'partials/form/field_input.html' %}
+{% else %}
+  <div class="checkbox {% if field.field.required %}required{% endif %}">
+    {% if field.field.required %}
+      <span class="nota-bene">{% translate 'This field is required' %}</span>
+    {% endif %}
+    <div class="horizontal-view">
+      {{ field }}
+      {{ field.label_tag }}
+    </div>
+    {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
+    {% include 'partials/form/field_input_errors.html' %}
+  </div>
+{% endif %}

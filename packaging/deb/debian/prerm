@@ -1,9 +1,0 @@
-#!/bin/sh -e
-
-if [ -f /etc/nginx/sites-enabled/kat-katalogus ]; then
-    rm /etc/nginx/sites-enabled/kat-katalogus
-    systemctl reload nginx
-fi
-
-systemctl disable --now kat-rocky.socket
-systemctl disable --now kat-rocky.service

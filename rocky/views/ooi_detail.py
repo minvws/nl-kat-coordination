@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.models import OOI
 from requests.exceptions import RequestException
 from katalogus.client import get_enabled_boefjes_for_ooi_class, get_katalogus
+from rocky.views.mixins import OrganizationIndemnificationMixin
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
 from rocky.views.mixins import OOIBreadcrumbsMixin
@@ -23,10 +24,11 @@ class PageActions(Enum):
 
 
 class OOIDetailView(
-    OOIRelatedObjectAddView,
-    BaseOOIDetailView,
     BoefjeMixin,
     OOIBreadcrumbsMixin,
+    OrganizationIndemnificationMixin,
+    OOIRelatedObjectAddView,
+    BaseOOIDetailView,
 ):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
@@ -87,8 +89,13 @@ class OOIDetailView(
         if boefjes:
             context["enabled_boefjes_available"] = True
 
-        # Filter boefjes on scan level <= OOI clearance level
-        if filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
+        # Filter boefjes on scan level <= OOI clearance level when not "show all"
+        # or when not "acknowledged clearance level > 0"
+        if (
+            (filter_form.is_valid() and not filter_form.cleaned_data["show_all"])
+            or self.request.user.organizationmember.acknowledged_clearance_level <= 0
+            or self.get_organization_indemnification
+        ):
             boefjes = [boefje for boefje in boefjes if boefje.scan_level.value <= self.ooi.scan_profile.level]
 
         context["boefjes"] = boefjes
@@ -113,5 +120,6 @@ class OOIDetailView(
         context["breadcrumbs"] = self.build_breadcrumbs()
 
         context["possible_boefjes_filter_form"] = filter_form
+        context["organization_indemnification"] = self.get_organization_indemnification
 
         return context

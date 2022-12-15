@@ -7,6 +7,7 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import ObjectDoesNotExist
 
 from tools.models import (
+    SCAN_LEVEL,
     Organization,
     OrganizationMember,
     GROUP_CLIENT,
@@ -25,12 +26,17 @@ class Command(BaseCommand):
         dev_org, _ = Organization.objects.get_or_create(name="Development Organization", code="_dev")
 
         dev_user = User.objects.last()
+
+        scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
+
         OrganizationMember.objects.create(
             user=dev_user,
             organization=dev_org,
             verified=True,
             authorized=True,
             status=OrganizationMember.STATUSES.ACTIVE,
+            trusted_clearance_level=max(scan_levels),
+            acknowledged_clearance_level=max(scan_levels),
         )
 
     def get_permissions(self, codenames):
@@ -69,6 +75,7 @@ class Command(BaseCommand):
             [
                 "can_scan_organization",
                 "can_enable_disable_boefje",
+                "can_set_clearance_level",
             ]
         )
         self.group_redteam.permissions.set(redteam_permissions)

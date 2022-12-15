@@ -20,7 +20,7 @@
               class="horizontal-view help">
           {% csrf_token %}
           {% translate 'Red teamer details' as fieldset_legend %}
-          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fieldset='name email password' fields=form %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
           <button type="submit">{% translate 'Submit' %}</button>
         </form>
         <p>

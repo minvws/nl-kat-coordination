@@ -1,9 +1,13 @@
-from typing import Dict
+import logging
+from typing import Dict, List
 
 import requests
 
 from rocky.health import ServiceHealth
 from rocky.settings import BYTES_API, BYTES_USERNAME, BYTES_PASSWORD
+
+
+logger = logging.getLogger(__name__)
 
 
 class BytesClient:
@@ -21,11 +25,26 @@ class BytesClient:
 
         return ServiceHealth.parse_obj(response.json())
 
-    def get_raw(self, boefje_meta_id: str) -> bytes:
-        response = self.session.get(f"{self.base_url}/bytes/raw/{boefje_meta_id}")
+    def get_raw(self, boefje_meta_id: str, raw_id: str) -> bytes:
+        response = self.session.get(f"{self.base_url}/bytes/raw/{boefje_meta_id}/{raw_id}")
         response.raise_for_status()
 
         return response.content
+
+    def get_raw_metas(self, boefje_meta_id: str) -> List:
+        # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
+        raw_files_limit = 100
+        params = {"boefje_meta_id": boefje_meta_id, "limit": raw_files_limit}
+
+        response = self.session.get(f"{self.base_url}/bytes/raw", params=params)
+        response.raise_for_status()
+
+        metas = response.json()
+
+        if len(metas) >= raw_files_limit:
+            logger.warning("Reached raw file limit for current view.")
+
+        return metas
 
     def get_raw_meta(self, boefje_meta_id: str):
         response = self.session.get(

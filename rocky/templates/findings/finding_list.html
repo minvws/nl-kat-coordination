@@ -1,0 +1,94 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    {% include 'partials/notifications/notifications_block.html' %}
+    <section>
+      <div>
+        <h1>{% translate 'Findings' %}</h1>
+        <p>
+          {% blocktranslate trimmed with observed_at|date as date %}
+        An overview of all findings KAT found on {{ date }}. Each finding relates to an object.
+        Click a finding for additional information.
+      {% endblocktranslate %}
+        </p>
+        {% include 'partials/findings_list_toolbar.html' %}
+        {% translate 'Object list' as filter_title %}
+        {% include 'partials/ooi_list_filters.html' with title=filter_title %}
+        <div class="horizontal-scroll">
+          <table class="action-buttons nowrap">
+            <thead>
+              <tr>
+                <th>{% translate 'Finding' %}</th>
+                <th>{% translate 'Finding Type' %}</th>
+                <th>{% translate 'Object Type' %}</th>
+                <th>{% translate 'Tree' %}</th>
+                <th>{% translate 'Graph' %}</th>
+                <th>{% translate 'Details' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for finding in ooi_list %}
+                {% spaceless %}
+                  <tr>
+                    <td>
+                      <a href="{% ooi_url 'ooi_detail' finding.primary_key query=mandatory_fields %}"
+                         title="{% blocktranslate trimmed with finding=finding.primary_key %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.human_readable }}</a>
+                    </td>
+                    <td>
+                      <a href="{% ooi_url 'ooi_detail' finding.finding_type query=mandatory_fields %}"
+                         title="{% blocktranslate trimmed with finding_type=finding.finding_type %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ finding.finding_type.human_readable }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'ooi_list' %}?ooi_type={{ finding.ooi.class_ }}"
+                         title="{% blocktranslate trimmed with ooi_type=finding.ooi.class_ %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ finding.ooi.class_ }}</a>
+                    </td>
+                    <td class="actions">
+                      <a aria-label="Navigate to tree view of {{ finding.human_readable }}"
+                         class="icon ti-subtask button"
+                         href="{% ooi_url 'ooi_tree' finding.primary_key query=mandatory_fields %}">{% translate 'Tree' %}</a>
+                    </td>
+                    <td class="actions">
+                      <a aria-label="Navigate to graph view of {{ finding.human_readable }}"
+                         class="icon ti-affiliate button"
+                         href="{% ooi_url 'ooi_graph' finding.primary_key query=mandatory_fields %}">{% translate 'Graph' %}</a>
+                    </td>
+                    <td class="actions">
+                      <button class="expando-button"
+                              data-icon-open-class="icon ti-chevron-down"
+                              data-icon-close-class="icon ti-chevron-up"
+                              data-close-label="{% translate 'Close details' %}">
+                        {% translate 'Open details' %}
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="expando-row">
+                    <td colspan="6">
+                      <dl>
+                        <div>
+                          <dt>{% translate 'Object' %}:</dt>
+                          <dd>{{ finding.ooi.human_readable }}</dd>
+                        </div>
+                        {% include 'partials/finding_occurrence_definition_list.html' %}
+                      </dl>
+                    </td>
+                  </tr>
+                {% endspaceless %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% include 'partials/findings_list_pagination.html' %}
+      </div>
+    </section>
+  </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock %}

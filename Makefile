@@ -1,4 +1,4 @@
-.PHONY: build, build-rocky, build-rocky-frontend, run, test, export_migrations
+.PHONY: build build-rocky build-rocky-frontend run test export_migrations debian clean
 
 
 # Export Docker buildkit options
@@ -55,46 +55,40 @@ lang:
 	make languages
 
 debian:
-	-mkdir ./build
-	docker build -t kat-deb-build-rocky packaging/deb/
-ifdef OCTOPOES_DIR
-	docker run \
+	mkdir -p build
+	docker run --rm \
 	--env PKG_NAME=kat-rocky \
-	--env BUILD_DIR=./build \
-	--env REPOSITORY=minvws/nl-kat-rocky \
-	--env RELEASE_VERSION=${RELEASE_VERSION} \
-	--env RELEASE_TAG=${RELEASE_TAG} \
-	--env OCTOPOES_DIR=/octopoes \
-	--mount type=bind,src=${CURDIR},dst=/app \
-	--mount type=bind,src=${OCTOPOES_DIR},dst=/octopoes \
-	--workdir /app \
-	kat-deb-build-rocky \
-	packaging/scripts/build-debian-package.sh
-else
-	docker run \
-	--env PKG_NAME=kat-rocky \
-	--env BUILD_DIR=./build \
 	--env REPOSITORY=minvws/nl-kat-rocky \
 	--env RELEASE_VERSION=${RELEASE_VERSION} \
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--workdir /app \
-	kat-deb-build-rocky \
+	kat-debian-build-image \
 	packaging/scripts/build-debian-package.sh
-endif
+
+ubuntu:
+	mkdir -p build
+	docker run --rm \
+	--env PKG_NAME=kat-rocky \
+	--env REPOSITORY=minvws/nl-kat-rocky \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--workdir /app \
+	kat-ubuntu-build-image \
+	packaging/scripts/build-debian-package.sh
 
 clean:
-	-rm -rf build
+	rm -rf build
+	rm -rf debian/kat-rocky/ debian/.debhelper debian/files static/ rocky.egg-info/ node_modules/ dist/
+	rm -f debian/debhelper-build-stamp
+	rm -f debian/kat-rocky.*.debhelper
+	rm -f debian/kat-rocky.substvars
+	rm -f debian/*.debhelper.log
+	rm -f debian/changelog
 
-check: ## Check the code style using robotidy, black, mypy, flake8, pylint, and vulture
-	robotidy --diff --check tests/robot
-	black --diff --check .
-	flake8 .
-	vulture .
-
-	## Would be nice if we could get these working one module at a time
-	#pylint --recursive=y rocky/middleware
-	#mypy rocky/middleware
+check:
+	pre-commit run --all-files --show-diff-on-failure --color always
 
 install-rf:
 	pip3 install -r requirements-dev.txt

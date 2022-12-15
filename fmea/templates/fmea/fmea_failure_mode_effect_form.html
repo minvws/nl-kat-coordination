@@ -8,8 +8,8 @@
     <section>
       <div class="form-view">
         <h1>{% translate 'FMEA effect and severity' %}</h1>
-        <form novalidate action="{% if editing_view %}{{ object.get_update_url }}{% else %}{% url 'fmea_failure_mode_effect_create' %}{% endif %}"  
-        method="post" 
+        <form novalidate action="{% if editing_view %}{{ object.get_update_url }}{% else %}{% url 'fmea_failure_mode_effect_create' %}{% endif %}"
+        method="post"
         class="horizontal-view help">
           {% csrf_token %}
           {% translate 'FMEA effect' as fieldset_legend %}

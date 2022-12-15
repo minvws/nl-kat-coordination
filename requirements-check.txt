@@ -1,8 +1,8 @@
 # Python linters
 flake8==5.0.4
-mypy==0.971
+mypy==0.991
 pylint==2.15.5
-vulture==2.5
+vulture==2.6
 
 # Python formatter
 black==22.10.0

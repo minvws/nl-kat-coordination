@@ -3,7 +3,7 @@ from typing import Type, List, Dict, Any
 from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import redirect
+from django.shortcuts import HttpResponseRedirect, redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +15,7 @@ from octopoes.models import DeclaredScanProfile
 from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
 from octopoes.models.types import type_by_name
+from rocky.views.indemnification_add import IndemnificationAddView
 from two_factor.views.utils import class_view_decorator
 from django.contrib.auth import get_user_model
 from onboarding.forms import (
@@ -32,7 +33,7 @@ from katalogus.client import get_katalogus
 from rocky.views import BaseOOIFormView
 from rocky.views.ooi_view import SingleOOITreeMixin, BaseOOIDetailView
 from tools.forms import SelectBoefjeForm
-from tools.models import Organization, OrganizationMember
+from tools.models import Indemnification, Organization, OrganizationMember
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     get_or_create_ooi,
@@ -461,10 +462,10 @@ class OnboardingOrganizationSetupView(
     """
 
     model = Organization
-    template_name = "account/step_2_organization_setup.html"
+    template_name = "account/step_2a_organization_setup.html"
     form_class = OnboardingCreateOrganizationForm
     current_step = 2
-    success_url = reverse_lazy("step_choose_user_type")
+    success_url = reverse_lazy("step_indemnification_setup")
 
     def dispatch(self, request, *args, **kwargs):
         organization_id = self.get_organization_id()
@@ -477,7 +478,7 @@ class OnboardingOrganizationSetupView(
             )
         if is_admin(self.request.user):
             self.add_message()
-            return redirect("step_account_setup_admin")
+            return redirect("step_indemnification_setup")
         else:
             return super().dispatch(request, *args, **kwargs)
 
@@ -506,10 +507,10 @@ class OnboardingOrganizationUpdateView(
     """
 
     model = Organization
-    template_name = "account/step_2_organization_update.html"
+    template_name = "account/step_2a_organization_update.html"
     form_class = OnboardingCreateOrganizationForm
     current_step = 2
-    success_url = reverse_lazy("step_choose_user_type")
+    success_url = reverse_lazy("step_indemnification_setup")
 
     def add_success_notification(self):
         success_message = _("Organization succesfully updated.")
@@ -517,9 +518,33 @@ class OnboardingOrganizationUpdateView(
 
 
 @class_view_decorator(otp_required)
-class OnboardingChooseUserTypeView(KatIntroductionAdminStepsMixin, TemplateView):
+class OnboardingIndemnificationSetupView(
+    SuperOrAdminUserRequiredMixin,
+    KatIntroductionAdminStepsMixin,
+    IndemnificationAddView,
+):
     current_step = 3
-    template_name = "account/step_2a_account_user_type.html"
+    template_name = "account/step_2b_indemnification_setup.html"
+    success_url = reverse_lazy("step_account_setup_intro")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["breadcrumbs"] = []
+
+        return context
+
+
+@class_view_decorator(otp_required)
+class OnboardingAccountSetupIntroView(SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
+    template_name = "account/step_2c_account_setup_intro.html"
+    current_step = 4
+
+
+@class_view_decorator(otp_required)
+class OnboardingChooseUserTypeView(KatIntroductionAdminStepsMixin, TemplateView):
+    current_step = 4
+    template_name = "account/step_3_account_user_type.html"
 
 
 @otp_required
@@ -539,14 +564,8 @@ def skip_onboarding(request):
 
 
 @class_view_decorator(otp_required)
-class OnboardingAccountSetupIntroView(SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
-    template_name = "account/step_3_account_setup_intro.html"
-    current_step = 3
-
-
-@class_view_decorator(otp_required)
 class OnboardingAccountCreationMixin(SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
-    current_step = 3
+    current_step = 4
 
     def dispatch(self, request, *args, **kwargs):
         if "organization_name" not in self.request.session and self.request.user.is_superuser:

@@ -1,6 +1,7 @@
 import uuid
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -43,6 +44,7 @@ class Organization(models.Model):
             ("can_switch_organization", "Can switch organization"),
             ("can_scan_organization", "Can scan organization"),
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
+            ("can_set_clearance_level", "Can set clearance level"),
         )
 
     def get_absolute_url(self):
@@ -54,6 +56,8 @@ class OrganizationMember(models.Model):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
         BLOCKED = "blocked", _("blocked")
+
+    scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
 
     user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, related_name="members")
@@ -72,6 +76,12 @@ class OrganizationMember(models.Model):
         null=True,
     )
     onboarded = models.BooleanField(default=False)
+    trusted_clearance_level = models.IntegerField(
+        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
+    )
+    acknowledged_clearance_level = models.IntegerField(
+        default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
+    )
 
     def __str__(self):
         return str(self.user)

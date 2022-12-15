@@ -14,19 +14,19 @@
               <caption>{% translate 'Failure mode effects tabel:' %}</caption>
               <thead>
                 <tr>
-                  <th>{% translate 'Failure mode effect' %}</th> 
+                  <th>{% translate 'Failure mode effect' %}</th>
                   <th>{% translate 'Severity level' %}</th>
-                  <th>{% translate 'Edit' %}</th>                       
+                  <th>{% translate 'Edit' %}</th>
                 </tr>
               </thead>
               <tbody>
-                {% for object in object_list %}                      
+                {% for object in object_list %}
                   <tr>
                     <td><a href="{{ object.get_absolute_url }}">{{ object.effect}}</a></td>
                     <td>{{ object.get_severity_level_display }}</td>
                     <td><a href="{{ object.get_update_url }}">Edit</a></td>
                   </tr>
-                {% endfor %}      
+                {% endfor %}
               </tbody>
             </table>
           </div>

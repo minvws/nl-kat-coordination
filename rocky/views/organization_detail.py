@@ -25,6 +25,7 @@ class PageActions(Enum):
     SIGNAL_GROUP_CREATE = "signal_group_create"
     SIGNAL_GROUP_ADD_MEMBER = "signal_group_add_member"
     SIGNAL_GROUP_SEND_TEST_MESSAGE = "signal_group_send_test_message"
+    GIVE_CLEARANCE = "give_clearance"
 
 
 def is_allowed_action_for_organization(action: PageActions, organization: Organization) -> bool:

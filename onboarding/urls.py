@@ -70,6 +70,11 @@ urlpatterns = [
         name="step_organization_update",
     ),
     path(
+        "step/indemnification-setup/",
+        views.OnboardingIndemnificationSetupView.as_view(),
+        name="step_indemnification_setup",
+    ),
+    path(
         "step/choose-user-type/",
         views.OnboardingChooseUserTypeView.as_view(),
         name="step_choose_user_type",

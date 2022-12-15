@@ -69,7 +69,6 @@ SERVER_EMAIL = os.getenv("SERVER_EMAIL")
 EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX")  # "KAT - "
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", False)  # False
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", False)  # False
-# EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", False) # False
 EMAIL_SSL_CERTFILE = os.getenv("EMAIL_SSL_CERTFILE", None)  # None
 EMAIL_SSL_KEYFILE = os.getenv("EMAIL_SSL_KEYFILE", None)
 EMAIL_TIMEOUT = 30  # 30 seconds
@@ -122,7 +121,7 @@ ROOT_URLCONF = "rocky.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [BASE_DIR / "rocky/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -211,7 +210,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
+LOCALE_PATHS = (BASE_DIR / "rocky/locale",)
 
 LANGUAGES = [
     ("en", "en"),

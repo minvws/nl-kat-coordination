@@ -9,8 +9,8 @@
       <div class="form-view">
         {% if failure_mode_exist %}
           <h1>{% translate 'Define which objects are affected for a failure mode' %}</h1>
-          <form action="{% if editing_view %}{% url 'fmea_failure_mode_affected_object_update' id %}{% else %}{% url 'fmea_failure_mode_affected_object_create' %}{% endif %}"  
-          method="post" 
+          <form action="{% if editing_view %}{% url 'fmea_failure_mode_affected_object_update' id %}{% else %}{% url 'fmea_failure_mode_affected_object_create' %}{% endif %}"
+          method="post"
           class="horizontal-view help">
             {% csrf_token %}
             {% translate 'Failure mode affected objects' as fieldset_legend %}

@@ -5,6 +5,14 @@
   --accordion-content-text-color: #000;
   --application-base-accent-color: #262431;
   --application-base-accent-color-text-color:  #fff;
+  --application-base-accent-color-hover: #4b436d;
+  --application-base-accent-color-hover-text-color: #fff;
+  --application-base-accent-color-active: #56469c;
+  --application-base-accent-color-active-text-color: #fff;
+  --application-base-accent-color-focus: #56469c;
+  --application-base-accent-color-focus-text-color: #fff;
+  --application-base-accent-color-selected: #56469c;
+  --application-base-accent-color-selected-text-color: #fff;
   --breadcrumb-bar-content-block-icon: "\ea61";
   --breadcrumb-bar-padding-right: 3%;
   --breadcrumb-bar-padding-left: 3%;
@@ -32,6 +40,8 @@
   --form-input-border-color: #ccc;
   --form-textarea-text-color: var(--form-base-input-text-color);
   --form-textarea-border-color: #ccc;
+  --h1-font-size: var(--heading-xl-font-size);
+  --h2-font-size: var(--heading-large-font-size);
   --icon-base-font-family: "tabler-icons";
   --icon-base-font-size: 1.2rem;
   --layout-block-gap: 3rem;

@@ -437,7 +437,7 @@ deployment/github_config.sh
 # From Rocky
 db.sqlite3
 .env
-./static
+static
 database.env
 package-lock.json
 .email_logs
@@ -454,3 +454,17 @@ assets/bytes/
 !packaging/deb/data/usr/lib
 # robot framework
 tests/robot/results*
+
+# debian build artifacts
+debhelper-build-stamp
+*.debhelper
+*.deb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.substvars
+debian/*/
+debian/*.log
+debian/files
+debian/changelog

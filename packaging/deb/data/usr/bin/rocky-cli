@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/bin/bash
 
-cd /usr/share/kat-rocky/app
-../venv/bin/python manage.py "$@"
+set -a
+source /etc/kat/rocky.conf
+
+/opt/venvs/kat-rocky/bin/manage.py "$@"

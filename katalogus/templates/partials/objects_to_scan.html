@@ -4,7 +4,15 @@
   {% translate 'Object list' as form_title %}
   <div>
     <h2>{{ form_title }}</h2>
-    <div class="horizontal-view">
+
+    <p>
+      {% blocktranslate trimmed with scan_level=plugin.scan_level %}
+        This boefje will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
+        or higher. There is no indemnification for this boefje to scan an OOI with a lower clearance level then <strong>L{{ scan_level }}</strong>. Use the filter to show OOI's with a lower clearance level.
+      {% endblocktranslate %}
+    </p>
+
+    <div class="horizontal-view toolbar">
       <div>
         <form method="get" class="inline">
           <div class="horizontal-view">
@@ -14,6 +22,20 @@
         </form>
       </div>
     </div>
+
+    {% if 'show_all=on' in request.get_full_path %}
+      <p class="warning"
+        role="group"
+        aria-label="{% translate 'scan level warning' %}">
+        {% blocktranslate %}
+          <span>Warning scan level:</span>
+          Scanning OOI's with a lower clearance level will result in KAT increasing the clearance level on that OOI,
+          not only for this scan but from now on out, until it manually gets set to something else again.
+          This means that all other enabled Boefjes will use this higher clearance level aswel.
+        {% endblocktranslate %}
+      </p>
+    {% endif %}
+
     {% if select_oois_form.fields.ooi.choices %}
       {% include 'partials/form/checkbox_group_table_form.html' with checkbox_group_table_form=select_oois_form btn_text='Start scan' plugin_enabled=plugin.enabled key='boefje_id' value=plugin.id action="scan" checkbox_group_table_filter_form=select_ooi_filter_form unique_id="" %}
     {% else %}

@@ -16,8 +16,8 @@
 								<tr>
 									<th>{% translate 'Risk Class' %}</th>
 									<th>{% translate 'Failure Mode' %}</th>
-									<th>{% translate 'Details' %}</th>  
-									<th>{% translate 'Edit' %}</th>                         
+									<th>{% translate 'Details' %}</th>
+									<th>{% translate 'Edit' %}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -31,10 +31,10 @@
 										<td>
                       <a href="{{ object.get_absolute_url }}">{{ object.failure_mode }}</a>
                     </td>
-										<td><button 
-											class="expando-button" 
-											data-icon-open-class="icon ti-chevron-down" 
-											data-icon-close-class="icon ti-chevron-up" 
+										<td><button
+											class="expando-button"
+											data-icon-open-class="icon ti-chevron-down"
+											data-icon-close-class="icon ti-chevron-up"
 											data-close-label="{% translate 'Sluit details' %}">{% translate 'Details' %}</button></td>
 										<td><a href="{{ object.get_update_url }}">{% translate 'Edit' %}</a></td>
 									</tr>

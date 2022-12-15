@@ -2,6 +2,7 @@ import json
 import logging
 import zipfile
 from io import BytesIO
+from typing import List, Dict
 
 from django.contrib import messages
 from django.http import Http404, FileResponse
@@ -21,11 +22,12 @@ class BytesRawView(View):
         try:
             client = get_bytes_client()
             client.login()
-            raw = client.get_raw(boefje_meta_id)
-            boefje_meta = client.get_raw_meta(boefje_meta_id)
+            raw_metas = client.get_raw_metas(boefje_meta_id)
+
+            raws = {raw_meta["id"]: client.get_raw(boefje_meta_id, raw_meta["id"]) for raw_meta in raw_metas}
 
             return FileResponse(
-                zip_data(raw, boefje_meta_id, boefje_meta),
+                zip_data(raws, raw_metas),
                 filename=f"{boefje_meta_id}.zip",
             )
         except Http404 as e:
@@ -37,12 +39,13 @@ class BytesRawView(View):
             return redirect(request.META["HTTP_REFERER"])
 
 
-def zip_data(data: bytes, boefje_meta_id: str, boefje_meta: dict) -> BytesIO:
+def zip_data(raws: Dict[str, bytes], raw_metas: List[Dict]) -> BytesIO:
     zf_buffer = BytesIO()
 
     with zipfile.ZipFile(zf_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr(boefje_meta_id, data)
-        zf.writestr("raw_meta.json", json.dumps(boefje_meta))
+        for raw_meta in raw_metas:
+            zf.writestr(raw_meta["id"], raws[raw_meta["id"]])
+            zf.writestr(f"raw_meta_{raw_meta['id']}.json", json.dumps(raw_meta))
 
     zf_buffer.seek(0)
 

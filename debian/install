@@ -1,0 +1,4 @@
+packaging/deb/data/etc/kat/* etc/kat
+packaging/deb/data/usr/bin/* usr/bin
+packaging/deb/data/usr/lib/systemd/system/kat-rocky.service usr/lib/systemd/system
+OOI_database_seed.json usr/share/kat-rocky

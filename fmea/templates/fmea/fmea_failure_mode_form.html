@@ -9,8 +9,8 @@
     <div class="form-view">
       {% if failure_mode_effect_exist %}
         <h1>{% translate 'Create a new failure mode' %}</h1>
-        <form novalidate action="{% if editing_view %}{{ object.get_update_url }}{% else %}{% url 'fmea_failure_mode_create' %}{% endif %}" 
-          method="post" 
+        <form novalidate action="{% if editing_view %}{{ object.get_update_url }}{% else %}{% url 'fmea_failure_mode_create' %}{% endif %}"
+          method="post"
           class="horizontal-view help">
           {% csrf_token %}
           {% translate 'Failure mode and effects' as fieldset_legend %}

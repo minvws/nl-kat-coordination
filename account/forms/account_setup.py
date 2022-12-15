@@ -49,14 +49,31 @@ class GroupAddForm(forms.Form):
 class IndemnificationAddForm(BaseRockyForm):
     may_scan = forms.CharField(
         label=_(
-            "I declare that KAT may scan the assets of my organization "
-            "and I am aware of the risk the extra load on my systems will bring."
+            "I declare that KAT may scan the assets of my organization and "
+            "that I have permission to scan these assets. "
+            "I am aware of the implications a scan with a higher scan level brings on my systems."
         ),
         widget=forms.CheckboxInput(),
     )
     am_authorized = forms.CharField(
-        label=_("I declare that I am authorized to give this indemnification within my organization."),
+        label=_(
+            "I declare that I am authorized to give this indemnification within my organization. "
+            "I have the expierence and knowledge to know what the consequences might be and"
+            " can be held responsible for them."
+        ),
         widget=forms.CheckboxInput(),
+    )
+
+
+class AssignClearanceLevelForm(BaseRockyForm):
+    assigned_level = forms.BooleanField(
+        label=_("Trusted to change Clearance Levels."),
+    )
+
+
+class AcknowledgeClearanceLevelForm(BaseRockyForm):
+    acknowledged_level = forms.BooleanField(
+        label=_("Acknowledged to change Clearance Levels."),
     )
 
 
