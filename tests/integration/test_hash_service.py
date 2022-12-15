@@ -1,16 +1,15 @@
 import pytest
 
-from bytes.config import settings, has_pastebin_key
+from bytes.config import has_pastebin_key
 from bytes.repositories.meta_repository import RawDataFilter
-from bytes.sqlalchemy.sql_meta_repository import SQLMetaDataRepository
+from bytes.database.sql_meta_repository import SQLMetaDataRepository
 from bytes.timestamping.pastebin import PastebinHashRepository
 from tests.loading import get_raw_data, get_boefje_meta
 
 
 @pytest.mark.skipif("not has_pastebin_key()")
-def test_save_raw_data_pastebin(meta_repository: SQLMetaDataRepository) -> None:
+def test_save_raw_data_pastebin(meta_repository: SQLMetaDataRepository, hash_repository: PastebinHashRepository) -> None:
     meta = get_boefje_meta()
-    service = PastebinHashRepository(api_dev_key=settings.pastebin_api_dev_key)
 
     with meta_repository:
         meta_repository.save_boefje_meta(meta)
@@ -28,7 +27,7 @@ def test_save_raw_data_pastebin(meta_repository: SQLMetaDataRepository) -> None:
     assert raws[0].hash_retrieval_link is not None
     assert "https://pastebin.com/" in raws[0].hash_retrieval_link
 
-    retrieved_hash = service.retrieve(raws[0].hash_retrieval_link)
+    retrieved_hash = hash_repository.retrieve(raws[0].hash_retrieval_link)
 
     assert (
         retrieved_hash

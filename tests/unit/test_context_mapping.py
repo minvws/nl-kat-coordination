@@ -1,5 +1,5 @@
-from bytes.sqlalchemy.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
-from bytes.sqlalchemy.sql_meta_repository import (
+from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
+from bytes.database.sql_meta_repository import (
     to_boefje_meta_in_db,
     to_boefje_meta,
     to_normalizer_meta_in_db,

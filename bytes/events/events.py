@@ -10,20 +10,19 @@ def utc_now() -> datetime:
 
 
 class Event(BaseModel):
+    event_id: str
+
     created_at: datetime = Field(default_factory=utc_now)  # Needs to be a callable, hence the wrapping
     organization: str
 
-    # Starting with underscore means it is ignored by pydantic
-    _event_id: str
-
 
 class RawFileReceived(Event):
-    _event_id: str = "raw_file_received"
+    event_id: str = "raw_file_received"
 
     raw_data: RawDataMeta
 
 
 class NormalizerMetaReceived(Event):
-    _event_id: str = "normalizer_meta_received"
+    event_id: str = "normalizer_meta_received"
 
     normalizer_meta: NormalizerMeta

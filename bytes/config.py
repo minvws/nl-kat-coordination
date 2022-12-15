@@ -1,3 +1,4 @@
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
@@ -35,10 +36,14 @@ class Settings(BaseSettings):
     vws_public_key_b64: str = ""
 
 
-settings = Settings()
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()
 
 
 def get_bytes_data_directory() -> Path:
+    settings = get_settings()
+
     if settings.bytes_data_dir:
         return Path(settings.bytes_data_dir)
 
@@ -46,4 +51,12 @@ def get_bytes_data_directory() -> Path:
 
 
 def has_pastebin_key() -> bool:
+    settings = get_settings()
+
     return settings.pastebin_api_dev_key != ""
+
+
+def has_rfc3161_provider() -> bool:
+    settings = get_settings()
+
+    return settings.rfc3161_provider != ""

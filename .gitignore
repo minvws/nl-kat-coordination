@@ -432,3 +432,17 @@ deployment/github_config.sh
 .venv
 
 !packaging/deb/data/usr/lib
+
+# debian build artifacts
+debhelper-build-stamp
+*.debhelper
+*.deb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.substvars
+debian/*/
+debian/*.log
+debian/files
+debian/changelog

@@ -9,9 +9,9 @@ from bytes.api.root import validation_exception_handler
 from bytes.api.v2 import router as router_v2
 
 
-from bytes.config import settings
+from bytes.config import get_settings
 
-logging.config.fileConfig(settings.log_cfg, disable_existing_loggers=False)
+logging.config.fileConfig(get_settings().log_cfg, disable_existing_loggers=False)
 
 app = FastAPI()
 

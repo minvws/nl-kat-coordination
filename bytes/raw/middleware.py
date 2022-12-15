@@ -2,7 +2,7 @@ import base64
 
 from nacl.public import PrivateKey, PublicKey, Box
 
-from bytes.config import settings
+from bytes.config import get_settings
 from bytes.models import EncryptionMiddleware
 
 
@@ -15,6 +15,8 @@ class FileMiddleware:
 
 
 def make_middleware() -> FileMiddleware:
+    settings = get_settings()
+
     if settings.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
         return NaclBoxMiddleware(settings.kat_private_key_b64, settings.vws_public_key_b64)
 
@@ -36,8 +38,7 @@ class NaclBoxMiddleware(FileMiddleware):
         self.box: Box = Box(private_key, public_key)
 
     def encode(self, contents: bytes) -> bytes:
-        encrypted_contents = self.box.encrypt(contents)
-        return encrypted_contents
+        return self.box.encrypt(contents)
 
     def decode(self, contents: bytes) -> bytes:
         nonce = contents[0 : self.box.NONCE_SIZE]

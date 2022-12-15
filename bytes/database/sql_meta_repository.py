@@ -2,10 +2,9 @@ import logging
 import uuid
 from typing import Type, List, Iterator, Optional
 
-from fastapi import Depends
 from sqlalchemy.orm import sessionmaker, Session
 
-from bytes.config import Settings, settings
+from bytes.config import Settings, get_settings
 from bytes.models import (
     Boefje,
     BoefjeMeta,
@@ -18,8 +17,8 @@ from bytes.models import (
 from bytes.repositories.hash_repository import HashRepository
 from bytes.timestamping.provider import create_hash_repository
 from bytes.timestamping.hashing import hash_data
-from bytes.sqlalchemy.db import SQL_BASE, get_engine
-from bytes.sqlalchemy.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
+from bytes.database.db import SQL_BASE, get_engine
+from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
 from bytes.repositories.meta_repository import MetaDataRepository, BoefjeMetaFilter, RawDataFilter
 from bytes.repositories.raw_repository import RawRepository
 from bytes.raw.file_raw_repository import create_raw_repository
@@ -39,7 +38,7 @@ class SQLMetaDataRepository(MetaDataRepository):
     def __enter__(self) -> None:
         pass
 
-    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:
+    def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         logger.info("Committing session")
         self.session.commit()
 
@@ -125,7 +124,7 @@ class SQLMetaDataRepository(MetaDataRepository):
             query = query.join(NormalizerMetaInDB, isouter=False)
 
         if query_filter.normalized is False:  # it can also be None, in which case we do not want a filter
-            query = query.join(NormalizerMetaInDB, isouter=True).filter(NormalizerMetaInDB.id == None)
+            query = query.join(NormalizerMetaInDB, isouter=True).filter(NormalizerMetaInDB.id.is_(None))
 
         if query_filter.mime_types:
             query = query.filter(RawFileInDB.mime_types.contains([m.value for m in query_filter.mime_types]))
@@ -172,11 +171,13 @@ class SQLMetaDataRepository(MetaDataRepository):
         )
 
 
-def create_meta_data_repository(
-    raw_repository: RawRepository = Depends(create_raw_repository),
-) -> Iterator[MetaDataRepository]:
-    session = sessionmaker(bind=get_engine())()
-    repository = SQLMetaDataRepository(session, raw_repository, create_hash_repository(), settings)
+def create_meta_data_repository() -> Iterator[MetaDataRepository]:
+    settings = get_settings()
+
+    session = sessionmaker(bind=get_engine(settings.bytes_db_uri))()
+    repository = SQLMetaDataRepository(
+        session, create_raw_repository(settings), create_hash_repository(settings), settings
+    )
 
     try:
         yield repository

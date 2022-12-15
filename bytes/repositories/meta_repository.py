@@ -22,7 +22,9 @@ class RawDataFilter(BaseModel):
     limit: int = 1
 
     @root_validator(pre=False)
-    def either_organization_or_boefje_meta_id(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    def either_organization_or_boefje_meta_id(  # pylint: disable=no-self-argument
+        cls, values: Dict[str, Any]
+    ) -> Dict[str, Any]:
         assert values.get("organization") or values.get(
             "boefje_meta_id"
         ), "boefje_meta_id and organization cannot both be None."
@@ -34,7 +36,7 @@ class MetaDataRepository:
     def __enter__(self) -> None:
         pass
 
-    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:
+    def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         pass
 
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
@@ -65,4 +67,4 @@ class MetaDataRepository:
         raise NotImplementedError()
 
     def get_raw(self, raw_id: str) -> RawData:
-        pass
+        raise NotImplementedError()

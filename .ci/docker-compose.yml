@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         ENVIRONMENT: dev
-    command: sh -c "sleep ${SLEEP_TIME:-1} && pytest -vv tests/integration"
+    command: sh -c "sleep ${SLEEP_TIME:-1} && pytest -v tests/integration"
     depends_on:
       - ci_bytes
     env_file:

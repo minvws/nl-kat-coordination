@@ -28,7 +28,8 @@ def hash_data(
 def _get_hasher(hash_algo: HashingAlgorithm) -> Any:
     if hash_algo == HashingAlgorithm.SHA512:
         return hashlib.sha512()
-    elif hash_algo == HashingAlgorithm.SHA224:
+
+    if hash_algo == HashingAlgorithm.SHA224:
         return hashlib.sha224()
-    else:
-        raise ValueError(f"Hashing algorithm {hash_algo} not implemented")
+
+    raise ValueError(f"Hashing algorithm {hash_algo} not implemented")

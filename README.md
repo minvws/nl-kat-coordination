@@ -41,7 +41,7 @@ To install the dependencies, assuming you are in the virtual environment, run
 $ pip install -r requirements-dev.txt
 ```
 Bytes depends on a Postgresql database that is configurable by the BYTES_DB_URI environment variable.
-See above for a minimal set of environment variables to start Bytes and 
+See above for a minimal set of environment variables to start Bytes and
 
 To start the API run
 ```shell
@@ -123,7 +123,7 @@ the implementation can be set using an env-var, `ENCRYPTION_MIDDLEWARE`. The opt
 - `"NACL_SEALBOX"`
 
 
-The `"NACL_SEALBOX"` option requires the `KAT_PRIVATE_KEY_B64` and `VWS_PUBLIC_KEY_B64` env vars. 
+The `"NACL_SEALBOX"` option requires the `KAT_PRIVATE_KEY_B64` and `VWS_PUBLIC_KEY_B64` env vars.
 ```bash
 ENCRYPTION_MIDDLEWARE="IDENTITY"
 KAT_PRIVATE_KEY_B64=""

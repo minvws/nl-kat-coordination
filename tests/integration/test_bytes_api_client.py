@@ -52,8 +52,13 @@ def test_filtered_boefje_meta(bytes_api_client: BytesAPIClient) -> None:
 
 
 def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: RabbitMQEventManager) -> None:
-    normalizer_meta = get_normalizer_meta()
-    bytes_api_client.save_boefje_meta(normalizer_meta.boefje_meta)
+    boefje_meta = get_boefje_meta()
+    bytes_api_client.save_boefje_meta(boefje_meta)
+
+    raw = b"test 123"
+    raw_id = bytes_api_client.save_raw(boefje_meta.id, raw)
+    normalizer_meta = get_normalizer_meta(raw_id)
+
     bytes_api_client.save_normalizer_meta(normalizer_meta)
     retrieved_normalizer_meta = bytes_api_client.get_normalizer_meta(normalizer_meta.id)
 
@@ -63,21 +68,6 @@ def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: Rabbit
     event_manager.connection.channel().basic_ack(method.delivery_tag)
 
     assert normalizer_meta.id in body.decode()
-
-
-def test_normalizer_meta_no_raw_id_field_in_json(bytes_api_client: BytesAPIClient) -> None:
-    normalizer_meta = get_normalizer_meta()
-    bytes_api_client.save_boefje_meta(normalizer_meta.boefje_meta)
-
-    test_url_without_params = f"{bytes_api_client._session._base_url}/bytes/normalizer_meta"
-
-    data = normalizer_meta.json(exclude={"raw_file_id"})
-    assert "raw_file_id" not in data
-
-    requests.post(test_url_without_params, data=data, headers=bytes_api_client.headers)
-    retrieved_normalizer_meta = bytes_api_client.get_normalizer_meta(normalizer_meta.id)
-
-    assert normalizer_meta == retrieved_normalizer_meta
 
 
 def test_normalizer_meta_pointing_to_raw_id(bytes_api_client: BytesAPIClient) -> None:

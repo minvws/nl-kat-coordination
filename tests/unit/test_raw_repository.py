@@ -3,7 +3,7 @@ import uuid
 import pytest
 from pydantic import ValidationError
 
-from bytes.config import settings
+from bytes.config import get_settings
 from bytes.raw.file_raw_repository import FileRawRepository
 from bytes.raw.middleware import NaclBoxMiddleware
 from bytes.repositories.meta_repository import RawDataFilter
@@ -11,6 +11,8 @@ from tests.loading import get_raw_data
 
 
 def has_encryption_keys() -> bool:
+    settings = get_settings()
+
     return settings.kat_private_key_b64 != "" and settings.vws_public_key_b64 != ""
 
 

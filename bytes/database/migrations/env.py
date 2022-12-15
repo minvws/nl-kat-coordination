@@ -7,9 +7,9 @@ from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from bytes.config import settings
-from bytes.sqlalchemy.db import SQL_BASE
-from bytes.sqlalchemy.db_models import SQL_BASE
+from bytes.config import get_settings
+from bytes.database.db import SQL_BASE
+from bytes.database.db_models import SQL_BASE
 
 config = context.config
 
@@ -22,7 +22,7 @@ fileConfig(config.config_file_name)  # type: ignore
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 target_metadata = SQL_BASE.metadata
-config.set_main_option("sqlalchemy.url", settings.bytes_db_uri)
+config.set_main_option("sqlalchemy.url", get_settings().bytes_db_uri)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

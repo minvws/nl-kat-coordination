@@ -10,7 +10,7 @@ from bytes.events.events import RawFileReceived, NormalizerMetaReceived
 from bytes.events.manager import EventManager
 from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataMeta
 from bytes.rabbitmq import create_event_manager
-from bytes.sqlalchemy.sql_meta_repository import create_meta_data_repository, ObjectNotFoundException
+from bytes.database.sql_meta_repository import create_meta_data_repository, ObjectNotFoundException
 from bytes.repositories.meta_repository import MetaDataRepository, BoefjeMetaFilter, RawDataFilter
 
 logger = logging.getLogger(__name__)

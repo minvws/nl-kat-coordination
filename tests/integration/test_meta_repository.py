@@ -6,7 +6,7 @@ from sqlalchemy.exc import DataError
 
 from bytes.models import RetrievalLink, SecureHash, MimeType
 from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter
-from bytes.sqlalchemy.sql_meta_repository import SQLMetaDataRepository
+from bytes.database.sql_meta_repository import SQLMetaDataRepository
 from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 
@@ -132,10 +132,13 @@ def test_save_boefje_meta_hash(meta_repository: SQLMetaDataRepository) -> None:
 
 
 def test_save_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:
-    normalizer_meta = get_normalizer_meta()
-
     with meta_repository:
-        meta_repository.save_boefje_meta(normalizer_meta.boefje_meta)
+        boefje_meta = get_boefje_meta()
+        meta_repository.save_boefje_meta(boefje_meta)
+
+        raw_id = meta_repository.save_raw(get_raw_data())
+        normalizer_meta = get_normalizer_meta(raw_id)
+
         meta_repository.save_normalizer_meta(normalizer_meta)
 
     normalizer_meta_from_db = meta_repository.get_normalizer_meta(normalizer_meta.id)
@@ -146,10 +149,12 @@ def test_save_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:
 
 
 def test_normalizer_id_length(meta_repository: SQLMetaDataRepository) -> None:
-    normalizer_meta = get_normalizer_meta()
-
     with meta_repository:
-        meta_repository.save_boefje_meta(normalizer_meta.boefje_meta)
+        boefje_meta = get_boefje_meta()
+        meta_repository.save_boefje_meta(boefje_meta)
+
+        raw_id = meta_repository.save_raw(get_raw_data())
+        normalizer_meta = get_normalizer_meta(raw_id)
 
         normalizer_meta.id = str(uuid.uuid4())
         normalizer_meta.normalizer.id = 64 * "a"

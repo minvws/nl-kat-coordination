@@ -11,7 +11,7 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette import status
 
-from bytes.config import settings
+from bytes.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +27,7 @@ class TokenResponse(BaseModel):
 
 
 def get_access_token(form_data: OAuth2PasswordRequestForm) -> Tuple[str, datetime]:
+    settings = get_settings()
     system_username = settings.bytes_username
     hashed_password = pwd_context.hash(settings.bytes_password)
 
@@ -39,10 +40,11 @@ def get_access_token(form_data: OAuth2PasswordRequestForm) -> Tuple[str, datetim
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return _create_access_token(form_data)
+    return _create_access_token(form_data, settings.secret, settings.access_token_expire_minutes)
 
 
 def authenticate_token(token: str = Depends(oauth2_scheme)) -> str:
+    settings = get_settings()
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -61,19 +63,21 @@ def authenticate_token(token: str = Depends(oauth2_scheme)) -> str:
         raise credentials_exception from error
 
 
-def _create_access_token(form_data: OAuth2PasswordRequestForm) -> Tuple[str, datetime]:
-    expire_time = _get_expire_time()
+def _create_access_token(
+    form_data: OAuth2PasswordRequestForm, secret: str, access_token_expire_minutes: float
+) -> Tuple[str, datetime]:
+    expire_time = _get_expire_time(access_token_expire_minutes)
     data = {
         "sub": form_data.username,
         "exp": expire_time,
     }
 
-    access_token = jwt.encode(data.copy(), settings.secret, algorithm=ALGORITHM)
+    access_token = jwt.encode(data.copy(), secret, algorithm=ALGORITHM)
 
     return access_token, expire_time
 
 
-def _get_expire_time() -> datetime:
-    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+def _get_expire_time(access_token_expire_minutes: float) -> datetime:
+    access_token_expires = timedelta(minutes=access_token_expire_minutes)
 
     return datetime.now(timezone.utc) + access_token_expires

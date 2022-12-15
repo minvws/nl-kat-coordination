@@ -2,7 +2,7 @@ from sqlalchemy import JSON, Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 
-from bytes.sqlalchemy.db import SQL_BASE
+from bytes.database.db import SQL_BASE
 
 
 class BoefjeMetaInDB(SQL_BASE):  # type: ignore
@@ -11,8 +11,8 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
     id = Column(UUID, primary_key=True)
     boefje_id = Column(String(length=64), nullable=False)
     boefje_version = Column(String(length=16))
-    organization = Column(String(length=4), nullable=False)
-    input_ooi = Column(String(length=128), nullable=False)
+    organization = Column(String(length=8), nullable=False)
+    input_ooi = Column(String(length=1024), nullable=False)
     arguments = Column(JSON, nullable=False, default=lambda: {})
 
     started_at = Column(DateTime(timezone=True))

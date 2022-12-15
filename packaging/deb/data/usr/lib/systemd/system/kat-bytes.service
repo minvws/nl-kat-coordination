@@ -1,19 +1,20 @@
 [Unit]
 Description=kat-bytes daemon
-Requires=kat-bytes.socket
 After=network.target
 
 [Service]
 User=kat
 Group=kat
-WorkingDirectory=/usr/share/kat-bytes/app
+SyslogIdentifier=kat-bytes
+WorkingDirectory=/opt/venvs/kat-bytes/
 EnvironmentFile=/etc/kat/bytes.conf
-ExecStart=/usr/share/kat-bytes/venv/bin/gunicorn \
+ExecStart=/opt/venvs/kat-bytes/bin/python -m gunicorn \
           --access-logfile - \
-          -c /etc/kat/gunicorn.bytes.conf.py \
-          --bind unix:/run/kat-bytes.sock \
+          -c /etc/kat/bytes.gunicorn.conf.py \
           -k uvicorn.workers.UvicornWorker \
           bytes.api:app
+Restart=on-failure
+RestartSec=3s
 
 [Install]
 WantedBy=multi-user.target

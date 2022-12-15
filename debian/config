@@ -6,7 +6,5 @@ set -e
 export DEBCONF_DEBUG=developer
 . /usr/share/debconf/confmodule
 
-db_input high kat-bytes/enable-nginx-conf || true
-
 db_go || echo nogo
 
