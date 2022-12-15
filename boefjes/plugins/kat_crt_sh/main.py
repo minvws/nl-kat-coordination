@@ -61,7 +61,7 @@ def request_certs(
 def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
     input_ = boefje_meta.arguments["input"]
     fqdn = input_["hostname"]["name"]
-    domain = fqdn if not fqdn.endswith(".") else fqdn[:-1]
+    domain = fqdn.rstrip(".")
     results = request_certs(domain)
 
     return boefje_meta, results
