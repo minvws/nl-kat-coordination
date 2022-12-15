@@ -1,7 +1,7 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     raise RuntimeError("dummy error")

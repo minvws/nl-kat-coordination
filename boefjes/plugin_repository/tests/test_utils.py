@@ -9,9 +9,7 @@ EXAMPLE_BOEFJE_FILE = load_plugin("test-boefje.yml")
 class TestUtils(TestCase):
     def setUp(self) -> None:
         self.example_config = EXAMPLE_BOEFJE_FILE
-        self.example_image = Image(
-            plugin=self.example_config, location="fixtures/test-boefje.yml"
-        )
+        self.example_image = Image(plugin=self.example_config, location="fixtures/test-boefje.yml")
 
     def test_load_boefje(self):
         self.assertIsInstance(self.example_config, Boefje)

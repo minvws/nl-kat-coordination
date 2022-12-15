@@ -32,7 +32,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     if not contents:
         return
 
-    input_ooi = normalizer_meta.boefje_meta.input_ooi
+    input_ooi = normalizer_meta.raw_data.boefje_meta.input_ooi
 
     # extract all certificates
     certificates, certificate_subject_alternative_names, hostnames = read_certificates(
@@ -75,19 +75,14 @@ def read_certificates(
         contents,
         flags=re.DOTALL,
     ):
-        pem_contents = (
-            "-----BEGIN CERTIFICATE-----" + m.group() + "-----END CERTIFICATE-----"
-        )
+        pem_contents = f"-----BEGIN CERTIFICATE-----{m.group()}-----END CERTIFICATE-----"
 
         cert = x509.load_pem_x509_certificate(pem_contents.encode(), default_backend())
         subject = cert.subject.get_attributes_for_oid(x509.OID_COMMON_NAME)[0].value
         issuer = cert.issuer.get_attributes_for_oid(x509.OID_ORGANIZATION_NAME)[0].value
         try:
             subject_alternative_names = [
-                name.value
-                for name in cert.extensions.get_extension_for_oid(
-                    x509.OID_SUBJECT_ALTERNATIVE_NAME
-                ).value
+                name.value for name in cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_ALTERNATIVE_NAME).value
             ]
         except x509.ExtensionNotFound:
             subject_alternative_names = []
@@ -95,9 +90,7 @@ def read_certificates(
         valid_until = cert.not_valid_after.isoformat()
         pk_algorithm = ""
         pk_size = cert.public_key().key_size
-        pk_number = (
-            cert.public_key().public_numbers().n.to_bytes(pk_size // 8, "big").hex()
-        )
+        pk_number = cert.public_key().public_numbers().n.to_bytes(pk_size // 8, "big").hex()
         if isinstance(
             cert.public_key(),
             cryptography.hazmat.backends.openssl.x509.rsa.RSAPublicKey,
@@ -125,9 +118,7 @@ def read_certificates(
             )
             hostnames.append(hostname)
             certificate_subject_alternative_names.append(
-                CertificateSubjectAlternativeName(
-                    certificate=certificate.reference, hostname=hostname.reference
-                )
+                CertificateSubjectAlternativeName(certificate=certificate.reference, hostname=hostname.reference)
             )
 
     return certificates, certificate_subject_alternative_names, hostnames

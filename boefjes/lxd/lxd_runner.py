@@ -1,18 +1,16 @@
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, Dict
 
 import pylxd
 import pylxd.exceptions
 import pylxd.models
 import requests
 
-from boefjes.plugins.models import RawData
 from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.models import PluginType
-from boefjes.runner import BoefjeJobRunner, get_environment_settings
+from boefjes.runtime_interfaces import BoefjeJobRunner
 
 logger = logging.getLogger(__name__)
 
@@ -46,16 +44,10 @@ class LXDBoefjeJobRunner(BoefjeJobRunner):
         self.raw: Optional[Union[str, bytes]] = None
         self.plugin = plugin
 
-    def run(self) -> Tuple[BoefjeMeta, RawData]:
-        self.boefje_meta.started_at = datetime.now(timezone.utc)
-        self.boefje_meta, raw = self._execute_boefje_plugin(
-            self.boefje_meta, self.plugin
-        )
-        self.boefje_meta.ended_at = datetime.now(timezone.utc)
+    def run(self, boefje_meta, environment) -> Tuple[BoefjeMeta, Union[str, bytes]]:
+        return boefje_meta, self._execute_boefje_plugin(boefje_meta, environment)
 
-        return self.boefje_meta, RawData(data=raw, mime_types={self.plugin.id})
-
-    def _execute_boefje_plugin(self, meta: BoefjeMeta, plugin: PluginType) -> str:
+    def _execute_boefje_plugin(self, meta: BoefjeMeta, environment: Dict[str, str]) -> str:
         client = self._create_lxd_client(settings.lxd_endpoint, settings.lxd_password)
         repository, plugin_id = meta.boefje.id.split("/")
         alias = f"{plugin_id}/{meta.boefje.version}"
@@ -66,14 +58,10 @@ class LXDBoefjeJobRunner(BoefjeJobRunner):
             "type": "boefje",
         }
 
-        environment = get_environment_settings(meta, plugin)
-
-        simplestreams_endpoint = get_simplestreams_endpoint(
-            meta.organization, repository
-        )
+        simplestreams_endpoint = get_simplestreams_endpoint(meta.organization, repository)
 
         config = _DEFAULT_LXD_CONFIG.copy()
-        instance_name = plugin_id + "-" + meta.id.split("-", 1)[0]
+        instance_name = f"{plugin_id}-{meta.id.split('-', 1)[0]}"
         config["name"] = instance_name
         config["source"]["alias"] = alias
         config["source"]["server"] = simplestreams_endpoint

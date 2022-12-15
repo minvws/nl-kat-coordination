@@ -27,9 +27,7 @@ class OrganisationInDB(SQL_BASE):
     id = Column(String(length=4), unique=True, nullable=False)
     name = Column(String(length=64), nullable=False)
 
-    repositories = relationship(
-        "RepositoryInDB", secondary=organisation_repo_association_table
-    )
+    repositories = relationship("RepositoryInDB", secondary=organisation_repo_association_table)
 
 
 class RepositoryInDB(SQL_BASE):
@@ -56,9 +54,7 @@ class SettingInDB(SQL_BASE):
     key = Column(String(length=128), nullable=False)
     value = Column(String(length=128), nullable=False)
     plugin_id = Column(String(length=64), nullable=False)
-    organisation_pk = Column(
-        Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False
-    )
+    organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
 
     organisation = relationship("OrganisationInDB")
 
@@ -77,12 +73,8 @@ class PluginStateInDB(SQL_BASE):
     id = Column(Integer, primary_key=True, autoincrement=True)
     plugin_id = Column(String(length=64), nullable=False)
     enabled = Column(Boolean, nullable=False)
-    organisation_pk = Column(
-        Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False
-    )
-    repository_pk = Column(
-        Integer, ForeignKey("repository.pk", ondelete="CASCADE"), nullable=False
-    )
+    organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
+    repository_pk = Column(Integer, ForeignKey("repository.pk", ondelete="CASCADE"), nullable=False)
 
     organisation = relationship("OrganisationInDB")
     repository = relationship("RepositoryInDB")

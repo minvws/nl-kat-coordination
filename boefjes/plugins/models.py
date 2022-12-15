@@ -43,7 +43,7 @@ class BoefjeResource:
         item = json.loads((path / BOEFJE_DEFINITION_FILE).read_text())
         self.boefje = Boefje(**item, repository_id=repository_id)
 
-        import_statement = package + "." + ENTRYPOINT_BOEFJES.rstrip(".py")
+        import_statement = f"{package}.{ENTRYPOINT_BOEFJES.rstrip('.py')}"
         module: Runnable = import_module(import_statement)
 
         if not hasattr(module, "run") or not isfunction(module.run):
@@ -62,7 +62,7 @@ class NormalizerResource:
         item = json.loads((path / NORMALIZER_DEFINITION_FILE).read_text())
         self.normalizer = Normalizer(**item, repository_id=repository_id)
 
-        import_statement = package + "." + ENTRYPOINT_NORMALIZERS.rstrip(".py")
+        import_statement = f"{package}.{ENTRYPOINT_NORMALIZERS.rstrip('.py')}"
         module: Runnable = import_module(import_statement)
 
         if not hasattr(module, "run") or not isfunction(module.run):

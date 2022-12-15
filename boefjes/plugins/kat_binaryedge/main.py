@@ -8,7 +8,7 @@ from pybinaryedge import BinaryEdge
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     be = BinaryEdge(getenv("BINARYEDGE_API"))
     results: Dict[str, List] = {"results": []}
@@ -40,4 +40,4 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
 
             results["results"].extend(result["events"])
 
-    return boefje_meta, json.dumps(results)
+    return [(set(), json.dumps(results))]

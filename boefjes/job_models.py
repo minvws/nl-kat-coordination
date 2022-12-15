@@ -1,6 +1,6 @@
 import hashlib
 from datetime import datetime, timedelta
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, validator
 
@@ -65,6 +65,12 @@ class BoefjeMeta(Job):
         return hashlib.sha256(encoded_arguments.encode("utf-8")).hexdigest()
 
 
-class NormalizerMeta(Job):
+class RawDataMeta(BaseModel):
+    id: str
     boefje_meta: BoefjeMeta
+    mime_types: List[Dict[str, str]]
+
+
+class NormalizerMeta(Job):
+    raw_data: RawDataMeta
     normalizer: Normalizer

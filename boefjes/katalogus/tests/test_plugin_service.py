@@ -91,12 +91,8 @@ def mock_plugin_service(organisation_id: str) -> PluginService:
 
     repo_store = RepositoryStorageMemory(organisation_id)
     _mocked_repositories = {
-        "test-repo": Repository(
-            id="test-repo", name="Test", base_url="http://localhost:8080"
-        ),
-        "test-repo-2": Repository(
-            id="test-repo-2", name="Test2", base_url="http://localhost:8081"
-        ),
+        "test-repo": Repository(id="test-repo", name="Test", base_url="http://localhost:8080"),
+        "test-repo-2": Repository(id="test-repo-2", name="Test2", base_url="http://localhost:8081"),
     }
     for id_, repo in _mocked_repositories.items():
         repo_store.create(repo)
@@ -131,9 +127,7 @@ class TestPluginsService(TestCase):
         self.assertEqual({"DNSZone"}, kat_test.consumes)
         self.assertSetEqual({"Hostname", "Certificate"}, set(kat_test.produces))
 
-        kat_test_norm = list(
-            filter(lambda x: x.id == "kat_test_normalize", plugins)
-        ).pop()
+        kat_test_norm = list(filter(lambda x: x.id == "kat_test_normalize", plugins)).pop()
         self.assertIn("kat_test_normalize", kat_test_norm.id)
         self.assertListEqual(["text/html"], kat_test_norm.consumes)
         self.assertListEqual([], kat_test_norm.produces)
@@ -146,21 +140,15 @@ class TestPluginsService(TestCase):
         self.assertIn("Normalizer 1", plugins["test-normalizer-1"].name)
 
     def test_get_repository_plugin(self):
-        plugin = self.service.repository_plugin(
-            "test-repo-2", "test-normalizer-1", self.organisation
-        )
+        plugin = self.service.repository_plugin("test-repo-2", "test-normalizer-1", self.organisation)
 
         self.assertIn("Normalizer 1", plugin.name)
         self.assertEqual(plugin.id, "test-normalizer-1")
         self.assertTrue(plugin.enabled)
 
     def test_update_by_id(self):
-        self.service.update_by_id(
-            "test-repo-2", "test-normalizer-1", self.organisation, False
-        )
-        plugin = self.service.repository_plugin(
-            "test-repo-2", "test-normalizer-1", self.organisation
-        )
+        self.service.update_by_id("test-repo-2", "test-normalizer-1", self.organisation, False)
+        plugin = self.service.repository_plugin("test-repo-2", "test-normalizer-1", self.organisation)
         self.assertIn("Normalizer 1", plugin.name)
         self.assertFalse(plugin.enabled)
 
@@ -170,22 +158,24 @@ class TestPluginsService(TestCase):
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
             self.service.update_by_id("LOCAL", plugin_id, self.organisation, True)
 
-        msg = "Settings for organisation test and plugin kat_test are not conform the plugin schema: 'api_key' is a required property"
+        msg = (
+            "Settings for organisation test and plugin kat_test are not conform the plugin schema: 'api_key' is a "
+            "required property"
+        )
         self.assertEqual(ctx.exception.message, msg)
 
-        self.service.settings_storage.update_by_key(
-            "api_key", 128 * "a", self.organisation, plugin_id
-        )
+        self.service.settings_storage.update_by_key("api_key", 128 * "a", self.organisation, plugin_id)
         self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         value = 129 * "a"
-        self.service.settings_storage.update_by_key(
-            "api_key", value, self.organisation, plugin_id
-        )
+        self.service.settings_storage.update_by_key("api_key", value, self.organisation, plugin_id)
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
             self.service.update_by_id("LOCAL", plugin_id, self.organisation, True)
 
-        msg = f"Settings for organisation test and plugin kat_test are not conform the plugin schema: '{value}' is too long"
+        msg = (
+            f"Settings for organisation test and plugin kat_test are not conform the plugin schema: "
+            f"'{value}' is too long"
+        )
         self.assertEqual(ctx.exception.message, msg)
 
     def test_get_schema(self):
@@ -194,9 +184,7 @@ class TestPluginsService(TestCase):
             {
                 "title": "Arguments",
                 "type": "object",
-                "properties": {
-                    "api_key": {"title": "Api Key", "maxLength": 128, "type": "string"}
-                },
+                "properties": {"api_key": {"title": "Api Key", "maxLength": 128, "type": "string"}},
                 "required": ["api_key"],
             },
             schema,
@@ -208,9 +196,7 @@ class TestPluginsService(TestCase):
     def test_removing_mandatory_setting_disables_plugin(self):
         plugin_id = "kat_test"
 
-        self.service.settings_storage.update_by_key(
-            "api_key", 128 * "a", self.organisation, plugin_id
-        )
+        self.service.settings_storage.update_by_key("api_key", 128 * "a", self.organisation, plugin_id)
         self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)

@@ -7,7 +7,7 @@ from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     data = json.loads(raw.decode())
 
     pk = boefje_meta.input_ooi
@@ -19,5 +19,5 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         yield Finding(
             finding_type=ft.reference,
             ooi=website_reference,
-            description=f"This server is not running in a 'green' datacenter according to the Green Web Foundation.",
+            description="This server is not running in a 'green' datacenter according to the Green Web Foundation.",
         )

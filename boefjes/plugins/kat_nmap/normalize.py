@@ -51,9 +51,7 @@ def get_ports_and_service(host: NmapHost) -> Iterator[OOI]:
         port_service = Service(name=service_name)
         yield port_service
 
-        ip_service = IPService(
-            ip_port=ip_port.reference, service=port_service.reference
-        )
+        ip_service = IPService(ip_port=ip_port.reference, service=port_service.reference)
         yield ip_service
 
 

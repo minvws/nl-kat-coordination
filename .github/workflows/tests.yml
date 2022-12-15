@@ -18,12 +18,15 @@ jobs:
       COMPOSE_FILE: .ci/docker-compose.yml
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
       - name: Configure git
-        env:
-          TOKEN: ${{ secrets.RDO_REPO_RO }}
-        run: git config --global url."https://${{ secrets.RDO_REPO_RO }}@github.com/".insteadOf "ssh://git@github.com/"
+        run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'pip' # caching pip dependencies
 
       - name: Install pip
         run: python3.8 -m pip install --upgrade pip

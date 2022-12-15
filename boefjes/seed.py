@@ -16,11 +16,7 @@ def main():
         print("Organisation Present")
 
     try:
-        session.add(
-            RepositoryInDB(
-                id="LOCAL", name="Local Plugin Repository", base_url="http://dev/null"
-            )
-        )
+        session.add(RepositoryInDB(id="LOCAL", name="Local Plugin Repository", base_url="http://dev/null"))
         session.commit()
     except IntegrityError:
         session.rollback()

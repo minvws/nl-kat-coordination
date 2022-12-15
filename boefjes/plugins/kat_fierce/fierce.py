@@ -26,18 +26,13 @@ import dns.reversename
 import dns.zone
 
 
-def fatal(msg, return_code=-1):
+def fatal(msg, _return_code=-1):
     # print(msg)
-    exit(return_code)
+    raise Exception(msg)
 
 
-def print_subdomain_result(
-    url, ip, http_connection_headers=None, nearby=None, stream=sys.stdout
-):
+def print_subdomain_result(url, ip, nearby=None):
     output = {"url": str(url), "ip": str(ip)}
-    # if http_connection_headers:
-    #     output.append("HTTP connected:")
-    #     output.append(http_connection_headers)
 
     if nearby:
         output["nearby"] = nearby
@@ -48,7 +43,7 @@ def print_subdomain_result(
 def unvisited_closure():
     visited = set()
 
-    def inner(l):
+    def inner(l):  # noqa: E741
         nonlocal visited
         result = set(l).difference(visited)
         visited.update(l)
@@ -74,9 +69,7 @@ def find_subdomain_list_file(filename):
     # installs (duh)
     package_filename_path = os.path.join("lists", filename)
     try:
-        full_package_path = pkg_resources.resource_filename(
-            "kat_fierce", package_filename_path
-        )
+        full_package_path = pkg_resources.resource_filename("kat_fierce", package_filename_path)
     except ImportError:
         return filename
 
@@ -99,11 +92,7 @@ def head_request(url, timeout=2):
 
 
 def concatenate_subdomains(domain, subdomains):
-    subdomains = [
-        nested_subdomain
-        for subdomain in subdomains
-        for nested_subdomain in subdomain.strip(".").split(".")
-    ]
+    subdomains = [nested_subdomain for subdomain in subdomains for nested_subdomain in subdomain.strip(".").split(".")]
 
     result = dns.name.Name(tuple(subdomains) + domain.labels)
 
@@ -123,11 +112,7 @@ def query(resolver, domain, record_type="A", tcp=False):
         # assume we received information on nameservers we can use and
         # perform the same query with those nameservers
         if resp.response.additional and resp.response.authority:
-            ns = [
-                rdata.address
-                for additionals in resp.response.additional
-                for rdata in additionals.items
-            ]
+            ns = [rdata.address for additionals in resp.response.additional for rdata in additionals.items]
             resolver.nameservers = ns
             return query(resolver, domain, record_type, tcp=tcp)
 
@@ -168,7 +153,7 @@ def zone_transfer(address, domain):
 def get_class_c_network(ip):
     ip = int(ip)
     floored = ipaddress.ip_address(ip - (ip % (2**8)))
-    class_c = ipaddress.IPv4Network("{}/24".format(floored))
+    class_c = ipaddress.IPv4Network(f"{floored}/24")
 
     return class_c
 
@@ -199,7 +184,7 @@ def range_expander(ip):
     try:
         network = ipaddress.IPv4Network(ip)
     except ipaddress.AddressValueError:
-        fatal("Invalid IPv4 CIDR: {!r}".format(ip))
+        fatal(f"Invalid IPv4 CIDR: {ip!r}")
 
     result = list(network)
 
@@ -228,17 +213,11 @@ def find_nearby(resolver, ips, filter_func=None):
             ip: query_result
             for ip, query_result in zip(
                 str_ips,
-                executor.map(
-                    reverse_query, itertools.repeat(resolver, len(str_ips)), str_ips
-                ),
+                executor.map(reverse_query, itertools.repeat(resolver, len(str_ips)), str_ips),
             )
         }
 
-    reversed_ips = {
-        k: v[0].to_text()
-        for k, v in reversed_ips.items()
-        if v is not None and filter_func(v[0].to_text())
-    }
+    reversed_ips = {k: v[0].to_text() for k, v in reversed_ips.items() if v is not None and filter_func(v[0].to_text())}
 
     return reversed_ips
 
@@ -250,7 +229,7 @@ def get_stripped_file_lines(filename):
     try:
         lines = open(filename).readlines()
     except FileNotFoundError:
-        fatal("Could not open file: {!r}".format(filename))
+        fatal(f"Could not open file: {filename!r}")
 
     return [line.strip() for line in lines]
 
@@ -292,9 +271,7 @@ def fierce(**kwargs):
     output = {}
     resolver = dns.resolver.Resolver()
 
-    resolver = update_resolver_nameservers(
-        resolver, kwargs["dns_servers"], kwargs["dns_file"]
-    )
+    resolver = update_resolver_nameservers(resolver, kwargs["dns_servers"], kwargs["dns_file"])
 
     if kwargs.get("range"):
         range_ips = range_expander(kwargs.get("range"))
@@ -328,7 +305,7 @@ def fierce(**kwargs):
         soa_mname = soa[0].mname
         master = query(resolver, soa_mname, record_type="A", tcp=kwargs["tcp"])
         master_address = master[0].address
-        output["SOA"] = "{} ({})".format(soa_mname, master_address)
+        output["SOA"] = f"{soa_mname} ({master_address})"
     else:
         # print("SOA: failure")
         fatal("Failed to lookup NS/SOA, Domain does not exist")
@@ -339,9 +316,7 @@ def fierce(**kwargs):
         # pprint.pprint({k: v.to_text(k) for k, v in zone.items()})
         return
 
-    random_subdomain = str(
-        random.randint(1e10, 1e11)
-    )  # noqa DUO102, non-cryptographic random use
+    random_subdomain = str(random.randint(1e10, 1e11))  # noqa DUO102, non-cryptographic random use
     random_domain = concatenate_subdomains(domain, [random_subdomain])
     wildcard = query(resolver, random_domain, record_type="A", tcp=kwargs["tcp"])
     wildcard_ips = set(rr.address for rr in wildcard.rrset) if wildcard else set()
@@ -375,18 +350,15 @@ def fierce(**kwargs):
 
         ip = ipaddress.IPv4Address(ips[0])
 
-        http_connection_headers = None
-        if kwargs.get("connect") and not ip.is_private:
-            http_connection_headers = head_request(str(ip))
+        if "connect" in kwargs and not ip.is_private:
+            head_request(str(ip))
 
         ips = expander_func(ip)
         unvisited_ips = unvisited(ips)
 
         nearby = find_nearby(resolver, unvisited_ips, filter_func=filter_func)
 
-        output["subdomains"][subdomain] = print_subdomain_result(
-            url, ip, http_connection_headers=http_connection_headers, nearby=nearby
-        )
+        output["subdomains"][subdomain] = print_subdomain_result(url, ip, nearby=nearby)
 
         if kwargs.get("delay"):
             time.sleep(kwargs["delay"])
@@ -408,9 +380,7 @@ def parse_args(args):
         action="store_true",
         help="attempt HTTP connection to non-RFC 1918 hosts",
     )
-    p.add_argument(
-        "--wide", action="store_true", help="scan entire class c of discovered records"
-    )
+    p.add_argument("--wide", action="store_true", help="scan entire class c of discovered records")
     p.add_argument(
         "--traverse",
         action="store",
@@ -424,9 +394,7 @@ def parse_args(args):
         nargs="+",
         help="filter on these domains when expanding lookup",
     )
-    p.add_argument(
-        "--range", action="store", help="scan an internal IP range, use cidr notation"
-    )
+    p.add_argument("--range", action="store", help="scan an internal IP range, use cidr notation")
     p.add_argument(
         "--delay",
         action="store",
@@ -436,9 +404,7 @@ def parse_args(args):
     )
 
     subdomain_group = p.add_mutually_exclusive_group()
-    subdomain_group.add_argument(
-        "--subdomains", action="store", nargs="+", help="use these subdomains"
-    )
+    subdomain_group.add_argument("--subdomains", action="store", nargs="+", help="use these subdomains")
     subdomain_group.add_argument(
         "--subdomain-file",
         action="store",

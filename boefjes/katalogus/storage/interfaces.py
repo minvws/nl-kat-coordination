@@ -14,7 +14,8 @@ class StorageError(Exception):
 class SettingsNotConformingToSchema(StorageError):
     def __init__(self, organisation_id: str, plugin_id: str, validation_error: str):
         super().__init__(
-            f"Settings for organisation {organisation_id} and plugin {plugin_id} are not conform the plugin schema: {validation_error}"
+            f"Settings for organisation {organisation_id} and plugin {plugin_id} are not conform the plugin schema: "
+            f"{validation_error}"
         )
 
 
@@ -35,16 +36,15 @@ class RepositoryNotFound(NotFound):
 class PluginNotFound(NotFound):
     def __init__(self, plugin_id: str, repository_id: str, organisation_id: str):
         super().__init__(
-            f"State for plugin with id '{plugin_id}' not found for organisation '{organisation_id}' and repostitory '{repository_id}'"
+            f"State for plugin with id '{plugin_id}' not found for organisation '{organisation_id}' and repostitory "
+            f"'{repository_id}'"
         )
 
 
 class SettingNotFound(NotFound):
     def __init__(self, key: str, organisation_id: str, plugin_id: str):
         super().__init__(
-            (
-                f"Setting with key '{key}' not found for organisation '{organisation_id}' and plugin '{plugin_id}'"
-            )
+            f"Setting with key '{key}' not found for organisation '{organisation_id}' and plugin '{plugin_id}'"
         )
 
 
@@ -52,9 +52,7 @@ class OrganisationStorage(ABC):
     def __enter__(self):
         return self
 
-    def __exit__(
-        self, exc_type: Type[Exception], exc_value: str, exc_traceback: str
-    ) -> None:
+    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
     def get_by_id(self, organisation_id: str) -> Organisation:
@@ -74,9 +72,7 @@ class RepositoryStorage(ABC):
     def __enter__(self):
         return self
 
-    def __exit__(
-        self, exc_type: Type[Exception], exc_value: str, exc_traceback: str
-    ) -> None:
+    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
     def get_by_id(self, id_: str) -> Repository:
@@ -96,9 +92,7 @@ class SettingsStorage(ABC):
     def __enter__(self):
         return self
 
-    def __exit__(
-        self, exc_type: Type[Exception], exc_value: str, exc_traceback: str
-    ) -> None:
+    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
     def get_by_key(self, key: str, organisation_id: str, plugin_id: str) -> str:
@@ -107,14 +101,10 @@ class SettingsStorage(ABC):
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         raise NotImplementedError
 
-    def create(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ) -> None:
+    def create(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
         raise NotImplementedError
 
-    def update_by_key(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ) -> None:
+    def update_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
         raise NotImplementedError
 
     def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
@@ -125,22 +115,14 @@ class PluginEnabledStorage(ABC):
     def __enter__(self):
         return self
 
-    def __exit__(
-        self, exc_type: Type[Exception], exc_value: str, exc_traceback: str
-    ) -> None:
+    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
-    def get_by_id(
-        self, plugin_id: str, repository_id: str, organisation_id: str
-    ) -> bool:
+    def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
         raise NotImplementedError
 
-    def create(
-        self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str
-    ) -> None:
+    def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
         raise NotImplementedError
 
-    def update_or_create_by_id(
-        self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str
-    ) -> None:
+    def update_or_create_by_id(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
         raise NotImplementedError
