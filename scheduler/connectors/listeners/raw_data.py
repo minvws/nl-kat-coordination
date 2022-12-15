@@ -1,7 +1,6 @@
 from typing import Optional
 
 from scheduler.connectors.errors import exception_handler
-from scheduler.models import RawData as RawDataModel
 from scheduler.models import RawDataReceivedEvent
 
 from .listeners import RabbitMQ

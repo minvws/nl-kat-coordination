@@ -428,3 +428,17 @@ $RECYCLE.BIN/
 deployment/github_config.sh
 !/packaging/deb/data/usr/lib
 .venv
+
+# debian build artifacts
+debhelper-build-stamp
+*.debhelper
+*.deb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.substvars
+debian/*/
+debian/*.log
+debian/files
+debian/changelog

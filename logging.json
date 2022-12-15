@@ -35,6 +35,13 @@
                 "console"
             ],
             "propagate": 0
+        },
+        "sqlalchemy.engine": {
+            "level": "DEBUG",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
         }
     }
 }

@@ -51,6 +51,7 @@ $ tree -L 3 --dirsfirst
 │   ├── models/                     # internal model definitions
 │   ├── queues/                     # priority queue
 │   ├── rankers/                    # priority/score calculations
+│   ├── repositories/               # data abstraction layer
 │   ├── schedulers/                 # schedulers
 │   ├── server/                     # scheduler rest api interface
 │   ├── utils/                      # common utility functions
@@ -76,7 +77,7 @@ to use whatever you want.
 
 ### Prerequisites
 
-By the use of environment variables we load in the configuration of the 
+By the use of environment variables we load in the configuration of the
 scheduler. Look at the [.env-dist](.env-dist) file for the application
 configuration settings, to build a `.env` file. Refer to the
 [`configuration.md`](docs/configuration.md) file for more information on the

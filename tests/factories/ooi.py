@@ -19,26 +19,15 @@ class ScanProfileFactory(Factory):
 
     reference: str = Faker("uuid4")
 
-    ooi_type: str = Faker(
-        "random_element",
-        elements=["Hostname", "Network"],
-    )
-
-    object_type: str = Faker(
-        "random_element",
-        elements=["Hostname", "Network"],
-    )
-
 
 class OOIFactory(Factory):
     class Meta:
         model = OOI
 
     primary_key: str = Sequence(lambda n: n)
-    name: str = Faker("name")
     scan_profile: ScanProfile
 
-    ooi_type: str = Faker(
+    object_type: str = Faker(
         "random_element",
         elements=["Hostname", "Network"],
     )

@@ -9,7 +9,5 @@ class OOI(BaseModel):
     """Representation of "Object Of Interests" from Octopoes."""
 
     primary_key: str
-    name: Optional[str]
-    ooi_type: Optional[str]
-    object_type: Optional[str]
+    object_type: str
     scan_profile: ScanProfile

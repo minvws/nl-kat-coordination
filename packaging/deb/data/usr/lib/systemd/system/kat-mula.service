@@ -5,10 +5,13 @@ After=network.target
 [Service]
 User=kat
 Group=kat
-WorkingDirectory=/usr/share/kat-mula/app
+SyslogIdentifier=kat-mula
+WorkingDirectory=/opt/venvs/kat-mula/
 # TODO: don't load env here. It exposes the values over dbus IPC
 EnvironmentFile=/etc/kat/mula.conf
-ExecStart=/usr/share/kat-mula/venv/bin/python -m scheduler
+ExecStart=/opt/venvs/kat-mula/bin/python -m scheduler
+Restart=on-failure
+RestartSec=3s
 
 [Install]
 WantedBy=multi-user.target

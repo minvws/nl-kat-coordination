@@ -1,26 +1,65 @@
-from typing import Any, List
+import datetime
+import uuid
+from typing import Dict, List, Literal, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from sqlalchemy import JSON, Column, DateTime, Integer, String
+
+from scheduler.utils import GUID
+
+from .base import Base
 
 
-class QueuePrioritizedItem(BaseModel):
+class PrioritizedItem(BaseModel):
     """Representation of an queue.PrioritizedItem on the priority queue. Used
     for unmarshalling of priority queue prioritized items to a JSON
     representation.
     """
 
-    priority: int
-    item: Any
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+
+    scheduler_id: Optional[str]
+
+    # A unique generated identifier for the object contained in data
+    hash: Optional[str]
+
+    priority: Optional[int]
+
+    data: Dict
+
+    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+
+    class Config:
+        orm_mode = True
 
 
-class QueueEntry(BaseModel):
-    """Representation of an queue.Entry on the priority queue. Used for
-    for unmarshalling of priority queue entries to a JSON representation.
+class PrioritizedItemORM(Base):
+    """Representation of an queue.PrioritizedItem on the priority queue. Used
+    for marshalling of priority queue prioritized items to a database
+    representation.
     """
 
-    priority: int
-    p_item: QueuePrioritizedItem
-    state: str
+    __tablename__ = "items"
+
+    id = Column(GUID, primary_key=True)
+    scheduler_id = Column(String)
+    hash = Column(String)
+
+    priority = Column(Integer)
+    data = Column(JSON, nullable=False)
+
+    created_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=datetime.datetime.utcnow,
+    )
+    modified_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.utcnow,
+    )
 
 
 class Queue(BaseModel):
@@ -31,7 +70,17 @@ class Queue(BaseModel):
     id: str
     size: int
     maxsize: int
+    item_type: str
     allow_replace: bool
     allow_updates: bool
     allow_priority_updates: bool
-    pq: List[QueueEntry]
+    pq: List[PrioritizedItem]
+
+
+class Filter(BaseModel):
+    field: str
+    operator: Literal["eq", "ne", "lt", "le", "gt", "ge", "in_", "notin_"]
+    value: Union[str, int, datetime.date]
+
+    def get_field(self) -> List[str]:
+        return self.field.split("__")
