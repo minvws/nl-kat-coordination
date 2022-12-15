@@ -1,9 +1,7 @@
 from enum import Enum
-from typing import Union, Dict, Tuple, List
+from typing import Union, Dict, Tuple
 
-from octopoes.models import OOI
-
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerOutput
 
 
 class Handler:
@@ -17,7 +15,7 @@ class BoefjeJobRunner:
 
 
 class NormalizerJobRunner:
-    def run(self, normalizer_meta, raw) -> List[OOI]:
+    def run(self, normalizer_meta, raw) -> NormalizerOutput:
         raise NotImplementedError()
 
 

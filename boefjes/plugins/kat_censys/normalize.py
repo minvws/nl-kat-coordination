@@ -20,7 +20,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
     network = Network(name="internet").reference
     ip = results["ip"]
@@ -30,11 +30,13 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             address=ip,
             network=network,
         )
+        yield ip_ooi
     else:
         ip_ooi = IPAddressV6(
             address=ip,
             network=network,
         )
+        yield ip_ooi
 
     if "dns" in results and "names" in results["dns"]:
         for hostname in results["dns"]["names"]:
