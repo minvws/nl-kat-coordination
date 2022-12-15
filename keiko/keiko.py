@@ -1,6 +1,4 @@
-"""
-Keiko report generation module
-"""
+"""Keiko report generation module."""
 
 import csv
 import os
@@ -24,7 +22,7 @@ DATA_SHAPE_CLASS_NAME = "DataShape"
 
 
 def baretext(input_: str) -> str:
-    """Function to remove non-alphanumeric characters from a string."""
+    """Remove non-alphanumeric characters from a string."""
     return "".join(filter(str.isalnum, input_)).lower()
 
 
@@ -35,8 +33,7 @@ def generate_report(
     report_id: str,
     debug: bool,
 ) -> None:
-    """Generate a preprocessed LateX file from a template, a JSON data file and a glossary CSV file"""
-
+    """Generate a preprocessed LateX file from a template, a JSON data file and a glossary CSV file."""
     # load data shape and validate
     data_shape_class = get_data_shape(template_name)
     data = data_shape_class.parse_obj(report_data.dict())
@@ -166,7 +163,7 @@ def generate_report(
 
 
 def read_glossary(glossary: str) -> Dict[str, Tuple[str, str]]:
-    """Read a glossary CSV file and return a dictionary of entries"""
+    """Read a glossary CSV file and return a dictionary of entries."""
     glossary_entries = {}
     glossary_file_path = Path(settings.glossaries_folder) / glossary
     with open(glossary_file_path) as glossary_file:

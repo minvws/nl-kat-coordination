@@ -27,7 +27,7 @@ class APITest(TestCase):
             {
                 "service": "keiko",
                 "healthy": True,
-                "version": "0.0.1-development",
+                "version": "0.0.1.dev1",
                 "additional": None,
                 "results": [],
             },

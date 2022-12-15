@@ -1,4 +1,4 @@
-"""Keiko's API entrypoint"""
+"""Keiko's API entrypoint."""
 
 from keiko.api import construct_api
 from keiko.logging import setup_loggers

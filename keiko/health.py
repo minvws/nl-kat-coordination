@@ -1,4 +1,4 @@
-"""Keiko health module"""
+"""Keiko health module."""
 from typing import Optional, Any, List
 
 from pydantic import BaseModel
@@ -7,7 +7,7 @@ from keiko.version import __version__
 
 
 class ServiceHealth(BaseModel):
-    """KAT Health model"""
+    """KAT Health model."""
 
     service: str
     healthy: bool = False
@@ -20,7 +20,7 @@ ServiceHealth.update_forward_refs()
 
 
 def get_health() -> ServiceHealth:
-    """Determine health of Keiko service"""
+    """Determine health of Keiko service."""
     return ServiceHealth(
         service="keiko",
         healthy=True,

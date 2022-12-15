@@ -2,7 +2,7 @@
 name = "keiko"
 version = "0.1.0"
 description = "KAT report engine using LateX to generate PDF"
-authors = [""]
+authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
 [tool.vulture]

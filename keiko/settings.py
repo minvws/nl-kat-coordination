@@ -1,4 +1,4 @@
-"""Keiko settings module"""
+"""Keiko settings module."""
 
 from pydantic import BaseSettings, Field
 

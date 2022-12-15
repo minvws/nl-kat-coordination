@@ -429,3 +429,19 @@ deployment/github_config.sh
 
 out/
 reports/
+
+!packaging/deb/data/**/lib
+
+# debian build artifacts
+debhelper-build-stamp
+*.debhelper
+*.deb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.substvars
+debian/*/
+debian/*.log
+debian/files
+debian/changelog

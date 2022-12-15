@@ -1,6 +1,4 @@
-"""
-Keiko CLI module
-"""
+"""Keiko CLI module."""
 import uuid
 from typing import TextIO
 
@@ -17,9 +15,10 @@ def main(
     sample: TextIO,
 ) -> None:
     """
-    Main click entry point. Generate a preprocessed LateX file from a template, a JSON data file and a glossary CSV file
-    """
+    Click entry point.
 
+    Generate a preprocessed LateX file from a template, a JSON data file and a glossary CSV file.
+    """
     setup_loggers()
 
     report_arguments = ReportArgumentsBase.parse_raw(sample.read())

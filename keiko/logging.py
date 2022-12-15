@@ -1,4 +1,4 @@
-"""Keiko's Logging module"""
+"""Keiko's Logging module."""
 
 import json
 import logging
@@ -11,8 +11,7 @@ settings = Settings()
 
 
 def setup_loggers() -> None:
-    """Load logging configuration"""
-
+    """Load logging configuration."""
     logger = getLogger(__name__)
     try:
         with open(settings.log_cfg, "rt", encoding="utf-8") as log_config:

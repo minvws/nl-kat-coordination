@@ -1,4 +1,4 @@
-"""Module to extract template definitions from reports directory"""
+"""Module to extract template definitions from reports directory."""
 
 import importlib
 import importlib.machinery
@@ -21,7 +21,7 @@ logger = getLogger(__name__)
 
 
 def get_templates() -> Set[str]:
-    """Assembles all template definitions found in the templates directory"""
+    """Assembles all template definitions found in the templates directory."""
 
     templates = set()
 

@@ -1,4 +1,4 @@
-"""Base models for keiko"""
+"""Base models for keiko."""
 
 from pydantic import BaseModel, Extra
 
@@ -6,16 +6,16 @@ from pydantic import BaseModel, Extra
 
 
 class DataShapeBase(BaseModel):
-    """Base model for data shapes"""
+    """Base model for data shapes."""
 
     class Config:
-        """Pydantic config for DataShapeBase"""
+        """Pydantic config for DataShapeBase."""
 
         extra = Extra.allow
 
 
 class ReportArgumentsBase(BaseModel):
-    """Base model for report arguments"""
+    """Base model for report arguments."""
 
     template: str
     data: DataShapeBase

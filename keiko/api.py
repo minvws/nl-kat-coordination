@@ -1,6 +1,4 @@
-"""
-Keiko Web API
-"""
+"""Keiko Web API."""
 import logging
 import uuid
 from pathlib import Path
@@ -21,18 +19,17 @@ logger = logging.getLogger(__name__)
 
 
 def construct_api() -> FastAPI:
-    """Constructs the FastAPI object, with prefilled examples from disk"""
-
+    """Construct the FastAPI object, with prefilled examples from disk."""
     app = FastAPI()
     examples = get_samples()
 
     @app.get("/templates")
     def get_templates_() -> List[str]:
-        """Endpoint to list known templates"""
+        """Endpoint to list known templates."""
         return list(get_templates())
 
     class ReportResponse(BaseModel):
-        """Response model for the create report endpoint"""
+        """Response model for the create report endpoint."""
 
         report_id: str
 
@@ -41,12 +38,9 @@ def construct_api() -> FastAPI:
         parameters: ReportArgumentsBase = Body(..., examples=examples),
         background_tasks: BackgroundTasks = BackgroundTasks(),
     ) -> ReportResponse:
-        """Endpoint to generate a report from a template"""
-
-        # generate id
+        """Endpoint to generate a report from a template."""
         report_id = str(uuid.uuid4())[:8]
 
-        # generate template in background
         background_tasks.add_task(
             generate_report,
             template_name=parameters.template,
@@ -60,7 +54,7 @@ def construct_api() -> FastAPI:
 
     @app.get("/health")
     def health() -> ServiceHealth:
-        """Health endpoint"""
+        """Health endpoint."""
         return get_health()
 
     # mount reports as static files

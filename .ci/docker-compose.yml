@@ -2,6 +2,8 @@ version: "3.9"
 
 services:
   ci_keiko:
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8080/health"]
     build:
       context: .
       args:

@@ -1,0 +1,16 @@
+#!/bin/bash -e
+
+adduser --home /etc/kat --no-create-home --system --group kat || true
+
+chown -R root:kat /etc/kat/
+chown -R kat:kat /var/lib/kat-keiko
+
+if [ "$1" = "upgrade" ]; then
+    systemctl daemon-reload
+
+    if systemctl is-active --quiet kat-keiko.service; then
+        systemctl restart kat-keiko.service
+    fi
+fi
+
+#DEBHELPER#
