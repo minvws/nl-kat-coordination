@@ -10,4 +10,5 @@ Contains documentation for developers and contributors.
    management
    development
    contributions
+   logging
    project_statuses
