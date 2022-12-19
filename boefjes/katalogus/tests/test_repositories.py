@@ -13,9 +13,7 @@ class TestRepositories(TestCase):
     def setUp(self) -> None:
         self.client = TestClient(app)
 
-        _mocked_repositories = {
-            "test": Repository(id="test", name="Test", base_url="http://localhost:8080")
-        }
+        _mocked_repositories = {"test": Repository(id="test", name="Test", base_url="http://localhost:8080")}
 
         def _mocked_get_repository_store(
             organisation_id: str,
@@ -44,9 +42,7 @@ class TestRepositories(TestCase):
     def test_add_repository(self):
         res = self.client.post(
             "/v1/organisations/test/repositories/",
-            data=json.dumps(
-                {"id": "new", "name": "New", "base_url": "http://plugin-repo"}
-            ),
+            data=json.dumps({"id": "new", "name": "New", "base_url": "http://plugin-repo"}),
         )
         self.assertEqual(201, res.status_code)
 

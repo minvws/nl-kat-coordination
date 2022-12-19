@@ -41,7 +41,7 @@ def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]
     return args
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     host = input_["address"]
 
@@ -51,4 +51,4 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
     protocol = "tcp"
     args = build_nmap_arguments(host, Protocol(protocol), top_ports)
 
-    return boefje_meta, run_nmap(args)
+    return [(set(), run_nmap(args))]

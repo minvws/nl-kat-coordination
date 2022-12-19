@@ -10,7 +10,7 @@ from boefjes.job_models import NormalizerMeta
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     result = json.loads(raw)
 
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     pk = boefje_meta.input_ooi
     ooi_ref = Reference.from_str(pk)
 
@@ -21,10 +21,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         "DNSSEC signature has expired",
     ]
 
-    if (
-        "No trusted keys found in tree" in result
-        and "No DNSSEC public key(s)" in result
-    ):
+    if "No trusted keys found in tree" in result and "No DNSSEC public key(s)" in result:
         ft = KATFindingType(id="KAT-600")
         finding = Finding(
             finding_type=ft.reference,
@@ -34,9 +31,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         yield ft
         yield finding
 
-    if "No trusted keys found in tree" in result and [
-        error for error in possible_errors if error in result
-    ]:
+    if "No trusted keys found in tree" in result and [error for error in possible_errors if error in result]:
         ft = KATFindingType(id="KAT-601")
         finding = Finding(
             finding_type=ft.reference,

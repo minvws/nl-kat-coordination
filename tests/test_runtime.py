@@ -10,14 +10,12 @@ from boefjes.app import SchedulerRuntimeManager
 from boefjes.clients.scheduler_client import SchedulerClientInterface, Task, Queue
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from boefjes.runtime import ItemHandler, StopWorking, RuntimeManager
+from boefjes.runtime_interfaces import Handler, StopWorking, RuntimeManager
 from tests.stubs import get_dummy_data
 
 
 class MockSchedulerClient(SchedulerClientInterface):
-    def __init__(
-        self, boefje_responses: List[bytes], normalizer_responses: List[bytes]
-    ):
+    def __init__(self, boefje_responses: List[bytes], normalizer_responses: List[bytes]):
         self.boefje_responses = boefje_responses
         self.normalizer_responses = normalizer_responses
 
@@ -28,14 +26,11 @@ class MockSchedulerClient(SchedulerClientInterface):
         if RuntimeManager.Queue.BOEFJES.value in queue and self.boefje_responses:
             return parse_raw_as(Task, self.boefje_responses.pop(0))
 
-        if (
-            RuntimeManager.Queue.NORMALIZERS.value in queue
-            and self.normalizer_responses
-        ):
+        if RuntimeManager.Queue.NORMALIZERS.value in queue and self.normalizer_responses:
             return parse_raw_as(Task, self.normalizer_responses.pop(0))
 
 
-class MockItemHandler(ItemHandler):
+class MockHandler(Handler):
     def __init__(
         self,
         log_path: Path,
@@ -56,7 +51,7 @@ class MockItemHandler(ItemHandler):
         self.calls += 1
 
         with open(self.log_path, "a") as f:
-            f.write(item.json() + "\n")
+            f.write(f"{item.json()}\n")
 
         time.sleep(self.sleep_time)
 
@@ -71,19 +66,13 @@ class RuntimeTest(TestCase):
         # This tests multiprocessing, so we use a file for interprocess communication
         self.tempdir = tempfile.TemporaryDirectory()
 
-        self.item_handler = MockItemHandler(
-            Path(self.tempdir.name) / "item_log", max_calls=2
-        )
+        self.item_handler = MockHandler(Path(self.tempdir.name) / "item_log", max_calls=2)
         queues_response = get_dummy_data("scheduler/queues_response.json")
         pop_response_boefje = get_dummy_data("scheduler/pop_response_boefje.json")
-        pop_response_normalizer = get_dummy_data(
-            "scheduler/pop_response_normalizer.json"
-        )
+        pop_response_normalizer = get_dummy_data("scheduler/pop_response_normalizer.json")
 
         def client_factory():
-            return MockSchedulerClient(
-                3 * [queues_response, pop_response_boefje], [pop_response_normalizer]
-            )
+            return MockSchedulerClient(3 * [queues_response, pop_response_boefje], [pop_response_normalizer])
 
         self.runtime = SchedulerRuntimeManager(
             self.item_handler,

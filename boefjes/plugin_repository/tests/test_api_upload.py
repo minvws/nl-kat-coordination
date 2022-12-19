@@ -21,9 +21,7 @@ class TestUploadAPI(TestCase):
     def setUp(self) -> None:
         self.client = TestClient(create_app(TEMP_PLUGINS_DIR))
 
-    @patch(
-        "boefjes.plugin_repository.api.routers.plugins.PLUGINS_DIR", TEMP_PLUGINS_DIR
-    )
+    @patch("boefjes.plugin_repository.api.routers.plugins.PLUGINS_DIR", TEMP_PLUGINS_DIR)
     def test_upload_boefje_plugin(self):
         plugin = load_plugin("test-boefje.yml")
 
@@ -33,9 +31,7 @@ class TestUploadAPI(TestCase):
         res = self.client.get("/plugins")
         self.assertDictEqual(plugin.dict(), res.json()[str(plugin)])
 
-    @patch(
-        "boefjes.plugin_repository.api.routers.plugins.PLUGINS_DIR", TEMP_PLUGINS_DIR
-    )
+    @patch("boefjes.plugin_repository.api.routers.plugins.PLUGINS_DIR", TEMP_PLUGINS_DIR)
     def test_upload_normalizer_plugin(self):
         plugin = load_plugin("test-normalizer.yml")
 
@@ -45,9 +41,7 @@ class TestUploadAPI(TestCase):
         res = self.client.get("/plugins")
         self.assertDictEqual(plugin.dict(), res.json()[str(plugin)])
 
-    @patch(
-        "boefjes.plugin_repository.api.routers.plugins.PLUGINS_DIR", TEMP_PLUGINS_DIR
-    )
+    @patch("boefjes.plugin_repository.api.routers.plugins.PLUGINS_DIR", TEMP_PLUGINS_DIR)
     def test_upload_bit_plugin(self):
         plugin = load_plugin("test-bit.yml")
 

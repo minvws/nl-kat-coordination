@@ -22,9 +22,7 @@ class TestAPI(TestCase):
 
         for plugin_choice, plugin_names in plugins:
             with self.subTest(plugin_choice=plugin_choice, plugins=plugin_names):
-                res = self.client.get(
-                    f"/plugins/", params={"plugin_choice": plugin_choice}
-                )
+                res = self.client.get("/plugins/", params={"plugin_choice": plugin_choice})
                 self.assertEqual(200, res.status_code)
                 self.assertEqual(plugin_names, res.json().keys())
 

@@ -17,9 +17,7 @@ def load_plugin(filename: str) -> Plugin:
     return parse_config(yaml.full_load(FIXTURES_DIR.joinpath(filename).read_bytes()))
 
 
-def upload_plugin(
-    client: TestClient, plugin: Plugin, metadata: bytes, rootfs: bytes
-) -> fastapi.Response:
+def upload_plugin(client: TestClient, plugin: Plugin, metadata: bytes, rootfs: bytes) -> fastapi.Response:
     plugin_file = yaml.dump(plugin.dict())
 
     res = client.post(

@@ -36,9 +36,7 @@ class TestPlugins(TestCase):
         )
 
     def test_list_repository(self):
-        res = self.client.get(
-            "/v1/organisations/test-org/repositories/test-repo/plugins"
-        )
+        res = self.client.get("/v1/organisations/test-org/repositories/test-repo/plugins")
         self.assertEqual(200, res.status_code)
         self.assertListEqual(
             ["test-boefje-1", "test-boefje-2"],
@@ -46,9 +44,7 @@ class TestPlugins(TestCase):
         )
 
     def test_list_repository2(self):
-        res = self.client.get(
-            "/v1/organisations/test-org/repositories/test-repo-2/plugins"
-        )
+        res = self.client.get("/v1/organisations/test-org/repositories/test-repo-2/plugins")
         self.assertEqual(200, res.status_code)
         self.assertListEqual(
             ["test-bit-1", "test-normalizer-1"],
@@ -56,21 +52,15 @@ class TestPlugins(TestCase):
         )
 
     def test_get_plugin(self):
-        res = self.client.get(
-            "/v1/organisations/test-org/repositories/test-repo/plugins/test-boefje-1"
-        )
+        res = self.client.get("/v1/organisations/test-org/repositories/test-repo/plugins/test-boefje-1")
         self.assertEqual(200, res.status_code)
 
     def test_non_existing_plugin(self):
-        res = self.client.get(
-            "/v1/organisations/test-org/repositories/test-repo/plugins/future-plugin"
-        )
+        res = self.client.get("/v1/organisations/test-org/repositories/test-repo/plugins/future-plugin")
         self.assertEqual(404, res.status_code)
 
     def test_default_enabled_property_list(self):
-        res = self.client.get(
-            "/v1/organisations/test-org/repositories/test-repo/plugins"
-        )
+        res = self.client.get("/v1/organisations/test-org/repositories/test-repo/plugins")
         self.assertEqual(200, res.status_code)
         self.assertFalse(any([plugin["enabled"] for plugin in res.json().values()]))
 

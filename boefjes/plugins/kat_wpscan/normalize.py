@@ -9,7 +9,7 @@ from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
-    url_reference = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+    url_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
     if raw:
         data = json.loads(raw.decode())

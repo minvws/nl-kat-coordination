@@ -1,4 +1,4 @@
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 
 import docker
 
@@ -10,12 +10,10 @@ WAPPALYZER_IMAGE = "noamblitz/wappalyzer:latest"
 def run_wappalyzer(url: str) -> str:
     client = docker.from_env()
 
-    return client.containers.run(
-        WAPPALYZER_IMAGE, ["wappalyzer", url], remove=True
-    ).decode()
+    return client.containers.run(WAPPALYZER_IMAGE, ["wappalyzer", url], remove=True).decode()
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
 
     hostname = input_["netloc"]["name"]
@@ -26,4 +24,4 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
 
     results = run_wappalyzer(url)
 
-    return boefje_meta, results
+    return [(set(), results)]

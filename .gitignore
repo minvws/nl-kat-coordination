@@ -443,3 +443,17 @@ deployment/github_config.sh
 !/tests/test_spf.py
 
 !packaging/deb/data/usr/lib
+
+# debian build artifacts
+debhelper-build-stamp
+*.debhelper
+*.deb
+*.dsc
+*.build
+*.buildinfo
+*.changes
+*.substvars
+debian/*/
+debian/*.log
+debian/files
+debian/changelog

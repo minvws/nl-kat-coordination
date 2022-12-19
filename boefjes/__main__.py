@@ -4,19 +4,17 @@ import logging.config
 import click
 
 from boefjes.app import get_runtime_manager
-from boefjes.runtime import RuntimeManager
+from boefjes.runtime_interfaces import RuntimeManager
 from boefjes.config import settings
 
-with open(settings.log_cfg, "r") as f:
+with open(settings.log_cfg) as f:
     logging.config.dictConfig(json.load(f))
 
 logger = logging.getLogger(__name__)
 
 
 @click.command()
-@click.argument(
-    "worker_type", type=click.Choice([q.value for q in RuntimeManager.Queue])
-)
+@click.argument("worker_type", type=click.Choice([q.value for q in RuntimeManager.Queue]))
 @click.option(
     "--log-level",
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]),

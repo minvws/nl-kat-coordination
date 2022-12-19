@@ -21,7 +21,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
@@ -62,18 +62,12 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         )
         yield ip_port_ooi
 
-        port_state = (
-            scan.get("result", {}).get("data", {}).get("state", {}).get("state", "open")
-        )
-
         if "service" in scan["result"]["data"]:
             service = scan["result"]["data"]["service"]
             service_ooi = Service(name=service["name"])
             yield service_ooi
 
-            ip_service_ooi = IPService(
-                ip_port=ip_port_ooi.reference, service=service_ooi.reference
-            )
+            ip_service_ooi = IPService(ip_port=ip_port_ooi.reference, service=service_ooi.reference)
             yield ip_service_ooi
 
             if "cpe" in service:
@@ -100,9 +94,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                     product_name = service["product"]
 
                     if "version" in service:
-                        software_ooi = Software(
-                            name=product_name, version=service["version"]
-                        )
+                        software_ooi = Software(name=product_name, version=service["version"])
                     else:
                         software_ooi = Software(name=product_name)
 

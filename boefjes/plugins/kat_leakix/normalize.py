@@ -26,14 +26,15 @@ from boefjes.job_models import NormalizerMeta
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
 
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
 
     for event in results:
-        # Future TODO: add event["time"] to results. This is the time the event was first seen. Date of last scan is not included in the result.
-        # Future TODO: LeakIX want to include a confidence per plugin, since some plugins have more false positives than others
-        # Potential TODO: ssh, ssl
+        # TODO: add event["time"] to results. This is the time the event was first seen. Date of last scan is not
+        #  included in the result.
+        # TODO: LeakIX want to include a confidence per plugin, since some plugins have more false positives than others
+        # TODO: ssh, ssl
 
         # Get general information
         ip = event["ip"]
@@ -109,9 +110,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         software_ooi = None
         software_name = event.get("service", {}).get("software", {}).get("name")
         software_version = event.get("service", {}).get("software", {}).get("version")
-        software_fingerprint = (
-            event.get("service", {}).get("software", {}).get("fingerprint")
-        )
+        software_fingerprint = event.get("service", {}).get("software", {}).get("fingerprint")
         if software_name:
             if software_version:
                 software_ooi = Software(name=software_name, version=software_version)
@@ -121,9 +120,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             software_ooi = Software(name=software_fingerprint)
         if software_ooi:
             yield software_ooi
-            software_instance_ooi = SoftwareInstance(
-                ooi=event_ooi, software=software_ooi.reference
-            )
+            software_instance_ooi = SoftwareInstance(ooi=event_ooi, software=software_ooi.reference)
             yield software_instance_ooi
             event_ooi = software_instance_ooi.reference
         # Potential TODO: add vendor
@@ -135,9 +132,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         if leak_severity or leak_stage:
             #  Got the differen severities from: https://pkg.go.dev/github.com/LeakIX/l9format#pkg-constants
             leak_infected = event.get("leak", {}).get("dataset", {}).get("infected")
-            leak_ransomnote = (
-                event.get("leak", {}).get("dataset", {}).get("ransom_notes")
-            )
+            leak_ransomnote = event.get("leak", {}).get("dataset", {}).get("ransom_notes")
             if leak_severity == "critical" or leak_infected or leak_ransomnote:
                 kat_number = "KAT-645"
             elif leak_severity == "high":
@@ -168,9 +163,9 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             else:
                 kat_info.append(f'Plugin = "{event_source}"')
             if leak_infected:
-                kat_info.append(f"Found evidence of external activity.")
+                kat_info.append("Found evidence of external activity.")
             if leak_ransomnote:
-                kat_info.append(f"Found a ransom note.")
+                kat_info.append("Found a ransom note.")
 
             if leak_stage:
                 kat_info.append(f"Stage of the leak is {leak_stage}.")

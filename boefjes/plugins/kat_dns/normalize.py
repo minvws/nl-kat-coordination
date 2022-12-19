@@ -32,9 +32,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     internet = Network(name="internet")
 
     if raw.decode() == "NXDOMAIN":
-        yield NXDOMAIN(
-            hostname=Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
-        )
+        yield NXDOMAIN(hostname=Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi))
         return
 
     # parse raw data into dns.response.Message
@@ -61,9 +59,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         return record
 
     # register argument hostname
-    input_hostname = register_hostname(
-        normalizer_meta.boefje_meta.arguments["input"]["name"]
-    )
+    input_hostname = register_hostname(normalizer_meta.raw_data.boefje_meta.arguments["input"]["name"])
 
     # keep track of discovered zones
     zone_links: Dict[str, DNSZone] = {}
@@ -101,16 +97,12 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                     yield soa
 
                 if isinstance(rr, A):
-                    ipv4 = IPAddressV4(
-                        network=internet.reference, address=IPv4Address(str(rr))
-                    )
+                    ipv4 = IPAddressV4(network=internet.reference, address=IPv4Address(str(rr)))
                     yield ipv4
                     register_record(DNSARecord(address=ipv4.reference, **default_args))
 
                 if isinstance(rr, AAAA):
-                    ipv6 = IPAddressV6(
-                        network=internet.reference, address=IPv6Address(str(rr))
-                    )
+                    ipv6 = IPAddressV6(network=internet.reference, address=IPv6Address(str(rr)))
                     yield ipv6
                     register_record(
                         DNSAAAARecord(

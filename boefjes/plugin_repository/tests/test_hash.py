@@ -58,9 +58,7 @@ class TestHash(TestCase):
     def test_get_or_generate_combined_hash(self):
         generate_combined_hash = self.hasher.generate_combined_hash
 
-        with patch.object(
-            self.hasher, "generate_combined_hash"
-        ) as mock_generate_combined_hash:
+        with patch.object(self.hasher, "generate_combined_hash") as mock_generate_combined_hash:
             mock_generate_combined_hash.side_effect = generate_combined_hash
 
             self.assertEqual(

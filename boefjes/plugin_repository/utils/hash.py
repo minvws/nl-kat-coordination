@@ -16,9 +16,7 @@ class Hasher:
 
     @staticmethod
     def generate_hash(file: Path) -> str:
-        result = subprocess.run(
-            ["shasum", "--algorithm", "256", file.as_posix()], stdout=subprocess.PIPE
-        )
+        result = subprocess.run(["shasum", "--algorithm", "256", file.as_posix()], stdout=subprocess.PIPE)
 
         return result.stdout.decode().split()[0]
 
@@ -38,12 +36,8 @@ class Hasher:
 
     @staticmethod
     def generate_combined_hash(metadata: Path, rootfs: Path) -> str:
-        process = subprocess.Popen(
-            ["cat", metadata.as_posix(), rootfs.as_posix()], stdout=subprocess.PIPE
-        )
-        output = subprocess.check_output(
-            ["shasum", "--algorithm", "256"], stdin=process.stdout
-        )
+        process = subprocess.Popen(["cat", metadata.as_posix(), rootfs.as_posix()], stdout=subprocess.PIPE)
+        output = subprocess.check_output(["shasum", "--algorithm", "256"], stdin=process.stdout)
 
         process.wait()
 
@@ -77,23 +71,14 @@ class Hasher:
                 metadata = file.location
                 rootfs_squash = _find_ftype("squashfs", files)
                 if rootfs_squash is not None and rootfs_squash.location.exists():
-                    file.combined_squashfs_sha256 = self.get_or_generate_combined_hash(
-                        metadata, rootfs_squash.location
-                    )
+                    file.combined_squashfs_sha256 = self.get_or_generate_combined_hash(metadata, rootfs_squash.location)
                 rootfs_xz = _find_ftype("root.tar.xz", files)
                 if rootfs_xz is not None and rootfs_xz.location.exists():
-                    file.combined_rootxz_sha256 = self.get_or_generate_combined_hash(
-                        metadata, rootfs_xz.location
-                    )
+                    file.combined_rootxz_sha256 = self.get_or_generate_combined_hash(metadata, rootfs_xz.location)
                 rootfs_disk_vm_img = _find_ftype("disk-kvm.img", files)
-                if (
-                    rootfs_disk_vm_img is not None
-                    and rootfs_disk_vm_img.location.exists()
-                ):
-                    file.combined_disk_vm_img_sha256 = (
-                        self.get_or_generate_combined_hash(
-                            metadata, rootfs_disk_vm_img.location
-                        )
+                if rootfs_disk_vm_img is not None and rootfs_disk_vm_img.location.exists():
+                    file.combined_disk_vm_img_sha256 = self.get_or_generate_combined_hash(
+                        metadata, rootfs_disk_vm_img.location
                     )
 
 

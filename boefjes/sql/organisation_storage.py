@@ -31,10 +31,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
     def get_all(self) -> Dict[str, Organisation]:
         query = self.session.query(OrganisationInDB)
 
-        return {
-            organisation.id: self.to_organisation(organisation)
-            for organisation in query.all()
-        }
+        return {organisation.id: self.to_organisation(organisation) for organisation in query.all()}
 
     def create(self, organisation: Organisation) -> None:
         logger.info("Saving organisation: %s", organisation.json())
@@ -56,9 +53,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
     def get_repositories(self, organisation_id: str) -> List[Repository]:
         instance = self._db_instance_by_id(organisation_id)
 
-        return [
-            SQLRepositoryStorage.to_repository(repo) for repo in instance.repositories
-        ]
+        return [SQLRepositoryStorage.to_repository(repo) for repo in instance.repositories]
 
     def delete_by_id(self, organisation_id: str) -> None:
         instance = self._db_instance_by_id(organisation_id)
@@ -66,11 +61,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
         self.session.delete(instance)
 
     def _db_instance_by_id(self, organisation_id: str) -> OrganisationInDB:
-        instance = (
-            self.session.query(OrganisationInDB)
-            .filter(OrganisationInDB.id == organisation_id)
-            .first()
-        )
+        instance = self.session.query(OrganisationInDB).filter(OrganisationInDB.id == organisation_id).first()
 
         if instance is None:
             raise OrganisationNotFound(organisation_id) from ObjectNotFoundException(
@@ -80,11 +71,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
         return instance
 
     def _db_repo_instance_by_id(self, repository_id: str) -> RepositoryInDB:
-        instance = (
-            self.session.query(RepositoryInDB)
-            .filter(RepositoryInDB.id == repository_id)
-            .first()
-        )
+        instance = self.session.query(RepositoryInDB).filter(RepositoryInDB.id == repository_id).first()
 
         if instance is None:
             raise ObjectNotFoundException(RepositoryInDB, repository_id=repository_id)

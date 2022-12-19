@@ -39,26 +39,15 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
             .filter(SettingInDB.plugin_id == plugin_id)
             .filter(OrganisationInDB.id == organisation_id)
         )
-        return {
-            setting.key: self.encryption.decode(setting.value)
-            for setting in query.all()
-        }
+        return {setting.key: self.encryption.decode(setting.value) for setting in query.all()}
 
-    def create(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ) -> None:
-        logger.info(
-            "Saving setting: %s: %s for organisation %s", key, value, organisation_id
-        )
+    def create(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
+        logger.info("Saving setting: %s: %s for organisation %s", key, value, organisation_id)
 
-        setting_in_db = self.to_setting_in_db(
-            key, self.encryption.encode(value), organisation_id, plugin_id
-        )
+        setting_in_db = self.to_setting_in_db(key, self.encryption.encode(value), organisation_id, plugin_id)
         self.session.add(setting_in_db)
 
-    def update_by_key(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ) -> None:
+    def update_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
         instance = self._db_instance_by_id(key, organisation_id, plugin_id)
 
         instance.value = self.encryption.encode(value)
@@ -68,9 +57,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
 
         self.session.delete(instance)
 
-    def _db_instance_by_id(
-        self, key: str, organisation_id: str, plugin_id: str
-    ) -> SettingInDB:
+    def _db_instance_by_id(self, key: str, organisation_id: str, plugin_id: str) -> SettingInDB:
         instance = (
             self.session.query(SettingInDB)
             .join(OrganisationInDB)
@@ -82,26 +69,16 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
         )
 
         if instance is None:
-            raise SettingNotFound(
-                key, organisation_id, plugin_id
-            ) from ObjectNotFoundException(
+            raise SettingNotFound(key, organisation_id, plugin_id) from ObjectNotFoundException(
                 SettingInDB, key=key, organisation_id=organisation_id
             )
 
         return instance
 
-    def to_setting_in_db(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ) -> SettingInDB:
-        organisation = (
-            self.session.query(OrganisationInDB)
-            .filter(OrganisationInDB.id == organisation_id)
-            .first()
-        )
+    def to_setting_in_db(self, key: str, value: str, organisation_id: str, plugin_id: str) -> SettingInDB:
+        organisation = self.session.query(OrganisationInDB).filter(OrganisationInDB.id == organisation_id).first()
 
-        return SettingInDB(
-            key=key, value=value, plugin_id=plugin_id, organisation_pk=organisation.pk
-        )
+        return SettingInDB(key=key, value=value, plugin_id=plugin_id, organisation_pk=organisation.pk)
 
 
 def create_setting_storage(organisation_id: str, session) -> SettingsStorage:
