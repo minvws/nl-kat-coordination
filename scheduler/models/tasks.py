@@ -92,7 +92,7 @@ class BoefjeTask(BaseModel):
 
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
     boefje: Boefje
-    input_ooi: str
+    input_ooi: Optional[str]
     organization: str
 
     dispatches: List[Normalizer] = Field(default_factory=list)
@@ -105,4 +105,6 @@ class BoefjeTask(BaseModel):
         """Make BoefjeTask hashable, so that we can de-duplicate it when used
         in the PriorityQueue. We hash the combination of the attributes
         input_ooi and boefje.id since this combination is unique."""
-        return mmh3.hash_bytes(f"{self.input_ooi}-{self.boefje.id}-{self.organization}").hex()
+        input_ooi = self.input_ooi if self.input_ooi else "None"
+
+        return mmh3.hash_bytes(f"{input_ooi}-{self.boefje.id}-{self.organization}").hex()
