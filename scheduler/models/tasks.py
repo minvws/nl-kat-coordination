@@ -105,6 +105,8 @@ class BoefjeTask(BaseModel):
         """Make BoefjeTask hashable, so that we can de-duplicate it when used
         in the PriorityQueue. We hash the combination of the attributes
         input_ooi and boefje.id since this combination is unique."""
-        input_ooi = self.input_ooi if self.input_ooi else "None"
+        if self.input_ooi:
+            return mmh3.hash_bytes(f"{self.input_ooi}-{self.boefje.id}-{self.organization}").hex()
 
-        return mmh3.hash_bytes(f"{input_ooi}-{self.boefje.id}-{self.organization}").hex()
+        return mmh3.hash_bytes(f"{self.boefje.id}-{self.organization}").hex()
+
