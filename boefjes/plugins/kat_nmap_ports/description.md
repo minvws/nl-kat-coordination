@@ -9,16 +9,18 @@ scan specific ports.
 
 This Nmap boefje has the following hardcoded options:
 
-`T4` assume a fast and reliable network  
-`Pn` skips host discovery, treats hosts as online  
-`-r` scan ports in order  
-`-v10` use verbosity level 10  
-`-sV` probe open ports to determine version info  
-`-sS` scan TCP SYN  
-`-sU` Scan UDP (slower)  
-`-oX` Output in XML  
+| Option | Function |
+| ----------- | ----------- |
+| `T4` | assume a fast and reliable network |
+| `Pn` | skips host discovery, treats hosts as online |
+|`-r` | scan ports in order |
+|`-v10` |use verbosity level 10 |
+|`-sV` |probe open ports to determine version info |
+|`-sS` |scan TCP SYN |
+|`-sU` |Scan UDP (slower) |
+|`-oX` |Output in XML |
 
-The PORTS variable is given as the argument for `-p`.
+The PORTS variable is given as the argument for `-p` (see the Nmap documentation for more information).
 
 ### Input OOIs
 
