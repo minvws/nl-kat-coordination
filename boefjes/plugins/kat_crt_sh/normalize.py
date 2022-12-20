@@ -1,6 +1,7 @@
+import datetime
 import json
 from typing import Iterator, Union
-
+from dateutil.parser import parse
 from octopoes.models import OOI
 from octopoes.models.ooi.certificate import Certificate
 from octopoes.models.ooi.dns.zone import Hostname
@@ -40,7 +41,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             issuer=certificate["issuer_name"],
             valid_from=certificate["not_before"],
             valid_until=certificate["not_after"],
-            pk_number=certificate["serial_number"].upper(),
+            serial_number=certificate["serial_number"].upper(),
+            expires_in=parse(certificate["not_after"]).astimezone(datetime.timezone.utc) - datetime.datetime.now(datetime.timezone.utc),
         )
         # walk over the common_name. which might be unrelated to the requested domain, or it might be a parent domain
         # which our dns Boefje should also have picked up.

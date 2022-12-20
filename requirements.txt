@@ -11,4 +11,5 @@ psycopg2-binary==2.9.5
 pylxd==2.3.1
 pynacl==1.5.0
 sqlalchemy==1.4.44
+python-dateutil==2.8.2
 git+https://github.com/minvws/nl-kat-octopoes@v1.4.0

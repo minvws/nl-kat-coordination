@@ -1,5 +1,5 @@
-import ipaddress
 import json
+import urllib.parse
 from typing import Iterator, Union
 
 from octopoes.models import OOI, Reference
@@ -9,36 +9,30 @@ from octopoes.models.ooi.network import (
     IPPort,
     Protocol,
     PortState,
-    IPAddressV4,
-    IPAddressV6,
     Network,
 )
+from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
-from octopoes.models.ooi.web import HTTPHeader
+from octopoes.models.ooi.web import (
+    HTTPHeader,
+    HTTPResource,
+    Website,
+    IPAddressHTTPURL,
+)
+
 from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+    ip_ooi_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
-    network = Network(name="internet").reference
+    network_reference = Network(name=ip_ooi_reference.tokenized.network.name).reference
     ip = results["ip"]
-    ipvx = ipaddress.ip_address(ip)
-    if ipvx.version == 4:
-        ip_ooi = IPAddressV4(
-            address=ip,
-            network=network,
-        )
-    else:
-        ip_ooi = IPAddressV6(
-            address=ip,
-            network=network,
-        )
 
     if "dns" in results and "names" in results["dns"]:
         for hostname in results["dns"]["names"]:
-            hostname_ooi = Hostname(name=hostname, network=network)
+            hostname_ooi = Hostname(name=hostname, network=network_reference)
             yield hostname_ooi
 
     for scan in results["services"]:
@@ -46,12 +40,15 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         transport = scan["transport_protocol"].lower()
 
         ip_port = IPPort(
-            address=ooi,
-            protocol=Protocol(transport),
+            address=ip_ooi_reference,
+            protocol=Protocol(transport) if transport != "quic" else Protocol.UDP,
             port=int(port_nr),
             state=PortState("open"),
         )
         yield ip_port
+
+        service = Service(name=scan["service_name"])
+        yield service
 
         if "tls" in scan:
             certificate = scan["tls"]["certificates"]
@@ -76,8 +73,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 valid_until=0,
                 pk_algorithm=certificate["leaf_data"]["pubkey_algorithm"],
                 pk_size=certificate["leaf_data"]["pubkey_bit_size"],
-                pk_number=certificate["leaf_data"]["fingerprint"],
-                website="",
+                serial_number=certificate["leaf_data"]["fingerprint"],
                 signed_by=None,
             )
 
@@ -99,11 +95,45 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                     continue
                 else:
                     header_field = header.lower().replace("_", "-")
-                    # this is always an array. when there are multiple values it means it was set multiple times
+                    # this is always a list, when there are multiple values it means it was set multiple times
                     for value in values:
-                        # todo: fix resource reference when it is clear to what it can be linked
+                        url = urllib.parse.urlparse(scan["http"]["request"]["uri"])
+                        port = 443 if url.scheme == "https" else 80
+                        ip_port = IPPort(
+                            address=ip_ooi_reference,
+                            protocol=Protocol[scan["transport_protocol"]],
+                            port=port,
+                        )
+                        yield ip_port
+
+                        web_url = IPAddressHTTPURL(
+                            network=network_reference,
+                            scheme=url.scheme,
+                            port=port,
+                            path=url.path,
+                            netloc=ip_ooi_reference,
+                        )
+                        yield web_url
+
+                        # todo: not a valid hostname, but this needs to be fixed in the `Website` model
+                        hostname = Hostname(network=network_reference, name=ip)
+                        yield hostname
+
+                        # todo: implement `HTTPResource.redirects_to` if available
+                        http_resource = HTTPResource(
+                            website=Website(
+                                ip_service=IPService(
+                                    ip_port=ip_port.reference,
+                                    service=service.reference,
+                                ).reference,
+                                hostname=hostname.reference,
+                            ).reference,
+                            web_url=web_url.reference,
+                        )
+                        yield http_resource
+
                         http_header = HTTPHeader(
-                            resource=ip_port.reference,
+                            resource=http_resource.reference,
                             key=header_field,
                             value=value,
                         )
