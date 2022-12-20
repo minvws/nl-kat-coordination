@@ -1,4 +1,4 @@
-import ipaddress
+# import ipaddress
 import json
 from typing import Iterator, Union
 
@@ -9,8 +9,8 @@ from octopoes.models.ooi.network import (
     IPPort,
     Protocol,
     PortState,
-    IPAddressV4,
-    IPAddressV6,
+    # IPAddressV4,
+    # IPAddressV6,
     Network,
 )
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -23,18 +23,18 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     ooi = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
 
     network = Network(name="internet").reference
-    ip = results["ip"]
-    ipvx = ipaddress.ip_address(ip)
-    if ipvx.version == 4:
-        ip_ooi = IPAddressV4(
-            address=ip,
-            network=network,
-        )
-    else:
-        ip_ooi = IPAddressV6(
-            address=ip,
-            network=network,
-        )
+    # ip = results["ip"]
+    # ipvx = ipaddress.ip_address(ip)
+    # if ipvx.version == 4:
+    #     ip_ooi = IPAddressV4(
+    #         address=ip,
+    #         network=network,
+    #     )
+    # else:
+    #     ip_ooi = IPAddressV6(
+    #         address=ip,
+    #         network=network,
+    #     )
 
     if "dns" in results and "names" in results["dns"]:
         for hostname in results["dns"]["names"]:
