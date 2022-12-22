@@ -3,7 +3,7 @@ name: Compile and deploy documentation to Pages
 on:
   push:
     branches:
-      - "develop"
+      - "main"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
