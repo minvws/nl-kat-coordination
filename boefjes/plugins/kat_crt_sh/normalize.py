@@ -42,7 +42,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             valid_from=certificate["not_before"],
             valid_until=certificate["not_after"],
             serial_number=certificate["serial_number"].upper(),
-            expires_in=parse(certificate["not_after"]).astimezone(datetime.timezone.utc) - datetime.datetime.now(datetime.timezone.utc),
+            expires_in=parse(certificate["not_after"]).astimezone(datetime.timezone.utc)
+            - datetime.datetime.now(datetime.timezone.utc),
         )
         # walk over the common_name. which might be unrelated to the requested domain, or it might be a parent domain
         # which our dns Boefje should also have picked up.
