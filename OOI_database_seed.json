@@ -1096,5 +1096,44 @@
       },
       "consult_api": false
     }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-NO-DMARC",
+    "fields": {
+      "last_updated": "2021-12-07T17:24:09.835Z",
+      "data": {
+        "description": "This hostname does not have a DMARC record.",
+        "recommendation": "Set a DMARC record to protect your domain.",
+        "risk": "Medium"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-NO-DKIM",
+    "fields": {
+      "last_updated": "2021-12-07T17:24:09.835Z",
+      "data": {
+        "description": "This hostname does not support a DKIM record.",
+        "recommendation": "Set a DKIM record to protect your domain.",
+        "risk": "Medium"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-NO-SPF",
+    "fields": {
+      "last_updated": "2021-12-07T17:24:09.835Z",
+      "data": {
+        "description": "This hostname does not have an SPF record.",
+        "recommendation": "Set an SPF record to protect your domain.",
+        "risk": "Medium"
+      },
+      "consult_api": false
+    }
   }
 ]
