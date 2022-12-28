@@ -1,7 +1,7 @@
 {
-    "id": "kat_cencys_normalize",
+    "id": "kat_censys_normalize",
     "consumes": [
-        "cencys"
+        "censys"
     ],
     "produces": [
         "IPPort",
