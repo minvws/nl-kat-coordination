@@ -1,5 +1,4 @@
 from django.views.generic import ListView
-from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 

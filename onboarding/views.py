@@ -3,7 +3,7 @@ from typing import Type, List, Dict, Any
 from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import HttpResponseRedirect, redirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -33,7 +33,7 @@ from katalogus.client import get_katalogus
 from rocky.views import BaseOOIFormView
 from rocky.views.ooi_view import SingleOOITreeMixin, BaseOOIDetailView
 from tools.forms import SelectBoefjeForm
-from tools.models import Indemnification, Organization, OrganizationMember
+from tools.models import Organization, OrganizationMember
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     get_or_create_ooi,
@@ -436,7 +436,7 @@ class OrganizationSessionMixin:
     def get_organization_id(self):
         try:
             organization = self.model.objects.get(name=self.request.session["organization_name"])
-        except:
+        except Exception:
             return None
         return organization.id
 

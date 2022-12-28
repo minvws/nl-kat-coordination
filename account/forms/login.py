@@ -1,6 +1,5 @@
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
-from account.validators import get_password_validators_help_texts
 
 
 class LoginForm(AuthenticationForm):

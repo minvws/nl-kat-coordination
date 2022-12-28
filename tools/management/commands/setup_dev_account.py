@@ -47,7 +47,7 @@ class Command(BaseCommand):
                 try:
                     permission = Permission.objects.get(codename=codename)
                     permission_objects.append(permission.id)
-                except:
+                except permission.DoesNotExist:
                     raise ObjectDoesNotExist("Permission:" + str(permission) + " does not exist.")
         return permission_objects
 

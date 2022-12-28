@@ -1,7 +1,6 @@
 import logging
 from requests import RequestException
 from rocky.health import ServiceHealth
-from rocky.version import __version__
 from katalogus.client import get_katalogus
 
 

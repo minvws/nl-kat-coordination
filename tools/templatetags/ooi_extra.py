@@ -2,7 +2,6 @@ import json
 from typing import Any, List, Type, Set
 from urllib import parse
 from django import template
-from django.utils.translation import gettext_lazy as _
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN

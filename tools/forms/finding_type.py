@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
-from octopoes.models.ooi.findings import KATFindingType
 
 from tools.forms import (
     BaseRockyForm,

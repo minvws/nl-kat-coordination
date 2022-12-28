@@ -44,6 +44,10 @@ robotframework-browser
 robotframework-debuglibrary
 robotframework-otp
 robotframework-postgresqldb
+pytest
+pytest-cov
+pytest-django
+pytest-mock
 
 # Include formatters and linters
 -r requirements-check.txt

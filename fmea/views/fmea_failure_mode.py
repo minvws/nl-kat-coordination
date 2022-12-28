@@ -1,7 +1,6 @@
 from typing import List, Dict
 
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
 from django.urls.base import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView

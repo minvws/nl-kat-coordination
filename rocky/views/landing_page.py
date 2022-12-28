@@ -1,7 +1,5 @@
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
-from tools.user_helpers import is_red_team, is_admin
-from two_factor.utils import default_device
 
 
 class LandingPageView(TemplateView):

@@ -2,7 +2,6 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 
 from rocky.settings import OCTOPOES_API
 from tools.models import Organization
-from tools.user_helpers import can_switch_organization
 
 from logging import getLogger
 

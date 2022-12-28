@@ -167,7 +167,7 @@ def iana_service_table(search_query: str) -> List[_Service]:
                     description,
                 )
                 services.append(service)
-        except:
+        except Exception:
             # just ignore on parse errors
             pass
     return services
@@ -278,7 +278,7 @@ def wiki_port_tables() -> List[_PortInfo]:
             if _map_usage_value(tcp):
                 protocols.append("udp")
             description = description.strip()
-        except:
+        except Exception:
             continue
 
         items.append(_PortInfo(port, protocols, description))

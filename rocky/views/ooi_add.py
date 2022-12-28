@@ -13,7 +13,7 @@ from two_factor.views.utils import class_view_decorator
 
 from rocky.views import BaseOOIFormView
 from tools.ooi_helpers import OOI_TYPES_WITHOUT_FINDINGS
-from tools.view_helpers import existing_ooi_type, get_ooi_url
+from tools.view_helpers import existing_ooi_type
 
 logger = logging.getLogger(__name__)
 
