@@ -24,18 +24,20 @@ class PluginSchemaForm(forms.Form):
         required = False
         help_text = ""
         for field_name, field_props in fields.items():
-            if field_name in required_fields:
-                required = True
             field_type = FIELD_TYPES[field_props["type"]]
             if "description" in field_props:
                 help_text = field_props["description"]
-            self.fields[field_name] = field_type(
-                required=required,
-                label=field_props.get("title", field_name),
-                max_length=min(MAX_SETTINGS_VALUE_LENGTH, field_props.get("maxLength", MAX_SETTINGS_VALUE_LENGTH)),
-                help_text=_(help_text),
-                error_messages=self.error_messages,
-            )
+            kwargs = {
+                "required": field_name in required_fields,
+                "label": field_props.get("title", field_name),
+                "help_text": _(help_text),
+                "error_messages": self.error_messages,
+            }
+            if field_props["type"] == "string":
+                kwargs["max_length"] = min(
+                    MAX_SETTINGS_VALUE_LENGTH, field_props.get("maxLength", MAX_SETTINGS_VALUE_LENGTH)
+                )
+            self.fields[field_name] = field_type(**kwargs)
 
 
 class PluginSettingAddEditForm(forms.Form):
@@ -62,11 +64,14 @@ class PluginSettingAddEditForm(forms.Form):
             initial = self.setting_value
         if field:
             field_type = FIELD_TYPES[field["type"]]
-            self.fields[self.setting_name] = field_type(
-                required=self.setting_name in self.plugin_schema["required"],
-                label=field.get("title", field),
-                max_length=min(MAX_SETTINGS_VALUE_LENGTH, field.get("maxLength", MAX_SETTINGS_VALUE_LENGTH)),
-                help_text=_(help_text),
-                error_messages=self.error_messages,
-                initial=initial,
-            )
+            kwargs = {
+                "required": self.setting_name in self.plugin_schema["required"],
+                "label": field.get("title", field),
+                "help_text": _(help_text),
+                "error_messages": self.error_messages,
+                "initial": initial,
+            }
+            if field["type"] == "string":
+                kwargs["max_length"] = min(MAX_SETTINGS_VALUE_LENGTH, field.get("maxLength", MAX_SETTINGS_VALUE_LENGTH))
+
+            self.fields[self.setting_name] = field_type(**kwargs)
