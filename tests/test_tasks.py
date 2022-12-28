@@ -4,8 +4,14 @@ import sys
 from typing import List
 from unittest import TestCase, mock
 
-from boefjes.job_models import BoefjeMeta, NormalizerMeta, UnsupportedReturnTypeNormalizer, InvalidReturnValueNormalizer
-from boefjes.job_handler import BoefjeHandler
+from boefjes.job_models import (
+    BoefjeMeta,
+    NormalizerMeta,
+    UnsupportedReturnTypeNormalizer,
+    InvalidReturnValueNormalizer,
+    NormalizerPlainOOI,
+)
+from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Boefje, Normalizer, Bit, PluginType
 
@@ -82,6 +88,11 @@ class TaskTest(TestCase):
             arguments={},
             organization="_dev",
         ).copy()
+
+    def test_parse_plain_ooi(self):
+        plain_ooi = NormalizerPlainOOI(object_type="Network", name="internet")
+
+        NormalizerHandler._parse_ooi(plain_ooi)
 
     @mock.patch("boefjes.job_handler.get_environment_settings", return_value={})
     @mock.patch("boefjes.job_handler.bytes_api_client")

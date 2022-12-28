@@ -1,0 +1,20 @@
+{
+  "id": "calvin-id",
+  "raw_data": {
+    "id": "123",
+    "boefje_meta": {
+      "id": "calvin",
+      "boefje": {
+        "id": "calvin"
+      },
+      "organization": "_dev",
+      "input_ooi": null,
+      "arguments": {}
+    },
+    "mime_types": [{"value": "boefje/calvin"}]
+
+  },
+  "normalizer": {
+    "id": "calvin-normalize"
+  }
+}

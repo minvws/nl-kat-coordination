@@ -6,6 +6,7 @@ from typing import Any, List, Dict, Set
 import requests
 
 from octopoes.models.types import OOIType
+from pydantic.tools import parse_obj_as
 
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from octopoes.api.models import Observation, Declaration
@@ -22,6 +23,7 @@ from boefjes.config import settings
 from boefjes.job_models import (
     BoefjeMeta,
     NormalizerMeta,
+    NormalizerPlainOOI,
 )
 
 logger = logging.getLogger(__name__)
@@ -189,7 +191,7 @@ class NormalizerHandler(Handler):
                         source=reference,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
-                        result=[OOIType.parse_obj(result.dict()) for result in observation.results],
+                        result=[self._parse_ooi(result) for result in observation.results],
                     )
                 )
 
@@ -197,7 +199,7 @@ class NormalizerHandler(Handler):
                 connector.save_declaration(
                     Declaration(
                         method=normalizer_meta.normalizer.id,
-                        ooi=OOIType.parse_obj(declaration.ooi.dict()),
+                        ooi=self._parse_ooi(declaration.ooi),
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )
@@ -213,6 +215,10 @@ class NormalizerHandler(Handler):
             raise exc
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
+
+    @staticmethod
+    def _parse_ooi(result: NormalizerPlainOOI):
+        return parse_obj_as(OOIType, result.dict())
 
 
 def get_octopoes_api_connector(org_code: str):
