@@ -98,6 +98,7 @@ services:
     environment:
       - APP_DB=ROCKY_DB
       - APP_DB_USER=ROCKY_DB_USER
+      - APP_DB_USER_CREATEDB=CREATEDB
       - APP_DB_PASSWORD=ROCKY_DB_PASSWORD
 
   bytes-db:
