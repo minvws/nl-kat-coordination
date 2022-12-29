@@ -25,7 +25,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **OpenKAT version**
-Note the release tag (and if possible: the installation method) here. 
+Note the release tag (and if possible: the installation method) here.
 If it concerns an in-development version, note the branch(es) and commit hash(es) here as well.
 
 **Desktop (please complete the following information if relevant):**
