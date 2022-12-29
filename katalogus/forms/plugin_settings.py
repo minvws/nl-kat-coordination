@@ -21,7 +21,6 @@ class PluginSchemaForm(forms.Form):
     def populate_fields(self):
         fields = self.plugin_schema["properties"]
         required_fields = self.plugin_schema["required"]
-        required = False
         help_text = ""
         for field_name, field_props in fields.items():
             field_type = FIELD_TYPES[field_props["type"]]
