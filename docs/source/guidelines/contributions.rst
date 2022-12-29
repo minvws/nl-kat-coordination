@@ -1,7 +1,8 @@
 Contributions
 #############
 
-All contributions, bug reports, bug fixes, documentation improvements, enhancements and ideas are welcome. You can directly join and be involved in the development of OpenKAT:
+All contributions, bug reports, bug fixes, documentation improvements, enhancements and ideas are welcome.
+You can directly join and be involved in the development of OpenKAT:
 
 - Install and use OpenKAT and provide feedback
 - Development of boefje, normalizer and bit plugins
@@ -10,7 +11,8 @@ All contributions, bug reports, bug fixes, documentation improvements, enhanceme
 - Solve tickets with a ``good first issue`` label
 - Port OpenKAT to other systems
 
-Note that it is required to sign a `Contributor License Agreement <https://cla-assistant.io/minvws/nl-kat-coordination>`_ when submitting. The ``CLAassitant`` bot will request this automatically on your first Pull Request.
+Note that it is required to sign a `Contributor License Agreement <https://cla-assistant.io/minvws/nl-kat-coordination>`_ when submitting.
+The ``CLAassitant`` bot will request this automatically on your first Pull Request.
 
 Contribute to Codebase
 ======================
@@ -19,7 +21,7 @@ Contribute to Codebase
 See :ref:`Development` for our code style, coding conventions, and overall workflow.
 
 - Fork the right repository in GitHub
-- Create a new branch from ``develop`` (and make sure it is always up-to-date with the OpenKAT ``develop`` branch!)
+- Create a new branch from either ``main`` or a release tag. Note that ``main`` changes rapidly, and as such may not be a suitable basis for your work.
     - This branch should be in the following format:
     - ``[feature|enhancement|bug|hotfix]/random-cat-popup-on-screen``
 - Commit and push the code
@@ -35,7 +37,11 @@ See :ref:`Development` for our code style, coding conventions, and overall workf
 Contribute Documentation
 ========================
 
-Contributing to the documentation benefits everyone who uses OpenKAT. We encourage you to help us improve the documentation, and you don't have to be an expert using OpenKAT to do so. There are many sections that are better off written by non-experts. If something in the docs doesn't make sense to you, updating the relevant section might be a great way to ensure it will help the next person. You're welcome to propose edits to almost every text, including comments and docstrings in the code, the wiki, and other files.
+Contributing to the documentation benefits everyone who uses OpenKAT.
+We encourage you to help us improve the documentation, and you don't have to be an expert using OpenKAT to do so.
+There are many sections that are better off written by non-experts.
+If something in the docs doesn't make sense to you, updating the relevant section might be a great way to ensure it will help the next person.
+You're welcome to propose edits to almost every text, including comments and docstrings in the code, the wiki, and other files.
 
 You could help us out with the following sections:
 
@@ -48,7 +54,9 @@ All documentation should be placed in a repository's ``docs`` folder.
 
 Contributor Social Contract
 ===========================
-All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :ref:`Guidelines`. Everyone is encouraged to politely and constructively point out guidelines violations to others. Actively enforcing these guidelines makes that the entire project benefits in quality control.
+All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :ref:`Guidelines`.
+Everyone is encouraged to politely and constructively point out guidelines violations to others.
+Actively enforcing these guidelines makes that the entire project benefits in quality control.
 
 Code of Conduct
 ===============
