@@ -23,7 +23,7 @@ Central to OpenKAT are objects and the data model. Objects are created by collec
 The data model helps in the search for more information, through the logical coherence of objects. When an object is found, OpenKAT automatically checks whether related objects are also present. Based on this, it searches for information again, completing the circle.
 
 Objects, the data model and recursivity
-****************************************
+***************************************
 
 The information collected by OpenKAT is stored as objects. For example, an object is "an IP address" or "a hostname". If there is a hostname, based on the data model, OpenKAT also expects an IP address and possible open ports.
 
@@ -81,12 +81,12 @@ Bytes stores all original information including the full metadata in timestamped
 The standard installation of Octopoes includes a data model suitable for information security. This can be supplemented or adapted to the specific situation in which OpenKAT is used. There are already parties involved in the development phase that want to use OpenKAT for checking certain administrative aspects of certification, which fits well with the current application.
 
 Analysis: Bits
-*************
+**************
 
 The objects in the database can be analyzed using business rules, which are included in Bits. For example, a list of open ports associated with an IP address is fine in one situation, but leads to a finding in another. A finding associated with a particular object is also stored as an object in Octopoes, and can lead to more scans or other actions. Bits, like Boefjes and Whiskers, are modular, customizable and easy to add. A finding based on a business rule can lead to additional scans or actions from OpenKAT.
 
 Reports
-***********
+*******
 
 Reports can be created in a couple of ways. In the standard installation of OpenKAT, there are a number of options for creating reports: by object and thematically. For example, there are findings reports with all findings based on the business rules such as:
 
