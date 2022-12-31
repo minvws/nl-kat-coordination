@@ -1,9 +1,9 @@
-===========
+============
 Introduction 
-===========
+============
 
 What is OpenKAT
-==============
+===============
 
 OpenKAT aims to monitor, record and analyze the status of information systems. OpenKAT scans networks, analyzes vulnerabilities and creates accessible reports. It integrates the most commonly used network tools and scanning software into a modular framework, accesses external databases and combines the information from all these sources into clear reports. 
 
@@ -32,7 +32,7 @@ OpenKAT is built to monitor a larger number of systems, such as the IT systems d
 The nicest playground for OpenKAT is a situation where many systems are active. In the user group around OpenKAT we see larger organizations from the non-profit sector, their service providers, hosting providers, auditors and others involved in information security. 
 
 Where do I start with OpenKAT?
-==========================
+==============================
 
 The documentation explains how the system works and what the main principles are. This gives an impression, but after reading the documentation, trying it yourself is the best way to find out how OpenKAT works. In addition to the documentation, read `the readme from the general repository <https://github.com/minvws/nl-kat-coordination>`_ (dutch).  
 
@@ -67,7 +67,7 @@ OpenKAT scans for vulnerabilities. If you find any, it is valid that you deal wi
 Many organizations have their contact information in ``security.txt`` in the root of their domain, so you get straight to the right people. Not every organization handles it equally professionally, but that's no reason not to want to use that standard yourself. 
 
 What are the plans for the future?
-=====================================
+==================================
 
 OpenKAT was created during the pandemic. Publishing the source code is one way to give the software built during this period a longer life. With OpenKAT, the Ministry of Health is contributing to the `National Cybersecurity Strategy <https://www.rijksoverheid.nl/actueel/nieuws/2022/10/10/kabinet-presenteert-nieuwe-cybersecuritystrategie>`_ (dutch) and supports the continued development of the system. 
 
