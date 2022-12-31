@@ -13,7 +13,7 @@ This guide explains how the plugins work and how they are created, and gives an 
 The community is working on sample boefjes with a ``enter your code here`` option and a repository with a prebuilt CI that provides boefjes as artifacts. Please send an email to meedoen@openkat.nl if you would like to participate in this. 
 
 What types of plugins are there?
-==============================
+================================
 
 There are three types of plugins, deployed by OpenKAT to collect information, translate it into objects for the data model and then analyze it. Boefjes gather facts, Whiskers structure the information for the data model and Bits determine what you want to think about it; they are the business rules. Each action is cut into the smallest possible pieces. 
 
@@ -26,7 +26,7 @@ There are three types of plugins, deployed by OpenKAT to collect information, tr
 Boefjes and Whiskers are linked together through the mime-type that the rascal passes along to the information. For each mime-type, multiple Boefjes and Whiskers are possible, each with its own specialization. Thus, the data from a crook can be delivered to multiple whiskers to extract a different object each time. Bits are linked to objects and assess the objects in the data model.
 
 How does it work? 
-==============
+=================
 
 A hostname given as an object to OpenKAT, for example, is used as input to a search by the matching boefjes. Based on the data model, logically related objects are searched to get a complete picture. 
 
@@ -35,7 +35,7 @@ Thus, OpenKAT is like a snowball rolling through the network based on the data m
 The new objects in the data model are evaluated by Bits, the business rules. This produces findings, which are added as objects. For example, the hostname includes a dns configuration, which must meet certain requirements. If it goes outside the established parameters it leads to a finding. 
 
 Where to start? 
-==============
+===============
 
 The first question is what information you need. If you know this, there are a number of options, which determine what is best to do:
 
@@ -50,12 +50,12 @@ OpenKAT assumes that you collect and process all information in the smallest pos
 To make a finding about a CVE to a software version, you have a string of objects: the finding of the software, the version, the CVE. That combination then leads to the object of the finding. 
 
 Existing boefjes
-=================
+================
 
 The existing boefjes can be viewed via the KATalog in OpenKAT and are on `GitHUB in the boefjes repository. <https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes>`_
 
 Example: the boefje for shodan
----------------------------------
+------------------------------
 
 The boefje calling shodan gives a good first impression of its capabilities. The boefje includes the following files. 
 
@@ -409,5 +409,4 @@ There are a number of ways to add your new boefje to OpenKAT.
 ``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the Github CI. 
 
 The goal is to set up a separate Github repo with a complete CI to create artifacts based on a template boefje. You can clone this repo. Your OpenKAT installation points you to the artifacts so they are usable from your system. This is now being worked on by the OpenKAT community. Send an email to meedoen@openkat.nl if you want to help. (status: Dec. 2022)
-
 
