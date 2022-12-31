@@ -7,6 +7,7 @@ Welcome to the OpenKAT documentation!
    :maxdepth: 4
    :caption: Contents
 
+   introduction/index
    guidelines/index
    templates/index
    technical_design/index
