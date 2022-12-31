@@ -1,6 +1,6 @@
-=====================
+==========
 User Guide
-=====================
+==========
 
 This manual covers the day-to-day use of OpenKAT via the web interface. The concepts behind OpenKAT are explained in the "How does OpenKAT work" section. When using OpenKAT for the first time, the on-boarding flow is available, see the section in this chapter. 
 
@@ -8,7 +8,7 @@ This manual covers the day-to-day use of OpenKAT via the web interface. The conc
   :alt: landingpage
 
 Web interface 
-============
+=============
 
 The user interface of OpenKAT consists of five screens, which provide access to the information and main functions of the system:
 
@@ -27,7 +27,7 @@ The Crisis Room provides the overview of all findings, which can be viewed for d
   alt: crisisroom
 
 KAT catalog
-----------
+-----------
 
 The KAT catalog contains all the tools that this instance of KAT has access to, all the boefjes and normalizers. Click on a boefje for more information, such as the objects it can search for.
 
@@ -84,44 +84,44 @@ The scans of KAT can be found on the Tasks page as tasks. A task is created per 
 
 
 Users and organizations
-==========================
+=======================
 
 OpenKAT has administrators, users and organizations. 
 
 Organizations
-------------
+-------------
 
 Organizations own the systems for which KAT is deployed. From KAT, multiple organizations can be monitored simultaneously, each with its own settings. The 1.4rc2 includes additional options for creating new organizations via an API. Please contact meedoen@openkat.nl if you would like to help test and develop this. 
 
 Users
-----------
+-----
 
 The administrator is responsible for the system. There are two types of users: the red team user who can launch new scans and the regular user who has read access and can request reports. 
 
 User management
-----------------
+---------------
 
 Users and organizations can be created in the on boarding flow, in the Web interface or automated. The administrator of the system can create organizations and do user management. The administrator of an organization in turn can create users within the organization. The django interface provides additional capabilities for user management via the command line, for use in an automated deployment and linkage to external user management. 
 
 Objects
-========
+=======
 
 Adding an initial object with an appropriate safeguard puts OpenKAT to work. This can be done in on-boarding, but objects can also be added individually or as CSV files. 
 
 Properties
--------------
+----------
 
 Objects can be viewed via the 'Objects' page in OpenKAT's main menu. Here are the already created objects with the type and safeguard level for each object. Objects can be added, scanned, filtered and there is an export option. 
 
 New objects can be created via the 'add' option. This can be done individually or per CSV. The specification of the CSV is included on the page where it can be provided. 
 
 Start scan
-------------
+----------
 
 Based on the object and the clearance, OpenKAT provides an overview of available boefjes. All users can perform a manual scan appropriate to the given safeguard level. The manual scan is accelerated by the scheduler. The results appear as findings with the object. 
 
 View Findings
------------------
+-------------
 
 Findings appear on the general findings page, but can also be viewed by object. 
 
@@ -138,40 +138,40 @@ Safeguard levels are used from level 1 to level 4, from "do not touch" to "very 
 The different levels are qualitative in nature. L1 'do not touch' is obvious, but the difference between L2 'normal user' and L3 'detectable scanning' is at the discretion of the developer and administrator. The use of NMAP, for example, falls in between and depends heavily on the arguments the tool brings. 
 
 +-------+-----------------------+
-| Level | Description.
+| Level | Description		|
 +=======+=======================+
-| L0 | do not scan
+| L0 	| do not scan		|
 +-------+-----------------------+
-| L1 | do not touch
+| L1 	| do not touch		|
 +-------+-----------------------+
-| L2 | normal user
+| L2	| normal user		|
 +-------+-----------------------+
-| L3 | detectable scanning
+| L3	| detectable scanning	|
 +-------+-----------------------+
-| L4 | intensive scanning
+| L4 	| intensive scanning	|
 +-------+-----------------------+
 
 
-Statement 
-----------
+Indemification by user 
+----------------------
 
 The user's statement counts as an indemnification for scanning a particular object. This obtains permission to scan and store the information. The statement is given at the start of a new scan or specifically for certain objects. 
 
 Inheritance
-----------
+-----------
 
 Objects are linked to other objects in the data model. Underlying objects receive the same safeguard level, parent objects a lower level. For example, a hostname has an ip address for which the same safeguard level applies, but it also has a DNS server that may be outside the organization's domain and receives a lower level. 
 
 Extended profiles
----------------------
+-----------------
 
 L0: Do not scan
-****************
+***************
 
 The user can explicitly indicate that certain systems should not be scanned. For example, because he is not the owner of these.
 
 L1: Do not touch
-*****************
+****************
 
 OpenSource and passive data collection. For this profile, objects are viewed through various freely available data and sources via the Internet. These can be sources that do not have explicit permission (e.g. LinkedIn, DNS, leaked password databases). The goal here is to detect public information that could be a risk to the client: information that could be misused by an attacker in a targeted attack. 
 
@@ -182,7 +182,7 @@ Examples of sources/tools used:
 - DNS
 
 L2: Touching at the normal user level
-********************************************
+*************************************
 
 Targeted scans, limited intrusive. Scan will be dosed and skip known sensitive scans. The scanned target usually continues to function without problems. 
 
@@ -193,7 +193,7 @@ Example of scanning tools useful for this purpose:
 - Burp passive scanner
 
 L3: Detectable scanning
-*************************
+***********************
 
 This scan will be more intrusive: connect to services to find out versions, try to log in with commonly used (default) login credentials, automated testing of found vulnerabilities whether they are vulnerable, more intensive guessing of urls and more intensive crawling of web pages.
 
@@ -205,12 +205,12 @@ Example of useful scanning tools and methods:
 - Burp Intruder, active scanner
 
 L4: Intensive scanning
-*********************
+**********************
 
 The premise of the test profile is to verify whether an attacker can exploit vulnerabilities to give himself more extensive access to the tested environment. Thus, known exploit code is applied in this level. 
 
 Reports
-===========
+=======
 
 OpenKAT displays all findings in the crisis room, the entry point for all current information from the system. In addition, OpenKAT can create thematic reports and display findings per object. The reports are available in the front end and as PDF, based on a LaTeX parser. The organization's house style can also be incorporated. It is also possible to link to other reporting and alerting systems. 
 
@@ -253,5 +253,4 @@ Based on the report, object and safeguard, select the relevant boefjes for your 
 - View results: in the web interface or as a PDF report
 
 The scan is an ongoing process, looking for information based on derivation and logical connections in the data model. The results of the scan appear over time, any findings can be viewed by object, at Findings and in the Crisis Room. In each context, reports can also be generated. 
-
 
