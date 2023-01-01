@@ -143,7 +143,7 @@ Currently, however, OpenKAT only understands fairly shallow structures. For exam
   "properties": {
     "SHODAN_API": {
       "title": "SHODAN_API",
-      "maxLength": 128,	
+      "maxLength": 128,
       "type": "string",
       "description": "A Shodan API key (see https://developer.shodan.io/api/requirements)."
     }
