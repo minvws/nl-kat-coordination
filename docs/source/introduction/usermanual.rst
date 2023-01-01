@@ -43,7 +43,7 @@ Each boefje has an info page with information about the tools used, the associat
 .. image:: img/boefjeinfopage.png
   :alt: Findings
 
-Findings 
+Findings
 --------
 
 The findings made by KAT can be seen on the Findings page. Use the filters to select the findings. Click on the finding for more information or to generate a report on this finding.
@@ -127,7 +127,7 @@ Findings appear on the general findings page, but can also be viewed by object.
 
 
 Scan levels and indemnities
-=========================== 
+===========================
 
 boefjes can collect information with varying intensity. OpenKAT has a system of safeguards to control permission to perform scans and prevent damage to the systems under test.
 
@@ -138,21 +138,21 @@ Safeguard levels are used from level 1 to level 4, from "do not touch" to "very 
 The different levels are qualitative in nature. L1 'do not touch' is obvious, but the difference between L2 'normal user' and L3 'detectable scanning' is at the discretion of the developer and administrator. The use of NMAP, for example, falls in between and depends heavily on the arguments the tool brings.
 
 +-------+-----------------------+
-| Level | Description		|
+| Level | Description		        |
 +=======+=======================+
-| L0 	| do not scan		|
+| L0  	| do not scan		        |
 +-------+-----------------------+
-| L1 	| do not touch		|
+| L1  	| do not touch	      	|
 +-------+-----------------------+
-| L2	| normal user		|
+| L2	  | normal user	        	|
 +-------+-----------------------+
-| L3	| detectable scanning	|
+| L3	  | detectable scanning	  |
 +-------+-----------------------+
-| L4 	| intensive scanning	|
+| L4  	| intensive scanning	  |
 +-------+-----------------------+
 
 
-Indemification by user 
+Indemification by user
 ----------------------
 
 The user's statement counts as an indemnification for scanning a particular object. This obtains permission to scan and store the information. The statement is given at the start of a new scan or specifically for certain objects.
@@ -220,7 +220,7 @@ OpenKAT displays all findings in the crisis room, the entry point for all curren
 My first scan
 =============
 
-If you are using OpenKAT for the first time you can use the on-boarding flow. The on-boarding flow helps you through the full cycle of OpenKAT. After following this flow, you will have a functioning OpenKAT installation running a first set of scans. By adding more objects, releasing and selecting boefjes, you can find out more information and perform analysis. 
+If you are using OpenKAT for the first time you can use the on-boarding flow. The on-boarding flow helps you through the full cycle of OpenKAT. After following this flow, you will have a functioning OpenKAT installation running a first set of scans. By adding more objects, releasing and selecting boefjes, you can find out more information and perform analysis.
 
 The on-boarding flow uses the following steps to get you going:
 
