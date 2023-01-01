@@ -96,7 +96,7 @@ Organizations own the systems for which KAT is deployed. From KAT, multiple orga
 Users
 -----
 
-The administrator is responsible for the system. There are two types of users: the red team user who can launch new scans and the regular user who has read access and can request reports. 
+The administrator is responsible for the system. Besides the administrator two usertypes have been defined: the red team user who can launch new scans and the regular user who has read access and can request reports. 
 
 User management
 ---------------
