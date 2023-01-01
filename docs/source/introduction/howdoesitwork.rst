@@ -1,5 +1,5 @@
 ======================
-How does OpenKAT work? 
+How does OpenKAT work?
 ======================
 
 General notes
@@ -18,7 +18,7 @@ OpenKAT uses a configurable data model. All information is translated into objec
 Basic concepts
 ==============
 
-Central to OpenKAT are objects and the data model. Objects are created by collecting and analyzing information. The objects found are analyzed using business rules, leading to findings that are included as objects in the data model. 
+Central to OpenKAT are objects and the data model. Objects are created by collecting and analyzing information. The objects found are analyzed using business rules, leading to findings that are included as objects in the data model.
 
 The data model helps in the search for more information, through the logical coherence of objects. When an object is found, OpenKAT automatically checks whether related objects are also present. Based on this, it searches for information again, completing the circle.
 
@@ -39,7 +39,7 @@ OpenKAT checks key aspects of configuration, accessibility and presence of vulne
 Indemnification
 ***************
 
-OpenKAT works with a system of indemnities for scanning, linked to intrusion levels. An organization gives an indemnification for a certain intensity of scan. For each intrusion level, the level is specified, in order to prevent unexpected problems for a production system. 
+OpenKAT works with a system of indemnities for scanning, linked to intrusion levels. An organization gives an indemnification for a certain intensity of scan. For each intrusion level, the level is specified, in order to prevent unexpected problems for a production system.
 
 Intrusion levels or indemnities:
 :L1: 'do not touch'
@@ -52,7 +52,7 @@ If scanning with OpenKAT poses a risk then it applies to all actors who have acc
 Users and organizations
 ***********************
 
-Scanning and reporting in OpenKAT are different systems with separate users. The red team user issues the command and determines the safeguard, the reporting user has read access and views the results. 
+Scanning and reporting in OpenKAT are different systems with separate users. The red team user issues the command and determines the safeguard, the reporting user has read access and views the results.
 
 :Red team user: Gives the system a certain command and safeguard ('scan this network, with this intrusion level'). Based on this, OpenKAT collects information.
 
@@ -66,7 +66,7 @@ The system has four parts: information collection, storage, analysis and reporti
 ... image:: img/modulesopenkat1.png
   :alt: modules in OpenKAT
 
-Collection: Boefjes and Whiskers 
+Collection: Boefjes and Whiskers
 ********************************
 
 Boefjes collect the information for OpenKAT. They are scripts that can call a tool or collect information themselves. Whiskers are the normalizers that try to filter out objects. These objects fit the data model being used. The scheduler "Mula" deploys boefjes depending on the query, the available clearance (the "intrusion level") and the information found. Thus, a scan leads to new data, which produces findings based on the business rules. This in turn can lead to new deployment of boefjes, who scan additional parts of a system.
@@ -108,4 +108,4 @@ GraphQL:
 - Simple input for queries
 - Build complex queries yourself
 
-OpenKAT can generate reports in a number of formats, including LaTeX and PDF. An API is also available that can interface with other systems. 
+OpenKAT can generate reports in a number of formats, including LaTeX and PDF. An API is also available that can interface with other systems.
