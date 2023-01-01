@@ -2,52 +2,52 @@
 Plugins for OpenKAT: boefjes, whiskers and bits
 ===============================================
 
-OpenKAT is modular and can be easily extended. This guide provides a first step for the development of new plugins: boefjes that scan, whiskers that collect objects, and bits that contain businessrules. 
+OpenKAT is modular and can be easily extended. This guide provides a first step for the development of new plugins: boefjes that scan, whiskers that collect objects, and bits that contain businessrules.
 
-OpenKAT comes with a KATalog of boefjes, which can be viewed through the front end of the system. The premise is that all information is processed and stored in the smallest unit, ensuring the modular nature of OpenKAT. 
+OpenKAT comes with a KATalog of boefjes, which can be viewed through the front end of the system. The premise is that all information is processed and stored in the smallest unit, ensuring the modular nature of OpenKAT.
 
 OpenKAT can access multiple KATalogs, so it is possible to create your own overview of boefjes in addition to the official KATalog. This is of interest to organizations that use boefjes for specific purposes or with software that has a different licensing model.
 
-This guide explains how the plugins work and how they are created, and gives an overview of which plugins already exist. 
+This guide explains how the plugins work and how they are created, and gives an overview of which plugins already exist.
 
-The community is working on sample boefjes with a ``enter your code here`` option and a repository with a prebuilt CI that provides boefjes as artifacts. Please send an email to meedoen@openkat.nl if you would like to participate in this. 
+The community is working on sample boefjes with a ``enter your code here`` option and a repository with a prebuilt CI that provides boefjes as artifacts. Please send an email to meedoen@openkat.nl if you would like to participate in this.
 
 What types of plugins are there?
 ================================
 
-There are three types of plugins, deployed by OpenKAT to collect information, translate it into objects for the data model and then analyze it. Boefjes gather facts, Whiskers structure the information for the data model and Bits determine what you want to think about it; they are the business rules. Each action is cut into the smallest possible pieces. 
+There are three types of plugins, deployed by OpenKAT to collect information, translate it into objects for the data model and then analyze it. Boefjes gather facts, Whiskers structure the information for the data model and Bits determine what you want to think about it; they are the business rules. Each action is cut into the smallest possible pieces.
 
-- Boefjes gather factual information, such as by calling an external scanning tool like nmap or using a database like shodan. 
+- Boefjes gather factual information, such as by calling an external scanning tool like nmap or using a database like shodan.
 
-- Whiskers analyze the information and turn it into objects for the data model in Octopoes
+- Whiskers analyze the information and turn it into objects for the data model in Octopoes.
 
-- Bits contain the business rules that do the analysis on the objects. 
+- Bits contain the business rules that do the analysis on the objects.
 
-Boefjes and Whiskers are linked together through the mime-type that the rascal passes along to the information. For each mime-type, multiple Boefjes and Whiskers are possible, each with its own specialization. Thus, the data from a crook can be delivered to multiple whiskers to extract a different object each time. Bits are linked to objects and assess the objects in the data model.
+Boefjes and Whiskers are linked together through the mime-type that the boefje passes along to the information. For each mime-type, multiple Boefjes and Whiskers are possible, each with its own specialization. Thus, the data from a crook can be delivered to multiple whiskers to extract a different object each time. Bits are linked to objects and assess the objects in the data model.
 
-How does it work? 
+How does it work?
 =================
 
-A hostname given as an object to OpenKAT, for example, is used as input to a search by the matching boefjes. Based on the data model, logically related objects are searched to get a complete picture. 
+A hostname given as an object to OpenKAT, for example, is used as input to a search by the matching boefjes. Based on the data model, logically related objects are searched to get a complete picture.
 
-Thus, OpenKAT is like a snowball rolling through the network based on the data model. The logical connections between objects point the way, and OpenKAT keeps looking for new boefjes until the model is complete. 
+Thus, OpenKAT is like a snowball rolling through the network based on the data model. The logical connections between objects point the way, and OpenKAT keeps looking for new boefjes until the model is complete.
 
-The new objects in the data model are evaluated by Bits, the business rules. This produces findings, which are added as objects. For example, the hostname includes a dns configuration, which must meet certain requirements. If it goes outside the established parameters it leads to a finding. 
+The new objects in the data model are evaluated by Bits, the business rules. This produces findings, which are added as objects. For example, the hostname includes a dns configuration, which must meet certain requirements. If it goes outside the established parameters it leads to a finding.
 
-Where to start? 
+Where to start?
 ===============
 
 The first question is what information you need. If you know this, there are a number of options, which determine what is best to do:
 
 - the information is already present in the data model -> create a businessrule (bit)
-- the information is present in the output of an existing boefje -> create a normalizer (whiskers) 
+- the information is present in the output of an existing boefje -> create a normalizer (whiskers)
 - the information is not yet available -> create a boefje, modify the data model and create a normalizer
 
-If you want to add factual information, use a boefje. Want to add an opinion or analysis, use a bit. 
+If you want to add factual information, use a boefje. Want to add an opinion or analysis, use a bit.
 
-OpenKAT assumes that you collect and process all information in the smallest possible units so that they can contribute back to other combinations and results. This is how you maintain the modular nature of the package. 
+OpenKAT assumes that you collect and process all information in the smallest possible units so that they can contribute back to other combinations and results. This is how you maintain the modular nature of the package.
 
-To make a finding about a CVE to a software version, you have a string of objects: the finding of the software, the version, the CVE. That combination then leads to the object of the finding. 
+To make a finding about a CVE to a software version, you have a string of objects: the finding of the software, the version, the CVE. That combination then leads to the object of the finding.
 
 Existing boefjes
 ================
@@ -57,26 +57,26 @@ The existing boefjes can be viewed via the KATalog in OpenKAT and are on `GitHUB
 Example: the boefje for shodan
 ------------------------------
 
-The boefje calling shodan gives a good first impression of its capabilities. The boefje includes the following files. 
+The boefje calling shodan gives a good first impression of its capabilities. The boefje includes the following files.
 
-- __init.py__, which remains empty, 
-- boefje.json, containing the normalizers and objects in the data model,
+- __init.py__, which remains empty
+- boefje.json, containing the normalizers and objects in the data model
 - cover.jpg, with a matching cat picture for the KATalog
 - description.md, simple documentation of the boefje
 - main.py, the actual boefje
 - normalize.py, the normalizer (whiskers)
 - normalizer.json, which accepts and supplies the normalizer
-- requirements.txt, with the requirements for this rascal
+- requirements.txt, with the requirements for this boefje
 - schema.json, settings for the web interface
 
 boefje.json
 ***********
 
-boefje.json is the definition of the boefje, with its position in the data model, the associated normalizer, the objects and the findings that the combination of boefje and normalizer can deliver. 
+boefje.json is the definition of the boefje, with its position in the data model, the associated normalizer, the objects and the findings that the combination of boefje and normalizer can deliver.
 
 The objects associated with this boefje are IPAddressV4, IPAddressV6, Finding, CVEFindingType. This boefje consumes IP addresses and produces findings about the open ports, supplemented by the information about these ports.
 
-Shodan comes with an API key, which you can add in the web interface. 
+Shodan comes with an API key, which you can add in the web interface.
 
 .. code-block::
 
@@ -97,7 +97,7 @@ Shodan comes with an API key, which you can add in the web interface.
         "scan_level": 1
     }
 
-Using the template as a base, you can create a boefje.json for your own boefje. The template starts with the name of your new boefje: 
+Using the template as a base, you can create a boefje.json for your own boefje. The template starts with the name of your new boefje:
 
 
 .. code-block::
@@ -107,7 +107,7 @@ Using the template as a base, you can create a boefje.json for your own boefje. 
         "name": "Boefje",
         "description": "Beschrijving",
 
-Your boefje collects information to turn it into objects. Specify the objects your boefje needs. Those objects come from the data model. Should the information you want to retrieve not yet be incorporated into the data model, you need to modify it separately. How this works is described in general terms later in this document. 
+Your boefje collects information to turn it into objects. Specify the objects your boefje needs. Those objects come from the data model. Should the information you want to retrieve not yet be incorporated into the data model, you need to modify it separately. How this works is described in general terms later in this document.
 
 .. code-block::
 
@@ -120,7 +120,7 @@ Your boefje collects information to turn it into objects. Specify the objects yo
             "informatie"
         ],
 
-The boefje can also bring variables from the web interface, like in Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface. 
+The boefje can also bring variables from the web interface, like in Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface.
 
 .. code-block::
 
@@ -153,10 +153,10 @@ Currently, however, OpenKAT only understands fairly shallow structures. For exam
   ]
  }
 
-main.py 
+main.py
 *******
 
-The boefje itself imports the shodan api module, assigns an IP address to it and accepts the output. This output goes to Bytes and is analyzed by one (or more) normalizers. The link between the normalizer and the byte is made via the mime-type, which you can give in the ``set`` function in the byte. The code block below also contains a check, to prevent you from asking for non-public IP addresses. 
+The boefje itself imports the shodan api module, assigns an IP address to it and accepts the output. This output goes to Bytes and is analyzed by one (or more) normalizers. The link between the normalizer and the byte is made via the mime-type, which you can give in the ``set`` function in the byte. The code block below also contains a check, to prevent you from asking for non-public IP addresses.
 
 .. code-block::
 
@@ -190,10 +190,10 @@ The boefje itself imports the shodan api module, assigns an IP address to it and
 
 	    return [(set(), json.dumps(results))]
 
-Normalizers 
+Normalizers
 -----------
 
-The normalizer imports the raw information, extracts the objects from it and gives them to Octopoes. Since OpenKAT 1.3.0, the normalizers are fully self-contained. They consist of the following files: 
+The normalizer imports the raw information, extracts the objects from it and gives them to Octopoes. Since OpenKAT 1.3.0, the normalizers are fully self-contained. They consist of the following files:
 
 - __init__.py
 - normalize.py
@@ -221,7 +221,7 @@ The normalizers translate the output of a boefje into objects that fit the data 
 normalize.py
 ************
 
-The file normalize.py contains the actual normalizer. From octopoes, the normalizer retrieves the objects and their references: from the findings list the CVEFindingType for the CVEs and the Finding for the findings, from the network objects list the IPPort, the Protocol and the PortState. Then the information about those objects is extracted from the imported data and stored as objects. 
+The file normalize.py contains the actual normalizer. From octopoes, the normalizer retrieves the objects and their references: from the findings list the CVEFindingType for the CVEs and the Finding for the findings, from the network objects list the IPPort, the Protocol and the PortState. Then the information about those objects is extracted from the imported data and stored as objects.
 
 .. code-block::
 
@@ -260,11 +260,11 @@ The file normalize.py contains the actual normalizer. From octopoes, the normali
 Adding objects
 ==============
 
-If you want to add an object, you need to know with which other objects there is a logical relationship. An object is as simple as possible. As a result, a seemingly simple query sometimes explodes into a whole tree of parts. 
+If you want to add an object, you need to know with which other objects there is a logical relationship. An object is as simple as possible. As a result, a seemingly simple query sometimes explodes into a whole tree of parts.
 
-Adding objects to the data model requires an addition in octopus. Here, an object can be added if it is connected to other objects. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_. 
+Adding objects to the data model requires an addition in octopus. Here, an object can be added if it is connected to other objects. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_.
 
-As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object in the data model, in this case an IPPort, looks like this: 
+As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object in the data model, in this case an IPPort, looks like this:
 
 
 .. code-block::
@@ -282,9 +282,9 @@ As with the boefje for shodan, here we again use the example from the functional
     _information_value = ["protocol", "port"]
     
 
-Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document. 
+Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document.
 
-The PortState is defined separately. This can be done for information that has a very specific nature so you can describe it. 
+The PortState is defined separately. This can be done for information that has a very specific nature so you can describe it.
 
 .. code-block::
 
@@ -299,11 +299,11 @@ The PortState is defined separately. This can be done for information that has a
 Bits: businessrules
 ===================
 
-Bits are businessrules that assess objects. Which ports are allowed to be open, which are not, which software version is acceptable, which is not. Does a system as a whole meet a set of requirements associated with a particular certification or not? 
+Bits are businessrules that assess objects. Which ports are allowed to be open, which are not, which software version is acceptable, which is not. Does a system as a whole meet a set of requirements associated with a particular certification or not?
 
-In the hostname example, that provides an IP address, and based on the IP address, we look at which ports are open. These include some ports that should be open because certain software is running and ports that should be closed because they are not used from a security or configuration standpoint. 
+In the hostname example, that provides an IP address, and based on the IP address, we look at which ports are open. These include some ports that should be open because certain software is running and ports that should be closed because they are not used from a security or configuration standpoint.
 
-The example below comes from the functional documentation and discusses the Bit for the IPPort object. The bit used for the analysis of open ports consists of three files: 
+The example below comes from the functional documentation and discusses the Bit for the IPPort object. The bit used for the analysis of open ports consists of three files:
 
 - __init.py__, an empty file
 - bit.py, which defines the structure
@@ -324,9 +324,9 @@ Bit.py gives the structure of the bit, containing the input and the businessrule
     module="bits.port_classification.port_classification",
  )
  
-The businessrules are contained in the module port_classification, in the file port_classification.py. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed. 
+The businessrules are contained in the module port_classification, in the file port_classification.py. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed.
 
-The specification for a bit is broad, but limited by the data model. Boefjes retrieve information externally, bits only look at the objects in Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT. 
+The specification for a bit is broad, but limited by the data model. Boefjes retrieve information externally, bits only look at the objects in Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT.
 
 .. code-block::
 
@@ -374,7 +374,7 @@ The specification for a bit is broad, but limited by the data model. Boefjes ret
             description=f"Port {port} is not a common port and should possibly not be open.",
         )
 
-Bits can recognize patterns and derive objects from them. The Bit for internet.nl can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions. 
+Bits can recognize patterns and derive objects from them. The Bit for internet.nl can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions.
 
 .. code-block::
 
@@ -400,13 +400,13 @@ Bits can recognize patterns and derive objects from them. The Bit for internet.n
 Add Boefjes
 ===========
 
-There are a number of ways to add your new boefje to OpenKAT. 
+There are a number of ways to add your new boefje to OpenKAT.
 
-- Put your boefje in the local folder with the other boefjes 
+- Put your boefje in the local folder with the other boefjes
 - Do a commit of your code, after review it can be included
-- Add an image server in the KAT catalog config file ``*`` 
+- Add an image server in the KAT catalog config file ``*``
 
-``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the Github CI. 
+``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the Github CI.
 
 The goal is to set up a separate Github repo with a complete CI to create artifacts based on a template boefje. You can clone this repo. Your OpenKAT installation points you to the artifacts so they are usable from your system. This is now being worked on by the OpenKAT community. Send an email to meedoen@openkat.nl if you want to help. (status: Dec. 2022)
 
