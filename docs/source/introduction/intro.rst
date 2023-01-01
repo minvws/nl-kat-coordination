@@ -1,5 +1,5 @@
 ============
-Introduction 
+Introduction
 ============
 
 What is OpenKAT
@@ -7,7 +7,7 @@ What is OpenKAT
 
 OpenKAT aims to monitor, record and analyze the status of information systems. OpenKAT scans networks, analyzes vulnerabilities and creates accessible reports. It integrates the most commonly used network tools and scanning software into a modular framework, accesses external databases and combines the information from all these sources into clear reports.
 
-... image:: img/flowopenkat.png
+.. image:: img/flowopenkat.png
   :alt: flow of OpenKAT
 
 Two brochures about OpenKAT have been created with a general explanation, both are in Dutch:
@@ -57,7 +57,7 @@ OpenKAT includes the following repositories:
 
 :Boefjes: `NL-KAT-boefjes <https://github.com/minvws/nl-kat-boefjes>`_
 
-The 'Modules of OpenKAT' section of the documentation goes into detail on each of these modules. 
+The 'Modules of OpenKAT' section of the documentation goes into detail on each of these modules.
 
 Responsible disclosure
 ======================
