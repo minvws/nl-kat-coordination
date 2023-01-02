@@ -280,7 +280,7 @@ As with the boefje for shodan, here we again use the example from the functional
     _natural_key_attrs = ["address", "protocol", "port"]
     _reverse_relation_names = {"address": "ports"}
     _information_value = ["protocol", "port"]
-    
+
 
 Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document.
 
@@ -323,7 +323,7 @@ Bit.py gives the structure of the bit, containing the input and the businessrule
     parameters=[],
     module="bits.port_classification.port_classification",
  )
- 
+
 The businessrules are contained in the module port_classification, in the file port_classification.py. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed.
 
 The specification for a bit is broad, but limited by the data model. Boefjes retrieve information externally, bits only look at the objects in Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT.
