@@ -8,16 +8,9 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import (
-    OOI,
-    Boefje,
-    BoefjeTask,
-    MutationOperationType,
-    Organisation,
-    Plugin,
-    PrioritizedItem,
-    TaskStatus,
-)
+from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
+                              Organisation, Plugin, PrioritizedItem,
+                              TaskStatus)
 
 from .scheduler import Scheduler
 
@@ -214,7 +207,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-    def push_tasks_new_boefjes(self) -> None:
+    def push_tasks_for_new_boefjes(self) -> None:
         """Create tasks for the ooi's that are associated with a new added boefjes."""
         if self.queue.full():
             self.logger.info(

@@ -3,15 +3,11 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
-from tests.factories import (
-    BoefjeFactory,
-    BoefjeMetaFactory,
-    OOIFactory,
-    OrganisationFactory,
-    PluginFactory,
-    ScanProfileFactory,
-)
+from scheduler import (config, connectors, models, queues, rankers,
+                       repositories, schedulers)
+from tests.factories import (BoefjeFactory, BoefjeMetaFactory, OOIFactory,
+                             OrganisationFactory, PluginFactory,
+                             ScanProfileFactory)
 from tests.utils import functions
 
 
@@ -58,11 +54,9 @@ class SchedulerTestCase(unittest.TestCase):
         models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
         self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
         self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
-        self.ooi_store = repositories.sqlalchemy.OOIStore(self.mock_ctx.datastore)
 
         self.mock_ctx.pq_store = self.pq_store
         self.mock_ctx.task_store = self.task_store
-        self.mock_ctx.ooi_store = self.ooi_store
 
         # Scheduler
         self.organisation = OrganisationFactory()
@@ -126,9 +120,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-        # OOI should be in datastore
-        ooi_db = self.scheduler.ctx.ooi_store.get_ooi(ooi.primary_key)
-        self.assertEqual(ooi_db.primary_key, ooi.primary_key)
+        # TODO: scheduled_job should be in datastore
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_new_boefje")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_reschedule_ooi")
@@ -166,9 +158,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
         self.assertIsNone(task_db)
 
-        # OOI should not be in datastore
-        ooi_db = self.scheduler.ctx.ooi_store.get_ooi(ooi.primary_key)
-        self.assertIsNone(ooi_db)
+        # TODO: scheduled_job should be in the datastore
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_new_boefje")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_reschedule_ooi")
@@ -187,8 +177,6 @@ class SchedulerTestCase(unittest.TestCase):
             created_at=datetime.now(),
             modified_at=datetime.now(),
         )
-
-        self.ooi_store.create_ooi(ooi)
 
         task = models.BoefjeTask(
             id=uuid.uuid4().hex,
@@ -221,10 +209,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-        # OOI should be in datastore
-        ooi_db = self.scheduler.ctx.ooi_store.get_ooi(ooi.primary_key)
-        self.assertEqual(ooi_db.primary_key, ooi.primary_key)
-        self.assertEqual(ooi_db.scan_profile.level, 1)
+        # TODO: scheduled_job should be in the datastore
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_scan_level_change")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_reschedule_ooi")
@@ -240,10 +225,9 @@ class SchedulerTestCase(unittest.TestCase):
         """When a new boefje is added, it should be filled up with oois that
         are associated with that boefje.
         """
-        # Add ooi's with the have the same type of boefje
+        # Add ooi's with the same type of boefje
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(organisation_id=self.organisation.id, scan_profile=scan_profile, object_type="test")
-        self.ooi_store.create_ooi(ooi)
 
         boefje = BoefjeFactory(consumes=[ooi.object_type])
 
@@ -273,7 +257,7 @@ class SchedulerTestCase(unittest.TestCase):
     ):
         """When no oois are available, it should be filled up with oois that
         haven't been scheduled in a long time."""
-        # Add ooi's with the have the same type of boefje
+        # Add ooi's with the same type of boefje
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(
             organisation_id=self.organisation.id,
@@ -281,7 +265,6 @@ class SchedulerTestCase(unittest.TestCase):
             object_type="test",
             checked_at=datetime.now() - timedelta(days=1),
         )
-        self.ooi_store.create_ooi(ooi)
 
         task = models.BoefjeTask(
             id=uuid.uuid4().hex,
@@ -301,9 +284,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertEqual(task, self.scheduler.queue.peek(0).data)
 
-        # OOI should be in database
-        ooi_db = self.scheduler.ctx.ooi_store.get_ooi(ooi.primary_key)
-        self.assertEqual(ooi_db.primary_key, ooi.primary_key)
+        # TODO: scheduled_job should be in the datastore
 
     # TODO
     def test_populate_boefjes_queue_overflow(self):

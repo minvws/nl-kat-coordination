@@ -5,7 +5,8 @@ from typing import List, Optional
 
 import mmh3
 from pydantic import BaseModel, Field
-from sqlalchemy import JSON, Boolean, Column, DateTime, Enum, String
+from sqlalchemy import (JSON, Boolean, Column, DateTime, Enum, ForeignKey,
+                        String)
 from sqlalchemy.orm import relationship
 
 from scheduler.utils import GUID
@@ -70,6 +71,9 @@ class TaskORM(Base):
         default=datetime.datetime.utcnow,
         onupdate=datetime.datetime.utcnow,
     )
+
+    scheduled_job_id = Column(GUID, ForeignKey("scheduled_jobs.id"))
+    scheduled_job = relationship("ScheduledJobORM", back_populates="tasks")
 
 
 class NormalizerTask(BaseModel):
