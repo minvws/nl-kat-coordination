@@ -100,7 +100,6 @@ Default installation
 .. code-block::
 
 	$ git clone https://github.com/minvws/nl-kat-coordination.git
-``
 
 - Go to the folder: 
 
