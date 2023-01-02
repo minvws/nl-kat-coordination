@@ -37,7 +37,7 @@ Automatic deployment of boefjes depends on the safeguard level, which can be set
 
 .. image:: img/katalogus.png
   :alt: KAT catalog
-  
+
 Each boefje has an info page with information about the tools used, the associated objects and the safeguard level required to use the boefje.
 
 .. image:: img/boefjeinfopage.png
@@ -68,7 +68,7 @@ The objects page is a practical page to find information about a host or system.
 
 .. image:: img/findingsreportperobject.png
   :alt: findings per object
-  
+
 The object detail page provides more information about a specific object, such as the number of findings for this object. More information can be requested per finding:
 
 .. image:: img/findingdetail.png
@@ -129,39 +129,28 @@ Findings appear on the general findings page, but can also be viewed by object.
 Scan levels and indemnities
 ===========================
 
-boefjes can collect information with varying intensity. OpenKAT has a system of safeguards to control permission to perform scans and prevent damage to the systems under test.
+Boefjes can collect information with varying intensity. OpenKAT has a system of safeguards to control permission to perform scans and prevent damage to the systems under test.
 
 For each object, the 'indemnification level' menu indicates how deeply scanning is allowed. Here the user gives an agreement on the risks of the scans and permission to store the information gathered on these systems.
 
-Safeguard levels are used from level 1 to level 4, from "do not touch" to "very intrusive. Scanning levels are distributed in the data model, either by inheritance or by user statements. Level 0 is "do not scan.
+The levels used range from level 0 to level 4, from 'do not scan' to 'very intrusive'. Scanning levels are distributed in the data model, either by inheritance or by user statements. The different levels are qualitative in nature. L1 'do not touch' is obvious, but the difference between L2 'normal user' and L3 'detectable scanning' is at the discretion of the developer and administrator. The use of NMAP, for example, falls in between and depends heavily on the arguments the tool brings.
 
-The different levels are qualitative in nature. L1 'do not touch' is obvious, but the difference between L2 'normal user' and L3 'detectable scanning' is at the discretion of the developer and administrator. The use of NMAP, for example, falls in between and depends heavily on the arguments the tool brings.
-
-.. list-table:: Title
+.. list-table:: Scan levels
    :widths: 25 50
    :header-rows: 1
-
-   * - Heading row 1, column 1
-     - Heading row 1, column 2
-   * - Row 1, column 1
-     -
-     - Row 1, column 3
-   * - Row 2, column 1
-     - Row 2, column 2
-     - Row 2, column 3
-
-* - Level
-  - Description
-* - L0
-  - do not scan
-* - L1
-  - do not touch
-* - L2
-  - normal user
-* - L3
-  - detectable scan
-* - L4
-  - intensive scan
+   
+   * - Level
+     - Description
+   * - L0
+     - do not scan
+   * - L1
+     - do not touch
+   * - L2
+     - normal user
+   * - L3
+     - detectable scan
+   * - L4
+     - intensive scan
 
 
 Indemification by user
@@ -209,8 +198,8 @@ L3: Detectable scan
 
 This scan will be more intrusive: connect to services to find out versions, try to log in with commonly used (default) login credentials, automated testing of found vulnerabilities whether they are vulnerable, more intensive guessing of urls and more intensive crawling of web pages.
 
-A greater number of scans per unit of time will be performed, reflecting a marked spike in data traffic. The infrastructure may not be designed for this.
-      
+A greater number of scans will be performed, resulting in a spike in data traffic. The infrastructure may not be designed for this.
+
 Example of useful scanning tools and methods:
 
 - Nessus, Nexpose, Acunetix
@@ -228,7 +217,7 @@ OpenKAT displays all findings in the crisis room, the entry point for all curren
 
 .. image:: img/report.png
   :alt: Report
-  
+
 My first scan
 =============
 
