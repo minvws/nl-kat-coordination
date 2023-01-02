@@ -16,9 +16,9 @@ jobs:
 
       - name: Get version from release tag or generate one
         run: |
-          echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
-
-          if [ -z "${RELEASE_VERSION}" ]; then
+          if [ ${GITHUB_REF_TYPE} = "tag" ]; then
+            echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+          else
             echo "RELEASE_VERSION=$(python setup.py --version)" >> $GITHUB_ENV
           fi
 
