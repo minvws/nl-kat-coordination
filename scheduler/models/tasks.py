@@ -34,10 +34,8 @@ class Task(BaseModel):
     p_item: PrioritizedItem
     status: TaskStatus
 
-    created_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow)
-    modified_at: datetime.datetime = Field(
-        default_factory=datetime.datetime.utcnow)
+    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
 
     class Config:
         orm_mode = True

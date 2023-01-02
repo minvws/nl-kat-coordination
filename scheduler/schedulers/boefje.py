@@ -8,9 +8,16 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
-                              Organisation, Plugin, PrioritizedItem,
-                              TaskStatus)
+from scheduler.models import (
+    OOI,
+    Boefje,
+    BoefjeTask,
+    MutationOperationType,
+    Organisation,
+    Plugin,
+    PrioritizedItem,
+    TaskStatus,
+)
 
 from .scheduler import Scheduler
 
@@ -310,8 +317,7 @@ class BoefjeScheduler(Scheduler):
                 self.push_item_to_queue(p_item)
 
     def push_tasks_for_scheduled_jobs(self):
-        """
-        """
+        """ """
         # Get all scheduled jobs that need to be rescheduled. We only
         # consider jobs that have been processed by the scheduler after the set
         # grace period.
@@ -544,11 +550,7 @@ class BoefjeScheduler(Scheduler):
             return True
 
         # Is boefje still running according to bytes?
-        if (
-            task_bytes is not None
-            and task_bytes.ended_at is None
-            and last_run_boefje.started_at is not None
-        ):
+        if task_bytes is not None and task_bytes.ended_at is None and last_run_boefje.started_at is not None:
             self.logger.debug(
                 "According to Bytes, boefje %s is still being processed [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
                 boefje.id,

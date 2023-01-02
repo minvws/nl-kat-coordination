@@ -46,7 +46,6 @@ class JobStore(JobStorer):
 
             return jobs, count
 
-
     def get_scheduled_job(self, job_id: str) -> Optional[models.ScheduledJob]:
         """Get a scheduled job.
 
