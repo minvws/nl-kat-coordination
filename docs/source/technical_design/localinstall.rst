@@ -90,7 +90,7 @@ Dependencies are packages required for OpenKAT to work. Run the following comman
 Getting Started
 ---------------
 
-Now the installation of OpenKAT can begin. We do this via git. 
+Now the installation of OpenKAT can begin. We do this via git.
 
 Default installation
 *********************
@@ -101,7 +101,7 @@ Default installation
 
 	$ git clone https://github.com/minvws/nl-kat-coordination.git
 
-- Go to the folder: 
+- Go to the folder:
 
 .. code-block::
 
