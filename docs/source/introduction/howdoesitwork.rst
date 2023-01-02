@@ -9,7 +9,7 @@ OpenKAT aims to monitor, record and analyze the status of information systems. O
 
 What OpenKAT adds to the available security and monitoring tools is the ability to combine the output from different sources for the purpose of analysis. Thanks to its object-oriented data model and forensically secured database, OpenKAT contains a complete overview and timeline of monitored systems. This makes the development through time insightful for analysis and provable for audits and controls.
 
-... image:: img/stepsopenkat.png
+.. image:: img/stepsopenkat.png
   :alt: steps in OpenKAT
 
 OpenKAT uses a configurable data model. All information is translated into objects, which are stored in the database. This contains both the original information and the objects. Analysis is done on the database based on business rules, noting changes. OpenKAT delivers findings in a dashboard or via reporting software.
@@ -63,7 +63,7 @@ System build
 
 The system has four parts: information collection, storage, analysis and reporting.
 
-... image:: img/modulesopenkat1.png
+.. image:: img/modulesopenkat1.png
   :alt: modules in OpenKAT
 
 Collection: Boefjes and Whiskers
