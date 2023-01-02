@@ -40,6 +40,7 @@ class SQLAlchemy(Datastore):
                 poolclass=pool.StaticPool,
                 json_serializer=serializer,
             )
+            models.Base.metadata.create_all(self.engine)
         else:
             self.engine = create_engine(
                 dsn,
@@ -50,8 +51,6 @@ class SQLAlchemy(Datastore):
 
         if self.engine is None:
             raise Exception("Invalid datastore type")
-
-        models.Base.metadata.create_all(self.engine)
 
         self.session = orm.sessionmaker(
             bind=self.engine,

@@ -34,5 +34,5 @@ requires = ["setuptools>=59", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.setuptools_scm]
-version_scheme = "python-simplified-semver"
+version_scheme = "guess-next-dev"
 local_scheme = "no-local-version"
