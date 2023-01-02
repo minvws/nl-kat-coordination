@@ -138,7 +138,7 @@ The levels used range from level 0 to level 4, from 'do not scan' to 'very intru
 .. list-table:: Scan levels
    :widths: 25 50
    :header-rows: 1
-   
+
    * - Level
      - Description
    * - L0
