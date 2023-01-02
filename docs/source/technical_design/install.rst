@@ -28,7 +28,7 @@ A larger installation of KAT can scale both horizontally and vertically. The set
 
 An example is shown in the diagram below. OpenKAT runs behind a proxy with firewalls, with Rocky accessible as the front end. From rocky, a second proxy connects to OpenKAT's components. Most components can be duplicated to distribute load and ensure availability. The arrows in the drawing indicate the direction in which the connections are initiated.
 
-.. image:: docs/source/technical_design/img/infraopenkat.png
+.. image:: img/infraopenkat.png
   :alt: Infra example of OpenKAT
 
 At the backend, a management interface can be added, adapted to the situation where OpenKAT is used. Each module has a healthpoint for monitoring.
