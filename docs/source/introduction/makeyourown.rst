@@ -126,7 +126,7 @@ The boefje can also bring variables from the web interface, like in Shodan the A
 
         "environment_keys": ["SHODAN_API"],
         "scan_level": 1
-        
+
 
 schema.json
 ***********
@@ -177,7 +177,7 @@ The boefje itself imports the shodan api module, assigns an IP address to it and
 	    input_ = boefje_meta.arguments["input"]
 	    ip = input_["address"]
 	    results = {}
-	
+
 	    if ip_address(ip).is_private:
 	        logging.info("Private IP requested, I will not forward this to Shodan.")
 	    else:
