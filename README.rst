@@ -1,6 +1,6 @@
-===============
+================
 What is OpenKAT?
-===============
+================
 
 OpenKAT aims to monitor, record and analyze the status of information systems. The basic premise is that many of the major security incidents are caused by small errors and known vulnerabilities, and that if you can find them in time your systems and infrastructure become a lot more secure.
 
@@ -107,7 +107,7 @@ The tools addressed by OpenKAT may have their own license, from the OS/S domain 
 Participate
 ===========
 
-You can directly participate and be involved in the development of OpenKAT. There is a community around OpenKAT with active developers and organizations working on implementing their own OpenKAT setup. If you want to start slowly, there are nice options: 
+You can directly participate and be involved in the development of OpenKAT. There is a community around OpenKAT with active developers and organizations working on implementing their own OpenKAT setup. If you want to start slowly, there are nice options:
 
 - Install the system and use it, give us feedback
 - Build your own boefjes, whiskers and bits
@@ -168,7 +168,7 @@ Most of the documentation in the software itself is written in English. Some of 
 Contact
 =======
 
-There a number of options to contact the OpenKAT team:
+There several options to contact the OpenKAT team:
 
 - Direct contact: meedoen@openkat.nl
 - `Github Discussions <https://github.com/minvws/nl-kat-coordination/discussions>`_
