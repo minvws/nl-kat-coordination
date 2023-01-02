@@ -2,6 +2,7 @@ import json
 from typing import Tuple, Union, List
 from boefjes.job_models import BoefjeMeta
 
+from os import getenv
 import requests
 from urllib.parse import urlparse, urlunsplit
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
@@ -26,6 +27,8 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     hostname = url_parts.netloc
     session = requests.Session()
 
+    useragent = getenv("useragent", default="OpenKAT")
+
     if url_parts.scheme == "https":
         # Adapter is available, use it regardless of Python version
         base_url = urlunsplit((url_parts.scheme, url_parts.netloc, "", "", ""))
@@ -45,21 +48,27 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
                 ]
             )
 
+    bodymimetypes = set("openkat-http/body")
     try:
         response = session.get(
             uri,
-            headers={"Host": hostname, "Accept": "application/json"},
+            headers={"Host": hostname, "User-Agent": useragent},
             verify=False,
             allow_redirects=False,
         )
-        result = {
-            # "content": response.content,
-            "cookies": response.cookies.get_dict(),
-            "headers": dict(response.headers),
-            "code": response.status_code,
-            "text": response.text,
-        }
-    except requests.exceptions.ConnectionError:
-        result = {}
 
-    return [(set(), json.dumps(result))]
+    except requests.exceptions.RequestException as request_error:
+        return [("openkat-http/error", str(request_error))]
+
+    if response.headers.get("content-type", False):
+        contenttype = response.headers.get("content-type")
+        bodymimetypes.add(contenttype)
+        # pick up the content type for the body from the server, and split away any encodings to make targeting by normalizers easier
+        contenttype = contenttype.split(";")
+        bodymimetypes.add(contenttype[0])
+
+    return [
+        (set("openkat-http/full"), "%s\n\n%s" % (response.headers, response.content)),
+        (set("openkat-http/headers"), json.dumps(response.headers.dict())),
+        (bodymimetypes, response.content),
+    ]

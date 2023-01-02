@@ -1,0 +1,9 @@
+{
+    "id": "kat_webpage_analysis_image",
+    "consumes": [
+        "image/jpeg", "image/jpg", "image/gif", "image/png", "image/bpm", "image/ico"
+    ],
+    "produces": [
+        "ImageMetadata"
+    ]
+}
