@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Optional, Tuple, Union
 
 from scheduler import models
@@ -37,6 +38,14 @@ class TaskStore(TaskStorer):
 
             return tasks, count
 
+    def get_tasks_since(self, scheduler_id: Union[str, None], since: datetime) -> List[models.Task]:
+        with self.datastore.session.begin() as session:
+            tasks_orm = session.query(models.TaskORM).filter(models.TaskORM.created_at >= since).all()
+
+            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
+
+            return tasks
+
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = session.query(models.TaskORM).filter(models.TaskORM.id == task_id).first()
@@ -47,18 +56,21 @@ class TaskStore(TaskStorer):
 
             return task
 
-    def get_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
+    def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
         with self.datastore.session.begin() as session:
-            task_orm = (
-                session.query(models.TaskORM).filter(models.TaskORM.p_item["hash"].as_string() == task_hash).first()
+            tasks_orm = (
+                session.query(models.TaskORM)
+                .filter(models.TaskORM.hash == task_hash)
+                .order_by(models.TaskORM.created_at.desc())
+                .all()
             )
 
-            if task_orm is None:
+            if tasks_orm is None:
                 return None
 
-            task = models.Task.from_orm(task_orm)
+            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
 
-            return task
+            return tasks
 
     def create_task(self, task: models.Task) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:

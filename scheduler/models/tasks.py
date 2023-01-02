@@ -5,7 +5,8 @@ from typing import List, Optional
 
 import mmh3
 from pydantic import BaseModel, Field
-from sqlalchemy import JSON, Column, DateTime, Enum, String
+from sqlalchemy import JSON, Boolean, Column, DateTime, Enum, String
+from sqlalchemy.orm import relationship
 
 from scheduler.utils import GUID
 
@@ -33,8 +34,10 @@ class Task(BaseModel):
     p_item: PrioritizedItem
     status: TaskStatus
 
-    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
-    modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    created_at: datetime.datetime = Field(
+        default_factory=datetime.datetime.utcnow)
+    modified_at: datetime.datetime = Field(
+        default_factory=datetime.datetime.utcnow)
 
     class Config:
         orm_mode = True
@@ -46,8 +49,11 @@ class TaskORM(Base):
     __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)
+
     scheduler_id = Column(String)
+
     p_item = Column(JSON, nullable=False)
+
     status = Column(
         Enum(TaskStatus),
         nullable=False,
@@ -59,6 +65,7 @@ class TaskORM(Base):
         nullable=False,
         default=datetime.datetime.utcnow,
     )
+
     modified_at = Column(
         DateTime(timezone=True),
         nullable=False,
@@ -94,6 +101,7 @@ class BoefjeTask(BaseModel):
     boefje: Boefje
     input_ooi: str
     organization: str
+    boefje: Boefje
 
     dispatches: List[Normalizer] = Field(default_factory=list)
 

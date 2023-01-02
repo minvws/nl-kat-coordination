@@ -77,7 +77,7 @@ to use whatever you want.
 
 ### Prerequisites
 
-By the use of environment variables we load in the configuration of the
+By the use of environment variables we load in the configuration of the 
 scheduler. Look at the [.env-dist](.env-dist) file for the application
 configuration settings, to build a `.env` file. Refer to the
 [`configuration.md`](docs/configuration.md) file for more information on the

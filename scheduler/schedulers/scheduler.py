@@ -79,6 +79,7 @@ class Scheduler(abc.ABC):
     def populate_queue(self) -> None:
         raise NotImplementedError
 
+    # TODO: exception handling
     def post_push(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being added to the queue. We
         persist a task to the datastore with the status QUEUED
@@ -104,6 +105,24 @@ class Scheduler(abc.ABC):
             return
 
         self.ctx.task_store.create_task(task)
+
+        # Determine whether we need to create a recurring scheduled job
+        scheduled_job = self.ctx.job_store.get_scheduled_job_by_hash(p_item.hash)
+        if scheduled_job is not None:
+            scheduled_job.checked_at = datetime.datetime.now(datetime.timezone.utc)
+            self.ctx.job_store.update_scheduled_job(scheduled_job)
+            return
+
+        scheduled_job = models.ScheduledJob(
+            hash=p_item.hash,
+            enabled=True,
+            scheduler_id=self.scheduler_id,
+            checked_at=datetime.datetime.now(datetime.timezone.utc),
+            created_at=datetime.datetime.now(datetime.timezone.utc),
+            modified_at=datetime.datetime.now(datetime.timezone.utc),
+        )
+        self.ctx.job_store.create_scheduled_job(scheduled_job)
+
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We

@@ -20,10 +20,11 @@ class PrioritizedItem(BaseModel):
 
     scheduler_id: Optional[str]
 
+    priority: Optional[int]
+
+    # TODO: maybe rename to data_hash, to be more descriptive?
     # A unique generated identifier for the object contained in data
     hash: Optional[str]
-
-    priority: Optional[int]
 
     data: Dict
 

@@ -314,7 +314,7 @@ class Server:
 
         try:
             p_item = s.pop_item_from_queue(filters)
-        except queues.QueueEmptyError as exc_empty:
+        except queues.QueueEmptyError:
             return None
 
         if p_item is None:

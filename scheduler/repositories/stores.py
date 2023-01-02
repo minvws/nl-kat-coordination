@@ -1,4 +1,5 @@
 import abc
+import datetime
 import logging
 from typing import List, Optional, Tuple, Union
 
@@ -79,4 +80,22 @@ class PriorityQueueStorer(abc.ABC):
 
     @abc.abstractmethod
     def get_items_by_scheduler_id(self, scheduler_id: str) -> List[models.PrioritizedItem]:
+        raise NotImplementedError
+
+
+class JobStorer(abc.ABC):
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger(__name__)
+
+    # TODO: filters
+    def get_scheduled_jobs(self) -> Tuple[List[models.ScheduledJob], int]:
+        raise NotImplementedError
+
+    def create_scheduled_job(self, job: models.ScheduledJob) -> Optional[models.ScheduledJob]:
+        raise NotImplementedError
+
+    def get_scheduled_job(self, job_id: str) -> Optional[models.ScheduledJob]:
+        raise NotImplementedError
+
+    def update_scheduled_job(self, job: models.ScheduledJob) -> Optional[models.ScheduledJob]:
         raise NotImplementedError
