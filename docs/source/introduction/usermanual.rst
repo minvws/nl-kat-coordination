@@ -23,7 +23,7 @@ Crisis Room
 
 The Crisis Room provides the overview of all findings, which can be viewed for different times. The time of day can be selected with the option button after which the findings that were applicable at that time become visible.
 
-... image:: img/crisisroom.png
+.. image:: img/crisisroom.png
   alt: crisisroom
 
 KAT catalog
@@ -71,7 +71,7 @@ The objects page is a practical page to find information about a host or system.
   
 The object detail page provides more information about a specific object, such as the number of findings for this object. More information can be requested per finding:
 
-... image:: img/findingdetail.png
+.. image:: img/findingdetail.png
   :alt: finding detail
 
 Tasks
@@ -137,19 +137,31 @@ Safeguard levels are used from level 1 to level 4, from "do not touch" to "very 
 
 The different levels are qualitative in nature. L1 'do not touch' is obvious, but the difference between L2 'normal user' and L3 'detectable scanning' is at the discretion of the developer and administrator. The use of NMAP, for example, falls in between and depends heavily on the arguments the tool brings.
 
-+-------+-----------------------+
-| Level | Description		        |
-+=======+=======================+
-| L0  	| do not scan		        |
-+-------+-----------------------+
-| L1  	| do not touch	      	|
-+-------+-----------------------+
-| L2	  | normal user	        	|
-+-------+-----------------------+
-| L3	  | detectable scanning	  |
-+-------+-----------------------+
-| L4  	| intensive scanning	  |
-+-------+-----------------------+
+.. list-table:: Title
+   :widths: 25 50
+   :header-rows: 1
+
+   * - Heading row 1, column 1
+     - Heading row 1, column 2
+   * - Row 1, column 1
+     -
+     - Row 1, column 3
+   * - Row 2, column 1
+     - Row 2, column 2
+     - Row 2, column 3
+
+* - Level
+  - Description
+* - L0
+  - do not scan
+* - L1
+  - do not touch
+* - L2
+  - normal user
+* - L3
+  - detectable scan
+* - L4
+  - intensive scan
 
 
 Indemification by user
@@ -192,8 +204,8 @@ Example of scanning tools useful for this purpose:
 - Nikto
 - Burp passive scanner
 
-L3: Detectable scanning
-***********************
+L3: Detectable scan
+*******************
 
 This scan will be more intrusive: connect to services to find out versions, try to log in with commonly used (default) login credentials, automated testing of found vulnerabilities whether they are vulnerable, more intensive guessing of urls and more intensive crawling of web pages.
 
@@ -204,8 +216,8 @@ Example of useful scanning tools and methods:
 - Nessus, Nexpose, Acunetix
 - Burp Intruder, active scanner
 
-L4: Intensive scanning
-**********************
+L4: Intensive scan
+******************
 
 The premise of the test profile is to verify whether an attacker can exploit vulnerabilities to give himself more extensive access to the tested environment. Thus, known exploit code is applied in this level.
 
@@ -214,7 +226,7 @@ Reports
 
 OpenKAT displays all findings in the crisis room, the entry point for all current information from the system. In addition, OpenKAT can create thematic reports and display findings per object. The reports are available in the front end and as PDF, based on a LaTeX parser. The organization's house style can also be incorporated. It is also possible to link to other reporting and alerting systems.
 
-... image:: img/report.png
+.. image:: img/report.png
   :alt: Report
   
 My first scan
