@@ -85,7 +85,7 @@ class PriorityQueueStorer(abc.ABC):
 
 class JobStorer(abc.ABC):
     def __init__(self) -> None:
-        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.logger: logging.Logger = logging.getLogger(self.__name__)
 
     # TODO: filters
     def get_scheduled_jobs(self) -> Tuple[List[models.ScheduledJob], int]:
