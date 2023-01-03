@@ -36,8 +36,11 @@ def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]
         "-sV",
         "-sS" if protocol == Protocol.TCP else "-sU",
     ]
-    if top_ports is not None:
+    if top_ports is None:
+        args.append("-p-")
+    else:
         args.extend(["--top-ports", str(top_ports)])
+
     if isinstance(ip, IPv6Address):
         args.append("-6")
 
