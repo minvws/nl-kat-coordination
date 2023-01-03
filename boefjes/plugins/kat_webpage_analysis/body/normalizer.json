@@ -1,0 +1,9 @@
+{
+    "id": "kat_webpage_analysis_body",
+    "consumes": [
+        "openkat-http/body"
+    ],
+    "produces": [
+        "HTTPResource"
+    ]
+}
