@@ -93,7 +93,7 @@ class Katalogus(HTTPService):
             self.organisations_normalizer_type_cache[org.id] = {}
 
             for plugin in self.get_plugins_by_organisation(org.id):
-                if plugin.type != "normalizer" and plugin.enabled is False:  # TODO: CHECK THIS enabled
+                if plugin.type != "normalizer" and not plugin.enabled:  # TODO: CHECK THIS enabled
                     continue
 
                 for type_ in plugin.consumes:
