@@ -15,7 +15,7 @@ class ExpiringDictTestCase(unittest.TestCase):
         self.assertEqual(ed.cache, {})
 
         # Should not raise an error
-        self.assertEqual(ed.get("a"), None)
+        self.assertIsNone(ed.get("a"))
 
     def test_lifetime_not_expired(self):
         ed = utils.ExpiringDict()
