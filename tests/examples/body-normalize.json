@@ -1,11 +1,11 @@
 {
   "id": "dns-lookup-job",
   "raw_data": {
-    "id": "dns-lookup-job",
+    "id": "webpage-analysis-job",
     "boefje_meta": {
-      "id": "dns-lookup-job",
+      "id": "webpage-analysis-job",
       "boefje": {
-        "id": "dns-records"
+        "id": "webpage-analysis"
       },
       "organization": "_dev",
       "input_ooi": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",

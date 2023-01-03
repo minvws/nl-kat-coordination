@@ -1,14 +1,53 @@
+import json
 from pathlib import Path
-from unittest import TestCase
+from requests.models import Response, CaseInsensitiveDict
+from unittest import TestCase, mock
+from unittest.mock import MagicMock
 
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.local import LocalNormalizerJobRunner
-from boefjes.job_models import NormalizerMeta
+from boefjes.local import LocalNormalizerJobRunner, LocalBoefjeJobRunner
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
+
 from tests.stubs import get_dummy_data
 
 
-class DnsTest(TestCase):
+class WebsiteAnalysisTest(TestCase):
     maxDiff = None
+
+    @mock.patch("boefjes.plugins.kat_webpage_analysis.main.do_request")
+    def test_website_analysis(self, do_request_mock: MagicMock):
+        meta = BoefjeMeta.parse_raw(get_dummy_data("webpage-analysis.json"))
+        local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
+
+        runner = LocalBoefjeJobRunner(local_repository)
+
+        mock_response = Response()
+        mock_response._content = bytes(get_dummy_data("download_body"))
+        mock_response.headers = CaseInsensitiveDict(json.loads(get_dummy_data("download_headers.json")))
+
+        do_request_mock.return_value = mock_response
+
+        output = runner.run(meta, {})
+
+        self.assertIn("openkat-http/full", output[0][0])
+        self.assertIn("openkat-http/headers", output[1][0])
+        self.assertIn("openkat-http/body", output[2][0])
+
+    @mock.patch("boefjes.plugins.kat_webpage_analysis.main.do_request")
+    def test_website_analysis_for_image(self, do_request_mock: MagicMock):
+        meta = BoefjeMeta.parse_raw(get_dummy_data("webpage-analysis.json"))
+        local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
+
+        runner = LocalBoefjeJobRunner(local_repository)
+
+        mock_response = Response()
+        mock_response._content = bytes(get_dummy_data("cat_image"))
+        mock_response.headers = CaseInsensitiveDict(json.loads(get_dummy_data("download_image_headers.json")))
+
+        do_request_mock.return_value = mock_response
+
+        output = runner.run(meta, {})
+        self.assertIn("image/jpeg", output[2][0])
 
     def test_body_image_normalizer(self):
         meta = NormalizerMeta.parse_raw(get_dummy_data("bodyimage-normalize.json"))

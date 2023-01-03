@@ -26,7 +26,7 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
     def __init__(self, local_repository: LocalPluginRepository):
         self.local_repository = local_repository
 
-    def run(self, boefje_meta: BoefjeMeta, environment: Dict[str, str]) -> Tuple[BoefjeMeta, Union[str, bytes]]:
+    def run(self, boefje_meta: BoefjeMeta, environment: Dict[str, str]) -> List[Tuple[set, Union[bytes, str]]]:
         logger.info("Running local boefje plugin")
 
         boefjes = self.local_repository.resolve_boefjes()
