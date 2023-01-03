@@ -41,7 +41,7 @@ class Katalogus(HTTPService):
         #          "plugin-id": {}
         #     }
         # }
-        self.organisations_new_boefjes_cache: Dict = {}
+        self.organisations_new_boefjes_cache = {}
 
         # Initialize the caches
         self._flush_organisations_plugin_cache()
