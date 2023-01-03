@@ -9,6 +9,9 @@ import docker
 from boefjes.job_models import BoefjeMeta
 
 NMAP_IMAGE = "instrumentisto/nmap:latest"
+NMAP_VALID_PORTS = (
+    "\\s*([TUSP]:)?(\\d+|[a-z*?]+|(\\[?\\d*-\\d*\\]?))(,(([TUSP]:)|\\s)?(\\d+|[a-z*?]+|(\\[?\\d*-\\d*\\]?)))*"
+)
 
 
 def run_nmap(args: List[str]) -> str:
@@ -20,7 +23,7 @@ def run_nmap(args: List[str]) -> str:
 def build_nmap_arguments(host: str, ports: str) -> List[str]:
     """Build nmap arguments from the hosts IP with the required ports."""
     ip = ip_address(host)
-    args = ["nmap", "-T4", "-Pn", "-r", "-v10", "-sV", "-sS", "-sU", f"-p{ports}"]
+    args = ["nmap", "-T4", "-Pn", "-r", "-v10", "-sV", "-sS", "-sU", f"-p{validate_ports(ports=ports)}"]
     if isinstance(ip, IPv6Address):
         args.append("-6")
     args.extend(["-oX", "-", host])
@@ -28,10 +31,9 @@ def build_nmap_arguments(host: str, ports: str) -> List[str]:
     return args
 
 
-def get_ports(
-    valid=re.compile(
-        "\\s*([TUSP]:)?(\\d+|[a-z*?]+|(\\[?\\d*-\\d*\\]?))(,(([TUSP]:)|\\s)?(\\d+|[a-z*?]+|(\\[?\\d*-\\d*\\]?)))*"
-    ),
+def validate_ports(
+    ports,
+    valid=re.compile(NMAP_VALID_PORTS),
 ) -> str:
     """Returns ports argument if valid. Double slashes are for flake8 W605.
 
@@ -53,7 +55,6 @@ def get_ports(
 
     See also: https://nmap.org/book/port-scanning-options.html.
     """
-    ports = getenv("PORTS")
     assert ports is not None, '"PORTS" argument is not specified.'
     assert valid.fullmatch(ports) is not None, f'Invalid PORTS argument "{ports}"'
     return ports
@@ -61,4 +62,9 @@ def get_ports(
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     """Build Nmap arguments and return results to normalizer."""
-    return [(set(), run_nmap(build_nmap_arguments(host=boefje_meta.arguments["input"]["address"], ports=get_ports())))]
+    return [
+        (
+            set(),
+            run_nmap(build_nmap_arguments(host=boefje_meta.arguments["input"]["address"], ports=getenv("PORTS"))),
+        )
+    ]
