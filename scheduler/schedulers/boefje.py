@@ -8,7 +8,8 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
+from scheduler.models import (OOI, Boefje, BoefjeTask, Organisation, Plugin,
+                              PrioritizedItem, TaskStatus)
 
 from .scheduler import Scheduler
 
@@ -53,10 +54,10 @@ class BoefjeScheduler(Scheduler):
         while not self.queue.full():
             time.sleep(1)
 
-            latest_ooi = None
+            mutation = None
             try:
-                latest_ooi = self.ctx.services.scan_profile.get_latest_object(
-                    queue=f"{self.organisation.id}__scan_profile_increments",
+                mutation = self.ctx.services.scan_profile_mutation.get_scan_profile_mutation(
+                    queue=f"{self.organisation.id}__scan_profile_mutations",
                 )
             except (
                 pika.exceptions.ConnectionClosed,
@@ -66,20 +67,29 @@ class BoefjeScheduler(Scheduler):
             ) as e:
                 self.logger.warning(
                     "Could not connect to rabbitmq queue: %s [org_id=%s, scheduler_id=%s]",
-                    f"{self.organisation.id}__scan_profile_increments",
+                    f"{self.organisation.id}__scan_profile_mutations",
                     self.organisation.id,
                     self.scheduler_id,
                 )
                 if self.stop_event.is_set():
                     raise e
 
-            if latest_ooi is not None:
+            if mutation is not None:
                 self.logger.debug(
-                    "Received scan profile increment for ooi: %s [org_id=%s, scheduler_id=%s]",
-                    latest_ooi,
+                    "Received scan level mutation: %s [org_id=%s, scheduler_id=%s]",
+                    mutation,
                     self.organisation.id,
                     self.scheduler_id,
                 )
+
+                latest_ooi = mutation.value
+                if latest_ooi is None:
+                    self.logger.debug(
+                        "Mutation value is None, skipping [org_id=%s, scheduler_id=%s]",
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    continue
 
                 # From ooi's create prioritized items (tasks) to push onto queue
                 # continue with the next object (when there are more objects)
