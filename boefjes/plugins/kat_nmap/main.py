@@ -24,7 +24,7 @@ class Protocol(Enum):
     UDP = "udp"
 
 
-def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]) -> str:
+def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]) -> List[str]:
     """Returns Nmap arguments to use based on protocol and top_ports for host."""
     ip = ip_address(host)
     args = [
