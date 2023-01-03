@@ -17,7 +17,7 @@ def run_nmap(args: List[str]) -> str:
     return client.containers.run(NMAP_IMAGE, args, remove=True).decode()
 
 
-def build_nmap_arguments(host: str, ports: str) -> str:
+def build_nmap_arguments(host: str, ports: str) -> List[str]:
     """Build nmap arguments from the hosts IP with the required ports."""
     ip = ip_address(host)
     args = ["nmap", "-T4", "-Pn", "-r", "-v10", "-sV", "-sS", "-sU", f"-p{ports}"]
