@@ -3,15 +3,11 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
-from tests.factories import (
-    BoefjeFactory,
-    BoefjeMetaFactory,
-    OOIFactory,
-    OrganisationFactory,
-    PluginFactory,
-    ScanProfileFactory,
-)
+from scheduler import (config, connectors, models, queues, rankers,
+                       repositories, schedulers)
+from tests.factories import (BoefjeFactory, BoefjeMetaFactory, OOIFactory,
+                             OrganisationFactory, PluginFactory,
+                             ScanProfileFactory)
 from tests.utils import functions
 
 
@@ -32,9 +28,9 @@ class SchedulerTestCase(unittest.TestCase):
         )
         self.mock_ctx.services.octopoes = self.mock_octopoes
 
-        # Mock connectors: Scan profiles
+        # Mock connectors: Scan profile mutation
         self.mock_scan_profiles = mock.create_autospec(
-            spec=connectors.listeners.ScanProfile,
+            spec=connectors.listeners.ScanProfileMutation,
             spec_set=True,
         )
         self.mock_ctx.services.scan_profile = self.mock_scan_profiles
@@ -85,36 +81,47 @@ class SchedulerTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
-    @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_for_oois")
-    def test_populate_boefjes_queue_get_latest_object(
-        self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_latest_object
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
+    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
+    def test_populate_boefjes_queue_scan_level_change(
+        self, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running
     ):
-        """When oois are available from octopoes api, and no random oois."""
+        """Scan level change"""
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
         task = models.BoefjeTask(
             id=uuid.uuid4().hex,
-            boefje=BoefjeFactory(),
+            boefje=boefje,
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
 
-        mock_get_latest_object.side_effect = [ooi, None]
-        mock_get_random_objects.return_value = []
-        mock_create_tasks_for_oois.side_effect = [
-            [functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=0, data=task)],
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id, priority=0, data=task,
+        )
+
+        mock_get_scan_profile_mutation.side_effect = [
+            models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi),
+            None,
         ]
 
+        mock_get_boefjes_for_ooi.return_value = [boefje]
+        mock_is_task_running.return_value = False
+        mock_is_task_allowed_to_run.return_value = True
+
         self.scheduler.populate_queue()
+
+        # Item should be on priority queue
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertEqual(task, self.scheduler.queue.peek(0).data)
 
-    # TODO
-    def test_populate_boefjes_queue_overflow(self):
-        """One ooi has too many boefjes to fit in the queue"""
-        pass
+        # Task should be in datastore
+        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")

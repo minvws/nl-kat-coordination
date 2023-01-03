@@ -52,8 +52,8 @@ class AppContext:
             orgs=svc_katalogus.get_organisations(),
         )
 
-        lst_scan_profile = listeners.ScanProfile(
-            dsn=self.config.host_scan_profile,
+        lst_mutations = listeners.ScanProfileMutation(
+            dsn=self.config.host_mutation,
         )
 
         lst_raw_data = listeners.RawData(

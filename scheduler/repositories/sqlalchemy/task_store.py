@@ -31,7 +31,13 @@ class TaskStore(TaskStorer):
                 query = query.filter(models.TaskORM.status == models.TaskStatus(status).name)
 
             count = query.count()
-            tasks_orm = query.order_by(models.TaskORM.created_at.desc()).offset(offset).limit(limit).all()
+
+            tasks_orm = (
+                query.order_by(models.TaskORM.created_at.desc())
+                .offset(offset)
+                .limit(limit)
+                .all()
+            )
 
             tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
 
@@ -47,10 +53,29 @@ class TaskStore(TaskStorer):
 
             return task
 
-    def get_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
+    def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
+        with self.datastore.session.begin() as session:
+            tasks_orm = (
+                session.query(models.TaskORM)
+                .filter(models.TaskORM.p_item["hash"].as_string() == task_hash)
+                .order_by(models.TaskORM.created_at.desc())
+                .all()
+            )
+
+            if tasks_orm is None:
+                return None
+
+            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
+
+            return tasks
+
+    def get_latest_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = (
-                session.query(models.TaskORM).filter(models.TaskORM.p_item["hash"].as_string() == task_hash).first()
+                session.query(models.TaskORM)
+                .filter(models.TaskORM.p_item["hash"].as_string() == task_hash)
+                .order_by(models.TaskORM.created_at.desc())
+                .first()
             )
 
             if task_orm is None:
