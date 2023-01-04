@@ -1,35 +1,20 @@
 version: "3.9"
 
 services:
-  # Integration test containers
-
-  rocky_integration:
+  rocky_tests:
     build:
       context: ..
       dockerfile: nl-kat-rocky/Dockerfile.dev
     command: bash /app/run_rocky.sh
     depends_on:
       - ci_rocky-db
-      - ci_katalogus
     volumes:
       - .:/app/rocky
       - ./.ci/run_rocky.sh:/app/run_rocky.sh
-      - ./.ci/rocky_db_seed.json:/app/rocky_db_seed.json
     env_file:
       - .ci/.env.test
 
   ci_rocky-db:
     image: postgres:12.8
-    env_file:
-      - .ci/.env.test
-
-  ci_katalogus:
-    build:
-      context: ..
-      dockerfile: nl-kat-boefjes/Dockerfile.dev
-    command:
-      ["python", "-m", "uvicorn", "--host", "0.0.0.0", "katalogus.api:app"]
-    volumes:
-      - ../nl-kat-boefjes:/app/boefjes
     env_file:
       - .ci/.env.test

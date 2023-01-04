@@ -4,31 +4,24 @@ on: [push]
 
 jobs:
   Tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Configure git
-        env:
-          TOKEN: ${{ secrets.RDO_REPO_RO }}
-        run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
-
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: nl-kat-rocky
 
       - name: Checkout octopoes
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: minvws/nl-kat-octopoes
           path: nl-kat-octopoes
 
-      - name: Checkout boefjes
-        uses: actions/checkout@v2
-        with:
-          repository: minvws/nl-kat-boefjes
-          path: nl-kat-boefjes
+      - name: Build image
+        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f base.yml  -f .ci/docker-compose.yml build --build-arg USER_UID="$(id -u)" --build-arg USER_GID="$(id -g)" rocky_tests
+        working-directory: nl-kat-rocky
 
       - name: Run tests
-        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
+        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_tests
         working-directory: nl-kat-rocky
