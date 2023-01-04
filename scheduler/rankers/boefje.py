@@ -32,7 +32,7 @@ class BoefjeRanker(Ranker):
         an exponential decay function in decreasing form.
         """
         # New tasks that have not yet run before
-        if obj.prior_tasks is None:
+        if obj.prior_tasks is None or len(obj.prior_tasks) == 0:
             return 2
 
         max_priority = self.MAX_PRIORITY

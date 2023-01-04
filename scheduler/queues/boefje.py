@@ -11,4 +11,4 @@ class BoefjePriorityQueue(PriorityQueue):
         input_ooi = dict_utils.deep_get(p_item.dict(), ["data", "input_ooi"])
         organization = dict_utils.deep_get(p_item.dict(), ["data", "organization"])
 
-        return mmh3.hash_bytes(f"{boefje_id}-{input_ooi}-{organization}").hex()
+        return mmh3.hash_bytes(f"{input_ooi}-{boefje_id}-{organization}").hex()

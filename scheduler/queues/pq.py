@@ -7,13 +7,9 @@ from typing import Any, Dict, List, Optional, Type
 import pydantic
 from scheduler import models, repositories
 
-from .errors import (
-    InvalidPrioritizedItemError,
-    NotAllowedError,
-    PrioritizedItemNotFoundError,
-    QueueEmptyError,
-    QueueFullError,
-)
+from .errors import (InvalidPrioritizedItemError, NotAllowedError,
+                     PrioritizedItemNotFoundError, QueueEmptyError,
+                     QueueFullError)
 
 
 class PriorityQueue(abc.ABC):
@@ -213,6 +209,21 @@ class PriorityQueue(abc.ABC):
         """
         identifier = self.create_hash(p_item)
         item = self.pq_store.get_item_by_hash(self.pq_id, identifier)
+        if item is None:
+            return False
+
+        return True
+
+    def is_item_on_queue_by_hash(self, hash: str) -> bool:
+        """Check if an item is on the queue by its hash.
+
+        Args:
+            hash: The hash of the item to be checked.
+
+        Returns:
+            True if the item is on the queue, False otherwise.
+        """
+        item = self.pq_store.get_item_by_hash(self.pq_id, hash)
         if item is None:
             return False
 

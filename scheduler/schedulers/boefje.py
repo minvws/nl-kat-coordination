@@ -161,6 +161,15 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
+                if self.queue.is_item_on_queue_by_hash(task.hash):
+                    self.logger.debug(
+                        "Task is already on queue: %s [org_id=%s, scheduler_id=%s]",
+                        task,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    continue
+
                 prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
                 score = self.ranker.rank(
                     SimpleNamespace(
@@ -178,17 +187,6 @@ class BoefjeScheduler(Scheduler):
                     data=task,
                     hash=task.hash,
                 )
-
-                if self.queue.is_item_on_queue(p_item):
-                    self.logger.debug(
-                        "Boefje: %s is already on queue [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
-                        boefje.id,
-                        boefje.id,
-                        ooi.primary_key,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
 
                 while not self.is_space_on_queue():
                     self.logger.debug(
@@ -361,7 +359,6 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the boefje is allowed to run on the ooi, False otherwise.
         """
-        import pdb; pdb.set_trace()
         if boefje.enabled is False:
             self.logger.debug(
                 "Boefje: %s is disabled [org_id=%s, boefje_id=%s, org_id=%s, scheduler_id=%s]",
