@@ -48,7 +48,7 @@ def request_certs(search_string, search_type="Identity", match="=", deduplicate=
     if deduplicate:
         query["deduplicate"] = "Y"
 
-    response = requests.get(CRT_SH_API, query)
+    response = requests.get(CRT_SH_API, params=query)
     if response.status_code != 200:
         response.raise_for_status()
     if json_output:
@@ -59,7 +59,7 @@ def request_certs(search_string, search_type="Identity", match="=", deduplicate=
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     fqdn = input_["hostname"]["name"]
-    domain = fqdn if not fqdn.endswith(".") else fqdn[:-1]
+    domain = fqdn.rstrip(".")
     results = request_certs(domain)
 
     return [(set(), results)]
