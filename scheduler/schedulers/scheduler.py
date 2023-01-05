@@ -92,6 +92,7 @@ class Scheduler(abc.ABC):
             id=p_item.id,
             hash=p_item.hash,
             scheduler_id=self.scheduler_id,
+            type=self.queue.item_type.type,
             p_item=p_item,
             status=models.TaskStatus.QUEUED,
             created_at=datetime.datetime.now(datetime.timezone.utc),
