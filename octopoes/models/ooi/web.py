@@ -5,6 +5,7 @@ from typing import Literal, Optional
 from pydantic import AnyUrl
 
 from octopoes.models import OOI, Reference
+from octopoes.models.ooi.certificate import Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, Network
 from octopoes.models.ooi.service import IPService
@@ -16,6 +17,7 @@ class Website(OOI):
 
     ip_service: Reference = ReferenceField(IPService, max_issue_scan_level=0, max_inherit_scan_level=4)
     hostname: Reference = ReferenceField(Hostname, max_inherit_scan_level=4)
+    certificate: Optional[Reference] = ReferenceField(Certificate, default=None)
 
     _natural_key_attrs = ["ip_service", "hostname"]
 
