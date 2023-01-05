@@ -161,6 +161,26 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
+                try:
+                    grace_period_passed = self.has_grace_period_passed(task)
+                    if not grace_period_passed:
+                        self.logger.debug(
+                            "Task has not passed grace period: %s [org_id=%s, scheduler_id=%s]",
+                            task,
+                            self.organisation.id,
+                            self.scheduler_id,
+                        )
+                        continue
+                except Exception as exc_grace_period:
+                    self.logger.warning(
+                        "Could not check if grace period has passed: %s [org_id=%s, scheduler_id=%s]",
+                        task,
+                        self.organisation.id,
+                        self.scheduler_id,
+                        exc_info=exc_grace_period,
+                    )
+                    continue
+
                 if self.queue.is_item_on_queue_by_hash(task.hash):
                     self.logger.debug(
                         "Task is already on queue: %s [org_id=%s, scheduler_id=%s]",
@@ -208,7 +228,6 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-    # TODO: tries
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue.
         """
@@ -300,6 +319,35 @@ class BoefjeScheduler(Scheduler):
                         )
                         continue
 
+                    try:
+                        grace_period_passed = self.has_grace_period_passed(task)
+                        if not grace_period_passed:
+                            self.logger.debug(
+                                "Task has not passed grace period: %s [org_id=%s, scheduler_id=%s]",
+                                task,
+                                self.organisation.id,
+                                self.scheduler_id,
+                            )
+                            continue
+                    except Exception as exc_grace_period:
+                        self.logger.warning(
+                            "Could not check if grace period has passed: %s [org_id=%s, scheduler_id=%s]",
+                            task,
+                            self.organisation.id,
+                            self.scheduler_id,
+                            exc_info=exc_grace_period,
+                        )
+                        continue
+
+                    if self.queue.is_item_on_queue_by_hash(task.hash):
+                        self.logger.debug(
+                            "Task is already on queue: %s [org_id=%s, scheduler_id=%s]",
+                            task,
+                            self.organisation.id,
+                            self.scheduler_id,
+                        )
+                        continue
+
                     prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
                     score = self.ranker.rank(
                         SimpleNamespace(
@@ -318,17 +366,6 @@ class BoefjeScheduler(Scheduler):
                         hash=task.hash,
                     )
 
-                    if self.queue.is_item_on_queue(p_item):
-                        self.logger.debug(
-                            "Boefje: %s is already on queue [boefje_id=%s, ooi_id=%s, org_id=%s, scheduler_id=%s]",
-                            boefje.id,
-                            boefje.id,
-                            ooi.primary_key,
-                            self.organisation.id,
-                            self.scheduler_id,
-                        )
-                        continue
-
                     while not self.is_space_on_queue():
                         self.logger.debug(
                             "Waiting for queue to have enough space, not adding task to queue [qsize=%d, maxsize=%d, org_id=%s, scheduler_id=%s]",
@@ -339,7 +376,7 @@ class BoefjeScheduler(Scheduler):
                         )
                         time.sleep(1)
 
-                self.push_item_to_queue(p_item)
+                    self.push_item_to_queue(p_item)
         else:
             self.logger.warning(
                 "Boefjes queue is full, not populating with new tasks [qsize=%d, org_id=%s, scheduler_id=%s]",
@@ -424,10 +461,11 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def is_task_running(self, task: BoefjeTask) -> bool:
+        import pdb; pdb.set_trace()
         # Get the last tasks that have run or are running for the hash
         # of this particular BoefjeTask.
         try:
-            latest_task = self.ctx.task_store.get_latest_task_by_hash(task.hash)
+            task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
             self.logger.warning(
                 "Could not get latest task by hash: %s [org_id=%s, scheduler_id=%s]",
@@ -439,25 +477,14 @@ class BoefjeScheduler(Scheduler):
             raise exc_db
 
         # Is task still running according to the datastore?
-        if latest_task is not None and (latest_task.status != TaskStatus.COMPLETED or latest_task.status == TaskStatus.FAILED):
+        if (
+            task_db is not None
+            and (task_db.status == TaskStatus.COMPLETED or task_db.status == TaskStatus.FAILED)
+        ):
+            return False
             self.logger.debug(
                 "Task is still running, according to the datastore [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
-                latest_task.id,
-                task.hash,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return True
-
-        # Has grace period passed according to datastore?
-        if (
-            latest_task is not None
-            and (latest_task.status == TaskStatus.COMPLETED or latest_task.status == TaskStatus.FAILED)
-            and datetime.utcnow() - latest_task.modified_at < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
-        ):
-            self.logger.debug(
-                "Task has not passed grace period, according to the datastore [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
-                latest_task.id,
+                task_db.id,
                 task.hash,
                 self.organisation.id,
                 self.scheduler_id,
@@ -482,16 +509,16 @@ class BoefjeScheduler(Scheduler):
             raise exc_bytes
 
         # Task has been finished (failed, or succeeded) according to
-        # the database, and we have no results of it in bytes, meaning
+        # the database, but we have no results of it in bytes, meaning
         # we have a problem
         if (
-            latest_task is not None
-            and (latest_task.status != TaskStatus.COMPLETED or latest_task.status == TaskStatus.FAILED)
+            task_db is not None
             and task_bytes is None
+            and (task_db.status == TaskStatus.COMPLETED or task_db.status == TaskStatus.FAILED)
         ):
             self.logger.error(
                 "Task has been finished, but no results found in bytes [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
-                latest_task.id,
+                task_db.id,
                 task.hash,
                 self.organisation.id,
                 self.scheduler_id,
@@ -514,6 +541,53 @@ class BoefjeScheduler(Scheduler):
             )
             return True
 
+        return False
+
+    def has_grace_period_passed(self, task: BoefjeTask) -> bool:
+        try:
+            task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
+        except Exception as exc_db:
+            self.logger.warning(
+                "Could not get latest task by hash: %s [org_id=%s, scheduler_id=%s]",
+                task.hash,
+                self.organisation.id,
+                self.scheduler_id,
+                exc_info=exc_db,
+            )
+            raise exc_db
+
+        # Has grace period passed according to datastore?
+        if (
+            task_db is not None
+            and (task_db.status == TaskStatus.COMPLETED or task_db.status == TaskStatus.FAILED)
+            and datetime.utcnow() - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+        ):
+            self.logger.debug(
+                "Task has not passed grace period, according to the datastore [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
+                task_db.id,
+                task.hash,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return False
+
+        try:
+            task_bytes = self.ctx.services.bytes.get_last_run_boefje(
+                boefje_id=task.boefje.id,
+                input_ooi=task.input_ooi,
+                organization_id=task.organization,
+            )
+        except Exception as exc_bytes:
+            self.logger.error(
+                "Failed to get last run boefje from bytes [boefje_id=%s, input_ooi=%s, org_id=%s, scheduler_id=%s, exc=%s]",
+                task.boefje.id,
+                task.input_ooi,
+                self.organisation.id,
+                self.scheduler_id,
+                exc_bytes,
+            )
+            raise exc_bytes
+
         # Did the grace period pass, according to bytes?
         if (
             task_bytes is not None
@@ -528,7 +602,9 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            return True
+            return False
+
+        return True
 
     def is_space_on_queue(self) -> bool:
         """Check if there is space on the queue.

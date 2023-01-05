@@ -90,7 +90,6 @@ class Scheduler(abc.ABC):
         # lookup.
         task = models.Task(
             id=p_item.id,
-            hash=p_item.hash,
             scheduler_id=self.scheduler_id,
             p_item=p_item,
             status=models.TaskStatus.QUEUED,
