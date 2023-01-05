@@ -8,7 +8,6 @@ from tools.forms import (
     Choices,
     ChoicesGroups,
     OBSERVED_AT_HELP_TEXT,
-    SCAN_LEVEL_CHOICES,
 )
 
 
@@ -56,14 +55,6 @@ class DataListInput(forms.Select):
         if value is None:
             return ""
         return str(value)
-
-
-class DeclaredScanProfileForm(BaseRockyForm):
-    scan_profile = forms.CharField(
-        label=_("Scan profile"),
-        widget=forms.Select(choices=SCAN_LEVEL_CHOICES),
-        required=True,
-    )
 
 
 class ObservedAtForm(BaseRockyForm):

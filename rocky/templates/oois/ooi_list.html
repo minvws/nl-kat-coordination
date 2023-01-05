@@ -8,18 +8,19 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{% translate 'Object List' %}</h1>
+        <h1>{% translate 'Object list' %}</h1>
         <p>
           {% blocktranslate trimmed %}
-        An overview of your object list. Objects can be added manually or by running boefjes. Click an object for additional information.
-      {% endblocktranslate %}
+            An overview of your object list. Objects can be added manually or by running boefjes.
+            Click an object for additional information.
+          {% endblocktranslate %}
         </p>
         <p class="de-emphasized">
           <strong>{% translate 'Currently filtered on:' %}</strong> {{ types_display }}
         </p>
         {% include 'partials/ooi_list_toolbar.html' %}
-        {% translate 'Object list' as filter_title %}
-        {% include 'partials/ooi_list_filters.html' with title=filter_title %}
+        {% translate 'Filter' as filter_title %}
+        {% include 'partials/ooi_list_filters.html' with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
         <div class="horizontal-scroll">
           <table class="action-buttons nowrap">
             <caption>{% translate 'Showing ' %}{{ ooi_list|length }} {% translate 'of' %} {{ total_oois }} {% translate 'objects' %}</caption>

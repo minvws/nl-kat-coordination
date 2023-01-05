@@ -2,9 +2,10 @@
 {% load i18n %}
 
 {% block title %}
-{% if count %}<span>{{ count }}</span> {% endif %}{{ title }}
+  {% if count %}<span>{{ count }}</span>{% endif %}
+  {{ title }}
 {% endblock %}
 
 {% block filter_form %}
-  {% include 'partials/elements/ooi_list_settings_form.html' %}
+  {% include 'partials/elements/ooi_list_settings_form.html' with clearance_level_filter_form=clearance_level_filter_form %}
 {% endblock %}

@@ -1,6 +1,6 @@
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Type, Dict, Union
+from typing import Type, Dict, Union, List
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -10,7 +10,8 @@ from octopoes.models.types import get_relations
 from pydantic import AnyUrl
 from pydantic.fields import ModelField, SHAPE_LIST
 
-from tools.forms import BaseRockyForm
+from tools.forms import BaseRockyForm, CheckboxGroup
+from tools.models import SCAN_LEVEL
 
 
 class OOIForm(BaseRockyForm):
@@ -118,3 +119,15 @@ def default_field_options(field: ModelField) -> Dict[str, Union[str, bool]]:
         "label": field.name,
         "required": bool(field.required),
     }
+
+
+class ClearancelevelFilterForm(BaseRockyForm):
+    clearance_level = forms.CharField(
+        label="",
+        widget=CheckboxGroup(toggle_all_button=True, choices=SCAN_LEVEL.choices),
+        required=False,
+    )
+
+    def __init__(self, clearance_level: List[str], *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["clearance_level"].initial = clearance_level

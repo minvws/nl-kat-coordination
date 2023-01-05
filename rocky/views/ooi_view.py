@@ -2,57 +2,49 @@ from datetime import datetime, timezone
 from time import sleep
 from typing import Type, List
 
-from django.contrib import messages
-from django.core.paginator import Paginator, EmptyPage
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import FormView
 from django_otp.decorators import otp_required
 from octopoes.api.models import Declaration
-from octopoes.models import OOI
+from octopoes.models import OOI, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER
 from pydantic import ValidationError
 from two_factor.views.utils import class_view_decorator
 
 from rocky.views.mixins import (
     SingleOOIMixin,
     SingleOOITreeMixin,
-    OctopoesAPIImproperlyConfigured,
     MultipleOOIMixin,
     ConnectorFormMixin,
 )
 from tools.forms import BaseRockyForm, ObservedAtForm
-from tools.ooi_form import OOIForm
+from tools.ooi_form import OOIForm, ClearancelevelFilterForm
 from tools.view_helpers import get_ooi_url, get_mandatory_fields
 
 
 @class_view_decorator(otp_required)
-class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, TemplateView):
+class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
     connector_form_class = ObservedAtForm
-    oois_per_page = 150
+    paginate_by = 150
+    context_object_name = "ooi_list"
+
+    def get_queryset(self):
+        scan_levels = DEFAULT_SCAN_LEVEL_FILTER
+        selected_clearance_level = self.request.GET.getlist("clearance_level")
+        if selected_clearance_level is not None:
+            scan_levels = {ScanLevel(int(s)) for s in selected_clearance_level}
+        return self.get_list(self.get_observed_at(), scan_level=scan_levels)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        observed_at = self.get_observed_at()
-        page_number = self.request.GET.get("page")
-        oois = self.get_list(observed_at)
-        paginator = Paginator(oois, self.oois_per_page)
-
-        try:
-            page_obj = paginator.get_page(page_number)
-        except EmptyPage:
-            page_obj = paginator.get_page(1)
-
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = observed_at
-        context["total_oois"] = oois.count
-        try:
-            context["ooi_list"] = page_obj
-        except OctopoesAPIImproperlyConfigured as e:
-            context["ooi_list"] = []
-            messages.add_message(self.request, messages.ERROR, str(e))
+        context["observed_at"] = self.get_observed_at()
+        context["total_oois"] = len(self.object_list)
 
+        context["clearance_level_filter_form"] = ClearancelevelFilterForm(self.request.GET.getlist("clearance_level"))
         return context
 
 

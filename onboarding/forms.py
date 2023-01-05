@@ -4,13 +4,12 @@ from django.contrib.auth.models import Group, Permission
 from django.utils.translation import gettext_lazy as _
 from tools.models import (
     Organization,
-    SCAN_LEVEL,
     GROUP_ADMIN,
     GROUP_REDTEAM,
     GROUP_CLIENT,
     OrganizationMember,
 )
-from tools.forms import BLANK_CHOICE
+from tools.forms import SCAN_LEVEL_CHOICES
 from account.forms import OrganizationMemberAddForm
 
 User = get_user_model()
@@ -39,7 +38,7 @@ class OnboardingSetClearanceLevelForm(forms.Form):
             },
         },
         widget=ClearanceLevelSelect(
-            choices=[BLANK_CHOICE] + SCAN_LEVEL.choices,
+            choices=SCAN_LEVEL_CHOICES,
             attrs={
                 "aria-describedby": _("explanation-clearance-level"),
             },

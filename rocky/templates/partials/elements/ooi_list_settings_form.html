@@ -9,7 +9,7 @@
   {% if object_type_filters %}
     <fieldset>
       <legend>
-        {% translate "Shown types" %}
+        {% translate "Filter by OOI types" %}
       </legend>
       <div class="column-4">
         {% for checkbox in object_type_filters %}
@@ -29,9 +29,16 @@
     <button type="button"
             class="toggle-all toggle-on ghost"
             data-toggle-target="ooi_type">
-      {% translate "Toggle all" %}
+      {% translate "Toggle all OOI types" %}
     </button>
-    <input type="submit"
-           value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}"/>
   </fieldset>
+  <fieldset>
+    <legend>
+      {% translate "Filter by clearance level" %}
+    </legend>
+    {{ clearance_level_filter_form }}
+  </fieldset>
+  <input type="submit"
+         value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}"/>
+</fieldset>
 </form>

@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timezone
 from functools import cached_property
 from typing import Set, Type, List, Dict, Optional, Tuple
+
 import requests.exceptions
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
@@ -9,14 +10,15 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference, DeclaredScanProfile
+from octopoes.models import OOI, Reference, DeclaredScanProfile, ScanLevel
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations, get_collapsed_types, type_by_name
 from pydantic import BaseModel
-from rocky.bytes_client import get_bytes_client
+
 from katalogus.client import Plugin, get_katalogus
+from rocky.bytes_client import get_bytes_client
 from tools.forms import ObservedAtForm, DEPTH_MAX, DEPTH_DEFAULT
 from tools.models import Organization, Indemnification, OrganizationMember
 from tools.ooi_helpers import (
@@ -149,38 +151,57 @@ class OctopoesMixin:
 
 
 class OOIList:
-    def __init__(self, octopoes_connector: OctopoesAPIConnector, ooi_types: Set[Type[OOI]], valid_time: datetime):
+    def __init__(
+        self,
+        octopoes_connector: OctopoesAPIConnector,
+        ooi_types: Set[Type[OOI]],
+        valid_time: datetime,
+        scan_level: Set[ScanLevel],
+    ):
         self.octopoes_connector = octopoes_connector
         self.ooi_types = ooi_types
         self.valid_time = valid_time
         self.ordered = True
         self._count = None
+        self.scan_level = scan_level
 
     @cached_property
     def count(self) -> int:
-        return self.octopoes_connector.list(self.ooi_types, self.valid_time, limit=0).count
+        return self.octopoes_connector.list(self.ooi_types, self.valid_time, limit=0, scan_level=self.scan_level).count
 
     def __len__(self):
         return self.count
 
     def __getitem__(self, key) -> List[OOI]:
         if isinstance(key, slice):
-            return self.octopoes_connector.list(self.ooi_types, self.valid_time, key.start, key.stop - key.start).items
+            return self.octopoes_connector.list(
+                self.ooi_types,
+                self.valid_time,
+                key.start,
+                key.stop - key.start,
+                scan_level=self.scan_level,
+            ).items
         elif isinstance(key, int):
-            return self.octopoes_connector.list(self.ooi_types, self.valid_time, key, 1).items
+            return self.octopoes_connector.list(
+                self.ooi_types, self.valid_time, key, 1, scan_level=self.scan_level
+            ).items
 
 
 class MultipleOOIMixin(OctopoesMixin):
-    allow_empty = False
     ooi_types: Set[Type[OOI]] = None
     ooi_type_filters: List = []
     filtered_ooi_types: List[str] = []
 
-    def get_list(self, observed_at: datetime) -> OOIList:
+    def get_list(self, observed_at: datetime, scan_level: Set[ScanLevel]) -> OOIList:
         ooi_types = self.ooi_types
         if self.filtered_ooi_types:
             ooi_types = {type_by_name(t) for t in self.filtered_ooi_types}
-        return OOIList(self.get_api_connector(), ooi_types, observed_at)
+        return OOIList(
+            self.get_api_connector(),
+            ooi_types,
+            observed_at,
+            scan_level=scan_level,
+        )
 
     def get_filtered_ooi_types(self):
         return self.request.GET.getlist("ooi_type", [])
