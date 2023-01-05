@@ -10,10 +10,9 @@ from octopoes.api.models import ServiceHealth, ValidatedObservation, ValidatedDe
 from octopoes.config.settings import Settings
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
-from octopoes.models import OOI, Reference, ScanProfileBase, ScanProfile
+from octopoes.models import OOI, Reference, ScanProfileBase, ScanProfile, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER
 from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.filter import FilterOperator
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
@@ -106,12 +105,11 @@ def list_objects(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     types: Set[Type[OOI]] = Depends(extract_types),
-    scan_level_operator: FilterOperator = FilterOperator.GREATER_THAN_OR_EQUAL_TO,
-    scan_level: int = 0,
+    scan_level: Set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
     offset: int = 0,
     limit: int = 20,
 ) -> Paginated[OOI]:
-    objects = octopoes.list_ooi(types, valid_time, offset, limit, scan_level_operator, scan_level)
+    objects = octopoes.list_ooi(types, valid_time, offset, limit, scan_level)
     return objects
 
 

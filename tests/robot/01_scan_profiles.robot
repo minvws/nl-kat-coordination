@@ -21,14 +21,14 @@ Inheritance Of Two Declared Scan Profiles
     Verify Scan Profile Increment Queue    ${REF_HOSTNAME}    ${4}
     Verify Scan Profile Increment Queue    ${REF_IPADDR}    ${2}
     Verify Scan Profile Increment Queue    ${REF_RESOLVEDHOSTNAME}    ${4}
-    Verify Scan LeveL Filter    ge    0    ${6}
-    Verify Scan LeveL Filter    gt    0    ${4}
-    Verify Scan LeveL Filter    le    0    ${2}
-    Verify Scan LeveL Filter    le    2    ${4}
-    Verify Scan LeveL Filter    le    4    ${6}
-    Verify Scan LeveL Filter    lt    2    ${2}
-    Verify Scan LeveL Filter    eq    2    ${2}
-    Verify Scan LeveL Filter    ne    2    ${4}
+    Verify Scan LeveL Filter    0    ${1}
+    Verify Scan LeveL Filter    1    ${0}
+    Verify Scan LeveL Filter    2    ${2}
+    Verify Scan LeveL Filter    3    ${0}
+    Verify Scan LeveL Filter    4    ${3}
+    Verify Scan LeveL Filter    ${{ [2,4] }}    ${5}
+    Verify Scan LeveL Filter    ${{ [3,4] }}    ${3}
+    Verify Scan LeveL Filter    ${{ [2,0] }}    ${3}
     Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[4]}}
     Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[2]}}
     Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[4]}}
@@ -128,16 +128,18 @@ Verify Scan Profile Increment Queue
     Fail    Scan Level of ${reference} should be incremented to ${scan_level}
 
 Verify Scan LeveL Filter
-    [Arguments]    ${operator}    ${scan_level}    ${expected_count}
+    [Arguments]    ${scan_level}    ${expected_count}
     ${params}    Get Valid Time Params
     ${params}    Create Dictionary
-    ...    scan_level_operator=${operator}
     ...    scan_level=${scan_level}
     ...    valid_time=${VALID_TIME}
     ${response}    Get    ${OCTOPOES_URI}/objects    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
     ${response_data}    Set Variable    ${response.json()}
-    Should Be Equal As Integers    ${response_data["count"]}    ${expected_count}
+    Should Be Equal As Integers
+    ...    ${response_data["count"]}
+    ...    ${expected_count}
+    ...    Scan Level Filter should return ${expected_count} objects for scan level ${scan_level}
     Length Should Be    ${response_data["items"]}    ${expected_count}
 
 Verify Scan Profile Mutation Queue

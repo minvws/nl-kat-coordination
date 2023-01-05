@@ -12,9 +12,8 @@ from requests import HTTPError
 from octopoes.config.settings import XTDBType
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI, Reference, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.filter import FilterOperator
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path, get_paths_to_neighours, Direction, Segment
 from octopoes.models.tree import ReferenceTree, ReferenceNode
@@ -65,8 +64,7 @@ class OOIRepository:
         valid_time: datetime,
         offset: int = 0,
         limit: int = 20,
-        scan_level_operator: FilterOperator = FilterOperator.GREATER_THAN_OR_EQUAL_TO,
-        scan_level: int = 0,
+        scan_levels: Set[ScanLevel] = None,
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
@@ -178,17 +176,6 @@ class XTDBOOIRepository(OOIRepository):
         stripped = {key.split("/")[1]: value for key, value in data.items()}
         return object_cls.parse_obj(stripped)
 
-    @staticmethod
-    def operator_to_xtdb_operator(operator: FilterOperator) -> str:
-        return {
-            FilterOperator.EQUAL_TO: "=",
-            FilterOperator.NOT_EQUAL_TO: "!=",
-            FilterOperator.LESS_THAN: "<",
-            FilterOperator.LESS_THAN_OR_EQUAL_TO: "<=",
-            FilterOperator.GREATER_THAN: ">",
-            FilterOperator.GREATER_THAN_OR_EQUAL_TO: ">=",
-        }[operator]
-
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
@@ -210,38 +197,35 @@ class XTDBOOIRepository(OOIRepository):
         valid_time: datetime,
         offset: int = 0,
         limit: int = 20,
-        scan_level_operator: FilterOperator = FilterOperator.GREATER_THAN_OR_EQUAL_TO,
-        scan_level: int = 0,
+        scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
     ) -> Paginated[OOI]:
         types = to_concrete(types)
 
         count_query = """
                 {{
                     :query {{
-                        :find [(count ?e )]
-                        :in [[_object_type ...]]
+                        :find [(count ?e)]
+                        :in [[_object_type ...] [_scan_level ...]]
                         :where [[?e :object_type _object_type]
-                                (or-join [?e]
+                                (or-join [?e _scan_level]
                                   (and
                                     [?scan_profile :type "ScanProfile"]
                                     [?scan_profile :reference ?e]
-                                    [?scan_profile :level ?level]
-                                    [({scan_level_operator} ?level {scan_level_value})]
+                                    [?scan_profile :level _scan_level]
                                   )
                                   (and
                                       (not-join [?e]
                                           [?scan_profile :type "ScanProfile"]
                                           [?scan_profile :reference ?e])
-                                      [({scan_level_operator} 0 {scan_level_value})]
+                                      [(= _scan_level 0)]
                                   )
                           )]
                     }}
-                    :in-args [[{object_types}]]
+                    :in-args [[{object_types}], [{scan_levels}]]
                 }}
                 """.format(
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
-            scan_level_operator=self.operator_to_xtdb_operator(scan_level_operator),
-            scan_level_value=scan_level,
+            scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
         )
 
         res_count = self.session.client.query(count_query, valid_time)
@@ -251,31 +235,29 @@ class XTDBOOIRepository(OOIRepository):
                 {{
                     :query {{
                         :find [(pull ?e [*])]
-                        :in [[_object_type ...]]
+                        :in [[_object_type ...] [_scan_level ...]]
                         :where [[?e :object_type _object_type]
-                                (or-join [?e]
+                                (or-join [?e _scan_level]
                                       (and
                                         [?scan_profile :type "ScanProfile"]
                                         [?scan_profile :reference ?e]
-                                        [?scan_profile :level ?level]
-                                        [({scan_level_operator} ?level {scan_level_value})]
+                                        [?scan_profile :level _scan_level]
                                       )
                                       (and
                                           (not-join [?e]
                                               [?scan_profile :type "ScanProfile"]
                                               [?scan_profile :reference ?e])
-                                          [({scan_level_operator} 0 {scan_level_value})]
+                                          [(= _scan_level 0)]
                                       )
                               )]
                         :limit {limit}
                         :offset {offset}
                     }}
-                    :in-args [[{object_types}]]
+                    :in-args [[{object_types}], [{scan_levels}]]
                 }}
         """.format(
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
-            scan_level_operator=self.operator_to_xtdb_operator(scan_level_operator),
-            scan_level_value=scan_level,
+            scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
             limit=limit,
             offset=offset,
         )

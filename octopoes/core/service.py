@@ -19,9 +19,10 @@ from octopoes.models import (
     DeclaredScanProfile,
     InheritedScanProfile,
     format_id_short,
+    ScanLevel,
+    DEFAULT_SCAN_LEVEL_FILTER,
 )
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.filter import FilterOperator
 from octopoes.models.origin import Origin, OriginType, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import get_max_scan_level_issuance, get_paths_to_neighours
@@ -81,10 +82,9 @@ class OctopoesService:
         valid_time: datetime,
         limit: int = 1000,
         offset: int = 0,
-        scan_level_operator: FilterOperator = FilterOperator.GREATER_THAN_OR_EQUAL_TO,
-        scan_level: int = 0,
+        scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
     ) -> Paginated[OOI]:
-        paginated = self.ooi_repository.list(types, valid_time, limit, offset, scan_level_operator, scan_level)
+        paginated = self.ooi_repository.list(types, valid_time, limit, offset, scan_levels)
         self._populate_scan_profiles(paginated.items, valid_time)
         return paginated
 
@@ -151,7 +151,7 @@ class OctopoesService:
         }
 
         # track all scan level assignments
-        assigned_scan_levels: Dict[Reference, int] = {
+        assigned_scan_levels: Dict[Reference, ScanLevel] = {
             scan_profile.reference: scan_profile.level for scan_profile in all_declared_scan_profiles
         }
 
@@ -195,7 +195,7 @@ class OctopoesService:
                     # assign scan levels to newly found oois and add to next iteration
                     for ooi in next_level:
                         if ooi.reference not in assigned_scan_levels:
-                            assigned_scan_levels[ooi.reference] = current_level
+                            assigned_scan_levels[ooi.reference] = ScanLevel(current_level)
                             temp_next_ooi_set.add(ooi)
 
                 logger.info("Assigned scan levels [level=%i] [len=%i]", current_level, len(temp_next_ooi_set))
@@ -203,7 +203,7 @@ class OctopoesService:
 
         scan_level_aggregates = {i: 0 for i in range(1, 5)}
         for scan_level in assigned_scan_levels.values():
-            scan_level_aggregates.setdefault(scan_level, 0)
+            scan_level_aggregates.setdefault(scan_level.value, 0)
             scan_level_aggregates[scan_level] += 1
 
         logger.info("Assigned scan levels [len=%i]", len(assigned_scan_levels.keys()))

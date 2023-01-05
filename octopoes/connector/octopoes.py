@@ -8,9 +8,8 @@ from requests import Response, HTTPError
 
 from octopoes.api.models import Observation, Declaration, ServiceHealth
 from octopoes.connector import RemoteException
-from octopoes.models import Reference, OOI, ScanProfile
+from octopoes.models import Reference, OOI, ScanProfile, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.filter import FilterOperator
 from octopoes.models.origin import Origin
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
@@ -72,16 +71,14 @@ class OctopoesAPIConnector:
         valid_time: Optional[datetime] = None,
         offset: int = 0,
         limit: int = 5000,
-        scan_level: int = 0,
-        scan_level_operator: FilterOperator = FilterOperator.GREATER_THAN_OR_EQUAL_TO,
+        scan_level: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
     ) -> Paginated[OOIType]:
         params = {
             "types": [t.__name__ for t in types],
             "valid_time": valid_time,
             "offset": offset,
             "limit": limit,
-            "scan_level": scan_level,
-            "scan_level_operator": scan_level_operator.value,
+            "scan_level": {s.value for s in scan_level},
         }
         res = self.session.get("/objects", params=params)
         return Paginated[OOIType].parse_obj(res.json())

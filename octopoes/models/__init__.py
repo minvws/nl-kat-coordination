@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import (
     List,
     TypeVar,
@@ -19,9 +19,23 @@ from pydantic import BaseModel, Field, conint
 from typing_extensions import Annotated
 
 
+class ScanLevel(IntEnum):
+    L0 = 0
+    L1 = 1
+    L2 = 2
+    L3 = 3
+    L4 = 4
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+
+DEFAULT_SCAN_LEVEL_FILTER = set(scan_level for scan_level in ScanLevel)
+
+
 class ScanProfileBase(BaseModel, abc.ABC):
     reference: Reference
-    level: conint(ge=0, le=4)
+    level: ScanLevel
 
     def __eq__(self, other):
         if isinstance(other, ScanProfileBase) and self.__class__ == other.__class__:
@@ -38,12 +52,11 @@ class ScanProfileBase(BaseModel, abc.ABC):
 
 class EmptyScanProfile(ScanProfileBase):
     scan_profile_type: Literal["empty"] = "empty"
-    level: conint(ge=0, le=0) = 0
+    level: ScanLevel = ScanLevel.L0
 
 
 class DeclaredScanProfile(ScanProfileBase):
     scan_profile_type: Literal["declared"] = "declared"
-    level: conint(ge=0, le=4)
 
 
 class InheritedScanProfile(ScanProfileBase):

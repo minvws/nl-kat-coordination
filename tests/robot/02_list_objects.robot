@@ -38,5 +38,5 @@ Verify Object List With Filter
 
 Get Objects With ScanLevel 0
     ${response}    Get    ${OCTOPOES_URI}/objects    params=scan_level=0
-    ${response_data}   Set Variable   ${response.json()}
+    ${response_data}    Set Variable    ${response.json()}
     RETURN    ${response_data}
