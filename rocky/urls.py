@@ -2,9 +2,14 @@ from django.urls import path, include
 from django.contrib import admin
 from two_factor.urls import urlpatterns as tf_urls
 from django.views.generic.base import TemplateView
+from rest_framework import routers
 from rocky import views
+from tools.viewsets import OrganizationViewSet
 
 handler404 = "rocky.views.handler404"
+
+router = routers.SimpleRouter()
+router.register(r"organization", OrganizationViewSet)
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
@@ -119,4 +124,5 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
+    path("api/v1/", include(router.urls)),
 ]

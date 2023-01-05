@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from django.utils.translation import gettext_lazy as _
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -99,6 +100,8 @@ INSTALLED_APPS = [
     "katalogus",
     "django_password_validators",
     "django_password_validators.password_history",
+    "rest_framework",
+    "tagulous",
 ]
 
 MIDDLEWARE = [
@@ -321,3 +324,57 @@ MARKDOWNIFY = {
         },
     }
 }
+
+DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
+
+# Turn on the browsable API by default if DEBUG is True, but disable by default in production
+BROWSABLE_API = os.getenv("BROWSABLE_API", "True" if DEBUG else "False") == "True"
+
+if BROWSABLE_API:
+    DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        # For now this will provide a safe default, but non-admin users will
+        # need to be able to use the API in the future..
+        "rest_framework.permissions.IsAdminUser",
+    ],
+    "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
+}
+
+
+SERIALIZATION_MODULES = {
+    "xml": "tagulous.serializers.xml_serializer",
+    "json": "tagulous.serializers.json",
+    "python": "tagulous.serializers.python",
+    "yaml": "tagulous.serializers.pyyaml",
+}
+TAGULOUS_SLUG_ALLOW_UNICODE = True
+
+TAG_COLORS = [
+    ("blue-light", _("Blue light")),
+    ("blue-medium", _("Blue medium")),
+    ("blue-dark", _("Blue dark")),
+    ("green-light", _("Green light")),
+    ("green-medium", _("Green medium")),
+    ("green-dark", _("Green dark")),
+    ("yellow-light", _("Yellow light")),
+    ("yellow-medium", _("Yellow medium")),
+    ("yellow-dark", _("Yellow dark")),
+    ("orange-light", _("Orange light")),
+    ("orange-medium", _("Orange medium")),
+    ("orange-dark", _("Orange dark")),
+    ("red-light", _("Red light")),
+    ("red-medium", _("Red medium")),
+    ("red-dark", _("Red dark")),
+    ("violet-light", _("Violet light")),
+    ("violet-medium", _("Violet medium")),
+    ("violet-dark", _("Violet dark")),
+]
+
+TAG_BORDER_TYPES = [
+    ("plain", _("Plain")),
+    ("solid", _("Solid")),
+    ("dashed", _("Dashed")),
+    ("dotted", _("Dotted")),
+]

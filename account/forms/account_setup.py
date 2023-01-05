@@ -2,10 +2,9 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth import forms as auth_forms
 from django.contrib.auth.models import Group
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from rocky.settings import MIAUW_API_ENABLED
-from tools.forms import DataListInput, BaseRockyForm
+from tools.forms import BaseRockyForm
 from tools.models import (
     GROUP_CLIENT,
     GROUP_ADMIN,
@@ -195,28 +194,6 @@ class OrganizationForm(forms.ModelForm):
     class Meta:
         model = Organization
         fields = ["name"]
-
-        def __init__(self, *args, **kwargs):
-            if MIAUW_API_ENABLED:
-                self.fields.append("signal_username")
-                self.widgets["signal_username"] = DataListInput()
-
-            super().__init__(*args, **kwargs)
-
-    def __init__(self, signal_username_choices=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if signal_username_choices and "signal_username" in self.fields:
-            self.fields["signal_username"].widget.choices = signal_username_choices
-
-    def clean_signal_username(self):
-        data = self.cleaned_data["signal_username"]
-
-        # you can only change signal_username when no group has been created yet
-        if data != self.instance.signal_username and self.instance.signal_group_id:
-            raise ValidationError(_("Unable to change signal username, once a group has been created."))
-
-        return data
 
 
 class SetPasswordForm(auth_forms.SetPasswordForm):

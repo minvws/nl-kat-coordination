@@ -20,6 +20,7 @@ def OnboardingMiddleware(get_response):
                 or "/plugins" in request.path
                 or "/i18n/" in request.path
                 or "/introduction/" in request.path
+                or request.path.startswith("/api/")
             ):
                 if not member_onboarded:
                     if request.user.is_superuser:

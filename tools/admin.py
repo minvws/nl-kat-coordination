@@ -5,6 +5,8 @@ from django.contrib import admin
 from django.db.models import JSONField
 from django.forms import widgets
 
+import tagulous.admin
+
 from tools.models import (
     Organization,
     OrganizationMember,
@@ -48,8 +50,20 @@ class OOIInformationAdmin(admin.ModelAdmin):
 
 
 class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ["name", "code", "tags"]
+
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    def get_readonly_fields(self, request, obj=None):
+        # Obj is None when adding an organization and in that case we don't make
+        # code read only so it is possible to specify the code when creating an
+        # organization, but code must be read only after the organization
+        # objecht has been created.
+        if obj:
+            return ["code"]
+        else:
+            return []
 
 
 class OrganizationMemberAdmin(admin.ModelAdmin):
@@ -70,7 +84,7 @@ class IndemnificationAdmin(admin.ModelAdmin):
         return request.user.is_superuser
 
 
-admin.site.register(Organization, OrganizationAdmin)
+tagulous.admin.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationMember, OrganizationMemberAdmin)
 admin.site.register(Indemnification, IndemnificationAdmin)
 admin.site.register(OOIInformation, OOIInformationAdmin)

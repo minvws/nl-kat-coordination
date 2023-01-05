@@ -29,18 +29,6 @@ class PageActions(Enum):
 
 
 def is_allowed_action_for_organization(action: PageActions, organization: Organization) -> bool:
-    if not MIAUW_API_ENABLED:
-        return False
-
-    if action == PageActions.SIGNAL_GROUP_CREATE:
-        return organization.signal_group_id is None
-
-    if action == PageActions.SIGNAL_GROUP_ADD_MEMBER:
-        return organization.signal_group_id is not None and organization.signal_username
-
-    if action == PageActions.SIGNAL_GROUP_SEND_TEST_MESSAGE:
-        return organization.signal_group_id is not None and organization.signal_username
-
     return False
 
 

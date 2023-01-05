@@ -1,12 +1,15 @@
 import uuid
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+import tagulous.models
 
 from tools.add_ooi_information import get_info, SEPARATOR
+from tools.fields import LowerCaseSlugField
 from tools.validators import phone_validator
 
 User = get_user_model()
@@ -24,20 +27,37 @@ class SCAN_LEVEL(models.IntegerChoices):
     L4 = 4, "L4"
 
 
+class OrganizationTag(tagulous.models.TagTreeModel):
+    COLOR_CHOICES = settings.TAG_COLORS
+    BORDER_TYPE_CHOICES = settings.TAG_BORDER_TYPES
+
+    color = models.CharField(choices=COLOR_CHOICES, max_length=20, default=COLOR_CHOICES[0][0])
+    border_type = models.CharField(choices=BORDER_TYPE_CHOICES, max_length=20, default=BORDER_TYPE_CHOICES[0][0])
+
+    class TagMeta:
+        force_lowercase = True
+        protect_all = True
+
+    @property
+    def css_class(self):
+        return f"tags-{self.color} {self.border_type}"
+
+
 class Organization(models.Model):
-    name = models.CharField(max_length=126, unique=True)
-    code = models.CharField(max_length=8, unique=True, default=None, null=True)
-    signal_username = models.CharField(validators=[phone_validator], max_length=126, unique=True, blank=True, null=True)
-    signal_group_id = models.CharField(max_length=126, blank=True, null=True)
+    name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation"))
+    code = LowerCaseSlugField(
+        max_length=32,
+        unique=True,
+        allow_unicode=True,
+        help_text=_(
+            "A slug containing only lower-case unicode letters, numbers, hyphens or underscores "
+            "that will be used in URLs and paths"
+        ),
+    )
+    tags = tagulous.models.TagField(to=OrganizationTag, blank=True)
 
     def __str__(self):
         return str(self.name)
-
-    def has_signal_group(self):
-        if self.signal_username is None or self.signal_group_id is None:
-            return False
-
-        return True
 
     class Meta:
         permissions = (
