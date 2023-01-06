@@ -32,12 +32,14 @@
       {% translate "Toggle all OOI types" %}
     </button>
   </fieldset>
-  <fieldset>
-    <legend>
-      {% translate "Filter by clearance level" %}
-    </legend>
-    {{ clearance_level_filter_form }}
-  </fieldset>
+
+  {% for field in clearance_level_filter_form %}
+    <fieldset>
+      <legend>{{ field.label }}</legend>
+      {{ field }}
+    </fieldset>
+  {% endfor %}
+
   <input type="submit"
          value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}"/>
 </fieldset>

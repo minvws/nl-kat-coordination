@@ -9,7 +9,7 @@ from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import FormView
 from django_otp.decorators import otp_required
 from octopoes.api.models import Declaration
-from octopoes.models import OOI, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER
+from octopoes.models import OOI, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, ScanProfileType
 from pydantic import ValidationError
 from two_factor.views.utils import class_view_decorator
 
@@ -19,8 +19,9 @@ from rocky.views.mixins import (
     MultipleOOIMixin,
     ConnectorFormMixin,
 )
-from tools.forms import BaseRockyForm, ObservedAtForm
-from tools.ooi_form import OOIForm, ClearancelevelFilterForm
+from tools.forms import BaseRockyForm, ObservedAtForm, CLEARANCE_TYPE_CHOICES
+from tools.models import SCAN_LEVEL
+from tools.ooi_form import OOIForm, ClearanceFilterForm
 from tools.view_helpers import get_ooi_url, get_mandatory_fields
 
 
@@ -35,7 +36,13 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         selected_clearance_level = self.request.GET.getlist("clearance_level")
         if selected_clearance_level is not None:
             scan_levels = {ScanLevel(int(s)) for s in selected_clearance_level}
-        return self.get_list(self.get_observed_at(), scan_level=scan_levels)
+
+        scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
+        selected_clearance_type = self.request.GET.getlist("clearance_type")
+        if selected_clearance_type is not None:
+            scan_profile_types = {ScanProfileType(s) for s in selected_clearance_type}
+
+        return self.get_list(self.get_observed_at(), scan_level=scan_levels, scan_profile_type=scan_profile_types)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -44,7 +51,17 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         context["observed_at"] = self.get_observed_at()
         context["total_oois"] = len(self.object_list)
 
-        context["clearance_level_filter_form"] = ClearancelevelFilterForm(self.request.GET.getlist("clearance_level"))
+        selected_clearance_levels = self.request.GET.getlist("clearance_level")
+        if not selected_clearance_levels:
+            selected_clearance_levels = [choice for choice, _ in SCAN_LEVEL.choices]
+        selected_clearance_types = self.request.GET.getlist("clearance_type")
+        if not selected_clearance_types:
+            selected_clearance_types = [choice for choice, _ in CLEARANCE_TYPE_CHOICES]
+
+        context["clearance_level_filter_form"] = ClearanceFilterForm(
+            selected_clearance_levels, selected_clearance_types
+        )
+
         return context
 
 

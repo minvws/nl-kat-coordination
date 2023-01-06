@@ -1,8 +1,8 @@
 {% load i18n %}
 
 {% with id=widget.attrs.id %}
-  <fieldset>
-    <div class="column-4"
+
+    <div class="horizontal-view-group"
          {% if id %} id="{{ id }}"{% endif %}
          {% if widget.attrs.class %} class="checkbox-group {{ widget.attrs.class }}"{% endif %}>
       {% for group, options, index in widget.optgroups %}
@@ -11,10 +11,12 @@
           <div {% if id %} id="{{ id }}_{{ index }}"{% endif %}>
           {% endif %}
           {% for option in options %}
-            <div class="horizontal-view">{% include option.template_name with widget=option %}</div>
+            <div>{% include option.template_name with widget=option %}</div>
           {% endfor %}
           {% if group %}</div>{% endif %}
         {% endfor %}
       </div>
-    {% endwith %}
-  </fieldset>
+
+{% endwith %}
+
+
