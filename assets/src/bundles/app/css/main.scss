@@ -19,7 +19,7 @@ and frameworks – Normalize, Bootstrap, jQueryUI, FancyCarouselSliderjQueryPowe
 https://sass-guidelin.es/#vendors-folder
 */
 @import "manon.scss";
-@import "manon-variables.scss";
+@import "themes/soft/manon-variables.scss"; /* Theme */
 @import "./vendors/all.scss";
 @import "./vendor/two-factor.scss";
 
