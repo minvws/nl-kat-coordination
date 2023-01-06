@@ -16,9 +16,16 @@ from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
 def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTPClient:
     parts = [base_uri]
-    if client != "_dev":
+    if xtdb_type == XTDBType.XTDB_MULTINODE:
+        parts.append("_xtdb")
         parts.append(client)
-    parts.append(f"_{xtdb_type.value}")
+    else:
+        # Before we had xtdb-multinode we supported multiple organizations by
+        # running multiple XTDB with a reverse proxy in front. This code can be
+        # removed once we no longer support that setup.
+        if client != "_dev":
+            parts.append(client)
+        parts.append(f"_{xtdb_type.value}")
     return XTDBHTTPClient("/".join(parts))
 
 

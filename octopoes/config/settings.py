@@ -8,6 +8,7 @@ from pydantic import BaseSettings
 class XTDBType(Enum):
     CRUX = "crux"
     XTDB = "xtdb"
+    XTDB_MULTINODE = "xtdb-multinode"
 
 
 class Settings(BaseSettings):

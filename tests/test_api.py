@@ -6,10 +6,23 @@ import requests
 from fastapi.testclient import TestClient
 
 from octopoes.api.api import app
+from octopoes.api.router import settings
+from octopoes.config.settings import Settings, XTDBType
 from octopoes.version import __version__
 
 
 client = TestClient(app)
+
+
+def get_settings_override():
+    return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def xtdbtype_multinode():
+    app.dependency_overrides[settings] = get_settings_override
+    yield
+    app.dependency_overrides = {}
 
 
 @pytest.fixture
@@ -93,3 +106,35 @@ def test_get_scan_profiles(requests_mock, patch_pika):
     response = client.get("/_dev/scan_profiles")
     assert response.status_code == 200
     assert response.json() == [{"level": 0, "reference": "Hostname|internet|mispo.es.", "scan_profile_type": "empty"}]
+
+
+def test_create_node():
+    with pytest.raises(Exception, match="Creating nodes requires XTDB_MULTINODE"):
+        client.post("/_dev/node")
+
+
+def test_delete_node():
+    with pytest.raises(Exception, match="Deleting nodes requires XTDB_MULTINODE"):
+        client.delete("/_dev/node")
+
+
+def test_create_node_multinode(requests_mock, xtdbtype_multinode):
+    requests_mock.real_http = True
+    requests_mock.post(
+        "http://crux:3000/_xtdb/create-node",
+        json={"created": "true"},
+        status_code=200,
+    )
+    response = client.post("/_dev/node")
+    assert response.status_code == 200
+
+
+def test_delete_node_multinode(requests_mock, xtdbtype_multinode):
+    requests_mock.real_http = True
+    requests_mock.post(
+        "http://crux:3000/_xtdb/delete-node",
+        json={"deleted": "true"},
+        status_code=200,
+    )
+    response = client.delete("/_dev/node")
+    assert response.status_code == 200
