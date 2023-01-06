@@ -1099,6 +1099,32 @@
   },
   {
     "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-CERTIFICATE-EXPIRING-SOON",
+    "fields": {
+      "last_updated": "2022-12-20T15:59:09.835Z",
+      "data": {
+        "description": "TLS certificate is expiring soon",
+        "recommendation": "Update the certificate to expire on a date further in the future.",
+        "risk": "Medium"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-CERTIFICATE-EXPIRED",
+    "fields": {
+      "last_updated": "2022-12-20T15:59:09.835Z",
+      "data": {
+        "description": "TLS certificate has expired",
+        "recommendation": "Replace the certificate with a valid one.",
+        "risk": "Critical"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
     "pk": "KATFindingType|KAT-NO-DMARC",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
