@@ -21,6 +21,8 @@ from octopoes.models import (
     format_id_short,
     ScanLevel,
     DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    ScanProfileType,
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import Origin, OriginType, OriginParameter
@@ -83,8 +85,9 @@ class OctopoesService:
         limit: int = 1000,
         offset: int = 0,
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOI]:
-        paginated = self.ooi_repository.list(types, valid_time, limit, offset, scan_levels)
+        paginated = self.ooi_repository.list(types, valid_time, limit, offset, scan_levels, scan_profile_types)
         self._populate_scan_profiles(paginated.items, valid_time)
         return paginated
 

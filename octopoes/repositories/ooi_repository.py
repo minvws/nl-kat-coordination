@@ -12,7 +12,14 @@ from requests import HTTPError
 from octopoes.config.settings import XTDBType
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
-from octopoes.models import OOI, Reference, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER
+from octopoes.models import (
+    OOI,
+    Reference,
+    ScanLevel,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    ScanProfileType,
+)
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path, get_paths_to_neighours, Direction, Segment
@@ -64,7 +71,8 @@ class OOIRepository:
         valid_time: datetime,
         offset: int = 0,
         limit: int = 20,
-        scan_levels: Set[ScanLevel] = None,
+        scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
@@ -198,6 +206,7 @@ class XTDBOOIRepository(OOIRepository):
         offset: int = 0,
         limit: int = 20,
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOI]:
         types = to_concrete(types)
 
@@ -205,27 +214,32 @@ class XTDBOOIRepository(OOIRepository):
                 {{
                     :query {{
                         :find [(count ?e)]
-                        :in [[_object_type ...] [_scan_level ...]]
+                        :in [[_object_type ...] [_scan_level ...] [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
-                                (or-join [?e _scan_level]
+                                (or-join [?e _scan_level _scan_profile_type]
                                   (and
                                     [?scan_profile :type "ScanProfile"]
                                     [?scan_profile :reference ?e]
                                     [?scan_profile :level _scan_level]
+                                    [?scan_profile :scan_profile_type _scan_profile_type]
                                   )
                                   (and
                                       (not-join [?e]
                                           [?scan_profile :type "ScanProfile"]
                                           [?scan_profile :reference ?e])
                                       [(= _scan_level 0)]
+                                      [(= _scan_profile_type "empty")]
                                   )
                           )]
                     }}
-                    :in-args [[{object_types}], [{scan_levels}]]
+                    :in-args [[{object_types}], [{scan_levels}], [{scan_profile_types}]]
                 }}
                 """.format(
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
+            scan_profile_types=" ".join(
+                [str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]
+            ),
         )
 
         res_count = self.session.client.query(count_query, valid_time)
@@ -235,29 +249,34 @@ class XTDBOOIRepository(OOIRepository):
                 {{
                     :query {{
                         :find [(pull ?e [*])]
-                        :in [[_object_type ...] [_scan_level ...]]
+                        :in [[_object_type ...] [_scan_level ...]  [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
-                                (or-join [?e _scan_level]
+                                (or-join [?e _scan_level _scan_profile_type]
                                       (and
                                         [?scan_profile :type "ScanProfile"]
                                         [?scan_profile :reference ?e]
                                         [?scan_profile :level _scan_level]
+                                        [?scan_profile :scan_profile_type _scan_profile_type]
                                       )
                                       (and
                                           (not-join [?e]
                                               [?scan_profile :type "ScanProfile"]
                                               [?scan_profile :reference ?e])
                                           [(= _scan_level 0)]
+                                          [(= _scan_profile_type "empty")]
                                       )
                               )]
                         :limit {limit}
                         :offset {offset}
                     }}
-                    :in-args [[{object_types}], [{scan_levels}]]
+                    :in-args [[{object_types}], [{scan_levels}], [{scan_profile_types}]]
                 }}
         """.format(
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
+            scan_profile_types=" ".join(
+                [str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]
+            ),
             limit=limit,
             offset=offset,
         )

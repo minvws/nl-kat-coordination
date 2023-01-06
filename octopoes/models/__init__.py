@@ -30,10 +30,17 @@ class ScanLevel(IntEnum):
         return str(self.value)
 
 
-DEFAULT_SCAN_LEVEL_FILTER = set(scan_level for scan_level in ScanLevel)
+DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
+
+
+class ScanProfileType(Enum):
+    DECLARED = "declared"
+    INHERITED = "inherited"
+    EMPTY = "empty"
 
 
 class ScanProfileBase(BaseModel, abc.ABC):
+    scan_profile_type: str
     reference: Reference
     level: ScanLevel
 
@@ -51,21 +58,23 @@ class ScanProfileBase(BaseModel, abc.ABC):
 
 
 class EmptyScanProfile(ScanProfileBase):
-    scan_profile_type: Literal["empty"] = "empty"
+    scan_profile_type: Literal["empty"] = ScanProfileType.EMPTY.value
     level: ScanLevel = ScanLevel.L0
 
 
 class DeclaredScanProfile(ScanProfileBase):
-    scan_profile_type: Literal["declared"] = "declared"
+    scan_profile_type: Literal["declared"] = ScanProfileType.DECLARED.value
 
 
 class InheritedScanProfile(ScanProfileBase):
-    scan_profile_type: Literal["inherited"] = "inherited"
+    scan_profile_type: Literal["inherited"] = ScanProfileType.INHERITED.value
 
 
 ScanProfile = Annotated[
     Union[EmptyScanProfile, InheritedScanProfile, DeclaredScanProfile], Field(discriminator="scan_profile_type")
 ]
+
+DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in ScanProfileType}
 
 
 class OOI(BaseModel, abc.ABC):
