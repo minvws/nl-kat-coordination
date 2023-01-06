@@ -11,7 +11,7 @@ setup(
     package_data={"octopoes": ["data/logging.yml"]},
     include_package_data=True,
     install_requires=[
-        "pydantic~=1.8.2",
+        "pydantic~=1.10.2",
         "dnspython~=2.1.0",
     ],
 )
