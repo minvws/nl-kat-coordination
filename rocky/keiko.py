@@ -1,10 +1,14 @@
 import time
-from typing import Dict, Optional
+from typing import Dict, BinaryIO
 
 import requests
 
 from rocky.health import ServiceHealth
 from rocky.settings import KEIKO_API
+
+
+class ReportNotFoundException(Exception):
+    pass
 
 
 class KeikoClient:
@@ -24,17 +28,16 @@ class KeikoClient:
         res.raise_for_status()
         return res.json()["report_id"]
 
-    def get_report(self, report_id: str) -> Optional[bytes]:
+    def get_report(self, report_id: str) -> BinaryIO:
 
         # try max 15 times to get the report, 1 second interval
         for i in range(15):
-            res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf")
+            time.sleep(1)
+            res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf", stream=True)
             if res.status_code == 200:
-                return res.content
-            else:
-                time.sleep(1)
-
-        return None
+                return res.raw
+        res.raise_for_status()
+        raise ReportNotFoundException
 
     def health(self) -> ServiceHealth:
         res = self.session.get(f"{self._base_uri}/health")
