@@ -1,6 +1,3 @@
-# Bug Report Template
-
-```
 ---
 name: Bug report
 about: Create a bug report to help us improve
@@ -44,4 +41,3 @@ If it concerns an in-development version, note the branch(es) and commit hash(es
 
 **Additional context**
 Add any other context about the problem here.
-```
