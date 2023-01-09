@@ -94,7 +94,7 @@ class NormalizerTask(BaseModel):
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
-    type: ClassVar[str] = "normalizer"
+    type: ClassVar[str] = "boefje"
 
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
     boefje: Boefje
