@@ -55,8 +55,10 @@ def validate_ports(
 
     See also: https://nmap.org/book/port-scanning-options.html.
     """
-    assert ports is not None, '"PORTS" argument is not specified.'
-    assert valid.fullmatch(ports) is not None, f'Invalid PORTS argument "{ports}"'
+    if ports is None:
+        raise ValueError('"PORTS" argument is not specified.')
+    if valid.fullmatch(ports) is None:
+        raise ValueError(f'Invalid PORTS argument "{ports}"')
     return ports
 
 
