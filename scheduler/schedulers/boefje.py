@@ -461,7 +461,6 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def is_task_running(self, task: BoefjeTask) -> bool:
-        import pdb; pdb.set_trace()
         # Get the last tasks that have run or are running for the hash
         # of this particular BoefjeTask.
         try:
@@ -475,21 +474,6 @@ class BoefjeScheduler(Scheduler):
                 exc_info=exc_db,
             )
             raise exc_db
-
-        # Is task still running according to the datastore?
-        if (
-            task_db is not None
-            and (task_db.status == TaskStatus.COMPLETED or task_db.status == TaskStatus.FAILED)
-        ):
-            return False
-            self.logger.debug(
-                "Task is still running, according to the datastore [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
-                task_db.id,
-                task.hash,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return True
 
         try:
             task_bytes = self.ctx.services.bytes.get_last_run_boefje(
@@ -510,11 +494,10 @@ class BoefjeScheduler(Scheduler):
 
         # Task has been finished (failed, or succeeded) according to
         # the database, but we have no results of it in bytes, meaning
-        # we have a problem
+        # we have a problem.
         if (
-            task_db is not None
-            and task_bytes is None
-            and (task_db.status == TaskStatus.COMPLETED or task_db.status == TaskStatus.FAILED)
+            task_bytes is None and task_db is not None
+            and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]
         ):
             self.logger.error(
                 "Task has been finished, but no results found in bytes [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
@@ -523,8 +506,22 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            raise Exception(
+            raise RuntimeError(
                 "Task has been finished, but no results found in bytes")
+
+        # Is task still running according to the datastore?
+        if (
+            task_db is not None
+            and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+        ):
+            self.logger.debug(
+                "Task is still running, according to the datastore [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
+                task_db.id,
+                task.hash,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return True
 
         # Is boefje still running according to bytes?
         if (
@@ -560,7 +557,7 @@ class BoefjeScheduler(Scheduler):
         if (
             task_db is not None
             and (task_db.status == TaskStatus.COMPLETED or task_db.status == TaskStatus.FAILED)
-            and datetime.utcnow() - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+            and datetime.now(timezone.utc) - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to the datastore [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",

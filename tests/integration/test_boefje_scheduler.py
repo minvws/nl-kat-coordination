@@ -85,7 +85,7 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
-    def test_populate_queue_scan_level_change(
+    def test_populate_queue_scan_level_change_a(
         self, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running
     ):
         """Scan level change"""
@@ -440,9 +440,12 @@ class SchedulerTestCase(unittest.TestCase):
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    def test_is_task_running(
+    def test_is_task_not_running(
         self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
     ):
+        """When both the task cannot be found in the datastore and bytes
+        the task is not running.
+        """
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -468,6 +471,9 @@ class SchedulerTestCase(unittest.TestCase):
     def test_is_task_running_datastore_running(
         self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
     ):
+        """When the task is found in the datastore and the status isn't
+        failed or completed, then the task is still running.
+        """
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -507,10 +513,12 @@ class SchedulerTestCase(unittest.TestCase):
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    def test_is_task_running_datastore_status(
+    def test_is_task_running_datastore_not_running(
         self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
     ):
-        """If status is completed or failed the task is not running anymore."""
+        """When the task is found in the datastore and the status is
+        failed or completed, then the task is not running.
+        """
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -561,11 +569,200 @@ class SchedulerTestCase(unittest.TestCase):
         is_running = self.scheduler.is_task_running(task)
         self.assertFalse(is_running)
 
-    def test_is_task_running_no_task_in_bytes(self):
-        pass
+    @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
+    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
+    def test_is_task_running_bytes_running(
+            self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
+    ):
+        """When task is found in bytes and the started_at field is not None, and
+        the ended_at field is None. The task is still running."""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        last_run_boefje = BoefjeMetaFactory(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            ended_at=None,
+        )
 
-    def test_is_task_running_grace_period(self):
-        pass
+        # Mock
+        mock_get_latest_task_by_hash.return_value = None
+        mock_get_last_run_boefje.return_value = last_run_boefje
+
+        # Act
+        is_running = self.scheduler.is_task_running(task)
+
+        # Assert
+        self.assertTrue(is_running)
+
+    @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
+    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
+    def test_is_task_running_bytes_not_running(
+        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
+    ):
+        """When task is found in bytes and the started_at field is not None, and
+        the ended_at field is not None. The task is not running."""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        last_run_boefje = BoefjeMetaFactory(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            ended_at=datetime.utcnow(),
+        )
+
+        # Mock
+        mock_get_latest_task_by_hash.return_value = None
+        mock_get_last_run_boefje.return_value = last_run_boefje
+
+        # Act
+        is_running = self.scheduler.is_task_running(task)
+
+        # Assert
+        self.assertFalse(is_running)
+
+    @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
+    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
+    def test_is_task_running_mismatch(
+        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash,
+    ):
+        """When a task has finished according to the datastore, (e.g. failed
+        or completed), but there are no results in bytes, we have a problem.
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        task_db = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            p_item=p_item,
+            status=models.TaskStatus.QUEUED,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        # Mock
+        mock_get_latest_task_by_hash.return_value = task_db
+        mock_get_last_run_boefje.return_value = None
+
+        # Act
+        with self.assertRaises(RuntimeError):
+            is_running = self.scheduler.is_task_running(task)
+
+    # TODO:
+    @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
+    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
+    def test_has_grace_period_passed_datastore_passed(
+        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash,
+    ):
+        """Grace period passed according to datastore."""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        task_db = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            p_item=p_item,
+            status=models.TaskStatus.QUEUED,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        # Mock
+        mock_get_latest_task_by_hash.return_value = task_db
+        mock_get_last_run_boefje.return_value = None
+
+        # Act
+        has_passed = self.scheduler.has_grace_period_passed(task)
+
+        # Assert
+        self.assertTrue(has_passed)
+
+    # TODO:
+    @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
+    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
+    def test_has_grace_period_passed_datastore_not_passed(
+        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash,
+    ):
+        """Grace period not passed according to datastore."""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        task_db = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            p_item=p_item,
+            status=models.TaskStatus.COMPLETED,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        # Mock
+        mock_get_latest_task_by_hash.return_value = task_db
+        mock_get_last_run_boefje.return_value = None
+
+        # Act
+        has_passed = self.scheduler.has_grace_period_passed(task)
+
+        # Assert
+        self.assertFalse(has_passed)
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
@@ -602,192 +799,6 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois(self, mock_get_boefjes_by_type_and_org_id, mock_get_last_run_boefje):
-        """Provided with oois it should return Boefje tasks"""
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefjes = [PluginFactory(type="boefje", scan_level=0) for _ in range(3)]
-        last_run_boefje = BoefjeMetaFactory(
-            boefje=boefjes[0],
-            input_ooi=ooi.primary_key,
-            ended_at=datetime.now(timezone.utc) - timedelta(days=1),
-        )
-
-        mock_get_boefjes_by_type_and_org_id.return_value = boefjes
-        mock_get_last_run_boefje.return_value = last_run_boefje
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-        self.assertEqual(3, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois_plugin_not_found(self, mock_get_boefjes_by_type_and_org_id):
-        """When no plugins are found for boefjes, it should return no boefje tasks"""
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefjes = [PluginFactory(type="boefje") for _ in range(3)]
-
-        mock_get_boefjes_by_type_and_org_id.return_value = boefjes
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-        self.assertEqual(0, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois_plugin_disabled(self, mock_get_boefjes_by_type_and_org_id):
-        """When a plugin is disabled, it should not return a boefje task"""
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefjes = [PluginFactory(type="boefje", scan_level=0, enabled=False) for _ in range(3)]
-
-        mock_get_boefjes_by_type_and_org_id.return_value = boefjes
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-        self.assertEqual(0, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois_no_boefjes(self, mock_get_boefjes_by_type_and_org_id):
-        """When no boefjes are found for oois, it should return no boefje tasks"""
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-
-        mock_get_boefjes_by_type_and_org_id.return_value = None
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-        self.assertEqual(0, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois_scan_level_too_intense(self, mock_get_boefjes_by_type_and_org_id):
-        """When a boefje scan level is too intense for an ooi, it should not return a boefje task"""
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefjes = [PluginFactory(type="boefje", scan_level=5)]
-
-        mock_get_boefjes_by_type_and_org_id.return_value = boefjes
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-
-        self.assertEqual(0, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois_scan_level_allowed(
-        self, mock_get_boefjes_by_type_and_org_id, mock_get_last_run_boefje
-    ):
-        """When a boefje scan level is allowed for an ooi, it should return a boefje task"""
-        scan_profile = ScanProfileFactory(level=5)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefjes = [PluginFactory(type="boefje", scan_level=0)]
-        last_run_boefje = BoefjeMetaFactory(
-            boefje=boefjes[0],
-            input_ooi=ooi.primary_key,
-            ended_at=datetime.now(timezone.utc) - timedelta(days=1),
-        )
-
-        mock_get_boefjes_by_type_and_org_id.return_value = boefjes
-        mock_get_last_run_boefje.return_value = last_run_boefje
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-
-        self.assertEqual(1, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois_grace_period_not_passed(
-        self, mock_get_boefjes_by_type_and_org_id, mock_get_last_run_boefje
-    ):
-        """When a boefje has been run recently, it should not return a boefje task"""
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefjes = [PluginFactory(type="boefje", scan_level=0)]
-        last_run_boefje = BoefjeMetaFactory(
-            boefje=boefjes[0],
-            input_ooi=ooi.primary_key,
-            ended_at=datetime.now(timezone.utc),
-        )
-
-        mock_get_boefjes_by_type_and_org_id.return_value = boefjes
-        mock_get_last_run_boefje.return_value = last_run_boefje
-
-        # Set grace period for a day, when a task has ended_at within this day
-        # it should not return a boefje task
-        self.mock_ctx.config.pq_populate_grace_period = 86400
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-        self.assertEqual(0, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois_grace_period_passed(
-        self, mock_get_boefjes_by_type_and_org_id, mock_get_last_run_boefje
-    ):
-        """When a boefje has been run recently, when the grace period has passed
-        it should return a boefje task
-        """
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefjes = [PluginFactory(type="boefje", scan_level=0)]
-        last_run_boefje = BoefjeMetaFactory(
-            boefje=boefjes[0],
-            input_ooi=ooi.primary_key,
-            ended_at=datetime.now(timezone.utc) - timedelta(days=1),
-        )
-
-        mock_get_boefjes_by_type_and_org_id.return_value = boefjes
-        mock_get_last_run_boefje.return_value = last_run_boefje
-
-        # Set grace period for a day, when a task has ended_at after this day
-        # it should not return a boefje task
-        self.mock_ctx.config.pq_populate_grace_period = 86400
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-        self.assertEqual(1, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_create_tasks_for_oois_boefje_still_running(
-        self, mock_get_boefjes_by_type_and_org_id, mock_get_last_run_boefje
-    ):
-        """When a boefje is still running, it should not return a boefje task"""
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefjes = [PluginFactory(type="boefje", scan_level=0)]
-        last_run_boefje = BoefjeMetaFactory(
-            boefje=boefjes[0],
-            input_ooi=ooi.primary_key,
-            ended_at=None,
-            started_at=datetime.now(timezone.utc),
-        )
-
-        mock_get_boefjes_by_type_and_org_id.return_value = boefjes
-        mock_get_last_run_boefje.return_value = last_run_boefje
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-        self.assertEqual(0, len(tasks))
-
-    @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    @mock.patch("scheduler.context.AppContext.services.datastore.get_task_by_hash")
-    def test_create_task_task_not_found_in_bytes(self, mock_get_last_run_boefje, mock_get_task_by_hash):
-        """When a task is not found in bytes, but is found in the datastore
-        and completed. It should not create a task.
-        """
-        # Create task in datastore, that is completed
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        task = models.BoefjeTask(
-            id=uuid.uuid4().hex,
-            boefje=BoefjeFactory(),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-            status=models.TaskStatus.COMPLETED,
-        )
-
-        mock_get_task_by_hash.return_value = task
-        mock_get_last_run_boefje.return_value = None
-
-        tasks = self.scheduler.create_tasks_for_oois([ooi])
-        self.assertEqual(0, len(tasks))
 
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
     def test_populate_boefjes_queue_qsize(self, mock_get_boefjes_by_type_and_org_id):
