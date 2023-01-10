@@ -68,13 +68,13 @@ ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
 
 
 utest: ## Run the unit tests.
-	$(ci-docker-compose) build
+	$(ci-docker-compose) build $(build_args)
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm bytes_unit
 
 
 itest: ## Run the integration tests.
-	$(ci-docker-compose) build
+	$(ci-docker-compose) build $(build_args)
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm bytes_integration
 
