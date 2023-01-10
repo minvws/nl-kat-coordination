@@ -541,6 +541,12 @@ class BoefjeScheduler(Scheduler):
         return False
 
     def has_grace_period_passed(self, task: BoefjeTask) -> bool:
+        """Check if the grace period has passed for a task in both the
+        datastore and bytes.
+
+        NOTE: We don't check the status of the task since this needs to be done
+        by checking if the task is still running or not.
+        """
         try:
             task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
@@ -556,7 +562,6 @@ class BoefjeScheduler(Scheduler):
         # Has grace period passed according to datastore?
         if (
             task_db is not None
-            and (task_db.status == TaskStatus.COMPLETED or task_db.status == TaskStatus.FAILED)
             and datetime.now(timezone.utc) - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
         ):
             self.logger.debug(
@@ -589,8 +594,7 @@ class BoefjeScheduler(Scheduler):
         if (
             task_bytes is not None
             and task_bytes.ended_at is not None
-            and datetime.now(timezone.utc) - task_bytes.ended_at
-            < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+            and datetime.now(timezone.utc) - task_bytes.ended_at < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to bytes [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
