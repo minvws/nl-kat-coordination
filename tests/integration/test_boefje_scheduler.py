@@ -33,11 +33,11 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.services.octopoes = self.mock_octopoes
 
         # Mock connectors: Scan profiles
-        self.mock_scan_profiles = mock.create_autospec(
-            spec=connectors.listeners.ScanProfile,
+        self.mock_scan_profile_mutation = mock.create_autospec(
+            spec=connectors.listeners.ScanProfileMutation,
             spec_set=True,
         )
-        self.mock_ctx.services.scan_profile = self.mock_scan_profiles
+        self.mock_ctx.services.scan_profile_mutation = self.mock_scan_profile_mutation
 
         # Mock connectors: Katalogus
         self.mock_katalogus = mock.create_autospec(
@@ -85,11 +85,11 @@ class SchedulerTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
-    @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
+    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_for_oois")
-    def test_populate_boefjes_queue_get_latest_object(
-        self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_latest_object
+    def test_populate_boefjes_queue_get_scan_profile_mutation(
+        self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_scan_profile_mutation
     ):
         """When oois are available from octopoes api, and no random oois."""
         scan_profile = ScanProfileFactory(level=0)
@@ -101,7 +101,14 @@ class SchedulerTestCase(unittest.TestCase):
             organization=self.organisation.id,
         )
 
-        mock_get_latest_object.side_effect = [ooi, None]
+        mock_get_scan_profile_mutation.side_effect = [
+            models.ScanProfileMutation(
+                operation=models.MutationOperationType.CREATE,
+                primary_key=ooi.primary_key,
+                value=ooi,
+            ),
+            None,
+        ]
         mock_get_random_objects.return_value = []
         mock_create_tasks_for_oois.side_effect = [
             [functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=0, data=task)],
@@ -116,11 +123,11 @@ class SchedulerTestCase(unittest.TestCase):
         """One ooi has too many boefjes to fit in the queue"""
         pass
 
-    @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
+    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_for_oois")
     def test_populate_boefjes_queue_with_no_oois(
-        self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_latest_object
+        self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_scan_profile_mutation
     ):
         """When no oois are available, it should be filled up with random oois"""
         scan_profile = ScanProfileFactory(level=0)
@@ -132,7 +139,7 @@ class SchedulerTestCase(unittest.TestCase):
             organization=self.organisation.id,
         )
 
-        mock_get_latest_object.return_value = None
+        mock_get_scan_profile_mutation.return_value = None
         mock_get_random_objects.side_effect = [[ooi], [], [], []]
         mock_create_tasks_for_oois.return_value = [
             functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=0, data=task),
@@ -359,10 +366,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.populate_queue()
         self.assertEqual(1, self.scheduler.queue.qsize())
 
-    @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
+    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_for_oois")
-    def test_post_push(self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_latest_object):
+    def test_post_push(self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_scan_profile_mutation):
         """When a task is added to the queue, it should be added to the database"""
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -372,7 +379,14 @@ class SchedulerTestCase(unittest.TestCase):
             organization=self.organisation.id,
         )
 
-        mock_get_latest_object.side_effect = [ooi, None]
+        mock_get_scan_profile_mutation.side_effect = [
+            models.ScanProfileMutation(
+                operation=models.MutationOperationType.CREATE,
+                primary_key=ooi.primary_key,
+                value=ooi,
+            ),
+            None,
+        ]
         mock_get_random_objects.return_value = []
 
         p_item = functions.create_p_item(scheduler_id=self.organisation.id, priority=0, data=task)
@@ -388,10 +402,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    @mock.patch("scheduler.context.AppContext.services.scan_profile.get_latest_object")
+    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.create_tasks_for_oois")
-    def test_post_pop(self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_latest_object):
+    def test_post_pop(self, mock_create_tasks_for_oois, mock_get_random_objects, mock_get_scan_profile_mutation):
         """When a task is removed from the queue, its status should be updated"""
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -401,7 +415,14 @@ class SchedulerTestCase(unittest.TestCase):
             organization=self.organisation.id,
         )
 
-        mock_get_latest_object.side_effect = [ooi, None]
+        mock_get_scan_profile_mutation.side_effect = [
+            models.ScanProfileMutation(
+                operation=models.MutationOperationType.CREATE,
+                primary_key=ooi.primary_key,
+                value=ooi,
+            ),
+            None,
+        ]
         mock_get_random_objects.return_value = []
 
         p_item = functions.create_p_item(scheduler_id=self.organisation.id, priority=0, data=task)
