@@ -1,7 +1,7 @@
 {
-    "id": "kat_webpage_analysis_body",
+    "id": "kat_find_images_in_html",
     "consumes": [
-        "openkat-http/body"
+        "text/html"
     ],
     "produces": [
         "HTTPResource"

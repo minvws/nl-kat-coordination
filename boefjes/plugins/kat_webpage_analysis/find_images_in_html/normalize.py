@@ -1,4 +1,3 @@
-from os.path import normpath, join
 from typing import Union, Iterator
 from urllib.parse import urljoin
 
