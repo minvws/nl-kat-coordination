@@ -1,5 +1,6 @@
-/* Colors */
+/* Color sets */
 @use "@minvws/manon/colors/critical-informational";
+@use "@minvws/manon/tag-colors-soft";
 
 /* Labels */
 @use "@minvws/manon/critical-informational-labels";
@@ -131,3 +132,8 @@
 
 /* Login meta */
 @use "@minvws/manon/login-meta";
+
+/* Tags */
+@use "@minvws/manon/tag";
+@use "@minvws/manon/tags";
+@use "@minvws/manon/tags-6-3";

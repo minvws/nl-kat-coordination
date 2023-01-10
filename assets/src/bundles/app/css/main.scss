@@ -19,7 +19,6 @@ and frameworks – Normalize, Bootstrap, jQueryUI, FancyCarouselSliderjQueryPowe
 https://sass-guidelin.es/#vendors-folder
 */
 @import "manon.scss";
-@import "themes/soft/manon-variables.scss"; /* Theme */
 @import "./vendors/all.scss";
 @import "./vendor/two-factor.scss";
 
@@ -56,8 +55,14 @@ https://sass-guidelin.es/#components-folder
 */
 @import "./components/all.scss";
 
+/* 
+6. Theme
+Branding, and visual theme layer. 
+*/
+@import "themes/soft/manon-variables.scss"; /* Theme */
+
 /*
-6. Page-specific styles
+7. Page-specific styles
 PAGES FOLDER
 If you have page-specific styles, it is better to put them in a `pages/` folder, in a file named after the page. For
 instance, it’s not uncommon to have very specific styles for the home page hence the need for a `_home.scss` file in
