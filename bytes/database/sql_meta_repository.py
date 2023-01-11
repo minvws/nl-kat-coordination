@@ -67,7 +67,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         if query_filter.boefje_id is not None:
             query = query.filter(BoefjeMetaInDB.boefje_id == query_filter.boefje_id)
 
-        if query_filter.input_ooi is not None:
+        if query_filter.input_ooi != "*":
             query = query.filter(BoefjeMetaInDB.input_ooi == query_filter.input_ooi)
 
         ordering_fn = BoefjeMetaInDB.started_at.desc if query_filter.descending else BoefjeMetaInDB.started_at.asc

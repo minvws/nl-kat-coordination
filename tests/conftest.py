@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import Iterator
 
+import alembic.config
 import pytest
 from pydantic import ValidationError
 from sqlalchemy.orm import sessionmaker
@@ -70,27 +71,24 @@ def rfc3616_repository(settings: Settings) -> HashRepository:
 def meta_repository(
     raw_repository: FileRawRepository, mock_hash_repository: PastebinHashRepository, settings: Settings
 ) -> Iterator[SQLMetaDataRepository]:
+    alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
+    alembic.config.main(argv=alembicArgs)
+
     engine = get_engine(settings.bytes_db_uri)
     session = sessionmaker(bind=engine)()
-
-    SQL_BASE.metadata.create_all(engine)
 
     yield SQLMetaDataRepository(session, raw_repository, mock_hash_repository, settings)
 
-    session.close()
-    session = sessionmaker(bind=engine)()
-
-    for table in SQL_BASE.metadata.tables.keys():
-        session.execute(f"TRUNCATE TABLE {table} CASCADE")
-
     session.commit()
-    session.close()
+
+    sessionmaker(bind=engine, autocommit=True)()\
+        .execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()]))
 
 
 @pytest.fixture
-def bytes_api_client(settings: Settings) -> Iterator[BytesAPIClient]:
-    engine = get_engine(settings.bytes_db_uri)
-    SQL_BASE.metadata.create_all(engine)
+def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
+    alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
+    alembic.config.main(argv=alembicArgs)
 
     yield BytesAPIClient(
         "http://ci_bytes:8000",
@@ -98,12 +96,8 @@ def bytes_api_client(settings: Settings) -> Iterator[BytesAPIClient]:
         settings.bytes_password,
     )
 
-    session = sessionmaker(bind=engine)()
-    for table in SQL_BASE.metadata.tables.keys():
-        session.execute(f"TRUNCATE TABLE {table} CASCADE")
-
-    session.commit()
-    session.close()
+    sessionmaker(bind=get_engine(settings.bytes_db_uri), autocommit=True)() \
+        .execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()]))
 
 
 @pytest.fixture

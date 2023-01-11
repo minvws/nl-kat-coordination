@@ -9,7 +9,7 @@ class BoefjeMetaFilter(BaseModel):
     organization: str
 
     boefje_id: Optional[str]
-    input_ooi: Optional[str]
+    input_ooi: Optional[str] = "*"
     limit: int = 1
     descending: bool = True
 

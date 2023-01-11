@@ -12,9 +12,7 @@ from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 def test_save_boefje_meta(meta_repository: SQLMetaDataRepository) -> None:
     boefje_meta = get_boefje_meta()
-    second_boefje_meta = get_boefje_meta(
-        str(uuid.uuid4()), boefje_id=boefje_meta.boefje.id, input_ooi="Network|internet"
-    )
+    second_boefje_meta = get_boefje_meta(str(uuid.uuid4()), boefje_id=boefje_meta.boefje.id, input_ooi=None)
     third_boefje_meta = get_boefje_meta(str(uuid.uuid4()), boefje_id="kat-test-2", input_ooi=boefje_meta.input_ooi)
 
     second_boefje_meta.started_at = boefje_meta.started_at + timedelta(hours=5)
@@ -77,6 +75,8 @@ def test_boefje_id_length(meta_repository: SQLMetaDataRepository) -> None:
             boefje_meta.id = str(uuid.uuid4())
             boefje_meta.boefje.id = 65 * "a"
             meta_repository.save_boefje_meta(boefje_meta)
+
+    meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
 
 
 def test_save_boefje_meta_hash(meta_repository: SQLMetaDataRepository) -> None:
@@ -165,6 +165,8 @@ def test_normalizer_id_length(meta_repository: SQLMetaDataRepository) -> None:
             normalizer_meta.id = str(uuid.uuid4())
             normalizer_meta.normalizer.id = 65 * "a"
             meta_repository.save_normalizer_meta(normalizer_meta)
+
+    meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
 
 
 def test_normalizer_meta_pointing_to_raw_id(meta_repository: SQLMetaDataRepository) -> None:

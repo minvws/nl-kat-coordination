@@ -7,7 +7,7 @@ services:
         ENVIRONMENT: dev
       context: .
       dockerfile: Dockerfile
-    command: pytest -v tests/unit
+    command: pytest tests/unit
     env_file:
       - .ci/.env.test
     volumes:
@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         ENVIRONMENT: dev
-    command: sh -c "sleep ${SLEEP_TIME:-1} && pytest -v tests/integration"
+    command: sh -c "sleep ${SLEEP_TIME:-1} && pytest tests/integration"
     depends_on:
       - ci_bytes
     env_file:

@@ -44,19 +44,17 @@ export m
 
 migrations: ## Generate a migration using alembic
 ifdef m
-ifdef revid
-	$(py-run) -m alembic --config /app/bytes/bytes/alembic.ini revision --autogenerate -m "$(m)" --rev-id="$(revid)"
+	$(py-run) -m alembic --config /app/bytes/bytes/alembic.ini revision --autogenerate -m "$(m)"
 else
-	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
-endif
-else
-	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
+	$(HIDE) (echo "Specify a message with m={message}"; exit 1)
 endif
 
 
 sql: ## Generate raw sql for the migrations
 	$(py-run) -m alembic --config /app/bytes/bytes/alembic.ini upgrade $(rev1):$(rev2) --sql
 
+migrate: ## Run alembic migrations
+	$(py-run) -m alembic --config /app/bytes/bytes/alembic.ini upgrade head
 
 ##
 ##|------------------------------------------------------------------------|
