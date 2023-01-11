@@ -70,7 +70,7 @@ else ifeq ($(revid),)
 else
 	docker-compose \
 		run scheduler \
-		alembic --config /app/scheduler/alembic.ini \
+		alembic --config /app/scheduler/scheduler/alembic.ini \
 		revision --autogenerate \
 		-m "$(m)" --rev-id "$(revid)"
 endif

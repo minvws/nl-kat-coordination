@@ -2,6 +2,7 @@ import copy
 import json
 import unittest
 import uuid
+from datetime import datetime, timedelta
 from typing import Optional
 from unittest import mock
 
@@ -18,7 +19,7 @@ class TestPriorityQueue(queues.PriorityQueue):
         return hash(item.id)
 
 
-class APITestCase(unittest.TestCase):
+class APITemplateTestCase(unittest.TestCase):
     def setUp(self):
         cfg = config.settings.Settings()
 
@@ -62,6 +63,8 @@ class APITestCase(unittest.TestCase):
 
         self.client = TestClient(self.server.api)
 
+
+class APITestCase(APITemplateTestCase):
     def test_get_schedulers(self):
         response = self.client.get("/schedulers")
         self.assertEqual(response.status_code, 200)
@@ -343,25 +346,53 @@ class APITestCase(unittest.TestCase):
         response = self.client.get(f"/queues/{self.scheduler.scheduler_id}/pop")
         self.assertEqual(200, response.status_code)
 
-    def test_get_tasks(self):
-        # First add a task
-        item = create_p_item(self.organisation.id, 0)
 
+class APITasksEndpointTestCase(APITemplateTestCase):
+    def setUp(self):
+        super().setUp()
+
+        # Add one task to the queue
+        first_item = create_p_item(
+            self.organisation.id,
+            0,
+            data=functions.TestModel(
+                id="123",
+                name="test",
+                child=functions.TestModel(id="123.123", name="test.child"),
+            ),
+        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", json=json.loads(first_item.json()))
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        self.first_item_api = self.client.get(f"/tasks/{first_item.id}").json()
+
+        # Add second item to the queue
+        second_item = create_p_item(
+            self.organisation.id,
+            1,
+            data=functions.TestModel(id="456", name="test"),
+        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", json=json.loads(second_item.json()))
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(2, self.scheduler.queue.qsize())
+
+        self.second_item_api = self.client.get(f"/tasks/{second_item.id}").json()
+
+    def test_create_task(self):
+        item = create_p_item(self.organisation.id, 0)
         response_post = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", json=json.loads(item.json()))
         self.assertEqual(201, response_post.status_code)
-        self.assertEqual(1, self.scheduler.queue.qsize())
+
         initial_item_id = response_post.json().get("id")
+        response_get = self.client.get(f"/tasks/{initial_item_id}")
+        self.assertEqual(200, response_get.status_code)
 
-        response_get = self.client.get("/tasks")
-        self.assertEqual(response_get.status_code, 200)
-        self.assertEqual(1, len(response_get.json()["results"]))
-        self.assertEqual(initial_item_id, response_get.json()["results"][0]["id"])
-
-    def test_get_tasks_empty(self):
-        response = self.client.get("/tasks")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(0, len(response.json()["results"]))
-        self.assertEqual(0, response.json()["count"])
+    def test_get_tasks(self):
+        response = self.client.get(f"/tasks")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
 
     def test_get_task(self):
         # First add a task
@@ -369,10 +400,81 @@ class APITestCase(unittest.TestCase):
 
         response_post = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", json=json.loads(item.json()))
         self.assertEqual(201, response_post.status_code)
-        self.assertEqual(1, self.scheduler.queue.qsize())
         initial_item_id = response_post.json().get("id")
 
         # Then get the task
         response_get = self.client.get(f"/tasks/{initial_item_id}")
         self.assertEqual(200, response_get.status_code, 200)
         self.assertEqual(initial_item_id, response_get.json().get("id"))
+
+    def test_get_tasks_value(self):
+        # Get tasks with embedded value of "test"", should return 2 items
+        response = self.client.get(f"/tasks", json=[{"field": "data__name", "operator": "eq", "value": "test"}])
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, len(response.json()["results"]))
+
+        # Get tasks with embedded value of "123", should return 1 item
+        response = self.client.get(f"/tasks", json=[{"field": "data__id", "operator": "eq", "value": "123"}])
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual("123", response.json()["results"][0]["p_item"]["data"]["id"])
+
+        # Get tasks with embedded value of 123 two level deep, should return 1 item
+        response = self.client.get(
+            f"/tasks", json=[{"field": "data__child__name", "operator": "eq", "value": "test.child"}]
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual("123.123", response.json()["results"][0]["p_item"]["data"]["child"]["id"])
+
+    def test_get_tasks_min_and_max_created_at(self):
+        # Get tasks based on datetime, both min_created_at and max_created_at, should return 2 items
+        response = self.client.get(
+            f"/tasks?min_created_at={self.first_item_api.get('created_at')}&max_created_at={self.second_item_api.get('created_at')}"
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, len(response.json()["results"]))
+
+        # Get tasks based on datetime, both min_created_at and max_created_at, should return 1 item
+        response = self.client.get(
+            f"/tasks?min_created_at={self.first_item_api.get('created_at')}&max_created_at={self.first_item_api.get('created_at')}"
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["results"]))
+
+    def test_get_tasks_min_created_at(self):
+        # Get tasks based on datetime, only min_created_at, should return 2 items
+        response = self.client.get(f"/tasks?min_created_at={self.first_item_api.get('created_at')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, len(response.json()["results"]))
+
+        # Get tasks based on datetime, only min_created_at, should return 1 item
+        response = self.client.get(f"/tasks?min_created_at={self.second_item_api.get('created_at')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(self.second_item_api.get("id"), response.json()["results"][0]["id"])
+
+    def test_get_tasks_max_created_at(self):
+        # Get tasks based on datetime, only max_created_at, should return 2 items
+        response = self.client.get(f"/tasks?max_created_at={self.second_item_api.get('created_at')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, len(response.json()["results"]))
+
+        # Get tasks based on datetime, only max_created_at, should return 1 item
+        response = self.client.get(f"/tasks?max_created_at={self.first_item_api.get('created_at')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(self.first_item_api.get("id"), response.json()["results"][0]["id"])
+
+    def test_get_tasks_min_greater_than_max_created_at(self):
+        # Get tasks min_created_at greater than max_created_at, should return an error
+        response = self.client.get(
+            f"/tasks?min_created_at={self.second_item_api.get('created_at')}&max_created_at={self.first_item_api.get('created_at')}"
+        )
+        self.assertEqual(400, response.status_code)
+
+    def test_get_tasks_min_created_at_future(self):
+        # Get tasks based on datetime for something in the future, should return 0 items
+        response = self.client.get(f"/tasks?min_created_at={datetime.now() + timedelta(seconds=10)}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(0, len(response.json()["results"]))

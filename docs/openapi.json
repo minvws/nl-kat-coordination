@@ -7,8 +7,8 @@
     "paths": {
         "/": {
             "get": {
-                "summary": "Method",
-                "operationId": "method__get",
+                "summary": "Root",
+                "operationId": "root__get",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -23,8 +23,8 @@
         },
         "/health": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_health_get",
+                "summary": "Health",
+                "operationId": "health_health_get",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -41,14 +41,15 @@
         },
         "/schedulers": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_schedulers_get",
+                "summary": "Get Schedulers",
+                "operationId": "get_schedulers_schedulers_get",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
                         "content": {
                             "application/json": {
                                 "schema": {
+                                    "title": "Response Get Schedulers Schedulers Get",
                                     "title": "Response Method Schedulers Get",
                                     "type": "array",
                                     "items": {
@@ -63,8 +64,8 @@
         },
         "/schedulers/{scheduler_id}": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_schedulers__scheduler_id__get",
+                "summary": "Get Scheduler",
+                "operationId": "get_scheduler_schedulers__scheduler_id__get",
                 "parameters": [
                     {
                         "required": true,
@@ -100,8 +101,8 @@
                 }
             },
             "patch": {
-                "summary": "Method",
-                "operationId": "method_schedulers__scheduler_id__patch",
+                "summary": "Patch Scheduler",
+                "operationId": "patch_scheduler_schedulers__scheduler_id__patch",
                 "parameters": [
                     {
                         "required": true,
@@ -149,8 +150,8 @@
         },
         "/schedulers/{scheduler_id}/tasks": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_schedulers__scheduler_id__tasks_get",
+                "summary": "List Tasks",
+                "operationId": "list_tasks_schedulers__scheduler_id__tasks_get",
                 "parameters": [
                     {
                         "required": true,
@@ -189,8 +190,41 @@
                         },
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Min Created At",
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "name": "min_created_at",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Max Created At",
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "name": "max_created_at",
+                        "in": "query"
                     }
                 ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "title": "Filters",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Filter"
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -217,8 +251,8 @@
         },
         "/tasks": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_tasks_get",
+                "summary": "List Tasks",
+                "operationId": "list_tasks_tasks_get",
                 "parameters": [
                     {
                         "required": false,
@@ -257,8 +291,41 @@
                         },
                         "name": "limit",
                         "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Min Created At",
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "name": "min_created_at",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": {
+                            "title": "Max Created At",
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "name": "max_created_at",
+                        "in": "query"
                     }
                 ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "title": "Filters",
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Filter"
+                                }
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "Successful Response",
@@ -285,8 +352,8 @@
         },
         "/tasks/{task_id}": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_tasks__task_id__get",
+                "summary": "Get Task",
+                "operationId": "get_task_tasks__task_id__get",
                 "parameters": [
                     {
                         "required": true,
@@ -322,8 +389,8 @@
                 }
             },
             "patch": {
-                "summary": "Method",
-                "operationId": "method_tasks__task_id__patch",
+                "summary": "Patch Task",
+                "operationId": "patch_task_tasks__task_id__patch",
                 "parameters": [
                     {
                         "required": true,
@@ -371,15 +438,15 @@
         },
         "/queues": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_queues_get",
+                "summary": "Get Queues",
+                "operationId": "get_queues_queues_get",
                 "responses": {
                     "200": {
                         "description": "Successful Response",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "title": "Response Method Queues Get",
+                                    "title": "Response Get Queues Queues Get",
                                     "type": "array",
                                     "items": {
                                         "$ref": "#/components/schemas/Queue"
@@ -393,8 +460,8 @@
         },
         "/queues/{queue_id}": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_queues__queue_id__get",
+                "summary": "Get Queue",
+                "operationId": "get_queue_queues__queue_id__get",
                 "parameters": [
                     {
                         "required": true,
@@ -432,8 +499,8 @@
         },
         "/queues/{queue_id}/pop": {
             "get": {
-                "summary": "Method",
-                "operationId": "method_queues__queue_id__pop_get",
+                "summary": "Pop Queue",
+                "operationId": "pop_queue_queues__queue_id__pop_get",
                 "parameters": [
                     {
                         "required": true,
@@ -484,8 +551,8 @@
         },
         "/queues/{queue_id}/push": {
             "post": {
-                "summary": "Method",
-                "operationId": "method_queues__queue_id__push_post",
+                "summary": "Push Queue",
+                "operationId": "push_queue_queues__queue_id__push_post",
                 "parameters": [
                     {
                         "required": true,
@@ -619,7 +686,6 @@
             "PrioritizedItem": {
                 "title": "PrioritizedItem",
                 "required": [
-                    "scheduler_id",
                     "data"
                 ],
                 "type": "object",
@@ -833,7 +899,14 @@
                         "title": "Location",
                         "type": "array",
                         "items": {
-                            "type": "string"
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
                         }
                     },
                     "msg": {
