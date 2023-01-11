@@ -10,11 +10,11 @@ Log4shell scan expects a URL object as input.
 
 ### Output OOIs
 
-Log4shell outputs the following OOIs:
+Currently, output needs to be verified from the `REPLY_FQDN`. In the future Log4shell outputs the following OOIs:
 
-| OOI type  |Description|
-|-----------|---|
-| Finding   |Finding if RCE is possible|
+| OOI type | Description                |
+| -------- | -------------------------- |
+| Finding  | Finding if RCE is possible |
 
 ### Running Boefje
 

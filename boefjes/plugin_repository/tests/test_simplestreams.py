@@ -68,16 +68,12 @@ class TestAPI(TestCase):
 
         # upload plugin
         plugin = load_plugin("test-boefje.yml")
-        with patch(
-            "boefjes.plugin_repository.api.routers.plugins.PLUGINS_DIR", directory
-        ):
+        with patch("boefjes.plugin_repository.api.routers.plugins.PLUGINS_DIR", directory):
             res = upload_plugin(self.client, plugin, b"metadata", b"rootfs")
         self.assertEqual(202, res.status_code)
 
         # retrieve images index
-        with patch(
-            "boefjes.plugin_repository.api.routers.simplestreams.PLUGINS_DIR", directory
-        ):
+        with patch("boefjes.plugin_repository.api.routers.simplestreams.PLUGINS_DIR", directory):
             res = self.client.get("/streams/v1/index.json")
 
         # make sure the plugin is there

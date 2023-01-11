@@ -1,12 +1,11 @@
 import logging
 import os
+import time
 from multiprocessing import Pool
 from typing import Callable
 
-import time
-
-from requests import HTTPError as RequestHTTPError
 from requests import ConnectionError
+from requests import HTTPError as RequestHTTPError
 from urllib3.exceptions import HTTPError
 
 from boefjes.clients.scheduler_client import (
@@ -14,8 +13,10 @@ from boefjes.clients.scheduler_client import (
     SchedulerClientInterface,
 )
 from boefjes.config import Settings
-from boefjes.job_handler import BoefjeMetaHandler, NormalizerMetaHandler
-from boefjes.runtime import ItemHandler, RuntimeManager, StopWorking
+from boefjes.job_handler import BoefjeHandler, NormalizerHandler
+from boefjes.katalogus.local_repository import get_local_repository
+from boefjes.local import LocalNormalizerJobRunner, LocalBoefjeJobRunner
+from boefjes.runtime_interfaces import Handler, RuntimeManager, StopWorking
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 class SchedulerRuntimeManager(RuntimeManager):
     def __init__(
         self,
-        item_handler: ItemHandler,
+        item_handler: Handler,
         client_factory: Callable[[], SchedulerClientInterface],
         settings: Settings,
         log_level: str,  # TODO: (re)move?
@@ -40,14 +41,12 @@ class SchedulerRuntimeManager(RuntimeManager):
 
         with Pool(processes=pool_size) as pool:
             try:
+                # Workers pull tasks from the scheduler
                 pool.starmap(
                     start_working,
-                    [
-                        (self.client_factory(), self.item_handler, self.settings, queue)
-                        for _ in range(pool_size)
-                    ],
+                    [(self.client_factory(), self.item_handler, self.settings, queue) for _ in range(pool_size)],
                 )
-            except Exception as e:
+            except Exception:  # noqa
                 logger.exception("An error occurred")
 
             logger.info("Closing worker pool")
@@ -55,7 +54,7 @@ class SchedulerRuntimeManager(RuntimeManager):
 
 def start_working(
     scheduler_client: SchedulerClientInterface,
-    item_handler: ItemHandler,
+    item_handler: Handler,
     settings: Settings,
     queue_to_handle: RuntimeManager.Queue,
 ) -> None:
@@ -76,7 +75,7 @@ def start_working(
 
             logger.debug(f"Found queues: {[queue.id for queue in queues]}")
         except (RequestHTTPError, HTTPError, ConnectionError):
-            # Scheduler is having issues, so make not of it and try again
+            # Scheduler is having issues, so make note of it and try again
             logger.exception("Getting the queues from the scheduler failed")
             time.sleep(10 * settings.poll_interval)  # But not immediately
 
@@ -88,7 +87,11 @@ def start_working(
                 task = scheduler_client.pop_task(queue.id)
             except (RequestHTTPError, HTTPError, ConnectionError):
                 logger.exception("Popping task from scheduler failed")
-                time.sleep(10 * settings.poll_interval)  # But not immediately
+                time.sleep(10 * settings.poll_interval)
+                continue
+            except Exception:
+                logger.exception("Popping task from scheduler failed")
+                time.sleep(10 * settings.poll_interval)
                 continue
 
             if not task:
@@ -96,29 +99,26 @@ def start_working(
                 continue
 
             try:
-                logger.info(f"Handling task[{task.item.id}]")
-                item_handler.handle(task.item)
+                logger.info(f"Handling task[{task.data.id}]")
+                item_handler.handle(task.data)
             except StopWorking:
                 logger.info("Stopping worker...")
-                break
-            except:
+                return
+            except:  # noqa
                 logger.exception("An error occurred handling a scheduler item")
 
         time.sleep(settings.poll_interval)
 
 
-def get_runtime_manager(
-    settings: Settings, queue: RuntimeManager.Queue, log_level: str
-) -> RuntimeManager:
+def get_runtime_manager(settings: Settings, queue: RuntimeManager.Queue, log_level: str) -> RuntimeManager:
     # Not a lambda since multiprocessing tries and fails to pickle lambda's
     def client_factory():
         return SchedulerAPIClient(settings.scheduler_api)
 
-    item_handler = (
-        BoefjeMetaHandler()
-        if queue is RuntimeManager.Queue.BOEFJES
-        else NormalizerMetaHandler()
-    )
+    if queue is RuntimeManager.Queue.BOEFJES:
+        item_handler = BoefjeHandler(LocalBoefjeJobRunner(get_local_repository()), get_local_repository())
+    else:
+        item_handler = NormalizerHandler(LocalNormalizerJobRunner(get_local_repository()))
 
     return SchedulerRuntimeManager(
         item_handler,

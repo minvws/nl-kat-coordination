@@ -41,11 +41,7 @@ class RepositoryStorageMemory(RepositoryStorage):
         organisation_id: str,
         defaults: Dict[str, Repository] = None,
     ):
-        self._data = (
-            repositories.setdefault(organisation_id, {})
-            if defaults is None
-            else defaults
-        )
+        self._data = repositories.setdefault(organisation_id, {}) if defaults is None else defaults
         self._organisation_id = organisation_id
 
     def get_by_id(self, id_: str) -> Repository:
@@ -75,20 +71,12 @@ class SettingsStorageMemory(SettingsStorage):
         return self._data[organisation_id][f"{plugin_id}.{key}"]
 
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
-        return {
-            k.split(".", maxsplit=1)[1]: v
-            for k, v in self._data[organisation_id].items()
-            if plugin_id in k
-        }
+        return {k.split(".", maxsplit=1)[1]: v for k, v in self._data[organisation_id].items() if plugin_id in k}
 
-    def create(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ) -> None:
+    def create(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
         self._data[organisation_id][f"{plugin_id}.{key}"] = value
 
-    def update_by_key(
-        self, key: str, value: str, organisation_id: str, plugin_id: str
-    ) -> None:
+    def update_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
         self._data[organisation_id][f"{plugin_id}.{key}"] = value
 
     def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
@@ -101,22 +89,14 @@ class PluginStatesStorageMemory(PluginEnabledStorage):
         organisation: str,
         defaults: Dict[str, bool] = None,
     ):
-        self._data = (
-            plugins_state.setdefault(organisation, {}) if defaults is None else defaults
-        )
+        self._data = plugins_state.setdefault(organisation, {}) if defaults is None else defaults
         self._organisation = organisation
 
-    def get_by_id(
-        self, plugin_id: str, repository_id: str, organisation_id: str
-    ) -> bool:
+    def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
         return self._data[plugin_id]
 
-    def create(
-        self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str
-    ) -> None:
+    def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
         self._data[plugin_id] = enabled
 
-    def update_or_create_by_id(
-        self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str
-    ) -> None:
+    def update_or_create_by_id(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
         self._data[plugin_id] = enabled

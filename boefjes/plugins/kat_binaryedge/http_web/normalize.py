@@ -19,7 +19,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
@@ -74,17 +74,13 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
             for app in response.get("apps", {}):
                 if "cpe" in app:
-                    software_ooi = Software(name=get_name_from_cpe(cpe), cpe=app["cpe"])
+                    software_ooi = Software(name=get_name_from_cpe(app["cpe"]), cpe=app["cpe"])
                     yield software_ooi
-                    yield SoftwareInstance(
-                        ooi=ip_port_ooi.reference, software=software_ooi.reference
-                    )
+                    yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
                 else:
                     software_name = app["name"]
                     if "version" in app:
-                        software_ooi = Software(
-                            name=software_name, version=app["version"]
-                        )
+                        software_ooi = Software(name=software_name, version=app["version"])
                         yield software_ooi
                         yield SoftwareInstance(
                             ooi=ip_port_ooi.reference,
@@ -109,12 +105,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 # Check all values for 'cpe'
                 if isinstance(potential_software, dict) and "cpe" in potential_software:
                     software_ooi = Software(
-                        name=get_name_from_cpe(cpe), cpe=potential_software["cpe"]
+                        name=get_name_from_cpe(potential_software["cpe"]), cpe=potential_software["cpe"]
                     )
                     yield software_ooi
-                    yield SoftwareInstance(
-                        ooi=ip_port_ooi.reference, software=software_ooi.reference
-                    )
+                    yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
 
             key_software = {
                 "secrets": "AWS Secrets",
@@ -126,6 +120,4 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 if ks_key in data:
                     software_ooi = Software(name=ks_software)
                     yield software_ooi
-                    yield SoftwareInstance(
-                        ooi=ip_port_ooi.reference, software=software_ooi.reference
-                    )
+                    yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)

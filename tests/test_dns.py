@@ -18,7 +18,7 @@ from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
 
 from boefjes.plugins.kat_dns.normalize import run
 from boefjes.plugins.kat_dns_zone.normalize import run as run_zone_normalizer
-from boefjes.job_models import NormalizerMeta, BoefjeMeta, Normalizer, Boefje
+from boefjes.job_models import NormalizerMeta, BoefjeMeta, Normalizer, Boefje, RawDataMeta
 from tests.stubs import get_dummy_data
 
 
@@ -40,17 +40,11 @@ class DnsTest(TestCase):
         zone = DNSZone(hostname=zone_hostname.reference)
         zone_hostname.dns_zone = zone.reference
 
-        input_hostname = Hostname(
-            name="example.nl", network=internet.reference, dns_zone=zone.reference
-        )
+        input_hostname = Hostname(name="example.nl", network=internet.reference, dns_zone=zone.reference)
 
         ip_v4_addresses = [
-            IPAddressV4(
-                network=internet.reference, address=IPv4Address("94.198.159.35")
-            ),
-            IPAddressV4(
-                network=internet.reference, address=IPv4Address("94.198.159.36")
-            ),
+            IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.35")),
+            IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.36")),
         ]
         dns_a_records = [
             DNSARecord(
@@ -164,19 +158,22 @@ class DnsTest(TestCase):
         self.assertCountEqual(expected, oois)
 
     def test_dns_normalizer_cname(self):
-
         meta = NormalizerMeta(
             id="",
             normalizer=Normalizer(id="kat_dns_normalize"),
-            boefje_meta=BoefjeMeta(
-                id="1234",
-                boefje=Boefje(id="dns-records"),
-                organization="_dev",
-                input_ooi="Hostname|internet|www.example.nl.",
-                arguments={
-                    "domain": "www.example.nl.",
-                    "input": {"name": "www.example.nl."},
-                },
+            raw_data=RawDataMeta(
+                id="",
+                boefje_meta=BoefjeMeta(
+                    id="1234",
+                    boefje=Boefje(id="dns-records"),
+                    organization="_dev",
+                    input_ooi="Hostname|internet|www.example.nl.",
+                    arguments={
+                        "domain": "www.example.nl.",
+                        "input": {"name": "www.example.nl."},
+                    },
+                ),
+                mime_types=[{"value": "boefje/dns-records"}],
             ),
         )
 
@@ -228,9 +225,7 @@ class DnsTest(TestCase):
             target_hostname=cname_target.reference,
         )
 
-        ip_address = IPAddressV4(
-            network=internet.reference, address=IPv4Address("94.198.159.35")
-        )
+        ip_address = IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.35"))
         dns_a_record = DNSARecord(
             hostname=cname_target.reference,
             address=ip_address.reference,
@@ -252,19 +247,22 @@ class DnsTest(TestCase):
         self.assertCountEqual(expected, oois)
 
     def test_parse_record_null_mx_record(self):
-
         meta = NormalizerMeta(
             id="",
             normalizer=Normalizer(id="kat_dns_normalize"),
-            boefje_meta=BoefjeMeta(
-                id="1234",
-                boefje=Boefje(id="dns-records"),
-                organization="_dev",
-                input_ooi="Hostname|internet|english.example.nl.",
-                arguments={
-                    "domain": "english.example.nl",
-                    "input": {"name": "english.example.nl"},
-                },
+            raw_data=RawDataMeta(
+                id="",
+                boefje_meta=BoefjeMeta(
+                    id="1234",
+                    boefje=Boefje(id="dns-records"),
+                    organization="_dev",
+                    input_ooi="Hostname|internet|english.example.nl.",
+                    arguments={
+                        "domain": "english.example.nl",
+                        "input": {"name": "english.example.nl"},
+                    },
+                ),
+                mime_types=[{"value": "boefje/dns-records"}],
             ),
         )
 
@@ -313,19 +311,22 @@ redir.example.nl. 14400 IN MX 0 .
         )
 
     def test_parse_cname_soa(self):
-
         meta = NormalizerMeta(
             id="",
             normalizer=Normalizer(id="kat_dns_normalize"),
-            boefje_meta=BoefjeMeta(
-                id="1234",
-                boefje=Boefje(id="dns-records"),
-                organization="_dev",
-                input_ooi="Hostname|internet|www.example.com",
-                arguments={
-                    "domain": "www.example.com",
-                    "input": {"name": "www.example.com"},
-                },
+            raw_data=RawDataMeta(
+                id="",
+                boefje_meta=BoefjeMeta(
+                    id="1234",
+                    boefje=Boefje(id="dns-records"),
+                    organization="_dev",
+                    input_ooi="Hostname|internet|www.example.com",
+                    arguments={
+                        "domain": "www.example.com",
+                        "input": {"name": "www.example.com"},
+                    },
+                ),
+                mime_types=[{"value": "boefje/dns-records"}],
             ),
         )
 
@@ -363,9 +364,7 @@ redir.example.nl. 14400 IN MX 0 .
             ttl=60,
             target_hostname=zone_hostname.reference,
         )
-        ip_address = IPAddressV4(
-            network=internet.reference, address=IPv4Address("94.198.159.35")
-        )
+        ip_address = IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.35"))
         a_record = DNSARecord(
             hostname=zone_hostname.reference,
             address=ip_address.reference,
@@ -432,7 +431,6 @@ redir.example.nl. 14400 IN MX 0 .
         )
 
     def test_find_parent_dns_zone(self):
-
         input_ = serialize_ooi(
             DNSZone(
                 hostname=Hostname(
@@ -445,12 +443,16 @@ redir.example.nl. 14400 IN MX 0 .
         meta = NormalizerMeta(
             id="",
             normalizer=Normalizer(id="kat_dns_normalize"),
-            boefje_meta=BoefjeMeta(
-                id="1234",
-                boefje=Boefje(id="dns-records"),
-                organization="_dev",
-                input_ooi="DnsZone|internet|sub.example.nl.",
-                arguments={"input": input_},
+            raw_data=RawDataMeta(
+                id="",
+                boefje_meta=BoefjeMeta(
+                    id="1234",
+                    boefje=Boefje(id="dns-records"),
+                    organization="_dev",
+                    input_ooi="DnsZone|internet|sub.example.nl.",
+                    arguments={"input": input_},
+                ),
+                mime_types=[{"value": "boefje/dns-records"}],
             ),
         )
 

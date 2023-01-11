@@ -45,9 +45,7 @@ def _get_plugin(
 
 
 @router.get("", response_model=Dict[str, PluginType])
-def list_plugins(
-    index: Index = Depends(get_index), plugin_choice: Optional[PluginChoice] = None
-) -> Dict[str, Plugin]:
+def list_plugins(index: Index = Depends(get_index), plugin_choice: Optional[PluginChoice] = None) -> Dict[str, Plugin]:
     ret = {
         name: image.plugin
         for name, image in index.images.items()
@@ -78,9 +76,7 @@ def add_plugin(
     except pydantic.ValidationError as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail=exc.errors())
 
-    background_tasks.add_task(
-        _handle_plugin_upload, PLUGINS_DIR, manifest, plugin, metadata, rootfs
-    )
+    background_tasks.add_task(_handle_plugin_upload, PLUGINS_DIR, manifest, plugin, metadata, rootfs)
 
     return {}
 

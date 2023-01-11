@@ -27,9 +27,7 @@ class SQLRepositoryStorage(SessionMixin, RepositoryStorage):
     def get_all(self) -> Dict[str, Repository]:
         query = self.session.query(RepositoryInDB)
 
-        return {
-            repository.id: self.to_repository(repository) for repository in query.all()
-        }
+        return {repository.id: self.to_repository(repository) for repository in query.all()}
 
     def create(self, repository: Repository) -> None:
         logger.info("Saving repository: %s", repository.json())
@@ -38,11 +36,7 @@ class SQLRepositoryStorage(SessionMixin, RepositoryStorage):
         self.session.add(repository_in_db)
 
     def _db_instance_by_id(self, repository_id: str) -> RepositoryInDB:
-        instance = (
-            self.session.query(RepositoryInDB)
-            .filter(RepositoryInDB.id == repository_id)
-            .first()
-        )
+        instance = self.session.query(RepositoryInDB).filter(RepositoryInDB.id == repository_id).first()
 
         if instance is None:
             raise RepositoryNotFound(repository_id) from ObjectNotFoundException(

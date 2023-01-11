@@ -9,7 +9,7 @@ from boefjes.job_models import NormalizerMeta
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
 
     results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
     for header in results["headers"].items():
         h = HTTPHeader(resource=ooi, key=header[0], value=header[1])

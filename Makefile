@@ -6,7 +6,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 # Makefile Reference: https://tech.davis-hansson.com/p/make/
 
-.PHONY: help sql migrate migrations
+.PHONY: help sql migrate migrations debian ubuntu clean
 
 # use HIDE to run commands invisibly, unless VERBOSE defined
 HIDE:=$(if $(VERBOSE),,@)
@@ -28,7 +28,7 @@ help: ## Show this help.
 ##|------------------------------------------------------------------------|
 ##			Development
 ##|------------------------------------------------------------------------|
-build: migrate seed
+build: seed
 
 seed:  # Seed the katalogus database
 	-docker-compose run katalogus python -m boefjes.seed
@@ -44,16 +44,15 @@ ifeq ($(m),)
 else ifeq ($(revid),)
 	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run katalogus python -m alembic revision --autogenerate -m "$(m)" --rev-id="$(revid)"
+	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)" --rev-id="$(revid)"
 endif
 
 
 sql: ## Generate raw sql for the migrations
-	docker-compose run katalogus python -m alembic upgrade $(rev1):$(rev2) --sql
+	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade $(rev1):$(rev2) --sql
 
-
-migrate: ## Run migrations using alembic
-	docker-compose run katalogus python -m alembic upgrade head
+check:
+	pre-commit run --all-files --show-diff-on-failure --color always
 
 ##
 ##|------------------------------------------------------------------------|
@@ -71,22 +70,8 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) run --rm katalogus_integration
 
 debian:
-	-mkdir ./build
-ifdef OCTOPOES_DIR
-	docker run \
-	--env PKG_NAME=kat-boefjes \
-	--env BUILD_DIR=./build \
-	--env REPOSITORY=minvws/nl-kat-boefjes \
-	--env RELEASE_VERSION=${RELEASE_VERSION} \
-	--env RELEASE_TAG=${RELEASE_TAG} \
-	--env OCTOPOES_DIR=/octopoes \
-	--mount type=bind,src=${CURDIR},dst=/app \
-	--mount type=bind,src=${OCTOPOES_DIR},dst=/octopoes \
-	--workdir /app \
-	debian:latest \
-	packaging/scripts/build-debian-package.sh
-else
-	docker run \
+	mkdir -p build
+	docker run --rm \
 	--env PKG_NAME=kat-boefjes \
 	--env BUILD_DIR=./build \
 	--env REPOSITORY=minvws/nl-kat-boefjes \
@@ -94,9 +79,27 @@ else
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--workdir /app \
-	debian:latest \
+	kat-debian-build-image \
 	packaging/scripts/build-debian-package.sh
-endif
+
+ubuntu:
+	mkdir -p build
+	docker run --rm \
+	--env PKG_NAME=kat-boefjes \
+	--env BUILD_DIR=./build \
+	--env REPOSITORY=minvws/nl-kat-boefjes \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--workdir /app \
+	kat-ubuntu-build-image \
+	packaging/scripts/build-debian-package.sh
 
 clean:
-	-rm -rf build
+	rm -rf build
+	rm -rf debian/kat-*/ debian/.debhelper debian/files *.egg-info/ dist/
+	rm debian/debhelper-build-stamp
+	rm debian/*.*.debhelper
+	rm debian/*.substvars
+	rm debian/*.debhelper.log
+	rm debian/changelog

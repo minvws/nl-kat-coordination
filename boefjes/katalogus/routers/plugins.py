@@ -54,9 +54,7 @@ def list_repository_plugins(
         return p.repository_plugins(repository_id, organisation_id)
 
 
-@router.get(
-    "/repositories/{repository_id}/plugins/{plugin_id}", response_model=PluginType
-)
+@router.get("/repositories/{repository_id}/plugins/{plugin_id}", response_model=PluginType)
 def get_repository_plugin(
     plugin_id: str,
     repository_id: str,
@@ -90,7 +88,7 @@ def update_plugin_state(
 
 
 @router.get("/plugins/{plugin_id}/schema.json", include_in_schema=False)
-def get_plugin_cover(
+def get_plugin_schema(
     plugin_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> JSONResponse:  # TODO: support for plugin covers in plugin repositories (?)

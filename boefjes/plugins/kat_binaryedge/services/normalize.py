@@ -31,7 +31,7 @@ def get_name_from_cpe(cpe: str) -> str:
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
@@ -79,39 +79,27 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             else:
                 software_ooi = Software(name=module.upper())
             yield software_ooi
-            yield SoftwareInstance(
-                ooi=ip_port_ooi.reference, software=software_ooi.reference
-            )
+            yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         elif module == "rsync":
             software_ooi = Software(
                 name=module.upper(),
                 version=scan.get("result", {}).get("data", {}).get("version"),
             )
             yield software_ooi
-            yield SoftwareInstance(
-                ooi=ip_port_ooi.reference, software=software_ooi.reference
-            )
+            yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         elif module == "telnet":
             software_ooi = Software(name=module.upper())
             yield software_ooi
-            yield SoftwareInstance(
-                ooi=ip_port_ooi.reference, software=software_ooi.reference
-            )
+            yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         elif module == "smb":
-            for dialect in (
-                scan.get("result", {}).get("data", {}).get("smb_dialects", [])
-            ):
+            for dialect in scan.get("result", {}).get("data", {}).get("smb_dialects", []):
                 software_ooi = Software(name=module.upper(), version=dialect)
                 yield software_ooi
-                yield SoftwareInstance(
-                    ooi=ip_port_ooi.reference, software=software_ooi.reference
-                )
+                yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
             for cpe in scan.get("result", {}).get("data", {}).get("cpe", []):
                 software_ooi = Software(name=get_name_from_cpe(cpe), cpe=cpe)
                 yield software_ooi
-                yield SoftwareInstance(
-                    ooi=ip_port_ooi.reference, software=software_ooi.reference
-                )
+                yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
 
         # (potential) TODO: SSH: hassh, hassh-algoritms
         # (potential) TODO: RSYNC: result.data.status

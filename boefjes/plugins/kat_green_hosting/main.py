@@ -1,14 +1,14 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 import requests
 from boefjes.job_models import BoefjeMeta
 
 API_URL = "https://admin.thegreenwebfoundation.org"
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     hostname = input_["hostname"]["name"]
 
     response = requests.get(f"{API_URL}/greencheck/{hostname}")
 
-    return boefje_meta, response.content
+    return [(set(), response.content)]

@@ -11,7 +11,7 @@ from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     ooi = Reference.from_str(boefje_meta.input_ooi)
 
     connector = OctopoesAPIConnector(settings.octopoes_api, boefje_meta.organization)
@@ -19,7 +19,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     # Get current ports
     try:
         current_tree = connector.get_tree(ooi, types={IPPort}, depth=1)
-    except ObjectNotFoundException as e:
+    except ObjectNotFoundException:
         # This IP doesn't exist anymore
         return
 
@@ -31,10 +31,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     # Get ports from a week ago
     last_week = datetime.now(timezone.utc) - timedelta(days=7)
     try:
-        old_tree = connector.get_tree(
-            ooi, types={IPPort}, depth=1, valid_time=last_week
-        )
-    except ObjectNotFoundException as e:
+        old_tree = connector.get_tree(ooi, types={IPPort}, depth=1, valid_time=last_week)
+    except ObjectNotFoundException:
         # This IP was not known a week ago
         return
 

@@ -19,7 +19,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.boefje_meta
+    boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
     pk_ooi = Reference.from_str(boefje_meta.input_ooi)
     network = Network(name="internet").reference
@@ -61,11 +61,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         yield ip_port_ooi
 
         service_name = ""
-        if (
-            module == "rdp"
-            and scan.get("result", {}).get("data", {}).get("security", "").lower()
-            == "ssl"
-        ):
+        if module == "rdp" and scan.get("result", {}).get("data", {}).get("security", "").lower() == "ssl":
             service_name = "ssl/rdp"
         elif module == "rdp" or module == "rdpeudp" or module == "bluekeep":
             service_name = "rdp"
@@ -75,9 +71,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         service_ooi = Service(name=service_name)
         yield service_ooi
 
-        ip_service_ooi = IPService(
-            ip_port=ip_port_ooi.reference, service=service_ooi.reference
-        )
+        ip_service_ooi = IPService(ip_port=ip_port_ooi.reference, service=service_ooi.reference)
         yield ip_service_ooi
 
         kat_641_ooi = KATFindingType(id="KAT-641")
@@ -88,15 +82,12 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             description=f"{module.upper()} should not be exposed to the internet.",
         )
 
-        if (
-            module == "bluekeep"
-            and scan.get("result", {}).get("data", {}).get("status", "").lower()
-            == "vulnerable"
-        ):
+        if module == "bluekeep" and scan.get("result", {}).get("data", {}).get("status", "").lower() == "vulnerable":
             kat_642_ooi = KATFindingType(id="KAT-642")
             yield kat_642_ooi
             yield Finding(
                 finding_type=kat_642_ooi.reference,
                 ooi=ip_service_ooi.reference,
-                description=f"It is verified that this Remote Desktop server is vulnerable to the Bluekeep vulnerability.",
+                description="It is verified that this Remote Desktop server is vulnerable to the Bluekeep "
+                "vulnerability.",
             )

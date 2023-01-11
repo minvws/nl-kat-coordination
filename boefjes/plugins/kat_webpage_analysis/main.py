@@ -1,5 +1,5 @@
 import json
-from typing import Tuple, Union
+from typing import Tuple, Union, List
 from boefjes.job_models import BoefjeMeta
 
 import requests
@@ -7,7 +7,7 @@ from urllib.parse import urlparse, urlunsplit
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
 
     port = f":{input_['web_url']['port']}"
@@ -62,4 +62,4 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
     except requests.exceptions.ConnectionError:
         result = {}
 
-    return boefje_meta, json.dumps(result)
+    return [(set(), json.dumps(result))]

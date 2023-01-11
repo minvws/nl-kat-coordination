@@ -27,9 +27,7 @@ class NmapTest(TestCase):
 
     def test_nmap_arguments_tcp_top_150_ipv6(self):
 
-        args = build_nmap_arguments(
-            "2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, 250
-        )
+        args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, 250)
         self.assertListEqual(
             [
                 "nmap",
@@ -69,9 +67,7 @@ class NmapTest(TestCase):
         )
 
     def test_nmap_arguments_tcp_full_ipv6(self):
-        args = build_nmap_arguments(
-            "2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, None
-        )
+        args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, None)
         self.assertListEqual(
             [
                 "nmap",
@@ -101,6 +97,7 @@ class NmapTest(TestCase):
                 "-v10",
                 "-sV",
                 "-sU",
+                "-p-",
                 "-oX",
                 "-",
                 "1.1.1.1",
@@ -109,9 +106,7 @@ class NmapTest(TestCase):
         )
 
     def test_nmap_arguments_udp_full_ipv6(self):
-        args = build_nmap_arguments(
-            "2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.UDP, None
-        )
+        args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.UDP, None)
         self.assertListEqual(
             [
                 "nmap",
@@ -121,6 +116,7 @@ class NmapTest(TestCase):
                 "-v10",
                 "-sV",
                 "-sU",
+                "-p-",
                 "-6",
                 "-oX",
                 "-",
@@ -150,9 +146,7 @@ class NmapTest(TestCase):
         )
 
     def test_nmap_arguments_udp_top250_ipv6(self):
-        args = build_nmap_arguments(
-            "2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.UDP, 250
-        )
+        args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.UDP, 250)
         self.assertListEqual(
             [
                 "nmap",

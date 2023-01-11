@@ -1,3 +1,4 @@
+from datetime import timezone, datetime
 from pathlib import Path
 
 import sys
@@ -5,11 +6,13 @@ from typing import List
 from unittest import TestCase, mock
 
 from boefjes.job_models import BoefjeMeta
-from boefjes.job_handler import handle_boefje_job
+from boefjes.job_handler import BoefjeHandler
+from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Boefje, Normalizer, Bit, PluginType
-from boefjes.runner import LocalBoefjeJobRunner
 
-import boefjes.plugins.models
+from boefjes.local import LocalBoefjeJobRunner
+
+MOCKED_NOW = datetime(2020, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 
 
 class TaskTest(TestCase):
@@ -82,34 +85,37 @@ class TaskTest(TestCase):
             organization="_dev",
         ).copy()
 
-    @mock.patch("boefjes.runner.get_environment_settings", return_value={})
+    @mock.patch("boefjes.job_handler.now", return_value=MOCKED_NOW)
+    @mock.patch("boefjes.job_handler.get_environment_settings", return_value={})
     @mock.patch("boefjes.job_handler.bytes_api_client")
-    def test_handle_boefje_with_exception(
-        self, mock_bytes_api_client, mock_get_environment_settings
-    ):
+    @mock.patch("boefjes.job_handler._find_ooi_in_past")
+    def test_handle_boefje_with_exception(self, mock_find_ooi_in_past, mock_bytes_api_client, mock_get_env, mock_now):
         meta = BoefjeMeta(
             id="some-random-job-id",
-            boefje={"id": "dummy-with-exception"},
+            boefje={"id": "dummy_boefje_runtime_exception"},
             input_ooi="Network|internet",
             arguments={},
             organization="_dev",
         )
-        boefje = boefjes.plugins.models.BoefjeResource(
-            Path(__file__).parent / "modules/dummy_boefje_runtime_exception",
-            "modules.dummy_boefje_runtime_exception",
-            "",
-        )
 
-        handle_boefje_job(meta, LocalBoefjeJobRunner(meta, boefje, {}))
+        local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
+        BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository).handle(meta)
 
-        mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
-        mock_bytes_api_client.save_raw.assert_called_once_with(
-            "some-random-job-id",
-            "dummy error",
+        expected_meta = meta.copy()
+        expected_meta.ended_at = MOCKED_NOW
+
+        mock_bytes_api_client.save_boefje_meta.assert_called_once_with(expected_meta)
+
+        save_raw_call = mock_bytes_api_client.save_raw.call_args_list[0][0]
+
+        self.assertEqual("some-random-job-id", save_raw_call[0])
+        self.assertIn("Traceback", save_raw_call[1])
+        self.assertEqual(
             {
                 "error/boefje",
-                "dummy-with-exception",
-                "boefje/dummy-with-exception",
-                f"boefje/dummy-with-exception-{meta.parameterized_arguments_hash}",
+                "dummy_boefje_runtime_exception",
+                "boefje/dummy_boefje_runtime_exception",
+                f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
             },
+            save_raw_call[2],
         )

@@ -24,9 +24,7 @@ def get_engine() -> Engine:
     return engine
 
 
-def session_managed_iterator(
-    service_factory: Callable[[Session], Any]
-) -> Iterator[Any]:
+def session_managed_iterator(service_factory: Callable[[Session], Any]) -> Iterator[Any]:
     """For FastApi-style managing of sessions life cycle within a request."""
 
     session = sessionmaker(bind=get_engine())()
@@ -45,6 +43,4 @@ def session_managed_iterator(
 
 class ObjectNotFoundException(Exception):
     def __init__(self, cls: Type[SQL_BASE], **kwargs):  # type: ignore
-        super().__init__(
-            f"The object of type {cls} was not found for query parameters {kwargs}"
-        )
+        super().__init__(f"The object of type {cls} was not found for query parameters {kwargs}")

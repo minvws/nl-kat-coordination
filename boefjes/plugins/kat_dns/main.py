@@ -1,7 +1,7 @@
 """Boefje script for getting dns records"""
 import json
 import logging
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 
 import dns.resolver
 from dns.name import Name
@@ -16,7 +16,7 @@ class ZoneNotFoundException(Exception):
     pass
 
 
-def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
+def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     hostname = boefje_meta.arguments["input"]["name"]
 
@@ -36,20 +36,18 @@ def run(boefje_meta: BoefjeMeta) -> Tuple[BoefjeMeta, Union[bytes, str]]:
         except dns.resolver.NoAnswer:
             pass
         except dns.resolver.NXDOMAIN:
-            return boefje_meta, "NXDOMAIN"
+            return [(set(), "NXDOMAIN")]
         except dns.resolver.Timeout:
             pass
 
-    answers_formatted = [
-        f"RESOLVER: {answer.nameserver}\n{answer.response}" for answer in answers
-    ]
+    answers_formatted = [f"RESOLVER: {answer.nameserver}\n{answer.response}" for answer in answers]
 
     results = {
         "dns_records": "\n\n".join(answers_formatted),
         "dmarc_response": get_email_security_records(hostname, "_dmarc"),
         "dkim_response": get_email_security_records(hostname, "_domainkey"),
     }
-    return boefje_meta, json.dumps(results)
+    return [(set(), json.dumps(results))]
 
 
 def get_parent_zone_soa(name: Name) -> Answer:

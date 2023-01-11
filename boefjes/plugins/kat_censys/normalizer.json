@@ -1,0 +1,13 @@
+{
+    "id": "kat_censys_normalize",
+    "consumes": [
+        "censys"
+    ],
+    "produces": [
+        "IPPort",
+        "Certificate",
+        "SoftwareInstance",
+        "ResolvedHostname",
+        "HTTPHeader"
+    ]
+}

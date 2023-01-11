@@ -11,18 +11,18 @@ jobs:
     steps:
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - uses: actions/checkout@v1
+
+      - uses: actions/checkout@v3
 
       - name: Replace version number with release version
         run: find . -type f -name 'version.py' -exec sed -ibak "s/__version__ = .*/__version__ = \"${RELEASE_VERSION}\"/" {} \;
 
       - name: Configure git
-        env:
-          TOKEN: ${{ secrets.RDO_REPO_RO }}
-        run: git config --global url."https://${{ secrets.RDO_REPO_RO }}@github.com/".insteadOf "ssh://git@github.com/"
+        run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
       - name: prep
         run: sudo mkdir -p /var/www/html
+
       - name: prep chown
         run: sudo chown `id -u`:`id -g` /var/www/html
 
@@ -37,7 +37,7 @@ jobs:
         working-directory: /var/www/html
 
       - name: Create archive
-        run: tar -zcvf boefjes_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
+        run: tar -zcvf ../boefjes_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
 
       - name: Create boefjes release
         run:  tar -cvzf ../boefjes_${{ env.RELEASE_VERSION }}.tar.gz .
@@ -47,9 +47,9 @@ jobs:
         with:
           name: boefjes_${{ env.RELEASE_VERSION }}
           path: ../boefjes_${{ env.RELEASE_VERSION }}.tar.gz
+
       - name: Upload venv tar
         uses: actions/upload-artifact@v1
         with:
           name: boefjes_venv_${{ env.RELEASE_VERSION }}
-          path: boefjes_venv_${{ env.RELEASE_VERSION }}.tar.gz
-
+          path: ../boefjes_venv_${{ env.RELEASE_VERSION }}.tar.gz

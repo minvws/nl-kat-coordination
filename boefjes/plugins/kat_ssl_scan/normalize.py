@@ -9,7 +9,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     root = ET.fromstring(raw)
-    website_reference = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+    website_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
     protocols = []
     for protocol in root.findall("./ssltest/protocol"):
@@ -18,8 +18,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         enabled = protocol.attrib["enabled"] == "1"
 
         protocols.append((type_, version, enabled))
-
-    test = root.find("./ssltest")
 
     if ("ssl", "2", True) in protocols:
         kft = KATFindingType(id="KAT-540")
