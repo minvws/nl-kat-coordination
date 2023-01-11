@@ -29,7 +29,7 @@ ifeq ("$(wildcard .env)","")
 	make env
 endif
 	make clean
-	make clone-main
+	make clone-stable
 	make build
 	make up
 
@@ -62,13 +62,13 @@ clone:
 	-git clone https://github.com/minvws/nl-kat-keiko.git
 	-git clone https://github.com/minvws/nl-kat-rocky.git
 
-clone-main:
-	-git clone --branch main https://github.com/minvws/nl-kat-boefjes.git
-	-git clone --branch main https://github.com/minvws/nl-kat-bytes.git
-	-git clone --branch main https://github.com/minvws/nl-kat-octopoes.git
-	-git clone --branch main https://github.com/minvws/nl-kat-mula.git
-	-git clone --branch main https://github.com/minvws/nl-kat-keiko.git
-	-git clone --branch main https://github.com/minvws/nl-kat-rocky.git
+clone-stable:
+	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-boefjes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-boefjes.git
+	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-bytes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-bytes.git
+	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-octopoes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-octopoes.git
+	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-mula/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-mula.git
+	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-keiko/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-keiko.git
+	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-rocky.git
 
 pull:
 	-git pull

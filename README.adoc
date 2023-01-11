@@ -1,6 +1,8 @@
 
 = Wat is OpenKAT?
 
+*NOTE: You can find the most recent English documentation at https://minvws.github.io/nl-kat-coordination/*
+
 OpenKAT heeft als doel het monitoren, registreren en analyseren van de status van informatiesystemen. Het uitgangspunt is dat veel van de grote beveiligingsincidenten worden veroorzaakt door kleine fouten en bekende kwetsbaarheden en dat als je die tijdig kunt vinden je systemen en infrastructuur een stuk veiliger worden.
 
 OpenKAT scant, verzamelt, analyseert en rapporteert in een permanent proces:
