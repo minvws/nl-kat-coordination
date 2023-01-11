@@ -8,7 +8,8 @@ from requests.exceptions import RequestException
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from tools.models import SCAN_LEVEL, Organization, OrganizationMember
+from tools.enums import SCAN_LEVEL
+from tools.models import Organization, OrganizationMember
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
 

@@ -1,6 +1,6 @@
 from typing import List, Tuple, Any
 from django.utils.translation import gettext_lazy as _
-from tools.models import SCAN_LEVEL
+from tools.enums import SCAN_LEVEL
 
 Choice = Tuple[Any, str]
 Choices = List[Choice]

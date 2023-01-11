@@ -8,4 +8,6 @@ max-line-length = 120
 # E203 and W503 are recommended for compatibility with Black (https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8)
 ignore = E203, W503
 exclude = .git, __pycache__, old, build, dist, venv
-per-file-ignores = __init__.py:F401,F403
+per-file-ignores =
+    __init__.py:F401,F403
+    whitelist.py:F821

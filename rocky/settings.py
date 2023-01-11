@@ -102,6 +102,7 @@ INSTALLED_APPS = [
     "django_password_validators.password_history",
     "rest_framework",
     "tagulous",
+    "drf_standardized_errors",
 ]
 
 MIDDLEWARE = [
@@ -340,6 +341,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAdminUser",
     ],
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
 }
 
 

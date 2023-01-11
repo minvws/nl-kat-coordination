@@ -1,0 +1,2 @@
+class RockyError(Exception):
+    pass

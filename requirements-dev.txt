@@ -31,6 +31,7 @@ django-password-validators==1.7.0
 django-csp==3.7
 djangorestframework==3.14.0
 django-tagulous==1.3.3
+drf-standardized-errors==0.12.4
 
 # temp fix to pass build, remove later when https://github.com/xhtml2pdf/xhtml2pdf/issues/589 is solved
 reportlab==3.6.12

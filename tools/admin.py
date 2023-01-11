@@ -7,6 +7,8 @@ from django.forms import widgets
 
 import tagulous.admin
 
+from rocky.admin import AdminErrorMessageMixin
+
 from tools.models import (
     Organization,
     OrganizationMember,
@@ -49,7 +51,7 @@ class OOIInformationAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 
-class OrganizationAdmin(admin.ModelAdmin):
+class OrganizationAdmin(AdminErrorMessageMixin, admin.ModelAdmin):
     list_display = ["name", "code", "tags"]
 
     def has_delete_permission(self, request, obj=None):

@@ -21,6 +21,7 @@ follow_imports = "skip"
 exclude = [".git", "__pycache__", "old", "build", "dist", "venv"]
 paths = ["./"]
 min_confidence = 90
+ignore_names = ["mock_*"]
 
 [tool.pylint.format]
 max-line-length = 120
