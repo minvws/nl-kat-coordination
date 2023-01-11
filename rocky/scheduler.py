@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import datetime
+import uuid
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Union
 
 import requests
-import uuid
 from pydantic import BaseModel, Field
 
 from rocky.health import ServiceHealth
@@ -94,6 +96,7 @@ class TaskStatus(Enum):
 class Task(BaseModel):
     id: str
     scheduler_id: str
+    type: str
     p_item: QueuePrioritizedItem
     status: TaskStatus
     created_at: datetime.datetime
@@ -110,15 +113,109 @@ class PaginatedTasksResponse(BaseModel):
     results: List[Task]
 
 
+class LazyTaskList:
+    def __init__(
+        self,
+        scheduler_client: SchedulerClient,
+        scheduler_id: str,
+        object_type: Optional[str] = None,
+        status: Optional[str] = None,
+        min_created_at: Optional[datetime.datetime] = None,
+        max_created_at: Optional[datetime.datetime] = None,
+        filters: Optional[List[Dict]] = None,
+    ):
+        self.scheduler_client = scheduler_client
+
+        self.scheduler_id = scheduler_id
+        self.object_type = object_type
+        self.status = status
+        self.min_created_at = min_created_at
+        self.max_created_at = max_created_at
+        self.filters = filters
+
+        self._count = None
+
+    @property
+    def count(self) -> int:
+        if self._count is None:
+            self._count = self.scheduler_client.list_tasks(
+                self.scheduler_id,
+                type=self.object_type,
+                limit=0,
+                status=self.status,
+                min_created_at=self.min_created_at,
+                max_created_at=self.max_created_at,
+                filters=self.filters,
+            ).count
+        return self._count
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, key) -> List[Task]:
+        if isinstance(key, slice):
+            offset = key.start or 0
+            limit = key.stop - offset
+        elif isinstance(key, int):
+            offset = key
+            limit = 1
+        else:
+            raise TypeError("Invalid slice argument type.")
+
+        res = self.scheduler_client.list_tasks(
+            self.scheduler_id,
+            type=self.object_type,
+            limit=limit,
+            offset=offset,
+            status=self.status,
+            min_created_at=self.min_created_at,
+            max_created_at=self.max_created_at,
+            filters=self.filters,
+        )
+
+        self._count = res.count
+        return res.results
+
+
 class SchedulerClient:
     def __init__(self, base_uri: str):
         self.session = requests.Session()
         self._base_uri = base_uri
 
-    def list_tasks(self, queue_name: str, limit: int) -> PaginatedTasksResponse:
-        params = {"limit": limit}
-        res = self.session.get(f"{self._base_uri}/schedulers/{queue_name}/tasks", params=params)
+    def list_tasks(
+        self,
+        scheduler_id: str,
+        type: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        status: Optional[str] = None,
+        min_created_at: Optional[datetime.datetime] = None,
+        max_created_at: Optional[datetime.datetime] = None,
+        filters: Optional[List[Dict]] = None,
+    ) -> PaginatedTasksResponse:
+        params = {
+            "scheduler_id": scheduler_id,
+            "type": type,
+            "limit": limit,
+            "offset": offset,
+            "status": status,
+            "min_created_at": min_created_at,
+            "max_created_at": max_created_at,
+        }
+
+        res = self.session.get(f"{self._base_uri}/tasks", params=params, json=filters)
         return PaginatedTasksResponse.parse_raw(res.text)
+
+    def get_lazy_task_list(
+        self,
+        scheduler_id: str,
+        object_type: Optional[str] = None,
+        status: Optional[str] = None,
+        min_created_at: Optional[datetime.datetime] = None,
+        max_created_at: Optional[datetime.datetime] = None,
+        filters: Optional[List[Dict]] = None,
+    ) -> LazyTaskList:
+        return LazyTaskList(self, scheduler_id, object_type, status, min_created_at, max_created_at, filters)
 
     def get_task_details(self, task_id):
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")

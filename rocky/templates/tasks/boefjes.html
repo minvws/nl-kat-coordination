@@ -57,8 +57,9 @@
               </tbody>
             </table>
           </div>
-        </div>
-      {% endif %}
+          {% include 'partials/list_paginator.html' %}
+        {% endif %}
+      </div>
     </section>
   </main>
 {% endblock %}

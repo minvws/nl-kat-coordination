@@ -58,6 +58,9 @@
             {% if ooi != plugin.produces|last %}-{% endif %}
           {% endfor %}
         </p>
+        <p>
+            {% include 'partials/scan_history.html' %}
+        </p>
       </div>
     </section>
     {% if perms.tools.can_scan_organization %}
