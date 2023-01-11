@@ -217,5 +217,12 @@ class TestPluginsService(TestCase):
 
         self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
 
+        self.service.settings_storage.update_by_key("api_key", 24, self.organisation, plugin_id)  # not multiple of 10
+
+        with self.assertRaises(SettingsNotConformingToSchema) as ctx:
+            self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
+
+        self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
+
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertFalse(plugin.enabled)
