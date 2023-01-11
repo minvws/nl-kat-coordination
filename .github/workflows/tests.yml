@@ -8,10 +8,15 @@ on:
   push:
     branches:
       - 'develop'
-      - 'master'
+      - 'main'
 
 jobs:
   Tests:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '3.8', '3.9', '3.10', '3.11' ]
 
     runs-on: ubuntu-20.04
     env:
@@ -25,11 +30,11 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: ${{ matrix.version }}
           cache: 'pip' # caching pip dependencies
 
       - name: Install pip
-        run: python3.8 -m pip install --upgrade pip
+        run: python3 -m pip install --upgrade pip
 
       - name: Install dev requirements
         run: pip install -r requirements-dev.txt
@@ -38,4 +43,4 @@ jobs:
         run: find . -name requirements.txt | xargs -L 1 pip install -r
 
       - name: Run pytests
-        run: python3.8 -m pytest
+        run: python3 -m pytest
