@@ -24,7 +24,7 @@ class OrganisationInDB(SQL_BASE):
     __tablename__ = "organisation"
 
     pk = Column(Integer, primary_key=True, autoincrement=True)
-    id = Column(String(length=4), unique=True, nullable=False)
+    id = Column(String(length=32), unique=True, nullable=False)
     name = Column(String(length=64), nullable=False)
 
     repositories = relationship("RepositoryInDB", secondary=organisation_repo_association_table)

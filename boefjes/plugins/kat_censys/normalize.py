@@ -25,7 +25,7 @@ from boefjes.job_models import NormalizerMeta
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     results = json.loads(raw)
-    ip_ooi_reference = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+    ip_ooi_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
     network_reference = Network(name=ip_ooi_reference.tokenized.network.name).reference
     ip = results["ip"]
@@ -73,8 +73,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 valid_until=0,
                 pk_algorithm=certificate["leaf_data"]["pubkey_algorithm"],
                 pk_size=certificate["leaf_data"]["pubkey_bit_size"],
-                pk_number=certificate["leaf_data"]["fingerprint"],
-                website="",  # todo: should be fixed in the Certificate model
+                serial_number=certificate["leaf_data"]["fingerprint"],
                 signed_by=None,
             )
 
