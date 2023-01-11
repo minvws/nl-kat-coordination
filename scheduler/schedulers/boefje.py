@@ -492,26 +492,10 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_bytes
 
-        # Task has been finished (failed, or succeeded) according to
-        # the database, but we have no results of it in bytes, meaning
-        # we have a problem.
-        if (
-            task_bytes is None and task_db is not None
-            and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]
-        ):
-            self.logger.error(
-                "Task has been finished, but no results found in bytes [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
-                task_db.id,
-                task.hash,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            raise RuntimeError(
-                "Task has been finished, but no results found in bytes")
-
         # Is task still running according to the datastore?
         if (
             task_db is not None
+            and task_bytes is None
             and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]
         ):
             self.logger.debug(
@@ -522,6 +506,24 @@ class BoefjeScheduler(Scheduler):
                 self.scheduler_id,
             )
             return True
+
+        # Task has been finished (failed, or succeeded) according to
+        # the database, but we have no results of it in bytes, meaning
+        # we have a problem.
+        if (
+            task_bytes is None
+            and task_db is not None
+            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+        ):
+            self.logger.error(
+                "Task has been finished, but no results found in bytes [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
+                task_db.id,
+                task.hash,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            raise RuntimeError(
+                "Task has been finished, but no results found in bytes")
 
         # Is boefje still running according to bytes?
         if (
