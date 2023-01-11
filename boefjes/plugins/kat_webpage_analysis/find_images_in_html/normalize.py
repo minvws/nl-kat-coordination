@@ -13,8 +13,8 @@ from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
-    soup = BeautifulSoup(raw, 'html.parser')
-    images = set([img['src'] for img in soup.find_all('img') if hasattr(img, 'src')])
+    soup = BeautifulSoup(raw, "html.parser")
+    images = set([img["src"] for img in soup.find_all("img") if hasattr(img, "src")])
 
     network_name = normalizer_meta.raw_data.boefje_meta.arguments["input"]["website"]["hostname"]["network"]["name"]
     host = normalizer_meta.raw_data.boefje_meta.arguments["input"]["website"]["hostname"]["name"]

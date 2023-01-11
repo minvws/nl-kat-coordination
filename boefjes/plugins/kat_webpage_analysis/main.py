@@ -55,7 +55,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         body_mimetypes.add(content_type[0])
 
     return [
-        ({"openkat-http/full"}, "%s\n\n%s" % (response.headers, response.content)),
+        ({"openkat-http/full"}, f"{response.headers}\n\n{response.content}"),
         ({"openkat-http/headers"}, json.dumps(dict(response.headers))),
         (body_mimetypes, response.content),
     ]

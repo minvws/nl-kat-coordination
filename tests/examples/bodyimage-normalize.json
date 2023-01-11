@@ -59,7 +59,7 @@
     ]
   },
   "normalizer": {
-    "id": "kat_webpage_analysis_image",
+    "id": "kat_check_images",
     "version": null
   }
 }
