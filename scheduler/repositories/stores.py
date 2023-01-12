@@ -34,7 +34,7 @@ class TaskStorer(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def get_tasks_by_hash(self, task_hash: str) -> Optional[models.Task]:
+    def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
         raise NotImplementedError
 
     @abc.abstractmethod
