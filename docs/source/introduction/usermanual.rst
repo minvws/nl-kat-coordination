@@ -24,7 +24,7 @@ Crisis Room
 The Crisis Room provides the overview of all findings, which can be viewed for different times. The time of day can be selected with the option button after which the findings that were applicable at that time become visible.
 
 .. image:: img/crisisroom.png
-  alt: crisisroom
+  :alt: crisisroom
 
 KAT catalog
 -----------

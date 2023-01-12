@@ -11,3 +11,4 @@ Welcome to the OpenKAT documentation!
    guidelines/index
    templates/index
    technical_design/index
+   modules/index

@@ -20,7 +20,7 @@ You need the following things to install OpenKAT:
 Before installing
 -----------------
 
-OpenKAT is installed in Docker, and therefore Docker must be installed first. Do this according to the instructions of your (Unix) operating system. You can read the instructions for Ubuntu below. On the `website of Docker <https://docs.docker.com/engine/install/`_ you will see installation instructions for other distributions.
+OpenKAT is installed in Docker, and therefore Docker must be installed first. Do this according to the instructions of your (Unix) operating system. You can read the instructions for Ubuntu below. On the `website of Docker <https://docs.docker.com/engine/install/>`_ you will see installation instructions for other distributions.
 
 Docker install
 **************
