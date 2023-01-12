@@ -15,12 +15,12 @@ services:
       - .env
 
   crux:
-    image: "juxt/xtdb-standalone-rocksdb:1.21.0"
+    image: "ghcr.io/dekkers/xtdb-http-multinode:main"
     restart: on-failure
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
-      - xtdb-data:/usr/lib/xtdb/data
+      - xtdb-data:/var/lib/xtdb
 
   octopoes_api:
     restart: on-failure
@@ -32,9 +32,11 @@ services:
       context: nl-kat-octopoes/
       args:
         ENVIRONMENT: dev
-    command: web
+    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
     env_file:
       - .env
+    volumes:
+      - ./nl-kat-octopoes:/app/octopoes
 
   octopoes_api_worker:
     restart: on-failure
@@ -48,6 +50,8 @@ services:
     command: worker-beat
     env_file:
       - .env
+    volumes:
+      - ./nl-kat-octopoes:/app/octopoes
 
   boefje:
     restart: on-failure
@@ -164,7 +168,7 @@ services:
       dockerfile: nl-kat-boefjes/Dockerfile.dev
       args:
         ENVIRONMENT: dev
-    command: katalogus
+    command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./nl-kat-boefjes:/app/boefjes
     ports:
@@ -210,6 +214,7 @@ services:
       context: nl-kat-keiko/
     ports:
       - "127.0.0.1:8005:8000"
+    command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko
     env_file:
       - .env
     volumes:
