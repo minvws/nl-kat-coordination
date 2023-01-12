@@ -12,8 +12,8 @@ OpenKAT aims to monitor, record and analyze the status of information systems. O
 
 Two brochures about OpenKAT have been created with a general explanation, both are in Dutch:
 
-- `the 'TL;DR' of 2 pages (English) <pdf/OpenKAT handout_ENG.pdf>`_
-- `the extensive brochure on OpenKAT (Dutch) <pdf/introductie OpenKAT V20220621.pdf>`_
+- :download:`the 'TL;DR' of 2 pages (English) <pdf/OpenKAT handout_ENG.pdf>`
+- :download:`the extensive brochure on OpenKAT (Dutch) <pdf/introductie OpenKAT V20220621.pdf>`
 
 These, like the information in the high on documentation you are reading now, are aimed at a general understanding of the system. The documentation for each module goes into more detail about how the software itself works.
 

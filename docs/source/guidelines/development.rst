@@ -153,4 +153,4 @@ These are automatically rendered by GitHub and the online Sphinx docs.
 
 Mermaid has support for things like PlantUML and ERD's.
 
-### require time estimate and timeframe for an issue
+.. require time estimate and timeframe for an issue
