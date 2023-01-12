@@ -42,7 +42,12 @@ exclude_patterns = []
 
 html_theme = "sphinx_rtd_theme"
 
-html_theme_options = {"collapse_navigation": False}
+html_logo = "keiko-hero.jpg"
+
+html_theme_options = {
+    "collapse_navigation": False,
+    "style_nav_header_background": "#ca005d",
+}
 
 html_context = {
     "display_github": True,

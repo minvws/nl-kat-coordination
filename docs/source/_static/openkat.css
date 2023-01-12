@@ -1,3 +1,7 @@
-.wy-nav-content:has(.wy-table-responsive){
-   max-width: fit-content;
+.wy-nav-content:has(.wy-table-responsive) {
+    max-width: fit-content;
+}
+
+.wy-side-nav-search > div.version {
+    color: hsla(0, 0%, 100%, .6);
 }
