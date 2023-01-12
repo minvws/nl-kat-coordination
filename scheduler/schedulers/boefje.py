@@ -8,9 +8,16 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
-                              Organisation, Plugin, PrioritizedItem,
-                              TaskStatus)
+from scheduler.models import (
+    OOI,
+    Boefje,
+    BoefjeTask,
+    MutationOperationType,
+    Organisation,
+    Plugin,
+    PrioritizedItem,
+    TaskStatus,
+)
 
 from .scheduler import Scheduler
 
@@ -229,8 +236,7 @@ class BoefjeScheduler(Scheduler):
             return
 
     def push_tasks_for_random_objects(self) -> None:
-        """Push tasks for random objects from octopoes to the queue.
-        """
+        """Push tasks for random objects from octopoes to the queue."""
         tries = 0
         while not self.queue.full():
             time.sleep(1)
@@ -510,11 +516,7 @@ class BoefjeScheduler(Scheduler):
         # Task has been finished (failed, or succeeded) according to
         # the database, but we have no results of it in bytes, meaning
         # we have a problem.
-        if (
-            task_bytes is None
-            and task_db is not None
-            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
-        ):
+        if task_bytes is None and task_db is not None and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
             self.logger.error(
                 "Task has been finished, but no results found in bytes [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
                 task_db.id,
@@ -522,15 +524,10 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            raise RuntimeError(
-                "Task has been finished, but no results found in bytes")
+            raise RuntimeError("Task has been finished, but no results found in bytes")
 
         # Is boefje still running according to bytes?
-        if (
-            task_bytes is not None
-            and task_bytes.ended_at is None
-            and task_bytes.started_at is not None
-        ):
+        if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
             self.logger.debug(
                 "Task is still running, according to bytes [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
                 task_bytes.id,
@@ -562,9 +559,8 @@ class BoefjeScheduler(Scheduler):
             raise exc_db
 
         # Has grace period passed according to datastore?
-        if (
-            task_db is not None
-            and datetime.now(timezone.utc) - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+        if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timedelta(
+            seconds=self.ctx.config.pq_populate_grace_period
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to the datastore [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",
@@ -596,7 +592,8 @@ class BoefjeScheduler(Scheduler):
         if (
             task_bytes is not None
             and task_bytes.ended_at is not None
-            and datetime.now(timezone.utc) - task_bytes.ended_at < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+            and datetime.now(timezone.utc) - task_bytes.ended_at
+            < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to bytes [task_id=%s, hash=%s, org_id=%s, scheduler_id=%s]",

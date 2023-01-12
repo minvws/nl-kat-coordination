@@ -7,9 +7,13 @@ from typing import Any, Dict, List, Optional, Type
 import pydantic
 from scheduler import models, repositories
 
-from .errors import (InvalidPrioritizedItemError, NotAllowedError,
-                     PrioritizedItemNotFoundError, QueueEmptyError,
-                     QueueFullError)
+from .errors import (
+    InvalidPrioritizedItemError,
+    NotAllowedError,
+    PrioritizedItemNotFoundError,
+    QueueEmptyError,
+    QueueFullError,
+)
 
 
 class PriorityQueue(abc.ABC):

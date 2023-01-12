@@ -3,11 +3,15 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import (config, connectors, models, queues, rankers,
-                       repositories, schedulers)
-from tests.factories import (BoefjeFactory, BoefjeMetaFactory, OOIFactory,
-                             OrganisationFactory, PluginFactory,
-                             ScanProfileFactory)
+from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
+from tests.factories import (
+    BoefjeFactory,
+    BoefjeMetaFactory,
+    OOIFactory,
+    OrganisationFactory,
+    PluginFactory,
+    ScanProfileFactory,
+)
 from tests.utils import functions
 
 
@@ -87,7 +91,12 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     def test_push_tasks_for_scan_profile_mutations(
-        self, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi, mock_has_grace_period_passed, mock_is_task_allowed_to_run, mock_is_task_running
+        self,
+        mock_get_scan_profile_mutation,
+        mock_get_boefjes_for_ooi,
+        mock_has_grace_period_passed,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         """Scan level change"""
         # Arrange
@@ -122,7 +131,9 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     def test_push_tasks_for_scan_profile_mutations_no_boefjes_found(
-        self, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi,
+        self,
+        mock_get_scan_profile_mutation,
+        mock_get_boefjes_for_ooi,
     ):
         """When no plugins are found for boefjes, it should return no boefje tasks"""
         # Arrange
@@ -147,7 +158,11 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     def test_push_tasks_for_scan_profile_mutations_not_allowed_to_run(
-        self, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running
+        self,
+        mock_get_scan_profile_mutation,
+        mock_get_boefjes_for_ooi,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         """When a boefje is not allowed to run, it should not be added to the queue"""
         # Arrange
@@ -175,7 +190,11 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     def test_push_tasks_for_scan_profile_mutations_still_running(
-        self, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running
+        self,
+        mock_get_scan_profile_mutation,
+        mock_get_boefjes_for_ooi,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         """When a boefje is still running, it should not be added to the queue"""
         # Arrange
@@ -204,7 +223,12 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     def test_push_tasks_for_scan_profile_mutations_item_on_queue(
-        self, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi, mock_has_grace_period_passed,mock_is_task_allowed_to_run, mock_is_task_running
+        self,
+        mock_get_scan_profile_mutation,
+        mock_get_boefjes_for_ooi,
+        mock_has_grace_period_passed,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         """When a boefje is already on the queue, it should not be added to the queue"""
         # Arrange
@@ -243,7 +267,12 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     def test_push_tasks_for_random_objects(
-        self, mock_get_random_objects, mock_get_boefjes_for_ooi, mock_has_grace_period_passed, mock_is_task_allowed_to_run, mock_is_task_running
+        self,
+        mock_get_random_objects,
+        mock_get_boefjes_for_ooi,
+        mock_has_grace_period_passed,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -274,7 +303,9 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     def test_push_tasks_for_random_objects_no_boefjes_found(
-            self, mock_get_random_objects, mock_get_boefjes_for_ooi,
+        self,
+        mock_get_random_objects,
+        mock_get_boefjes_for_ooi,
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -296,7 +327,7 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     def test_push_tasks_for_random_objects_not_allowed_to_run(
-            self, mock_get_random_objects, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running
+        self, mock_get_random_objects, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -321,7 +352,12 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     def test_push_tasks_for_random_objects_still_running(
-        self, mock_get_random_objects, mock_get_boefjes_for_ooi, mock_has_grace_period_passed, mock_is_task_allowed_to_run, mock_is_task_running
+        self,
+        mock_get_random_objects,
+        mock_get_boefjes_for_ooi,
+        mock_has_grace_period_passed,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -341,14 +377,18 @@ class SchedulerTestCase(unittest.TestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     def test_push_tasks_for_random_objects_item_on_queue(
-        self, mock_get_random_objects, mock_get_boefjes_for_ooi, mock_has_grace_period_passed, mock_is_task_allowed_to_run, mock_is_task_running
+        self,
+        mock_get_random_objects,
+        mock_get_boefjes_for_ooi,
+        mock_has_grace_period_passed,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -382,7 +422,12 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     def test_push_tasks_for_random_objects_everything_processed(
-        self, mock_get_random_objects, mock_get_boefjes_for_ooi, mock_has_grace_period_passed, mock_is_task_allowed_to_run, mock_is_task_running
+        self,
+        mock_get_random_objects,
+        mock_get_boefjes_for_ooi,
+        mock_has_grace_period_passed,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         """Test if the scheduler stops when there are no more objects to
         process.
@@ -452,9 +497,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    def test_is_task_not_running(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
-    ):
+    def test_is_task_not_running(self, mock_get_last_run_boefje, mock_get_latest_task_by_hash):
         """When both the task cannot be found in the datastore and bytes
         the task is not running.
         """
@@ -480,9 +523,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    def test_is_task_running_datastore_running(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
-    ):
+    def test_is_task_running_datastore_running(self, mock_get_last_run_boefje, mock_get_latest_task_by_hash):
         """When the task is found in the datastore and the status isn't
         failed or completed, then the task is still running.
         """
@@ -526,9 +567,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    def test_is_task_running_datastore_not_running(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
-    ):
+    def test_is_task_running_datastore_not_running(self, mock_get_last_run_boefje, mock_get_latest_task_by_hash):
         """When the task is found in the datastore and the status is
         failed or completed, then the task is not running.
         """
@@ -578,7 +617,8 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Mock
         mock_get_latest_task_by_hash.side_effect = [
-            task_db_first, task_db_second,
+            task_db_first,
+            task_db_second,
         ]
         mock_get_last_run_boefje.return_value = last_run_boefje
 
@@ -592,9 +632,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    def test_is_task_running_bytes_running(
-            self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
-    ):
+    def test_is_task_running_bytes_running(self, mock_get_last_run_boefje, mock_get_latest_task_by_hash):
         """When task is found in bytes and the started_at field is not None, and
         the ended_at field is None. The task is still running."""
         # Arrange
@@ -624,9 +662,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
-    def test_is_task_running_bytes_not_running(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash
-    ):
+    def test_is_task_running_bytes_not_running(self, mock_get_last_run_boefje, mock_get_latest_task_by_hash):
         """When task is found in bytes and the started_at field is not None, and
         the ended_at field is not None. The task is not running."""
         # Arrange
@@ -657,7 +693,9 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
     def test_is_task_running_mismatch(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash,
+        self,
+        mock_get_last_run_boefje,
+        mock_get_latest_task_by_hash,
     ):
         """When a task has finished according to the datastore, (e.g. failed
         or completed), but there are no results in bytes, we have a problem.
@@ -701,7 +739,9 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
     def test_has_grace_period_passed_datastore_passed(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash,
+        self,
+        mock_get_last_run_boefje,
+        mock_get_latest_task_by_hash,
     ):
         """Grace period passed according to datastore, and the status is completed"""
         # Arrange
@@ -745,7 +785,9 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
     def test_has_grace_period_passed_datastore_not_passed(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash,
+        self,
+        mock_get_last_run_boefje,
+        mock_get_latest_task_by_hash,
     ):
         """Grace period not passed according to datastore."""
         # Arrange
@@ -789,7 +831,9 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
     def test_has_grace_period_passed_bytes_passed(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash,
+        self,
+        mock_get_last_run_boefje,
+        mock_get_latest_task_by_hash,
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -838,7 +882,9 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
     def test_has_grace_period_passed_bytes_not_passed(
-        self, mock_get_last_run_boefje, mock_get_latest_task_by_hash,
+        self,
+        mock_get_last_run_boefje,
+        mock_get_latest_task_by_hash,
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -891,7 +937,13 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     def test_populate_queue_random_objects(
-        self, mock_get_random_objects, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running, mock_has_grace_period_passed,
+        self,
+        mock_get_random_objects,
+        mock_get_scan_profile_mutation,
+        mock_get_boefjes_for_ooi,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
+        mock_has_grace_period_passed,
     ):
         """When no scan profile mutations are present, it should be filled up
         with random oois"""
@@ -929,7 +981,13 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
     def test_populate_queue_scan_profile_mutations(
-        self, mock_get_scan_profile_mutation, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running, mock_has_grace_period_passed, mock_push_tasks_for_random_objects,
+        self,
+        mock_get_scan_profile_mutation,
+        mock_get_boefjes_for_ooi,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
+        mock_has_grace_period_passed,
+        mock_push_tasks_for_random_objects,
     ):
         """Population of queue should start with scan profile mutations"""
         # Arrange
@@ -1009,7 +1067,9 @@ class SchedulerTestCase(unittest.TestCase):
             organization=self.organisation.id,
         )
         p_item = functions.create_p_item(
-            scheduler_id=self.organisation.id, priority=0, data=task,
+            scheduler_id=self.organisation.id,
+            priority=0,
+            data=task,
         )
 
         # Act
@@ -1037,7 +1097,9 @@ class SchedulerTestCase(unittest.TestCase):
             organization=self.organisation.id,
         )
         p_item = functions.create_p_item(
-            scheduler_id=self.organisation.id, priority=0, data=task,
+            scheduler_id=self.organisation.id,
+            priority=0,
+            data=task,
         )
 
         # Act
