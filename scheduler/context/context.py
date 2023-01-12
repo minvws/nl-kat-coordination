@@ -35,34 +35,34 @@ class AppContext:
             logging.config.dictConfig(json.load(f))
 
         # Services
-        katalogus = services.Katalogus(
+        katalogus_service = services.Katalogus(
             host=self.config.host_katalogus,
             source=f"scheduler/{scheduler.__version__}",
         )
 
-        bytes = services.Bytes(
+        bytes_service = services.Bytes(
             host=self.config.host_bytes,
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
             source=f"scheduler/{scheduler.__version__}",
         )
 
-        octopoes = services.Octopoes(
+        octopoes_service = services.Octopoes(
             host=self.config.host_octopoes,
             source=f"scheduler/{scheduler.__version__}",
             orgs=katalogus.get_organisations(),
         )
 
         # Listeners
-        mutations = listeners.ScanProfileMutation(
+        mutations_listener = listeners.ScanProfileMutation(
             dsn=self.config.host_mutation,
         )
 
-        raw_data = listeners.RawData(
+        raw_data_listener = listeners.RawData(
             dsn=self.config.host_raw_data,
         )
 
-        normalizer_meta = listeners.NormalizerMeta(
+        normalizer_meta_listener = listeners.NormalizerMeta(
             dsn=self.config.host_normalizer_meta,
         )
 
@@ -70,12 +70,12 @@ class AppContext:
         # notation
         self.services: SimpleNamespace = SimpleNamespace(
             **{
-                services.Katalogus.name: katalogus,
-                services.Octopoes.name: octopoes,
-                services.Bytes.name: bytes,
-                listeners.ScanProfileMutation.name: mutations,
-                listeners.RawData.name: raw_data,
-                listeners.NormalizerMeta.name: normalizer_meta,
+                services.Katalogus.name: katalogus_service,
+                services.Octopoes.name: octopoes_service,
+                services.Bytes.name: bytes_service,
+                listeners.ScanProfileMutation.name: mutations_listener,
+                listeners.RawData.name: raw_data_listener,
+                listeners.NormalizerMeta.name: normalizer_meta_listener,
             }
         )
 
