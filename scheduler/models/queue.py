@@ -28,6 +28,7 @@ class PrioritizedItem(BaseModel):
     data: Dict
 
     created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+
     modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
 
     class Config:
@@ -75,12 +76,3 @@ class Queue(BaseModel):
     allow_updates: bool
     allow_priority_updates: bool
     pq: List[PrioritizedItem]
-
-
-class Filter(BaseModel):
-    field: str
-    operator: Literal["eq", "ne", "lt", "le", "gt", "ge", "in_", "notin_"]
-    value: Union[str, int, datetime.date]
-
-    def get_field(self) -> List[str]:
-        return self.field.split("__")

@@ -29,11 +29,11 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.services.octopoes = self.mock_octopoes
 
         # Mock connectors: Scan profile mutation
-        self.mock_scan_profiles = mock.create_autospec(
+        self.mock_scan_profile_mutation = mock.create_autospec(
             spec=connectors.listeners.ScanProfileMutation,
             spec_set=True,
         )
-        self.mock_ctx.services.scan_profile = self.mock_scan_profiles
+        self.mock_ctx.services.scan_profile_mutation = self.mock_scan_profile_mutation
 
         # Mock connectors: Katalogus
         self.mock_katalogus = mock.create_autospec(
@@ -507,6 +507,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
             p_item=p_item,
             status=models.TaskStatus.QUEUED,
             created_at=datetime.now(timezone.utc),
@@ -552,6 +553,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db_first = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
             created_at=datetime.utcnow(),
@@ -561,6 +563,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db_second = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
             p_item=p_item,
             status=models.TaskStatus.FAILED,
             created_at=datetime.utcnow(),
@@ -680,6 +683,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
             created_at=datetime.now(timezone.utc),
@@ -721,6 +725,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
             created_at=datetime.now(timezone.utc),
@@ -764,6 +769,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
             created_at=datetime.now(timezone.utc),
@@ -806,6 +812,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
             created_at=datetime.now(timezone.utc),
@@ -854,6 +861,7 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
             created_at=datetime.now(timezone.utc),

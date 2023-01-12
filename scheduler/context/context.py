@@ -34,6 +34,7 @@ class AppContext:
         with open(self.config.log_cfg, "rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
+        # Services
         svc_katalogus = services.Katalogus(
             host=self.config.host_katalogus,
             source=f"scheduler/{scheduler.__version__}",
@@ -52,6 +53,7 @@ class AppContext:
             orgs=svc_katalogus.get_organisations(),
         )
 
+        # Listeners
         lst_mutations = listeners.ScanProfileMutation(
             dsn=self.config.host_mutation,
         )
@@ -71,7 +73,7 @@ class AppContext:
                 services.Katalogus.name: svc_katalogus,
                 services.Octopoes.name: svc_octopoes,
                 services.Bytes.name: svc_bytes,
-                listeners.ScanProfile.name: lst_scan_profile,
+                listeners.ScanProfileMutation.name: lst_mutation,
                 listeners.RawData.name: lst_raw_data,
                 listeners.NormalizerMeta.name: lst_normalizer_meta,
             }

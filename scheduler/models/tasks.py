@@ -1,7 +1,7 @@
 import datetime
 import uuid
 from enum import Enum as _Enum
-from typing import List, Optional
+from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, Field
@@ -30,6 +30,7 @@ class TaskStatus(_Enum):
 class Task(BaseModel):
     id: uuid.UUID
     scheduler_id: str
+    type: str
     p_item: PrioritizedItem
     status: TaskStatus
 
@@ -47,6 +48,7 @@ class TaskORM(Base):
 
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String)
+    type = Column(String)
     p_item = Column(JSON, nullable=False)
     status = Column(
         Enum(TaskStatus),
@@ -70,6 +72,8 @@ class TaskORM(Base):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
+    type: ClassVar[str] = "normalizer"
+
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
     normalizer: Normalizer
     raw_data: RawData
@@ -89,6 +93,8 @@ class NormalizerTask(BaseModel):
 
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
+
+    type: ClassVar[str] = "boefje"
 
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
     boefje: Boefje
