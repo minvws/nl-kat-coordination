@@ -50,7 +50,7 @@ class AppContext:
         octopoes_service = services.Octopoes(
             host=self.config.host_octopoes,
             source=f"scheduler/{scheduler.__version__}",
-            orgs=katalogus.get_organisations(),
+            orgs=katalogus_service.get_organisations(),
         )
 
         # Listeners
