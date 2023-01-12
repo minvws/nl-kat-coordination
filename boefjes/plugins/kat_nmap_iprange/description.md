@@ -1,6 +1,6 @@
 # Nmap IP-range
 
-This boefje checks an IP range/NetBlock and stores any IP-addresses that seem to be active.
+This boefje checks an IP range/NetBlock and stores any IP addresses that seem to be active.
 
 ### Options
 

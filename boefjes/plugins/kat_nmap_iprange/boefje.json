@@ -1,5 +1,5 @@
 {
-    "id": "nmap-iprange",
+    "id": "nmap-ip-range",
     "name": "Nmap IP range",
     "description": "Scan an IP range and store found IPs.",
     "consumes": [

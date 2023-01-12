@@ -3,7 +3,7 @@
     "consumes": [
         "nmap-tcp-top250",
         "nmap-ports",
-        "nmap-iprange"
+        "nmap-ip-range"
     ],
     "produces": [
         "IPAddressV6",

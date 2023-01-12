@@ -17,6 +17,7 @@ from boefjes.job_models import NormalizerMeta
 
 
 def get_ip_ports_and_service(host: NmapHost, network: Network) -> Iterator[OOI]:
+    """Yields IPs, open ports and services if any ports are open on this host."""
     open_ports = host.get_open_ports()
     if open_ports:
         ip = (
@@ -63,7 +64,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
     yield network
 
-    logging.info(f"Parsing {len(raw)} Nmap-xml(s) for {network}.")
+    logging.info("Parsing %d Nmap-xml(s) for %s.", len(raw), network)
     for r in raw:
         for host in NmapParser.parse_fromstring(r).hosts:
             yield from get_ip_ports_and_service(host=host, network=network)
