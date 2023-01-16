@@ -60,14 +60,6 @@ class TaskStore(TaskStorer):
 
             return tasks, count
 
-    def get_tasks_since(self, scheduler_id: Union[str, None], since: datetime) -> List[models.Task]:
-        with self.datastore.session.begin() as session:
-            tasks_orm = session.query(models.TaskORM).filter(models.TaskORM.created_at >= since).all()
-
-            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
-
-            return tasks
-
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = session.query(models.TaskORM).filter(models.TaskORM.id == task_id).first()
@@ -103,12 +95,12 @@ class TaskStore(TaskStorer):
                 .first()
             )
 
-            if tasks_orm is None:
+            if task_orm is None:
                 return None
 
-            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
+            task = models.Task.from_orm(task_orm)
 
-            return tasks
+            return task
 
     def create_task(self, task: models.Task) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:

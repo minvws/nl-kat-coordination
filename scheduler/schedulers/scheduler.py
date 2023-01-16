@@ -106,8 +106,12 @@ class Scheduler(abc.ABC):
 
         self.ctx.task_store.create_task(task)
 
+        item_hash = p_item.hash
+        if item_hash is None:
+            return
+
         # Determine whether we need to create a recurring scheduled job
-        scheduled_job = self.ctx.job_store.get_scheduled_job_by_hash(p_item.hash)
+        scheduled_job = self.ctx.job_store.get_scheduled_job_by_hash(item_hash)
         if scheduled_job is not None:
             scheduled_job.checked_at = datetime.datetime.now(datetime.timezone.utc)
             self.ctx.job_store.update_scheduled_job(scheduled_job)

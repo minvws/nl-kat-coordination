@@ -34,7 +34,10 @@ check: ## Check the code style using black, mypy and pylint.
 mypy: ## Check code style using mypy.
 	docker-compose -f base.yml -f .ci/docker-compose.yml \
 		run --rm mula \
-		python -m mypy --cache-dir /home/scheduler/.mypy_cache /app/scheduler/scheduler
+		python -m mypy \
+			--install-types \
+			--cache-dir /home/scheduler/ \
+			/app/scheduler/scheduler
 
 black: ## Check code style with black.
 	docker-compose -f base.yml -f .ci/docker-compose.yml \

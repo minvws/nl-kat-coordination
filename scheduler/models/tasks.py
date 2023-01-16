@@ -104,7 +104,6 @@ class BoefjeTask(BaseModel):
     type: ClassVar[str] = "boefje"
 
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
-    boefje: Boefje
     input_ooi: Optional[str]
     organization: str
     boefje: Boefje

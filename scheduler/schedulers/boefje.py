@@ -303,7 +303,14 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
-                # TODO: create_p_item because we need to rank
+                prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
+                score = self.ranker.rank(
+                    SimpleNamespace(
+                        prior_tasks=prior_tasks,
+                        task=task,
+                    )
+                )
+
                 # We need to create a PrioritizedItem for this task, to push
                 # it to the priority queue.
                 p_item = PrioritizedItem(
@@ -325,7 +332,7 @@ class BoefjeScheduler(Scheduler):
                     )
                     return None
 
-                while not self.space_on_queue():
+                while not self.is_space_on_queue():
                     self.logger.debug(
                         "Waiting for queue to have enough space, not adding tasks queue [qsize=%d, maxsize=%d, org_id=%s, scheduler_id=%s]",
                         self.queue.qsize(),
