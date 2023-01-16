@@ -3807,6 +3807,42 @@ msgstr " (als "
 msgid "Object findings"
 msgstr "Objectbevindingen"
 
+#: rocky/views/ooi_list.py:60
+msgid "No OOIs selected."
+msgstr "Geen objecten geselecteerd"
+
+#: rocky/views/ooi_list.py:71
+msgid "Unknown action."
+msgstr "Ongeldige actie."
+
+#: rocky/views/ooi_list.py:90 rocky/views/ooi_list.py:97
+#, python-format
+msgid "An error occurred while saving clearance level for %s."
+msgstr "Er is een fout opgetreden bij het opslaan van het vrijwaringsniveau voor %s."
+
+#: rocky/views/ooi_list.py:102
+#, python-format
+msgid "Successfully set scan profile to %s for %d oois."
+msgstr "Vrijwaringsniveau succesvol gezet op %s voor %d objecten."
+
+#: rocky/views/ooi_list.py:106
+#, python-format
+msgid "Unknown Scan Profile: %s."
+msgstr "Ongeldig vrijwaringsniveau: %s."
+
+#: rocky/views/ooi_list.py:116
+#, python-format
+msgid "An error occurred deleting %s."
+msgstr "Er is een fout opgetreden bij het verwijderen van %s."
+
+#: rocky/views/ooi_list.py:129
+#, python-format
+msgid ""
+"Successfully deleted %d ooi(s). Note: Bits can recreate objects automatically."
+msgstr ""
+"%d object(en) succesvol verwijderd. Let op: Bits kunnen objecten automatisch "
+"weer toevoegen."
+
 #: rocky/views/ooi_report.py:156
 msgid "You can't generate a report for an OOI on a date in the future."
 msgstr "Een rapport kan niet voor een toekomstig tijdstip worden aangemaakt."
@@ -4377,7 +4413,7 @@ msgstr ""
 #: templates/oois/ooi_detail.html:79
 msgid "There are no boefjes available within the current clearance level of"
 msgstr ""
-"Er zijn geen boefjes beschikbaar binnen de huidige vrijwaringsniveau van"
+"Er zijn geen boefjes beschikbaar binnen het huidige vrijwaringsniveau van"
 
 #: templates/oois/ooi_detail.html:82
 msgid "Or if you have the authorization, upgrade the clearance level of"
@@ -4513,17 +4549,10 @@ msgstr ""
 msgid "Currently filtered on:"
 msgstr "Momenteel gefilterd op:"
 
-#: templates/oois/ooi_list.html:25
-msgid "Showing "
-msgstr "Toont "
-
-#: templates/oois/ooi_list.html:25
-msgid "of"
-msgstr "van"
-
-#: templates/oois/ooi_list.html:25
-msgid "objects"
-msgstr "objecten"
+#: templates/oois/ooi_list.html:24
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
+msgstr "Toont %(length)s van %(total)s objecten"
 
 #: templates/oois/ooi_list.html:28
 #: templates/partials/elements/ooi_tree_condensed_table.html:8
@@ -4543,6 +4572,10 @@ msgstr "Toon alleen objecten van type %(type)s"
 #: templates/oois/ooi_list.html:50
 msgid "N/A"
 msgstr "NVT"
+
+#: templates/oois/ooi_list.html:50
+msgid "Delete object(s)"
+msgstr "Verwijder object(en)"
 
 #: templates/oois/ooi_page_tabs.html:4
 msgid "List of views for OOI"
@@ -5577,7 +5610,8 @@ msgstr "Datum/Tijd (UTC)"
 msgid "Doc! I'm from the future, I'm here to take you back!"
 msgstr "Dokter! Ik kom uit de toekomst, ik ben hier om je terug te brengen!"
 
-#: tools/forms/finding_type.py:174
+#: tools/forms/finding_type.py:174 rocky/views/ooi_list.py:97
+#: rocky/views/ooi_list.py:122
 msgid "OOI doesn't exist"
 msgstr "Object bestaat niet"
 

@@ -33,7 +33,7 @@ itest: ## Run the integration tests.
 ifneq ($(build),)
 	docker-compose -f base.yml -f .ci/docker-compose.yml build
 endif
-	docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration
+	docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_tests
 
 export_migrations:
 	python manage.py export_migrations contenttypes 0001
