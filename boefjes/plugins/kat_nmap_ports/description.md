@@ -1,12 +1,13 @@
-# Nmap
+# Nmap Ports
 
 Nmap is a network scanning tool that uses IP packets to identify all the devices connected to a network and to provide
 information on the services and operating systems they are running. In KAT, a Python wrapper around Nmap is used to find
-open ports with their services of an IpAddress. Nmap itself runs in a temporary Docker container.
+open ports with their services of an IpAddress. Nmap itself runs in a temporary Docker container. This boefje allows to
+scan specific ports.
 
 ### Options
 
-This Nmap has the following hardcoded options:
+This Nmap boefje has the following hardcoded options:
 
 | Option | Function |
 | ----------- | ----------- |
@@ -15,9 +16,11 @@ This Nmap has the following hardcoded options:
 |`-r` | scan ports in order |
 |`-v10` |use verbosity level 10 |
 |`-sV` |probe open ports to determine version info |
+|`-sS` |scan TCP SYN |
+|`-sU` |Scan UDP (slower) |
 |`-oX` |Output in XML |
 
-A TCP scan uses `-sS` (TCP SYN), a UDP scan uses `-sU`. TOP_PORTS defaults to `250`.
+The PORTS variable is given as the argument for `-p` (see the Nmap documentation for more information).
 
 ### Input OOIs
 
@@ -35,30 +38,6 @@ Nmap outputs the following OOIs:
 |Finding|Finding if ports are open that should not be open (TEMP!)|
 |KatFindingType|FindingType if ports are open that should not be open (TEMP!)|
 
-### Running Boefje
+The boefje uses the same normalizer and structure as the generic `kat_nmap` boefje.
 
-```json
-{
-  "id": "nmap-scan-job",
-  "organization": "_dev",
-  "arguments": {
-    "host": "1.1.1.1"
-  },
-  "dispatches": {
-    "normalizers": [
-      "kat_nmap.normalize"
-    ],
-    "boefjes": []
-  }
-}
-```
-
-### Boefje structure
-
-```
-boefjes/tools/kat_nmap
-├── normalize.py
-├── main.py
-```
-
-**Cat name**: Elsje
+**Cat name**: Elsje (inverted)
