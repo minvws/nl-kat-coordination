@@ -63,7 +63,7 @@ System build
 
 The system has four parts: information collection, storage, analysis and reporting.
 
-.. image:: img/modulesopenkat1.png
+.. image:: img/modulesopenkat.png
   :alt: modules in OpenKAT
 
 Collection: Boefjes and Whiskers

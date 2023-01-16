@@ -79,7 +79,7 @@ Tasks
 
 The scans of KAT can be found on the Tasks page as tasks. A task is created per boefje and per normalizer, with a status. Per task, the object is displayed and the json with metadata can be downloaded. This includes the hash of the scan performed.
 
-.. image:: img/tasksnormalizers.png
+.. image:: img/boefjes.png
   :alt: tasks
 
 
