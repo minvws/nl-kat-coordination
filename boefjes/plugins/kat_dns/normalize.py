@@ -34,9 +34,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     internet = Network(name="internet")
 
     if raw.decode() == "NXDOMAIN":
-        yield NXDOMAIN(
-            hostname=Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
-        )
+        yield NXDOMAIN(hostname=Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi))
         return
 
     results = json.loads(raw)
