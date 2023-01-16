@@ -4,7 +4,7 @@
     "properties": {
         "TOP_PORTS": {
             "title": "TOP_PORTS",
-            "type": "integer",
+            "type": "string",
             "description": "Scan TOP_PORTS most common ports. Defaults to 250."
         },
         "PROTOCOL": {
@@ -14,7 +14,5 @@
             "description": "Scan 'udp' or 'tcp'. Defaults to 'tcp'."
         }
     },
-    "required": [
-
-    ]
+    "required": []
 }
