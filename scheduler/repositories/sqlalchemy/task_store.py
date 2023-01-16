@@ -1,12 +1,5 @@
 import datetime
-
-<<<<<<< HEAD
-from typing import List, Optional, Tuple, Union
-
-=======
 from typing import List, Optional, Tuple
-
->>>>>>> feature/refactor-boefje-scheduler
 
 from scheduler import models
 
