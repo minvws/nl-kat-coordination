@@ -31,9 +31,8 @@ class BoefjeRanker(Ranker):
         Since we want to have a lower bound of a priority of 3, we will use
         an exponential decay function in decreasing form.
         """
-
         # New tasks that have not yet run before
-        if obj.prior_tasks is None:
+        if obj.prior_tasks is None or len(obj.prior_tasks) == 0:
             return 2
 
         max_priority = self.MAX_PRIORITY

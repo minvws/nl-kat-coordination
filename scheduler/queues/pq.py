@@ -48,7 +48,7 @@ class PriorityQueue(abc.ABC):
         self,
         pq_id: str,
         maxsize: int,
-        item_type: Type[pydantic.BaseModel],
+        item_type: Any,
         pq_store: repositories.stores.PriorityQueueStorer,
         allow_replace: bool = False,
         allow_updates: bool = False,
@@ -81,7 +81,7 @@ class PriorityQueue(abc.ABC):
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.pq_id: str = pq_id
         self.maxsize: int = maxsize
-        self.item_type: Type[pydantic.BaseModel] = item_type
+        self.item_type: Any = item_type
         self.allow_replace: bool = allow_replace
         self.allow_updates: bool = allow_updates
         self.allow_priority_updates: bool = allow_priority_updates
@@ -213,6 +213,21 @@ class PriorityQueue(abc.ABC):
         """
         identifier = self.create_hash(p_item)
         item = self.pq_store.get_item_by_hash(self.pq_id, identifier)
+        if item is None:
+            return False
+
+        return True
+
+    def is_item_on_queue_by_hash(self, hash: str) -> bool:
+        """Check if an item is on the queue by its hash.
+
+        Args:
+            hash: The hash of the item to be checked.
+
+        Returns:
+            True if the item is on the queue, False otherwise.
+        """
+        item = self.pq_store.get_item_by_hash(self.pq_id, hash)
         if item is None:
             return False
 

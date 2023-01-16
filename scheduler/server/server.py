@@ -1,3 +1,4 @@
+import datetime
 import logging
 import queue as _queue
 from typing import Any, Dict, List, Optional, Union
@@ -189,16 +190,27 @@ class Server:
         self,
         request: fastapi.Request,
         scheduler_id: Union[str, None] = None,
+        type: Union[str, None] = None,
         status: Union[str, None] = None,
         offset: int = 0,
         limit: int = 10,
+        min_created_at: Union[datetime.datetime, None] = None,
+        max_created_at: Union[datetime.datetime, None] = None,
+        filters: List[models.Filter] = None,
     ) -> Any:
         try:
+            if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
+                raise ValueError("min_date must be less than max_date")
+
             results, count = self.ctx.task_store.get_tasks(
                 scheduler_id=scheduler_id,
+                type=type,
                 status=status,
                 offset=offset,
                 limit=limit,
+                min_created_at=min_created_at,
+                max_created_at=max_created_at,
+                filters=filters,
             )
         except ValueError as exc:
             raise fastapi.HTTPException(

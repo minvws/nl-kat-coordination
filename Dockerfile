@@ -1,9 +1,12 @@
-FROM python:3.8
+ARG PYTHON_VERSION=3.8
+FROM python:$PYTHON_VERSION
 
 EXPOSE 8000
 
 ARG USER_UID=1000
 ARG USER_GID=1000
+
+ENTRYPOINT ["/app/scheduler/entrypoint.sh"]
 
 RUN groupadd --gid $USER_GID scheduler
 RUN adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID scheduler
