@@ -338,7 +338,7 @@ class BoefjeScheduler(Scheduler):
         scheduled_jobs = self.ctx.job_store.get_scheduled_jobs(
             scheduler_id=self.scheduler_id,
             enabled=True,
-            max_checked_at=datetime.utcnow() - timedelta(seconds=self.grace_period),
+            max_checked_at=datetime.utcnow() - timedelta(seconds=self.ctx.config.pq_populate_grace_period),
         )
 
         # Do we execute the task again?
