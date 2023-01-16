@@ -10,8 +10,7 @@
     "optional_key": {
       "title": "Optional Key",
       "maxLength": 128,
-      "type": "string",
-      "optional": true
+      "type": "string"
     }
   },
   "required": [
