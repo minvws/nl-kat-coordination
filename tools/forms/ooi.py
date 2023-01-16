@@ -78,9 +78,9 @@ class SelectOOIForm(BaseRockyForm):
 
 class SelectOOIFilterForm(BaseRockyForm):
     show_all = forms.NullBooleanField(
-        widget=LabeledCheckboxInput(
-            label=_("Show objects that don't meet the Boefjes scan level"),
-            autosubmit=True,
+        label=_("Show objects that don't meet the Boefjes scan level"),
+        widget=forms.CheckboxInput(
+            attrs={"class": "submit-on-click"},
         ),
     )
 

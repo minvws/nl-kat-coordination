@@ -81,7 +81,7 @@ class PluginDetailScanOOI(BoefjeMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["select_ooi_filter_form"] = SelectOOIFilterForm
         if "show_all" in self.request.GET:
-            context["select_oois_form"] = SelectOOIForm(self.get_form_consumable_oois())
+            context["select_oois_form"] = SelectOOIForm(oois=self.get_form_consumable_oois())
         else:
-            context["select_oois_form"] = SelectOOIForm(self.get_form_filtered_consumable_oois())
+            context["select_oois_form"] = SelectOOIForm(oois=self.get_form_filtered_consumable_oois())
         return context

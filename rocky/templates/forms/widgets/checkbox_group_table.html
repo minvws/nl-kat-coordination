@@ -7,7 +7,7 @@
       <thead>
         <tr>
           <th>
-            {% if widget.options|length > 1 %}<input name="toggle-all" type="checkbox"/>{% endif %}
+            {% if widget.options|length > 1 %}<input class="toggle-all" data-toggle-target="ooi" type="checkbox"/>{% endif %}
           </th>
           {% for column_name in widget.column_names %}<th>{{ column_name }}</th>{% endfor %}
         </tr>
