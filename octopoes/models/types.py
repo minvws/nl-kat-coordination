@@ -54,6 +54,7 @@ from octopoes.models.ooi.web import (
     URL,
     HTTPHeaderURL,
     HTTPHeaderHostname,
+    ImageMetadata,
 )
 
 CertificateType = Union[
@@ -94,7 +95,15 @@ NetworkType = Union[
 ServiceType = Union[Service, IPService]
 SoftwareType = Union[Software, SoftwareInstance]
 WebType = Union[
-    Website, URL, HostnameHTTPURL, IPAddressHTTPURL, HTTPResource, HTTPHeader, HTTPHeaderURL, HTTPHeaderHostname
+    Website,
+    URL,
+    HostnameHTTPURL,
+    IPAddressHTTPURL,
+    HTTPResource,
+    HTTPHeader,
+    HTTPHeaderURL,
+    HTTPHeaderHostname,
+    ImageMetadata,
 ]
 
 OOIType = Union[
