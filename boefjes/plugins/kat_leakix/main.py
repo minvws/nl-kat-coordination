@@ -31,7 +31,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
                 headers={"Accept": "application/json", "api-key": getenv("LEAKIX_API")},
             )
             page_counter += 1
-            if not response:
+            if not response or not response.content:
                 break
             response_json = response.json()
             if not response_json:
