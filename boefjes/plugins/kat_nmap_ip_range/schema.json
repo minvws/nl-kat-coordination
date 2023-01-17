@@ -4,12 +4,12 @@
     "properties": {
         "TOP_PORTS_TCP": {
             "title": "TOP_PORTS_TCP",
-            "type": "integer",
+            "type": "string",
             "description": "Scan TOP_PORTS most common TCP ports. Defaults to 250."
         },
         "TOP_PORTS_UDP": {
             "title": "TOP_PORTS_UDP",
-            "type": "integer",
+            "type": "string",
             "description": "Scan TOP_PORTS most common UDP ports. Defaults to 10."
         }
     },
