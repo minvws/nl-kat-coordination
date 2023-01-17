@@ -2,7 +2,7 @@ import logging
 from typing import Iterator, Union
 from libnmap.objects import NmapHost, NmapService
 from libnmap.parser import NmapParser
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import (
     IPAddressV6,
     IPPort,
@@ -16,14 +16,14 @@ from octopoes.models.ooi.service import Service, IPService
 from boefjes.job_models import NormalizerMeta
 
 
-def get_ip_ports_and_service(host: NmapHost, network: Network) -> Iterator[OOI]:
+def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Reference) -> Iterator[OOI]:
     """Yields IPs, open ports and services if any ports are open on this host."""
     open_ports = host.get_open_ports()
     if open_ports:
         ip = (
-            IPAddressV4(network=network.reference, address=host.address)
+            IPAddressV4(network=network.reference, address=host.address, netblock=netblock)
             if host.ipv4
-            else IPAddressV6(network=network.reference, address=host.address)
+            else IPAddressV6(network=network.reference, address=host.address, netblock=netblock)
         )
         yield ip
 
@@ -64,7 +64,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
     yield network
 
+    netblock_ref = None
+    if "NetBlock" in normalizer_meta.raw_data.boefje_meta.arguments["input"]["object_type"]:
+        netblock_ref = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+
     logging.info("Parsing %d Nmap-xml(s) for %s.", len(raw), network)
     for r in raw:
         for host in NmapParser.parse_fromstring(r).hosts:
-            yield from get_ip_ports_and_service(host=host, network=network)
+            yield from get_ip_ports_and_service(host=host, network=network, netblock=netblock_ref)
