@@ -7,4 +7,7 @@ Contains documentation for developers and contributors.
    :maxdepth: 4
    :caption: Contents
 
+   install
    containers
+   localinstall
+   hardening

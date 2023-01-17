@@ -41,7 +41,7 @@ Contributing to the documentation benefits everyone who uses OpenKAT.
 We encourage you to help us improve the documentation, and you don't have to be an expert using OpenKAT to do so.
 There are many sections that are better off written by non-experts.
 If something in the docs doesn't make sense to you, updating the relevant section might be a great way to ensure it will help the next person.
-You're welcome to propose edits to almost every text, including comments and docstrings in the code, the wiki, and other files.
+You're welcome to propose edits to almost every text, including comments and docstrings in the code, this documentation, and other files.
 
 You could help us out with the following sections:
 
