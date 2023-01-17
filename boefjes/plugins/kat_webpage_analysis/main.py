@@ -47,12 +47,31 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         return [({"openkat-http/error"}, str(request_error))]
 
     if "content-type" in response.headers:
+        allowed_content_types = [
+            "application/ld+json",
+            "application/json",
+            "image/jpeg",
+            "image/jpg",
+            "image/gif",
+            "image/png",
+            "image/bpm",
+            "image/ico",
+            "text/html",
+            "text/plain",
+            "text/css",
+            "text/csv",
+            "text/javascript",
+            "text/xml",
+        ]
         content_type = response.headers.get("content-type")
-        body_mimetypes.add(content_type)
+
+        if content_type in allowed_content_types:
+            body_mimetypes.add(content_type)
 
         # Pick up the content type for the body from the server and split away encodings to make normalization easier
         content_type = content_type.split(";")
-        body_mimetypes.add(content_type[0])
+        if content_type[0] in allowed_content_types:
+            body_mimetypes.add(content_type[0])
 
     return [
         ({"openkat-http/full"}, f"{response.headers}\n\n{response.content}"),
