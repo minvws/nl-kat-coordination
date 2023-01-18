@@ -228,10 +228,7 @@ class PriorityQueue(abc.ABC):
             True if the item is on the queue, False otherwise.
         """
         item = self.pq_store.get_item_by_hash(self.pq_id, hash)
-        if item is None:
-            return False
-
-        return True
+        return item is not None
 
     def get_p_item_by_identifier(self, p_item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
         """Get an item from the queue by its identifier.
