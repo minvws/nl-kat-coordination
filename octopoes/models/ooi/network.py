@@ -38,13 +38,29 @@ class IPAddress(OOI):
 class IPAddressV4(IPAddress):
     object_type: Literal["IPAddressV4"] = "IPAddressV4"
     address: IPv4Address
-    _reverse_relation_names = {"network": "ip_v4_addresses"}
+
+    netblock: Optional[Reference] = ReferenceField(
+        "IPV4NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4
+    )
+
+    _reverse_relation_names = {
+        "network": "ip_v4_addresses",
+        "netblock": "ip_v4_addresses",
+    }
 
 
 class IPAddressV6(IPAddress):
     object_type: Literal["IPAddressV6"] = "IPAddressV6"
     address: IPv6Address
-    _reverse_relation_names = {"network": "ip_v6_addresses"}
+
+    netblock: Optional[Reference] = ReferenceField(
+        "IPV6NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4
+    )
+
+    _reverse_relation_names = {
+        "network": "ip_v6_addresses",
+        "netblock": "ip_v6_addresses",
+    }
 
 
 class Protocol(Enum):
@@ -113,7 +129,7 @@ class IPV6NetBlock(NetBlock):
 
     parent: Optional[Reference] = ReferenceField("IPV6NetBlock", default=None)
 
-    start_ip: Reference = ReferenceField(IPAddressV6)
+    start_ip: Reference = ReferenceField(IPAddressV6, max_issue_scan_level=4)
     mask: conint(ge=0, lt=128)
 
     _reverse_relation_names = {
@@ -127,7 +143,7 @@ class IPV4NetBlock(NetBlock):
 
     parent: Optional[Reference] = ReferenceField("IPV4NetBlock", default=None)
 
-    start_ip: Reference = ReferenceField(IPAddressV4)
+    start_ip: Reference = ReferenceField(IPAddressV4, max_issue_scan_level=4)
     mask: conint(ge=0, lt=32)
 
     _reverse_relation_names = {
