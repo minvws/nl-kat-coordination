@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.paginator import Paginator, Page
 from django.http import Http404
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
 from octopoes.models import OOI
 from requests.exceptions import RequestException
 
@@ -18,6 +19,7 @@ from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
 from tools.forms import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
+from tools.models import OrganizationMember, Indemnification
 from tools.ooi_helpers import format_display
 from tools.view_helpers import Breadcrumb
 
@@ -38,6 +40,9 @@ class OOIDetailView(
     scan_history_limit = 10
 
     def post(self, request, *args, **kwargs):
+        if not verify_may_update_scan_profile(self.request):
+            return self.get(request, *args, **kwargs)
+
         if "action" not in self.request.POST:
             return self.get(request, *args, **kwargs)
         self.ooi = self.get_ooi()
@@ -176,3 +181,17 @@ class OOIDetailView(
         ]
 
         return context
+
+
+def verify_may_update_scan_profile(request) -> bool:
+    organization_member = OrganizationMember.objects.get(user=request.user)
+
+    if not Indemnification.objects.filter(organization=organization_member.organization).exists():
+        messages.add_message(request, messages.ERROR, _("The required indemnification to perform this action is missing."))
+        return False
+
+    if not organization_member.acknowledged_clearance_level > 0:
+        messages.add_message(request, messages.ERROR, _("Acknowledged clearance level too low."))
+        return False
+
+    return True

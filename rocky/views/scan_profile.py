@@ -7,7 +7,8 @@ from django.views.generic import FormView
 from django_otp.decorators import otp_required
 from octopoes.models import InheritedScanProfile, EmptyScanProfile, DeclaredScanProfile
 from two_factor.views.utils import class_view_decorator
-from rocky.views import OOIDetailView
+
+from rocky.views import OOIDetailView, verify_may_update_scan_profile
 from tools.forms import SetClearanceLevelForm
 from tools.view_helpers import (
     get_mandatory_fields,
@@ -38,7 +39,11 @@ class ScanProfileDetailView(OOIDetailView, FormView):
         return context
 
     def post(self, request, *args, **kwargs):
+        if not verify_may_update_scan_profile(self.request):
+            return self.get(request, *args, **kwargs)
+
         super().post(request, *args, **kwargs)
+
         form = self.get_form()
         if form.is_valid():
             self.api_connector.save_scan_profile(

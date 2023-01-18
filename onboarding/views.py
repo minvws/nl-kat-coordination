@@ -30,7 +30,7 @@ from onboarding.view_helpers import (
     KatIntroductionAdminStepsMixin,
 )
 from katalogus.client import get_katalogus
-from rocky.views import BaseOOIFormView
+from rocky.views import BaseOOIFormView, OrganizationIndemnificationMixin, verify_may_update_scan_profile
 from rocky.views.ooi_view import SingleOOITreeMixin, BaseOOIDetailView
 from tools.forms import SelectBoefjeForm
 from tools.models import Organization, OrganizationMember
@@ -242,6 +242,7 @@ class OnboardingSetupScanOOIDetailView(
     SingleOOITreeMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
+    OrganizationIndemnificationMixin,
     TemplateView,
 ):
     template_name = "step_3c_setup_scan_ooi_detail.html"
@@ -258,6 +259,9 @@ class OnboardingSetupScanOOIDetailView(
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        if not verify_may_update_scan_profile(self.request):
+            return self.get(request, *args, **kwargs)
+
         self.set_clearance_level()
         self.enable_selected_boefjes()
         return redirect(get_ooi_url("step_report", self.get_ooi_id()))

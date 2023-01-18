@@ -6,15 +6,20 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.contrib import messages
 from octopoes.models.types import type_by_name
+
+from rocky.views import OrganizationIndemnificationMixin, verify_may_update_scan_profile
 from tools.forms import SelectOOIForm, SelectOOIFilterForm
 from katalogus.views.mixins import BoefjeMixin
 
 
 @class_view_decorator(otp_required)
-class PluginDetailScanOOI(BoefjeMixin, TemplateView):
+class PluginDetailScanOOI(BoefjeMixin, TemplateView, OrganizationIndemnificationMixin):
     limit_ooi_list = 9999
 
     def post(self, request, *args, **kwargs):
+        if not verify_may_update_scan_profile(self.request):
+            return self.get(request, *args, **kwargs)
+
         """Start scanning oois at plugin detail page."""
         selected_oois = request.POST.getlist("ooi")
         plugin_id = request.POST.get("boefje_id")

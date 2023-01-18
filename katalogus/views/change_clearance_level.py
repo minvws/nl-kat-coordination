@@ -7,10 +7,11 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.mixins import KATalogusMixin
+from rocky.views import OrganizationIndemnificationMixin, verify_may_update_scan_profile
 
 
 @class_view_decorator(otp_required)
-class ChangeClearanceLevel(BoefjeMixin, KATalogusMixin, TemplateView):
+class ChangeClearanceLevel(BoefjeMixin, KATalogusMixin, TemplateView, OrganizationIndemnificationMixin):
     template_name = "change_clearance_level.html"
 
     def setup(self, request, *args, **kwargs):
@@ -32,6 +33,9 @@ class ChangeClearanceLevel(BoefjeMixin, KATalogusMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         """Start scanning oois at plugin detail page."""
+        if not verify_may_update_scan_profile(self.request):
+            return self.get(request, *args, **kwargs)
+
         boefje = self.katalogus_client.get_boefje(self.plugin_id)
         self.run_boefje_for_oois(
             boefje=boefje, oois=self.oois, organization=self.organization, api_connector=self.get_api_connector()

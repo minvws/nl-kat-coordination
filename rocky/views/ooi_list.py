@@ -17,7 +17,7 @@ from octopoes.models import Reference, DeclaredScanProfile
 from octopoes.models.types import get_collapsed_types, type_by_name
 from octopoes.models.exception import ObjectNotFoundException
 
-from rocky.views import BaseOOIListView
+from rocky.views import BaseOOIListView, OrganizationIndemnificationMixin, verify_may_update_scan_profile
 from tools.forms import SelectOOIForm
 from tools.models import SCAN_LEVEL
 from tools.view_helpers import BreadcrumbsMixin
@@ -28,7 +28,7 @@ class PageActions(Enum):
     UPDATE_SCAN_PROFILE = "update-scan-profile"
 
 
-class OOIListView(BreadcrumbsMixin, BaseOOIListView):
+class OOIListView(BreadcrumbsMixin, BaseOOIListView, OrganizationIndemnificationMixin):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
     ooi_types = get_collapsed_types().difference({Finding, FindingType})
@@ -45,6 +45,7 @@ class OOIListView(BreadcrumbsMixin, BaseOOIListView):
         context["object_type_filters"] = self.get_ooi_type_filters()
         context["select_oois_form"] = SelectOOIForm(context.get("ooi_list", []))
         context["scan_levels"] = [alias for level, alias in SCAN_LEVEL.choices]
+        context["organization_indemnification"] = self.get_organization_indemnification
 
         return context
 
@@ -75,6 +76,9 @@ class OOIListView(BreadcrumbsMixin, BaseOOIListView):
         return self.get(request, status=404, *args, **kwargs)
 
     def _set_scan_profiles(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if not verify_may_update_scan_profile(self.request):
+            return self.get(request, status=403, *args, **kwargs)
+
         connector = self.get_api_connector()
         scan_profile = request.POST.get("scan-profile")
 
