@@ -1,23 +1,16 @@
 import uuid
-from django.http import QueryDict
-from django.utils.translation import gettext_lazy as _
-from django.urls.base import reverse_lazy, reverse
 from datetime import date, datetime, timezone
 from enum import Enum
-from typing import Optional, List, TypedDict, Dict, Any
+from typing import List, TypedDict, Dict, Any
 from urllib.parse import urlparse, urlunparse, urlencode
 
 from django.contrib import messages
-from django.http.request import HttpRequest
-from octopoes.connector.octopoes import OctopoesAPIConnector
+from django.http import QueryDict
+from django.urls.base import reverse_lazy, reverse
+from django.utils.translation import gettext_lazy as _
+
+from account.mixins import OrganizationView
 from octopoes.models.types import OOI_TYPES
-
-from tools.models import Organization
-
-
-class RockyHttpRequest(HttpRequest):
-    active_organization: Optional[Organization]
-    octopoes_api_connector: Optional[OctopoesAPIConnector]
 
 
 def convert_date_to_datetime(d: date) -> datetime:
@@ -61,14 +54,16 @@ def url_with_querystring(path, **kwargs) -> str:
     )
 
 
-def get_ooi_url(routename: str, ooi_id: str, **kwargs) -> str:
+def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
     kwargs["ooi_id"] = ooi_id
+    # exclude in querystring
+    kwargs = {k: v for k, v in kwargs.items()}
 
     if "query" in kwargs:
         kwargs.update(kwargs["query"])
         del kwargs["query"]
 
-    return url_with_querystring(reverse(routename), **kwargs)
+    return url_with_querystring(reverse(routename, kwargs={"organization_code": organization_code}), **kwargs)
 
 
 def existing_ooi_type(ooi_type: str):
@@ -165,38 +160,28 @@ class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
     breadcrumbs = [{"url": reverse_lazy("organization_list"), "text": _("Organizations")}]
 
 
-class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
-    breadcrumb_object: Organization = None
-
-    def set_breadcrumb_object(self, organization: Organization):
-        self.breadcrumb_object = organization
-
+class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
     def build_breadcrumbs(self):
-        if self.request.user.has_perm("tools.can_switch_organization"):
-            breadcrumbs = [
-                {"url": reverse("organization_list"), "text": _("Organizations")},
-                {
-                    "url": reverse("organization_detail", kwargs={"pk": self.breadcrumb_object.pk}),
-                    "text": self.breadcrumb_object.name,
-                },
-            ]
-        else:
-            breadcrumbs = [
-                {
-                    "url": reverse("crisis_room"),
-                    "text": self.breadcrumb_object.name,
-                }
-            ]
 
-        breadcrumbs.append(
+        breadcrumbs = [
             {
-                "url": reverse("organization_member_list", kwargs={"pk": self.breadcrumb_object.pk}),
-                "text": _("Members"),
-            }
-        )
+                "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),
+                "text": self.organization.name,
+            },
+        ]
+        permission = self.request.user.has_perm("tools.view_organization")
+        if permission:
+            organization_url = {"url": reverse("organization_list"), "text": _("Organizations")}
+            breadcrumbs.insert(0, organization_url)
 
         return breadcrumbs
 
 
-class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
-    breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
+class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
+    def build_breadcrumbs(self):
+        return [
+            {
+                "url": reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Objects"),
+            }
+        ]

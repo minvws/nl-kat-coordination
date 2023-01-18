@@ -1,8 +1,9 @@
 import logging
-from requests import RequestException
-from rocky.health import ServiceHealth
-from katalogus.client import get_katalogus
 
+from requests import RequestException
+
+from katalogus.client import get_katalogus
+from rocky.health import ServiceHealth
 
 logger = logging.getLogger(__name__)
 

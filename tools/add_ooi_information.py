@@ -4,13 +4,13 @@ import json
 import os
 import re
 from dataclasses import dataclass
-from itertools import product
 from typing import Optional, Tuple, List, Dict, Union
 
 import requests
 from ares import CVESearch
 from bs4 import BeautifulSoup
 from cwe import Database
+from itertools import product
 
 from rocky.settings import BASE_DIR
 

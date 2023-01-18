@@ -27,7 +27,7 @@
                 <label {% if option.attrs.id %} for="{{ option.attrs.id }}"{% endif %}>
                   {% with cell_template=widget.column_templates|index:forloop.counter0 %}
                     {% if cell_template %}
-                      {% include cell_template with value=cell %}
+                      {% include cell_template with value=cell organization_code=widget.attrs.organization_code %}
                     {% else %}
                       {{ cell }}
                     {% endif %}

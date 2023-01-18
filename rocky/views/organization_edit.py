@@ -1,15 +1,16 @@
 from typing import List, Tuple, Optional
 
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from rocky.settings import MIAUW_API_ENABLED
+
 from account.forms import OrganizationForm
+from rocky.settings import MIAUW_API_ENABLED
 from tools.miauw_helpers import get_registered_usernames
 from tools.models import Organization
 

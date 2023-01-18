@@ -14,18 +14,17 @@
         <p>
           {% translate 'A red teamer account can run scans and generate reports.' %}
         </p>
-        <form novalidate
-              action="{% url 'step_account_setup_red_teamer' %}"
-              method="post"
-              class="horizontal-view help">
+        <form novalidate method="post" class="horizontal-view help">
           {% csrf_token %}
           {% translate 'Red teamer details' as fieldset_legend %}
           {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
           <button type="submit">{% translate 'Submit' %}</button>
         </form>
         <p>
-          <a href="{% url 'step_account_setup_admin' %}" class="button ghost">{% translate 'Go back to previous step' %}</a>
-          <a href="{% url 'step_account_setup_client' %}" class="button ">{% translate 'Skip this step' %}</a>
+          <a href="{% url 'step_account_setup_admin' organization.code %}"
+             class="button ghost">{% translate 'Go back to previous step' %}</a>
+          <a href="{% url 'step_account_setup_client' organization.code %}"
+             class="button ">{% translate 'Skip this step' %}</a>
         </p>
       </div>
     </section>

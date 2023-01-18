@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-  {% include 'header.html' %}
+  {% include 'header.html' with view_type="onboarding" %}
   <main id="main-content">
     <section>
       <div>
@@ -18,16 +18,13 @@
             page within KAT when necesarry.
          {% endblocktranslate %}
         </p>
-        <form novalidate
-              action="{% url 'step_organization_update' object.id %}"
-              method="post"
-              class="horizontal-view help">
+        <form novalidate method="post" class="horizontal-view help">
           {% csrf_token %}
           {% translate 'Organization details' as fieldset_legend %}
           {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
           <button type="submit" class="ghost">{% translate 'Submit changes' %}</button>
         </form>
-        <a class="button" href="{% url 'step_indemnification_setup' %}">{% translate 'Continue to indemnification' %}</a>
+        <a class="button" href="{% url 'step_indemnification_setup' organization.code %}">{% translate 'Continue' %}</a>
       </div>
     </section>
   </main>

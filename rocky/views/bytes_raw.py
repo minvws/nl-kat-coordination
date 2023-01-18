@@ -7,21 +7,22 @@ from typing import List, Dict
 from django.contrib import messages
 from django.http import Http404, FileResponse
 from django.shortcuts import redirect
-from django.views import View
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
+from account.mixins import OrganizationView
 from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
-class BytesRawView(View):
-    def get(self, request, boefje_meta_id: str):
+class BytesRawView(OrganizationView):
+    def get(self, request, **kwargs):
         try:
-            client = get_bytes_client()
+            client = get_bytes_client(self.organization.code)
             client.login()
+            boefje_meta_id = kwargs["boefje_meta_id"]
             raw_metas = client.get_raw_metas(boefje_meta_id)
 
             raws = {raw_meta["id"]: client.get_raw(boefje_meta_id, raw_meta["id"]) for raw_meta in raw_metas}

@@ -1,15 +1,16 @@
+from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
+from django_otp.plugins.otp_totp.models import TOTPDevice
+
+from account.forms import SetPasswordForm, PasswordResetForm
 from rocky.settings import (
     EMAIL_HOST,
     EMAIL_PORT,
     HELP_DESK_EMAIL,
 )
-from account.forms import SetPasswordForm, PasswordResetForm
-from django_otp.plugins.otp_totp.models import TOTPDevice
 
 
 class PasswordResetView(auth_views.PasswordResetView):

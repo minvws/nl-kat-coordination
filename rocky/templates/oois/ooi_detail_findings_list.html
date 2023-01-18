@@ -6,7 +6,8 @@
     <h2>{% translate 'Findings' %}</h2>
     <div class="horizontal-view toolbar">
       {% if not ooi|is_finding and not ooi|is_finding_type %}
-        <a href="{% ooi_url 'finding_add' ooi.primary_key %}" class="button">{% translate 'Add finding' %}</a>
+        <a href="{% ooi_url 'finding_add' ooi.primary_key organization.code %}"
+           class="button">{% translate 'Add finding' %}</a>
       {% endif %}
     </div>
     <table>
@@ -35,7 +36,7 @@
               <td>{{ finding.description }}</td>
             {% endif %}
             <td>
-              <a href="{% ooi_url 'ooi_detail' finding.id query=mandatory_fields %}">{{ finding.human_readable }}</a>
+              <a href="{% ooi_url 'ooi_detail' finding.id organization.code query=mandatory_fields %}">{{ finding.human_readable }}</a>
             </td>
           </tr>
         {% endfor %}

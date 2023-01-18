@@ -4,12 +4,14 @@
 <div class="horizontal-view toolbar">
   {% if not ooi_past_due %}
     {% if not ooi|is_finding and not ooi|is_finding_type %}
-      <a href="{% ooi_url 'ooi_edit' ooi_id %}" class="button ghost">{% blocktranslate %}Edit {{ display_type }}{% endblocktranslate %}</a>
+      <a href="{% ooi_url 'ooi_edit' ooi_id organization.code %}"
+         class="button ghost">{% blocktranslate %}Edit {{ display_type }}{% endblocktranslate %}</a>
     {% endif %}
     {% if not ooi|is_finding_type %}
-      <a href="{% ooi_url 'ooi_delete' ooi_id %}" class="button ghost">{% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}</a>
+      <a href="{% ooi_url 'ooi_delete' ooi_id organization.code %}"
+         class="button ghost">{% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}</a>
     {% endif %}
   {% endif %}
-  <a href="{% ooi_url 'ooi_report' ooi_id query=mandatory_fields %}"
+  <a href="{% ooi_url 'ooi_report' ooi_id organization.code query=mandatory_fields %}"
      class="button ghost">{% translate 'Generate report' %}</a>
 </div>

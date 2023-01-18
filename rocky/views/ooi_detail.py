@@ -1,27 +1,23 @@
 from datetime import datetime, timezone
 from enum import Enum
-from typing import List
 
 from django.contrib import messages
 from django.core.paginator import Paginator, Page
 from django.http import Http404
 from django.shortcuts import redirect
-from django.utils.translation import gettext_lazy as _
-from octopoes.models import OOI
 from requests.exceptions import RequestException
 
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
+from octopoes.models import OOI
 from rocky import scheduler
-from rocky.views.mixins import OOIBreadcrumbsMixin, OrganizationIndemnificationMixin
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
-from tools.forms import ObservedAtForm
+from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
-from tools.models import OrganizationMember, Indemnification
+from tools.models import Indemnification, OrganizationMember
 from tools.ooi_helpers import format_display
-from tools.view_helpers import Breadcrumb
 
 
 class PageActions(Enum):
@@ -30,8 +26,6 @@ class PageActions(Enum):
 
 class OOIDetailView(
     BoefjeMixin,
-    OOIBreadcrumbsMixin,
-    OrganizationIndemnificationMixin,
     OOIRelatedObjectAddView,
     BaseOOIDetailView,
 ):
@@ -40,7 +34,7 @@ class OOIDetailView(
     scan_history_limit = 10
 
     def post(self, request, *args, **kwargs):
-        if not verify_may_update_scan_profile(self.request):
+        if not self.verify_may_update_scan_profile():
             return self.get(request, *args, **kwargs)
 
         if "action" not in self.request.POST:
@@ -57,7 +51,7 @@ class OOIDetailView(
         )
         messages.add_message(request, messages.SUCCESS, success_message)
 
-        return redirect("task_list")
+        return redirect("task_list", organization_code=self.organization.code)
 
     def handle_page_action(self, action: str) -> bool:
         try:
@@ -65,9 +59,9 @@ class OOIDetailView(
                 boefje_id = self.request.POST.get("boefje_id")
                 ooi_id = self.request.GET.get("ooi_id")
 
-                boefje = get_katalogus(self.request.active_organization.code).get_boefje(boefje_id)
-                ooi = self.get_single_ooi(ooi_id)
-                self.run_boefje_for_oois(boefje, [ooi], self.request.active_organization, self.api_connector)
+                boefje = get_katalogus(self.organization.code).get_boefje(boefje_id)
+                ooi = self.get_single_ooi(pk=ooi_id)
+                self.run_boefje_for_oois(boefje, [ooi], self.api_connector)
                 return True
 
         except RequestException as exception:
@@ -79,16 +73,18 @@ class OOIDetailView(
             return self.ooi
 
         try:
-            return self.get_ooi(self.get_ooi_id(), datetime.now(timezone.utc))
+            return self.get_ooi(pk=self.get_ooi_id(), observed_at=datetime.now(timezone.utc))
         except Http404:
             return None
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
-        breadcrumbs = super().build_breadcrumbs()
-        return breadcrumbs
+    def get_organizationmember(self):
+        return OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
+
+    def get_organization_indemnification(self):
+        return Indemnification.objects.filter(organization=self.organization).exists()
 
     def get_scan_history(self) -> Page:
-        scheduler_id = f"boefje-{self.request.active_organization.code}"
+        scheduler_id = f"boefje-{self.organization.code}"
 
         filters = [
             {"field": "data__input_ooi", "operator": "eq", "value": self.get_ooi_id()},
@@ -133,17 +129,18 @@ class OOIDetailView(
         filter_form = PossibleBoefjesFilterForm(self.request.GET)
 
         # List from katalogus
-        boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.request.active_organization)
+        boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
 
         if boefjes:
             context["enabled_boefjes_available"] = True
 
         # Filter boefjes on scan level <= OOI clearance level when not "show all"
         # or when not "acknowledged clearance level > 0"
+        member = self.get_organizationmember()
         if (
             (filter_form.is_valid() and not filter_form.cleaned_data["show_all"])
-            or self.request.user.organizationmember.acknowledged_clearance_level <= 0
-            or self.get_organization_indemnification
+            or member.acknowledged_clearance_level <= 0
+            or self.get_organization_indemnification()
         ):
             boefjes = [boefje for boefje in boefjes if boefje.scan_level.value <= self.ooi.scan_profile.level]
 
@@ -151,12 +148,12 @@ class OOIDetailView(
         context["ooi"] = self.ooi
 
         declarations, observations, inferences = self.get_origins(
-            self.ooi.reference, self.get_observed_at(), self.request.active_organization
+            self.ooi.reference, self.get_observed_at(), self.organization
         )
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
-
+        context["member"] = self.get_organizationmember()
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi))
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
@@ -166,10 +163,8 @@ class OOIDetailView(
         context["ooi_current"] = self.get_current_ooi()
         context["findings_severity_summary"] = self.findings_severity_summary()
         context["severity_summary_totals"] = self.get_findings_severity_totals()
-        context["breadcrumbs"] = self.build_breadcrumbs()
-
         context["possible_boefjes_filter_form"] = filter_form
-        context["organization_indemnification"] = self.get_organization_indemnification
+        context["organization_indemnification"] = self.get_organization_indemnification()
 
         context["scan_history"] = self.get_scan_history()
         context["scan_history_form_fields"] = [
@@ -181,17 +176,3 @@ class OOIDetailView(
         ]
 
         return context
-
-
-def verify_may_update_scan_profile(request) -> bool:
-    organization_member = OrganizationMember.objects.get(user=request.user)
-
-    if not Indemnification.objects.filter(organization=organization_member.organization).exists():
-        messages.add_message(request, messages.ERROR, _("The required indemnification to perform this action is missing."))
-        return False
-
-    if not organization_member.acknowledged_clearance_level > 0:
-        messages.add_message(request, messages.ERROR, _("Acknowledged clearance level too low."))
-        return False
-
-    return True

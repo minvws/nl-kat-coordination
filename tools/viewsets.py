@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 
-from tools.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode
 from tools.models import Organization
+from tools.serializers import OrganizationSerializer, OrganizationSerializerReadOnlyCode
 
 
 class OrganizationViewSet(viewsets.ModelViewSet):

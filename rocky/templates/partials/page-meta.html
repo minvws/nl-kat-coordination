@@ -5,7 +5,12 @@
     {% if request.user.is_authenticated %}
       <div class="login-meta">
         <p>
-          {% translate 'Logged in as' %}: <a href="{% url 'account_detail' %}">{{ request.user }}</a>
+          {% translate 'Logged in as' %}:
+          {% if organization %}
+            <a href="{% url 'account_detail' organization_code=organization.code %}">{{ request.user }}</a>
+          {% else %}
+            {{ request.user }}
+          {% endif %}
         </p>
       </div>
     {% endif %}

@@ -1,14 +1,12 @@
 import json
 from json import JSONDecodeError
 
+import tagulous.admin
 from django.contrib import admin
 from django.db.models import JSONField
 from django.forms import widgets
 
-import tagulous.admin
-
 from rocky.admin import AdminErrorMessageMixin
-
 from tools.models import (
     Organization,
     OrganizationMember,
@@ -69,6 +67,8 @@ class OrganizationAdmin(AdminErrorMessageMixin, admin.ModelAdmin):
 
 
 class OrganizationMemberAdmin(admin.ModelAdmin):
+    list_display = ("user", "organization")
+
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
 

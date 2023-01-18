@@ -1,4 +1,5 @@
 from django.urls import path
+
 from fmea import views
 
 urlpatterns = [

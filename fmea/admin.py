@@ -1,14 +1,15 @@
 from django.contrib import admin
+
+from fmea.forms import (
+    FailureModeForm,
+    FailureModeAffectedObjectForm,
+    FailureModeEffectForm,
+)
 from .models import (
     FailureMode,
     FailureModeAffectedObject,
     FailureModeTreeObject,
     FailureModeEffect,
-)
-from fmea.forms import (
-    FailureModeForm,
-    FailureModeAffectedObjectForm,
-    FailureModeEffectForm,
 )
 
 

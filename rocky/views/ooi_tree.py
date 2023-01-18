@@ -3,15 +3,15 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from fmea.models import DEPARTMENTS
-from rocky.views import BaseOOIDetailView
-from tools.forms import OoiTreeSettingsForm
+from rocky.views.mixins import OOIBreadcrumbsMixin
+from rocky.views.ooi_view import BaseOOIDetailView
+from tools.forms.ooi import OoiTreeSettingsForm
 from tools.ooi_helpers import (
     get_ooi_types_from_tree,
     filter_ooi_tree,
     create_object_tree_item_from_ref,
 )
 from tools.view_helpers import get_ooi_url, Breadcrumb
-from rocky.views.mixins import OOIBreadcrumbsMixin
 
 
 class OOITreeView(OOIBreadcrumbsMixin, BaseOOIDetailView):
@@ -45,7 +45,7 @@ class OOITreeView(OOIBreadcrumbsMixin, BaseOOIDetailView):
 
     def get_last_breadcrumb(self):
         return {
-            "url": get_ooi_url("ooi_tree", self.ooi.primary_key),
+            "url": get_ooi_url("ooi_tree", self.ooi.primary_key, self.organization.code),
             "text": _("Tree Visualisation"),
         }
 
@@ -68,7 +68,7 @@ class OOISummaryView(OOITreeView):
 
     def get_last_breadcrumb(self):
         return {
-            "url": get_ooi_url("ooi_summary", self.ooi.primary_key),
+            "url": get_ooi_url("ooi_summary", self.ooi.primary_key, self.organization.code),
             "text": _("Summary"),
         }
 
@@ -79,11 +79,11 @@ class OOIGraphView(OOITreeView):
     def get_filtered_tree(self, tree_dict):
         filtered_tree = super().get_filtered_tree(tree_dict)
 
-        return hydrate_tree(filtered_tree)
+        return hydrate_tree(filtered_tree, self.organization.code)
 
     def get_last_breadcrumb(self):
         return {
-            "url": get_ooi_url("ooi_graph", self.ooi.primary_key),
+            "url": get_ooi_url("ooi_graph", self.ooi.primary_key, self.organization.code),
             "text": _("Graph Visualisation"),
         }
 
@@ -93,11 +93,11 @@ class OOIGraphView(OOITreeView):
         return context
 
 
-def hydrate_tree(tree):
-    return hydrate_branch(tree)
+def hydrate_tree(tree, organization_code: str):
+    return hydrate_branch(tree, organization_code)
 
 
-def hydrate_branch(branch):
+def hydrate_branch(branch, organization_code: str):
     branch["name"] = branch["tree_meta"]["location"] + "-" + branch["ooi_type"]
     branch["overlay_data"] = {"Type": branch["ooi_type"]}
     if branch["ooi_type"] == "Finding":
@@ -109,9 +109,9 @@ def hydrate_branch(branch):
         branch["overlay_data"]["State"] = branch["state"]
 
     branch["display_name"] = branch["human_readable"]
-    branch["graph_url"] = get_ooi_url("ooi_graph", branch["id"])
+    branch["graph_url"] = get_ooi_url("ooi_graph", branch["id"], organization_code=organization_code)
 
     if branch.get("children"):
-        branch["children"] = [hydrate_branch(child) for child in branch["children"]]
+        branch["children"] = [hydrate_branch(child, organization_code) for child in branch["children"]]
 
     return branch

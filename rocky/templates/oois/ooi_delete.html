@@ -21,8 +21,8 @@
           <table>
             <thead>
               <tr>
-                <th>Key</th>
-                <th>Value</th>
+                <th>{% translate 'Key' %}</th>
+                <th>{% translate 'Value' %}</th>
               </tr>
             </thead>
             <tbody>
@@ -42,7 +42,7 @@
               <button type="submit">
                 {% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}
               </button>
-              <a href="{% ooi_url 'ooi_detail' ooi.primary_key %}"
+              <a href="{% ooi_url 'ooi_detail' ooi.primary_key organization.code %}"
                  class="button ghost">{% translate 'Cancel' %}</a>
             </div>
           </form>
@@ -51,7 +51,7 @@
             {% translate 'Deletion not possible for types: KATFindingType and CVEFindingType' %}
           </p>
           <div class="horizontal-view">
-            <a href="{% ooi_url 'ooi_detail' ooi.primary_key %}"
+            <a href="{% ooi_url 'ooi_detail' ooi.primary_key organization.code %}"
                class="button ghost">{% translate 'Cancel' %}</a>
           </div>
         {% endif %}

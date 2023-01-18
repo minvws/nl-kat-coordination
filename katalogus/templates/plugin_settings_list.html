@@ -44,23 +44,22 @@
                 </td>
                 {% if not setting.value %}
                   <td>
-                    <a href="{% url 'plugin_settings_add_single' plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate 'Add' %}</a>
+                    <a href="{% url 'plugin_settings_add_single' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate 'Add' %}</a>
                   </td>
                 {% else %}
                   <td>
-                    <a href="{% url 'plugin_settings_edit' plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate 'Edit' %}</a>
+                    <a href="{% url 'plugin_settings_edit' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate 'Edit' %}</a>
                   </td>
                   <td>
-                    <a href="{% url 'plugin_settings_delete' plugin_type=plugin.type plugin_id=plugin.id name=setting.name %}">{% translate 'Delete' %}</a>
+                    <a href="{% url 'plugin_settings_delete' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id name=setting.name %}">{% translate 'Delete' %}</a>
                   </td>
                 {% endif %}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% include 'partials/pagination.html' %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% include 'partials/pagination.html' %}
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 {% endif %}

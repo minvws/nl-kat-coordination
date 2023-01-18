@@ -8,7 +8,7 @@
     <section>
       <div class="one-third-two-thirds">
         <div>
-          <img src="{% url 'plugin_cover' plugin_id=plugin.id %}"
+          <img src="{% url 'plugin_cover' organization_code=organization.code plugin_id=plugin.id %}"
                alt="boefje placeholder image"/>
         </div>
         <div>
@@ -42,7 +42,7 @@
         </p>
         <p>
           {% for ooi in plugin.consumes %}
-            <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
+            <a href="{% url 'ooi_add' organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
             {% if ooi != plugin.consumes|last %}-{% endif %}
           {% endfor %}
         </p>
@@ -54,7 +54,7 @@
         </p>
         <p>
           {% for ooi in plugin.produces %}
-            <a href="{% url 'ooi_add' ooi %}">{{ ooi }}</a>
+            <a href="{% url 'ooi_add' organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
             {% if ooi != plugin.produces|last %}-{% endif %}
           {% endfor %}
         </p>

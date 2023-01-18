@@ -3,9 +3,10 @@
 
 {% if list.items %}
   {% if list.tree_meta.depth > 1 %}
-    <input type="checkbox" class="toggle-table-body is-hidden" id="tree-{{ list.tree_meta.location }}">
+    <input type="checkbox"
+           class="toggle-table-body is-hidden"
+           id="tree-{{ list.tree_meta.location }}">
   {% endif %}
-
   <div class="horizontal-scroll">
     <table class="tree-view">
       <thead>
@@ -19,18 +20,19 @@
                 {% endif %}
                 {{ list.ooi_type }}: {{ list.human_readable }}
               </label>
-
               <nav>
                 {% translate 'go to:' %}
-                <a href="{% ooi_url 'ooi_detail' list.id %}" title="{% translate 'Go to detailpage' %}">{% translate 'detail' %}</a>
-                <a href="{% ooi_url 'ooi_tree' list.id %}" title="{% translate 'Go to tree view' %}">{% translate 'tree' %}</a>
-                <a href="{% ooi_url 'ooi_graph' list.id %}" title="{% translate 'Go to graph view' %}">{% translate 'graph' %}</a>
+                <a href="{% ooi_url 'ooi_detail' list.id organization.code %}"
+                   title="{% translate 'Go to detailpage' %}">{% translate 'detail' %}</a>
+                <a href="{% ooi_url 'ooi_tree' list.id organization.code %}"
+                   title="{% translate 'Go to tree view' %}">{% translate 'tree' %}</a>
+                <a href="{% ooi_url 'ooi_graph' list.id organization.code %}"
+                   title="{% translate 'Go to graph view' %}">{% translate 'graph' %}</a>
               </nav>
             </div>
           </th>
         </tr>
       </thead>
-
       <tbody>
         {% for prop, item in list.items %}
           {% include "partials/elements/ooi_tree_table_row.html" %}

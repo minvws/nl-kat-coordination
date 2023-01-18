@@ -6,11 +6,11 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+from two_factor.views.utils import class_view_decorator
+
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_relations, OOI_TYPES, to_concrete
-from two_factor.views.utils import class_view_decorator
-
 from rocky.views.ooi_view import SingleOOITreeMixin
 from tools.ooi_helpers import (
     get_knowledge_base_data_for_ooi,
@@ -24,7 +24,7 @@ from tools.view_helpers import existing_ooi_type, url_with_querystring
 class OOIRelatedObjectManager(SingleOOITreeMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.api_connector = self.get_api_connector()
+        self.api_connector = self.octopoes_api_connector
 
     def get_related_objects(self):
         related = []
@@ -42,7 +42,7 @@ class OOIRelatedObjectManager(SingleOOITreeMixin):
 class OOIFindingManager(SingleOOITreeMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.api_connector = self.get_api_connector()
+        self.api_connector = self.octopoes_api_connector
 
     def get_findings(self) -> List[Dict]:
         findings: List[Dict] = []
@@ -128,7 +128,7 @@ class OOIRelatedObjectAddView(OOIRelatedObjectManager, OOIFindingManager, Templa
         return the URL to the corresponding add object form with corresponding get parameters
         """
 
-        path = reverse("ooi_add", kwargs={"ooi_type": ooi_type})
+        path = reverse("ooi_add", kwargs={"organization_code": self.organization.code, "ooi_type": ooi_type})
         query_params = {ooi_relation: ooi.primary_key}
 
         if ooi_type == "Finding":

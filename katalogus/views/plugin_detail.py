@@ -5,10 +5,10 @@ from django.core.paginator import Paginator, Page
 from django.http import FileResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views import View
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
+from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from katalogus.views import PluginSettingsListView
 from katalogus.views.mixins import KATalogusMixin
@@ -18,11 +18,11 @@ from rocky import scheduler
 logger = getLogger(__name__)
 
 
-class PluginCoverImgView(View):
+class PluginCoverImgView(OrganizationView):
     """Get the cover image of a plugin."""
 
-    def get(self, request, plugin_id: str):
-        return FileResponse(get_katalogus(request.active_organization.code).get_cover(plugin_id))
+    def get(self, request, *args, **kwargs):
+        return FileResponse(get_katalogus(self.organization.code).get_cover(kwargs["plugin_id"]))
 
 
 @class_view_decorator(otp_required)
@@ -37,7 +37,7 @@ class PluginDetailView(
     scan_history_limit = 10
 
     def get_scan_history(self) -> Page:
-        scheduler_id = f"{self.plugin['type']}-{self.request.active_organization.code}"
+        scheduler_id = f"{self.plugin['type']}-{self.organization.code}"
 
         filters = [
             {
@@ -82,10 +82,18 @@ class PluginDetailView(
         context = super().get_context_data(**kwargs)
         context["plugin"] = self.plugin
         context["breadcrumbs"] = [
-            {"url": reverse("katalogus"), "text": _("KAT-alogus")},
+            {
+                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
+                "text": _("KAT-alogus"),
+            },
             {
                 "url": reverse(
-                    "plugin_detail", kwargs={"plugin_type": self.plugin["type"], "plugin_id": self.plugin_id}
+                    "plugin_detail",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "plugin_type": self.plugin["type"],
+                        "plugin_id": self.plugin_id,
+                    },
                 ),
                 "text": self.plugin["name"],
             },

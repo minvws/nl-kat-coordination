@@ -1,6 +1,6 @@
 import zipfile
 
-from rocky.views import zip_data
+from rocky.views.bytes_raw import zip_data
 
 
 def test_zip_data():

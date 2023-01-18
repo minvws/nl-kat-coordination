@@ -11,16 +11,15 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from django_otp.decorators import otp_required
+from pydantic import ValidationError
+from two_factor.views.utils import class_view_decorator
+
+from account.mixins import OrganizationView
 from octopoes.api.models import Declaration
-from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
 from octopoes.models.ooi.web import URL
-from pydantic import ValidationError
-from two_factor.views.utils import class_view_decorator
-
-from rocky.settings import OCTOPOES_API
 from tools.forms.upload_csv import (
     UploadCSVForm,
     CSV_ERRORS,
@@ -43,17 +42,11 @@ CSV_CRITERIAS = [
 ]
 
 
-def save_ooi(ooi, organization) -> None:
-    connector = OctopoesAPIConnector(OCTOPOES_API, organization)
-    connector.save_declaration(Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc)))
-
-
 @class_view_decorator(otp_required)
-class UploadCSV(PermissionRequiredMixin, FormView):
+class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
     form_class = UploadCSVForm
     permission_required = "tools.can_scan_organization"
-    success_url = reverse_lazy("ooi_list")
     reference_cache: Dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
     ooi_types: ClassVar[Dict[str, Any]] = {
         "Hostname": {"type": Hostname},
@@ -66,16 +59,20 @@ class UploadCSV(PermissionRequiredMixin, FormView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-
-        self.organization_code = request.user.organizationmember.organization.code
-        if not self.organization_code:
+        if not self.organization:
             self.add_error_notification(CSV_ERRORS["no_org"])
+
+    def get_success_url(self):
+        return reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"url": reverse("ooi_list"), "text": _("Objects")},
-            {"url": reverse("upload_csv"), "text": _("Upload CSV")},
+            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
+            {
+                "url": reverse("upload_csv", kwargs={"organization_code": self.organization.code}),
+                "text": _("Upload CSV"),
+            },
         ]
         context["criterias"] = CSV_CRITERIAS
         return context
@@ -114,7 +111,9 @@ class UploadCSV(PermissionRequiredMixin, FormView):
             if is_reference and required:
                 try:
                     referenced_ooi = self.get_or_create_reference(field, values.get(field))
-                    save_ooi(ooi=referenced_ooi, organization=self.organization_code)
+                    self.octopoes_api_connector.save_declaration(
+                        Declaration(ooi=referenced_ooi, valid_time=datetime.now(timezone.utc))
+                    )
                     kwargs[field] = referenced_ooi.reference
                 except IndexError:
                     if required:
@@ -131,7 +130,7 @@ class UploadCSV(PermissionRequiredMixin, FormView):
 
     def form_valid(self, form):
         if not self.proccess_csv(form):
-            return redirect("upload_csv")
+            return redirect("upload_csv", organization_code=self.organization.code)
         return super().form_valid(form)
 
     def add_error_notification(self, error_message):
@@ -153,7 +152,9 @@ class UploadCSV(PermissionRequiredMixin, FormView):
                     continue  # skip empty lines
                 try:
                     ooi = self.get_ooi_from_csv(object_type, row)
-                    save_ooi(ooi=ooi, organization=self.organization_code)
+                    self.octopoes_api_connector.save_declaration(
+                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc))
+                    )
                 except ValidationError:
                     rows_with_error.append(row_number)
 

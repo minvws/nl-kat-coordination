@@ -51,7 +51,9 @@
         <form method="post" class="inline">
           {% csrf_token %}
           <div class="horizontal-view">
-            <a href="{% url 'skip_onboarding' %}" class="button ghost">{% translate 'Skip onboarding' %}</a>
+          {% if organization %}
+            <a href="{% url 'complete_onboarding' organization.code %}" class="button ghost">{% translate 'Skip onboarding' %}</a>
+          {% endif%}
             <button type="submit" class="button">{% translate 'Start scanning' %}</button>
           </div>
         </form>

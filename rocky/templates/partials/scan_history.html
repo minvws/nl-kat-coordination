@@ -73,18 +73,18 @@
           <tr>
             <td>
               {% if scan.type == 'boefje' %}
-                <a href="{% ooi_url 'ooi_detail' scan.p_item.data.input_ooi %}">{{ scan.p_item.data.input_ooi }}</a>
+                <a href="{% ooi_url 'ooi_detail' scan.p_item.data.input_ooi organization.code %}">{{ scan.p_item.data.input_ooi }}</a>
               {% elif scan.type == 'normalizer' %}
-                <a href="{% ooi_url 'ooi_detail' scan.p_item.data.raw_data.boefje_meta.input_ooi %}">{{ scan.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                <a href="{% ooi_url 'ooi_detail' scan.p_item.data.raw_data.boefje_meta.input_ooi organization.code %}">{{ scan.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
               {% else %}
                 {{ scan.id }}
               {% endif %}
             </td>
             <td>
               {% if scan.type == 'boefje' %}
-                <a href="{% url 'plugin_detail' scan.type scan.p_item.data.boefje.id %}">{{ scan.p_item.data.boefje.name }}</a>
+                <a href="{% url 'plugin_detail' scan.type scan.p_item.data.boefje.id organization.code %}">{{ scan.p_item.data.boefje.name }}</a>
               {% elif scan.type == 'normalizer' %}
-                <a href="{% url 'plugin_detail' scan.type scan.p_item.data.normalizer.id %}">{{ scan.p_item.data.normalizer.name }}</a>
+                <a href="{% url 'plugin_detail' scan.type scan.p_item.data.normalizer.id organization.code %}">{{ scan.p_item.data.normalizer.name }}</a>
               {% else %}
                 {{ scan.id }}
               {% endif %}

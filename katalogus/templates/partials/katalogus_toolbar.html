@@ -1,8 +1,8 @@
 {% load i18n %}
 
 <div class="horizontal-view horizontal-scroll toolbar">
-  <a href="{% url 'katalogus' %}"
-     class="button icon ti-layout-grid {% if view == 'table' %}ghost{% endif %}">{% translate 'Gridview' %}</a>
-  <a href="{% url 'katalogus' 'table' %}"
-     class="button icon ti-menu-2 {% if view != 'table' %}ghost{% endif %}">{% translate 'Tableview' %}</a>
+   <a href="{% url 'katalogus' organization.code %}"
+      class="button icon ti-layout-grid {% if view == 'table' %}ghost{% endif %}">{% translate 'Gridview' %}</a>
+   <a href="{% url 'katalogus' organization_code=organization.code view='table' %}"
+      class="button icon ti-menu-2 {% if view != 'table' %}ghost{% endif %}">{% translate 'Tableview' %}</a>
 </div>

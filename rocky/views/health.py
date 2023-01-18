@@ -1,35 +1,37 @@
 import logging
 from typing import List
-from django.contrib.auth.decorators import user_passes_test
-from django.http import JsonResponse, HttpResponse, HttpRequest
+
+from django.http import JsonResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView, View
 from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
-from octopoes.connector.octopoes import OctopoesAPIConnector
 from requests import RequestException
+from two_factor.views.utils import class_view_decorator
+
+from katalogus.health import get_katalogus_health
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from rocky.bytes_client import get_bytes_client
 from rocky.health import ServiceHealth
 from rocky.keiko import keiko_client
-from rocky.version import __version__
-from katalogus.health import get_katalogus_health
-from tools.user_helpers import is_red_team
 from rocky.scheduler import client
-from django.views.generic import TemplateView
-from rocky.bytes_client import get_bytes_client
+from rocky.version import __version__
+from rocky.views.mixins import OctopoesView
 
 logger = logging.getLogger(__name__)
 
 
-@user_passes_test(is_red_team)
-@otp_required
-def health(request: HttpRequest) -> HttpResponse:
-    rocky_health = get_rocky_health(request.octopoes_api_connector)
-    return JsonResponse(rocky_health.dict())
+@class_view_decorator(otp_required)
+class Health(OctopoesView, View):
+    def get(self, request, *args, **kwargs) -> JsonResponse:
+        octopoes_connector = self.octopoes_api_connector
+        rocky_health = get_rocky_health(octopoes_connector)
+        return JsonResponse(rocky_health.dict())
 
 
 def get_bytes_health() -> ServiceHealth:
     try:
-        bytes_health = get_bytes_client().health()
+        bytes_health = get_bytes_client("").health()  # For the health endpoint the organization has no effect
     except RequestException as ex:
         logger.exception(ex)
         bytes_health = ServiceHealth(
@@ -110,15 +112,18 @@ def flatten_health(health_: ServiceHealth) -> List[ServiceHealth]:
 
 
 @class_view_decorator(otp_required)
-class HealthChecks(TemplateView):
+class HealthChecks(OctopoesView, TemplateView):
     template_name = "health.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"url": reverse("health"), "text": _("Health")},
-            {"url": reverse("health_beautified"), "text": _("Beautified")},
+            {"url": reverse("health", kwargs={"organization_code": self.organization.code}), "text": _("Health")},
+            {
+                "url": reverse("health_beautified", kwargs={"organization_code": self.organization.code}),
+                "text": _("Beautified"),
+            },
         ]
-        rocky_health = get_rocky_health(self.request.octopoes_api_connector)
+        rocky_health = get_rocky_health(self.octopoes_api_connector)
         context["health_checks"] = flatten_health(rocky_health)
         return context

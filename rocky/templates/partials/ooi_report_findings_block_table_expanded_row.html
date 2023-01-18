@@ -6,9 +6,7 @@
     <span class="sr-only">
       {% blocktranslate with object_id=findings.grouper.id %}Details of {{ object_id }}{% endblocktranslate %}
     </span>
-
     <h1>{% translate "Finding details" %}</h1>
-
     {% if not finding_type.risk_level_source %}
       <p class="warning" role="group" aria-label="{% translate 'warning' %}">
         <span>{% translate 'Warning' %}:</span>
@@ -18,60 +16,67 @@
         {% endblocktranslate %}
       </p>
     {% endif %}
-
     <dl>
       <div class="meta">
-        <dt>{% translate "Type" %}</dt>
-        <dd>{{ finding_type.ooi_type }}</dd>
+        <dt>
+          {% translate "Type" %}
+        </dt>
+        <dd>
+          {{ finding_type.ooi_type }}
+        </dd>
       </div>
-
       <div>
-        <dt>{% translate "Finding" %}</dt>
-        <dd><a href="{% ooi_url 'ooi_detail' finding_type.ooi_type|add:'|'|add:finding_type.id %}">{{ finding_type.id }}</a></dd>
+        <dt>
+          {% translate "Finding" %}
+        </dt>
+        <dd>
+          <a href="{% ooi_url 'ooi_detail' finding_type.ooi_type|add:'|'|add:finding_type.id organization.code %}">{{ finding_type.id }}</a>
+        </dd>
       </div>
-
       {% include 'partials/elements/definition_list_item.html' with label='Description' description=finding_type.description %}
-
       <div>
-        <dt>{% translate "Risk level" %}</dt>
-        <dd>{{ finding_type.risk_level_score }} / 10</dd>
+        <dt>
+          {% translate "Risk level" %}
+        </dt>
+        <dd>
+          {{ finding_type.risk_level_score }} / 10
+        </dd>
       </div>
-
       {% include 'partials/elements/definition_list_item.html' with label='Severity' description=finding_type.risk_level_severity %}
-
       {% include 'partials/elements/definition_list_item.html' with label='Impact' description=finding_type.impact_description %}
-
       {% if finding_type.source %}
         <div>
-          <dt>{% translate "Source" %}</dt>
-          <dd><a href="{{ finding_type.source }}" target="_blank">{{ finding_type.source }}</a></dd>
+          <dt>
+            {% translate "Source" %}
+          </dt>
+          <dd>
+            <a href="{{ finding_type.source }}" target="_blank">{{ finding_type.source }}</a>
+          </dd>
         </div>
       {% endif %}
-
       {% include 'partials/elements/definition_list_items.html' with items=finding_type.items exclude_keys='id,human_readable,ooi_type,description,risk_level_score,impact_description,source,findings,risk_level_severity' %}
     </dl>
-
     <div>
       <h2>{% translate "Occurrences" %}</h2>
-
       <dl>
         <div>
-          <dt>{% translate "Total occurrences" %}</dt>
-          <dd>{{ findings_list.meta.total_by_finding_type|get_item:finding_type.id }}</dd>
+          <dt>
+            {% translate "Total occurrences" %}
+          </dt>
+          <dd>
+            {{ findings_list.meta.total_by_finding_type|get_item:finding_type.id }}
+          </dd>
         </div>
       </dl>
-
       <div>
         <h3>{% translate "Occurrence" %}</h3>
         {% for finding in findings.list %}
-          <a href="{% ooi_url 'ooi_detail' finding.ooi.id %}">{{ finding.ooi.human_readable }}</a>
-
+          <a href="{% ooi_url 'ooi_detail' finding.ooi.id organization.code %}">{{ finding.ooi.human_readable }}</a>
           <div id="{{ findings.grouper.id }}-{{ finding.ooi.id }}">
             {% include 'partials/finding_occurrence_definition_list.html' %}
           </div>
         {% endfor %}
       </div>
-
       {% if findings_list.meta.total_by_finding_type|get_item:finding_type.id > 999 %}
         {# not implemented yet #}
         <div class="horizontal-view">
@@ -80,6 +85,5 @@
         </div>
       {% endif %}
     </div>
-
   </td>
 </tr>

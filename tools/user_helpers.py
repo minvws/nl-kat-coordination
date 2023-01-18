@@ -1,5 +1,7 @@
 from typing import List
+
 from django.contrib.auth import get_user_model
+
 from tools.models import (
     Organization,
     OrganizationMember,

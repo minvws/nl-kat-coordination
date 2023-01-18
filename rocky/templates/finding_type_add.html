@@ -3,22 +3,20 @@
 {% load static %}
 
 {% block content %}
-	{% include 'header.html' %}
-
-	<main id="main-content">
+  {% include 'header.html' %}
+  <main id="main-content">
     <article>
       <div class="form-view">
         <h1>{% translate 'Add finding type' %}:</h1>
-
-        <form action="{% url 'finding_type_add' %}" method="post" class="horizontal-view help">
+        <form action="{% url 'finding_type_add' organization_code=organization.code %}"
+              method="post"
+              class="horizontal-view help">
           {% csrf_token %}
-
           {% translate 'Finding Type' as fieldset_legend %}
           {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
-
           <button type="submit">{% translate 'Add finding type' %}</button>
         </form>
       </div>
     </article>
-	</main>
+  </main>
 {% endblock %}

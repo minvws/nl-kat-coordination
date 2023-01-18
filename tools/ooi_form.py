@@ -4,13 +4,14 @@ from typing import Type, Dict, Union, List
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models.types import get_relations
 from pydantic import AnyUrl
 from pydantic.fields import ModelField, SHAPE_LIST
 
-from tools.forms import BaseRockyForm, CheckboxGroup, CLEARANCE_TYPE_CHOICES
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI
+from octopoes.models.types import get_relations
+from tools.forms.base import BaseRockyForm, CheckboxGroup
+from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
 
 

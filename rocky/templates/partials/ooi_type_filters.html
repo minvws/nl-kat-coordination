@@ -3,7 +3,7 @@
 {% load ooi_extra %}
 
 {% if object_type_filters %}
-  <form action="{% if request.resolver_match.url_name == 'ooi_tree' %}{% ooi_url 'ooi_tree' ooi_id %}{% else %}{% url request.resolver_match.url_name %}{% endif %}"
+  <form action="{% if request.resolver_match.url_name == 'ooi_tree' %}{% ooi_url 'ooi_tree' ooi_id organization_code=organization.code %}{% else %}{% url request.resolver_match.url_name %}{% endif %}"
         method="get">
     {% with 'ooi_type' as ignore_params %}
       {% include 'partials/form/field_hidden_from_list.html' with list=mandatory_fields ignore_params=ignore_params.split %}

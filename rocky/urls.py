@@ -1,128 +1,150 @@
-from django.urls import path, include
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
-from two_factor.urls import urlpatterns as tf_urls
+from django.urls import path, include
 from django.views.generic.base import TemplateView
 from rest_framework import routers
-from rocky import views
+from two_factor.urls import urlpatterns as tf_urls
+
+from rocky.views.bytes_raw import BytesRawView
+from rocky.views.finding_add import FindingAddView
+from rocky.views.finding_list import FindingListView
+from rocky.views.finding_type_add import FindingTypeAddView
+from rocky.views.health import Health, HealthChecks
+from rocky.views.indemnification_add import IndemnificationAddView
+from rocky.views.landing_page import LandingPageView
+from rocky.views.ooi_add import OOIAddTypeSelectView, OOIAddView
+from rocky.views.ooi_delete import OOIDeleteView
+from rocky.views.ooi_detail import OOIDetailView
+from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
+from rocky.views.ooi_edit import OOIEditView
+from rocky.views.ooi_findings import OOIFindingListView
+from rocky.views.ooi_list import OOIListView, OOIListExportView
+from rocky.views.ooi_report import OOIReportView, OOIReportPDFView
+from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
+from rocky.views.organization_add import OrganizationAddView
+from rocky.views.organization_detail import OrganizationDetailView
+from rocky.views.organization_edit import OrganizationEditView
+from rocky.views.organization_list import OrganizationListView
+from rocky.views.organization_member_add import OrganizationMemberAddView
+from rocky.views.organization_member_edit import OrganizationMemberEditView
+from rocky.views.privacy_statement import PrivacyStatementView
+from rocky.views.scan_profile import ScanProfileResetView, ScanProfileDetailView
+from rocky.views.scans import ScanListView
+from rocky.views.tasks import BoefjesTaskListView, NormalizersTaskListView, DownloadTaskDetail
+from rocky.views.upload_csv import UploadCSV
 from tools.viewsets import OrganizationViewSet
 
-handler404 = "rocky.views.handler404"
+handler404 = "rocky.views.handler404.handler404"
 
 router = routers.SimpleRouter()
 router.register(r"organization", OrganizationViewSet)
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
-    path("", views.LandingPageView.as_view(), name="landing_page"),
-    path("account/", include("account.urls"), name="account"),
+    path("api/v1/", include(router.urls)),
+    path("<organization_code>/health/", Health.as_view(), name="health"),
     path("", include(tf_urls)),
-    path(
-        "indemnifications/",
-        views.IndemnificationAddView.as_view(),
-        name="indemnification_add",
-    ),
-    path("switch_client/", views.switch_client, name="switch_client"),
-    path("findings/", views.FindingListView.as_view(), name="finding_list"),
-    path("findings/add/", views.FindingAddView.as_view(), name="finding_add"),
-    path("finding_type/add/", views.FindingTypeAddView.as_view(), name="finding_type_add"),
-    path("objects/graph/", views.OOIGraphView.as_view(), name="ooi_graph"),
-    path("objects/report/", views.OOIReportView.as_view(), name="ooi_report"),
-    path("objects/report/pdf/", views.OOIReportPDFView.as_view(), name="ooi_pdf_report"),
-    path("objects/summary/", views.OOISummaryView.as_view(), name="ooi_summary"),
-    path("objects/tree/", views.OOITreeView.as_view(), name="ooi_tree"),
-    path("objects/findings/", views.OOIFindingListView.as_view(), name="ooi_findings"),
-    path("organizations/", views.OrganizationListView.as_view(), name="organization_list"),
-    path(
-        "organizations/add/",
-        views.OrganizationAddView.as_view(),
-        name="organization_add",
-    ),
-    path(
-        "organizations/<path:pk>/edit/",
-        views.OrganizationEditView.as_view(),
-        name="organization_edit",
-    ),
-    path(
-        "organizations/<path:pk>/members/add/",
-        views.OrganizationMemberAddView.as_view(),
-        name="organization_member_add",
-    ),
-    path(
-        "organizations/<path:pk>/members/",
-        views.OrganizationMemberListView.as_view(),
-        name="organization_member_list",
-    ),
-    path(
-        "organizations/<path:pk>/",
-        views.OrganizationDetailView.as_view(),
-        name="organization_detail",
-    ),
-    path(
-        "organization_members/<path:pk>/edit/",
-        views.OrganizationMemberEditView.as_view(),
-        name="organization_member_edit",
-    ),
-    path("health/", views.health, name="health"),
-    path(
-        "health/v1/",
-        views.HealthChecks.as_view(),
-        name="health_beautified",
-    ),
-    path("objects/", views.OOIListView.as_view(), name="ooi_list"),
-    path("objects/add/", views.OOIAddTypeSelectView.as_view(), name="ooi_add_type_select"),
-    path(
-        "objects/add-related/",
-        views.OOIRelatedObjectAddView.as_view(),
-        name="ooi_add_related",
-    ),
-    path("objects/add/<ooi_type>/", views.OOIAddView.as_view(), name="ooi_add"),
-    path("objects/edit/", views.OOIEditView.as_view(), name="ooi_edit"),
-    path("objects/delete/", views.OOIDeleteView.as_view(), name="ooi_delete"),
-    path("objects/detail/", views.OOIDetailView.as_view(), name="ooi_detail"),
-    path("objects/export", views.OOIListExportView.as_view(), name="ooi_list_export"),
-    path(
-        "objects/indemnification/reset/",
-        views.ScanProfileResetView.as_view(),
-        name="scan_profile_reset",
-    ),
-    path(
-        "objects/scan-profile/",
-        views.ScanProfileDetailView.as_view(),
-        name="scan_profile_detail",
-    ),
-    path("scans/", views.ScanListView.as_view(), name="scan_list"),
-    path("admin/", admin.site.urls),
-    path(
-        "upload/csv/",
-        views.UploadCSV.as_view(),
-        name="upload_csv",
-    ),
-    path("signal_qr/", views.SignalQRView.as_view(), name="signal_qr"),
-    path(
-        "privacy-statement/",
-        views.PrivacyStatementView.as_view(),
-        name="privacy_statement",
-    ),
-    path("onboarding/", include("onboarding.urls"), name="onboarding"),
-    path("crisis-room/", include("crisis_room.urls"), name="crisis_room"),
-    path("tasks/", views.BoefjesTaskListView.as_view(), name="task_list"),
-    path("tasks/boefjes", views.BoefjesTaskListView.as_view(), name="boefjes_task_list"),
-    path(
-        "tasks/normalizers",
-        views.NormalizersTaskListView.as_view(),
-        name="normalizers_task_list",
-    ),
-    path(
-        "tasks/<task_id>/download/",
-        views.DownloadTaskDetail.as_view(),
-        name="download_task_meta",
-    ),
-    path("bytes/<boefje_meta_id>/raw", views.BytesRawView.as_view(), name="bytes_raw"),
-    path("onboarding/", include("onboarding.urls"), name="onboarding"),
-    path("kat-alogus/", include("katalogus.urls"), name="katalogus"),
+    path("", include("account.urls"), name="account"),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
-    path("api/v1/", include(router.urls)),
 ]
+urlpatterns += i18n_patterns(
+    path("admin/", admin.site.urls),
+    path("", LandingPageView.as_view(), name="landing_page"),
+    path("onboarding/", include("onboarding.urls"), name="onboarding"),
+    path("crisis-room/", include("crisis_room.urls"), name="crisis_room"),
+    path(
+        "privacy-statement/",
+        PrivacyStatementView.as_view(),
+        name="privacy_statement",
+    ),
+    path(
+        "<organization_code>/indemnifications/",
+        IndemnificationAddView.as_view(),
+        name="indemnification_add",
+    ),
+    path("<organization_code>/findings/", FindingListView.as_view(), name="finding_list"),
+    path("<organization_code>/findings/add/", FindingAddView.as_view(), name="finding_add"),
+    path("<organization_code>/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
+    path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
+    path("<organization_code>/objects/report/", OOIReportView.as_view(), name="ooi_report"),
+    path("<organization_code>/objects/report/pdf/", OOIReportPDFView.as_view(), name="ooi_pdf_report"),
+    path("<organization_code>/objects/summary/", OOISummaryView.as_view(), name="ooi_summary"),
+    path("<organization_code>/objects/tree/", OOITreeView.as_view(), name="ooi_tree"),
+    path("<organization_code>/objects/findings/", OOIFindingListView.as_view(), name="ooi_findings"),
+    path("organizations/", OrganizationListView.as_view(), name="organization_list"),
+    path(
+        "organizations/add/",
+        OrganizationAddView.as_view(),
+        name="organization_add",
+    ),
+    path(
+        "organizations/<path:pk>/edit/",
+        OrganizationEditView.as_view(),
+        name="organization_edit",
+    ),
+    path(
+        "<organization_code>/members/add/",
+        OrganizationMemberAddView.as_view(),
+        name="organization_member_add",
+    ),
+    path(
+        "<organization_code>/",
+        OrganizationDetailView.as_view(),
+        name="organization_detail",
+    ),
+    path(
+        "organization_members/<path:pk>/edit/",
+        OrganizationMemberEditView.as_view(),
+        name="organization_member_edit",
+    ),
+    path(
+        "<organization_code>/health/v1/",
+        HealthChecks.as_view(),
+        name="health_beautified",
+    ),
+    path("<organization_code>/objects/", OOIListView.as_view(), name="ooi_list"),
+    path("<organization_code>/objects/add/", OOIAddTypeSelectView.as_view(), name="ooi_add_type_select"),
+    path(
+        "<organization_code>/objects/add-related/",
+        OOIRelatedObjectAddView.as_view(),
+        name="ooi_add_related",
+    ),
+    path("<organization_code>/objects/add/<ooi_type>/", OOIAddView.as_view(), name="ooi_add"),
+    path("<organization_code>/objects/edit/", OOIEditView.as_view(), name="ooi_edit"),
+    path("<organization_code>/objects/delete/", OOIDeleteView.as_view(), name="ooi_delete"),
+    path("<organization_code>/objects/detail/", OOIDetailView.as_view(), name="ooi_detail"),
+    path("<organization_code>/objects/export", OOIListExportView.as_view(), name="ooi_list_export"),
+    path(
+        "<organization_code>/objects/indemnification/reset/",
+        ScanProfileResetView.as_view(),
+        name="scan_profile_reset",
+    ),
+    path(
+        "<organization_code>/objects/scan-profile/",
+        ScanProfileDetailView.as_view(),
+        name="scan_profile_detail",
+    ),
+    path("<organization_code>/scans/", ScanListView.as_view(), name="scan_list"),
+    path(
+        "<organization_code>/upload/csv/",
+        UploadCSV.as_view(),
+        name="upload_csv",
+    ),
+    path("<organization_code>/tasks/", BoefjesTaskListView.as_view(), name="task_list"),
+    path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
+    path(
+        "<organization_code>/tasks/normalizers",
+        NormalizersTaskListView.as_view(),
+        name="normalizers_task_list",
+    ),
+    path(
+        "<organization_code>/tasks/<task_id>/download/",
+        DownloadTaskDetail.as_view(),
+        name="download_task_meta",
+    ),
+    path("<organization_code>/bytes/<boefje_meta_id>/raw", BytesRawView.as_view(), name="bytes_raw"),
+    path("<organization_code>/kat-alogus/", include("katalogus.urls"), name="katalogus"),
+)

@@ -23,7 +23,6 @@ from requests import HTTPError
 
 from tools.models import Organization
 
-
 pytestmark = pytest.mark.django_db
 
 
@@ -42,7 +41,7 @@ express_organizations = pluralized(express_organization)
 class TestOrganizationViewSet(ViewSetTest):
     @pytest.fixture
     def organizations(self):
-        with patch("katalogus.client.KATalogusClientV1.create_organization"), patch(
+        with patch("katalogus.client.KATalogusClientV1"), patch(
             "octopoes.connector.octopoes.OctopoesAPIConnector.create_node"
         ):
             return [
@@ -81,7 +80,9 @@ class TestOrganizationViewSet(ViewSetTest):
         data = static_fixture({"name": "Test Org 3", "code": "test3", "tags": ["tag2", "tag3"]})
 
         initial_ids = precondition_fixture(
-            lambda mock_katalogus, mock_octopoes, organizations: set(Organization.objects.values_list("id", flat=True)),
+            lambda mock_models_katalogus, mock_models_octopoes, organizations: set(
+                Organization.objects.values_list("id", flat=True)
+            ),
             async_=False,
         )
 
@@ -112,6 +113,7 @@ class TestOrganizationViewSet(ViewSetTest):
 
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
+            mocker.patch("katalogus.client.KATalogusClientV1.organization_exists", return_value=False)
             mocker.patch("katalogus.client.KATalogusClientV1.create_organization", side_effect=HTTPError("Test error"))
             mocker.patch("octopoes.connector.octopoes.OctopoesAPIConnector.create_node")
 
@@ -137,6 +139,7 @@ class TestOrganizationViewSet(ViewSetTest):
 
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
+            mocker.patch("katalogus.client.KATalogusClientV1.organization_exists", return_value=False)
             mocker.patch("katalogus.client.KATalogusClientV1.create_organization")
             mocker.patch(
                 "octopoes.connector.octopoes.OctopoesAPIConnector.create_node", side_effect=HTTPError("Test error")
@@ -205,7 +208,9 @@ class TestOrganizationViewSet(ViewSetTest):
         Returns204,
     ):
         initial_ids = precondition_fixture(
-            lambda mock_katalogus, mock_octopoes, organizations: set(Organization.objects.values_list("id", flat=True)),
+            lambda mock_models_katalogus, mock_models_octopoes, organizations: set(
+                Organization.objects.values_list("id", flat=True)
+            ),
             async_=False,
         )
 

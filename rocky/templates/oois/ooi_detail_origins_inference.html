@@ -15,11 +15,9 @@
         <tbody>
           {% for inference in inferences %}
             <tr>
+              <td>{{ inference.origin.method }}</td>
               <td>
-                {{ inference.origin.method }}
-              </td>
-              <td>
-                <a href="{% ooi_url 'ooi_detail' inference.origin.source %}">{{ inference.origin.source }}</a>
+                <a href="{% ooi_url 'ooi_detail' inference.origin.source organization.code %}">{{ inference.origin.source }}</a>
               </td>
             </tr>
           {% endfor %}

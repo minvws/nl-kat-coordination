@@ -1,20 +1,22 @@
 from datetime import datetime, timezone
+
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
+from two_factor.views.utils import class_view_decorator
+
 from octopoes.api.models import Declaration
 from octopoes.models.ooi.findings import KATFindingType
-from two_factor.views.utils import class_view_decorator
-from rocky.views.mixins import OctopoesMixin
+from rocky.views.mixins import OctopoesView
+from tools.forms.finding_type import FindingTypeAddForm
 from tools.models import OOIInformation
-from tools.forms import FindingTypeAddForm
 from tools.view_helpers import get_ooi_url
 
 
 @class_view_decorator(otp_required)
-class FindingTypeAddView(OctopoesMixin, FormView):
+class FindingTypeAddView(OctopoesView, FormView):
     template_name = "finding_type_add.html"
     form_class = FindingTypeAddForm
 
@@ -22,14 +24,20 @@ class FindingTypeAddView(OctopoesMixin, FormView):
         context = super().get_context_data(**kwargs)
 
         context["breadcrumbs"] = [
-            {"url": reverse("finding_list"), "text": _("Findings")},
-            {"url": reverse("finding_type_add"), "text": _("Add finding type")},
+            {
+                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Findings"),
+            },
+            {
+                "url": reverse("finding_type_add", kwargs={"organization_code": self.organization.code}),
+                "text": _("Add finding type"),
+            },
         ]
 
         return context
 
     def form_valid(self, form):
-        self.api_connector = self.get_api_connector()
+        self.api_connector = self.octopoes_api_connector
         form_data = form.cleaned_data
         # set data
         finding_type = KATFindingType(id=form_data["id"])
@@ -50,4 +58,4 @@ class FindingTypeAddView(OctopoesMixin, FormView):
 
         self.api_connector.save_declaration(Declaration(ooi=finding_type, valid_time=datetime.now(timezone.utc)))
 
-        return redirect(get_ooi_url("ooi_detail", finding_type.primary_key))
+        return redirect(get_ooi_url("ooi_detail", finding_type.primary_key, self.organization.code))

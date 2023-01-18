@@ -4,23 +4,24 @@ from functools import cached_property
 from typing import Set, Type, List, Dict, Optional, Tuple
 
 import requests.exceptions
-from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from pydantic import BaseModel
+
+from account.mixins import OrganizationView
+from katalogus.client import Plugin, get_katalogus
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference, DeclaredScanProfile, ScanLevel, ScanProfileType
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations, get_collapsed_types, type_by_name
-from pydantic import BaseModel
-
-from katalogus.client import Plugin, get_katalogus
 from rocky.bytes_client import get_bytes_client
-from tools.forms import ObservedAtForm, DEPTH_MAX, DEPTH_DEFAULT
-from tools.models import Organization, Indemnification, OrganizationMember
+from tools.forms.settings import DEPTH_MAX, DEPTH_DEFAULT
+from tools.forms.base import ObservedAtForm
+from tools.models import Organization
 from tools.ooi_helpers import (
     get_knowledge_base_data_for_ooi_store,
 )
@@ -40,37 +41,15 @@ class OriginData(BaseModel):
     boefje: Optional[Plugin]
 
 
-class OctopoesAPIImproperlyConfigured(ImproperlyConfigured):
-    pass
-
-
 class OOIAttributeError(AttributeError):
     pass
 
 
-class OctopoesMixin:
-    api_connector: OctopoesAPIConnector = None
-
-    def get_api_connector(self) -> OctopoesAPIConnector:
-        # needs obvious check, because of execution order
-        if not self.request.user.is_verified():
-            return None
-
-        if not self.request.active_organization:
-            raise OctopoesAPIImproperlyConfigured("Organization missing")
-
-        if not self.request.active_organization.code:
-            raise OctopoesAPIImproperlyConfigured("Organization missing code")
-
-        if self.request.octopoes_api_connector is None:
-            raise OctopoesAPIImproperlyConfigured("No Octopoes connector set.")
-
-        return self.request.octopoes_api_connector
-
+class OctopoesView(OrganizationView):
     def get_single_ooi(self, pk: str, observed_at: Optional[datetime] = None) -> OOI:
         try:
             ref = Reference.from_str(pk)
-            return self.get_api_connector().get(ref, valid_time=observed_at)
+            return self.octopoes_api_connector.get(ref, valid_time=observed_at)
         except Exception as e:
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
             self.handle_connector_exception(e)
@@ -78,7 +57,7 @@ class OctopoesMixin:
     def get_ooi_tree(self, pk: str, depth: int, observed_at: Optional[datetime] = None) -> ReferenceTree:
         try:
             ref = Reference.from_str(pk)
-            return self.get_api_connector().get_tree(ref, depth=depth, valid_time=observed_at)
+            return self.octopoes_api_connector.get_tree(ref, depth=depth, valid_time=observed_at)
         except Exception as e:
             self.handle_connector_exception(e)
 
@@ -89,7 +68,7 @@ class OctopoesMixin:
         organization: Organization,
     ) -> Tuple[List[OriginData], List[OriginData], List[OriginData]]:
         try:
-            origins = self.api_connector.list_origins(reference, valid_time)
+            origins = self.octopoes_api_connector.list_origins(reference, valid_time)
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
@@ -98,7 +77,7 @@ class OctopoesMixin:
                     continue
 
                 try:
-                    client = get_bytes_client()
+                    client = get_bytes_client(organization.code)
                     client.login()
 
                     normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
@@ -140,15 +119,6 @@ class OctopoesMixin:
         except ValueError:
             return default_depth
 
-    def declare_scan_level(self, reference: Reference, level: int) -> None:
-        self.api_connector.save_scan_profile(
-            DeclaredScanProfile(
-                reference=reference,
-                level=level,
-            ),
-            datetime.now(timezone.utc),
-        )
-
 
 class OOIList:
     def __init__(
@@ -185,8 +155,8 @@ class OOIList:
             return self.octopoes_connector.list(
                 self.ooi_types,
                 valid_time=self.valid_time,
-                offset=key.start,
-                limit=key.stop - key.start,
+                offset=key.start or 0,
+                limit=key.stop - (key.start or 0),
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
             ).items
@@ -201,19 +171,22 @@ class OOIList:
             ).items
 
 
-class MultipleOOIMixin(OctopoesMixin):
+class MultipleOOIMixin(OctopoesView):
     ooi_types: Set[Type[OOI]] = None
     ooi_type_filters: List = []
     filtered_ooi_types: List[str] = []
 
     def get_list(
-        self, observed_at: datetime, scan_level: Set[ScanLevel], scan_profile_type: Set[ScanProfileType]
+        self,
+        observed_at: datetime,
+        scan_level: Set[ScanLevel],
+        scan_profile_type: Set[ScanProfileType],
     ) -> OOIList:
         ooi_types = self.ooi_types
         if self.filtered_ooi_types:
             ooi_types = {type_by_name(t) for t in self.filtered_ooi_types}
         return OOIList(
-            self.get_api_connector(),
+            self.octopoes_api_connector,
             ooi_types,
             observed_at,
             scan_level=scan_level,
@@ -243,16 +216,22 @@ class MultipleOOIMixin(OctopoesMixin):
         return ", ".join(self.filtered_ooi_types)
 
 
-class OOIBreadcrumbsMixin(BreadcrumbsMixin):
+class OOIBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
     def build_breadcrumbs(self) -> List[Breadcrumb]:
         if isinstance(self.ooi, Finding):
-            start = {"url": reverse("finding_list"), "text": _("Findings")}
+            start = {
+                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Findings"),
+            }
         else:
-            start = {"url": reverse("ooi_list"), "text": _("Objects")}
+            start = {
+                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Objects"),
+            }
         return [
             start,
             {
-                "url": get_ooi_url("ooi_detail", self.ooi.primary_key),
+                "url": get_ooi_url("ooi_detail", self.ooi.primary_key, self.organization.code),
                 "text": self.ooi.human_readable,
             },
         ]
@@ -275,7 +254,7 @@ class ConnectorFormMixin:
         return self.connector_form_class(**self.get_connector_form_kwargs())
 
 
-class SingleOOIMixin(OctopoesMixin):
+class SingleOOIMixin(OctopoesView):
     ooi: OOI
 
     def get_ooi_id(self) -> str:
@@ -291,14 +270,17 @@ class SingleOOIMixin(OctopoesMixin):
         return self.get_single_ooi(pk, observed_at)
 
     def get_breadcrumb_list(self):
-        start = {"url": reverse("ooi_list"), "text": "Objects"}
+        start = {
+            "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
+            "text": "Objects",
+        }
         if isinstance(self.ooi, Finding):
             start = {"url": reverse("finding_list"), "text": "Findings"}
 
         return [
             start,
             {
-                "url": get_ooi_url("ooi_detail", self.ooi.primary_key),
+                "url": get_ooi_url("ooi_detail", self.ooi.primary_key, self.organization.code),
                 "text": self.ooi.human_readable,
             },
         ]
@@ -338,11 +320,3 @@ class SingleOOITreeMixin(SingleOOIMixin):
         self.tree = self.get_ooi_tree(pk, self.depth, observed_at)
 
         return self.tree.store[str(self.tree.root.reference)]
-
-
-class OrganizationIndemnificationMixin:
-    def get_organization_indemnification(self):
-        user = self.request.user
-        organizationmember = OrganizationMember.objects.get(user=user)
-
-        return Indemnification.objects.filter(organization=organizationmember.organization).exists()

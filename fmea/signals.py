@@ -1,5 +1,6 @@
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
+
 from fmea.models import FailureMode, FailureModeEffect
 from fmea.tools import calculate_risk_class
 

@@ -20,7 +20,7 @@
           </p>
           <div class="horizontal-scroll">
             <table rf-selector="table-normalizers">
-              <caption>{% translate 'List of tasks for ' %}{{ request.active_organization }}</caption>
+              <caption>{% translate 'List of tasks for ' %}{{ organization.name }}</caption>
               <thead>
                 <tr>
                   <th scope="col">{% translate 'OOI' %}</th>
@@ -35,7 +35,7 @@
                 {% for task in object_list %}
                   <tr>
                     <td>
-                      <a href="{% ooi_url 'ooi_detail' task.p_item.data.raw_data.boefje_meta.input_ooi %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                      <a href="{% ooi_url 'ooi_detail' ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
                     </td>
                     <td>{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</td>
                     <td>{{ task.p_item.data.normalizer.id }}</td>
@@ -48,10 +48,10 @@
                     {% endif %}
                     <td>{{ task.created_at }}</td>
                     <td>
-                      {% if task.status.value == 'completed' %}
-                        <a href="{% url 'bytes_raw' task.p_item.data.raw_data.boefje_meta.id %}">{% translate 'Download meta and raw data' %}</a>
+                      {% if task.p_item.data.boefje_meta.boefje.id and task.status.value == 'completed' %}
+                        <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.boefje_meta.boefje.id %}">{% translate 'Download meta and raw data' %}</a>
                       {% else %}
-                        <a href="{% url 'download_task_meta' task.id %}">{% translate 'Download meta data' %}</a>
+                        <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate 'Download meta data' %}</a>
                       {% endif %}
                     </td>
                   </tr>

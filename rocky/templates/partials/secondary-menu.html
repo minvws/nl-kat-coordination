@@ -2,7 +2,7 @@
 
 <ul>
   {% if request.user.is_authenticated %}
-    {% if request.user.is_superuser or perms.tools.view_organization and not view_type == "onboarding" %}
+    {% if request.user.is_superuser or perms.tools.view_organization  %}
       <li>
         <a href="{% url 'organization_list' %}"
            {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Organizations' %}</a>

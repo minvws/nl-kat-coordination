@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 from rocky.settings import (
     MIAUW_BASE_URL,
     MIAUW_USERNAME,
@@ -7,7 +8,6 @@ from rocky.settings import (
 )
 from tools.miauw import MiauwAPIClient, SignalGroupResponse
 from tools.models import Organization
-
 
 client = MiauwAPIClient(MIAUW_BASE_URL, MIAUW_USERNAME, MIAUW_PASSWORD)
 

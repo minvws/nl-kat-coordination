@@ -18,15 +18,15 @@
             <tr>
               <td>
                 {% if observation.boefje.id %}
-                  <a href="{% url 'plugin_detail' plugin_type="boefje" plugin_id=observation.boefje.id %}">{{ observation.boefje.name }}</a>
+                  <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type="boefje" plugin_id=observation.boefje.id %}">{{ observation.boefje.name }}</a>
                 {% endif %}
               </td>
               <td>
-                <a href="{% ooi_url 'ooi_detail' observation.origin.source %}">{{ observation.origin.source }}</a>
+                <a href="{% ooi_url 'ooi_detail' observation.origin.source organization.code %}">{{ observation.origin.source }}</a>
               </td>
               <td>
                 {% if observation.normalizer.boefje_meta.id %}
-                  <a href="{% url 'bytes_raw' observation.normalizer.boefje_meta.id %}">{{ observation.normalizer.boefje_meta.id }}</a>
+                  <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=observation.normalizer.boefje_meta.id %}">{{ observation.normalizer.boefje_meta.id }}</a>
                 {% endif %}
               </td>
             </tr>

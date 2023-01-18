@@ -5,20 +5,19 @@ from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import View
 from django.views.generic.list import ListView
 from django_otp.decorators import otp_required
 from requests import HTTPError
 from two_factor.views.utils import class_view_decorator
 
+from account.mixins import OrganizationView
 from rocky.scheduler import client
-from tools.models import Organization
 
 TASK_LIMIT = 50
 
 
 @class_view_decorator(otp_required)
-class DownloadTaskDetail(View):
+class DownloadTaskDetail(OrganizationView):
     def get(self, request, *args, **kwargs):
         task_id = kwargs["task_id"]
         filename = "task_" + task_id + ".json"
@@ -37,24 +36,21 @@ class DownloadTaskDetail(View):
     def show_error_message(self):
         error_message = _("Task details not found.")
         messages.add_message(self.request, messages.ERROR, error_message)
-        return redirect(reverse("task_list"))
+        return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
 @class_view_decorator(otp_required)
-class TaskListView(ListView):
+class TaskListView(OrganizationView, ListView):
     paginate_by = 20
 
-    def setup(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         self.scheduler_id = None
-        self.org: Organization = request.active_organization
-
-        if self.org:
-            self.scheduler_id = self.plugin_type + "-" + self.org.code
+        if self.organization:
+            self.scheduler_id = self.plugin_type + "-" + self.organization.code
         else:
             error_message = _("Organization could not be found")
             messages.add_message(request, messages.ERROR, error_message)
-
-        return super().setup(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         if not self.scheduler_id:
@@ -82,8 +78,8 @@ class TaskListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"url": reverse("ooi_list"), "text": _("Objects")},
-            {"url": reverse("task_list"), "text": _("Tasks")},
+            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
         ]
         return context
 

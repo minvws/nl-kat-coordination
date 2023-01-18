@@ -1,51 +1,37 @@
 from django.contrib import messages
-from django.shortcuts import HttpResponseRedirect
-from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
+from django.urls import reverse_lazy
 from account.forms import IndemnificationAddForm
-from tools.models import OrganizationMember, Indemnification
+from account.mixins import OrganizationView
+from tools.models import Indemnification
 
 
 @class_view_decorator(otp_required)
-class IndemnificationAddView(FormView):
+class IndemnificationAddView(OrganizationView, FormView):
     template_name = "indemnification_add.html"
     form_class = IndemnificationAddForm
-    success_url = reverse_lazy("indemnification_add")
-    indemnification_present = False
 
-    def form_valid(self, form):
-        user = self.request.user
-        organizationmember = OrganizationMember.objects.get(user=user)
-
+    def post(self, request, *args, **kwargs):
         Indemnification.objects.get_or_create(
-            user=user,
-            organization=organizationmember.organization,
+            user=self.request.user,
+            organization=self.organization,
         )
-
         self.add_success_notification()
+        return super().post(request, *args, **kwargs)
 
-        return HttpResponseRedirect(self.get_success_url())
+    def get_success_url(self) -> str:
+        return reverse_lazy("organization_detail", kwargs={"organization_code": self.organization.code})
 
     def add_success_notification(self):
         success_message = _("Indemnification successfully set.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
-    def get(self, *args, **kwargs):
-        user = self.request.user
-        organizationmember = OrganizationMember.objects.get(user=user)
-        if Indemnification.objects.filter(organization=organizationmember.organization):
-            self.indemnification_present = True
-
-        return super().get(*args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {"url": "", "text": "Indemnifications"},
-        ]
-        context["indemnification_present"] = self.indemnification_present
-
+        context["indemnification_present"] = Indemnification.objects.filter(
+            user=self.request.user, organization=self.organization
+        )
         return context

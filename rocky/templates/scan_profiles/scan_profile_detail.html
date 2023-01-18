@@ -9,7 +9,9 @@
     <section>
       <div>
         {% include 'partials/ooi_head.html' with ooi=ooi view='scan_profile_detail' %}
-        <h1 rf-selector="clearance-header">{% translate 'Clearance level' %}: {{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}</h1>
+        <h1 rf-selector="clearance-header">
+          {% translate 'Clearance level' %}: {{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}
+        </h1>
         {% if ooi.scan_profile.scan_profile_type == 'declared' %}
           <h2>{% translate 'Declared' %}</h2>
           <p class="explanation">
@@ -22,10 +24,10 @@
               of objects that inherit from this clearance level will also be recalculated.
             {% endblocktranslate %}
           </p>
-          {% if user.organizationmember.acknowledged_clearance_level > 0 and organization_indemnification %}
+          {% if user.acknowledged_clearance_level > 0 and organization_indemnification %}
             <div class="horizontal-view">
-              <a href="{% ooi_url 'scan_profile_reset' ooi.reference %}&{% include 'partials/elements/href_querystring_from_list.html' with list=mandatory_fields %}"
-                class="button">{% translate 'Set clearance level to inherit' %}</a>
+              <a href="{% ooi_url 'scan_profile_reset' ooi.reference organization.code %}&{% include 'partials/elements/href_querystring_from_list.html' with list=mandatory_fields %}"
+                 class="button">{% translate 'Set clearance level to inherit' %}</a>
             </div>
           {% endif %}
         {% elif ooi.scan_profile.scan_profile_type == 'empty' %}
@@ -40,10 +42,9 @@
         {% elif ooi.scan_profile.scan_profile_type == 'inherited' %}
           <h2>{% translate 'Inherited' %}</h2>
         {% endif %}
-
-        {% if user.organizationmember.acknowledged_clearance_level > 0 and organization_indemnification %}
+        {% if user.acknowledged_clearance_level > 0 and organization_indemnification %}
           <form novalidate
-                action="{% ooi_url 'scan_profile_detail' ooi.primary_key %}"
+                action="{% ooi_url 'scan_profile_detail' ooi.primary_key organization.code %}"
                 method="post"
                 class="horizontal-view help">
             {% csrf_token %}

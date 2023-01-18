@@ -1,21 +1,23 @@
 from logging import getLogger
+
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.urls import reverse
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
-from django.utils.translation import gettext_lazy as _
+
+from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
-from django.views import View
 
 logger = getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
-class PluginEnableDisableView(View):
+class PluginEnableDisableView(OrganizationView):
     def dispatch(self, request, *args, **kwargs):
-        self.katalogus_client = get_katalogus(request.user.organizationmember.organization.code)
+        self.katalogus_client = get_katalogus(self.organization.code)
         return super().dispatch(request, *args, **kwargs)
 
     def check_required_settings(self, plugin_id):
@@ -44,7 +46,16 @@ class PluginEnableDisableView(View):
                         boefje_id=plugin_id
                     )
                 )
-                return redirect(reverse("plugin_detail", kwargs={"plugin_id": plugin_id, "plugin_type": plugin_type}))
+                return redirect(
+                    reverse(
+                        "plugin_detail",
+                        kwargs={
+                            "organization_code": self.organization.code,
+                            "plugin_id": plugin_id,
+                            "plugin_type": plugin_type,
+                        },
+                    )
+                )
         return HttpResponseRedirect(request.POST.get("current_url"))
 
     def add_warning_message(self, message):

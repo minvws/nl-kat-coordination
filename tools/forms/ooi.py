@@ -2,18 +2,20 @@ from typing import List, Tuple, Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from octopoes.models import OOI
 
-from tools.forms import (
+from octopoes.models import OOI
+from tools.forms.settings import (
+    DEPTH_DEFAULT,
+    DEPTH_HELP_TEXT,
+    DEPTH_MAX,
+    SCAN_LEVEL_CHOICES,
+)
+from tools.forms.base import (
     BaseRockyForm,
     ObservedAtForm,
     CheckboxGroup,
     CheckboxTable,
-    DEPTH_DEFAULT,
-    DEPTH_HELP_TEXT,
-    DEPTH_MAX,
     LabeledCheckboxInput,
-    SCAN_LEVEL_CHOICES,
 )
 
 
@@ -48,6 +50,7 @@ class OoiTreeSettingsForm(OOIReportSettingsForm):
 
 
 class SelectOOIForm(BaseRockyForm):
+
     ooi = forms.MultipleChoiceField(
         label=_("Objects"),
         widget=CheckboxTable(
@@ -63,10 +66,12 @@ class SelectOOIForm(BaseRockyForm):
     def __init__(
         self,
         oois: List[OOI],
+        organization_code: str,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
+        self.fields["ooi"].widget.attrs["organization_code"] = organization_code
         self.set_choices_for_field("ooi", [self._to_choice(ooi) for ooi in oois])
         if len(self.fields["ooi"].choices) == 1:
             self.fields["ooi"].initial = self.fields["ooi"].choices[0][0]

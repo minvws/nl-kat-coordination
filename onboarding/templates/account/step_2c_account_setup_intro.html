@@ -30,10 +30,14 @@
           You can always add additional user accounts If you’re team expands in the future.
          {% endblocktranslate %}
         </p>
-        <div class="horizontal-view">
-          <a href="{% url 'step_choose_user_type' %}" class="button">{% translate 'Create separate accounts' %}</a>
-          <a href="{% url 'switch_kat_user' %}" class="button ">{% translate 'Continue with this account, onboard me!' %}</a>
-        </div>
+        {% if organization %}
+          <div class="horizontal-view">
+            <a href="{% url 'step_choose_user_type' organization.code %}"
+               class="button">{% translate 'Create separate accounts' %}</a>
+            <a href="{% url 'complete_onboarding' organization.code %}"
+               class="button ">{% translate 'Continue with this account, onboard me!' %}</a>
+          </div>
+        {% endif %}
       </div>
     </section>
   </main>

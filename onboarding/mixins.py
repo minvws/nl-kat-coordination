@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
 from tools.models import GROUP_ADMIN, GROUP_REDTEAM
 
 

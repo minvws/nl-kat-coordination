@@ -18,18 +18,17 @@
           as well as organization details.
          {% endblocktranslate %}
         </p>
-        <form novalidate
-              action="{% url 'step_account_setup_admin' %}"
-              method="post"
-              class="horizontal-view help">
+        <form novalidate method="post" class="horizontal-view help">
           {% csrf_token %}
           {% translate 'Admin details' as fieldset_legend %}
           {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
           <button type="submit">{% translate 'Submit' %}</button>
         </form>
         <p>
-          <a href="{% url 'step_choose_user_type' %}" class="button ghost">{% translate 'Go back to previous step' %}</a>
-          <a href="{% url 'step_account_setup_red_teamer' %}" class="button ">{% translate 'Skip this step' %}</a>
+          <a href="{% url 'step_choose_user_type' organization.code %}"
+             class="button ghost">{% translate 'Go back to previous step' %}</a>
+          <a href="{% url 'step_account_setup_red_teamer' organization.code %}"
+             class="button ">{% translate 'Skip this step' %}</a>
         </p>
       </div>
     </section>

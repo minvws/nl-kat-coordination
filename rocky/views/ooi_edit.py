@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
-from octopoes.models import Reference
 
+from octopoes.models import Reference
 from rocky.views.ooi_view import BaseOOIFormView
 from tools.view_helpers import get_ooi_url
 
@@ -33,7 +33,7 @@ class OOIEditView(BaseOOIFormView):
         breadcrumb_list = self.get_breadcrumb_list()
         breadcrumb_list.append(
             {
-                "url": get_ooi_url("ooi_edit", self.ooi.primary_key),
+                "url": get_ooi_url("ooi_edit", self.ooi.primary_key, self.organization.code),
                 "text": _("Edit"),
             }
         )

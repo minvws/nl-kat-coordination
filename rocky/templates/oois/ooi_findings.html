@@ -4,21 +4,19 @@
 
 {% block content %}
   {% include 'header.html' %}
-
   <main id="main-content">
     <section>
       <div>
         {% include 'partials/ooi_head.html' with ooi=ooi view='ooi_findings' %}
-
         {% if findings|length > 0 %}
           {% include "oois/ooi_detail_findings_list.html" with findings=findings %}
         {% else %}
-        <p>
-          {% translate 'Currently there are no findings for OOI' %} "{{ ooi.human_readable }}".
-        </p>
-        <a href="{% ooi_url 'finding_add' ooi.primary_key %}" class="button">{% translate 'Add finding' %}</a>
+          <p>
+            {% translate 'Currently there are no findings for OOI' %} "{{ ooi.human_readable }}".
+          </p>
+          <a href="{% ooi_url 'finding_add' ooi.primary_key organization.code %}"
+             class="button">{% translate 'Add finding' %}</a>
         {% endif %}
-
         {{ self }}
       </div>
     </section>

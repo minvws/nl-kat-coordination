@@ -1,5 +1,5 @@
 from rocky.health import ServiceHealth
-from rocky.views import flatten_health
+from rocky.views.health import flatten_health
 
 
 def test_flatten_health_simple():

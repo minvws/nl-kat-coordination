@@ -1,7 +1,7 @@
-import time
 from typing import Dict, BinaryIO
 
 import requests
+import time
 
 from rocky.health import ServiceHealth
 from rocky.settings import KEIKO_API

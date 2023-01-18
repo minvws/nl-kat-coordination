@@ -40,8 +40,12 @@
           {% endblocktranslate %}
         </p>
         <p>
-          <a href="{% url 'skip_onboarding' %}" class="button ghost">{% translate 'Skip onboarding' %}</a>
-          <a href="{% url 'step_choose_report_info' %}" class="button">{% translate "Let's get started" %}</a>
+          {% if organization %}
+            <a href="{% url 'complete_onboarding' organization.code %}"
+               class="button ghost">{% translate 'Skip onboarding' %}</a>
+          {% endif %}
+          <a href="{% url 'step_choose_report_info' organization.code %}"
+             class="button">{% translate "Let's get started" %}</a>
         </p>
       </div>
     </section>

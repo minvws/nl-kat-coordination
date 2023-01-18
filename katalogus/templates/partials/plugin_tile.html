@@ -2,7 +2,7 @@
 {% load static %}
 
 <div role="group">
-  <img src="{% url 'plugin_cover' plugin_id=plugin.id %}"
+  <img src="{% url 'plugin_cover' organization_code=organization.code plugin_id=plugin.id %}"
        alt="boefje placeholder image"/>
   <div class="horizontal-view scan-intensity">
     <span class="de-emphasized">{% translate 'Scan level:' %}</span>
@@ -17,6 +17,6 @@
     {{ plugin.description }}
   </p>
   <span class="de-emphasized">{% translate 'Publisher:' %} OpenKAT</span>
-  <a href="{% url 'plugin_detail' plugin_type=plugin.type plugin_id=plugin.id %}">{% translate 'See details' %}</a>
+  <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate 'See details' %}</a>
   <div class="action-buttons">{% include 'partials/enable_disable_plugin.html' with plugin=plugin %}</div>
 </div>

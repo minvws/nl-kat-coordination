@@ -9,13 +9,13 @@
       </button>
       <ul id="export-add" aria-expanded="false" class="dropdown-list">
         <li>
-          <a href="{% url 'ooi_add_type_select' %}">{% translate 'Add object' %}</a>
+          <a href="{% url 'ooi_add_type_select' organization.code %}">{% translate 'Add object' %}</a>
         </li>
         <li>
-          <a href="{% url 'scan_list' %}">{% translate 'Scan for objects' %}</a>
+          <a href="{% url 'scan_list' organization.code %}">{% translate 'Scan for objects' %}</a>
         </li>
         <li>
-          <a href="{% url 'upload_csv' %}">{% translate 'Upload CSV' %}</a>
+          <a href="{% url 'upload_csv' organization.code %}">{% translate 'Upload CSV' %}</a>
         </li>
       </ul>
     </div>
@@ -26,10 +26,10 @@
       </button>
       <ul id="export-dropdown" aria-expanded="false" class="dropdown-list">
         <li>
-          <a href="{% url 'ooi_list_export' %}?{% url_replace 'file_type' 'json' %}">{% translate 'Download as JSON' %}</a>
+          <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'json' %}">{% translate 'Download as JSON' %}</a>
         </li>
         <li>
-          <a href="{% url 'ooi_list_export' %}?{% url_replace 'file_type' 'csv' %}">{% translate 'Download as CSV' %}</a>
+          <a href="{% url 'ooi_list_export' organization.code %}?{% url_replace 'file_type' 'csv' %}">{% translate 'Download as CSV' %}</a>
         </li>
       </ul>
     </div>

@@ -1,4 +1,4 @@
-body > header {
+body>header {
   div.horizontal-view {
     @media (max-width: 56rem) {
       position: relative;
@@ -12,6 +12,7 @@ body > header {
 
       .collapsible-menu {
         padding-top: 1rem;
+
         .secondary-menu {
           width: 100%;
 
@@ -25,7 +26,71 @@ body > header {
 
   nav:not(.breadcrumb-bar) {
     min-height: 4rem;
-    padding-top: 1rem;
+    align-items: center;
+
+    a.logo {
+      border: 0;
+    }
+
+    .menu_toggle {
+      min-height: 4rem;
+    }
+
+    .dropdown {
+
+
+      &-button {
+        min-height: 4rem;
+      }
+
+      >ul {
+        top: 100%;
+
+        >li {
+          width: 100%;
+
+          >a {
+            color: black;
+            width: 100%;
+            padding-top: var(--button-base-padding-top);
+            padding-right: var(--button-base-padding-right);
+            padding-bottom: var(--button-base-padding-bottom);
+            padding-left: var(--button-base-padding-left);
+
+          }
+        }
+      }
+    }
+
+    @media (max-width: 56rem) {
+      .dropdown {
+        width: 100%;
+
+        &-button {
+          text-align: left;
+          padding-left: 0;
+          width: 100%;
+        }
+
+        >ul {
+          >li {
+            max-width: 100%;
+          }
+        }
+      }
+    }
+
+    select {
+      background-color: transparent;
+      color: inherit;
+      font-size: inherit;
+      border-radius: 1rem;
+      padding: .5rem;
+    }
+
+    ul {
+      align-items: center;
+    }
 
     a {
       border-bottom: 1px solid transparent;

@@ -7,22 +7,21 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{% translate 'Account details' %}</h1>
-        <dl>
+        <div class="column-2">
           <div>
-            <dt>
-              {% translate 'Username' %}
-            </dt>
-            <dd>
-              {{ user }}
-            </dd>
+            <h1>{% translate 'Account details' %}</h1>
           </div>
+          <div class="horizontal-view toolbar">
+            <a class="button" href="{% url 'password_reset' %}">{% translate 'Reset password' %}</a>
+          </div>
+        </div>
+        <dl>
           <div>
             <dt>
               {% translate 'Full name' %}
             </dt>
             <dd>
-              {{ user.full_name }}
+              {{ member.member_name }}
             </dd>
           </div>
           <div>
@@ -30,7 +29,15 @@
               {% translate  'E-mail address' %}
             </dt>
             <dd>
-              {{ user.email }}
+              {{ member.user }}
+            </dd>
+          </div>
+          <div>
+            <dt>
+              {% translate  'Member type' %}
+            </dt>
+            <dd>
+              {{ member.user.groups.all.0 }}
             </dd>
           </div>
           <div>
@@ -38,45 +45,53 @@
               {% translate 'Organization' %}
             </dt>
             <dd>
-              {% spaceless %}
-                {% if user.organizationmember.organization %}
-                  {{ user.organizationmember.organization }}
-                {% else %}
-                  -
-                {% endif %}
-              {% endspaceless %}
+              {{ member.organization }}
             </dd>
           </div>
-          {% if user.organizationmember.trusted_clearance_level > 0 %}
+          {% if member.acknowledged_clearance_level > 0 %}
             <div>
               <dt>
                 {% translate 'Permission to set OOI clearance levels ' %}
               </dt>
               <dd>
-                L{{ user.organizationmember.acknowledged_clearance_level }}
+                L{{ member.acknowledged_clearance_level }}
               </dd>
             </div>
           {% endif %}
         </dl>
-        <a class="button" href="{% url 'password_reset' %}">{% translate 'Reset password' %}</a>
-        {% if user.organizationmember.trusted_clearance_level > 0 %}
-          <h2>OOI clearance</h2>
-          <p>
-            You have currently accepted clearance up to level <strong>L{{ user.organizationmember.acknowledged_clearance_level }}</strong>
-          </p>
-          {% if user.organizationmember.acknowledged_clearance_level < user.organizationmember.trusted_clearance_level %}
-            <p class="explanation">
-              You are granted clearance for level 4 by an admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Beware: <strong>with great power comes great responsibility.</strong>
-            </p>
-            {% include 'partials/single_action_form.html' with btn_text="Accept level 4 clearance and responsibility" action='accept_clearance' key='member_id' value=user.organizationmember.id btn_class="ghost" %}
-          {% else %}
-            <p class="explanation">
-              You can withdraw this at anytime you like, but know that you're not able to change clearance levels anymore when you do.
-            </p>
-            {% include 'partials/single_action_form.html' with btn_text="Withdraw acceptance up to level 4 clearance and responsibility" action='withdraw_acceptance' key='member_id' value=user.organizationmember.id btn_class="ghost" %}
-          {% endif %}
-        {% endif %}
       </div>
     </section>
+    {% if perms.tools.can_scan_organization %}
+      <section>
+        <div>
+          <h2>{% translate 'OOI clearance' %}</h2>
+          {% if member.trusted_clearance_level <= 0 %}
+            <p>
+              {% blocktranslate%}
+              You don't have any clearance to scan objects.<br>
+              Get in contact with the admin to give you the necessary clearance level.
+            {% endblocktranslate%}
+            </p>
+          {% else %}
+            <p>
+              {% translate 'You have currently accepted clearance up to level' %} <strong>
+              {% if member.acknowledged_clearance_level < 0 %}
+              L0{% else %}L{{ member.acknowledged_clearance_level }}{% endif %}</strong>
+            </p>
+            {% if member.acknowledged_clearance_level < member.trusted_clearance_level %}
+              <p class="explanation">
+                {% translate 'You are granted clearance for level 4 by your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>' %}
+              </p>
+              {% include 'partials/single_action_form.html' with btn_text="Accept level 4 clearance and responsibility" action='accept_clearance' key='member_id' value=member.id btn_class="ghost" %}
+            {% else %}
+              <p class="explanation">
+                {% translate "You can withdraw this at anytime you like, but know that you're not able to change clearance levels anymore when you do." %}
+              </p>
+              {% include 'partials/single_action_form.html' with btn_text="Withdraw acceptance up to level 4 clearance and responsibility" action='withdraw_acceptance' key='member_id' value=member.id btn_class="ghost" %}
+            {% endif %}
+          {% endif %}
+        </div>
+      </section>
+    {% endif %}
   </main>
 {% endblock %}

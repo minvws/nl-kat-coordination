@@ -1,8 +1,9 @@
 from django.urls import path
+
 from account import views
 
 urlpatterns = [
-    path("", views.AccountView.as_view(), name="account_detail"),
+    path("<organization_code>/account/", views.AccountView.as_view(), name="account_detail"),
     path("login/", views.LoginRockyView.as_view(), name="login"),  # Bypass the two_factor login
     path("logout/", views.LogoutRockyView.as_view(), name="logout"),
     path(

@@ -9,7 +9,7 @@
     {% include 'forms/widgets/checkbox_option.html' %}
   {% endif %}
   {% if widget %}<span class="tile-label">{{ item|get_type_name }}</span>{% endif %}
-  <img src="{% url 'plugin_cover' plugin_id=item.id %}"
+  <img src="{% url 'plugin_cover' organization_code=organization.code plugin_id=item.id %}"
        alt="placeholder image for Boefje {{ item.name }}">
   {% with scan_level=item.scan_level.value %}
     <div class="horizontal-view scan-intensity">
@@ -26,7 +26,7 @@
     OpenKAT
   </span>
   <div class="action-buttons">
-    <a href="{% url 'plugin_detail' plugin_type="boefje" plugin_id=item.id %}">{% translate 'See details' %}</a>
+    <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type="boefje" plugin_id=item.id %}">{% translate 'See details' %}</a>
     {% if not widget %}{{ item }}{% endif %}
   </div>
 </div>

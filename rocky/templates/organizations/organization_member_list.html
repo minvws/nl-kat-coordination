@@ -1,92 +1,65 @@
-{% extends 'layouts/base.html' %}
 {% load i18n %}
-{% load static %}
 
-{% block content %}
-  {% include 'header.html' %}
-  <main id="main-content">
-    <section>
-      <div>
-        {% with organization.name as name %}
-          <h1>
-            {% blocktranslate %}{{ name }}{% endblocktranslate %}
-          </h1>
-        {% endwith %}
-        {% if perms.tools.add_organizationmember %}
-          <div class="horizontal-view toolbar">
-            <a href="{% url 'organization_member_add' object.pk %}"
-               class="button ghost">{% translate 'Add new member' %}</a>
-          </div>
-        {% endif %}
-        {% if perms.tools.can_switch_organization %}
-          {% include 'organizations/organization_page_tabs.html' with view='organization_members' %}
-        {% endif %}
-        {% include 'partials/organization_member_list_filters.html' with members=members.status %}
-        <div class="horizontal-scroll">
-          <table>
-            <caption>{% translate 'Member overview:' %}</caption>
-            <thead>
-              <tr>
-                <th>{% translate 'Member name' %}</th>
-                <th>{% translate 'Status' %}</th>
-                <th>{% translate 'Added on' %}</th>
-                {% if miauw_api_enabled %}
-                  <th>{% translate 'Actions' %}</th>
-                {% endif %}
-                <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
-                <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
-                <th>{% translate 'Grant/revoke permisson to set OOI clearance levels' %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for member in members %}
-                <tr>
-                  <td>{{ member.user }}</td>
-                  <td>{{ member.status }}</td>
-                  <td>{{ member.user.date_joined }}</td>
-                  {% if miauw_api_enabled %}
-                    <td>
-                      <a href="{% url 'organization_member_edit' member.id %}">{% translate 'Edit' %}</a>
-                    </td>
-                  {% endif %}
-                  <td>
-                    {% if member.trusted_clearance_level > 0 %}
-                      Yes (L{{ member.trusted_clearance_level }})
-                    {% else %}
-                      No
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if member.acknowledged_clearance_level > 0 %}
-                      Yes (L{{ member.acknowledged_clearance_level }})
-                    {% else %}
-                      No
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% for group in member.user.groups.all %}
-                      {% for permission in group.permissions.all %}
-                        {% if 'can_set_clearance_level' in permission.codename %}
-                          {% if member.trusted_clearance_level > 0 %}
-                            {% include 'partials/single_action_form.html' with btn_text="Revoke" action='withdraw_clearance' key='member_id' value=member.id btn_class="ghost" %}
-                          {% else %}
-                            {% include 'partials/single_action_form.html' with btn_text="Grant" action='give_clearance' key='member_id' value=member.id %}
-                          {% endif %}
-                        {% endif %}
-                      {% endfor %}
-                    {% endfor %}
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+<section>
+  <div>
+    <h2>{% translate 'Members' %}</h2>
+    {% if perms.tools.add_organizationmember %}
+      <div class="horizontal-view toolbar">
+        <a href="{% url 'organization_member_add' organization.code %}"
+           class="button">{% translate 'Add new member' %}</a>
       </div>
-    </section>
-  </main>
-{% endblock content %}
-
-{% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+    {% endif %}
+    {% include 'partials/organization_member_list_filters.html' with checkbox_filters=checkbox_filters %}
+    <div class="horizontal-scroll">
+      <table>
+        <caption>{% translate 'Member overview:' %}</caption>
+        <thead>
+          <tr>
+            <th>{% translate 'Member name' %}</th>
+            <th>{% translate 'Status' %}</th>
+            <th>{% translate 'Added on' %}</th>
+            <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
+            <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
+            <th>{% translate 'Grant/revoke permisson to set OOI clearance levels' %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for member in members %}
+            <tr>
+              <td>{{ member.user }}</td>
+              <td>{{ member.status }}</td>
+              <td>{{ member.user.date_joined }}</td>
+              <td>
+                {% if member.trusted_clearance_level > 0 %}
+                  {% translate 'Yes' %} (L{{ member.trusted_clearance_level }})
+                {% else %}
+                  {% translate 'No' %}
+                {% endif %}
+              </td>
+              <td>
+                {% if member.acknowledged_clearance_level > 0 %}
+                  Yes (L{{ member.acknowledged_clearance_level }})
+                {% else %}
+                  No
+                {% endif %}
+              </td>
+              <td>
+                {% for group in member.user.groups.all %}
+                  {% for permission in group.permissions.all %}
+                    {% if 'can_set_clearance_level' in permission.codename %}
+                      {% if member.trusted_clearance_level > 0 %}
+                        {% include 'partials/single_action_form.html' with btn_text="Revoke" action='withdraw_clearance' key='member_id' value=member.id btn_class="ghost" %}
+                      {% else %}
+                        {% include 'partials/single_action_form.html' with btn_text="Grant" action='give_clearance' key='member_id' value=member.id %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

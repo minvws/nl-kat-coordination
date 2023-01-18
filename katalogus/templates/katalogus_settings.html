@@ -12,7 +12,7 @@
           <p class="emphasized">
             {% translate 'There are currently no settings defined. Add settings at plugin detail page.' %}
           </p>
-          <a class="button" href="{% url 'katalogus' %}">{% translate 'Go back' %}</a>
+          <a class="button" href="{% url 'katalogus' organization.code %}">{% translate 'Go back' %}</a>
         {% else %}
           <p class="emphasized">
             {% translate 'This is an overview of the latest settings of all plugins.' %}
@@ -31,7 +31,7 @@
                 {% for setting in object_list %}
                   <tr>
                     <td>
-                      <a href="{% url 'plugin_detail' plugin_type=plugin_type plugin_id=setting.plugin_id %}">{{ setting.plugin_name }}</a>
+                      <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type=plugin_type plugin_id=setting.plugin_id %}">{{ setting.plugin_name }}</a>
                     </td>
                     <td>{{ setting.name }}</td>
                     <td>{{ setting.value }}</td>

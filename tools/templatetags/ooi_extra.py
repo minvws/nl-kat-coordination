@@ -1,7 +1,9 @@
 import json
 from typing import Any, List, Type, Set
 from urllib import parse
+
 from django import template
+
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN
@@ -36,8 +38,8 @@ def get_type(x: Any):
 
 
 @register.simple_tag()
-def ooi_url(routename: str, ooi_id: str, **kwargs) -> str:
-    return get_ooi_url(routename, ooi_id, **kwargs)
+def ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
+    return get_ooi_url(routename, ooi_id, organization_code, **kwargs)
 
 
 @register.filter()

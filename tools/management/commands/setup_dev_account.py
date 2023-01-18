@@ -1,15 +1,13 @@
-from colorama import Fore
 import logging
-from django.contrib.auth.models import Group
+
+from colorama import Fore
 from django.contrib.auth import get_user_model
-from django.core.management import BaseCommand
+from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.management import BaseCommand
 
-from tools.enums import SCAN_LEVEL
 from tools.models import (
-    Organization,
-    OrganizationMember,
     GROUP_CLIENT,
     GROUP_REDTEAM,
     GROUP_ADMIN,
@@ -20,24 +18,6 @@ User = get_user_model()
 
 class Command(BaseCommand):
     help = "Creates the development organization, member, groups and set permissions."
-
-    def setup_dev_organization_and_member(self):
-
-        dev_org, _ = Organization.objects.get_or_create(name="Development Organization", code="_dev")
-
-        dev_user = User.objects.last()
-
-        scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
-
-        OrganizationMember.objects.create(
-            user=dev_user,
-            organization=dev_org,
-            verified=True,
-            authorized=True,
-            status=OrganizationMember.STATUSES.ACTIVE,
-            trusted_clearance_level=max(scan_levels),
-            acknowledged_clearance_level=max(scan_levels),
-        )
 
     def get_permissions(self, codenames):
         permission_objects = []
@@ -59,7 +39,6 @@ class Command(BaseCommand):
         Group.objects.get_or_create(name=GROUP_CLIENT)
 
     def handle(self, *args, **options):
-        self.setup_dev_organization_and_member()
         self.setup_kat_groups()
 
         admin_permissions = self.get_permissions(

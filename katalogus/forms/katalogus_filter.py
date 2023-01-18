@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from tools.forms import BaseRockyForm
+
+from tools.forms.base import BaseRockyForm
 
 FILTER_OPTIONS = (
     ("enabled", _("Enabled")),

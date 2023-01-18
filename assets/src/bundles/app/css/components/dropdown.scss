@@ -26,7 +26,6 @@
 
     li {
       border-top: 1px $offwhite solid;
-      max-width: 12rem;
       padding: 0;
 
       > a {
@@ -45,6 +44,12 @@
       }
       &:first-child {
         border-top: none;
+      }
+      &:last-child {
+        // border-top should still inherit
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
       }
       &:hover {
         background-color: $grey;

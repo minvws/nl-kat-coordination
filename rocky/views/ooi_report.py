@@ -9,6 +9,11 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django_otp.decorators import otp_required
+from requests import HTTPError
+from two_factor.views.utils import class_view_decorator
+
+from account.mixins import OrganizationView
+from katalogus.client import get_katalogus
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSARecord,
@@ -22,17 +27,13 @@ from octopoes.models.ooi.findings import (
     Finding,
     FindingType,
 )
-from requests import HTTPError
-from two_factor.views.utils import class_view_decorator
-
-from katalogus.client import get_katalogus
 from rocky.keiko import keiko_client, ReportNotFoundException
 from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
 from rocky.views.ooi_view import (
     BaseOOIDetailView,
     ConnectorFormMixin,
 )
-from tools.forms import OOIReportSettingsForm
+from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
 from tools.ooi_helpers import (
     get_ooi_dict,
@@ -158,7 +159,7 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
                 request,
                 _("You can't generate a report for an OOI on a date in the future."),
             )
-            return redirect(get_ooi_url("ooi_detail", self.request.GET.get("ooi_id")))
+            return redirect(get_ooi_url("ooi_detail", self.request.GET.get("ooi_id"), self.organization.code))
         return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request, *args, **kwargs):
@@ -170,7 +171,7 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
         findings_list = build_findings_list_from_store(self.tree.store)
         context["breadcrumbs"].append(
             {
-                "url": get_ooi_url("ooi_report", self.ooi.primary_key),
+                "url": get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code),
                 "text": _("Findings report"),
             }
         )
@@ -185,7 +186,7 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.api_connector = self.get_api_connector()
+        self.api_connector = self.octopoes_api_connector
         self.depth = self.get_depth()
 
     def get(self, request, *args, **kwargs):
@@ -202,11 +203,11 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
             report_id = keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
         except HTTPError as e:
             messages.error(self.request, _("Error generating report: {}").format(e))
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key))
+            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
 
         # generate file name
         report_name = "bevindingenrapport"
-        org_code = self.request.active_organization.code
+        org_code = self.organization.code
         ooi_id = self.ooi.primary_key
         valid_time = self.get_observed_at().isoformat()
         current_time = datetime.now(timezone.utc).isoformat()
@@ -232,7 +233,7 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
             messages.error(
                 self.request, _("Error generating report: Timeout reached. See Keiko logs for more information.")
             )
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key))
+            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
 
 
 """
@@ -248,7 +249,7 @@ allowed_finding_types - Set of finding types that are interesting for this repor
 """
 
 
-class Report:
+class Report(OrganizationView):
     boefjes_required: Set = None  # type: ignore
     boefjes_optional: Set = None  # type: ignore
     start_ooi: OOI = None  # type: ignore

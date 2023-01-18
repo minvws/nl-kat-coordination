@@ -1,11 +1,12 @@
 from enum import Enum
+
 from django.contrib import messages
-from django.shortcuts import redirect
-from django.urls.base import reverse
 from django.views.generic.detail import DetailView
 from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
 from two_factor.views.utils import class_view_decorator
+
+from account.mixins import OrganizationView
 from tools.models import OrganizationMember
 
 
@@ -15,27 +16,21 @@ class PageActions(Enum):
 
 
 @class_view_decorator(otp_required)
-class AccountView(DetailView):
+class AccountView(OrganizationView, DetailView):
     template_name = "account_detail.html"
+    context_object_name = "member"
 
     def get_object(self):
-        if "pk" not in self.kwargs:
-            return self.request.user
-        return super().get_object()
+        return OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
 
     def post(self, request, *args, **kwargs):
-        if "action" not in self.request.POST:
-            return self.get(request, *args, **kwargs)
-
-        self.object = self.get_object()
-        self.handle_page_action(request.POST["action"])
-
-        return redirect(reverse("account_detail"))
+        if "action" in self.request.POST:
+            self.handle_page_action(request.POST["action"])
+        return self.get(request, *args, **kwargs)
 
     def handle_page_action(self, action: str):
         try:
-            member_id = self.request.POST.get("member_id")
-            organizationmember = OrganizationMember.objects.get(id=member_id)
+            organizationmember = self.get_object()
             if action == PageActions.ACCEPT_CLEARANCE.value:
                 organizationmember.acknowledged_clearance_level = organizationmember.trusted_clearance_level
             elif action == PageActions.WITHDRAW_ACCEPTANCE.value:
@@ -51,5 +46,4 @@ class AccountView(DetailView):
         context["breadcrumbs"] = [
             {"url": "", "text": "Account details"},
         ]
-
         return context

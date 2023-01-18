@@ -27,8 +27,12 @@
           {% endblocktranslate %}
         </p>
         <div class="horizontal-view">
-          <a href="{% url 'skip_onboarding' %}" class="button ghost">{% translate 'Skip onboarding' %}</a>
-          <a href="{% url 'step_setup_scan_ooi_info' %}" class="button">{% translate 'DNS report' %}</a>
+          {% if organization %}
+            <a href="{% url 'complete_onboarding' organization.code %}"
+               class="button ghost">{% translate 'Skip onboarding' %}</a>
+            <a href="{% url 'step_setup_scan_ooi_info' organization.code %}"
+               class="button">{% translate 'DNS report' %}</a>
+          {% endif %}
           <a href="" class="button ghost disabled">Pen test</a>
           <a href="" class="button ghost disabled">Mail report</a>
           <a href="" class="button ghost disabled">DigiD</a>

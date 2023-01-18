@@ -20,11 +20,7 @@
           {% for findings in findings_per_org_total %}
             <tr>
               <td>
-                {% if perms.tools.view_organization or request.user.is_superuser %}
-                  <a href="{{ findings.organization.get_absolute_url }}">{{ findings.organization.name }}</a>
-                {% else %}
-                  {{ findings.organization.name }}
-                {% endif %}
+                <a href="{% url 'organization_detail' findings.organization.code %}">{{ findings.organization.name }}</a>
               </td>
               <td class="number">{{ findings|get_item:"meta"|get_item:"total" }}</td>
               <td>
@@ -42,15 +38,25 @@
                 <table>
                   <thead>
                     <th>{% translate 'Severity' %}</th>
-                    <th>{% translate 'Occurences' %}</th>
+                    <th>{% translate 'Occurrences' %}</th>
                   </thead>
                   <tbody>
                     {% for key, value in findings.meta.total_by_severity.items %}
                       <tr>
                         <td>
-                          <span class="{{ key }}">{{ key|title }}</span>
+                          {% if value != 0 %}
+                            <a href="{% url 'finding_list' organization_code=findings.organization.code %}?severity={{ key }}"><span class="{{ key }}">{{ key|title }}</span></a>
+                          {% else %}
+                            <span class="{{ key }}">{{ key|title }}</span>
+                          {% endif %}
                         </td>
-                        <td class="number">{{ value }}</td>
+                        <td class="number">
+                          {% if value != 0 %}
+                            <a href="{% url 'finding_list' organization_code=findings.organization.code %}?severity={{ key }}">{{ value }}</a>
+                          {% else %}
+                            {{ value }}
+                          {% endif %}
+                        </td>
                       </tr>
                     {% endfor %}
                   </tbody>
@@ -79,11 +85,7 @@
           {% for findings in findings_per_org_critical %}
             <tr>
               <td>
-                {% if perms.tools.view_organization or request.user.is_superuser %}
-                  <a href="{% url 'organization_list' %}">{{ findings.organization.name }}</a>
-                {% else %}
-                  {{ findings.organization.name }}
-                {% endif %}
+                <a href="{% url 'organization_detail' findings.organization.code %}">{{ findings.organization.name }}</a>
               </td>
               <td class="number">{{ findings|get_item:"meta"|get_item:"total_by_severity"|get_item:"critical" }}</td>
               <td>
@@ -107,9 +109,19 @@
                     {% for key, value in findings.meta.total_by_severity.items %}
                       <tr>
                         <td>
-                          <span class="{{ key }}">{{ key|title }}</span>
+                          {% if value != 0 %}
+                            <a href="{% url 'finding_list' organization_code=findings.organization.code %}?severity={{ key }}"><span class="{{ key }}">{{ key|title }}</span></a>
+                          {% else %}
+                            <span class="{{ key }}">{{ key|title }}</span>
+                          {% endif %}
                         </td>
-                        <td class="number">{{ value }}</td>
+                        <td class="number">
+                          {% if value != 0 %}
+                            <a href="{% url 'finding_list' organization_code=findings.organization.code %}?severity={{ key }}">{{ value }}</a>
+                          {% else %}
+                            {{ value }}
+                          {% endif %}
+                        </td>
                       </tr>
                     {% endfor %}
                   </tbody>

@@ -9,12 +9,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
-from fmea.models import FailureMode, FailureModeAffectedObject, FailureModeTreeObject
 from django.views.generic.list import ListView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from fmea.forms import FailureModeAffectedObjectForm
+from fmea.models import FailureMode, FailureModeAffectedObject, FailureModeTreeObject
 from fmea.views.view_helpers import AffectedObjectBreadcrumbsMixin
 
 

@@ -8,7 +8,11 @@
     <section>
       <div>
         <h1>{% translate 'Organizations' %}</h1>
-        <p>{% translate 'You are using KAT as ' %}{{ active_organization.name }}</p>
+        {% if perms.tools.add_organization %}
+          <div class="horizontal-view toolbar">
+            <a href="{% url 'organization_add' %}" class="button">{% translate 'Add new organization' %}</a>
+          </div>
+        {% endif %}
         <div class="horizontal-scroll">
           <table>
             <caption>{% translate 'Organization overview:' %}</caption>
@@ -16,20 +20,19 @@
               <tr>
                 <th>{% translate 'Name' %}</th>
                 <th>{% translate 'Code' %}</th>
-                <th>{% translate 'Number of members' %}</th>
+                <th>{% translate 'Members' %}</th>
               </tr>
             </thead>
             <tbody>
-              {% for organization in object_list %}
-                <tr {% if organization == active_organization %}aria-current="true"{% endif %}>
+              {% for object in object_list %}
+                <tr>
                   <td>
-                    <a href="{% url 'organization_detail' organization.id %}">{{ organization.name }}</a>
-                    {% if organization == active_organization %}
-                      ({% translate 'active' %})
-                    {% endif %}
+                    <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.name }}</a>
                   </td>
-                  <td>{{ organization.code }}</td>
-                  <td>{{ organization.members.count }}</td>
+                  <td>
+                    <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.code }}</a>
+                  </td>
+                  <td>{{ object.total_members }}</td>
                 </tr>
               {% endfor %}
             </tbody>

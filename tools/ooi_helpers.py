@@ -1,6 +1,10 @@
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, Optional, Any, Union, TypedDict, Tuple
+
+from django.contrib.auth import get_user_model
+from pydantic import parse_obj_as
+
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -16,8 +20,6 @@ from octopoes.models.ooi.findings import (
 )
 from octopoes.models.tree import ReferenceNode
 from octopoes.models.types import get_relations, OOI_TYPES
-from pydantic import parse_obj_as
-from django.contrib.auth import get_user_model
 from tools.models import OOIInformation
 
 User = get_user_model()

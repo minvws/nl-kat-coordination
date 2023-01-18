@@ -1,0 +1,27 @@
+{% load i18n %}
+
+{% if organizations_dropdown_list|length > 0 %}
+  {% if organizations_dropdown_list|length == 1 and organization.code %}
+    <li>{{ organization.name }}</li>
+  {% else %}
+    <div class="dropdown">
+      <button class="dropdown-button">
+        {% if not organization.code %}
+            {% translate 'Select organization' %}
+        {% else %}
+          {{ organization.name }}
+        {% endif %}
+        <span class="icon ti-chevron-down"></span>
+      </button>
+      <ul class="dropdown-list">
+        {% for single_organization in organizations_dropdown_list %}
+          {% if organization.code != single_organization.code %}
+            <li>
+              <a href="{% url 'organization_detail' single_organization.code %}">{{ single_organization.name }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endif %}

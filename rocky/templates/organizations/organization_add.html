@@ -8,7 +8,6 @@
     <section>
       <div>
         <h1>{% translate 'Organization setup' %}</h1>
-        <strong>{% translate 'Organization' %}</strong>
         <p>
           {% blocktranslate trimmed %}
             Please enter the following organization details.
@@ -16,10 +15,7 @@
             page within KAT when necesarry.
          {% endblocktranslate %}
         </p>
-        <form novalidate
-              action="{% url 'organization_add' %}"
-              method="post"
-              class="horizontal-view help">
+        <form novalidate method="post" class="horizontal-view help">
           {% csrf_token %}
           {% translate 'Organization details' as fieldset_legend %}
           {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}

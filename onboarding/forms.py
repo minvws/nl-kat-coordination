@@ -2,6 +2,9 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.utils.translation import gettext_lazy as _
+
+from account.forms import OrganizationMemberAddForm
+from tools.forms.settings import SCAN_LEVEL_CHOICES
 from tools.models import (
     Organization,
     GROUP_ADMIN,
@@ -9,8 +12,6 @@ from tools.models import (
     GROUP_CLIENT,
     OrganizationMember,
 )
-from tools.forms import SCAN_LEVEL_CHOICES
-from account.forms import OrganizationMemberAddForm
 
 User = get_user_model()
 

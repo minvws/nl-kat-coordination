@@ -1,5 +1,5 @@
-from two_factor.forms import TOTPDeviceForm, AuthenticationTokenForm, BackupTokenForm
 from django.utils.translation import gettext_lazy as _
+from two_factor.forms import TOTPDeviceForm, AuthenticationTokenForm, BackupTokenForm
 
 
 class TwoFactorSetupTokenForm(TOTPDeviceForm):

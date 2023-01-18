@@ -13,8 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
 from django.utils.translation import gettext_lazy as _
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -102,7 +102,7 @@ INSTALLED_APPS = [
     "django_password_validators.password_history",
     "rest_framework",
     "tagulous",
-    "drf_standardized_errors",
+    # "drf_standardized_errors",
 ]
 
 MIDDLEWARE = [
@@ -115,8 +115,6 @@ MIDDLEWARE = [
     "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "rocky.middleware.active_organization_middleware.ActiveOrganizationMiddleware",
-    "rocky.middleware.active_organization_middleware.OctopoesConnectorMiddleware",
     "rocky.middleware.onboarding.OnboardingMiddleware",
 ]
 
@@ -230,7 +228,7 @@ STATIC_ROOT = BASE_DIR / "static"
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "assets"),)
 
 LOGIN_URL = "two_factor:login"
-LOGIN_REDIRECT_URL = "landing_page"
+LOGIN_REDIRECT_URL = "crisis_room"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

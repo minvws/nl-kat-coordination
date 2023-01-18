@@ -10,9 +10,9 @@
        aria-label="{% translate 'scan level warning' %}">
       <strong>Warning:</strong>
       {% blocktranslate trimmed with plugin_name=plugin.name scan_level=plugin.scan_level%}
-              {{plugin_name}} will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
-              or higher.
-{% endblocktranslate %}
+        {{plugin_name}} will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
+        or higher.
+      {% endblocktranslate %}
     </p>
     <section>
       <div>
@@ -49,7 +49,7 @@
         <form class="inline" method="post">
           {% csrf_token %}
           <fieldset>
-            <a href="{% url 'plugin_detail' plugin_type=plugin.type plugin_id=plugin.id %}"
+            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
                class="button ghost">{% translate 'Cancel' %}</a>
             <button type="submit">{% translate 'Scan' %}</button>
           </fieldset>

@@ -15,15 +15,15 @@
     {% if ooi_current %}
       <li>{% translate "You will not be able to add Findings or other OOI's to past due objects." %}</li>
       <li>
-        <a href="{% ooi_url 'ooi_detail' ooi_current.primary_key %}"
+        <a href="{% ooi_url 'ooi_detail' ooi_current.primary_key organization.code %}"
            title="{% blocktranslate with name=ooi_current.human_readable %}Show details for {{ name }}{% endblocktranslate %}">{% translate 'View the current state' %}</a>
       </li>
     {% else %}
       <li>
         {% blocktranslate trimmed %}
-            You will not be able to add Findings or other OOI's, this object has been deleted
-            and is no longer available.
-          {% endblocktranslate %}
+          You will not be able to add Findings or other OOI's, this object has been deleted
+          and is no longer available.
+        {% endblocktranslate %}
       </li>
     {% endif %}
   </ul>

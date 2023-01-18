@@ -12,15 +12,16 @@
             <h1>{% translate 'KAT-alogus' %}</h1>
             <p class="emphasized">
               {% blocktranslate %}
-                    An overview of all available boefjes.
-                    Boefjes can be used to scan for vulnerablilities and security issues within specified objects.
-                    Each boefje has his own focus area and strengths.
-                  {% endblocktranslate %}
+                An overview of all available boefjes.
+                Boefjes can be used to scan for vulnerablilities and security issues within specified objects.
+                Each boefje has his own focus area and strengths.
+              {% endblocktranslate %}
             </p>
           </div>
           {% if perms.tools.can_scan_organization %}
             <div class="horizontal-view toolbar">
-              <a class="button ghost" href={% url 'katalogus_settings' %}>{% translate 'Settings' %}</a>
+              <a class="button ghost"
+                 href="{% url 'katalogus_settings' organization.code %}">{% translate 'Settings' %}</a>
             </div>
           {% endif %}
         </div>
@@ -48,7 +49,7 @@
                     <td>{{ plugin.description }}</td>
                     <td>{% include 'partials/enable_disable_plugin.html' with plugin=plugin %}</td>
                     <td>
-                      <a href="{% url 'plugin_detail' plugin_type=plugin.type plugin_id=plugin.id %}"
+                      <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
                          class="nowrap">{% translate 'See details' %}</a>
                     </td>
                   </tr>
@@ -76,5 +77,4 @@
 {% block html_at_end_body %}
   {{ block.super }}
   <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-  <script src="{% static '/js/dropdown.js' %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}
