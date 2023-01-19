@@ -4,7 +4,7 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
-OPENSSL_IMAGE = "securefab/openssl:latest"
+OPENSSL_IMAGE = "alpine/openssl:latest"
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
