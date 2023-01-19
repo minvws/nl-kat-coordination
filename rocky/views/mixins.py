@@ -19,8 +19,8 @@ from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations, get_collapsed_types, type_by_name
 from rocky.bytes_client import get_bytes_client
-from tools.forms.settings import DEPTH_MAX, DEPTH_DEFAULT
 from tools.forms.base import ObservedAtForm
+from tools.forms.settings import DEPTH_MAX, DEPTH_DEFAULT
 from tools.models import Organization
 from tools.ooi_helpers import (
     get_knowledge_base_data_for_ooi_store,

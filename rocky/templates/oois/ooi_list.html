@@ -33,7 +33,7 @@
           {% if ooi_list %}
             <fieldset>
               <div class="horizontal-view">
-                {% if may_update_scan_profile %}
+                {% if may_update_clearance_level %}
                   <select id="scan-profiles" name="scan-profile">
                     {% for level in scan_levels %}
                       <option value="{{ level }}">
@@ -47,10 +47,8 @@
                           value="update-scan-profile">
                     {% translate 'Set clearance level' %}
                   </button>
-                  <button type="submit" class="dropdown-button" name="action" value="delete">{% translate 'Delete object(s)' %}</button>
-                {% else %}
-                  <button type="submit" class="dropdown-button" name="action" value="delete">{% translate 'Delete object(s)' %}</button>
                 {% endif %}
+                <button type="submit" class="dropdown-button" name="action" value="delete">{% translate 'Delete object(s)' %}</button>
               </div>
             </fieldset>
           {% endif %}

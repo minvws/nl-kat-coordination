@@ -37,15 +37,11 @@ class ChangeClearanceLevel(BoefjeMixin, KATalogusMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         """Start scanning oois at plugin detail page."""
-        if not self.verify_may_update_scan_profile():
+        if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
 
         boefje = self.katalogus_client.get_boefje(self.plugin_id)
-        self.run_boefje_for_oois(
-            boefje=boefje,
-            oois=self.oois,
-            api_connector=self.octopoes_api_connector,
-        )
+        self.run_boefje_for_oois(boefje=boefje, oois=self.oois)
         messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
         del request.session["selected_oois"]  # delete session
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))

@@ -19,7 +19,7 @@ class PluginDetailScanOOI(BoefjeMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         """Start scanning oois at plugin detail page."""
-        if not self.verify_may_update_scan_profile():
+        if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
 
         selected_oois = request.POST.getlist("ooi")
@@ -31,7 +31,6 @@ class PluginDetailScanOOI(BoefjeMixin, TemplateView):
                 self.run_boefje_for_oois(
                     boefje=boefje,
                     oois=oois_with_clearance_level,
-                    api_connector=self.octopoes_api_connector,
                 )
             oois_without_clearance_level = self.get_oois_without_clearance_level(selected_oois)
             if oois_without_clearance_level:

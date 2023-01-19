@@ -34,7 +34,7 @@ class OOIDetailView(
     scan_history_limit = 10
 
     def post(self, request, *args, **kwargs):
-        if not self.verify_may_update_scan_profile():
+        if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
 
         if "action" not in self.request.POST:
@@ -61,7 +61,7 @@ class OOIDetailView(
 
                 boefje = get_katalogus(self.organization.code).get_boefje(boefje_id)
                 ooi = self.get_single_ooi(pk=ooi_id)
-                self.run_boefje_for_oois(boefje, [ooi], self.api_connector)
+                self.run_boefje_for_oois(boefje, [ooi])
                 return True
 
         except RequestException as exception:

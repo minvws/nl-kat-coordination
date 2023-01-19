@@ -8,12 +8,11 @@ from django.views.generic import FormView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
-from octopoes.models import InheritedScanProfile, EmptyScanProfile, DeclaredScanProfile
-
+from octopoes.models import InheritedScanProfile, EmptyScanProfile
+from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
 from rocky.views.ooi_detail import OOIDetailView
 from tools.forms.ooi import SetClearanceLevelForm
 from tools.models import Indemnification, OrganizationMember
-
 from tools.view_helpers import (
     get_mandatory_fields,
     get_ooi_url,
@@ -46,7 +45,7 @@ class ScanProfileDetailView(OOIDetailView, FormView):
         return context
 
     def post(self, request, *args, **kwargs):
-        if not self.verify_may_update_scan_profile():
+        if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
 
         super().post(request, *args, **kwargs)
@@ -54,31 +53,10 @@ class ScanProfileDetailView(OOIDetailView, FormView):
         if form.is_valid():
 
             level = form.cleaned_data["level"]
-            if (
-                level > self.organization_member.trusted_clearance_level
-                or level > self.organization_member.acknowledged_clearance_level
-            ):
-                messages.add_message(
-                    request,
-                    messages.ERROR,
-                    _(
-                        "You do not have clearance for level %s. \
-                        You are trusted with clearance level %s and you acknowledged a clearance level of %s."
-                    )
-                    % (
-                        level,
-                        self.organization_member.trusted_clearance_level,
-                        self.organization_member.acknowledged_clearance_level,
-                    ),
-                )
-            else:
-                self.api_connector.save_scan_profile(
-                    DeclaredScanProfile(
-                        reference=self.ooi.reference,
-                        level=level,
-                    ),
-                    valid_time=datetime.now(timezone.utc),
-                )
+            try:
+                self.raise_clearance_level(self.ooi.reference, level)
+            except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
+                return self.get(request, status=403, *args, **kwargs)
         else:
             messages.add_message(
                 self.request,

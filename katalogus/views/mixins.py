@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from logging import getLogger
 from typing import List
 from uuid import uuid4
@@ -10,8 +9,8 @@ from requests import HTTPError
 
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, DeclaredScanProfile
+from octopoes.models import OOI
+from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
 from rocky.scheduler import Boefje, BoefjeTask, QueuePrioritizedItem, client
 from rocky.views.mixins import OctopoesView
 
@@ -70,18 +69,14 @@ class BoefjeMixin(OctopoesView):
         self,
         boefje: Boefje,
         oois: List[OOI],
-        api_connector: OctopoesAPIConnector,
     ) -> None:
 
         for ooi in oois:
             if ooi.scan_profile.level < boefje.scan_level:
-                api_connector.save_scan_profile(
-                    DeclaredScanProfile(
-                        reference=ooi.reference,
-                        level=boefje.scan_level,
-                    ),
-                    datetime.now(timezone.utc),
-                )
+                try:
+                    self.raise_clearance_level(ooi.reference, boefje.scan_level)
+                except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
+                    continue
             self.run_boefje(boefje, ooi)
 
     def scan(self, view_args) -> None:
@@ -106,7 +101,7 @@ class BoefjeMixin(OctopoesView):
         oois = [self.get_single_ooi(pk=ooi_id) for ooi_id in ooi_ids]
 
         try:
-            self.run_boefje_for_oois(boefje, oois, self.octopoes_api_connector)
+            self.run_boefje_for_oois(boefje, oois)
         except HTTPError:
             return
 
