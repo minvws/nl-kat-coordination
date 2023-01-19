@@ -78,7 +78,7 @@ The objects associated with this boefje are IPAddressV4, IPAddressV6, Finding, C
 
 Shodan comes with an API key, which you can add in the web interface.
 
-.. code-block::
+.. code-block:: json
 
     {
         "id": "shodan",
@@ -100,29 +100,32 @@ Shodan comes with an API key, which you can add in the web interface.
 Using the template as a base, you can create a boefje.json for your own boefje. The template starts with the name of your new boefje:
 
 
-.. code-block::
+.. code-block:: json
 
     {
         "id": "boefje",
         "name": "Boefje",
         "description": "Beschrijving",
+    }
 
 Your boefje collects information to turn it into objects. Specify the objects your boefje needs. Those objects come from the data model. Should the information you want to retrieve not yet be incorporated into the data model, you need to modify it separately. How this works is described in general terms later in this document.
 
-.. code-block::
+.. code-block:: json
 
-        "consumes": [
-            "object uit het datamodel",
-            "nog een object uit het datamodel"
-        ],
-        "produces": [
-            "informatie",
-            "informatie"
-        ],
+        {
+            "consumes": [
+                "object uit het datamodel",
+                "nog een object uit het datamodel"
+            ],
+            "produces": [
+                "informatie",
+                "informatie"
+            ],
+        }
 
 The boefje can also bring variables from the web interface, like in Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface.
 
-.. code-block::
+.. code-block:: json
 
         "environment_keys": ["SHODAN_API"],
         "scan_level": 1
@@ -135,7 +138,7 @@ To allow the user to add information through the web interface, add the schema.j
 
 Currently, however, OpenKAT only understands fairly shallow structures. For example, not all field types are supported, nor does OpenKAT understand references. You can test whether your Schema is neatly understood by checking the settings form in Rocky's KAT catalog for your boefje.
 
-.. code-block::
+.. code-block:: json
 
  {
   "title": "Arguments",
@@ -158,7 +161,7 @@ main.py
 
 The boefje itself imports the shodan api module, assigns an IP address to it and accepts the output. This output goes to Bytes and is analyzed by one (or more) normalizers. The link between the normalizer and the byte is made via the mime-type, which you can give in the ``set`` function in the byte. The code block below also contains a check, to prevent you from asking for non-public IP addresses.
 
-.. code-block::
+.. code-block:: python
 
 	import json
 	import logging
@@ -204,7 +207,7 @@ normalizer.json
 
 The normalizers translate the output of a boefje into objects that fit the data model. Each normalizer defines what input it accepts and what it provides. In the case of the shodan normalizer, it involves the entire output of the shodan boefje (created based on IP address), where findings and ports come out. The normalizer.json defines these:
 
-.. code-block::
+.. code-block:: json
 
 	{
 	    "id": "kat_shodan_normalize",
@@ -223,7 +226,7 @@ normalize.py
 
 The file normalize.py contains the actual normalizer. From octopoes, the normalizer retrieves the objects and their references: from the findings list the CVEFindingType for the CVEs and the Finding for the findings, from the network objects list the IPPort, the Protocol and the PortState. Then the information about those objects is extracted from the imported data and stored as objects.
 
-.. code-block::
+.. code-block:: python
 
  import json
  from typing import Iterator, Union
@@ -286,7 +289,7 @@ Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortS
 
 The PortState is defined separately. This can be done for information that has a very specific nature so you can describe it.
 
-.. code-block::
+.. code-block:: python
 
  class PortState(Enum):
     OPEN = "open"
@@ -312,7 +315,7 @@ The example below comes from the functional documentation and discusses the Bit 
 Bit.py gives the structure of the bit, containing the input and the businessrules against which it is tested. An example is included below. The bit accepts input belonging to the objects IPPort and IPAddress. It then calls the module port_classification, which contains the businessrules.
 
 
-.. code-block::
+.. code-block:: python
 
  from bits.definitions import BitParameterDefinition, BitDefinition
  from octopoes.models.ooi.network import IPPort, IPAddress
@@ -328,7 +331,7 @@ The businessrules are contained in the module port_classification, in the file p
 
 The specification for a bit is broad, but limited by the data model. Boefjes retrieve information externally, bits only look at the objects in Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT.
 
-.. code-block::
+.. code-block:: python
 
  from typing import List, Iterator
 
@@ -376,7 +379,7 @@ The specification for a bit is broad, but limited by the data model. Boefjes ret
 
 Bits can recognize patterns and derive objects from them. The Bit for internet.nl can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions.
 
-.. code-block::
+.. code-block:: python
 
 	from bits.definitions import BitParameterDefinition, BitDefinition
 	from octopoes.models.ooi.dns.zone import Hostname
