@@ -1,7 +1,7 @@
-Templates
-#########
+GitHub Templates
+################
 
-Contains files to be used in .github
+Contains files to be used in the ``.github`` folder.
 
 .. toctree::
    :maxdepth: 4
