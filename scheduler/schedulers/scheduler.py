@@ -137,12 +137,6 @@ class Scheduler(abc.ABC):
         try:
             p_item = self.queue.pop(filters)
         except queues.QueueEmptyError as exc:
-            self.logger.warning(
-                "Queue %s is empty, not populating new tasks [queue_id=%s, qsize=%d]",
-                self.queue.pq_id,
-                self.queue.pq_id,
-                self.queue.qsize(),
-            )
             raise exc
 
         if p_item is not None:

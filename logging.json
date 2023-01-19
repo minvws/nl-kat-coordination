@@ -23,21 +23,28 @@
     },
     "loggers": {
         "uvicorn.error": {
-            "level": "WARNING",
+            "level": "CRITICAL",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        },
+        "uvicorn.access": {
+            "level": "CRITICAL",
             "handlers": [
                 "console"
             ],
             "propagate": 0
         },
         "pika": {
-            "level": "WARNING",
+            "level": "CRITICAL",
             "handlers": [
                 "console"
             ],
             "propagate": 0
         },
         "sqlalchemy.engine": {
-            "level": "DEBUG",
+            "level": "CRITICAL",
             "handlers": [
                 "console"
             ],
