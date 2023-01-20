@@ -34,33 +34,35 @@ class AppContext:
         with open(self.config.log_cfg, "rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
-        svc_katalogus = services.Katalogus(
+        # Services
+        katalogus_service = services.Katalogus(
             host=self.config.host_katalogus,
             source=f"scheduler/{scheduler.__version__}",
         )
 
-        svc_bytes = services.Bytes(
+        bytes_service = services.Bytes(
             host=self.config.host_bytes,
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
             source=f"scheduler/{scheduler.__version__}",
         )
 
-        svc_octopoes = services.Octopoes(
+        octopoes_service = services.Octopoes(
             host=self.config.host_octopoes,
             source=f"scheduler/{scheduler.__version__}",
-            orgs=svc_katalogus.get_organisations(),
+            orgs=katalogus_service.get_organisations(),
         )
 
-        lst_mutation = listeners.ScanProfileMutation(
+        # Listeners
+        mutations_listener = listeners.ScanProfileMutation(
             dsn=self.config.host_mutation,
         )
 
-        lst_raw_data = listeners.RawData(
+        raw_data_listener = listeners.RawData(
             dsn=self.config.host_raw_data,
         )
 
-        lst_normalizer_meta = listeners.NormalizerMeta(
+        normalizer_meta_listener = listeners.NormalizerMeta(
             dsn=self.config.host_normalizer_meta,
         )
 
@@ -68,12 +70,12 @@ class AppContext:
         # notation
         self.services: SimpleNamespace = SimpleNamespace(
             **{
-                services.Katalogus.name: svc_katalogus,
-                services.Octopoes.name: svc_octopoes,
-                services.Bytes.name: svc_bytes,
-                listeners.ScanProfileMutation.name: lst_mutation,
-                listeners.RawData.name: lst_raw_data,
-                listeners.NormalizerMeta.name: lst_normalizer_meta,
+                services.Katalogus.name: katalogus_service,
+                services.Octopoes.name: octopoes_service,
+                services.Bytes.name: bytes_service,
+                listeners.ScanProfileMutation.name: mutations_listener,
+                listeners.RawData.name: raw_data_listener,
+                listeners.NormalizerMeta.name: normalizer_meta_listener,
             }
         )
 

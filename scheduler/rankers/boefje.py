@@ -31,7 +31,8 @@ class BoefjeRanker(Ranker):
         Since we want to have a lower bound of a priority of 3, we will use
         an exponential decay function in decreasing form.
         """
-        if obj.last_run_boefje is None:
+        # New tasks that have not yet run before
+        if obj.prior_tasks is None or not obj.prior_tasks:
             return 2
 
         max_priority = self.MAX_PRIORITY
@@ -42,10 +43,10 @@ class BoefjeRanker(Ranker):
         max_days = self.MAX_DAYS * (60 * 60 * 24)
 
         # Check how long since the grace period has passed
-        run_since_grace_period = ((datetime.now(timezone.utc) - obj.last_run_boefje.ended_at) - grace_period).seconds
+        run_since_grace_period = ((datetime.now(timezone.utc) - obj.prior_tasks[0].modified_at) - grace_period).seconds
 
         # Makes sure that we don't have tasks that are still in the grace
-        # period>
+        # period
         if run_since_grace_period < 0:
             return -1
 
