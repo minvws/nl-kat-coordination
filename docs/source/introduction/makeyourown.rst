@@ -105,7 +105,7 @@ Using the template as a base, you can create a boefje.json for your own boefje. 
     {
         "id": "boefje",
         "name": "Boefje",
-        "description": "Beschrijving",
+        "description": "Beschrijving"
     }
 
 Your boefje collects information to turn it into objects. Specify the objects your boefje needs. Those objects come from the data model. Should the information you want to retrieve not yet be incorporated into the data model, you need to modify it separately. How this works is described in general terms later in this document.
@@ -120,16 +120,17 @@ Your boefje collects information to turn it into objects. Specify the objects yo
             "produces": [
                 "informatie",
                 "informatie"
-            ],
+            ]
         }
 
 The boefje can also bring variables from the web interface, like in Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface.
 
 .. code-block:: json
 
+    {
         "environment_keys": ["SHODAN_API"],
         "scan_level": 1
-
+    }
 
 schema.json
 ***********
@@ -270,7 +271,7 @@ Adding objects to the data model requires an addition in octopus. Here, an objec
 As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object in the data model, in this case an IPPort, looks like this:
 
 
-.. code-block::
+.. code-block:: python
 
  class IPPort(OOI):
     object_type: Literal["IPPort"] = "IPPort"
