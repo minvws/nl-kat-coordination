@@ -32,4 +32,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
+          name: "github-pages-no-deploy"
           path: 'docs/_build'
