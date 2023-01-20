@@ -54,7 +54,7 @@ All documentation should be placed in a repository's ``docs`` folder.
 
 Contributor Social Contract
 ===========================
-All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :ref:`Guidelines`.
+All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :ref:`Project Guidelines`.
 Everyone is encouraged to politely and constructively point out guidelines violations to others.
 Actively enforcing these guidelines makes that the entire project benefits in quality control.
 

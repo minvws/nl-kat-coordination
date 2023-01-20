@@ -29,7 +29,7 @@ Open a terminal of your choice, such as gnome-terminal on Ubuntu.
 
 - We won't assume you have older versions of Docker running, but if you do, you need to uninstall them with the following command:
 
-.. code-block::
+.. code-block:: sh
 
 	$ sudo apt-get remove docker docker-engine docker.io containerd runc yarnpkg
 
@@ -37,7 +37,7 @@ If apt-get does not run through because of missing packages, try the command aga
 
 - Then install some required packages that allow *apt* to use packages over HTTPS:
 
-.. code-block::
+.. code-block:: sh
 
 	$ sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-release
 
@@ -45,7 +45,7 @@ The packages are checked and updated as needed. If an installation is required, 
 
 -Next add Docker's official GPG key:
 
-.. code-block::
+.. code-block:: sh
 
 	$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 	$ echo  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
@@ -53,7 +53,7 @@ The packages are checked and updated as needed. If an installation is required, 
 
 - Update your packages and install the latest Docker version:
 
-.. code-block::
+.. code-block:: sh
 
 	$ sudo apt-get update
 	$ sudo apt-get install docker-ce docker-ce-cli containerd.io
@@ -67,7 +67,7 @@ Install docker-compose
 
 Install the latest version of docker-compose and give the tool appropriate permissions with the following two commands:
 
-.. code-block::
+.. code-block:: sh
 
 	$ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 	$ sudo chmod +x /usr/local/bin/docker-compose
@@ -79,7 +79,7 @@ Install dependencies
 Dependencies are packages required for OpenKAT to work. Run the following commands to install them:
 
 
-.. code-block::
+.. code-block:: sh
 
 	$ curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 	$ sudo apt-get install -y nodejs gcc g++ make python3-pip docker-compose
@@ -97,19 +97,19 @@ Default installation
 
 - Clone the repository:
 
-.. code-block::
+.. code-block:: sh
 
 	$ git clone https://github.com/minvws/nl-kat-coordination.git
 
 - Go to the folder:
 
-.. code-block::
+.. code-block:: sh
 
 	$ cd nl-kat-coordination
 
 - Make KAT:
 
-.. code-block::
+.. code-block:: sh
 
 	$ make kat
 
@@ -119,7 +119,7 @@ Currently, the make cat instruction only works for the first user on a ``*nix`` 
 
 In some cases this may not work because Docker does not yet know your user name. You solve this with the following commands, entering your user name instead of $USER:
 
-.. code-block::
+.. code-block:: sh
 
 	$ sudo gpasswd -a $USER docker
 	$ newgrp docker
@@ -133,13 +133,13 @@ If you want to create a specific build, you have a number of options. You can al
 
 - Clone only relevant repositories
 
-.. code-block::
+.. code-block:: sh
 
 	$ make clone
 
 - Start a separate container
 
-.. code-block::
+.. code-block:: sh
 
 	$ docker-compose up --build -d {container_name}
 
@@ -150,13 +150,13 @@ By default a user named 'admin', with the password 'admin' should be available.
 
 - Optional seed of the database with OOI information
 
-.. code-block::
+.. code-block:: sh
 
 	$ docker exec -it nl-kat-coordination_rocky_1 python3 /app/rocky/manage.py loaddata OOI_database_seed.json
 
 - install octopus-core in your local python environment with a symlink (after cloning)
 
-.. code-block::
+.. code-block:: sh
 
 	$ pip install -e nl-kat-coordination-octopoes-core
 
@@ -167,7 +167,7 @@ Updating an existing installation can be done with the new make update.
 
 Go to the directory containing openkat:
 
-.. code-block::
+.. code-block:: sh
 
 	$ cd nl-kat-coordination
 	$ make update

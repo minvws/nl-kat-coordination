@@ -42,7 +42,8 @@ exclude_patterns = []
 
 html_theme = "sphinx_rtd_theme"
 
-html_logo = "keiko-hero.jpg"
+html_logo = "_static/keiko-hero.jpg"
+html_favicon = "_static/favicon.svg"
 
 html_theme_options = {
     "collapse_navigation": False,

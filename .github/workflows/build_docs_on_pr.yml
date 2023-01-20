@@ -1,0 +1,36 @@
+name: Build docs artifact for PR
+
+on:
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - "docs/**"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-artifact:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install pip dependencies
+        run: pip install -r requirements.txt
+
+      - name: Compile static HTML
+        run: sphinx-build -b html docs/source docs/_build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: "github-pages-no-deploy"
+          path: 'docs/_build'

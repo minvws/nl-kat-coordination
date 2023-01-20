@@ -26,7 +26,7 @@ When a cycle has been completed, we hold a quick retrospective to evaluate what 
 Bugs and Feature Requests
 =========================
 
-For effective bug reporting and feature requests there are :ref:`Templates`.
+For effective bug reporting and feature requests there are :ref:`GitHub Templates`.
 These should be used and submitted in the coordination repository's `issues board <https://github.com/minvws/nl-kat-coordination/issues>`_.
 Please make sure to link them to the central project board as an incoming feature/refinement.
 
