@@ -42,6 +42,7 @@ All designs that are ready to be reviewed.
 
 `To visit the review designs Figma file, go here. <https://www.figma.com/file/QRL8085Z827bNdO0bIDdFL/KAT-%7C-Design-%7C-For-review?node-id=5%3A4&t=HBbKMXdEdiT0uAIY-1>`_
 
+
 Approved for implementation
 ===========================
 Approved designs. These are ready to be implemented by developers.
