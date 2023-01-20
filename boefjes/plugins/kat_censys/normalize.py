@@ -3,7 +3,7 @@ import urllib.parse
 from typing import Iterator, Union
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.certificate import Certificate
+from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import (
     IPPort,
@@ -66,7 +66,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             else:
                 cert_subject = "n/a"
             # todo: link certificate properly. Currently there is no website, because it will be returned for an ip
-            yield Certificate(
+            yield X509Certificate(
                 subject=cert_subject,
                 issuer=certificate["leaf_data"]["issuer_dn"],
                 valid_from=0,
