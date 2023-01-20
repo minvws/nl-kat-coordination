@@ -19,7 +19,7 @@ Documentation
 Brochures
 *********
 
-The high level documentation on OpenKAT explain the purpose and operation of OpenKAT at the management level:
+The high level documentation on OpenKAT explains the purpose and operation of OpenKAT at the management level:
 
 - `the 'TL;DR' of 2 pages (English) <docs/source/introduction/pdf/OpenKAT handout_ENG.pdf>`_
 - `the extensive brochure on OpenKAT (Dutch) <docs/source/introduction/pdf/introductie OpenKAT V20220621.pdf>`_
