@@ -30,6 +30,6 @@ jobs:
         run: sphinx-build -b html docs/source docs/_build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           path: 'docs/_build'
