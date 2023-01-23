@@ -130,3 +130,18 @@ sequenceDiagram
     n->>o: Add object(s)
     c->>-r: task.status = done
 ```
+
+## Fonts license
+
+All fonts used within Rocky remain under their own license. For example: Fredoka One, Open Sans & Tabler icons.
+
+For more information check their respective folders for extra/ more specific license (if available) or visit:
+
+### Fredoka One
+https://fonts.google.com/specimen/Fredoka+One/about
+
+### Open Sans
+https://fonts.google.com/specimen/Open+Sans/about
+
+### Tabler icons
+https://tabler-icons.io/

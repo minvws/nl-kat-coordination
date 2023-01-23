@@ -1,20 +1,12 @@
 /* theme: KAT Soft based on manon components */
+@import "application-base"; /* Styling on highest level. */
+@import "headings-base-set"; /* Heading styles */
 
 :root {
   --accordion-button-icon-after-open-content: "\ea5f";
   --accordion-button-icon-after-close-content: "\ea62";
   --accordion-content-gap: 1.5rem;
   --accordion-content-text-color: #000;
-  --application-base-accent-color: #262431;
-  --application-base-accent-color-text-color:  #fff;
-  --application-base-accent-color-hover: #4b436d;
-  --application-base-accent-color-hover-text-color: #fff;
-  --application-base-accent-color-active: #56469c;
-  --application-base-accent-color-active-text-color: #fff;
-  --application-base-accent-color-focus: #56469c;
-  --application-base-accent-color-focus-text-color: #fff;
-  --application-base-accent-color-selected: #56469c;
-  --application-base-accent-color-selected-text-color: #fff;
   --breadcrumb-bar-content-block-icon: "\ea61";
   --breadcrumb-bar-padding-right: 3%;
   --breadcrumb-bar-padding-left: 3%;

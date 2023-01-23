@@ -11,7 +11,7 @@
     "prettier": "^2.7.1"
   },
   "dependencies": {
-    "@minvws/manon": "1.1.5",
+    "@minvws/manon": "1.1.7",
     "d3": "^7.4.3"
   },
   "browserslist": [
