@@ -25,9 +25,12 @@ class OOIFactory(Factory):
         model = OOI
 
     primary_key: str = Sequence(lambda n: n)
+
     scan_profile: ScanProfile
 
     object_type: str = Faker(
         "random_element",
         elements=["Hostname", "Network"],
     )
+
+    organisation_id: str = Faker("uuid4")
