@@ -15,4 +15,4 @@ class LoginForm(AuthenticationForm):
 
     def __init__(self, request=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].help_text = _("Insert the email you registered with or got at KAT installation.")
+        self.fields["username"].help_text = _("Insert the email you registered with or got at OpenKAT installation.")

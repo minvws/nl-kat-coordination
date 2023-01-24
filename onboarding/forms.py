@@ -67,7 +67,7 @@ class OnboardingCreateOrganizationForm(forms.ModelForm):
         widgets = {
             "name": forms.TextInput(
                 attrs={
-                    "placeholder": _("The name of the organization this KAT account is for."),
+                    "placeholder": _("The name of the organization this OpenKAT account is for."),
                     "autocomplete": "off",
                     "aria-describedby": _("explanation-organization-name"),
                 },

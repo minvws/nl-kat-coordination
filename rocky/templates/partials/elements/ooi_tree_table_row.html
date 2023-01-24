@@ -5,7 +5,7 @@
     <td>{{ prop }}</td>
     {% if prop == 'id' %}
       <td>
-        <a href="{% ooi_url 'ooi_detail' organization.code ooi_type=item %}"
+        <a href="{% ooi_url 'ooi_detail' organization_code=organization.code ooi_id=ooi_id ooi_type=item %}"
            title="Show details for {{ item }}">{{ item }}</a>
       </td>
     {% elif prop == 'ooi_type' %}

@@ -17,7 +17,7 @@ def create_signal_group_for_organization(
 ) -> SignalGroupResponse:
     return client.create_group(
         organization.signal_username,
-        organization.name + " KAT Notifications",
+        organization.name + " OpenKAT Notifications",
     )
 
 

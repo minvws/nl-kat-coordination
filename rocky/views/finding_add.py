@@ -103,15 +103,15 @@ class FindingAddView(BaseOOIFormView):
                 description=form_data.get("description"),
                 reproduce=form_data.get("reproduce"),
             )
-            self.api_connector.save_declaration(Declaration(ooi=finding, valid_time=observed_at))
-            self.api_connector.save_declaration(Declaration(ooi=finding_type, valid_time=observed_at))
+            self.octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=observed_at))
+            self.octopoes_api_connector.save_declaration(Declaration(ooi=finding_type, valid_time=observed_at))
 
         return redirect(get_ooi_url("ooi_detail", ooi_id, self.organization.code))
 
     def get_ooi_options(self) -> List[Dict[str, str]]:
         # Query to render form options
         ooi_set = set(OOI_TYPES.values()).difference({Finding, FindingType})
-        objects = self.api_connector.list(ooi_set).items
+        objects = self.octopoes_api_connector.list(ooi_set).items
 
         # generate options
         options = [(o.primary_key, o.get_ooi_type()) for o in objects]

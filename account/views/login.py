@@ -58,7 +58,7 @@ class LoginRockyView(LoginView):
         context["breadcrumbs"] = [
             {
                 "url": reverse("landing_page"),
-                "text": _("KAT"),
+                "text": _("OpenKAT"),
             },
             {
                 "url": reverse("login"),
@@ -88,7 +88,7 @@ class QRGeneratorRockyView(QRGeneratorView):
 @class_view_decorator(sensitive_post_parameters())
 @class_view_decorator(never_cache)
 class SetupRockyView(SetupView):
-    # This is set to skip the extra welcome form which is for KAT a redundant step.
+    # This is set to skip the extra welcome form which is for OpenKAT a redundant step.
     form_list = (
         ("method", MethodForm),
         ("generator", TwoFactorSetupTokenForm),

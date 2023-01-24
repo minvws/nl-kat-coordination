@@ -48,8 +48,8 @@
                     {% endif %}
                     <td>{{ task.created_at }}</td>
                     <td>
-                      {% if task.p_item.data.boefje_meta.boefje.id and task.status.value == 'completed' %}
-                        <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.boefje_meta.boefje.id %}">{% translate 'Download meta and raw data' %}</a>
+                      {% if task.status.value == 'completed' %}
+                        <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}">{% translate 'Download meta and raw data' %}</a>
                       {% else %}
                         <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate 'Download meta data' %}</a>
                       {% endif %}

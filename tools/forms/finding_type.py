@@ -25,7 +25,7 @@ class FindingTypeAddForm(BaseRockyForm):
     id = forms.CharField(
         label=_("KAT-ID"),
         max_length=120,
-        help_text=_("Unique ID within KAT, for this type"),
+        help_text=_("Unique ID within OpenKAT, for this type"),
         widget=forms.TextInput(attrs={"placeholder": "KAT-000000"}),
     )
     title = forms.CharField(

@@ -31,7 +31,7 @@ class GroupAddForm(forms.Form):
 
     account_type = forms.CharField(
         label=_("Account Type"),
-        help_text=_("Every member of KAT must be part of a group."),
+        help_text=_("Every member of OpenKAT must be part of a group."),
         error_messages={
             "group": {
                 "required": _("Please select a group to proceed."),
@@ -49,7 +49,7 @@ class GroupAddForm(forms.Form):
 class IndemnificationAddForm(BaseRockyForm):
     may_scan = forms.CharField(
         label=_(
-            "I declare that KAT may scan the assets of my organization and "
+            "I declare that OpenKAT may scan the assets of my organization and "
             "that I have permission to scan these assets. "
             "I am aware of the implications a scan with a higher scan level brings on my systems."
         ),

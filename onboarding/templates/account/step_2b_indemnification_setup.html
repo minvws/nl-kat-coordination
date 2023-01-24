@@ -7,14 +7,15 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{% translate 'KAT setup' %}</h1>
+        <h1>{% translate 'OpenKAT setup' %}</h1>
         {% include 'partials/stepper.html' %}
         <h2>{% translate 'Indemnification setup' %}</h2>
         {% if indemnification_present %}
           <p>
             {% translate "Indemnification on the organization is already present." %}
           </p>
-          <a class="button" href="{% url 'step_account_setup_intro' organization.code %}">{% translate 'Continue' %}</a>
+          <a class="button"
+             href="{% url 'step_account_setup_intro' organization.code %}">{% translate 'Continue' %}</a>
         {% else %}
           {% include 'partials/form/indemnification_add_form.html' %}
         {% endif %}

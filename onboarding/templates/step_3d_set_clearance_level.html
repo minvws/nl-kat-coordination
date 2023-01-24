@@ -7,7 +7,7 @@
   <main id="main-content" class="explanation-page">
     <section>
       <div>
-        <h1>{% translate 'KAT Introduction' %}</h1>
+        <h1>{% translate 'OpenKAT Introduction' %}</h1>
         {% include 'partials/stepper.html' %}
         <h2>{% translate 'Setup - Set clearance level for example.org' %}</h2>
         <h3>{% translate 'Introduction' %}</h3>
@@ -15,7 +15,7 @@
           {% blocktranslate trimmed %}
             Some scans are lightweight while others might be a bit
             more agressive with their scanning.
-            KAT requires you to set a clearance level
+            OpenKAT requires you to set a clearance level
             for each object to prevent you from unintentionally
             running agressive scans. For example you might have the
             right to run any type of scan on your own server but you
@@ -26,7 +26,7 @@
         <h3>{% translate 'How to know required clearance level' %}</h3>
         <p>
           {% blocktranslate trimmed %}
-            Each plugin that scans will have a scan intesity score. The intesity of the scan must be equal to or below the clearance level you set for your object. If the scan has an intesity level that is too high, KAT will notify you before running it. Visually clearance levels and intesity scores are indicated with little cat paws.
+            Each plugin that scans will have a scan intesity score. The intesity of the scan must be equal to or below the clearance level you set for your object. If the scan has an intesity level that is too high, OpenKAT will notify you before running it. Visually clearance levels and intesity scores are indicated with little cat paws.
           {% endblocktranslate %}
         </p>
         <div id="id_boefjes" class="column-4 plugins tiles images-cover">{% include 'partials/boefje_tile_static.html' %}</div>
@@ -51,7 +51,7 @@
         <h3>{% translate 'Setting and changing your clearance level' %}</h3>
         <p>
           {% blocktranslate trimmed %}
-            After creating a new object KAT will ask you to set a clearance level.
+            After creating a new object OpenKAT will ask you to set a clearance level.
             On the object detail page you can always change the clearance level.
             For the onboarding we will suggest to set the clearance level to L2.
           {% endblocktranslate %}

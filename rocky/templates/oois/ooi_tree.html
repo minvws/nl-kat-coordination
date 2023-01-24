@@ -14,9 +14,9 @@
         {% include 'partials/ooi_list_filters.html' with title=filter_title ooi_id=ooi.primary_key %}
 
         {% if tree_view == 'table' %}
-          {% include "partials/elements/ooi_tree_table.html" with list=tree %}
+          {% include "partials/elements/ooi_tree_table.html" with list=tree ooi_id=ooi.primary_key %}
         {% else %}
-          {% include "partials/elements/ooi_tree_condensed_table.html" with list=tree %}
+          {% include "partials/elements/ooi_tree_condensed_table.html" with list=tree ooi_id=ooi.primary_key %}
         {% endif %}
 
         {% include 'partials/ooi_tree_toolbar_bottom.html' with  ooi_id=ooi.primary_key %}

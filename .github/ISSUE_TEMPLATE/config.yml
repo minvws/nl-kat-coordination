@@ -1,13 +1,13 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Public KAT coordination repository
+  - name: Public OpenKAT coordination repository
     url: https://github.com/minvws/nl-kat-coordination
-  - name: Public KAT security issue reporting
+  - name: Public OpenKAT security issue reporting
     url: https://github.com/underdarknl
     about: If you find any serious security issues, please contact Jan Klopper (@underdarknl) directly and do NOT create a public issue.
-  - name: Public KAT security policy
+  - name: Public OpenKAT security policy
     url: https://github.com/minvws/nl-kat-coordination/security/policy
-  - name: Public KAT code of conduct
+  - name: Public OpenKAT code of conduct
     url: https://github.com/minvws/.github/blob/master/CODE_OF_CONDUCT.md
-  - name: Public KAT contributor agreement
+  - name: Public OpenKAT contributor agreement
     url: https://github.com/minvws/.github/blob/master/CONTRIBUTING.md
