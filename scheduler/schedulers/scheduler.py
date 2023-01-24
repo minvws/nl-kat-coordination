@@ -177,12 +177,15 @@ class Scheduler(abc.ABC):
             )
             raise exc
 
-        self.logger.debug(
-            "Pushed item to queue %s [queue_id=%s, qsize=%d, item=%s]",
+        self.logger.info(
+            "Pushed item (%s) to queue %s with priority %s [p_item.id=%s, p_item.hash=%s, queue.pq_id=%s, queue.qsize=%d]",
+            p_item.id,
             self.queue.pq_id,
+            p_item.priority,
+            p_item.id,
+            p_item.hash,
             self.queue.pq_id,
             self.queue.qsize(),
-            p_item,
         )
 
         self.post_push(p_item)
@@ -223,15 +226,6 @@ class Scheduler(abc.ABC):
                 raise exc
 
             count += 1
-
-        if count > 0:
-            self.logger.info(
-                "Added %d items to queue: %s [queue_id=%s, count=%d]",
-                count,
-                self.queue.pq_id,
-                self.queue.pq_id,
-                count,
-            )
 
     def run_in_thread(
         self,
