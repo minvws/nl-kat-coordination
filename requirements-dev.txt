@@ -2,7 +2,7 @@ ares==0.7.1
 asgiref==3.5.2
 beautifulsoup4==4.11.1
 certifi==2022.12.7
-chardet==4.0.0
+chardet==5.1.0
 cwe==1.6
 Django==3.2.16
 django-formtools==2.4
