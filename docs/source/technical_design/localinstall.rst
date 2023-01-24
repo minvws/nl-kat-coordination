@@ -23,7 +23,7 @@ Before installing
 Install Docker
 **************
 
-OpenKAT is installed in Docker, and therefore Docker must be installed first. You should use a repository if one is available for your operating system. For all the installation steps and more information, see the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_, which contains links to installation pages for all major Linux distributions. 
+OpenKAT is installed in Docker, and therefore Docker must be installed first. You should use a repository if one is available for your operating system. For all the installation steps and more information, see the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_, which contains links to installation pages for all major Linux distributions.
 
 **Important:** Please follow the post-installation steps as well! You can find them here: `Docker Engine post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/>`_.
 
