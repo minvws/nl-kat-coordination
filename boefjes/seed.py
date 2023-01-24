@@ -9,13 +9,6 @@ def main():
     session = sessionmaker(bind=get_engine())()
 
     try:
-        session.add(OrganisationInDB(id="_dev", name="Development Organisation"))
-        session.commit()
-    except IntegrityError:
-        session.rollback()
-        print("Organisation Present")
-
-    try:
         session.add(RepositoryInDB(id="LOCAL", name="Local Plugin Repository", base_url="http://dev/null"))
         session.commit()
     except IntegrityError:
