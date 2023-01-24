@@ -2,14 +2,14 @@ import datetime
 from typing import Iterator, List
 
 from octopoes.models import OOI
-from octopoes.models.ooi.certificate import Certificate
+from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.findings import KATFindingType, Finding
 from octopoes.models.ooi.web import Website
 
 THRESHOLD = datetime.timedelta(weeks=2)
 
 
-def run(input_ooi: Certificate, additional_oois: List[Website]) -> Iterator[OOI]:
+def run(input_ooi: X509Certificate, additional_oois: List[Website]) -> Iterator[OOI]:
     # only applies to OOIs referencing the certificate
     if additional_oois:
         if input_ooi.expired:

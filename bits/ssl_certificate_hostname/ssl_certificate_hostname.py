@@ -2,7 +2,7 @@ from typing import List, Iterator, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.certificate import (
-    Certificate,
+    X509Certificate,
     SubjectAlternativeNameHostname,
 )
 from octopoes.models.ooi.findings import KATFindingType, Finding
@@ -10,7 +10,7 @@ from octopoes.models.ooi.web import Website
 
 
 def run(
-    input_ooi: Certificate,
+    input_ooi: X509Certificate,
     additional_oois: List[Union[Website, SubjectAlternativeNameHostname]],
 ) -> Iterator[OOI]:
 

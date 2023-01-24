@@ -15,8 +15,8 @@ class AlgorithmType(Enum):
     ECC = "ECC"
 
 
-class Certificate(OOI):
-    object_type: Literal["Certificate"] = "Certificate"
+class X509Certificate(OOI):
+    object_type: Literal["X509Certificate"] = "X509Certificate"
 
     subject: str
     issuer: Optional[str]
@@ -26,7 +26,7 @@ class Certificate(OOI):
     pk_size: Optional[int]
     pk_number: Optional[str]
     signed_by: Optional[Reference] = ReferenceField(
-        "Certificate", max_issue_scan_level=1, max_inherit_scan_level=0, default=None
+        "X509Certificate", max_issue_scan_level=1, max_inherit_scan_level=0, default=None
     )
     serial_number: str
     expires_in: Optional[timedelta]
@@ -47,7 +47,7 @@ class Certificate(OOI):
 
 
 class SubjectAlternativeName(OOI):
-    certificate: Reference = ReferenceField(Certificate)
+    certificate: Reference = ReferenceField(X509Certificate)
 
     _natural_key_attrs = ["certificate"]
 
@@ -85,7 +85,7 @@ class SubjectAlternativeNameQualifier(SubjectAlternativeName):
         return reference.tokenized.name
 
 
-Certificate.update_forward_refs()
+X509Certificate.update_forward_refs()
 SubjectAlternativeNameHostname.update_forward_refs()
 SubjectAlternativeNameIP.update_forward_refs()
 SubjectAlternativeNameQualifier.update_forward_refs()

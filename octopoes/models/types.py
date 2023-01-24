@@ -6,7 +6,7 @@ from pydantic.fields import ModelField
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
-    Certificate,
+    X509Certificate,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
@@ -58,7 +58,7 @@ from octopoes.models.ooi.web import (
 )
 
 CertificateType = Union[
-    Certificate,
+    X509Certificate,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
