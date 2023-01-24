@@ -151,7 +151,6 @@ class LocalPluginRepository:
         def_file = normalizer.path / "normalizer.json"
         def_obj = json.loads(def_file.read_text())
         def_obj["repository_id"] = LocalPluginRepository.RESERVED_ID
-        def_obj["produces"] = []
 
         return Normalizer.parse_obj(def_obj)
 
