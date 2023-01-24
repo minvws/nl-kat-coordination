@@ -5,6 +5,11 @@
     "api_key": {
       "title": "Api Key",
       "maxLength": 128,
+      "type": "integer"
+    },
+    "optional_key": {
+      "title": "Optional Key",
+      "maxLength": 128,
       "type": "string"
     }
   },
