@@ -10,6 +10,24 @@ from urllib.parse import urlparse, urlunsplit
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 
 
+ALLOWED_CONTENT_TYPES = [
+    "application/ld+json",
+    "application/json",
+    "image/jpeg",
+    "image/jpg",
+    "image/gif",
+    "image/png",
+    "image/bpm",
+    "image/ico",
+    "text/html",
+    "text/plain",
+    "text/css",
+    "text/csv",
+    "text/javascript",
+    "text/xml",
+]
+
+
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     useragent = getenv("useragent", default="OpenKAT")
@@ -47,30 +65,14 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         return [({"openkat-http/error"}, str(request_error))]
 
     if "content-type" in response.headers:
-        allowed_content_types = [
-            "application/ld+json",
-            "application/json",
-            "image/jpeg",
-            "image/jpg",
-            "image/gif",
-            "image/png",
-            "image/bpm",
-            "image/ico",
-            "text/html",
-            "text/plain",
-            "text/css",
-            "text/csv",
-            "text/javascript",
-            "text/xml",
-        ]
-        content_type = response.headers.get("content-type")
+        content_type = response.headers["content-type"]
 
-        if content_type in allowed_content_types:
+        if content_type in ALLOWED_CONTENT_TYPES:
             body_mimetypes.add(content_type)
 
         # Pick up the content type for the body from the server and split away encodings to make normalization easier
         content_type = content_type.split(";")
-        if content_type[0] in allowed_content_types:
+        if content_type[0] in ALLOWED_CONTENT_TYPES:
             body_mimetypes.add(content_type[0])
 
     return [

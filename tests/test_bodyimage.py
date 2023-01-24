@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+
 from requests.models import Response, CaseInsensitiveDict
 from unittest import TestCase, mock
 from unittest.mock import MagicMock
@@ -86,3 +87,10 @@ class WebsiteAnalysisTest(TestCase):
         output = runner.run(meta, get_dummy_data("download_body"))
 
         self.assertEqual(4, len(output))
+
+        output_dicts = sorted([o.dict() for o in output], key=lambda x: x["primary_key"])
+
+        self.assertEqual("URL|internet|http://placekitten.com/600/600", output_dicts[0]["primary_key"])
+        self.assertEqual("URL|internet|http://placekitten.com/600/600.webp", output_dicts[1]["primary_key"])
+        self.assertEqual("URL|internet|https://mispo.es/600/600", output_dicts[2]["primary_key"])
+        self.assertEqual("URL|internet|https://mispo.es/600/600.webp", output_dicts[3]["primary_key"])
