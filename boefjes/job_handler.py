@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Any, List, Dict, Set
 
 import requests
+from octopoes.connector import RemoteException
 
 from octopoes.models.types import OOIType
 from pydantic.tools import parse_obj_as
@@ -176,14 +177,8 @@ class NormalizerHandler(Handler):
 
         try:
             results = self.job_runner.run(normalizer_meta, raw)
-        except Exception as exc:
-            logger.exception(f"Normalizer {normalizer_meta=} failed")
-            raise exc
+            connector = get_octopoes_api_connector(normalizer_meta.raw_data.boefje_meta.organization)
 
-        normalizer_meta.ended_at = datetime.now(timezone.utc)
-        connector = get_octopoes_api_connector(normalizer_meta.raw_data.boefje_meta.organization)
-
-        try:
             for observation in results.observations:
                 reference = Reference.from_str(observation.input_ooi)
                 connector.save_observation(
@@ -205,15 +200,17 @@ class NormalizerHandler(Handler):
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )
                 )
-        except Exception as exc:
+        except Exception:
+            logger.exception(f"Normalizer {normalizer_meta=} failed")
+        except (RequestException, ObjectNotFoundException, RemoteException):
             logger.exception(f"Error saving results to Octopoes, {normalizer_meta=}")
-            raise exc
+        finally:
+            normalizer_meta.ended_at = datetime.now(timezone.utc)
 
         try:
             bytes_api_client.save_normalizer_meta(normalizer_meta)
-        except Exception as exc:
+        except Exception:
             logger.exception(f"Error while handling a normalizer job, {normalizer_meta=}")
-            raise exc
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 

@@ -1,6 +1,6 @@
 import hashlib
 from datetime import datetime, timedelta
-from typing import Dict, Optional, List, Union
+from typing import Dict, Optional, List, Union, Literal
 
 from pydantic import BaseModel, Field, validator, Extra
 
@@ -100,13 +100,13 @@ class NormalizerPlainOOI(BaseModel):  # Validation of plain OOIs being returned 
 
 
 class NormalizerObservation(BaseModel):
-    type: str = "observation"
+    type: Literal["observation"] = "observation"
     input_ooi: str
     results: List[NormalizerPlainOOI]
 
 
 class NormalizerDeclaration(BaseModel):
-    type: str = "declaration"
+    type: Literal["declaration"] = "declaration"
     ooi: NormalizerPlainOOI
 
 
