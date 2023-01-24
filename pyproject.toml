@@ -54,7 +54,7 @@ dnspython = "^2.2.1"
 kombu = "^5.2.4"
 celery = "^5.2.7"
 pyparsing = "^3.0.9"
-packaging = "^21.3"
+packaging = "^23.0"
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"
