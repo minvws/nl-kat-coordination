@@ -1,4 +1,5 @@
 import json
+import mimetypes
 from typing import Tuple, Union, List
 from boefjes.job_models import BoefjeMeta
 
@@ -10,22 +11,7 @@ from urllib.parse import urlparse, urlunsplit
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 
 
-ALLOWED_CONTENT_TYPES = [
-    "application/ld+json",
-    "application/json",
-    "image/jpeg",
-    "image/jpg",
-    "image/gif",
-    "image/png",
-    "image/bpm",
-    "image/ico",
-    "text/html",
-    "text/plain",
-    "text/css",
-    "text/csv",
-    "text/javascript",
-    "text/xml",
-]
+ALLOWED_CONTENT_TYPES = mimetypes.types_map.values()
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
