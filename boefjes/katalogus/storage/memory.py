@@ -74,10 +74,10 @@ class SettingsStorageMemory(SettingsStorage):
         return {k.split(".", maxsplit=1)[1]: v for k, v in self._data[organisation_id].items() if plugin_id in k}
 
     def create(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
-        self._data[organisation_id][f"{plugin_id}.{key}"] = value
+        self._data[organisation_id][f"{plugin_id}.{key}"] = str(value)
 
     def update_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
-        self._data[organisation_id][f"{plugin_id}.{key}"] = value
+        self._data[organisation_id][f"{plugin_id}.{key}"] = str(value)
 
     def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
         del self._data[organisation_id][f"{plugin_id}.{key}"]
