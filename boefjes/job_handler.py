@@ -138,10 +138,11 @@ class BoefjeHandler(Handler):
         try:
             boefje_meta.started_at = datetime.now(timezone.utc)
             boefje_results = self.job_runner.run(boefje_meta, environment)
-            boefje_meta.ended_at = datetime.now(timezone.utc)
         except Exception as exc:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id, exc_info=True)
             boefje_results = [({"error/boefje"}, str(exc))]
+        finally:
+            boefje_meta.ended_at = datetime.now(timezone.utc)
 
         logger.info("Saving to Bytes")
 
