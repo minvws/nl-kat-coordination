@@ -31,11 +31,10 @@ class KATalogusClientV1:
         self.organization = organization
         self.organization_uri = f"{base_uri}/v1/organisations/{organization}"
 
-    def organization_exists(self):
+    def organization_exists(self) -> bool:
         response = requests.get(f"{self.organization_uri}")
 
-        if response.status_code == 404:
-            return False
+        return response.status_code != 404
 
     def create_organization(self, name: str):
         response = requests.post(f"{self.base_uri}/v1/organisations/", json={"id": self.organization, "name": name})

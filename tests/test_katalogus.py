@@ -27,13 +27,22 @@ def test_katalogus_plugin_listing(my_user, rf, organization, mocker):
     assertNotContains(response, "test_binary_edge_normalizer")
 
 
-def test_katalogus_client_organization_exists(mocker):
+def test_katalogus_client_organization_not_exists(mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_requests.get().status_code = 404
 
     client = KATalogusClientV1("test", "test")
 
     assert client.organization_exists() is False
+
+
+def test_katalogus_client_organization_exists(mocker):
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests.get().status_code = 200
+
+    client = KATalogusClientV1("test", "test")
+
+    assert client.organization_exists() is True
 
 
 def test_katalogus_client(mocker):
