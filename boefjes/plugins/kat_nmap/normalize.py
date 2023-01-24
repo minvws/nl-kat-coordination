@@ -1,8 +1,8 @@
+import logging
 from typing import Iterator, Union
-
-from libnmap.objects import NmapHost, NmapService, NmapReport
+from libnmap.objects import NmapHost, NmapService
 from libnmap.parser import NmapParser
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import (
     IPAddressV6,
     IPPort,
@@ -16,48 +16,59 @@ from octopoes.models.ooi.service import Service, IPService
 from boefjes.job_models import NormalizerMeta
 
 
-def get_ports_and_service(host: NmapHost) -> Iterator[OOI]:
-    internet = Network(name="internet")
-    yield internet
-
-    ip = (
-        IPAddressV4(network=internet.reference, address=host.address)
-        if host.ipv4
-        else IPAddressV6(network=internet.reference, address=host.address)
-    )
-    yield ip
-
-    for port, protocol in host.get_open_ports():
-        service: NmapService = host.get_service(port, protocol)
-
-        # If service is tcpwrapped we should consider the port closed
-        if service.service == "tcpwrapped":
-            continue
-
-        ip_port = IPPort(
-            address=ip.reference,
-            protocol=Protocol(protocol),
-            port=port,
-            state=PortState(service.state),
+def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Reference) -> Iterator[OOI]:
+    """Yields IPs, open ports and services if any ports are open on this host."""
+    open_ports = host.get_open_ports()
+    if open_ports:
+        ip = (
+            IPAddressV4(network=network.reference, address=host.address, netblock=netblock)
+            if host.ipv4
+            else IPAddressV6(network=network.reference, address=host.address, netblock=netblock)
         )
-        yield ip_port
+        yield ip
 
-        service_name = service.service
-        if port == 80:
-            service_name = "http"
-        if port == 443:
-            service_name = "https"
+        for port, protocol in open_ports:
+            service: NmapService = host.get_service(port, protocol)
 
-        port_service = Service(name=service_name)
-        yield port_service
+            # If service is tcpwrapped we should consider the port closed
+            if service.service == "tcpwrapped":
+                continue
 
-        ip_service = IPService(ip_port=ip_port.reference, service=port_service.reference)
-        yield ip_service
+            ip_port = IPPort(
+                address=ip.reference,
+                protocol=Protocol(protocol),
+                port=port,
+                state=PortState(service.state),
+            )
+            yield ip_port
+
+            service_name = service.service
+            if port == 80:
+                service_name = "http"
+            if port == 443:
+                service_name = "https"
+
+            port_service = Service(name=service_name)
+            yield port_service
+
+            ip_service = IPService(ip_port=ip_port.reference, service=port_service.reference)
+            yield ip_service
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+    """Decouple and parse Nmap XMLs and yield relevant network."""
+    # Multiple XMLs are concatenated through "\n\n". XMLs end with "\n"; we split on "\n\n\n".
+    raw = raw.decode().split("\n\n\n")
 
-    parsed: NmapReport = NmapParser.parse_fromstring(raw.decode())
+    # Relevant network object is received from the normalizer_meta.
+    network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
+    yield network
 
-    for host in parsed.hosts:
-        yield from get_ports_and_service(host)
+    netblock_ref = None
+    if "NetBlock" in normalizer_meta.raw_data.boefje_meta.arguments["input"]["object_type"]:
+        netblock_ref = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+
+    logging.info("Parsing %d Nmap-xml(s) for %s.", len(raw), network)
+    for r in raw:
+        for host in NmapParser.parse_fromstring(r).hosts:
+            yield from get_ip_ports_and_service(host=host, network=network, netblock=netblock_ref)

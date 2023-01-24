@@ -2,7 +2,8 @@
     "id": "kat_nmap_normalize",
     "consumes": [
         "nmap",
-        "nmap-ports"
+        "nmap-ports",
+        "nmap-ip-range"
     ],
     "produces": [
         "IPAddressV6",
