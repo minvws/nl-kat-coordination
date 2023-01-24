@@ -33,3 +33,6 @@ disable = ["E0203", "F0401", "R0914", "W1514", "R0903", "E0401"]
 [tool.pytest.ini_options]
 addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
 DJANGO_SETTINGS_MODULE = "rocky.settings"
+
+[tool.coverage.run]
+omit = ["fmea/*"]

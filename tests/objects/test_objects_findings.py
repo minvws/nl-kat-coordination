@@ -1,8 +1,7 @@
-from django.urls import reverse, resolve
 from pytest_django.asserts import assertContains
 
 from octopoes.models.tree import ReferenceTree
-from rocky.views.ooi_tree import OOIGraphView
+from rocky.views.ooi_findings import OOIFindingListView
 from tests.conftest import setup_request
 
 
@@ -27,14 +26,12 @@ TREE_DATA = {
 }
 
 
-def test_ooi_graph(rf, my_user, organization, mock_organization_view_octopoes):
+def test_ooi_finding_list(rf, my_user, organization, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_graph", {"ooi_id": "Network|testnetwork"}), my_user)
-    request.resolver_match = resolve(reverse("ooi_graph", kwargs={"organization_code": organization.code}))
-    response = OOIGraphView.as_view()(request, organization_code=organization.code)
+    request = setup_request(rf.get("finding_list", {"ooi_id": "Network|testnetwork"}), my_user)
+    response = OOIFindingListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 1
-    assertContains(response, "testnetwork")
-    assertContains(response, "KAT-000")
+    assertContains(response, "Add finding")

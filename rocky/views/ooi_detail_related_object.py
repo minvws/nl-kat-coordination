@@ -112,6 +112,11 @@ class OOIRelatedObjectAddView(OOIRelatedObjectManager, OOIFindingManager, Templa
             if existing_ooi_type(ooi_type_choice["ooi_type"]):
                 return redirect(self.ooi_add_url(self.ooi_id, **ooi_type_choice))
 
+        if "status_code" in kwargs:
+            response = super().get(request, *args, **kwargs)
+            response.status_code = kwargs["status_code"]
+            return response
+
         return super().get(request, *args, **kwargs)
 
     def split_ooi_type_choice(self, ooi_type_choice) -> Dict[str, str]:

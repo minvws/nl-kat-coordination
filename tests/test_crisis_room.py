@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from django.urls import reverse, resolve
 from pytest_django.asserts import assertContains
 
@@ -10,11 +12,8 @@ from tests.conftest import setup_request
 
 
 def test_crisis_room(rf, my_user, organization, mock_crisis_room_octopoes):
-    url = reverse("crisis_room")
-    request = rf.get(url)
-    request.resolver_match = resolve(url)
-
-    setup_request(request, my_user)
+    request = setup_request(rf.get("crisis_room"), my_user)
+    request.resolver_match = resolve(reverse("crisis_room"))
 
     mock_crisis_room_octopoes().list.return_value = Paginated[OOIType](
         count=150,
@@ -36,3 +35,19 @@ def test_crisis_room(rf, my_user, organization, mock_crisis_room_octopoes):
     assertContains(response, "1")
 
     assert mock_crisis_room_octopoes().list.call_count == 1
+
+
+def test_crisis_room_observed_at(rf, my_user, organization, mock_crisis_room_octopoes):
+    mock_crisis_room_octopoes().list.return_value = Paginated[OOIType](count=0, items=[])
+
+    request = setup_request(rf.get("crisis_room", {"observed_at": "2021-01-01"}), my_user)
+    request.resolver_match = resolve(reverse("crisis_room"))
+    response = CrisisRoomView.as_view()(request)
+    assert response.status_code == 200
+    assertContains(response, "Jan 01, 2021")
+
+    request = setup_request(rf.get("crisis_room", {"observed_at": "2021-bad-format"}), my_user)
+    request.resolver_match = resolve(reverse("crisis_room"))
+    response = CrisisRoomView.as_view()(request)
+    assert response.status_code == 200
+    assertContains(response, datetime.now(timezone.utc).date().strftime("%b %d, %Y"))

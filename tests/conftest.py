@@ -1,7 +1,7 @@
 from unittest.mock import patch, MagicMock
 
 import pytest
-from django.contrib.auth.models import Permission, ContentType
+from django.contrib.auth.models import Permission, ContentType, Group
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django_otp import DEVICE_ID_SESSION_KEY
@@ -11,6 +11,7 @@ from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 from tools.models import Organization, OrganizationMember, OOIInformation, Indemnification
+from tools.models import GROUP_REDTEAM, GROUP_ADMIN
 
 
 @pytest.fixture
@@ -59,8 +60,24 @@ def my_user(user, organization):
 
 
 @pytest.fixture
+def my_red_teamer(my_user, organization):
+    group = Group.objects.create(name=GROUP_ADMIN)
+    group.user_set.add(my_user)
+
+    group = Group.objects.create(name=GROUP_REDTEAM)
+    group.user_set.add(my_user)
+
+    return my_user
+
+
+@pytest.fixture
 def mock_models_katalogus(mocker):
     return mocker.patch("tools.models.get_katalogus")
+
+
+@pytest.fixture
+def mock_views_katalogus(mocker):
+    return mocker.patch("rocky.views.ooi_report.get_katalogus")
 
 
 @pytest.fixture

@@ -25,16 +25,6 @@ class ScanProfileDetailView(OOIDetailView, FormView):
     template_name = "scan_profiles/scan_profile_detail.html"
     form_class = SetClearanceLevelForm
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
-        breadcrumbs = super().build_breadcrumbs()
-        breadcrumbs.append(
-            {
-                "url": get_ooi_url("scan_profile_detail", self.ooi.primary_key, self.organization.code),
-                "text": _("Scan profile"),
-            }
-        )
-        return breadcrumbs
-
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
@@ -46,7 +36,7 @@ class ScanProfileDetailView(OOIDetailView, FormView):
 
     def post(self, request, *args, **kwargs):
         if not self.indemnification_present:
-            return self.get(request, *args, **kwargs)
+            return self.get(request, status_code=403, *args, **kwargs)
 
         super().post(request, *args, **kwargs)
         form = self.get_form()

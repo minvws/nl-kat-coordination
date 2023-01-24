@@ -1,86 +1,117 @@
 [
   {
+    "id": "binaryedge",
+    "repository_id": "LOCAL",
     "name": "BinaryEdge",
-    "module": "kat_binaryedge.scan",
+    "version": null,
+    "authors": null,
+    "created": null,
     "description": "Use BinaryEdge to find open ports with vulnerabilities that are found on that port",
-    "consumes": ["IPAddressV4", "IPAddressV6"],
+    "environment_keys": [
+      "BINARYEDGE_API"
+    ],
+    "related": null,
+    "enabled": true,
+    "type": "boefje",
+    "scan_level": 2,
+    "consumes": [
+      "IPAddressV6",
+      "IPAddressV4"
+    ],
+    "options": null,
     "produces": [
-      "IPService",
-      "IPPort",
       "KATFindingType",
       "SoftwareInstance",
-      "Software",
-      "Finding",
       "Service",
-      "CVEFindingType"
-    ],
-    "dispatches": {
-      "normalizers": [
-        "kat_binaryedge.normalizers.containers",
-        "kat_binaryedge.normalizers.databases",
-        "kat_binaryedge.normalizers.http_web",
-        "kat_binaryedge.normalizers.message_queues",
-        "kat_binaryedge.normalizers.protocols",
-        "kat_binaryedge.normalizers.remote_desktop",
-        "kat_binaryedge.normalizers.service_identification",
-        "kat_binaryedge.normalizers.services"
-      ],
-      "boefjes": []
-    },
-    "image": null
-  },
-  {
-    "name": "Check HTTP Headers",
-    "module": "kat_check_header.check_header",
-    "description": "Checks HTTP header for vulnerabilities",
-    "consumes": ["HTTPHeader"],
-    "produces": ["Finding", "KATFindingType"],
-    "dispatches": {
-      "normalizers": ["kat_check_header.normalize"],
-      "boefjes": []
-    },
-    "image": null
-  },
-  {
-    "name": "Nmap UDP (Full)",
-    "module": "kat_nmap.scan",
-    "description": "Scan all UDP ports. Including service detection",
-    "consumes": ["IPAddressV4", "IPAddressV6"],
-    "produces": [
-      "IPService",
-      "IPAddressV6",
       "IPPort",
-      "IPAddressV4",
-      "Service"
-    ],
-    "dispatches": {
-      "normalizers": ["kat_nmap.normalize"],
-      "boefjes": []
-    },
-    "image": null
+      "Finding",
+      "Software",
+      "IPService",
+      "CVEFindingType"
+    ]
   },
   {
+    "id": "ssl-certificates",
+    "repository_id": "LOCAL",
     "name": "SSLCertificates",
-    "module": "kat_ssl_certificates.scan",
+    "version": null,
+    "authors": null,
+    "created": null,
     "description": "Scan SSL certificates of websites",
-    "consumes": ["Website"],
-    "produces": ["Certificate"],
-    "dispatches": {
-      "normalizers": ["kat_ssl_certificates.normalize"],
-      "boefjes": []
-    },
-    "image": "static/assets/kat_ssl_certificates/cover.jpg"
+    "environment_keys": [],
+    "related": null,
+    "enabled": false,
+    "type": "boefje",
+    "scan_level": 1,
+    "consumes": [
+      "Website"
+    ],
+    "options": null,
+    "produces": [
+      "Certificate"
+    ]
   },
   {
+    "id": "ssl-version",
+    "repository_id": "LOCAL",
     "name": "SSLScan",
-    "module": "kat_ssl_scan.scan",
+    "version": null,
+    "authors": null,
+    "created": null,
     "description": "Scan SSL/TLS versions of websites",
-    "consumes": ["Website"],
-    "produces": ["Finding", "KATFindingType"],
-    "dispatches": {
-      "normalizers": ["kat_ssl_scan.normalize"],
-      "boefjes": []
-    },
-    "image": null
+    "environment_keys": [],
+    "related": null,
+    "enabled": false,
+    "type": "boefje",
+    "scan_level": 2,
+    "consumes": [
+      "Website"
+    ],
+    "options": null,
+    "produces": [
+      "KATFindingType",
+      "Finding"
+    ]
+  },
+  {
+    "id": "wp-scan",
+    "repository_id": "LOCAL",
+    "name": "WPScantest",
+    "version": null,
+    "authors": null,
+    "created": null,
+    "description": "Scan wordpress sites",
+    "environment_keys": [
+      "WP_SCAN_API"
+    ],
+    "related": null,
+    "enabled": false,
+    "type": "boefje",
+    "scan_level": 2,
+    "consumes": [
+      "SoftwareInstance"
+    ],
+    "options": null,
+    "produces": [
+      "Finding",
+      "CVEFindingType"
+    ]
+  },
+  {
+    "id": "kat_binaryedge_containers",
+    "repository_id": "LOCAL",
+    "name": "test_binary_edge_normalizer",
+    "version": null,
+    "authors": null,
+    "created": null,
+    "description": null,
+    "environment_keys": [],
+    "related": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "binaryedge"
+    ],
+    "produces": []
   }
 ]

@@ -80,7 +80,6 @@ class OOIListView(BaseOOIListView):
         return self.get(request, status=404, *args, **kwargs)
 
     def _set_scan_profiles(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
-
         scan_profile = request.POST.get("scan-profile")
 
         level = SCAN_LEVEL[scan_profile]
@@ -118,7 +117,7 @@ class OOIListView(BaseOOIListView):
 
         for ooi_reference in selected_oois:
             try:
-                self.raise_clearance_level(ooi_reference, level.value)
+                self.raise_clearance_level(Reference.from_str(ooi_reference), level.value)
             except (RequestException, RemoteException, ConnectionError):
                 messages.add_message(
                     request, messages.ERROR, _("An error occurred while saving clearance level for %s.") % ooi_reference

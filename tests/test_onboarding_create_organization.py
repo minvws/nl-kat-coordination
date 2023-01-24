@@ -1,4 +1,4 @@
-from django.urls import reverse, resolve
+from django.urls import reverse
 from pytest_django.asserts import assertContains
 from requests import HTTPError
 
@@ -7,12 +7,7 @@ from tests.conftest import setup_request
 
 
 def test_onboarding_create_organization(rf, my_user, mock_models_katalogus, mock_models_octopoes):
-    url = reverse("step_organization_setup")
-    request = rf.post(url, {"name": "Test Organization", "code": "test"})
-    request.resolver_match = resolve(url)
-
-    setup_request(request, my_user)
-
+    request = setup_request(rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), my_user)
     mock_models_katalogus().organization_exists.return_value = False
 
     response = OnboardingOrganizationSetupView.as_view()(request)
@@ -21,11 +16,7 @@ def test_onboarding_create_organization(rf, my_user, mock_models_katalogus, mock
 
 
 def test_onboarding_create_organization_already_exist_katalogus(rf, user, mock_models_katalogus, mock_models_octopoes):
-    url = reverse("step_organization_setup")
-    request = rf.post(url, {"name": "Test Organization", "code": "test"})
-    request.resolver_match = resolve(url)
-
-    setup_request(request, user)
+    request = setup_request(rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), user)
 
     mock_models_katalogus().organization_exists.return_value = True
     mock_models_katalogus().create_organization.side_effect = HTTPError()

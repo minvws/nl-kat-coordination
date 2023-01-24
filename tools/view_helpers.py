@@ -1,11 +1,8 @@
 import uuid
 from datetime import date, datetime, timezone
-from enum import Enum
-from typing import List, TypedDict, Dict, Any
+from typing import List, TypedDict
 from urllib.parse import urlparse, urlunparse, urlencode
 
-from django.contrib import messages
-from django.http import QueryDict
 from django.urls.base import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -56,11 +53,11 @@ def url_with_querystring(path, **kwargs) -> str:
 
 def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
     kwargs["ooi_id"] = ooi_id
-    # exclude in querystring
-    kwargs = {k: v for k, v in kwargs.items()}
 
     if "query" in kwargs:
+        kwargs["query"] = {key: value for key, value in kwargs["query"] if key not in kwargs}
         kwargs.update(kwargs["query"])
+
         del kwargs["query"]
 
     return url_with_querystring(reverse(routename, kwargs={"organization_code": organization_code}), **kwargs)
@@ -87,44 +84,6 @@ class BreadcrumbsMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = self.build_breadcrumbs()
-        return context
-
-
-class PageActionMixin:
-    class PageActions(Enum):
-        pass
-
-    def is_allowed_page_action(self, page_action: str) -> bool:
-        return page_action in [item.value for item in self.PageActions]
-
-    def handle_page_action(self, page_action: str) -> None:
-        if not self.is_allowed_page_action(page_action):
-            messages.add_message(self.request, messages.WARNING, f"Action not allowed: {page_action}")
-            return self.get(self.request)
-
-        # Does the page_action exist?
-        if not hasattr(self, page_action):
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                f"Action not implemented: {page_action}",
-            )
-            return self.get(self.request)
-
-        try:
-            getattr(self, page_action)(self.get_page_action_args(page_action))
-        except Exception as e:
-            messages.add_message(self.request, messages.ERROR, f"{page_action} failed: '{e}'")
-
-    def get_page_action_args(self, page_action) -> QueryDict:
-        return self.request.POST
-
-    def get_page_actions(self) -> List[Dict[str, bool]]:
-        return [{page_action.value: self.is_allowed_page_action(page_action)} for page_action in self.PageActions]
-
-    def get_context_data(self, **kwargs) -> Dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["page_actions"] = self.get_page_actions()
         return context
 
 
@@ -162,7 +121,6 @@ class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
 
 class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
     def build_breadcrumbs(self):
-
         breadcrumbs = [
             {
                 "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),

@@ -2,13 +2,10 @@ from logging import getLogger
 from typing import List
 from uuid import uuid4
 
-from django.contrib import messages
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
-from requests import HTTPError
 
 from account.mixins import OrganizationView
-from katalogus.client import get_katalogus
+from katalogus.client import get_katalogus, Plugin
 from octopoes.models import OOI
 from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
 from rocky.scheduler import Boefje, BoefjeTask, QueuePrioritizedItem, client
@@ -39,7 +36,7 @@ class BoefjeMixin(OctopoesView):
     this mixin provides the methods to construct the boefjes for the OOI's and run them.
     """
 
-    def run_boefje(self, katalogus_boefje: Boefje, ooi: OOI) -> None:
+    def run_boefje(self, katalogus_boefje: Plugin, ooi: OOI) -> None:
 
         boefje_queue_name = f"boefje-{self.organization.code}"
 
@@ -67,7 +64,7 @@ class BoefjeMixin(OctopoesView):
 
     def run_boefje_for_oois(
         self,
-        boefje: Boefje,
+        boefje: Plugin,
         oois: List[OOI],
     ) -> None:
 
@@ -78,37 +75,3 @@ class BoefjeMixin(OctopoesView):
                 except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
                     continue
             self.run_boefje(boefje, ooi)
-
-    def scan(self, view_args) -> None:
-        if "ooi" not in view_args:
-            return
-
-        if "boefje_id" not in view_args:
-            return
-
-        boefje_id = view_args.get("boefje_id")
-        boefje = self.get_boefje(boefje_id)
-
-        if not boefje.enabled:
-            messages.add_message(
-                self.request,
-                messages.WARNING,
-                _("Trying to run disabled boefje '{boefje_id}'.").format(boefje_id=boefje_id),
-            )
-            return
-
-        ooi_ids = view_args.getlist("ooi")
-        oois = [self.get_single_ooi(pk=ooi_id) for ooi_id in ooi_ids]
-
-        try:
-            self.run_boefje_for_oois(boefje, oois)
-        except HTTPError:
-            return
-
-        success_message = _(
-            "Your scan is running successfully in the background. \n "
-            "Results will be added to the object list when they are in. "
-            "It may take some time, a refresh of the page may be needed to show the results."
-        )
-        messages.add_message(self.request, messages.SUCCESS, success_message)
-        return
