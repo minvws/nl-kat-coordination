@@ -206,3 +206,23 @@ class TestPluginsService(TestCase):
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertFalse(plugin.enabled)
+
+    def test_adding_integer_settings_with_faulty_value_given_constraints(self):
+        plugin_id = "kat_test_2"
+
+        self.service.settings_storage.update_by_key("api_key", "24", self.organisation, plugin_id)
+
+        with self.assertRaises(SettingsNotConformingToSchema) as ctx:
+            self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
+
+        self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
+
+        self.service.settings_storage.update_by_key("api_key", 24, self.organisation, plugin_id)  # Will become a string
+
+        with self.assertRaises(SettingsNotConformingToSchema) as ctx:
+            self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
+
+        self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
+
+        plugin = self.service.by_plugin_id(plugin_id, self.organisation)
+        self.assertFalse(plugin.enabled)
