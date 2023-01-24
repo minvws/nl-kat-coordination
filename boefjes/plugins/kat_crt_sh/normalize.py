@@ -3,7 +3,7 @@ import json
 from typing import Iterator, Union
 from dateutil.parser import parse
 from octopoes.models import OOI
-from octopoes.models.ooi.certificate import Certificate
+from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 
@@ -36,7 +36,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 unique_domains.add(name)
 
         # todo: yield only current certs?
-        yield Certificate(
+        yield X509Certificate(
             subject=common_name,
             issuer=certificate["issuer_name"],
             valid_from=certificate["not_before"],

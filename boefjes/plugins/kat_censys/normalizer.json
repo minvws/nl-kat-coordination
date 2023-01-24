@@ -5,7 +5,7 @@
     ],
     "produces": [
         "IPPort",
-        "Certificate",
+        "X509Certificate",
         "SoftwareInstance",
         "ResolvedHostname",
         "HTTPHeader"

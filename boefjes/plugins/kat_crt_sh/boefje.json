@@ -7,7 +7,7 @@
     ],
     "produces": [
         "Hostname",
-        "Certificate"
+        "X509Certificate"
     ],
     "environment_keys": [],
     "scan_level": 1

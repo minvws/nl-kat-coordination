@@ -168,9 +168,6 @@ class NormalizerHandler(Handler):
             results = self.job_runner.run(normalizer_meta, raw)
             normalizer_meta.ended_at = now()
 
-            input_ooi = normalizer_meta.raw_data.boefje_meta.input_ooi
-            results = list(filter(lambda r: r.reference != input_ooi, results))
-
             reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
             observation = Observation(
                 method=normalizer_meta.normalizer.id,
