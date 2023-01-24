@@ -30,7 +30,7 @@ class BoefjeMeta(BaseModel):
 
     id: str
     boefje: Boefje
-    input_ooi: str
+    input_ooi: Optional[str]
     arguments: Dict[str, Any]
     organization: str
     started_at: Optional[datetime.datetime]
@@ -66,7 +66,7 @@ class BoefjeTask(BaseModel):
 
     id: Optional[str]
     boefje: Boefje
-    input_ooi: str
+    input_ooi: Optional[str]
     organization: str
 
 

@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import List
+from typing import List, Optional
 from uuid import uuid4
 
 from django.urls import reverse
@@ -36,8 +36,7 @@ class BoefjeMixin(OctopoesView):
     this mixin provides the methods to construct the boefjes for the OOI's and run them.
     """
 
-    def run_boefje(self, katalogus_boefje: Plugin, ooi: OOI) -> None:
-
+    def run_boefje(self, katalogus_boefje: Plugin, ooi: Optional[OOI]) -> None:
         boefje_queue_name = f"boefje-{self.organization.code}"
 
         boefje = Boefje(
@@ -54,7 +53,7 @@ class BoefjeMixin(OctopoesView):
         boefje_task = BoefjeTask(
             id=uuid4().hex,
             boefje=boefje,
-            input_ooi=ooi.reference,
+            input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
 
@@ -67,6 +66,8 @@ class BoefjeMixin(OctopoesView):
         boefje: Plugin,
         oois: List[OOI],
     ) -> None:
+        if not oois and not boefje.consumes:
+            self.run_boefje(boefje, None)
 
         for ooi in oois:
             if ooi.scan_profile.level < boefje.scan_level:

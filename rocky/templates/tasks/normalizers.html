@@ -34,9 +34,13 @@
               <tbody>
                 {% for task in object_list %}
                   <tr>
-                    <td>
-                      <a href="{% ooi_url 'ooi_detail' ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
-                    </td>
+                    {% if task.p_item.data.raw_data.boefje_meta.input_ooi %}
+                      <td>
+                        <a href="{% ooi_url 'ooi_detail' ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                      </td>
+                    {% else %}
+                      <td>{% translate 'No input OOI' %}</td>
+                    {% endif %}
                     <td>{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</td>
                     <td>{{ task.p_item.data.normalizer.id }}</td>
                     {% if task.status.value == 'completed' %}

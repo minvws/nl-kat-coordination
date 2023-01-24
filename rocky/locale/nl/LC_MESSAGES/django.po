@@ -4490,6 +4490,10 @@ msgstr "Toon alles"
 msgid "Show tasks"
 msgstr "Toon taken"
 
+#: templates/tasks/boefjes.html:41 templates/tasks/normalizers.html:42
+msgid "No input OOI"
+msgstr "Geen input object"
+
 #: rocky/templates/two_factor/_wizard_actions.html:8
 msgid "Log in"
 msgstr "Inloggen"
