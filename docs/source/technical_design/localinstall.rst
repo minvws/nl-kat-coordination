@@ -13,65 +13,19 @@ Requirements
 You need the following things to install OpenKAT:
 
 - A computer with a Linux installation. In this document we use Ubuntu, but on many other distributions it works in a similar way. Later we will also add instructions for macOS.
-- Docker. If you don't already have this, install it first in Chapter 2.
+- Docker. If you don't already have this, install it first.
 
-- OpenKAT's `GitHub repository: <https://github.com/minvws/nl-kat-coordination/>`_
+- OpenKAT's `GitHub repository <https://github.com/minvws/nl-kat-coordination/>`_.
 
 Before installing
 -----------------
 
-OpenKAT is installed in Docker, and therefore Docker must be installed first. Do this according to the instructions of your (Unix) operating system. You can read the instructions for Ubuntu below. On the `website of Docker <https://docs.docker.com/engine/install/>`_ you will see installation instructions for other distributions.
-
-Docker install
+Install Docker
 **************
 
-Open a terminal of your choice, such as gnome-terminal on Ubuntu.
+OpenKAT is installed in Docker, and therefore Docker must be installed first. You should use a repository if one is available for your operating system. For all the installation steps and more information, see the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_, which contains links to installation pages for all major Linux distributions. 
 
-- We won't assume you have older versions of Docker running, but if you do, you need to uninstall them with the following command:
-
-.. code-block:: sh
-
-	$ sudo apt-get remove docker docker-engine docker.io containerd runc yarnpkg
-
-If apt-get does not run through because of missing packages, try the command again without the name that apt-get stumbled over.
-
-- Then install some required packages that allow *apt* to use packages over HTTPS:
-
-.. code-block:: sh
-
-	$ sudo apt-get install apt-transport-https ca-certificates curl gnupg lsb-release
-
-The packages are checked and updated as needed. If an installation is required, apt asks if you want to continue with the installation ("Do you want to continue?"). Type 'Y' and press enter.
-
--Next add Docker's official GPG key:
-
-.. code-block:: sh
-
-	$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-	$ echo  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-
-- Update your packages and install the latest Docker version:
-
-.. code-block:: sh
-
-	$ sudo apt-get update
-	$ sudo apt-get install docker-ce docker-ce-cli containerd.io
-	$ sudo usermod -aG docker ${USER}
-
-
-When asked if you want to continue the installation, type 'Y' again and press enter.
-
-Install docker-compose
-**********************
-
-Install the latest version of docker-compose and give the tool appropriate permissions with the following two commands:
-
-.. code-block:: sh
-
-	$ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-	$ sudo chmod +x /usr/local/bin/docker-compose
-
+**Important:** Please follow the post-installation steps as well! You can find them here: `Docker Engine post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/>`_.
 
 Install dependencies
 ********************
