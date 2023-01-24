@@ -11,7 +11,7 @@ from dateutil.parser import parse
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
-    Certificate,
+    X509Certificate,
     AlgorithmType,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
@@ -94,7 +94,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
 def read_certificates(
     contents: str, website_reference: Reference
-) -> Tuple[List[Certificate], List[SubjectAlternativeName], List[Hostname]]:
+) -> Tuple[List[X509Certificate], List[SubjectAlternativeName], List[Hostname]]:
     # iterate through the PEM certificates and decode them
     certificates = []
     certificate_subject_alternative_names = []
@@ -132,7 +132,7 @@ def read_certificates(
             pk_algorithm = None
             pk_number = None
 
-        certificate = Certificate(
+        certificate = X509Certificate(
             subject=subject,
             issuer=issuer,
             valid_from=valid_from,
