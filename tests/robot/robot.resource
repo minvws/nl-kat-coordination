@@ -23,17 +23,28 @@ ${SCAN_PROFILE_MUTATION_QUEUE}      _dev__scan_profile_mutations
 
 
 *** Keywords ***
-Insert Origin
+Insert Observation
     [Arguments]    ${origin_file}
     ${norm_output_json}    Get File    ${origin_file}
     ${response}    Post    ${OCTOPOES_URI}/observations    ${norm_output_json}
     Should Be Equal As Integers    ${response.status_code}    200
 
+Insert Declaration
+    [Arguments]    ${origin_file}
+    ${norm_output_json}    Get File    ${origin_file}
+    ${response}    Post    ${OCTOPOES_URI}/declarations    ${norm_output_json}
+    Should Be Equal As Integers    ${response.status_code}    200
+
 Insert Normalizer Output
-    Insert Origin    tests/fixtures/normalizer_output.json
+    Insert Observation    tests/fixtures/normalizer_output.json
 
 Insert Empty Normalizer Output
-    Insert Origin    tests/fixtures/normalizer_output_empty.json
+    Insert Observation    tests/fixtures/normalizer_output_empty.json
+
+Insert Calvin Outputs
+    Insert Declaration    tests/fixtures/calvin_output_1.json
+    Insert Declaration    tests/fixtures/calvin_output_2.json
+    Await Sync
 
 Get Url
     [Arguments]    ${url}

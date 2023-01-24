@@ -1,7 +1,8 @@
+import uuid
 from datetime import datetime
 from typing import Optional, Any, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from octopoes.models import Reference, OOI
 from octopoes.models.datetime import TimezoneAwareDatetime
@@ -40,6 +41,8 @@ class Declaration(BaseModel):
 
     ooi: OOI
     valid_time: datetime
+    method: Optional[str]
+    task_id: Optional[str]
 
 
 class ScanProfileDeclaration(BaseModel):
@@ -61,3 +64,5 @@ class ValidatedDeclaration(BaseModel):
 
     ooi: OOIType
     valid_time: TimezoneAwareDatetime
+    method: Optional[str] = "manual"
+    task_id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))

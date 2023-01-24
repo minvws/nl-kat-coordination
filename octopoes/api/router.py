@@ -204,10 +204,10 @@ def save_declaration(
 ) -> None:
     origin = Origin(
         origin_type=OriginType.DECLARATION,
-        method="manual",
+        method=declaration.method,
         source=declaration.ooi.reference,
         result=[declaration.ooi.reference],
-        task_id=str(uuid.uuid4()),
+        task_id=declaration.task_id,
     )
     octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time)
     xtdb_session_.commit()
