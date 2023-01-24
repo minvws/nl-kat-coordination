@@ -8,4 +8,4 @@ vulture==2.6
 black==22.10.0
 
 # Robot formatter
-robotframework-tidy==3.3.2
+robotframework-tidy==3.3.3
