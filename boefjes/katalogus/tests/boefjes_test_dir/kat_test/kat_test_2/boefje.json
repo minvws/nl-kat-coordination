@@ -6,7 +6,7 @@
         "DNSZone"
     ],
     "produces": [
-        "Certificate",
+        "X509Certificate",
         "Hostname"
     ],
     "environment_keys": [],
