@@ -7,7 +7,7 @@ import mmh3
 import pika
 import requests
 
-from scheduler import context, queues, rankers
+from scheduler import context, models, queues, rankers
 from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
                               Organisation, Plugin, PrioritizedItem,
                               TaskStatus)
@@ -178,7 +178,7 @@ class BoefjeScheduler(Scheduler):
     def push_tasks_for_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the oois that
         boefjes can run on, and create tasks for it.
-        """"
+        """
         if self.queue.full():
             self.logger.info(
                 "Boefjes queue is full, not populating with new tasks [qsize=%d, org_id=%s, scheduler_id=%s]",

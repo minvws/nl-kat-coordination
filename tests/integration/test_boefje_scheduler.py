@@ -3,15 +3,11 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
-from tests.factories import (
-    BoefjeFactory,
-    BoefjeMetaFactory,
-    OOIFactory,
-    OrganisationFactory,
-    PluginFactory,
-    ScanProfileFactory,
-)
+from scheduler import (config, connectors, models, queues, rankers,
+                       repositories, schedulers)
+from tests.factories import (BoefjeFactory, BoefjeMetaFactory, OOIFactory,
+                             OrganisationFactory, PluginFactory,
+                             ScanProfileFactory)
 from tests.utils import functions
 
 
@@ -276,7 +272,48 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertIn("is too intense", cm.output[-1])
 
     # TODO
-    def test_push_tasks_for_new_boefjes(self):
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_new_boefjes_by_org_id")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_oois_by_boefje")
+    def test_push_tasks_for_new_boefjes(
+        self,
+        mock_get_oois_by_boefje,
+        mock_get_new_boefjes_by_org_id,
+        mock_has_grace_period_passed,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
+    ):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mock_is_task_running.return_value = False
+        mock_is_task_allowed_to_run.return_value = True
+        mock_has_grace_period_passed.return_value = True
+        mock_get_new_boefjes_by_org_id = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        mock_get_oois_by_boefje.return_value = [ooi]
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+    def test_push_tasks_for_new_boefjes_no_oois_found(self):
+        """When no ooi's are found for the new boefjes, no tasks should be
+        added to the queue"""
         pass
 
     # TODO
