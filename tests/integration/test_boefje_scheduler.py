@@ -339,8 +339,8 @@ class SchedulerTestCase(unittest.TestCase):
             type="boefje",
             p_item=p_item,
             status=models.TaskStatus.QUEUED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
+            created_at=datetime.utcnow(),
+            modified_at=datetime.utcnow(),
         )
 
         # Mock
@@ -512,8 +512,8 @@ class SchedulerTestCase(unittest.TestCase):
             type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
+            created_at=datetime.utcnow(),
+            modified_at=datetime.utcnow(),
         )
 
         # Mock
@@ -556,8 +556,8 @@ class SchedulerTestCase(unittest.TestCase):
             type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_populate_grace_period),
+            created_at=datetime.utcnow(),
+            modified_at=datetime.utcnow() - timedelta(seconds=self.mock_ctx.config.pq_populate_grace_period),
         )
 
         # Mock
@@ -602,8 +602,8 @@ class SchedulerTestCase(unittest.TestCase):
             type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
+            created_at=datetime.utcnow(),
+            modified_at=datetime.utcnow(),
         )
 
         # Mock
@@ -647,8 +647,8 @@ class SchedulerTestCase(unittest.TestCase):
             type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_populate_grace_period),
+            created_at=datetime.utcnow(),
+            modified_at=datetime.utcnow() - timedelta(seconds=self.mock_ctx.config.pq_populate_grace_period),
         )
 
         last_run_boefje = BoefjeMetaFactory(
@@ -698,8 +698,8 @@ class SchedulerTestCase(unittest.TestCase):
             type="boefje",
             p_item=p_item,
             status=models.TaskStatus.COMPLETED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_populate_grace_period),
+            created_at=datetime.utcnow(),
+            modified_at=datetime.utcnow() - timedelta(seconds=self.mock_ctx.config.pq_populate_grace_period),
         )
 
         last_run_boefje = BoefjeMetaFactory(

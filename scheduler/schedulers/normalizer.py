@@ -72,14 +72,14 @@ class NormalizerScheduler(Scheduler):
                 continue
 
             if latest_raw_data is None:
-                self.logger.info(
-                    "No latest raw data found [org_id=%s, scheduler_id=%s]",
+                self.logger.debug(
+                    "No new raw data on message queue [org_id=%s, scheduler_id=%s]",
                     self.organisation.id,
                     self.scheduler_id,
                 )
                 break
 
-            self.logger.debug(
+            self.logger.info(
                 "Received latest raw data [raw_data=%s, org_id=%s, scheduler_id=%s]",
                 latest_raw_data,
                 self.organisation.id,
@@ -266,7 +266,7 @@ class NormalizerScheduler(Scheduler):
 
         if latest_normalizer_meta is None:
             self.logger.debug(
-                "No normalizer meta found on queue: %s [org_id=%s, scheduler_id=%s]",
+                "No new normalizer meta found on message queue: %s [org_id=%s, scheduler_id=%s]",
                 f"{self.organisation.id}__normalizer_meta_received",
                 self.organisation.id,
                 self.scheduler_id,
