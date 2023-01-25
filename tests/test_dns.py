@@ -1,4 +1,5 @@
 from ipaddress import IPv4Address, IPv6Address
+from pathlib import Path
 from unittest import TestCase
 
 from boefjes.job_handler import serialize_ooi
@@ -16,9 +17,10 @@ from octopoes.models.ooi.dns.records import (
 from octopoes.models.ooi.dns.zone import Hostname, DNSZone
 from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
 
-from boefjes.plugins.kat_dns.normalize import run
-from boefjes.plugins.kat_dns_zone.normalize import run as run_zone_normalizer
-from boefjes.job_models import NormalizerMeta, BoefjeMeta, Normalizer, Boefje, RawDataMeta
+from boefjes.job_models import NormalizerMeta, BoefjeMeta, Normalizer, Boefje, RawDataMeta, ObservationsWithoutInputOOI
+from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.local import LocalNormalizerJobRunner
+
 from tests.stubs import get_dummy_data
 
 
@@ -26,14 +28,6 @@ class DnsTest(TestCase):
     maxDiff = None
 
     def test_dns_normalizer(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
-
-        oois = list(
-            run(
-                meta,
-                get_dummy_data("inputs/dns-result-example.nl.txt"),
-            )
-        )
         internet = Network(name="internet")
 
         zone_hostname = Hostname(name="example.nl.", network=internet.reference)
@@ -155,35 +149,16 @@ class DnsTest(TestCase):
             + [soa_record]
         )
 
-        self.assertCountEqual(expected, oois)
+        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
+
+        runner = LocalNormalizerJobRunner(local_repository)
+        results = runner.run(meta, get_dummy_data("inputs/dns-result-example.nl.txt"))
+
+        self.assertEqual(1, len(results.observations))
+        self.assertCountEqual(expected, results.observations[0].results)
 
     def test_dns_normalizer_cname(self):
-        meta = NormalizerMeta(
-            id="",
-            normalizer=Normalizer(id="kat_dns_normalize"),
-            raw_data=RawDataMeta(
-                id="",
-                boefje_meta=BoefjeMeta(
-                    id="1234",
-                    boefje=Boefje(id="dns-records"),
-                    organization="_dev",
-                    input_ooi="Hostname|internet|www.example.nl.",
-                    arguments={
-                        "domain": "www.example.nl.",
-                        "input": {"name": "www.example.nl."},
-                    },
-                ),
-                mime_types=[{"value": "boefje/dns-records"}],
-            ),
-        )
-
-        oois = list(
-            run(
-                meta,
-                get_dummy_data("inputs/dns-result-www.example.nl.txt"),
-            )
-        )
-
         internet = Network(name="internet")
 
         zone_hostname = Hostname(
@@ -244,7 +219,31 @@ class DnsTest(TestCase):
             dns_a_record,
             input_hostname,
         ]
-        self.assertCountEqual(expected, oois)
+
+        meta = NormalizerMeta(
+            id="",
+            normalizer=Normalizer(id="kat_dns_normalize"),
+            raw_data=RawDataMeta(
+                id="",
+                boefje_meta=BoefjeMeta(
+                    id="1234",
+                    boefje=Boefje(id="dns-records"),
+                    organization="_dev",
+                    input_ooi="Hostname|internet|www.example.nl.",
+                    arguments={
+                        "domain": "www.example.nl.",
+                        "input": {"name": "www.example.nl."},
+                    },
+                ),
+                mime_types=[{"value": "boefje/dns-records"}],
+            ),
+        )
+
+        local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
+        runner = LocalNormalizerJobRunner(local_repository)
+        results = runner.run(meta, get_dummy_data("inputs/dns-result-www.example.nl.txt"))
+
+        self.assertCountEqual(expected, results.observations[0].results)
 
     def test_parse_record_null_mx_record(self):
         meta = NormalizerMeta(
@@ -280,7 +279,6 @@ redir.example.nl. 14400 IN MX 0 .
 ;AUTHORITY
 ;ADDITIONAL
 """
-        oois = list(run(meta, answer.encode()))
 
         internet = Network(name="internet")
         input_hostname = Hostname(
@@ -305,38 +303,17 @@ redir.example.nl. 14400 IN MX 0 .
             ttl=14400,
             preference=0,
         )
+
+        local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
+        runner = LocalNormalizerJobRunner(local_repository)
+        results = runner.run(meta, answer.encode())
+
         self.assertCountEqual(
             [cname_target, cname_record, mx_record, input_fqdn, input_hostname],
-            oois,
+            results.observations[0].results,
         )
 
     def test_parse_cname_soa(self):
-        meta = NormalizerMeta(
-            id="",
-            normalizer=Normalizer(id="kat_dns_normalize"),
-            raw_data=RawDataMeta(
-                id="",
-                boefje_meta=BoefjeMeta(
-                    id="1234",
-                    boefje=Boefje(id="dns-records"),
-                    organization="_dev",
-                    input_ooi="Hostname|internet|www.example.com",
-                    arguments={
-                        "domain": "www.example.com",
-                        "input": {"name": "www.example.com"},
-                    },
-                ),
-                mime_types=[{"value": "boefje/dns-records"}],
-            ),
-        )
-
-        oois = list(
-            run(
-                meta,
-                get_dummy_data("inputs/dns-result-example.com-cnames.txt"),
-            )
-        )
-
         internet = Network(name="internet")
 
         zone_hostname = Hostname(
@@ -411,6 +388,29 @@ redir.example.nl. 14400 IN MX 0 .
             mail_hostname=zone_hostname.reference,
             preference=0,
         )
+
+        meta = NormalizerMeta(
+            id="",
+            normalizer=Normalizer(id="kat_dns_normalize"),
+            raw_data=RawDataMeta(
+                id="",
+                boefje_meta=BoefjeMeta(
+                    id="1234",
+                    boefje=Boefje(id="dns-records"),
+                    organization="_dev",
+                    input_ooi="Hostname|internet|www.example.com",
+                    arguments={
+                        "domain": "www.example.com",
+                        "input": {"name": "www.example.com"},
+                    },
+                ),
+                mime_types=[{"value": "boefje/dns-records"}],
+            ),
+        )
+        local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
+        runner = LocalNormalizerJobRunner(local_repository)
+        results = runner.run(meta, get_dummy_data("inputs/dns-result-example.com-cnames.txt"))
+
         self.assertCountEqual(
             [
                 zone,
@@ -427,42 +427,10 @@ redir.example.nl. 14400 IN MX 0 .
             ]
             + ns_hostnames
             + ns_records,
-            oois,
+            results.observations[0].results,
         )
 
     def test_find_parent_dns_zone(self):
-        input_ = serialize_ooi(
-            DNSZone(
-                hostname=Hostname(
-                    network=Reference.from_str("Network|internet"),
-                    name="sub.example.nl.",
-                ).reference
-            )
-        )
-
-        meta = NormalizerMeta(
-            id="",
-            normalizer=Normalizer(id="kat_dns_normalize"),
-            raw_data=RawDataMeta(
-                id="",
-                boefje_meta=BoefjeMeta(
-                    id="1234",
-                    boefje=Boefje(id="dns-records"),
-                    organization="_dev",
-                    input_ooi="DnsZone|internet|sub.example.nl.",
-                    arguments={"input": input_},
-                ),
-                mime_types=[{"value": "boefje/dns-records"}],
-            ),
-        )
-
-        oois = list(
-            run_zone_normalizer(
-                meta,
-                get_dummy_data("inputs/dns-zone-result-sub.example.nl.txt"),
-            )
-        )
-
         internet = Network(name="internet")
 
         requested_zone = DNSZone(
@@ -497,6 +465,34 @@ redir.example.nl. 14400 IN MX 0 .
             minimum=86400,
         )
 
+        input_ = serialize_ooi(
+            DNSZone(
+                hostname=Hostname(
+                    network=Reference.from_str("Network|internet"),
+                    name="sub.example.nl.",
+                ).reference
+            )
+        )
+
+        meta = NormalizerMeta(
+            id="",
+            normalizer=Normalizer(id="kat_dns_zone_normalize"),
+            raw_data=RawDataMeta(
+                id="",
+                boefje_meta=BoefjeMeta(
+                    id="1234",
+                    boefje=Boefje(id="dns-records"),
+                    organization="_dev",
+                    input_ooi="DnsZone|internet|sub.example.nl.",
+                    arguments={"input": input_},
+                ),
+                mime_types=[{"value": "boefje/dns-records"}],
+            ),
+        )
+        local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
+        runner = LocalNormalizerJobRunner(local_repository)
+        results = runner.run(meta, get_dummy_data("inputs/dns-zone-result-sub.example.nl.txt"))
+
         self.assertCountEqual(
             [
                 requested_zone,
@@ -505,5 +501,15 @@ redir.example.nl. 14400 IN MX 0 .
                 name_server_hostname,
                 soa_record,
             ],
-            oois,
+            results.observations[0].results,
         )
+
+    def test_exception_raised_no_input_ooi(self):
+        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        meta.raw_data.boefje_meta.input_ooi = None
+
+        local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
+        runner = LocalNormalizerJobRunner(local_repository)
+
+        with self.assertRaises(ObservationsWithoutInputOOI):
+            runner.run(meta, get_dummy_data("inputs/dns-result-example.nl.txt"))

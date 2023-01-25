@@ -1,18 +1,22 @@
-from datetime import timezone, datetime
 from pathlib import Path
 
 import sys
 from typing import List
 from unittest import TestCase, mock
 
-from boefjes.job_models import BoefjeMeta
-from boefjes.job_handler import BoefjeHandler
+from boefjes.job_models import (
+    BoefjeMeta,
+    NormalizerMeta,
+    UnsupportedReturnTypeNormalizer,
+    InvalidReturnValueNormalizer,
+    NormalizerPlainOOI,
+)
+from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Boefje, Normalizer, Bit, PluginType
 
-from boefjes.local import LocalBoefjeJobRunner
-
-MOCKED_NOW = datetime(2020, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+from tests.stubs import get_dummy_data
+from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 
 
 class TaskTest(TestCase):
@@ -85,11 +89,15 @@ class TaskTest(TestCase):
             organization="_dev",
         ).copy()
 
-    @mock.patch("boefjes.job_handler.now", return_value=MOCKED_NOW)
+    def test_parse_plain_ooi(self):
+        plain_ooi = NormalizerPlainOOI(object_type="Network", name="internet")
+
+        NormalizerHandler._parse_ooi(plain_ooi)
+
     @mock.patch("boefjes.job_handler.get_environment_settings", return_value={})
     @mock.patch("boefjes.job_handler.bytes_api_client")
     @mock.patch("boefjes.job_handler._find_ooi_in_past")
-    def test_handle_boefje_with_exception(self, mock_find_ooi_in_past, mock_bytes_api_client, mock_get_env, mock_now):
+    def test_handle_boefje_with_exception(self, mock_find_ooi_in_past, mock_bytes_api_client, mock_get_env):
         meta = BoefjeMeta(
             id="some-random-job-id",
             boefje={"id": "dummy_boefje_runtime_exception"},
@@ -101,21 +109,36 @@ class TaskTest(TestCase):
         local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
         BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository).handle(meta)
 
-        expected_meta = meta.copy()
-        expected_meta.ended_at = MOCKED_NOW
-
-        mock_bytes_api_client.save_boefje_meta.assert_called_once_with(expected_meta)
-
-        save_raw_call = mock_bytes_api_client.save_raw.call_args_list[0][0]
-
-        self.assertEqual("some-random-job-id", save_raw_call[0])
-        self.assertIn("Traceback", save_raw_call[1])
-        self.assertEqual(
+        mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
+        mock_bytes_api_client.save_raw.assert_called_once_with(
+            "some-random-job-id",
+            "dummy error",
             {
                 "error/boefje",
                 "dummy_boefje_runtime_exception",
                 "boefje/dummy_boefje_runtime_exception",
                 f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
             },
-            save_raw_call[2],
         )
+
+    def test_exception_raised_unsupported_return_type_normalizer(self):
+        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        meta.raw_data.boefje_meta.input_ooi = None
+        meta.normalizer.id = "dummy_bad_normalizer_return_type"
+
+        local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
+        runner = LocalNormalizerJobRunner(local_repository)
+
+        with self.assertRaises(UnsupportedReturnTypeNormalizer):
+            runner.run(meta, b"123")
+
+    def test_exception_raised_invalid_return_value(self):
+        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        meta.raw_data.boefje_meta.input_ooi = None
+        meta.normalizer.id = "dummy_bad_normalizer_dict_structure"
+
+        local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
+        runner = LocalNormalizerJobRunner(local_repository)
+
+        with self.assertRaises(InvalidReturnValueNormalizer):
+            runner.run(meta, b"123")

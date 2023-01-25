@@ -1,20 +1,15 @@
 import hashlib
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, Optional, List, Union, Literal
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, validator, Extra
 
 
 class JobException(Exception):
     """General error for jobs"""
 
-
-class JobImproperKeysException(JobException):
-    """Error for jobs missing required keys"""
-
-
-class JobInvalidJsonException(JobException):
-    """Error for jobs missing required keys"""
+    def __init__(self, message: str):
+        super().__init__(message)
 
 
 class Job(BaseModel):
@@ -54,7 +49,7 @@ class Normalizer(BaseModel):
 
 class BoefjeMeta(Job):
     boefje: Boefje
-    input_ooi: str
+    input_ooi: Optional[str]
     arguments: Dict = {}
     organization: str
 
@@ -74,3 +69,51 @@ class RawDataMeta(BaseModel):
 class NormalizerMeta(Job):
     raw_data: RawDataMeta
     normalizer: Normalizer
+
+
+class ObservationsWithoutInputOOI(JobException):
+    def __init__(self, normalizer_meta: NormalizerMeta):
+        super().__init__(
+            "Observations are yielded in the normalizer but no input ooi was found. "
+            "Your boefje should either yield observations with a custom input"
+            "or always run on a specified input ooi type.\n"
+            f"NormalizerMeta: {normalizer_meta.json(indent=3)}"
+        )
+
+
+class UnsupportedReturnTypeNormalizer(JobException):
+    def __init__(self, result_type: str):
+        super().__init__(f"The return type '{result_type}' is not supported")
+
+
+class InvalidReturnValueNormalizer(JobException):
+    def __init__(self, validation_msg: str):
+        super().__init__(f"Output dictionary in normalizer was invalid: {validation_msg}")
+
+
+class NormalizerPlainOOI(BaseModel):  # Validation of plain OOIs being returned from Normalizers
+    object_type: str
+
+    class Config:
+        allow_population_by_field_name = True
+        extra = Extra.allow
+
+
+class NormalizerObservation(BaseModel):
+    type: Literal["observation"] = "observation"
+    input_ooi: str
+    results: List[NormalizerPlainOOI]
+
+
+class NormalizerDeclaration(BaseModel):
+    type: Literal["declaration"] = "declaration"
+    ooi: NormalizerPlainOOI
+
+
+class NormalizerResult(BaseModel):  # Moves all validation logic to Pydantic
+    item: Union[NormalizerPlainOOI, NormalizerObservation, NormalizerDeclaration]
+
+
+class NormalizerOutput(BaseModel):
+    observations: List[NormalizerObservation] = []
+    declarations: List[NormalizerDeclaration] = []

@@ -10,7 +10,7 @@
   },
   "dispatches": {
     "normalizers": [
-      "kat_dns.normalize"
+      "kat_dns_normalize"
     ],
     "boefjes": []
   }
