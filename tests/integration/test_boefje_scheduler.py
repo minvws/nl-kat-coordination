@@ -54,9 +54,11 @@ class SchedulerTestCase(unittest.TestCase):
         models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
         self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
         self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
+        self.job_store = repositories.sqlalchemy.JobStore(self.mock_ctx.datastore)
 
         self.mock_ctx.pq_store = self.pq_store
         self.mock_ctx.task_store = self.task_store
+        self.mock_ctx.job_store = self.job_store
 
         # Scheduler
         self.organisation = OrganisationFactory()
@@ -123,6 +125,10 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Scheduled job schould be in datastore
+        scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
+        self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
@@ -257,6 +263,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
+        # Scheduled job schould be in datastore
+        scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
+        self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
+
     def test_is_not_allowed_to_run(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -271,15 +281,14 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertFalse(allowed_to_run)
         self.assertIn("is too intense", cm.output[-1])
 
-    # TODO
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_new_boefjes_by_org_id")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_oois_by_boefje")
+    @mock.patch("scheduler.context.AppContext.servcies.katalogus.get_new_boefjes_by_org_id")
+    @mock.patch("scheduler.context.AppContext.services.octopoes.get_objects_by_object_types")
     def test_push_tasks_for_new_boefjes(
         self,
-        mock_get_oois_by_boefje,
+        mock_get_objects_by_object_types,
         mock_get_new_boefjes_by_org_id,
         mock_has_grace_period_passed,
         mock_is_task_allowed_to_run,
@@ -295,7 +304,7 @@ class SchedulerTestCase(unittest.TestCase):
         mock_is_task_allowed_to_run.return_value = True
         mock_has_grace_period_passed.return_value = True
         mock_get_new_boefjes_by_org_id = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        mock_get_oois_by_boefje.return_value = [ooi]
+        mock_get_objects_by_object_type = [ooi]
 
         # Act
         self.scheduler.push_tasks_for_new_boefjes()
@@ -310,6 +319,10 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Scheduled job schould be in datastore
+        scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
+        self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
 
     def test_push_tasks_for_new_boefjes_no_oois_found(self):
         """When no ooi's are found for the new boefjes, no tasks should be
@@ -755,6 +768,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Assert
         self.assertFalse(has_passed)
 
+    # TODO
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
@@ -798,10 +812,17 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
+        # Scheduled job schould be in datastore
+        scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
+        scheduled_jobs= self.mock_ctx.job_store.get_scheduled_jobs(self.scheduler.scheduler_id)
+        import pdb; pdb.set_trace()
+        self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
+
     # TODO
     def test_populate_queue_new_boefjes(self):
         pass
 
+    # TODO
     def test_populate_queue_scheduled_jobs(self):
         pass
 
@@ -870,6 +891,10 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Scheduled job schould be in datastore
+        scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
+        self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""

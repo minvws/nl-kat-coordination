@@ -7,6 +7,7 @@ from ..stores import JobStorer
 from .datastore import SQLAlchemy
 
 
+# TODO: org id?
 class JobStore(JobStorer):
     def __init__(self, datastore: SQLAlchemy) -> None:
         super().__init__()
@@ -16,9 +17,9 @@ class JobStore(JobStorer):
     def get_scheduled_jobs(
         self,
         scheduler_id: Optional[str],
-        enabled: Optional[bool],
-        min_checked_at: Optional[datetime.datetime],
-        max_checked_at: Optional[datetime.datetime],
+        enabled: Optional[bool] = True,
+        min_checked_at: Optional[datetime.datetime] = None,
+        max_checked_at: Optional[datetime.datetime] = None,
     ) -> Tuple[List[models.ScheduledJob], int]:
         """Get all scheduled jobs.
 
@@ -65,7 +66,7 @@ class JobStore(JobStorer):
 
             return models.ScheduledJob.from_orm(job_orm)
 
-    def get_scheduled_job_by_hash(self, hash: str) -> Optional[models.ScheduledJob]:
+    def get_scheduled_job_by_hash(self, item_hash: str) -> Optional[models.ScheduledJob]:
         """Get a scheduled job by its hash.
 
         Args:
@@ -75,7 +76,7 @@ class JobStore(JobStorer):
             The ScheduledJob instance if found, None otherwise.
         """
         with self.datastore.session() as session:
-            job_orm = session.query(models.ScheduledJobORM).filter_by(hash=hash).first()
+            job_orm = session.query(models.ScheduledJobORM).filter(models.ScheduledJobORM.hash == item_hash).first()
 
             if job_orm is None:
                 return None
@@ -95,6 +96,7 @@ class JobStore(JobStorer):
             session.add(job_orm)
 
             created_job = models.ScheduledJob.from_orm(job_orm)
+            import pdb; pdb.set_trace()
 
             return created_job
 

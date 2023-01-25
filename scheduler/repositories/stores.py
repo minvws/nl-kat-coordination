@@ -105,7 +105,7 @@ class JobStorer(abc.ABC):
     ) -> Tuple[List[models.ScheduledJob], int]:
         raise NotImplementedError
 
-    def get_scheduled_job_by_hash(self, hash: str) -> Optional[models.ScheduledJob]:
+    def get_scheduled_job_by_hash(self, item_hash: str) -> Optional[models.ScheduledJob]:
         raise NotImplementedError
 
     def create_scheduled_job(self, job: models.ScheduledJob) -> Optional[models.ScheduledJob]:

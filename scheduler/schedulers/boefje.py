@@ -218,7 +218,7 @@ class BoefjeScheduler(Scheduler):
         for boefje in new_boefjes:
             # TODO: get all ooi's for this organisation that this boefje could
             # be run on. This needs to come from octopoes.
-            oois = self.ctx.services.octopoes.get_oois_by_boefje(boefje_id=boefje.id)
+            oois = self.ctx.services.octopoes.get_objects_by_object_types(boefje.consumes)
 
             for ooi in oois:
                 task = BoefjeTask(
@@ -269,7 +269,7 @@ class BoefjeScheduler(Scheduler):
         # Get all scheduled jobs that need to be rescheduled. We only
         # consider jobs that have been processed by the scheduler after the set
         # grace period.
-        scheduled_jobs = self.ctx.job_store.get_scheduled_jobs(
+        scheduled_jobs, _ = self.ctx.job_store.get_scheduled_jobs(
             scheduler_id=self.scheduler_id,
             enabled=True,
             max_checked_at=datetime.utcnow() - timedelta(seconds=self.ctx.config.pq_populate_grace_period),
@@ -277,6 +277,7 @@ class BoefjeScheduler(Scheduler):
 
         for job in scheduled_jobs:
 
+            # import pdb; pdb.set_trace()
             # Create a new task, and a new p_item
             task = BoefjeTask(**job.p_item.data)
             if task is None:
@@ -288,7 +289,7 @@ class BoefjeScheduler(Scheduler):
                 )
 
             try:
-                self.do_checks(task, job.ooi)  # FIXME: job.ooi
+                self.do_checks(task)
             except Exception:
                 continue
 
@@ -589,7 +590,12 @@ class BoefjeScheduler(Scheduler):
 
         return boefjes
 
-    def do_checks(self, task: models.BoefjeTask, ooi: models.OOI) -> None:
+    def do_checks(self, task: models.BoefjeTask, ooi: models.OOI = None) -> None:
+        if ooi is None:
+            ooi = self.ctx.services.octopoes.get_object(
+                self.organisation.id, task.input_ooi,
+            )
+
         if not self.is_task_allowed_to_run(task.boefje, ooi):
             self.logger.debug(
                 "Task is not allowed to run: %s [org_id=%s, scheduler_id=%s]",
