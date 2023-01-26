@@ -7,6 +7,7 @@ import dns.resolver
 from dns.name import Name
 from dns.resolver import Answer
 
+from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
         try:
             resolver = dns.resolver.Resolver()
-            resolver.nameservers = ["8.8.8.8"]
+            resolver.nameservers = [settings.remote_ns]
             answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)
         except dns.resolver.NoAnswer:
