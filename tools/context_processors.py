@@ -1,8 +1,4 @@
-from rocky.settings import MIAUW_API_ENABLED, LANGUAGES
-
-
-def miauw_api(request):
-    return {"miauw_api_enabled": MIAUW_API_ENABLED}
+from rocky.settings import LANGUAGES
 
 
 def languages(request):

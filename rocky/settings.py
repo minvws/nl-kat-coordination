@@ -32,12 +32,6 @@ QUEUE_NAME_BOEFJES = os.getenv("QUEUE_NAME_BOEFJES")
 QUEUE_NAME_NORMALIZERS = os.getenv("QUEUE_NAME_NORMALIZERS")
 QUEUE_URI = os.getenv("QUEUE_URI")
 
-MIAUW_API_ENABLED = os.getenv("MIAUW_API_ENABLED", "False") == "True"
-MIAUW_BASE_URL = os.getenv("MIAUW_BASE_URL", "")
-MIAUW_USERNAME = os.getenv("MIAUW_USERNAME", "")
-MIAUW_PASSWORD = os.getenv("MIAUW_PASSWORD", "")
-MIAUW_REQUEST_VALIDATE = os.getenv("MIAUW_REQUEST_VALIDATE", "True") == "True"
-
 OCTOPOES_API = os.getenv("OCTOPOES_API")
 
 SCHEDULER_API = os.getenv("SCHEDULER_API", "")
@@ -131,7 +125,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "tools.context_processors.miauw_api",
                 "tools.context_processors.languages",
             ],
             "builtins": ["tools.templatetags.ooi_extra"],
@@ -144,7 +137,6 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 WSGI_APPLICATION = "rocky.wsgi.application"
 
 AUTH_USER_MODEL = "account.KATUser"
-
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -341,7 +333,6 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
 }
-
 
 SERIALIZATION_MODULES = {
     "xml": "tagulous.serializers.xml_serializer",

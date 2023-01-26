@@ -9,15 +9,6 @@
     <section>
       <div>
         <h1>{% translate 'Edit organization' %}</h1>
-        <p>
-          {% translate object.name as name %}
-          {% url 'signal_qr' as url %}
-          {% blocktranslate %}
-            Set signal username for {{ name }}.<br>
-            You can register your signal username with the QR code here:<br>
-            <a href="{{ url }}">Signal QR Code</a>
-          {% endblocktranslate %}
-        </p>
         <form method="post" class="horizontal-view">
           {% csrf_token %}
           <fieldset>

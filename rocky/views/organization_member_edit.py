@@ -8,7 +8,6 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from account.forms import OrganizationMemberForm
-from rocky.settings import MIAUW_API_ENABLED
 from tools.models import OrganizationMember
 
 
@@ -19,25 +18,6 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UpdateView):
     template_name = "organizations/organization_member_edit.html"
     object: OrganizationMember
     permission_required = "tools.change_organization"
-
-    def get(self, request, *args, **kwargs):
-        if not MIAUW_API_ENABLED:
-            messages.add_message(request, messages.WARNING, "Miauw API is not enabled.")
-            self.object = self.get_object()
-            return redirect(
-                reverse(
-                    "organization_member_list",
-                    kwargs={"pk": self.object.organization_id},
-                )
-            )
-
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        if not MIAUW_API_ENABLED:
-            self.get(request, *args, **kwargs)
-
-        return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse("organization_detail", kwargs={"pk": self.object.organization_id})
