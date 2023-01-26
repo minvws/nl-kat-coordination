@@ -36,11 +36,11 @@
           </li>
           <li>
             <a href="{% url 'finding_list' organization.code %}"
-               {% if 'finding' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Findings' %}</a>
+               {% if 'finding' in request.path|urlencode or 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate 'Findings' %}</a>
           </li>
           <li>
             <a href="{% url 'ooi_list' organization.code %}"
-               {% if 'objects' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Objects' %}</a>
+            {% if 'objects' in request.path|urlencode and not 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate 'Objects' %}</a>
           </li>
           <li>
             <a href="{% url 'task_list' organization.code %}"

@@ -9,6 +9,7 @@ from django.http import HttpResponse, Http404, HttpRequest
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
+from django.urls import reverse
 from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
@@ -50,6 +51,9 @@ class OOIListView(BaseOOIListView):
         context["member"] = self.organization_member
         context["scan_levels"] = [alias for level, alias in SCAN_LEVEL.choices]
         context["organization_indemnification"] = self.get_organization_indemnification
+        context["breadcrumbs"] = [
+            {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
+        ]
 
         return context
 
