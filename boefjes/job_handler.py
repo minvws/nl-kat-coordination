@@ -1,13 +1,16 @@
 import logging
-import traceback
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 from typing import Any, List, Dict, Set
 
 import requests
+from octopoes.connector import RemoteException
+
+from octopoes.models.types import OOIType
+from pydantic.tools import parse_obj_as
 
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from octopoes.api.models import Observation
+from octopoes.api.models import Observation, Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models import Reference
@@ -18,7 +21,11 @@ from boefjes.runtime_interfaces import Handler, BoefjeJobRunner, NormalizerJobRu
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import (
+    BoefjeMeta,
+    NormalizerMeta,
+    NormalizerPlainOOI,
+)
 
 logger = logging.getLogger(__name__)
 bytes_api_client = BytesAPIClient(
@@ -28,13 +35,9 @@ bytes_api_client = BytesAPIClient(
 )
 
 
-def now():
-    return datetime.now(timezone.utc)
-
-
 def _find_ooi_in_past(reference: Reference, connector: OctopoesAPIConnector, lookback_days: int = 4) -> OOI:
     # Source OOIs may not live in crux since we currently have TTLs in place (to be removed soon).
-    valid_time = now()
+    valid_time = datetime.now(timezone.utc)
 
     for days_in_past in range(lookback_days):
         try:
@@ -44,7 +47,7 @@ def _find_ooi_in_past(reference: Reference, connector: OctopoesAPIConnector, loo
                 "Object %s not found in Octopoes, looking into other valid times...",
                 reference,
             )
-            date = now() - timedelta(days=days_in_past)
+            date = datetime.now(timezone.utc) - timedelta(days=days_in_past)
             valid_time = date.replace(hour=0, minute=0, second=0, microsecond=0)
 
     raise ObjectNotFoundException(f"Object {reference} not found in Octopoes")
@@ -118,12 +121,14 @@ class BoefjeHandler(Handler):
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
-        boefje_meta.arguments["input"] = serialize_ooi(
-            _find_ooi_in_past(
-                Reference.from_str(boefje_meta.input_ooi),
-                get_octopoes_api_connector(boefje_meta.organization),
+
+        if boefje_meta.input_ooi:
+            boefje_meta.arguments["input"] = serialize_ooi(
+                _find_ooi_in_past(
+                    Reference.from_str(boefje_meta.input_ooi),
+                    get_octopoes_api_connector(boefje_meta.organization),
+                )
             )
-        )
 
         env_keys = self.local_repository.by_id(boefje_meta.boefje.id).environment_keys
         environment = get_environment_settings(boefje_meta, env_keys)
@@ -132,13 +137,13 @@ class BoefjeHandler(Handler):
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
         try:
-            boefje_meta.started_at = now()
+            boefje_meta.started_at = datetime.now(timezone.utc)
             boefje_results = self.job_runner.run(boefje_meta, environment)
         except Exception as exc:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id, exc_info=True)
-            boefje_results = [({"error/boefje"}, f"{traceback.format_exc()}\n{str(exc)}")]
+            boefje_results = [({"error/boefje"}, str(exc))]
         finally:
-            boefje_meta.ended_at = now()
+            boefje_meta.ended_at = datetime.now(timezone.utc)
 
         logger.info("Saving to Bytes")
 
@@ -159,33 +164,59 @@ class NormalizerHandler(Handler):
         self.job_runner: NormalizerJobRunner = job_runner
 
     def handle(self, normalizer_meta: NormalizerMeta) -> None:
+        logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
+
         try:
-            logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
             bytes_api_client.login()
             raw = bytes_api_client.get_raw(normalizer_meta.raw_data.boefje_meta.id, normalizer_meta.raw_data.id)
-
-            normalizer_meta.started_at = now()
-            results = self.job_runner.run(normalizer_meta, raw)
-            normalizer_meta.ended_at = now()
-
-            input_ooi = normalizer_meta.raw_data.boefje_meta.input_ooi
-            results = list(filter(lambda r: r.reference != input_ooi, results))
-
-            reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
-            observation = Observation(
-                method=normalizer_meta.normalizer.id,
-                source=reference,
-                task_id=normalizer_meta.id,
-                valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
-                result=results,
-            )
-            get_octopoes_api_connector(normalizer_meta.raw_data.boefje_meta.organization).save_observation(observation)
-            bytes_api_client.save_normalizer_meta(normalizer_meta)
-
-            logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
         except Exception as exc:
-            logger.exception("Error while handling a normalizer job")
+            logger.exception(f"Error getting raw from bytes, {normalizer_meta=}")
             raise exc
+
+        normalizer_meta.started_at = datetime.now(timezone.utc)
+
+        try:
+            results = self.job_runner.run(normalizer_meta, raw)
+            connector = get_octopoes_api_connector(normalizer_meta.raw_data.boefje_meta.organization)
+
+            for observation in results.observations:
+                reference = Reference.from_str(observation.input_ooi)
+                connector.save_observation(
+                    Observation(
+                        method=normalizer_meta.normalizer.id,
+                        source=reference,
+                        task_id=normalizer_meta.id,
+                        valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                        result=[self._parse_ooi(result) for result in observation.results],
+                    )
+                )
+
+            for declaration in results.declarations:
+                connector.save_declaration(
+                    Declaration(
+                        method=normalizer_meta.normalizer.id,
+                        ooi=self._parse_ooi(declaration.ooi),
+                        task_id=normalizer_meta.id,
+                        valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                    )
+                )
+        except Exception:
+            logger.exception(f"Normalizer {normalizer_meta=} failed")
+        except (RequestException, ObjectNotFoundException, RemoteException):
+            logger.exception(f"Error saving results to Octopoes, {normalizer_meta=}")
+        finally:
+            normalizer_meta.ended_at = datetime.now(timezone.utc)
+
+        try:
+            bytes_api_client.save_normalizer_meta(normalizer_meta)
+        except Exception:
+            logger.exception(f"Error while handling a normalizer job, {normalizer_meta=}")
+
+        logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
+
+    @staticmethod
+    def _parse_ooi(result: NormalizerPlainOOI):
+        return parse_obj_as(OOIType, result.dict())
 
 
 def get_octopoes_api_connector(org_code: str):

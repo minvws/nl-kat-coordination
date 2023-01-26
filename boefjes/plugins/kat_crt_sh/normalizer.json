@@ -5,6 +5,6 @@
     ],
     "produces": [
         "Hostname",
-        "Certificate"
+        "X509Certificate"
     ]
 }

@@ -25,7 +25,7 @@
     "mime_types": [{"value": "boefje/dns-records"}]
   },
   "normalizer": {
-    "id": "kat_dns.normalize",
+    "id": "kat_dns_normalize",
     "version": null
   }
 }

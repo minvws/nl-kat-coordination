@@ -4,6 +4,6 @@
         "ssl-certificates"
     ],
     "produces": [
-        "Certificate"
+        "X509Certificate"
     ]
 }
