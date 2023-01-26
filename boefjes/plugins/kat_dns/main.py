@@ -31,7 +31,9 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     for type_ in dns_record_types:
 
         try:
-            answer: Answer = dns.resolver.resolve(hostname, type_)
+            resolver = dns.resolver.Resolver()
+            resolver.nameservers = ["8.8.8.8"]
+            answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)
         except dns.resolver.NoAnswer:
             pass
