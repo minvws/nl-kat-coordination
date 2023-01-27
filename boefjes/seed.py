@@ -2,7 +2,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.sql.db import get_engine
-from boefjes.sql.db_models import OrganisationInDB, RepositoryInDB
+from boefjes.sql.db_models import RepositoryInDB
 
 
 def main():
