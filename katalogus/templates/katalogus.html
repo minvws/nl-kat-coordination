@@ -27,7 +27,9 @@
         </div>
       </div>
     </section>
-    {% include 'partials/katalogus_filter.html' with total_plugins=object_list|length form=form %}
+    <section>
+      {% include 'partials/katalogus_filter.html' with total_plugins=object_list|length form=form %}
+    </section>
     {% if view == 'table' %}
       <section>
         <div>

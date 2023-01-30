@@ -1,24 +1,16 @@
+{% extends 'partials/list_filters.html' %}
 {% load i18n %}
 
-<section>
-  <div>
-    <section class="filter">
-      <div>
-        <p>
-          {{ total_plugins }} {% translate 'Available plugins' %}
-        </p>
-        <button aria-expanded="false"
-                data-hide-filters-label="{% translate 'Hide filters' %}">
-          {% translate 'Show filters' %}
-        </button>
-      </div>
-      <form novalidate method="get" class="help">
+{% block title %}
+  {{ total_plugins }} {% translate 'Available plugins' %}
+{% endblock %}
+
+{% block filter_form %}
+  <form novalidate method="get" class="help">
         {% csrf_token %}
         {% include 'partials/form/fieldset.html' with fields=form %}
         <fieldset>
           <button type="submit">{% translate 'Update List' %}</button>
         </fieldset>
       </form>
-    </section>
-  </div>
-</section>
+{% endblock %}
