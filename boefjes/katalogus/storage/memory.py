@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationStorage,
@@ -100,10 +101,10 @@ class PluginStatesStorageMemory(PluginEnabledStorage):
 
     def get_all_enabled(self, organisation_id: str) -> Dict[str, List[str]]:
         return {
-            "LOCAL": [
+            LocalPluginRepository.RESERVED_ID: [
                 key.split(".", maxsplit=1)[1]
-                for key, val in self._data.items()
-                if val and key.split(".", maxsplit=1)[0] == organisation_id
+                for key, value in self._data.items()
+                if value and key.split(".", maxsplit=1)[0] == organisation_id
             ]
         }
 
