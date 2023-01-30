@@ -13,3 +13,4 @@ Welcome to the OpenKAT documentation!
    templates/index
    ux_design/index
    technical_design/index
+   release_notes/index

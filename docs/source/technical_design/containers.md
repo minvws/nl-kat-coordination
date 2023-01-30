@@ -155,12 +155,12 @@ See also https://github.com/minvws/nl-kat-bytes#configuration
 
 ## Octopoes
 
-| Environment variable | Required | Default Value | Format                | Description               |
-|----------------------|----------|---------------|-----------------------|---------------------------|
-| `XTDB_URI`           | yes      |               | http://crux:3000      | XTDB uri                  |
-| `XTDB_TYPE`          | no       | crux          |                       | crux or xtdb              |
-| `QUEUE_URI`          | yes      |               |                       | RabbitMQ queue            |
-| `KATALOGUS_API`      | yes      |               | http://katalogus:8000 | URI for the Katalogus API |
+| Environment variable | Required | Default Value | Format                | Description                  |
+|----------------------|----------|---------------|-----------------------|------------------------------|
+| `XTDB_URI`           | yes      |               | http://crux:3000      | XTDB uri                     |
+| `XTDB_TYPE`          | no       | crux          |                       | crux, xtdb or xtdb-multinode |
+| `QUEUE_URI`          | yes      |               |                       | RabbitMQ queue               |
+| `KATALOGUS_API`      | yes      |               | http://katalogus:8000 | URI for the Katalogus API    |
 
 See also https://github.com/minvws/nl-kat-octopoes#environment-variables
 
