@@ -47,8 +47,9 @@ Insert Calvin Outputs
 
     Await Sync
 
-Insert Regular Declaration
+Insert Regular Declarations
     Insert Declaration    tests/fixtures/regular_manual_declaration.json
+    Insert Declaration    tests/fixtures/regular_manual_declaration_with_null_values.json
 
     Await Sync
 

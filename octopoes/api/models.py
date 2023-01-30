@@ -64,5 +64,5 @@ class ValidatedDeclaration(BaseModel):
 
     ooi: OOIType
     valid_time: TimezoneAwareDatetime
-    method: str = "manual"
-    task_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    method: Optional[str] = "manual"
+    task_id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
