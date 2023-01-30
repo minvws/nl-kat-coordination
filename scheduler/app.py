@@ -199,7 +199,12 @@ class App:
             self.schedulers[scheduler_id].stop()
             self.schedulers.pop(scheduler_id)
 
-        self.logger.info("Removed %s organisations from scheduler [org_ids=%s]", len(removals), removals)
+        if removals:
+            self.logger.info(
+                "Removed %s organisations from scheduler [org_ids=%s]",
+                len(removals),
+                removals,
+            )
 
         # Add schedulers for organisation
         for org_id in additions:
@@ -213,7 +218,12 @@ class App:
             self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
             scheduler_boefje.run()
 
-        self.logger.info("Added %s organisations to scheduler [org_ids=%s]", len(additions), additions)
+        if additions:
+            self.logger.info(
+                "Added %s organisations to scheduler [org_ids=%s]",
+                len(additions),
+                additions,
+            )
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the
