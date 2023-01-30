@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certifi
     curl -sL https://deb.nodesource.com/gpgkey/nodesource.gpg.key -o /etc/apt/keyrings/nodesource.asc && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_18.x bullseye main" > /etc/apt/sources.list.d/nodesource.list
 
-RUN apt-get update && apt-get upgrade && \
+RUN apt-get update && apt-get -y upgrade && \
     apt-get install -y --no-install-recommends \
     gettext devscripts debhelper equivs \
     python3-setuptools python3-pip python3-dev \
