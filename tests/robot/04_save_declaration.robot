@@ -14,6 +14,8 @@ Add Several Append Origins
     Verify Object Present    Hostname|internet|calvinnormalizer.org
     Verify Origin Present    Hostname|internet|calvinnormalizer.org.    43210
 
+    Insert Regular Declaration
+
 
 *** Keywords ***
 Setup Test
