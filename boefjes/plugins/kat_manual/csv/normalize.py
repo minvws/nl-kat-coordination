@@ -1,5 +1,6 @@
 import csv
 import io
+import ipaddress
 import logging
 from typing import Union, Iterator, Dict, Tuple, List
 from octopoes.models import OOI, Reference
@@ -66,13 +67,20 @@ def get_object_type(csv_data: io.StringIO) -> str:
 
     if "address" in headers:
         if line:
-            if line.count(".") == 3:  # We are optimistic at this stage. Octopoes should handle further validation
+            address = next(csv.DictReader(csv_data, delimiter=",", quotechar='"'))["address"]
+            csv_data.seek(0)
+
+            try:
+                ipaddress.IPv4Address(address)
                 return "IPAddressV4"
+            except ValueError:
+                pass
 
-            if line.count(":") == 7:  # We are optimistic at this stage. Octopoes should handle further validation
+            try:
+                ipaddress.IPv6Address(address)
                 return "IPAddressV6"
-
-            raise ValueError("Unsupported OOI type for csv normalizer: bad address column.")
+            except ValueError:
+                ValueError("Unsupported OOI type for csv normalizer: bad address column.")
 
         return "IPAddressV4"  # No data in the csv, so this is redundant but an Exception would be overkill.
 
