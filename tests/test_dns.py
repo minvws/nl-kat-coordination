@@ -478,7 +478,7 @@ class DnsTest(TestCase):
         )
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
-        results = runner.run(meta, get_dummy_data("inputs/dns-zone-result-sub.example.nl.json"))
+        results = runner.run(meta, get_dummy_data("inputs/dns-zone-result-sub.example.nl.txt"))
 
         self.assertCountEqual(
             [
