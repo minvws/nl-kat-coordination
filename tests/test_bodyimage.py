@@ -55,7 +55,7 @@ class WebsiteAnalysisTest(TestCase):
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
-        output = runner.run(meta, get_dummy_data("cat_image"))
+        output = runner.run(meta, get_dummy_data("cat_image")).observations[0].results
 
         self.assertEqual(1, len(output))
         self.assertEqual(
@@ -84,7 +84,7 @@ class WebsiteAnalysisTest(TestCase):
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
-        output = runner.run(meta, get_dummy_data("download_body"))
+        output = runner.run(meta, get_dummy_data("download_body")).observations[0].results
 
         self.assertEqual(4, len(output))
 

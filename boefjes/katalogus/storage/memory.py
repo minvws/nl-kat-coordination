@@ -1,5 +1,6 @@
-from typing import Dict
+from typing import Dict, List
 
+from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationStorage,
@@ -58,22 +59,25 @@ class RepositoryStorageMemory(RepositoryStorage):
 
 
 class SettingsStorageMemory(SettingsStorage):
-    def __init__(
-        self,
-        organisation: str,
-        defaults: Dict[str, str] = None,
-    ):
-        defaults = defaults or {}
-        self._data = {organisation: defaults}
-        self._organisation = organisation
+    def __init__(self):
+        self._data = {}
 
     def get_by_key(self, key: str, organisation_id: str, plugin_id: str) -> str:
         return self._data[organisation_id][f"{plugin_id}.{key}"]
 
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
-        return {k.split(".", maxsplit=1)[1]: v for k, v in self._data[organisation_id].items() if plugin_id in k}
+        if organisation_id not in self._data:
+            return {}
+
+        org_data = self._data[organisation_id].items()
+        org_data_for_plugin = {k: v for k, v in org_data if plugin_id == k.split(".", maxsplit=1)[0]}
+
+        return {k.split(".", maxsplit=1)[1]: v for k, v in org_data_for_plugin.items()}
 
     def create(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
+        if organisation_id not in self._data:
+            self._data[organisation_id] = {}
+
         self._data[organisation_id][f"{plugin_id}.{key}"] = str(value)
 
     def update_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
@@ -93,10 +97,19 @@ class PluginStatesStorageMemory(PluginEnabledStorage):
         self._organisation = organisation
 
     def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
-        return self._data[plugin_id]
+        return self._data[f"{organisation_id}.{plugin_id}"]
+
+    def get_all_enabled(self, organisation_id: str) -> Dict[str, List[str]]:
+        return {
+            LocalPluginRepository.RESERVED_ID: [
+                key.split(".", maxsplit=1)[1]
+                for key, value in self._data.items()
+                if value and key.split(".", maxsplit=1)[0] == organisation_id
+            ]
+        }
 
     def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
-        self._data[plugin_id] = enabled
+        self._data[f"{organisation_id}.{plugin_id}"] = enabled
 
     def update_or_create_by_id(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
-        self._data[plugin_id] = enabled
+        self._data[f"{organisation_id}.{plugin_id}"] = enabled

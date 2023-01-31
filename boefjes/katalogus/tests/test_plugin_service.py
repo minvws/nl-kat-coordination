@@ -86,7 +86,7 @@ def get_plugin_seed():
 
 
 def mock_plugin_service(organisation_id: str) -> PluginService:
-    storage = SettingsStorageMemory("test")
+    storage = SettingsStorageMemory()
     storage.create("DUMMY_VAR", "123", "test", "test_plugin")
 
     repo_store = RepositoryStorageMemory(organisation_id)
@@ -226,3 +226,53 @@ class TestPluginsService(TestCase):
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertFalse(plugin.enabled)
+
+    def test_clone_one_setting(self):
+        new_org_id = "org2"
+
+        plugin_id = "kat_test"
+        self.service.create_setting("api_key", "24", self.organisation, plugin_id)
+        assert self.service.get_setting_by_key("api_key", self.organisation, plugin_id) == "24"
+
+        self.service.update_by_id(LocalPluginRepository.RESERVED_ID, plugin_id, self.organisation, True)
+
+        self.service.update_by_id(LocalPluginRepository.RESERVED_ID, "test-boefje-1", new_org_id, True)
+        self.service.update_by_id(LocalPluginRepository.RESERVED_ID, "test-boefje-2", new_org_id, True)
+
+        with self.assertRaises(KeyError):
+            self.service.get_setting_by_key("api_key", new_org_id, plugin_id)
+
+        new_org_plugins = self.service.get_all(new_org_id)
+        assert len(new_org_plugins) == 8
+        assert len([x for x in new_org_plugins if x.enabled]) == 6  # 4 Normalizers plus two boefjes enabled above
+        assert plugin_id not in [x.id for x in new_org_plugins if x.enabled]
+        assert "test-boefje-1" in [x.id for x in new_org_plugins if x.enabled]
+
+        self.service.clone_settings_to_organisation(self.organisation, new_org_id)
+
+        assert self.service.get_setting_by_key("api_key", self.organisation, plugin_id) == "24"
+        assert self.service.get_setting_by_key("api_key", new_org_id, plugin_id) == "24"
+
+        new_org_plugins = self.service.get_all(new_org_id)
+        assert len(new_org_plugins) == 8
+        assert len([x for x in new_org_plugins if x.enabled]) == 5
+        assert plugin_id in [x.id for x in new_org_plugins if x.enabled]
+        assert "test-boefje-1" not in [x.id for x in new_org_plugins if x.enabled]
+
+    def test_clone_many_settings(self):
+        plugin_ids = ["test-boefje-1", "test-boefje-2"] * 4
+        all_settings = {str(x): str(x + 1) for x in range(8)}
+
+        for plugin_id, (key, value) in zip(plugin_ids, all_settings.items()):
+            self.service.create_setting(key, value, self.organisation, plugin_id)
+
+        self.service.clone_settings_to_organisation(self.organisation, "org2")
+
+        all_settings_for_new_org = self.service.get_all_settings("org2", "test-boefje-1")
+        assert len(all_settings_for_new_org) == 4
+        assert all_settings_for_new_org == {
+            "0": "1",
+            "2": "3",
+            "4": "5",
+            "6": "7",
+        }

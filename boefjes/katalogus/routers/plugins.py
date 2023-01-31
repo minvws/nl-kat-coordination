@@ -128,3 +128,13 @@ def get_plugin_description(
         raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
+
+
+@router.post("/settings/clone/{to_organisation_id}")
+def clone_organisation_settings(
+    organisation_id: str,
+    to_organisation_id: str,
+    storage: PluginService = Depends(get_plugin_service),
+):
+    with storage as store:
+        store.clone_settings_to_organisation(organisation_id, to_organisation_id)

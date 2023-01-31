@@ -52,7 +52,7 @@ sql: ## Generate raw sql for the migrations
 	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade $(rev1):$(rev2) --sql
 
 check:
-	pre-commit run --all-files --show-diff-on-failure --color always
+	pre-commit run --all-files --color always
 
 ##
 ##|------------------------------------------------------------------------|

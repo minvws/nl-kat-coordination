@@ -9,28 +9,11 @@ services:
         - ENVIRONMENT=dev
     command: sh -c 'python -m pytest -vv boefjes/katalogus/tests/integration'
     depends_on:
-      - ci_katalogus
       - ci_katalogus-db
     env_file:
       - .ci/.env.test
     volumes:
     - .:/app/boefjes
-
-  ci_katalogus:
-    build:
-      context: ..
-      dockerfile: nl-kat-boefjes/Dockerfile.dev
-      args:
-        - ENVIRONMENT=dev
-    command: ["python", "-m", "uvicorn", "--host", "0.0.0.0", "boefjes.katalogus.api:app"]
-    depends_on:
-      - ci_katalogus-db
-    env_file:
-      - .ci/.env.test
-    environment:
-      - ENABLE_DB=false
-    volumes:
-      - .:/app/boefjes
 
   ci_katalogus-db:
     image: postgres:12.8
