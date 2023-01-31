@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from tools.add_ooi_information import retirejs_info, cve_info, snyk_info, port_info
+from tools.add_ooi_information import retirejs_info, cve_info, snyk_info, port_info, service_info, cwe_info, get_info
 
 
 def test_retirejs_info():
@@ -41,10 +41,7 @@ def test_cve(mocker):
 
 def test_snyk_info(mocker):
     requests_patch = mocker.patch("tools.add_ooi_information.requests")
-    response = mocker.MagicMock()
-    response.content = (Path(__file__).parent / "stubs" / "snyk_response.html").read_bytes()
-
-    requests_patch.get.return_value = response
+    requests_patch.get().content = (Path(__file__).parent / "stubs" / "snyk_response.html").read_bytes()
 
     output = snyk_info("SNYK-PYTHON-MECHANIZE-3232926")
     output.pop("information updated")  # Remove timestamp
@@ -63,10 +60,7 @@ def test_snyk_info(mocker):
 
 def test_port_info(mocker):
     requests_patch = mocker.patch("tools.add_ooi_information.requests")
-    response = mocker.MagicMock()
-    response.text = (Path(__file__).parent / "stubs" / "wiki.html").read_text()
-
-    requests_patch.get.return_value = response
+    requests_patch.get().text = (Path(__file__).parent / "stubs" / "wiki.html").read_text()
 
     descriptions, source = port_info("80", "TCP")
 
@@ -81,3 +75,41 @@ def test_port_info(mocker):
         "Hypertext Transfer Protocol Secure (HTTPS)[48][49] uses TCP in versions 1.x "
         "and 2. HTTP/3 uses QUIC,[50] a transport protocol on top of UDP."
     )
+
+
+def test_service_info(mocker):
+    requests_patch = mocker.patch("tools.add_ooi_information.requests")
+    requests_patch.get().text = (Path(__file__).parent / "stubs" / "iana_service.html").read_text()
+
+    description, source = service_info("ssh")
+
+    assert (
+        description == "Service is usually on port 22, with protocol tcp: The Secure Shell (SSH) Protocol. "
+        "Service is usually on port 22, with protocol udp: The Secure Shell (SSH) Protocol. "
+        "Service is usually on port 22, with protocol sctp: SSH. Service is usually on port None, "
+        "with protocol tcp: SSH Remote Login Protocol"
+    )
+
+    assert source == "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
+
+    output = get_info("Service", "ssh")
+    output.pop("information updated")  # Remove timestamp
+
+    assert output == {
+        "description": description,
+        "source": source,
+    }
+
+
+def test_cwe_info():
+    output = cwe_info("CWE-20")
+    output.pop("information updated")  # Remove timestamp
+
+    assert output == {
+        "description": "The product does not validate or incorrectly validates input "
+        "that can affect the control flow or data flow of a program.",
+        "source": "https://cwe.mitre.org/index.html",
+    }
+
+    output = cwe_info("CWE-223230")
+    assert output == {"description": "Not found"}

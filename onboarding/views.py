@@ -33,6 +33,7 @@ from onboarding.view_helpers import (
     KatIntroductionAdminStepsMixin,
     KatIntroductionRegistrationStepsMixin,
 )
+from rocky.bytes_client import get_bytes_client
 from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_report import Report, DNSReport, build_findings_list_from_store
@@ -195,8 +196,10 @@ class OnboardingSetupScanOOIAddView(
 
     def get_hidden_form_fields(self):
         hidden_fields = {}
+        bytes_client = get_bytes_client(self.organization.code)
+
         for field_name, params in self.hidden_form_fields.items():
-            ooi, created = get_or_create_ooi(self.octopoes_api_connector, params["ooi"])
+            ooi, created = get_or_create_ooi(self.octopoes_api_connector, bytes_client, params["ooi"])
             hidden_fields[field_name] = ooi.primary_key
 
             if created:

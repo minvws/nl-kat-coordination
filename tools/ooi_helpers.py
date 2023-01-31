@@ -20,6 +20,8 @@ from octopoes.models.ooi.findings import (
 )
 from octopoes.models.tree import ReferenceNode
 from octopoes.models.types import get_relations, OOI_TYPES
+
+from rocky.bytes_client import BytesClient
 from tools.models import OOIInformation
 
 User = get_user_model()
@@ -353,7 +355,7 @@ OOI_TYPES_WITHOUT_FINDINGS = [name for name, cls_ in OOI_TYPES.items() if cls_ n
 
 
 def get_or_create_ooi(
-    api_connector: OctopoesAPIConnector, ooi: OOI, observed_at: datetime = None
+    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime = None
 ) -> Tuple[OOI, Union[bool, datetime]]:
     _now = datetime.now(timezone.utc)
     if observed_at is None:
@@ -365,12 +367,18 @@ def get_or_create_ooi(
         if observed_at < _now:
             # don't create an OOI when expected valid_time is in the past
             raise ValueError(f"OOI not found and unable to create at {observed_at}")
-        create_ooi(api_connector, ooi, observed_at)
+
+        create_ooi(api_connector, bytes_client, ooi, observed_at)
         return ooi, datetime.now(timezone.utc)
 
 
-def create_ooi(api_connector: OctopoesAPIConnector, ooi: OOI, observed_at: datetime = None) -> None:
+def create_ooi(
+    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime = None
+) -> None:
     if observed_at is None:
         observed_at = datetime.now(timezone.utc)
 
-    api_connector.save_declaration(Declaration(ooi=ooi, valid_time=observed_at))
+    declaration = Declaration(ooi=ooi, valid_time=observed_at)
+    bytes_client.add_manual_proof(BytesClient.raw_from_declarations([declaration]))
+
+    api_connector.save_declaration(declaration)

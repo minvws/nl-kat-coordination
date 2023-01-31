@@ -16,6 +16,8 @@ from octopoes.models.ooi.findings import (
     FindingType,
 )
 from octopoes.models.types import OOI_TYPES
+
+from rocky.bytes_client import get_bytes_client, BytesClient
 from rocky.views.ooi_view import BaseOOIFormView
 from tools.forms.finding_type import FindingAddForm
 from tools.view_helpers import get_ooi_url
@@ -94,6 +96,8 @@ class FindingAddView(BaseOOIFormView):
         # Create finding for each finding type
         ooi_ref = Reference.from_str(ooi_id)
 
+        proof = []  # Collect as much data as possible in a single proof
+
         for f_id in finding_type_ids:
             finding_type = get_finding_type_from_id(f_id)
             finding = Finding(
@@ -103,8 +107,13 @@ class FindingAddView(BaseOOIFormView):
                 description=form_data.get("description"),
                 reproduce=form_data.get("reproduce"),
             )
-            self.octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=observed_at))
-            self.octopoes_api_connector.save_declaration(Declaration(ooi=finding_type, valid_time=observed_at))
+            proof.append(Declaration(ooi=finding, valid_time=observed_at))
+            proof.append(Declaration(ooi=finding_type, valid_time=observed_at))
+
+        get_bytes_client(self.organization.code).add_manual_proof(BytesClient.raw_from_declarations(proof))
+
+        for declaration in proof:
+            self.octopoes_api_connector.save_declaration(declaration)
 
         return redirect(get_ooi_url("ooi_detail", ooi_id, self.organization.code))
 

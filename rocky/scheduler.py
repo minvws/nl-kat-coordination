@@ -53,6 +53,14 @@ class Normalizer(BaseModel):
     version: Optional[str] = Field(default=None)
 
 
+class NormalizerMeta(BaseModel):
+    id: str
+    raw_file_id: str
+    normalizer: Normalizer
+    started_at: datetime.datetime
+    ended_at: datetime.datetime
+
+
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 

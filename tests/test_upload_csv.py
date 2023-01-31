@@ -46,20 +46,22 @@ def test_upload_csv_simple(rf, my_user, organization):
     assert response.status_code == 200
 
 
-def test_upload_bad_input(rf, my_user, organization, mock_organization_view_octopoes):
-    example_file = BytesIO(b"invalid|'\n4\bcsv|format")
+def test_upload_bad_input(rf, my_user, organization, mock_organization_view_octopoes, mock_bytes_client):
+    data = b"invalid|'\n4\bcsv|format"
+    example_file = BytesIO(data)
     example_file.name = "networks.csv"
 
     request = setup_request(rf.post("upload_csv", {"object_type": "Hostname", "csv_file": example_file}), my_user)
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 302
+    mock_bytes_client().add_manual_proof.assert_called_once_with(data, manual_mime_type="manual/csv")
 
     messages = list(request._messages)
     assert "could not be created for row number" in messages[0].message
 
 
-def test_upload_bad_name(rf, my_user, organization, mock_organization_view_octopoes):
+def test_upload_bad_name(rf, my_user, organization, mock_organization_view_octopoes, mock_bytes_client):
     example_file = BytesIO(b"name,network\n\xa0\xa1,internet")
     example_file.name = "networks.cvs"
 
@@ -67,10 +69,11 @@ def test_upload_bad_name(rf, my_user, organization, mock_organization_view_octop
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
+    assert mock_bytes_client().add_manual_proof.call_count == 0
     assertContains(response, "Only CSV file supported")
 
 
-def test_upload_bad_decoding(rf, my_user, organization, mock_organization_view_octopoes):
+def test_upload_bad_decoding(rf, my_user, organization, mock_organization_view_octopoes, mock_bytes_client):
     example_file = BytesIO(b"name,network\n\xa0\xa1,internet")
     example_file.name = "networks.csv"
 
@@ -78,6 +81,7 @@ def test_upload_bad_decoding(rf, my_user, organization, mock_organization_view_o
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
+    assert mock_bytes_client().add_manual_proof.call_count == 0
     assertContains(response, "File could not be decoded")
 
 
@@ -86,7 +90,14 @@ def test_upload_bad_decoding(rf, my_user, organization, mock_organization_view_o
     zip(CSV_EXAMPLES, INPUT_TYPES, EXPECTED_OOI_COUNTS),
 )
 def test_upload_csv(
-    rf, my_user, mock_organization_view_octopoes, organization, example_input, input_type, expected_ooi_counts
+    rf,
+    my_user,
+    mock_organization_view_octopoes,
+    organization,
+    mock_bytes_client,
+    example_input,
+    input_type,
+    expected_ooi_counts,
 ):
     example_file = BytesIO(example_input)
     example_file.name = f"{input_type}.csv"
@@ -96,6 +107,7 @@ def test_upload_csv(
 
     assert response.status_code == 302
     assert mock_organization_view_octopoes().save_declaration.call_count == expected_ooi_counts
+    mock_bytes_client().add_manual_proof.assert_called_once_with(example_input, manual_mime_type="manual/csv")
 
     messages = list(request._messages)
     assert "successfully added" in messages[0].message

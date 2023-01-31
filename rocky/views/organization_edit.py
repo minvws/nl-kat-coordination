@@ -27,11 +27,11 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
         context["breadcrumbs"] = [
             {"url": reverse("organization_list"), "text": "Organizations"},
             {
-                "url": reverse("organization_detail", kwargs={"organization_code": self.object.id}),
+                "url": reverse("organization_detail", kwargs={"organization_code": self.object.code}),
                 "text": self.object.name,
             },
             {
-                "url": reverse("organization_edit", kwargs={"organization_code": self.object.id}),
+                "url": reverse("organization_edit", kwargs={"pk": self.object.id}),
                 "text": _("Edit"),
             },
         ]
@@ -47,6 +47,6 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
 
         if self.request.user.has_perm("tools.can_view_organization"):
             organization = self.get_object()
-            return redirect(reverse("organization_detail", kwargs={"organization_code": organization.id}))
+            return redirect(reverse("organization_detail", kwargs={"organization_code": organization.code}))
 
         return redirect("crisis_room")

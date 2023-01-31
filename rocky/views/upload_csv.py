@@ -20,6 +20,8 @@ from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
 from octopoes.models.ooi.web import URL
+
+from rocky.bytes_client import get_bytes_client
 from tools.forms.upload_csv import (
     UploadCSVForm,
     CSV_ERRORS,
@@ -144,7 +146,11 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
     def proccess_csv(self, form):
         object_type = form.cleaned_data["object_type"]
         csv_file = form.cleaned_data["csv_file"]
-        csv_data = io.StringIO(csv_file.read().decode("UTF-8"))
+
+        csv_raw_data = csv_file.read()
+        get_bytes_client(self.organization.code).add_manual_proof(csv_raw_data, manual_mime_type="manual/csv")
+
+        csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
         rows_with_error = []
         try:
             for row_number, row in enumerate(csv.DictReader(csv_data, delimiter=",", quotechar='"'), start=1):

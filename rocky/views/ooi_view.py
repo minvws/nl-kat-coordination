@@ -13,6 +13,8 @@ from two_factor.views.utils import class_view_decorator
 
 from octopoes.api.models import Declaration
 from octopoes.models import OOI, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, ScanProfileType
+
+from rocky.bytes_client import get_bytes_client, BytesClient
 from rocky.views.mixins import (
     SingleOOIMixin,
     SingleOOITreeMixin,
@@ -119,7 +121,11 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
 
     def save_ooi(self, data) -> OOI:
         new_ooi = self.ooi_class.parse_obj(data)
-        self.octopoes_api_connector.save_declaration(Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc)))
+        declaration = Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc))
+
+        get_bytes_client(self.organization.code).add_manual_proof(BytesClient.raw_from_declarations([declaration]))
+
+        self.octopoes_api_connector.save_declaration(declaration)
         return new_ooi
 
     def form_valid(self, form):

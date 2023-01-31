@@ -1,7 +1,7 @@
 from unittest.mock import patch, MagicMock
 
 import pytest
-from django.contrib.auth.models import Permission, ContentType, Group
+from django.contrib.auth.models import Permission, Group
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django_otp import DEVICE_ID_SESSION_KEY
@@ -45,16 +45,11 @@ def my_user(user, organization):
         trusted_clearance_level=4,
         acknowledged_clearance_level=4,
     )
-    content_type = ContentType.objects.get_by_natural_key("tools", "organizationmember")
-    permission, _ = Permission.objects.get_or_create(
-        content_type=content_type,
-        codename="can_scan_organization",
-    )
     Indemnification.objects.create(
         organization=organization,
         user=user,
     )
-    user.user_permissions.add(permission)
+    user.user_permissions.add(Permission.objects.get(codename="can_scan_organization"))
 
     return user
 
@@ -78,6 +73,11 @@ def mock_models_katalogus(mocker):
 @pytest.fixture
 def mock_views_katalogus(mocker):
     return mocker.patch("rocky.views.ooi_report.get_katalogus")
+
+
+@pytest.fixture
+def mock_bytes_client(mocker):
+    return mocker.patch("rocky.bytes_client.BytesClient")
 
 
 @pytest.fixture
