@@ -1,15 +1,14 @@
+from django.contrib import messages
+from django.core.exceptions import BadRequest
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+from octopoes.models.types import type_by_name
 from two_factor.views.utils import class_view_decorator
 
-from django.urls import reverse
-from django.shortcuts import redirect
-from django.contrib import messages
-
 from katalogus.views.mixins import BoefjeMixin
-from octopoes.models.types import type_by_name
-
 from tools.forms.ooi import SelectOOIForm, SelectOOIFilterForm
 
 
@@ -22,8 +21,11 @@ class PluginDetailScanOOI(BoefjeMixin, TemplateView):
         if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
 
+        if "boefje_id" not in request.POST:
+            raise BadRequest("No boefje_id provided")
+
         selected_oois = request.POST.getlist("ooi")
-        plugin_id = request.POST.get("boefje_id")
+        plugin_id = request.POST["boefje_id"]
         if selected_oois and plugin_id:
             boefje = self.katalogus_client.get_boefje(plugin_id)
             oois_with_clearance_level = self.get_oois_with_clearance_level(selected_oois)

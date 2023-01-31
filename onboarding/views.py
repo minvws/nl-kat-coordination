@@ -3,6 +3,7 @@ from typing import Type, List, Dict, Any
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.core.exceptions import BadRequest
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -11,15 +12,15 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django_otp.decorators import otp_required
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI
+from octopoes.models.ooi.network import Network
+from octopoes.models.types import type_by_name
 from two_factor.views.utils import class_view_decorator
 
 from account.forms import OrganizationForm, OrganizationUpdateForm
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models.ooi.network import Network
-from octopoes.models.types import type_by_name
 from onboarding.forms import (
     OnboardingCreateUserAdminForm,
     OnboardingCreateUserRedTeamerForm,
@@ -130,14 +131,16 @@ class OnboardingSetupScanSelectPluginsView(
         return SelectBoefjeForm(boefjes=boefjes, organization=self.organization, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        if "ooi_id" not in request.GET:
+            raise BadRequest("No OOI ID provided")
+        ooi_id = request.GET["ooi_id"]
+
         form = self.get_form()
         if form.is_valid():
             if "boefje" in request.POST:
                 data = form.cleaned_data
                 request.session["selected_boefjes"] = data
-            return redirect(
-                get_ooi_url("step_setup_scan_ooi_detail", self.request.GET.get("ooi_id"), self.organization.code)
-            )
+            return redirect(get_ooi_url("step_setup_scan_ooi_detail", ooi_id, self.organization.code))
         return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
@@ -340,8 +343,12 @@ class OnboardingReportView(
     current_step = 4
 
     def post(self, request, *args, **kwargs):
+        if "ooi_id" not in request.GET:
+            raise BadRequest("No OOI ID provided")
+        ooi_id = request.GET["ooi_id"]
+
         self.set_member_onboarded()
-        return redirect(get_ooi_url("dns_report", self.request.GET.get("ooi_id"), self.organization.code))
+        return redirect(get_ooi_url("dns_report", ooi_id, self.organization.code))
 
     def set_member_onboarded(self):
         member = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)

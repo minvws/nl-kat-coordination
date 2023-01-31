@@ -1,9 +1,10 @@
 import pytest
+from django.core.exceptions import BadRequest
+from octopoes.models.pagination import Paginated
+from octopoes.models.types import OOIType
 from pytest_django.asserts import assertContains
 
 from katalogus.views.plugin_detail import PluginDetailView
-from octopoes.models.pagination import Paginated
-from octopoes.models.types import OOIType
 from tests.conftest import setup_request
 
 
@@ -31,7 +32,7 @@ def test_plugin_detail(
     mock_mixins_katalogus().get_plugin_details.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("step_organization_setup"), my_user)
+    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), my_user)
     response = PluginDetailView.as_view()(
         request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"
     )
@@ -39,3 +40,21 @@ def test_plugin_detail(
     assertContains(response, "TestBoefje")
     assertContains(response, "Meows to the moon")
     assertContains(response, "testnetwork")
+
+
+def test_plugin_detail_data_missing(
+    rf,
+    my_user,
+    organization,
+    mock_mixins_katalogus,
+    plugin_details,
+    plugin_schema,
+    mock_organization_view_octopoes,
+    network,
+    lazy_task_list_with_boefje,
+):
+    request = setup_request(rf.post("step_organization_setup"), my_user)
+    with pytest.raises(BadRequest):
+        PluginDetailView.as_view()(
+            request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"
+        )

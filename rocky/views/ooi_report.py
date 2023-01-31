@@ -3,17 +3,13 @@ from datetime import datetime
 from typing import Dict, List, Set, Type, Optional
 
 from django.contrib import messages
+from django.core.exceptions import BadRequest
 from django.http import FileResponse
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django_otp.decorators import otp_required
-from requests import HTTPError
-from two_factor.views.utils import class_view_decorator
-
-from account.mixins import OrganizationView
-from katalogus.client import get_katalogus
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSARecord,
@@ -27,6 +23,11 @@ from octopoes.models.ooi.findings import (
     Finding,
     FindingType,
 )
+from requests import HTTPError
+from two_factor.views.utils import class_view_decorator
+
+from account.mixins import OrganizationView
+from katalogus.client import get_katalogus
 from rocky.keiko import keiko_client, ReportNotFoundException
 from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
 from rocky.views.ooi_view import (
@@ -154,12 +155,16 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
     connector_form_class = OOIReportSettingsForm
 
     def dispatch(self, request, *args, **kwargs):
+        if "ooi_id" not in request.GET:
+            raise BadRequest("Missing ooi_id parameter")
+        ooi_id = request.GET["ooi_id"]
+
         if self.get_observed_at() > convert_date_to_datetime(datetime.now(timezone.utc)):
             messages.error(
                 request,
                 _("You can't generate a report for an OOI on a date in the future."),
             )
-            return redirect(get_ooi_url("ooi_detail", self.request.GET.get("ooi_id"), self.organization.code))
+            return redirect(get_ooi_url("ooi_detail", ooi_id, self.organization.code))
         return super().dispatch(request, *args, **kwargs)
 
     def setup(self, request, *args, **kwargs):
