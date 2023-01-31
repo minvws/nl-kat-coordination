@@ -27,7 +27,7 @@ The high level documentation on OpenKAT explains the purpose and operation of Op
 Technical documentation
 ***********************
 
-`The full documentation of OpenKAT can be found here <https://minvws.github.io/nl-kat-coordination/index.html>`_. It includes information such as:
+`The full documentation of OpenKAT can be found here <https://docs.openkat.nl>`_. It includes information such as:
 
 - Introduction to the system
 - Modules
