@@ -66,7 +66,7 @@ Now use rocky-cli to initialize the database:
     sudo -u kat rocky-cli migrate
     sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
 
-The steps for creating the other databases will be similar, but we'll lay them out anyway for completeness.
+The steps for creating the other databases will be similar, but we'll explain them anyway for completeness.
 
 KAT-alogus DB
 -------------
