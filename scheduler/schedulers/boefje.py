@@ -272,12 +272,11 @@ class BoefjeScheduler(Scheduler):
         scheduled_jobs, _ = self.ctx.job_store.get_scheduled_jobs(
             scheduler_id=self.scheduler_id,
             enabled=True,
-            max_checked_at=datetime.utcnow() - timedelta(seconds=self.ctx.config.pq_populate_grace_period),
+            max_checked_at=datetime.utcnow() - timedelta(seconds=self.ctx.config.pq_populate_grace_period),  # FIXME: check this with datetime
         )
 
         for job in scheduled_jobs:
 
-            # import pdb; pdb.set_trace()
             # Create a new task, and a new p_item
             task = BoefjeTask(**job.p_item.data)
             if task is None:
@@ -293,7 +292,12 @@ class BoefjeScheduler(Scheduler):
             except Exception:
                 continue
 
-            prior_tasks = self.get_tasks_by_hash(task.hash)
+            # TODO: do we delete the job when we're not allowed to run?
+            # boefje/ooi does not exist anymore. We should not delete it
+            # when it is running/grace period has not passed.
+
+            # FIXME: should be present from the relationship
+            prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
             score = self.ranker.rank(
                 SimpleNamespace(
                     prior_tasks=prior_tasks,

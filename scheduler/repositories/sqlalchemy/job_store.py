@@ -26,7 +26,7 @@ class JobStore(JobStorer):
         Returns:
             A list of ScheduledJob instances.
         """
-        with self.datastore.session() as session:
+        with self.datastore.session.begin() as session:
             query = session.query(models.ScheduledJobORM)
 
             if scheduler_id is not None:
@@ -58,7 +58,7 @@ class JobStore(JobStorer):
         Returns:
             The ScheduledJob instance if found, None otherwise.
         """
-        with self.datastore.session() as session:
+        with self.datastore.session.begin() as session:
             job_orm = session.query(models.ScheduledJobORM).get(job_id)
 
             if job_orm is None:
@@ -75,7 +75,7 @@ class JobStore(JobStorer):
         Returns:
             The ScheduledJob instance if found, None otherwise.
         """
-        with self.datastore.session() as session:
+        with self.datastore.session.begin() as session:
             job_orm = session.query(models.ScheduledJobORM).filter(models.ScheduledJobORM.hash == item_hash).first()
 
             if job_orm is None:
@@ -91,12 +91,11 @@ class JobStore(JobStorer):
         Args:
             scheduled_job: The scheduled job to create.
         """
-        with self.datastore.session() as session:
+        with self.datastore.session.begin() as session:
             job_orm = models.ScheduledJobORM(**job.dict())
             session.add(job_orm)
 
             created_job = models.ScheduledJob.from_orm(job_orm)
-            import pdb; pdb.set_trace()
 
             return created_job
 
@@ -106,5 +105,5 @@ class JobStore(JobStorer):
         Args:
             scheduled_job: The scheduled job to update.
         """
-        with self.datastore.session() as session:
+        with self.datastore.session.begin() as session:
             (session.query(models.ScheduledJobORM).filter(models.ScheduledJobORM.id == job.id).update(job.dict()))
