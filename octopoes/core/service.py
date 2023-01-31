@@ -130,7 +130,11 @@ class OctopoesService:
         parameters_references = self.origin_parameter_repository.list_by_origin(origin.id, valid_time)
         parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
-        resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
+        try:
+            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
+        except Exception as e:
+            logger.exception("Error running inference", exc_info=e)
+            return
         self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
