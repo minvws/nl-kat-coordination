@@ -103,6 +103,20 @@ class PluginService:
             plugin = self.by_plugin_id(plugin_id, organisation_id)
             self.update_by_id(plugin.repository_id, plugin_id, organisation_id, False)
 
+    def clone_settings_to_organisation(self, from_organisation: str, to_organisation: str):
+        # One requirement is that we also do not keep previously enabled boefjes enabled of they are not copied.
+        for repository_id, plugins in self.plugin_enabled_store.get_all_enabled(to_organisation).items():
+            for plugin_id in plugins:
+                self.update_by_id(repository_id, plugin_id, to_organisation, enabled=False)
+
+        for plugin in self.get_all(from_organisation):
+            for key, value in self.get_all_settings(from_organisation, plugin.id).items():
+                self.create_setting(key, value, to_organisation, plugin.id)
+
+        for repository_id, plugins in self.plugin_enabled_store.get_all_enabled(from_organisation).items():
+            for plugin_id in plugins:
+                self.update_by_id(repository_id, plugin_id, to_organisation, enabled=True)
+
     def update_setting_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str):
         return self.settings_storage.update_by_key(key, value, organisation_id, plugin_id)
 
@@ -204,7 +218,7 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
         yield PluginService(
             store,
             repository_storage,
-            SettingsStorageMemory(organisation_id),
+            SettingsStorageMemory(),
             client,
             local_repo,
         )

@@ -1,0 +1,7 @@
+{
+    "id": "kat_manual_csv",
+    "consumes": ["manual/csv"],
+    "produces": [
+        "OOIType"
+    ]
+}

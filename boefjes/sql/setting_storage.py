@@ -83,7 +83,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
 
 def create_setting_storage(organisation_id: str, session) -> SettingsStorage:
     if not settings.enable_db:
-        return SettingsStorageMemory(organisation_id)
+        return SettingsStorageMemory()
 
     encrypter = IdentityMiddleware()
     if get_context().env.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
