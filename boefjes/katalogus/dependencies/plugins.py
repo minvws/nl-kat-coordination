@@ -110,7 +110,13 @@ class PluginService:
                 self.update_by_id(repository_id, plugin_id, to_organisation, enabled=False)
 
         for plugin in self.get_all(from_organisation):
+            old_settings = self.get_all_settings(to_organisation, plugin.id)
+
             for key, value in self.get_all_settings(from_organisation, plugin.id).items():
+                if key in old_settings:
+                    self.update_setting_by_key(key, value, to_organisation, plugin.id)
+                    continue
+
                 self.create_setting(key, value, to_organisation, plugin.id)
 
         for repository_id, plugins in self.plugin_enabled_store.get_all_enabled(from_organisation).items():
