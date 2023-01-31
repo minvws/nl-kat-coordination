@@ -90,9 +90,10 @@ class TestAPI(TestCase):
         new_org_id = "org2"
         org2 = Organisation(id=new_org_id, name="Second test Organisation")
         self.client.post("/v1/organisations/", org2.json())
+        self.client.post(f"/v1/organisations/{new_org_id}/{plug}/settings/test_key", json={"value": "second value"})
 
         # Show that the second organisation has no settings and dns-records is not enabled
-        assert self.client.get(f"/v1/organisations/{new_org_id}/{plug}/settings").json() == {}
+        assert self.client.get(f"/v1/organisations/{new_org_id}/{plug}/settings").json() == {"test_key": "second value"}
         assert self.client.get(f"/v1/organisations/{new_org_id}/plugins/{plug}").json()["enabled"] is False
 
         # Enable two boefjes that should get disabled by the cloning
