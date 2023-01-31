@@ -1,7 +1,7 @@
 import csv
 import io
-import ipaddress
 import logging
+from ipaddress import ip_network, IPv4Network
 from typing import Union, Iterator, Dict, Tuple, List
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -70,17 +70,7 @@ def get_object_type(csv_data: io.StringIO) -> str:
             address = next(csv.DictReader(csv_data, delimiter=",", quotechar='"'))["address"]
             csv_data.seek(0)
 
-            try:
-                ipaddress.IPv4Address(address)
-                return "IPAddressV4"
-            except ValueError:
-                pass
-
-            try:
-                ipaddress.IPv6Address(address)
-                return "IPAddressV6"
-            except ValueError:
-                ValueError("Unsupported OOI type for csv normalizer: bad address column.")
+            return "IPAddressV4" if isinstance(ip_network(address), IPv4Network) else "IPAddressV6"
 
         return "IPAddressV4"  # No data in the csv, so this is redundant but an Exception would be overkill.
 
