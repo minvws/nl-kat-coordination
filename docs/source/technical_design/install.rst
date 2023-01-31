@@ -9,17 +9,15 @@ Pre-built Docker images
 
 The pre-built docker images are on the Github Container Registry. The deployment manual based on the pre-built docker images is included in this manual. A kubernetes script is being worked on for automatic deploy.
 
+Debian packages
+===============
+
+The Debian packages are now available as artifacts from the Github actions in the repository of each module and the artifacts are added to the GitHub release on the main repository. How to install them is explained in the manual and there is also an unofficial installation script for this. A repository to enable ``apt install kat`` is under construction.
+
 make kat
 ========
 
 The 'developer option' or local install of OpenKAT, which builds the system from the source using docker containers. The manual for this install explains how to set up your computer for an install of OpenKAT.
-
-Debian packages
-===============
-
-The Debian packages are now available as artifacts from the Github actions in the repository of each module. There is an unofficial installation script to merge them into a working installation, and a repository to enable ``apt install kat`` is under construction.
-
-There is a beta community for the debian packages. If you want to get involved in this, send an email to meedoen@openkat.nl.
 
 Example infrastructure
 ======================

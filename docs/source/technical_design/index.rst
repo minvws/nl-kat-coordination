@@ -9,5 +9,6 @@ Contains documentation for developers and contributors.
 
    install
    containers
+   debianinstall
    localinstall
    hardening
