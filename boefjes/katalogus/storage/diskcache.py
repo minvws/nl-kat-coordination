@@ -55,21 +55,3 @@ class RepositoryStorageDisk(RepositoryStorage):
 
     def delete_by_id(self, id_: str) -> None:
         del self._repositories[id_]
-
-
-class PluginStatesStorageDisk(PluginEnabledStorage):
-    def __init__(self, directory: Union[str, Path]):
-        self._cache = Cache(Path(directory).as_posix())
-        if "plugins_states" not in self._cache:
-            self._cache["plugins_states"] = {}
-
-        self._plugins_states = self._cache["plugins_states"]
-
-    def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
-        return self._plugins_states[plugin_id]
-
-    def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
-        self._plugins_states[plugin_id] = enabled
-
-    def update_or_create_by_id(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
-        self._plugins_states[plugin_id] = enabled

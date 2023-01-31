@@ -1,7 +1,7 @@
 from abc import ABC
-from typing import Dict, Type
+from typing import Dict, Type, List
 
-from boefjes.katalogus.models import Organisation, Repository, Plugin
+from boefjes.katalogus.models import Organisation, Repository
 
 
 class StorageError(Exception):
@@ -119,6 +119,9 @@ class PluginEnabledStorage(ABC):
         pass
 
     def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
+        raise NotImplementedError
+
+    def get_all_enabled(self, organisation_id: str) -> Dict[str, List[str]]:
         raise NotImplementedError
 
     def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
