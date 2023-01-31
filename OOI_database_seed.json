@@ -1078,7 +1078,7 @@
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
-        "description": "This website does not have an SSL certificate.",
+        "description": "This website does not have an SSL certificate. This finding might be caused by an unfinished certificate scan.",
         "risk": "Medium"
       },
       "consult_api": false
@@ -1158,6 +1158,18 @@
         "description": "This hostname does not have an SPF record.",
         "recommendation": "Set an SPF record to protect your domain.",
         "risk": "Medium"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-INVALID-SPF",
+    "fields": {
+      "last_updated": "2021-12-07T17:24:09.835Z",
+      "data": {
+        "description": "This SPF record could not be parsed by the internet.nl SPF parser and is therefore deemed invalid.",
+        "risk": "Low"
       },
       "consult_api": false
     }
