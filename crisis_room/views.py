@@ -1,6 +1,7 @@
 from datetime import timezone, datetime
 from typing import List, Union
 
+from django.conf import settings
 from django.urls.base import reverse
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
@@ -9,7 +10,6 @@ from two_factor.views.utils import class_view_decorator
 from octopoes.connector import RemoteException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.findings import Finding
-from rocky.settings import OCTOPOES_API
 from rocky.views.ooi_report import build_findings_list_from_store
 from rocky.views.ooi_view import ConnectorFormMixin
 from tools.forms.base import ObservedAtForm
@@ -46,7 +46,7 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
 
     def get_list_for_org(self, organization: Organization) -> Union[List, None]:
         try:
-            api_connector = OctopoesAPIConnector(OCTOPOES_API, organization.code)
+            api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
 
             return api_connector.list(self.ooi_types, valid_time=self.get_observed_at()).items
         except RemoteException:

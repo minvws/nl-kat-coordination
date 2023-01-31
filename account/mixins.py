@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from django.conf import settings
 from django.contrib import messages
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
@@ -14,7 +15,6 @@ from rocky.exceptions import (
     TrustedClearanceLevelTooLowException,
     ClearanceLevelTooLowException,
 )
-from rocky.settings import OCTOPOES_API
 from tools.models import Organization, OrganizationMember, Indemnification
 
 
@@ -46,7 +46,7 @@ class OrganizationView(View):
         except OrganizationMember.DoesNotExist:
             self.organization_member = None
 
-        self.octopoes_api_connector = OctopoesAPIConnector(OCTOPOES_API, organization_code)
+        self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)
 
     def dispatch(self, request, *args, **kwargs):
 

@@ -2,6 +2,7 @@ import json
 from io import BytesIO
 from typing import Dict, Type, Set, List
 
+from django.conf import settings
 import requests
 from pydantic import BaseModel
 
@@ -9,7 +10,6 @@ from octopoes.models import OOI
 from octopoes.models.types import type_by_name
 
 from rocky.health import ServiceHealth
-from rocky.settings import KATALOGUS_API
 from tools.enums import SCAN_LEVEL
 
 
@@ -158,4 +158,4 @@ def parse_plugin(plugin: Dict) -> Plugin:
 
 
 def get_katalogus(organization: str) -> KATalogusClientV1:
-    return KATalogusClientV1(KATALOGUS_API, organization)
+    return KATalogusClientV1(settings.KATALOGUS_API, organization)

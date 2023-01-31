@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import views as auth_views
 from django.urls import reverse
@@ -6,11 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from account.forms import SetPasswordForm, PasswordResetForm
-from rocky.settings import (
-    EMAIL_HOST,
-    EMAIL_PORT,
-    HELP_DESK_EMAIL,
-)
 
 
 class PasswordResetView(auth_views.PasswordResetView):
@@ -48,14 +44,16 @@ class PasswordResetView(auth_views.PasswordResetView):
 
     def is_smtp_valid(self):
         smtp_credentials = [
-            EMAIL_HOST,
-            EMAIL_PORT,
+            settings.EMAIL_HOST,
+            settings.EMAIL_PORT,
         ]
         return not ("" in smtp_credentials or None in smtp_credentials)
 
     def add_error_notification(self):
-        if HELP_DESK_EMAIL:
-            error_message = _("We couldn't send a password reset link. Contact " + HELP_DESK_EMAIL + " for support.")
+        if settings.HELP_DESK_EMAIL:
+            error_message = _(
+                "We couldn't send a password reset link. Contact " + settings.HELP_DESK_EMAIL + " for support."
+            )
         else:
             error_message = _("We couldn't send a password reset link. Contact your system administrator.")
         messages.add_message(self.request, messages.ERROR, error_message)

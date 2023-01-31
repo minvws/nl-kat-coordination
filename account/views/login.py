@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LogoutView
 from django.forms import ValidationError
@@ -18,7 +19,6 @@ from account.forms import (
     TwoFactorVerifyTokenForm,
     TwoFactorBackupTokenForm,
 )
-from rocky.settings import LOGIN_REDIRECT_URL
 from tools.models import OrganizationMember
 
 User = get_user_model()
@@ -71,7 +71,7 @@ class LoginRockyView(LoginView):
         url = self.get_redirect_url()
         if default_device(self.request.user) is None:
             url = resolve_url("setup")
-        return url or resolve_url(LOGIN_REDIRECT_URL)
+        return url or resolve_url(settings.LOGIN_REDIRECT_URL)
 
 
 @class_view_decorator(sensitive_post_parameters())

@@ -10,9 +10,8 @@ import requests
 from ares import CVESearch
 from bs4 import BeautifulSoup
 from cwe import Database
+from django.conf import settings
 from itertools import product
-
-from rocky.settings import BASE_DIR
 
 RETIREJS_SOURCE = "https://github.com/RetireJS/retire.js/blob/master/repository/jsrepository.json"
 
@@ -79,7 +78,7 @@ def _snyk_search(snyk_id: str) -> Dict:
 
 def retirejs_info(retirejs_id: str) -> dict:
     """Uses the retirejs vulnerabilities list to find outdated javascript instances"""
-    filename_path = os.path.join(BASE_DIR, "data/retirejs.json")
+    filename_path = os.path.join(settings.BASE_DIR, "data/retirejs.json")
     with open(filename_path, encoding="utf-8") as json_file:
         data = json.load(json_file)
 

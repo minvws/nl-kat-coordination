@@ -1,10 +1,10 @@
 from typing import Dict, BinaryIO
+from django.conf import settings
 
 import requests
 import time
 
 from rocky.health import ServiceHealth
-from rocky.settings import KEIKO_API
 
 
 class ReportNotFoundException(Exception):
@@ -45,4 +45,4 @@ class KeikoClient:
         return ServiceHealth.parse_obj(res.json())
 
 
-keiko_client = KeikoClient(KEIKO_API)
+keiko_client = KeikoClient(settings.KEIKO_API)

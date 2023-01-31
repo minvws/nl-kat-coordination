@@ -2,6 +2,7 @@ import logging
 import uuid
 
 import tagulous.models
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -13,7 +14,6 @@ from django.utils.translation import gettext_lazy as _
 from katalogus.client import get_katalogus
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.exceptions import RockyError
-from rocky.settings import OCTOPOES_API, TAG_COLORS, TAG_BORDER_TYPES
 from tools.add_ooi_information import get_info, SEPARATOR
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
@@ -30,8 +30,8 @@ ORGANIZATION_CODE_LENGTH = 32
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):
-    COLOR_CHOICES = TAG_COLORS
-    BORDER_TYPE_CHOICES = TAG_BORDER_TYPES
+    COLOR_CHOICES = settings.TAG_COLORS
+    BORDER_TYPE_CHOICES = settings.TAG_BORDER_TYPES
 
     color = models.CharField(choices=COLOR_CHOICES, max_length=20, default=COLOR_CHOICES[0][0])
     border_type = models.CharField(choices=BORDER_TYPE_CHOICES, max_length=20, default=BORDER_TYPE_CHOICES[0][0])
@@ -79,7 +79,7 @@ class Organization(models.Model):
         except Exception as e:
             raise RockyError(f"Katalogus returned error deleting organization: {e}") from e
 
-        octopoes_client = OctopoesAPIConnector(OCTOPOES_API, client=self.code)
+        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=self.code)
         try:
             octopoes_client.delete_node()
         except Exception as e:
@@ -100,7 +100,7 @@ class Organization(models.Model):
         except Exception as e:
             raise RockyError(f"Katalogus returned error creating organization: {e}") from e
 
-        octopoes_client = OctopoesAPIConnector(OCTOPOES_API, client=instance.code)
+        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=instance.code)
 
         try:
             octopoes_client.create_node()

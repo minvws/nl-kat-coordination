@@ -6,10 +6,10 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Union
 
 import requests
+from django.conf import settings
 from pydantic import BaseModel, Field
 
 from rocky.health import ServiceHealth
-from rocky.settings import SCHEDULER_API
 
 
 class Boefje(BaseModel):
@@ -239,4 +239,4 @@ class SchedulerClient:
         return ServiceHealth.parse_raw(health_endpoint.content)
 
 
-client = SchedulerClient(SCHEDULER_API)
+client = SchedulerClient(settings.SCHEDULER_API)

@@ -1,7 +1,7 @@
+from django.conf import settings
+
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext as _
-
-from rocky.settings import AUTH_PASSWORD_VALIDATORS
 
 
 def get_password_validators_help_texts():
@@ -11,7 +11,7 @@ def get_password_validators_help_texts():
     help_texts = []
     validators = {}
     explanation = _("Your password must contain at least the following:")
-    for validator in AUTH_PASSWORD_VALIDATORS:
+    for validator in settings.AUTH_PASSWORD_VALIDATORS:
         validators.update(validator["OPTIONS"])
     help_texts += [
         str(validators["min_length"]) + _(" characters"),

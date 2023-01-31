@@ -1,5 +1,6 @@
 # Python linters
 flake8==5.0.4
+flake8-tidy-imports==4.8.0
 mypy==0.991
 pylint==2.15.5
 vulture==2.6

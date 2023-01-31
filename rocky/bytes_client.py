@@ -4,12 +4,12 @@ import uuid
 from datetime import datetime, timezone
 from typing import Dict, List, Set
 
+from django.conf import settings
 import requests
 from octopoes.api.models import Declaration
 
 from rocky.health import ServiceHealth
 from rocky.scheduler import BoefjeMeta, NormalizerMeta, Boefje, Normalizer
-from rocky.settings import BYTES_API, BYTES_USERNAME, BYTES_PASSWORD
 
 logger = logging.getLogger(__name__)
 
@@ -143,4 +143,4 @@ class BytesClient:
 
 
 def get_bytes_client(organization: str) -> BytesClient:
-    return BytesClient(BYTES_API, BYTES_USERNAME, BYTES_PASSWORD, organization)
+    return BytesClient(settings.BYTES_API, settings.BYTES_USERNAME, settings.BYTES_PASSWORD, organization)
