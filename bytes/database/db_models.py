@@ -11,8 +11,8 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
     id = Column(UUID, primary_key=True)
     boefje_id = Column(String(length=64), nullable=False)
     boefje_version = Column(String(length=16))
-    organization = Column(String(length=8), nullable=False)
-    input_ooi = Column(String(length=1024), nullable=False)
+    organization = Column(String(length=32), nullable=False)
+    input_ooi = Column(String(length=1024), nullable=True)
     arguments = Column(JSON, nullable=False, default=lambda: {})
 
     started_at = Column(DateTime(timezone=True))
