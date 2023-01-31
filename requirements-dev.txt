@@ -56,7 +56,7 @@ toml==0.10.2
 tomli==2.0.1
 toolz==0.12.0
 typing-extensions==4.2.0
-urllib3==1.26.9
+urllib3==1.26.14
 uvicorn==0.17.6
 wrapt==1.14.1
 zipp==3.8.1
