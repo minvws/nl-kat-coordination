@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 import pytest
@@ -218,3 +220,7 @@ def setup_request(request, user):
 @pytest.fixture
 def mock_scheduler(mocker):
     return mocker.patch("rocky.views.ooi_detail.scheduler.client")
+
+
+def get_boefjes_data():
+    return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())

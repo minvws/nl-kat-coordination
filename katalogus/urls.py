@@ -16,6 +16,16 @@ urlpatterns = [
         name="katalogus_settings",
     ),
     path(
+        "settings/migrate/",
+        views.KATalogusSettingsListView.as_view(),
+        name="katalogus_clone_settings",
+    ),
+    path(
+        "settings/migrate/confirmation/<to_organization>/",
+        views.ConfirmCloneSettingsView.as_view(),
+        name="confirm_clone_settings",
+    ),
+    path(
         "plugins/<plugin_type>/<plugin_id>/",
         PluginDetailView.as_view(),
         name="plugin_detail",

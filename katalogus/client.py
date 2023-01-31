@@ -78,8 +78,14 @@ class KATalogusClientV1:
         response = requests.put(f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body)
         response.raise_for_status()
 
-    def delete_plugin_setting(self, plugin_id: str, name: str) -> None:
+    def delete_plugin_setting(self, plugin_id: str, name: str):
         response = requests.delete(f"{self.organization_uri}/{plugin_id}/settings/{name}")
+        return response
+
+    def clone_all_configuration_to_organization(self, to_organization: str):
+        response = requests.post(f"{self.organization_uri}/settings/clone/{to_organization}")
+        response.raise_for_status()
+
         return response
 
     def health(self) -> ServiceHealth:

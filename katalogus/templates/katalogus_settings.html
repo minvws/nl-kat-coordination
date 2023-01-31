@@ -47,5 +47,8 @@
     {% endif %}
   </div>
 </section>
+{% if form.fields %}
+  {% include 'clone_settings.html' %}
+{% endif %}
 </main>
 {% endblock %}
