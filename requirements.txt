@@ -1,5 +1,5 @@
 alembic==1.8.1
-anyio==3.6.1
+anyio==3.6.2
 asgiref==3.5.2
 bcrypt==4.0.1
 certifi==2022.12.7
