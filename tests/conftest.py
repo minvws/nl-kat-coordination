@@ -10,6 +10,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 
 from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
+from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 from tools.models import Organization, OrganizationMember, OOIInformation, Indemnification
@@ -164,6 +165,17 @@ def network():
     return Network(
         name="testnetwork",
         scan_profile=DeclaredScanProfile(reference=Reference.from_str("Network|testnetwork"), level=ScanLevel.L1),
+    )
+
+
+@pytest.fixture
+def finding():
+    return Finding(
+        finding_type=Reference.from_str("KATFindingType|KAT-0001"),
+        ooi=Reference.from_str("Network|testnetwork"),
+        proof="proof",
+        description="description",
+        reproduce="reproduce",
     )
 
 

@@ -275,7 +275,10 @@ class SingleOOIMixin(OctopoesView):
             "text": "Objects",
         }
         if isinstance(self.ooi, Finding):
-            start = {"url": reverse("finding_list"), "text": "Findings"}
+            start = {
+                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
+                "text": "Findings",
+            }
 
         return [
             start,
