@@ -1,5 +1,5 @@
-Technical design documentation
-##############################
+Installation and deployment
+###########################
 
 Contains documentation for developers and contributors.
 

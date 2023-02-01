@@ -58,8 +58,8 @@ Scanning and reporting in OpenKAT are different systems with separate users. The
 
 :Reporting user: Has read only access to the objects, can look through time at the scans done and see what findings the system has created.
 
-System build
-============
+System design
+=============
 
 The system has four parts: information collection, storage, analysis and reporting.
 
