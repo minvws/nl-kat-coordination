@@ -153,7 +153,7 @@ class DnsTest(TestCase):
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
-        results = runner.run(meta, get_dummy_data("inputs/dns-result-example.nl.txt"))
+        results = runner.run(meta, get_dummy_data("inputs/dns-result-example.nl.json"))
 
         self.assertEqual(1, len(results.observations))
         self.assertCountEqual(expected, results.observations[0].results)
@@ -241,7 +241,7 @@ class DnsTest(TestCase):
 
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
-        results = runner.run(meta, get_dummy_data("inputs/dns-result-www.example.nl.txt"))
+        results = runner.run(meta, get_dummy_data("inputs/dns-result-www.example.nl.json"))
 
         self.assertCountEqual(expected, results.observations[0].results)
 
@@ -265,20 +265,7 @@ class DnsTest(TestCase):
             ),
         )
 
-        answer = """\
-RESOLVER: 2001:b88:1002::10
-id 21479
-opcode QUERY
-rcode NOERROR
-flags QR RD RA
-;QUESTION
-english.example.nl. IN MX
-;ANSWER
-english.example.nl. 60 IN CNAME redir.example.nl.
-redir.example.nl. 14400 IN MX 0 .
-;AUTHORITY
-;ADDITIONAL
-"""
+        answer = get_dummy_data("inputs/dns-result-mx-example.nl.json")
 
         internet = Network(name="internet")
         input_hostname = Hostname(
@@ -306,7 +293,7 @@ redir.example.nl. 14400 IN MX 0 .
 
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
-        results = runner.run(meta, answer.encode())
+        results = runner.run(meta, answer)
 
         self.assertCountEqual(
             [cname_target, cname_record, mx_record, input_fqdn, input_hostname],
@@ -409,7 +396,7 @@ redir.example.nl. 14400 IN MX 0 .
         )
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
-        results = runner.run(meta, get_dummy_data("inputs/dns-result-example.com-cnames.txt"))
+        results = runner.run(meta, get_dummy_data("inputs/dns-result-example.com-cnames.json"))
 
         self.assertCountEqual(
             [
@@ -512,4 +499,4 @@ redir.example.nl. 14400 IN MX 0 .
         runner = LocalNormalizerJobRunner(local_repository)
 
         with self.assertRaises(ObservationsWithoutInputOOI):
-            runner.run(meta, get_dummy_data("inputs/dns-result-example.nl.txt"))
+            runner.run(meta, get_dummy_data("inputs/dns-result-example.nl.json"))
