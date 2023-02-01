@@ -17,7 +17,7 @@ VALID_HOSTNAME_CHARACTERS = string.ascii_letters + string.digits + "-."
 class DNSZone(OOI):
     object_type: Literal["DNSZone"] = "DNSZone"
 
-    hostname: Reference = ReferenceField("Hostname", max_issue_scan_level=2, max_inherit_scan_level=0)
+    hostname: Reference = ReferenceField("Hostname", max_issue_scan_level=2, max_inherit_scan_level=1)
     parent: Optional[Reference] = ReferenceField(
         "DNSZone", max_issue_scan_level=0, max_inherit_scan_level=1, default=None
     )
@@ -41,7 +41,7 @@ class Hostname(OOI):
         "Hostname", max_issue_scan_level=4, max_inherit_scan_level=4, default=None
     )
     dns_zone: Optional[Reference] = ReferenceField(
-        DNSZone, max_issue_scan_level=0, max_inherit_scan_level=2, default=None
+        DNSZone, max_issue_scan_level=1, max_inherit_scan_level=2, default=None
     )
 
     _natural_key_attrs = ["network", "name"]

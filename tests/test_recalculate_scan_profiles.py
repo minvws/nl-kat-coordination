@@ -27,7 +27,7 @@ def test_recalculate_inherent(
 
     assert scan_profile_repository.get(ipaddressv4.reference, valid_time).level == 4
     assert scan_profile_repository.get(resolved_hostname.reference, valid_time).level == 4
-    assert scan_profile_repository.get(dns_zone.reference, valid_time).level == 0
+    assert scan_profile_repository.get(dns_zone.reference, valid_time).level == 1
 
 
 def test_recalculate_inherent_max(
@@ -55,13 +55,13 @@ def test_recalculate_inherent_recalculate(
 
     assert scan_profile_repository.get(ipaddressv4.reference, valid_time).level == 3
     assert scan_profile_repository.get(resolved_hostname.reference, valid_time).level == 3
-    assert scan_profile_repository.get(dns_zone.reference, valid_time).level == 0
+    assert scan_profile_repository.get(dns_zone.reference, valid_time).level == 1
 
     octopoes.recalculate_scan_profiles(valid_time)
 
     assert scan_profile_repository.get(ipaddressv4.reference, valid_time).level == 3
     assert scan_profile_repository.get(resolved_hostname.reference, valid_time).level == 3
-    assert scan_profile_repository.get(dns_zone.reference, valid_time).level == 0
+    assert scan_profile_repository.get(dns_zone.reference, valid_time).level == 1
 
     profile = DeclaredScanProfile(reference=hostname.reference, level=2)
     scan_profile_repository.save(None, profile, valid_time)
@@ -70,7 +70,7 @@ def test_recalculate_inherent_recalculate(
 
     assert scan_profile_repository.get(ipaddressv4.reference, valid_time).level == 2
     assert scan_profile_repository.get(resolved_hostname.reference, valid_time).level == 2
-    assert scan_profile_repository.get(dns_zone.reference, valid_time).level == 0
+    assert scan_profile_repository.get(dns_zone.reference, valid_time).level == 1
 
     scan_profile_repository.delete(profile, valid_time)
 

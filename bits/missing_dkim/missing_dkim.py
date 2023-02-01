@@ -14,7 +14,14 @@ def run(
     additional_oois: List[DKIMExists],
 ) -> Iterator[OOI]:
 
-    if input_ooi.name == input_ooi.fqdn.tokenized.name and not tldextract.extract(input_ooi.name).subdomain:
+    if (
+        # only report on findings on the fqdn because of double findings
+        input_ooi.name == input_ooi.fqdn.tokenized.name
+        # don't report on findings on subdomains because it's not needed on subdomains
+        and not tldextract.extract(input_ooi.name).subdomain
+        # don't report on findings on tlds
+        and tldextract.extract(input_ooi.name).domain
+    ):
         if not additional_oois:
             ft = KATFindingType(id="KAT-NO-DKIM")
             yield ft
