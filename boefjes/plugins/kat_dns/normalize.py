@@ -116,7 +116,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                     )
 
                 if isinstance(rr, TXT):
-                    # TODO: concatenated txt records should be handled better see https://www.rfc-editor.org/rfc/rfc1035 3.3.14
+                    # TODO: concatenated txt records should be handled better
+                    # see https://www.rfc-editor.org/rfc/rfc1035 3.3.14
                     default_args["value"] = str(rr).strip('"').replace('" "', "")
                     register_record(DNSTXTRecord(**default_args))
 
