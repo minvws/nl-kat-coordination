@@ -20,7 +20,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     uri = get_uri(input_)
     ip = input_["website"]["ip_service"]["ip_port"]["address"]["address"]
-
     # Code from https://github.com/Roadmaster/forcediphttpsadapter/blob/master/example.py
     url_parts = urlparse(uri)
     hostname = url_parts.netloc
@@ -33,7 +32,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     else:
         # Fall back to old hack-ip-into-url behavior, for either https with no adapter, or http.
         if ip:
-            url_parts = url_parts._replace(netloc=ip)
+            url_parts = url_parts._replace(netloc="[%s]" % ip)
             uri = urlunsplit(
                 [
                     url_parts.scheme,
