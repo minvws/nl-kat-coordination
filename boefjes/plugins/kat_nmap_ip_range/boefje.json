@@ -3,7 +3,8 @@
     "name": "Nmap IP range",
     "description": "Scan an IP range and store found IPs.",
     "consumes": [
-        "NetBlock"
+        "IPV6NetBlock",
+        "IPV4NetBlock"
     ],
     "produces": [
         "IPAddressV6",
