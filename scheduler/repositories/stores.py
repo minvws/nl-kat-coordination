@@ -1,7 +1,7 @@
 import abc
 import datetime
 import logging
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 
 from scheduler import models
 
@@ -59,7 +59,7 @@ class PriorityQueueStorer(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def pop(self, scheduler_id: str, filters: List[models.Filter] = None) -> Optional[models.PrioritizedItem]:
+    def pop(self, scheduler_id: str, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
         raise NotImplementedError
 
     @abc.abstractmethod

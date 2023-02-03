@@ -1,7 +1,7 @@
 import datetime
 from typing import List, Literal, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class Filter(BaseModel):

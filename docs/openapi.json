@@ -50,7 +50,6 @@
                             "application/json": {
                                 "schema": {
                                     "title": "Response Get Schedulers Schedulers Get",
-                                    "title": "Response Method Schedulers Get",
                                     "type": "array",
                                     "items": {
                                         "$ref": "#/components/schemas/Scheduler"

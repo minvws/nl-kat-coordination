@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from scheduler.models import Base
-from scheduler.repositories import sqlalchemy, stores
+from scheduler.repositories import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from tests.integration.test_api import create_p_item
 

@@ -1,6 +1,6 @@
 from typing import List
 
-from factory import Factory, Faker, LazyFunction, PostGenerationMethodCall, Sequence, fuzzy
+from factory import Factory, LazyFunction, Sequence, fuzzy
 from scheduler.models import Plugin
 
 

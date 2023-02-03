@@ -2,7 +2,7 @@
 
 Within the scheduler project you'll be able to extend the functionality with
 your own procedures. The most likely customization you'll make will be
-the directives of populating the queue, dispatching and ranking tasks. 
+the directives of populating the queue, dispatching and ranking tasks.
 
 Examples on how to extend the classes can be found in their respective folders.
 The files are named `boefje.py`, and `normalizer.py` that are a specific KAT

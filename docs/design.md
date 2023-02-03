@@ -39,7 +39,7 @@ services.
 
 ```mermaid
 graph TB
-    
+
     Rocky["Rocky<br/>[webapp]"]
     Octopoes["Octopoes<br/>[graph database]"]
     Katalogus["Katalogus<br/>[software system]"]
@@ -86,7 +86,7 @@ executed in the `Scheduler`.
 
 ```mermaid
 flowchart TB
-    
+
     %% External services
     Rocky["Rocky<br/>[webapp]"]
     Octopoes["Octopoes<br/>[graph database]"]
@@ -101,7 +101,7 @@ flowchart TB
     Rocky--"Create scan job<br/>HTTP POST"--->push_queue
     push_queue--"Push job with highest priority"-->BoefjePriorityQueue
     push_queue--"Push job with highest priority"-->NormalizerPriorityQueue
-    
+
     %% External services flow
     %% Bytes--"Check last run of boefje and ooi<br/>HTTP GET"-->create_tasks_for_ooi
     %% Katalogus--"Get available boefjes<br/>HTTP GET"--->create_tasks_for_ooi
@@ -115,7 +115,7 @@ flowchart TB
     push_boefje-->post_push_boefje
     push_boefje--> BoefjePriorityQueue
     post_push_boefje-->Datastore
-    
+
     %% Normalizer flow
     get_latest_raw_data-->create_tasks_for_raw_data-->rank_normalizer-->push_normalizer
     push_normalizer-->post_push_normalizer
@@ -148,7 +148,7 @@ flowchart TB
             end
 
             post_push_normalizer[["post_push()<br/><br/>add tasks to database"]]
-            
+
             NormalizerPriorityQueue(["PriorityQueue"])
         end
 
@@ -200,7 +200,7 @@ flowchart TB
 
   - Continuously get the latest raw data files from the message
     queue that was sent by the bytes (`get_latest_raw_data()`), for boefjes
-    that are done processing. 
+    that are done processing.
 
   - When a raw file has been received the task from the `BoefjeScheduler` is
     updated as `completed`.
@@ -234,7 +234,7 @@ classDiagram
     class Scheduler {
         <<abstract>>
         +AppContext ctx
-        +Dict[str, ThreadRunner] threads        
+        +Dict[str, ThreadRunner] threads
         +PriorityQueue queue
         +Ranker ranker
         populate_queue()

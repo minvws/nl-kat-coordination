@@ -1,6 +1,6 @@
 """Initial migration
 Revision ID: 0001
-Revises: 
+Revises:
 Create Date: 2022-07-25 11:02:13.395259
 """
 import scheduler

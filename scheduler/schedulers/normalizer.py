@@ -88,7 +88,8 @@ class NormalizerScheduler(Scheduler):
             )
             if boefje_task_db is None:
                 self.logger.debug(
-                    "Could not find boefje task in database [raw_data.boefje_meta.id_id=%s, organisation.id=%s, scheduler_id=%s]",
+                    "Could not find boefje task in database "
+                    "[raw_data.boefje_meta.id_id=%s, organisation.id=%s, scheduler_id=%s]",
                     latest_raw_data.raw_data.boefje_meta.id,
                     self.organisation.id,
                     self.scheduler_id,
@@ -107,7 +108,8 @@ class NormalizerScheduler(Scheduler):
                 self.ctx.task_store.update_task(boefje_task_db)
 
                 self.logger.info(
-                    "Updated boefje task (%s) status to %s in datastore [task.id=%s, organisation.id=%s, scheduler_id=%s]",
+                    "Updated boefje task (%s) status to %s in datastore "
+                    "[task.id=%s, organisation.id=%s, scheduler_id=%s]",
                     boefje_task_db.id,
                     status,
                     boefje_task_db.id,
@@ -117,7 +119,8 @@ class NormalizerScheduler(Scheduler):
 
                 if status == TaskStatus.FAILED:
                     self.logger.info(
-                        "Boefje task (%s) failed, stop creating normalizer tasks [task.id=%s, organisation.id=%s, scheduler_id=%s]",
+                        "Boefje task (%s) failed, stop creating normalizer tasks "
+                        "[task.id=%s, organisation.id=%s, scheduler_id=%s]",
                         boefje_task_db.id,
                         boefje_task_db.id,
                         self.organisation.id,
@@ -132,7 +135,8 @@ class NormalizerScheduler(Scheduler):
             # NOTE: maxsize 0 means unlimited
             while len(p_items) > (self.queue.maxsize - self.queue.qsize()) and self.queue.maxsize != 0:
                 self.logger.debug(
-                    "Waiting for queue to have enough space, not adding %d tasks to queue [queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
+                    "Waiting for queue to have enough space, not adding %d tasks to queue "
+                    "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
                     len(p_items),
                     self.queue.qsize(),
                     self.queue.maxsize,
@@ -144,7 +148,8 @@ class NormalizerScheduler(Scheduler):
             self.push_items_to_queue(p_items)
         else:
             self.logger.warning(
-                "Normalizer queue is full, not populating with new tasks [queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
+                "Normalizer queue is full, not populating with new tasks "
+                "[queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
                 self.queue.qsize(),
                 self.organisation.id,
                 self.scheduler_id,
@@ -165,7 +170,8 @@ class NormalizerScheduler(Scheduler):
                 )
             except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
                 self.logger.warning(
-                    "Could not get normalizers for org: %s and mime_type: %s [boefje_meta.id=%s, organisation.id=%s, scheduler_id=%s]",
+                    "Could not get normalizers for org: %s and mime_type: %s "
+                    "[boefje_meta.id=%s, organisation.id=%s, scheduler_id=%s]",
                     self.organisation.name,
                     mime_type,
                     raw_data.boefje_meta.id,
@@ -185,7 +191,8 @@ class NormalizerScheduler(Scheduler):
                 continue
 
             self.logger.debug(
-                "Found %d normalizers for mime_type: %s [mime_type=%s, normalizers=%s, organisation.id=%s, scheduler_id=%s]",
+                "Found %d normalizers for mime_type: %s "
+                "[mime_type=%s, normalizers=%s, organisation.id=%s, scheduler_id=%s]",
                 len(normalizers),
                 mime_type.get("value"),
                 mime_type.get("value"),
@@ -197,7 +204,8 @@ class NormalizerScheduler(Scheduler):
             for normalizer in normalizers:
                 if normalizer.enabled is False:
                     self.logger.debug(
-                        "Normalizer: %s is disabled for org: %s [normalizer.id=%s, organisation.id=%s, scheduler_id=%s]",
+                        "Normalizer: %s is disabled for org: %s "
+                        "[normalizer.id=%s, organisation.id=%s, scheduler_id=%s]",
                         normalizer.name,
                         self.organisation.name,
                         normalizer.id,
@@ -213,7 +221,8 @@ class NormalizerScheduler(Scheduler):
 
                 if self.queue.is_item_on_queue(PrioritizedItem(scheduler_id=self.scheduler_id, data=task)):
                     self.logger.debug(
-                        "Normalizer task: %s is already on queue [normalizer.id=%s, boefje_meta.id=%s, organisation.id=%s, scheduler_id=%s]",
+                        "Normalizer task: %s is already on queue "
+                        "[normalizer_id=%s, boefje_meta_id=%s, org_id=%s, scheduler_id=%s]",
                         normalizer.name,
                         normalizer.id,
                         raw_data.boefje_meta.id,
@@ -226,7 +235,8 @@ class NormalizerScheduler(Scheduler):
                 p_items.append(PrioritizedItem(id=task.id, scheduler_id=self.scheduler_id, priority=score, data=task))
 
                 self.logger.debug(
-                    "Created normalizer task: %s for raw data: %s [normalizer.id=%s, raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
+                    "Created normalizer task: %s for raw data: %s "
+                    "[normalizer.id=%s, raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
                     normalizer.name,
                     raw_data.id,
                     normalizer.id,
@@ -271,7 +281,8 @@ class NormalizerScheduler(Scheduler):
             return
 
         self.logger.debug(
-            "Received normalizer meta %s [normalizer.id=%s, latest_normalizer_meta=%s, organisation.id=%s, scheduler_id=%s]",
+            "Received normalizer meta %s "
+            "[normalizer.id=%s, latest_normalizer_meta=%s, organisation.id=%s, scheduler_id=%s]",
             latest_normalizer_meta.normalizer_meta.id,
             latest_normalizer_meta.normalizer_meta.id,
             latest_normalizer_meta,
@@ -284,7 +295,8 @@ class NormalizerScheduler(Scheduler):
         )
         if normalizer_task_db is None:
             self.logger.warning(
-                "Could not find normalizer task in database [normalizer_meta_id=%s, latest_normalizer_meta=%s, organisation.id=%s, scheduler_id=%s]",
+                "Could not find normalizer task in database "
+                "[normalizer_meta_id=%s, latest_normalizer_meta=%s, organisation.id=%s, scheduler_id=%s]",
                 latest_normalizer_meta.normalizer_meta.id,
                 latest_normalizer_meta,
                 self.organisation.id,

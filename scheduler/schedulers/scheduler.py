@@ -128,7 +128,7 @@ class Scheduler(abc.ABC):
 
         return None
 
-    def pop_item_from_queue(self, filters: List[models.Filter] = None) -> Optional[models.PrioritizedItem]:
+    def pop_item_from_queue(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
         """Pop an item from the queue.
 
         Returns:
@@ -178,7 +178,8 @@ class Scheduler(abc.ABC):
             raise exc
 
         self.logger.info(
-            "Pushed item (%s) to queue %s with priority %s [p_item.id=%s, p_item.hash=%s, queue.pq_id=%s, queue.qsize=%d]",
+            "Pushed item (%s) to queue %s with priority %s "
+            "[p_item.id=%s, p_item.hash=%s, queue.pq_id=%s, queue.qsize=%d]",
             p_item.id,
             self.queue.pq_id,
             p_item.priority,

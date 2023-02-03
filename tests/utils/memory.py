@@ -23,7 +23,8 @@ def profile_memory(func, *args, **kwargs):
         memory_after = get_process_memory()
 
         print(
-            f"{func.__name__}: memory before: {memory_before:.2f} MB, after: {memory_after:.2f} MB, consumed: {memory_after - memory_before:.2f} MB; exec time: {elapsed_time}"
+            f"{func.__name__}: memory before: {memory_before:.2f} MB, after: {memory_after:.2f} MB, "
+            f"consumed: {memory_after - memory_before:.2f} MB; exec time: {elapsed_time}"
         )
 
         return result

@@ -23,9 +23,6 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.config = cfg
 
         # Mock connectors: octopoes
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-
         self.mock_octopoes = mock.create_autospec(
             spec=connectors.services.Octopoes,
             spec_set=True,
@@ -310,7 +307,6 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Mocks
         mock_get_random_objects.side_effect = [[ooi], [], [], []]
@@ -734,7 +730,7 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Act
         with self.assertRaises(RuntimeError):
-            is_running = self.scheduler.is_task_running(task)
+            self.scheduler.is_task_running(task)
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")

@@ -9,7 +9,7 @@ install_types = true
 non_interactive = true
 ignore_missing_imports = true
 implicit_reexport = true
-exclude = "alembic"
+exclude = "^(tests|whitelist.py)"
 
 [tool.pylint.master]
 fail-under=7.0
@@ -28,6 +28,11 @@ disable = [
     "fixme",
     "invalid-name",
 ]
+
+[tool.vulture]
+min_confidence = 90
+paths = ["./"]
+exclude = ["tests"]
 
 [build-system]
 requires = ["setuptools>=59", "wheel", "setuptools_scm[toml]>=6.2"]

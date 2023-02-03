@@ -2,9 +2,8 @@ import logging
 import time
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import List, Optional
+from typing import List
 
-import mmh3
 import pika
 import requests
 
@@ -13,7 +12,6 @@ from scheduler.models import (
     OOI,
     Boefje,
     BoefjeTask,
-    MutationOperationType,
     Organisation,
     Plugin,
     PrioritizedItem,
@@ -221,7 +219,8 @@ class BoefjeScheduler(Scheduler):
 
                 while not self.is_space_on_queue():
                     self.logger.debug(
-                        "Waiting for queue to have enough space, not adding task to queue [queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
+                        "Waiting for queue to have enough space, not adding task to queue "
+                        "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
                         self.queue.qsize(),
                         self.queue.maxsize,
                         self.organisation.id,
@@ -230,7 +229,8 @@ class BoefjeScheduler(Scheduler):
                     time.sleep(1)
 
                 self.logger.info(
-                    "Created boefje task: %s for ooi: %s [boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
+                    "Created boefje task: %s for ooi: %s "
+                    "[boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
                     boefje.name,
                     ooi.primary_key,
                     boefje.id,
@@ -242,7 +242,8 @@ class BoefjeScheduler(Scheduler):
                 self.push_item_to_queue(p_item)
         else:
             self.logger.warning(
-                "Boefjes queue is full, not populating with new tasks [queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
+                "Boefjes queue is full, not populating with new tasks "
+                "[queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
                 self.queue.qsize(),
                 self.organisation.id,
                 self.scheduler_id,
@@ -304,7 +305,8 @@ class BoefjeScheduler(Scheduler):
                     # 0 when we do get new tasks from an ooi.
                     if tries >= 3:
                         self.logger.debug(
-                            "No tasks generated for 3 tries, breaking out of loop [organisation.id=%s, scheduler_id=%s]",
+                            "No tasks generated for 3 tries, breaking out of loop "
+                            "[organisation.id=%s, scheduler_id=%s]",
                             self.organisation.id,
                             self.scheduler_id,
                         )
@@ -395,7 +397,8 @@ class BoefjeScheduler(Scheduler):
 
                     while not self.is_space_on_queue():
                         self.logger.debug(
-                            "Waiting for queue to have enough space, not adding task to queue [queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
+                            "Waiting for queue to have enough space, not adding task to queue "
+                            "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
                             self.queue.qsize(),
                             self.queue.maxsize,
                             self.organisation.id,
@@ -404,7 +407,8 @@ class BoefjeScheduler(Scheduler):
                         time.sleep(1)
 
                     self.logger.info(
-                        "Created rescheduled boefje task: %s for ooi: %s [boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
+                        "Created rescheduled boefje task: %s for ooi: %s "
+                        "[boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
                         boefje.name,
                         ooi.primary_key,
                         boefje.id,
@@ -416,7 +420,8 @@ class BoefjeScheduler(Scheduler):
                     self.push_item_to_queue(p_item)
         else:
             self.logger.warning(
-                "Boefjes queue is full, not populating with new tasks [queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
+                "Boefjes queue is full, not populating with new tasks "
+                "[queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
                 self.queue.qsize(),
                 self.organisation.id,
                 self.scheduler_id,
@@ -446,7 +451,8 @@ class BoefjeScheduler(Scheduler):
 
         if ooi.scan_profile is None:
             self.logger.debug(
-                "No scan_profile found for ooi: %s [ooi.primary_key=%s, ooi.scan_profile=%s, organisation.id=%s, scheduler_id=%s]",
+                "No scan_profile found for ooi: %s "
+                "[ooi.primary_key=%s, ooi.scan_profile=%s, organisation.id=%s, scheduler_id=%s]",
                 ooi.primary_key,
                 ooi,
                 ooi.scan_profile,
@@ -483,7 +489,8 @@ class BoefjeScheduler(Scheduler):
         # intesity is allowed to run on.
         if boefje_scan_level > ooi_scan_level:
             self.logger.debug(
-                "Boefje: %s scan level %s is too intense for ooi: %s scan level %s [boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
+                "Boefje: %s scan level %s is too intense for ooi: %s scan level %s "
+                "[boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
                 boefje.id,
                 boefje_scan_level,
                 ooi.primary_key,
@@ -520,7 +527,8 @@ class BoefjeScheduler(Scheduler):
             )
         except Exception as exc_bytes:
             self.logger.error(
-                "Failed to get last run boefje from bytes [boefje.id=%s, input.primary_key=%s, organisation.id=%s, scheduler_id=%s, exc=%s]",
+                "Failed to get last run boefje from bytes "
+                "[boefje.id=%s, input.primary_key=%s, organisation.id=%s, scheduler_id=%s, exc=%s]",
                 task.boefje.id,
                 task.input_ooi,
                 self.organisation.id,
@@ -536,7 +544,8 @@ class BoefjeScheduler(Scheduler):
             and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]
         ):
             self.logger.debug(
-                "Task is still running, according to the datastore [task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
+                "Task is still running, according to the datastore "
+                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,
                 self.organisation.id,
@@ -549,7 +558,8 @@ class BoefjeScheduler(Scheduler):
         # we have a problem.
         if task_bytes is None and task_db is not None and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
             self.logger.error(
-                "Task has been finished, but no results found in bytes [task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
+                "Task has been finished, but no results found in bytes "
+                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,
                 self.organisation.id,
@@ -560,7 +570,8 @@ class BoefjeScheduler(Scheduler):
         # Is boefje still running according to bytes?
         if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
             self.logger.debug(
-                "Task is still running, according to bytes [task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
+                "Task is still running, according to bytes "
+                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
                 task_bytes.id,
                 task.hash,
                 self.organisation.id,
@@ -595,7 +606,8 @@ class BoefjeScheduler(Scheduler):
             seconds=self.ctx.config.pq_populate_grace_period
         ):
             self.logger.debug(
-                "Task has not passed grace period, according to the datastore [task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
+                "Task has not passed grace period, according to the datastore "
+                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,
                 self.organisation.id,
@@ -611,7 +623,8 @@ class BoefjeScheduler(Scheduler):
             )
         except Exception as exc_bytes:
             self.logger.error(
-                "Failed to get last run boefje from bytes [task.boefje.id=%s, task.input_ooi=%s, organisation.id=%s, scheduler_id=%s, exc=%s]",
+                "Failed to get last run boefje from bytes "
+                "[task.boefje.id=%s, task.input_ooi=%s, organisation.id=%s, scheduler_id=%s, exc=%s]",
                 task.boefje.id,
                 task.input_ooi,
                 self.organisation.id,
@@ -628,7 +641,8 @@ class BoefjeScheduler(Scheduler):
             < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
         ):
             self.logger.debug(
-                "Task has not passed grace period, according to bytes [task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
+                "Task has not passed grace period, according to bytes "
+                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
                 task_bytes.id,
                 task.hash,
                 self.organisation.id,

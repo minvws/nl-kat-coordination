@@ -1,11 +1,8 @@
-import random
-import time
 import unittest
 import uuid
-from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, models, queues, rankers, schedulers
+from scheduler import config, models, queues, rankers, schedulers
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,

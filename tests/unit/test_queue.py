@@ -3,10 +3,9 @@ import queue as _queue
 import unittest
 import uuid
 
-import pydantic
-from scheduler import models, queues
+from scheduler import queues
 from scheduler.models import Base
-from scheduler.repositories import sqlalchemy, stores
+from scheduler.repositories import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from tests.utils import functions
 

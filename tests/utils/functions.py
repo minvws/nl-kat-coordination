@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import Any, ClassVar, Dict, Optional
+from typing import Optional, Any, ClassVar
 
 import pydantic
 from scheduler import models
@@ -13,7 +13,7 @@ class TestModel(pydantic.BaseModel):
     child: Any
 
 
-def create_p_item(scheduler_id: str, priority: int, data: TestModel = None) -> models.PrioritizedItem:
+def create_p_item(scheduler_id: str, priority: int, data: Optional[TestModel] = None) -> models.PrioritizedItem:
     if data is None:
         data = TestModel(
             id=uuid.uuid4().hex,

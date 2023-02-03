@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import logging
-from typing import Any, Dict, List, Optional, Type
+from typing import Any, Dict, List, Optional
 
 import pydantic
 from scheduler import models, repositories
@@ -87,7 +87,7 @@ class PriorityQueue(abc.ABC):
         self.allow_priority_updates: bool = allow_priority_updates
         self.pq_store: repositories.stores.PriorityQueueStorer = pq_store
 
-    def pop(self, filters: List[models.Filter] = None) -> Optional[models.PrioritizedItem]:
+    def pop(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
         """Remove and return the highest priority item from the queue.
 
         Raises:
@@ -152,7 +152,9 @@ class PriorityQueue(abc.ABC):
 
         if not allowed:
             raise NotAllowedError(
-                f"[item_on_queue={item_on_queue}, item_changed={item_changed}, priority_changed={priority_changed}, allow_replace={self.allow_replace}, allow_updates={self.allow_updates}, allow_priority_updates={self.allow_priority_updates}]"
+                f"[item_on_queue={item_on_queue}, item_changed={item_changed}, priority_changed={priority_changed}, "
+                f"allow_replace={self.allow_replace}, allow_updates={self.allow_updates}, "
+                f"allow_priority_updates={self.allow_priority_updates}]"
             )
 
         # If already on queue update the item, else create a new one

@@ -26,7 +26,7 @@ class ExpiringDict:
         self.lock: threading.Lock = threading.Lock()
         self.cache: Dict[str, Any] = {}
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default: Optional[Any] = None) -> Any:
         try:
             return self.__getitem__(key)
         except KeyError:

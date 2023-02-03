@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
 
-from factory import Factory, Faker, LazyFunction, PostGenerationMethodCall, Sequence, fuzzy
+from factory import Factory, Faker, LazyFunction, Sequence, fuzzy
 from scheduler.models import Boefje, BoefjeMeta
 
 
