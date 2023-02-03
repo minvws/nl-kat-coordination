@@ -2,3 +2,4 @@
 max-line-length = 120
 ignore = E203, W503
 exclude = .git, __pycache__, venv
+eradicate-whitelist-extend = Example:

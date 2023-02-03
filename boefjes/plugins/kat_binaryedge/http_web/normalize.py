@@ -66,11 +66,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         if module == "webv2":
             response = scan.get("result", {}).get("data", {}).get("response", {})
             # (potential) TODO:
-            # - url [string]
-            # - protocol_version [int]
-            # - redirects [list]
-            # - headers.headers [object]
-            # - plugin (name+version) of {wordpress,joomla}
+            # * url [string]
+            # * protocol_version [int]
+            # * redirects [list]
+            # * headers.headers [object]
+            # * plugin (name+version) of {wordpress,joomla}
 
             for app in response.get("apps", {}):
                 if "cpe" in app:
@@ -95,10 +95,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                         )
         elif module == "web-enrich":
             # (potential) TODO:
-            # - http_version [string]
-            # - headers [object]
-            # - redirects [list]
-            # - url [string]
+            # * http_version [string]
+            # * headers [object]
+            # * redirects [list]
+            # * url [string]
 
             data = scan.get("result", {}).get("data", {})
             for potential_software in data:

@@ -13,5 +13,4 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     ip = input_["address"]
     host = h.view(ip)
 
-    # return boefje_meta, json.dumps(host)
     return [(set(), json.dumps(host))]
