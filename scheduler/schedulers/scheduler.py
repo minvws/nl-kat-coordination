@@ -94,8 +94,8 @@ class Scheduler(abc.ABC):
             type=self.queue.item_type.type,
             p_item=p_item,
             status=models.TaskStatus.QUEUED,
-            created_at=datetime.datetime.now(datetime.timezone.utc),
-            modified_at=datetime.datetime.now(datetime.timezone.utc),
+            created_at=datetime.datetime.utcnow(),
+            modified_at=datetime.datetime.utcnow(),
         )
 
         task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))
