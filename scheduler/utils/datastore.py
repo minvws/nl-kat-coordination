@@ -25,7 +25,6 @@ class GUID(TypeDecorator):
         return dialect.type_descriptor(CHAR(32))
 
     def process_bind_param(self, value, dialect):
-        # import pdb; pdb.set_trace()
         if value is None:
             return value
 
