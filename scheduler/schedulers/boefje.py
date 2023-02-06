@@ -12,6 +12,10 @@ from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
                               Organisation, Plugin, PrioritizedItem,
                               TaskStatus)
 
+from .errors import (OOINotFoundError, PluginDisabledError,
+                     PluginNotFoundError, TaskAlreadyRunningError,
+                     TaskGracePeriodNotPassedError,
+                     TaskNotAllowedToRunException)
 from .scheduler import Scheduler
 
 
@@ -269,6 +273,8 @@ class BoefjeScheduler(Scheduler):
         # Get all scheduled jobs that need to be rescheduled. We only
         # consider jobs that have been processed by the scheduler after the set
         # grace period.
+        #
+        # NOTE: now we check when 
         scheduled_jobs, _ = self.ctx.job_store.get_scheduled_jobs(
             scheduler_id=self.scheduler_id,
             enabled=True,
@@ -288,13 +294,18 @@ class BoefjeScheduler(Scheduler):
                 )
 
             try:
-                self.do_checks(task)
-            except Exception:
+                self.evaluate_task(task)
+            except Exception as exc_eval:
+                # TODO: logging
+                job.enabled = False
+                self.job_store.update_scheduled_job(job)
                 continue
 
-            # TODO: do we delete the job when we're not allowed to run?
-            # boefje/ooi does not exist anymore. We should not delete it
-            # when it is running/grace period has not passed.
+            try:
+                self.do_checks(task)
+            except Exception as exc_checks:
+                # TODO: logging
+                continue
 
             # FIXME: should be present from the relationship
             prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
@@ -594,11 +605,49 @@ class BoefjeScheduler(Scheduler):
 
         return boefjes
 
-    def do_checks(self, task: models.BoefjeTask, ooi: models.OOI = None) -> None:
-        if ooi is None:
-            ooi = self.ctx.services.octopoes.get_object(
-                self.organisation.id, task.input_ooi,
+    def evaluate_task(self, task: models.BoefjeTask) -> None:
+        """Check if the ooi (when set), and the boefje is still available."""
+        ooi = None
+        if task.primary_key is not None:
+            try:
+                ooi = self.ctx.services.octopoes.get_object(
+                    self.organisation.id, task.input_ooi,
+                )
+            except Exception as exc_octopoes:
+                raise exc_octopoes
+
+        if ooi is None and task.primary_key is not None:
+            raise OOINotFoundError()
+
+        plugin = None
+        try:
+            plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                task.boefje.id, self.organisation.id,
             )
+        except Exception as exc_katalogus:
+            raise exc_katalogus
+
+        if plugin is None:
+            raise PluginNotFoundError()
+
+        if plugin.enabled is False:
+            raise PluginDisabledError()
+
+        return None
+
+
+    def do_checks(self, task: models.BoefjeTask, ooi: models.OOI = None) -> None:
+        """Do checks to make sure we're able to run this task.
+        """
+        # Make it is possible we have a boefje task without an associated
+        # ooi, make sure we get the ooi when there is an association.
+        if ooi is None and task.primary_key is not None:  # TODO: check the primary_key
+            try:
+                ooi = self.ctx.services.octopoes.get_object(
+                    self.organisation.id, task.input_ooi,
+                )
+            except Exception as exc_octopoes:
+                raise exc_octopoes
 
         if not self.is_task_allowed_to_run(task.boefje, ooi):
             self.logger.debug(
@@ -607,7 +656,9 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            raise TaskNotAllowedToRunException()
+            raise TaskNotAllowedToRunException(
+                f"Task is not allowed to run: {task} [org_id={self.organisation.id}, scheduler_id={self.scheduler_id}]",
+            )
 
         try:
             is_running = self.is_task_running(task)
@@ -618,7 +669,7 @@ class BoefjeScheduler(Scheduler):
                     self.organisation.id,
                     self.scheduler_id,
                 )
-                raise RunTimeError(
+                raise TaskAlreadyRunningError(
                     f"Task is already running: {task} [org_id={self.organisation.id}, scheduler_id={self.scheduler_id}]"
                 )
         except Exception as exc_running:
@@ -640,7 +691,7 @@ class BoefjeScheduler(Scheduler):
                     self.organisation.id,
                     self.scheduler_id,
                 )
-                raise RunTimeError(
+                raise TaskGracePeriodNotPassedError(
                     f"Task has not passed grace period: {task} [org_id={self.organisation.id}, scheduler_id={self.scheduler_id}]"
                 )
         except Exception as exc_grace_period:
@@ -660,4 +711,4 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            raise RunTimeError(f"Task is already on queue: {task}")
+            raise TaskAlreadyOnQueueuError(f"Task is already on queue: {task} [org_id={self.organisation.id}, scheduler_id={self.scheduler_id}]")
