@@ -203,10 +203,25 @@ services:
     volumes:
       - ./nl-kat-mula:/app/scheduler
     depends_on:
+      - scheduler-db
       - boefje
       - normalizer
       - octopoes_api
       - katalogus
+
+  scheduler-db:
+    image: postgres:12.8
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - scheduler-db-data:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env
+    environment:
+      - APP_DB=SCHEDULER_DB
+      - APP_DB_USER=SCHEDULER_DB_USER
+      - APP_DB_PASSWORD=SCHEDULER_DB_PASSWORD
 
   keiko:
     restart: on-failure
@@ -224,5 +239,6 @@ volumes:
   rocky-db-data:
   bytes-db-data:
   katalogus-db-data:
+  scheduler-db-data:
   xtdb-data:
   scheduler-db-data:
