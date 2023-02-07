@@ -5,13 +5,14 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, queues, rankers, repositories, schedulers, server
+from scheduler import (config, models, queues, rankers, repositories,
+                       schedulers, server)
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 from tests.utils.functions import create_p_item
 
 
-class TestPriorityQueue(queues.PriorityQueue):
+class MockPriorityQueue(queues.PriorityQueue):
     def create_hash(self, item: functions.TestModel):
         return hash(item.id)
 
@@ -36,7 +37,7 @@ class APITemplateTestCase(unittest.TestCase):
         # Scheduler
         self.organisation = OrganisationFactory()
 
-        queue = TestPriorityQueue(
+        queue = MockPriorityQueue(
             pq_id=self.organisation.id,
             maxsize=10,
             item_type=functions.TestModel,
