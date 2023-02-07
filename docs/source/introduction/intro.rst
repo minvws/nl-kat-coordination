@@ -10,7 +10,10 @@ OpenKAT aims to monitor, record and analyze the status of information systems. O
 .. image:: img/flowopenkat.png
   :alt: flow of OpenKAT
 
-Two brochures about OpenKAT have been created with a general explanation, both are in Dutch:
+White papers
+============
+
+Two brochures or white papers about OpenKAT have been created with a general explanation, both are in Dutch. You can read them without giving your email adress :-) 
 
 - :download:`the 'TL;DR' of 2 pages (English) <pdf/OpenKAT handout_ENG.pdf>`
 - :download:`the extensive brochure on OpenKAT (Dutch) <pdf/introductie OpenKAT V20220621.pdf>`
