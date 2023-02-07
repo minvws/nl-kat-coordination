@@ -1,0 +1,12 @@
+    {
+        "id": "webpage-capture",
+        "name": "Webpage Capture",
+        "description": "Takes a screenshot of a webpage. Image is stored to bytes.",
+        "consumes": [
+            "HostnameHTTPURL",
+            "IPAddressHTTPURL"
+        ],
+        "produces": [],
+        "environment_keys": [],
+        "scan_level": 2
+    }
