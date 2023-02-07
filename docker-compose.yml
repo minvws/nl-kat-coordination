@@ -241,4 +241,3 @@ volumes:
   katalogus-db-data:
   scheduler-db-data:
   xtdb-data:
-  scheduler-db-data:
