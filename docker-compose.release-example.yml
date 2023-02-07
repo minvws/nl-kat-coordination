@@ -200,5 +200,5 @@ volumes:
   bytes-db-data:
   bytes-data:
   katalogus-db-data:
-  scheduler-db:
+  scheduler-db-data:
   xtdb-data:
