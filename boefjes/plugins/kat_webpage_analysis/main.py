@@ -32,7 +32,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     else:
         # Fall back to old hack-ip-into-url behavior, for either https with no adapter, or http.
         if ip:
-            url_parts = url_parts._replace(netloc="[%s]" % ip)
+            url_parts = url_parts._replace(netloc=f"[{ip}]")
             uri = urlunsplit(
                 [
                     url_parts.scheme,
