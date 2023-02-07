@@ -274,7 +274,9 @@ class BoefjeScheduler(Scheduler):
         # consider jobs that have been processed by the scheduler after the set
         # grace period.
         #
-        # NOTE: now we check when 
+        # NOTE: now we check when a task has been checked since the grace
+        # period, this can be updated to retrieve all the task with the
+        # next_check set.
         scheduled_jobs, _ = self.ctx.job_store.get_scheduled_jobs(
             scheduler_id=self.scheduler_id,
             enabled=True,
@@ -298,7 +300,7 @@ class BoefjeScheduler(Scheduler):
             except Exception as exc_eval:
                 # TODO: logging
                 job.enabled = False
-                self.job_store.update_scheduled_job(job)
+                self.ctx.job_store.update_scheduled_job(job)
                 continue
 
             try:

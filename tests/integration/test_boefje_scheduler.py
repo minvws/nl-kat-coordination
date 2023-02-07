@@ -130,7 +130,8 @@ class SchedulerTestCase(unittest.TestCase):
         scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
         self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
 
-        # TODO: task should be associated with it
+        # Task should be associated with it
+        self.assertEqual(scheduled_job.p_item, task_pq.p_item)
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
@@ -325,8 +326,9 @@ class SchedulerTestCase(unittest.TestCase):
         # Scheduled job schould be in datastore
         scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
         self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
-
-        # TODO: task should be associated with it
+        import pdb; pdb.set_trace()
+        # Task should be associated with it
+        self.assertEqual(scheduled_job.p_item, task_pq.p_item)
 
     def test_push_tasks_for_new_boefjes_no_oois_found(self):
         """When no ooi's are found for the new boefjes, no tasks should be

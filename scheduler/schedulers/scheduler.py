@@ -109,10 +109,13 @@ class Scheduler(abc.ABC):
         if item_hash is None:
             return
 
+        # TODO: what is determination on not to add one, a one off?
+
         # Determine whether we need to create a recurring scheduled job
         scheduled_job = self.ctx.job_store.get_scheduled_job_by_hash(item_hash)
         if scheduled_job is not None:
-            scheduled_job.checked_at = datetime.datetime.now(datetime.timezone.utc)
+            scheduled_job.tasks.append(task)
+            scheduled_job.checked_at = datetime.datetime.now(datetime.timezone.utc)  # FIXME
             self.ctx.job_store.update_scheduled_job(scheduled_job)
             return
 
@@ -121,11 +124,14 @@ class Scheduler(abc.ABC):
             enabled=True,
             scheduler_id=self.scheduler_id,
             p_item=p_item,
-            checked_at=datetime.datetime.now(datetime.timezone.utc),
-            created_at=datetime.datetime.now(datetime.timezone.utc),
-            modified_at=datetime.datetime.now(datetime.timezone.utc),
+            checked_at=datetime.datetime.now(datetime.timezone.utc),  # FIXME
+            created_at=datetime.datetime.now(datetime.timezone.utc),  # FIXME
+            modified_at=datetime.datetime.now(datetime.timezone.utc),  # FIXME
         )
+        scheduled_job.tasks.append(task)
         scheduled_job_db = self.ctx.job_store.create_scheduled_job(scheduled_job)
+
+        return
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
