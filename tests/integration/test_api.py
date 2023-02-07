@@ -5,8 +5,7 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import (config, models, queues, rankers, repositories,
-                       schedulers, server)
+from scheduler import config, models, queues, rankers, repositories, schedulers, server
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 from tests.utils.functions import create_p_item

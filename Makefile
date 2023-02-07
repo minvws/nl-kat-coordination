@@ -56,7 +56,6 @@ pylint: ## Rate the code with pylint.
 
 fmt: ## Format the code using black.
 	$(ci-docker-compose) run --rm mula \
-		run --rm mula \
 		black .
 
 done: ## Prepare for a commit.
