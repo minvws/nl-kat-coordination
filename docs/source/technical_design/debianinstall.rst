@@ -236,7 +236,7 @@ After finishing these steps, you should restart KAT to load the new configuratio
     sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
 Start KAT on system boot
-------------------------
+========================
 
 To start KAT when the system boots, enable all KAT services:
 
@@ -249,7 +249,6 @@ Start using OpenKAT
 
 By default OpenKAT will be accessible in your browser through `https://<server IP>:8000`. There, Rocky will take you through the steps of setting up your account and running your first boefjes.
 
-=================
 Upgrading OpenKAT
 =================
 
