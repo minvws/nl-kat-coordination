@@ -1,9 +1,9 @@
-============
-Introduction
-============
-
+===============
 What is OpenKAT
 ===============
+
+Introduction
+============
 
 OpenKAT aims to monitor, record and analyze the status of information systems. OpenKAT scans networks, analyzes vulnerabilities and creates accessible reports. It integrates the most commonly used network tools and scanning software into a modular framework, accesses external databases and combines the information from all these sources into clear reports.
 
