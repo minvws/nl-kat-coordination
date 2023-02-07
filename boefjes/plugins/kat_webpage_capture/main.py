@@ -31,6 +31,7 @@ def get_file_from_container(container: docker.models.containers.Container, path:
 
 
 def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
+    """Returns playwright command including webpage, browser and locations for image, har and storage."""
     return " ".join(
         [
             "playwright screenshot",
@@ -73,4 +74,4 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     image_bytes, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)
 
-    return [(set("image/bytes"), image_bytes), (set("har/zip"), har_zip), (set("webstorage/json"), storage_json)]
+    return [(set("image/png"), image_bytes), (set("har/zip"), har_zip), (set("webstorage/json"), storage_json)]
