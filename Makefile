@@ -74,7 +74,7 @@ endif
 
 checkout: # Usage: `make checkout branch=develop`
 	for service in $(SERVICES); do
-		git -C https://github.com/minvws/$$service.git checkout $(branch);
+		git -C $$service checkout $(branch);
 	done
 
 pull-reset:
