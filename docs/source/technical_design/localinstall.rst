@@ -82,7 +82,7 @@ In some cases this may not work because Docker does not yet know your user name.
 	$ sudo gpasswd -a $USER docker
 	$ newgrp docker
 
-Then OpenKAT is built, including all the parts such as Octopoes and Rocky. 
+Then OpenKAT is built, including all the parts such as Octopoes and Rocky.
 
 Front end
 *********
