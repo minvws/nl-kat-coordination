@@ -1,5 +1,5 @@
 ===============
-Debian packages
+Production: Debian packages
 ===============
 
 OpenKAT has Debian packages available. In the near future we will have an apt
