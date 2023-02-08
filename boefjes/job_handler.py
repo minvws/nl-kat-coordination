@@ -136,10 +136,10 @@ class BoefjeHandler(Handler):
         mime_types = _collect_default_mime_types(boefje_meta)
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
+        boefje_meta.started_at = datetime.now(timezone.utc)
         exc = None
 
         try:
-            boefje_meta.started_at = datetime.now(timezone.utc)
             boefje_results = self.job_runner.run(boefje_meta, environment)
         except Exception as e:
             exc = e
@@ -169,14 +169,11 @@ class NormalizerHandler(Handler):
     def handle(self, normalizer_meta: NormalizerMeta) -> None:
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
-        try:
-            bytes_api_client.login()
-            raw = bytes_api_client.get_raw(normalizer_meta.raw_data.boefje_meta.id, normalizer_meta.raw_data.id)
-        except Exception as exc:
-            logger.exception(f"Error getting raw from bytes, {normalizer_meta=}")
-            raise exc
+        bytes_api_client.login()
+        raw = bytes_api_client.get_raw(normalizer_meta.raw_data.boefje_meta.id, normalizer_meta.raw_data.id)
 
         normalizer_meta.started_at = datetime.now(timezone.utc)
+        exc = None
 
         try:
             results = self.job_runner.run(normalizer_meta, raw)
@@ -203,17 +200,19 @@ class NormalizerHandler(Handler):
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )
                 )
-        except Exception:
+        except Exception as e:
+            exc = e
             logger.exception(f"Normalizer {normalizer_meta=} failed")
-        except (RequestException, ObjectNotFoundException, RemoteException):
+        except (RequestException, ObjectNotFoundException, RemoteException) as e:
+            exc = e
             logger.exception(f"Error saving results to Octopoes, {normalizer_meta=}")
         finally:
             normalizer_meta.ended_at = datetime.now(timezone.utc)
 
-        try:
-            bytes_api_client.save_normalizer_meta(normalizer_meta)
-        except Exception:
-            logger.exception(f"Error while handling a normalizer job, {normalizer_meta=}")
+        bytes_api_client.save_normalizer_meta(normalizer_meta)
+
+        if exc:
+            raise exc
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
