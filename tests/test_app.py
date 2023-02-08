@@ -7,7 +7,7 @@ from unittest import TestCase
 from pydantic import parse_raw_as
 
 from boefjes.app import SchedulerRuntimeManager
-from boefjes.clients.scheduler_client import SchedulerClientInterface, QueuePrioritizedItem, Queue
+from boefjes.clients.scheduler_client import SchedulerClientInterface, QueuePrioritizedItem, Queue, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, StopWorking, RuntimeManager
@@ -22,12 +22,15 @@ class MockSchedulerClient(SchedulerClientInterface):
     def get_queues(self) -> List[Queue]:
         return parse_raw_as(List[Queue], self.boefje_responses.pop(0))
 
-    def pop_task(self, queue: str) -> Optional[QueuePrioritizedItem]:
+    def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
         if RuntimeManager.Queue.BOEFJES.value in queue and self.boefje_responses:
             return parse_raw_as(QueuePrioritizedItem, self.boefje_responses.pop(0))
 
         if RuntimeManager.Queue.NORMALIZERS.value in queue and self.normalizer_responses:
             return parse_raw_as(QueuePrioritizedItem, self.normalizer_responses.pop(0))
+
+    def patch_task(self, task_id: str, status: TaskStatus) -> None:
+        pass
 
 
 class MockHandler(Handler):

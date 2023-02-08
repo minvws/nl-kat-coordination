@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 import sys
 from typing import List
 from unittest import TestCase, mock
@@ -107,7 +108,9 @@ class TaskTest(TestCase):
         )
 
         local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
-        BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository).handle(meta)
+
+        with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they ar reraised
+            BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository).handle(meta)
 
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
         mock_bytes_api_client.save_raw.assert_called_once_with(

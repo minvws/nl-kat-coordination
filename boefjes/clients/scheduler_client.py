@@ -52,7 +52,7 @@ class SchedulerClientInterface:
     def get_queues(self) -> List[Queue]:
         raise NotImplementedError()
 
-    def pop_task(self, queue: str) -> Optional[QueuePrioritizedItem]:
+    def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
         raise NotImplementedError()
 
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
@@ -74,13 +74,14 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         return parse_obj_as(List[Queue], response.json())
 
-    def pop_task(self, queue: str) -> Optional[QueuePrioritizedItem]:
+    def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
         response = self._session.get(f"{self.base_url}/queues/{queue}/pop")
         self._verify_response(response)
 
         return parse_obj_as(Optional[QueuePrioritizedItem], response.json())
 
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
+        # The pop endpoint does not return the complete task object, so we retrieve it first.
         response = self._session.get(f"{self.base_url}/tasks/{task_id}")
         self._verify_response(response)
 

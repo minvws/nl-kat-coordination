@@ -11,6 +11,7 @@ from urllib3.exceptions import HTTPError
 from boefjes.clients.scheduler_client import (
     SchedulerAPIClient,
     SchedulerClientInterface,
+    TaskStatus,
 )
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler
@@ -84,7 +85,7 @@ def start_working(
         for queue in queues:
             try:
                 logger.info(f"Popping from queue {queue.id}")
-                task = scheduler_client.pop_task(queue.id)
+                p_item = scheduler_client.pop_item(queue.id)
             except (RequestHTTPError, HTTPError, ConnectionError):
                 logger.exception("Popping task from scheduler failed")
                 time.sleep(10 * settings.poll_interval)
@@ -94,18 +95,22 @@ def start_working(
                 time.sleep(10 * settings.poll_interval)
                 continue
 
-            if not task:
+            if not p_item:
                 logger.info(f"Queue {queue.id} empty")
                 continue
 
             try:
-                logger.info(f"Handling task[{task.data.id}]")
-                item_handler.handle(task.data)
+                logger.info(f"Handling task[{p_item.data.id}]")
+                item_handler.handle(p_item.data)
+                scheduler_client.patch_task(str(p_item.id), TaskStatus.COMPLETED)
+                logger.info(f"Set task status to completed in the scheduler for task[{p_item.data.id}]")
             except StopWorking:
                 logger.info("Stopping worker...")
                 return
             except:  # noqa
-                logger.exception("An error occurred handling a scheduler item")
+                logger.exception("An error occurred handling scheduler item %s", p_item.data.id)
+                scheduler_client.patch_task(str(p_item.id), TaskStatus.FAILED)
+                logger.info(f"Set task status to failed in the scheduler for task[{p_item.data.id}]")
 
         time.sleep(settings.poll_interval)
 

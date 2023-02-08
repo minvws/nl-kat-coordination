@@ -136,24 +136,27 @@ class BoefjeHandler(Handler):
         mime_types = _collect_default_mime_types(boefje_meta)
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
+        exc = None
+
         try:
             boefje_meta.started_at = datetime.now(timezone.utc)
             boefje_results = self.job_runner.run(boefje_meta, environment)
-        except Exception as exc:
+        except Exception as e:
+            exc = e
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id, exc_info=True)
-            boefje_results = [({"error/boefje"}, str(exc))]
+            boefje_results = [({"error/boefje"}, str(e))]
         finally:
             boefje_meta.ended_at = datetime.now(timezone.utc)
 
-        logger.info("Saving to Bytes")
+        logger.info("Saving to Bytes for boefje boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
-        try:
-            bytes_api_client.login()
-            bytes_api_client.save_boefje_meta(boefje_meta)
-            for boefje_added_mime_types, output in boefje_results:
-                bytes_api_client.save_raw(boefje_meta.id, output, mime_types.union(boefje_added_mime_types))
-        except Exception as exc:
-            logger.exception("Error while saving to bytes")
+        bytes_api_client.login()
+        bytes_api_client.save_boefje_meta(boefje_meta)
+
+        for boefje_added_mime_types, output in boefje_results:
+            bytes_api_client.save_raw(boefje_meta.id, output, mime_types.union(boefje_added_mime_types))
+
+        if exc:  # If an exception was raised, save the error in Bytes and reraise it so the app updates the task status
             raise exc
 
         logger.info("Done with boefje for %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
