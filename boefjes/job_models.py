@@ -2,7 +2,9 @@ import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, Optional, List, Union, Literal
 
-from pydantic import BaseModel, Field, validator, Extra
+from pydantic import BaseModel, Field, Extra
+
+from boefjes.katalogus.models import Boefje, Normalizer
 
 
 class JobException(Exception):
@@ -23,28 +25,6 @@ class Job(BaseModel):
             return self.ended_at - self.started_at
         else:
             return None
-
-
-class Boefje(BaseModel):
-    id: str
-    version: Optional[str] = Field(default=None)
-
-    @validator("id")
-    def non_empty_id(cls, value: str):
-        if not value:
-            raise ValueError("Boefje id cannot be empty")
-        return value
-
-
-class Normalizer(BaseModel):
-    id: str  # To be phased out for an id
-    version: Optional[str] = Field(default=None)
-
-    @validator("id")
-    def non_empty_id(cls, value: str):
-        if not value:
-            raise ValueError("Normalizer id cannot be empty")
-        return value
 
 
 class BoefjeMeta(Job):

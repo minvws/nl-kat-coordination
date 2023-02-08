@@ -16,7 +16,7 @@ from boefjes.katalogus.local_repository import (
     LocalPluginRepository,
     get_local_repository,
 )
-from boefjes.katalogus.models import Repository, PluginType
+from boefjes.katalogus.models import Repository, PluginType, RESERVED_LOCAL_ID
 from boefjes.katalogus.storage.interfaces import (
     RepositoryStorage,
     PluginEnabledStorage,
@@ -178,7 +178,7 @@ class PluginService:
         plugins = {}
 
         for repository in repositories:
-            if repository.id == LocalPluginRepository.RESERVED_ID:
+            if repository.id == RESERVED_LOCAL_ID:
                 continue
 
             try:

@@ -4,7 +4,7 @@ from boefjes.config import settings
 from boefjes.katalogus.clients import MockPluginRepositoryClient
 from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.katalogus.models import Boefje, Normalizer, Bit, Repository
+from boefjes.katalogus.models import Boefje, Normalizer, Bit, Repository, RESERVED_LOCAL_ID
 from boefjes.katalogus.storage.interfaces import SettingsNotConformingToSchema
 from boefjes.katalogus.storage.memory import (
     PluginStatesStorageMemory,
@@ -234,10 +234,10 @@ class TestPluginsService(TestCase):
         self.service.create_setting("api_key", "24", self.organisation, plugin_id)
         assert self.service.get_setting_by_key("api_key", self.organisation, plugin_id) == "24"
 
-        self.service.update_by_id(LocalPluginRepository.RESERVED_ID, plugin_id, self.organisation, True)
+        self.service.update_by_id(RESERVED_LOCAL_ID, plugin_id, self.organisation, True)
 
-        self.service.update_by_id(LocalPluginRepository.RESERVED_ID, "test-boefje-1", new_org_id, True)
-        self.service.update_by_id(LocalPluginRepository.RESERVED_ID, "test-boefje-2", new_org_id, True)
+        self.service.update_by_id(RESERVED_LOCAL_ID, "test-boefje-1", new_org_id, True)
+        self.service.update_by_id(RESERVED_LOCAL_ID, "test-boefje-2", new_org_id, True)
 
         with self.assertRaises(KeyError):
             self.service.get_setting_by_key("api_key", new_org_id, plugin_id)
