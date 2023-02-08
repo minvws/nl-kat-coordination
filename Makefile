@@ -5,79 +5,51 @@ SHELL := bash
 HIDE:=$(if $(VERBOSE),,@)
 UNAME := $(shell uname)
 
-
-.PHONY: kat kat-stable clone migrate build itest debian-build-image ubuntu-build-image
+.PHONY: kat kat-stable rebuild update clean clone clone-stable migrate build itest debian-build-image ubuntu-build-image
 
 # Export Docker buildkit options
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+SERVICES = nl-kat-rocky nl-kat-boefjes nl-kat-bytes nl-kat-octopoes nl-kat-mula nl-kat-keiko
 
 
-kat:  # This should give you a clean install
-ifeq ("$(wildcard .env)","")
-	make env
-endif
-	make clean
-	make clone
-	make build
-	make up
+kat: env-if-empty clean clone build up # This should give you a clean install
 
+kat-stable: env-if-empty clean clone-stable build up # This should give you a clean install of a stable version
 
-kat-stable:  # This should give you a clean install of a stable version
-ifeq ("$(wildcard .env)","")
-	make env
-endif
-	make clean
-	make clone-stable
-	make build
-	make up
+rebuild: clean build up
 
-rebuild:
-	make clean
-	make build
-	make up
+update: down pull build up
 
-update:
-	-docker-compose down
-	make pull
-	make build
-	make up
-
-clean:
-	-docker-compose down
+clean: down
 	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
 
 up:
-	docker-compose up -d --force-recreate rocky
+	docker-compose up -d --force-recreate
 
 down:
 	-docker-compose down
 
 clone:
-	-git clone https://github.com/minvws/nl-kat-boefjes.git
-	-git clone https://github.com/minvws/nl-kat-bytes.git
-	-git clone https://github.com/minvws/nl-kat-octopoes.git
-	-git clone https://github.com/minvws/nl-kat-mula.git
-	-git clone https://github.com/minvws/nl-kat-keiko.git
-	-git clone https://github.com/minvws/nl-kat-rocky.git
+	for service in $(SERVICES); do
+		git clone https://github.com/minvws/$$service.git;
+	done
 
 clone-stable:
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-boefjes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-boefjes.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-bytes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-bytes.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-octopoes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-octopoes.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-mula/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-mula.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-keiko/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-keiko.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-rocky.git
+	for service in $(SERVICES); do
+		git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/$$service/tags" | jq -r '.[0].name') https://github.com/minvws/$$service.git;
+	done
 
 pull:
-	-git pull
-	-git -C nl-kat-boefjes pull
-	-git -C nl-kat-bytes pull
-	-git -C nl-kat-octopoes pull
-	-git -C nl-kat-mula pull
-	-git -C nl-kat-keiko pull
-	-git -C nl-kat-rocky pull
+	for service in . $(SERVICES); do
+		git -C $$service pull;
+	done
+
+env-if-empty:
+ifeq ("$(wildcard .env)","")
+	make env
+endif
 
 env:  # Create .env file from the env-dist with randomly generated credentials from vars annotated by "{%EXAMPLE_VAR}"
 	$(HIDE) cp .env-dist .env
@@ -88,29 +60,15 @@ else
 endif
 
 checkout: # Usage: `make checkout branch=develop`
-	-git checkout $(branch)
-	-git -C nl-kat-boefjes checkout $(branch)
-	-git -C nl-kat-bytes checkout $(branch)
-	-git -C nl-kat-octopoes checkout $(branch)
-	-git -C nl-kat-mula checkout $(branch)
-	-git -C nl-kat-keiko checkout $(branch)
-	-git -C nl-kat-rocky checkout $(branch)
+	for service in $(SERVICES); do
+		git -C https://github.com/minvws/$$service.git checkout $(branch);
+	done
 
 pull-reset:
-	-git reset --hard HEAD
-	-git pull
-	-git -C nl-kat-boefjes reset --hard HEAD
-	-git -C nl-kat-boefjes pull
-	-git -C nl-kat-bytes reset --hard HEAD
-	-git -C nl-kat-bytes pull
-	-git -C nl-kat-octopoes reset --hard HEAD
-	-git -C nl-kat-octopoes pull
-	-git -C nl-kat-mula reset --hard HEAD
-	-git -C nl-kat-mula pull
-	-git -C nl-kat-keiko reset --hard HEAD
-	-git -C nl-kat-keiko pull
-	-git -C nl-kat-rocky reset --hard HEAD
-	-git -C nl-kat-rocky pull
+	for service in . $(SERVICES); do
+		git -C $$service reset --hard HEAD;
+		git -C $$service pull;
+	done
 
 build:  # Build should prepare all other services: migrate them, seed them, etc.
 ifeq ($(UNAME), Darwin)
@@ -118,8 +76,7 @@ ifeq ($(UNAME), Darwin)
 else
 	docker-compose build --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
 endif
-	docker-compose run --rm rocky make build-rocky
-	make -C nl-kat-rocky build-rocky-frontend
+	make -C nl-kat-rocky build
 	make -C nl-kat-boefjes build
 	make -C nl-kat-bytes build
 
