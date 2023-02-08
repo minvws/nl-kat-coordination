@@ -1,6 +1,6 @@
-===============
+===========================
 Production: Debian packages
-===============
+===========================
 
 OpenKAT has Debian packages available. In the near future we will have an apt
 repository that will allow you to keep your installation up-to-date using apt.
