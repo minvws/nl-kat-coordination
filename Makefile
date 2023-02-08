@@ -22,8 +22,16 @@ rebuild: clean build up
 
 update: down pull build up
 
-clean: down
+clean: down # This should clean up all persistent data
 	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
+	-docker-compose run --rm -u root bytes rm -rf bytes-data
+
+upgrade: fetch down # Upgrade to a release without losing persistent data. Release version can be passed as release=x.x
+	for service in . $(SERVICES); do
+		make checkout branch=release-$(release);
+	done
+	make build-all
+	make up
 
 up:
 	docker-compose up -d --force-recreate
@@ -39,6 +47,11 @@ clone:
 clone-stable:
 	for service in $(SERVICES); do
 		git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/$$service/tags" | jq -r '.[0].name') https://github.com/minvws/$$service.git;
+	done
+
+fetch:
+	for service in . $(SERVICES); do
+		git -C $$service fetch;
 	done
 
 pull:
@@ -70,12 +83,14 @@ pull-reset:
 		git -C $$service pull;
 	done
 
-build:  # Build should prepare all other services: migrate them, seed them, etc.
+build-all:  # Build should prepare all other services: migrate them, seed them, etc.
 ifeq ($(UNAME), Darwin)
 	docker-compose build --build-arg USER_UID="$$(id -u)"
 else
 	docker-compose build --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
 endif
+
+build: build-all
 	make -C nl-kat-rocky build
 	make -C nl-kat-boefjes build
 	make -C nl-kat-bytes build
