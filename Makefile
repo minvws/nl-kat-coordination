@@ -33,6 +33,11 @@ upgrade: fetch down # Upgrade to a release without losing persistent data. Relea
 	make build-all
 	make up
 
+reset: down
+	-docker volume rm nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
+	-docker-compose run --rm -u root bytes rm -rf bytes-data
+	make -C nl-kat-rocky almost-flush
+
 up:
 	docker-compose up -d --force-recreate
 
