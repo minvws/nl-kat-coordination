@@ -12,7 +12,7 @@ The pre-built docker images can be used for production installations of OpenKAT 
 Debian packages
 ===============
 
-The Debian packages can be used for production installations of OpenKAT and are available as artifacts from the Github actions in the repository of each module. How to install them is explained in the manual. A repository to enable ``apt install kat`` is under construction. The packages cannot easily be converted to RPM's, for this we do not have a solutions yet. 
+The Debian packages can be used for production installations of OpenKAT and are available as artifacts from the Github actions in the repository of each module. How to install them is explained in the manual. A repository to enable ``apt install kat`` is under construction. The packages cannot easily be converted to RPM's, for this we do not have a solution yet.
 
 make kat
 ========
@@ -22,7 +22,7 @@ The 'developer option' or local install of OpenKAT builds the system from the so
 Minimum requirements
 ====================
 
-OpenKAT can run from a single computer or VM, but this limits the functionality in the long run. The starting point for a development setup would include about 25 GB of diskspace, 4GB of RAM and 2 cores. Diskspace is mostly used by the databases and some logging. More of everything is more fun. 
+OpenKAT can run from a single computer or VM, but this limits the functionality in the long run. The starting point for a development setup would include about 25 GB of diskspace, 4GB of RAM and 2 cores. Diskspace is mostly used by the databases and some logging. More of everything is more fun.
 
 Example infrastructure
 ======================
