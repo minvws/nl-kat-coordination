@@ -64,16 +64,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         # TODO: jarm
         for cert_chain in scan.get("data", {}).get("cert_info", {}).get("certificate_chain", []):
             pass
-            # yield Certificate(
-            #     subject = cert_chain['as_dict']['subject']['common_name'],
-            #     issuer = cert_chain['as_dict']['issuer']['common_name'],
-            #     valid_from = cert_chain['as_dict']['validity']['not_before'],
-            #     valid_until = cert_chain['as_dict']['validity']['not_after'],
-            #     pk_algorithm = cert_chain['as_dict']['public_key_info']['algorithm'],
-            #     pk_size = cert_chain['as_dict']['public_key_info']['key_size'],
-            #     pk_number = ,  # FIXME: determine how to get this value
-            #     # Optional: hostname_ooi, certificate_ooi
-            # )
 
         vulns = scan.get("data", {}).get("vulnerabilities", {})
         if vulns.get("compression", {}).get("supports_compression"):
