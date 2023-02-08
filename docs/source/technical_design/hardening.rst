@@ -1,6 +1,6 @@
-=================
-Hardening OpenKAT
-=================
+=============================
+Production: Hardening OpenKAT
+=============================
 
 Hardening is making your environment secure. The default installation of OpenKAT is suitable for local use. If you are installing the software in a production environment, make sure you are running a secure configuration. The following modifications are a first step:
 
