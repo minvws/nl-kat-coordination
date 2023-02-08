@@ -5,12 +5,8 @@
 
 import subprocess
 
-branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode(
-    "utf-8"
-)
-commit_date = subprocess.check_output(
-    ["git", "log", "--format=#%h %cs", "-n 1"]
-).decode("utf-8")
+branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode("utf-8")
+commit_date = subprocess.check_output(["git", "log", "--format=#%h %cs", "-n 1"]).decode("utf-8")
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information

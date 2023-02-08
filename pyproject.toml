@@ -1,0 +1,19 @@
+[tool.black]
+target-version = ["py38"]
+line-length = 120
+
+[tool.mypy]
+python_version = "3.8"
+plugins = ["pydantic.mypy"]
+strict = false
+ignore_missing_imports = true
+follow_imports = "skip"
+disallow_untyped_decorators = false # Needed for FastAPI decorators
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.vulture]
+min_confidence = 90
+exclude = ["/tests/"]
+paths = ["."]
