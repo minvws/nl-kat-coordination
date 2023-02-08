@@ -1,4 +1,4 @@
-from bits.definitions import BitParameterDefinition, BitDefinition
+from bits.definitions import BitDefinition
 from octopoes.models.types import HTTPHeader
 
 BIT = BitDefinition(

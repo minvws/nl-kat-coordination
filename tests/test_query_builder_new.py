@@ -151,9 +151,7 @@ class QueryNodeTest(TestCase):
         dns_a_record_node = address_node.relations_in[("DnsARecord", "IpAddressV4", "DnsARecord/_IpAddressV4")]
         self.assertEqual({"DnsARecord"}, dns_a_record_node.object_types)
 
-        dns_aaaa_record_node = address_node.relations_in[
-            ("DnsAaaaRecord", "IpAddressV6", "DnsAaaaRecord/_IpAddressV6")
-        ]
+        dns_aaaa_record_node = address_node.relations_in[("DnsAaaaRecord", "IpAddressV6", "DnsAaaaRecord/_IpAddressV6")]
         self.assertEqual({"DnsAaaaRecord"}, dns_aaaa_record_node.object_types)
 
         finding_node = address_node.relations_in[("Finding", "OOI", "Finding/_OOI")]

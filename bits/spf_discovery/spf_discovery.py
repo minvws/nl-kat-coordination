@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSTXTRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.email_security import DNSSPFRecord, DNSSPFMechanismIP, DNSSPFMechanismHostname
@@ -79,9 +79,7 @@ def parse_ip_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNS
 
 def parse_a_mx_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[str]:
     if mechanism == "a" or mechanism == "mx":
-        yield DNSSPFMechanismHostname(
-            spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism=mechanism
-        )
+        yield DNSSPFMechanismHostname(spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism=mechanism)
     else:
         mechanism_type, domain = mechanism.split(":", 1)
         # remove prefix-length for now

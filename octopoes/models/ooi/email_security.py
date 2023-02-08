@@ -1,5 +1,5 @@
 import hashlib
-from typing import Literal, Optional, List
+from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.records import DNSTXTRecord

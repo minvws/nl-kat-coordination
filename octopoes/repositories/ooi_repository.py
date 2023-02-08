@@ -237,9 +237,7 @@ class XTDBOOIRepository(OOIRepository):
                 """.format(
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
-            scan_profile_types=" ".join(
-                [str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]
-            ),
+            scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
         )
 
         res_count = self.session.client.query(count_query, valid_time)
@@ -274,9 +272,7 @@ class XTDBOOIRepository(OOIRepository):
         """.format(
             object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
             scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
-            scan_profile_types=" ".join(
-                [str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]
-            ),
+            scan_profile_types=" ".join([str_val(scan_profile_type.value) for scan_profile_type in scan_profile_types]),
             limit=limit,
             offset=offset,
         )
@@ -384,9 +380,7 @@ class XTDBOOIRepository(OOIRepository):
 
         # Query next level
         exclude.update(references)
-        deeper_result = self._get_tree_level(
-            deeper_references, depth=depth - 1, exclude=exclude, valid_time=valid_time
-        )
+        deeper_result = self._get_tree_level(deeper_references, depth=depth - 1, exclude=exclude, valid_time=valid_time)
 
         # Replace flat results with recursed results
         deeper_lookup = {node.reference: node for node in deeper_result}

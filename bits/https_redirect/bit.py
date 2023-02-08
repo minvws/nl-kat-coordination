@@ -1,5 +1,5 @@
 from bits.definitions import BitParameterDefinition, BitDefinition
-from octopoes.models.ooi.web import HTTPResource, WebURL, HTTPHeader, HostnameHTTPURL
+from octopoes.models.ooi.web import HTTPHeader, HostnameHTTPURL
 
 BIT = BitDefinition(
     id="https-redirect",

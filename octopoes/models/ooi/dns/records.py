@@ -1,10 +1,10 @@
 import abc
 import hashlib
-from typing import Optional, Literal, List
+from typing import Optional, Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPAddress, NetBlock
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.persistence import ReferenceField
 
 

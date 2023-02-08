@@ -1,7 +1,6 @@
-import re
 from typing import List, Iterator
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.ooi.findings import CVEFindingType, Finding
 from octopoes.models.types import HTTPHeader
 

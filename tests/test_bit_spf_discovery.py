@@ -3,7 +3,7 @@ from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import DNSTXTRecord
 from octopoes.models.ooi.email_security import DNSSPFRecord, DNSSPFMechanismIP
 from octopoes.models.ooi.findings import KATFindingType
-from octopoes.models.ooi.network import IPAddressV4, Network
+from octopoes.models.ooi.network import IPAddressV4
 
 
 def test_spf_discovery_simple_success():

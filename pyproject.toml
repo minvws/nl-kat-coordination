@@ -25,7 +25,7 @@ disable = ["R0914","W1514", "R0903", "E0401", "R0401"] # Ignore too-many-local-v
 extension-pkg-whitelist = "pydantic" # Ignore pydantic import checks
 
 [tool.black]
-line-length = 119
+line-length = 120
 target-version = ['py38']
 
 [tool.pydocstyle]

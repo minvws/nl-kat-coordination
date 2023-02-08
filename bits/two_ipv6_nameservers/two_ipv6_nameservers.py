@@ -1,7 +1,7 @@
 from typing import List, Iterator, Union
 
 from octopoes.models import OOI
-from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSNSRecord
+from octopoes.models.ooi.dns.records import DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import KATFindingType, Finding
 

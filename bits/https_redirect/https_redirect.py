@@ -1,8 +1,7 @@
-from typing import List, Iterator, Union
+from typing import List, Iterator
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import KATFindingType, Finding
-from octopoes.models.ooi.network import IPPort, IPAddress
-from octopoes.models.ooi.web import Website, WebURL, HTTPResource, HTTPHeader, HostnameHTTPURL
+from octopoes.models.ooi.web import HTTPHeader, HostnameHTTPURL
 
 
 def run(

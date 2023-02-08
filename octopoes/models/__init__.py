@@ -15,7 +15,7 @@ from typing import (
     Tuple,
 )
 
-from pydantic import BaseModel, Field, conint
+from pydantic import BaseModel, Field
 from typing_extensions import Annotated
 
 
