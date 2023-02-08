@@ -89,7 +89,7 @@ def start_working(
                 logger.exception("Popping task from scheduler failed")
                 time.sleep(10 * settings.poll_interval)
                 continue
-            except Exception:
+            except:  # noqa
                 logger.exception("Popping task from scheduler failed")
                 time.sleep(10 * settings.poll_interval)
                 continue
@@ -122,8 +122,7 @@ def get_runtime_manager(settings: Settings, queue: RuntimeManager.Queue, log_lev
 
     return SchedulerRuntimeManager(
         item_handler,
-        # Do not share a session between workers
-        client_factory,
+        client_factory,  # Do not share a session between workers
         settings,
         log_level,
     )

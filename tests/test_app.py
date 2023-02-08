@@ -7,7 +7,7 @@ from unittest import TestCase
 from pydantic import parse_raw_as
 
 from boefjes.app import SchedulerRuntimeManager
-from boefjes.clients.scheduler_client import SchedulerClientInterface, Task, Queue
+from boefjes.clients.scheduler_client import SchedulerClientInterface, QueuePrioritizedItem, Queue
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, StopWorking, RuntimeManager
@@ -22,12 +22,12 @@ class MockSchedulerClient(SchedulerClientInterface):
     def get_queues(self) -> List[Queue]:
         return parse_raw_as(List[Queue], self.boefje_responses.pop(0))
 
-    def pop_task(self, queue: str) -> Optional[Task]:
+    def pop_task(self, queue: str) -> Optional[QueuePrioritizedItem]:
         if RuntimeManager.Queue.BOEFJES.value in queue and self.boefje_responses:
-            return parse_raw_as(Task, self.boefje_responses.pop(0))
+            return parse_raw_as(QueuePrioritizedItem, self.boefje_responses.pop(0))
 
         if RuntimeManager.Queue.NORMALIZERS.value in queue and self.normalizer_responses:
-            return parse_raw_as(Task, self.normalizer_responses.pop(0))
+            return parse_raw_as(QueuePrioritizedItem, self.normalizer_responses.pop(0))
 
 
 class MockHandler(Handler):
@@ -61,7 +61,7 @@ class MockHandler(Handler):
             return [parse_raw_as(Union[BoefjeMeta, NormalizerMeta], x) for x in f]
 
 
-class RuntimeTest(TestCase):
+class AppTest(TestCase):
     def setUp(self) -> None:
         # This tests multiprocessing, so we use a file for interprocess communication
         self.tempdir = tempfile.TemporaryDirectory()
