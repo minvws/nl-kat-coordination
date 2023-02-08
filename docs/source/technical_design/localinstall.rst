@@ -1,6 +1,6 @@
-==========================
-Developer or local install
-==========================
+====================================
+make kat: developer or local install
+====================================
 
 **Important:** The version of OpenKAT you are about to install is a **development environment**, which is used by the developers to build OpenKAT. This is not a version that would be used in a production environment, and it requires some knowledge about Linux, compiling software, and Docker.
 
