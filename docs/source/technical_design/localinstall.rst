@@ -29,7 +29,10 @@ OpenKAT is installed in Docker, and therefore Docker must be installed first. Th
 
 OpenKAT requires a newer version of Docker than what is available in the default ubuntu and debian repositories. That is why you should always use Docker's repository. On the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_ page you can find links to installation pages for all major Linux distributions. For a specific example using the Docker repository on Debian, see `Debian install using the repository <https://docs.docker.com/engine/install/debian/#install-using-the-repository>`_. The installation pages for the other Linux distributions contain similar instructions.
 
-**Important:** Please follow the post-installation steps as well! You can find them here: `Docker Engine post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/>`_.
+Post installation steps
+***********************
+
+After installing Docker, follow the post-installation steps to make sure your Docker setup is fully functional. You can find them here: `Docker Engine post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/>`_.
 
 Install dependencies
 ********************
