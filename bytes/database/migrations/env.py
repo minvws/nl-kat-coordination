@@ -9,24 +9,20 @@ from alembic import context
 # access to the values within the .ini file in use.
 from bytes.config import get_settings
 from bytes.database.db import SQL_BASE
-from bytes.database.db_models import SQL_BASE
 
 config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)  # type: ignore
+fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = SQL_BASE.metadata
 config.set_main_option("sqlalchemy.url", get_settings().bytes_db_uri)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
 

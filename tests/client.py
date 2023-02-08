@@ -86,7 +86,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
-        response = self._session.get(f"/bytes/boefje_meta", headers=self.headers, params=query_filter.dict())
+        response = self._session.get("/bytes/boefje_meta", headers=self.headers, params=query_filter.dict())
         self._verify_response(response)
 
         boefje_meta_json = response.json()
@@ -140,7 +140,7 @@ class BytesAPIClient:
         params = query_filter.dict()
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
-        response = self._session.get(f"/bytes/raw", headers=self.headers, stream=True, params=params)
+        response = self._session.get("/bytes/raw", headers=self.headers, stream=True, params=params)
         self._verify_response(response)
 
         return response.json()  # type: ignore

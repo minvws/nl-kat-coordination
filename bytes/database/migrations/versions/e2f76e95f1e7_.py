@@ -5,10 +5,6 @@ Revises: 0011_2, 0011
 Create Date: 2022-11-10 19:19:13.732053
 
 """
-from alembic import op
-import sqlalchemy as sa
-
-
 # revision identifiers, used by Alembic.
 revision = "e2f76e95f1e7"
 down_revision = ("0011_2", "0011")

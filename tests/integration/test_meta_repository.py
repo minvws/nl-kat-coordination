@@ -83,13 +83,13 @@ def test_boefje_organization_id_length(meta_repository: SQLMetaDataRepository) -
     boefje_meta = get_boefje_meta()
 
     with meta_repository:
-        boefje_meta.organization = 32*"t"
+        boefje_meta.organization = 32 * "t"
         meta_repository.save_boefje_meta(boefje_meta)
 
     with pytest.raises(DataError):
         with meta_repository:
             boefje_meta.id = str(uuid.uuid4())
-            boefje_meta.organization = 33*"t"
+            boefje_meta.organization = 33 * "t"
             meta_repository.save_boefje_meta(boefje_meta)
 
     meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db

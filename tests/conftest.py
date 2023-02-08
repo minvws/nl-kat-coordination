@@ -81,8 +81,9 @@ def meta_repository(
 
     session.commit()
 
-    sessionmaker(bind=engine, autocommit=True)()\
-        .execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()]))
+    sessionmaker(bind=engine, autocommit=True)().execute(
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()])
+    )
 
 
 @pytest.fixture
@@ -96,8 +97,9 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
         settings.bytes_password,
     )
 
-    sessionmaker(bind=get_engine(settings.bytes_db_uri), autocommit=True)() \
-        .execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()]))
+    sessionmaker(bind=get_engine(settings.bytes_db_uri), autocommit=True)().execute(
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()])
+    )
 
 
 @pytest.fixture

@@ -1,4 +1,3 @@
-import json
 import uuid
 
 import pytest
@@ -165,12 +164,12 @@ def test_raw_mimes(bytes_api_client: BytesAPIClient) -> None:
 
     assert len(retrieved_raws) == 2
     assert (
-        retrieved_raws[0]["secure_hash"]
-        == "sha512:ce89137e70b5f8433e787293f0c01332c0ca405d355a7080a50630340f77bf5227561a01cba83272273513097d91f3bf9a8e8f17416fadfc1575028157cef2df"
+        retrieved_raws[0]["secure_hash"] == "sha512:ce89137e70b5f8433e787293f0c01332c0ca405d355a7080a50630340f7"
+        "7bf5227561a01cba83272273513097d91f3bf9a8e8f17416fadfc1575028157cef2df"
     )
     assert (
-        retrieved_raws[1]["secure_hash"]
-        == "sha512:0ae68528b2daf4d9fd494ee378b043be8646489dbe1e7d63bbf33560f58d6c9b5abaa05387644c635f0c8a327a261e1435ad78de0cb30745d8bb05d76ddda612"
+        retrieved_raws[1]["secure_hash"] == "sha512:0ae68528b2daf4d9fd494ee378b043be8646489dbe1e7d63bbf33560f58"
+        "d6c9b5abaa05387644c635f0c8a327a261e1435ad78de0cb30745d8bb05d76ddda612"
     )
 
 

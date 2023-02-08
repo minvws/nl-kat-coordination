@@ -13,14 +13,16 @@ class HashTests(TestCase):
         secure_hash = hash_data(data=get_raw_data(), datetime=dt)
 
         self.assertEqual(
-            "sha512:bc4d1f0a71ba9bf2ab2b7520322f8e969c48d5ae99e84b4a60b850f61ce5b1e95e13f3ef6c43680fb03960f98799a92770e30591253784cc3213b194a73ea21d",
+            "sha512:bc4d1f0a71ba9bf2ab2b7520322f8e969c48d5ae99e84b4a60b850f61ce5b"
+            "1e95e13f3ef6c43680fb03960f98799a92770e30591253784cc3213b194a73ea21d",
             secure_hash,
         )
 
         secure_hash = hash_data(data=get_raw_data(), datetime=dt)
 
         self.assertEqual(
-            "sha512:bc4d1f0a71ba9bf2ab2b7520322f8e969c48d5ae99e84b4a60b850f61ce5b1e95e13f3ef6c43680fb03960f98799a92770e30591253784cc3213b194a73ea21d",
+            "sha512:bc4d1f0a71ba9bf2ab2b7520322f8e969c48d5ae99e84b4a60b850f61ce5b"
+            "1e95e13f3ef6c43680fb03960f98799a92770e30591253784cc3213b194a73ea21d",
             secure_hash,
         )
 
