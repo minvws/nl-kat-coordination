@@ -4,20 +4,26 @@ How do I install OpenKAT?
 
 OpenKAT can be installed in a number of ways. You can use OpenKAT in a way that suits your situation. For developers and for introductory purposes, there is a local installation. For production application there are debian packages that are automatically built from each release or pre-built docker containers. Also there is community work on kubernetes and nomad scripts. At VWS, OpenKAT is installed based on ansible script. Use the hardening guide for a production install.
 
-Pre-built Docker images
+Production environments
 =======================
+
+Pre-built Docker images
+***********************
 
 The pre-built docker images can be used for production installations of OpenKAT and can be found on the Github Container Registry. The deployment manual based on the pre-built docker images is included in this manual. A kubernetes script is being worked on for automatic deploy.
 
 Debian packages
-===============
+***************
 
 The Debian packages can be used for production installations of OpenKAT and are available as artifacts from the Github actions in the repository of each module. How to install them is explained in the manual. A repository to enable ``apt install kat`` is under construction. The packages cannot easily be converted to RPM's, for this we do not have a solution yet.
 
-make kat
-========
+Development environment
+=======================
 
-The 'developer option' or local install of OpenKAT builds the system from the source using docker containers. The manual for this install explains how to set up your computer for an install of OpenKAT.
+make kat
+********
+
+The 'developer option' or local install of OpenKAT builds the system from the source using make kat or make kat-stable. The manual for this install explains how to set up your computer for an install of OpenKAT.
 
 Minimum requirements
 ====================
