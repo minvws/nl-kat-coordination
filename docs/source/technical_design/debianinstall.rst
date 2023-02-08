@@ -182,11 +182,13 @@ Add the 'kat' vhost
 -------------------
 
 Generate a safe password for the KAT user in rabbitmq. You can use the /dev/urandom method again and put it in a shell variable to use it later:
+
 .. code-block:: sh
 
     rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
 
 Now create a KAT user for RabbitMQ, create the virtual host and set the permissions:
+
 .. code-block:: sh
 
     rabbitmqctl add_user kat ${rabbitmq_pass}
@@ -194,6 +196,7 @@ Now create a KAT user for RabbitMQ, create the virtual host and set the permissi
     rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
 Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for `/etc/kat/mula.conf`:
+
 .. code-block:: sh
 
     SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@localhost:5672/kat
@@ -207,6 +210,7 @@ And update the `QUEUE_URI` setting to the same value for the following files:
  * `/etc/kat/octopoes.conf`
 
 Or use this command to do it for you:
+
 .. code-block:: sh
 
     sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
