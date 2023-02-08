@@ -5,7 +5,8 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, Field
-from sqlalchemy import JSON, Boolean, Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import (JSON, Boolean, Column, DateTime, Enum, ForeignKey,
+                        String)
 from sqlalchemy.orm import relationship
 
 from scheduler.utils import GUID
@@ -37,6 +38,8 @@ class Task(BaseModel):
 
     created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
     modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+
+    scheduled_job_id: Optional[uuid.UUID] = None
 
     class Config:
         orm_mode = True

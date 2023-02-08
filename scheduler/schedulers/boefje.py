@@ -300,6 +300,7 @@ class BoefjeScheduler(Scheduler):
             except Exception as exc_eval:
                 # TODO: logging
                 job.enabled = False
+                import pdb; pdb.set_trace()
                 self.ctx.job_store.update_scheduled_job(job)
                 continue
 
@@ -311,6 +312,7 @@ class BoefjeScheduler(Scheduler):
 
             # FIXME: should be present from the relationship
             prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
+            # prior_tasks = job.tasks
             score = self.ranker.rank(
                 SimpleNamespace(
                     prior_tasks=prior_tasks,
@@ -610,7 +612,7 @@ class BoefjeScheduler(Scheduler):
     def evaluate_task(self, task: models.BoefjeTask) -> None:
         """Check if the ooi (when set), and the boefje is still available."""
         ooi = None
-        if task.primary_key is not None:
+        if task.input_ooi is not None:
             try:
                 ooi = self.ctx.services.octopoes.get_object(
                     self.organisation.id, task.input_ooi,
@@ -618,7 +620,7 @@ class BoefjeScheduler(Scheduler):
             except Exception as exc_octopoes:
                 raise exc_octopoes
 
-        if ooi is None and task.primary_key is not None:
+        if ooi is None and task.input_ooi is not None:
             raise OOINotFoundError()
 
         plugin = None

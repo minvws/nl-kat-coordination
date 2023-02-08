@@ -130,8 +130,8 @@ class SchedulerTestCase(unittest.TestCase):
         scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
         self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
 
-        # Task should be associated with it
-        self.assertEqual(scheduled_job.p_item, task_pq.p_item)
+        # Task should be associated with scheduled job
+        self.assertEqual(scheduled_job.id, task_db.scheduled_job_id)
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
@@ -270,6 +270,9 @@ class SchedulerTestCase(unittest.TestCase):
         scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
         self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
 
+        # Task should be associated with scheduled job
+        self.assertEqual(scheduled_job.id, task_db.scheduled_job_id)
+
     def test_is_not_allowed_to_run(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -326,9 +329,9 @@ class SchedulerTestCase(unittest.TestCase):
         # Scheduled job schould be in datastore
         scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
         self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
-        import pdb; pdb.set_trace()
-        # Task should be associated with it
-        self.assertEqual(scheduled_job.p_item, task_pq.p_item)
+
+        # Task should be associated with scheduled job
+        self.assertEqual(scheduled_job.id, task_db.scheduled_job_id)
 
     def test_push_tasks_for_new_boefjes_no_oois_found(self):
         """When no ooi's are found for the new boefjes, no tasks should be
@@ -362,6 +365,7 @@ class SchedulerTestCase(unittest.TestCase):
             data=task,
             hash=task.hash,
         )
+
         scheduled_job = models.ScheduledJob(
             hash=p_item.hash,
             enabled=True,
@@ -393,7 +397,10 @@ class SchedulerTestCase(unittest.TestCase):
         # Scheduled job should be updated in datastore
         scheduled_job_db = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
         self.assertEqual(scheduled_job_db.p_item, self.scheduler.queue.peek(0))
-        self.assertNotEqual(scheduled_job_db.checked_at, self.scheduler.queue.peek(0))
+        self.assertNotEqual(scheduled_job_db.checked_at, self.scheduler.queue.peek(0))  # FIXME
+
+        # Task should be associated with scheduled job
+        self.assertEqual(scheduled_job_db.id, task_db.scheduled_job_id)
 
     @mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash")
     @mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje")
@@ -899,6 +906,9 @@ class SchedulerTestCase(unittest.TestCase):
         # Scheduled job schould be in datastore
         scheduled_job = self.mock_ctx.job_store.get_scheduled_job_by_hash(task_pq.hash)
         self.assertEqual(scheduled_job.p_item, self.scheduler.queue.peek(0))
+
+        # Task should be associated with scheduled job
+        self.assertEqual(scheduled_job.id, task_db.scheduled_job_id)
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
