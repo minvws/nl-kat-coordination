@@ -31,10 +31,12 @@ export version
 upgrade: fetch down # Upgrade to the latest release without losing persistent data. Usage: `make upgrade version=v1.5.0` (version is optional)
 ifeq ($(version),)
 	version=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1)
-endif
+	make upgrade version=$$version
+else
 	make checkout branch=$(version)
 	make build-all
 	make up
+endif
 
 reset: down
 	-docker volume rm nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
