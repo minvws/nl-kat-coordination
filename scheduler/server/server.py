@@ -246,18 +246,19 @@ class Server:
 
         return models.Task(**task.dict())
 
-    def patch_task(self, task_id: str, item: models.Task) -> Any:
-        try:
-            task_db = self.ctx.task_store.get_task_by_id(task_id)
-        except ValueError as exc:
+    def patch_task(self, task_id: str, item: Dict) -> Any:
+        if len(item) == 0:
             raise fastapi.HTTPException(
                 status_code=400,
-                detail=str(exc),
-            ) from exc
+                detail="no data to patch",
+            )
+
+        try:
+            task_db = self.ctx.task_store.get_task_by_id(task_id)
         except Exception as exc:
             raise fastapi.HTTPException(
-                status_code=500,
-                detail="failed to get task",
+                status_code=400,
+                detail=f"failed to get task [exception: {exc}]",
             ) from exc
 
         if task_db is None:
@@ -266,33 +267,18 @@ class Server:
                 detail="task not found",
             )
 
-        patch_data = item.dict(exclude_unset=True)
-        if len(patch_data) == 0:
-            raise fastapi.HTTPException(
-                status_code=400,
-                detail="no data to patch",
-            )
+        updated_task = task_db.copy(update=item)
 
-        # Update the patched attributes
-        for attr, value in patch_data.items():
-            try:
-                setattr(task_db, attr, value)
-            except AttributeError as exc:
-                raise fastapi.HTTPException(
-                    status_code=400,
-                    detail="attribute not found",
-                ) from exc
-
-        # update task in database
+        # Update task in database
         try:
-            self.ctx.task_store.update_task(task_db)
+            self.ctx.task_store.update_task(updated_task)
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=500,
                 detail="failed to update task",
             ) from exc
 
-        return models.Task(**task_db.dict())
+        return updated_task
 
     def get_queues(self) -> Any:
         return [models.Queue(**s.queue.dict()) for s in self.schedulers.values()]
