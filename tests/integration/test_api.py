@@ -1,6 +1,7 @@
 import copy
 import json
 import unittest
+import uuid
 from datetime import datetime, timedelta
 from unittest import mock
 
@@ -473,3 +474,28 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         response = self.client.get(f"/tasks?min_created_at={datetime.now() + timedelta(seconds=10)}")
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, len(response.json()["results"]))
+
+    def test_patch_tasks(self):
+        # Patch a task
+        self.assertEqual("queued", self.first_item_api.get("status"))
+        response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"status": "completed"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("completed", response.json().get("status"))
+
+    def test_patch_task_empty(self):
+        # Patch a task with empty body
+        response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={})
+        self.assertEqual(400, response.status_code)
+        self.assertEqual("no data to patch", response.json().get("detail"))
+
+    def test_patch_task_not_found(self):
+        # Patch a task that does not exist
+        response = self.client.patch(f"/tasks/{uuid.uuid4().hex}", json={"status": "completed"})
+        self.assertEqual(404, response.status_code)
+        self.assertEqual("task not found", response.json().get("detail"))
+
+    def test_patch_task_malformed_id(self):
+        # Patch a task with malformed id
+        response = self.client.patch("/tasks/123.123", json={"status": "completed"})
+        self.assertEqual(400, response.status_code)
+        self.assertIn("failed to get task", response.json().get("detail"))
