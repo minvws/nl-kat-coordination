@@ -26,10 +26,13 @@ clean: down # This should clean up all persistent data
 	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
 	-docker-compose run --rm -u root bytes rm -rf bytes-data
 
-upgrade: fetch down # Upgrade to a release without losing persistent data. Release version can be passed as release=x.x
-	for service in . $(SERVICES); do
-		make checkout branch=release-$(release);
-	done
+export version
+
+upgrade: fetch down # Upgrade to the latest release without losing persistent data. Usage: `make upgrade version=v1.5.0` (version is optional)
+ifeq ($(version),)
+	version=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1)
+endif
+	make checkout branch=$(version)
 	make build-all
 	make up
 
@@ -51,7 +54,8 @@ clone:
 
 clone-stable:
 	for service in $(SERVICES); do
-		git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/$$service/tags" | jq -r '.[0].name') https://github.com/minvws/$$service.git;
+		TAG=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1);
+		git clone --branch $$TAG https://github.com/minvws/$$service.git;
 	done
 
 fetch:
@@ -78,7 +82,7 @@ else
 endif
 
 checkout: # Usage: `make checkout branch=develop`
-	for service in $(SERVICES); do
+	for service in . $(SERVICES); do
 		git -C $$service checkout $(branch);
 	done
 
