@@ -7,8 +7,6 @@ from boefjes.katalogus.models import Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationStorage,
     RepositoryStorage,
-    SettingsStorage,
-    PluginEnabledStorage,
 )
 
 

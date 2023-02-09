@@ -25,7 +25,6 @@ def check_version(version1: str, version2: str) -> VersionCheck:
     # Split the version until first dot
     version1_splitted = version1.split(".", 1)
     version2_splitted = version2.split(".", 1)
-    # print(f"  Splitted: {version1_splitted}  &  {version2_splitted}")
 
     # Check versions until first dot
     v1 = version1_splitted[0]

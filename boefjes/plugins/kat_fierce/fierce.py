@@ -27,7 +27,6 @@ import dns.zone
 
 
 def fatal(msg, _return_code=-1):
-    # print(msg)
     raise Exception(msg)
 
 
@@ -66,7 +65,7 @@ def find_subdomain_list_file(filename):
 
     # If the relative check failed then attempt to find the list file
     # in the pip package directory. This will typically happen on pip package
-    # installs (duh)
+    # installs
     package_filename_path = os.path.join("lists", filename)
     try:
         full_package_path = pkg_resources.resource_filename("kat_fierce", package_filename_path)
@@ -280,8 +279,6 @@ def fierce(**kwargs):
             range_ips,
         )
         if nearby:
-            # print("Nearby:")
-            # pprint.pprint(nearby)
             pass
 
     if not kwargs.get("domain"):
@@ -307,20 +304,16 @@ def fierce(**kwargs):
         master_address = master[0].address
         output["SOA"] = f"{soa_mname} ({master_address})"
     else:
-        # print("SOA: failure")
         fatal("Failed to lookup NS/SOA, Domain does not exist")
 
     zone = zone_transfer(master_address, domain)
-    # print("Zone: {}".format("success" if zone else "failure"))
     if zone:
-        # pprint.pprint({k: v.to_text(k) for k, v in zone.items()})
         return
 
     random_subdomain = str(random.randint(1e10, 1e11))  # noqa DUO102, non-cryptographic random use
     random_domain = concatenate_subdomains(domain, [random_subdomain])
     wildcard = query(resolver, random_domain, record_type="A", tcp=kwargs["tcp"])
     wildcard_ips = set(rr.address for rr in wildcard.rrset) if wildcard else set()
-    # print("Wildcard: {}".format(", ".join(wildcard_ips) if wildcard_ips else "failure"))
 
     subdomains = get_subdomains(kwargs["subdomains"], kwargs["subdomain_file"])
 
@@ -442,7 +435,6 @@ def main():
     try:
         fierce(**vars(args))
     except KeyboardInterrupt:
-        # print("Exiting...")
         pass
 
 
