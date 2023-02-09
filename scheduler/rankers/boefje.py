@@ -1,6 +1,6 @@
 import math
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Any
 
 from .ranker import Ranker
