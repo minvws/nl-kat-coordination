@@ -49,7 +49,7 @@ down:
 
 clone:
 	for service in $(SERVICES); do
-		git clone https://github.com/minvws/$$service.git;
+		git clone https://github.com/minvws/$$service.git || true;
 	done
 
 clone-stable:
@@ -60,12 +60,12 @@ clone-stable:
 
 fetch:
 	for service in . $(SERVICES); do
-		git -C $$service fetch;
+		git -C $$service fetch || true;
 	done
 
 pull:
 	for service in . $(SERVICES); do
-		git -C $$service pull;
+		git -C $$service pull || true;
 	done
 
 env-if-empty:
@@ -83,7 +83,7 @@ endif
 
 checkout: # Usage: `make checkout branch=develop`
 	for service in . $(SERVICES); do
-		git -C $$service checkout $(branch);
+		git -C $$service checkout $(branch) || true;
 	done
 
 pull-reset:
