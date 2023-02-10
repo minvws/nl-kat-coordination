@@ -193,7 +193,7 @@ Now create a KAT user for RabbitMQ, create the virtual host and set the permissi
 
     rabbitmqctl add_user kat ${rabbitmq_pass}
     rabbitmqctl add_vhost kat
-    rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+    sudo rabbitmqctl set_permissions -p kat kat ".*" ".*" ".*"
 
 Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for `/etc/kat/mula.conf`:
 
