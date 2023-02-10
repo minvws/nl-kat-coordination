@@ -35,7 +35,7 @@ repos:
       rev: v0.991
       hooks:
           - id: mypy
-            additional_dependencies: ['types-PyYAML', 'types-requests', 'pydantic']
+            additional_dependencies: ['types-PyYAML', 'types-requests', 'pydantic', 'fastapi', 'click']
             exclude: "tests|templates"
 
     - repo: https://github.com/PyCQA/pylint
@@ -43,12 +43,13 @@ repos:
       hooks:
           - id: pylint
             exclude: "tests|templates"
+            additional_dependencies: ['types-PyYAML', 'types-requests', 'pydantic', 'fastapi', 'click', 'jinja2']
 
     - repo: https://github.com/PyCQA/pydocstyle
       rev: 6.1.1
       hooks:
           - id: pydocstyle
-            exclude: "tests|templates"
+            exclude: "tests|templates|packaging"
 
     - repo: https://github.com/PyCQA/flake8
       rev: 5.0.4

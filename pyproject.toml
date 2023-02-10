@@ -13,8 +13,8 @@ paths = ["keiko"]
 max-line-length = "120"
 
 [tool.pylint."MESSAGES CONTROL"]
-disable = ["R0914","W1514", "R0903", "E0401"] # Ignore too-many-local-variables; unspecified encodings; too-few-public-methods; import-error
-extension-pkg-whitelist = "pydantic" # Ignore pydantic import checks
+disable = ["R0914", "R0903"] # Ignore too-many-local-variables; too-few-public-methods
+extension-pkg-whitelist = "pydantic"
 
 [tool.black]
 line-length = 119
@@ -25,8 +25,6 @@ target-version = ['py38']
 [tool.mypy]
 python_version = "3.8"
 strict = true
-ignore_missing_imports = true
-follow_imports = "skip"
 
 [tool.poetry.dependencies]
 python = "^3.8"

@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring
+"""Version information for keiko."""
 from importlib.metadata import version, PackageNotFoundError
 
 try:

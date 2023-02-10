@@ -66,7 +66,7 @@ def generate_report(
 
     # read template and find used glossary entries
     found_entries: Set[str] = set()
-    with open(template.filename) as template_file:
+    with open(template.filename, encoding="utf-8") as template_file:
         for line in template_file:
             for word in line.split():
                 bare_word = baretext(word)
@@ -166,7 +166,7 @@ def read_glossary(glossary: str) -> Dict[str, Tuple[str, str]]:
     """Read a glossary CSV file and return a dictionary of entries."""
     glossary_entries = {}
     glossary_file_path = Path(settings.glossaries_folder) / glossary
-    with open(glossary_file_path) as glossary_file:
+    with open(glossary_file_path, encoding="utf-8") as glossary_file:
         csvreader = csv.reader(glossary_file)
         # skip header
         _ = next(csvreader)
