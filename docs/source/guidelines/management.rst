@@ -1,8 +1,8 @@
 Project management
 ##################
 
-In principle, `all project management is handled in a central board <https://github.com/orgs/minvws/projects/7>`_.
-Issues and PRs may be created in the repositories of the KAT modules, as long as they are linked to the central board.
+OpenKAT development is largely public except for the day-to-day planning of the development team at the Ministery of Health, Welfare and Sports. Do get in touch if you want to contribute. In principle, `all project management is handled in a central board <https://github.com/orgs/minvws/projects/7>`_.
+Issues and PRs may be created in the repositories of the KAT modules, and will be linked to the central board.
 All (linked) issues and PR's should be assigned to a status column, and have an assignee so we know who is chiefly responsible / who should take action.
 Developers are encouraged to use the Review column(s) to get their PR's merged, and to regularly check if they can help review something.
 
