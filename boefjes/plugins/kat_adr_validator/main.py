@@ -5,8 +5,8 @@ import docker
 from boefjes.job_models import BoefjeMeta
 
 
-ADR_VALIDATOR_REPOSITORY="registry.gitlab.com/commonground/don/adr-validator"
-ADR_VALIDATOR_VERSION="0.2.0"
+ADR_VALIDATOR_REPOSITORY="registry.gitlab.com/commonground/don/adr-validator/tmp"
+ADR_VALIDATOR_VERSION="main"
 
 
 def run_adr_validator(url: str) -> str:
