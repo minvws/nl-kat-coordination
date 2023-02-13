@@ -14,13 +14,21 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 SERVICES = nl-kat-rocky nl-kat-boefjes nl-kat-bytes nl-kat-octopoes nl-kat-mula nl-kat-keiko
 
 
-kat: env-if-empty clean clone build up # This should give you a clean install
+kat: env-if-empty clean clone # This should give you a clean install
+	make build
+	make up
 
-kat-stable: env-if-empty clean clone-stable build up # This should give you a clean install of a stable version
+kat-stable: env-if-empty clean clone-stable # This should give you a clean install of a stable version
+	make build
+	make up
 
-rebuild: clean build up
+rebuild: clean
+	make build
+	make up
 
-update: down pull build up
+update: down pull
+	make build
+	make up
 
 clean: down # This should clean up all persistent data
 	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
