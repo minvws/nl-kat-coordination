@@ -1,3 +1,4 @@
+import logging
 from typing import List, Optional, Union
 
 import requests
@@ -6,8 +7,13 @@ import uuid
 from enum import Enum
 import datetime
 
+from requests.adapters import HTTPAdapter, Retry
+
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from pydantic import BaseModel, parse_obj_as
+
+
+logger = logging.getLogger(__name__)
 
 
 class Queue(BaseModel):
@@ -59,10 +65,24 @@ class SchedulerClientInterface:
         raise NotImplementedError()
 
 
+class LogRetry(Retry):
+    """Add a log when retrying a request"""
+
+    def __init__(self, *args, skip_log=False, **kwargs):
+        if not skip_log:
+            logger.error("Failed to create desired call. Retrying...")
+
+        super().__init__(*args, **kwargs)
+
+
 class SchedulerAPIClient(SchedulerClientInterface):
     def __init__(self, base_url: str):
         self.base_url = base_url
         self._session = requests.Session()
+
+        max_retries = LogRetry(skip_log=True, total=6, backoff_factor=1)
+        self._session.mount("https://", HTTPAdapter(max_retries=max_retries))
+        self._session.mount("http://", HTTPAdapter(max_retries=max_retries))
 
     @staticmethod
     def _verify_response(response: requests.Response) -> None:
@@ -81,12 +101,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return parse_obj_as(Optional[QueuePrioritizedItem], response.json())
 
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
-        # The pop endpoint does not return the complete task object, so we retrieve it first.
-        response = self._session.get(f"{self.base_url}/tasks/{task_id}")
+        response = self._session.patch(f"{self.base_url}/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
-        task = parse_obj_as(Task, response.json())
-        task.status = status
-
-        response = self._session.patch(f"{self.base_url}/tasks/{task.id}", data=task.json())
-        self._verify_response(response)
+        logger.info(f"Set task status to {status} in the scheduler for task[{task_id}]")

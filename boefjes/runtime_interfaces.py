@@ -26,7 +26,3 @@ class RuntimeManager:
 
     def run(self, queue: Queue) -> None:
         raise NotImplementedError()
-
-
-class StopWorking(Exception):
-    """Exception to tell workers in the runtime to stop working"""

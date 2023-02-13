@@ -4,9 +4,7 @@ import time
 from multiprocessing import Pool
 from typing import Callable
 
-from requests import ConnectionError
-from requests import HTTPError as RequestHTTPError
-from urllib3.exceptions import HTTPError
+from requests import HTTPError
 
 from boefjes.clients.scheduler_client import (
     SchedulerAPIClient,
@@ -17,7 +15,7 @@ from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalNormalizerJobRunner, LocalBoefjeJobRunner
-from boefjes.runtime_interfaces import Handler, RuntimeManager, StopWorking
+from boefjes.runtime_interfaces import Handler, RuntimeManager
 
 logger = logging.getLogger(__name__)
 
@@ -29,10 +27,12 @@ class SchedulerRuntimeManager(RuntimeManager):
         client_factory: Callable[[], SchedulerClientInterface],
         settings: Settings,
         log_level: str,  # TODO: (re)move?
+        exit_on_error: bool = False,
     ):
         self.item_handler = item_handler
         self.client_factory = client_factory
         self.settings = settings
+        self.exit_on_error = exit_on_error
 
         logger.setLevel(log_level)
 
@@ -45,7 +45,10 @@ class SchedulerRuntimeManager(RuntimeManager):
                 # Workers pull tasks from the scheduler
                 pool.starmap(
                     start_working,
-                    [(self.client_factory(), self.item_handler, self.settings, queue) for _ in range(pool_size)],
+                    [
+                        (self.client_factory(), self.item_handler, self.settings, queue, self.exit_on_error)
+                        for _ in range(pool_size)
+                    ],
                 )
             except Exception:  # noqa
                 logger.exception("An error occurred")
@@ -58,6 +61,7 @@ def start_working(
     item_handler: Handler,
     settings: Settings,
     queue_to_handle: RuntimeManager.Queue,
+    exit_on_error: bool = False,
 ) -> None:
     """
     This function runs in parallel and polls the scheduler for queues and jobs.
@@ -69,28 +73,24 @@ def start_working(
     while True:
         try:
             queues = scheduler_client.get_queues()
-
-            # We do not target a specific queue since we start one runtime for all organisations
-            # and queue ids contain the organisation_id
-            queues = [q for q in queues if q.id.startswith(queue_to_handle.value)]
-
-            logger.debug(f"Found queues: {[queue.id for queue in queues]}")
-        except (RequestHTTPError, HTTPError, ConnectionError):
+        except HTTPError:
             # Scheduler is having issues, so make note of it and try again
             logger.exception("Getting the queues from the scheduler failed")
             time.sleep(10 * settings.poll_interval)  # But not immediately
-
             continue
 
+        # We do not target a specific queue since we start one runtime for all organisations
+        # and queue ids contain the organisation_id
+        queues = [q for q in queues if q.id.startswith(queue_to_handle.value)]
+
+        logger.debug(f"Found queues: {[queue.id for queue in queues]}")
+
         for queue in queues:
+            logger.info(f"Popping from queue {queue.id}")
+
             try:
-                logger.info(f"Popping from queue {queue.id}")
                 p_item = scheduler_client.pop_item(queue.id)
-            except (RequestHTTPError, HTTPError, ConnectionError):
-                logger.exception("Popping task from scheduler failed")
-                time.sleep(10 * settings.poll_interval)
-                continue
-            except:  # noqa
+            except HTTPError:
                 logger.exception("Popping task from scheduler failed")
                 time.sleep(10 * settings.poll_interval)
                 continue
@@ -99,18 +99,27 @@ def start_working(
                 logger.info(f"Queue {queue.id} empty")
                 continue
 
+            logger.info(f"Handling task[{p_item.data.id}]")
+
             try:
-                logger.info(f"Handling task[{p_item.data.id}]")
                 item_handler.handle(p_item.data)
-                scheduler_client.patch_task(str(p_item.id), TaskStatus.COMPLETED)
-                logger.info(f"Set task status to completed in the scheduler for task[{p_item.data.id}]")
-            except StopWorking:
-                logger.info("Stopping worker...")
-                return
             except:  # noqa
                 logger.exception("An error occurred handling scheduler item %s", p_item.data.id)
-                scheduler_client.patch_task(str(p_item.id), TaskStatus.FAILED)
-                logger.info(f"Set task status to failed in the scheduler for task[{p_item.data.id}]")
+
+                try:
+                    scheduler_client.patch_task(str(p_item.id), TaskStatus.FAILED)
+                except HTTPError:
+                    logger.exception("Could not patch scheduler task to failed")
+
+                if exit_on_error:
+                    raise
+
+                continue
+
+            try:
+                scheduler_client.patch_task(str(p_item.id), TaskStatus.COMPLETED)
+            except HTTPError:
+                logger.exception("Could not patch scheduler task to completed")
 
         time.sleep(settings.poll_interval)
 

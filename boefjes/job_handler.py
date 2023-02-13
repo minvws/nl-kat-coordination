@@ -4,7 +4,6 @@ from enum import Enum
 from typing import Any, List, Dict, Set
 
 import requests
-from octopoes.connector import RemoteException
 
 from octopoes.models.types import OOIType
 from pydantic.tools import parse_obj_as
@@ -137,29 +136,27 @@ class BoefjeHandler(Handler):
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
         boefje_meta.started_at = datetime.now(timezone.utc)
-        exc = None
+        boefje_results = None
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, environment)
         except Exception as e:
-            exc = e
-            logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id, exc_info=True)
+            logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
             boefje_results = [({"error/boefje"}, str(e))]
+
+            raise
         finally:
             boefje_meta.ended_at = datetime.now(timezone.utc)
+            logger.info("Saving to Bytes for boefje boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
-        logger.info("Saving to Bytes for boefje boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+            bytes_api_client.login()
+            bytes_api_client.save_boefje_meta(boefje_meta)
 
-        bytes_api_client.login()
-        bytes_api_client.save_boefje_meta(boefje_meta)
+            if boefje_results:
+                for boefje_added_mime_types, output in boefje_results:
+                    bytes_api_client.save_raw(boefje_meta.id, output, mime_types.union(boefje_added_mime_types))
 
-        for boefje_added_mime_types, output in boefje_results:
-            bytes_api_client.save_raw(boefje_meta.id, output, mime_types.union(boefje_added_mime_types))
-
-        if exc:  # If an exception was raised, save the error in Bytes and reraise it so the app updates the task status
-            raise exc
-
-        logger.info("Done with boefje for %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+            logger.info("Done with boefje for %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
 
 class NormalizerHandler(Handler):
@@ -173,7 +170,6 @@ class NormalizerHandler(Handler):
         raw = bytes_api_client.get_raw(normalizer_meta.raw_data.boefje_meta.id, normalizer_meta.raw_data.id)
 
         normalizer_meta.started_at = datetime.now(timezone.utc)
-        exc = None
 
         try:
             results = self.job_runner.run(normalizer_meta, raw)
@@ -200,19 +196,9 @@ class NormalizerHandler(Handler):
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )
                 )
-        except Exception as e:
-            exc = e
-            logger.exception(f"Normalizer {normalizer_meta=} failed")
-        except (RequestException, ObjectNotFoundException, RemoteException) as e:
-            exc = e
-            logger.exception(f"Error saving results to Octopoes, {normalizer_meta=}")
         finally:
             normalizer_meta.ended_at = datetime.now(timezone.utc)
-
-        bytes_api_client.save_normalizer_meta(normalizer_meta)
-
-        if exc:
-            raise exc
+            bytes_api_client.save_normalizer_meta(normalizer_meta)
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 

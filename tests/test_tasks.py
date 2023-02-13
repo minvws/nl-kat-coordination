@@ -109,7 +109,7 @@ class TaskTest(TestCase):
 
         local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
 
-        with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they ar reraised
+        with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
             BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository).handle(meta)
 
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
