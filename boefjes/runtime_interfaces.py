@@ -26,3 +26,7 @@ class RuntimeManager:
 
     def run(self, queue: Queue) -> None:
         raise NotImplementedError()
+
+
+class JobRuntimeError(RuntimeError):
+    """Base exception class for exceptions raised during running of jobs"""

@@ -4,6 +4,7 @@ import time
 from multiprocessing import Pool
 from typing import Callable
 
+from pydantic import ValidationError
 from requests import HTTPError
 
 from boefjes.clients.scheduler_client import (
@@ -27,12 +28,10 @@ class SchedulerRuntimeManager(RuntimeManager):
         client_factory: Callable[[], SchedulerClientInterface],
         settings: Settings,
         log_level: str,  # TODO: (re)move?
-        exit_on_error: bool = False,
     ):
         self.item_handler = item_handler
         self.client_factory = client_factory
         self.settings = settings
-        self.exit_on_error = exit_on_error
 
         logger.setLevel(log_level)
 
@@ -45,10 +44,7 @@ class SchedulerRuntimeManager(RuntimeManager):
                 # Workers pull tasks from the scheduler
                 pool.starmap(
                     start_working,
-                    [
-                        (self.client_factory(), self.item_handler, self.settings, queue, self.exit_on_error)
-                        for _ in range(pool_size)
-                    ],
+                    [(self.client_factory(), self.item_handler, self.settings, queue) for _ in range(pool_size)],
                 )
             except Exception:  # noqa
                 logger.exception("An error occurred")
@@ -61,7 +57,6 @@ def start_working(
     item_handler: Handler,
     settings: Settings,
     queue_to_handle: RuntimeManager.Queue,
-    exit_on_error: bool = False,
 ) -> None:
     """
     This function runs in parallel and polls the scheduler for queues and jobs.
@@ -90,7 +85,7 @@ def start_working(
 
             try:
                 p_item = scheduler_client.pop_item(queue.id)
-            except HTTPError:
+            except (HTTPError, ValidationError):
                 logger.exception("Popping task from scheduler failed")
                 time.sleep(10 * settings.poll_interval)
                 continue
@@ -100,26 +95,24 @@ def start_working(
                 continue
 
             logger.info(f"Handling task[{p_item.data.id}]")
+            status = TaskStatus.FAILED
 
             try:
                 item_handler.handle(p_item.data)
-            except:  # noqa
+                status = TaskStatus.COMPLETED
+            except Exception:
                 logger.exception("An error occurred handling scheduler item %s", p_item.data.id)
+                continue
+            except:  # noqa
+                logger.exception("Exiting worker...")
+                return
+            finally:
+                logger.info(f"Patching scheduler task task[{p_item.data.id}] to {status.value}")
 
                 try:
-                    scheduler_client.patch_task(str(p_item.id), TaskStatus.FAILED)
+                    scheduler_client.patch_task(str(p_item.id), status)
                 except HTTPError:
-                    logger.exception("Could not patch scheduler task to failed")
-
-                if exit_on_error:
-                    raise
-
-                continue
-
-            try:
-                scheduler_client.patch_task(str(p_item.id), TaskStatus.COMPLETED)
-            except HTTPError:
-                logger.exception("Could not patch scheduler task to completed")
+                    logger.exception(f"Could not patch scheduler task to {status.value}")
 
         time.sleep(settings.poll_interval)
 

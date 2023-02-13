@@ -115,7 +115,7 @@ class TaskTest(TestCase):
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
         mock_bytes_api_client.save_raw.assert_called_once_with(
             "some-random-job-id",
-            "dummy error",
+            "Boefje failed",
             {
                 "error/boefje",
                 "dummy_boefje_runtime_exception",

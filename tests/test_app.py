@@ -90,7 +90,7 @@ class AppTest(TestCase):
             return self.scheduler_client
 
         self.runtime = SchedulerRuntimeManager(
-            self.item_handler, client_factory, Settings(pool_size=1, poll_interval=0.01), "DEBUG", exit_on_error=True
+            self.item_handler, client_factory, Settings(pool_size=1, poll_interval=0.01), "DEBUG"
         )
 
     def tearDown(self) -> None:
@@ -145,7 +145,7 @@ class AppTest(TestCase):
         self.assertEqual(2, len(items))
 
         patched_tasks = self.scheduler_client.get_all_patched_tasks()
-        self.assertEqual(4, len(patched_tasks))
+        self.assertEqual(6, len(patched_tasks))
         self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[0])
         self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[1])
         self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[2])
@@ -161,13 +161,15 @@ class AppTest(TestCase):
         self.assertEqual(2, len(items))
 
         patched_tasks = self.scheduler_client.get_all_patched_tasks()
-        self.assertEqual(4, len(patched_tasks))
+        self.assertEqual(6, len(patched_tasks))
         self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[0])
         self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[1])
         self.assertEqual(
             ["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[2]
         )  # Handler starts raising an Exception from the second call onward
         self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[3])
+        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[4])
+        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[5])
 
     def test_null(self) -> None:
         """This tests ensures we test the behaviour when the scheduler client returns None for the pop_task method"""

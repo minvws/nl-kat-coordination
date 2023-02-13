@@ -2,9 +2,7 @@ import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, Optional, List, Union, Literal
 
-from pydantic import BaseModel, Field, Extra
-
-from boefjes.katalogus.models import Boefje, Normalizer
+from pydantic import BaseModel, Field, Extra, constr
 
 
 class JobException(Exception):
@@ -25,6 +23,20 @@ class Job(BaseModel):
             return self.ended_at - self.started_at
         else:
             return None
+
+
+class Boefje(BaseModel):
+    """Identifier for Boefje in a BoefjeMeta"""
+
+    id: constr(min_length=1)
+    version: Optional[str] = Field(default=None)
+
+
+class Normalizer(BaseModel):
+    """Identifier for Normalizer in a NormalizerMeta"""
+
+    id: constr(min_length=1)
+    version: Optional[str] = Field(default=None)
 
 
 class BoefjeMeta(Job):
