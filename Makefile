@@ -59,24 +59,24 @@ down:
 	-docker-compose down
 
 clone:
-	for service in $(SERVICES); do
-		git clone https://github.com/minvws/$$service.git || true;
+	for service in $(SERVICES); do \
+		git clone https://github.com/minvws/$$service.git || true; \
 	done
 
 clone-stable:
-	for service in $(SERVICES); do
-		TAG=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1);
-		git clone --branch $$TAG https://github.com/minvws/$$service.git;
+	for service in $(SERVICES); do \
+		TAG=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1); \
+		git clone --branch $$TAG https://github.com/minvws/$$service.git; \
 	done
 
 fetch:
-	for service in . $(SERVICES); do
-		git -C $$service fetch || true;
+	for service in . $(SERVICES); do \
+		git -C $$service fetch || true; \
 	done
 
 pull:
-	for service in . $(SERVICES); do
-		git -C $$service pull || true;
+	for service in . $(SERVICES); do \
+		git -C $$service pull || true; \
 	done
 
 env-if-empty:
@@ -93,14 +93,14 @@ else
 endif
 
 checkout: # Usage: `make checkout branch=develop`
-	for service in . $(SERVICES); do
-		git -C $$service checkout $(branch) || true;
+	for service in . $(SERVICES); do \
+		git -C $$service checkout $(branch) || true; \
 	done
 
 pull-reset:
-	for service in . $(SERVICES); do
-		git -C $$service reset --hard HEAD;
-		git -C $$service pull;
+	for service in . $(SERVICES); do \
+		git -C $$service reset --hard HEAD; \
+		git -C $$service pull; \
 	done
 
 build-all:  # Build should prepare all other services: migrate them, seed them, etc.
