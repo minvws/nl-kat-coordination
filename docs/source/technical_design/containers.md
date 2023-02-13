@@ -1,4 +1,4 @@
-# Container deployment
+# Production: Container deployment
 
 OpenKAT can be deployed using containers. We aim to support both simple docker /
 docker-compose setups and container orchestration systems like Kubernetes and
