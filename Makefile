@@ -48,7 +48,7 @@ endif
 
 reset: down
 	-docker volume rm nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
-	-docker-compose run --rm -u root bytes rm -rf bytes-data
+	-docker-compose run --rm --no-deps --entrypoint /bin/rm -u root bytes -rf bytes-data
 	make -C nl-kat-rocky almost-flush
 
 up:
