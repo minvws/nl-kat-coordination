@@ -233,6 +233,7 @@ class Server:
                 detail=str(exc),
             ) from exc
         except Exception as exc:
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=500,
                 detail="failed to get task",
@@ -273,6 +274,7 @@ class Server:
         try:
             self.ctx.task_store.update_task(updated_task)
         except Exception as exc:
+            self.logger.error(exc)
             raise fastapi.HTTPException(
                 status_code=500,
                 detail="failed to update task",

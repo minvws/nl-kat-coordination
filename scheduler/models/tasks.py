@@ -16,7 +16,7 @@ from .queue import PrioritizedItem
 from .raw_data import RawData
 
 
-class TaskStatus(_Enum):
+class TaskStatus(str, _Enum):
     """Status of a task."""
 
     PENDING = "pending"
