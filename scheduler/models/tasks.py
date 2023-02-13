@@ -6,6 +6,7 @@ from typing import ClassVar, List, Optional
 import mmh3
 from pydantic import BaseModel, Field
 from sqlalchemy import JSON, Column, DateTime, Enum, String
+from sqlalchemy.sql import func
 
 from scheduler.utils import GUID
 
@@ -60,13 +61,13 @@ class TaskORM(Base):
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.utcnow,
+        server_default=func.now(),
     )
     modified_at = Column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        server_default=func.now(),
+        onupdate=func.now(),
     )
 
 
