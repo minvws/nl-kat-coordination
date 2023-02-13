@@ -1,6 +1,6 @@
-import datetime
 import uuid
-from typing import Optional, Any, ClassVar
+from datetime import datetime, timezone
+from typing import Any, ClassVar, Optional
 
 import pydantic
 from scheduler import models
@@ -35,6 +35,6 @@ def create_task(p_item: models.PrioritizedItem) -> models.Task:
         scheduler_id=p_item.scheduler_id,
         p_item=p_item,
         status=models.TaskStatus.QUEUED,
-        created_at=datetime.datetime.utcnow(),
-        modified_at=datetime.datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
+        modified_at=datetime.now(timezone.utc),
     )

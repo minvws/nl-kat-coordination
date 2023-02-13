@@ -1,5 +1,5 @@
-import datetime
 import uuid
+from datetime import datetime, timezone
 from enum import Enum as _Enum
 from typing import ClassVar, List, Optional
 
@@ -34,8 +34,9 @@ class Task(BaseModel):
     p_item: PrioritizedItem
     status: TaskStatus
 
-    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
-    modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Config:
         orm_mode = True
@@ -59,13 +60,13 @@ class TaskORM(Base):
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.datetime.utcnow,
+        default=datetime.utcnow,
     )
     modified_at = Column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
     )
 
 
