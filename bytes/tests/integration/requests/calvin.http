@@ -1,0 +1,114 @@
+###
+POST http://localhost:8002/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&username={{bytes-username}}&password={{bytes-password}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+
+    client.test("Has access token", function() {
+        client.assert(response.body.hasOwnProperty("access_token"), "Cannot find 'access token' option in response");
+    });
+
+    client.global.set("auth_token", response.body.access_token);
+    client.global.set("boefje_meta_id", "dbb29eb4-2e0d-4322-bf85-a769e17cf0ba");
+%}
+
+###
+
+POST http://localhost:8002/bytes/boefje_meta/
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "id": "{{boefje_meta_id}}",
+  "started_at": "2020-12-28T10:11:40.903Z",
+  "ended_at": "2020-12-28T10:11:43.903Z",
+  "boefje": {
+    "id": "calvin",
+    "version": null
+  },
+  "input_ooi": null,
+  "arguments": {},
+  "organization": "_dev"
+}
+
+###
+
+POST http://localhost:8002/bytes/raw/{{boefje_meta_id}}?mime_types=calvin
+Content-Type: application/octet-stream
+Authorization: Bearer {{auth_token}}
+
+[
+  {
+    "log_count": 9.0,
+    "eventType": "ksql-usecase",
+    "log_routing_key": "test_app.account_change",
+    "window_emit": 1.65597893E12,
+    "windowKey": "{\"client_environment_app\":\"organisation/env/app\",\"log_user_user_id\":1234}-1655979300000",
+    "window_start": 1.6559757E12,
+    "log_action_code": "U",
+    "eventTitle": "UC: User privilege monitoring",
+    "log_user_user_id": 1234.0,
+    "_id": "62b43a6e69c14474a3773f8b",
+    "window_end": 1.6559793E12,
+    "client_environment_app": "organisation/env/app",
+    "severity": "MEDIUM",
+    "eventId": "{\"client_environment_app\":\"organisation/env/app\",\"log_user_user_id\":1234}-1655979300000",
+    "outbox_sent": null
+  },
+  {
+    "log_count": 16.0,
+    "eventType": "ksql-usecase",
+    "log_routing_key": "test_app.account_change",
+    "window_emit": 1.655981491E12,
+    "windowKey": "{\"client_environment_app\":\"organisation/env/app\",\"log_user_user_id\":1234}-1655982000000",
+    "window_start": 1.6559784E12,
+    "log_action_code": "U",
+    "eventTitle": "UC: User privilege monitoring",
+    "log_user_user_id": 1234.0,
+    "_id": "62b43a6e69c14474a3773f8e",
+    "window_end": 1.655982E12,
+    "client_environment_app": "organisation/env/app",
+    "severity": "MEDIUM",
+    "eventId": "{\"client_environment_app\":\"organisation/env/app\",\"log_user_user_id\":1234}-1655982000000",
+    "outbox_sent": null
+  },
+  {
+    "log_count": 7.0,
+    "eventType": "ksql-usecase",
+    "log_routing_key": "test_app.account_change",
+    "window_emit": 1.655981491E12,
+    "windowKey": "{\"client_environment_app\":\"organisation/env/app\",\"log_user_user_id\":1234}-1655982900000",
+    "window_start": 1.6559793E12,
+    "log_action_code": "U",
+    "eventTitle": "UC: User privilege monitoring",
+    "log_user_user_id": 1234.0,
+    "_id": "62b445a869c14474a37747f4",
+    "window_end": 1.6559829E12,
+    "client_environment_app": "organisation/env/app",
+    "severity": "MEDIUM",
+    "eventId": "{\"client_environment_app\":\"organisation/env/app\",\"log_user_user_id\":1234}-1655982900000",
+    "outbox_sent": null
+  },
+  {
+    "log_count": 4.0,
+    "eventType": "ksql-usecase",
+    "log_routing_key": "test_app.account_change",
+    "window_emit": 1.658822215E12,
+    "windowKey": "{\"client_environment_app\":\"organisation/env/app\",\"log_user_user_id\":1234}-1658825100000",
+    "window_start": 1.6588215E12,
+    "log_action_code": "U",
+    "eventTitle": "UC: User privilege monitoring",
+    "log_user_user_id": 1234.0,
+    "_id": "62df9e499dd2b029d842576d",
+    "window_end": 1.6588251E12,
+    "client_environment_app": "organisation/env/app",
+    "severity": "MEDIUM",
+    "eventId": "{\"client_environment_app\":\"organisation/env/app\",\"log_user_user_id\":1234}-1658825100000",
+    "outbox_sent": null
+  }
+]

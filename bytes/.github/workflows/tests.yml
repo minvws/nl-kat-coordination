@@ -1,0 +1,27 @@
+name: Run the test suite
+
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '3.8', '3.9', '3.10', '3.11' ]
+
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Run unit tests
+        run: make utest build_args='--build-arg PYTHON_VERSION=${{ matrix.version }}'
+
+      - name: Run integration tests
+        run: SLEEP_TIME=5 make itest build_args='--build-arg PYTHON_VERSION=${{ matrix.version }}'
