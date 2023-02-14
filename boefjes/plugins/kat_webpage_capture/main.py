@@ -1,4 +1,4 @@
-from typing import Tuple, Union, List
+from typing import Tuple, Union, List, Generator, ByteString
 
 from boefjes.job_models import BoefjeMeta
 from PIL import Image
@@ -12,22 +12,57 @@ PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.30.0-focal"
 BROWSER = "chromium"
 
 
+class TarStream(io.RawIOBase):
+    """Wrapper around generator to feed tarfile.
+
+    Based on:
+    - https://stackoverflow.com/questions/39155958/how-do-i-read-a-tarfile-from-a-generator
+    - https://stackoverflow.com/questions/6657820/how-to-convert-an-iterable-to-a-stream/6658949
+    """
+
+    def __init__(self, stream: Generator):
+        """Store the generator in the TarStream class."""
+        self.bytes_left = None
+        self.stream = stream
+        self.able_to_read = bool(stream)
+        super().__init__()
+
+    def reader(self) -> io.BufferedReader:
+        """Return the bufferedreader for this TarStream."""
+        return io.BufferedReader(self)
+
+    def readable(self) -> bool:
+        """Returns whether the generator stream is (still) readable."""
+        return self.able_to_read
+
+    def readinto(self, memory_view: ByteString) -> int:
+        """Read the generator. Returns 0 when done. Output is stored in memory_view."""
+        try:
+            chunk = self.bytes_left or next(self.stream)
+        except StopIteration:
+            self.able_to_read = False
+            return 0
+        view_len = len(memory_view)
+        output, self.bytes_left = chunk[:view_len], chunk[view_len:]
+        outlen = len(output)
+        memory_view[:outlen] = output
+        return outlen
+
+
 def get_file_from_container(container: docker.models.containers.Container, path: str) -> bytes:
     """Returns a file from a docker container."""
     try:
         stream, _ = container.get_archive(path)
     except docker.errors.NotFound:
-        logging.warning(f"[Webpage Capture] {path} not found in container {container.short_id} {container.image.tags}")
+        logging.warning(
+            "[Webpage Capture] %s not found in container %s %s", path, container.short_id, container.image.tags
+        )
         return None
 
-    # Extract a file as archive stream and write to BytesIO.
-    file_as_tar_bytes = io.BytesIO()
-    for stream_part in stream:
-        file_as_tar_bytes.write(stream_part)
-    file_as_tar_bytes.seek(0)
-
-    # Get the file from the tar object.
-    return tarfile.open(mode="r", fileobj=file_as_tar_bytes).extractfile(os.path.basename(path)).read()
+    f = tarfile.open(mode="r|", fileobj=TarStream(stream).reader())
+    tarobject = f.next()
+    if tarobject.name == os.path.basename(path):
+        return f.extractfile(tarobject).read()
 
 
 def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
@@ -45,7 +80,7 @@ def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
     )
 
 
-def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> List[bytes]:
+def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tuple[bytes]:
     """Run Playwright in Docker."""
     client = docker.from_env()
     res = client.containers.run(
@@ -74,4 +109,8 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     image_bytes, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)
 
-    return [(set("image/png"), image_bytes), (set("har/zip"), har_zip), (set("webstorage/json"), storage_json)]
+    return [
+        (set("image/png"), image_bytes),
+        (set("application/zip+json"), har_zip),
+        (set("application/json"), storage_json),
+    ]
