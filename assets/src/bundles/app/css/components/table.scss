@@ -1,53 +1,3 @@
-@import "./action-buttons.scss";
-@import "./block-indented.scss";
-@import "./cat-loader.scss";
-@import "./cat-paw-loader.scss";
-@import "./cytoscape.scss";
-@import "./dropdown.scss";
-@import "./fmea.scss";
-@import "./footer-logo.scss";
-@import "./hover-block.scss";
-@import "./inline-form.scss";
-@import "./language.scss";
-@import "./main-navigation.scss";
-@import "./messages.scss";
-@import "./ooi-summary.scss";
-@import "./plugins.scss";
-@import "./pre.scss";
-@import "./qr-code.scss";
-@import "./scan-level-indicator.scss";
-@import "./select.scss";
-@import "./stepper.scss";
-@import "./toolbar.scss";
-@import "./tree-tables.scss";
-@import "./wait-text.scss";
-
-/* Temporary overrides */
-/* Level indicator alignment within tiles */
-.tiles .level-indicator {
-  margin-left: auto;
-}
-
-/* Removing divider between image and following grouped content */
-.tiles img+div {
-	border-top: 0;
-}
-
-.tiles > div {
-	min-width: 0;
-}
-
-/* Added min height for form buttons */
-form {
-	button,
-	a.button,
-	input[type="button"],
-	input[type="submit"],
-	input[type="reset"] {
-		min-height: 2.75rem;
-	}
-}
-
 /* table alignment within table expando row */
 table tr.expando-row td {
 	table td {
@@ -56,59 +6,12 @@ table tr.expando-row td {
 	}
 }
 
-/* Boefje detail page */
-.two-thirds-one-third > div {
-	display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
 table.nowrap {
 	th,
 	td {
 	  a {
 	  	white-space: inherit;
 	  }
-	}
-}
-
-.recommendation {
-	padding: var(--critical-informational-labels-padding);
-    min-width: var(--critical-informational-labels-min-width);
-    text-align: var(--critical-informational-labels-text-align);
-    display: inline-block;
-	background-color: #c3ddf6;
-}
-
-/* Layout */
-/* Temporary fix until we figure out what to do with nested divs */
-section div {
-	display: flex;
-	flex-direction: column;
-	gap: var(--section-content-block-gap);
-}
-
-dl div {
-	display: grid;
-}
-
-header > section > div {
-	gap: 0;
-}
-
-body > header nav:not(.breadcrumb-bar) {
-	position: relative;
-
-	a.logo {
-		position: absolute;
-
-		@media (min-width: 56rem) {
-			position: static;
-		}
-
-		&:hover {
-			border-bottom: 0;
-		}
 	}
 }
 

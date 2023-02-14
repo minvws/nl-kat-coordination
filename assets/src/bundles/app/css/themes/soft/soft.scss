@@ -1,10 +1,34 @@
 /* theme: Soft */
-
 /* Fonts */
 @import "fonts/fonts.scss"; /* Fonts */
 
-/* Variables */
-@import "variables"; /* KAT variables */
+/* Styling sets. E.g color sets */
+@import "manon/spot-large"; /* Branding colors */
+@import "manon/headings-base-set"; /* Defining available heading styles */
+
+/* Base - Top level styling */
+@import "manon/application-base"; /* Styling on the highest level */
 
 /* Manon variables */
 @import "manon/manon-variables.scss";
+
+/* Base components */
+@import "manon/button";
+@import "manon/table";
+@import "manon/footer";
+@import "manon/form";
+
+/* Components */
+@import "manon/accordion";
+@import "manon/breadcrumb-bar";
+@import "manon/button-ghost"; /* Ghost button */
+@import "manon/button-icon"; /* Icon button */
+@import "manon/filter";
+@import "manon/layout";
+@import "manon/login-meta";
+@import "manon/navigation";
+@import "manon/tabs";
+@import "manon/tile";
+
+/* Needs sorting */
+@import "manon/manon-variables";

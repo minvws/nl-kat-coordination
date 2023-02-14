@@ -1,74 +1,53 @@
-/*
-1. Configuration and helpers
-Abstracts folder
-The abstracts/ folder gathers all Sass tools and helpers used across the project. Every global variable, function,
-mixin and placeholder should be put in here.
+/* Abstracts */
+@import "abstracts/mixins.scss";
+@import "abstracts/colors.scss";
 
-The rule of thumb for this folder is that it should not output a single line of CSS when compiled on its own. These are nothing but Sass helpers.
+/* Helpers */
+@import "helpers/align-right.scss";
+@import "helpers/is-hidden.scss";
+@import "helpers/uc-first.scss";
 
-https://sass-guidelin.es/#abstracts-folder
-*/
-@import "./abstracts/all.scss";
+/* Vendors */
+@import "vendors/manon.scss";
+@import "vendors/graph-override.scss";
+@import "vendors/two-factor.scss";
+@import "vendors/manon-overrides/dl.scss";
+@import "vendors/manon-overrides/tile.scss";
 
-/*
-2. Vendors
-Vendors folder
-And last but not least, most projects will have a vendors/ folder containing all the CSS files from external libraries
-and frameworks – Normalize, Bootstrap, jQueryUI, FancyCarouselSliderjQueryPowered, and so on.
+/* Theme */
+@import "themes/soft/soft.scss";
 
-https://sass-guidelin.es/#vendors-folder
-*/
-@import "manon.scss";
-@import "./vendors/all.scss";
-@import "./vendor/two-factor.scss";
-
-/*
-3. Base stuff
-Base
-The `base/` folder holds what we might call the boilerplate code for the project. In there, you might find the reset
-file, some typographic rules, and probably a stylesheet defining some standard styles for commonly used HTML elements.
-
-https://sass-guidelin.es/#base-folder
-*/
-@import "./base/all.scss";
-
-/*
-4. Layout-related sections
-Layout folder
-The `layout/` folder contains everything that takes part in laying out the site or application. This folder could have
-stylesheets for the main parts of the site (header, footer, navigation, sidebar…), the grid system or even CSS styles
-for all the forms.
-
-https://sass-guidelin.es/#layout-folder
-*/
-// @import "./layout/all.scss";
-
-/*
-5. Components
-Components folder
-For smaller components, there is the `components/` folder. While `layout/` is macro (defining the global wireframe),
-components/ is more focused on widgets. It contains all kind of specific modules like a slider, a loader, a widget,
-and basically anything along those lines. There are usually a lot of files in components/ since the whole
-site/application should be mostly composed of tiny modules.
-
-https://sass-guidelin.es/#components-folder
-*/
-@import "./components/all.scss";
-
-/*
-6. Theme
-Branding, and visual theme layer.
-*/
-@import "themes/soft/soft.scss"; /* Theme */
-
-/*
-7. Page-specific styles
-PAGES FOLDER
-If you have page-specific styles, it is better to put them in a `pages/` folder, in a file named after the page. For
-instance, it’s not uncommon to have very specific styles for the home page hence the need for a `_home.scss` file in
-`pages/`.
-
-https://sass-guidelin.es/#pages-folder
-*/
-// @import './pages/all.scss';
-@import "./layout/all.scss";
+/* Components */
+@import "components/action-buttons.scss";
+@import "components/block-indented.scss";
+@import "components/cat-loader.scss";
+@import "components/cat-paw-loader.scss";
+@import "components/cytoscape.scss";
+@import "components/dl.scss";
+@import "components/dropdown.scss";
+@import "components/fmea.scss";
+@import "components/footer-logo.scss";
+@import "components/form.scss";
+@import "components/header.scss";
+@import "components/hover-block.scss";
+@import "components/inline-form.scss";
+@import "components/input-link.scss";
+@import "components/language.scss";
+@import "components/layout.scss";
+@import "components/main-navigation.scss";
+@import "components/messages.scss";
+@import "components/notifications.scss";
+@import "components/ooi-summary.scss";
+@import "components/page-meta.scss";
+@import "components/plugins.scss";
+@import "components/pre.scss";
+@import "components/qr-code.scss";
+@import "components/scan-level-indicator.scss";
+@import "components/select.scss";
+@import "components/stepper.scss";
+@import "components/table.scss";
+@import "components/tiles.scss";
+@import "components/toolbar.scss";
+@import "components/tree-tables.scss";
+@import "components/two-thirds-one-third.scss";
+@import "components/wait-text.scss";

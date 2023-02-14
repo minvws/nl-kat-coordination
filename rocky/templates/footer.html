@@ -2,15 +2,9 @@
 {% load i18n %}
 
 <footer>
-  <div class="two-thirds-one-third">
-    <div>
-      <a href="/" class="kat-logo" title="OpenKAT">
-        <img src="{% static 'img/kat_logo.png' %}"
-             alt="logo Kwetsbaarheden Analyse Tool"/>
-      </a>
-    </div>
+    <span>Kwetsbaarheden analyse tool.</span>
     <nav aria-labelledby="footer-nav-1">
-      <h1 id="footer-nav-1">{% translate 'Service' %}</h1>
+      <h1 id="footer-nav-1" class="visually-hidden">{% translate 'Service' %}</h1>
       <ul>
         <li>
           <a href="{% url 'crisis_room' %}">OpenKAT</a>
@@ -25,6 +19,5 @@
         {% endif %}
       </ul>
     </nav>
-  </div>
 </footer>
 <script src="{% static '/js/dropdown.js' %}" nonce="{{ request.csp_nonce }}"></script>

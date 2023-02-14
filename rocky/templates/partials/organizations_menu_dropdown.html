@@ -5,7 +5,7 @@
     <li>{{ organization.name }}</li>
   {% else %}
     <div class="dropdown">
-      <button class="dropdown-button">
+      <button class="dropdown-button ghost">
         {% if not organization.code %}
             {% translate 'Select organization' %}
         {% else %}

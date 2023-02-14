@@ -6,23 +6,6 @@
   --application-base-line-height: 1.75;
 
   /* Accent color */
-  --application-base-accent-color: #262431;
-  --application-base-accent-color-text-color:  #fff;
-
-    /* Accent color states */
-      /* Hover */
-      --application-base-accent-color-hover: #4b436d;
-      --application-base-accent-color-hover-text-color: #fff;
-
-      /* Active */
-      --application-base-accent-color-active: #56469c;
-      --application-base-accent-color-active-text-color: #fff;
-
-      /* Focus */
-      --application-base-accent-color-focus: #56469c;
-      --application-base-accent-color-focus-text-color: #fff;
-
-      /* Selected */
-      --application-base-accent-color-selected: #56469c;
-      --application-base-accent-color-selected-text-color: #fff;
+  --application-base-accent-color: var(--branding-color-1);
+  --application-base-accent-color-text-color:  var(--branding-color-1-text-color);
 }

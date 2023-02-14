@@ -1,0 +1,10 @@
+/* Added min height for form buttons */
+form {
+	button,
+	a.button,
+	input[type="button"],
+	input[type="submit"],
+	input[type="reset"] {
+		min-height: 2.75rem;
+	}
+}

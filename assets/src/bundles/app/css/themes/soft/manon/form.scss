@@ -1,0 +1,23 @@
+/* Form - Variables */
+
+:root {
+  /* Accent color */
+  --form-accent-color-color: var(--branding-color-2);
+
+  /* Input */
+  --form-base-input-text-color: #000;
+  --form-input-border-width: 1px;
+  --form-input-border-style: solid;
+  --form-input-border-color: #ccc;
+
+  /* Help */
+  --form-help-button-icon-content: "\ec9d";
+  --form-help-button-icon-font-family: var(--icon-base-font-family);
+
+  /* Textarea */
+  --form-textarea-text-color: var(--form-base-input-text-color);
+  --form-textarea-border-color: #ccc;
+
+  /* Fieldset */
+  --form-fieldset-legend-font-weight: 600;
+}
