@@ -6,11 +6,12 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
 
-build:
-	make build-rocky
-	make build-rocky-frontend
+build: build-rocky build-rocky-frontend
 
 build-rocky:
+	docker-compose run --rm rocky make build-rocky-native
+
+build-rocky-native:
 	python3 manage.py migrate
 	python3 manage.py createsuperuser
 	python3 manage.py loaddata OOI_database_seed.json
@@ -19,6 +20,9 @@ build-rocky:
 
 build-rocky-frontend:
 	docker run --rm -v $$PWD:/app/rocky node:18-bullseye sh -c "cd /app/rocky && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
+
+almost-flush:
+	docker-compose run --rm rocky python manage.py almost_flush
 
 run:
 	python3 manage.py runserver
@@ -51,8 +55,7 @@ languages:
 	python manage.py makemessages --locale nl
 	python manage.py makemessages --locale pap
 
-lang:
-	make languages
+lang: languages
 
 debian:
 	mkdir -p build
@@ -96,7 +99,6 @@ install-rf:
 
 test-prepare:
 	python3 manage.py flush --no-input
-	#python3 manage.py makemigrations
 	python3 manage.py migrate
 	DJANGO_SUPERUSER_PASSWORD=robotpassword python3 manage.py createsuperuser --email robot@localhost --noinput
 	python3 manage.py loaddata OOI_database_seed.json
@@ -104,7 +106,6 @@ test-prepare:
 
 test-finish:
 	python3 manage.py flush --no-input
-	#python3 manage.py makemigrations
 	python3 manage.py migrate
 	python3 manage.py createsuperuser
 	python3 manage.py loaddata OOI_database_seed.json
