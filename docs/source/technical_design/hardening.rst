@@ -1,6 +1,6 @@
-=================
-Hardening OpenKAT
-=================
+=============================
+Production: Hardening OpenKAT
+=============================
 
 Hardening is making your environment secure. The default installation of OpenKAT is suitable for local use. If you are installing the software in a production environment, make sure you are running a secure configuration. The following modifications are a first step:
 
@@ -57,10 +57,6 @@ Rocky expects a reverse proxy that can handle TLS. This is a good place to set t
 |					    | xr-spatial-tracking=()		       |
 +-------------------------------------------+------------------------------------------+
 | Cache-Control				    | no-store, max-age=0		       |
-+-------------------------------------------+------------------------------------------+
-| Pragma				    | no-cache				       |
-+-------------------------------------------+------------------------------------------+
-| X-DNS-Prefetch-Control		    | off				       |
 +-------------------------------------------+------------------------------------------+
 | Expect-CT				    | max-age=86400, enforce		       |
 +-------------------------------------------+------------------------------------------+

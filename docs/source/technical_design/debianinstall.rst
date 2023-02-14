@@ -1,6 +1,6 @@
-===============
-Debian packages
-===============
+===========================
+Production: Debian packages
+===========================
 
 OpenKAT has Debian packages available. In the near future we will have an apt
 repository that will allow you to keep your installation up-to-date using apt.
@@ -11,8 +11,11 @@ steps for installing it on a single machine.
 Prerequisites
 =============
 
-We will be using sudo in this guide, so make sure you have sudo installed on
+We will be using ``sudo`` in this guide, so make sure you have ``sudo`` installed on
 your system.
+
+The packages are built with Ubuntu 22.04 and Debian 11 in mind.
+They may or may not work on other versions or distributions.
 
 Downloading and installing
 ==========================
