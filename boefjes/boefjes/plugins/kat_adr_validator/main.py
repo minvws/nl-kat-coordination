@@ -5,8 +5,8 @@ import docker
 from boefjes.job_models import BoefjeMeta
 
 
-ADR_VALIDATOR_REPOSITORY="registry.gitlab.com/commonground/don/adr-validator/tmp"
-ADR_VALIDATOR_VERSION="main"
+ADR_VALIDATOR_REPOSITORY = "registry.gitlab.com/commonground/don/adr-validator/tmp"
+ADR_VALIDATOR_VERSION = "main"
 
 
 def run_adr_validator(url: str) -> str:
@@ -29,4 +29,9 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     output = run_adr_validator(url)
 
-    return [(set(), output,),]
+    return [
+        (
+            set(),
+            output,
+        ),
+    ]
