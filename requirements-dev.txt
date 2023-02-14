@@ -23,7 +23,7 @@ lazy-object-proxy==1.7.1
 mako==1.2.4
 markupsafe==2.1.2
 mccabe==0.7.0
-mypy-extensions==0.4.3
+mypy-extensions==1.0.0
 mypy==0.960
 packaging==23.0
 passlib[bcrypt]==1.7.4
