@@ -38,7 +38,7 @@ export version
 
 upgrade: fetch down # Upgrade to the latest release without losing persistent data. Usage: `make upgrade version=v1.5.0` (version is optional)
 ifeq ($(version),)
-	version=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1)
+	version=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-coordination/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1)
 	make upgrade version=$$version
 else
 	make checkout branch=$(version)
@@ -65,9 +65,9 @@ clone:
 	done
 
 clone-stable:
+	TAG=$(shell curl --silent https://api.github.com/repos/minvws/nl-kat-coordination/tags | jq -r '.[].name' | grep -v "rc" | head -n 1)
 	for service in $(SERVICES); do \
-		TAG=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1); \
-		git clone --branch $$TAG https://github.com/minvws/$$service.git; \
+		git clone --branch $$TAG https://github.com/minvws/$$service.git || true; \
 	done
 
 fetch:
