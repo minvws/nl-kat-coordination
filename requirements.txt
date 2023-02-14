@@ -38,4 +38,4 @@ typing-extensions==4.2.0
 urllib3==1.26.14
 uvicorn==0.17.6
 zipp==3.8.1
-httpx==0.23.1
+httpx==0.23.3
