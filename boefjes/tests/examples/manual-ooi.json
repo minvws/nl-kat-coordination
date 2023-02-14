@@ -1,0 +1,19 @@
+{
+  "id": "manual-id",
+  "raw_data": {
+    "id": "123",
+    "boefje_meta": {
+      "id": "321",
+      "boefje": {
+        "id": "manual"
+      },
+      "organization": "_dev",
+      "input_ooi": null,
+      "arguments": {}
+    },
+    "mime_types": [{"value": "manual/ooi"}]
+  },
+  "normalizer": {
+    "id": "kat_manual_ooi"
+  }
+}

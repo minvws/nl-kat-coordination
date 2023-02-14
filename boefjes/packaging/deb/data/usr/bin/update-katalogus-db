@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -a
+source /etc/kat/boefjes.conf
+cd /opt/venvs/kat-boefjes/lib/python*/site-packages
+
+/opt/venvs/kat-boefjes/bin/python -m alembic --config boefjes/alembic.ini upgrade head
+
+cd boefjes
+/opt/venvs/kat-boefjes/bin/python -m boefjes.seed
+
+set +a

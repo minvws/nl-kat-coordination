@@ -1,0 +1,13 @@
+    {
+        "id": "webpage-analysis",
+        "name": "WebpageAnalysis",
+        "description": "Downloads a resource and uses several different normalizers to analyze",
+        "consumes": [
+            "HTTPResource"
+        ],
+        "produces": [
+            "HTTPHeader"
+        ],
+        "environment_keys": [],
+        "scan_level": 2
+    }

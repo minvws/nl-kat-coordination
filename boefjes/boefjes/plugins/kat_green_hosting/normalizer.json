@@ -1,0 +1,10 @@
+{
+    "id": "kat_green_hosting_normalize",
+    "consumes": [
+        "green-hosting"
+    ],
+    "produces": [
+        "KATFindingType",
+        "Finding"
+    ]
+}

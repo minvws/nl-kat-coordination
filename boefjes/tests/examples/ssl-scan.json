@@ -1,0 +1,13 @@
+{
+  "id": "ssl-scan-job",
+  "organization": "_dev",
+  "arguments": {
+    "domain": "example.nl"
+  },
+  "dispatches": {
+    "normalizers": [
+      "kat_ssl_scan.normalize"
+    ],
+    "boefjes": []
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "dns-lookup-job",
+  "raw_data": {
+    "id": "dns-lookup-job",
+    "boefje_meta": {
+      "id": "dns-lookup-job",
+      "boefje": {
+        "id": "dns-records",
+        "name": "DnsResolve"
+      },
+      "organization": "_dev",
+      "input_ooi": "Hostname|internet|example.nl",
+      "arguments": {
+        "input": {
+          "name": "example.nl"
+        }
+      },
+      "dispatches": [
+        {
+          "id": "kat_dns.normalize",
+          "version": null
+        }
+      ]
+    },
+    "mime_types": [{"value": "boefje/dns-records"}]
+  },
+  "normalizer": {
+    "id": "kat_dns_normalize",
+    "version": null
+  }
+}

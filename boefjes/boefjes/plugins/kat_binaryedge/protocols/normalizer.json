@@ -1,0 +1,16 @@
+{
+    "id": "kat_binaryedge_protocols",
+    "consumes": [
+        "binaryedge"
+    ],
+    "produces": [
+        "KATFindingType",
+        "SoftwareInstance",
+        "Service",
+        "IPPort",
+        "Finding",
+        "Software",
+        "IPService",
+        "CVEFindingType"
+    ]
+}

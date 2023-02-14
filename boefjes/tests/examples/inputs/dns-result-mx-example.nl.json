@@ -1,0 +1,3 @@
+{"dkim_response": "NXDOMAIN",
+  "dmarc_response": "NXDOMAIN",
+  "dns_records": "RESOLVER: 2001:b88:1002::10\nid 21479\nopcode QUERY\nrcode NOERROR\nflags QR RD RA\n;QUESTION\nenglish.example.nl. IN MX\n;ANSWER\nenglish.example.nl. 60 IN CNAME redir.example.nl.\nredir.example.nl. 14400 IN MX 0 .\n;AUTHORITY\n;ADDITIONAL\n"}

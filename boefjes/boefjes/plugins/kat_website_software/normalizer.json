@@ -1,0 +1,10 @@
+{
+    "id": "kat_website_software_normalize",
+    "consumes": [
+        "website-software"
+    ],
+    "produces": [
+        "Software",
+        "SoftwareInstance"
+    ]
+}

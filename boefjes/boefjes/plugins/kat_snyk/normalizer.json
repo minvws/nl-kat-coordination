@@ -1,0 +1,12 @@
+{
+    "id": "kat_snyk_normalize",
+    "consumes": [
+        "snyk"
+    ],
+    "produces": [
+        "Finding",
+        "KATFindingType",
+        "SnykFindingType",
+        "CVEFindingType"
+    ]
+}

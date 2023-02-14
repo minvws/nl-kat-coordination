@@ -1,0 +1,4 @@
+BEGIN;
+-- upgrade 0003 -> 197672984df0
+ALTER TABLE organisation ALTER COLUMN id TYPE VARCHAR(32);
+COMMIT;
