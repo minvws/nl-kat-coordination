@@ -1,0 +1,23 @@
+name: Check the LaTeX style using linters
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "develop"
+      - "master"
+
+jobs:
+  check-latex:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install chktex
+        run: sudo apt-get install chktex
+
+      - name: Run checks
+        run: make check-latex
