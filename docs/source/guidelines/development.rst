@@ -99,7 +99,7 @@ It has a simple syntax and many plugins available that should improve our test c
 Development Environment
 =======================
 
-See :ref:`Developer or local install` for the overall installation instructions.
+See :ref:`Installation and deployment` for the overall installation instructions.
 In a development context, we strongly recommend to use the Docker setup to test and make changes in the codebase (and not production packages).
 
 When it comes to development there is no specific IDE that must be used, although many of us would choose PyCharm as the preferred IDE.
