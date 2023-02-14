@@ -5,8 +5,10 @@ from functools import wraps
 from typing import Callable, Dict, Union, Any, Set
 
 import requests
+from requests.adapters import HTTPAdapter
 from requests.models import HTTPError
 
+from boefjes.clients.scheduler_client import LogRetry
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
@@ -47,6 +49,11 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
 class BytesAPIClient:
     def __init__(self, base_url: str, username: str, password: str):
         self._session = BytesAPISession(base_url)
+
+        max_retries = LogRetry(total=6, backoff_factor=1, skip_log=True)
+        self._session.mount("https://", HTTPAdapter(max_retries=max_retries))
+        self._session.mount("http://", HTTPAdapter(max_retries=max_retries))
+
         self.credentials = {
             "username": username,
             "password": password,

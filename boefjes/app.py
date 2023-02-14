@@ -4,19 +4,19 @@ import time
 from multiprocessing import Pool
 from typing import Callable
 
-from requests import ConnectionError
-from requests import HTTPError as RequestHTTPError
-from urllib3.exceptions import HTTPError
+from pydantic import ValidationError
+from requests import HTTPError
 
 from boefjes.clients.scheduler_client import (
     SchedulerAPIClient,
     SchedulerClientInterface,
+    TaskStatus,
 )
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalNormalizerJobRunner, LocalBoefjeJobRunner
-from boefjes.runtime_interfaces import Handler, RuntimeManager, StopWorking
+from boefjes.runtime_interfaces import Handler, RuntimeManager
 
 logger = logging.getLogger(__name__)
 
@@ -68,44 +68,51 @@ def start_working(
     while True:
         try:
             queues = scheduler_client.get_queues()
-
-            # We do not target a specific queue since we start one runtime for all organisations
-            # and queue ids contain the organisation_id
-            queues = [q for q in queues if q.id.startswith(queue_to_handle.value)]
-
-            logger.debug(f"Found queues: {[queue.id for queue in queues]}")
-        except (RequestHTTPError, HTTPError, ConnectionError):
+        except HTTPError:
             # Scheduler is having issues, so make note of it and try again
             logger.exception("Getting the queues from the scheduler failed")
             time.sleep(10 * settings.poll_interval)  # But not immediately
-
             continue
 
+        # We do not target a specific queue since we start one runtime for all organisations
+        # and queue ids contain the organisation_id
+        queues = [q for q in queues if q.id.startswith(queue_to_handle.value)]
+
+        logger.debug(f"Found queues: {[queue.id for queue in queues]}")
+
         for queue in queues:
+            logger.info(f"Popping from queue {queue.id}")
+
             try:
-                logger.info(f"Popping from queue {queue.id}")
-                task = scheduler_client.pop_task(queue.id)
-            except (RequestHTTPError, HTTPError, ConnectionError):
-                logger.exception("Popping task from scheduler failed")
-                time.sleep(10 * settings.poll_interval)
-                continue
-            except Exception:
+                p_item = scheduler_client.pop_item(queue.id)
+            except (HTTPError, ValidationError):
                 logger.exception("Popping task from scheduler failed")
                 time.sleep(10 * settings.poll_interval)
                 continue
 
-            if not task:
+            if not p_item:
                 logger.info(f"Queue {queue.id} empty")
                 continue
 
+            logger.info(f"Handling task[{p_item.data.id}]")
+            status = TaskStatus.FAILED
+
             try:
-                logger.info(f"Handling task[{task.data.id}]")
-                item_handler.handle(task.data)
-            except StopWorking:
-                logger.info("Stopping worker...")
-                return
+                item_handler.handle(p_item.data)
+                status = TaskStatus.COMPLETED
+            except Exception:
+                logger.exception("An error occurred handling scheduler item %s", p_item.data.id)
+                continue
             except:  # noqa
-                logger.exception("An error occurred handling a scheduler item")
+                logger.exception("Exiting worker...")
+                return
+            finally:
+                logger.info(f"Patching scheduler task task[{p_item.data.id}] to {status.value}")
+
+                try:
+                    scheduler_client.patch_task(str(p_item.id), status)
+                except HTTPError:
+                    logger.exception(f"Could not patch scheduler task to {status.value}")
 
         time.sleep(settings.poll_interval)
 
@@ -122,8 +129,7 @@ def get_runtime_manager(settings: Settings, queue: RuntimeManager.Queue, log_lev
 
     return SchedulerRuntimeManager(
         item_handler,
-        # Do not share a session between workers
-        client_factory,
+        client_factory,  # Do not share a session between workers
         settings,
         log_level,
     )

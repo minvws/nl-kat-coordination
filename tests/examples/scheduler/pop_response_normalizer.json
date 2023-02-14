@@ -1,7 +1,10 @@
 {
+  "id": "60da7d4ff41f4940901bd98a92e9014b",
   "priority": 1,
+  "scheduler_id": "normalizer-_dev",
+  "hash": "7e698c377cfd85015c0d7086b76b76b4",
   "data": {
-    "id": "70da7d4ff41f4940901bd98a92e9014b",
+    "id": "60da7d4ff41f4940901bd98a92e9014b",
     "raw_data": {
         "id": "60da7d4ff41f4940901bd98a92e9014a",
         "boefje_meta": {

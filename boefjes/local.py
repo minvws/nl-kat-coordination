@@ -18,7 +18,7 @@ from boefjes.job_models import (
     NormalizerResult,
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.runtime_interfaces import BoefjeJobRunner, NormalizerJobRunner
+from boefjes.runtime_interfaces import BoefjeJobRunner, NormalizerJobRunner, JobRuntimeError
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,10 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
 
         with TemporaryEnvironment() as temporary_environment:
             temporary_environment.update(environment)
-            return boefje_resource.module.run(boefje_meta)
+            try:
+                return boefje_resource.module.run(boefje_meta)
+            except BaseException as e:  # noqa
+                raise JobRuntimeError("Boefje failed") from e
 
 
 class LocalNormalizerJobRunner(NormalizerJobRunner):
@@ -59,7 +62,12 @@ class LocalNormalizerJobRunner(NormalizerJobRunner):
         normalizers = self.local_repository.resolve_normalizers()
         normalizer = normalizers[normalizer_meta.normalizer.id]
 
-        return self._parse_results(normalizer_meta, normalizer.module.run(normalizer_meta, raw))
+        try:
+            results = normalizer.module.run(normalizer_meta, raw)
+        except BaseException as e:
+            raise JobRuntimeError("Normalizer failed") from e
+
+        return self._parse_results(normalizer_meta, results)
 
     def _parse_results(self, normalizer_meta: NormalizerMeta, results: List[Any]) -> NormalizerOutput:
         parsed: List[NormalizerResult] = [self._parse(result) for result in results]
