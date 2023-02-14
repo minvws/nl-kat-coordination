@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<div class="horizontal-view">
+  {% if cancel_url %}
+    <a href="{{ cancel_url }}" class="button ghost">{% trans "Cancel" %}</a>
+  {% endif %}
+  {% if step == 'auth' %}
+    <button type="submit">{% trans "Log in" %}</button>
+  {% elif step == 'generator' %}
+    <button type="submit">{% trans "Authenticate" %}</button>
+  {% else %}
+    <button type="submit">{% trans "Submit" %}</button>
+  {% endif %}
+</div>

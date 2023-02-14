@@ -1,0 +1,60 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <p class="warning"
+       role="group"
+       aria-label="{% translate 'scan level warning' %}">
+      <strong>Warning:</strong>
+      {% blocktranslate trimmed with plugin_name=plugin.name scan_level=plugin.scan_level%}
+        {{plugin_name}} will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
+        or higher.
+      {% endblocktranslate %}
+    </p>
+    <section>
+      <div>
+        <h1>{% translate 'Scan OOI' %}</h1>
+        <p class="emphasized">
+          {% blocktranslate trimmed with scan_level=plugin.scan_level%}
+            The following objects are not yet cleared for level {{scan_level}}, please be advised that by continuing you will declare a level {{scan_level}} on these objects.
+          {% endblocktranslate %}
+        </p>
+        <table>
+          <caption>{% translate 'Selected OOIs:' %}</caption>
+          <thead>
+            <tr>
+              <th>{% translate 'OOI' %}</th>
+              <th>{% translate 'Clearance level' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ooi in oois %}
+              <tr>
+                <td scope="row">{{ ooi.primary_key }}</td>
+                <td>
+                  <ul class="level-indicator l{{ ooi.scan_profile.level }}">
+                    {% for i in '1234'|make_list %}<li></li>{% endfor %}
+                  </ul>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p>
+          {% translate 'Are you sure you want to scan anyways?' %}
+        </p>
+        <form class="inline" method="post">
+          {% csrf_token %}
+          <fieldset>
+            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
+               class="button ghost">{% translate 'Cancel' %}</a>
+            <button type="submit">{% translate 'Scan' %}</button>
+          </fieldset>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

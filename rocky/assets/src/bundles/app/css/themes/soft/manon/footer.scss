@@ -1,0 +1,24 @@
+/* Footer - Variables */
+
+:root {
+	--footer-min-height: 0;
+	--footer-background-color: #fff;
+	--footer-text-color: #6A6A6A;
+	--footer-padding: 1rem 2%;
+
+	/* Links */
+	--footer-link-text-color: var(--link-text-color);
+	--footer-link-text-decoration: underline;
+
+	/* Links hover */
+	--footer-link-hover-text-color: var(--link-hover-text-color);
+	--footer-link-hover-text-decoration: underline;
+
+	/* Visited */
+	--footer-link-visited-text-color: var(--link-visited-text-color);
+	--footer-link-visited-text-decoration: underline;
+
+	/* Visited hover */
+	--footer-link-visited-hover-text-color: var(--link-visited-hover-text-color);
+	--footer-link-visited-hover-text-decoration: underline;
+}

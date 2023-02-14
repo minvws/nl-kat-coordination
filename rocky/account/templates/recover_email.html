@@ -1,0 +1,38 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main>
+    <section>
+      <div class="form-view">
+        <div>
+          <h1>{% translate "Recover email address" %}</h1>
+          <p>
+            {% translate "Information on how to recover your connected email address" %}
+          </p>
+          <div id="explanation-forgotten-email-adres" class="explanation">
+            <h1>{% translate "Forgotten email address?" %}</h1>
+            {% if help_desk_email %}
+              <p>
+                {% translate "If you don’t remember the email address connected to your account, contact: " %}
+                <a href="mailto:{{ help_desk_email }}">{{ help_desk_email }}</a>
+              </p>
+            {% else %}
+              <p>
+                {% translate 'Please contact the system administrator.' %}
+              </p>
+            {% endif %}
+          </div>
+          <div class="horizontal-view">
+            <a href="{% url 'landing_page' %}"
+               class="button ghost back"
+               type="submit">{% translate "Back to Home" %}</a>
+            <a href="{% url 'login' %}" class="button">{% translate "Back to login" %}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock %}

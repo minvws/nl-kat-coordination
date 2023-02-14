@@ -1,0 +1,39 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+	<main id="main-content">
+		<section>
+			<div>
+				<h1>Failure mode affected object</h1>
+				<div class="vertical-scroll">
+					{% if object %}
+						<table>
+							<caption>{% translate 'Failure mode affected object tabel:' %}</caption>
+							<thead>
+								<tr>
+                  <th>{% translate 'Failure mode' %}</th>
+                  <th>{% translate 'Affected Department' %}</th>
+									<th>{% translate 'Affected Object' %}</th>
+									<th>{% translate 'Edit' %}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>{{ object.failure_mode }}</td>
+									<td>{{ object.affected_department }}</td>
+                  <td>{{ object.affected_ooi_type }}</td>
+									<td><a href="{% url 'fmea_failure_mode_affected_object_update' object.id %}">Edit</a></td>
+								</tr>
+							</tbody>
+						</table>
+					{% else %}
+						<p>{% translate 'Failure mode affected objects cannot be found.' %}</p>
+					{% endif %}
+				</div>
+			</div>
+		</section>
+	</main>
+{% endblock %}

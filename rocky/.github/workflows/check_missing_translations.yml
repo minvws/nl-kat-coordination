@@ -1,0 +1,18 @@
+name: Check missing translations
+on: [push]
+
+jobs:
+  locale:
+    strategy:
+      matrix:
+        locale: ['nl', 'pap']
+
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install gettext
+        run: sudo apt-get -f install gettext
+
+      - name: Run msgfmt and check for untranslated ${{ matrix.locale }}
+        run: msgcmp rocky/locale/${{ matrix.locale }}/LC_MESSAGES/django.po rocky/locale/${{ matrix.locale }}/LC_MESSAGES/django.po

@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<nav class="tabs"
+     aria-label="{% translate 'List of views for organization' %}">
+  <ul>
+    <li {% if view == 'organization_detail' %} aria-current="page"{% endif %}>
+      <a href="{% url 'organization_detail' organization.id %}">{% translate 'Details' %}</a>
+    </li>
+    {% if perms.tools.view_organizationmember %}
+      <li {% if view == 'organization_members' %} aria-current="page"{% endif %}>
+        <a href="{% url 'organization_member_list' organization.id %}">{% translate 'Members' %}</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>

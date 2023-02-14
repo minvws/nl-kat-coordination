@@ -1,0 +1,38 @@
+#!/usr/bin/make -f
+# You must remove unused comment lines for the released package.
+export DH_VERBOSE = 1
+export DESTDIR = $(CURDIR)/debian/kat-rocky
+export DH_VIRTUALENV_INSTALL_ROOT = /opt/venvs
+
+SNAKE=/usr/bin/python3
+PIP_ARGS = --extra-pip-arg "--no-binary" --extra-pip-arg "pillow,psycopg2-binary,reportlab"
+EXTRA_REQUIREMENTS=--upgrade-pip --preinstall "setuptools>=65" --preinstall "wheel" $(PIP_ARGS)
+PACKAGE=$(shell dh_listpackages)
+DH_VENV_ARGS=--python $(SNAKE) $(EXTRA_REQUIREMENTS)
+DH_VENV_DIR=debian/$(PACKAGE)$(DH_VIRTUALENV_INSTALL_ROOT)/$(PACKAGE)
+
+%:
+	dh $@ --with python-virtualenv
+
+.PHONY: override_dh_virtualenv override_dh_fixperms
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod 750 $(DESTDIR)/etc/kat/
+	find $(DESTDIR)/etc/kat -type f -exec chmod 640 {} \;
+	chmod 755 $(DESTDIR)/usr/bin/rocky-cli
+
+override_dh_virtualenv:
+	dh_virtualenv $(DH_VENV_ARGS)
+	SECRET_KEY="foo" $(DH_VENV_DIR)/bin/python manage.py collectstatic --noinput --clear
+	SECRET_KEY="foo" $(DH_VENV_DIR)/bin/python manage.py compilemessages
+	find static -type f -exec install -D "{}" "$(DESTDIR)/usr/share/kat-rocky/{}" \;
+
+	# remove pip to prevent mutation of venv
+	$(DH_VENV_DIR)/bin/python -m pip uninstall --yes pip
+
+	# TODO: fix broken shebang replacement by setuptools
+	sed -i 's|#!.*|#!$(DH_VIRTUALENV_INSTALL_ROOT)/$(PACKAGE)/bin/python|' $(DH_VENV_DIR)/bin/manage.py
+
+override_dh_gencontrol:
+	dh_gencontrol -- -Vpython=`py3versions -d`
