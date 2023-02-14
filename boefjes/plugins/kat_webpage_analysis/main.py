@@ -1,15 +1,15 @@
+import ipaddress
 import json
 import mimetypes
-from typing import Tuple, Union, List
-from boefjes.job_models import BoefjeMeta
-
 from os import getenv
+from typing import Tuple, Union, List
+from urllib.parse import urlparse, urlunsplit
+
 import requests
+from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 from requests import Session
 
-from urllib.parse import urlparse, urlunsplit
-from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
-
+from boefjes.job_models import BoefjeMeta
 
 ALLOWED_CONTENT_TYPES = mimetypes.types_map.values()
 
@@ -20,7 +20,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     uri = get_uri(input_)
     ip = input_["website"]["ip_service"]["ip_port"]["address"]["address"]
-
     # Code from https://github.com/Roadmaster/forcediphttpsadapter/blob/master/example.py
     url_parts = urlparse(uri)
     hostname = url_parts.netloc
@@ -33,7 +32,16 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     else:
         # Fall back to old hack-ip-into-url behavior, for either https with no adapter, or http.
         if ip:
-            url_parts = url_parts._replace(netloc=ip)
+            try:
+                addr = ipaddress.ip_address(ip)
+            except ValueError:
+                # Not a valid IP address, so don't try to hack it into the URL
+                pass
+            else:
+                if addr.version == 6:
+                    # IPv6 addresses need to be wrapped in brackets
+                    url_parts = url_parts._replace(netloc=f"[{ip}]")
+
             uri = urlunsplit(
                 [
                     url_parts.scheme,

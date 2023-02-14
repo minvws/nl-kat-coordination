@@ -28,5 +28,5 @@ class RuntimeManager:
         raise NotImplementedError()
 
 
-class StopWorking(Exception):
-    """Exception to tell workers in the runtime to stop working"""
+class JobRuntimeError(RuntimeError):
+    """Base exception class for exceptions raised during running of jobs"""
