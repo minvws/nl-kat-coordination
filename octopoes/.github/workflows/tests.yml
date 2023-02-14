@@ -1,0 +1,42 @@
+name: Run the unit tests
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - "develop"
+      - "main"
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['3.8', '3.9', '3.10', '3.11']
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install requirements.txt
+        run: pip install -r requirements-dev.txt
+
+      - name: Run unit tests
+        run: pytest --cov-report=xml
+
+
+      - if: ${{ matrix.version == '3.8' }}
+        name: Upload coverage as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage
+          path: coverage.xml
