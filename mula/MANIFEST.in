@@ -1,0 +1,2 @@
+include scheduler/alembic.ini
+include scheduler/alembic/script.py.mako
