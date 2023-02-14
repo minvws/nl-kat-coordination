@@ -70,7 +70,6 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) run --rm katalogus_integration
 
 debian:
-	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-boefjes \
 	--env BUILD_DIR=./build \
@@ -78,6 +77,7 @@ debian:
 	--env RELEASE_VERSION=${RELEASE_VERSION} \
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
+	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
 	--workdir /app \
 	kat-debian-build-image \
 	packaging/scripts/build-debian-package.sh
@@ -91,6 +91,7 @@ ubuntu:
 	--env RELEASE_VERSION=${RELEASE_VERSION} \
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
+	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
 	--workdir /app \
 	kat-ubuntu-build-image \
 	packaging/scripts/build-debian-package.sh

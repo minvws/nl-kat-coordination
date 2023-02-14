@@ -1,0 +1,21 @@
+name: Rocky Run the test suite
+
+on:
+  push:
+    paths:
+      - octopoes/**
+      - rocky/**
+
+jobs:
+  Tests:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build image
+        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f rocky/base.yml  -f rocky/.ci/docker-compose.yml build --build-arg USER_UID="$(id -u)" --build-arg USER_GID="$(id -g)" rocky_tests
+
+      - name: Run tests
+        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker-compose -f rocky/base.yml  -f rocky/.ci/docker-compose.yml run --rm rocky_tests

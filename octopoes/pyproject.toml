@@ -6,12 +6,8 @@ authors = [""]
 license = "EUPL"
 
 [build-system]
-requires = ["setuptools>=62.2", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=62.2", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
-
-[tool.setuptools_scm]
-version_scheme = "guess-next-dev"
-local_scheme = "no-local-version"
 
 [tool.vulture]
 min_confidence = 90

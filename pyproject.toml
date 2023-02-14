@@ -1,3 +1,6 @@
+[build-system]
+requires = ["setuptools>=65", "setuptools_scm[toml]>=7.1"]
+
 [tool.black]
 target-version = ["py38"]
 line-length = 120
@@ -12,6 +15,8 @@ disallow_untyped_decorators = false # Needed for FastAPI decorators
 
 [tool.pylint.format]
 max-line-length = 120
+
+[tool.setuptools_scm]
 
 [tool.vulture]
 min_confidence = 90

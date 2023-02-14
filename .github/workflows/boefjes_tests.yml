@@ -1,0 +1,44 @@
+name: Boefjes Run the test suite
+
+on:
+  push:
+    paths:
+      - boefjes/**
+
+jobs:
+  Tests:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '3.8', '3.9', '3.10', '3.11' ]
+
+    runs-on: ubuntu-20.04
+    env:
+      COMPOSE_FILE: .ci/docker-compose.yml
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install pip
+        run: python3 -m pip install --upgrade pip
+
+      - name: Install dev requirements
+        run: pip install -r requirements-dev.txt
+        working-directory: ./boefjes
+
+      - name: Install requirements
+        run: find . -name requirements.txt | xargs -L 1 pip install -r
+        working-directory: ./boefjes
+
+      - name: Install Octopoes
+        run: pip install wheel && cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
+
+      - name: Run pytests
+        run: python3 -m pytest
+        working-directory: ./boefjes

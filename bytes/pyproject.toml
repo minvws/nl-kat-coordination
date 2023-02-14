@@ -21,9 +21,5 @@ max-line-length = 120
 check-quote-consistency = true
 
 [build-system]
-requires = ["setuptools>=65", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=65", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
-
-[tool.setuptools_scm]
-version_scheme = "guess-next-dev"
-local_scheme = "no-local-version"

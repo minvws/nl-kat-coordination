@@ -4,7 +4,9 @@ services:
   rocky_tests:
     build:
       context: ..
-      dockerfile: nl-kat-rocky/Dockerfile.dev
+      dockerfile: rocky/Dockerfile
+      args:
+        ENVIRONMENT: dev
     command: bash /app/run_rocky.sh
     depends_on:
       - ci_rocky-db

@@ -1,10 +1,6 @@
 [build-system]
-requires = ["setuptools>=62.2", "wheel", "setuptools_scm>=6.2"]
+requires = ["setuptools>=62.2", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
-
-[tool.setuptools_scm]
-version_scheme = "guess-next-dev"
-local_scheme = "no-local-version"
 
 [tool.black]
 target-version = ['py38']

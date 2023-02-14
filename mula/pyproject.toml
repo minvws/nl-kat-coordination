@@ -35,9 +35,5 @@ paths = ["./"]
 exclude = ["tests"]
 
 [build-system]
-requires = ["setuptools>=59", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=59", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
-
-[tool.setuptools_scm]
-version_scheme = "guess-next-dev"
-local_scheme = "no-local-version"
