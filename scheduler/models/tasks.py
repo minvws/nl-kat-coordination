@@ -1,11 +1,12 @@
-import datetime
 import uuid
+from datetime import datetime, timezone
 from enum import Enum as _Enum
 from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, Field
 from sqlalchemy import JSON, Column, DateTime, Enum, String
+from sqlalchemy.sql import func
 
 from scheduler.utils import GUID
 
@@ -16,7 +17,7 @@ from .queue import PrioritizedItem
 from .raw_data import RawData
 
 
-class TaskStatus(_Enum):
+class TaskStatus(str, _Enum):
     """Status of a task."""
 
     PENDING = "pending"
@@ -34,8 +35,9 @@ class Task(BaseModel):
     p_item: PrioritizedItem
     status: TaskStatus
 
-    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
-    modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Config:
         orm_mode = True
@@ -59,13 +61,13 @@ class TaskORM(Base):
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.datetime.utcnow,
+        server_default=func.now(),
     )
     modified_at = Column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow,
+        server_default=func.now(),
+        onupdate=func.now(),
     )
 
 

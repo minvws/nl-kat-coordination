@@ -1,8 +1,8 @@
 import abc
-import datetime
 import logging
 import threading
 import traceback
+from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 from scheduler import context, models, queues, rankers, utils
@@ -94,8 +94,8 @@ class Scheduler(abc.ABC):
             type=self.queue.item_type.type,
             p_item=p_item,
             status=models.TaskStatus.QUEUED,
-            created_at=datetime.datetime.utcnow(),
-            modified_at=datetime.datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
         )
 
         task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))

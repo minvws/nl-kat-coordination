@@ -1,9 +1,10 @@
-import datetime
 import uuid
+from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 from sqlalchemy import JSON, Column, DateTime, Integer, String
+from sqlalchemy.sql import func
 
 from scheduler.utils import GUID
 
@@ -27,9 +28,9 @@ class PrioritizedItem(BaseModel):
 
     data: Dict
 
-    created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Config:
         orm_mode = True
@@ -53,13 +54,14 @@ class PrioritizedItemORM(Base):
     created_at = Column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.datetime.utcnow,
+        server_default=func.now(),
     )
+
     modified_at = Column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow,
+        server_default=func.now(),
+        onupdate=func.now(),
     )
 
 
