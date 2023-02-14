@@ -17,15 +17,13 @@ from boefjes.plugins.models import (
     ENTRYPOINT_NORMALIZERS,
     ModuleException,
 )
-from boefjes.katalogus.models import PluginType, Boefje, Normalizer
+from boefjes.katalogus.models import PluginType, Boefje, Normalizer, RESERVED_LOCAL_ID
 
 
 logger = logging.getLogger(__name__)
 
 
 class LocalPluginRepository:
-    RESERVED_ID = "LOCAL"
-
     def __init__(self, path: Path):
         self.path = path
 
@@ -96,7 +94,7 @@ class LocalPluginRepository:
 
         for path, package in paths_and_packages:
             try:
-                boefje_resources.append(BoefjeResource(path, package, LocalPluginRepository.RESERVED_ID))
+                boefje_resources.append(BoefjeResource(path, package, RESERVED_LOCAL_ID))
             except ModuleException as exc:
                 logger.exception(exc)
 
@@ -107,7 +105,7 @@ class LocalPluginRepository:
             [NORMALIZER_DEFINITION_FILE, ENTRYPOINT_NORMALIZERS]
         )
         normalizer_resources = [
-            NormalizerResource(path, package, LocalPluginRepository.RESERVED_ID) for path, package in paths_and_packages
+            NormalizerResource(path, package, RESERVED_LOCAL_ID) for path, package in paths_and_packages
         ]
 
         return {resource.normalizer.id: resource for resource in normalizer_resources}
@@ -142,7 +140,7 @@ class LocalPluginRepository:
     def _boefje_to_plugin(boefje: BoefjeResource) -> Boefje:
         def_file = boefje.path / "boefje.json"
         def_obj = json.loads(def_file.read_text())
-        def_obj["repository_id"] = LocalPluginRepository.RESERVED_ID
+        def_obj["repository_id"] = RESERVED_LOCAL_ID
 
         return Boefje.parse_obj(def_obj)
 
@@ -150,7 +148,7 @@ class LocalPluginRepository:
     def _normalizer_to_plugin(normalizer: NormalizerResource) -> Normalizer:
         def_file = normalizer.path / "normalizer.json"
         def_obj = json.loads(def_file.read_text())
-        def_obj["repository_id"] = LocalPluginRepository.RESERVED_ID
+        def_obj["repository_id"] = RESERVED_LOCAL_ID
 
         return Normalizer.parse_obj(def_obj)
 

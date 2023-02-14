@@ -5,6 +5,9 @@ from typing import Union, NewType, Optional, List, Literal, Set
 from pydantic import BaseModel, AnyHttpUrl, Field
 
 
+RESERVED_LOCAL_ID = "LOCAL"
+
+
 class Repository(BaseModel):
     id: str
     name: str
@@ -18,7 +21,7 @@ class Organisation(BaseModel):
 
 class Plugin(BaseModel):
     id: str
-    repository_id: str
+    repository_id: str = RESERVED_LOCAL_ID
     name: Optional[str]
     version: Optional[str]
     authors: Optional[List[str]]
@@ -35,15 +38,15 @@ class Plugin(BaseModel):
 class Boefje(Plugin):
     type: Literal["boefje"] = "boefje"
     scan_level: int = 1
-    consumes: Set[str]
+    consumes: Set[str] = Field(default_factory=set)
+    produces: List[str] = Field(default_factory=list)
     options: Optional[List[str]]
-    produces: List[str]  # mime types
 
 
 class Normalizer(Plugin):
     type: Literal["normalizer"] = "normalizer"
-    consumes: List[str]  # mime types (and/ or boefjes)
-    produces: List[str]  # oois
+    consumes: List[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
+    produces: List[str] = Field(default_factory=list)  # oois
     enabled: bool = True
 
 
