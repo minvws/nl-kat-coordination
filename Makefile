@@ -5,79 +5,85 @@ SHELL := bash
 HIDE:=$(if $(VERBOSE),,@)
 UNAME := $(shell uname)
 
-
-.PHONY: kat kat-stable clone migrate build itest debian-build-image ubuntu-build-image
+.PHONY: kat kat-stable rebuild update clean clone clone-stable migrate build itest debian-build-image ubuntu-build-image
 
 # Export Docker buildkit options
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+SERVICES = nl-kat-rocky nl-kat-boefjes nl-kat-bytes nl-kat-octopoes nl-kat-mula nl-kat-keiko
 
 
-kat:  # This should give you a clean install
-ifeq ("$(wildcard .env)","")
-	make env
-endif
-	make clean
-	make clone
+kat: env-if-empty clean clone # This should give you a clean install
 	make build
 	make up
 
-
-kat-stable:  # This should give you a clean install of a stable version
-ifeq ("$(wildcard .env)","")
-	make env
-endif
-	make clean
-	make clone-stable
+kat-stable: env-if-empty clean clone-stable # This should give you a clean install of a stable version
 	make build
 	make up
 
-rebuild:
-	make clean
+rebuild: clean
 	make build
 	make up
 
-update:
-	-docker-compose down
-	make pull
+update: down pull
 	make build
 	make up
 
-clean:
-	-docker-compose down
+clean: down # This should clean up all persistent data
 	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
+	-docker-compose run --rm --no-deps --entrypoint /bin/rm -u root bytes -rf bytes-data
+
+export version
+
+upgrade: fetch down # Upgrade to the latest release without losing persistent data. Usage: `make upgrade version=v1.5.0` (version is optional)
+ifeq ($(version),)
+	version=$(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-coordination/tags" | jq -r '.[].name' | grep -v "rc" | head -n 1)
+	make upgrade version=$$version
+else
+	make checkout branch=$(version)
+	make build-all
+	make up
+endif
+
+reset: down
+	-docker volume rm nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
+	-docker-compose run --rm --no-deps --entrypoint /bin/rm -u root bytes -rf bytes-data
+	make up
+	make -C nl-kat-boefjes build
+	make -C nl-kat-rocky almost-flush
 
 up:
-	docker-compose up -d --force-recreate rocky
+	docker-compose up -d --force-recreate
 
 down:
 	-docker-compose down
 
 clone:
-	-git clone https://github.com/minvws/nl-kat-boefjes.git
-	-git clone https://github.com/minvws/nl-kat-bytes.git
-	-git clone https://github.com/minvws/nl-kat-octopoes.git
-	-git clone https://github.com/minvws/nl-kat-mula.git
-	-git clone https://github.com/minvws/nl-kat-keiko.git
-	-git clone https://github.com/minvws/nl-kat-rocky.git
+	for service in $(SERVICES); do \
+		git clone https://github.com/minvws/$$service.git || true; \
+	done
 
 clone-stable:
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-boefjes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-boefjes.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-bytes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-bytes.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-octopoes/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-octopoes.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-mula/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-mula.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-keiko/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-keiko.git
-	-git clone --branch $(shell curl --silent  "https://api.github.com/repos/minvws/nl-kat-rocky/tags" | jq -r '.[0].name') https://github.com/minvws/nl-kat-rocky.git
+	TAG=$(shell curl --silent https://api.github.com/repos/minvws/nl-kat-coordination/tags | jq -r '.[].name' | grep -v "rc" | head -n 1)
+	for service in $(SERVICES); do \
+		git clone --branch $$TAG https://github.com/minvws/$$service.git || true; \
+	done
+
+fetch:
+	for service in . $(SERVICES); do \
+		git -C $$service fetch || true; \
+	done
 
 pull:
-	-git pull
-	-git -C nl-kat-boefjes pull
-	-git -C nl-kat-bytes pull
-	-git -C nl-kat-octopoes pull
-	-git -C nl-kat-mula pull
-	-git -C nl-kat-keiko pull
-	-git -C nl-kat-rocky pull
+	for service in . $(SERVICES); do \
+		git -C $$service pull || true; \
+	done
+
+env-if-empty:
+ifeq ("$(wildcard .env)","")
+	make env
+endif
 
 env:  # Create .env file from the env-dist with randomly generated credentials from vars annotated by "{%EXAMPLE_VAR}"
 	$(HIDE) cp .env-dist .env
@@ -88,40 +94,26 @@ else
 endif
 
 checkout: # Usage: `make checkout branch=develop`
-	-git checkout $(branch)
-	-git -C nl-kat-boefjes checkout $(branch)
-	-git -C nl-kat-bytes checkout $(branch)
-	-git -C nl-kat-octopoes checkout $(branch)
-	-git -C nl-kat-mula checkout $(branch)
-	-git -C nl-kat-keiko checkout $(branch)
-	-git -C nl-kat-rocky checkout $(branch)
+	for service in . $(SERVICES); do \
+		git -C $$service checkout $(branch) || true; \
+	done
 
 pull-reset:
-	-git reset --hard HEAD
-	-git pull
-	-git -C nl-kat-boefjes reset --hard HEAD
-	-git -C nl-kat-boefjes pull
-	-git -C nl-kat-bytes reset --hard HEAD
-	-git -C nl-kat-bytes pull
-	-git -C nl-kat-octopoes reset --hard HEAD
-	-git -C nl-kat-octopoes pull
-	-git -C nl-kat-mula reset --hard HEAD
-	-git -C nl-kat-mula pull
-	-git -C nl-kat-keiko reset --hard HEAD
-	-git -C nl-kat-keiko pull
-	-git -C nl-kat-rocky reset --hard HEAD
-	-git -C nl-kat-rocky pull
+	for service in . $(SERVICES); do \
+		git -C $$service reset --hard HEAD; \
+		git -C $$service pull; \
+	done
 
-build:  # Build should prepare all other services: migrate them, seed them, etc.
+build-all:  # Build should prepare all other services: migrate them, seed them, etc.
 ifeq ($(UNAME), Darwin)
 	docker-compose build --build-arg USER_UID="$$(id -u)"
 else
 	docker-compose build --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
 endif
-	docker-compose run --rm rocky make build-rocky
-	make -C nl-kat-rocky build-rocky-frontend
+
+build: build-all
+	make -C nl-kat-rocky build
 	make -C nl-kat-boefjes build
-	make -C nl-kat-bytes build
 
 debian-build-image:
 	docker build -t kat-debian-build-image packaging/debian
