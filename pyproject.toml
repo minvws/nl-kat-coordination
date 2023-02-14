@@ -46,15 +46,3 @@ local_scheme = "no-local-version"
 omit = [
     "scheduler/alembic/*"
 ]
-
-[tool.coverage.report]
-exclude_lines = [
-  "pragma: no cover",
-  "def __repr__",
-  "def __str__",
-  "raise AssertionError",
-  "raise NotImplementedError",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-  "if typing.TYPE_CHECKING:"
-]

@@ -66,7 +66,7 @@ done: ## Prepare for a commit.
 cov: ## Generate a test coverage report
 	$(ci-docker-compose) run --rm mula \
 		python -m pytest \
-		--cov-report term-missing \
+		--cov-report term-missing:skip-covered \
 		--cov=scheduler tests/
 
 ##
