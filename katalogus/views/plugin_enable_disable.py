@@ -35,20 +35,26 @@ class PluginEnableDisableView(OrganizationView):
         plugin_state = kwargs["plugin_state"]
         if plugin_state == "True":
             self.katalogus_client.disable_boefje(plugin_id)
-            self.add_warning_message(_("Boefje '{boefje_id}' disabled.").format(boefje_id=plugin_id))
+            messages.add_message(
+                self.request, messages.WARNING, _("Boefje '{boefje_id}' disabled.").format(boefje_id=plugin_id)
+            )
         else:
             if self.check_required_settings(plugin_id):
                 self.katalogus_client.enable_boefje(plugin_id)
-                self.add_success_message(_("Boefje '{boefje_id}' enabled.").format(boefje_id=plugin_id))
+                messages.add_message(
+                    self.request, messages.SUCCESS, _("Boefje '{boefje_id}' enabled.").format(boefje_id=plugin_id)
+                )
             else:
-                self.add_error_message(
+                messages.add_message(
+                    self.request,
+                    messages.INFO,
                     _("Before enabling, please set the required settings for boefje '{boefje_id}'.").format(
                         boefje_id=plugin_id
-                    )
+                    ),
                 )
                 return redirect(
                     reverse(
-                        "plugin_detail",
+                        "plugin_settings_add",
                         kwargs={
                             "organization_code": self.organization.code,
                             "plugin_id": plugin_id,
@@ -57,12 +63,3 @@ class PluginEnableDisableView(OrganizationView):
                     )
                 )
         return HttpResponseRedirect(request.POST.get("current_url"))
-
-    def add_warning_message(self, message):
-        messages.add_message(self.request, messages.WARNING, message)
-
-    def add_error_message(self, message):
-        messages.add_message(self.request, messages.ERROR, message)
-
-    def add_success_message(self, message):
-        messages.add_message(self.request, messages.SUCCESS, message)

@@ -7,15 +7,40 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{% translate 'Add setting - ' %}{{ setting_name }}</h1>
+        <h1>
+          {% blocktrans count form.fields|length as count %}
+            Add setting
+          {% plural %}
+            Add settings
+          {% endblocktrans %}
+        </h1>
         <p class="emphasized">
-          {% translate 'Setting' %}
+          {% blocktrans count form.fields|length as count %}
+            Setting
+          {% plural %}
+            Settings
+          {% endblocktrans %}
         </p>
         <div class="form-view">
           <form novalidate method="post" class="horizontal-view help">
             {% csrf_token %}
             {% include 'partials/form/fieldset.html' with legend=name fields=form %}
-            <button type="submit">{% translate 'Add setting' %}</button>
+            <div class="horizontal-view">
+              <button type="submit" class="ghost" name="add">
+                {% blocktrans count form.fields|length as count %}
+                  Add setting
+                {% plural %}
+                  Add settings
+                {% endblocktrans %}
+              </button>
+              <button type="submit" name="add-enable">
+                {% blocktrans count form.fields|length as count %}
+                  Add setting and enable boefje
+                {% plural %}
+                  Add settings and enable boefje
+                {% endblocktrans %}
+              </button>
+            </div>
           </form>
         </div>
       </div>

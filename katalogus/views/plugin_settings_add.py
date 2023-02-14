@@ -30,6 +30,13 @@ class PluginSettingsAddView(PermissionRequiredMixin, KATalogusMixin, FormView):
                 break
 
             self.katalogus_client.add_plugin_setting(self.plugin_id, name, value)
+
+        if "add-enable" in self.request.POST:
+            self.katalogus_client.enable_boefje(self.plugin_id)
+            messages.add_message(
+                self.request, messages.SUCCESS, _("Boefje '{boefje_id}' enabled.").format(boefje_id=self.plugin_id)
+            )
+
         self.add_success_notification()
         return HttpResponseRedirect(self.get_success_url())
 
