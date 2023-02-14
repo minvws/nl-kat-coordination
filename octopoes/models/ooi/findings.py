@@ -25,6 +25,10 @@ class CWEFindingType(FindingType):
     object_type: Literal["CWEFindingType"] = "CWEFindingType"
 
 
+class CAPECFindingType(FindingType):
+    object_type: Literal["CAPECFindingType"] = "CAPECFindingType"
+
+
 class RetireJSFindingType(FindingType):
     object_type: Literal["RetireJSFindingType"] = "RetireJSFindingType"
 
