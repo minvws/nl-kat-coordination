@@ -40,7 +40,8 @@ class PluginSchemaForm(forms.Form):
 
 
 class PluginSettingAddEditForm(forms.Form):
-    """Form for adding a single setting or multiple settings, use setting name to populate schema field propertis into form field."""
+    """Form for adding a single setting or multiple settings, use setting name
+    to populate schema field propertis into form field."""
 
     error_messages = {
         "required": _("This field is required."),
