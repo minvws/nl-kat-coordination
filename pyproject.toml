@@ -1,24 +1,48 @@
-[build-system]
-requires = ["setuptools>=65", "setuptools_scm[toml]>=7.1"]
-
 [tool.black]
-target-version = ["py38"]
 line-length = 120
+target-version = ['py38']
 
 [tool.mypy]
-python_version = "3.8"
-plugins = ["pydantic.mypy"]
+python_version = 3.8
 strict = false
+install_types = true
+non_interactive = true
 ignore_missing_imports = true
-follow_imports = "skip"
-disallow_untyped_decorators = false # Needed for FastAPI decorators
+implicit_reexport = true
+exclude = "^(tests|whitelist.py)"
 
-[tool.pylint.format]
-max-line-length = 120
-
-[tool.setuptools_scm]
+[tool.pylint.master]
+fail-under=7.0
+max-line-length=120
+check-quote-consistency=true
+extension-pkg-whitelist = [
+    "pydantic",
+    "mmh3"
+]
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "too-few-public-methods",
+    "cyclic-import",
+    "fixme",
+    "invalid-name",
+]
 
 [tool.vulture]
 min_confidence = 90
-exclude = ["/tests/"]
-paths = ["."]
+paths = ["./"]
+exclude = ["tests"]
+
+[build-system]
+requires = ["setuptools>=59", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta:__legacy__"
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "no-local-version"
+
+[tool.coverage.run]
+omit = [
+    "scheduler/alembic/*"
+]
