@@ -7,7 +7,7 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import NormalizerTask, Organisation, PrioritizedItem, RawData, TaskStatus
+from scheduler.models import NormalizerTask, Organisation, PrioritizedItem, RawData
 
 from .scheduler import Scheduler
 
