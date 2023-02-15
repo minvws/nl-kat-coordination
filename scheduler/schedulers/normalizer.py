@@ -81,19 +81,14 @@ class NormalizerScheduler(Scheduler):
                 )
                 break
 
-            # Find the associated BoefjeTask (if any), the item on boefje queue
-            # has been processed, update the status of that task.
-            boefje_task_db = self.ctx.task_store.get_task_by_id(
-                latest_raw_data.raw_data.boefje_meta.id,
-            )
-            if boefje_task_db is None:
-                self.logger.debug(
-                    "Could not find boefje task in database "
-                    "[raw_data.boefje_meta.id_id=%s, organisation.id=%s, scheduler_id=%s]",
-                    latest_raw_data.raw_data.boefje_meta.id,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
+            for mime_type in latest_raw_data.raw_data.mime_types:
+                if mime_type.get("value", "").startswith("error/"):
+                    self.logger.info(
+                        "Skipping raw data with error mime type [organisation.id=%s, scheduler_id=%s]",
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    continue
 
             p_items = self.create_tasks_for_raw_data(latest_raw_data.raw_data)
             if not p_items:
