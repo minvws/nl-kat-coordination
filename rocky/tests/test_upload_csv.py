@@ -55,7 +55,9 @@ def test_upload_bad_input(rf, my_user, organization, mock_organization_view_octo
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 302
-    mock_bytes_client().add_manual_proof.assert_called_once_with(data, manual_mime_type="manual/csv")
+
+    task_id = mock_bytes_client().add_manual_proof.call_args[0][0]
+    mock_bytes_client().add_manual_proof.assert_called_once_with(task_id, data, manual_mime_types={"manual/csv"})
 
     messages = list(request._messages)
     assert "could not be created for row number" in messages[0].message
@@ -107,7 +109,11 @@ def test_upload_csv(
 
     assert response.status_code == 302
     assert mock_organization_view_octopoes().save_declaration.call_count == expected_ooi_counts
-    mock_bytes_client().add_manual_proof.assert_called_once_with(example_input, manual_mime_type="manual/csv")
+
+    task_id = mock_bytes_client().add_manual_proof.call_args[0][0]
+    mock_bytes_client().add_manual_proof.assert_called_once_with(
+        task_id, example_input, manual_mime_types={"manual/csv"}
+    )
 
     messages = list(request._messages)
     assert "successfully added" in messages[0].message

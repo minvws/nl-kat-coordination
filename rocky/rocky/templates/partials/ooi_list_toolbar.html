@@ -15,6 +15,9 @@
           <a href="{% url 'scan_list' organization.code %}">{% translate 'Scan for objects' %}</a>
         </li>
         <li>
+          <a href="{% url 'upload_raw' organization.code %}">{% translate 'Upload raw file' %}</a>
+        </li>
+        <li>
           <a href="{% url 'upload_csv' organization.code %}">{% translate 'Upload CSV' %}</a>
         </li>
       </ul>

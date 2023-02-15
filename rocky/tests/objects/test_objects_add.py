@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from pytest_django.asserts import assertContains
 
@@ -19,10 +20,11 @@ def test_add_ooi(rf, my_user, organization, mock_organization_view_octopoes, moc
         b' "primary_key": "Network|testnetwork", "name": "testnetwork"}'
     )
     mock_bytes_client().add_manual_proof.assert_called_once()
-    only_call_arg = mock_bytes_client().add_manual_proof.call_args[0][0]
+    call_args = mock_bytes_client().add_manual_proof.call_args[0]
 
-    assert data_without_valid_time in only_call_arg
-    assert json.loads(only_call_arg.decode("utf-8"))
+    assert isinstance(call_args[0], uuid.UUID)
+    assert data_without_valid_time in call_args[1]
+    assert json.loads(call_args[1].decode("utf-8"))
 
     assert mock_organization_view_octopoes().save_declaration.call_count == 1
 
