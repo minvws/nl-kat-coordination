@@ -11,7 +11,7 @@ from boefjes.katalogus.models import Organisation, Repository, Boefje
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
     PluginNotFound,
-    SettingNotFound,
+    SettingsNotFound,
     RepositoryNotFound,
     StorageError,
 )
@@ -140,22 +140,30 @@ class TestRepositories(TestCase):
 
         with self.settings_storage as settings_storage:
             settings_storage.create("TEST_SETTING", "123.9", organisation_id, plugin_id)
+            settings_storage.create("TEST_SETTING2", 12, organisation_id, plugin_id)
+
+        with self.settings_storage as settings_storage:
+            settings_storage.update_by_key("TEST_SETTING2", 13, organisation_id, plugin_id)
 
         returned_settings = settings_storage.get_by_key("TEST_SETTING", organisation_id, plugin_id)
         self.assertEqual("123.9", returned_settings)
 
-        with self.assertRaises(SettingNotFound):
+        returned_settings = settings_storage.get_by_key("TEST_SETTING2", organisation_id, plugin_id)
+        self.assertEqual(13, returned_settings)
+
+        with self.assertRaises(SettingsNotFound):
             settings_storage.get_by_key("no setting!", organisation_id, plugin_id)
 
-        with self.assertRaises(SettingNotFound):
+        with self.assertRaises(SettingsNotFound):
             settings_storage.get_by_key("TEST_SETTING", "no organisation!", plugin_id)
 
-        self.assertEqual({"TEST_SETTING": "123.9"}, settings_storage.get_all(org.id, plugin_id))
+        self.assertEqual({"TEST_SETTING": "123.9", "TEST_SETTING2": 13}, settings_storage.get_all(org.id, plugin_id))
         self.assertEqual(dict(), settings_storage.get_all(org.id, "wrong"))
         self.assertEqual(dict(), settings_storage.get_all("wrong", plugin_id))
 
         with self.settings_storage as settings_storage:
             settings_storage.delete_by_key("TEST_SETTING", org.id, plugin_id)
+            settings_storage.delete_by_key("TEST_SETTING2", org.id, plugin_id)
 
         self.assertEqual(dict(), settings_storage.get_all(org.id, plugin_id))
 

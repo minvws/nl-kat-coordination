@@ -41,10 +41,8 @@ seed:  # Seed the katalogus database
 migrations: ## Generate a migration using alembic
 ifeq ($(m),)
 	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
-else ifeq ($(revid),)
-	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)" --rev-id="$(revid)"
+	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)"
 endif
 
 
@@ -70,6 +68,7 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) run --rm katalogus_integration
 
 debian:
+	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-boefjes \
 	--env BUILD_DIR=./build \
@@ -77,7 +76,6 @@ debian:
 	--env RELEASE_VERSION=${RELEASE_VERSION} \
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
-	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
 	--workdir /app \
 	kat-debian-build-image \
 	packaging/scripts/build-debian-package.sh
@@ -91,7 +89,6 @@ ubuntu:
 	--env RELEASE_VERSION=${RELEASE_VERSION} \
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
-	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
 	--workdir /app \
 	kat-ubuntu-build-image \
 	packaging/scripts/build-debian-package.sh

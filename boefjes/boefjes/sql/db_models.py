@@ -6,6 +6,7 @@ from sqlalchemy import (
     UniqueConstraint,
     Table,
     Boolean,
+    JSON,
 )
 from sqlalchemy.orm import relationship
 
@@ -39,20 +40,18 @@ class RepositoryInDB(SQL_BASE):
     base_url = Column(String(length=128), nullable=False)
 
 
-class SettingInDB(SQL_BASE):
-    __tablename__ = "setting"
+class SettingsInDB(SQL_BASE):
+    __tablename__ = "settings"
     __table_args__ = (
         UniqueConstraint(
-            "key",
             "organisation_pk",
             "plugin_id",
-            name="unique_keys_per_organisation_per_plugin",
+            name="unique_settings_per_organisation_per_plugin",
         ),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    key = Column(String(length=128), nullable=False)
-    value = Column(String(length=128), nullable=False)
+    value = Column(JSON, nullable=False)
     plugin_id = Column(String(length=64), nullable=False)
     organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
 
