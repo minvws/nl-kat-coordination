@@ -70,7 +70,7 @@ Example: the boefje for shodan
 The boefje calling shodan gives a good first impression of its capabilities. The boefje includes the following files.
 
 - __init.py__, which remains empty
-- boefje.json, containing the normalizers and classes in the data model
+- boefje.json, containing the normalizers and object-types in the data model
 - cover.jpg, with a matching cat picture for the KATalog
 - description.md, simple documentation of the boefje
 - main.py, the actual boefje
