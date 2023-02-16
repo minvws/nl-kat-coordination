@@ -246,14 +246,14 @@ The file normalize.py contains the actual normalizer: Its only job is to parse r
                 yield ft
                 yield f
 
-Adding objects
-==============
+Adding object-types
+===================
 
-If you want to add an object, you need to know with which other objects there is a logical relationship. An object is as simple as possible. As a result, a seemingly simple query sometimes explodes into a whole tree of parts.
+If you want to add an object-type, you need to know with which other object-types there is a logical relationship. An object-type is as simple as possible. As a result, a seemingly simple query sometimes explodes into a whole tree of objects.
 
-Adding objects to the data model requires an addition in octopus. Here, an object can be added if it is connected to other objects. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_.
+Adding object-types to the data model requires an addition in octopus. Here, an object-type can be added if it is connected to other object-types. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_.
 
-As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object in the data model, in this case an IPPort, looks like this:
+As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object-type in the data model, in this case an IPPort, looks like this:
 
 
 .. code-block:: python
@@ -271,7 +271,7 @@ As with the boefje for shodan, here we again use the example from the functional
     _information_value = ["protocol", "port"]
 
 
-Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document.
+Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object-type and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document.
 
 The PortState is defined separately. This can be done for information that has a very specific nature so you can describe it.
 
@@ -298,7 +298,7 @@ The example below comes from the functional documentation and discusses the Bit 
 - bit.py, which defines the structure
 - port_classification.py, which contains the business rules
 
-Bit.py gives the structure of the bit, containing the input and the businessrules against which it is tested. An example is included below. The bit accepts input belonging to the objects IPPort and IPAddress. It then calls the module port_classification, which contains the businessrules.
+Bit.py gives the structure of the bit, containing the input and the businessrules against which it is tested. An example is included below. The bit consumes input objects of type IPPort:
 
 
 .. code-block:: python
@@ -313,9 +313,9 @@ Bit.py gives the structure of the bit, containing the input and the businessrule
     module="bits.port_classification.port_classification",
  )
 
-The businessrules are contained in the module port_classification, in the file port_classification.py. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed.
+The businessrules are contained in the module *port_classification*, in the file *port_classification.py*. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed.
 
-The specification for a bit is broad, but limited by the data model. Boefjes retrieve information externally, bits only look at the objects in Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT.
+The specification for a bit is broad, but limited by the data model: Whereas Boefjes are actively gathering information externally, bits only look at the existing objects they receive from Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT.
 
 .. code-block:: python
 
@@ -363,7 +363,9 @@ The specification for a bit is broad, but limited by the data model. Boefjes ret
             description=f"Port {port} is not a common port and should possibly not be open.",
         )
 
-Bits can recognize patterns and derive objects from them. The Bit for internet.nl can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions.
+Bits can recognize patterns and derive new objects from them. 
+
+For example: The Bit for *internet.nl* can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions:
 
 .. code-block:: python
 
