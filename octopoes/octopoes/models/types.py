@@ -34,6 +34,7 @@ from octopoes.models.ooi.email_security import (
 from octopoes.models.ooi.dns.zone import Hostname, DNSZone, ResolvedHostname
 from octopoes.models.ooi.findings import (
     Finding,
+    ADRFindingType,
     KATFindingType,
     CVEFindingType,
     CWEFindingType,
@@ -63,6 +64,9 @@ from octopoes.models.ooi.web import (
     HTTPHeaderURL,
     HTTPHeaderHostname,
     ImageMetadata,
+    RESTAPI,
+    APIDesignRule,
+    APIDesignRuleResult,
 )
 
 CertificateType = Union[
@@ -83,8 +87,8 @@ DnsRecordType = Union[
     ResolvedHostname,
     NXDOMAIN,
 ]
-FindingType = Union[
-    Finding,
+FindingTypeType = Union[
+    ADRFindingType,
     KATFindingType,
     CVEFindingType,
     RetireJSFindingType,
@@ -113,6 +117,9 @@ WebType = Union[
     HTTPHeaderURL,
     HTTPHeaderHostname,
     ImageMetadata,
+    RESTAPI,
+    APIDesignRule,
+    APIDesignRuleResult,
 ]
 EmailSecurityType = Union[
     DNSSPFRecord,
@@ -130,7 +137,6 @@ OOIType = Union[
     CertificateType,
     DnsType,
     DnsRecordType,
-    FindingType,
     NetworkType,
     ServiceType,
     SoftwareType,
@@ -141,6 +147,8 @@ OOIType = Union[
     DNSSPFRecord,
     MonitoringType,
     EmailSecurityType,
+    Finding,
+    FindingTypeType,
 ]
 
 
