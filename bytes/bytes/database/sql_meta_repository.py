@@ -201,8 +201,7 @@ class ObjectNotFoundException(Exception):
 
 
 class MetaIntegrityError(Exception):
-    def __init__(self, message: str):
-        super().__init__(message)
+    """An IntegrityError occurred for the MetaRepository"""
 
 
 def to_boefje_meta_in_db(boefje_meta: BoefjeMeta) -> BoefjeMetaInDB:
