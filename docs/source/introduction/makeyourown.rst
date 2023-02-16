@@ -209,7 +209,8 @@ The normalizers translate the output of a boefje into objects that fit the data 
 normalize.py
 ************
 
-The file normalize.py contains the actual normalizer. From octopoes, the normalizer retrieves the objects and their references: from the findings list the CVEFindingType for the CVEs and the Finding for the findings, from the network objects list the IPPort, the Protocol and the PortState. Then the information about those objects is extracted from the imported data and stored as objects.
+The file normalize.py contains the actual normalizer: Its only job is to parse raw data and create, fill and yield the actual objects. (of valid object-types that are subclassed from OOI like IPPort)
+
 
 .. code-block:: python
 
