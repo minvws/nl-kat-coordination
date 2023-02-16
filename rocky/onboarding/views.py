@@ -54,7 +54,6 @@ User = get_user_model()
 
 class OnboardingBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
     def build_breadcrumbs(self):
-
         return [
             {
                 "url": reverse_lazy("step_introduction", kwargs={"organization_code": self.organization.code}),
@@ -263,7 +262,6 @@ class OnboardingSetupScanOOIDetailView(
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-
         ooi = self.get_ooi()
         level = int(self.request.session["clearance_level"])
         try:

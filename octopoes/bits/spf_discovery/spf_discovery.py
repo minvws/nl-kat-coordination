@@ -14,7 +14,6 @@ def run(
     input_ooi: DNSTXTRecord,
     additional_oois,
 ) -> Iterator[OOI]:
-
     if input_ooi.value.startswith("v=spf1"):
         spf_value = input_ooi.value.replace("%(d)", input_ooi.hostname.tokenized.name)
         parsed = parse(spf_value)

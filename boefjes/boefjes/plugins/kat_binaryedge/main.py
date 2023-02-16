@@ -9,7 +9,6 @@ from boefjes.job_models import BoefjeMeta
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
-
     be = BinaryEdge(getenv("BINARYEDGE_API"))
     results: Dict[str, List] = {"results": []}
 

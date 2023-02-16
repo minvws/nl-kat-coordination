@@ -9,7 +9,6 @@ def run(
     hostname: Hostname,
     additional_oois: List[Union[HostnameHTTPURL, Website]],
 ) -> Iterator[OOI]:
-
     hostname_http_urls = [
         hostname_http_url for hostname_http_url in additional_oois if isinstance(hostname_http_url, HostnameHTTPURL)
     ]
@@ -18,7 +17,6 @@ def run(
     # HTTPResource is cartesian product of HostnameHTTPURL and Websites
     for hostname_http_url in hostname_http_urls:
         for website in websites:
-
             # only create resource if ports are the same and schemes are the same
             if (
                 int(website.ip_service.tokenized.ip_port.port) == hostname_http_url.port

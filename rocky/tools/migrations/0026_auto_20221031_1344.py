@@ -24,7 +24,6 @@ def add_group_permissions(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0025_auto_20221027_1233"),
         ("contenttypes", "0002_remove_content_type_name"),

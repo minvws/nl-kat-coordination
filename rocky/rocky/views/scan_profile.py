@@ -41,7 +41,6 @@ class ScanProfileDetailView(OOIDetailView, FormView):
         super().post(request, *args, **kwargs)
         form = self.get_form()
         if form.is_valid():
-
             level = form.cleaned_data["level"]
             try:
                 self.raise_clearance_level(self.ooi.reference, level)
