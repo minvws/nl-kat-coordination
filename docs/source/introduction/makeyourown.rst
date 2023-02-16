@@ -47,12 +47,22 @@ If you want to add factual information, use a boefje. Want to add an opinion or 
 
 OpenKAT assumes that you collect and process all information in the smallest possible units so that they can contribute back to other combinations and results. This is how you maintain the modular nature of the package.
 
-To make a finding about a CVE to a software version, you have a string of objects: the finding of the software, the version, the CVE. That combination then leads to the object of the finding.
+To make a finding about a CVE to a software version, you need multiple objects: the finding of the software, the version, the CVE. That combination then leads to the object of the finding.
+
 
 Existing boefjes
 ================
 
 The existing boefjes can be viewed via the KATalog in OpenKAT and are on `GitHUB in the boefjes repository. <https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes>`_
+
+Object-types, classes and objects.
+----------------------------------
+
+When we talk about object-types, we mean things like IPAddressV4. These have corresponding python classes that are all derived from the OOI base class.  These classes are defined in the Octopoes models directory.
+
+They are used everywhere, both in code and as strings in json definition files.
+
+When we talk about objects, we usually mean instance of such a class, or a 'record' in the database.
 
 Example: the boefje for shodan
 ------------------------------
@@ -60,7 +70,7 @@ Example: the boefje for shodan
 The boefje calling shodan gives a good first impression of its capabilities. The boefje includes the following files.
 
 - __init.py__, which remains empty
-- boefje.json, containing the normalizers and objects in the data model
+- boefje.json, containing the normalizers and classes in the data model
 - cover.jpg, with a matching cat picture for the KATalog
 - description.md, simple documentation of the boefje
 - main.py, the actual boefje
@@ -72,11 +82,9 @@ The boefje calling shodan gives a good first impression of its capabilities. The
 boefje.json
 ***********
 
-boefje.json is the definition of the boefje, with its position in the data model, the associated normalizer, the objects and the findings that the combination of boefje and normalizer can deliver.
+boefje.json is the definition of the boefje, with its position in the data model, the associated normalizer, the object-types and the findings that the combination of boefje and normalizer can deliver.
 
-The objects associated with this boefje are IPAddressV4, IPAddressV6, Finding, CVEFindingType. This boefje consumes IP addresses and produces findings about the open ports, supplemented by the information about these ports.
-
-Shodan comes with an API key, which you can add in the web interface.
+An example:
 
 .. code-block:: json
 
@@ -97,40 +105,16 @@ Shodan comes with an API key, which you can add in the web interface.
         "scan_level": 1
     }
 
-Using the template as a base, you can create a boefje.json for your own boefje. The template starts with the name of your new boefje:
+The object-types associated with this boefje are *IPAddressV4, IPAddressV6, Finding, CVEFindingType.* 
 
+This boefje consumes IP addresses and produces findings about the open ports, supplemented by the information about these ports.
 
-.. code-block:: json
+Using the template as a base, you can create a boefje.json for your own boefje. Just change the *name* and *id* to the name your boefje.
 
-    {
-        "id": "boefje",
-        "name": "Boefje",
-        "description": "Beschrijving"
-    }
+NOTE: If your boefje needs object-types that do not exist, you will need to create those. This will be described later in the document.
 
-Your boefje collects information to turn it into objects. Specify the objects your boefje needs. Those objects come from the data model. Should the information you want to retrieve not yet be incorporated into the data model, you need to modify it separately. How this works is described in general terms later in this document.
+The boefje also uses variables from the web interface, like the Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface. Use *environment_keys* for this. The schema.json file defines the metadata for these fields.
 
-.. code-block:: json
-
-        {
-            "consumes": [
-                "object uit het datamodel",
-                "nog een object uit het datamodel"
-            ],
-            "produces": [
-                "informatie",
-                "informatie"
-            ]
-        }
-
-The boefje can also bring variables from the web interface, like in Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface.
-
-.. code-block:: json
-
-    {
-        "environment_keys": ["SHODAN_API"],
-        "scan_level": 1
-    }
 
 schema.json
 ***********
@@ -206,7 +190,7 @@ The normalizer imports the raw information, extracts the objects from it and giv
 normalizer.json
 ***************
 
-The normalizers translate the output of a boefje into objects that fit the data model. Each normalizer defines what input it accepts and what it provides. In the case of the shodan normalizer, it involves the entire output of the shodan boefje (created based on IP address), where findings and ports come out. The normalizer.json defines these:
+The normalizers translate the output of a boefje into objects that fit the data model. Each normalizer defines what input it accepts and what object-types it provides. In the case of the shodan normalizer, it involves the entire output of the shodan boefje (created based on IP address), where findings and ports come out. The normalizer.json defines these:
 
 .. code-block:: json
 
