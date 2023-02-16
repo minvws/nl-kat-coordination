@@ -98,12 +98,48 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
+        # FIXME: check if we need to return here, we still need to create a
+        # scheduled job if it doesn't exist. And do we need to create one
+        # for the normalizers, and when?
+        import pdb; pdb.set_trace()
         task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
             self.ctx.task_store.update_task(task)
             return
 
-        self.ctx.task_store.create_task(task)
+        task_db = self.ctx.task_store.create_task(task)
+
+        item_hash = p_item.hash
+        if item_hash is None:
+            return
+
+        # TODO: what is determination on not to add one, a one off?
+
+        # Determine whether we need to create a recurring scheduled job
+        scheduled_job = self.ctx.job_store.get_scheduled_job_by_hash(item_hash)
+        if scheduled_job is not None:
+            task_db.scheduled_job_id = scheduled_job.id
+            self.ctx.task_store.update_task(task_db)
+
+            scheduled_job.checked_at = datetime.datetime.utcnow()
+            self.ctx.job_store.update_scheduled_job(scheduled_job)
+            return
+
+        scheduled_job = models.ScheduledJob(
+            hash=item_hash,
+            enabled=True,
+            scheduler_id=self.scheduler_id,
+            p_item=p_item,
+            checked_at=datetime.datetime.utcnow(),
+            created_at=datetime.datetime.utcnow(),
+            modified_at=datetime.datetime.utcnow(),
+        )
+        scheduled_job_db = self.ctx.job_store.create_scheduled_job(scheduled_job)
+
+        task_db.scheduled_job_id = scheduled_job_db.id
+        self.ctx.task_store.update_task(task_db)
+
+        return
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We

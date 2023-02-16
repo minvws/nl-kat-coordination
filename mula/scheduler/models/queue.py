@@ -11,31 +11,6 @@ from scheduler.utils import GUID
 from .base import Base
 
 
-class PrioritizedItem(BaseModel):
-    """Representation of an queue.PrioritizedItem on the priority queue. Used
-    for unmarshalling of priority queue prioritized items to a JSON
-    representation.
-    """
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
-
-    scheduler_id: Optional[str]
-
-    # A unique generated identifier for the object contained in data
-    hash: Optional[str]
-
-    priority: Optional[int]
-
-    data: Dict
-
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    class Config:
-        orm_mode = True
-
-
 class PrioritizedItemORM(Base):
     """Representation of an queue.PrioritizedItem on the priority queue. Used
     for marshalling of priority queue prioritized items to a database
@@ -63,6 +38,35 @@ class PrioritizedItemORM(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+
+class PrioritizedItem(BaseModel):
+    """Representation of an queue.PrioritizedItem on the priority queue. Used
+    for unmarshalling of priority queue prioritized items to a JSON
+    representation.
+    """
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+
+    scheduler_id: Optional[str]
+
+    priority: Optional[int]
+
+    # TODO: maybe rename to data_hash, to be more descriptive?
+    # A unique generated identifier for the object contained in data
+    hash: Optional[str]
+
+    data: Dict
+
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    class Config:
+        orm_mode = True
+
+    class Meta:
+        orm_model = PrioritizedItemORM
 
 
 class Queue(BaseModel):

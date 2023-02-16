@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import Boefje, Organisation, Plugin
@@ -13,10 +13,37 @@ class Katalogus(HTTPService):
     def __init__(self, host: str, source: str, timeout: int = 5):
         super().__init__(host, source, timeout)
 
+        # Example:
+        #
+        # {
+        #     "organisation_id": {
+        #          "plugin-id": {}
+        #     }
+        # }
         self.organisations_plugin_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
+
+        # Example:
+        #
+        # {
+        #     "organisation_id": {
+        #         "plugin-type": {
+        #             "plugin-id": {}
+        #         }
+        #     }
+        # }
         self.organisations_boefje_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
         self.organisations_normalizer_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
 
+        # Example:
+        #
+        # {
+        #     "organisation_id": {
+        #          "plugin-id": {}
+        #     }
+        # }
+        self.organisations_new_boefjes_cache: Dict = {}
+
+        # Initialize the caches
         self._flush_organisations_plugin_cache()
         self._flush_organisations_normalizer_type_cache()
         self._flush_organisations_boefje_type_cache()
@@ -26,9 +53,19 @@ class Katalogus(HTTPService):
         orgs = self.get_organisations()
 
         for org in orgs:
-            self.organisations_plugin_cache[org.id] = {
-                plugin.id: plugin for plugin in self.get_plugins_by_organisation(org.id)
-            }
+            if org.id not in self.organisations_plugin_cache:
+                self.organisations_plugin_cache[org.id] = {}
+
+            plugins = self.get_plugins_by_organisation(org.id)
+            for plugin in plugins:
+                if plugin.id in self.organisations_plugin_cache[org.id]:
+                    continue
+
+                # Add new boefje to organisation plugin cache and new boefjes cache
+                self.organisations_plugin_cache[org.id][plugin.id] = plugin
+
+                # Add new boefje to new boefjes cache
+                self.organisations_new_boefjes_cache.setdefault(org.id, {})[plugin.id] = plugin
 
     def _flush_organisations_boefje_type_cache(self) -> None:
         """boefje.consumes -> plugin type boefje"""
@@ -39,17 +76,13 @@ class Katalogus(HTTPService):
             self.organisations_boefje_type_cache[org.id] = {}
 
             for plugin in self.get_plugins_by_organisation(org.id):
-                if plugin.type != "boefje":
-                    continue
-
-                # NOTE: backwards compatability, when it is a boefje the
-                # consumes field is a string field.
-                if isinstance(plugin.consumes, str):
-                    self.organisations_boefje_type_cache[org.id].setdefault(plugin.consumes, []).append(plugin)
+                if plugin.type != "boefje" and plugin.enabled is False:  # TODO: CHECK THIS enabled
                     continue
 
                 for type_ in plugin.consumes:
                     self.organisations_boefje_type_cache[org.id].setdefault(type_, []).append(plugin)
+
+        self.logger.debug("flushed boefje cache [cache=%s]", self.organisations_boefje_type_cache.cache)
 
     def _flush_organisations_normalizer_type_cache(self) -> None:
         """normalizer.consumes -> plugin type normalizer"""
@@ -60,11 +93,13 @@ class Katalogus(HTTPService):
             self.organisations_normalizer_type_cache[org.id] = {}
 
             for plugin in self.get_plugins_by_organisation(org.id):
-                if plugin.type != "normalizer":
+                if plugin.type != "normalizer" and not plugin.enabled:  # TODO: CHECK THIS enabled
                     continue
 
                 for type_ in plugin.consumes:
                     self.organisations_normalizer_type_cache[org.id].setdefault(type_, []).append(plugin)
+
+        self.logger.debug("flushed normalizer cache [cache=%s]", self.organisations_normalizer_type_cache.cache)
 
     @exception_handler
     def get_boefjes(self) -> List[Boefje]:
@@ -115,3 +150,8 @@ class Katalogus(HTTPService):
         except dict_utils.ExpiredError:
             self._flush_organisations_normalizer_type_cache()
             return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
+
+    def get_new_boefjes_by_org_id(self, organisation_id: str) -> List[Plugin]:
+        new_boefjes = self.organisations_new_boefjes_cache[organisation_id].values()
+        self.organisations_new_boefjes_cache[organisation_id] = {}
+        return new_boefjes

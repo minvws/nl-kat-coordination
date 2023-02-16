@@ -7,9 +7,10 @@ from typing import List
 import pika
 import requests
 
-from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
-
+from .errors import (OOINotFoundError, PluginDisabledError,
+                     PluginNotFoundError, TaskAlreadyRunningError,
+                     TaskGracePeriodNotPassedError,
+                     TaskNotAllowedToRunException)
 from .scheduler import Scheduler
 
 
@@ -42,22 +43,22 @@ class BoefjeScheduler(Scheduler):
         self.organisation: Organisation = organisation
 
     def populate_queue(self) -> None:
-        """Populate the PriorityQueue.
+        """Populate the PriorityQueue
 
-        While the queue is not full we will try to fill it with items that have
-        been created, e.g. when the scan level was increased (since oois start
-        with a scan level 0 and will not start any boefjes).
-
-        When this is done we will try and fill the rest of the queue with
-        random items from octopoes and schedule them accordingly.
+        This method will populate the queue with tasks. It will first
+        create tasks for oois that have a scan level change. Then it
+        will create tasks for newly added/enabled boefjes. Finally it
+        will create tasks for oois that have not been checked in a
+        while.
         """
         self.push_tasks_for_scan_profile_mutations()
 
-        self.push_tasks_for_random_objects()
+        self.push_tasks_for_new_boefjes()
+
+        self.push_tasks_for_scheduled_jobs()
 
     def push_tasks_for_scan_profile_mutations(self) -> None:
         """Create tasks for oois that have a scan level change.
-
         We loop until we don't have any messages on the queue anymore.
         """
         while not self.queue.full():
@@ -133,62 +134,9 @@ class BoefjeScheduler(Scheduler):
                     organization=self.organisation.id,
                 )
 
-                if not self.is_task_allowed_to_run(boefje, ooi):
-                    self.logger.debug(
-                        "Task is not allowed to run: %s [organisation.id=%s, scheduler_id=%s]",
-                        task,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
-
                 try:
-                    is_running = self.is_task_running(task)
-                    if is_running:
-                        self.logger.debug(
-                            "Task is already running: %s [organisation.id=%s, scheduler_id=%s]",
-                            task,
-                            self.organisation.id,
-                            self.scheduler_id,
-                        )
-                        continue
-                except Exception as exc_running:
-                    self.logger.warning(
-                        "Could not check if task is running: %s [organisation.id=%s, scheduler_id=%s]",
-                        task,
-                        self.organisation.id,
-                        self.scheduler_id,
-                        exc_info=exc_running,
-                    )
-                    continue
-
-                try:
-                    grace_period_passed = self.has_grace_period_passed(task)
-                    if not grace_period_passed:
-                        self.logger.debug(
-                            "Task has not passed grace period: %s [organisation.id=%s, scheduler_id=%s]",
-                            task,
-                            self.organisation.id,
-                            self.scheduler_id,
-                        )
-                        continue
-                except Exception as exc_grace_period:
-                    self.logger.warning(
-                        "Could not check if grace period has passed: %s [organisation.id=%s, scheduler_id=%s]",
-                        task,
-                        self.organisation.id,
-                        self.scheduler_id,
-                        exc_info=exc_grace_period,
-                    )
-                    continue
-
-                if self.queue.is_item_on_queue_by_hash(task.hash):
-                    self.logger.debug(
-                        "Task is already on queue: %s [organisation.id=%s, scheduler_id=%s]",
-                        task,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
+                    self.do_checks(task, ooi)
+                except Exception:
                     continue
 
                 prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
@@ -242,182 +190,168 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-    def push_tasks_for_random_objects(self) -> None:
-        """Push tasks for random objects from octopoes to the queue."""
-        tries = 0
-        while not self.queue.full():
-            time.sleep(1)
-
-            try:
-                random_oois = self.ctx.services.octopoes.get_random_objects(
-                    organisation_id=self.organisation.id,
-                    n=10,
-                )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
-                self.logger.warning(
-                    "Could not get random oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
-                    self.organisation.name,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                return
-
-            if len(random_oois) == 0:
-                self.logger.debug(
-                    "No random oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
-                    self.organisation.name,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                break
-
-            for ooi in random_oois:
-                self.logger.debug(
-                    "Checking random ooi %s for rescheduling of tasks [organisation.id=%s, scheduler_id=%s]",
-                    ooi.primary_key,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-
-                boefjes = self.get_boefjes_for_ooi(ooi)
-                if boefjes is None or len(boefjes) == 0:
-                    self.logger.debug(
-                        "No boefjes available for ooi %s, skipping [organisation.id=%s, scheduler_id=%s]",
-                        ooi,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
-
-                for boefje in boefjes:
-                    # NOTE: It is possible that a random ooi will not generate
-                    # any tasks, for instance when all ooi's and their boefjes
-                    # have already run. When this happens 3 times in a row we
-                    # will break out of the loop. We reset the tries counter to
-                    # 0 when we do get new tasks from an ooi.
-                    if tries >= 3:
-                        self.logger.debug(
-                            "No tasks generated for 3 tries, breaking out of loop "
-                            "[organisation.id=%s, scheduler_id=%s]",
-                            self.organisation.id,
-                            self.scheduler_id,
-                        )
-                        return
-
-                    task = BoefjeTask(
-                        boefje=Boefje.parse_obj(boefje),
-                        input_ooi=ooi.primary_key,
-                        organization=self.organisation.id,
-                    )
-
-                    if not self.is_task_allowed_to_run(boefje, ooi):
-                        self.logger.debug(
-                            "Task is not allowed to run: %s [organisation.id=%s, scheduler_id=%s]",
-                            task,
-                            self.organisation.id,
-                            self.scheduler_id,
-                        )
-                        tries += 1
-                        continue
-
-                    try:
-                        is_running = self.is_task_running(task)
-                        if is_running:
-                            self.logger.debug(
-                                "Task is already running: %s [organisation.id=%s, scheduler_id=%s]",
-                                task,
-                                self.organisation.id,
-                                self.scheduler_id,
-                            )
-                            continue
-                    except Exception as exc_running:
-                        self.logger.warning(
-                            "Could not check if task is running: %s [organisation.id=%s, scheduler_id=%s]",
-                            task,
-                            self.organisation.id,
-                            self.scheduler_id,
-                            exc_info=exc_running,
-                        )
-                        continue
-
-                    try:
-                        grace_period_passed = self.has_grace_period_passed(task)
-                        if not grace_period_passed:
-                            self.logger.debug(
-                                "Task has not passed grace period: %s [organisation.id=%s, scheduler_id=%s]",
-                                task,
-                                self.organisation.id,
-                                self.scheduler_id,
-                            )
-                            continue
-                    except Exception as exc_grace_period:
-                        self.logger.warning(
-                            "Could not check if grace period has passed: %s [organisation.id=%s, scheduler_id=%s]",
-                            task,
-                            self.organisation.id,
-                            self.scheduler_id,
-                            exc_info=exc_grace_period,
-                        )
-                        continue
-
-                    if self.queue.is_item_on_queue_by_hash(task.hash):
-                        self.logger.debug(
-                            "Task is already on queue: %s [organisation.id=%s, scheduler_id=%s]",
-                            task,
-                            self.organisation.id,
-                            self.scheduler_id,
-                        )
-                        continue
-
-                    prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
-                    score = self.ranker.rank(
-                        SimpleNamespace(
-                            prior_tasks=prior_tasks,
-                            task=task,
-                        )
-                    )
-                    # We need to create a PrioritizedItem for this task, to
-                    # push it to the priority queue.
-                    p_item = PrioritizedItem(
-                        id=task.id,
-                        scheduler_id=self.scheduler_id,
-                        priority=score,
-                        data=task,
-                        hash=task.hash,
-                    )
-
-                    while not self.is_space_on_queue():
-                        self.logger.debug(
-                            "Waiting for queue to have enough space, not adding task to queue "
-                            "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
-                            self.queue.qsize(),
-                            self.queue.maxsize,
-                            self.organisation.id,
-                            self.scheduler_id,
-                        )
-                        time.sleep(1)
-
-                    self.logger.info(
-                        "Created rescheduled boefje task: %s for ooi: %s "
-                        "[boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
-                        boefje.name,
-                        ooi.primary_key,
-                        boefje.id,
-                        ooi.primary_key,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-
-                    self.push_item_to_queue(p_item)
-        else:
-            self.logger.warning(
-                "Boefjes queue is full, not populating with new tasks "
-                "[queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
+    def push_tasks_for_new_boefjes(self) -> None:
+        """When new boefjes are added or enabled we find the oois that
+        boefjes can run on, and create tasks for it.
+        """
+        if self.queue.full():
+            self.logger.info(
+                "Boefjes queue is full, not populating with new tasks [qsize=%d, org_id=%s, scheduler_id=%s]",
                 self.queue.qsize(),
                 self.organisation.id,
                 self.scheduler_id,
             )
             return
+
+        try:
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
+        except (
+            pika.exceptions.ConnectionClosed,
+            pika.exceptions.ChannelClosed,
+            pika.exceptions.ChannelClosedByBroker,
+            pika.exceptions.AMQPConnectionError,
+        ) as e:
+            self.logger.warning(
+                "Could not connect to rabbitmq queue: %s [org_id=%s, scheduler_id=%s]",
+                f"{self.organisation.id}__scan_profile_increments",
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            if self.stop_event.is_set():
+                raise e
+
+        if new_boefjes is None:
+            return
+
+        self.logger.debug(
+            "Received new boefjes: %s [org_id=%s, scheduler_id=%s]",
+            new_boefjes,
+            self.organisation.id,
+            self.scheduler_id,
+        )
+
+        for boefje in new_boefjes:
+            # TODO: get all ooi's for this organisation that this boefje could
+            # be run on. This needs to come from octopoes.
+            oois = self.ctx.services.octopoes.get_objects_by_object_types(boefje.consumes)
+
+            for ooi in oois:
+                task = BoefjeTask(
+                    boefje=boefje,
+                    input_ooi=ooi.primary_key,
+                    organization=self.organisation.id,
+                )
+
+                try:
+                    self.do_checks(task, ooi)
+                except Exception:
+                    continue
+
+                prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
+                score = self.ranker.rank(
+                    SimpleNamespace(
+                        prior_tasks=prior_tasks,
+                        task=task,
+                    )
+                )
+
+                # We need to create a PrioritizedItem for this task, to push
+                # it to the priority queue.
+                p_item = PrioritizedItem(
+                    id=task.id,
+                    scheduler_id=self.scheduler_id,
+                    priority=score,
+                    data=task,
+                    hash=task.hash,
+                )
+
+                while not self.is_space_on_queue():
+                    self.logger.debug(
+                        "Waiting for queue to have enough space, not adding tasks queue [qsize=%d, maxsize=%d, org_id=%s, scheduler_id=%s]",
+                        self.queue.qsize(),
+                        self.queue.maxsize,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    time.sleep(1)
+
+                self.push_item_to_queue(p_item)
+
+    def push_tasks_for_scheduled_jobs(self):
+        """Get all the tasks that are scheduled to run and push them to the
+        queue.
+        """
+        # Get all scheduled jobs that need to be rescheduled. We only
+        # consider jobs that have been processed by the scheduler after the set
+        # grace period.
+        #
+        # NOTE: now we check when a task has been checked since the grace
+        # period, this can be updated to retrieve all the task with the
+        # next_check set.
+        scheduled_jobs, _ = self.ctx.job_store.get_scheduled_jobs(
+            scheduler_id=self.scheduler_id,
+            enabled=True,
+            max_checked_at=datetime.utcnow() - timedelta(seconds=self.ctx.config.pq_populate_grace_period),  # FIXME: check this with datetime
+        )
+
+        for job in scheduled_jobs:
+
+            # Create a new task, and a new p_item
+            task = BoefjeTask(**job.p_item.data)
+            if task is None:
+                self.logger.debug(
+                    "Not able to parse task from job: %s [org_id=%s, scheduler_id=%s]",
+                    job,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+
+            try:
+                self.evaluate_task(task)
+            except Exception as exc_eval:
+                # TODO: logging
+                job.enabled = False
+                import pdb; pdb.set_trace()
+                self.ctx.job_store.update_scheduled_job(job)
+                continue
+
+            try:
+                self.do_checks(task)
+            except Exception as exc_checks:
+                # TODO: logging
+                continue
+
+            # FIXME: should be present from the relationship
+            prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
+            # prior_tasks = job.tasks
+            score = self.ranker.rank(
+                SimpleNamespace(
+                    prior_tasks=prior_tasks,
+                    task=task,
+                ),
+            )
+
+            # We need to create a PrioritizedItem for this task, to rank and to
+            # push it to the priority queue.
+            p_item = PrioritizedItem(
+                id=task.id,
+                scheduler_id=self.scheduler_id,
+                priority=score,
+                data=task,
+                hash=task.hash,
+            )
+
+            while not self.is_space_on_queue():
+                self.logger.debug(
+                    "Waiting for queue to have enough space, not adding task to queue [qsize=%d, maxsize=%d, org_id=%s, scheduler_id=%s]",
+                    self.queue.qsize(),
+                    self.queue.maxsize,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                time.sleep(1)
+
+            self.push_item_to_queue(p_item)
 
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
@@ -575,7 +509,6 @@ class BoefjeScheduler(Scheduler):
     def has_grace_period_passed(self, task: BoefjeTask) -> bool:
         """Check if the grace period has passed for a task in both the
         datastore and bytes.
-
         NOTE: We don't check the status of the task since this needs to be done
         by checking if the task is still running or not.
         """
@@ -655,10 +588,8 @@ class BoefjeScheduler(Scheduler):
 
     def get_boefjes_for_ooi(self, ooi) -> List[Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
-
         Args:
             ooi: The models.OOI to get boefjes for.
-
         Returns:
             A list of Plugin of type Boefje that can be run on the ooi.
         """
@@ -698,3 +629,110 @@ class BoefjeScheduler(Scheduler):
         )
 
         return boefjes
+
+    def evaluate_task(self, task: models.BoefjeTask) -> None:
+        """Check if the ooi (when set), and the boefje is still available."""
+        ooi = None
+        if task.input_ooi is not None:
+            try:
+                ooi = self.ctx.services.octopoes.get_object(
+                    self.organisation.id, task.input_ooi,
+                )
+            except Exception as exc_octopoes:
+                raise exc_octopoes
+
+        if ooi is None and task.input_ooi is not None:
+            raise OOINotFoundError()
+
+        plugin = None
+        try:
+            plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                task.boefje.id, self.organisation.id,
+            )
+        except Exception as exc_katalogus:
+            raise exc_katalogus
+
+        if plugin is None:
+            raise PluginNotFoundError()
+
+        if plugin.enabled is False:
+            raise PluginDisabledError()
+
+        return None
+
+    def do_checks(self, task: models.BoefjeTask, ooi: models.OOI = None) -> None:
+        """Do checks to make sure we're able to run this task.
+        """
+        # Make it is possible we have a boefje task without an associated
+        # ooi, make sure we get the ooi when there is an association.
+        if ooi is None and task.primary_key is not None:  # TODO: check the primary_key
+            try:
+                ooi = self.ctx.services.octopoes.get_object(
+                    self.organisation.id, task.input_ooi,
+                )
+            except Exception as exc_octopoes:
+                raise exc_octopoes
+
+        if not self.is_task_allowed_to_run(task.boefje, ooi):
+            self.logger.debug(
+                "Task is not allowed to run: %s [org_id=%s, scheduler_id=%s]",
+                task,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            raise TaskNotAllowedToRunException(
+                f"Task is not allowed to run: {task} [org_id={self.organisation.id}, scheduler_id={self.scheduler_id}]",
+            )
+
+        try:
+            is_running = self.is_task_running(task)
+            if is_running:
+                self.logger.debug(
+                    "Task is already running: %s [org_id=%s, scheduler_id=%s]",
+                    task,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                raise TaskAlreadyRunningError(
+                    f"Task is already running: {task} [org_id={self.organisation.id}, scheduler_id={self.scheduler_id}]"
+                )
+        except Exception as exc_running:
+            self.logger.warning(
+                "Could not check if task is running: %s [org_id=%s, scheduler_id=%s]",
+                task,
+                self.organisation.id,
+                self.scheduler_id,
+                exc_info=exc_running,
+            )
+            raise exc_running
+
+        try:
+            grace_period_passed = self.has_grace_period_passed(task)
+            if not grace_period_passed:
+                self.logger.debug(
+                    "Task has not passed grace period: %s [org_id=%s, scheduler_id=%s]",
+                    task,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                raise TaskGracePeriodNotPassedError(
+                    f"Task has not passed grace period: {task} [org_id={self.organisation.id}, scheduler_id={self.scheduler_id}]"
+                )
+        except Exception as exc_grace_period:
+            self.logger.warning(
+                "Could not check if grace period has passed: %s [org_id=%s, scheduler_id=%s]",
+                task,
+                self.organisation.id,
+                self.scheduler_id,
+                exc_info=exc_grace_period,
+            )
+            raise exc_grace_period
+
+        if self.queue.is_item_on_queue_by_hash(task.hash):
+            self.logger.debug(
+                "Task is already on queue: %s [org_id=%s, scheduler_id=%s]",
+                task,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            raise TaskAlreadyOnQueueuError(f"Task is already on queue: {task} [org_id={self.organisation.id}, scheduler_id={self.scheduler_id}]")

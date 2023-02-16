@@ -48,14 +48,13 @@ graph TB
     Scheduler["Scheduler<br/>[system]"]
     TaskRunner["Task Runner<br/>[software system]"]
 
-    Rocky--"Create object"-->Octopoes
     Rocky--"Create scan job<br/>HTTP POST"--->Scheduler
 
-    Octopoes--"Get random oois<br/>HTTP GET"-->Scheduler
+    Octopoes--"Scan Profile Mutation<br/>AMQP"-->RabbitMQ
 
-    RabbitMQ--"Get latest created oois<br/>Get latest raw files<br/>AMQP"-->Scheduler
+    RabbitMQ--"1. Get scan profile mutation<br/>2. Get latest raw files<br/>AMQP"-->Scheduler
 
-    Katalogus--"Get available plugins<br/>HTTP GET"-->Scheduler
+    Katalogus--"1. Get organizations</br>2. Get available plugins<br/>HTTP GET"-->Scheduler
     Bytes--"Get last run boefje<br/>HTTP GET"-->Scheduler
 
     Scheduler--"Pop task of queue"-->TaskRunner
@@ -73,11 +72,19 @@ Following we review how different dataflows, from the `boefjes` and the
 `normalizers` are implemented within the `Scheduler` system. The following
 events within a KAT installation will trigger dataflows in the `Scheduler`:
 
+App:
+
 * When a plugin is enabled or disabled (`monitor_organisations`)
 
 * When an organisation is created or deleted (`monitor_organisations`)
 
-* When a scan level is increased (`get_latest_object`)
+Boefje scheduler:
+
+* When a new boefje has been added (`get_new_boefjes_by_org_id`)
+
+* When a scan level is increased (`get_scan_profile_mutation`)
+
+Normalizer scheduler:
 
 * When a raw file is created (`get_latest_raw_data`)
 
@@ -172,21 +179,25 @@ flowchart TB
 * The `BoefjeScheduler` implementation of the `populate_queue()` method will:
 
   - Continuously get the latest scan level changes of ooi's from a message
-    queue that was sent by octopoes (`get_latest_objects()`). The tasks
-    created from these ooi's (`tasks = ooi * boefjes`) from this queue will
+    queue that is sent from octopoes received on a rabbitmq message queue
+    (`get_scan_profile_mutations`). The tasks created from these ooi's
+    (`tasks = ooi * boefjes`) from this queue will
     get the priority of 2.
 
-  - To fill up the queue, and to enforce that we reschedule tasks we get
-    random ooi's from octopoes (`get_random_objects`). The tasks of from these
-    ooi's (`tasks = ooi * boefjes`) will get the priority that has been
-    calculated by the ranker. At the moment a task will get the priority of 3,
-    when 7 days have gone by (e.g. how longer it hasn't been checked the
-    higher the priority it will get). For everything that hasn't been check
-    before the 7 days it will scale the priority appropriately.
+  - Check newly enabled/added boefjes, and check the ooi's in the datastore
+    that match the boefje and tasks that need to be created.
 
-  - In order for a  created tasks from `get_latest_objects()` and
-    `get_random_objects()` to be elligible for execution, the task adhere to
-    the following (`create_tasks_for_ooi()`):
+  - To fill up the queue, and to enforce that we reschedule tasks we reference
+    the scheduler internal ooi datastore. We only consider oois that have been
+    processed by the scheduler after the set grace period. The tasks of from
+    these ooi's (`tasks = ooi * boefjes`) will get the priority that has been
+    calculated by the ranker. At the moment a task will get the priority of 3,
+    when 7 days have gone by (e.g. how longer it hasn't been checked the higher
+    the priority it will get). For everything that hasn't been check before the
+    7 days it will scale the priority appropriately.
+
+  - In order for a created tasks o be elligible for execution, the tasks adhere
+    to the following (`create_tasks_for_ooi()`):
 
     * Should not have run within the 'grace period', meaning a task should not
       be scheduled again within the last 24 hours (can be configured).

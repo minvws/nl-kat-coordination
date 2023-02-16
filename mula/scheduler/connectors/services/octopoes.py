@@ -21,6 +21,14 @@ class Octopoes(HTTPService):
         response = self.get(url)
         return [OOI(**ooi) for ooi in response.json()]
 
+    # TODO: method needs to be added to octopoes_api
+    @exception_handler
+    def get_objects_by_object_types(self, organisation_id: str, object_types: List[str]) -> List[OOI]:
+        """Get all oois from octopoes"""
+        url = f"{self.host}/{organisation_id}/objects/"
+        response = self.get(url)
+        return [OOI(**ooi) for ooi in response.json()]
+
     @exception_handler
     def get_random_objects(self, organisation_id: str, n: int) -> List[OOI]:
         """Get `n` random oois from octopoes"""

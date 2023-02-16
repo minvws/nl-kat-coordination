@@ -3,14 +3,9 @@ import unittest
 from unittest import mock
 
 from scheduler import config, models, queues, rankers, repositories, schedulers
-from tests.factories import (
-    BoefjeMetaFactory,
-    OOIFactory,
-    OrganisationFactory,
-    PluginFactory,
-    RawDataFactory,
-    ScanProfileFactory,
-)
+from tests.factories import (BoefjeMetaFactory, OOIFactory,
+                             OrganisationFactory, PluginFactory,
+                             RawDataFactory, ScanProfileFactory)
 from tests.utils import functions
 
 
@@ -54,24 +49,38 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
+    @mock.patch("scheduler.context.AppContext.job_store.get_scheduled_jobs")
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type")
     @mock.patch("scheduler.schedulers.NormalizerScheduler.create_tasks_for_raw_data")
     def test_populate_normalizer_queue_get_latest_raw_data(
-        self, mock_create_tasks_for_raw_data, mock_get_normalizers, mock_get_latest_raw_data
+        self,
+        mock_get_scheduled_jobs,
+        mock_create_tasks_for_raw_data,
+        mock_get_normalizers,
+        mock_get_latest_raw_data
     ):
+        # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(type="boefje", scan_level=0)
-        boefje_task = models.BoefjeTask(
+
+        task = models.BoefjeTask(
             boefje=boefje,
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
-        task = functions.create_task(p_item)
-        self.mock_ctx.task_store.create_task(task)
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        # task = functions.create_task(p_item)
+        # self.mock_ctx.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
             id=p_item.id.hex,
