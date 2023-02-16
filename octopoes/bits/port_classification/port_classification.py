@@ -16,7 +16,7 @@ def run(
 
     port = input_ooi.port
     if port in SA_PORTS:
-        open_sa_port = KATFindingType(id="KAT-560")
+        open_sa_port = KATFindingType(id="KAT-OPEN-SYSADMIN-PORT")
         yield open_sa_port
         yield Finding(
             finding_type=open_sa_port.reference,
@@ -25,7 +25,7 @@ def run(
         )
 
     if port in DB_PORTS:
-        ft = KATFindingType(id="KAT-561")
+        ft = KATFindingType(id="KAT-OPEN-DATABASE-PORT")
         yield ft
         yield Finding(
             finding_type=ft.reference,
@@ -34,7 +34,7 @@ def run(
         )
 
     if port not in COMMON_TCP_PORTS and port not in SA_PORTS and port not in DB_PORTS:
-        kat = KATFindingType(id="KAT-562")
+        kat = KATFindingType(id="KAT-UNCOMMON-OPEN-PORT")
         yield kat
         yield Finding(
             finding_type=kat.reference,

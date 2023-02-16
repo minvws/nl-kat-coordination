@@ -72,7 +72,7 @@ def run(
 
         yield from _create_kat_finding(
             header.reference,
-            kat_id="KAT-607",
+            kat_id="KAT-CSP-VULNERABILITIES",
             description=description,
         )
 

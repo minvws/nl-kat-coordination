@@ -131,7 +131,7 @@ context("Boefjes", () => {
       cy.get("table thead")
         .contains("Findings")
         .parents("table")
-        .contains("KAT-600 @ mispo.es");
+        .contains("KAT-NO-DNSSEC @ mispo.es");
     });
   });
 });
