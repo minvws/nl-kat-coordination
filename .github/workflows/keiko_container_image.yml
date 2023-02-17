@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - keiko/**
+  pull_request:
+    paths:
+      - keiko/**
 
 jobs:
   create_container_image:
