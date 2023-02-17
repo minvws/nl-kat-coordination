@@ -1,16 +1,17 @@
 import logging
-from typing import Dict, Optional, List
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from fastapi.responses import Response
 from pydantic import BaseModel
+from starlette.responses import JSONResponse
 
 from bytes.auth import authenticate_token
 from bytes.events.events import RawFileReceived, NormalizerMetaReceived
 from bytes.events.manager import EventManager
 from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataMeta
 from bytes.rabbitmq import create_event_manager
-from bytes.database.sql_meta_repository import create_meta_data_repository, ObjectNotFoundException
+from bytes.database.sql_meta_repository import create_meta_data_repository, ObjectNotFoundException, MetaIntegrityError
 from bytes.repositories.meta_repository import MetaDataRepository, BoefjeMetaFilter, RawDataFilter
 
 logger = logging.getLogger(__name__)
@@ -24,11 +25,16 @@ RAW_TAG = "Raw"
 def create_boefje_meta(
     boefje_meta: BoefjeMeta,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
-) -> Dict[str, str]:
-    with meta_repository:
-        meta_repository.save_boefje_meta(boefje_meta)
+) -> JSONResponse:
+    try:
+        with meta_repository:
+            meta_repository.save_boefje_meta(boefje_meta)
+    except MetaIntegrityError:
+        return JSONResponse(
+            {"status": "failed", "message": "Integrity error: object might already exist"}, status_code=400
+        )
 
-    return {"status": "success"}
+    return JSONResponse({"status": "success"}, status_code=201)
 
 
 @router.get("/boefje_meta/{boefje_meta_id}", response_model=BoefjeMeta, tags=[BOEFJE_META_TAG])
@@ -71,9 +77,14 @@ def create_normalizer_meta(
     normalizer_meta: NormalizerMeta,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
-) -> Dict[str, str]:
-    with meta_repository:
-        meta_repository.save_normalizer_meta(normalizer_meta)
+) -> JSONResponse:
+    try:
+        with meta_repository:
+            meta_repository.save_normalizer_meta(normalizer_meta)
+    except MetaIntegrityError:
+        return JSONResponse(
+            {"status": "failed", "message": "Integrity error: object might already exist"}, status_code=400
+        )
 
     event = NormalizerMetaReceived(
         organization=normalizer_meta.boefje_meta.organization,
@@ -81,7 +92,7 @@ def create_normalizer_meta(
     )
     event_manager.publish(event)
 
-    return {"status": "success"}
+    return JSONResponse({"status": "success"}, status_code=201)
 
 
 @router.get("/normalizer_meta/{normalizer_meta_id}", response_model=NormalizerMeta, tags=[NORMALIZER_META_TAG])

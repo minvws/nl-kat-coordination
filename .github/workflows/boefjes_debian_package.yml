@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - boefjes/**
+      - octopoes/**
+  pull_request:
+    paths:
+      - boefjes/**
+      - octopoes/**
 
 jobs:
   build-package:
