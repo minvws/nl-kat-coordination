@@ -105,7 +105,7 @@ An example:
         "scan_level": 1
     }
 
-The object-types associated with this boefje are *IPAddressV4, IPAddressV6, Finding, CVEFindingType.* 
+The object-types associated with this boefje are *IPAddressV4, IPAddressV6, Finding, CVEFindingType.*
 
 This boefje consumes IP addresses and produces findings about the open ports, supplemented by the information about these ports.
 
@@ -363,7 +363,7 @@ The specification for a bit is broad, but limited by the data model: Whereas Boe
             description=f"Port {port} is not a common port and should possibly not be open.",
         )
 
-Bits can recognize patterns and derive new objects from them. 
+Bits can recognize patterns and derive new objects from them.
 
 For example: The Bit for *internet.nl* can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions:
 
