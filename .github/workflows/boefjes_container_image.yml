@@ -46,7 +46,7 @@ jobs:
           # https://github.com/docker/cli/issues/2827
           context: .
           file: boefjes/Dockerfile
-          push: true
+          push: ${{ github.event.pull_request.head.repo.owner.login == github.repository_owner }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
