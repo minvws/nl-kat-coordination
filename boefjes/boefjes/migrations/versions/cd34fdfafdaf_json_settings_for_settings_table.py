@@ -31,7 +31,7 @@ def upgrade() -> None:
     conn = op.get_bind()
 
     # Seed the original data into the new table
-    conn.execute("INSERT INTO settings (values, organisation_pk, plugin_id) SELECT json_object_agg(key, value) AS values, plugin_id, organisation_pk, plugin_id FROM setting GROUP BY organisation_pk, plugin_id;")
+    conn.execute("INSERT INTO settings (values, plugin_id, organisation_pk) SELECT json_object_agg(key, value) AS values, plugin_id, organisation_pk FROM setting GROUP BY organisation_pk, plugin_id;")
 
     op.drop_table('setting')
     # ### end Alembic commands ###
