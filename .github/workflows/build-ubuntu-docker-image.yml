@@ -6,6 +6,9 @@ on:
   push:
     paths:
       - "packaging/ubuntu/Dockerfile"
+  pull_request:
+    paths:
+      - "packaging/ubuntu/Dockerfile"
 
 env:
   REGISTRY: ghcr.io

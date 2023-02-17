@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - mula/**
+  pull_request:
+    paths:
+      - mula/**
 
 jobs:
   build-package:
