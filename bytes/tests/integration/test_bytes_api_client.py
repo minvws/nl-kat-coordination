@@ -24,6 +24,14 @@ def test_boefje_meta(bytes_api_client: BytesAPIClient) -> None:
 
     assert boefje_meta == retrieved_boefje_meta
 
+    with pytest.raises(HTTPError) as ctx:
+        bytes_api_client.save_boefje_meta(boefje_meta)
+
+    assert ctx._excinfo[1].response.json() == {
+        "status": "failed",
+        "message": "Integrity error: object might already exist",
+    }
+
 
 def test_filtered_boefje_meta(bytes_api_client: BytesAPIClient) -> None:
     boefje_meta = get_boefje_meta()
