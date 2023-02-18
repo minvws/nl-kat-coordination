@@ -3,6 +3,11 @@ name: Rocky Create container image
 on:
   push:
     paths:
+      - octopoes/**
+      - rocky/**
+  pull_request:
+    paths:
+      - octopoes/**
       - rocky/**
 
 jobs:
@@ -41,7 +46,7 @@ jobs:
           # https://github.com/docker/cli/issues/2827
           context: .
           file: rocky/Dockerfile
-          push: true
+          push: ${{ github.event_name == "push" || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
