@@ -20,5 +20,5 @@ max-line-length = 120
 
 [tool.vulture]
 min_confidence = 90
-exclude = ["/tests/", "/.venv/"]
+exclude = ["/tests/", "/.venv/", "/venv/"]
 paths = ["."]
