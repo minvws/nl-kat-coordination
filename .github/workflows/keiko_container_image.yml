@@ -43,7 +43,7 @@ jobs:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827
           context: keiko
-          push: ${{ github.event_name == "push" || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
+          push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
