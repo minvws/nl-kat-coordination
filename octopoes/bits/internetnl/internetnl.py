@@ -10,7 +10,6 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[Union[Finding, Website]],
 ) -> Iterator[OOI]:
-
     # only websites have to comply with the internetnl rules
     websites = [websites for websites in additional_oois if isinstance(websites, Website)]
     if not websites:
@@ -27,7 +26,9 @@ def run(
         "KAT-NO-HSTS": "This website has at least one webpage with a missing Strict-Transport-Policy header",
         "KAT-NO-CSP": "This website has at least one webpage with a missing Content-Security-Policy header",
         "KAT-NO-X-FRAME-OPTIONS": "This website has at least one webpage with a missing X-Frame-Options header",
-        "KAT-NO-X-CONTENT-TYPE-OPTIONS": "This website has at least one webpage with a missing X-Content-Type-Options header",
+        "KAT-NO-X-CONTENT-TYPE-OPTIONS": (
+            "This website has at least one webpage with a missing X-Content-Type-Options header"
+        ),
         "KAT-CSP-VULNERABILITIES": "This website has at least one webpage with a mis-configured CSP header",
         "KAT-HSTS-VULNERABILITIES": "This website has at least one webpage with a mis-configured HSTS header",
         "KAT-NO-CERTIFICATE": "This website does not have an SSL certificate",
