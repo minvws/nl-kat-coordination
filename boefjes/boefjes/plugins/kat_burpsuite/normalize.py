@@ -33,7 +33,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     #  with parser.getElementsByTagName('issues').attributes['exportTime'].value
 
     for issue in parser.getElementsByTagName("issue"):
-
         host_element = issue.getElementsByTagName("host")[0]
         host = host_element.firstChild.nodeValue
 
