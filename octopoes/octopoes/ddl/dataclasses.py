@@ -4,7 +4,7 @@ from __future__ import annotations
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from logging import getLogger
-from typing import Any, Iterator, List, Literal, Union
+from typing import Any, Dict, Iterator, List, Literal, Optional, Tuple, Type, Union
 
 import mmh3
 from graphql import (
@@ -29,11 +29,11 @@ class BaseObjectMeta:
     Provide the class attributes in a separate class to avoid Pydantic Metaclass
     """
 
-    _natural_key_attrs: list[str]
+    _natural_key_attrs: List[str]
     _human_readable_format: str
 
     @classmethod
-    def get_natural_key_attrs(cls) -> list[str]:
+    def get_natural_key_attrs(cls) -> List[str]:
         """Make natural_key_attrs public."""
         return cls._natural_key_attrs
 
@@ -47,8 +47,8 @@ class BaseObject(BaseModel, BaseObjectMeta):
     """Base class for all database objects."""
 
     object_type: str
-    primary_key: str | None
-    human_readable: str | None
+    primary_key: Optional[str]
+    human_readable: Optional[str]
 
     @staticmethod
     def str_value(value: Any) -> str:
@@ -94,7 +94,7 @@ class DataclassGenerator:
     def __init__(self, schema: CompleteSchema):
         """Initialize instance."""
         self.schema = schema
-        self.dataclasses: dict[str, type[BaseObject]] = {}
+        self.dataclasses: Dict[str, Type[BaseObject]] = {}
         self.generate_pydantic_models()
 
     @staticmethod
@@ -103,7 +103,7 @@ class DataclassGenerator:
         real_type = field.type.of_type if getattr(field.type, "of_type", None) else field.type
         return isinstance(real_type, (GraphQLObjectType, GraphQLUnionType))
 
-    def get_deepest_type(self, type_: GraphQLOutputType, is_list: bool = False) -> tuple[GraphQLOutputType, bool]:
+    def get_deepest_type(self, type_: GraphQLOutputType, is_list: bool = False) -> Tuple[GraphQLOutputType, bool]:
         """Get the deepest type of a GraphQL type."""
         is_list = is_list or isinstance(type_, GraphQLList)
         if getattr(type_, "of_type", None):
@@ -139,7 +139,7 @@ class DataclassGenerator:
             new_type = List[new_type]
         return new_type
 
-    def generate_pydantic_model(self, object_type: GraphQLObjectType) -> type[BaseObject]:
+    def generate_pydantic_model(self, object_type: GraphQLObjectType) -> Type[BaseObject]:
         """Generate a dataclass for the given object type."""
         if object_type.name in self.dataclasses:
             return self.dataclasses[object_type.name]
@@ -151,11 +151,11 @@ class DataclassGenerator:
             if name not in ("object_type", "primary_key", "human_readable"):
                 fields[name] = (self.graphql_field_to_python_type(type_), ...)
 
-        base_model: type[BaseObject] = BaseObject
+        base_model: Type[BaseObject] = BaseObject
         if self.schema.ooi_type in object_type.interfaces:
             base_model = OOI
 
-        dataclass: type[BaseObject] = create_model(object_type.name, __base__=base_model, **fields)  # type: ignore
+        dataclass: Type[BaseObject] = create_model(object_type.name, __base__=base_model, **fields)  # type: ignore
 
         dataclass._natural_key_attrs = (  # pylint: disable=protected-access
             object_type.fields["primary_key"].args["natural_key"].default_value
@@ -172,6 +172,6 @@ class DataclassGenerator:
         for object_type in self.schema.object_types:
             self.generate_pydantic_model(object_type)
 
-    def parse_obj(self, obj: dict[str, Any]) -> Any:
+    def parse_obj(self, obj: Dict[str, Any]) -> Any:
         """Parse a json object into a Dataclass variant type."""
         return self.dataclasses[obj["object_type"]](**obj)

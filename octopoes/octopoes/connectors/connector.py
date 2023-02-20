@@ -18,21 +18,19 @@ class Connector:
     def is_host_available(self, hostname: str, port: int) -> bool:
         """Check if the host is available.
 
-        Returns
-        -------
+        Returns:
             A boolean
         """
         try:
             socket.create_connection((hostname, port))
             return True
-        except OSError:
+        except socket.error:
             return False
 
     def is_host_healthy(self, host: str, health_endpoint: str) -> bool:
         """Check if host is healthy by inspecting the host's health endpoint.
 
-        Returns
-        -------
+        Returns:
             A boolean
         """
         try:
@@ -49,8 +47,7 @@ class Connector:
         Args:
             func: A python callable that needs to be retried.
 
-        Returns
-        -------
+        Returns:
             A boolean signifying whether or not the func was executed successfully.
         """
         for i in range(10):

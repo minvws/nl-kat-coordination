@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timezone
 from enum import Enum
 from http import HTTPStatus
-from typing import Any, Callable, Dict, Optional, Tuple, Union, cast
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union, cast
 
 import requests
 from pydantic import BaseModel, Field
@@ -31,7 +31,7 @@ Operation = Tuple[OperationType, Union[str, Dict[str, Any]], Optional[datetime]]
 class Transaction(BaseModel):
     """A XTDB transaction, consisting of a list of operations."""
 
-    operations: list[Operation] = Field(alias="tx-ops")
+    operations: List[Operation] = Field(alias="tx-ops")
 
     class Config:
         """Serialize operations as 'tx-ops' in JSON."""
@@ -49,7 +49,7 @@ class XTDBHTTPSession(requests.Session):
         self._base_url = base_url
         self.headers["Accept"] = "application/json"
 
-    def request(self, method: str, url: str | bytes, **kwargs) -> requests.Response:  # type: ignore
+    def request(self, method: str, url: Union[str, bytes], **kwargs) -> requests.Response:  # type: ignore
         """Execute request with prepended base URL."""
         return super().request(method, self._base_url + str(url), **kwargs)
 
@@ -57,13 +57,13 @@ class XTDBHTTPSession(requests.Session):
 class XTDBStatus(BaseModel):
     """Status response from XTDB."""
 
-    version: str | None
-    revision: str | None
-    index_version: int | None = Field(None, alias="indexVersion")
-    consumer_state: str | None = Field(None, alias="consumerState")
-    kv_store: str | None = Field(None, alias="kvStore")
-    estimate_num_keys: int | None = Field(None, alias="estimateNumKeys")
-    size: int | None
+    version: Optional[str]
+    revision: Optional[str]
+    index_version: Optional[int] = Field(None, alias="indexVersion")
+    consumer_state: Optional[str] = Field(None, alias="consumerState")
+    kv_store: Optional[str] = Field(None, alias="kvStore")
+    estimate_num_keys: Optional[int] = Field(None, alias="estimateNumKeys")
+    size: Optional[int]
 
 
 class XTDBHTTPClient:
@@ -91,7 +91,7 @@ class XTDBHTTPClient:
         self._verify_response(res)
         return XTDBStatus.parse_raw(res.content)
 
-    def get_entity(self, entity_id: str, valid_time: datetime | None = None) -> dict[str, Any]:
+    def get_entity(self, entity_id: str, valid_time: Optional[datetime] = None) -> Dict[str, Any]:
         """Load entity from XTDB."""
         if valid_time is None:
             valid_time = datetime.now(timezone.utc)
@@ -99,7 +99,7 @@ class XTDBHTTPClient:
         self._verify_response(res)
         return cast(Dict[str, Any], res.json())
 
-    def query(self, query: str, valid_time: datetime | None = None) -> Any:
+    def query(self, query: str, valid_time: Optional[datetime] = None) -> Any:
         """Query XTDB."""
         if valid_time is None:
             valid_time = datetime.now(timezone.utc)
@@ -117,7 +117,7 @@ class XTDBHTTPClient:
         self._session.get("/await-tx", params={"txId": transaction_id})
         logger.info("Transaction completed [txId=%s]", transaction_id)
 
-    def submit_transaction(self, operations: list[Operation]) -> None:
+    def submit_transaction(self, operations: List[Operation]) -> None:
         """Submit transaction to XTDB."""
         res = self._session.post(
             "/submit-tx",
@@ -151,15 +151,15 @@ class XTDBSession:
         """Initialize instance."""
         self.client = client
 
-        self._operations: list[Operation] = []
+        self._operations: List[Operation] = []
         self._committed = False
-        self.post_commit_callbacks: list[Callable[..., Any]] = []
+        self.post_commit_callbacks: List[Callable[..., Any]] = []
 
     def __enter__(self) -> XTDBSession:
         """Enter context manager."""
         return self
 
-    def __exit__(self, _exc_type: type[Exception], _exc_value: str, _exc_traceback: str) -> None:
+    def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         """Exit context manager."""
         self.commit()
 

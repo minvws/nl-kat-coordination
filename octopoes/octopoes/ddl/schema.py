@@ -1,4 +1,4 @@
-"""Module defines the classes that represent the Octopoes GraphQL schema layers.
+"""This module defines the classes that represent the Octopoes GraphQL schema layers.
 
 The Octopoes GraphQL schema is hierarchical, composed of the following layers:
 

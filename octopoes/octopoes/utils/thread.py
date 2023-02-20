@@ -6,7 +6,8 @@ from typing import Any, Callable, Optional
 
 
 class ThreadRunner(threading.Thread):
-    """ThreadRunner extends threading.Thread to allow for graceful shutdown using event signalling.
+    """
+    ThreadRunner extends threading.Thread to allow for graceful shutdown using event signalling.
 
     Additionally, to the standard threading.Thread attributes we use the following attributes.
 

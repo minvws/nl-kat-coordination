@@ -22,8 +22,7 @@ def get_katalogus(uri: str) -> Katalogus:
 class AppContext:
     """AppContext allows shared data between modules.
 
-    Attributes
-    ----------
+    Attributes:
         config:
             A settings.Settings object containing configurable application
             settings
@@ -42,7 +41,7 @@ class AppContext:
 
         # Load logging configuration
         try:
-            with open(self.config.log_cfg) as log_config:
+            with open(self.config.log_cfg, "r") as log_config:
                 logging.config.dictConfig(yaml.safe_load(log_config))
                 self.logger.info("Configured loggers with config: %s", self.config.log_cfg)
         except FileNotFoundError:

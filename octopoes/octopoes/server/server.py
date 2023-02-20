@@ -173,16 +173,13 @@ class Server:
         """Serve graphiql frontend."""
         # load template from disk
         graphiql_template = Path(__file__).parent / "static" / "graphiql.html"
-        with open(graphiql_template) as graphiql_html:
+        with open(graphiql_template, "r") as graphiql_html:
             template = graphiql_html.read()
             return Template(template).substitute(ingester_id=ingester_id)
 
     def post_graphql(self, ingester_id: str, request_body: GraphqlRequest) -> Any:
         """Execute grqpql query."""
-        result = graphql_sync(
-            self.ingesters[ingester_id].current_schema.api_schema.schema,
-            request_body.query,
-        )
+        result = graphql_sync(self.ingesters[ingester_id].current_schema.api_schema.schema, request_body.query)
         return result.formatted
 
     def post_object(

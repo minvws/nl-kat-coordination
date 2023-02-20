@@ -109,10 +109,7 @@ class Ingester:  # pylint: disable=too-many-instance-attributes
         return data["object_type"]
 
     def resolve_graphql_type(
-        self,
-        parent_obj: Any,
-        type_info: GraphQLResolveInfo,
-        **kwargs: Any,  # pylint: disable=unused-argument
+        self, parent_obj: Any, type_info: GraphQLResolveInfo, **kwargs: Any  # pylint: disable=unused-argument
     ) -> Any:
         """Fetch instances of type from XTDB."""
         # outgoing relation
@@ -122,9 +119,7 @@ class Ingester:  # pylint: disable=too-many-instance-attributes
         # backlink
         if parent_obj:
             return self.object_repository.list_by_incoming_relation(
-                parent_obj["primary_key"],
-                type_info.return_type.of_type.name,
-                kwargs["backlink"],
+                parent_obj["primary_key"], type_info.return_type.of_type.name, kwargs["backlink"]
             )
 
         return self.object_repository.list_by_object_type(type_info.return_type.of_type.name)

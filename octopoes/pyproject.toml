@@ -64,6 +64,5 @@ pre-commit = "^2.20.0"
 
 [tool.ruff]
 extend = "../pyproject.toml"
-select = ["E", "F", "ERA", "W", "TID", "DJ", "UP", "RUF", "C90", "PL", "I", "PT", "N"]
+select = ["E", "F", "ERA", "W", "TID", "DJ", "RUF", "C90", "PL", "I", "PT", "N"]
 extend-exclude = ["tests/", "docs/source/conf.py", "packaging/"]
-
