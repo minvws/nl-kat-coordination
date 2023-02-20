@@ -127,6 +127,42 @@ type DNSMXRecord implements BaseObject & OOI & DNSRecordBase {
   mx_hostname(reverse_name: String! = "mx_hostname_of"): Hostname
   ttl: Int
 }
+
+type DNSTXTRecord implements BaseObject & OOI & DNSRecordBase {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["hostname", "type", "value"]): ID!
+  human_readable(format: String! = "{hostname_name} {type} {value}"): String!
+
+  hostname(reverse_name: String! = "dns_txt_records"): Hostname!
+  type: DNSRecordType!
+  value: String!
+  ttl: Int
+}
+
+type DNSNSRecord implements BaseObject & OOI & DNSRecordBase {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["hostname", "type", "value"]): ID!
+  human_readable(format: String! = "{hostname_name} {type} {value}"): String!
+
+  hostname(reverse_name: String! = "dns_ns_records"): Hostname!
+  target_hostname(reverse_name: String! = "ns_record_targets"): Hostname!
+  type: DNSRecordType!
+  value: String!
+  ttl: Int
+}
+
+type DNSCNAMERecord implements BaseObject & OOI & DNSRecordBase {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["hostname", "type", "value"]): ID!
+  human_readable(format: String! = "{hostname_name} {type} {value}"): String!
+
+  hostname(reverse_name: String! = "dns_cname_records"): Hostname!
+  target_hostname(reverse_name: String! = "cname_target_of"): Hostname!
+  type: DNSRecordType!
+  value: String!
+  ttl: Int
+}
+
 type DNSSOARecord implements BaseObject & OOI & DNSRecordBase {
   object_type: String!
   primary_key(natural_key: [String!] = ["hostname", "type", "value"]): ID!
@@ -144,4 +180,23 @@ type DNSSOARecord implements BaseObject & OOI & DNSRecordBase {
 
   primary_ns(reverse_name: String! = "primary_ns_of"): Hostname
   admin_email(reverse_name: String! = "dns_soa_admin_email_of"): Hostname
+}
+
+type NXDOMAIN implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["hostname", "type", "value"]): ID!
+  human_readable(format: String! = "{hostname_name} {type} {value}"): String!
+
+  hostname(reverse_name: String! = "nxdomain_hostname"): Hostname!
+  value: String!
+}
+
+type DNSZone implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["hostname", "type", "value"]): ID!
+  human_readable(format: String! = "{hostname_name} {type} {value}"): String!
+
+  hostname(reverse_name: String! = "dns_zone_hostname"): Hostname!
+  parent(reverse_name: String! = "child_dns_zones"): DNSZone!
+  value: String!
 }
