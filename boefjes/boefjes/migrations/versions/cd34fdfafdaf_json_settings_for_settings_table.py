@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table(
         "settings",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("values", sa.String(length=256), nullable=False),
+        sa.Column("values", sa.String(length=512), nullable=False),
         sa.Column("plugin_id", sa.String(length=64), nullable=False),
         sa.Column("organisation_pk", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["organisation_pk"], ["organisation.pk"], ondelete="CASCADE"),
