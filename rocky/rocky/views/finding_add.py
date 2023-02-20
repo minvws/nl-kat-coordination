@@ -15,6 +15,8 @@ from octopoes.models.ooi.findings import (
     RetireJSFindingType,
     SnykFindingType,
     FindingType,
+    CWEFindingType,
+    CAPECFindingType,
 )
 from octopoes.models.types import OOI_TYPES
 
@@ -23,7 +25,15 @@ from rocky.views.ooi_view import BaseOOIFormView
 from tools.forms.finding_type import FindingAddForm
 from tools.view_helpers import get_ooi_url
 
-from octopoes.octopoes.models.ooi.findings import CWEFindingType, CAPECFindingType
+
+FINDING_TYPES_PREFIXES = {
+    "CVE": CVEFindingType,
+    "SNYK": SnykFindingType,
+    "CWE": CWEFindingType,
+    "CAPEC": CAPECFindingType,
+    "RetireJS": RetireJSFindingType,
+    "KAT": KATFindingType,
+}
 
 
 def get_finding_type_from_id(
@@ -31,23 +41,11 @@ def get_finding_type_from_id(
 ) -> FindingType:
     finding_type_id = finding_type_id.upper()
 
-    if finding_type_id.upper().startswith("CVE"):
-        # Fetch CVE info
-        finding_type = CVEFindingType(id=finding_type_id)
-    elif finding_type_id.upper().startswith("RetireJS"):
-        # Fetch RetireJS info
-        finding_type = RetireJSFindingType(id=finding_type_id)
-    elif finding_type_id.upper().startswith("SNYK"):
-        # Fetch RetireJS info
-        finding_type = SnykFindingType(id=finding_type_id)
-    elif finding_type_id.upper().startswith("CWE"):
-        finding_type = CWEFindingType(id=finding_type_id)
-    elif finding_type_id.upper().startswith("CAPEC"):
-        finding_type = CAPECFindingType(id=finding_type_id)
+    prefix = finding_type_id.upper().split("-")[0]
+    if prefix in FINDING_TYPES_PREFIXES:
+        return FINDING_TYPES_PREFIXES[prefix](id=finding_type_id)
     else:
-        finding_type = KATFindingType(id=finding_type_id)
-
-    return finding_type
+        raise ValueError("Invalid finding type prefix")
 
 
 class FindingAddView(BaseOOIFormView):
