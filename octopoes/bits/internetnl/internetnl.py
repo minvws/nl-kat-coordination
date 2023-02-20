@@ -19,16 +19,18 @@ def run(
 
     result = ""
     internetnl_findings = {
-        "KAT-581": "This webserver does not have an IPv6 address",
+        "KAT-WEBSERVER-NO-IPV6": "This webserver does not have an IPv6 address",
         "KAT-NAMESERVER-NO-TWO-IPV6": "This webserver does not have at least two nameservers with an IPv6 address",
-        "KAT-600": "This webserver is not DNSSEC signed",
-        "KAT-601": "The DNSSEC signature of this webserver is not valid",
-        "KAT-500": "This website has at least one webpage with a missing Strict-Transport-Policy header",
-        "KAT-501": "This website has at least one webpage with a missing Content-Security-Policy header",
-        "KAT-504": "This website has at least one webpage with a missing X-Frame-Options header",
-        "KAT-509": "This website has at least one webpage with a missing X-Content-Type-Options header",
-        "KAT-607": "This website has at least one webpage with a mis-configured CSP header",
-        "KAT-606": "This website has at least one webpage with a mis-configured HSTS header",
+        "KAT-NO-DNSSEC": "This webserver is not DNSSEC signed",
+        "KAT-INVALID-DNSSEC": "The DNSSEC signature of this webserver is not valid",
+        "KAT-NO-HSTS": "This website has at least one webpage with a missing Strict-Transport-Policy header",
+        "KAT-NO-CSP": "This website has at least one webpage with a missing Content-Security-Policy header",
+        "KAT-NO-X-FRAME-OPTIONS": "This website has at least one webpage with a missing X-Frame-Options header",
+        "KAT-NO-X-CONTENT-TYPE-OPTIONS": (
+            "This website has at least one webpage with a missing X-Content-Type-Options header"
+        ),
+        "KAT-CSP-VULNERABILITIES": "This website has at least one webpage with a mis-configured CSP header",
+        "KAT-HSTS-VULNERABILITIES": "This website has at least one webpage with a mis-configured HSTS header",
         "KAT-NO-CERTIFICATE": "This website does not have an SSL certificate",
         "KAT-HTTPS-NOT-AVAILABLE": "HTTPS is not available for this website",
         "KAT-SSL-CERT-HOSTNAME-MISMATCH": "The SSL certificate of this website does not match the hostname",

@@ -49,7 +49,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
     # Make Finding if too many ports are opened last week
     if num_new_ports > 10:
-        kat_ooi = KATFindingType(id="KAT-644")
+        kat_ooi = KATFindingType(id="KAT-10-OR-MORE-NEW-PORTS-OPEN")
         yield kat_ooi
         yield Finding(
             finding_type=kat_ooi.reference,

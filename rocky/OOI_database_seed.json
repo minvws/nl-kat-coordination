@@ -221,7 +221,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-500",
+    "pk": "KATFindingType|KAT-NO-HSTS",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -236,7 +236,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-501",
+    "pk": "KATFindingType|KAT-NO-CSP",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -251,7 +251,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-502",
+    "pk": "KATFindingType|KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -266,7 +266,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-503",
+    "pk": "KATFindingType|KAT-NO-EXPLICIT-XSS-PROTECTION",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -281,7 +281,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-504",
+    "pk": "KATFindingType|KAT-NO-X-FRAME-OPTIONS",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -296,7 +296,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-505",
+    "pk": "KATFindingType|KAT-NO-X-DNS-PREFETCH-CONTROL",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -309,7 +309,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-506",
+    "pk": "KATFindingType|KAT-NO-EXCPECT-CT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -324,7 +324,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-507",
+    "pk": "KATFindingType|KAT-NO-PERMISSIONS-POLICY",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -338,7 +338,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-508",
+    "pk": "KATFindingType|KAT-NO-REFERRER-POLICY",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -353,7 +353,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-509",
+    "pk": "KATFindingType|KAT-NO-X-CONTENT-TYPE-OPTIONS",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -368,7 +368,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-540",
+    "pk": "KATFindingType|KAT-SSL-2-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -381,7 +381,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-541",
+    "pk": "KATFindingType|KAT-SSL-3-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -394,7 +394,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-542",
+    "pk": "KATFindingType|KAT-TLS-1.0-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -407,7 +407,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-543",
+    "pk": "KATFindingType|KAT-TLS-1.1-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -420,7 +420,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-544",
+    "pk": "KATFindingType|KAT-TLS-1.1-AND-1.2-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -433,7 +433,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-545",
+    "pk": "KATFindingType|KAT-NO-TLS-1.2",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -446,7 +446,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-546",
+    "pk": "KATFindingType|KAT-NO-TLS-1.3",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -459,7 +459,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-547",
+    "pk": "KATFindingType|KAT-NO-TLS-FALLBACK-SCSV",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -472,7 +472,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-560",
+    "pk": "KATFindingType|KAT-OPEN-SYSADMIN-PORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -485,7 +485,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-561",
+    "pk": "KATFindingType|KAT-OPEN-DATABASE-PORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -498,7 +498,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-562",
+    "pk": "KATFindingType|KAT-UNCOMMON-OPEN-PORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -511,7 +511,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-581",
+    "pk": "KATFindingType|KAT-WEBSERVER-NO-IPV6",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -524,7 +524,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-580",
+    "pk": "KATFindingType|KAT-NAMESERVER-IPV6-NOT-REACHABLE",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -537,7 +537,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-582",
+    "pk": "KATFindingType|KAT-WEBSERVER-IPV6-NOT-REACHABLE",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -550,7 +550,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-583",
+    "pk": "KATFindingType|KAT-NOT-ENOUGH-IPV6-NAMESERVERS",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -563,7 +563,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-584",
+    "pk": "KATFindingType|KAT-WEBSERVER-NO-IPV6",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -576,7 +576,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-585",
+    "pk": "KATFindingType|KAT-IPV4-IPV6-INCONSISTENT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -589,7 +589,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-600",
+    "pk": "KATFindingType|KAT-NO-DNSSEC",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -602,7 +602,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-601",
+    "pk": "KATFindingType|KAT-INVALID-DNSSEC",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -615,7 +615,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-606",
+    "pk": "KATFindingType|KAT-HSTS-VULNERABILITIES",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -627,7 +627,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-607",
+    "pk": "KATFindingType|KAT-CSP-VULNERABILITIES",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -639,7 +639,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-621",
+    "pk": "KATFindingType|KAT-JAVASCRIPT-VULNERABILITIES",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -651,7 +651,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-640",
+    "pk": "KATFindingType|KAT-POTENTIAL-MALWARE",
     "fields": {
       "last_updated": "2021-09-29T14:46:09.835Z",
       "data": {
@@ -664,7 +664,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-641",
+    "pk": "KATFindingType|KAT-EXPOSED-SOFTWARE",
     "fields": {
       "last_updated": "2021-09-29T16:46:09.835Z",
       "data": {
@@ -677,7 +677,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-642",
+    "pk": "KATFindingType|KAT-VERIFIED-VULNERABILITY",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -690,7 +690,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-611",
+    "pk": "KATFindingType|KAT-INVALID-SPF-SYNTAX",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -714,7 +714,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-613",
+    "pk": "KATFindingType|KAT-SPF-TOO-LONG",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -726,7 +726,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-614",
+    "pk": "KATFindingType|KAT-INVALID-IP-IN-SPF",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -738,7 +738,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-615",
+    "pk": "KATFindingType|KAT-SPF-REDIRECT-LOOP",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -774,7 +774,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-618",
+    "pk": "KATFindingType|KAT-SPF-INCLUDE-LOOP",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -798,7 +798,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-643",
+    "pk": "KATFindingType|KAT-DICOM-EXPOSED",
     "fields": {
       "last_updated": "2021-11-12T17:24:09.835Z",
       "data": {
@@ -811,7 +811,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-644",
+    "pk": "KATFindingType|KAT-10-OR-MORE-NEW-PORTS-OPEN",
     "fields": {
       "last_updated": "2021-11-12T17:24:09.835Z",
       "data": {
@@ -923,7 +923,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-645",
+    "pk": "KATFindingType|KAT-LEAKIX-CRITICAL",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -936,7 +936,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-646",
+    "pk": "KATFindingType|KAT-LEAKIX-HIGH",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -949,7 +949,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-647",
+    "pk": "KATFindingType|KAT-LEAKIX-MEDIUM",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -962,7 +962,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-648",
+    "pk": "KATFindingType|KAT-LEAKIX-LOW",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -975,7 +975,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-649",
+    "pk": "KATFindingType|KAT-LEAKIX-RECOMMENDATION",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -988,7 +988,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-654",
+    "pk": "KATFindingType|KAT-SOFTWARE-UPDATE-AVAILABLE",
     "fields": {
       "last_updated": "2022-01-27T09:01:09.835Z",
       "data": {
@@ -1001,7 +1001,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-660",
+    "pk": "KATFindingType|KAT-NO-GREEN-HOSTING",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -1176,7 +1176,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "ADRFindingType|API-03",
+    "pk": "ADRFindingType|API-NONSTANDARD-HTTP",
     "fields": {
       "last_updated": "2023-02-09T15:42:42.000Z",
       "data": {
@@ -1188,20 +1188,19 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "ADRFindingType|API-16",
+    "pk": "ADRFindingType|API-NO-OPENAPI",
     "fields": {
       "last_updated": "2023-02-09T15:42:42.000Z",
       "data": {
         "description": "Use OpenAPI Specification for documentation",
         "risk": "Recommendation"
-
       },
       "consult_api": false
     }
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "ADRFindingType|API-20",
+    "pk": "ADRFindingType|API-NO-MAJOR-VERSION-IN-URI",
     "fields": {
       "last_updated": "2023-02-09T15:42:42.000Z",
       "data": {
@@ -1213,7 +1212,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "ADRFindingType|API-48",
+    "pk": "ADRFindingType|API-TRAILING-SLASHES",
     "fields": {
       "last_updated": "2023-02-09T15:42:42.000Z",
       "data": {
@@ -1225,7 +1224,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "ADRFindingType|API-51",
+    "pk": "ADRFindingType|API-NO-OAS-JSON-STANDARD",
     "fields": {
       "last_updated": "2023-02-09T15:42:42.000Z",
       "data": {
@@ -1237,7 +1236,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "ADRFindingType|API-56",
+    "pk": "ADRFindingType|API-NO-SEMANTIC-VERSIONING",
     "fields": {
       "last_updated": "2023-02-09T15:42:42.000Z",
       "data": {
@@ -1249,7 +1248,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "ADRFindingType|API-57",
+    "pk": "ADRFindingType|API-NO-COMPLETE-VERSION-RESPONSE",
     "fields": {
       "last_updated": "2023-02-09T15:42:42.000Z",
       "data": {

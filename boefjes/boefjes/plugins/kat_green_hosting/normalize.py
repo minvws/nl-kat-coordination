@@ -14,7 +14,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     website_reference = Reference.from_str(pk)
 
     if not data["green"]:
-        ft = KATFindingType(id="KAT-660")
+        ft = KATFindingType(id="KAT-NO-GREEN-HOSTING")
         yield ft
         yield Finding(
             finding_type=ft.reference,
