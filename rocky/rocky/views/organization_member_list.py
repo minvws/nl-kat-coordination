@@ -17,7 +17,8 @@ from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 class PageActions(Enum):
     GIVE_CLEARANCE = "give_clearance"
     WITHDRAW_CLEARANCE = "withdraw_clearance"
-
+    VERIFY = "verify"
+    UNVERIFY = "unverify"
 
 @class_view_decorator(otp_required)
 class OrganizationMemberListView(
@@ -57,6 +58,10 @@ class OrganizationMemberListView(
             elif action == PageActions.WITHDRAW_CLEARANCE.value:
                 organizationmember.trusted_clearance_level = 0
                 organizationmember.acknowledged_clearance_level = 0
+            elif action == PageActions.VERIFY.value:
+                organizationmember.verified = True
+            elif action == PageActions.UNVERIFY.value:
+                organizationmember.verified = False
             else:
                 raise Exception(f"Unhandled allowed action: {action}")
             organizationmember.save()

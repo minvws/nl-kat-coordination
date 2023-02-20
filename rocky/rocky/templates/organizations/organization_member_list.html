@@ -21,6 +21,7 @@
             <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Grant/revoke permisson to set OOI clearance levels' %}</th>
+            <th>{% translate 'Verified' %}</th>
           </tr>
         </thead>
         <tbody>
@@ -55,6 +56,13 @@
                     {% endif %}
                   {% endfor %}
                 {% endfor %}
+              </td>
+              <td>
+                {% if member.verified %}
+                    {% include 'partials/single_action_form.html' with btn_text="Unverify" action='unverify' key='member_id' value=member.id btn_class="ghost" %}
+                  {% else %}
+                    {% include 'partials/single_action_form.html' with btn_text="Verify" action='verify' key='member_id' value=member.id %}
+                {% endif %}
               </td>
             </tr>
           {% endfor %}
