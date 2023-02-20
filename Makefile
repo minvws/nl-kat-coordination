@@ -11,7 +11,7 @@ UNAME := $(shell uname)
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-kat: env-if-empty clean clone # This should give you a clean install
+kat: env-if-empty clean # This should give you a clean install
 	make build
 	make up
 

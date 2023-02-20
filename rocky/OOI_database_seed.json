@@ -1173,5 +1173,90 @@
       },
       "consult_api": false
     }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-03",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Only apply standard HTTP methods",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-16",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Use OpenAPI Specification for documentation",
+        "risk": "Recommendation"
+
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-20",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Include the major version number in the URI",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-48",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Leave off trailing slashes from URIs",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-51",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Publish OAS document at a standard location in JSON-format",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-56",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Adhere to the Semantic Versioning model when releasing API changes",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-57",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Return the full version number in a response header",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
   }
 ]

@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from uuid import uuid4
 
 from django.shortcuts import redirect
 from django.urls.base import reverse
@@ -57,9 +58,13 @@ class FindingTypeAddView(OctopoesView, FormView):
         }
 
         info.save()
-        declaration = Declaration(ooi=finding_type, valid_time=datetime.now(timezone.utc))
 
-        get_bytes_client(self.organization.code).add_manual_proof(BytesClient.raw_from_declarations([declaration]))
+        task_id = uuid4()
+        declaration = Declaration(ooi=finding_type, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
+
+        get_bytes_client(self.organization.code).add_manual_proof(
+            task_id, BytesClient.raw_from_declarations([declaration])
+        )
         self.api_connector.save_declaration(declaration)
 
         return redirect(get_ooi_url("ooi_detail", finding_type.primary_key, self.organization.code))
