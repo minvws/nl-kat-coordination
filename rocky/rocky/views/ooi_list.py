@@ -88,7 +88,6 @@ class OOIListView(BaseOOIListView):
     def _set_scan_profiles(
         self, selected_oois: List[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
     ) -> HttpResponse:
-
         try:
             self.verify_raise_clearance_level(level.value)
         except IndemnificationNotPresentException:
@@ -232,7 +231,6 @@ class OOIListExportView(OOIListView):
             )
 
         if file_type == "json":
-
             response = HttpResponse(
                 json.dumps(exports),
                 content_type="application/json",
@@ -242,7 +240,6 @@ class OOIListExportView(OOIListView):
             return response
 
         elif file_type == "csv":
-
             response = HttpResponse(
                 content_type="text/csv",
                 headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(observed_at) + ".csv"},
@@ -264,5 +261,4 @@ class OOIListExportView(OOIListView):
             return response
 
         else:
-
             raise Http404("Export type not found")
