@@ -6,15 +6,8 @@ from pydantic import BaseModel, Field
 
 class Boefje(BaseModel):
     """Boefje representation."""
-
     id: str
-    name: Optional[str]
-    description: Optional[str]
     version: Optional[str] = Field(default=None)
-    scan_level: Optional[int] = Field(default=None)
-    consumes: Optional[Union[str, List[str]]]
-    produces: Optional[List[str]]
-    dispatches: Optional[Dict[str, List[str]]] = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):
@@ -23,7 +16,8 @@ class BoefjeMeta(BaseModel):
     id: str
     boefje: Boefje
     input_ooi: Optional[str]
-    arguments: Dict[str, Any]
+    arguments: Dict = {}
     organization: str
+
     started_at: Optional[datetime.datetime]
     ended_at: Optional[datetime.datetime]
