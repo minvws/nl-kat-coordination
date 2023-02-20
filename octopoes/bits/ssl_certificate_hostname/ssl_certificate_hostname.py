@@ -13,7 +13,6 @@ def run(
     input_ooi: X509Certificate,
     additional_oois: List[Union[Website, SubjectAlternativeNameHostname]],
 ) -> Iterator[OOI]:
-
     subject = input_ooi.subject.rstrip(".")
 
     websites = [website for website in additional_oois if isinstance(website, Website)]

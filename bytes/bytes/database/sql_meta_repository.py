@@ -2,6 +2,7 @@ import logging
 import uuid
 from typing import Type, List, Iterator, Optional
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker, Session
 
 from bytes.config import Settings, get_settings
@@ -40,7 +41,11 @@ class SQLMetaDataRepository(MetaDataRepository):
 
     def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         logger.info("Committing session")
-        self.session.commit()
+
+        try:
+            self.session.commit()
+        except IntegrityError as e:
+            raise MetaIntegrityError(str(e)) from e
 
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Inserting meta: %s", boefje_meta.json())
@@ -193,6 +198,10 @@ def create_meta_data_repository() -> Iterator[MetaDataRepository]:
 class ObjectNotFoundException(Exception):
     def __init__(self, cls: Type[SQL_BASE], **kwargs):  # type: ignore
         super().__init__(f"The object of type {cls} was not found for query parameters {kwargs}")
+
+
+class MetaIntegrityError(Exception):
+    """An IntegrityError occurred for the MetaRepository"""
 
 
 def to_boefje_meta_in_db(boefje_meta: BoefjeMeta) -> BoefjeMetaInDB:

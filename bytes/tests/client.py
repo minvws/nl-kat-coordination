@@ -34,7 +34,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
             return function(self, *args, **kwargs)
         except HTTPError as error:
             if error.response.status_code != 401:
-                raise error from HTTPError
+                raise
 
             self.login()
             return function(self, *args, **kwargs)

@@ -10,7 +10,6 @@ def run(
     resource: HTTPResource,
     additional_oois: List[Union[HTTPHeader, ResolvedHostname]],
 ) -> Iterator[OOI]:
-
     if not additional_oois:
         return
 
@@ -20,7 +19,7 @@ def run(
         return
 
     if "strict-transport-security" not in header_keys:
-        ft = KATFindingType(id="KAT-500")
+        ft = KATFindingType(id="KAT-NO-HSTS")
         yield ft
         finding = Finding(
             finding_type=ft.reference,
@@ -30,7 +29,7 @@ def run(
         yield finding
 
     if "content-security-policy" not in header_keys:
-        ft = KATFindingType(id="KAT-501")
+        ft = KATFindingType(id="KAT-NO-CSP")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
@@ -40,7 +39,7 @@ def run(
         yield finding
 
     if "x-permitted-cross-domain-policies" not in header_keys:
-        ft = KATFindingType(id="KAT-502")
+        ft = KATFindingType(id="KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
@@ -50,7 +49,7 @@ def run(
         yield finding
 
     if "x-xss-protection" not in header_keys:
-        ft = KATFindingType(id="KAT-503")
+        ft = KATFindingType(id="KAT-NO-EXPLICIT-XSS-PROTECTION")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
@@ -60,7 +59,7 @@ def run(
         yield finding
 
     if "x-frame-options" not in header_keys:
-        ft = KATFindingType(id="KAT-504")
+        ft = KATFindingType(id="KAT-NO-X-FRAME-OPTIONS")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
@@ -70,7 +69,7 @@ def run(
         yield finding
 
     if "x-dns-prefetch-control" not in header_keys:
-        ft = KATFindingType(id="KAT-505")
+        ft = KATFindingType(id="KAT-NO-X-DNS-PREFETCH-CONTROL")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
@@ -80,7 +79,7 @@ def run(
         yield finding
 
     if "expect-ct" not in header_keys:
-        ft = KATFindingType(id="KAT-506")
+        ft = KATFindingType(id="KAT-NO-EXCPECT-CT")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
@@ -90,7 +89,7 @@ def run(
         yield finding
 
     if "permissions-policy" not in header_keys:
-        ft = KATFindingType(id="KAT-507")
+        ft = KATFindingType(id="KAT-NO-PERMISSIONS-POLICY")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
@@ -100,7 +99,7 @@ def run(
         yield finding
 
     if "referrer-policy" not in header_keys:
-        ft = KATFindingType(id="KAT-508")
+        ft = KATFindingType(id="KAT-NO-REFERRER-POLICY")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
@@ -110,7 +109,7 @@ def run(
         yield finding
 
     if "x-content-type-options" not in header_keys:
-        ft = KATFindingType(id="KAT-509")
+        ft = KATFindingType(id="KAT-NO-X-CONTENT-TYPE-OPTIONS")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,

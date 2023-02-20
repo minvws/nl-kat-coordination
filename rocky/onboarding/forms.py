@@ -27,7 +27,6 @@ class ClearanceLevelSelect(forms.Select):
 
 
 class OnboardingSetClearanceLevelForm(forms.Form):
-
     level = forms.IntegerField(
         label=_("Clearance level"),
         help_text=_(

@@ -9,7 +9,6 @@ def run(
     hostname: Hostname,
     additional_oois: List[Union[DNSARecord, DNSAAAARecord]],
 ) -> Iterator[OOI]:
-
     # only run bit on fqdns
     if not hostname.name.endswith("."):
         return

@@ -9,7 +9,6 @@ def run(
     input_ooi: Website,
     additional_oois,
 ) -> Iterator[OOI]:
-
     if input_ooi.ip_service.tokenized.service.name.lower() != "https":
         return
 

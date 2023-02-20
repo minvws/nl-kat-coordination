@@ -11,12 +11,12 @@
         "recommendation": 8
       },
       "total_by_finding_type": {
-        "KAT-561": 1,
-        "KAT-607": 1,
-        "KAT-500": 1,
-        "KAT-600": 8,
+        "KAT-OPEN-DATABASE-PORT": 1,
+        "KAT-CSP-VULNERABILITIES": 1,
+        "KAT-NO-HSTS": 1,
+        "KAT-NO-DNSSEC": 8,
         "KAT-INTERNETNL": 2,
-        "KAT-560": 1,
+        "KAT-OPEN-SYSADMIN-PORT": 1,
         "RetireJS-jquerymigrate-f348": 1,
         "RetireJS-jquerymigrate-f901": 1,
         "KAT-NO-CERTIFICATE": 1,
@@ -24,15 +24,15 @@
         "CVE-2018-14041": 1,
         "CVE-2018-14042": 1,
         "CVE-2019-8331": 1,
-        "KAT-581": 1,
-        "KAT-502": 1,
-        "KAT-503": 1,
-        "KAT-504": 1,
-        "KAT-505": 1,
-        "KAT-506": 1,
-        "KAT-507": 1,
-        "KAT-508": 1,
-        "KAT-509": 1
+        "KAT-WEBSERVER-NO-IPV6": 1,
+        "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES": 1,
+        "KAT-NO-EXPLICIT-XSS-PROTECTION": 1,
+        "KAT-NO-X-FRAME-OPTIONS": 1,
+        "KAT-NO-X-DNS-PREFETCH-CONTROL": 1,
+        "KAT-NO-EXCPECT-CT": 1,
+        "KAT-NO-PERMISSIONS-POLICY": 1,
+        "KAT-NO-REFERRER-POLICY": 1,
+        "KAT-NO-X-CONTENT-TYPE-OPTIONS": 1
       },
       "total_finding_types": 22,
       "total_by_severity_per_finding_type": {
@@ -44,11 +44,11 @@
       }
     },
     "findings_grouped": {
-      "KAT-561": {
+      "KAT-OPEN-DATABASE-PORT": {
         "finding_type": {
-          "id": "KAT-561",
+          "id": "KAT-OPEN-DATABASE-PORT",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-561",
+          "human_readable": "KAT-OPEN-DATABASE-PORT",
           "object_type": "KATFindingType",
           "risk": "High",
           "description": "A database port is open.",
@@ -61,9 +61,9 @@
         },
         "list": [
           {
-            "id": "Finding|IPPort|internet|134.209.85.72|tcp|3306|KAT-561",
+            "id": "Finding|IPPort|internet|134.209.85.72|tcp|3306|KAT-OPEN-DATABASE-PORT",
             "ooi_type": "Finding",
-            "human_readable": "KAT-561 @ 134.209.85.72:3306/tcp",
+            "human_readable": "KAT-OPEN-DATABASE-PORT @ 134.209.85.72:3306/tcp",
             "object_type": "Finding",
             "proof": null,
             "description": "Port 3306 is a database port and should not be open.",
@@ -78,9 +78,9 @@
               "state": "open"
             },
             "finding_type": {
-              "id": "KAT-561",
+              "id": "KAT-OPEN-DATABASE-PORT",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-561",
+              "human_readable": "KAT-OPEN-DATABASE-PORT",
               "object_type": "KATFindingType",
               "risk": "High",
               "description": "A database port is open.",
@@ -94,11 +94,11 @@
           }
         ]
       },
-      "KAT-607": {
+      "KAT-CSP-VULNERABILITIES": {
         "finding_type": {
-          "id": "KAT-607",
+          "id": "KAT-CSP-VULNERABILITIES",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-607",
+          "human_readable": "KAT-CSP-VULNERABILITIES",
           "object_type": "KATFindingType",
           "risk": "Middle",
           "description": "List of vulnerabilities found in the content security policy (CSP) settings of the http header.",
@@ -110,9 +110,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPHeader|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|Content-Security-Policy|KAT-607",
+            "id": "Finding|HTTPHeader|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|Content-Security-Policy|KAT-CSP-VULNERABILITIES",
             "ooi_type": "Finding",
-            "human_readable": "KAT-607 @ Content-Security-Policy @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-CSP-VULNERABILITIES @ Content-Security-Policy @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "List of CSP findings:\n 1. Unsafe-inline, unsafe-eval and unsafe-hashes should not be used in the CSP settings of an HTTP Header.\n 2. Frame-ancestors has not been defined.\n 3. default-src has not been correctly defined.\n 4. frame-src has not been correctly defined.",
@@ -126,9 +126,9 @@
               "value": "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';"
             },
             "finding_type": {
-              "id": "KAT-607",
+              "id": "KAT-CSP-VULNERABILITIES",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-607",
+              "human_readable": "KAT-CSP-VULNERABILITIES",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "List of vulnerabilities found in the content security policy (CSP) settings of the http header.",
@@ -141,11 +141,11 @@
           }
         ]
       },
-      "KAT-500": {
+      "KAT-NO-HSTS": {
         "finding_type": {
-          "id": "KAT-500",
+          "id": "KAT-NO-HSTS",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-500",
+          "human_readable": "KAT-NO-HSTS",
           "object_type": "KATFindingType",
           "risk": "Medium",
           "impact": "When a browser uses the HTTP protocol, the network connection is not encrypted, so computers in the chain between the web server and the browser can read the data traffic. This makes data and identity theft possible, as well as manipulating data traffic, allowing for all kinds of fraud scenarios. With HSTS, only HTTPS traffic to the website is accepted by the browser.",
@@ -160,9 +160,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-500",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-HSTS",
             "ooi_type": "Finding",
-            "human_readable": "KAT-500 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-HSTS @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header strict-transport-security is missing or not configured correctly.",
@@ -174,9 +174,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-500",
+              "id": "KAT-NO-HSTS",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-500",
+              "human_readable": "KAT-NO-HSTS",
               "object_type": "KATFindingType",
               "risk": "Medium",
               "impact": "When a browser uses the HTTP protocol, the network connection is not encrypted, so computers in the chain between the web server and the browser can read the data traffic. This makes data and identity theft possible, as well as manipulating data traffic, allowing for all kinds of fraud scenarios. With HSTS, only HTTPS traffic to the website is accepted by the browser.",
@@ -192,11 +192,11 @@
           }
         ]
       },
-      "KAT-600": {
+      "KAT-NO-DNSSEC": {
         "finding_type": {
-          "id": "KAT-600",
+          "id": "KAT-NO-DNSSEC",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-600",
+          "human_readable": "KAT-NO-DNSSEC",
           "object_type": "KATFindingType",
           "risk": "Middle",
           "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -209,9 +209,9 @@
         },
         "list": [
           {
-            "id": "Finding|Hostname|internet|mispo.es.|KAT-600",
+            "id": "Finding|Hostname|internet|mispo.es.|KAT-NO-DNSSEC",
             "ooi_type": "Finding",
-            "human_readable": "KAT-600 @ mispo.es.",
+            "human_readable": "KAT-NO-DNSSEC @ mispo.es.",
             "object_type": "Finding",
             "proof": null,
             "description": "Domain mispo.es. is not signed with DNSSEC.",
@@ -224,9 +224,9 @@
               "name": "mispo.es."
             },
             "finding_type": {
-              "id": "KAT-600",
+              "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-600",
+              "human_readable": "KAT-NO-DNSSEC",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -239,9 +239,9 @@
             }
           },
           {
-            "id": "Finding|Hostname|internet|mispo.es|KAT-600",
+            "id": "Finding|Hostname|internet|mispo.es|KAT-NO-DNSSEC",
             "ooi_type": "Finding",
-            "human_readable": "KAT-600 @ mispo.es",
+            "human_readable": "KAT-NO-DNSSEC @ mispo.es",
             "object_type": "Finding",
             "proof": null,
             "description": "Domain mispo.es is not signed with DNSSEC.",
@@ -254,9 +254,9 @@
               "name": "mispo.es"
             },
             "finding_type": {
-              "id": "KAT-600",
+              "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-600",
+              "human_readable": "KAT-NO-DNSSEC",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -269,9 +269,9 @@
             }
           },
           {
-            "id": "Finding|Hostname|internet|ns1.domaindiscount24.net.|KAT-600",
+            "id": "Finding|Hostname|internet|ns1.domaindiscount24.net.|KAT-NO-DNSSEC",
             "ooi_type": "Finding",
-            "human_readable": "KAT-600 @ ns1.domaindiscount24.net.",
+            "human_readable": "KAT-NO-DNSSEC @ ns1.domaindiscount24.net.",
             "object_type": "Finding",
             "proof": null,
             "description": "Domain ns1.domaindiscount24.net. is not signed with DNSSEC.",
@@ -284,9 +284,9 @@
               "name": "ns1.domaindiscount24.net."
             },
             "finding_type": {
-              "id": "KAT-600",
+              "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-600",
+              "human_readable": "KAT-NO-DNSSEC",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -299,9 +299,9 @@
             }
           },
           {
-            "id": "Finding|Hostname|internet|ns1.domaindiscount24.net|KAT-600",
+            "id": "Finding|Hostname|internet|ns1.domaindiscount24.net|KAT-NO-DNSSEC",
             "ooi_type": "Finding",
-            "human_readable": "KAT-600 @ ns1.domaindiscount24.net",
+            "human_readable": "KAT-NO-DNSSEC @ ns1.domaindiscount24.net",
             "object_type": "Finding",
             "proof": null,
             "description": "Domain ns1.domaindiscount24.net is not signed with DNSSEC.",
@@ -314,9 +314,9 @@
               "name": "ns1.domaindiscount24.net"
             },
             "finding_type": {
-              "id": "KAT-600",
+              "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-600",
+              "human_readable": "KAT-NO-DNSSEC",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -329,9 +329,9 @@
             }
           },
           {
-            "id": "Finding|Hostname|internet|ns2.domaindiscount24.net.|KAT-600",
+            "id": "Finding|Hostname|internet|ns2.domaindiscount24.net.|KAT-NO-DNSSEC",
             "ooi_type": "Finding",
-            "human_readable": "KAT-600 @ ns2.domaindiscount24.net.",
+            "human_readable": "KAT-NO-DNSSEC @ ns2.domaindiscount24.net.",
             "object_type": "Finding",
             "proof": null,
             "description": "Domain ns2.domaindiscount24.net. is not signed with DNSSEC.",
@@ -344,9 +344,9 @@
               "name": "ns2.domaindiscount24.net."
             },
             "finding_type": {
-              "id": "KAT-600",
+              "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-600",
+              "human_readable": "KAT-NO-DNSSEC",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -359,9 +359,9 @@
             }
           },
           {
-            "id": "Finding|Hostname|internet|ns2.domaindiscount24.net|KAT-600",
+            "id": "Finding|Hostname|internet|ns2.domaindiscount24.net|KAT-NO-DNSSEC",
             "ooi_type": "Finding",
-            "human_readable": "KAT-600 @ ns2.domaindiscount24.net",
+            "human_readable": "KAT-NO-DNSSEC @ ns2.domaindiscount24.net",
             "object_type": "Finding",
             "proof": null,
             "description": "Domain ns2.domaindiscount24.net is not signed with DNSSEC.",
@@ -374,9 +374,9 @@
               "name": "ns2.domaindiscount24.net"
             },
             "finding_type": {
-              "id": "KAT-600",
+              "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-600",
+              "human_readable": "KAT-NO-DNSSEC",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -389,9 +389,9 @@
             }
           },
           {
-            "id": "Finding|Hostname|internet|ns3.domaindiscount24.net.|KAT-600",
+            "id": "Finding|Hostname|internet|ns3.domaindiscount24.net.|KAT-NO-DNSSEC",
             "ooi_type": "Finding",
-            "human_readable": "KAT-600 @ ns3.domaindiscount24.net.",
+            "human_readable": "KAT-NO-DNSSEC @ ns3.domaindiscount24.net.",
             "object_type": "Finding",
             "proof": null,
             "description": "Domain ns3.domaindiscount24.net. is not signed with DNSSEC.",
@@ -404,9 +404,9 @@
               "name": "ns3.domaindiscount24.net."
             },
             "finding_type": {
-              "id": "KAT-600",
+              "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-600",
+              "human_readable": "KAT-NO-DNSSEC",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -419,9 +419,9 @@
             }
           },
           {
-            "id": "Finding|Hostname|internet|ns3.domaindiscount24.net|KAT-600",
+            "id": "Finding|Hostname|internet|ns3.domaindiscount24.net|KAT-NO-DNSSEC",
             "ooi_type": "Finding",
-            "human_readable": "KAT-600 @ ns3.domaindiscount24.net",
+            "human_readable": "KAT-NO-DNSSEC @ ns3.domaindiscount24.net",
             "object_type": "Finding",
             "proof": null,
             "description": "Domain ns3.domaindiscount24.net is not signed with DNSSEC.",
@@ -434,9 +434,9 @@
               "name": "ns3.domaindiscount24.net"
             },
             "finding_type": {
-              "id": "KAT-600",
+              "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-600",
+              "human_readable": "KAT-NO-DNSSEC",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
@@ -525,11 +525,11 @@
           }
         ]
       },
-      "KAT-560": {
+      "KAT-OPEN-SYSADMIN-PORT": {
         "finding_type": {
-          "id": "KAT-560",
+          "id": "KAT-OPEN-SYSADMIN-PORT",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-560",
+          "human_readable": "KAT-OPEN-SYSADMIN-PORT",
           "object_type": "KATFindingType",
           "risk": "Middle",
           "description": "A system administration port is open.",
@@ -542,9 +542,9 @@
         },
         "list": [
           {
-            "id": "Finding|IPPort|internet|134.209.85.72|tcp|22|KAT-560",
+            "id": "Finding|IPPort|internet|134.209.85.72|tcp|22|KAT-OPEN-SYSADMIN-PORT",
             "ooi_type": "Finding",
-            "human_readable": "KAT-560 @ 134.209.85.72:22/tcp",
+            "human_readable": "KAT-OPEN-SYSADMIN-PORT @ 134.209.85.72:22/tcp",
             "object_type": "Finding",
             "proof": null,
             "description": "Port 22 is a system administrator port and should not be open.",
@@ -559,9 +559,9 @@
               "state": "open"
             },
             "finding_type": {
-              "id": "KAT-560",
+              "id": "KAT-OPEN-SYSADMIN-PORT",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-560",
+              "human_readable": "KAT-OPEN-SYSADMIN-PORT",
               "object_type": "KATFindingType",
               "risk": "Middle",
               "description": "A system administration port is open.",
@@ -908,11 +908,11 @@
           }
         ]
       },
-      "KAT-581": {
+      "KAT-WEBSERVER-NO-IPV6": {
         "finding_type": {
-          "id": "KAT-581",
+          "id": "KAT-WEBSERVER-NO-IPV6",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-581",
+          "human_readable": "KAT-WEBSERVER-NO-IPV6",
           "object_type": "KATFindingType",
           "risk": "Low",
           "description": "This webserver does not have an IPv6 address",
@@ -925,9 +925,9 @@
         },
         "list": [
           {
-            "id": "Finding|Hostname|internet|mispo.es.|KAT-581",
+            "id": "Finding|Hostname|internet|mispo.es.|KAT-WEBSERVER-NO-IPV6",
             "ooi_type": "Finding",
-            "human_readable": "KAT-581 @ mispo.es.",
+            "human_readable": "KAT-WEBSERVER-NO-IPV6 @ mispo.es.",
             "object_type": "Finding",
             "proof": null,
             "description": "There are no webservers with an IPv6 address.",
@@ -940,9 +940,9 @@
               "name": "mispo.es."
             },
             "finding_type": {
-              "id": "KAT-581",
+              "id": "KAT-WEBSERVER-NO-IPV6",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-581",
+              "human_readable": "KAT-WEBSERVER-NO-IPV6",
               "object_type": "KATFindingType",
               "risk": "Low",
               "description": "This webserver does not have an IPv6 address",
@@ -956,11 +956,11 @@
           }
         ]
       },
-      "KAT-502": {
+      "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES": {
         "finding_type": {
-          "id": "KAT-502",
+          "id": "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-502",
+          "human_readable": "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES",
           "object_type": "KATFindingType",
           "risk": "Very low",
           "impact": "When the value of this header is not set to master- only, Adobe Flash or Adobe Acrobat (and possibly other software) can also look at cross-domain configuration files hosted at the web server.",
@@ -975,9 +975,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-502",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES",
             "ooi_type": "Finding",
-            "human_readable": "KAT-502 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header x-permitted-cross-domain-policies is missing or not configured correctly.",
@@ -989,9 +989,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-502",
+              "id": "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-502",
+              "human_readable": "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES",
               "object_type": "KATFindingType",
               "risk": "Very low",
               "impact": "When the value of this header is not set to master- only, Adobe Flash or Adobe Acrobat (and possibly other software) can also look at cross-domain configuration files hosted at the web server.",
@@ -1007,11 +1007,11 @@
           }
         ]
       },
-      "KAT-503": {
+      "KAT-NO-EXPLICIT-XSS-PROTECTION": {
         "finding_type": {
-          "id": "KAT-503",
+          "id": "KAT-NO-EXPLICIT-XSS-PROTECTION",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-503",
+          "human_readable": "KAT-NO-EXPLICIT-XSS-PROTECTION",
           "object_type": "KATFindingType",
           "risk": "Very low",
           "impact": "Reflected cross-site scripting attacks may not be blocked.",
@@ -1026,9 +1026,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-503",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-EXPLICIT-XSS-PROTECTION",
             "ooi_type": "Finding",
-            "human_readable": "KAT-503 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-EXPLICIT-XSS-PROTECTION @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header x-xss-protection is missing or not configured correctly.",
@@ -1040,9 +1040,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-503",
+              "id": "KAT-NO-EXPLICIT-XSS-PROTECTION",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-503",
+              "human_readable": "KAT-NO-EXPLICIT-XSS-PROTECTION",
               "object_type": "KATFindingType",
               "risk": "Very low",
               "impact": "Reflected cross-site scripting attacks may not be blocked.",
@@ -1058,11 +1058,11 @@
           }
         ]
       },
-      "KAT-504": {
+      "KAT-NO-X-FRAME-OPTIONS": {
         "finding_type": {
-          "id": "KAT-504",
+          "id": "KAT-NO-X-FRAME-OPTIONS",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-504",
+          "human_readable": "KAT-NO-X-FRAME-OPTIONS",
           "object_type": "KATFindingType",
           "risk": "Very low",
           "impact": "There is a change that clickjacking is possible. This is an attack technique in which the website is invisibly loaded. On top of the original website, another malicious website is loaded that contains specially placed buttons or links. When the victim clicks on those buttons or links, the mouse click and thus its corresponding action is performed on the original website (which is made invisible). If the victim is logged in, then this click can perform an unauthorized action.",
@@ -1077,9 +1077,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-504",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-X-FRAME-OPTIONS",
             "ooi_type": "Finding",
-            "human_readable": "KAT-504 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-X-FRAME-OPTIONS @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header x-frame-options is missing or not configured correctly.",
@@ -1091,9 +1091,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-504",
+              "id": "KAT-NO-X-FRAME-OPTIONS",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-504",
+              "human_readable": "KAT-NO-X-FRAME-OPTIONS",
               "object_type": "KATFindingType",
               "risk": "Very low",
               "impact": "There is a change that clickjacking is possible. This is an attack technique in which the website is invisibly loaded. On top of the original website, another malicious website is loaded that contains specially placed buttons or links. When the victim clicks on those buttons or links, the mouse click and thus its corresponding action is performed on the original website (which is made invisible). If the victim is logged in, then this click can perform an unauthorized action.",
@@ -1109,11 +1109,11 @@
           }
         ]
       },
-      "KAT-505": {
+      "KAT-NO-X-DNS-PREFETCH-CONTROL": {
         "finding_type": {
-          "id": "KAT-505",
+          "id": "KAT-NO-X-DNS-PREFETCH-CONTROL",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-505",
+          "human_readable": "KAT-NO-X-DNS-PREFETCH-CONTROL",
           "object_type": "KATFindingType",
           "risk": "Very low",
           "description": "The HTTP header X-DNS-Prefetch-Control is missing.",
@@ -1126,9 +1126,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-505",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-X-DNS-PREFETCH-CONTROL",
             "ooi_type": "Finding",
-            "human_readable": "KAT-505 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-X-DNS-PREFETCH-CONTROL @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header x-dns-prefetch-control is missing or not configured correctly.",
@@ -1140,9 +1140,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-505",
+              "id": "KAT-NO-X-DNS-PREFETCH-CONTROL",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-505",
+              "human_readable": "KAT-NO-X-DNS-PREFETCH-CONTROL",
               "object_type": "KATFindingType",
               "risk": "Very low",
               "description": "The HTTP header X-DNS-Prefetch-Control is missing.",
@@ -1156,11 +1156,11 @@
           }
         ]
       },
-      "KAT-506": {
+      "KAT-NO-EXCPECT-CT": {
         "finding_type": {
-          "id": "KAT-506",
+          "id": "KAT-NO-EXCPECT-CT",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-506",
+          "human_readable": "KAT-NO-EXCPECT-CT",
           "object_type": "KATFindingType",
           "risk": "Very low",
           "impact": "The Expect-CT header prevents the use of misissued certificates for the website from going unnoticed.",
@@ -1175,9 +1175,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-506",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-EXCPECT-CT",
             "ooi_type": "Finding",
-            "human_readable": "KAT-506 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-EXCPECT-CT @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header expect-ct is missing or not configured correctly.",
@@ -1189,9 +1189,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-506",
+              "id": "KAT-NO-EXCPECT-CT",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-506",
+              "human_readable": "KAT-NO-EXCPECT-CT",
               "object_type": "KATFindingType",
               "risk": "Very low",
               "impact": "The Expect-CT header prevents the use of misissued certificates for the website from going unnoticed.",
@@ -1207,11 +1207,11 @@
           }
         ]
       },
-      "KAT-507": {
+      "KAT-NO-PERMISSIONS-POLICY": {
         "finding_type": {
-          "id": "KAT-507",
+          "id": "KAT-NO-PERMISSIONS-POLICY",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-507",
+          "human_readable": "KAT-NO-PERMISSIONS-POLICY",
           "object_type": "KATFindingType",
           "risk": "Very low",
           "impact": "When the website has a cross-site scripting vulnerability, then the attacker exploiting this vulnerability can use all the capabilities of the victim's browser.",
@@ -1225,9 +1225,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-507",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-PERMISSIONS-POLICY",
             "ooi_type": "Finding",
-            "human_readable": "KAT-507 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-PERMISSIONS-POLICY @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header permissions-policy is missing or not configured correctly.",
@@ -1239,9 +1239,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-507",
+              "id": "KAT-NO-PERMISSIONS-POLICY",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-507",
+              "human_readable": "KAT-NO-PERMISSIONS-POLICY",
               "object_type": "KATFindingType",
               "risk": "Very low",
               "impact": "When the website has a cross-site scripting vulnerability, then the attacker exploiting this vulnerability can use all the capabilities of the victim's browser.",
@@ -1256,11 +1256,11 @@
           }
         ]
       },
-      "KAT-508": {
+      "KAT-NO-REFERRER-POLICY": {
         "finding_type": {
-          "id": "KAT-508",
+          "id": "KAT-NO-REFERRER-POLICY",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-508",
+          "human_readable": "KAT-NO-REFERRER-POLICY",
           "object_type": "KATFindingType",
           "risk": "Very low",
           "impact": "When a website visitor clicks on a link to another website, the user's browser sends through the Referer HTTP header (a part of the URL) to the other website. The website that is linked to will know which website (and webpage, if HTTP was used) the visitor came from. This is a privacy leak for the website visitor. In some cases, sensitive information such as session tokens may leak to websites that are linked to.",
@@ -1275,9 +1275,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-508",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-REFERRER-POLICY",
             "ooi_type": "Finding",
-            "human_readable": "KAT-508 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-REFERRER-POLICY @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header referrer-policy is missing or not configured correctly.",
@@ -1289,9 +1289,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-508",
+              "id": "KAT-NO-REFERRER-POLICY",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-508",
+              "human_readable": "KAT-NO-REFERRER-POLICY",
               "object_type": "KATFindingType",
               "risk": "Very low",
               "impact": "When a website visitor clicks on a link to another website, the user's browser sends through the Referer HTTP header (a part of the URL) to the other website. The website that is linked to will know which website (and webpage, if HTTP was used) the visitor came from. This is a privacy leak for the website visitor. In some cases, sensitive information such as session tokens may leak to websites that are linked to.",
@@ -1307,11 +1307,11 @@
           }
         ]
       },
-      "KAT-509": {
+      "KAT-NO-X-CONTENT-TYPE-OPTIONS": {
         "finding_type": {
-          "id": "KAT-509",
+          "id": "KAT-NO-X-CONTENT-TYPE-OPTIONS",
           "ooi_type": "KATFindingType",
-          "human_readable": "KAT-509",
+          "human_readable": "KAT-NO-X-CONTENT-TYPE-OPTIONS",
           "object_type": "KATFindingType",
           "risk": "Very low",
           "impact": "A malicious user of the system could upload a legitimate file containing HTML code to the website (if such functionality exists) with a file extension such as <c>.jpg</c> or <c>.png</c>. If the victim uses Internet Explorer or Chrome and downloads the malicious file, the uploaded HTML code will be executed, even though the file contains an image extension and the server would return an image header such as <c>Content-Type: image/jpeg</c>. This may include a <i>cross-site scripting</i> vulnerability.",
@@ -1326,9 +1326,9 @@
         },
         "list": [
           {
-            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-509",
+            "id": "Finding|HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|KAT-NO-X-CONTENT-TYPE-OPTIONS",
             "ooi_type": "Finding",
-            "human_readable": "KAT-509 @ https://mispo.es:443/ @ 134.209.85.72",
+            "human_readable": "KAT-NO-X-CONTENT-TYPE-OPTIONS @ https://mispo.es:443/ @ 134.209.85.72",
             "object_type": "Finding",
             "proof": null,
             "description": "Header x-content-type-options is missing or not configured correctly.",
@@ -1340,9 +1340,9 @@
               "object_type": "HTTPResource"
             },
             "finding_type": {
-              "id": "KAT-509",
+              "id": "KAT-NO-X-CONTENT-TYPE-OPTIONS",
               "ooi_type": "KATFindingType",
-              "human_readable": "KAT-509",
+              "human_readable": "KAT-NO-X-CONTENT-TYPE-OPTIONS",
               "object_type": "KATFindingType",
               "risk": "Very low",
               "impact": "A malicious user of the system could upload a legitimate file containing HTML code to the website (if such functionality exists) with a file extension such as <c>.jpg</c> or <c>.png</c>. If the victim uses Internet Explorer or Chrome and downloads the malicious file, the uploaded HTML code will be executed, even though the file contains an image extension and the server would return an image header such as <c>Content-Type: image/jpeg</c>. This may include a <i>cross-site scripting</i> vulnerability.",

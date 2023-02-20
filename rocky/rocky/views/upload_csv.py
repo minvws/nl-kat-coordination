@@ -2,6 +2,7 @@ import csv
 import io
 from datetime import datetime, timezone
 from typing import Dict, ClassVar, Any
+from uuid import uuid4
 
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -148,7 +149,11 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
         csv_file = form.cleaned_data["csv_file"]
 
         csv_raw_data = csv_file.read()
-        get_bytes_client(self.organization.code).add_manual_proof(csv_raw_data, manual_mime_type="manual/csv")
+
+        task_id = uuid4()
+        get_bytes_client(self.organization.code).add_manual_proof(
+            task_id, csv_raw_data, manual_mime_types={"manual/csv"}
+        )
 
         csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
         rows_with_error = []
@@ -159,7 +164,7 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
                 try:
                     ooi = self.get_ooi_from_csv(object_type, row)
                     self.octopoes_api_connector.save_declaration(
-                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc))
+                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
                     )
                 except ValidationError:
                     rows_with_error.append(row_number)

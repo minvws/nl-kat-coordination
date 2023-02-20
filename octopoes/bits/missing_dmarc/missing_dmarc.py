@@ -13,7 +13,6 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[DMARCTXTRecord],
 ) -> Iterator[OOI]:
-
     if (
         # only report on findings on the fqdn because of double findings
         input_ooi.name == input_ooi.fqdn.tokenized.name

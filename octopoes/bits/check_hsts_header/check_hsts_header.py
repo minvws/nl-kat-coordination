@@ -10,7 +10,6 @@ def run(
     input_ooi: HTTPHeader,
     additional_oois: List,
 ) -> Iterator[OOI]:
-
     header = input_ooi
     if header.key.lower() != "strict-transport-security":
         return
@@ -34,7 +33,7 @@ def run(
 
         yield from _create_kat_finding(
             header.reference,
-            kat_id="KAT-606",
+            kat_id="KAT-HSTS-VULNERABILITIES",
             description=description,
         )
 

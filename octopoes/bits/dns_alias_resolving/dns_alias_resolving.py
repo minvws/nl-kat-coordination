@@ -10,7 +10,6 @@ def run(
     hostname: Hostname,
     additional_oois: List[Union[DNSCNAMERecord, ResolvedHostname]],
 ) -> Iterator[OOI]:
-
     cname_records = [ooi for ooi in additional_oois if isinstance(ooi, DNSCNAMERecord)]
     resolved_hostnames = [ooi for ooi in additional_oois if isinstance(ooi, ResolvedHostname)]
 
