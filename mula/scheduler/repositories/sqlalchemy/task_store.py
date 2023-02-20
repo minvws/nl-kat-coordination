@@ -3,7 +3,7 @@ from typing import List, Optional, Tuple
 
 from scheduler import models
 
-from ..stores import TaskStorer
+from ..stores import TaskStorer  # noqa: TID252
 from .datastore import SQLAlchemy
 
 

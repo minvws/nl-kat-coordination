@@ -24,7 +24,6 @@ def OnboardingMiddleware(get_response):
                 or request.path.startswith("/api/")
             ):
                 if not member_onboarded:
-
                     if is_red_team(request.user):
                         # a redteamer can be in many organizations, but we onboard the first one.
                         member = OrganizationMember.objects.filter(user=request.user)

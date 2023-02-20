@@ -5,7 +5,7 @@ from scheduler import models
 
 from sqlalchemy import create_engine, orm, pool
 
-from ..stores import Datastore
+from ..stores import Datastore  # noqa: TID252
 
 
 class SQLAlchemy(Datastore):

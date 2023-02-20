@@ -10,7 +10,6 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[Union[Finding, Website]],
 ) -> Iterator[OOI]:
-
     # only websites have to comply with the internetnl rules
     websites = [websites for websites in additional_oois if isinstance(websites, Website)]
     if not websites:

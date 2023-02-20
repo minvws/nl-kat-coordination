@@ -90,7 +90,6 @@ xtdb_sample_2 = {
 
 class ReferenceNodeTest(TestCase):
     def test_filter_children(self):
-
         ref_net = Reference("Network|internet")
         ref_ip = Reference("IPAddressV4|1.1.1.2")
         ref_port = Reference("IPPort|IPPort|internet|1.1.1.2|tcp|80")
@@ -105,7 +104,6 @@ class ReferenceNodeTest(TestCase):
         self.assertDictEqual({}, root_node.children["ip_addresses"][0].children)
 
     def test_xtdb_reference_node_to_reference_node(self):
-
         root = XTDBReferenceNode.parse_obj(xtdb_sample)
         reference_node = root.to_reference_node("crux.db/id")
         self.assertEqual(
@@ -132,7 +130,6 @@ class ReferenceNodeTest(TestCase):
         self.assertEqual(refs, reference_node.collect_references())
 
     def test_xtdb_data_to_reference_node_complext(self):
-
         root = XTDBReferenceNode.parse_obj(xtdb_sample_2)
         reference_node = root.to_reference_node("crux.db/id")
 

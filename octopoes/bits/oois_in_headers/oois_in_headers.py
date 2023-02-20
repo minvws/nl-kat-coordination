@@ -13,7 +13,6 @@ def run(
     input_ooi: HTTPHeader,
     additional_oois: List,
 ) -> Iterator[OOI]:
-
     if input_ooi.key.lower() not in ["location", "content-security-policy"]:
         return
 

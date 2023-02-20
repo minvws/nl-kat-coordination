@@ -103,7 +103,6 @@ class PathTest(TestCase):
         self.assertEqual(path, path.reverse().reverse())
 
     def test_get_paths_to_neighbours(self):
-
         neighbouring_paths = get_paths_to_neighours(MockIPAddressV4)
 
         expected_paths = {

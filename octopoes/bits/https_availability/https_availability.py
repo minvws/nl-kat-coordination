@@ -9,7 +9,6 @@ def run(
     input_ooi: IPAddress,
     additional_oois: List[Union[IPPort, Website]],
 ) -> Iterator[OOI]:
-
     websites = [website for website in additional_oois if isinstance(website, Website)]
 
     open_ports = [port.port for port in additional_oois if isinstance(port, IPPort)]

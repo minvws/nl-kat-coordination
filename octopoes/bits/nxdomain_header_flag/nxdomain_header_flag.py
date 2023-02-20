@@ -11,7 +11,6 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[Union[NXDOMAIN, HTTPHeaderHostname]],
 ) -> Iterator[OOI]:
-
     hostname_exists = True
     headers = []
     for ooi in additional_oois:

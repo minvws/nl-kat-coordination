@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from scheduler import models
 
-from ..stores import PriorityQueueStorer
+from ..stores import PriorityQueueStorer  # noqa: TID252
 from .datastore import SQLAlchemy
 
 
