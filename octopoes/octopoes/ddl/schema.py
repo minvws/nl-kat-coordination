@@ -9,7 +9,12 @@ APISchema: Extends CompleteSchema with backlink-properties and Query type. This 
 """
 from typing import cast, List
 
-from graphql import GraphQLSchema, GraphQLInterfaceType, GraphQLObjectType, GraphQLUnionType
+from graphql import (
+    GraphQLSchema,
+    GraphQLInterfaceType,
+    GraphQLObjectType,
+    GraphQLUnionType,
+)
 
 
 class BaseSchema:
@@ -45,7 +50,9 @@ class BaseSchema:
     def union_types(self) -> List[GraphQLUnionType]:
         """Return all union types."""
         return [
-            t for t in self.schema.type_map.values() if isinstance(t, GraphQLUnionType) and not t.name.startswith("__")
+            t
+            for t in self.schema.type_map.values()
+            if isinstance(t, GraphQLUnionType) and not t.name.startswith("__")
         ]
 
     def get_object_type(self, name: str) -> GraphQLObjectType:
