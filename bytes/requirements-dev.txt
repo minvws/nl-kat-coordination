@@ -24,7 +24,7 @@ mako==1.2.4
 markupsafe==2.1.2
 mccabe==0.7.0
 mypy-extensions==1.0.0
-mypy==0.960
+mypy==1.0.1
 packaging==23.0
 passlib[bcrypt]==1.7.4
 pathspec==0.9.0
