@@ -1,0 +1,35 @@
+
+enum ScanProfileType {
+  declared
+  inherited
+  empty
+}
+
+type ScanProfile implements BaseObject {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["ooi"]): ID!
+  human_readable(format: String! = "L{level}"): String!
+
+  level: Int!
+  type: ScanProfileType!
+  ooi: UOOI!
+}
+
+enum OriginType {
+  declaration
+  observation
+  inference
+}
+
+type Origin implements BaseObject {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["source", "method"]): ID!
+  human_readable(format: String! = "{source_human_readable} {method} {normalizer_id}"): String!
+
+  type: OriginType!
+  source: UOOI!
+  method: String!
+  results: [UOOI!]
+
+  normalizer_id: String!
+}

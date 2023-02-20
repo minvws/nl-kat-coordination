@@ -7,8 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 # Needed for automatic apidoc
-import os
-import sys
+import os, sys
+#from octopoes.version import __version__
 
 sys.path.insert(0, os.path.abspath("../.."))
 

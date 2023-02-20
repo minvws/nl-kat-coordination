@@ -1,28 +1,29 @@
+"""Octopoes application settings."""
+
 import os
-from enum import Enum
 from pathlib import Path
 
-from pydantic import BaseSettings
-
-
-class XTDBType(Enum):
-    CRUX = "crux"
-    XTDB = "xtdb"
-    XTDB_MULTINODE = "xtdb-multinode"
+from pydantic import BaseSettings, AnyHttpUrl
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
+    debug: bool = False
     log_cfg: str = os.path.join(Path(__file__).parent.parent.parent, "logging.yml")
-    queue_name_octopoes: str = "octopoes"
+
+    # Server settings
+    api_host: str = "0.0.0.0"
+    api_port: int = 8000
+
+    # Application settings
 
     # External services settings
-    queue_uri: str = "amqp://guest:guest@rabbitmq:5672/%2fkat"
-    xtdb_uri: str = "http://crux:3000"
-    xtdb_type: XTDBType = XTDBType.CRUX
+    katalogus_uri: AnyHttpUrl = "http://katalogus:8000/"  # type: ignore
+    xtdb_uri: AnyHttpUrl = "http://xtdb:3000/_xtdb"  # type: ignore
 
-    katalogus_api: str = "http://localhost:8003"
+    class Config:
+        """Settings configuration."""
 
-    scan_level_recalculation_interval: int = 60
+        env_prefix = "octopoes_"

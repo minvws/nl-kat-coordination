@@ -1,0 +1,7 @@
+type Animal implements OOI & BaseObject {
+   primary_key(natural_key: [String] = ["color", "size"]): ID!
+   human_readable: String!
+   color: String!
+   # size: String!
+}
+

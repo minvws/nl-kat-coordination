@@ -1,0 +1,8 @@
+directive @test(arg1: String!) on FIELD_DEFINITION
+
+type Test implements OOI & BaseObject {
+   primary_key(natural_key: [String] = ["test"]): ID!
+   human_readable: String!
+   test: String! @test(arg1: "test")
+}
+

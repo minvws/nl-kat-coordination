@@ -1,0 +1,6 @@
+# Native Kat
+type Test {
+   primary_key(natural_key: [String] = ["test"]): ID!
+   human_readable: String!
+   test: String!
+}

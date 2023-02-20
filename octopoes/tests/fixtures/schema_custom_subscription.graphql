@@ -1,0 +1,6 @@
+type Subscription implements OOI & BaseObject {
+  object_type: String!
+  primary_key(natural_key: [String] = ["test"]): ID!
+  human_readable: String!
+  test: Subscription!
+}

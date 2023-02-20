@@ -2,9 +2,24 @@
 
 Octopoes is KAT's knowledge-graph. It stores the knowledge KAT has gathered about its domain. As Octopoes uses [XTDB](https://xtdb.com) for bi-temporal data-storage, Octopoes keeps the current state of the knowledge-graph, as well as a complete, queryable history of the knowledge-graph.
 
-## Instructions
+## Development environment with poetry and pre-commit
 
-Install dependencies
+To activate and install an isolated virtual environment:
+```bash
+poetry shell
+poetry install
+pre-commit install
+```
+
+To update `poetry.lock` with the dependencies from `pyproject.toml`, and update `requirements.txt` and `requirements-dev.txt`:
+```bash
+make update-requirements
+```
+
+Note that the requirements files should NOT be edited manually.
+
+You can install the production dependencies directly through pip with:
+
 ```bash
 python3 -m pip install -r requirements.txt
 ```
@@ -26,11 +41,8 @@ python3 -m uvicorn octopoes.api.api:app [--port 8000]
 
 ### Run the event processor
 ```bash
-python3 -m celery -A octopoes.tasks.tasks worker -B -s /tmp/celerybeat-schedule --loglevel=WARNING
+python3 -m celery -A octopoes.tasks.tasks worker --loglevel=WARNING
 ```
-_Note: The `-B` flag instructs celery start the Celery Beat scheduler in the same process_
-_Note: The `-s` flag is used to specify the beat schedule location and should be writeable by the user the process runs in_
-
 
 
 ## Healthcheck
@@ -243,15 +255,15 @@ OriginRepository ->> XTDB: get(origin, valid_time)
 OriginRepository ->> OriginRepository: compare(origin)
 OriginRepository ->> XTDB: save(origin, valid_time)
 OriginRepository ->> EventManager: publish( CREATE_ORIGIN )
-OriginRepository ->- OctopoesService: #nbsp
+OriginRepository ->- OctopoesService:
 OctopoesService ->>+ OOIRepository: save(ooi, valid_time)
 OOIRepository ->> XTDB: get(ooi, valid_time)
 OOIRepository ->> OOIRepository: compare(ooi)
 OOIRepository ->> XTDB: save(ooi, valid_time)
 OOIRepository ->> EventManager: publish( UPDATE_OOI )
-OOIRepository ->- OctopoesService: #nbsp
-OctopoesService ->- API: #nbsp
-API ->- Client: #nbsp
+OOIRepository ->- OctopoesService:
+OctopoesService ->- API:
+API ->- Client:
 ```
 ### Sequence: process update ooi
 ```mermaid
@@ -271,7 +283,7 @@ loop bits
   OctopoesService ->> OctopoesService: run_bit
 end
 
-Listener ->>- EventManager: #nbsp
+Listener ->>- EventManager:
 ```
 
 ## Crux / XTDB

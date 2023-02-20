@@ -1,0 +1,16 @@
+interface BaseObject {
+  object_type: String!
+  primary_key: ID!
+  human_readable: String!
+}
+
+interface OOI implements BaseObject {
+  object_type: String!
+  primary_key: ID!
+  human_readable: String!
+}
+
+scalar IPv4
+scalar IPv6
+scalar HostnameX
+scalar InternationalDomainName

@@ -1,0 +1,1 @@
+union Animals = Dogs | Cats

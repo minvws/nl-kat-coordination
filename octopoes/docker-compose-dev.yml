@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+
+  xtdb:
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.0"
+    restart: on-failure
+    ports:
+      - "127.0.0.1:9500:3000"
+
+  katalogus_mock:
+    image: "wiremock/wiremock:2.34.0"
+    volumes:
+      - ./.ci/wiremock:/home/wiremock
+    ports:
+      - "127.0.0.1:9501:8080"

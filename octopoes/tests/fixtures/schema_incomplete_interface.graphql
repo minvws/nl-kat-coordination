@@ -1,0 +1,7 @@
+type ZooKeeper implements OOI & BaseObject {
+  object_type: String!
+  primary_key(natural_key: [String] = ["name"]): ID!
+  #human_readable(format: String = "{name} pets {pet_name}"): String!
+  name: String!
+  pet: Animal!
+}
