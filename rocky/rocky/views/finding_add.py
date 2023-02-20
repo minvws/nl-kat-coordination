@@ -23,6 +23,8 @@ from rocky.views.ooi_view import BaseOOIFormView
 from tools.forms.finding_type import FindingAddForm
 from tools.view_helpers import get_ooi_url
 
+from octopoes.octopoes.models.ooi.findings import CWEFindingType, CAPECFindingType
+
 
 def get_finding_type_from_id(
     finding_type_id: str,
@@ -38,6 +40,10 @@ def get_finding_type_from_id(
     elif finding_type_id.upper().startswith("SNYK"):
         # Fetch RetireJS info
         finding_type = SnykFindingType(id=finding_type_id)
+    elif finding_type_id.upper().startswith("CWE"):
+        finding_type = CWEFindingType(id=finding_type_id)
+    elif finding_type_id.upper().startswith("CAPEC"):
+        finding_type = CAPECFindingType(id=finding_type_id)
     else:
         finding_type = KATFindingType(id=finding_type_id)
 
@@ -90,7 +96,11 @@ class FindingAddView(BaseOOIFormView):
 
         s: str = form_data["finding_type_ids"]
         finding_type_ids = s.replace(",", "\n").splitlines()
-        finding_type_ids = [x.strip() for x in finding_type_ids if x.strip().startswith(("KAT-", "CVE-", "CWE-"))]
+        finding_type_ids = [
+            x.strip()
+            for x in finding_type_ids
+            if x.strip().startswith(("KAT-", "CVE-", "CWE-", "CAPEC-", "RetireJS-", "SNYK-"))
+        ]
 
         observed_at = datetime.combine(form_data.get("date"), datetime.min.time(), tzinfo=timezone.utc)
 
