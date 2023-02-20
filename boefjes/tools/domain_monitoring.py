@@ -18,16 +18,21 @@ import tldextract
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.job_models import BoefjeMeta, Boefje
 
-FULL_DOMAINS = (
+FULL_DOMAINS = {
     "minvws.nl",
     "coronamelder.nl",
     "brba.nl",
     "rdobeheer.nl",
-    "autodiscovers",
-    "gits",
-    "gitlabs",  # we can also find certs that are submatches
-    "ssh",
-)
+    # "autodiscovers",
+    # "gits",
+    # "gitlabs",  # we can also find certs that are submatches
+    # "ssh",
+}
+
+# google.nl
+# -> substr match [google.nl] -> google.tk, google.somefakedomain.com
+# git, ssh
+# -> substr match [git, ssh] -> git.gitlab.com, sesshop.gitlab.nl
 
 IGNORELIST = ("", "*", "www", "dev", "acc", "staging")  # ignore common stuff, cleans up the lists for speed
 MIN_LENGTH = 3  # ignore parts that are too small
@@ -106,7 +111,7 @@ class MessageQueue:
         )
         self._client.save_boefje_meta(meta)
         self._client.save_raw(meta.id, stream.getvalue(), {"application/jsonlines"})
-        self._client.login()
+        self._logger.info("Saved stream to bytes")
 
 
 def domain_match(input_domains: Set[str], domains: Sequence[str]) -> Optional[Tuple[MatchType, List[str]]]:
@@ -131,6 +136,48 @@ def domain_match(input_domains: Set[str], domains: Sequence[str]) -> Optional[Tu
             return MatchType.SUPERSTRING, substring_matches
 
 
+def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple[MatchType, str]]:
+    matches = []
+
+    for input_domain in input_domains:
+        input_domain_without_tld = extract_domain(input_domain)
+
+        for domain in domains:
+            tokenized_domain = tokenize_domain(domain)
+
+            # check for direct matches against domains
+            if input_domain_without_tld in tokenized_domain:
+                matches.append((MatchType.DIRECT, domain))
+
+            # remove direct matches and check for substring matches against domains
+            diff_tokenized_domain = set(tokenized_domain).difference([input_domain_without_tld])
+            for part in diff_tokenized_domain:
+                if input_domain_without_tld in part:
+                    matches.append((MatchType.SUBSTRING, domain))
+
+    return matches
+
+    # # global input_domains
+    # domain_parts = clean_input(domains)
+    #
+    # # are there any cheap matches?
+    # direct_matches = list(input_domains.intersection(domain_parts))
+    # if direct_matches:
+    #     return MatchType.DIRECT, direct_matches
+    #
+    # # are the certs domains partial matches to our list?
+    # for part in domain_parts:
+    #     substring_matches = list(match for match in input_domains if part in match)
+    #     if substring_matches:
+    #         return MatchType.SUBSTRING, substring_matches
+    #
+    # # does our list partialy matches against the certs domains?
+    # for domain in input_domains:
+    #     substring_matches = list(match for match in domain_parts if domain in match)
+    #     if substring_matches:
+    #         return MatchType.SUPERSTRING, substring_matches
+
+
 def clean_input(domains: Sequence[str]) -> Set[str]:
     output = set()
 
@@ -142,6 +189,31 @@ def clean_input(domains: Sequence[str]) -> Set[str]:
         output = output.union(filter(lambda x: len(x) >= MIN_LENGTH, domain_parts))
 
     return output
+
+
+def clean_input_domain(domain: str) -> Set[str]:
+    domain = tldextract.extract(domain.lower())
+    domain_parts = set(domain.subdomain.split("."))
+    domain_parts.add(domain.domain)
+    domain_parts = domain_parts.difference(IGNORELIST)
+
+    return set(filter(lambda x: len(x) >= MIN_LENGTH, domain_parts))
+
+
+# extract domain
+def extract_domain(domain: str) -> str:
+    # returns domain without suffix and subdomain
+    return tldextract.extract(domain.lower()).domain
+
+
+# tokenize domain
+def tokenize_domain(domain: str) -> List[str]:
+    # returns list of subdomains and domain without suffix
+    result = tldextract.extract(domain.lower())
+
+    return [sub for sub in result.subdomain.split(".") if len(sub) >= MIN_LENGTH and sub not in IGNORELIST] + [
+        result.domain
+    ]
 
 
 # todo: input_domains
@@ -165,7 +237,8 @@ class Monitor:
 
         self._logger.info("Starting monitor")
         certstream.listen_for_events(self._message_callback, self._stream_url)
-        # self._queue.flush() # todo: log and flush
+        logging.info("Monitor stopped")
+        self._queue.flush()
 
     def _message_callback(self, message, context) -> None:
         self._logger.debug("Incoming message: %s", message)
@@ -173,10 +246,13 @@ class Monitor:
         if message["message_type"] == "certificate_update":
             all_domains = message["data"]["leaf_cert"]["all_domains"]
 
-            if all_domains and (match := domain_match(self._input_domains, all_domains)) is not None:
-                match_type, match = match
-                self._logger.info("Match (type %s) found for %s: %s", match_type, match, ", ".join(all_domains))
-                self._queue.enqueue({"match_type": match_type, "match": match, "domains": all_domains})
+            # if all_domains and (match := domain_match(self._input_domains, all_domains)) is not None:
+            if all_domains and (match := domains_match(self._input_domains, all_domains)):
+
+                # match_type, match = match
+                for match_type, match in match:
+                    self._logger.info("Match (type %s) found for %s: %s", match_type, match, ", ".join(all_domains))
+                    self._queue.enqueue({"match_type": match_type, "match": match, "domains": all_domains})
 
 
 # todo: input_domains
@@ -189,7 +265,7 @@ class Monitor:
 def main(size: int, interval: int, bytes_api: str, bytes_username: str, bytes_password: str) -> NoReturn:
     client = BytesAPIClient(bytes_api, bytes_username, bytes_password)
     message_queue = MessageQueue(client, size, datetime.timedelta(seconds=interval))
-    monitor = Monitor(clean_input(FULL_DOMAINS), client, message_queue)
+    monitor = Monitor(FULL_DOMAINS, client, message_queue)
     monitor.start()
 
 
