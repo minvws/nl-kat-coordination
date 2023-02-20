@@ -20,7 +20,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     parser = minidom.parse(raw)
 
     # assume that input ooi is none or a HostnameHTTPURL
-    if normalizer_meta.raw_data.boefje_meta and normalizer_meta.raw_data.boefje_meta.input_ooi and False:
+    if normalizer_meta.raw_data.boefje_meta and normalizer_meta.raw_data.boefje_meta.input_ooi:
         ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
         network = Network(name=ooi.tokenized.netloc.network.name)
     else:
