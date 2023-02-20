@@ -1,10 +1,10 @@
 CREATE TABLE settings (
-    id SERIAL NOT NULL, 
-    values JSON NOT NULL, 
-    plugin_id VARCHAR(64) NOT NULL, 
-    organisation_pk INTEGER NOT NULL, 
-    PRIMARY KEY (id), 
-    FOREIGN KEY(organisation_pk) REFERENCES organisation (pk) ON DELETE CASCADE, 
+    id SERIAL NOT NULL,
+    values JSON NOT NULL,
+    plugin_id VARCHAR(64) NOT NULL,
+    organisation_pk INTEGER NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY(organisation_pk) REFERENCES organisation (pk) ON DELETE CASCADE,
     CONSTRAINT unique_settings_per_organisation_per_plugin UNIQUE (organisation_pk, plugin_id)
 );
 

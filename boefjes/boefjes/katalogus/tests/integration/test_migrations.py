@@ -1,28 +1,17 @@
 import os
-import time
 from unittest import TestCase, skipIf
 
 import alembic.config
 
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import OperationalError
 from sqlalchemy import text
 
 from boefjes.config import settings
 from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
-from boefjes.katalogus.models import Organisation, Repository, Boefje
-from boefjes.katalogus.storage.interfaces import (
-    OrganisationNotFound,
-    PluginNotFound,
-    SettingsNotFound,
-    RepositoryNotFound,
-    StorageError,
-)
+from boefjes.katalogus.models import Organisation
 from boefjes.sql.db import get_engine, SQL_BASE
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.repository_storage import SQLRepositoryStorage
 from boefjes.sql.setting_storage import SQLSettingsStorage
-from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -36,7 +25,7 @@ class TestRepositories(TestCase):
 
         session = sessionmaker(bind=engine)()
 
-        organisation_storage = SQLOrganisationStorage(session, IdentityMiddleware())
+        organisation_storage = SQLOrganisationStorage(session, settings)
 
         with organisation_storage as storage:
             storage.create(Organisation(id="dev1", name="Test 1 "))
@@ -44,15 +33,18 @@ class TestRepositories(TestCase):
             storage.create(Organisation(id="dev3", name="Test 3 "))
 
         with engine.connect() as connection:
-            connection.execute(text("INSERT INTO setting (key, value, plugin_id, organisation_pk) values"
-                "('key1', 'val1', 'test-plugin1', 1),"
-                "('key2', 'val2', 'test-plugin1', 2),"
-                "('key3', 'val3', 'test-plugin1', 1),"
-                "('key4', 'val4', 'test-plugin2', 2),"
-                "('key5', 'val5', 'test-plugin2', 1),"
-                "('key6', 'val6', 'test-plugin2', 2),"
-                "('key7', 'val7', 'test-plugin2', 1)"
-            ))
+            connection.execute(
+                text(
+                    "INSERT INTO setting (key, value, plugin_id, organisation_pk) values"
+                    "('key1', 'val1', 'test-plugin1', 1),"
+                    "('key2', 'val2', 'test-plugin1', 2),"
+                    "('key3', 'val3', 'test-plugin1', 1),"
+                    "('key4', 'val4', 'test-plugin2', 2),"
+                    "('key5', 'val5', 'test-plugin2', 1),"
+                    "('key6', 'val6', 'test-plugin2', 2),"
+                    "('key7', 'val7', 'test-plugin2', 1)"
+                )
+            )
 
         alembicArgs = ["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"]
         alembic.config.main(argv=alembicArgs)
@@ -71,17 +63,16 @@ class TestRepositories(TestCase):
         with engine.connect() as connection:
             res = connection.execute(text("SELECT * FROM setting"))
             assert res.fetchall() == [
-                (1, 'key5', 'val5', 1, 'test-plugin2'),
-                (2, 'key7', 'val7', 1, 'test-plugin2'),
-                (3, 'key1', 'val1', 1, 'test-plugin1'),
-                (4, 'key3', 'val3', 1, 'test-plugin1'),
-                (5, 'key4', 'val4', 2, 'test-plugin2'),
-                (6, 'key6', 'val6', 2, 'test-plugin2'),
-                (7, 'key2', 'val2', 2, 'test-plugin1'),
+                (1, "key5", "val5", 1, "test-plugin2"),
+                (2, "key7", "val7", 1, "test-plugin2"),
+                (3, "key1", "val1", 1, "test-plugin1"),
+                (4, "key3", "val3", 1, "test-plugin1"),
+                (5, "key4", "val4", 2, "test-plugin2"),
+                (6, "key6", "val6", 2, "test-plugin2"),
+                (7, "key2", "val2", 2, "test-plugin1"),
             ]
 
         alembicArgs = ["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"]
         alembic.config.main(argv=alembicArgs)
 
         SQL_BASE.metadata.drop_all(engine)
-

@@ -60,7 +60,9 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
 
     def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
         instance = self._db_instance_by_id(organisation_id, plugin_id)
-        filtered_values = {instance_key: value for instance_key, value in instance.values.items() if instance_key != key}
+        filtered_values = {
+            instance_key: value for instance_key, value in instance.values.items() if instance_key != key
+        }
 
         instance.values = filtered_values
 
