@@ -55,12 +55,10 @@ class EventManager:
         )
 
         if isinstance(event, ScanProfileDBEvent):
-
             incremented = (event.operation_type == OperationType.CREATE and event.new_data.level > 0) or (
                 event.operation_type == OperationType.UPDATE and event.new_data.level > event.old_data.level
             )
             if incremented:
-
                 ooi = json.dumps(
                     {
                         "primary_key": event.new_data.reference,

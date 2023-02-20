@@ -50,7 +50,6 @@ class OoiTreeSettingsForm(OOIReportSettingsForm):
 
 
 class SelectOOIForm(BaseRockyForm):
-
     ooi = forms.MultipleChoiceField(
         label=_("Objects"),
         widget=CheckboxTable(
@@ -104,7 +103,6 @@ class PossibleBoefjesFilterForm(BaseRockyForm):
 
 
 class SetClearanceLevelForm(forms.Form):
-
     level = forms.IntegerField(
         label=_("Clearance level"),
         help_text=_(

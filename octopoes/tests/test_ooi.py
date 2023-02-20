@@ -13,6 +13,5 @@ class OOITest(TestCase):
         self.assertEqual("MockLabel|MockIPAddressV4|internet|1.1.1.1|LABEL-1000", str(label.reference))
 
     def test_reference_equality(self):
-
         internet = MockNetwork(name="internet")
         self.assertEqual(Reference.from_str("MockNetwork|internet"), internet.reference)

@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - bytes/**
+  pull_request:
+    paths:
+      - bytes/**
 
 jobs:
   test:

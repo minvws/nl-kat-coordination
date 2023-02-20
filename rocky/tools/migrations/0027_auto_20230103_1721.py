@@ -8,7 +8,6 @@ import tools.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0026_auto_20221031_1344"),
     ]

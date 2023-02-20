@@ -8,7 +8,6 @@ def run(
     input_ooi: HostnameHTTPURL,
     additional_oois: List[HTTPHeader],
 ) -> Iterator[OOI]:
-
     header_keys = [header.key.lower() for header in additional_oois if isinstance(header, HTTPHeader)]
 
     # only check for http urls

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from typing import List, Dict
+from uuid import uuid4
 
 from django.shortcuts import redirect
 from django.urls.base import reverse
@@ -98,6 +99,7 @@ class FindingAddView(BaseOOIFormView):
 
         proof = []  # Collect as much data as possible in a single proof
 
+        task_id = uuid4()
         for f_id in finding_type_ids:
             finding_type = get_finding_type_from_id(f_id)
             finding = Finding(
@@ -107,10 +109,10 @@ class FindingAddView(BaseOOIFormView):
                 description=form_data.get("description"),
                 reproduce=form_data.get("reproduce"),
             )
-            proof.append(Declaration(ooi=finding, valid_time=observed_at))
-            proof.append(Declaration(ooi=finding_type, valid_time=observed_at))
+            proof.append(Declaration(ooi=finding, valid_time=observed_at, task_id=str(task_id)))
+            proof.append(Declaration(ooi=finding_type, valid_time=observed_at, task_id=str(task_id)))
 
-        get_bytes_client(self.organization.code).add_manual_proof(BytesClient.raw_from_declarations(proof))
+        get_bytes_client(self.organization.code).add_manual_proof(task_id, BytesClient.raw_from_declarations(proof))
 
         for declaration in proof:
             self.octopoes_api_connector.save_declaration(declaration)

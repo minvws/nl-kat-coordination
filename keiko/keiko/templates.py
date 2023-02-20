@@ -28,7 +28,6 @@ def get_templates() -> Set[str]:
     for template_folder in [
         f for f in os.listdir(settings.templates_folder) if (Path(settings.templates_folder) / f).is_dir()
     ]:
-
         try:
             get_data_shape(template_folder)
             templates.add(template_folder)
