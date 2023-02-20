@@ -19,7 +19,7 @@ def run(
     is_nameserver = bool(dns_ns_records)
 
     if dns_a_records and not dns_aaaa_records and not is_nameserver:
-        finding_type = KATFindingType(id="KAT-581")
+        finding_type = KATFindingType(id="KAT-WEBSERVER-NO-IPV6")
         yield finding_type
         yield Finding(
             finding_type=finding_type.reference,
