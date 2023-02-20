@@ -9,7 +9,7 @@ import queue
 import threading
 import uuid
 from enum import Enum
-from typing import Set, Optional, Tuple, List, Sequence, Any, NoReturn
+from typing import Set, Tuple, List, Sequence, Any, NoReturn
 
 import certstream
 import click
@@ -18,7 +18,7 @@ import tldextract
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.job_models import BoefjeMeta, Boefje
 
-IGNORELIST = ("", "*", "www", "dev", "acc", "staging")  # ignore common stuff, cleans up the lists for speed
+IGNORE_LIST = ("", "*", "www", "dev", "acc", "staging")  # ignore common stuff, cleans up the lists for speed
 MIN_LENGTH = 3  # ignore parts that are too small
 
 
@@ -98,28 +98,6 @@ class MessageQueue:
         self._logger.info("Saved stream to bytes")
 
 
-# def domain_match(input_domains: Set[str], domains: Sequence[str]) -> Optional[Tuple[MatchType, List[str]]]:
-#     # global input_domains
-#     domain_parts = clean_input(domains)
-#
-#     # are there any cheap matches?
-#     direct_matches = list(input_domains.intersection(domain_parts))
-#     if direct_matches:
-#         return MatchType.DIRECT, direct_matches
-#
-#     # are the certs domains partial matches to our list?
-#     for part in domain_parts:
-#         substring_matches = list(match for match in input_domains if part in match)
-#         if substring_matches:
-#             return MatchType.SUBSTRING, substring_matches
-#
-#     # does our list partialy matches against the certs domains?
-#     for domain in input_domains:
-#         substring_matches = list(match for match in domain_parts if domain in match)
-#         if substring_matches:
-#             return MatchType.SUPERSTRING, substring_matches
-
-
 def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple[MatchType, str]]:
     matches = []
 
@@ -142,28 +120,6 @@ def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple
     return matches
 
 
-# def clean_input(domains: Sequence[str]) -> Set[str]:
-#     output = set()
-#
-#     for domain in domains:
-#         domain = tldextract.extract(domain.lower())
-#         domain_parts = set(domain.subdomain.split("."))
-#         domain_parts.add(domain.domain)
-#         domain_parts = domain_parts.difference(IGNORELIST)
-#         output = output.union(filter(lambda x: len(x) >= MIN_LENGTH, domain_parts))
-#
-#     return output
-
-
-def clean_input_domain(domain: str) -> Set[str]:
-    domain = tldextract.extract(domain.lower())
-    domain_parts = set(domain.subdomain.split("."))
-    domain_parts.add(domain.domain)
-    domain_parts = domain_parts.difference(IGNORELIST)
-
-    return set(filter(lambda x: len(x) >= MIN_LENGTH, domain_parts))
-
-
 # extract domain
 def extract_domain(domain: str) -> str:
     # returns domain without suffix and subdomain
@@ -175,19 +131,18 @@ def tokenize_domain(domain: str) -> List[str]:
     # returns list of subdomains and domain without suffix
     result = tldextract.extract(domain.lower())
 
-    return [sub for sub in result.subdomain.split(".") if len(sub) >= MIN_LENGTH and sub not in IGNORELIST] + [
+    return [sub for sub in result.subdomain.split(".") if len(sub) >= MIN_LENGTH and sub not in IGNORE_LIST] + [
         result.domain
     ]
 
 
-# todo: input_domains
 class Monitor:
     def __init__(
         self,
         input_domains: Set[str],
         client: BytesAPIClient,
         message_queue: MessageQueue,
-        stream_url: str = "wss://certstream.calidog.io",
+        stream_url,
     ):
         self._input_domains = input_domains
         self._stream_url = stream_url
@@ -197,12 +152,17 @@ class Monitor:
 
     def start(self) -> None:
         self._logger.info("Logging in to Bytes API")
-        self._client.login()  # todo: catch exception
+        try:
+            self._client.login()
 
-        self._logger.info("Starting monitor")
-        certstream.listen_for_events(self._message_callback, self._stream_url)
-        logging.info("Monitor stopped")
-        self._queue.flush()
+        except Exception as e:
+            self._logger.error("Failed to login to Bytes API: %s", e)
+
+        else:
+            self._logger.info("Starting monitor: %s", self._stream_url)
+            certstream.listen_for_events(self._message_callback, self._stream_url)
+            logging.info("Monitor stopped")
+            self._queue.flush()
 
     def _message_callback(self, message, context) -> None:
         self._logger.debug("Incoming message: %s", message)
@@ -210,10 +170,7 @@ class Monitor:
         if message["message_type"] == "certificate_update":
             all_domains = message["data"]["leaf_cert"]["all_domains"]
 
-            # if all_domains and (match := domain_match(self._input_domains, all_domains)) is not None:
             if all_domains and (match := domains_match(self._input_domains, all_domains)):
-
-                # match_type, match = match
                 for match_type, match in match:
                     self._logger.info("Match (type %s) found for %s: %s", match_type, match, ", ".join(all_domains))
                     self._queue.enqueue({"match_type": match_type, "match": match, "domains": all_domains})
@@ -226,18 +183,25 @@ class Monitor:
 @click.option("--bytes-api", default="http://localhost:8002", envvar="BYTES_API", help="Bytes API uri")
 @click.option("--bytes-username", help="Bytes API username", envvar="BYTES_USERNAME")
 @click.option("--bytes-password", help="Bytes API password", envvar="BYTES_PASSWORD")
-def main(domains: Sequence[str], size: int, interval: int, bytes_api: str, bytes_username: str,
-         bytes_password: str) -> NoReturn:
+@click.option("--stream-url", default="wss://certstream.calidog.io", help="Certstream url")
+def main(
+    domains: Sequence[str],
+    size: int,
+    interval: int,
+    bytes_api: str,
+    bytes_username: str,
+    bytes_password: str,
+    stream_url: str,
+) -> NoReturn:
     domains = set(domains)
     click.echo(f"Domains to check: {', '.join(domains)}")
 
     client = BytesAPIClient(bytes_api, bytes_username, bytes_password)
     message_queue = MessageQueue(client, size, datetime.timedelta(seconds=interval))
-    monitor = Monitor(domains, client, message_queue)
+    monitor = Monitor(domains, client, message_queue, stream_url)
     monitor.start()
 
 
-# todo: create cli app
 if __name__ == "__main__":
     logging.basicConfig(format="[%(levelname)s:%(name)s] %(asctime)s - %(message)s", level=logging.INFO)
 

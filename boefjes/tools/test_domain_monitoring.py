@@ -1,17 +1,10 @@
-import pytest
-
-from tools.domain_monitoring import MatchType, clean_input_domain, domains_match, tokenize_domain
+from tools.domain_monitoring import MatchType, domains_match, tokenize_domain
 
 
 def test_tokenize_domain():
     assert tokenize_domain("example.com") == ["example"]
     assert tokenize_domain("config.example.com") == ["config", "example"]
     assert tokenize_domain("www.nu.nl") == ["nu"]
-
-
-def test_clean_input_domain():
-    assert clean_input_domain("example.com") == {"example"}
-    assert clean_input_domain("config.example.com") == {"config", "example"}
 
 
 def test_domain_match_direct_simple():
