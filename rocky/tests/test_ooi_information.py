@@ -113,4 +113,7 @@ def test_cwe_info():
     }
 
     output = cwe_info("CWE-223230")
-    assert output == {"description": "Not found"}
+    assert output == {
+        "description": "Not found",
+        "risk": "Very low",
+    }
