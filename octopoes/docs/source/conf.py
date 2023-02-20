@@ -8,7 +8,8 @@
 
 # Needed for automatic apidoc
 import os, sys
-#from octopoes.version import __version__
+
+# from octopoes.version import __version__
 
 sys.path.insert(0, os.path.abspath("../.."))
 

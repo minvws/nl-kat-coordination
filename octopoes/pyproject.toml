@@ -66,3 +66,8 @@ robotframework-requests = "^0.9.4"
 robotframework-tidy = "^3.3.2"
 robotframework-httplibrary = "^0.4.2"
 pre-commit = "^2.20.0"
+
+[tool.ruff]
+extend = "../pyproject.toml"
+#select = ["E", "F", "ERA", "W", "TID", "DJ", "UP", "RUF", "C90", "D", "PL"]
+extend-exclude = ["tests", "docs/source/conf.py"]

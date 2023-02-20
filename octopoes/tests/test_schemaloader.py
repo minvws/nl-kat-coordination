@@ -2,7 +2,6 @@ from graphql import GraphQLList
 
 
 def test_complete_schema(schema_loader):
-
     assert (
         schema_loader.complete_schema.origin_type.fields["results"].type.of_type.of_type
         == schema_loader.complete_schema.ooi_union_type

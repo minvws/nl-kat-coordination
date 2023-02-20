@@ -118,7 +118,6 @@ class SchemaLoader:
             natural_keys = set()
             fields = set()
             for field in node.fields:
-
                 fields.add(field.name.value)
                 if field.name.value == "primary_key":
                     for argument in field.arguments:
@@ -227,7 +226,6 @@ class SchemaLoader:
         # Create backlinks
         for type_ in self.complete_schema.object_types:
             for field_name, field in type_.fields.items():
-
                 if getattr(field.type, "of_type", None) is None:
                     continue
 

@@ -7,7 +7,7 @@ from typing import Dict, Optional, cast
 
 import pika
 
-from ..connector import Connector
+from ..connector import Connector  # noqa
 
 
 class Listener(Connector):
