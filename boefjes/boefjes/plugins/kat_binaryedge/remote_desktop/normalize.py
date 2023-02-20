@@ -74,7 +74,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         ip_service_ooi = IPService(ip_port=ip_port_ooi.reference, service=service_ooi.reference)
         yield ip_service_ooi
 
-        kat_641_ooi = KATFindingType(id="KAT-641")
+        kat_641_ooi = KATFindingType(id="KAT-EXPOSED-SOFTWARE")
         yield kat_641_ooi
         yield Finding(
             finding_type=kat_641_ooi.reference,
@@ -83,7 +83,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         )
 
         if module == "bluekeep" and scan.get("result", {}).get("data", {}).get("status", "").lower() == "vulnerable":
-            kat_642_ooi = KATFindingType(id="KAT-642")
+            kat_642_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_642_ooi
             yield Finding(
                 finding_type=kat_642_ooi.reference,
