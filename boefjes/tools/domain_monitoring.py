@@ -18,22 +18,6 @@ import tldextract
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.job_models import BoefjeMeta, Boefje
 
-FULL_DOMAINS = {
-    "minvws.nl",
-    "coronamelder.nl",
-    "brba.nl",
-    "rdobeheer.nl",
-    # "autodiscovers",
-    # "gits",
-    # "gitlabs",  # we can also find certs that are submatches
-    # "ssh",
-}
-
-# google.nl
-# -> substr match [google.nl] -> google.tk, google.somefakedomain.com
-# git, ssh
-# -> substr match [git, ssh] -> git.gitlab.com, sesshop.gitlab.nl
-
 IGNORELIST = ("", "*", "www", "dev", "acc", "staging")  # ignore common stuff, cleans up the lists for speed
 MIN_LENGTH = 3  # ignore parts that are too small
 
@@ -114,26 +98,26 @@ class MessageQueue:
         self._logger.info("Saved stream to bytes")
 
 
-def domain_match(input_domains: Set[str], domains: Sequence[str]) -> Optional[Tuple[MatchType, List[str]]]:
-    # global input_domains
-    domain_parts = clean_input(domains)
-
-    # are there any cheap matches?
-    direct_matches = list(input_domains.intersection(domain_parts))
-    if direct_matches:
-        return MatchType.DIRECT, direct_matches
-
-    # are the certs domains partial matches to our list?
-    for part in domain_parts:
-        substring_matches = list(match for match in input_domains if part in match)
-        if substring_matches:
-            return MatchType.SUBSTRING, substring_matches
-
-    # does our list partialy matches against the certs domains?
-    for domain in input_domains:
-        substring_matches = list(match for match in domain_parts if domain in match)
-        if substring_matches:
-            return MatchType.SUPERSTRING, substring_matches
+# def domain_match(input_domains: Set[str], domains: Sequence[str]) -> Optional[Tuple[MatchType, List[str]]]:
+#     # global input_domains
+#     domain_parts = clean_input(domains)
+#
+#     # are there any cheap matches?
+#     direct_matches = list(input_domains.intersection(domain_parts))
+#     if direct_matches:
+#         return MatchType.DIRECT, direct_matches
+#
+#     # are the certs domains partial matches to our list?
+#     for part in domain_parts:
+#         substring_matches = list(match for match in input_domains if part in match)
+#         if substring_matches:
+#             return MatchType.SUBSTRING, substring_matches
+#
+#     # does our list partialy matches against the certs domains?
+#     for domain in input_domains:
+#         substring_matches = list(match for match in domain_parts if domain in match)
+#         if substring_matches:
+#             return MatchType.SUPERSTRING, substring_matches
 
 
 def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple[MatchType, str]]:
@@ -157,38 +141,18 @@ def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple
 
     return matches
 
-    # # global input_domains
-    # domain_parts = clean_input(domains)
-    #
-    # # are there any cheap matches?
-    # direct_matches = list(input_domains.intersection(domain_parts))
-    # if direct_matches:
-    #     return MatchType.DIRECT, direct_matches
-    #
-    # # are the certs domains partial matches to our list?
-    # for part in domain_parts:
-    #     substring_matches = list(match for match in input_domains if part in match)
-    #     if substring_matches:
-    #         return MatchType.SUBSTRING, substring_matches
-    #
-    # # does our list partialy matches against the certs domains?
-    # for domain in input_domains:
-    #     substring_matches = list(match for match in domain_parts if domain in match)
-    #     if substring_matches:
-    #         return MatchType.SUPERSTRING, substring_matches
 
-
-def clean_input(domains: Sequence[str]) -> Set[str]:
-    output = set()
-
-    for domain in domains:
-        domain = tldextract.extract(domain.lower())
-        domain_parts = set(domain.subdomain.split("."))
-        domain_parts.add(domain.domain)
-        domain_parts = domain_parts.difference(IGNORELIST)
-        output = output.union(filter(lambda x: len(x) >= MIN_LENGTH, domain_parts))
-
-    return output
+# def clean_input(domains: Sequence[str]) -> Set[str]:
+#     output = set()
+#
+#     for domain in domains:
+#         domain = tldextract.extract(domain.lower())
+#         domain_parts = set(domain.subdomain.split("."))
+#         domain_parts.add(domain.domain)
+#         domain_parts = domain_parts.difference(IGNORELIST)
+#         output = output.union(filter(lambda x: len(x) >= MIN_LENGTH, domain_parts))
+#
+#     return output
 
 
 def clean_input_domain(domain: str) -> Set[str]:
@@ -255,17 +219,21 @@ class Monitor:
                     self._queue.enqueue({"match_type": match_type, "match": match, "domains": all_domains})
 
 
-# todo: input_domains
 @click.command()
+@click.option("--domains", multiple=True, envvar="DOMAINS", help="Domains to monitor")
 @click.option("--size", default=1000, help="Size of the message queue")
-@click.option("--interval", default=3600, help="Interval in seconds to flush the queue")
-@click.option("--bytes-api", default="http://localhost:8002", help="Bytes API uri", envvar="BYTES_API")
+@click.option("--interval", type=int, default=3600, help="Interval in seconds to flush the queue")
+@click.option("--bytes-api", default="http://localhost:8002", envvar="BYTES_API", help="Bytes API uri")
 @click.option("--bytes-username", help="Bytes API username", envvar="BYTES_USERNAME")
 @click.option("--bytes-password", help="Bytes API password", envvar="BYTES_PASSWORD")
-def main(size: int, interval: int, bytes_api: str, bytes_username: str, bytes_password: str) -> NoReturn:
+def main(domains: Sequence[str], size: int, interval: int, bytes_api: str, bytes_username: str,
+         bytes_password: str) -> NoReturn:
+    domains = set(domains)
+    click.echo(f"Domains to check: {', '.join(domains)}")
+
     client = BytesAPIClient(bytes_api, bytes_username, bytes_password)
     message_queue = MessageQueue(client, size, datetime.timedelta(seconds=interval))
-    monitor = Monitor(FULL_DOMAINS, client, message_queue)
+    monitor = Monitor(domains, client, message_queue)
     monitor.start()
 
 
