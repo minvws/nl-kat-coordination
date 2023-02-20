@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from octopoes.ddl.ddl import SchemaLoader, SchemaValidationException
+from octopoes.ddl.ddl import SchemaLoader, SchemaValidationError
 
 TEST_CASES = [
     ("schema_incorrect_natural_key.graphql", "Natural keys must be defined as fields [type=Animal, natural_key=size]"),
@@ -44,7 +44,7 @@ TEST_CASES = [
 @pytest.mark.parametrize("schema,expected_output", TEST_CASES)
 def test_malformed_graphql_schema_validation(schema: str, expected_output: str) -> None:
     """Parametrized helper function for testing schema validation."""
-    with pytest.raises(SchemaValidationException) as exc:
+    with pytest.raises(SchemaValidationError) as exc:
         SchemaLoader((Path(__file__).parent / "fixtures" / schema).read_text())
     assert str(exc.value) in expected_output
 
