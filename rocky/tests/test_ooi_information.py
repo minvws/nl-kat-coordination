@@ -108,7 +108,7 @@ def test_cwe_info():
     assert output == {
         "description": "The product does not validate or incorrectly validates input "
         "that can affect the control flow or data flow of a program.",
-        "source": "https://cwe.mitre.org/index.html",
+        "source": "https://cwe.mitre.org/data/definitions/20.html",
         "risk": "Very low",
     }
 
