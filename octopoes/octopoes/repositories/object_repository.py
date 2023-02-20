@@ -1,12 +1,12 @@
 """Repository to save/load Octopoes objects to XTDB."""
 import json
 import logging
-from datetime import timezone, datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from graphql import GraphQLObjectType, GraphQLUnionType
 
-from octopoes.connectors.services.xtdb import XTDBHTTPClient, XTDBSession, OperationType
+from octopoes.connectors.services.xtdb import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.ddl.dataclasses import BaseObject, DataclassGenerator
 from octopoes.ddl.ddl import SchemaLoader
 
@@ -17,7 +17,10 @@ class ObjectRepository:
     """Repository to save/load Octopoes objects to XTDB."""
 
     def __init__(
-        self, schema: SchemaLoader, dataclass_generator: DataclassGenerator, xtdb_client: XTDBHTTPClient
+        self,
+        schema: SchemaLoader,
+        dataclass_generator: DataclassGenerator,
+        xtdb_client: XTDBHTTPClient,
     ) -> None:
         """Initialize the object repository."""
         self.schema = schema
@@ -37,7 +40,7 @@ class ObjectRepository:
     def prefix_fields(obj: Dict[str, Any]) -> Dict[str, Any]:
         """Prefix fields with object_type."""
         non_prefixed_fields = ["object_type", "primary_key", "human_readable"]
-        object_type, primary_key, human_readable = [obj.pop(key) for key in non_prefixed_fields]
+        object_type, primary_key, human_readable = (obj.pop(key) for key in non_prefixed_fields)
 
         export = {f"{object_type}/{key}": value for key, value in obj.items()}
 
@@ -83,7 +86,13 @@ class ObjectRepository:
         """Save an object to XTDB."""
         xtdb_session = XTDBSession(self.xtdb_client)
         for obj_ in obj.dependencies():
-            xtdb_session.add((OperationType.PUT, self.serialize_obj(obj_), datetime.now(timezone.utc)))
+            xtdb_session.add(
+                (
+                    OperationType.PUT,
+                    self.serialize_obj(obj_),
+                    datetime.now(timezone.utc),
+                )
+            )
         xtdb_session.commit()
 
     def list_by_object_type(self, object_type: str) -> List[Dict[str, Any]]:

@@ -1,7 +1,4 @@
-from pathlib import Path
-
 from octopoes.ddl.dataclasses import DataclassGenerator
-from octopoes.ddl.ddl import SchemaLoader
 
 
 def test_generate_dataclasses_from_simple_schema(schema_loader):

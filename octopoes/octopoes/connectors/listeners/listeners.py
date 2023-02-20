@@ -13,7 +13,8 @@ from ..connector import Connector  # noqa
 class Listener(Connector):
     """The Listener base class interface.
 
-    Attributes:
+    Attributes
+    ----------
         name:
             Identifier of the Listener
         logger:
@@ -49,6 +50,7 @@ class RabbitMQ(Listener):
         """Initialize the RabbitMQ Listener.
 
         Args:
+        ----
             dsn:
                 A string defining the data source name of the RabbitMQ host to
                 connect to.

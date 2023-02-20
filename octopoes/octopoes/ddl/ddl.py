@@ -5,36 +5,35 @@ import re
 from functools import cached_property
 from logging import getLogger
 from pathlib import Path
-from typing import Optional
 
 from graphql import (
-    build_schema,
-    GraphQLObjectType,
-    GraphQLSchema,
-    GraphQLUnionType,
+    DirectiveDefinitionNode,
+    DocumentNode,
+    EnumTypeDefinitionNode,
+    GraphQLArgument,
     GraphQLField,
     GraphQLList,
+    GraphQLObjectType,
+    GraphQLSchema,
     GraphQLString,
+    GraphQLUnionType,
+    InputObjectTypeDefinitionNode,
+    InterfaceTypeDefinitionNode,
+    ObjectTypeDefinitionNode,
+    ScalarTypeDefinitionNode,
+    TypeDefinitionNode,
+    UnionTypeDefinitionNode,
+    build_schema,
     extend_schema,
     parse,
-    GraphQLArgument,
-    DocumentNode,
-    DirectiveDefinitionNode,
-    ObjectTypeDefinitionNode,
-    TypeDefinitionNode,
-    ScalarTypeDefinitionNode,
-    InputObjectTypeDefinitionNode,
-    UnionTypeDefinitionNode,
-    EnumTypeDefinitionNode,
-    InterfaceTypeDefinitionNode,
 )
 
-from octopoes.ddl.schema import BaseSchema, CompleteSchema, APISchema
+from octopoes.ddl.schema import APISchema, BaseSchema, CompleteSchema
 
 logger = getLogger(__name__)
 
 
-class SchemaValidationException(Exception):
+class SchemaValidationError(Exception):
     """Exception raised when a schema is invalid."""
 
 
@@ -80,7 +79,7 @@ class SchemaLoader:
       Meant to expose to API
     """
 
-    def __init__(self, ooi_schema_definition: Optional[str] = None):
+    def __init__(self, ooi_schema_definition: str | None = None):
         """Initialize instance."""
         self.ooi_schema_definition = (
             ooi_schema_definition if ooi_schema_definition is not None else OOI_SCHEMA_FILE.read_text()
@@ -102,7 +101,7 @@ class SchemaLoader:
         """Load the schema from disk."""
         return BaseSchema(extend_schema(self.base_schema.schema, self.ooi_schema_document))
 
-    def validate_type_definition_node(self, node: TypeDefinitionNode) -> str:
+    def validate_type_definition_node(self, node: TypeDefinitionNode) -> str:  # noqa: C901
         """Validate type definitions in general."""
         if node.name.value in RESERVED_TYPE_NAMES or node.name.value in BUILTIN_TYPES:
             return f"Use of reserved type name is not allowed [type={node.name.value}]"
@@ -113,7 +112,12 @@ class SchemaLoader:
         # Validate that natural keys are defined as fields
         if not isinstance(  # pylint: disable=too-many-nested-blocks
             node,
-            (UnionTypeDefinitionNode, EnumTypeDefinitionNode, InterfaceTypeDefinitionNode, ScalarTypeDefinitionNode),
+            (
+                UnionTypeDefinitionNode,
+                EnumTypeDefinitionNode,
+                InterfaceTypeDefinitionNode,
+                ScalarTypeDefinitionNode,
+            ),
         ):
             natural_keys = set()
             fields = set()
@@ -177,26 +181,42 @@ class SchemaLoader:
     def validate_ooi_schema(self) -> None:
         """Look into the AST of the schema definition file to apply restrictions.
 
-        References:
+        References
+        ----------
             - https://graphql-core-3.readthedocs.io/en/latest/modules/language.html
         """
         validators = [
-            (lambda x: issubclass(type(x), UnionTypeDefinitionNode), self.validate_union_definition_node),
-            (lambda x: issubclass(type(x), ObjectTypeDefinitionNode), self.validate_object_type_definition_node),
-            (lambda x: issubclass(type(x), DirectiveDefinitionNode), self.validate_directive_definition_node),
+            (
+                lambda x: issubclass(type(x), UnionTypeDefinitionNode),
+                self.validate_union_definition_node,
+            ),
+            (
+                lambda x: issubclass(type(x), ObjectTypeDefinitionNode),
+                self.validate_object_type_definition_node,
+            ),
+            (
+                lambda x: issubclass(type(x), DirectiveDefinitionNode),
+                self.validate_directive_definition_node,
+            ),
             (
                 lambda x: issubclass(type(x), InputObjectTypeDefinitionNode),
                 self.validate_input_object_definition_node,
             ),
-            (lambda x: issubclass(type(x), TypeDefinitionNode), self.validate_type_definition_node),
-            (lambda x: issubclass(type(x), ScalarTypeDefinitionNode), self.validate_scalar_type_definition_node),
+            (
+                lambda x: issubclass(type(x), TypeDefinitionNode),
+                self.validate_type_definition_node,
+            ),
+            (
+                lambda x: issubclass(type(x), ScalarTypeDefinitionNode),
+                self.validate_scalar_type_definition_node,
+            ),
         ]
 
         for definition in self.ooi_schema_document.definitions:
             for validator in validators:
                 if validator[0](definition):  # type: ignore
                     if error_message := validator[1](definition):
-                        raise SchemaValidationException(error_message)
+                        raise SchemaValidationError(error_message)
 
     @cached_property
     def complete_schema_document(self) -> DocumentNode:
@@ -238,7 +258,8 @@ class SchemaLoader:
                     continue
 
                 target_field_type.fields[field.args["reverse_name"].default_value] = GraphQLField(
-                    GraphQLList(type_), {"backlink": GraphQLArgument(GraphQLString, default_value=field_name)}
+                    GraphQLList(type_),
+                    {"backlink": GraphQLArgument(GraphQLString, default_value=field_name)},
                 )
 
         # Construct Query Type

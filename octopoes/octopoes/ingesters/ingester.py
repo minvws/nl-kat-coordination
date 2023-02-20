@@ -1,12 +1,13 @@
 """Main processing logic for Octopoes."""
+import http
 import logging
 import threading
-from typing import Callable, Optional, Any, NoReturn
+from typing import Any, Callable, NoReturn, Optional
 
-from graphql import GraphQLResolveInfo, GraphQLUnionType, GraphQLObjectType
+from graphql import GraphQLObjectType, GraphQLResolveInfo, GraphQLUnionType
 from requests import HTTPError
 
-from octopoes.connectors.services.xtdb import XTDBHTTPClient, XTDBSession, OperationType
+from octopoes.connectors.services.xtdb import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.context.context import AppContext
 from octopoes.ddl.dataclasses import DataclassGenerator
 from octopoes.ddl.ddl import SchemaLoader
@@ -57,7 +58,7 @@ class Ingester:  # pylint: disable=too-many-instance-attributes
             current_schema = SchemaLoader(current_schema_def["schema"])
             current_schema = SchemaLoader()
         except HTTPError as exc:
-            if exc.response.status_code == 404:
+            if exc.response.status_code == http.HTTPStatus.NOT_FOUND:
                 logger.info("No current_schema found in XTDB, using OpenKAT schema from disk")
                 current_schema = SchemaLoader()
             else:
@@ -108,7 +109,10 @@ class Ingester:  # pylint: disable=too-many-instance-attributes
         return data["object_type"]
 
     def resolve_graphql_type(
-        self, parent_obj: Any, type_info: GraphQLResolveInfo, **kwargs: Any  # pylint: disable=unused-argument
+        self,
+        parent_obj: Any,
+        type_info: GraphQLResolveInfo,
+        **kwargs: Any,  # pylint: disable=unused-argument
     ) -> Any:
         """Fetch instances of type from XTDB."""
         # outgoing relation
@@ -118,7 +122,9 @@ class Ingester:  # pylint: disable=too-many-instance-attributes
         # backlink
         if parent_obj:
             return self.object_repository.list_by_incoming_relation(
-                parent_obj["primary_key"], type_info.return_type.of_type.name, kwargs["backlink"]
+                parent_obj["primary_key"],
+                type_info.return_type.of_type.name,
+                kwargs["backlink"],
             )
 
         return self.object_repository.list_by_object_type(type_info.return_type.of_type.name)

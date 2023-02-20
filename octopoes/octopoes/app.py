@@ -19,7 +19,8 @@ from octopoes.utils import thread
 class App:
     """Main application definition for Octopoes.
 
-    Attributes:
+    Attributes
+    ----------
         logger:
             The logger for the class.
         ctx:
@@ -42,6 +43,7 @@ class App:
         """Initialize the application.
 
         Args:
+        ----
             ctx:
                 Application context of shared data (e.g. configuration,
                 external services connections).
@@ -85,6 +87,7 @@ class App:
         """Make a function run in a thread, and add it to the dict of threads.
 
         Args:
+        ----
             name: The name of the thread.
             func: The function to run in the thread.
             interval: The interval to run the function.
@@ -112,6 +115,7 @@ class App:
         """Create an ingesters for the given organisation.
 
         Args:
+        ----
             org: The organisation to create an ingesters for.
         """
         return Ingester(self.ctx, f"{org.id}", organisation=org)
@@ -134,7 +138,11 @@ class App:
                 del self.ingesters[ingester.ingester_id]
                 break
 
-        self.logger.info("Removed %s organisations from ingesters [org_ids=%s]", len(removals), removals)
+        self.logger.info(
+            "Removed %s organisations from ingesters [org_ids=%s]",
+            len(removals),
+            removals,
+        )
 
         for org_id in additions:
             org = self.ctx.services.katalogus.get_organisation(org_id)
@@ -142,7 +150,11 @@ class App:
             ingester = self.create_ingester(org)
             self.ingesters[ingester.ingester_id] = ingester
 
-        self.logger.info("Added %s organisations to ingesters [org_ids=%s]", len(additions), additions)
+        self.logger.info(
+            "Added %s organisations to ingesters [org_ids=%s]",
+            len(additions),
+            additions,
+        )
 
     def run(self) -> None:
         """Start the Octopoes application, and run in threads the following processes.

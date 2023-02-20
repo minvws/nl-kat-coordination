@@ -1,11 +1,8 @@
 from enum import Enum
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
-from octopoes.config.settings import Settings
-from octopoes.connectors.services import HTTPService
 from octopoes.connectors.services.katalogus import Katalogus
 from octopoes.context.context import AppContext
 from octopoes.ddl.dataclasses import OOI

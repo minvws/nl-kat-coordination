@@ -1,4 +1,4 @@
-"""This module defines the classes that represent the Octopoes GraphQL schema layers.
+"""Module defines the classes that represent the Octopoes GraphQL schema layers.
 
 The Octopoes GraphQL schema is hierarchical, composed of the following layers:
 
@@ -7,12 +7,12 @@ OOISchema: Extends BaseSchema with user-configured OOI types.
 CompleteSchema: Extends OOISchema with KAT concrete types like Origin and ScanProfile.
 APISchema: Extends CompleteSchema with backlink-properties and Query type. This layer is presented to the API.
 """
-from typing import cast, List
+from typing import List, cast
 
 from graphql import (
-    GraphQLSchema,
     GraphQLInterfaceType,
     GraphQLObjectType,
+    GraphQLSchema,
     GraphQLUnionType,
 )
 

@@ -4,6 +4,7 @@ from typing import List
 
 from octopoes.connectors.errors import exception_handler
 from octopoes.models.organisation import Organisation
+
 from .services import HTTPService
 
 

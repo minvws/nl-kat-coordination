@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 
-from pydantic import BaseSettings, AnyHttpUrl
+from pydantic import AnyHttpUrl, BaseSettings
 
 
 class Settings(BaseSettings):

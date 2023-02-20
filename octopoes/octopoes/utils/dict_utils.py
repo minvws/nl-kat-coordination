@@ -1,5 +1,5 @@
 """Dict utitilies."""
-from typing import Any, List, Optional, MutableMapping, Tuple
+from typing import Any, List, MutableMapping, Optional, Tuple
 
 
 def deep_get(data: Optional[Any], keys: List[str]) -> Any:

@@ -13,7 +13,8 @@ from ..connector import Connector  # noqa
 class HTTPService(Connector):
     """HTTPService exposes methods to make http requests to services that typically expose rest api endpoints.
 
-    Attributes:
+    Attributes
+    ----------
         logger:
             The logger for the class.
         session:
@@ -43,6 +44,7 @@ class HTTPService(Connector):
         """Initialize instance. During initialization the host will be checked if it is available and healthy.
 
         Args:
+        ----
             host:
                 A string url formatted reference to the host of the service
             source:
@@ -97,7 +99,8 @@ class HTTPService(Connector):
             params:
                 A dict to set the request_body paramaters for the request
 
-        Returns:
+        Returns
+        -------
             A request.Response object
         """
         response = self.session.get(
@@ -131,7 +134,8 @@ class HTTPService(Connector):
             params:
                 A dict to set the request_body paramaters for the request
 
-        Returns:
+        Returns
+        -------
             A request.Response object
         """
         response = self.session.post(
@@ -178,7 +182,8 @@ class HTTPService(Connector):
     def is_healthy(self) -> bool:
         """Check if host is healthy by inspecting the host's health endpoint.
 
-        Returns:
+        Returns
+        -------
             A boolean
         """
         if self.host is None:
@@ -194,7 +199,8 @@ class HTTPService(Connector):
     def _verify_response(self, response: requests.Response) -> None:
         """Verify the received response from a request.
 
-        Raises:
+        Raises
+        ------
             Exception
         """
         try:

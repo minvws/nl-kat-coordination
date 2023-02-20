@@ -21,6 +21,10 @@ paths = ["octopoes", "tests"]
 disable = ["R0914","W1514", "R0903", "E0401", "R0401"] # Ignore too-many-local-variables; unspecified encodings; too-few-public-methods; import-error; cyclic-import
 extension-pkg-whitelist = "pydantic" # Ignore pydantic import checks
 
+[tool.black]
+target-version = ["py38"]
+line-length = 120
+
 [tool.mypy]
 python_version = "3.8"
 plugins = ["pydantic.mypy"]
@@ -60,5 +64,6 @@ pre-commit = "^2.20.0"
 
 [tool.ruff]
 extend = "../pyproject.toml"
-#select = ["E", "F", "ERA", "W", "TID", "DJ", "UP", "RUF", "C90", "D", "PL"]
-extend-exclude = ["tests", "docs/source/conf.py"]
+select = ["E", "F", "ERA", "W", "TID", "DJ", "UP", "RUF", "C90", "PL", "I", "PT", "N"]
+extend-exclude = ["tests/", "docs/source/conf.py", "packaging/"]
+

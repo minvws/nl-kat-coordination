@@ -3,12 +3,12 @@
 import logging
 from pathlib import Path
 from string import Template
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
 
 import uvicorn
-from fastapi import FastAPI, status, Body, APIRouter, Depends, HTTPException
-from fastapi.responses import PlainTextResponse, HTMLResponse, JSONResponse
-from graphql import print_schema, graphql_sync
+from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, status
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from graphql import graphql_sync, print_schema
 from pydantic import BaseModel, Field
 from requests import HTTPError
 
@@ -173,13 +173,16 @@ class Server:
         """Serve graphiql frontend."""
         # load template from disk
         graphiql_template = Path(__file__).parent / "static" / "graphiql.html"
-        with open(graphiql_template, "r") as graphiql_html:
+        with open(graphiql_template) as graphiql_html:
             template = graphiql_html.read()
             return Template(template).substitute(ingester_id=ingester_id)
 
     def post_graphql(self, ingester_id: str, request_body: GraphqlRequest) -> Any:
         """Execute grqpql query."""
-        result = graphql_sync(self.ingesters[ingester_id].current_schema.api_schema.schema, request_body.query)
+        result = graphql_sync(
+            self.ingesters[ingester_id].current_schema.api_schema.schema,
+            request_body.query,
+        )
         return result.formatted
 
     def post_object(

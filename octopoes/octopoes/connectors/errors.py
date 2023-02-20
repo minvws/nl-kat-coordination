@@ -1,7 +1,7 @@
 """Connector errors."""
 
 import functools
-from typing import Callable, Any, TypeVar, cast
+from typing import Any, Callable, TypeVar, cast
 
 import pydantic
 
