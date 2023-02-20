@@ -37,7 +37,7 @@ py==1.11.0
 pyasn1==0.4.8
 pycparser==2.21
 pydantic==1.10.4
-pylint==2.15.6
+pylint==2.15.10
 pynacl==1.5.0
 pyparsing==3.0.9
 pytest==7.2.1

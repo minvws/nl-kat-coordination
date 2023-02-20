@@ -1,6 +1,6 @@
 # Python linters
 mypy==0.991
-pylint==2.15.5
+pylint==2.15.10
 vulture==2.6
 
 # Python formatter
