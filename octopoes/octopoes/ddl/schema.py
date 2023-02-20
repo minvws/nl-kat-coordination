@@ -41,18 +41,14 @@ class BaseSchema:
     def object_types(self) -> List[GraphQLObjectType]:
         """Return all object types."""
         return [
-            t
-            for t in self.schema.type_map.values()
-            if isinstance(t, GraphQLObjectType) and not t.name.startswith("__")
+            t for t in self.schema.type_map.values() if isinstance(t, GraphQLObjectType) and not t.name.startswith("__")
         ]
 
     @property
     def union_types(self) -> List[GraphQLUnionType]:
         """Return all union types."""
         return [
-            t
-            for t in self.schema.type_map.values()
-            if isinstance(t, GraphQLUnionType) and not t.name.startswith("__")
+            t for t in self.schema.type_map.values() if isinstance(t, GraphQLUnionType) and not t.name.startswith("__")
         ]
 
     def get_object_type(self, name: str) -> GraphQLObjectType:
