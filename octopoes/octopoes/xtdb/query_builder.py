@@ -27,7 +27,6 @@ def generate_pull_query(
     limit: Optional[int] = None,
     field_node: Optional[RelatedFieldNode] = None,
 ) -> str:
-
     pk_prefix = ":crux.db/id" if xtdb_type == XTDBType.CRUX else ":xt/id"
 
     in_params = []

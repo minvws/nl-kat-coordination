@@ -32,6 +32,7 @@ from rocky.views.scan_profile import ScanProfileResetView, ScanProfileDetailView
 from rocky.views.scans import ScanListView
 from rocky.views.tasks import BoefjesTaskListView, NormalizersTaskListView, DownloadTaskDetail
 from rocky.views.upload_csv import UploadCSV
+from rocky.views.upload_raw import UploadRaw
 from tools.viewsets import OrganizationViewSet
 
 handler404 = "rocky.views.handler404.handler404"
@@ -128,11 +129,8 @@ urlpatterns += i18n_patterns(
         name="scan_profile_detail",
     ),
     path("<organization_code>/scans/", ScanListView.as_view(), name="scan_list"),
-    path(
-        "<organization_code>/upload/csv/",
-        UploadCSV.as_view(),
-        name="upload_csv",
-    ),
+    path("<organization_code>/upload/csv/", UploadCSV.as_view(), name="upload_csv"),
+    path("<organization_code>/upload/raw/", UploadRaw.as_view(), name="upload_raw"),
     path("<organization_code>/tasks/", BoefjesTaskListView.as_view(), name="task_list"),
     path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
     path(

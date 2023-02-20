@@ -10,7 +10,6 @@ def run(
     input_ooi: HTTPHeader,
     additional_oois: List,
 ) -> Iterator[OOI]:
-
     header = input_ooi
     if header.key.lower() != "strict-transport-security":
         return

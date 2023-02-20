@@ -10,7 +10,6 @@ def run(
     ip_address: IPAddress,
     additional_oois: List[Union[IPPort, ResolvedHostname]],
 ) -> Iterator[OOI]:
-
     hostnames = [resolved.hostname for resolved in additional_oois if isinstance(resolved, ResolvedHostname)]
     ip_ports = [ip_port for ip_port in additional_oois if isinstance(ip_port, IPPort)]
 

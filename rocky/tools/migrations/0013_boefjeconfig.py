@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0012_rename_module_job_boefje_name"),
     ]

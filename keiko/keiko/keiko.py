@@ -88,7 +88,6 @@ def generate_report(
 
     # create temp folder
     with tempfile.TemporaryDirectory() as tmp_dirname:
-
         logger.info(
             "Temporary folder created. [report_id=%s] [template=%s] [tmp_dirname=%s]",
             report_id,

@@ -29,7 +29,6 @@ class KeikoClient:
         return res.json()["report_id"]
 
     def get_report(self, report_id: str) -> BinaryIO:
-
         # try max 15 times to get the report, 1 second interval
         for i in range(15):
             time.sleep(1)

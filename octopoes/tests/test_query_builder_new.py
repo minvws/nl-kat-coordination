@@ -217,7 +217,6 @@ class QueryNodeTest(TestCase):
         )
 
     def test_escape_injection_success(self):
-
         query = generate_pull_query(
             FieldSet.ALL_FIELDS,
             where={"attr_1": 'test_value_with_quotes" and injection'},

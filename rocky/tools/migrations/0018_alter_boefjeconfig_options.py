@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0017_alter_organizationmember_foreignkey"),
     ]

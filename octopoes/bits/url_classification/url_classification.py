@@ -11,7 +11,6 @@ def run(
     url: URL,
     additional_oois: List,
 ) -> Iterator[OOI]:
-
     if url.raw.scheme == "http" or url.raw.scheme == "https":
         port = url.raw.port
         if port is None:
