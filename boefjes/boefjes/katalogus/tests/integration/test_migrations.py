@@ -61,16 +61,16 @@ class TestRepositories(TestCase):
         alembic.config.main(argv=alembicArgs)
 
         with engine.connect() as connection:
-            res = connection.execute(text("SELECT * FROM setting"))
-            assert res.fetchall() == [
-                (1, "key5", "val5", 1, "test-plugin2"),
-                (2, "key7", "val7", 1, "test-plugin2"),
-                (3, "key1", "val1", 1, "test-plugin1"),
-                (4, "key3", "val3", 1, "test-plugin1"),
-                (5, "key4", "val4", 2, "test-plugin2"),
-                (6, "key6", "val6", 2, "test-plugin2"),
-                (7, "key2", "val2", 2, "test-plugin1"),
-            ]
+            results = [x[1:] for x in connection.execute(text("SELECT * FROM setting")).fetchall()]
+
+        assert len(results) == 7
+        assert ("key5", "val5", 1, "test-plugin2") in results
+        assert ("key7", "val7", 1, "test-plugin2") in results
+        assert ("key1", "val1", 1, "test-plugin1") in results
+        assert ("key3", "val3", 1, "test-plugin1") in results
+        assert ("key4", "val4", 2, "test-plugin2") in results
+        assert ("key6", "val6", 2, "test-plugin2") in results
+        assert ("key2", "val2", 2, "test-plugin1") in results
 
         alembicArgs = ["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"]
         alembic.config.main(argv=alembicArgs)

@@ -5,9 +5,12 @@ Revises: 197672984df0
 Create Date: 2023-02-16 14:47:20.424959
 
 """
+import json
+
 from alembic import op
 import sqlalchemy as sa
 
+from boefjes.sql.setting_storage import create_encrypter
 
 # revision identifiers, used by Alembic.
 revision = "cd34fdfafdaf"
@@ -21,7 +24,7 @@ def upgrade() -> None:
     op.create_table(
         "settings",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("values", sa.JSON(), nullable=False),
+        sa.Column("values", sa.String(length=256), nullable=False),
         sa.Column("plugin_id", sa.String(length=64), nullable=False),
         sa.Column("organisation_pk", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["organisation_pk"], ["organisation.pk"], ondelete="CASCADE"),
@@ -30,12 +33,29 @@ def upgrade() -> None:
     )
 
     conn = op.get_bind()
+    encrypter = create_encrypter()
 
-    # Seed the original data into the new table
-    conn.execute(
-        "INSERT INTO settings (values, plugin_id, organisation_pk) SELECT json_object_agg(key, value) "
-        "AS values, plugin_id, organisation_pk FROM setting GROUP BY organisation_pk, plugin_id;"
-    )
+    with conn.begin():
+        res = conn.execute(
+            "SELECT json_object_agg(key, value) "
+            "AS values, plugin_id, organisation_pk FROM setting GROUP BY plugin_id, organisation_pk;"
+        )
+
+        results = []
+        for result in res.fetchall():
+            new_values = {}
+            for key, value in result[0].items():
+                new_values[key] = encrypter.decode(value)
+
+            new_result = (encrypter.encode(json.dumps(new_values)), result[1], result[2])
+            results.append(new_result)
+
+        # Seed the encrypted original data into the new table
+        for result in results:
+            conn.execute(
+                f"INSERT INTO settings (values, plugin_id, organisation_pk) "
+                f"VALUES ('{result[0]}', '{result[1]}', {result[2]})"
+            )
 
     op.drop_table("setting")
     # ### end Alembic commands ###
@@ -58,12 +78,23 @@ def downgrade() -> None:
     )
 
     conn = op.get_bind()
+    encrypter = create_encrypter()
 
-    # Seed the original data into the new table
-    conn.execute(
-        "INSERT INTO setting (key, value, organisation_pk, plugin_id) SELECT json_data.key AS key, json_data.value "
-        "AS value, organisation_pk, plugin_id from settings, json_each_text(settings.values) AS json_data;"
-    )
+    with conn.begin():
+        res = conn.execute("SELECT values, plugin_id, organisation_pk from settings;")
+
+        results = []
+        for result in res.fetchall():
+            decoded_values = json.loads(encrypter.decode(result[0]))
+
+            for key, value in decoded_values.items():
+                results.append((key, encrypter.encode(value), result[1], result[2]))
+
+        for result in results:
+            conn.execute(
+                f"INSERT INTO setting (key, value, plugin_id, organisation_pk) "
+                f"VALUES ('{result[0]}', '{result[1]}', '{result[2]}', {result[3]})"
+            )
 
     op.drop_table("settings")
     # ### end Alembic commands ###

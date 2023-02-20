@@ -6,7 +6,6 @@ from sqlalchemy import (
     UniqueConstraint,
     Table,
     Boolean,
-    JSON,
 )
 from sqlalchemy.orm import relationship
 
@@ -51,7 +50,7 @@ class SettingsInDB(SQL_BASE):
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    values = Column(JSON, nullable=False)
+    values = Column(String(length=256), nullable=False)
     plugin_id = Column(String(length=64), nullable=False)
     organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
 

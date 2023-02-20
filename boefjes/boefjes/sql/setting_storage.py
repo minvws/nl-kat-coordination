@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Dict
 
@@ -30,7 +31,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
                 SettingsInDB, organisation_id=organisation_id
             )
 
-        return self.encryption.decode(instance.values[key])
+        return json.loads(self.encryption.decode(instance.values))[key]
 
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         try:
@@ -38,33 +39,42 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
         except SettingsNotFound:
             return {}
 
-        return {key: self.encryption.decode(value) for key, value in instance.values.items()}
+        return {key: value for key, value in json.loads(self.encryption.decode(instance.values)).items()}
 
     def create(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
         logger.info("Saving settings: %s for organisation %s", settings, organisation_id)
 
         try:
             instance = self._db_instance_by_id(organisation_id, plugin_id)
-            instance.values = {**instance.values, **{key: self.encryption.encode(value)}}
+            json_settings = json.dumps({**json.loads(self.encryption.decode(instance.values)), **{key: value}})
+            instance.values = self.encryption.encode(json_settings)
         except SettingsNotFound:
             organisation = self.session.query(OrganisationInDB).filter(OrganisationInDB.id == organisation_id).first()
-            encoded_settings = {key: self.encryption.encode(value)}
+            all_settings = {key: value}
 
-            setting_in_db = SettingsInDB(values=encoded_settings, plugin_id=plugin_id, organisation_pk=organisation.pk)
+            setting_in_db = SettingsInDB(
+                values=self.encryption.encode(json.dumps(all_settings)),
+                plugin_id=plugin_id,
+                organisation_pk=organisation.pk,
+            )
             self.session.add(setting_in_db)
 
     def update_by_key(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
         instance = self._db_instance_by_id(organisation_id, plugin_id)
 
-        instance.values = {**instance.values, **{key: self.encryption.encode(value)}}
+        instance.values = self.encryption.encode(
+            json.dumps({**json.loads(self.encryption.decode(instance.values)), **{key: value}})
+        )
 
     def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
         instance = self._db_instance_by_id(organisation_id, plugin_id)
         filtered_values = {
-            instance_key: value for instance_key, value in instance.values.items() if instance_key != key
+            instance_key: value
+            for instance_key, value in json.loads(self.encryption.decode(instance.values)).items()
+            if instance_key != key
         }
 
-        instance.values = filtered_values
+        instance.values = self.encryption.encode(json.dumps(filtered_values))
 
     def _db_instance_by_id(self, organisation_id: str, plugin_id: str) -> SettingsInDB:
         instance = (
@@ -88,6 +98,12 @@ def create_setting_storage(session) -> SettingsStorage:
     if not settings.enable_db:
         return SettingsStorageMemory()
 
+    encrypter = create_encrypter()
+
+    return SQLSettingsStorage(session, encrypter)
+
+
+def create_encrypter():
     encrypter = IdentityMiddleware()
     if get_context().env.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
         encrypter = NaclBoxMiddleware(
@@ -95,4 +111,4 @@ def create_setting_storage(session) -> SettingsStorage:
             get_context().env.katalogus_public_key_b64,
         )
 
-    return SQLSettingsStorage(session, encrypter)
+    return encrypter
