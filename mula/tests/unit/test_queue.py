@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from tests.utils import functions
 
 
-class TestPriorityQueue(queues.PriorityQueue):
+class MockPriorityQueue(queues.PriorityQueue):
     def create_hash(self, item: functions.TestModel):
         return hash(item.id)
 
@@ -22,7 +22,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         self.pq_store = sqlalchemy.PriorityQueueStore(datastore=self.datastore)
 
-        self.pq = TestPriorityQueue(
+        self.pq = MockPriorityQueue(
             pq_id="test",
             maxsize=10,
             item_type=functions.TestModel,

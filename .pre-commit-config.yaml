@@ -32,7 +32,8 @@ repos:
     rev: v2.7
     hooks:
       - id: vulture
-        exclude: "/tests/"
+        exclude: |
+          /tests/
 
   - repo: https://github.com/psf/black
     rev: "23.1.0"
@@ -48,12 +49,12 @@ repos:
           (?x)(
           ^boefjes/ |
           ^keiko/templates |
-          ^mula/whitelist.py$ |
+          ^mula/whitelist\.py$ |
           ^octopoes/ |
           ^rocky/ |
           /tests/ |
-          docs/source/conf.py$ |
-          setup.py$
+          docs/source/conf\.py$ |
+          setup\.py$
           )
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
