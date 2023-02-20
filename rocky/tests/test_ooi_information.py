@@ -109,6 +109,7 @@ def test_cwe_info():
         "description": "The product does not validate or incorrectly validates input "
         "that can affect the control flow or data flow of a program.",
         "source": "https://cwe.mitre.org/index.html",
+        "risk": "Very low",
     }
 
     output = cwe_info("CWE-223230")
