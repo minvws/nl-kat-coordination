@@ -69,7 +69,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     zone_links: Dict[str, DNSZone] = {}
 
     for response in responses:
-
         for rrset in response.answer:
             for rr in rrset:
                 rr: Rdata

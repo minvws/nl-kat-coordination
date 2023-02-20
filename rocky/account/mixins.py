@@ -49,7 +49,6 @@ class OrganizationView(View):
         self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)
 
     def dispatch(self, request, *args, **kwargs):
-
         if self.organization is None or self.organization_member is None:
             raise Http404()
 

@@ -18,7 +18,6 @@ class ZoneNotFoundException(Exception):
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
-
     hostname = boefje_meta.arguments["input"]["name"]
 
     requested_dns_name = dns.name.from_text(hostname)
@@ -30,7 +29,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     dns_record_types = ["A", "AAAA", "TXT", "MX", "NS", "CNAME", "DNAME"]
     for type_ in dns_record_types:
-
         try:
             resolver = dns.resolver.Resolver()
             resolver.nameservers = [settings.remote_ns]
@@ -55,7 +53,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
 def get_parent_zone_soa(name: Name) -> Answer:
     while True:
-
         try:
             return dns.resolver.resolve(name, dns.rdatatype.SOA)
         except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):

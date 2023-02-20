@@ -55,7 +55,6 @@ def schedule_scan_profile_recalculations():
 
 @app.task(queue=settings.queue_name_octopoes)
 def recalculate_scan_profiles(org: str, *args, **kwargs):
-
     # bootstrap octopoes
     octopoes, _, session, rabbit_connection = bootstrap_octopoes(settings, org)
 

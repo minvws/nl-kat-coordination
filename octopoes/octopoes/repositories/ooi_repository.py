@@ -144,7 +144,6 @@ datamodel = Datamodel(entities=entities)
 
 
 class XTDBOOIRepository(OOIRepository):
-
     xtdb_type: XTDBType = XTDBType.CRUX
 
     def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
@@ -158,7 +157,6 @@ class XTDBOOIRepository(OOIRepository):
 
     @classmethod
     def serialize(cls, ooi: OOI) -> Dict[str, Any]:
-
         # export model with pydantic serializers
         export = json.loads(ooi.json())
 
@@ -311,7 +309,6 @@ class XTDBOOIRepository(OOIRepository):
         search_types: Optional[Set[Type[OOI]]] = None,
         depth: Optional[int] = 1,
     ) -> ReferenceTree:
-
         if search_types is None:
             search_types = {OOI}
         search_types = to_concrete(search_types)
@@ -354,7 +351,6 @@ class XTDBOOIRepository(OOIRepository):
         exclude: Optional[Set[Reference]] = None,
         valid_time: Optional[datetime] = None,
     ) -> List[ReferenceNode]:
-
         if depth == 0 or not references:
             return []
 
@@ -416,7 +412,6 @@ class XTDBOOIRepository(OOIRepository):
 
     @classmethod
     def construct_neighbour_query(cls, reference: Reference, paths: Optional[Set[Path]] = None) -> str:
-
         if paths is None:
             paths = get_paths_to_neighours(reference.class_type)
 
@@ -443,7 +438,6 @@ class XTDBOOIRepository(OOIRepository):
 
     @classmethod
     def construct_neighbour_query_multi(cls, references: Set[Reference], paths: Set[Path]) -> str:
-
         encoded_segments = [cls.encode_segment(path.segments[0]) for path in sorted(paths)]
         segment_query_sections = [f"{{:{s} [*]}}" for s in encoded_segments]
 
@@ -468,7 +462,6 @@ class XTDBOOIRepository(OOIRepository):
     def get_neighbours(
         self, reference: Reference, valid_time: datetime, paths: Set[Path] = None
     ) -> Dict[Path, List[OOI]]:
-
         query = self.construct_neighbour_query(reference, paths)
 
         response = self.session.client.query(query, valid_time=valid_time)
@@ -491,7 +484,6 @@ class XTDBOOIRepository(OOIRepository):
         return ret
 
     def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
-
         query = self.construct_neighbour_query_multi(references, paths)
 
         response = self.session.client.query(query, valid_time=valid_time)
@@ -516,7 +508,6 @@ class XTDBOOIRepository(OOIRepository):
         return neighbours
 
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
-
         # retrieve old ooi
         old_ooi = None
         try:
@@ -548,7 +539,6 @@ class XTDBOOIRepository(OOIRepository):
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
     def delete(self, reference: Reference, valid_time: datetime) -> None:
-
         # retrieve old ooi
         try:
             ooi = self.get(reference, valid_time=valid_time)
