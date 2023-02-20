@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, Optional, Any, Union, TypedDict, Tuple
+from uuid import uuid4
 
 from django.contrib.auth import get_user_model
 from pydantic import parse_obj_as
@@ -378,7 +379,8 @@ def create_ooi(
     if observed_at is None:
         observed_at = datetime.now(timezone.utc)
 
-    declaration = Declaration(ooi=ooi, valid_time=observed_at)
-    bytes_client.add_manual_proof(BytesClient.raw_from_declarations([declaration]))
+    task_id = uuid4()
+    declaration = Declaration(ooi=ooi, valid_time=observed_at, task_id=str(task_id))
+    bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))
 
     api_connector.save_declaration(declaration)
