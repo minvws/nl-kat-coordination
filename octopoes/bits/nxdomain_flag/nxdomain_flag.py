@@ -10,7 +10,6 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[NXDOMAIN],
 ) -> Iterator[OOI]:
-
     if additional_oois:
         nxdomain = KATFindingType(id="KAT-NXDOMAIN")
         yield nxdomain

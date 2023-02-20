@@ -10,7 +10,6 @@ def run(
     hostname: Hostname,
     additional_oois: List[Union[DNSAAAARecord, DNSARecord, DNSNSRecord]],
 ) -> Iterator[OOI]:
-
     dns_a_records = [dns_a_record for dns_a_record in additional_oois if isinstance(dns_a_record, DNSARecord)]
     dns_aaaa_records = [
         dns_aaaa_record for dns_aaaa_record in additional_oois if isinstance(dns_aaaa_record, DNSAAAARecord)

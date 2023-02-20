@@ -45,7 +45,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
 
 def check_with_header(url_input: str, header_name: str, payload: str, timeout: int) -> Optional[str]:
-
     try:
         response = requests.get(url_input, headers={header_name: payload}, verify=False, timeout=timeout)
 

@@ -72,7 +72,6 @@ class OctopoesView(OrganizationView):
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
-
                 if origin.origin.origin_type != OriginType.OBSERVATION:
                     continue
 

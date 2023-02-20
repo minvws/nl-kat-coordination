@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from typing import Type, List
+from uuid import uuid4
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -121,9 +122,13 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
 
     def save_ooi(self, data) -> OOI:
         new_ooi = self.ooi_class.parse_obj(data)
-        declaration = Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc))
 
-        get_bytes_client(self.organization.code).add_manual_proof(BytesClient.raw_from_declarations([declaration]))
+        task_id = uuid4()
+        declaration = Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
+
+        get_bytes_client(self.organization.code).add_manual_proof(
+            task_id, BytesClient.raw_from_declarations([declaration])
+        )
 
         self.octopoes_api_connector.save_declaration(declaration)
         return new_ooi

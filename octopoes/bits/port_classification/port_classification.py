@@ -13,7 +13,6 @@ def run(
     input_ooi: IPPort,
     additional_oois: List,
 ) -> Iterator[OOI]:
-
     port = input_ooi.port
     if port in SA_PORTS:
         open_sa_port = KATFindingType(id="KAT-OPEN-SYSADMIN-PORT")

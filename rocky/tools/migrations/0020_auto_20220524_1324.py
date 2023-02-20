@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0019_alter_scanprofile_remove_level_and_user"),
     ]

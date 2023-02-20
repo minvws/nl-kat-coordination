@@ -151,7 +151,6 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
         else:
             selected_group = Group.objects.get(name=self.cleaned_data["account_type"])
         if self.organization and selected_group:
-
             self.set_user()
             OrganizationMember.objects.get_or_create(
                 user=self.user, organization=self.organization, member_name=self.cleaned_data["name"]

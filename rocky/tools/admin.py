@@ -30,7 +30,6 @@ class JSONInfoWidget(widgets.Textarea):
 
 
 class OOIInformationAdmin(admin.ModelAdmin):
-
     # makes sure that the order stays the same
     fields = ("id", "data", "consult_api")
 

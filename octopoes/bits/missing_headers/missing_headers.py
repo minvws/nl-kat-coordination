@@ -10,7 +10,6 @@ def run(
     resource: HTTPResource,
     additional_oois: List[Union[HTTPHeader, ResolvedHostname]],
 ) -> Iterator[OOI]:
-
     if not additional_oois:
         return
 

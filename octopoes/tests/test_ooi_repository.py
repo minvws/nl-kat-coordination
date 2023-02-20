@@ -113,7 +113,6 @@ class OOIRepositoryTest(TestCase):
 
     @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
     def test_get_neighbours(self):
-
         self.session.client.query.return_value = [
             [
                 {

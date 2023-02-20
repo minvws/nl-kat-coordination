@@ -108,7 +108,6 @@ class OctopoesService:
             self.ooi_repository.delete(reference, valid_time)
 
     def save_origin(self, origin: Origin, oois: List[OOI], valid_time: datetime) -> None:
-
         origin.result = [ooi.reference for ooi in oois]
 
         if origin.origin_type != OriginType.DECLARATION and origin.source not in origin.result:
@@ -122,7 +121,6 @@ class OctopoesService:
         self.origin_repository.save(origin, valid_time=valid_time)
 
     def _run_inference(self, origin: Origin, valid_time: datetime):
-
         bit_definition = get_bit_definitions()[origin.method]
 
         source = self.ooi_repository.get(origin.source, valid_time)
@@ -142,7 +140,6 @@ class OctopoesService:
         return path_level is not None and path_level >= current_level
 
     def recalculate_scan_profiles(self, valid_time: datetime) -> None:
-
         # fetch all scan profiles
         all_scan_profiles = self.scan_profile_repository.list(None, valid_time=valid_time)
 
@@ -163,7 +160,6 @@ class OctopoesService:
         }
 
         for current_level in range(4, 0, -1):
-
             # start point: all scan profiles with current level + all higher scan levels
             start_ooi_references = {
                 profile.reference for profile in all_declared_scan_profiles if profile.level == current_level
@@ -171,7 +167,6 @@ class OctopoesService:
             next_ooi_set = {ooi for ooi in self.ooi_repository.get_bulk(start_ooi_references, valid_time).values()}
 
             while next_ooi_set:
-
                 # prepare next iteration, group oois per type
                 ooi_types = {ooi.__class__ for ooi in next_ooi_set}
                 grouped_per_type: Dict[Type[OOI], Set[OOI]] = {
@@ -180,7 +175,6 @@ class OctopoesService:
 
                 temp_next_ooi_set = set()
                 for ooi_type_ in grouped_per_type.keys():
-
                     current_ooi_set = grouped_per_type[ooi_type_]
 
                     # find paths to neighbours higher or equal than current processing level
@@ -266,7 +260,6 @@ class OctopoesService:
         )
 
     def process_event(self, event: DBEvent):
-
         # handle event
         event_handler_name = f"_on_{event.operation_type.value}_{event.entity_type}"
         handler: Optional[Callable[[DBEvent], None]] = getattr(self, event_handler_name)
@@ -286,10 +279,8 @@ class OctopoesService:
         # analyze bit definitions
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
-
             # attach bit instances
             if isinstance(ooi, bit_definition.consumes):
-
                 bit_instance = Origin(
                     origin_type=OriginType.INFERENCE,
                     method=bit_id,
@@ -300,7 +291,6 @@ class OctopoesService:
             # attach bit parameters
             for additional_param in bit_definition.parameters:
                 if isinstance(ooi, additional_param.ooi_type):
-
                     path_parts = additional_param.relation_path.split(".")
                     try:
                         tree = self.ooi_repository.get_tree(
@@ -327,7 +317,6 @@ class OctopoesService:
         ...
 
     def _on_delete_ooi(self, event: OOIDBEvent) -> None:
-
         reference = event.old_data.reference
 
         # delete related origins to which it is a source
