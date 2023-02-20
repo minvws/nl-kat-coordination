@@ -38,7 +38,7 @@ def upgrade() -> None:
     with conn.begin():
         res = conn.execute(
             "SELECT json_object_agg(key, value) "
-            "AS values, plugin_id, organisation_pk FROM setting GROUP BY plugin_id, organisation_pk;"
+            "AS values, plugin_id, organisation_pk FROM setting GROUP BY plugin_id, organisation_pk"
         )
 
         results = []
@@ -81,7 +81,7 @@ def downgrade() -> None:
     encrypter = create_encrypter()
 
     with conn.begin():
-        res = conn.execute("SELECT values, plugin_id, organisation_pk from settings;")
+        res = conn.execute("SELECT values, plugin_id, organisation_pk from settings")
 
         results = []
         for result in res.fetchall():
