@@ -94,8 +94,7 @@ class NormalizerTask(BaseModel):
 
 
 class BoefjeTask(BaseModel):
-    """BoefjeTask represent data needed for a Boefje to run.
-    """
+    """BoefjeTask represent data needed for a Boefje to run."""
 
     type: ClassVar[str] = "boefje"
 

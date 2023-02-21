@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 class Boefje(BaseModel):
     """Boefje representation."""
+
     id: str
     version: Optional[str] = Field(default=None)
 
