@@ -30,10 +30,12 @@ jobs:
           - 5432:5432
 
     steps:
-      - name: Install docker.io dependency
+      - name: Prepare postgres service Rocky
         run: |
-          sudo apt-get remove docker.io runc containerd
-          sudo apt install docker.io
+          sudo apt install -y postgresql-client
+          createdb -h postgres -U postgres rocky_db
+          createuser -h postgres -U postgres rocky
+          psql -h postgres -U postgres -d rocky_db -c 'GRANT ALL ON DATABASE rocky_db TO rocky;'  
 
       - name: Get the artifacts
         run: |
@@ -45,13 +47,6 @@ jobs:
         run: |
           tar zvxf kat-*.tar.gz
           sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
-
-      - name: Prepare postgres service Rocky
-        run: |
-          sudo apt install -y postgresql-client
-          createdb -h postgres -U postgres rocky_db
-          createuser -h postgres -U postgres rocky
-          psql -h postgres -U postgres -d rocky_db -c 'GRANT ALL ON DATABASE rocky_db TO rocky;'  
 
       - name: Migrations for Rocky
         run: |
