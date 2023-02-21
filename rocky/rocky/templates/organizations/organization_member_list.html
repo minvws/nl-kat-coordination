@@ -59,9 +59,9 @@
               </td>
               <td>
                 {% if member.verified %}
-                    {% include 'partials/single_action_form.html' with btn_text="Unverify" action='unverify' key='member_id' value=member.id btn_class="ghost" %}
+                    {% include 'partials/single_action_checkbox_form.html' with input_checked=member.verified action='unverify' key='member_id' value=member.id %}
                   {% else %}
-                    {% include 'partials/single_action_form.html' with btn_text="Verify" action='verify' key='member_id' value=member.id %}
+                    {% include 'partials/single_action_checkbox_form.html' with input_checked=member.verified action='verify' key='member_id' value=member.id %}
                 {% endif %}
               </td>
             </tr>
