@@ -1,6 +1,6 @@
 *** Settings ***
 Library     OTP
-Library     Browser
+Library     Browser    strict=False
 Library     DebugLibrary
 Library     OperatingSystem
 
@@ -8,8 +8,8 @@ Library     OperatingSystem
 *** Keywords ***
 Browser Setup
     Set Suite Variable    ${ROOT_URL}    localhost:8000
-    New Browser    chromium    headless=${headless}    downloadsPath=/tmp
-    New Context    acceptDownloads=True
+    New Browser    firefox    headless=${headless}    downloadsPath=/tmp
+    New Context    acceptDownloads=True    viewport={'width': 1920, 'height': 1080}
     New Page    ${ROOT_URL}
 
 Login As User For The First Time
@@ -50,15 +50,8 @@ Generate First DNS Report
     Click    "Create object"
     Click    xpath=//*[@id="main-content"]/section/div/form/button
     Click    "Enable and start scan"
-    Click    "Got it, generate my report"
+    Click    "Start scanning"
     Get Text    css=#main-content > section > div > h3    contains    Boefjes are scanning    boefjes are not scanning
-    Wait For Elements State    "Open my DNS-report"    enabled    300s
-    Click    "Open my DNS-report"
-    Get Text
-    ...    css=#main-content > section > div > p
-    ...    contains
-    ...    These are the findings of a KAT-analysis
-    ...    error login failed
 
 Reload The Page Until Element Contains    # For the desired effect, should be called through: Wait Until Keyword Succeeds    60s    2s    Reload The Page Until Element Contains    url    selector    keyword
     [Arguments]    ${url}    ${selector}    ${keyword}

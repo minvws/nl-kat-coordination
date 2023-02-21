@@ -1,0 +1,243 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    restart: on-failure
+    image: "rabbitmq:3.9-management"
+    deploy:
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      retries: 10
+    env_file:
+      - .env.robot-coordination
+
+  crux:
+    image: "juxt/xtdb-standalone-rocksdb:1.21.0"
+    restart: on-failure
+    deploy:
+      resources:
+          limits:
+            memory: 1024M
+          reservations:
+            memory: 512M
+
+  octopoes_api:
+    restart: on-failure
+    depends_on:
+      - crux
+    image: "ghcr.io/minvws/nl-kat-octopoes:${OCTOPOES_TAG}"
+    deploy:
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    command: web
+    env_file:
+      - .env.robot-coordination
+
+  octopoes_api_worker:
+    restart: on-failure
+    depends_on:
+      - crux
+      - rabbitmq
+    image: "ghcr.io/minvws/nl-kat-octopoes:${OCTOPOES_TAG}"
+    deploy:
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    command: worker-beat
+    env_file:
+      - .env.robot-coordination
+
+  boefje:
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+      - bytes
+    image: "ghcr.io/minvws/nl-kat-boefjes:${BOEFJES_TAG}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    command: boefje
+    env_file:
+      - .env.robot-coordination
+
+  normalizer:
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+      - bytes
+    image: "ghcr.io/minvws/nl-kat-boefjes:${BOEFJES_TAG}"
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    command: normalizer
+    env_file:
+      - .env.robot-coordination
+
+  rocky-db:
+    restart: on-failure
+    image: postgres:12.8
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    volumes:
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env.robot-coordination
+    environment:
+      - APP_DB=ROCKY_DB
+      - APP_DB_USER=ROCKY_DB_USER
+      - APP_DB_PASSWORD=ROCKY_DB_PASSWORD
+
+  bytes-db:
+    restart: on-failure
+    image: postgres:12.8
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    volumes:
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env.robot-coordination
+    environment:
+      - APP_DB=BYTES_DB
+      - APP_DB_USER=BYTES_DB_USER
+      - APP_DB_PASSWORD=BYTES_DB_PASSWORD
+
+  rocky:
+    restart: on-failure
+    depends_on:
+      - octopoes_api_worker
+      - octopoes_api
+      - rocky-db
+      - boefje
+      - normalizer
+      - katalogus
+      - scheduler
+    ports:
+      - "127.0.0.1:8000:8000"
+    image: "ghcr.io/minvws/nl-kat-rocky:${ROCKY_TAG}"
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    env_file:
+      - .env.robot-coordination
+    environment:
+      - DATABASE_MIGRATION=true
+
+  bytes:
+    restart: on-failure
+    depends_on:
+      - bytes-db
+    image: "ghcr.io/minvws/nl-kat-bytes:${BYTES_TAG}"
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    env_file:
+      - .env.robot-coordination
+    environment:
+      - BYTES_DATA_DIR=/data
+
+  katalogus:
+    restart: on-failure
+    depends_on:
+      - katalogus-db
+    image: "ghcr.io/minvws/nl-kat-boefjes:${BOEFJES_TAG}"
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    command: katalogus
+    env_file:
+      - .env.robot-coordination
+    environment:
+      - DATABASE_MIGRATION=true
+
+  katalogus-db:
+    restart: on-failure
+    image: postgres:12.8
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    volumes:
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env.robot-coordination
+    environment:
+      - APP_DB=KATALOGUS_DB
+      - APP_DB_USER=KATALOGUS_DB_USER
+      - APP_DB_PASSWORD=KATALOGUS_DB_PASSWORD
+
+  scheduler:
+    restart: on-failure
+    image: "ghcr.io/minvws/nl-kat-mula:${MULA_TAG}"
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    env_file:
+      - .env.robot-coordination
+    depends_on:
+      - boefje
+      - normalizer
+      - octopoes_api
+      - katalogus
+
+  keiko:
+    restart: on-failure
+    image: "ghcr.io/minvws/nl-kat-keiko:${KEIKO_TAG}"
+    deploy:
+      replicas: 1
+      resources:
+          limits:
+            memory: 512M
+          reservations:
+            memory: 128M
+    env_file:
+      - .env.robot-coordination
