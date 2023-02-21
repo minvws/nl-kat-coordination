@@ -171,7 +171,9 @@ class Monitor:
 
             if all_domains and (match := domains_match(self._input_domains, all_domains)):
                 for match_type, domain, match in match:
-                    self._logger.info("Match (type %s) found for %s: %s", match_type, match, ", ".join(all_domains))
+                    self._logger.info(
+                        "Match (type %s) found %s for %s: %s", match_type, match, domain, ", ".join(all_domains)
+                    )
                     self._queue.enqueue(
                         {"match_type": match_type, "domain": domain, "match": match, "domains": all_domains}
                     )
