@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Install docker.io dependency
         run: |
-          sudo apt-get docker.io
+          sudo apt-get remove docker.io
           sudo apt install docker.io
 
       - name: Get the artifacts
