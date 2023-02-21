@@ -21,6 +21,7 @@ from octopoes.models.ooi.dns.records import (
     DNSCNAMERecord,
     NXDOMAIN,
 )
+from octopoes.models.ooi.dns.zone import Hostname, DNSZone, ResolvedHostname, SimilarHostname
 from octopoes.models.ooi.email_security import (
     DNSSPFMechanismIP,
     DNSSPFMechanismHostname,
@@ -31,7 +32,6 @@ from octopoes.models.ooi.email_security import (
     DKIMKey,
     DKIMSelector,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone, ResolvedHostname
 from octopoes.models.ooi.findings import (
     Finding,
     ADRFindingType,
@@ -75,7 +75,7 @@ CertificateType = Union[
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
 ]
-DnsType = Union[DNSZone, Hostname]
+DnsType = Union[DNSZone, Hostname, SimilarHostname]
 DnsRecordType = Union[
     DNSARecord,
     DNSAAAARecord,

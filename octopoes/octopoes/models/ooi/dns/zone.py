@@ -99,7 +99,7 @@ class SimilarHostname(OOI):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"{reference.tokenized.similar_to.name} -> {reference.tokenized.hostname.name}"
+        return f"{reference.tokenized.similar_to.name} is similar to {reference.tokenized.hostname.name}"
 
 
 Hostname.update_forward_refs()
