@@ -31,7 +31,9 @@ jobs:
 
     steps:
       - name: Get the artifacts
-        run: curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v1.5.2/kat-${{ matrix.dist }}-1.5.2.tar.gz;
+        run: |
+          mkdir openkat 
+          curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v1.5.2/kat-${{ matrix.dist }}-1.5.2.tar.gz --output kat-${{ matrix.dist }}-1.5.2.tar.gz;
 
       - name: Unpack and install the artifacts
         run: |
