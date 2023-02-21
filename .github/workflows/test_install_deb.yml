@@ -34,6 +34,7 @@ jobs:
         run: |
           mkdir openkat 
           curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v1.5.2/kat-${{ matrix.dist }}-1.5.2.tar.gz --output kat-${{ matrix.dist }}-1.5.2.tar.gz;
+          curl -Ls https://github.com/dekkers/xtdb-http-multinode/releases/download/v1.0.2/xtdb-http-multinode_1.0.2_all.deb --output xtdb-http-multinode_1.0.2_all.deb;
 
       - name: Unpack and install the artifacts
         run: |
