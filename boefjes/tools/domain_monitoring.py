@@ -97,7 +97,7 @@ class MessageQueue:
         self.start_timer()
 
 
-def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple[MatchType, str]]:
+def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple[MatchType, str, str]]:
     matches = []
 
     for input_domain in input_domains:
@@ -108,13 +108,13 @@ def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple
 
             # check for direct matches against domains
             if input_domain_without_tld in tokenized_domain:
-                matches.append((MatchType.DIRECT, domain))
+                matches.append((MatchType.DIRECT, input_domain, domain))
 
             # remove direct matches and check for substring matches against domains
             diff_tokenized_domain = set(tokenized_domain).difference([input_domain_without_tld])
             for part in diff_tokenized_domain:
                 if input_domain_without_tld in part:
-                    matches.append((MatchType.SUBSTRING, domain))
+                    matches.append((MatchType.SUBSTRING, input_domain, domain))
 
     return matches
 
@@ -170,9 +170,11 @@ class Monitor:
             all_domains = message["data"]["leaf_cert"]["all_domains"]
 
             if all_domains and (match := domains_match(self._input_domains, all_domains)):
-                for match_type, match in match:
+                for match_type, domain, match in match:
                     self._logger.info("Match (type %s) found for %s: %s", match_type, match, ", ".join(all_domains))
-                    self._queue.enqueue({"match_type": match_type, "match": match, "domains": all_domains})
+                    self._queue.enqueue(
+                        {"match_type": match_type, "domain": domain, "match": match, "domains": all_domains}
+                    )
 
 
 @click.command()
@@ -202,6 +204,6 @@ def main(
 
 
 if __name__ == "__main__":
-    logging.basicConfig(format="%(asctime)s %(levelname)7s [%(name)15s]: %(message)s", level=logging.INFO)
+    logging.basicConfig(format="%(asctime)s [%(levelname)-8s] [%(name)-16s]: %(message)s", level=logging.INFO)
 
     main()

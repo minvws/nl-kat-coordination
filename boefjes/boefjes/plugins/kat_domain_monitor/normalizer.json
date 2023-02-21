@@ -1,0 +1,11 @@
+{
+  "id": "kat_domain_monitor",
+  "consumes": [
+    "application/jsonlines"
+  ],
+  "produces": [
+    "Network",
+    "Hostname",
+    "SimilarHostname"
+  ]
+}

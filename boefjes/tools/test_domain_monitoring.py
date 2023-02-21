@@ -8,36 +8,41 @@ def test_tokenize_domain():
 
 
 def test_domain_match_direct_simple():
-    assert domains_match({"vws.nl"}, ["vws.nl"]) == [(MatchType.DIRECT, "vws.nl")]
+    assert domains_match({"vws.nl"}, ["vws.nl"]) == [(MatchType.DIRECT, "vws.nl", "vws.nl")]
 
 
 def test_domain_match_direct_subdomain():
-    assert domains_match({"vws.nl"}, ["vws.freehosting.net"]) == [(MatchType.DIRECT, "vws.freehosting.net")]
+    assert domains_match({"vws.nl"}, ["vws.freehosting.net"]) == [(MatchType.DIRECT, "vws.nl", "vws.freehosting.net")]
 
 
 def test_domain_match_direct_multiple():
     assert domains_match({"example.com"}, ["example.com", "example.org"]) == [
-        (MatchType.DIRECT, "example.com"),
-        (MatchType.DIRECT, "example.org"),
+        (MatchType.DIRECT, "example.com", "example.com"),
+        (MatchType.DIRECT, "example.com", "example.org"),
+    ]
+    assert domains_match({"coronamelder.nl", "test.nl"}, ["coronamelder.nl", "coronamelder.net", "test.com"]) == [
+        (MatchType.DIRECT, "test.nl", "test.com"),
+        (MatchType.DIRECT, "coronamelder.nl", "coronamelder.nl"),
+        (MatchType.DIRECT, "coronamelder.nl", "coronamelder.net"),
     ]
 
 
 def test_domain_match_substring_simple():
-    assert domains_match({"vws.nl"}, ["mijnvws.net"]) == [(MatchType.SUBSTRING, "mijnvws.net")]
+    assert domains_match({"vws.nl"}, ["mijnvws.net"]) == [(MatchType.SUBSTRING, "vws.nl", "mijnvws.net")]
 
 
 def test_domain_match_substring_subdomain():
-    assert domains_match({"vws.nl"}, ["vwss.inloggen.nl"]) == [(MatchType.SUBSTRING, "vwss.inloggen.nl")]
+    assert domains_match({"vws.nl"}, ["vwss.inloggen.nl"]) == [(MatchType.SUBSTRING, "vws.nl", "vwss.inloggen.nl")]
 
 
 def test_domain_match_substring_multiple():
     assert domains_match({"example.com"}, ["sub.example.com", "exampledata.org"]) == [
-        (MatchType.DIRECT, "sub.example.com"),
-        (MatchType.SUBSTRING, "exampledata.org"),
+        (MatchType.DIRECT, "example.com", "sub.example.com"),
+        (MatchType.SUBSTRING, "example.com", "exampledata.org"),
     ]
 
     assert domains_match({"coronamelder.nl"}, ["coronamelder.nl", "coronamelder.net", "mijncoronamelder.tk"]) == [
-        (MatchType.DIRECT, "coronamelder.nl"),
-        (MatchType.DIRECT, "coronamelder.net"),
-        (MatchType.SUBSTRING, "mijncoronamelder.tk"),
+        (MatchType.DIRECT, "coronamelder.nl", "coronamelder.nl"),
+        (MatchType.DIRECT, "coronamelder.nl", "coronamelder.net"),
+        (MatchType.SUBSTRING, "coronamelder.nl", "mijncoronamelder.tk"),
     ]
