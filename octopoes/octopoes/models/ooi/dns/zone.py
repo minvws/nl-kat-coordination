@@ -89,5 +89,19 @@ class ResolvedHostname(OOI):
         return f"{reference.tokenized.hostname.name} -> {reference.tokenized.address.address}"
 
 
+class SimilarHostname(OOI):
+    object_type: Literal["SimilarHostname"] = "SimilarHostname"
+
+    hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=1)
+    similar_to: Reference = ReferenceField(Hostname, max_issue_scan_level=1, max_inherit_scan_level=0)
+
+    _natural_key_attrs = ["hostname", "similar_to"]
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"{reference.tokenized.similar_to.name} -> {reference.tokenized.hostname.name}"
+
+
 Hostname.update_forward_refs()
+SimilarHostname.update_forward_refs()
 DNSZone.update_forward_refs()
