@@ -30,6 +30,9 @@ jobs:
           - 5432:5432
 
     steps:
+      - name: Install docker.io dependency
+        run: sudo apt install docker.io
+
       - name: Get the artifacts
         run: |
           mkdir openkat 
@@ -39,7 +42,7 @@ jobs:
       - name: Unpack and install the artifacts
         run: |
           tar zvxf kat-*.tar.gz
-          sudo apt install ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
+          sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
 
       - name: Prepare postgres service Rocky
         run: |
