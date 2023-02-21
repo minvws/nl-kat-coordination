@@ -69,33 +69,32 @@ class MessageQueue:
             self._messages.put_nowait(message)
 
     def flush(self) -> None:
-        self.start_timer()
+        if not self._messages.empty():
+            self._logger.info("Flushing queue (%d messages)", self._messages.qsize())
+            stream = io.BytesIO()
 
-        # skip if queue is empty
-        if self._messages.empty():
+            # write all messages to the stream as jsonlines
+            while not self._messages.empty():
+                message = self._messages.get_nowait()
+                stream.write(json.dumps(message, cls=ExtendedJSONEncoder).encode("utf-8") + b"\r\n")
+
+            # save the stream to bytes
+            self._logger.info("Saving stream to bytes (%d bytes)", stream.tell())
+            meta = BoefjeMeta(
+                id=str(uuid.uuid4()),
+                boefje=Boefje(id="domain-monitoring", version="0.1"),
+                organization="",
+                started_at=datetime.datetime.now(datetime.timezone.utc),
+                ended_at=datetime.datetime.now(datetime.timezone.utc),
+            )
+            self._client.save_boefje_meta(meta)
+            self._client.save_raw(meta.id, stream.getvalue(), {"application/jsonlines"})
+            self._logger.info("Saved stream to bytes")
+
+        else:
             self._logger.warning("Queue is empty, skipping flush")
-            return
 
-        self._logger.info("Flushing queue (%d messages)", self._messages.qsize())
-        stream = io.BytesIO()
-
-        # write all messages to the stream as jsonlines
-        while not self._messages.empty():
-            message = self._messages.get_nowait()
-            stream.write(json.dumps(message, cls=ExtendedJSONEncoder).encode("utf-8") + b"\r\n")
-
-        # save the stream to bytes
-        self._logger.info("Saving stream to bytes (%d bytes)", stream.tell())
-        meta = BoefjeMeta(
-            id=str(uuid.uuid4()),
-            boefje=Boefje(id="domain-monitoring", version="0.1"),
-            organization="",
-            started_at=datetime.datetime.now(datetime.timezone.utc),
-            ended_at=datetime.datetime.now(datetime.timezone.utc),
-        )
-        self._client.save_boefje_meta(meta)
-        self._client.save_raw(meta.id, stream.getvalue(), {"application/jsonlines"})
-        self._logger.info("Saved stream to bytes")
+        self.start_timer()
 
 
 def domains_match(input_domains: Set[str], domains: Sequence[str]) -> List[Tuple[MatchType, str]]:
@@ -179,7 +178,7 @@ class Monitor:
 @click.command()
 @click.option("--domains", multiple=True, envvar="DOMAINS", help="Domains to monitor")
 @click.option("--size", default=1000, help="Size of the message queue")
-@click.option("--interval", type=int, default=3600, help="Interval in seconds to flush the queue")
+@click.option("--interval", type=click.IntRange(1), default=3600, help="Interval in seconds to flush the queue")
 @click.option("--bytes-api", default="http://localhost:8002", envvar="BYTES_API", help="Bytes API uri")
 @click.option("--bytes-username", help="Bytes API username", envvar="BYTES_USERNAME")
 @click.option("--bytes-password", help="Bytes API password", envvar="BYTES_PASSWORD")
@@ -203,6 +202,6 @@ def main(
 
 
 if __name__ == "__main__":
-    logging.basicConfig(format="[%(levelname)s:%(name)s] %(asctime)s - %(message)s", level=logging.INFO)
+    logging.basicConfig(format="%(asctime)s %(levelname)7s [%(name)15s]: %(message)s", level=logging.INFO)
 
     main()
