@@ -39,11 +39,11 @@ jobs:
       - name: Unpack and install the artifacts
         run: |
           tar zvxf kat-*.tar.gz
-          apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
+          sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
 
       - name: Prepare postgres service Rocky
         run: |
-          apt install -y postgresql-client
+          sudo apt install -y postgresql-client
           createdb -h postgres -U postgres rocky_db
           createuser -h postgres -U postgres rocky
           psql -h postgres -U postgres -d rocky_db -c 'GRANT ALL ON DATABASE rocky_db TO rocky;'  
