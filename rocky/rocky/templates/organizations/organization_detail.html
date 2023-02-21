@@ -24,7 +24,14 @@
             </tbody>
           </table>
         </div>
-        <a href="{% url 'indemnification_add' organization.code %}" class="button ghost">{% translate 'Add indemnification' %}</a>
+        <a href="{% url 'indemnification_add' organization.code %}"
+           class="button ghost">{% translate 'Add indemnification' %}</a>
+      </div>
+    </section>
+    <section>
+      <div>
+        <h2>{% translate 'Tags' %}</h2>
+        {% include 'organizations/organization_tags.html' %}
       </div>
     </section>
     {% if perms.tools.view_organization or request.user.is_superuser %}
