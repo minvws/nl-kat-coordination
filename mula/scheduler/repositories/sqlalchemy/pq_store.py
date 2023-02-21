@@ -30,7 +30,7 @@ class PriorityQueueStore(PriorityQueueStorer):
                 for f in filters:
                     query = query.filter(models.PrioritizedItemORM.data[f.get_field()].as_string() == f.value)
 
-            item_orm = query.first()
+            item_orm = query.with_for_update().first()
 
             if item_orm is None:
                 return None

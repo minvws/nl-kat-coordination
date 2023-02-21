@@ -1,9 +1,12 @@
 import copy
 import queue as _queue
+import threading
+import time
 import unittest
 import uuid
+from typing import Optional
 
-from scheduler import queues
+from scheduler import models, queues
 from scheduler.models import Base
 from scheduler.repositories import sqlalchemy
 from sqlalchemy.orm import sessionmaker
@@ -291,6 +294,103 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # The queue should now be empty
         self.assertEqual(0, self.pq.qsize())
+
+    def test_pop_with_lock(self):
+        """When popping an item it should acquire a lock an not allow another
+        thread to pop an item.
+        """
+        # Arrange
+        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=first_item)
+        self.pq.push(p_item=second_item)
+
+        event = threading.Event()
+        queue = _queue.Queue()
+
+        # This function is similar to the pop() function of the queue, but
+        # it will set a timeout so we can test the lock.
+        def first_pop(event):
+            with self.pq.lock:
+                item = self.pq_store.pop(self.pq.pq_id, None)
+
+                event.set()
+                time.sleep(5)
+
+                self.pq.remove(item)
+
+                queue.put(item)
+
+        def second_pop(event) -> Optional[models.PrioritizedItem]:
+            # Wait for thread 1 to set the event before continuing
+            event.wait()
+
+            item = self.pq.pop()
+            queue.put(item)
+
+        # Act; with thread 1 we will create a lock on the queue, and then with
+        # thread 2 we try to pop an item while the lock is active.
+        thread1 = threading.Thread(target=first_pop, args=(event, ))
+        thread2 = threading.Thread(target=second_pop, args=(event, ))
+
+        thread1.start()
+        thread2.start()
+
+        thread1.join()
+        thread2.join()
+
+        # Assert, we should expect the first item to be popped first
+        self.assertEqual(first_item.id, queue.get().id)
+        self.assertEqual(second_item.id, queue.get().id)
+
+    def test_pop_without_lock(self):
+        """When popping an item it should acquire a lock an not allow another
+        thread to pop an item.
+
+        NOTE: Here we test the procedure when a lock isn't set.
+        """
+        # Arrange
+        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=first_item)
+        self.pq.push(p_item=second_item)
+
+        event = threading.Event()
+        queue = _queue.Queue()
+
+        # This function is similar to the pop() function of the queue, but
+        # it will set a timeout. We have omitted the lock here.
+        def first_pop(event):
+            item = self.pq_store.pop(self.pq.pq_id, None)
+
+            event.set()
+            time.sleep(5)
+
+            self.pq.remove(item)
+
+            queue.put(item)
+
+        def second_pop(event) -> Optional[models.PrioritizedItem]:
+            # Wait for thread 1 to set the event before continuing
+            event.wait()
+
+            item = self.pq.pop()
+            queue.put(item)
+
+        # Act; with thread 1 we won't create a lock, and then with thread 2 we
+        # try to pop an item while the timeout is active.
+        thread1 = threading.Thread(target=first_pop, args=(event, ))
+        thread2 = threading.Thread(target=second_pop, args=(event, ))
+
+        thread1.start()
+        thread2.start()
+
+        thread1.join()
+        thread2.join()
+
+        # Assert, we should expect the first item on the second pop
+        self.assertEqual(first_item.id, queue.get().id)
+        self.assertNotEqual(second_item.id, queue.get().id)
 
     def test_pop_queue_empty(self):
         """When popping an item from an empty queue, it should raise an
