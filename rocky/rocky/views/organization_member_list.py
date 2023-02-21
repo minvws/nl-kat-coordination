@@ -20,6 +20,7 @@ class PageActions(Enum):
     VERIFY = "verify"
     UNVERIFY = "unverify"
 
+
 @class_view_decorator(otp_required)
 class OrganizationMemberListView(
     OrganizationMemberBreadcrumbsMixin,
