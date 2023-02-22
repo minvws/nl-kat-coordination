@@ -33,9 +33,9 @@ jobs:
       - name: Prepare postgres service Rocky
         run: |
           sudo apt install -y postgresql-client
-          createdb -h postgres -U postgres rocky_db
-          createuser -h postgres -U postgres rocky
-          psql -h postgres -U postgres -d rocky_db -c 'GRANT ALL ON DATABASE rocky_db TO rocky;'  
+          createdb -h localhost -U postgres rocky_db
+          createuser -h localhost -U postgres rocky
+          psql -h localhost -U postgres -d rocky_db -c 'GRANT ALL ON DATABASE rocky_db TO rocky;'  
 
       - name: Get the artifacts
         run: |
