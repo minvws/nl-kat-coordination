@@ -40,12 +40,12 @@ jobs:
 
       - name: Prepare rabbitmq
         run: |
-          sudo echo "export ERL_EPMD_ADDRESS=127.0.0.1" >> /etc/rabbitmq/rabbitmq-env.conf
-          sudo echo "export NODENAME=rabbit@localhost" >> /etc/rabbitmq/rabbitmq-env.conf
+          echo "export ERL_EPMD_ADDRESS=127.0.0.1" | sudo tee -a /etc/rabbitmq/rabbitmq-env.conf
+          echo "export NODENAME=rabbit@localhost" | sudo tee -a /etc/rabbitmq/rabbitmq-env.conf
           sudo systemctl stop rabbitmq-server
           sudo epmd -kill
-          sudo echo "listeners.tcp.local = 127.0.0.1:5672" >> /etc/rabbitmq/rabbitmq.conf
-          sudo echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." >> /etc/rabbitmq/advanced.config
+          echo "listeners.tcp.local = 127.0.0.1:5672" | sudo tee -a /etc/rabbitmq/rabbitmq.conf
+          echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." | sudo tee -a /etc/rabbitmq/advanced.config
 
       - name: Create kat vhost in rabbitmq
         run: |
@@ -60,7 +60,7 @@ jobs:
           sed -i "s/QUEUE_URI= /QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/*.conf
           sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
 
-      - name: Get the artifacts
+      - name: Get the OpenKAT artifacts
         run: |
           mkdir openkat 
           curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v1.5.2/kat-ubuntu22.04-1.5.2.tar.gz --output kat-ubuntu22.04-1.5.2.tar.gz;
@@ -91,3 +91,9 @@ jobs:
         run: |
           DJANGO_SUPERUSER_PASSWORD=test DJANGO_SUPERUSER_EMAIL=test@test.nl sudo -u kat rocky-cli createsuperuser --noinput
           sudo -u kat rocky-cli setup_dev_account
+
+      - name: Setup Bytes credentials
+        run: sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
+
+      - name: Restart KAT
+        run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
