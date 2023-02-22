@@ -8,7 +8,6 @@ See [nl-kat-coordination](https://github.com/minvws/nl-kat-coordination) for mor
 As said, Django is the framework for this project.
 To comply to government standards, use [Manon](https://github.com/minvws/nl-rdo-manon) for style and accessibility.
 Yarn is used as package manager and ParcelJS is used as bundler to compile the frontend (CSS and Javascript).
-For browsertests we are using [Cypress](https://www.cypress.io/).
 You can find the Manon repository here: [https://github.com/minvws/nl-rdo-manon](https://github.com/minvws/nl-rdo-manon)
 
 ## Running Rocky
@@ -60,43 +59,6 @@ To run all tests, run:
 ```bash
 $ make test
 ```
-
-But first you will need to setup Cypress.
-
-### Setting up Cypress
-
-Cypress is installed in a separate directory `roeltje`.
-You will need to run the django command `setup_test_users` to create users and credentials used in cypress
-see: [cypress.json](https://github.com/minvws/nl-kat-rocky/blob/develop/roeltje/cypress.json).
-
-```bash
-$ python manage.py setup_test_users
-$ yarn --cwd roeltje
-$ yarn --cwd roeltje cypress open
-```
-
-add to 1Password:
-
-```json
-otpauth://totp/localhost%3A8000%3A%20admin?secret=TAAVFPQD3C3NLRSZQBD3CJ7ZUVDJXDS5&digits=6&issuer=localhost%3A8000
-```
-
-So eventually your `cypress.json` shapes like this:
-
-```json
-{
-  "viewportWidth": 1280,
-  "viewportHeight": 1024,
-  "env": {
-    "base_url": "http://localhost:8000/",
-    "client_user": "admin",
-    "client_pass": "admin",
-    "client_otp_secret": "TAAVFPQD3C3NLRSZQBD3CJ7ZUVDJXDS5"
-  }
-}
-```
-
-!! WARNING !! DON'T DO THIS IN ANY PUBLIC FACING INSTALL!
 
 ## Database
 
