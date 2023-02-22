@@ -62,12 +62,13 @@ class OOIFindingManager(SingleOOITreeMixin):
     def findings_severity_summary(self) -> List[Dict[str, Union[str, int]]]:
         summary_table = []
         self.total_occurences = 0
+        finding_details = self.get_finding_details()
         for risk_level in RiskLevelSeverity:
             occurences_count = len(
                 list(
                     filter(
                         lambda x: x["risk_level_severity"] == risk_level.value,
-                        self.get_finding_details(),
+                        finding_details,
                     )
                 )
             )
