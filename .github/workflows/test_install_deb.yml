@@ -109,3 +109,18 @@ jobs:
 
       - name: Restart KAT
         run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+
+      - name: Check Octopoes API health
+        run: curl -s http://localhost:8001/health | jq .healthy | grep true -q
+
+      - name: Check Bytes API health
+        run: curl -s http://localhost:8002/health | jq .healthy | grep true -q
+
+      - name: Check Katalogus API health
+        run: curl -s http://localhost:8003/health | jq .healthy | grep true -q
+
+      - name: Check Scheduler API health
+        run: curl -s http://localhost:8004/health | jq .healthy | grep true -q
+
+      - name: Check Keiko API health
+        run: curl -s http://localhost:8005/health | jq .healthy | grep true -q
