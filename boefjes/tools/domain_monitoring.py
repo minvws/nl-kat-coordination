@@ -185,7 +185,7 @@ class Monitor:
 @click.option("--interval", type=click.IntRange(1), default=3600, help="Interval in seconds to flush the queue")
 @click.option("--bytes-api", default="http://localhost:8002", envvar="BYTES_API", help="Bytes API uri")
 @click.option("--bytes-username", help="Bytes API username", envvar="BYTES_USERNAME")
-@click.option("--bytes-password", help="Bytes API password", envvar="BYTES_PASSWORD")
+@click.password_option("--bytes-password", help="Bytes API password", envvar="BYTES_PASSWORD")
 @click.option("--stream-url", default="wss://certstream.calidog.io", help="Certstream url")
 def main(
     domains: Sequence[str],
