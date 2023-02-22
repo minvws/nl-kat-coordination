@@ -61,13 +61,6 @@ jobs:
           sudo rabbitmqctl add_vhost kat
           sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
-      - name: Update configs for rabbitmq
-        run: |
-          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN= /SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
-          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN= /SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
-          sudo sed -i "s/QUEUE_URI= /QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/*.conf
-          sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
-
       - name: Get the OpenKAT artifacts
         run: |
           curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v1.5.2/kat-ubuntu22.04-1.5.2.tar.gz --output kat-ubuntu22.04-1.5.2.tar.gz;
@@ -77,6 +70,13 @@ jobs:
         run: |
           tar zvxf kat-*.tar.gz
           sudo apt install ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
+
+      - name: Update configs for rabbitmq
+        run: |
+          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN= /SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
+          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN= /SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
+          sudo sed -i "s/QUEUE_URI= /QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/*.conf
+          sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
 
       - name: Migrations for Rocky
         run: |
