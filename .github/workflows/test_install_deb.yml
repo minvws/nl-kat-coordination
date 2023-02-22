@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         dist: [ debian11, ubuntu22.04 ]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       PGPASSWORD: postgres  # No password prompt
 
@@ -45,6 +45,7 @@ jobs:
       - name: Unpack and install the artifacts
         run: |
           tar zvxf kat-*.tar.gz
+          sudo apt update
           sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
 
       - name: Migrations for Rocky
