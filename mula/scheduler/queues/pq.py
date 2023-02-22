@@ -8,13 +8,9 @@ from typing import Any, Dict, List, Optional
 import pydantic
 from scheduler import models, repositories
 
-from .errors import (
-    InvalidPrioritizedItemError,
-    NotAllowedError,
-    PrioritizedItemNotFoundError,
-    QueueEmptyError,
-    QueueFullError,
-)
+from .errors import (InvalidPrioritizedItemError, NotAllowedError,
+                     PrioritizedItemNotFoundError, QueueEmptyError,
+                     QueueFullError)
 
 
 class PriorityQueue(abc.ABC):
@@ -158,7 +154,8 @@ class PriorityQueue(abc.ABC):
 
             if not allowed:
                 raise NotAllowedError(
-                    f"[item_on_queue={item_on_queue}, item_changed={item_changed}, priority_changed={priority_changed}, "
+                    f"[item_on_queue={item_on_queue}, item_changed={item_changed}, "
+                    f" priority_changed={priority_changed}, "
                     f"allow_replace={self.allow_replace}, allow_updates={self.allow_updates}, "
                     f"allow_priority_updates={self.allow_priority_updates}]"
                 )
