@@ -67,7 +67,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
         vulns = scan.get("data", {}).get("vulnerabilities", {})
         if vulns.get("compression", {}).get("supports_compression"):
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -75,7 +75,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 description="SSL is set to support compression, but it is advised to disable this.",
             )
         if vulns.get("fallback", {}).get("supports_fallback_scsv"):
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -83,7 +83,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 description="SSL is set to support fallback scsv, but it is advised to disable this.",
             )
         if "heartbleed" in vulns and vulns["heartbleed"]["is_vulnerable_to_heartbleed"]:
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -92,7 +92,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 "the fix.",
             )
         if "openssl_ccs" in vulns and vulns["openssl_ccs"]["is_vulnerable_to_ccs_injection"]:
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -100,7 +100,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 description="It is verified this connection is vulnerable to the OpenSSL CSS Injection Vulnerability.",
             )
         if "renegotiation" in vulns and vulns["renegotiation"]["accepts_client_renegotiation"]:
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -108,7 +108,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 description="This SSL accepts client renegotiation, but i can be used in a DOS attack.",
             )
         if "renegotiation" in vulns and vulns["renegotiation"]["supports_secure_renegotiation"]:
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,

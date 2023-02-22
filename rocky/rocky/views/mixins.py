@@ -72,7 +72,6 @@ class OctopoesView(OrganizationView):
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
-
                 if origin.origin.origin_type != OriginType.OBSERVATION:
                     continue
 
@@ -256,6 +255,7 @@ class ConnectorFormMixin:
 
 class SingleOOIMixin(OctopoesView):
     ooi: OOI
+    tree: ReferenceTree
 
     def get_ooi_id(self) -> str:
         if "ooi_id" not in self.request.GET:
@@ -292,7 +292,7 @@ class SingleOOIMixin(OctopoesView):
         class_relations = get_relations(ooi.__class__)
         props = {field_name: value for field_name, value in ooi if field_name not in class_relations}
 
-        knowledge_base = get_knowledge_base_data_for_ooi_store(self.tree.store)
+        knowledge_base = get_knowledge_base_data_for_ooi_store({ooi.primary_key: ooi})
 
         if knowledge_base[ooi.get_information_id()]:
             props.update(knowledge_base[ooi.get_information_id()])

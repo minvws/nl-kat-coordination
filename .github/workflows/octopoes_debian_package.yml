@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - octopoes/**
+  pull_request:
+    paths:
+      - octopoes/**
 
 jobs:
   build-package:

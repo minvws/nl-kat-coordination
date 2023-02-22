@@ -31,7 +31,6 @@ class OctopoesServiceTest(TestCase):
 
     @patch("octopoes.core.service.get_bit_definitions", mocked_bit_definitions)
     def test_process_ooi_create_event(self):
-
         # upon creation of a new ooi
         ooi = Hostname(network=Network(name="internet").reference, name="example.com")
         self.octopoes.process_event(
@@ -56,7 +55,6 @@ class OctopoesServiceTest(TestCase):
 
     @patch("octopoes.core.service.get_bit_definitions", mocked_bit_definitions)
     def test_process_event_abstract_bit_consumes(self):
-
         # upon creation of a new ooi
         ooi = IPAddressV4(network=Network(name="internet").reference, address=ip_address("1.1.1.1"))
         self.octopoes.process_event(
@@ -80,7 +78,6 @@ class OctopoesServiceTest(TestCase):
         )
 
     def test_on_update_origin(self):
-
         # when the result of an origin changes
         old_data = Origin(
             origin_type=OriginType.OBSERVATION,

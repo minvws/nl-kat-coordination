@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 import requests
 from requests.adapters import HTTPAdapter, Retry
 
-from ..connector import Connector
+from ..connector import Connector  # noqa: TID252
 
 
 class HTTPService(Connector):

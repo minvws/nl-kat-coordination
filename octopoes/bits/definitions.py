@@ -27,7 +27,6 @@ class BitDefinition(BaseModel):
 
 
 def get_bit_definitions() -> Dict[str, BitDefinition]:
-
     bit_definitions = {}
 
     for package in pkgutil.walk_packages([str(BITS_DIR)]):

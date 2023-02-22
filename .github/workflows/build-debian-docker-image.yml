@@ -6,6 +6,9 @@ on:
   push:
     paths:
       - "packaging/debian/Dockerfile"
+  pull_request:
+    paths:
+      - "packaging/debian/Dockerfile"
 
 env:
   REGISTRY: ghcr.io

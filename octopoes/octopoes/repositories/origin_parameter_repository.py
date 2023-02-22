@@ -39,7 +39,6 @@ class OriginParameterRepository:
 
 
 class XTDBOriginParameterRepository(OriginParameterRepository):
-
     xtdb_type: XTDBType = XTDBType.CRUX
 
     def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):

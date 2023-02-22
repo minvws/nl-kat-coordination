@@ -5,7 +5,6 @@ from boefjes.plugins.kat_nmap.main import build_nmap_arguments, Protocol
 
 class NmapTest(TestCase):
     def test_nmap_arguments_tcp_top_150(self):
-
         args = build_nmap_arguments("1.1.1.1", Protocol.TCP, 250)
         self.assertListEqual(
             [
@@ -26,7 +25,6 @@ class NmapTest(TestCase):
         )
 
     def test_nmap_arguments_tcp_top_150_ipv6(self):
-
         args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, 250)
         self.assertListEqual(
             [

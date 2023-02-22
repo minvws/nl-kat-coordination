@@ -13,7 +13,6 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[DNSSPFRecord],
 ) -> Iterator[OOI]:
-
     # Only needs SPF when it is the fqdn and not a subdomain
     if (
         # only report on findings on the fqdn because of double findings

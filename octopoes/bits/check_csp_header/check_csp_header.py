@@ -10,7 +10,6 @@ def run(
     input_ooi: HTTPHeader,
     additional_oois: List,
 ) -> Iterator[OOI]:
-
     header = input_ooi
     if header.key.lower() != "content-security-policy":
         return
@@ -51,7 +50,6 @@ def run(
 
     policies = [policy.strip().split(" ") for policy in header.value.split(";")]
     for policy in policies:
-
         if policy[0] in ["frame-src", "frame-ancestors"]:
             if not _source_valid(policy[1:]):
                 findings.append(f"{policy[0]} has not been correctly defined.")
@@ -72,7 +70,7 @@ def run(
 
         yield from _create_kat_finding(
             header.reference,
-            kat_id="KAT-607",
+            kat_id="KAT-CSP-VULNERABILITIES",
             description=description,
         )
 

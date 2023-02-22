@@ -1,0 +1,28 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Upload raw file' %}</h1>
+        <p class="emphasized">
+          {% translate 'Automate the creation of multiple objects by uploading a raw file.' %}
+        </p>
+        <ul>
+          {% for criteria in criterias %}<li>{{ criteria }}</li>{% endfor %}
+        </ul>
+        <form novalidate
+              method="post"
+              enctype="multipart/form-data"
+              class="horizontal-view help">
+          {% csrf_token %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+          <button type="submit">{% translate 'Upload raw' %}</button>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

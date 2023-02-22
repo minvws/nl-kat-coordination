@@ -10,7 +10,6 @@ def run(
     hostname: Hostname,
     additional_oois: List[Union[Finding, DNSNSRecord]],
 ) -> Iterator[OOI]:
-
     no_ipv6_findings = [
         finding
         for finding in additional_oois

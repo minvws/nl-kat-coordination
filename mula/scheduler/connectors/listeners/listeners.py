@@ -5,7 +5,7 @@ from typing import Dict, Optional
 
 import pika
 
-from ..connector import Connector
+from ..connector import Connector  # noqa: TID252
 
 
 class Listener(Connector):

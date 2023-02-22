@@ -77,7 +77,6 @@ class OOIListView(BaseOOIListView):
             return self._delete_oois(selected_oois, request, *args, **kwargs)
 
         if action == PageActions.UPDATE_SCAN_PROFILE.value:
-
             return self._set_scan_profiles(selected_oois, request, *args, **kwargs)
 
         messages.add_message(request, messages.ERROR, _("Unknown action."))
@@ -200,7 +199,6 @@ class OOIListExportView(OOIListView):
             )
 
         if file_type == "json":
-
             response = HttpResponse(
                 json.dumps(exports),
                 content_type="application/json",
@@ -210,7 +208,6 @@ class OOIListExportView(OOIListView):
             return response
 
         elif file_type == "csv":
-
             response = HttpResponse(
                 content_type="text/csv",
                 headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(observed_at) + ".csv"},
@@ -232,5 +229,4 @@ class OOIListExportView(OOIListView):
             return response
 
         else:
-
             raise Http404("Export type not found")
