@@ -8,7 +8,7 @@
     class="submit-on-click {{ input_class }}"
     {% if input_checked %}checked{% endif %}
     {% if input_disabled %}disabled{% endif %}>
-    <label>{{ label_text }}</label>
+    {% if label_text %}<label>{{ label_text }}</label>{% endif %}
 </form>
 
 <script src="{% static '/js/autoSubmit.js' %}" nonce="{{ request.csp_nonce }}"></script>

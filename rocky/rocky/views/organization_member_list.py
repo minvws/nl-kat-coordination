@@ -27,15 +27,25 @@ class OrganizationMemberListView(
     ListView,
 ):
     model = OrganizationMember
-    filters_active: List[str] = []
     context_object_name = "members"
 
     def get_queryset(self):
-        return self.model.objects.filter(organization=self.organization)
+        queryset = self.model.objects.filter(organization=self.organization)
+        if "verified_status_filter" in self.request.GET:
+          verified_status_filter = self.request.GET.getlist("verified_status_filter", [])
+          queryset = self.filter_queryset(queryset, verified_status_filter)
+        return queryset
+
+    def filter_queryset(self, queryset, verified_status_filter):
+          result = []
+          if "verified" in verified_status_filter:
+              result += [member for member in queryset if member.verified]
+          if "unverified" in verified_status_filter:
+              result += [member for member in queryset if not member.verified]
+          return result
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.filters_active = self.get_filters_active()
 
     def post(self, request, *args, **kwargs):
         if "action" not in self.request.POST:
@@ -69,20 +79,21 @@ class OrganizationMemberListView(
         except RequestException as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
 
-    def get_filters_active(self):
-        return self.request.GET.getlist("client_status", [])
-
-    def get_checkbox_filters(self):
+    def get_verified_filters(self):
         return [
             {
-                "label": choice[0],
-                "value": choice[1],
-                "checked": not self.filters_active or choice[0] in self.filters_active,
+                "label": "Verified",
+                "value": "verified",
+                "checked": not "verified_status_filter" in self.request.GET or "verified" in self.request.GET.getlist("verified_status_filter", []),
+            },
+            {
+                "label": "Unverified",
+                "value": "unverified",
+                "checked": not "verified_status_filter" in self.request.GET or "unverified" in self.request.GET.getlist("verified_status_filter", []),
             }
-            for choice in OrganizationMember.STATUSES.choices
         ]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["checkbox_filters"] = self.get_checkbox_filters()
+        context["verified_filters"] = self.get_verified_filters()
         return context

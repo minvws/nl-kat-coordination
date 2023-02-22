@@ -16,7 +16,6 @@
         <thead>
           <tr>
             <th>{% translate 'Member name' %}</th>
-            <th>{% translate 'Status' %}</th>
             <th>{% translate 'Added on' %}</th>
             <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
@@ -28,7 +27,6 @@
           {% for member in members %}
             <tr>
               <td>{{ member.user }}</td>
-              <td>{{ member.status }}</td>
               <td>{{ member.user.date_joined }}</td>
               <td>
                 {% if member.trusted_clearance_level > 0 %}
