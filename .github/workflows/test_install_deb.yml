@@ -48,5 +48,6 @@ jobs:
 
       - name: Migrations for Rocky
         run: |
+          sudo sed -i "s/ROCKY_DB_PASSWORD=/ROCKY_DB_PASSWORD=postgres/g" /etc/kat/rocky.conf
           sudo -u kat rocky-cli migrate
           sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
