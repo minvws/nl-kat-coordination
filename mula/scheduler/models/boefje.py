@@ -17,7 +17,7 @@ class BoefjeMeta(BaseModel):
     id: str
     boefje: Boefje
     input_ooi: Optional[str]
-    arguments: Dict[str, Any] = Field(default=dict)
+    arguments: Dict[str, Any] = Field(default_factory=dict)
     organization: str
 
     started_at: Optional[datetime.datetime]
