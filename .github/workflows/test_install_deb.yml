@@ -14,7 +14,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt-get install -y docker.io containerd runc
-          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres
+          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres && sleep 10
 
       - name: Prepare postgres service Rocky
         run: |
