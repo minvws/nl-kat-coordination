@@ -73,27 +73,27 @@ jobs:
 
       - name: Update configs for rabbitmq
         run: |
-          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN= /SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
-          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN= /SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
-          sudo sed -i "s/QUEUE_URI= /QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/rocky.conf
-          sudo sed -i "s/QUEUE_URI= /QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/bytes.conf
-          sudo sed -i "s/QUEUE_URI= /QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/boefjes.conf
-          sudo sed -i "s/QUEUE_URI= /QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/octopoes.conf
+          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN=/SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
+          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN=/SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/rocky.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/bytes.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/boefjes.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/octopoes.conf
 
       - name: Migrations for Rocky
         run: |
-          sudo sed -i "s/ROCKY_DB_PASSWORD= /ROCKY_DB_PASSWORD=postgres/g" /etc/kat/rocky.conf
+          sudo sed -i "s/ROCKY_DB_PASSWORD=/ROCKY_DB_PASSWORD=postgres/g" /etc/kat/rocky.conf
           sudo -u kat rocky-cli migrate
           sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
 
       - name: Migrations for Katalogus
         run: |
-          sudo sed -i "s/KATALOGUS_DB_URI= /KATALOGUS_DB_URI=postgresql:\/\/katalogus:postgres@localhost\/katalogus_db/g" /etc/kat/boefjes.conf
+          sudo sed -i "s/KATALOGUS_DB_URI=/KATALOGUS_DB_URI=postgresql:\/\/katalogus:postgres@localhost\/katalogus_db/g" /etc/kat/boefjes.conf
           sudo -u kat update-katalogus-db
 
       - name: Migrations for Bytes
         run: |
-          sudo sed -i "s/BYTES_DB_URI= /BYTES_DB_URI=postgresql:\/\/bytes:postgres@localhost\/bytes_db/g" /etc/kat/bytes.conf
+          sudo sed -i "s/BYTES_DB_URI=/BYTES_DB_URI=postgresql:\/\/bytes:postgres@localhost\/bytes_db/g" /etc/kat/bytes.conf
           sudo -u kat update-bytes-db
 
       - name: Setup accounts in Rocky
@@ -102,7 +102,12 @@ jobs:
           sudo -u kat rocky-cli setup_dev_account
 
       - name: Setup Bytes credentials
-        run: sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
+        run: |
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/rocky.conf
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/boefjes.conf
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/mula.conf
 
       - name: Restart KAT
         run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+
+      -
