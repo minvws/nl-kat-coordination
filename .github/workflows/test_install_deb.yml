@@ -16,9 +16,7 @@ jobs:
 
     steps:
       - name: Install dependencies Docker and rabbitmq
-        run: |
-          sudo apt update
-          sudo apt-get install -y docker.io containerd runc rabbitmq-server
+        run: sudo apt-get install -y docker.io containerd runc rabbitmq-server
 
       - name: Start postgresql and wait until the service is healthy
         run: |
@@ -118,16 +116,24 @@ jobs:
       - name: Check Keiko API health
         run: |
           for i in {1..15}; do curl -s http://localhost:8005/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) ; fi
+          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
 
       - name: Check Bytes API health
-        run: for i in {1..15}; do curl -s http://localhost:8002/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8002/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
 
       - name: Check Katalogus API health
-        run: for i in {1..15}; do curl -s http://localhost:8003/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8003/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
 
       - name: Check Scheduler API health
-        run: for i in {1..15}; do curl -s http://localhost:8004/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8004/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
 
       - name: Check Octopoes API health
-        run: for i in {1..15}; do curl -s http://localhost:8001/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8001/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
