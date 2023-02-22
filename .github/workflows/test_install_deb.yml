@@ -14,8 +14,24 @@ jobs:
         run: |
           sudo apt update
           sudo apt-get install -y docker.io containerd runc rabbitmq-server
+
+      - name: Start postgresql and wait until the service is healthy
+        run: |
           docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres:12.8
           for i in {1..10}; do pg_isready && break || sleep 1 ; done
+
+      - name: Prepare rabbitmq configurations
+        run: |
+          echo "export ERL_EPMD_ADDRESS=127.0.0.1" | sudo tee -a /etc/rabbitmq/rabbitmq-env.conf
+          echo "export NODENAME=rabbit@localhost" | sudo tee -a /etc/rabbitmq/rabbitmq-env.conf
+          sudo systemctl stop rabbitmq-server
+          sudo epmd -kill
+          echo "listeners.tcp.local = 127.0.0.1:5672" | sudo tee -a /etc/rabbitmq/rabbitmq.conf
+          echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." | sudo tee -a /etc/rabbitmq/advanced.config
+
+      - name: Start rabbitmq and wait until the service is healthy
+          systemctl start rabbitmq-server
+          for i in {1..10}; do rabbitmq-diagnostics -q ping && break || sleep 1 ; done
 
       - name: Prepare postgres service Rocky
         run: |
@@ -38,15 +54,6 @@ jobs:
           psql -h localhost -U postgres -d bytes_db -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
           psql -h localhost -U postgres -d bytes_db -c "ALTER USER bytes WITH PASSWORD 'postgres';"
 
-      - name: Prepare rabbitmq
-        run: |
-          echo "export ERL_EPMD_ADDRESS=127.0.0.1" | sudo tee -a /etc/rabbitmq/rabbitmq-env.conf
-          echo "export NODENAME=rabbit@localhost" | sudo tee -a /etc/rabbitmq/rabbitmq-env.conf
-          sudo systemctl stop rabbitmq-server
-          sudo epmd -kill
-          echo "listeners.tcp.local = 127.0.0.1:5672" | sudo tee -a /etc/rabbitmq/rabbitmq.conf
-          echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." | sudo tee -a /etc/rabbitmq/advanced.config
-
       - name: Create kat vhost in rabbitmq
         run: |
           sudo rabbitmqctl add_user kat rabbit
@@ -62,7 +69,6 @@ jobs:
 
       - name: Get the OpenKAT artifacts
         run: |
-          mkdir openkat 
           curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v1.5.2/kat-ubuntu22.04-1.5.2.tar.gz --output kat-ubuntu22.04-1.5.2.tar.gz;
           curl -Ls https://github.com/dekkers/xtdb-http-multinode/releases/download/v1.0.2/xtdb-http-multinode_1.0.2_all.deb --output xtdb-http-multinode_1.0.2_all.deb;
 
