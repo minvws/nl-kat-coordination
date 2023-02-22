@@ -32,17 +32,17 @@ class OrganizationMemberListView(
     def get_queryset(self):
         queryset = self.model.objects.filter(organization=self.organization)
         if "verified_status_filter" in self.request.GET:
-          verified_status_filter = self.request.GET.getlist("verified_status_filter", [])
-          queryset = self.filter_queryset(queryset, verified_status_filter)
+            verified_status_filter = self.request.GET.getlist("verified_status_filter", [])
+            queryset = self.filter_queryset(queryset, verified_status_filter)
         return queryset
 
     def filter_queryset(self, queryset, verified_status_filter):
-          result = []
-          if "verified" in verified_status_filter:
-              result += [member for member in queryset if member.verified]
-          if "unverified" in verified_status_filter:
-              result += [member for member in queryset if not member.verified]
-          return result
+        result = []
+        if "verified" in verified_status_filter:
+            result += [member for member in queryset if member.verified]
+        if "unverified" in verified_status_filter:
+            result += [member for member in queryset if not member.verified]
+        return result
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -84,13 +84,15 @@ class OrganizationMemberListView(
             {
                 "label": "Verified",
                 "value": "verified",
-                "checked": not "verified_status_filter" in self.request.GET or "verified" in self.request.GET.getlist("verified_status_filter", []),
+                "checked": not "verified_status_filter" in self.request.GET
+                or "verified" in self.request.GET.getlist("verified_status_filter", []),
             },
             {
                 "label": "Unverified",
                 "value": "unverified",
-                "checked": not "verified_status_filter" in self.request.GET or "unverified" in self.request.GET.getlist("verified_status_filter", []),
-            }
+                "checked": not "verified_status_filter" in self.request.GET
+                or "unverified" in self.request.GET.getlist("verified_status_filter", []),
+            },
         ]
 
     def get_context_data(self, **kwargs):
