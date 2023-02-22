@@ -65,7 +65,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         software_instance_ooi = SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         yield software_instance_ooi
 
-        kat_ooi = KATFindingType(id="KAT-642")
+        kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
         yield kat_ooi
         yield Finding(
             finding_type=kat_ooi.reference,
