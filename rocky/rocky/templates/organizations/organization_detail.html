@@ -28,12 +28,14 @@
            class="button ghost">{% translate 'Add indemnification' %}</a>
       </div>
     </section>
-    <section>
-      <div>
-        <h2>{% translate 'Tags' %}</h2>
-        {% include 'organizations/organization_tags.html' %}
-      </div>
-    </section>
+    {% if organization.tags.all %}
+      <section>
+        <div>
+          <h2>{% translate 'Tags' %}</h2>
+          {% include 'organizations/organization_tags.html' %}
+        </div>
+      </section>
+    {% endif %}
     {% if perms.tools.view_organization or request.user.is_superuser %}
       {% include 'organizations/organization_member_list.html' %}
     {% endif %}
