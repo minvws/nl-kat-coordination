@@ -31,7 +31,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt-get install -y docker.io containerd runc
-          sudo service postgresql start
+          sudo service postgresql start && sleep 5
 
       - name: Prepare postgres service Rocky
         run: |
