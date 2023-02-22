@@ -39,7 +39,7 @@ jobs:
           createdb -h localhost -U postgres rocky_db
           createuser -h localhost -U postgres rocky
           psql -h localhost -U postgres -d rocky_db -c "ALTER DATABASE rocky_db OWNER TO rocky;"
-          psql -h localhost -U postgres -d rocky_db -c "ALTER USER rocky WITH PASSWORD 'postgres';" 
+          psql -h localhost -U postgres -d rocky_db -c "ALTER USER rocky WITH PASSWORD 'postgres';"
 
       - name: Prepare postgres service Katalogus
         run: |
