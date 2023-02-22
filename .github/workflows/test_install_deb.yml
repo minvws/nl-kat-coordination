@@ -30,6 +30,7 @@ jobs:
           echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." | sudo tee -a /etc/rabbitmq/advanced.config
 
       - name: Start rabbitmq and wait until the service is healthy
+        run: |
           systemctl start rabbitmq-server
           for i in {1..10}; do rabbitmq-diagnostics -q ping && break || sleep 1 ; done
 
