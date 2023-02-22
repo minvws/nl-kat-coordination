@@ -134,27 +134,27 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             leak_infected = event.get("leak", {}).get("dataset", {}).get("infected")
             leak_ransomnote = event.get("leak", {}).get("dataset", {}).get("ransom_notes")
             if leak_severity == "critical" or leak_infected or leak_ransomnote:
-                kat_number = "KAT-645"
+                kat_number = "KAT-LEAKIX-CRITICAL"
             elif leak_severity == "high":
-                kat_number = "KAT-646"
+                kat_number = "KAT-LEAKIX-HIGH"
             elif leak_severity == "medium":
-                kat_number = "KAT-647"
+                kat_number = "KAT-LEAKIX-MEDIUM"
             elif leak_severity == "low":
-                kat_number = "KAT-648"
+                kat_number = "KAT-LEAKIX-LOW"
             elif leak_severity == "info":
-                kat_number = "KAT-649"
+                kat_number = "KAT-LEAKIX-RECOMMENDATION"
             elif leak_stage == "open":
                 # no severity given, default = low
-                kat_number = "KAT-648"
+                kat_number = "KAT-LEAKIX-LOW"
             elif leak_stage == "explore":
                 # no severity given, default = high
-                kat_number = "KAT-646"
+                kat_number = "KAT-LEAKIX-HIGH"
             elif leak_stage == "exfiltrate":
                 # no severity given, default = critical
-                kat_number = "KAT-645"
+                kat_number = "KAT-LEAKIX-CRITICAL"
             else:
                 # new stage or severity, default to low
-                kat_number = "KAT-648"
+                kat_number = "KAT-LEAKIX-LOW"
 
             kat_ooi = KATFindingType(id=kat_number)
             kat_info = []
