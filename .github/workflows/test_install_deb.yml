@@ -49,9 +49,9 @@ jobs:
 
       - name: Create kat vhost in rabbitmq
         run: |
-          rabbitmqctl add_user kat rabbit
-          rabbitmqctl add_vhost kat
-          rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+          sudo rabbitmqctl add_user kat rabbit
+          sudo rabbitmqctl add_vhost kat
+          sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
       - name: Update configs for rabbitmq
         run: |
