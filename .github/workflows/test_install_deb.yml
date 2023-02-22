@@ -9,6 +9,11 @@ jobs:
     env:
       PGPASSWORD: postgres  # No password prompt
 
+    # TODO:
+    #  - Decide when to run this: before a release or in pull requests?
+    #  - Remove hardcoded release versions
+    #  - Rocky health checks
+
     steps:
       - name: Install dependencies Docker and rabbitmq
         run: |
@@ -111,16 +116,16 @@ jobs:
         run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
       - name: Check Octopoes API health
-        run: for i in {1..5}; do curl -s http://localhost:8001/health | jq .healthy | grep true -q && break || sleep 1 ; done
+        run: for i in $(seq 1 10); do curl -s http://localhost:8001/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
 
       - name: Check Bytes API health
-        run: for i in {1..5}; do curl -s http://localhost:8002/health | jq .healthy | grep true -q && break || sleep 1 ; done
+        run: for i in {1..10}; do curl -s http://localhost:8002/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
 
       - name: Check Katalogus API health
-        run: for i in {1..5}; do curl -s http://localhost:8003/health | jq .healthy | grep true -q && break || sleep 1 ; done
+        run: for i in {1..10}; do curl -s http://localhost:8003/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
 
       - name: Check Scheduler API health
-        run: for i in {1..5}; do curl -s http://localhost:8004/health | jq .healthy | grep true -q && break || sleep 1 ; done
+        run: for i in {1..10}; do curl -s http://localhost:8004/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
 
       - name: Check Keiko API health
-        run: for i in {1..5}; do curl -s http://localhost:8005/health | jq .healthy | grep true -q && break || sleep 1 ; done
+        run: for i in {1..10}; do curl -s http://localhost:8005/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done; (exit $s)
