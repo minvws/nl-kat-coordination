@@ -14,14 +14,22 @@ jobs:
         run: |
           sudo apt update
           sudo apt-get install -y docker.io containerd runc
-          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres && sleep 10
+          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres
+          for i in {1..10}; do pg_isready && break || sleep 1 ; done
 
       - name: Prepare postgres service Rocky
         run: |
           createdb -h localhost -U postgres rocky_db
           createuser -h localhost -U postgres rocky
-          psql -h localhost -U postgres -d rocky_db -c "GRANT ALL ON DATABASE rocky_db TO rocky;"
+          psql -h localhost -U postgres -d rocky_db -c "ALTER DATABASE rocky_db OWNER TO rocky;"
           psql -h localhost -U postgres -d rocky_db -c "ALTER USER rocky WITH PASSWORD 'postgres';" 
+
+#      - name: Prepare postgres service Bytes
+#        run: |
+#          createdb -h localhost -U postgres bytes_db
+#          createuser -h localhost -U postgres bytes
+#          psql -h localhost -U postgres -d bytes_db -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
+#          psql -h localhost -U postgres -d bytes_db -c "ALTER USER bytes WITH PASSWORD 'postgres';"
 
       - name: Get the artifacts
         run: |
