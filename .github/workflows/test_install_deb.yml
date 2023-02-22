@@ -40,8 +40,8 @@ jobs:
 
       - name: Prepare rabbitmq
         run: |
-          echo "export ERL_EPMD_ADDRESS=127.0.0.1" >> /etc/rabbitmq/rabbitmq-env.conf
-          echo "export NODENAME=rabbit@localhost" >> /etc/rabbitmq/rabbitmq-env.conf
+          sudo echo "export ERL_EPMD_ADDRESS=127.0.0.1" >> /etc/rabbitmq/rabbitmq-env.conf
+          sudo echo "export NODENAME=rabbit@localhost" >> /etc/rabbitmq/rabbitmq-env.conf
           sudo systemctl stop rabbitmq-server
           sudo epmd -kill
           echo "listeners.tcp.local = 127.0.0.1:5672" >> /etc/rabbitmq/rabbitmq.conf
