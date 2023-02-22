@@ -8,9 +8,13 @@ from typing import Any, Dict, List, Optional
 import pydantic
 from scheduler import models, repositories
 
-from .errors import (InvalidPrioritizedItemError, NotAllowedError,
-                     PrioritizedItemNotFoundError, QueueEmptyError,
-                     QueueFullError)
+from .errors import (
+    InvalidPrioritizedItemError,
+    NotAllowedError,
+    PrioritizedItemNotFoundError,
+    QueueEmptyError,
+    QueueFullError,
+)
 
 
 class PriorityQueue(abc.ABC):
@@ -135,7 +139,9 @@ class PriorityQueue(abc.ABC):
             item_on_queue = self.get_p_item_by_identifier(p_item)
 
             item_changed = (
-                False if not item_on_queue or p_item.data == item_on_queue.data else True  # FIXM: checking json/dicts here
+                False
+                if not item_on_queue or p_item.data == item_on_queue.data
+                else True  # FIXM: checking json/dicts here
             )
 
             priority_changed = False if not item_on_queue or p_item.priority == item_on_queue.priority else True

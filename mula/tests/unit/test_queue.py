@@ -330,8 +330,8 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # Act; with thread 1 we will create a lock on the queue, and then with
         # thread 2 we try to pop an item while the lock is active.
-        thread1 = threading.Thread(target=first_pop, args=(event, ))
-        thread2 = threading.Thread(target=second_pop, args=(event, ))
+        thread1 = threading.Thread(target=first_pop, args=(event,))
+        thread2 = threading.Thread(target=second_pop, args=(event,))
 
         thread1.start()
         thread2.start()
@@ -379,8 +379,8 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # Act; with thread 1 we won't create a lock, and then with thread 2 we
         # try to pop an item while the timeout is active.
-        thread1 = threading.Thread(target=first_pop, args=(event, ))
-        thread2 = threading.Thread(target=second_pop, args=(event, ))
+        thread1 = threading.Thread(target=first_pop, args=(event,))
+        thread2 = threading.Thread(target=second_pop, args=(event,))
 
         thread1.start()
         thread2.start()
