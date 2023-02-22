@@ -48,5 +48,5 @@ jobs:
 
       - name: Migrations for Rocky
         run: |
-          rocky-cli migrate
-          rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
+          sudo -u kat rocky-cli migrate
+          sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
