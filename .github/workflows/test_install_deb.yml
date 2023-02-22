@@ -98,7 +98,7 @@ jobs:
 
       - name: Setup accounts in Rocky
         run: |
-          DJANGO_SUPERUSER_PASSWORD=test DJANGO_SUPERUSER_EMAIL=test@test.nl sudo -u kat rocky-cli createsuperuser --noinput
+          DJANGO_SUPERUSER_PASSWORD=test sudo -u kat rocky-cli createsuperuser --noinput --email test@test.nl
           sudo -u kat rocky-cli setup_dev_account
 
       - name: Setup Bytes credentials
