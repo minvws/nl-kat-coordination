@@ -121,19 +121,19 @@ jobs:
       - name: Check Bytes API health
         run: |
           for i in {1..15}; do curl -s http://localhost:8002/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
+          if [ $s != 0 ]; then echo $(curl http://localhost:8002/health) && exit $s ; fi
 
       - name: Check Katalogus API health
         run: |
           for i in {1..15}; do curl -s http://localhost:8003/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
+          if [ $s != 0 ]; then echo $(curl http://localhost:8003/health) && exit $s ; fi
 
       - name: Check Scheduler API health
         run: |
           for i in {1..15}; do curl -s http://localhost:8004/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
+          if [ $s != 0 ]; then echo $(curl http://localhost:8004/health) && exit $s ; fi
 
       - name: Check Octopoes API health
         run: |
           for i in {1..15}; do curl -s http://localhost:8001/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl http://localhost:8005/health) && exit $s ; fi
+          if [ $s != 0 ]; then echo $(curl http://localhost:8001/health) && exit $s ; fi
