@@ -44,8 +44,8 @@ jobs:
           sudo echo "export NODENAME=rabbit@localhost" >> /etc/rabbitmq/rabbitmq-env.conf
           sudo systemctl stop rabbitmq-server
           sudo epmd -kill
-          echo "listeners.tcp.local = 127.0.0.1:5672" >> /etc/rabbitmq/rabbitmq.conf
-          echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." >> /etc/rabbitmq/advanced.config
+          sudo echo "listeners.tcp.local = 127.0.0.1:5672" >> /etc/rabbitmq/rabbitmq.conf
+          sudo echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." >> /etc/rabbitmq/advanced.config
 
       - name: Create kat vhost in rabbitmq
         run: |
