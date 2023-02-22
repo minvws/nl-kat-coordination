@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         dist: [ debian11, ubuntu22.04 ]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
     env:
       PGPASSWORD: postgres  # No password prompt
 
@@ -32,7 +32,6 @@ jobs:
     steps:
       - name: Prepare postgres service Rocky
         run: |
-          sudo apt install -y postgresql-client
           createdb -h localhost -U postgres rocky_db
           createuser -h localhost -U postgres rocky
           psql -h localhost -U postgres -d rocky_db -c 'GRANT ALL ON DATABASE rocky_db TO rocky;'  
