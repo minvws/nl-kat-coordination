@@ -9,29 +9,12 @@ jobs:
     env:
       PGPASSWORD: postgres  # No password prompt
 
-    services:
-      postgres:
-        image: postgres
-
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
       - name: Install dependencies
         run: |
           sudo apt update
           sudo apt-get install -y docker.io containerd runc
-          sudo service postgresql start && sleep 5
+          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres
 
       - name: Prepare postgres service Rocky
         run: |
