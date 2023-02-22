@@ -56,7 +56,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             latest_version = version.get("Version_text")
 
     if software_version and latest_version and check_version.check_version_in(software_version, f"<{latest_version}"):
-        kat_ooi = KATFindingType(id="KAT-654")
+        kat_ooi = KATFindingType(id="KAT-SOFTWARE-UPDATE-AVAILABLE")
         yield kat_ooi
         yield Finding(
             finding_type=kat_ooi.reference,

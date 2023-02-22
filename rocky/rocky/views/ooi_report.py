@@ -300,7 +300,7 @@ class DNSReport(Report):
         Hostname,
     ]
     allowed_finding_types = [
-        "KAT-581",
+        "KAT-WEBSERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-TWO-IPV6",
     ]
