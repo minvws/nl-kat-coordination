@@ -81,7 +81,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                     yield software_instance_ooi
 
                     if module == "malware-simple":
-                        malware_ooi = KATFindingType(id="KAT-640")
+                        malware_ooi = KATFindingType(id="KAT-POTENTIAL-MALWARE")
                         yield malware_ooi
                         yield Finding(
                             finding_type=malware_ooi.reference,
@@ -106,7 +106,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                     yield software_instance_ooi
 
                     if module == "malware-simple":
-                        malware_ooi = KATFindingType(id="KAT-640")
+                        malware_ooi = KATFindingType(id="KAT-POTENTIAL-MALWARE")
                         yield malware_ooi
                         yield Finding(
                             finding_type=malware_ooi.reference,
