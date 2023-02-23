@@ -112,7 +112,7 @@ jobs:
           sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/mula.conf
 
       - name: Restart KAT
-        run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+        run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker xtdb-http-multinode
 
       - name: Check Keiko API health or print response and logs
         run: |
@@ -134,12 +134,12 @@ jobs:
           for i in {1..15}; do curl -s http://localhost:8004/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -v http://localhost:8004/health) || true && journalctl --no-pager -u kat-mula.service && exit $s ; fi
 
-      - name: Check Octopoes API health or print response and logs
-        run: |
-          for i in {1..15}; do curl -s http://localhost:8001/_dev/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl -v http://localhost:8001/_dev/health) || true && journalctl --no-pager -u kat-octopoes.service && exit $s ; fi
-
       - name: Check XTDB health or print response and logs
         run: |
           for i in {1..15}; do curl -s http://localhost:3000/_xtdb/status | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -v http://localhost:3000/_xtdb/status) || true && journalctl --no-pager -u xtdb-http-multinode.service && exit $s ; fi
+
+      - name: Check Octopoes API health or print response and logs
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8001/_dev/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -v http://localhost:8001/_dev/health) || true && journalctl --no-pager -u kat-octopoes.service && exit $s ; fi
