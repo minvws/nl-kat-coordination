@@ -136,5 +136,5 @@ jobs:
 
       - name: Check Octopoes API health or print response and logs
         run: |
-          for i in {1..15}; do curl -s http://localhost:8001/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl -v http://localhost:8001/health) || true && journalctl --no-pager -u kat-octopoes.service && exit $s ; fi
+          for i in {1..15}; do curl -s http://localhost:8001/health/ | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -v http://localhost:8001/health/) || true && journalctl --no-pager -u kat-octopoes.service && exit $s ; fi
