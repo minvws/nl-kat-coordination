@@ -15,6 +15,7 @@ WORKDIR /app/bytes
 ENV PATH=/home/bytes/.local/bin:${PATH}
 
 RUN mkdir /data && chown bytes: /data
+RUN mkdir ./bytes-data && chown bytes: ./bytes-data
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
 # dependencies

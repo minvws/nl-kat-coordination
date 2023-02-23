@@ -88,6 +88,7 @@ endif
 build: build-all
 	make -C rocky build
 	make -C boefjes build
+	make -C bytes build
 
 debian-build-image:
 	docker build -t kat-debian-build-image packaging/debian

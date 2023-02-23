@@ -30,8 +30,10 @@ help: ## Show this help.
 ##|------------------------------------------------------------------------|
 
 done: lint test ## Prepare for a commit.
-build:
 
+build:  # Create the bytes-data directory (on the mounted host as well)
+	-docker-compose run --rm --no-deps --entrypoint /bin/sh -u root bytes \
+		-c "printenv BYTES_DATA_DIR || echo /app/bytes/bytes-data | xargs -L 1 mkdir"  # Avoid escaping env vars...
 
 lint: ## Format the code using black.
 	pre-commit run --all-files --show-diff-on-failure --color always
