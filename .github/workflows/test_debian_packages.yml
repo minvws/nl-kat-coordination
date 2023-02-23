@@ -136,8 +136,8 @@ jobs:
 
       - name: Check XTDB health or print response and logs
         run: |
-          for i in {1..15}; do curl -s http://localhost:3000/_xtdb/status | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
-          if [ $s != 0 ]; then echo $(curl -v http://localhost:3000/_xtdb/status) || true && journalctl --no-pager -u xtdb-http-multinode.service && exit $s ; fi
+          for i in {1..15}; do curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status) || true && journalctl --no-pager -u xtdb-http-multinode.service && exit $s ; fi
 
       - name: Check Octopoes API health or print response and logs
         run: |
