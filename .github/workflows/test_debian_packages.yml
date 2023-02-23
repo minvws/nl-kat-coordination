@@ -1,20 +1,25 @@
-name: Install debian package
+name: Test installing the debian packages
 
 on:
-  push:
+  create:
+    tags:
+      - v*
 
 jobs:
   test-deb-install:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-22.04 ]
+
     env:
       PGPASSWORD: postgres  # No password prompt
 
-    # TODO:
-    #  - Decide when to run this: before a release or in pull requests?
-    #  - Remove hardcoded release versions
-    #  - Rocky health checks
-
     steps:
+      - name: Set env
+          run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+
       - name: Install dependencies Docker and rabbitmq
         run: sudo apt-get install -y docker.io containerd runc rabbitmq-server
 
@@ -66,7 +71,7 @@ jobs:
 
       - name: Get the OpenKAT artifacts
         run: |
-          curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v1.5.2/kat-ubuntu22.04-1.5.2.tar.gz --output kat-ubuntu22.04-1.5.2.tar.gz;
+          curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v${{ env.RELEASE_VERSION }}/kat-ubuntu22.04-${{ env.RELEASE_VERSION }}.tar.gz --output kat-ubuntu22.04-${{ env.RELEASE_VERSION }}.tar.gz;
           curl -Ls https://github.com/dekkers/xtdb-http-multinode/releases/download/v1.0.2/xtdb-http-multinode_1.0.2_all.deb --output xtdb-http-multinode_1.0.2_all.deb;
 
       - name: Unpack and install the artifacts
