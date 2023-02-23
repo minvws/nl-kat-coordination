@@ -50,7 +50,7 @@
                     {% endif %}
                     <td>{{ task.created_at }}</td>
                     <td>
-                      {% if task.status.value == 'completed' %}
+                      {% if task.status.value in 'completed,failed' %}
                         <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}">{% translate 'Download meta and raw data' %}</a>
                       {% else %}
                         <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate 'Download meta data' %}</a>
