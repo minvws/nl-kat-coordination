@@ -109,6 +109,11 @@ jobs:
       - name: Restart KAT
         run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker xtdb-http-multinode
 
+      - name: Setup accounts in Rocky
+        run: |
+          DJANGO_SUPERUSER_PASSWORD=test sudo -u kat rocky-cli createsuperuser --noinput --email test@test.nl
+          sudo -u kat rocky-cli setup_dev_account
+
       - name: Check Keiko API health or print response and logs
         run: |
           for i in {1..15}; do curl -s http://localhost:8005/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
@@ -134,10 +139,8 @@ jobs:
           for i in {1..15}; do curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status) || true && journalctl --no-pager -u xtdb-http-multinode.service && exit $s ; fi
 
-      - name: Setup accounts in Rocky
-        run: |
-          DJANGO_SUPERUSER_PASSWORD=test sudo -u kat rocky-cli createsuperuser --noinput --email test@test.nl
-          sudo -u kat rocky-cli setup_dev_account
+      - name: Create _dev node in Octopoes
+        run: curl -s -X POST http://localhost:8001/_dev/node
 
       - name: Check Octopoes API health or print response and logs
         run: |
