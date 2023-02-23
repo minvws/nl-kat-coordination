@@ -9,7 +9,7 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 build: build-rocky build-rocky-frontend
 
 build-rocky:
-	docker-compose run --rm rocky make build-rocky-native
+	docker-compose run -u root --rm rocky make build-rocky-native  # root for write permissions compilemessages
 
 build-rocky-native:
 	python3 manage.py migrate
