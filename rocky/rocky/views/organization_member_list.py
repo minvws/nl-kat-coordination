@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import List
 
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -34,6 +33,9 @@ class OrganizationMemberListView(
         if "verified_status_filter" in self.request.GET:
             verified_status_filter = self.request.GET.getlist("verified_status_filter", [])
             queryset = self.filter_queryset(queryset, verified_status_filter)
+        for member in queryset:
+            if member.user.is_superuser:
+                member.verified = True
         return queryset
 
     def filter_queryset(self, queryset, verified_status_filter):
@@ -84,13 +86,13 @@ class OrganizationMemberListView(
             {
                 "label": "Verified",
                 "value": "verified",
-                "checked": not "verified_status_filter" in self.request.GET
+                "checked": "verified_status_filter" not in self.request.GET
                 or "verified" in self.request.GET.getlist("verified_status_filter", []),
             },
             {
                 "label": "Unverified",
                 "value": "unverified",
-                "checked": not "verified_status_filter" in self.request.GET
+                "checked": "verified_status_filter" not in self.request.GET
                 or "unverified" in self.request.GET.getlist("verified_status_filter", []),
             },
         ]
