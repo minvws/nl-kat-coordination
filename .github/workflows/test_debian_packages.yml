@@ -73,6 +73,7 @@ jobs:
         run: |
           tar zvxf kat-*.tar.gz
           sudo apt install ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
+          sudo sed -i "s/WorkingDirectory=\/opt\/venvs\/kat-boefjes\/lib\/python3.9\/site-packages/WorkingDirectory=\/opt\/venvs\/kat-bytes\//g" /usr/lib/systemd/system/kat-katalogus.service
 
       - name: Update configs for rabbitmq
         run: |
@@ -113,28 +114,27 @@ jobs:
       - name: Restart KAT
         run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
-      - name: Check Keiko API health
+      - name: Check Keiko API health or print response and logs
         run: |
           for i in {1..15}; do curl -s http://localhost:8005/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -v http://localhost:8005/health) || true && journalctl --no-pager -u kat-keiko.service && exit $s ; fi
 
-      - name: Check Bytes API health
+      - name: Check Bytes API health or print response and logs
         run: |
           for i in {1..15}; do curl -s http://localhost:8002/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -v http://localhost:8002/health) || true && journalctl --no-pager -u kat-bytes.service && exit $s ; fi
 
-      - name: Check Katalogus API health
+      - name: Check Katalogus API health or print response and logs
         run: |
           for i in {1..15}; do curl -s http://localhost:8003/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -v http://localhost:8003/health) || true && journalctl --no-pager -u kat-katalogus.service && exit $s ; fi
 
-      - name: Check Scheduler API health
+      - name: Check Scheduler API health or print response and logs
         run: |
           for i in {1..15}; do curl -s http://localhost:8004/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -v http://localhost:8004/health) || true && journalctl --no-pager -u kat-mula.service && exit $s ; fi
 
-      - name: Check Octopoes API health
+      - name: Check Octopoes API health or print response and logs
         run: |
           for i in {1..15}; do curl -s http://localhost:8001/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -v http://localhost:8001/health) || true && journalctl --no-pager -u kat-octopoes.service && exit $s ; fi
-
