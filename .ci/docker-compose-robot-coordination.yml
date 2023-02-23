@@ -31,7 +31,7 @@ services:
     restart: on-failure
     depends_on:
       - crux
-    image: "ghcr.io/minvws/nl-kat-octopoes:${OCTOPOES_TAG}"
+    image: "ghcr.io/minvws/nl-kat-octopoes:${BRANCH_TAG}"
     deploy:
       resources:
           limits:
@@ -47,7 +47,7 @@ services:
     depends_on:
       - crux
       - rabbitmq
-    image: "ghcr.io/minvws/nl-kat-octopoes:${OCTOPOES_TAG}"
+    image: "ghcr.io/minvws/nl-kat-octopoes:${BRANCH_TAG}"
     deploy:
       resources:
           limits:
@@ -63,7 +63,7 @@ services:
     depends_on:
       - rabbitmq
       - bytes
-    image: "ghcr.io/minvws/nl-kat-boefjes:${BOEFJES_TAG}"
+    image: "ghcr.io/minvws/nl-kat-boefjes:${BRANCH_TAG}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
@@ -82,7 +82,7 @@ services:
     depends_on:
       - rabbitmq
       - bytes
-    image: "ghcr.io/minvws/nl-kat-boefjes:${BOEFJES_TAG}"
+    image: "ghcr.io/minvws/nl-kat-boefjes:${BRANCH_TAG}"
     deploy:
       replicas: 1
       resources:
@@ -144,7 +144,7 @@ services:
       - scheduler
     ports:
       - "127.0.0.1:8000:8000"
-    image: "ghcr.io/minvws/nl-kat-rocky:${ROCKY_TAG}"
+    image: "ghcr.io/minvws/nl-kat-rocky:${BRANCH_TAG}"
     deploy:
       replicas: 1
       resources:
@@ -161,7 +161,7 @@ services:
     restart: on-failure
     depends_on:
       - bytes-db
-    image: "ghcr.io/minvws/nl-kat-bytes:${BYTES_TAG}"
+    image: "ghcr.io/minvws/nl-kat-bytes:${BRANCH_TAG}"
     deploy:
       replicas: 1
       resources:
@@ -178,7 +178,7 @@ services:
     restart: on-failure
     depends_on:
       - katalogus-db
-    image: "ghcr.io/minvws/nl-kat-boefjes:${BOEFJES_TAG}"
+    image: "ghcr.io/minvws/nl-kat-boefjes:${BRANCH_TAG}"
     deploy:
       replicas: 1
       resources:
@@ -213,7 +213,7 @@ services:
 
   scheduler:
     restart: on-failure
-    image: "ghcr.io/minvws/nl-kat-mula:${MULA_TAG}"
+    image: "ghcr.io/minvws/nl-kat-mula:${BRANCH_TAG}"
     deploy:
       replicas: 1
       resources:
@@ -231,7 +231,7 @@ services:
 
   keiko:
     restart: on-failure
-    image: "ghcr.io/minvws/nl-kat-keiko:${KEIKO_TAG}"
+    image: "ghcr.io/minvws/nl-kat-keiko:${BRANCH_TAG}"
     deploy:
       replicas: 1
       resources:

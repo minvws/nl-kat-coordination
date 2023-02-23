@@ -6,7 +6,6 @@ on:
       - "**"
   push:
     branches:
-      - "develop"
       - "main"
 
   workflow_run:
@@ -15,79 +14,25 @@ on:
       - completed
 
 env:
-  OCTOPOES_TAG: 'main'
-  KEIKO_TAG: 'main'
-  MULA_TAG: 'main'
-  BYTES_TAG: 'main'
-  BOEFJES_TAG: 'main'
   COMPOSE_INTERACTIVE_NO_CLI: 1
   COMPOSE_FILE: '.ci/docker-compose-robot-coordination.yml'
 
 jobs:
   End-to-End:
     runs-on: ubuntu-22.04
-    defaults:
-      run:
-        working-directory: nl-kat-rocky
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          path: nl-kat-rocky
 
       - name: Inject slug/short variables for branch names
         uses: rlespinasse/github-slug-action@v4
 
-      - name: Check if Octopoes has matching branch
-        id: octopoes-check
-        run: docker inspect ghcr.io/minvws/nl-kat-octopoes:${{ env.GITHUB_REF_NAME_SLUG }}
-        continue-on-error: true
-
-      - name: Set branch tag if Octopoes has matching tag
-        if: steps.octopoes-check.outcome == 'success'
-        run: echo "OCTOPOES_TAG=${{ env.GITHUB_REF_NAME_SLUG }}" >> $GITHUB_ENV
-
-      - name: Check if Keiko has matching branch
-        id: keiko-check
-        run: docker inspect ghcr.io/minvws/nl-kat-keiko:${{ env.GITHUB_REF_NAME_SLUG }}
-        continue-on-error: true
-
-      - name: Set branch tag if Keiko has matching tag
-        if: steps.keiko-check.outcome == 'success'
-        run: echo "KEIKO_TAG=${{ env.GITHUB_REF_NAME_SLUG }}" >> $GITHUB_ENV
-
-      - name: Check if Mula has matching branch
-        id: mula-check
-        run: docker inspect ghcr.io/minvws/nl-kat-mula:${{ env.GITHUB_REF_NAME_SLUG }}
-        continue-on-error: true
-
-      - name: Set branch tag if Mula has matching tag
-        if: steps.mula-check.outcome == 'success'
-        run: echo "MULA_TAG=${{ env.GITHUB_REF_NAME_SLUG }}" >> $GITHUB_ENV
-
-      - name: Check if Bytes has matching branch
-        id: bytes-check
-        run: docker inspect ghcr.io/minvws/nl-kat-bytes:${{ env.GITHUB_REF_NAME_SLUG }}
-        continue-on-error: true
-
-      - name: Set branch tag if Bytes has matching tag
-        if: steps.bytes-check.outcome == 'success'
-        run: echo "BYTES_TAG=${{ env.GITHUB_REF_NAME_SLUG }}" >> $GITHUB_ENV
-
-      - name: Check if Boefjes has matching branch
-        id: boefjes-check
-        run: docker inspect ghcr.io/minvws/nl-kat-boefjes:${{ env.GITHUB_REF_NAME_SLUG }}
-        continue-on-error: true
-
-      - name: Set branch tag if Boefjes has matching tag
-        if: steps.boefjes-check.outcome == 'success'
-        run: echo "BOEFJES_TAG=${{ env.GITHUB_REF_NAME_SLUG }}" >> $GITHUB_ENV
-
       - name: Download and run ghcr containers
         run: docker-compose -f .ci/docker-compose-robot-coordination.yml up -d
         env:
-          ROCKY_TAG: ${{ env.GITHUB_REF_NAME_SLUG }}
+          #BRANCH_TAG: ${{ env.GITHUB_REF_NAME_SLUG }}
+          BRANCH_TAG: 'main' # debugging on main branch images
 
       - name: Log memory stats
         run: free -h
