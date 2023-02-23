@@ -73,7 +73,7 @@ jobs:
         run: |
           tar zvxf kat-*.tar.gz
           sudo apt install ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
-          sudo sed -i "s/WorkingDirectory=\/opt\/venvs\/kat-boefjes\/lib\/python3.9\/site-packages/WorkingDirectory=\/opt\/venvs\/kat-bytes\//g" /usr/lib/systemd/system/kat-katalogus.service
+          sudo sed -i "s/WorkingDirectory=\/opt\/venvs\/kat-boefjes\/lib\/python3.9\/site-packages/WorkingDirectory=\/opt\/venvs\/kat-boefjes\//g" /usr/lib/systemd/system/kat-katalogus.service
 
       - name: Update configs for rabbitmq
         run: |
