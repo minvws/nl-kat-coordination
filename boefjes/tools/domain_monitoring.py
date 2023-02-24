@@ -179,6 +179,7 @@ class Monitor:
                     )
 
 
+# todo: add organization option
 @click.command()
 @click.option("--domains", multiple=True, envvar="DOMAINS", help="Domains to monitor")
 @click.option("--size", default=1000, help="Size of the message queue")
