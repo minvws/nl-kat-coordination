@@ -1,0 +1,2 @@
+shodan==1.25.0
+ipaddress==1.0.23

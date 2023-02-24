@@ -1,0 +1,7 @@
+{
+  "id": "wpscan-job",
+  "organization": "_dev",
+  "arguments": {
+    "url": "https://zorg4ons.nl"
+  }
+}

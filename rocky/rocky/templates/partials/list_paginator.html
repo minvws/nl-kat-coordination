@@ -1,0 +1,54 @@
+{% load i18n %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+  <nav role="navigation"
+       class="pagination"
+       aria-label="{% translate 'List pagination' %}">
+    <ul>
+      {% if page_obj.has_previous %}
+        <li>
+          <a aria-label="{% translate 'Previous Page' %}"
+             href="{{ request.path }}?{% url_replace page_param|default:'page' page_obj.previous_page_number %}">
+            <span>{% translate 'Previous' %}</span>
+          </a>
+        </li>
+      {% endif %}
+      {% if page_obj.number|add:'-4' > 1 %}
+        <li>
+          <a aria-label="{% translate 'Five Pages Back' %}"
+             href="{{ request.path }}?{% url_replace page_param|default:"page" page_obj.number|add:'-5' %}">
+            &hellip;
+          </a>
+        </li>
+      {% endif %}
+      {% for i in page_obj.paginator.page_range %}
+        {% if page_obj.number == i %}
+          <li>
+            <a aria-label="{% translate 'Page' %} {{ i }}" aria-current="true">{{ page_obj.number }}</a>
+          </li>
+        {% elif i > page_obj.number|add:'-5' and i < page_obj.number|add:'5' %}
+          <li>
+            <a aria-label="{% translate 'Page' %} {{ i }}"
+               href="{{ request.path }}?{% url_replace page_param|default:"page" i %}">{{ i }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.paginator.num_pages > page_obj.number|add:'4' %}
+        <li>
+          <a aria-label="{% translate 'Five Pages Forward' %}"
+             href="{{ request.path }}?{% url_replace page_param|default:"page" page_obj.number|add:'5' %}">
+            &hellip;
+          </a>
+        </li>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <li>
+          <a aria-label="{% translate 'Next Page' %}"
+             href="{{ request.path }}?{% url_replace page_param|default:"page" page_obj.next_page_number %}">
+            <span>{% translate 'Next' %}</span>
+          </a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

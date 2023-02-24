@@ -1,0 +1,7 @@
+/* Tiles - Variables */
+
+ul.tiles > li > a,
+.tiles > div > a,
+.tile > a {
+  color: var(--link-text-color, initial);
+}

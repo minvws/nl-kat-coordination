@@ -19,14 +19,13 @@ Some tools and hooks have been adopted for both local development as well as in 
 
 Some of the tools are:
 
-- ``Black`` for formatting, it also takes care of imports order
-- ``flake8`` for checking code style and programming errors
+- ``black`` for formatting, it also takes care of imports order
+- ``ruff`` for checking code style, programming errors, and more
 - ``vulture`` for checking dead code
 
 With some tools exceptions are made that differ a bit from the standard configuration such as line lengths, error codes, etc.
 See the different configuration files. A few more will be implemented later on including:
 
-- ``pylint`` for checking code (and documentation) style and programming errors and measuring code quality (next to ``flake8``)
 - ``mypy`` for type checking
 
 For the frontend there are a few more tasks in the CI/CD pipeline:
@@ -37,7 +36,7 @@ For the frontend there are a few more tasks in the CI/CD pipeline:
 Pre-commit
 ----------
 
-Continuous Integration will run several checks as mentioned above, like black and flake8 and more using pre-commit hooks.
+Continuous Integration will run several checks as mentioned above, like ``black``, ``ruff`` and more using pre-commit hooks.
 Any warnings from these checks will cause the Continuous Integration to fail; therefore, it is helpful to run the check yourself before submitting code.
 This can be done by `installing pre-commit <https://pre-commit.com/#install>`_::
 
@@ -56,10 +55,10 @@ Type Hinting
 In this project we use strict type hinting where possible.
 This should make code easier to read and reason about and easier to use (external) libraries.
 Also, many modern frameworks today use type hints for e.g. runtime data validation and documentation.
-Static code analysis tools (including those in an IDE) and type linters can be used to validate typing and improve code qualtity.
+Static code analysis tools (including those in an IDE) and type linters can be used to validate typing and improve code quality.
 
 Although we try to provide as much type hinting as possible, it may be harder to use type hints in some contexts because of mismatches between different type linters or external libraries that don't have type hints or typing stubs.
-Therefore we try to be less strict in e.g. (parts of) Django based applications, but enfore stricter type hinting in more isolated code such as clients and utility functions.
+Therefore we try to be less strict in e.g. (parts of) Django based applications, but enforce stricter type hinting in more isolated code such as clients and utility functions.
 
 In principle, all independent code (e.g. which does not depend on, or inherit from, external libraries) should be strictly typed.
 
@@ -99,7 +98,7 @@ It has a simple syntax and many plugins available that should improve our test c
 Development Environment
 =======================
 
-See :ref:`Developer or local install` for the overall installation instructions.
+See :ref:`Installation and deployment` for the overall installation instructions.
 In a development context, we strongly recommend to use the Docker setup to test and make changes in the codebase (and not production packages).
 
 When it comes to development there is no specific IDE that must be used, although many of us would choose PyCharm as the preferred IDE.
@@ -131,7 +130,7 @@ We believe that writing good, well thought-out code is more important than addin
 Remember that writing tests and documentation (where necessary) are obligatory.
 That said, everyone should remember to be polite and constructive in their feedback and comments.
 
-``# noqa`` and/or ``# pylint: disable=error-msg`` may be used sparingly on a per-line basis if the CI encounters a false positive, or if it concerns a code style issue that is non-trivial to fix.
+``# noqa:``  may be used sparingly on a per-line basis if the CI encounters a false positive, or if it concerns a code style issue that is non-trivial to fix.
 Code reviewers are strongly encouraged to be sceptical of this.
 
 Code commenting and documentation

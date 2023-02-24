@@ -1,0 +1,11 @@
+{% extends 'partials/list_filters.html' %}
+{% load i18n %}
+
+{% block title %}{{ observed_at|date:'M d, Y' }}{% endblock %}
+{% block show_text %}{% translate 'Show settings' %}{% endblock %}
+{% block hide_text %}{% translate 'Hide settings' %}{% endblock %}
+
+{% block filter_form %}
+  {% translate 'Submit' as submit_text %}
+  {% include 'partials/elements/ooi_list_settings_form.html' with ooi_id=ooi.primary_key %}
+{% endblock %}

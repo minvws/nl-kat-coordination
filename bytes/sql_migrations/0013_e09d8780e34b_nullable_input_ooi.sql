@@ -1,0 +1,1 @@
+ALTER TABLE boefje_meta ALTER COLUMN input_ooi DROP NOT NULL;

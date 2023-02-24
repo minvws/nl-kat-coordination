@@ -1,6 +1,6 @@
-===============
-Debian packages
-===============
+===========================
+Production: Debian packages
+===========================
 
 OpenKAT has Debian packages available. In the near future we will have an apt
 repository that will allow you to keep your installation up-to-date using apt.
@@ -11,8 +11,11 @@ steps for installing it on a single machine.
 Prerequisites
 =============
 
-We will be using sudo in this guide, so make sure you have sudo installed on
+We will be using ``sudo`` in this guide, so make sure you have ``sudo`` installed on
 your system.
+
+The packages are built with Ubuntu 22.04 and Debian 11 in mind.
+They may or may not work on other versions or distributions.
 
 Downloading and installing
 ==========================
@@ -166,7 +169,7 @@ Create a new file `/etc/rabbitmq/rabbitmq.conf` and add the following lines:
 
     listeners.tcp.local = 127.0.0.1:5672
 
-Create a new file `/etc/rabbitmq/advanced.config` and add the following lines:
+Create a new file `/etc/rabbitmq/advanced.conf` and add the following lines:
 
 .. code-block:: erlang
 
@@ -182,18 +185,21 @@ Add the 'kat' vhost
 -------------------
 
 Generate a safe password for the KAT user in rabbitmq. You can use the /dev/urandom method again and put it in a shell variable to use it later:
+
 .. code-block:: sh
 
     rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
 
 Now create a KAT user for RabbitMQ, create the virtual host and set the permissions:
+
 .. code-block:: sh
 
-    rabbitmqctl add_user kat ${rabbitmq_pass}
-    rabbitmqctl add_vhost kat
-    rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+   sudo rabbitmqctl add_user kat ${rabbitmq_pass}
+   sudo rabbitmqctl add_vhost kat
+   sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
 Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for `/etc/kat/mula.conf`:
+
 .. code-block:: sh
 
     SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@localhost:5672/kat
@@ -207,9 +213,10 @@ And update the `QUEUE_URI` setting to the same value for the following files:
  * `/etc/kat/octopoes.conf`
 
 Or use this command to do it for you:
+
 .. code-block:: sh
 
-    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
+    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
 
 Configure Bytes credentials
 ===========================
@@ -220,7 +227,7 @@ copy the value of `BYTES_PASSWORD` in `/etc/kat/bytes.conf` to the setting with 
 - `/etc/kat/boefjes.conf`
 - `/etc/kat/mula.conf`
 
-This oneliner will do it for you:
+This oneliner will do it for you, executed as root:
 
 .. code-block:: sh
 
@@ -236,7 +243,7 @@ After finishing these steps, you should restart KAT to load the new configuratio
     sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
 Start KAT on system boot
-------------------------
+========================
 
 To start KAT when the system boots, enable all KAT services:
 
@@ -247,9 +254,8 @@ To start KAT when the system boots, enable all KAT services:
 Start using OpenKAT
 ===================
 
-By default OpenKAT will be accessible in your browser through `https://<server IP>:8000`. There, Rocky will take you through the steps of setting up your account and running your first boefjes.
+By default OpenKAT will be accessible in your browser through `https://<server IP>:8443` (http://<server IP>:8000 for docker based installs). There, Rocky will take you through the steps of setting up your account and running your first boefjes.
 
-=================
 Upgrading OpenKAT
 =================
 

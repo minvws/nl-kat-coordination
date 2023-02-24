@@ -1,0 +1,54 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "default": {
+            "format": "%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
+            "datefmt": "[%Y-%m-%d %H:%M:%S %z]"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "INFO",
+            "formatter": "default",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "root": {
+        "level": "INFO",
+        "handlers": [
+            "console"
+        ]
+    },
+    "loggers": {
+        "uvicorn.error": {
+            "level": "CRITICAL",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        },
+        "uvicorn.access": {
+            "level": "CRITICAL",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        },
+        "pika": {
+            "level": "CRITICAL",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        },
+        "sqlalchemy.engine": {
+            "level": "CRITICAL",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        }
+    }
+}

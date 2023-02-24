@@ -29,14 +29,14 @@ services:
     ports:
       - "127.0.0.1:8001:80"
     build:
-      context: nl-kat-octopoes/
+      context: octopoes/
       args:
         ENVIRONMENT: dev
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
     env_file:
       - .env
     volumes:
-      - ./nl-kat-octopoes:/app/octopoes
+      - ./octopoes:/app/octopoes
 
   octopoes_api_worker:
     restart: on-failure
@@ -44,14 +44,14 @@ services:
       - crux
       - rabbitmq
     build:
-      context: nl-kat-octopoes/
+      context: octopoes/
       args:
         ENVIRONMENT: dev
     command: worker-beat
     env_file:
       - .env
     volumes:
-      - ./nl-kat-octopoes:/app/octopoes
+      - ./octopoes:/app/octopoes
 
   boefje:
     restart: on-failure
@@ -60,11 +60,11 @@ services:
       - bytes
     build:
       context: .
-      dockerfile: nl-kat-boefjes/Dockerfile.dev
+      dockerfile: boefjes/Dockerfile
       args:
         ENVIRONMENT: dev
     volumes:
-      - ./nl-kat-boefjes:/app/boefjes
+      - ./boefjes:/app/boefjes
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 1
@@ -79,11 +79,11 @@ services:
       - bytes
     build:
       context: .
-      dockerfile: nl-kat-boefjes/Dockerfile.dev
+      dockerfile: boefjes/Dockerfile
       args:
         ENVIRONMENT: dev
     volumes:
-      - ./nl-kat-boefjes:/app/boefjes
+      - ./boefjes:/app/boefjes
     deploy:
       replicas: 1
     command: normalizer
@@ -134,12 +134,12 @@ services:
       - "127.0.0.1:8000:80"
     build:
       context: .
-      dockerfile: nl-kat-rocky/Dockerfile.dev
+      dockerfile: rocky/Dockerfile
       args:
         ENVIRONMENT: dev
     command: python3 manage.py runserver 0.0.0.0:80
     volumes:
-      - ./nl-kat-rocky:/app/rocky
+      - ./rocky:/app/rocky
     env_file:
       - .env
 
@@ -150,12 +150,12 @@ services:
     ports:
       - "127.0.0.1:8002:8000"
     build:
-      context: nl-kat-bytes/
+      context: bytes/
       args:
         ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
     volumes:
-      - ./nl-kat-bytes:/app/bytes
+      - ./bytes:/app/bytes
     env_file:
       - .env
 
@@ -165,12 +165,12 @@ services:
       - katalogus-db
     build:
       context: .
-      dockerfile: nl-kat-boefjes/Dockerfile.dev
+      dockerfile: boefjes/Dockerfile
       args:
         ENVIRONMENT: dev
     command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
-      - ./nl-kat-boefjes:/app/boefjes
+      - ./boefjes:/app/boefjes
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
@@ -193,7 +193,7 @@ services:
   scheduler:
     restart: on-failure
     build:
-      context: nl-kat-mula/
+      context: mula/
       args:
         ENVIRONMENT: dev
     ports:
@@ -201,28 +201,43 @@ services:
     env_file:
       - .env
     volumes:
-      - ./nl-kat-mula:/app/scheduler
+      - ./mula:/app/scheduler
     depends_on:
+      - scheduler-db
       - boefje
       - normalizer
       - octopoes_api
       - katalogus
 
+  scheduler-db:
+    image: postgres:12.8
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - scheduler-db-data:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env
+    environment:
+      - APP_DB=SCHEDULER_DB
+      - APP_DB_USER=SCHEDULER_DB_USER
+      - APP_DB_PASSWORD=SCHEDULER_DB_PASSWORD
+
   keiko:
     restart: on-failure
     build:
-      context: nl-kat-keiko/
+      context: keiko/
     ports:
       - "127.0.0.1:8005:8000"
     command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko
     env_file:
       - .env
     volumes:
-      - ./nl-kat-keiko:/app/keiko
+      - ./keiko:/app/keiko
 
 volumes:
   rocky-db-data:
   bytes-db-data:
   katalogus-db-data:
-  xtdb-data:
   scheduler-db-data:
+  xtdb-data:

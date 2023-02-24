@@ -1,0 +1,11 @@
+/* Application base */
+
+:root {
+  /* Text styling */
+  --application-base-font-family: "Open Sans", sans-serif;
+  --application-base-line-height: 1.75;
+
+  /* Accent color */
+  --application-base-accent-color: var(--branding-color-1);
+  --application-base-accent-color-text-color:  var(--branding-color-1-text-color);
+}

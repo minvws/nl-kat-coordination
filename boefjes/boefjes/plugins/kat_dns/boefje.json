@@ -1,0 +1,25 @@
+{
+    "id": "dns-records",
+    "name": "DnsRecords",
+    "description": "Fetch the DNS record(s) of a hostname",
+    "consumes": [
+        "Hostname"
+    ],
+    "produces": [
+        "IPAddressV6",
+        "DNSARecord",
+        "DNSNSRecord",
+        "DNSTXTRecord",
+        "DNSSOARecord",
+        "NXDOMAIN",
+        "DNSCNAMERecord",
+        "DNSMXRecord",
+        "Hostname",
+        "Network",
+        "DNSAAAARecord",
+        "IPAddressV4",
+        "DNSZone"
+    ],
+    "environment_keys": [],
+    "scan_level": 1
+}

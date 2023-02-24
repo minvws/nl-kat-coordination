@@ -1,0 +1,12 @@
+Source: kat-rocky
+Build-Depends: python3, dh-virtualenv, libssl-dev, libfreetype-dev, python3-setuptools, python3-pip, debhelper-compat (= 12)
+Maintainer: OpenKAT <maintainer@openkat.nl>
+
+Package: kat-rocky
+Section: python
+Priority: optional
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${python}, openssl, ${misc:Depends}, ${shlibs:Depends}
+Description: Rocky web interface for KAT
+  This is the web interface component of the KAT project.

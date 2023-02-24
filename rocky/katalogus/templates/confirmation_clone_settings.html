@@ -1,0 +1,34 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Clone settings' %}</h1>
+        <p class="emphasized">Override both the KAT-alogus settings as well as enabled and disabled plugins of organization <i>{{to_organization}}</i>.</p>
+
+        <p>Be aware that:</p>
+        <ul>
+          <li>All plugins currently enabled for <i>{{organization.name}}</i> will also be enabled for <i>{{to_organization}}</i>.</li>
+          <li>All other plugins will be disabled for <i>{{to_organization}}</i>.</li>
+          <li>Plugin settings for <i>{{organization.name}}</i>, such as API keys, will overwrite the plugin settings for <i>{{to_organization}}</i>.</li>
+          <li>Plugin settings from <i>{{to_organization}}</i> that do not appear in <i>{{organization.name}}</i> will remain unchanged.</li>
+        </ul>
+
+        <p><strong>Are you sure you want to clone all KAT-alogus settings from organization <i>{{organization.name}}</i> into organization <i>{{to_organization}}</i>?</strong></p>
+
+        <form class="inline" method="post">
+          {% csrf_token %}
+          <fieldset>
+            <a href="{% url 'katalogus_settings' organization.code %}"
+               class="button ghost">{% translate 'Cancel' %}</a>
+            <button type="submit">{% translate 'Clone' %}</button>
+          </fieldset>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}

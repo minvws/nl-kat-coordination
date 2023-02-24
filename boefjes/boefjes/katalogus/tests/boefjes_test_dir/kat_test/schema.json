@@ -1,0 +1,14 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "api_key": {
+      "title": "Api Key",
+      "maxLength": 128,
+      "type": "string"
+    }
+  },
+  "required": [
+    "api_key"
+  ]
+}

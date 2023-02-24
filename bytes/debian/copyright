@@ -1,0 +1,10 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: kat-octopoes
+Upstream-Contact: info@openkat.nl
+Source: __URL__
+
+Files: *
+Copyright: 2022 OpenKAT
+License: EUPL
+
+License: EUPL

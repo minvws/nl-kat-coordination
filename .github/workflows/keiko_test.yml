@@ -1,0 +1,36 @@
+name: Keiko Run the unit tests
+
+on:
+  push:
+    paths:
+      - keiko/**
+  pull_request:
+    paths:
+      - keiko/**
+
+jobs:
+  test:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ '3.8', '3.9', '3.10', '3.11' ]
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Python ${{ matrix.version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+          cache: 'pip' # caching pip dependencies
+
+      - name: Install requirements-dev.txt
+        run: pip install -r requirements-dev.txt
+        working-directory: ./keiko
+
+      - name: Run unit tests
+        run: make test
+        working-directory: ./keiko

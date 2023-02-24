@@ -1,0 +1,35 @@
+<h3>Finding {{ finding.human_readable }}</h3>
+
+<article class="is-indented">
+  <dl>
+    {% for key, value in finding.items %}
+      {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
+        <div>
+          <dt>{{ key }}</dt>
+          <dd>{{ value }}</dd>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </dl>
+
+  {% for finding_type in finding.children %}
+    {% if finding_type|is_finding_type %}
+      <h4>Info {{ finding_type.human_readable }}</h4>
+      <dl>
+        {% for key, value in finding_type.items %}
+          {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
+            <div>
+              <dt>{{ key }}</dt>
+              <dd>{{ value }}</dd>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </dl>
+    {% endif %}
+  {% endfor %}
+
+  <aside class="ooi_summary__risk-rating">
+    <h5>Risk Rating</h5>
+    <span>99.99</span>
+  </aside>
+</article>

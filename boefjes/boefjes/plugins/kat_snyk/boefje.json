@@ -1,0 +1,16 @@
+    {
+        "id": "snyk",
+        "name": "Snyk.io-vulnerabilities",
+        "description": "Get Snyk.io vulnerabilities based on Software",
+        "consumes": [
+            "SoftwareInstance"
+        ],
+        "produces": [
+            "Finding",
+            "KATFindingType",
+            "SnykFindingType",
+            "CVEFindingType"
+        ],
+        "environment_keys": [],
+        "scan_level": 1
+    }

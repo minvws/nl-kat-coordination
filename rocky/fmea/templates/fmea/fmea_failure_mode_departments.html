@@ -1,0 +1,35 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+	<main id="main-content">
+		<section>
+			<div>
+				<h1>{% translate 'Departments failure modes' %}</h1>
+				<div class="horizontal-scroll">
+					<table>
+						<caption>{% translate 'Failure modes and affected departments tabel:' %}</caption>
+						<thead>
+							<tr>
+								<th scope="col">{% translate 'Failure Mode' %}</th>
+								<th scope="col">{% translate 'Affected Departments' %}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for object in object_list %}
+								<tr>
+									<td>{{ object.failure_mode }}</td>
+									<td>{{ object.affected_department }}</td>
+								</tr>
+							{% empty %}
+								<p>{% translate 'Nothing found.' %}</p>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</main>
+{% endblock %}

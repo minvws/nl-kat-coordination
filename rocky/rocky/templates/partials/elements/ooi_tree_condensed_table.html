@@ -1,0 +1,20 @@
+{% load i18n %}
+{% if list.items %}
+  {% with current_depth=0 %}
+    <div class="horizontal-scroll">
+      <table class="action-buttons tree-view">
+        <thead>
+          <tr>
+            <th class="col-ooi-id">{% translate "Key" %}</th>
+            <th class="col-ooi-type">{% translate "Type" %}</th>
+            <th class="col-action">{% translate "Tree" %}</th>
+            <th class="col-action">{% translate "Graph" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% include "partials/elements/ooi_tree_condensed_table_row.html" with object=list %}
+        </tbody>
+      </table>
+    </div>
+  {% endwith %}
+{% endif %}

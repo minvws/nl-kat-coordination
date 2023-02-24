@@ -1,0 +1,12 @@
+/* Navigation - Variables */
+
+:root {
+  --navigation-collapsible-menu-list-item-collapsed-hover-background-color: #14131a;
+  --navigation-gap: 1rem;
+  --navigation-align-content: flex-start;
+  --navigation-list-gap: var(--navigation-gap);
+  --navigation-link-text-decoration: none;
+  --navigation-link-hover-text-decoration: none;
+  --navigation-background-color: var(--application-base-background-color);
+  --navigation-text-color: var(--application-base-text-color);
+}

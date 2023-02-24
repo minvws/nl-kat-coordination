@@ -1,0 +1,15 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "WP_SCAN_API": {
+      "title": "WP_SCAN_API",
+      "maxLength": 128,
+      "type": "string",
+      "description": "A WPScan API key/token (see https://wpscan.com/api)."
+    }
+  },
+  "required": [
+    "WP_SCAN_API"
+  ]
+}

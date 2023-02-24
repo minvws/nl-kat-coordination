@@ -1,0 +1,5 @@
+{% load i18n %}
+{% load static %}
+
+<a href="{% ooi_url 'ooi_detail' value.primary_key organization_code query=mandatory_fields %}"
+   title="{% blocktranslate trimmed with name=value.human_readable %} Show details for {{ name }} {% endblocktranslate %}">{{ value.human_readable }}</a>

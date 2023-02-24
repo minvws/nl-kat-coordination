@@ -1,0 +1,15 @@
+    {
+        "id": "many-ports-open",
+        "name": "Many new ports open",
+        "description": "Check if there are many ports open that were not before",
+        "consumes": [
+            "IPAddressV4",
+            "IPAddressV6"
+        ],
+        "produces": [
+            "KATFindingType",
+            "Finding"
+        ],
+        "environment_keys": [],
+        "scan_level": 1
+    }

@@ -1,16 +1,19 @@
-============
-Introduction
-============
-
+===============
 What is OpenKAT
 ===============
+
+Introduction
+============
 
 OpenKAT aims to monitor, record and analyze the status of information systems. OpenKAT scans networks, analyzes vulnerabilities and creates accessible reports. It integrates the most commonly used network tools and scanning software into a modular framework, accesses external databases and combines the information from all these sources into clear reports.
 
 .. image:: img/flowopenkat.png
   :alt: flow of OpenKAT
 
-Two brochures about OpenKAT have been created with a general explanation, both are in Dutch:
+White papers
+============
+
+Two brochures or white papers about OpenKAT have been created with a general explanation, both are in Dutch. You can read them without giving your email adress :-)
 
 - :download:`the 'TL;DR' of 2 pages (English) <pdf/OpenKAT handout_ENG.pdf>`
 - :download:`the extensive brochure on OpenKAT (Dutch) <pdf/introductie OpenKAT V20220621.pdf>`

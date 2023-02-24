@@ -1,0 +1,12 @@
+{
+    "id": "adr-validator",
+    "consumes": [
+        "adr-validator"
+    ],
+    "produces": [
+        "APIDesignRule",
+        "APIDesignRuleResult",
+        "ADRFindingType",
+        "Finding"
+    ]
+}

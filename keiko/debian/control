@@ -1,0 +1,12 @@
+Source: kat-keiko
+Build-Depends: python3, dh-virtualenv, python3-setuptools, python3-pip, python3-dev, debhelper-compat (= 12)
+Maintainer: OpenKAT <maintainer@openkat.nl>
+
+Package: kat-keiko
+Section: python
+Priority: optional
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${python}, texlive-latex-base, texlive-latex-extra, texlive-latex-recommended, texlive-lang-european, chktex, ${misc:Depends}, ${shlibs:Depends}
+Description: Keiko
+ The PDF report generation tool for KAT.

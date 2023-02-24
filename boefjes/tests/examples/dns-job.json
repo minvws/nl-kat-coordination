@@ -1,0 +1,18 @@
+{
+  "id": "dns-lookup-job",
+  "boefje": {
+    "id": "dns-records",
+    "version": null
+  },
+  "organization": "_dev",
+  "input_ooi": "Hostname|internet|www.example.nl.",
+  "arguments": {
+    "input": {"name": "www.example.nl."}
+  },
+  "dispatches": [
+    {
+      "id": "kat_dns_normalize",
+      "version": null
+    }
+  ]
+}

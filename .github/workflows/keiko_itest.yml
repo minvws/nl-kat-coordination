@@ -1,0 +1,29 @@
+name: Keiko Run the robot framework integration tests
+
+on:
+  push:
+    paths:
+      - keiko/**
+  pull_request:
+    paths:
+      - keiko/**
+
+jobs:
+  itest:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Install requirements-dev.txt
+        run: pip install -r requirements-dev.txt
+        working-directory: ./keiko
+
+      - name: Run integration tests
+        run: make itest
+        working-directory: ./keiko
