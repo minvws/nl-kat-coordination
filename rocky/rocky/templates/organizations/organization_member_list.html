@@ -16,18 +16,30 @@
         <thead>
           <tr>
             <th>{% translate 'Member name' %}</th>
+            <th>{% translate 'Role' %}</th>
             <th>{% translate 'Added on' %}</th>
             <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Grant/revoke permisson to set OOI clearance levels' %}</th>
-            <th>{% translate 'Blocked' %}</th>
+            <th>{% translate 'Suspended' %}</th>
             {% comment %} <th>{% translate 'Verified' %}</th> {% endcomment %}
           </tr>
         </thead>
         <tbody>
           {% for member in members %}
             <tr>
-              <td>{{ member.user }}</td>
+              <td>{{ member.user }}<br>
+              <td>
+              {% if member.user.is_superuser %}
+                Superuser
+              {% else %}
+                {% if member.user.is_staff %}
+                  Admin
+                {% endif %}
+              {% endif %}<br>
+              {% for group in member.user.groups.all %}
+                {{ group|title }}<br>
+              {% endfor %}
               <td>{{ member.user.date_joined }}</td>
               <td>
                 {% if member.trusted_clearance_level > 0 %}
@@ -63,13 +75,6 @@
                   {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='block' key='member_id' value=member.id %}
                 {% endif %}
               </td>
-              {% comment %} <td>
-                {% if member.verified %}
-                  {% include 'partials/single_action_checkbox_form.html' with input_checked=member.verified input_disabled=member.user.is_superuser action='unverify' key='member_id' value=member.id %}
-                {% else %}
-                  {% include 'partials/single_action_checkbox_form.html' with input_checked=member.verified input_disabled=member.user.is_superuser action='verify' key='member_id' value=member.id %}
-                {% endif %}
-              </td> {% endcomment %}
             </tr>
           {% endfor %}
         </tbody>

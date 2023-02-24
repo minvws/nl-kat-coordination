@@ -30,20 +30,20 @@ class OrganizationMemberListView(
 
     def get_queryset(self):
         queryset = self.model.objects.filter(organization=self.organization)
-        if "verified_status_filter" in self.request.GET:
-            verified_status_filter = self.request.GET.getlist("verified_status_filter", [])
-            queryset = self.filter_queryset(queryset, verified_status_filter)
+        if "blocked_status_filter" in self.request.GET:
+            blocked_status_filter = self.request.GET.getlist("blocked_status_filter", [])
+            queryset = self.filter_queryset(queryset, blocked_status_filter)
         for member in queryset:
             if member.status == "blocked":
                 member.blocked = True
         return queryset
 
-    def filter_queryset(self, queryset, verified_status_filter):
+    def filter_queryset(self, queryset, blocked_status_filter):
         result = []
-        if "verified" in verified_status_filter:
-            result += [member for member in queryset if member.verified]
-        if "unverified" in verified_status_filter:
-            result += [member for member in queryset if not member.verified]
+        if "blocked" in blocked_status_filter:
+            result += [member for member in queryset if member.status == "blocked"]
+        if "unblocked" in blocked_status_filter:
+            result += [member for member in queryset if not member.status == "blocked"]
         return result
 
     def setup(self, request, *args, **kwargs):
@@ -81,23 +81,23 @@ class OrganizationMemberListView(
         except RequestException as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
 
-    def get_verified_filters(self):
+    def get_blocked_filters(self):
         return [
             {
-                "label": "Verified",
-                "value": "verified",
-                "checked": "verified_status_filter" not in self.request.GET
-                or "verified" in self.request.GET.getlist("verified_status_filter", []),
+                "label": "Suspended",
+                "value": "blocked",
+                "checked": "blocked_status_filter" not in self.request.GET
+                or "blocked" in self.request.GET.getlist("blocked_status_filter", []),
             },
             {
-                "label": "Unverified",
-                "value": "unverified",
-                "checked": "verified_status_filter" not in self.request.GET
-                or "unverified" in self.request.GET.getlist("verified_status_filter", []),
+                "label": "Not suspended",
+                "value": "unblocked",
+                "checked": "blocked_status_filter" not in self.request.GET
+                or "unblocked" in self.request.GET.getlist("blocked_status_filter", []),
             },
         ]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["verified_filters"] = self.get_verified_filters()
+        context["blocked_filters"] = self.get_blocked_filters()
         return context

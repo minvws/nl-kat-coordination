@@ -153,7 +153,11 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
         if self.organization and selected_group:
             self.set_user()
             OrganizationMember.objects.get_or_create(
-                user=self.user, organization=self.organization, member_name=self.cleaned_data["name"]
+                user=self.user,
+                organization=self.organization,
+                member_name=self.cleaned_data["name"],
+                verified=True,
+                status=OrganizationMember.STATUSES.ACTIVE,
             )
 
             selected_group.user_set.add(self.user)

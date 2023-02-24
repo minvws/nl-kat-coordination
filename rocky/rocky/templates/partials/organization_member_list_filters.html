@@ -12,14 +12,14 @@
         {% translate "Verified status" %}
       </legend>
       <div>
-        {% for verified_filter in verified_filters %}
+        {% for blocked_filter in blocked_filters %}
           <div class="horizontal-view">
             <input type="checkbox"
-                   id="verified-filter-{{ verified_filter.value }}"
-                   name="verified_status_filter"
-                   value="{{ verified_filter.value }}"
-                   {% if verified_filter.checked %} checked{% endif %}>
-            <label for="verified-filter-{{ verified_filter.value }}">{{ verified_filter.label }}</label>
+                   id="blocked-filter-{{ blocked_filter.value }}"
+                   name="blocked_status_filter"
+                   value="{{ blocked_filter.value }}"
+                   {% if blocked_filter.checked %} checked{% endif %}>
+            <label for="blocked-filter-{{ blocked_filter.value }}">{{ blocked_filter.label }}</label>
           </div>
         {% endfor %}
       </div>
