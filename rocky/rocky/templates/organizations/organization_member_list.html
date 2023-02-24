@@ -20,7 +20,8 @@
             <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Grant/revoke permisson to set OOI clearance levels' %}</th>
-            <th>{% translate 'Verified' %}</th>
+            <th>{% translate 'Blocked' %}</th>
+            {% comment %} <th>{% translate 'Verified' %}</th> {% endcomment %}
           </tr>
         </thead>
         <tbody>
@@ -56,12 +57,19 @@
                 {% endfor %}
               </td>
               <td>
+                {% if member.status == "blocked" %}
+                  {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='unblock' key='member_id' value=member.id %}
+                {% else %}
+                  {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='block' key='member_id' value=member.id %}
+                {% endif %}
+              </td>
+              {% comment %} <td>
                 {% if member.verified %}
                   {% include 'partials/single_action_checkbox_form.html' with input_checked=member.verified input_disabled=member.user.is_superuser action='unverify' key='member_id' value=member.id %}
                 {% else %}
                   {% include 'partials/single_action_checkbox_form.html' with input_checked=member.verified input_disabled=member.user.is_superuser action='verify' key='member_id' value=member.id %}
                 {% endif %}
-              </td>
+              </td> {% endcomment %}
             </tr>
           {% endfor %}
         </tbody>
