@@ -83,7 +83,7 @@ class MessageQueue:
             meta = BoefjeMeta(
                 id=str(uuid.uuid4()),
                 boefje=Boefje(id="domain-monitoring", version="0.1"),
-                organization="",
+                organization="dev",
                 started_at=datetime.datetime.now(datetime.timezone.utc),
                 ended_at=datetime.datetime.now(datetime.timezone.utc),
             )
