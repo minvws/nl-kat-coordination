@@ -93,7 +93,7 @@ OpenKAT includes the following subsystems, which can all be found in the `NL-KAT
 
 :Raw data storage: `Bytes <https://github.com/minvws/nl-kat-coordination/tree/main/bytes>`_
 
-:Scrapers and normalizers: `Boefjes <https://github.com/minvws/nl-kat-coordination/tree/main/boefjes>`_
+:Boefjes and normalizers: `Boefjes <https://github.com/minvws/nl-kat-coordination/tree/main/boefjes>`_
 
 Which licence applies to OpenKAT?
 =================================
