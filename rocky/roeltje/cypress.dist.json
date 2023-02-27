@@ -1,9 +1,0 @@
-{
-  "viewportWidth": 1280,
-  "viewportHeight": 1024,
-  "env": {
-    "client_user": "",
-    "client_pass": "",
-    "client_otp_secret": ""
-  }
-}

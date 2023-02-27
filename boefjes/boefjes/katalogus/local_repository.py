@@ -150,7 +150,10 @@ class LocalPluginRepository:
         def_obj = json.loads(def_file.read_text())
         def_obj["repository_id"] = RESERVED_LOCAL_ID
 
-        return Normalizer.parse_obj(def_obj)
+        normalizer: Normalizer = Normalizer.parse_obj(def_obj)
+        normalizer.consumes.append(f"normalizer/{normalizer.id}")
+
+        return normalizer
 
 
 def get_local_repository():
