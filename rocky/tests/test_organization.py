@@ -1,5 +1,7 @@
 import pytest
 from django.contrib.auth.models import Permission
+from django.core.exceptions import PermissionDenied
+from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
 from rocky.views.organization_detail import OrganizationDetailView
@@ -52,7 +54,6 @@ def test_organization_member_list(rf, my_user, organization, mock_models_katalog
     assertContains(response, "Add new member")
     assertContains(response, my_user.email)
     assertContains(response, "Grant")
-    assertContains(response, "active")
 
 
 def test_organization_member_give_and_revoke_clearance(
@@ -130,4 +131,32 @@ def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(
     assertContains(response, "Add new member")
     assertContains(response, my_user.email)
     assertContains(response, "Grant")
-    assertContains(response, "active")
+
+
+def test_organization_does_not_exist(client, normal_user, organization):
+    client.force_login(normal_user)
+    response = client.get(reverse("organization_detail", kwargs={"organization_code": "nonexistent"}))
+
+    assert response.status_code == 404
+
+
+def test_organization_no_member(client, normal_user_without_organization_member, organization):
+    client.force_login(normal_user_without_organization_member)
+    response = client.get(reverse("organization_detail", kwargs={"organization_code": organization.code}))
+
+    assert response.status_code == 404
+
+
+def test_organization_active_member(rf, normal_user, organization):
+    request = setup_request(rf.get("organization_detail"), normal_user)
+    response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
+
+    assert response.status_code == 200
+
+
+def test_organization_blocked_member(rf, normal_user, organization):
+    OrganizationMember.objects.filter(user=normal_user, organization=organization).update(status="blocked")
+
+    request = setup_request(rf.get("organization_detail"), normal_user)
+    with pytest.raises(PermissionDenied):
+        OrganizationDetailView.as_view()(request, organization_code=organization.code)

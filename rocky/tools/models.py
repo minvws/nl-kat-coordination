@@ -112,6 +112,9 @@ post_save.connect(Organization.post_create, sender=Organization)
 
 
 class OrganizationMember(models.Model):
+    # New is the status after an e-mail invite has been created for a member but the invite hasn't been accepted yet.
+    # Active is when the member has accepted the invited or the account was created directly without an invite.
+    # Blocked is when an organization admin has blocked the member.
     class STATUSES(models.TextChoices):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
@@ -119,12 +122,9 @@ class OrganizationMember(models.Model):
 
     scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
 
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, related_name="members")
-    verified = models.BooleanField(default=False)
-    authorized = models.BooleanField(default=False)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
-    member_name = models.CharField(max_length=126)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]

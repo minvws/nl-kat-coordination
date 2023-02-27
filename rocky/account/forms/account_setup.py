@@ -155,8 +155,6 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
             OrganizationMember.objects.get_or_create(
                 user=self.user,
                 organization=self.organization,
-                member_name=self.cleaned_data["name"],
-                verified=True,
                 status=OrganizationMember.STATUSES.ACTIVE,
             )
 
