@@ -97,7 +97,7 @@ urlpatterns += i18n_patterns(
         name="organization_detail",
     ),
     path(
-        "organization_members/<path:pk>/edit/",
+        "<organization_code>/members/edit/<path:pk>/",
         OrganizationMemberEditView.as_view(),
         name="organization_member_edit",
     ),

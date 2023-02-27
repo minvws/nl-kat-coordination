@@ -21,6 +21,7 @@
             <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Grant/revoke permisson to set OOI clearance levels' %}</th>
+            <th>{% translate 'Edit' %}</th>
           </tr>
         </thead>
         <tbody>
@@ -55,6 +56,11 @@
                     {% endif %}
                   {% endfor %}
                 {% endfor %}
+              </td>
+              <td>
+                <a href="{% url 'organization_member_edit' organization.code member.id %}">
+                  <button class="ti-edit"></button>
+                </a>
               </td>
             </tr>
           {% endfor %}

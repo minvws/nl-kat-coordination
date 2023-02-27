@@ -6,13 +6,13 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
-
 from account.forms import OrganizationMemberForm
 from tools.models import OrganizationMember
+from account.mixins import OrganizationView
 
 
 @class_view_decorator(otp_required)
-class OrganizationMemberEditView(PermissionRequiredMixin, UpdateView):
+class OrganizationMemberEditView(PermissionRequiredMixin, OrganizationView, UpdateView):
     form_class = OrganizationMemberForm
     model = OrganizationMember
     template_name = "organizations/organization_member_edit.html"
@@ -28,11 +28,10 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UpdateView):
         context["breadcrumbs"] = [
             {"url": reverse("organization_list"), "text": "Organizations"},
             {
-                "url": reverse("organization_detail", kwargs={"pk": self.object.organization_id}),
-                "text": self.object.organization.name,
-            },
-            {
-                "url": reverse("organization_member_edit", kwargs={"pk": self.object.id}),
+                "url": reverse(
+                    "organization_member_edit",
+                    kwargs={"organization_code": self.organization.code, "pk": self.object.id},
+                ),
                 "text": _("Edit member"),
             },
         ]
