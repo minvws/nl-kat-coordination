@@ -11,6 +11,8 @@ poetry install
 pre-commit install
 ```
 
+### Updating dependencies
+
 To update `poetry.lock` with the dependencies from `pyproject.toml`, and update `requirements.txt` and `requirements-dev.txt`:
 ```bash
 make update-requirements
@@ -24,37 +26,75 @@ You can install the production dependencies directly through pip with:
 python3 -m pip install -r requirements.txt
 ```
 
+### Running Octopoes directly through your Python interpreter
+When the Poetry environment is activated, you can run Octopoes directly in your Python interpreter:
+
+```bash
+python3 -m octopoes
+```
+
+This will expose the Octopoes HTTP API on the port declared by the `OCTOPOES_API_PORT` environment variable.
+The API documentation is available at `/docs`, and the OpenAPI schema at `/openapi.json`.
+
+For development purposes, you should/can run a mock Katalogus and XTDB through:
+
+```bash
+docker compose -f docker-compose-dev.yml up
+```
+
+Be sure to set `OCTOPOES_KATALOGUS_URI` and `OCTOPOES_XTDB_URI` to the corresponding values in the `docker-compose-dev.yml` file if you do so.
+
+## Tests
+The unit tests (`octopoes/tests`) are run through `pytest`.
+
+
+## API documentation notes
+
+- Note that `ingester_id` corresponds to an organization code in Rocky and the Katalogus.
+- You can access a GraphQL playground at `/graphiql` to run arbitrary queries against XTDB.
+- A health endpoint is available at `/health`.
+
+## Overall project architecture and implementation notes
+Octopoes is a microservice that exposes a HTTP REST API. The API is used to create, read, update, and delete to and from the knowledge-graph.
+The implemented endpoints generally accept and return either JSON or GraphQL.
+
+Octopoes communicates with XTDB (implementation of the graph) and the Katalogus (plugin and configuration service) through HTTP clients, implemented in `octopoes.services.xtdb` and `octopoes.services.katalogus`.
+
+The graph model and "KAT Universe" are defined in `octopoes.ddl` and the accompanying GraphQL schemas.
+
+Octopoes is essentially a multithreaded, asynchronous program:
+- uvicorn+FastAPI handles input/output interaction with external clients;
+  - Note that most API routes take `ingester_id` as a parameter, which is the organization code in the Katalogus.
+    This is used to determine which XTDB instance to use.
+- a monitor thread watches the organisations in the Katalogus service, and adds/removes organisations to/from the ingesters
+- an ingester thread for each organization in the Katalogus, which connects to XTDB and CRUDs data to/from the graph.
+
 ## Environment variables
 ```bash
-export XTDB_URI="http://xtdb.local"
-export QUEUE_URI="amqp://guest:guest@localhost:5672/%2fkat"
+# Enables some verbose debugging output
+OCTOPOES_DEBUG=True
 
-# Optional
-export LOG_CFG="logging.yml"
-export QUEUE_NAME_OCTOPOES="octopoes"
+# Describes verbosity settings for logging
+OCTOPOES_LOG_CFG=logging.yml
+
+# Interface and port that the API listens on
+OCTOPOES_API_HOST=127.0.0.1
+OCTOPOES_API_PORT=8000
+
+# URIs to external service dependencies
+OCTOPOES_KATALOGUS_URI=http://localhost:9501
+OCTOPOES_XTDB_URI=http://localhost:9500/_xtdb
+OCTOPOES_RABBITMQ_URI=
 ```
 
-### Run Octopoes API
-```bash
-python3 -m uvicorn octopoes.api.api:app [--port 8000]
-```
+## Integration and relation to other KAT components
 
-### Run the event processor
-```bash
-python3 -m celery -A octopoes.tasks.tasks worker --loglevel=WARNING
-```
+### Rocky
 
+### Normalizers
 
-## Healthcheck
-```bash
-# Return XTDB connection info
-curl http://localhost:8000/_dev/health
-# Return some XTDB objects (or empty list [])
-curl http://localhost:8000/_dev/objects
+### Mula
 
-# To request data for a different KAT-client:
-curl http://localhost:8000/clientx/healthcheck
-```
 
 
 ## OOI
@@ -463,14 +503,3 @@ The OOI class tree is traversed 2 levels deep. Bear in mind that both Finding an
 
 Hence the 1 and 2 levels markers on Finding and Job in the image belond.
 ![KAT Query Plan](img/kat_query_plan.png "KAT Query Plan")
-
-
-
-
-
-## Tests
-
-The unit tests `octopoes/tests` are run using
-```bash
-python -m unittest discover octopoes/tests
-```
