@@ -129,7 +129,7 @@ class TestPluginsService(TestCase):
 
         kat_test_norm = list(filter(lambda x: x.id == "kat_test_normalize", plugins)).pop()
         self.assertIn("kat_test_normalize", kat_test_norm.id)
-        self.assertListEqual(["text/html"], kat_test_norm.consumes)
+        self.assertListEqual(["text/html", "normalizer/kat_test_normalize"], kat_test_norm.consumes)
         self.assertListEqual([], kat_test_norm.produces)
 
     def test_get_repository_plugins(self):
