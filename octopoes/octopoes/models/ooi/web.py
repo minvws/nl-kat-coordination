@@ -316,7 +316,7 @@ class Cookie(OOI):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         t = reference.tokenized
 
-        return f"{t.name} @ {t.domain}{t.path}"
+        return f"{t.name} @ {t.domain.name}{t.path}"
 
 
 class RawCookie(OOI):
@@ -327,11 +327,11 @@ class RawCookie(OOI):
     response_domain: Reference = ReferenceField(Hostname)
     parsed_cookie: Optional[Reference] = ReferenceField(Cookie)
 
-    _natural_key_attrs = ["raw"]
+    _natural_key_attrs = ["raw", "response_domain"]
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"Raw cookie on {reference.tokenized.response_domain}"
+        return f"Raw cookie on {reference.tokenized.response_domain.name}"
 
 
 class CookieValidOnWebURL(OOI):
