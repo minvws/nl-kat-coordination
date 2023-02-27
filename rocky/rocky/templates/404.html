@@ -12,23 +12,8 @@
           {% translate 'The page you wanted to see or the file you wanted to view was not found.' %}
         </p>
         <p>
-          {% translate 'You may be able to find the information you are looking for through the following pages:' %}
+          {% translate 'You may want to go back to the' %} <a href="{% url 'crisis_room' %}">{% translate 'Crisis Room' %}</a>.
         </p>
-        <ul>
-          <li>
-            <a href="{% url 'crisis_room' %}">{% translate 'Crisis Room' %}</a>
-          </li>
-          <li>
-            <a href="{% url 'katalogus' views.kwargs.organization_code %}">{% translate 'KAT-alogus' %}</a>
-          </li>
-          <li>
-            <a href="{% url 'finding_list' organization.code %}">{% translate 'Findings' %}</a>
-          </li>
-        </ul>
-        <p>
-          {% translate 'Or go back to the main page' %}
-        </p>
-        <a href="../index.html" class="button"><span class=" icon ti-home"></span>{% translate 'Homepage' %}</a>
       </div>
     </section>
   </main>
