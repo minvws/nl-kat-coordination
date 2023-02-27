@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 

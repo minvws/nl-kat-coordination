@@ -1,6 +1,6 @@
 from abc import ABC
 from enum import Enum
-from typing import Literal, Optional, Dict, List, Union
+from typing import Literal, Optional, Dict
 
 from pydantic import AnyUrl
 
