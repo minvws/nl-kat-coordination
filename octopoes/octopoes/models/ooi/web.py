@@ -332,19 +332,3 @@ class RawCookie(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"Raw cookie on {reference.tokenized.response_domain.name}"
-
-
-class CookieValidOnWebURL(OOI):
-    object_type: Literal["CookieValidOnWebURL"] = "CookieValidOnWebURL"
-
-    cookie: Reference = ReferenceField(Cookie)
-    web_url: Reference = ReferenceField(WebURL)
-
-    _natural_key_attrs = ["cookie", "web_url"]
-    _reverse_relation_names = {"cookie": "valid_weburls", "web_url": "cookies"}
-
-    @classmethod
-    def format_reference_human_readable(cls, reference: Reference) -> str:
-        t = reference.tokenized
-
-        return f"{t.cookie.name}={t.cookie.value} @ {t.web_url}"
