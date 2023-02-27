@@ -9,38 +9,26 @@
     <section>
       <div>
         <h1>{% translate 'Edit member' %}</h1>
-        <form method="post" class="horizontal-view">
+        <form method="post" class="horizontal-view help">
           {% csrf_token %}
           <fieldset>
             {% with member.member_name as name %}
               <legend>
-                {% blocktranslate %}Edit {{ name }}{% endblocktranslate %}
+                {% blocktranslate %}Edit {{ member.member_name }}{% endblocktranslate %}
               </legend>
             {% endwith %}
-            <div>
-              {% translate 'Member name' %}
-              <div>{{ object.member_name }}</div>
-            </div>
-            <div>
-              {% translate 'Role in organization' %}
-              <div>{{ object.member_role }}</div>
-            </div>
-            <div>
-              {% translate 'Goal' %}
-              <div>{{ object.goal }}</div>
-            </div>
-            <div>
-              {% translate 'Authorized to sign' %}
-              <div>{{ object.authorized }}</div>
-            </div>
             {% for field in form %}
-              {% include 'partials/form/field_input_wrapper.html' %}
+              {% if field.name != "trusted_clearance_level" %}
+                {% include 'partials/form/field_input.html' %}
+              {% else %}
+                {% include 'organizations/select_clearance_level_radio_input.html' %}
+              {% endif %}
             {% endfor %}
           </fieldset>
           <div class="horizontal-view">
             <button type="submit">{% translate 'Save member' %}</button>
             <a class="button ghost"
-               href="{% url 'organization_detail' object.organization_id %}">{% translate 'Cancel' %}</a>
+               href="{% url 'organization_detail' organization.code %}">{% translate 'Cancel' %}</a>
           </div>
         </form>
       </div>

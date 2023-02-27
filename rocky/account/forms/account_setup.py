@@ -15,6 +15,7 @@ from tools.models import (
     OrganizationMember,
 )
 from tools.models import ORGANIZATION_CODE_LENGTH
+from tools.enums import SCAN_LEVEL
 
 User = get_user_model()
 
@@ -166,10 +167,17 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
         fields = ("account_type", "name", "email", "password")
 
 
-class OrganizationMemberForm(forms.ModelForm):
+class OrganizationMemberEditForm(forms.ModelForm):
+    trusted_clearance_level = forms.ChoiceField(
+        required=False,
+        label=_("Trusted clearance level"),
+        choices=SCAN_LEVEL.choices,
+        widget=forms.RadioSelect(),
+    )
+
     class Meta:
         model = OrganizationMember
-        fields = ["status"]
+        fields = ["member_name", "trusted_clearance_level"]
 
 
 class OrganizationForm(forms.ModelForm):

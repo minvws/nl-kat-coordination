@@ -1,0 +1,25 @@
+{% load i18n %}
+
+<fieldset>
+  <legend>
+    {{ field.label_tag }}
+  </legend>
+  {% for choice in field %}
+    <div class="horizontal-view">
+      <input type="radio"
+             name="{{ field.name }}"
+             value="{{ choice.data.value }}"
+             id="id_{{ field.name }}_{{ forloop.counter0 }}"
+             {% if choice.data.attrs.checked %} checked{% endif %}/>
+      <label>
+        <ul class="level-indicator l{{ forloop.counter0 }}">
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </label>
+      {% include 'partials/form/field_input_errors.html' %}
+    </div>
+  {% endfor %}
+</fieldset>
