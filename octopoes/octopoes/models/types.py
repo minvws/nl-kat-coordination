@@ -67,6 +67,10 @@ from octopoes.models.ooi.web import (
     RESTAPI,
     APIDesignRule,
     APIDesignRuleResult,
+    Cookie,
+    RawCookie,
+    CookieValidOnWebURL,
+
 )
 
 CertificateType = Union[
@@ -120,6 +124,9 @@ WebType = Union[
     RESTAPI,
     APIDesignRule,
     APIDesignRuleResult,
+    Cookie,
+    RawCookie,
+    CookieValidOnWebURL,
 ]
 EmailSecurityType = Union[
     DNSSPFRecord,

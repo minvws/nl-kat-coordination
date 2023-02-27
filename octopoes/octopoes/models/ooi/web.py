@@ -1,6 +1,6 @@
 from abc import ABC
 from enum import Enum
-from typing import Literal, Optional, Dict
+from typing import Literal, Optional, Dict, List, Union
 
 from pydantic import AnyUrl
 
@@ -284,3 +284,67 @@ class APIDesignRuleResult(OOI):
         api_url = format_web_url_token(t.rest_api.api_url)
 
         return f"{rule} @ {api_url}"
+
+
+class Cookie(OOI):
+    object_type: Literal["Cookie"] = "Cookie"
+
+    name: str
+    value: str
+    expires: Optional[str]
+    max_age: Optional[int]
+    # https://datatracker.ietf.org/doc/html/rfc6265#section-5.3 p6
+    domain: Reference = ReferenceField(Hostname)
+    # https://datatracker.ietf.org/doc/html/rfc6265#section-5.3 p7
+    path: Optional[str]
+    created: Optional[str]
+    # last-access-time: # not used in openkat context
+    # https://datatracker.ietf.org/doc/html/rfc6265#section-5.3 p3
+    persistent: bool
+    # https://datatracker.ietf.org/doc/html/rfc6265#section-5.3 p6
+    host_only: bool
+    # https://datatracker.ietf.org/doc/html/rfc6265#section-5.3 p8
+    secure_only: bool
+    # https://datatracker.ietf.org/doc/html/rfc6265#section-5.3 p9
+    http_only: bool
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite
+    same_site: Optional[str]
+
+    _natural_key_attrs = ["name", "value", "domain", "path"]
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        t = reference.tokenized
+
+        return f"{t.name} @ {t.domain}{t.path}"
+
+
+class RawCookie(OOI):
+    object_type: Literal["RawCookie"] = "RawCookie"
+
+    # raw cookies do not have relations with other objects
+    raw: str
+    response_domain: Reference = ReferenceField(Hostname)
+    parsed_cookie: Optional[Reference] = ReferenceField(Cookie)
+
+    _natural_key_attrs = ["raw"]
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"Raw cookie on {reference.tokenized.response_domain}"
+
+
+class CookieValidOnWebURL(OOI):
+    object_type: Literal["CookieValidOnWebURL"] = "CookieValidOnWebURL"
+
+    cookie: Reference = ReferenceField(Cookie)
+    web_url: Reference = ReferenceField(WebURL)
+
+    _natural_key_attrs = ["cookie", "web_url"]
+    _reverse_relation_names = {"cookie": "valid_weburls", "web_url": "cookies"}
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        t = reference.tokenized
+
+        return f"{t.cookie.name}={t.cookie.value} @ {t.web_url}"
