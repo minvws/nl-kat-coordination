@@ -1,5 +1,3 @@
-{% load i18n %}
-
 <ul class="tags horizontal-view">
   {% for tag in organization.tags.all %}<li class="{{ tag.css_class }}">{{ tag.name }}</li>{% endfor %}
 </ul>
