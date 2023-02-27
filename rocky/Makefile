@@ -28,8 +28,6 @@ run:
 	python3 manage.py runserver
 
 test:
-	yarn --cwd roeltje
-	yarn --cwd roeltje cypress run
 	python3 manage.py test
 
 itest: ## Run the integration tests.

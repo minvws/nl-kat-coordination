@@ -1,0 +1,11 @@
+{
+    "id": "kat_burpsuite_normalize",
+    "consumes": [
+        "xml/burp-export"
+    ],
+    "produces": [
+        "Finding",
+        "IPPort",
+        "CVEFindingType"
+    ]
+}
