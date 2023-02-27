@@ -1,10 +1,9 @@
 from django.contrib import messages
-from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import UpdateView, FormView
+from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 from account.forms import OrganizationMemberEditForm
@@ -21,6 +20,11 @@ class OrganizationMemberEditView(PermissionRequiredMixin, OrganizationView, Upda
     permission_required = "tools.change_organizationmember"
 
     def get_success_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _("Member %s successfully updated.") % (self.object.member_name),
+        )
         return reverse("organization_detail", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
