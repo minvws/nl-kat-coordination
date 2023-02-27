@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     log_cfg: Path = BASE_DIR / "dev.logging.conf"
 
     bytes_db_uri: str
-    bytes_data_dir: Path = "/data"
+    bytes_data_dir: Path = Path("/data")
 
     bytes_log_file: str = "bytes.log"
     access_token_expire_minutes: float = 15.0
