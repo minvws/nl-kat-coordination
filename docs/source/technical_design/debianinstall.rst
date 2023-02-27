@@ -169,7 +169,7 @@ Create a new file `/etc/rabbitmq/rabbitmq.conf` and add the following lines:
 
     listeners.tcp.local = 127.0.0.1:5672
 
-Create a new file `/etc/rabbitmq/advanced.config` and add the following lines:
+Create a new file `/etc/rabbitmq/advanced.conf` and add the following lines:
 
 .. code-block:: erlang
 
@@ -194,9 +194,9 @@ Now create a KAT user for RabbitMQ, create the virtual host and set the permissi
 
 .. code-block:: sh
 
-    rabbitmqctl add_user kat ${rabbitmq_pass}
-    rabbitmqctl add_vhost kat
-    rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+   sudo rabbitmqctl add_user kat ${rabbitmq_pass}
+   sudo rabbitmqctl add_vhost kat
+   sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
 Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for `/etc/kat/mula.conf`:
 
@@ -216,7 +216,7 @@ Or use this command to do it for you:
 
 .. code-block:: sh
 
-    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
+    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
 
 Configure Bytes credentials
 ===========================
@@ -227,7 +227,7 @@ copy the value of `BYTES_PASSWORD` in `/etc/kat/bytes.conf` to the setting with 
 - `/etc/kat/boefjes.conf`
 - `/etc/kat/mula.conf`
 
-This oneliner will do it for you:
+This oneliner will do it for you, executed as root:
 
 .. code-block:: sh
 
