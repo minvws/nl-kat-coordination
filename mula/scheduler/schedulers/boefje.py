@@ -128,7 +128,7 @@ class BoefjeScheduler(Scheduler):
             # queue.
             for boefje in boefjes:
                 task = BoefjeTask(
-                    boefje=Boefje.parse_obj(boefje),
+                    boefje=Boefje(id=boefje.id, version=boefje.version),
                     input_ooi=ooi.primary_key,
                     organization=self.organisation.id,
                 )

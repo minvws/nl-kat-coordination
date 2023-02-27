@@ -18,6 +18,7 @@ from octopoes.models.ooi.findings import (
     CWEFindingType,
     RetireJSFindingType,
     SnykFindingType,
+    CAPECFindingType,
 )
 from octopoes.models.tree import ReferenceNode
 from octopoes.models.types import get_relations, OOI_TYPES
@@ -343,6 +344,7 @@ def get_finding_type_from_finding(finding: Finding) -> FindingType:
             CWEFindingType,
             RetireJSFindingType,
             SnykFindingType,
+            CAPECFindingType,
         ],
         {
             "object_type": finding.finding_type.class_,
