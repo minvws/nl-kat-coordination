@@ -200,3 +200,115 @@ type DNSZone implements BaseObject & OOI {
   parent(reverse_name: String! = "child_dns_zones"): DNSZone!
   value: String!
 }
+
+# Certificates
+enum AlgorithmType { RSA, ECC }
+
+type X509Certificate implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["issuer", "serial_number"]): ID!
+  human_readable(format: String! = "{issuer} ({serial_number})"): String!
+
+  subject: String!
+  issuer: String
+  valid_from: String!
+  valid_until: String!
+  pk_algorithm: String
+  pk_size: String
+  pk_number: String
+  signed_by: X509Certificate
+  serial_number: String!
+  expires_in: Int
+
+  signed_by(reverse_name: String! = "signed_certificates"): X509Certificate
+
+}
+
+type SubjectAlternativeName implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["hostname", "type", "value"]): ID!
+  human_readable(format: String! = "{hostname_name} {type} {value}"): String!
+
+  hostname(reverse_name: String! = "dns_zone_hostname"): Hostname!
+  parent(reverse_name: String! = "child_dns_zones"): DNSZone!
+  subject: String!
+  issuer: String
+  valid_from: String!
+  valid_until: String!
+  pk_algorithm: String
+  pk_size: String
+  pk_number: String
+  signed_by: X509Certificate
+  serial_number: String
+  expires_in: Int
+
+  signed_by(reverse_name: String! = "signed_certificates"): X509Certificate
+
+}
+
+type SubjectAlternativeNameHostname implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["hostname", "type", "value"]): ID!
+  human_readable(format: String! = "{hostname_name} {type} {value}"): String!
+
+  hostname(reverse_name: String! = "dns_zone_hostname"): Hostname!
+  parent(reverse_name: String! = "child_dns_zones"): DNSZone!
+  subject: String!
+  issuer: String
+  valid_from: String!
+  valid_until: String!
+  pk_algorithm: String
+  pk_size: String
+  pk_number: String
+  signed_by: X509Certificate
+  serial_number: String
+  expires_in: Int
+
+  signed_by(reverse_name: String! = "signed_certificates"): X509Certificate
+
+}
+
+type SubjectAlternativeNameIP implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["issuer", "serial_number", "value", "address"]): ID!
+  human_readable(format: String! = "{hostname_name} {type} {value}"): String!
+
+  hostname(reverse_name: String! = "dns_zone_hostname"): Hostname!
+  parent(reverse_name: String! = "child_dns_zones"): DNSZone!
+  subject: String!
+  issuer: String
+  valid_from: String!
+  valid_until: String!
+  pk_algorithm: String
+  pk_size: String
+  pk_number: String
+  signed_by: X509Certificate
+  serial_number: String
+  expires_in: Int
+
+  signed_by(reverse_name: String! = "signed_certificates"): X509Certificate
+
+}
+
+type SubjectAlternativeNameQualifier implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["issuer", "serial_number", "value", "name"]): ID!
+  human_readable(format: String! = "{issuer} {serial_number} {value}"): String!
+
+  hostname(reverse_name: String! = "dns_zone_hostname"): Hostname!
+  parent(reverse_name: String! = "child_dns_zones"): DNSZone!
+  subject: String!
+  issuer: String
+  valid_from: String!
+  valid_until: String!
+  pk_algorithm: String
+  pk_size: String
+  pk_number: String
+  signed_by: X509Certificate
+  serial_number: String
+  expires_in: Int
+
+  signed_by(reverse_name: String! = "signed_certificates"): X509Certificate
+  name: String!
+
+}
