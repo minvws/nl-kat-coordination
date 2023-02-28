@@ -11,7 +11,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     results = json.loads(raw)
     internet = Network(name="internet")
     for address in results["ip_addresses"]:
-        if "/" in address:
+        if "/" in address["ip_address"]:
             ip, mask = address["ip_address"].split("/")
             ip_address = IPAddressV4(address=ip, network=internet.reference)
             yield ip_address
