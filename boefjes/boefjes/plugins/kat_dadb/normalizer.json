@@ -6,6 +6,6 @@
     "produces": [
         "Hostname",
         "IPAddressV4",
-        "IPV4NetBlock",
+        "IPV4NetBlock"
     ]
 }
