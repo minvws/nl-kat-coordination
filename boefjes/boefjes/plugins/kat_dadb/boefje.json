@@ -3,7 +3,7 @@
     "name": "dadb",
     "description": "Fetch hostnames and ipaddresses from DADB",
     "consumes": [
-        "Network",
+        "Network"
     ],
     "produces": [
         "Hostname",
