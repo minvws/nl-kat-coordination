@@ -41,11 +41,9 @@ class PluginNotFound(NotFound):
         )
 
 
-class SettingNotFound(NotFound):
-    def __init__(self, key: str, organisation_id: str, plugin_id: str):
-        super().__init__(
-            f"Setting with key '{key}' not found for organisation '{organisation_id}' and plugin '{plugin_id}'"
-        )
+class SettingsNotFound(NotFound):
+    def __init__(self, organisation_id: str, plugin_id: str):
+        super().__init__(f"Setting not found for organisation '{organisation_id}' and plugin '{plugin_id}'")
 
 
 class OrganisationStorage(ABC):
@@ -101,10 +99,10 @@ class SettingsStorage(ABC):
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         raise NotImplementedError
 
-    def create(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
+    def create(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
         raise NotImplementedError
 
-    def update_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
+    def update_by_key(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
         raise NotImplementedError
 
     def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:

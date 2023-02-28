@@ -11,7 +11,7 @@ from boefjes.katalogus.models import Organisation, Repository, Boefje
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
     PluginNotFound,
-    SettingNotFound,
+    SettingsNotFound,
     RepositoryNotFound,
     StorageError,
 )
@@ -140,28 +140,64 @@ class TestRepositories(TestCase):
 
         with self.settings_storage as settings_storage:
             settings_storage.create("TEST_SETTING", "123.9", organisation_id, plugin_id)
+            settings_storage.create("TEST_SETTING2", 12, organisation_id, plugin_id)
+
+        with self.settings_storage as settings_storage:
+            settings_storage.update_by_key("TEST_SETTING2", 13, organisation_id, plugin_id)
 
         returned_settings = settings_storage.get_by_key("TEST_SETTING", organisation_id, plugin_id)
         self.assertEqual("123.9", returned_settings)
 
-        with self.assertRaises(SettingNotFound):
+        returned_settings = settings_storage.get_by_key("TEST_SETTING2", organisation_id, plugin_id)
+        self.assertEqual(13, returned_settings)
+
+        with self.assertRaises(SettingsNotFound):
             settings_storage.get_by_key("no setting!", organisation_id, plugin_id)
 
-        with self.assertRaises(SettingNotFound):
+        with self.assertRaises(SettingsNotFound):
             settings_storage.get_by_key("TEST_SETTING", "no organisation!", plugin_id)
 
-        self.assertEqual({"TEST_SETTING": "123.9"}, settings_storage.get_all(org.id, plugin_id))
+        self.assertEqual({"TEST_SETTING": "123.9", "TEST_SETTING2": 13}, settings_storage.get_all(org.id, plugin_id))
         self.assertEqual(dict(), settings_storage.get_all(org.id, "wrong"))
         self.assertEqual(dict(), settings_storage.get_all("wrong", plugin_id))
 
         with self.settings_storage as settings_storage:
             settings_storage.delete_by_key("TEST_SETTING", org.id, plugin_id)
+            settings_storage.delete_by_key("TEST_SETTING2", org.id, plugin_id)
 
         self.assertEqual(dict(), settings_storage.get_all(org.id, plugin_id))
 
         with self.assertRaises(StorageError):
             with self.settings_storage as settings_storage:
                 settings_storage.create("TEST_SETTING", "123.9", organisation_id, 65 * "a")
+
+    def test_settings_storage_values_field_limits(self):
+        organisation_id = "test"
+        plugin_id = 64 * "a"
+
+        org = Organisation(id=organisation_id, name="Test")
+        with self.organisation_storage as storage:
+            storage.create(org)
+
+        with self.settings_storage as settings_storage:
+            settings_storage.create("TEST_SETTING", 12 * "123.9", organisation_id, plugin_id)
+            settings_storage.create("TEST_SETTING2", 12000, organisation_id, plugin_id)
+            settings_storage.create("TEST_SETTING3", 30 * "b", organisation_id, plugin_id)
+            settings_storage.create("TEST_SETTING4", 30 * "b", organisation_id, plugin_id)
+            settings_storage.create("TEST_SETTING5", 10 * "b", organisation_id, plugin_id)
+            settings_storage.create("TEST_SETTING6", 123456789, organisation_id, plugin_id)
+
+        self.assertEqual(
+            {
+                "TEST_SETTING": 12 * "123.9",
+                "TEST_SETTING2": 12000,
+                "TEST_SETTING3": 30 * "b",
+                "TEST_SETTING4": 30 * "b",
+                "TEST_SETTING5": 10 * "b",
+                "TEST_SETTING6": 123456789,
+            },
+            settings_storage.get_all(org.id, plugin_id),
+        )
 
     def test_plugin_enabled_storage(self):
         with self.organisation_storage as storage:

@@ -62,28 +62,28 @@ class SettingsStorageMemory(SettingsStorage):
         self._data = {}
 
     def get_by_key(self, key: str, organisation_id: str, plugin_id: str) -> str:
-        return self._data[organisation_id][f"{plugin_id}.{key}"]
+        return self._data[organisation_id][plugin_id][key]
 
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         if organisation_id not in self._data:
             return {}
 
-        org_data = self._data[organisation_id].items()
-        org_data_for_plugin = {k: v for k, v in org_data if plugin_id == k.split(".", maxsplit=1)[0]}
+        return self._data[organisation_id].get(plugin_id, {})
 
-        return {k.split(".", maxsplit=1)[1]: v for k, v in org_data_for_plugin.items()}
-
-    def create(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
+    def create(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
         if organisation_id not in self._data:
             self._data[organisation_id] = {}
 
-        self._data[organisation_id][f"{plugin_id}.{key}"] = str(value)
+        if plugin_id not in self._data[organisation_id]:
+            self._data[organisation_id][plugin_id] = {}
 
-    def update_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str) -> None:
-        self._data[organisation_id][f"{plugin_id}.{key}"] = str(value)
+        self._data[organisation_id][plugin_id][key] = value
+
+    def update_by_key(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
+        self._data[organisation_id][plugin_id][key] = value
 
     def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
-        del self._data[organisation_id][f"{plugin_id}.{key}"]
+        del self._data[organisation_id][plugin_id][key]
 
 
 class PluginStatesStorageMemory(PluginEnabledStorage):
