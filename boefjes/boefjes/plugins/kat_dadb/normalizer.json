@@ -1,0 +1,11 @@
+{
+    "id": "kat_dadb_normalize",
+    "consumes": [
+        "dadb"
+    ],
+    "produces": [
+        "Hostname",
+        "IPAddressV4",
+        "IPV4NetBlock",
+    ]
+}
