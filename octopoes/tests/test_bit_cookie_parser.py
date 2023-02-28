@@ -8,7 +8,8 @@ from octopoes.models.ooi.web import RawCookie, Cookie
 
 def test_spf_discovery_simple_success():
     raw_cookie = RawCookie(
-        raw="has_recent_activity=1; path=/; expires=Tue, 28 Feb 2023 14:21:36 GMT; secure; HttpOnly; SameSite=Lax, gh_sess=xxxxxxx; path=/; secure; HttpOnly; SameSite=Lax",
+        raw="has_recent_activity=1; path=/; expires=Tue, 28 Feb 2023 14:21:36 GMT; secure; HttpOnly; "
+            "SameSite=Lax, gh_sess=xxxxxxx; path=/; secure; HttpOnly; SameSite=Lax",
         response_domain=Hostname(name="domain.com", network=Network(name="internet").reference).reference,
     )
     results = list(run(raw_cookie, []))
@@ -42,7 +43,8 @@ def test_spf_discovery_simple_success():
 
 def test_spf_discovery_simple_invalid():
     raw_cookie = RawCookie(
-        raw="has_recent_activity=1; path=/; expires=sdsd, 28 Feb 2023 14:21:36 GMT; secure; HttpOnly; SameSite=Lax, gh_sess=xxxxxxx; path=/; secure; HttpOnly; SameSite=Lax",
+        raw="has_recent_activity=1; path=/; expires=sdsd, 28 Feb 2023 14:21:36 GMT; secure; HttpOnly; "
+            "SameSite=Lax, gh_sess=xxxxxxx; path=/; secure; HttpOnly; SameSite=Lax",
         response_domain=Hostname(name="domain.com", network=Network(name="internet").reference).reference,
     )
     results = list(run(raw_cookie, []))
@@ -53,7 +55,8 @@ def test_spf_discovery_simple_invalid():
 
 def test_spf_discovery_simple_invalid2():
     raw_cookie = RawCookie(
-        raw="has_recent_activity=1; path=/; expires=Tue, 28 Feb 2023 14:21:36 GMT; secure; HttpOnly; Nonsense; SameSite=Lax, gh_sess=xxxxxxx; path=/; secure; HttpOnly; SameSite=Lax",
+        raw="has_recent_activity=1; path=/; expires=Tue, 28 Feb 2023 14:21:36 GMT; secure; HttpOnly; Nonsense; "
+            "SameSite=Lax, gh_sess=xxxxxxx; path=/; secure; HttpOnly; SameSite=Lax",
         response_domain=Hostname(name="domain.com", network=Network(name="internet").reference).reference,
     )
     results = list(run(raw_cookie, []))

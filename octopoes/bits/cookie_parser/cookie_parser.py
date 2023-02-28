@@ -20,7 +20,7 @@ def run(
         if len(parsed_cookie) == 0:
             ft = KATFindingType(id="KAT-INVALID-COOKIE")
             yield ft
-            yield Finding(ooi=input_ooi.reference, finding_type=ft.reference, description=f"Invalid cookie")
+            yield Finding(ooi=input_ooi.reference, finding_type=ft.reference, description="Invalid cookie")
         for name, morsel in parsed_cookie.items():
             # https://datatracker.ietf.org/doc/html/rfc6265#section-5.3 p6
             host_only = False
