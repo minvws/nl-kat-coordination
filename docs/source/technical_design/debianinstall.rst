@@ -259,14 +259,14 @@ By default OpenKAT will be accessible in your browser through `https://<server I
 Upgrading OpenKAT
 =================
 
-You can upgrade OpenKAT by installing the newer packages. Make a backup of your files, download the packages and remove the old ones if needed: 
+You can upgrade OpenKAT by installing the newer packages. Make a backup of your files, download the packages and remove the old ones if needed:
 
 .. code-block:: sh
 
     tar zvxf kat-*.tar.gz
-    apt install --no-install-recommends ./kat-*_amd64.deb 
-    
-If a newer version of the xtdb multinode is available install it as well: 
+    apt install --no-install-recommends ./kat-*_amd64.deb
+
+If a newer version of the xtdb multinode is available install it as well:
 
 .. code-block:: sh
 
