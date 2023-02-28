@@ -90,6 +90,14 @@ class Server:
         )
 
         router.add_api_route(
+            path="/schema",
+            endpoint=self.get_json_schema,
+            methods=["GET"],
+            response_class=JSONResponse,
+            status_code=200,
+        )
+
+        router.add_api_route(
             path="/ooi-schema",
             endpoint=self.get_ooi_schema,
             methods=["GET"],
@@ -111,13 +119,6 @@ class Server:
             methods=["POST"],
             response_class=JSONResponse,
             status_code=200,
-            openapi_extra={
-                "requestBody": {
-                    "examples": {
-                        "test": '{"name": "test", "description": "test"}',
-                    }
-                }
-            },
         )
 
         self.api.include_router(router)
@@ -160,6 +161,10 @@ class Server:
     def get_graphql_schema(self, ingester_id: str) -> Any:
         """Serve graphql schema."""
         return print_schema(self.ingesters[ingester_id].current_schema.api_schema.schema)
+
+    def get_json_schema(self, ingester_id: str) -> Any:
+        """Serve graphql schema."""
+        return self.ingesters[ingester_id].dataclass_generator.ooi_type.schema()
 
     def get_ooi_schema(self, ingester_id: str) -> Any:
         """Serve graphql ooi schema (no backlinks)."""

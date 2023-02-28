@@ -95,6 +95,7 @@ class DataclassGenerator:
         """Initialize instance."""
         self.schema = schema
         self.dataclasses: Dict[str, Type[BaseObject]] = {}
+        self._enum_cache: Dict[str, Type[Enum]] = {}
         self.generate_pydantic_models()
 
     @staticmethod
@@ -104,7 +105,7 @@ class DataclassGenerator:
         return isinstance(real_type, (GraphQLObjectType, GraphQLUnionType))
 
     def get_deepest_type(self, type_: GraphQLOutputType, is_list: bool = False) -> Tuple[GraphQLOutputType, bool]:
-        """Get the deepest type of a GraphQL type."""
+        """Get the deepest type from a GraphQL type."""
         is_list = is_list or isinstance(type_, GraphQLList)
         if getattr(type_, "of_type", None):
             return self.get_deepest_type(type_.of_type, is_list)
@@ -127,7 +128,8 @@ class DataclassGenerator:
         if real_type.name == "IPv6":
             new_type = IPv6Address
         if isinstance(real_type, GraphQLEnumType):
-            new_type = Enum(real_type.name, {t: t for t in real_type.values.keys()})  # type: ignore
+            new_enum_type = Enum(real_type.name, {t: t for t in real_type.values.keys()})  # type: ignore
+            new_type = self._enum_cache.setdefault(real_type.name, new_enum_type)
         if isinstance(real_type, GraphQLObjectType):
             new_type = self.generate_pydantic_model(real_type)
         if isinstance(real_type, GraphQLUnionType):
@@ -175,3 +177,11 @@ class DataclassGenerator:
     def parse_obj(self, obj: Dict[str, Any]) -> Any:
         """Parse a json object into a Dataclass variant type."""
         return self.dataclasses[obj["object_type"]](**obj)
+
+    @property
+    def ooi_type(self) -> Type[BaseModel]:
+        """Return the OOI Union type."""
+        ooi_union = Union[tuple(self.dataclasses.values())]  # type: ignore
+        fields = {"__root__": (ooi_union, ...)}
+        ooi_type: Type[BaseModel] = create_model("OOIType", **fields)  # type: ignore
+        return ooi_type
