@@ -18,10 +18,19 @@
               </legend>
             {% endwith %}
             {% for field in form %}
-              {% if field.name != "trusted_clearance_level" and field.name != "acknowledged_clearance_level" %}
-                {% include 'partials/form/field_input.html' %}
-              {% else %}
+              {% if field.name == "trusted_clearance_level" %}
                 {% include 'organizations/select_clearance_level_radio_input.html' %}
+              {% elif  field.name == "acknowledged_clearance_level" %}
+                <fieldset>
+                  <legend>
+                    {% translate 'Acknowledged clearance level' %}
+                  </legend>
+                  <div class="horizontal-view">
+                    <label>{% include 'partials/cat_paws.html' with level=object.acknowledged_clearance_level %}</label>
+                  </div>
+                </fieldset>
+              {% else %}
+                {% include 'partials/form/field_input.html' %}
               {% endif %}
             {% endfor %}
           </fieldset>

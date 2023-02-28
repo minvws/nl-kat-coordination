@@ -26,49 +26,49 @@
         </thead>
         <tbody>
           {% for member in members %}
-            <tr>
-              <td>
-                {% if not member.member_name %}
-                  {% translate 'Unset' %}
-                {% else %}
-                  {{ member.member_name }}
-                {% endif %}
-              </td>
-              <td>{{ member.status }}</td>
-              <td>{{ member.user.date_joined }}</td>
-              <td>
-                {% if member.trusted_clearance_level > 0 %}
-                  {% translate 'Yes' %} (L{{ member.trusted_clearance_level }})
-                {% else %}
-                  {% translate 'No' %}
-                {% endif %}
-              </td>
-              <td>
-                {% if member.acknowledged_clearance_level > 0 %}
-                  Yes (L{{ member.acknowledged_clearance_level }})
-                {% else %}
-                  No
-                {% endif %}
-              </td>
-              <td>
-                {% for group in member.user.groups.all %}
-                  {% for permission in group.permissions.all %}
-                    {% if 'can_set_clearance_level' in permission.codename %}
-                      {% if member.trusted_clearance_level > 0 %}
-                        {% include 'partials/single_action_form.html' with btn_text="Revoke" action='withdraw_clearance' key='member_id' value=member.id btn_class="ghost" %}
-                      {% else %}
-                        {% include 'partials/single_action_form.html' with btn_text="Grant" action='give_clearance' key='member_id' value=member.id %}
+            {% if not member.user.is_superuser or request.user.is_superuser %}
+              <tr>
+                <td>
+                  {% if not member.member_name %}
+                    {% translate 'Unset' %}
+                  {% else %}
+                    {{ member.member_name }}
+                  {% endif %}
+                </td>
+                <td>{{ member.status }}</td>
+                <td>{{ member.user.date_joined }}</td>
+                <td>
+                  {% if member.trusted_clearance_level > 0 %}
+                    {% translate 'Yes' %} (L{{ member.trusted_clearance_level }})
+                  {% else %}
+                    {% translate 'No' %}
+                  {% endif %}
+                </td>
+                <td>
+                  {% if member.acknowledged_clearance_level > 0 %}
+                    Yes (L{{ member.acknowledged_clearance_level }})
+                  {% else %}
+                    No
+                  {% endif %}
+                </td>
+                <td>
+                  {% for group in member.user.groups.all %}
+                    {% for permission in group.permissions.all %}
+                      {% if 'can_set_clearance_level' in permission.codename %}
+                        {% if member.trusted_clearance_level > 0 %}
+                          {% include 'partials/single_action_form.html' with btn_text="Revoke" action='withdraw_clearance' key='member_id' value=member.id btn_class="ghost" %}
+                        {% else %}
+                          {% include 'partials/single_action_form.html' with btn_text="Grant" action='give_clearance' key='member_id' value=member.id %}
+                        {% endif %}
                       {% endif %}
-                    {% endif %}
+                    {% endfor %}
                   {% endfor %}
-                {% endfor %}
-              </td>
-              <td>
-              {% if not member.user.is_superuser %}
-                <a href="{% url 'organization_member_edit' organization.code member.id %}"><button class="icon ti-edit">{% translate 'Edit' %}</button></a>
-              {% endif %}
-              </td>
-            </tr>
+                </td>
+                <td>
+                  <a href="{% url 'organization_member_edit' organization.code member.id %}"><button class="icon ti-edit">{% translate 'Edit' %}</button></a>
+                </td>
+              </tr>
+            {% endif %}
           {% endfor %}
         </tbody>
       </table>

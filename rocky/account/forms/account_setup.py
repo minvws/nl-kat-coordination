@@ -153,10 +153,13 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
             selected_group = Group.objects.get(name=self.cleaned_data["account_type"])
         if self.organization and selected_group:
             self.set_user()
-            OrganizationMember.objects.get_or_create(
+            member, _ = OrganizationMember.objects.get_or_create(
                 user=self.user, organization=self.organization, member_name=self.cleaned_data["name"]
             )
-
+            if selected_group.name == "admin":
+                member.acknowledged_clearance_level = 4
+                member.trusted_clearance_level = 4
+                member.save()
             selected_group.user_set.add(self.user)
             self.user.save()
 
@@ -174,14 +177,6 @@ class OrganizationMemberEditForm(forms.ModelForm):
         choices=SCAN_LEVEL.choices,
         widget=forms.RadioSelect(),
         help_text=_("Select a clearance level you trust this member with."),
-    )
-
-    acknowledged_clearance_level = forms.ChoiceField(
-        required=False,
-        label=_("Acknowledged clearance level"),
-        choices=SCAN_LEVEL.choices,
-        widget=forms.RadioSelect(),
-        help_text=_("The clearance level this memeber agreed on based on the assigned trusted clearance level."),
     )
 
     def __init__(self, *args, **kwargs):
