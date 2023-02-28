@@ -61,7 +61,7 @@ class OOIForm(BaseRockyForm):
             elif issubclass(field.type_, Enum):
                 fields[name] = generate_select_ooi_type(field)
             elif issubclass(field.type_, str):
-                fields[name] = forms.CharField(max_length=2056, **default_attrs)
+                fields[name] = forms.CharField(max_length=4096, **default_attrs)
 
         return fields
 
