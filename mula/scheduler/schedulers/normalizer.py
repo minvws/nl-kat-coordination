@@ -7,7 +7,7 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import NormalizerTask, Organisation, PrioritizedItem, RawData, TaskStatus
+from scheduler.models import NormalizerTask, Organisation, PrioritizedItem, RawData
 
 from .scheduler import Scheduler
 
@@ -81,48 +81,10 @@ class NormalizerScheduler(Scheduler):
                 )
                 break
 
-            # Find the associated BoefjeTask (if any), the item on boefje queue
-            # has been processed, update the status of that task.
-            boefje_task_db = self.ctx.task_store.get_task_by_id(
-                latest_raw_data.raw_data.boefje_meta.id,
-            )
-            if boefje_task_db is None:
-                self.logger.debug(
-                    "Could not find boefje task in database "
-                    "[raw_data.boefje_meta.id_id=%s, organisation.id=%s, scheduler_id=%s]",
-                    latest_raw_data.raw_data.boefje_meta.id,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-
-            # Check status of the job and update status of boefje tasks, and
-            # stop creating normalizer tasks.
-            if boefje_task_db is not None:
-                status = TaskStatus.COMPLETED
-                for mime_type in latest_raw_data.raw_data.mime_types:
-                    if mime_type.get("value", "").startswith("error/"):
-                        status = TaskStatus.FAILED
-                        break
-
-                boefje_task_db.status = status
-                self.ctx.task_store.update_task(boefje_task_db)
-
-                self.logger.info(
-                    "Updated boefje task (%s) status to %s in datastore "
-                    "[task.id=%s, organisation.id=%s, scheduler_id=%s]",
-                    boefje_task_db.id,
-                    status,
-                    boefje_task_db.id,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-
-                if status == TaskStatus.FAILED:
+            for mime_type in latest_raw_data.raw_data.mime_types:
+                if mime_type.get("value", "").startswith("error/"):
                     self.logger.info(
-                        "Boefje task (%s) failed, stop creating normalizer tasks "
-                        "[task.id=%s, organisation.id=%s, scheduler_id=%s]",
-                        boefje_task_db.id,
-                        boefje_task_db.id,
+                        "Skipping raw data with error mime type [organisation.id=%s, scheduler_id=%s]",
                         self.organisation.id,
                         self.scheduler_id,
                     )
@@ -246,80 +208,3 @@ class NormalizerScheduler(Scheduler):
                 )
 
         return p_items
-
-    def update_normalizer_task_status(self):
-        try:
-            latest_normalizer_meta = self.ctx.services.normalizer_meta.get_latest_normalizer_meta(
-                queue=f"{self.organisation.id}__normalizer_meta_received",
-            )
-        except (
-            pika.exceptions.ConnectionClosed,
-            pika.exceptions.ChannelClosed,
-            pika.exceptions.ChannelClosedByBroker,
-            pika.exceptions.AMQPConnectionError,
-        ) as e:
-            self.logger.debug(
-                "Could not connect to rabbitmq queue: %s [organisation.id=%s, scheduler_id=%s]",
-                f"{self.organisation.id}__normalizer_meta_received",
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            if self.stop_event.is_set():
-                raise e
-
-            time.sleep(10)
-            return
-
-        if latest_normalizer_meta is None:
-            self.logger.debug(
-                "No new normalizer meta found on message queue: %s [organisation.id=%s, scheduler_id=%s]",
-                f"{self.organisation.id}__normalizer_meta_received",
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            time.sleep(10)
-            return
-
-        self.logger.debug(
-            "Received normalizer meta %s "
-            "[normalizer.id=%s, latest_normalizer_meta=%s, organisation.id=%s, scheduler_id=%s]",
-            latest_normalizer_meta.normalizer_meta.id,
-            latest_normalizer_meta.normalizer_meta.id,
-            latest_normalizer_meta,
-            self.organisation.id,
-            self.scheduler_id,
-        )
-
-        normalizer_task_db = self.ctx.task_store.get_task_by_id(
-            latest_normalizer_meta.normalizer_meta.id,
-        )
-        if normalizer_task_db is None:
-            self.logger.warning(
-                "Could not find normalizer task in database "
-                "[normalizer_meta_id=%s, latest_normalizer_meta=%s, organisation.id=%s, scheduler_id=%s]",
-                latest_normalizer_meta.normalizer_meta.id,
-                latest_normalizer_meta,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
-
-        normalizer_task_db.status = TaskStatus.COMPLETED
-        self.ctx.task_store.update_task(normalizer_task_db)
-
-        self.logger.info(
-            "Updated normalizer task (%s) status to %s in datastore [task.id=%s, organisation.id=%s, scheduler_id=%s]",
-            normalizer_task_db.id,
-            normalizer_task_db.status,
-            normalizer_task_db.id,
-            self.organisation.id,
-            self.scheduler_id,
-        )
-
-    def run(self) -> None:
-        super().run()
-
-        self.run_in_thread(
-            name="update_normalizer_task_status",
-            func=self.update_normalizer_task_status,
-        )
