@@ -1,0 +1,59 @@
+.dropdown {
+  span {
+    pointer-events: none;
+  }
+
+  position: relative;
+
+  > ul {
+    padding: 0;
+    display: none;
+    background-color: $lightgrey;
+    border: 1px $grey solid;
+    list-style-type: disc;
+    margin-block-end: 0;
+    margin-block-start: 0;
+    padding-inline-start: 0;
+    position: absolute;
+    top: 2.875rem;
+    z-index: 1;
+    width: max-content;
+    gap: 0;
+
+    &[aria-expanded="true"] {
+      display: flex;
+    }
+
+    li {
+      border-top: 1px $offwhite solid;
+      padding: 0;
+
+      > a {
+        align-items: center;
+        color: black;
+        display: flex;
+        margin: 0;
+        padding: 0.5rem;
+        text-decoration: none;
+        &:hover {
+          color: black;
+        }
+      }
+      &::marker {
+        content: none;
+      }
+      &:first-child {
+        border-top: none;
+      }
+      &:last-child {
+        // border-top should still inherit
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+      }
+      &:hover {
+        background-color: $grey;
+      }
+    }
+  }
+}

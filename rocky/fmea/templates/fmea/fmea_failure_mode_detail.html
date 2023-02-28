@@ -1,0 +1,109 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+	<main id="main-content">
+		<section>
+			<div>
+				<h1>{% translate 'Failure mode' %}</h1>
+
+        <div class="horizontal-scroll">
+          <table>
+            <caption>{% translate 'Failure mode properties' %}</caption>
+            <thead>
+              <tr>
+                <th colspan="2">
+                  {% translate 'Properties' %}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <th scope="row">
+                  {% translate 'Risk class' %}
+                </th>
+
+                <td>
+                  <span class="{{ object.risk_class.split|join:'-'|lower }}">
+                    {{ object.risk_class }}
+                  </span>
+                </td>
+              </tr>
+
+              <tr>
+                <th scope="row">
+                  {% translate 'Failure mode' %}
+                </th>
+
+                <td>
+                  {{ object.failure_mode }}
+                </td>
+              </tr>
+
+              <tr>
+                <th scope="row">
+                  {% translate 'Frequency level' %}
+                </th>
+
+                <td>
+                  {{ object.get_frequency_level_display }}
+                </td>
+              </tr>
+
+              <tr>
+                <th scope="row">
+                  {% translate 'Detectability level' %}
+                </th>
+
+                <td>
+                  {{ object.get_detectability_level_display }}
+                </td>
+              </tr>
+
+              <tr>
+                <th scope="row">
+                  {% if object.risk_class %}
+                    <b>
+                      {% blocktrans count object.effect.all.count as count %}
+                        Effect and severity level
+                        {% plural %}
+                        Effects and severity levels
+                      {% endblocktrans %}
+                    </b>
+                  {% endif %}
+                </th>
+
+                <td>
+                  <ol type="A">
+                    {% for effect in object.effect.all %}
+                      <li>{{ effect }} - {{ effect.get_severity_level_display }}</li>
+                    {% endfor %}
+                  </ol>
+                </td>
+              </tr>
+
+              <tr>
+                <th scope="row">
+                  {% translate 'Description' %}
+                </th>
+
+                <td>
+                  {{ object.description }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="horizontal-view">
+          <a href="{{ object.get_update_url }}"
+            class="button cta"
+          >{% translate 'Edit' %}</a>
+        </div>
+			</div>
+		</section>
+	</main>
+{% endblock %}

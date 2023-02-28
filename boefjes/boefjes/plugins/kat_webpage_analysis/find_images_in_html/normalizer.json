@@ -1,0 +1,9 @@
+{
+    "id": "kat_find_images_in_html",
+    "consumes": [
+        "text/html"
+    ],
+    "produces": [
+        "HTTPResource"
+    ]
+}

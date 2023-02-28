@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  bytes_unit:
+    build:
+      args:
+        ENVIRONMENT: dev
+      context: .
+      dockerfile: Dockerfile
+    command: pytest tests/unit
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - .:/app/bytes
+
+  bytes_integration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ENVIRONMENT: dev
+    command: sh -c "sleep ${SLEEP_TIME:-1} && pytest tests/integration"
+    depends_on:
+      - ci_bytes
+    env_file:
+      - .ci/.env.test
+    volumes:
+    - .:/app/bytes
+
+  ci_bytes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        ENVIRONMENT: dev
+    command: uvicorn bytes.api:app --host 0.0.0.0
+    depends_on:
+      - ci_bytes-db
+      - ci_rabbitmq
+    volumes:
+      - .:/app/bytes
+    env_file:
+      - .ci/.env.test
+
+  ci_rabbitmq:
+    image: "rabbitmq:3-management"
+    volumes:
+      - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
+  ci_bytes-db:
+    image: postgres:12.8
+    env_file:
+      - .ci/.env.test

@@ -1,0 +1,46 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+	<main id="main-content">
+		<section>
+			<div>
+        <div class="vertical-scroll">
+          {% if heatmap_data %}
+            <table>
+              <caption>{% translate 'FMEA Departments Heatmap:' %}</caption>
+              <tbody>
+                <tr>
+                  <td></td>
+                  {% for department in departments %}
+                    <td>{{ department }}</td>
+                  {% endfor %}
+                </tr>
+                {% for data in heatmap_data %}
+                  <tr>
+                    <td>{{ data.failure_mode }}</td>
+                    {% for department in departments %}
+                        {% if department in data.affected_departments %}
+                          <td >
+                            <span class="{{ data.risk_class.split|join:'-'|lower }}">
+                              {{ data.risk_class }}
+                            </span>
+                          </td>
+                        {% else %}
+                          <td></td>
+                        {% endif %}
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p>{% translate 'No data to build heatmap' %}</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock %}

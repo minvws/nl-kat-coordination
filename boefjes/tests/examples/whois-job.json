@@ -1,0 +1,13 @@
+{
+  "id": "whois-job",
+  "organization": "_dev",
+  "arguments": {
+    "domain": "tweakers.net"
+  },
+  "dispatches": {
+    "normalizers": [
+      "kat_whois.whois_normalize"
+    ],
+    "boefjes": []
+  }
+}

@@ -1,0 +1,6 @@
+{% load static %}
+
+<ul class="level-indicator l{{ value }}">
+  {% get_scan_levels as scan_levels %}
+  {% for level in scan_levels %}<li></li>{% endfor %}
+</ul>

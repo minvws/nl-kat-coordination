@@ -1,0 +1,47 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "default": {
+            "format": "%(asctime)s [%(process)d] [%(levelname)s] [%(module)s] [%(name)s] %(message)s",
+            "datefmt": "[%Y-%m-%d %H:%M:%S %z]"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "INFO",
+            "formatter": "default",
+            "stream": "ext://sys.stdout"
+        },
+        "syslog": {
+            "class": "logging.handlers.SysLogHandler",
+            "formatter": "default",
+            "address": "/dev/log",
+            "facility": "local0"
+        }
+    },
+    "root": {
+        "level": "INFO",
+        "handlers": [
+            "console",
+            "syslog"
+        ]
+    },
+    "loggers": {
+        "uvicorn.error": {
+            "level": "WARNING",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        },
+        "pika": {
+            "level": "WARNING",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        }
+    }
+}

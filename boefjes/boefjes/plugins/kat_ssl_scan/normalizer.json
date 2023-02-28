@@ -1,0 +1,10 @@
+{
+    "id": "kat_ssl_scan_normalize",
+    "consumes": [
+        "ssl-version"
+    ],
+    "produces": [
+        "KATFindingType",
+        "Finding"
+    ]
+}

@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  rocky_tests:
+    build:
+      context: ..
+      dockerfile: rocky/Dockerfile
+      args:
+        ENVIRONMENT: dev
+    command: bash /app/run_rocky.sh
+    depends_on:
+      - ci_rocky-db
+    volumes:
+      - .:/app/rocky
+      - ./.ci/run_rocky.sh:/app/run_rocky.sh
+    env_file:
+      - .ci/.env.test
+
+  ci_rocky-db:
+    image: postgres:12.8
+    env_file:
+      - .ci/.env.test

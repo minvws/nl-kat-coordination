@@ -1,0 +1,9 @@
+{
+    "id": "kat_check_images",
+    "consumes": [
+        "image/jpeg", "image/jpg", "image/gif", "image/png", "image/bpm", "image/ico"
+    ],
+    "produces": [
+        "ImageMetadata"
+    ]
+}

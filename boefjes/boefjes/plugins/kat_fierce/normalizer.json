@@ -1,0 +1,13 @@
+{
+    "id": "kat_fierce_normalize",
+    "consumes": [
+        "fierce"
+    ],
+    "produces": [
+        "IPAddressV6",
+        "DNSARecord",
+        "Hostname",
+        "DNSAAAARecord",
+        "IPAddressV4"
+    ]
+}

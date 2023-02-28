@@ -1,0 +1,55 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' with breadcrumb_list=breadcrumb_list %}
+
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Failure mode effect' %}</h1>
+        <div class="horizontal-scroll">
+          <table>
+            <caption>{% translate 'Failure mode effect properties' %}</caption>
+            <thead>
+              <tr>
+                <th colspan="2">
+                  {% translate 'Properties' %}
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <th scope="row">
+                  {% translate 'Effect' %}
+                </th>
+
+                <td>
+                  {{ object.effect }}
+                </td>
+              </tr>
+
+              <tr>
+                <th scope="row">
+                  {% translate 'Severity' %}
+                </th>
+
+                <td>
+                  {{ object.get_severity_level_display }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="horizontal-view">
+          <a href="{{ object.get_update_url }}"
+            class="button cta"
+          >{% translate 'Edit' %}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+{% endblock %}

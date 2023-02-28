@@ -1,0 +1,14 @@
+    {
+        "id": "ssl-version",
+        "name": "SSLScan",
+        "description": "Scan SSL/TLS versions of websites",
+        "consumes": [
+            "Website"
+        ],
+        "produces": [
+            "KATFindingType",
+            "Finding"
+        ],
+        "environment_keys": [],
+        "scan_level": 2
+    }

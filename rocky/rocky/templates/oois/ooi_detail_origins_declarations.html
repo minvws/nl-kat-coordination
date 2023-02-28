@@ -1,0 +1,22 @@
+{% load i18n %}
+{% load ooi_extra %}
+{% spaceless %}
+{% if declarations %}
+  <div class="horizontal-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>{% translate 'Declarations' %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            {{ ooi.get_ooi_type }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+{% endspaceless %}

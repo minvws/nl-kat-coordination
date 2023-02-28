@@ -1,0 +1,13 @@
+{
+    "id": "adr-validator",
+    "name": "API Design Rules validator",
+    "description": "Validate if an API conforms to the API Design Rules",
+    "consumes": [
+        "RESTAPI"
+    ],
+    "produces": [
+        "ADRFindingType",
+        "Finding"
+    ],
+    "scan_level": 1
+}

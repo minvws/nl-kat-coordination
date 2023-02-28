@@ -1,0 +1,2 @@
+ALTER TABLE boefje_meta ALTER COLUMN organization TYPE VARCHAR(8);
+ALTER TABLE boefje_meta ALTER COLUMN input_ooi TYPE VARCHAR(1024);

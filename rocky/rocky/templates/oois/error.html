@@ -1,0 +1,24 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+{% include 'header.html' %}
+
+<main id="main-content">
+  <section>
+    <div>
+      <h1>{% translate "Object List" %}</h1>
+
+      <p>
+        {% translate "An error occurred. Please contact a system administrator." %}
+      </p>
+
+      {% include 'partials/ooi_list_toolbar.html' %}
+
+    </div>
+  </section>
+
+</main>
+{% endblock %}
+

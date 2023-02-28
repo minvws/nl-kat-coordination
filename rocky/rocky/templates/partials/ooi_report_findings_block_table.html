@@ -1,0 +1,56 @@
+{% load i18n %}
+{% load ooi_extra %}
+
+<div class="horizontal-scroll">
+  <table>
+    <caption>
+      {% blocktranslate trimmed with name=ooi.human_readable type=ooi.get_ooi_type %}
+        Findings for {{ type }} {{ name }} on {{ observed_at }}:
+      {% endblocktranslate %}
+    </caption>
+
+    <thead>
+      <tr>
+        <th scope="col">
+          {% translate "Risk level" %}
+        </th>
+
+        <th scope="col">
+          {% translate "Finding type" %}
+        </th>
+
+        <th scope="col">
+          {% translate "Occurrences" %}
+        </th>
+
+        <th scope="col">
+          {% translate "Details" %}
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {% for findings in findings_list.findings_grouped.values %}
+        <tr>
+          <td>
+            <span class="{{ findings.finding_type.risk_level_severity }}">{{ findings.finding_type.risk_level_severity }}</span>
+          </td>
+
+          <td>
+            {{ findings.finding_type.id }}
+          </td>
+
+          <td class="number">
+            {{ findings_list.meta.total_by_finding_type|get_item:findings.finding_type.id }}
+          </td>
+
+          <td>
+            <button class="expando-button" data-icon-open-class="icon ti-chevron-down" data-icon-close-class="icon ti-chevron-up">{% translate 'Open finding details' %}</button>
+          </td>
+        </tr>
+
+        {% include "partials/ooi_report_findings_block_table_expanded_row.html" with finding_type=findings.finding_type %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

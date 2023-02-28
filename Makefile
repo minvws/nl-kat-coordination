@@ -5,20 +5,13 @@ SHELL := bash
 HIDE:=$(if $(VERBOSE),,@)
 UNAME := $(shell uname)
 
-.PHONY: kat kat-stable rebuild update clean clone clone-stable migrate build itest debian-build-image ubuntu-build-image
+.PHONY: kat rebuild update clean migrate build itest debian-build-image ubuntu-build-image
 
 # Export Docker buildkit options
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-SERVICES = nl-kat-rocky nl-kat-boefjes nl-kat-bytes nl-kat-octopoes nl-kat-mula nl-kat-keiko
-
-
-kat: env-if-empty clean clone # This should give you a clean install
-	make build
-	make up
-
-kat-stable: env-if-empty clean clone-stable # This should give you a clean install of a stable version
+kat: env-if-empty clean # This should give you a clean install
 	make build
 	make up
 
@@ -50,8 +43,8 @@ reset: down
 	-docker volume rm nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
 	-docker-compose run --rm --no-deps --entrypoint /bin/rm -u root bytes -rf bytes-data
 	make up
-	make -C nl-kat-boefjes build
-	make -C nl-kat-rocky almost-flush
+	make -C boefjes build
+	make -C rocky almost-flush
 
 up:
 	docker-compose up -d --force-recreate
@@ -59,26 +52,11 @@ up:
 down:
 	-docker-compose down
 
-clone:
-	for service in $(SERVICES); do \
-		git clone https://github.com/minvws/$$service.git || true; \
-	done
-
-clone-stable:
-	TAG=$(shell curl --silent https://api.github.com/repos/minvws/nl-kat-coordination/tags | jq -r '.[].name' | grep -v "rc" | head -n 1)
-	for service in $(SERVICES); do \
-		git clone --branch $$TAG https://github.com/minvws/$$service.git || true; \
-	done
-
 fetch:
-	for service in . $(SERVICES); do \
-		git -C $$service fetch || true; \
-	done
+	-git fetch
 
 pull:
-	for service in . $(SERVICES); do \
-		git -C $$service pull || true; \
-	done
+	-git pull
 
 env-if-empty:
 ifeq ("$(wildcard .env)","")
@@ -94,15 +72,11 @@ else
 endif
 
 checkout: # Usage: `make checkout branch=develop`
-	for service in . $(SERVICES); do \
-		git -C $$service checkout $(branch) || true; \
-	done
+	-git checkout $(branch)
 
 pull-reset:
-	for service in . $(SERVICES); do \
-		git -C $$service reset --hard HEAD; \
-		git -C $$service pull; \
-	done
+	-git reset --hard HEAD
+	-git pull
 
 build-all:  # Build should prepare all other services: migrate them, seed them, etc.
 ifeq ($(UNAME), Darwin)
@@ -112,8 +86,8 @@ else
 endif
 
 build: build-all
-	make -C nl-kat-rocky build
-	make -C nl-kat-boefjes build
+	make -C rocky build
+	make -C boefjes build
 
 debian-build-image:
 	docker build -t kat-debian-build-image packaging/debian
