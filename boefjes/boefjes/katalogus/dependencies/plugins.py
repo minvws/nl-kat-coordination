@@ -234,7 +234,7 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
         return PluginService(
             create_plugin_enabled_storage(session),
             create_repository_storage(session),
-            create_setting_storage(organisation_id, session),
+            create_setting_storage(session),
             PluginRepositoryClient(),
             get_local_repository(),
         )

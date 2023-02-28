@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import logging
+import threading
 from typing import Any, Dict, List, Optional
 
 import pydantic
@@ -86,6 +87,7 @@ class PriorityQueue(abc.ABC):
         self.allow_updates: bool = allow_updates
         self.allow_priority_updates: bool = allow_priority_updates
         self.pq_store: repositories.stores.PriorityQueueStorer = pq_store
+        self.lock: threading.Lock = threading.Lock()
 
     def pop(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
         """Remove and return the highest priority item from the queue.
@@ -93,14 +95,15 @@ class PriorityQueue(abc.ABC):
         Raises:
             QueueEmptyError: If the queue is empty.
         """
-        if self.empty():
-            raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
+        with self.lock:
+            if self.empty():
+                raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
 
-        item = self.pq_store.pop(self.pq_id, filters)
-        if item is None:
-            return None
+            item = self.pq_store.pop(self.pq_id, filters)
+            if item is None:
+                return None
 
-        self.remove(item)
+            self.remove(item)
 
         return item
 
@@ -119,58 +122,62 @@ class PriorityQueue(abc.ABC):
 
             PrioritizedItemNotFoundError: If the item is not found on the queue.
         """
-        if not isinstance(p_item, models.PrioritizedItem):
-            raise InvalidPrioritizedItemError("The item is not a PrioritizedItem")
+        with self.lock:
+            if not isinstance(p_item, models.PrioritizedItem):
+                raise InvalidPrioritizedItemError("The item is not a PrioritizedItem")
 
-        if not self._is_valid_item(p_item.data):
-            raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
+            if not self._is_valid_item(p_item.data):
+                raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
 
-        if self.full():
-            raise QueueFullError(f"Queue {self.pq_id} is full.")
+            if self.full():
+                raise QueueFullError(f"Queue {self.pq_id} is full.")
 
-        # We try to get the item from the queue by a specified identifier of
-        # that item by the implementation of the queue. We don't do this by
-        # the item itself or its hash because this might have been changed
-        # and we might need to update that.
-        item_on_queue = self.get_p_item_by_identifier(p_item)
+            # We try to get the item from the queue by a specified identifier of
+            # that item by the implementation of the queue. We don't do this by
+            # the item itself or its hash because this might have been changed
+            # and we might need to update that.
+            item_on_queue = self.get_p_item_by_identifier(p_item)
 
-        item_changed = (
-            False if not item_on_queue or p_item.data == item_on_queue.data else True  # FIXM: checking json/dicts here
-        )
-
-        priority_changed = False if not item_on_queue or p_item.priority == item_on_queue.priority else True
-
-        allowed = False
-        if item_on_queue and self.allow_replace:
-            allowed = True
-        elif self.allow_updates and item_changed and item_on_queue:
-            allowed = True
-        elif self.allow_priority_updates and priority_changed and item_on_queue:
-            allowed = True
-        elif not item_on_queue:
-            allowed = True
-
-        if not allowed:
-            raise NotAllowedError(
-                f"[item_on_queue={item_on_queue}, item_changed={item_changed}, priority_changed={priority_changed}, "
-                f"allow_replace={self.allow_replace}, allow_updates={self.allow_updates}, "
-                f"allow_priority_updates={self.allow_priority_updates}]"
+            item_changed = (
+                False
+                if not item_on_queue or p_item.data == item_on_queue.data
+                else True  # FIXM: checking json/dicts here
             )
 
-        # If already on queue update the item, else create a new one
-        item_db = None
-        if not item_on_queue:
-            identifier = self.create_hash(p_item)
-            p_item.hash = identifier
-            item_db = self.pq_store.push(self.pq_id, p_item)
-        else:
-            self.pq_store.update(self.pq_id, p_item)
-            item_db = self.get_p_item_by_identifier(p_item)
+            priority_changed = False if not item_on_queue or p_item.priority == item_on_queue.priority else True
 
-        if not item_db:
-            raise PrioritizedItemNotFoundError(f"Item {p_item} not found in datastore {self.pq_id}")
+            allowed = False
+            if item_on_queue and self.allow_replace:
+                allowed = True
+            elif self.allow_updates and item_changed and item_on_queue:
+                allowed = True
+            elif self.allow_priority_updates and priority_changed and item_on_queue:
+                allowed = True
+            elif not item_on_queue:
+                allowed = True
 
-        return item_db
+            if not allowed:
+                raise NotAllowedError(
+                    f"[item_on_queue={item_on_queue}, item_changed={item_changed}, "
+                    f" priority_changed={priority_changed}, "
+                    f"allow_replace={self.allow_replace}, allow_updates={self.allow_updates}, "
+                    f"allow_priority_updates={self.allow_priority_updates}]"
+                )
+
+            # If already on queue update the item, else create a new one
+            item_db = None
+            if not item_on_queue:
+                identifier = self.create_hash(p_item)
+                p_item.hash = identifier
+                item_db = self.pq_store.push(self.pq_id, p_item)
+            else:
+                self.pq_store.update(self.pq_id, p_item)
+                item_db = self.get_p_item_by_identifier(p_item)
+
+            if not item_db:
+                raise PrioritizedItemNotFoundError(f"Item {p_item} not found in datastore {self.pq_id}")
+
+            return item_db
 
     def peek(self, index: int) -> Optional[models.PrioritizedItem]:
         """Return the item at index without removing it.
