@@ -15,7 +15,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             ip, mask = address["ip_address"].split("/")
             ip_address = IPAddressV4(address=ip, network=internet.reference)
             yield ip_address
-            yield IPV4NetBlock(start_ip=ip_address.reference, mask=int(mask))
+            yield IPV4NetBlock(start_ip=ip_address.reference, mask=int(mask), network=internet.reference)
         else:
             yield IPAddressV4(address=address["ip_address"], network=internet.reference)
 
