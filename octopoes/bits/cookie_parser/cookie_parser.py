@@ -8,7 +8,7 @@ from octopoes.models.ooi.network import Network
 
 from octopoes.models.ooi.web import RawCookie, Cookie
 
-from octopoes.models.ooi.findings import FindingType, Finding
+from octopoes.models.ooi.findings import KATFindingType, Finding
 
 
 def run(
@@ -17,6 +17,10 @@ def run(
 ) -> Iterator[OOI]:
     try:
         parsed_cookie = SimpleCookie(input_ooi.raw)
+        if len(parsed_cookie) == 0:
+            ft = KATFindingType(id="KAT-INVALID-COOKIE")
+            yield ft
+            yield Finding(ooi=input_ooi.reference, finding_type=ft.reference, description=f"Invalid cookie")
         for name, morsel in parsed_cookie.items():
             # https://datatracker.ietf.org/doc/html/rfc6265#section-5.3 p6
             host_only = False
@@ -63,9 +67,9 @@ def run(
                 expires=expires,
                 max_age=max_age,
                 created=str(datetime.now()),
-                same_site=morsel["samesite"],
+                same_site=morsel["samesite"].strip(","),
             )
     except CookieError as e:
-        ft = FindingType(id="KAT-INVALID-COOKIE")
+        ft = KATFindingType(id="KAT-INVALID-COOKIE")
         yield ft
-        yield Finding(findings_type=ft.reference, description=f"Invalid cookie: {e}")
+        yield Finding(ooi=input_ooi.reference, finding_type=ft.reference, description=f"Invalid cookie: {e}")
