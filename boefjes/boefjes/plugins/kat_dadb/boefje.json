@@ -8,7 +8,7 @@
     "produces": [
         "Hostname",
         "IPAddress",
-        "Netblock"
+        "IPV4NetBlock"
     ],
     "environment_keys": ["DADB_API", "DADB_ACCESS_TOKEN"],
     "scan_level": 2
