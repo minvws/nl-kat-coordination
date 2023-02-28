@@ -312,3 +312,82 @@ type SubjectAlternativeNameQualifier implements BaseObject & OOI {
   name: String!
 
 }
+
+# E-mail security
+type DNSSPFRecord implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["dns_txt_record", "value"]): ID!
+  human_readable(format: String! = "SPF Record of {dns_txt_record}"): String!
+
+  value: String!
+  ttl: Int
+  all: String
+  exp: String
+
+  dns_txt_record(reverse_name: String! = "dns_spf_record"): DNSTXTRecord!
+
+}
+
+type DNSSPFMechanism implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["dns_txt_record", "value"]): ID!
+  human_readable(format: String! = "SPF Record of {dns_txt_record}"): String!
+
+  spf_record(reverse_name: String! = "spf_record"): DNSSPFRecord!
+  mechanism: String!
+
+}
+
+type DNSSPFMechanismIP implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["spf_record", "mechanism", "ip"]): ID!
+  human_readable(format: String! = "SPF Record of {dns_txt_record}"): String!
+
+  spf_record(reverse_name: String! = "spf_ip_mechanisms"): DNSSPFRecord!
+  mechanism: String!
+  ip(reverse_name: String! = "dns_spf_record"): IPAddress!
+
+}
+
+type DNSSPFMechanismHostname implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["spf_record", "mechanism", "hostname"]): ID!
+  human_readable(format: String! = "SPF Record of {dns_txt_record}"): String!
+
+  spf_record(reverse_name: String! = "spf_hostname_mechanisms"): DNSSPFRecord!
+  mechanism: String!
+  hostname(reverse_name: String! = "hostname"): Hostname!
+
+}
+
+type DNSSPFMechanismNetBlock implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["spf_record", "mechanism", "netblock"]): ID!
+  human_readable(format: String! = "SPF Record of {dns_txt_record}"): String!
+
+  spf_record(reverse_name: String! = "spf_netblock_mechanisms"): DNSSPFRecord!
+  mechanism: String!
+  netblock(reverse_name: String! = "netblock"): NetBlock!
+
+}
+
+type DMARCTXTRecord implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["value", "hostname"]): ID!
+  human_readable(format: String! = "DMARC TXT Record of {hostname}"): String!
+
+  value: String!
+  ttl: Int
+  hostname(reverse_name: String! = "dmarc_txt_record"): Hostname!
+}
+
+type DKIMExists implements BaseObject & OOI {
+  object_type: String!
+  primary_key(natural_key: [String!] = ["value", "hostname"]): ID!
+  human_readable(format: String! = "DMARC TXT Record of {hostname}"): String!
+
+  value: String!
+  ttl: Int
+  hostname(reverse_name: String! = "dkim_exists"): Hostname!
+}
+
