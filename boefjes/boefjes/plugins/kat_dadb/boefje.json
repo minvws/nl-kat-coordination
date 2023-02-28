@@ -1,15 +1,15 @@
-    {
-        "id": "dadb",
-        "name": "dadb",
-        "description": "Fetch hostnames and ipaddresses from DADB",
-        "consumes": [
-            "Network",
-        ],
-        "produces": [
-            "Hostname",
-            "IPAddress",
-            "Netblock"
-        ],
-        "environment_keys": ["DADB_API", "DADB_ACCESS_TOKEN"],
-        "scan_level": 2
-    }
+{
+    "id": "dadb",
+    "name": "dadb",
+    "description": "Fetch hostnames and ipaddresses from DADB",
+    "consumes": [
+        "Network",
+    ],
+    "produces": [
+        "Hostname",
+        "IPAddress",
+        "Netblock"
+    ],
+    "environment_keys": ["DADB_API", "DADB_ACCESS_TOKEN"],
+    "scan_level": 2
+}
