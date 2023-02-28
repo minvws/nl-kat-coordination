@@ -10,6 +10,7 @@
              name="{{ field.name }}"
              value="{{ choice.data.value }}"
              id="id_{{ field.name }}_{{ forloop.counter0 }}"
+             {% if choice.data.attrs.disabled %} disabled{% endif %}
              {% if choice.data.attrs.checked %} checked{% endif %}/>
       <label>
         <ul class="level-indicator l{{ forloop.counter0 }}">
@@ -19,7 +20,8 @@
           <li></li>
         </ul>
       </label>
-      {% include 'partials/form/field_input_errors.html' %}
     </div>
   {% endfor %}
+  {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
+  {% include 'partials/form/field_input_errors.html' %}
 </fieldset>

@@ -173,11 +173,32 @@ class OrganizationMemberEditForm(forms.ModelForm):
         label=_("Trusted clearance level"),
         choices=SCAN_LEVEL.choices,
         widget=forms.RadioSelect(),
+        help_text=_("Select a clearance level you trust this member with."),
     )
+
+    acknowledged_clearance_level = forms.ChoiceField(
+        required=False,
+        label=_("Acknowledged clearance level"),
+        choices=SCAN_LEVEL.choices,
+        widget=forms.RadioSelect(),
+        help_text=_("The clearance level this memeber agreed on based on the assigned trusted clearance level."),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["acknowledged_clearance_level"].disabled = True
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if instance.trusted_clearance_level < instance.acknowledged_clearance_level:
+            instance.acknowledged_clearance_level = instance.trusted_clearance_level
+        if commit:
+            instance.save()
+        return instance
 
     class Meta:
         model = OrganizationMember
-        fields = ["member_name", "trusted_clearance_level"]
+        fields = ["member_name", "trusted_clearance_level", "acknowledged_clearance_level"]
 
 
 class OrganizationForm(forms.ModelForm):
