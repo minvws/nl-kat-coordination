@@ -31,14 +31,10 @@
               <td>{{ member.user }}<br>
               <td>
               {% if member.user.is_superuser %}
-                Superuser
-              {% else %}
-                {% if member.user.is_staff %}
-                  Admin
-                {% endif %}
-              {% endif %}<br>
+                {% translate 'Super user' %}
+              {% endif %}
               {% for group in member.user.groups.all %}
-                {{ group|title }}<br>
+                  {{ group.name|title }}<br>
               {% endfor %}
               <td>{{ member.user.date_joined }}</td>
               <td>
@@ -59,10 +55,12 @@
                 {% for group in member.user.groups.all %}
                   {% for permission in group.permissions.all %}
                     {% if 'can_set_clearance_level' in permission.codename %}
-                      {% if member.trusted_clearance_level > 0 %}
-                        {% include 'partials/single_action_form.html' with btn_text="Revoke" action='withdraw_clearance' key='member_id' value=member.id btn_class="ghost" %}
-                      {% else %}
-                        {% include 'partials/single_action_form.html' with btn_text="Grant" action='give_clearance' key='member_id' value=member.id %}
+                      {% if not member.user.is_superuser %}
+                        {% if member.trusted_clearance_level > 0 %}
+                          {% include 'partials/single_action_form.html' with btn_text="Revoke" action='withdraw_clearance' key='member_id' value=member.id btn_class="ghost" %}
+                        {% else %}
+                          {% include 'partials/single_action_form.html' with btn_text="Grant" action='give_clearance' key='member_id' value=member.id %}
+                        {% endif %}
                       {% endif %}
                     {% endif %}
                   {% endfor %}
