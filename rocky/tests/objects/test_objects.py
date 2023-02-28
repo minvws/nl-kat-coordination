@@ -161,6 +161,63 @@ def test_update_scan_profile_single(rf, my_user, organization, mock_organization
     assert mock_organization_view_octopoes().save_scan_profile.call_count == 1
 
 
+def test_update_scan_profile_to_inherit(rf, my_user, organization, mock_organization_view_octopoes):
+    kwargs = {"organization_code": organization.code}
+    url = reverse("ooi_list", kwargs=kwargs)
+
+    request = rf.post(
+        url,
+        data={
+            "ooi": ["Hostname|internet|scanme.org."],
+            "scan-profile": "inherit",
+            "action": "update-scan-profile",
+        },
+    )
+    setup_request(request, my_user)
+    response = OOIListView.as_view()(request, organization_code=organization.code)
+
+    assert response.status_code == 200
+    assert mock_organization_view_octopoes().save_scan_profile.call_count == 1
+
+
+def test_update_scan_profile_to_inherit_connection_error(rf, my_user, organization, mock_organization_view_octopoes):
+    mock_organization_view_octopoes().save_scan_profile.side_effect = ConnectionError
+    kwargs = {"organization_code": organization.code}
+    url = reverse("ooi_list", kwargs=kwargs)
+
+    request = rf.post(
+        url,
+        data={
+            "ooi": ["Hostname|internet|scanme.org."],
+            "scan-profile": "inherit",
+            "action": "update-scan-profile",
+        },
+    )
+    setup_request(request, my_user)
+    response = OOIListView.as_view()(request, organization_code=organization.code)
+
+    assert response.status_code == 500
+
+
+def test_update_scan_profile_to_inherit_object_not_found(rf, my_user, organization, mock_organization_view_octopoes):
+    mock_organization_view_octopoes().save_scan_profile.side_effect = ObjectNotFoundException("nothing found")
+    kwargs = {"organization_code": organization.code}
+    url = reverse("ooi_list", kwargs=kwargs)
+
+    request = rf.post(
+        url,
+        data={
+            "ooi": ["Hostname|internet|scanme.org."],
+            "scan-profile": "inherit",
+            "action": "update-scan-profile",
+        },
+    )
+    setup_request(request, my_user)
+    response = OOIListView.as_view()(request, organization_code=organization.code)
+
+    assert response.status_code == 404
+
+
 def test_update_scan_profiles_forbidden_acknowledged(rf, my_user, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
