@@ -23,12 +23,13 @@ class OrganizationListView(
         queryset = []
         members = OrganizationMember.objects.filter(user=self.request.user)
         for member in members:
-            queryset.append(
-                {
-                    "organization": member.organization,
-                    "total_members": self.get_organizationmembers(member.organization).count(),
-                }
-            )
+            if member.status != "blocked":
+                queryset.append(
+                    {
+                        "organization": member.organization,
+                        "total_members": self.get_organizationmembers(member.organization).count(),
+                    }
+                )
         return queryset
 
     def get_superuser_queryset(self):

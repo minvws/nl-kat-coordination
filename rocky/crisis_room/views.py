@@ -42,7 +42,7 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
 
     def get_user_organizations(self) -> List:
         members = OrganizationMember.objects.filter(user=self.request.user)
-        return [member.organization for member in members]
+        return [member.organization for member in members if member.status != "blocked"]
 
     def get_list_for_org(self, organization: Organization) -> Union[List, None]:
         try:
@@ -80,6 +80,7 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
         context["breadcrumb_list"] = [
             {"url": reverse("crisis_room"), "text": "CRISIS ROOM"},
         ]
+        context["organizations"] = self.get_user_organizations()
         context["findings_per_org_total"] = self.sort_finding_list_by_total(findings_per_org)
         context["findings_per_org_critical"] = self.sort_finding_list_by_critical(findings_per_org)
         context["observed_at_form"] = self.get_connector_form()

@@ -41,9 +41,9 @@ class OrganizationMemberListView(
     def filter_queryset(self, queryset, blocked_status_filter):
         result = []
         if "blocked" in blocked_status_filter:
-            result += [member for member in queryset if member.status == "blocked"]
+            result.extend([member for member in queryset if member.status == "blocked"])
         if "unblocked" in blocked_status_filter:
-            result += [member for member in queryset if not member.status == "blocked"]
+            result.extend([member for member in queryset if not member.status == "blocked"])
         return result
 
     def setup(self, request, *args, **kwargs):
