@@ -7,12 +7,7 @@ from django.db.models import JSONField
 from django.forms import widgets
 
 from rocky.admin import AdminErrorMessageMixin
-from tools.models import (
-    Organization,
-    OrganizationMember,
-    Indemnification,
-    OOIInformation,
-)
+from tools.models import Organization, OrganizationMember, Indemnification, OOIInformation, OrganizationTag
 
 
 class JSONInfoWidget(widgets.Textarea):
@@ -85,7 +80,12 @@ class IndemnificationAdmin(admin.ModelAdmin):
         return request.user.is_superuser
 
 
+class OrganizationTagAdmin(admin.ModelAdmin):
+    pass
+
+
 tagulous.admin.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationMember, OrganizationMemberAdmin)
 admin.site.register(Indemnification, IndemnificationAdmin)
 admin.site.register(OOIInformation, OOIInformationAdmin)
+admin.site.register(OrganizationTag, OrganizationTagAdmin)
