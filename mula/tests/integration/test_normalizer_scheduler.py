@@ -114,11 +114,9 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
 
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type")
-    def test_populate_normalizer_queue_update_boefje_status_failed(
-        self, mock_get_normalizers, mock_get_latest_raw_data
-    ):
-        """When a boefje failed the boefje task status should be updated,
-        and no task should be created because the mime_type contains "error/"
+    def test_populate_normalizer_queue_error_mimetype(self, mock_get_normalizers, mock_get_latest_raw_data):
+        """When a boefje failed no task should be created because the mime_type
+        contains "error/"
         """
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -152,51 +150,6 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         self.scheduler.populate_queue()
 
         self.assertEqual(0, self.scheduler.queue.qsize())
-        task_db_updated = self.mock_ctx.task_store.get_task_by_id(p_item.id)
-        self.assertEqual(task_db_updated.status, models.TaskStatus.FAILED)
-
-    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type")
-    def test_populate_normalizer_queue_update_boefje_status_completed(
-        self, mock_get_normalizers, mock_get_latest_raw_data
-    ):
-        """When a boefje suceeds the boefje task status should be updated
-        to completed.
-        """
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(type="boefje", scan_level=0)
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
-        task = functions.create_task(p_item)
-        self.mock_ctx.task_store.create_task(task)
-
-        latest_raw_data = models.RawDataReceivedEvent(
-            raw_data=RawDataFactory(
-                boefje_meta=BoefjeMetaFactory(
-                    id=p_item.id.hex,
-                    boefje=boefje,
-                    input_ooi=ooi.primary_key,
-                ),
-                mime_types=[{"value": "text/plain"}],
-            ),
-            organization=self.organisation.name,
-            created_at=datetime.datetime.now(),
-        )
-
-        mock_get_latest_raw_data.side_effect = [latest_raw_data, None]
-        mock_get_normalizers.return_value = []
-
-        self.scheduler.populate_queue()
-
-        self.assertEqual(0, self.scheduler.queue.qsize())
-        task_db_updated = self.mock_ctx.task_store.get_task_by_id(p_item.id)
-        self.assertEqual(task_db_updated.status, models.TaskStatus.COMPLETED)
 
     # TODO
     def test_update_normalizer_task(self):
