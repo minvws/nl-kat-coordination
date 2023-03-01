@@ -314,9 +314,7 @@ class OctopoesService:
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
-        inference_origins = self.origin_repository.list_by_source(
-            event.new_data.reference, valid_time=event.valid_time
-        )
+        inference_origins = self.origin_repository.list_by_source(event.new_data.reference, valid_time=event.valid_time)
         inference_params = self.origin_parameter_repository.list_by_reference(
             event.new_data.reference, valid_time=event.valid_time
         )
