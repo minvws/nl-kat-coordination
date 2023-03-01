@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         dist: [ debian, ubuntu ]
-        package: [ bytes, boefjes ]
+        package: [ bytes, boefjes, rocky, keiko, octopoes, mula ]
     runs-on: ubuntu-latest
 
     steps:
@@ -32,6 +32,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           options: -v ${{ github.workspace }}/${{ matrix.package }}:/app
+            -v ${{ github.workspace }}/octopoes:/octopoes
             -e REPOSITORY=${{ github.repository }}
             -e RELEASE_VERSION=${{ env.RELEASE_VERSION }}
             -e RELEASE_TAG=${{ env.RELEASE_TAG }}
