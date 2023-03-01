@@ -31,7 +31,7 @@ jobs:
           image: ghcr.io/minvws/nl-kat-${{ matrix.dist }}-build-image:latest
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          options: -v ${{ github.workspace }}/bytes:/app
+          options: -v ${{ github.workspace }}/${{ matrix.package }}:/app
             -e REPOSITORY=${{ github.repository }}
             -e RELEASE_VERSION=${{ env.RELEASE_VERSION }}
             -e RELEASE_TAG=${{ env.RELEASE_TAG }}
@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: kat-${{ matrix.package }}_${{ env.RELEASE_VERSION }}_${{ matrix.dist }}.deb
-          path: bytes/build/kat-${{ matrix.package }}_${{ env.RELEASE_VERSION }}_amd64.deb
+          path: ${{ matrix.package }}/build/kat-${{ matrix.package }}_${{ env.RELEASE_VERSION }}_amd64.deb
 
   test-deb-install:
     needs: build-packages
