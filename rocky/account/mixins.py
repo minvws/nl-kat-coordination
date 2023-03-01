@@ -49,7 +49,7 @@ class OrganizationView(View):
         except OrganizationMember.DoesNotExist:
             raise Http404()
 
-        if self.organization_member.status == "blocked":
+        if self.organization_member.status == OrganizationMember.STATUSES.BLOCKED:
             raise PermissionDenied()
 
         self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)

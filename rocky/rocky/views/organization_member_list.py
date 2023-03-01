@@ -34,16 +34,16 @@ class OrganizationMemberListView(
             blocked_status_filter = self.request.GET.getlist("blocked_status_filter", [])
             queryset = self.filter_queryset(queryset, blocked_status_filter)
         for member in queryset:
-            if member.status == "blocked":
+            if member.status == OrganizationMember.STATUSES.BLOCKED:
                 member.blocked = True
         return queryset
 
     def filter_queryset(self, queryset, blocked_status_filter):
         result = []
         if "blocked" in blocked_status_filter:
-            result.extend([member for member in queryset if member.status == "blocked"])
+            result.extend([member for member in queryset if member.status == OrganizationMember.STATUSES.BLOCKED])
         if "unblocked" in blocked_status_filter:
-            result.extend([member for member in queryset if not member.status == "blocked"])
+            result.extend([member for member in queryset if not member.status == OrganizationMember.STATUSES.BLOCKED])
         return result
 
     def setup(self, request, *args, **kwargs):
@@ -72,9 +72,9 @@ class OrganizationMemberListView(
                 organizationmember.trusted_clearance_level = 0
                 organizationmember.acknowledged_clearance_level = 0
             elif action == PageActions.BLOCK.value:
-                organizationmember.status = "blocked"
+                organizationmember.status = OrganizationMember.STATUSES.BLOCKED
             elif action == PageActions.UNBLOCK.value:
-                organizationmember.status = "active"
+                organizationmember.status = OrganizationMember.STATUSES.ACTIVE
             else:
                 raise Exception(f"Unhandled allowed action: {action}")
             organizationmember.save()

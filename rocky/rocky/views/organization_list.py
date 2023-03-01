@@ -23,7 +23,7 @@ class OrganizationListView(
         queryset = []
         members = OrganizationMember.objects.filter(user=self.request.user)
         for member in members:
-            if member.status != "blocked":
+            if member.status != OrganizationMember.STATUSES.BLOCKED:
                 queryset.append(
                     {
                         "organization": member.organization,

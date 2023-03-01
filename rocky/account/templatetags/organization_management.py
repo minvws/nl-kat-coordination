@@ -13,7 +13,7 @@ def get_organizations(user):
     members = OrganizationMember.objects.filter(user=user)
     if members.exists():
         for member in members:
-            if member.status != "blocked":
+            if member.status != OrganizationMember.STATUSES.BLOCKED:
                 organization = Organization.objects.get(name=member.organization)
                 organizations.append(organization)
         return organizations

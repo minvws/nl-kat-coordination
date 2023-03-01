@@ -42,7 +42,7 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
 
     def get_user_organizations(self) -> List:
         members = OrganizationMember.objects.filter(user=self.request.user)
-        return [member.organization for member in members if member.status != "blocked"]
+        return [member.organization for member in members if member.status != OrganizationMember.STATUSES.BLOCKED]
 
     def get_list_for_org(self, organization: Organization) -> Union[List, None]:
         try:
