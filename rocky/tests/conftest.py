@@ -1,7 +1,8 @@
 import json
 from pathlib import Path
 from unittest.mock import patch, MagicMock
-
+import binascii
+from os import urandom
 import pytest
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages.middleware import MessageMiddleware
@@ -14,7 +15,7 @@ from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 from tools.models import Organization, OrganizationMember, OOIInformation, Indemnification
-from tools.models import GROUP_REDTEAM, GROUP_ADMIN
+from tools.models import GROUP_REDTEAM, GROUP_ADMIN, GROUP_CLIENT
 
 
 @pytest.fixture
@@ -32,7 +33,7 @@ def user(django_user_model):
     user.is_verified = lambda: True
 
     device = user.staticdevice_set.create(name="default")
-    device.token_set.create(token=user.get_username())
+    device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
 
     return user
 
@@ -58,14 +59,103 @@ def my_user(user, organization):
 
 
 @pytest.fixture
-def my_red_teamer(my_user, organization):
+def my_admin_user(django_user_model, organization):
+    admin_user = django_user_model.objects.create_user(email="admin@openkat.nl", password="AdminAdmin123!!")
+    admin_user.is_verified = lambda: True
+
+    device = admin_user.staticdevice_set.create(name="admin_device")
+    device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
+
     group = Group.objects.create(name=GROUP_ADMIN)
-    group.user_set.add(my_user)
+    group.user_set.add(admin_user)
+
+    admin_permissions = [
+        Permission.objects.get(codename="view_organization").id,
+        Permission.objects.get(codename="view_organizationmember").id,
+        Permission.objects.get(codename="add_organizationmember").id,
+        Permission.objects.get(codename="change_organizationmember").id,
+    ]
+    group.permissions.set(admin_permissions)
+
+    OrganizationMember.objects.create(
+        user=admin_user,
+        organization=organization,
+        verified=True,
+        authorized=True,
+        status=OrganizationMember.STATUSES.ACTIVE,
+        trusted_clearance_level=-1,
+        acknowledged_clearance_level=-1,
+    )
+    Indemnification.objects.create(
+        organization=organization,
+        user=admin_user,
+    )
+
+    return admin_user
+
+
+@pytest.fixture
+def my_redteam_user(django_user_model, organization):
+    redteam_user = django_user_model.objects.create_user(email="redteamer@openkat.nl", password="RedteamRedteam123!!")
+    redteam_user.is_verified = lambda: True
+
+    device = redteam_user.staticdevice_set.create(name="redteam_device")
+    device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
 
     group = Group.objects.create(name=GROUP_REDTEAM)
-    group.user_set.add(my_user)
+    group.user_set.add(redteam_user)
 
-    return my_user
+    redteam_permissions = [
+        Permission.objects.get(codename="can_scan_organization").id,
+        Permission.objects.get(codename="can_enable_disable_boefje").id,
+        Permission.objects.get(codename="can_set_clearance_level").id,
+    ]
+    group.permissions.set(redteam_permissions)
+
+    OrganizationMember.objects.create(
+        user=redteam_user,
+        organization=organization,
+        verified=True,
+        authorized=True,
+        status=OrganizationMember.STATUSES.ACTIVE,
+        trusted_clearance_level=-1,
+        acknowledged_clearance_level=-1,
+    )
+
+    Indemnification.objects.create(
+        organization=organization,
+        user=redteam_user,
+    )
+    return redteam_user
+
+
+@pytest.fixture
+def client_user(django_user_model, organization):
+    client_user = django_user_model.objects.create_user(email="clientt@openkat.nl", password="ClientClient123!!")
+    client_user.is_verified = lambda: True
+
+    device = client_user.staticdevice_set.create(name="client_device")
+    device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
+
+    group = Group.objects.create(name=GROUP_CLIENT)
+    group.user_set.add(client_user)
+
+    OrganizationMember.objects.create(
+        user=client_user,
+        organization=organization,
+        verified=True,
+        authorized=True,
+        status=OrganizationMember.STATUSES.ACTIVE,
+        trusted_clearance_level=-1,
+        acknowledged_clearance_level=-1,
+    )
+
+    Indemnification.objects.create(
+        organization=organization,
+        user=client_user,
+    )
+
+    return client_user
 
 
 @pytest.fixture

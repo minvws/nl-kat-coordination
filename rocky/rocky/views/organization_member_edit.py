@@ -55,7 +55,9 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
                 self.request,
                 messages.WARNING,
                 _(
-                    "The updated trusted clearance level of L%s is lower then the member's acknowledged clearance level of L%s. This member only has clearance for level L%s. For this reason the acknowldeged clearance level has been set at the same level as trusted clearance level."
+                    "The updated trusted clearance level of L%s is lower then the member's acknowledged clearance level"
+                    "of L%s. This member only has clearance for level L%s. For this reason the acknowldeged clearance"
+                    "level has been set at the same level as trusted clearance level."
                 )
                 % (tcl, acl, tcl),
             )
