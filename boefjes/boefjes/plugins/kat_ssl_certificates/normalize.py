@@ -7,7 +7,7 @@ import cryptography
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from dateutil.parser import parse
-
+import logging
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
@@ -119,9 +119,10 @@ def read_certificates(
         valid_until = cert.not_valid_after.isoformat()
         pk_algorithm = ""
         pk_size = cert.public_key().key_size
+        logging.info("Parsing certificate of type %s", type(cert.public_key()))
         if isinstance(
             cert.public_key(),
-            cryptography.hazmat.backends.openssl.x509.rsa.RSAPublicKey,
+            cryptography.hazmat.backends.openssl.rsa.RSAPublicKey,
         ):
             pk_algorithm = str(AlgorithmType.RSA)
             pk_number = cert.public_key().public_numbers().n.to_bytes(pk_size // 8, "big").hex()
