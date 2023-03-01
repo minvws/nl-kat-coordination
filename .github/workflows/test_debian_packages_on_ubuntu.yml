@@ -8,7 +8,6 @@ jobs:
     strategy:
       matrix:
         dist: [ debian, ubuntu ]
-        package: [ bytes, boefjes ]
     runs-on: ubuntu-latest
 
     steps:
