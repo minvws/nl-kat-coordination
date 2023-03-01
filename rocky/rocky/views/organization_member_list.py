@@ -33,9 +33,6 @@ class OrganizationMemberListView(
         if "client_status" in self.request.GET:
             status_filter = self.request.GET.getlist("client_status", [])
             queryset = self.filter_queryset(queryset, status_filter)
-        for member in queryset:
-            if member.status == OrganizationMember.STATUSES.BLOCKED:
-                member.blocked = True
         return queryset
 
     def filter_queryset(self, queryset, blocked_status_filter):
