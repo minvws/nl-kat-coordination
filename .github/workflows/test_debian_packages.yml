@@ -1,9 +1,9 @@
 name: Test installing the debian packages
 
 on:
-  create:
-    tags:
-      - v*
+  push:
+    branches:
+      - 'release*'
 
 jobs:
   test-deb-install:
