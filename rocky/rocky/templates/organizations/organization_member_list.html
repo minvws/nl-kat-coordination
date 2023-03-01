@@ -16,12 +16,13 @@
         <thead>
           <tr>
             <th>{% translate 'Member name' %}</th>
+            <th>{% translate 'Status' %}</th>
             <th>{% translate 'Role' %}</th>
             <th>{% translate 'Added on' %}</th>
             <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Grant/revoke permisson to set OOI clearance levels' %}</th>
-            <th>{% translate 'Suspended' %}</th>
+            <th>{% translate 'Suspend' %}</th>
             {% comment %} <th>{% translate 'Verified' %}</th> {% endcomment %}
           </tr>
         </thead>
@@ -29,6 +30,13 @@
           {% for member in members %}
             <tr>
               <td>{{ member.user }}<br>
+              <td>
+                {% if member.status == "blocked" %}
+                  {% translate 'Suspended' %}
+                {% else %}
+                  {{ member.status|title }}
+                {% endif %}
+              <br>
               <td>
               {% if member.user.is_superuser %}
                 {% translate 'Super user' %}

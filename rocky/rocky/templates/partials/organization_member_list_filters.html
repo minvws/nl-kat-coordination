@@ -9,17 +9,17 @@
   <form method="get">
     <fieldset>
       <legend>
-        {% translate "Verified status" %}
+        {% translate "Shown status types" %}
       </legend>
       <div>
-        {% for blocked_filter in blocked_filters %}
+        {% for checkbox in checkbox_filters %}
           <div class="horizontal-view">
             <input type="checkbox"
-                   id="blocked-filter-{{ blocked_filter.value }}"
-                   name="blocked_status_filter"
-                   value="{{ blocked_filter.value }}"
-                   {% if blocked_filter.checked %} checked{% endif %}>
-            <label for="blocked-filter-{{ blocked_filter.value }}">{{ blocked_filter.label }}</label>
+                  id="checkbox-filter-{{ checkbox.value }}"
+                  name="client_status"
+                  value="{{ checkbox.value }}"
+                  {% if checkbox.checked %} checked{% endif %}>
+            <label for="checkbox-filter-{{ checkbox.value }}">{{ checkbox.label }}</label>
           </div>
         {% endfor %}
       </div>
