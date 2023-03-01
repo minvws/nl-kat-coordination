@@ -8,10 +8,41 @@ jobs:
     strategy:
       matrix:
         dist: [ debian, ubuntu ]
+        package: [ bytes, boefjes ]
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Get version from release tag or generate one
+        run: |
+          if [ ${GITHUB_REF_TYPE} = "tag" ]; then
+            echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+          else
+            pip install setuptools-scm==7.1.0
+            echo "RELEASE_VERSION=$(python -m setuptools_scm)" >> $GITHUB_ENV
+          fi
+
+      - name: Run debian package build
+        uses: addnab/docker-run-action@v3
+        with:
+          run: packaging/scripts/build-debian-package.sh
+          registry: ghcr.io
+          image: ghcr.io/minvws/nl-kat-${{ matrix.dist }}-build-image:latest
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          options: -v ${{ github.workspace }}/bytes:/app
+            -e REPOSITORY=${{ github.repository }}
+            -e RELEASE_VERSION=${{ env.RELEASE_VERSION }}
+            -e RELEASE_TAG=${{ env.RELEASE_TAG }}
+            -e PKG_NAME=kat-${{ matrix.package }}
+            --workdir /app
+
+      - name: Upload .deb to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: kat-${{ matrix.package }}_${{ env.RELEASE_VERSION }}_${{ matrix.dist }}.deb
+          path: bytes/build/kat-${{ matrix.package }}_${{ env.RELEASE_VERSION }}_amd64.deb
 
   test-deb-install:
     needs: build-packages
@@ -86,12 +117,12 @@ jobs:
           sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
       - name: Download artifact
-      - uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3
         with:
           name: kat-bytes_${{ env.RELEASE_VERSION }}_ubuntu.deb
 
       - name: Download artifact
-      - uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3
         with:
           name: kat-boefjes_${{ env.RELEASE_VERSION }}_ubuntu.deb
 
