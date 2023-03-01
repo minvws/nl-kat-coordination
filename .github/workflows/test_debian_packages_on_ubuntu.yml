@@ -82,12 +82,10 @@ jobs:
           workflow: bytes_debian_package.yml
           workflow_conclusion: completed
           name: kat-bytes_${{ env.RELEASE_VERSION }}_ubuntu.deb
-          # Optional, a directory where to extract artifact(s), defaults to the current directory
           path: kat-bytes_${{ env.RELEASE_VERSION }}_amd64.deb
 
       - name: Get the OpenKAT artifacts
         run: |
-#          curl -Ls https://github.com/minvws/nl-kat-coordination/releases/download/v${{ env.RELEASE_VERSION }}/kat-ubuntu22.04-${{ env.RELEASE_VERSION }}.tar.gz --output kat-ubuntu22.04-${{ env.RELEASE_VERSION }}.tar.gz;
           curl -Ls https://github.com/dekkers/xtdb-http-multinode/releases/download/v1.0.2/xtdb-http-multinode_1.0.2_all.deb --output xtdb-http-multinode_1.0.2_all.deb;
 
       - name: Unpack and install the artifacts
