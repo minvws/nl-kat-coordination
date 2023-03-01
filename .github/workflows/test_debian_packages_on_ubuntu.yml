@@ -82,6 +82,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: bytes_debian_package.yml
+          commit: ${{ github.sha }}
           workflow_conclusion: completed
           name: kat-bytes_${{ env.RELEASE_VERSION }}_ubuntu.deb
           path: kat-bytes_${{ env.RELEASE_VERSION }}_amd64.deb
