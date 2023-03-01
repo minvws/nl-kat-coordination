@@ -2,8 +2,6 @@ name: Test installing the debian packages
 
 on:
   push:
-#    branches:
-#      - 'release*'
 
 jobs:
   build-packages:
