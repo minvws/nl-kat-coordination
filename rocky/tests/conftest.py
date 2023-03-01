@@ -70,6 +70,28 @@ def user(django_user_model):
 
 
 @pytest.fixture
+def user2(django_user_model):
+    user = django_user_model.objects.create_superuser(email="cl1@openkat.nl", password="TestTest123!!")
+    user.is_verified = lambda: True
+
+    device = user.staticdevice_set.create(name="default")
+    device.token_set.create(token=user.get_username())
+
+    return user
+
+
+@pytest.fixture
+def user3(django_user_model):
+    user = django_user_model.objects.create_superuser(email="cl2@openkat.nl", password="TestTest123!!")
+    user.is_verified = lambda: True
+
+    device = user.staticdevice_set.create(name="default")
+    device.token_set.create(token=user.get_username())
+
+    return user
+
+
+@pytest.fixture
 def my_user(user, organization):
     OrganizationMember.objects.create(
         user=user,
@@ -85,6 +107,26 @@ def my_user(user, organization):
     user.user_permissions.add(Permission.objects.get(codename="can_scan_organization"))
 
     return user
+
+
+@pytest.fixture
+def my_new_user(user2, organization):
+    OrganizationMember.objects.create(
+        user=user2,
+        organization=organization,
+        status=OrganizationMember.STATUSES.NEW,
+    )
+    return user2
+
+
+@pytest.fixture
+def my_blocked_user(user3, organization):
+    OrganizationMember.objects.create(
+        user=user3,
+        organization=organization,
+        status=OrganizationMember.STATUSES.BLOCKED,
+    )
+    return user3
 
 
 @pytest.fixture
