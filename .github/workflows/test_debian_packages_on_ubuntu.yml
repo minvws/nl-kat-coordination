@@ -7,7 +7,7 @@ jobs:
   build-packages:
     strategy:
       matrix:
-        dist: [ debian, ubuntu ]
+        dist: [ ubuntu ]
         package: [ bytes, boefjes, rocky, keiko, octopoes, mula ]
     runs-on: ubuntu-latest
 
@@ -117,15 +117,35 @@ jobs:
           sudo rabbitmqctl add_vhost kat
           sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
-      - name: Download artifact
+      - name: Download Bytes artifact
         uses: actions/download-artifact@v3
         with:
           name: kat-bytes_${{ env.RELEASE_VERSION }}_ubuntu.deb
 
-      - name: Download artifact
+      - name: Download Boefjes artifact
         uses: actions/download-artifact@v3
         with:
           name: kat-boefjes_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Rocky artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-rocky_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Mula artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-mula_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Keiko artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-keiko_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Octopoes artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-octopoes_${{ env.RELEASE_VERSION }}_ubuntu.deb
 
       - name: Get the OpenKAT artifacts
         run: |
@@ -133,7 +153,6 @@ jobs:
 
       - name: Unpack and install the artifacts
         run: |
-          tar zvxf kat-*.tar.gz
           sudo apt install ./kat-*.deb ./xtdb-http-multinode_*_all.deb
           sudo sed -i "s/WorkingDirectory=\/opt\/venvs\/kat-boefjes\/lib\/python3.9\/site-packages/WorkingDirectory=\/opt\/venvs\/kat-boefjes\//g" /usr/lib/systemd/system/kat-katalogus.service
 
