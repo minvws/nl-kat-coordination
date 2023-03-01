@@ -39,7 +39,7 @@ class OOIDetailView(
     def post(self, request, *args, **kwargs):
         if not self.indemnification_present:
             messages.add_message(
-                request, messages.ERROR, "Indemnification not present at organization %s." % self.organization
+                request, messages.ERROR, f"Indemnification not present at organization {self.organization}."
             )
             return self.get(request, status_code=403, *args, **kwargs)
 
