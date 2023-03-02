@@ -17,8 +17,10 @@ EOF
 
 echo "Build frontend"
 yarn
-yarn build
+yarn build &
 
-dpkg-buildpackage -us -uc -b
+dpkg-buildpackage -us -uc -j auto -b &
+
+wait
 
 mv /${PKG_NAME}_${RELEASE_VERSION}_*.deb /app/build/
