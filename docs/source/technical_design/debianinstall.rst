@@ -259,12 +259,18 @@ By default OpenKAT will be accessible in your browser through `https://<server I
 Upgrading OpenKAT
 =================
 
-You can upgrade OpenKAT by installing the newer packages:
+You can upgrade OpenKAT by installing the newer packages. Make a backup of your files, download the packages and remove the old ones if needed:
 
 .. code-block:: sh
 
-    tar zvxf kat-debian-packages.tar.gz -C /opt && cd /opt/kat-debian-packages
-    apt install --no-install-recommends ./kat-*_all.deb
+    tar zvxf kat-*.tar.gz
+    apt install --no-install-recommends ./kat-*_amd64.deb
+
+If a newer version of the xtdb multinode is available install it as well:
+
+.. code-block:: sh
+
+    apt install --no-install-recommends ./xtdb-http-multinode_*_all.deb
 
 After installation you need to run the database migrations and load fixture again. For Rocky DB:
 
@@ -272,6 +278,8 @@ After installation you need to run the database migrations and load fixture agai
 
     sudo -u kat rocky-cli migrate
     sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
+
+When running "sudo -u kat rocky-cli migrate" you might get the warning "Your models in app(s): 'password_history', 'two_factor' have changes that are not yet reflected in a migration, and so won't be applied." This can be ignored.
 
 For KAT-alogus DB
 
@@ -284,3 +292,9 @@ For Bytes DB:
 .. code-block:: sh
 
     sudo -u kat update-bytes-db
+
+Restart all processes:
+
+.. code-block:: sh
+
+sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
