@@ -19,7 +19,7 @@ echo "Build frontend"
 yarn
 yarn build &
 
-dpkg-buildpackage -us -uc --jobs=auto -b &
+dpkg-buildpackage -us -uc -j 4 -b &
 
 wait
 
