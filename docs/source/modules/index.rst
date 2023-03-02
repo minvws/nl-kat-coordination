@@ -1,7 +1,7 @@
-Modules
-#######
+Releases & Modules
+##################
 
-Contains references to the documentations of the modules of OpenKAT
+Contains references to the latest releases and the documentations of the modules of OpenKAT
 
 .. toctree::
    :maxdepth: 4
