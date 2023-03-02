@@ -106,6 +106,7 @@ jobs:
 
       - name: Prepare postgres service Bytes
         run: |
+          createdb -h localhost -U postgres bytes_db
           createuser -h localhost -U postgres bytes
           psql -h localhost -U postgres -d bytes_db -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
           psql -h localhost -U postgres -d bytes_db -c "ALTER USER bytes WITH PASSWORD 'postgres';"
