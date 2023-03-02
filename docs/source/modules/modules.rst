@@ -1,6 +1,14 @@
-=======
+=================
+Releases & modules
+=================
+
+Releases
+********
+
+Find all `releases, releasenotes and artefacts for OpenKAT <https://github.com/minvws/nl-kat-coordination/releases>`_ on Github. 
+
 Modules
-=======
+*******
 
 OpenKAT consists of individual modules, each of which performs a subtask of the system. The modules are specific to OpenKAT. Rocky is the frontend, Mula is the scheduler, Bytes the storage of raw data, Octopoes contains the data model, Keiko is the PDF engine for reports and Boefjes and Whiskers and are separate components stored in the KATalogus. OpenKAT uses Manon for the design in order to easily comply with accessibility and style requirements.
 
