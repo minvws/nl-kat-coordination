@@ -105,8 +105,6 @@ jobs:
           psql -h localhost -U postgres -d katalogus_db -c "ALTER USER katalogus WITH PASSWORD 'postgres';"
 
       - name: Prepare postgres service Bytes
-        run: |
-          createdb -h localhost -U postgres bytes_db
           createuser -h localhost -U postgres bytes
           psql -h localhost -U postgres -d bytes_db -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
           psql -h localhost -U postgres -d bytes_db -c "ALTER USER bytes WITH PASSWORD 'postgres';"
@@ -230,3 +228,26 @@ jobs:
         run: |
           for i in {1..15}; do curl -s http://localhost:8001/_dev/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -v http://localhost:8001/_dev/health) || true && journalctl --no-pager -u kat-octopoes.service && exit $s ; fi
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: pip
+
+      - name: Install Robot Framework
+        run: pip3 install robotframework robotframework-browser robotframework-debuglibrary robotframework-otp robotframework-postgresqldb pyotp
+
+      - name: Initialize rfbrowser
+        run: rfbrowser init
+
+      - name: Run Robot Full Onboarding Flow
+        run: robot -d rocky/tests/robot/results-complete_onboarding -v headless:true rocky/tests/robot/complete_onboarding
+
+      - name: Upload Robot Framework reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: rf-results-complete-onboarding
+          path: /home/runner/work/nl-kat-coordination/nl-kat-coordination/rocky/tests/robot/results*
+
