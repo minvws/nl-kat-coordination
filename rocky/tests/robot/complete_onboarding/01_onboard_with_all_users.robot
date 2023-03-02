@@ -8,11 +8,21 @@ Suite Setup     Browser Setup
 I want to login as the default superuser for the first time
     Login As User For The First Time    robot@localhost    robotpassword
 
-I want to onboard and create all optional users
+I want to add indemnifications
     Click    xpath=//a[@class="button"]
-    Click    xpath=//button[contains(text(),"Submit")]
+    Fill Text    xpath=//*[@id="id_name"]    Dev Org
+    Fill Text    xpath=//*[@id="id_code"]    dev
+    Click    "Submit"
+    #Click    xpath=//button[contains(text(),"Submit")]
+    Check Checkbox    css=#id_may_scan
+    Check Checkbox    css=#id_am_authorized
+    Click    "Submit"
+    Get Title    equal    OpenKAT - step_account_setup_intro
+
+I want to onboard and create all optional users
     Click    "Create separate accounts"
-    Get Title    equal    KAT - step_account_setup_admin
+    Click    "Let's add accounts"
+    Get Title    equal    OpenKAT - step_account_setup_admin
 
 I want to create a secondary admin account
     Create A User While Onboarding    Admin    admin@localhost    P@SSw00rdAdmin!123456789
@@ -24,7 +34,7 @@ I want to create a client account
     Create A User While Onboarding    Client    client@localhost    P@SSw00rdClient!123456789
 
 I am on the Crisis Room page
-    Get Title    equal    KAT - crisis_room
+    Get Title    equal    OpenKAT - crisis_room
 
 Is user onboarded?
     Go to    ${ROOT_URL}/admin/tools/organizationmember/1/change/
