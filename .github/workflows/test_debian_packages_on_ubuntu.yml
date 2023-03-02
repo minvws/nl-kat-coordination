@@ -187,6 +187,9 @@ jobs:
           sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/boefjes.conf
           sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/mula.conf
 
+      - name: Setup Octopoes to use xtdb-multinode
+        run: sudo sed -i "s/XTDB_TYPE=\"xtdb\"/XTDB_TYPE=\"xtdb-multinode\"/kat/g" /etc/kat/octopoes.conf
+
       - name: Restart KAT
         run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker xtdb-http-multinode
 
