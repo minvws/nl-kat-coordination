@@ -383,11 +383,9 @@ type DMARCTXTRecord implements BaseObject & OOI {
 
 type DKIMExists implements BaseObject & OOI {
   object_type: String!
-  primary_key(natural_key: [String!] = ["value", "hostname"]): ID!
-  human_readable(format: String! = "DMARC TXT Record of {hostname}"): String!
+  primary_key(natural_key: [String!] = ["hostname"]): ID!
+  human_readable(format: String! = "DKIM Exists on {hostname}"): String!
 
-  value: String!
-  ttl: Int
   hostname(reverse_name: String! = "dkim_exists"): Hostname!
 }
 
