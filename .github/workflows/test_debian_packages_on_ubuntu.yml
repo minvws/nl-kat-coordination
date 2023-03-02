@@ -105,6 +105,7 @@ jobs:
           psql -h localhost -U postgres -d katalogus_db -c "ALTER USER katalogus WITH PASSWORD 'postgres';"
 
       - name: Prepare postgres service Bytes
+        run: |
           createuser -h localhost -U postgres bytes
           psql -h localhost -U postgres -d bytes_db -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
           psql -h localhost -U postgres -d bytes_db -c "ALTER USER bytes WITH PASSWORD 'postgres';"
