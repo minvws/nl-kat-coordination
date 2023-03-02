@@ -69,7 +69,7 @@ jobs:
           fi
 
       - name: Install dependencies Docker and rabbitmq
-        run: sudo apt-get install -y docker.io containerd runc rabbitmq-server
+        run: sudo apt-get update && sudo apt-get install -y docker.io containerd runc rabbitmq-server
 
       - name: Start postgresql and wait until the service is healthy
         run: |
@@ -151,7 +151,7 @@ jobs:
         run: |
           curl -Ls https://github.com/dekkers/xtdb-http-multinode/releases/download/v1.0.2/xtdb-http-multinode_1.0.2_all.deb --output xtdb-http-multinode_1.0.2_all.deb;
 
-      - name: Unpack and install the artifacts
+      - name: Install the artifacts
         run: |
           sudo apt install ./kat-*.deb ./xtdb-http-multinode_*_all.deb
           sudo sed -i "s/WorkingDirectory=\/opt\/venvs\/kat-boefjes\/lib\/python3.9\/site-packages/WorkingDirectory=\/opt\/venvs\/kat-boefjes\//g" /usr/lib/systemd/system/kat-katalogus.service
