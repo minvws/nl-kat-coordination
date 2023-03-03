@@ -12,6 +12,6 @@ ${PKG_NAME} (${RELEASE_VERSION}) unstable; urgency=low
 
 EOF
 
-dpkg-buildpackage -us -uc --jobs=4 -b
+dpkg-buildpackage -us -uc -b
 
 mv /${PKG_NAME}_${RELEASE_VERSION}_*.deb /app/build/
