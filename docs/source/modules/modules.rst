@@ -5,7 +5,7 @@ Releases & modules
 Releases
 ********
 
-Find all `releases, releasenotes and artefacts for OpenKAT <https://github.com/minvws/nl-kat-coordination/releases>`_ on Github. 
+Find all `releases, release notes and artifacts for OpenKAT <https://github.com/minvws/nl-kat-coordination/releases>`_ on GitHub.
 
 Modules
 *******
