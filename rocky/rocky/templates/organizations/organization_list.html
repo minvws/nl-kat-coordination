@@ -20,6 +20,7 @@
               <tr>
                 <th>{% translate 'Name' %}</th>
                 <th>{% translate 'Code' %}</th>
+                <th>{% translate 'Tags' %}</th>
                 <th>{% translate 'Members' %}</th>
               </tr>
             </thead>
@@ -32,6 +33,7 @@
                   <td>
                     <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.code }}</a>
                   </td>
+                  <td>{% include 'organizations/organization_tags.html' with organization=object.organization %}</td>
                   <td>{{ object.total_members }}</td>
                 </tr>
               {% endfor %}

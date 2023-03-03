@@ -40,7 +40,7 @@
                     {% else %}
                       <td>{% translate 'No input OOI' %}</td>
                     {% endif %}
-                    <td>{{ task.p_item.data.boefje.name }}</td>
+                    <td>{{ task.p_item.data.boefje.id }}</td>
                     {% if task.status.value == 'completed' %}
                       <td class="confirmation">{{ task.status.value|capfirst }}</td>
                     {% elif task.status.value == 'failed' %}

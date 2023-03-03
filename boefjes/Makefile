@@ -41,10 +41,8 @@ seed:  # Seed the katalogus database
 migrations: ## Generate a migration using alembic
 ifeq ($(m),)
 	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
-else ifeq ($(revid),)
-	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)" --rev-id="$(revid)"
+	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)"
 endif
 
 
