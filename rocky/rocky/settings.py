@@ -84,7 +84,6 @@ INSTALLED_APPS = [
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
-    "markdownify.apps.MarkdownifyConfig",
     "two_factor",
     "account",
     "tools",
@@ -274,47 +273,6 @@ CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
-
-# MarkDownify settings
-# see https://django-markdownify.readthedocs.io/en/latest/settings.html
-MARKDOWNIFY = {
-    "default": {
-        "WHITELIST_TAGS": [
-            "a",
-            "abbr",
-            "acronym",
-            "b",
-            "br",
-            "blockquote",
-            "em",
-            "h1",
-            "h2",
-            "h3",
-            "h4",
-            "h5",
-            "h6",
-            "i",
-            "li",
-            "ol",
-            "p",
-            "pre",
-            "strong",
-            "table",
-            "thead",
-            "tbody",
-            "th",
-            "tr",
-            "td",
-            "ul",
-        ],
-        "MARKDOWN_EXTENSIONS": [
-            "markdown.extensions.extra",
-        ],
-        "LINKIFY_TEXT": {
-            "PARSE_URLS": False,
-        },
-    }
-}
 
 DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
