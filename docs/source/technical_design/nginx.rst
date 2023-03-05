@@ -36,19 +36,19 @@ Then put the following content in there:
 
 .. code-block:: sh
 
-server {
-    listen 80;
-    server_name  openkat.example.com;
-    access_log   /var/log/nginx/openkat.example.com-access.log;
-    error_log	/var/log/nginx/openkat.example.com-error.log;
-    location / {
-        proxy_set_header HOST $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass http://localhost:8000;
+    server {
+        listen 80;
+        server_name  openkat.example.com;
+        access_log   /var/log/nginx/openkat.example.com-access.log;
+        error_log	/var/log/nginx/openkat.example.com-error.log;
+        location / {
+            proxy_set_header HOST $host;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_pass http://localhost:8000;
+        }
     }
-}
 
 With this, we have set up minimal things for OpenKAT. Much more is possible, but this is the minimum we need to use OpenKAT properly.
 
