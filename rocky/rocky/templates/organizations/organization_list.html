@@ -14,31 +14,35 @@
           </div>
         {% endif %}
         <div class="horizontal-scroll">
-          <table>
-            <caption>{% translate 'Organization overview:' %}</caption>
-            <thead>
-              <tr>
-                <th>{% translate 'Name' %}</th>
-                <th>{% translate 'Code' %}</th>
-                <th>{% translate 'Tags' %}</th>
-                <th>{% translate 'Members' %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for object in object_list %}
+          {% if object_list %}
+            <table>
+              <caption>{% translate 'Organization overview:' %}</caption>
+              <thead>
                 <tr>
-                  <td>
-                    <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.name }}</a>
-                  </td>
-                  <td>
-                    <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.code }}</a>
-                  </td>
-                  <td>{% include 'organizations/organization_tags.html' with organization=object.organization %}</td>
-                  <td>{{ object.total_members }}</td>
+                  <th>{% translate 'Name' %}</th>
+                  <th>{% translate 'Code' %}</th>
+                  <th>{% translate 'Tags' %}</th>
+                  <th>{% translate 'Members' %}</th>
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {% for object in object_list %}
+                  <tr>
+                    <td>
+                      <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.name }}</a>
+                    </td>
+                    <td>
+                      <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.code }}</a>
+                    </td>
+                    <td>{% include 'organizations/organization_tags.html' with organization=object.organization %}</td>
+                    <td>{{ object.total_members }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            {% translate 'There where no organizations found for your user account' %}.
+          {% endif %}
         </div>
       </div>
     </section>
