@@ -69,7 +69,7 @@ Default installation
 
 .. code-block:: sh
 
-    $ export KAT_COMPOSE_FILE=$PWD/docker-compose.yml:$PWD/docker-compose.no-mounts.yml
+    $ export KAT_COMPOSE_FILE=$PWD/docker-compose.yml:$PWD/docker-compose.mountless.yml
 
 - Make KAT:
 
