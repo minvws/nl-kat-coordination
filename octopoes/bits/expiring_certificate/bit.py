@@ -1,6 +1,5 @@
-from bits.definitions import BitDefinition, BitParameterDefinition
+from bits.definitions import BitDefinition
 from octopoes.models.ooi.certificate import X509Certificate
-from octopoes.models.ooi.web import Website
 
 BIT = BitDefinition(
     id="expiring-certificate",
