@@ -9,48 +9,46 @@ from tools.user_helpers import (
 )
 
 
-def test_organizations_for_user(my_user):
-    result = organizations_for_user(my_user)
+def test_organizations_for_user(superuser_member):
+    result = organizations_for_user(superuser_member.user)
+
     assert len(result) == 1
 
 
-def test_organizations_for_red_teamer(my_redteam_user):
-    result = organizations_for_user(my_redteam_user)
+def test_organizations_for_red_teamer(redteam_member):
+    result = organizations_for_user(redteam_member.user)
     assert len(result) == 1
 
 
-def test_is_not_red_team(my_user):
-    assert not is_red_team(my_user)
+def test_is_not_red_team(superuser_member):
+    assert not is_red_team(superuser_member.user)
 
 
-def test_is_red_team(my_redteam_user):
-    assert is_red_team(my_redteam_user)
+def test_is_red_team(redteam_member):
+    assert is_red_team(redteam_member.user)
 
 
-def test_is_not_admin(my_user):
-    assert not is_admin(my_user)
+def test_is_not_admin(superuser_member):
+    assert not is_admin(superuser_member.user)
 
 
-def test_is_admin(my_admin_user):
-    assert is_admin(my_admin_user)
+def test_is_admin(admin_member):
+    assert is_admin(admin_member.user)
 
 
-def test_indemnification_present(my_user):
-    assert indemnification_present(my_user)
+def test_indemnification_present(superuser_member):
+    assert indemnification_present(superuser_member.user)
 
 
-def test_can_scan_organization(my_user, organization):
-    assert can_scan_organization(my_user, organization)
-
-    member = OrganizationMember.objects.get(user=my_user, organization=organization)
-    assert member.delete()
-
-    assert not can_scan_organization(my_user, organization)
+def test_can_scan_organization(superuser_member, organization):
+    assert can_scan_organization(superuser_member.user, organization)
+    assert superuser_member.delete()
+    assert not can_scan_organization(superuser_member.user, organization)
 
 
-def test_red_teamer_can_scan_organization(my_redteam_user, organization):
-    assert can_scan_organization(my_redteam_user, organization)
+def test_red_teamer_can_scan_organization(redteam_member, organization):
+    assert can_scan_organization(redteam_member.user, organization)
 
 
-def test_can_switch_organization(my_user):
-    assert can_switch_organization(my_user)
+def test_can_switch_organization(superuser_member):
+    assert can_switch_organization(superuser_member.user)

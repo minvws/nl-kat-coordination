@@ -30,10 +30,12 @@ TREE_DATA = {
 }
 
 
-def test_ooi_report(rf, my_user, organization, ooi_information, mock_organization_view_octopoes):
+def test_ooi_report(rf, superuser_member, organization, ooi_information, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
+    request = setup_request(
+        rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), superuser_member.user
+    )
     request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
     response = OOIReportView.as_view()(request, organization_code=organization.code)
 
@@ -43,10 +45,12 @@ def test_ooi_report(rf, my_user, organization, ooi_information, mock_organizatio
     assertContains(response, "Fake recommendation...")
 
 
-def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organization_view_octopoes, mocker):
+def test_ooi_pdf_report(rf, superuser_member, organization, ooi_information, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
+    request = setup_request(
+        rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), superuser_member.user
+    )
     request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
 
     # Setup Keiko mock
@@ -72,10 +76,14 @@ def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organiz
     assert report_data_param["findings_grouped"]["KAT-000"]["list"][0]["description"] == "Fake description..."
 
 
-def test_ooi_pdf_report_timeout(rf, my_user, organization, ooi_information, mock_organization_view_octopoes, mocker):
+def test_ooi_pdf_report_timeout(
+    rf, superuser_member, organization, ooi_information, mock_organization_view_octopoes, mocker
+):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
+    request = setup_request(
+        rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), superuser_member.user
+    )
     request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
 
     # Setup Keiko mock

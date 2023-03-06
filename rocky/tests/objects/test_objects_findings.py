@@ -26,10 +26,10 @@ TREE_DATA = {
 }
 
 
-def test_ooi_finding_list(rf, my_user, organization, mock_organization_view_octopoes):
+def test_ooi_finding_list(rf, superuser_member, organization, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("finding_list", {"ooi_id": "Network|testnetwork"}), my_user)
+    request = setup_request(rf.get("finding_list", {"ooi_id": "Network|testnetwork"}), superuser_member.user)
     response = OOIFindingListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200

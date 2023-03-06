@@ -7,13 +7,13 @@ from tests.conftest import setup_request, get_boefjes_data
 from tools.models import Organization, OrganizationMember
 
 
-def test_katalogus_plugin_listing(my_user, rf, organization, mocker):
+def test_katalogus_plugin_listing(superuser_member, rf, organization, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
     mock_requests.get.return_value = mock_response
     mock_response.json.return_value = get_boefjes_data()
 
-    request = setup_request(rf.get("katalogus"), my_user)
+    request = setup_request(rf.get("katalogus"), superuser_member.user)
     response = KATalogusView.as_view()(request, organization_code=organization.code)
 
     assertContains(response, "KAT-alogus")
@@ -24,14 +24,14 @@ def test_katalogus_plugin_listing(my_user, rf, organization, mocker):
     assertNotContains(response, "test_binary_edge_normalizer")
 
 
-def test_katalogus_settings_list_one_organization(my_user, rf, organization, mocker):
+def test_katalogus_settings_list_one_organization(superuser_member, rf, organization, mocker):
     # Mock katalogus calls: return right boefjes and settings
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
     boefjes_data = get_boefjes_data()
     mock_katalogus().get_boefjes.return_value = [parse_plugin(b) for b in boefjes_data if b["type"] == "boefje"]
     mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test"}
 
-    request = setup_request(rf.get("katalogus_settings"), my_user)
+    request = setup_request(rf.get("katalogus_settings"), superuser_member.user)
     response = KATalogusSettingsListView.as_view()(request, organization_code=organization.code)
     assert response.status_code == 200
 
@@ -45,7 +45,9 @@ def test_katalogus_settings_list_one_organization(my_user, rf, organization, moc
     assertNotContains(response, "Organizations:")
 
 
-def test_katalogus_settings_list_multiple_organization(my_user, rf, organization, mock_models_octopoes, mocker):
+def test_katalogus_settings_list_multiple_organization(
+    superuser_member, rf, organization, mock_models_octopoes, mocker
+):
     # Mock katalogus calls: return right boefjes and settings
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
     boefjes_data = get_boefjes_data()
@@ -55,7 +57,7 @@ def test_katalogus_settings_list_multiple_organization(my_user, rf, organization
     # Add another organization and organization member, since this view only shows for multiple organizations
     second_organization = Organization.objects.create(name="Second Test Organization", code="test2")
     OrganizationMember.objects.create(
-        user=my_user,
+        user=superuser_member.user,
         organization=second_organization,
         verified=True,
         authorized=True,
@@ -64,7 +66,7 @@ def test_katalogus_settings_list_multiple_organization(my_user, rf, organization
         acknowledged_clearance_level=4,
     )
 
-    request = setup_request(rf.get("katalogus_settings"), my_user)
+    request = setup_request(rf.get("katalogus_settings"), superuser_member.user)
     response = KATalogusSettingsListView.as_view()(request, organization_code=organization.code)
     assert response.status_code == 200
 
@@ -79,13 +81,13 @@ def test_katalogus_settings_list_multiple_organization(my_user, rf, organization
     assertContains(response, second_organization.name)
 
 
-def test_katalogus_confirm_clone_settings(my_user, rf, organization, mock_models_octopoes, mocker):
+def test_katalogus_confirm_clone_settings(superuser_member, rf, organization, mock_models_octopoes, mocker):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
     # Add another organization and organization member, since this view only shows for multiple organizations
     second_organization = Organization.objects.create(name="Second Test Organization", code="test2")
     OrganizationMember.objects.create(
-        user=my_user,
+        user=superuser_member.user,
         organization=second_organization,
         verified=True,
         authorized=True,
@@ -94,7 +96,7 @@ def test_katalogus_confirm_clone_settings(my_user, rf, organization, mock_models
         acknowledged_clearance_level=4,
     )
 
-    request = setup_request(rf.get("confirm_clone_settings"), my_user)
+    request = setup_request(rf.get("confirm_clone_settings"), superuser_member.user)
     response = ConfirmCloneSettingsView.as_view()(
         request, organization_code=organization.code, to_organization=second_organization.code
     )
@@ -109,14 +111,14 @@ def test_katalogus_confirm_clone_settings(my_user, rf, organization, mock_models
     assertContains(response, second_organization.name)
 
 
-def test_katalogus_clone_settings(my_user, rf, organization, mocker, mock_models_octopoes):
+def test_katalogus_clone_settings(superuser_member, rf, organization, mocker, mock_models_octopoes):
     # Mock katalogus calls: return right boefjes and settings
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
 
     # Add another organization and organization member, since this view only shows for multiple organizations
     second_organization = Organization.objects.create(name="Second Test Organization", code="test2")
     OrganizationMember.objects.create(
-        user=my_user,
+        user=superuser_member.user,
         organization=second_organization,
         verified=True,
         authorized=True,
@@ -125,7 +127,7 @@ def test_katalogus_clone_settings(my_user, rf, organization, mocker, mock_models
         acknowledged_clearance_level=4,
     )
 
-    request = setup_request(rf.post("confirm_clone_settings"), my_user)
+    request = setup_request(rf.post("confirm_clone_settings"), superuser_member.user)
     response = ConfirmCloneSettingsView.as_view()(
         request, organization_code=organization.code, to_organization=second_organization.code
     )

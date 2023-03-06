@@ -41,11 +41,11 @@ TREE_DATA = {
 }
 
 
-def test_scan_profile(rf, my_user, organization, mock_scheduler, mock_organization_view_octopoes, mocker):
+def test_scan_profile(rf, superuser_member, organization, mock_scheduler, mock_organization_view_octopoes, mocker):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), my_user)
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), superuser_member.user)
     response = ScanProfileDetailView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
@@ -54,7 +54,9 @@ def test_scan_profile(rf, my_user, organization, mock_scheduler, mock_organizati
     assertContains(response, "Set clearance level")
 
 
-def test_scan_profile_submit(rf, my_user, organization, mock_scheduler, mock_organization_view_octopoes, mocker):
+def test_scan_profile_submit(
+    rf, superuser_member, organization, mock_scheduler, mock_organization_view_octopoes, mocker
+):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
@@ -62,7 +64,7 @@ def test_scan_profile_submit(rf, my_user, organization, mock_scheduler, mock_org
     query_string = urlencode({"ooi_id": "Network|testnetwork"}, doseq=True)
     request = setup_request(
         rf.post(f"/en/{organization.code}/objects/scan-profile/?{query_string}", data={"level": "L1"}),
-        my_user,
+        superuser_member.user,
     )
     response = ScanProfileDetailView.as_view()(request, organization_code=organization.code)
 
@@ -71,18 +73,18 @@ def test_scan_profile_submit(rf, my_user, organization, mock_scheduler, mock_org
 
 
 def test_scan_profile_submit_no_indemnification(
-    rf, my_user, organization, mock_scheduler, mock_organization_view_octopoes, mocker
+    rf, superuser_member, organization, mock_scheduler, mock_organization_view_octopoes, mocker
 ):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    Indemnification.objects.get(user=my_user).delete()
+    Indemnification.objects.get(user=superuser_member.user).delete()
 
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
     query_string = urlencode({"ooi_id": "Network|testnetwork"}, doseq=True)
     request = setup_request(
         rf.post(f"/en/{organization.code}/objects/scan-profile/?{query_string}", data={"level": "L1"}),
-        my_user,
+        superuser_member.user,
     )
     response = ScanProfileDetailView.as_view()(request, organization_code=organization.code)
 
@@ -90,16 +92,15 @@ def test_scan_profile_submit_no_indemnification(
 
 
 def test_scan_profile_no_permissions_acknowledged(
-    rf, my_user, organization, mock_scheduler, mock_organization_view_octopoes, mocker
+    rf, superuser_member, organization, mock_scheduler, mock_organization_view_octopoes, mocker
 ):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    member = OrganizationMember.objects.get(user=my_user)
-    member.acknowledged_clearance_level = -1
-    member.save()
+    superuser_member.acknowledged_clearance_level = -1
+    superuser_member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), my_user)
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), superuser_member.user)
     response = ScanProfileDetailView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
@@ -109,16 +110,16 @@ def test_scan_profile_no_permissions_acknowledged(
 
 
 def test_scan_profile_no_permissions_trusted(
-    rf, my_user, organization, mock_scheduler, mock_organization_view_octopoes, mocker
+    rf, superuser_member, organization, mock_scheduler, mock_organization_view_octopoes, mocker
 ):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mocker.patch("katalogus.utils.get_katalogus")
 
-    member = OrganizationMember.objects.get(user=my_user)
+    member = OrganizationMember.objects.get(user=superuser_member.user)
     member.trusted_clearance_level = -1
     member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), my_user)
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), superuser_member.user)
     response = ScanProfileDetailView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200

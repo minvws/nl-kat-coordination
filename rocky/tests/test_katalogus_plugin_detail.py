@@ -15,7 +15,7 @@ def mock_mixins_katalogus(mocker):
 
 def test_plugin_detail(
     rf,
-    my_user,
+    superuser_member,
     organization,
     mock_mixins_katalogus,
     plugin_details,
@@ -32,7 +32,7 @@ def test_plugin_detail(
     mock_mixins_katalogus().get_plugin_details.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), superuser_member.user)
     response = PluginDetailView.as_view()(
         request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"
     )
@@ -44,7 +44,7 @@ def test_plugin_detail(
 
 def test_plugin_detail_data_missing(
     rf,
-    my_user,
+    superuser_member,
     organization,
     mock_mixins_katalogus,
     plugin_details,
@@ -53,7 +53,7 @@ def test_plugin_detail_data_missing(
     network,
     lazy_task_list_with_boefje,
 ):
-    request = setup_request(rf.post("step_organization_setup"), my_user)
+    request = setup_request(rf.post("step_organization_setup"), superuser_member.user)
     with pytest.raises(BadRequest):
         PluginDetailView.as_view()(
             request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"

@@ -4,9 +4,9 @@ from rocky.views.ooi_delete import OOIDeleteView
 from tests.conftest import setup_request
 
 
-def test_ooi_delete(rf, my_user, organization, mock_organization_view_octopoes, network):
+def test_ooi_delete(rf, superuser_member, organization, mock_organization_view_octopoes, network):
     mock_organization_view_octopoes().get.return_value = network
-    request = setup_request(rf.get("ooi_delete", {"ooi_id": "Network|testnetwork"}), my_user)
+    request = setup_request(rf.get("ooi_delete", {"ooi_id": "Network|testnetwork"}), superuser_member.user)
     response = OOIDeleteView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
@@ -15,9 +15,9 @@ def test_ooi_delete(rf, my_user, organization, mock_organization_view_octopoes, 
     assertContains(response, "Are you sure?")
 
 
-def test_finding_delete(rf, my_user, organization, mock_organization_view_octopoes, finding):
+def test_finding_delete(rf, superuser_member, organization, mock_organization_view_octopoes, finding):
     mock_organization_view_octopoes().get.return_value = finding
-    request = setup_request(rf.get("ooi_delete", {"ooi_id": finding.primary_key}), my_user)
+    request = setup_request(rf.get("ooi_delete", {"ooi_id": finding.primary_key}), superuser_member.user)
     response = OOIDeleteView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200

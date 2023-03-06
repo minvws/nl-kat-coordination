@@ -4,8 +4,8 @@ from rocky.views.finding_add import FindingAddView
 from tests.conftest import setup_request
 
 
-def test_findings_add(rf, my_user, organization, mock_organization_view_octopoes):
-    request = setup_request(rf.get("finding_add"), my_user)
+def test_findings_add(rf, superuser_member, organization, mock_organization_view_octopoes):
+    request = setup_request(rf.get("finding_add"), superuser_member.user)
     response = FindingAddView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200

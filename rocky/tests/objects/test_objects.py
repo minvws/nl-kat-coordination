@@ -16,13 +16,13 @@ from tests.conftest import setup_request
 from tools.models import OrganizationMember, Indemnification
 
 
-def test_ooi_list(rf, my_user, organization, mock_organization_view_octopoes):
+def test_ooi_list(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
     request = rf.get(url)
     request.resolver_match = resolve(url)
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
@@ -36,7 +36,7 @@ def test_ooi_list(rf, my_user, organization, mock_organization_view_octopoes):
 
 
 def test_ooi_list_with_clearance_type_filter_and_clearance_level_filter(
-    rf, my_user, organization, mock_organization_view_octopoes
+    rf, superuser_member, organization, mock_organization_view_octopoes
 ):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
@@ -46,7 +46,7 @@ def test_ooi_list_with_clearance_type_filter_and_clearance_level_filter(
     )
     request.resolver_match = resolve(url)
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
@@ -72,7 +72,7 @@ def test_ooi_list_with_clearance_type_filter_and_clearance_level_filter(
     assertContains(response, "Showing 150 of 200 objects")
 
 
-def test_ooi_list_delete_multiple(rf, my_user, organization, mock_organization_view_octopoes):
+def test_ooi_list_delete_multiple(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -84,10 +84,10 @@ def test_ooi_list_delete_multiple(rf, my_user, organization, mock_organization_v
             "action": "delete",
         },
     )
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
-    my_user.acknowledged_clearance_level = 0
-    my_user.save()
+    superuser_member.acknowledged_clearance_level = 0
+    superuser_member.save()
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
@@ -95,35 +95,35 @@ def test_ooi_list_delete_multiple(rf, my_user, organization, mock_organization_v
     assert mock_organization_view_octopoes().delete.call_count == 2
 
 
-def test_ooi_list_delete_none(rf, my_user, organization, mock_organization_view_octopoes):
+def test_ooi_list_delete_none(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
     request = rf.post(url, data={"ooi": [], "scan-profile": "L0", "action": "delete"})
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
-    my_user.acknowledged_clearance_level = 0
-    my_user.save()
+    superuser_member.acknowledged_clearance_level = 0
+    superuser_member.save()
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 422
 
 
-def test_ooi_list_unknown_action(rf, my_user, organization, mock_organization_view_octopoes):
+def test_ooi_list_unknown_action(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
     request = rf.post(url, data={"ooi": ["Network|internet"], "scan-profile": "L0", "action": "None"})
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
-    my_user.acknowledged_clearance_level = 0
-    my_user.save()
+    superuser_member.acknowledged_clearance_level = 0
+    superuser_member.save()
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 404
 
 
-def test_update_scan_profile_multiple(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profile_multiple(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -135,14 +135,14 @@ def test_update_scan_profile_multiple(rf, my_user, organization, mock_organizati
             "action": "update-scan-profile",
         },
     )
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().save_scan_profile.call_count == 2
 
 
-def test_update_scan_profile_single(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profile_single(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -154,14 +154,14 @@ def test_update_scan_profile_single(rf, my_user, organization, mock_organization
             "action": "update-scan-profile",
         },
     )
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().save_scan_profile.call_count == 1
 
 
-def test_update_scan_profile_to_inherit(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profile_to_inherit(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -173,14 +173,16 @@ def test_update_scan_profile_to_inherit(rf, my_user, organization, mock_organiza
             "action": "update-scan-profile",
         },
     )
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().save_scan_profile.call_count == 1
 
 
-def test_update_scan_profile_to_inherit_connection_error(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profile_to_inherit_connection_error(
+    rf, superuser_member, organization, mock_organization_view_octopoes
+):
     mock_organization_view_octopoes().save_scan_profile.side_effect = ConnectionError
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
@@ -193,13 +195,15 @@ def test_update_scan_profile_to_inherit_connection_error(rf, my_user, organizati
             "action": "update-scan-profile",
         },
     )
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 500
 
 
-def test_update_scan_profile_to_inherit_object_not_found(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profile_to_inherit_object_not_found(
+    rf, superuser_member, organization, mock_organization_view_octopoes
+):
     mock_organization_view_octopoes().save_scan_profile.side_effect = ObjectNotFoundException("nothing found")
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
@@ -212,13 +216,15 @@ def test_update_scan_profile_to_inherit_object_not_found(rf, my_user, organizati
             "action": "update-scan-profile",
         },
     )
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 404
 
 
-def test_update_scan_profiles_forbidden_acknowledged(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profiles_forbidden_acknowledged(
+    rf, superuser_member, organization, mock_organization_view_octopoes
+):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -231,18 +237,17 @@ def test_update_scan_profiles_forbidden_acknowledged(rf, my_user, organization, 
         },
     )
 
-    member = OrganizationMember.objects.get(user=my_user)
-    member.acknowledged_clearance_level = -1
-    member.save()
+    superuser_member.acknowledged_clearance_level = -1
+    superuser_member.save()
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 403
 
 
-def test_update_scan_profiles_forbidden_trusted(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profiles_forbidden_trusted(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -255,18 +260,17 @@ def test_update_scan_profiles_forbidden_trusted(rf, my_user, organization, mock_
         },
     )
 
-    member = OrganizationMember.objects.get(user=my_user)
-    member.trusted_clearance_level = -1
-    member.save()
+    superuser_member.trusted_clearance_level = -1
+    superuser_member.save()
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 403
 
 
-def test_update_scan_profiles_no_indemnification(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profiles_no_indemnification(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -279,16 +283,16 @@ def test_update_scan_profiles_no_indemnification(rf, my_user, organization, mock
         },
     )
 
-    Indemnification.objects.get(user=my_user).delete()
+    Indemnification.objects.get(user=superuser_member.user).delete()
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 403
 
 
-def test_update_scan_profiles_octopoes_down(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profiles_octopoes_down(rf, superuser_member, organization, mock_organization_view_octopoes):
     mock_organization_view_octopoes().save_scan_profile.side_effect = ConnectionError
 
     request = rf.post(
@@ -300,14 +304,14 @@ def test_update_scan_profiles_octopoes_down(rf, my_user, organization, mock_orga
         },
     )
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 500
 
 
-def test_update_scan_profiles_object_not_found(rf, my_user, organization, mock_organization_view_octopoes):
+def test_update_scan_profiles_object_not_found(rf, superuser_member, organization, mock_organization_view_octopoes):
     mock_organization_view_octopoes().save_scan_profile.side_effect = ObjectNotFoundException("gone")
 
     request = rf.post(
@@ -319,14 +323,14 @@ def test_update_scan_profiles_object_not_found(rf, my_user, organization, mock_o
         },
     )
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 404
 
 
-def test_delete_octopoes_down(rf, my_user, organization, mock_organization_view_octopoes):
+def test_delete_octopoes_down(rf, superuser_member, organization, mock_organization_view_octopoes):
     mock_organization_view_octopoes().delete.side_effect = ConnectionError
 
     request = rf.post(
@@ -338,14 +342,14 @@ def test_delete_octopoes_down(rf, my_user, organization, mock_organization_view_
         },
     )
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 500
 
 
-def test_delete_object_not_found(rf, my_user, organization, mock_organization_view_octopoes):
+def test_delete_object_not_found(rf, superuser_member, organization, mock_organization_view_octopoes):
     mock_organization_view_octopoes().delete.side_effect = ObjectNotFoundException("gone")
 
     request = rf.post(
@@ -357,20 +361,20 @@ def test_delete_object_not_found(rf, my_user, organization, mock_organization_vi
         },
     )
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     response = OOIListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 404
 
 
-def test_ooi_list_export_json(rf, my_user, organization, mock_organization_view_octopoes):
+def test_ooi_list_export_json(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list_export", kwargs=kwargs)
     request = rf.get(url, {"file_type": "json"})
     request.resolver_match = resolve(url)
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
@@ -391,13 +395,13 @@ def test_ooi_list_export_json(rf, my_user, organization, mock_organization_view_
     assert exported_objects[2] == {"key": "Network|testnetwork", "name": "testnetwork", "ooi_type": "Network"}
 
 
-def test_ooi_list_export_csv(rf, my_user, organization, mock_organization_view_octopoes):
+def test_ooi_list_export_csv(rf, superuser_member, organization, mock_organization_view_octopoes):
     kwargs = {"organization_code": organization.code}
     url = reverse("ooi_list_export", kwargs=kwargs)
     request = rf.get(url, {"file_type": "csv"})
     request.resolver_match = resolve(url)
 
-    setup_request(request, my_user)
+    setup_request(request, superuser_member.user)
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
