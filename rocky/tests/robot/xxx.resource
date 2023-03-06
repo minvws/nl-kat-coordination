@@ -34,7 +34,7 @@ Login As User Normally
     Fill Text    css=#id_auth-password    ${password}
     Click    "Log in"
     ${otp-code}    get otp    ${otp-raw-global}
-    Fill Text    id=id_otp_token    ${otp-code}
+    Fill Text    id=id_token-otp_token    ${otp-code}
     Click    "Submit"
     Get Text    .login-meta    contains    Logged in as:    error login failed
 

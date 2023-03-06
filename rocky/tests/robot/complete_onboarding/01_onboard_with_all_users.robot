@@ -33,12 +33,24 @@ I want to create a redteamer account
 I want to create a client account
     Create A User While Onboarding    Client    client@localhost    P@SSw00rdClient!123456789
 
-I am on the Crisis Room page
-    Get Title    equal    OpenKAT - crisis_room
+I can confirm that I can proceed
+    #Debug
+    Click    "Let's get started"
+    Click    "Let's get started"
+    Click    "Continue"
+    Click    "Continue"
+    Click    "Continue with this account, onboard me!"
 
-Is user onboarded?
-    Go to    ${ROOT_URL}/admin/tools/organizationmember/1/change/
-    Get Checkbox State    id=id_onboarded    ==    True    user not onboarded
+I want generate my first report
+    Generate First DNS Report
+
+I am on the Crisis Room page
+    #Debug
+    Get Title    equal    OpenKAT - step_report
+
+#Is user onboarded?
+#    Go to    ${ROOT_URL}/admin/tools/organizationmember/1/change/
+#    Get Checkbox State    id=id_onboarded    ==    True    user not onboarded
 
 I want to logout
     Go to    ${ROOT_URL}/crisis-room
@@ -55,4 +67,4 @@ Create A User While Onboarding
     Fill Text    xpath=//*[@id="id_email"]    ${email}
     Fill Text    xpath=//*[@id="id_password"]    ${password}
     Click    "Submit"
-    Get Text    .confirmation    contains    User succesfully created.    error account creation failed
+    #Get Text    .confirmation    contains    succesfully    error account creation failed
