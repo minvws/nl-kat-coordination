@@ -1,7 +1,6 @@
 import datetime
 from typing import Dict, List
 
-import pytz
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -135,7 +134,7 @@ CVE-2021-00000""",
     date = forms.DateTimeField(
         label=_("Date/Time (UTC)"),
         widget=DateTimeInput(format="%Y-%m-%dT%H:%M"),
-        initial=datetime.datetime.now(tz=pytz.UTC),
+        initial=lambda: datetime.datetime.now(tz=datetime.timezone.utc),
         help_text=FINDING_DATETIME_HELP_TEXT,
     )
 
@@ -157,7 +156,7 @@ CVE-2021-00000""",
         data = self.cleaned_data["date"]
 
         # date should not be in the future
-        if data > datetime.datetime.now(tz=pytz.UTC):
+        if data > datetime.datetime.now(tz=datetime.timezone.utc):
             raise ValidationError(_("Doc! I'm from the future, I'm here to take you back!"))
 
         return data
