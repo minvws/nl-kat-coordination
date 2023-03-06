@@ -5,8 +5,6 @@ from octopoes.models.ooi.web import Website
 BIT = BitDefinition(
     id="expiring-certificate",
     consumes=X509Certificate,
-    parameters=[
-        BitParameterDefinition(ooi_type=Website, relation_path="certificate"),
-    ],
+    parameters=[],
     module="bits.expiring_certificate.expiring_certificate",
 )
