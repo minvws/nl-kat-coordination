@@ -65,6 +65,12 @@ Default installation
 
 	$ cd nl-kat-coordination
 
+- If you are running Docker in rootless mode, make sure to set this environment variable. You might want to add this statement (with the absolute path to your OpenKAT installation instead of `$PWD`) to your `~/.bashrc` or `~/.zshrc` file, depending on the shell you are using. Keep in mind that this means you have to rebuild some of the containers for your changes to have effect.
+
+.. code-block:: sh
+
+    $ export KAT_COMPOSE_FILE=$PWD/docker-compose.yml:$PWD/docker-compose.no-mounts.yml
+
 - Make KAT:
 
 .. code-block:: sh

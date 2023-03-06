@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  rocky:
+    volumes:
+      - rocky-code:/app/rocky
+
+volumes:
+  rocky-code:
