@@ -37,8 +37,8 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
             messages.SUCCESS,
             _("Settings from %s to %s successfully cloned.")
             % (
-                to_organization.name,
                 self.organization.name,
+                to_organization.name,
             ),
         )
         return HttpResponseRedirect(
