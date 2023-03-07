@@ -12,7 +12,7 @@
         <form method="post" class="horizontal-view help">
           {% csrf_token %}
           <fieldset>
-            {% with member.member_name as name %}
+            {% with object.user.full_name as name %}
               <legend>
                 {% blocktranslate %}Edit {{ member.member_name }}{% endblocktranslate %}
               </legend>

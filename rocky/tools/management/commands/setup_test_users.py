@@ -93,7 +93,5 @@ def add_user(user_kwargs: Dict[str, str], group_name: Optional[str] = None):
     )
 
     if created:
-        organizationmember.verified = True
-        organizationmember.authorized = True
         organizationmember.status = OrganizationMember.STATUSES.ACTIVE
         organizationmember.save()

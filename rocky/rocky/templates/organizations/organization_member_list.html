@@ -17,11 +17,14 @@
           <tr>
             <th>{% translate 'Member name' %}</th>
             <th>{% translate 'Status' %}</th>
+            <th>{% translate 'Role' %}</th>
             <th>{% translate 'Added on' %}</th>
             <th>{% translate 'Has trusted permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Acknowledged permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Grant/revoke permisson to set OOI clearance levels' %}</th>
             <th>{% translate 'Edit' %}</th>
+            <th>{% translate 'Suspend' %}</th>
+            {% comment %} <th>{% translate 'Verified' %}</th> {% endcomment %}
           </tr>
         </thead>
         <tbody>
@@ -29,13 +32,30 @@
             {% if not member.user.is_superuser or request.user.is_superuser %}
               <tr>
                 <td>
-                  {% if not member.member_name %}
+                  {% if not member.user.full_name %}
                     {% translate 'Unset' %}
                   {% else %}
-                    {{ member.member_name }}
+                    {{ member.user.full_name }}
                   {% endif %}
+                  <br>
                 </td>
-                <td>{{ member.status }}</td>
+                <td>
+                  {% if member.status == "blocked" %}
+                    {% translate 'Suspended' %}
+                  {% else %}
+                    {{ member.status|title }}
+                  {% endif %}
+                  <br>
+                </td>
+                <td>
+                  {% if member.user.is_superuser %}
+                    {% translate 'Super user' %}
+                  {% endif %}
+                  {% for group in member.user.groups.all %}
+                    {{ group.name|title }}
+                    <br>
+                  {% endfor %}
+                </td>
                 <td>{{ member.user.date_joined }}</td>
                 <td>
                   {% if member.trusted_clearance_level > 0 %}
@@ -46,26 +66,37 @@
                 </td>
                 <td>
                   {% if member.acknowledged_clearance_level > 0 %}
-                    Yes (L{{ member.acknowledged_clearance_level }})
+                    {% translate 'Yes' %} (L{{ member.acknowledged_clearance_level }})
                   {% else %}
-                    No
+                    {% translate 'No' %}
                   {% endif %}
                 </td>
                 <td>
                   {% for group in member.user.groups.all %}
                     {% for permission in group.permissions.all %}
                       {% if 'can_set_clearance_level' in permission.codename %}
-                        {% if member.trusted_clearance_level > 0 %}
-                          {% include 'partials/single_action_form.html' with btn_text="Revoke" action='withdraw_clearance' key='member_id' value=member.id btn_class="ghost" %}
-                        {% else %}
-                          {% include 'partials/single_action_form.html' with btn_text="Grant" action='give_clearance' key='member_id' value=member.id %}
+                        {% if not member.user.is_superuser %}
+                          {% if member.trusted_clearance_level > 0 %}
+                            {% include 'partials/single_action_form.html' with btn_text="Revoke" action='withdraw_clearance' key='member_id' value=member.id btn_class="ghost" %}
+                          {% else %}
+                            {% include 'partials/single_action_form.html' with btn_text="Grant" action='give_clearance' key='member_id' value=member.id %}
+                          {% endif %}
                         {% endif %}
                       {% endif %}
                     {% endfor %}
                   {% endfor %}
                 </td>
                 <td>
-                  <a href="{% url 'organization_member_edit' organization.code member.id %}"><button class="icon ti-edit">{% translate 'Edit' %}</button></a>
+                  <a href="{% url 'organization_member_edit' organization.code member.id %}">
+                    <button class="icon ti-edit">{% translate 'Edit' %}</button>
+                  </a>
+                </td>
+                <td>
+                  {% if member.status == "blocked" %}
+                    {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='unblock' key='member_id' value=member.id %}
+                  {% else %}
+                    {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='block' key='member_id' value=member.id %}
+                  {% endif %}
                 </td>
               </tr>
             {% endif %}

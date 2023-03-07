@@ -59,8 +59,6 @@ def test_katalogus_settings_list_multiple_organization(
     OrganizationMember.objects.create(
         user=superuser_member.user,
         organization=second_organization,
-        verified=True,
-        authorized=True,
         status=OrganizationMember.STATUSES.ACTIVE,
         trusted_clearance_level=4,
         acknowledged_clearance_level=4,
@@ -89,8 +87,6 @@ def test_katalogus_confirm_clone_settings(superuser_member, rf, organization, mo
     OrganizationMember.objects.create(
         user=superuser_member.user,
         organization=second_organization,
-        verified=True,
-        authorized=True,
         status=OrganizationMember.STATUSES.ACTIVE,
         trusted_clearance_level=4,
         acknowledged_clearance_level=4,
@@ -120,8 +116,6 @@ def test_katalogus_clone_settings(superuser_member, rf, organization, mocker, mo
     OrganizationMember.objects.create(
         user=superuser_member.user,
         organization=second_organization,
-        verified=True,
-        authorized=True,
         status=OrganizationMember.STATUSES.ACTIVE,
         trusted_clearance_level=4,
         acknowledged_clearance_level=4,

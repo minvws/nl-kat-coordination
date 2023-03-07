@@ -156,6 +156,7 @@ services:
     command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
     volumes:
       - ./bytes:/app/bytes
+      - bytes-data:/data
     env_file:
       - .env
 
@@ -238,6 +239,7 @@ services:
 volumes:
   rocky-db-data:
   bytes-db-data:
+  bytes-data:
   katalogus-db-data:
   scheduler-db-data:
   xtdb-data:

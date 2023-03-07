@@ -10,7 +10,7 @@ from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
-from tools.models import OOIInformation
+from tools.models import OOIInformation, OrganizationMember
 from tests.setup import OrganizationSetup, UserSetup, MemberSetup
 
 
@@ -59,6 +59,24 @@ def clientuser(django_user_model):
 @pytest.fixture
 def client_member(clientuser, organization):
     return MemberSetup(clientuser, organization).create_member()
+
+
+@pytest.fixture
+def my_new_user(django_user_model, organization):
+    user = UserSetup(django_user_model)._create_superuser(email="cl1@openkat.nl", password="TestTest123!!")
+    member = MemberSetup(user, organization).create_member()
+    member.status = OrganizationMember.STATUSES.NEW
+    member.save()
+    return member
+
+
+@pytest.fixture
+def my_blocked_user(django_user_model, organization):
+    user = UserSetup(django_user_model)._create_superuser(email="cl2@openkat.nl", password="TestTest123!!")
+    member = MemberSetup(user, organization).create_member()
+    member.status = OrganizationMember.STATUSES.BLOCKED
+    member.save()
+    return member
 
 
 @pytest.fixture
