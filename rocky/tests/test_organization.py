@@ -108,7 +108,6 @@ def test_organization_member_give_and_revoke_clearance(
 def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(
     rf, superuser_member, organization, mock_models_katalogus, mock_models_octopoes
 ):
-
     # No action in the POST means we simply reload the page
     request = setup_request(
         rf.post(
