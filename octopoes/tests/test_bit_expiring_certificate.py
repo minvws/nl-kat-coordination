@@ -4,7 +4,7 @@ from octopoes.models.ooi.certificate import X509Certificate
 from bits.expiring_certificate.expiring_certificate import run
 
 
-def test_spf_discovery_simple_success():
+def test_expiring_cert_simple_success():
     certificate = X509Certificate(
         subject="example.com",
         valid_from="2022-11-15T08:52:57",
@@ -17,7 +17,7 @@ def test_spf_discovery_simple_success():
     assert len(results) == 0
 
 
-def test_spf_discovery_simple_expired():
+def test_expiring_cert_simple_expired():
     certificate = X509Certificate(
         subject="example.com",
         valid_from="2022-11-15T08:52:57",
@@ -30,7 +30,7 @@ def test_spf_discovery_simple_expired():
     assert len(results) == 2
 
 
-def test_spf_discovery_simple_expires_soon():
+def test_expiring_cert_simple_expires_soon():
     certificate = X509Certificate(
         subject="example.com",
         valid_from="2022-11-15T08:52:57",
