@@ -36,6 +36,8 @@ from rocky.views.upload_raw import UploadRaw
 from tools.viewsets import OrganizationViewSet
 
 handler404 = "rocky.views.handler404.handler404"
+handler403 = "rocky.views.handler403.handler403"
+
 
 router = routers.SimpleRouter()
 router.register(r"organization", OrganizationViewSet)

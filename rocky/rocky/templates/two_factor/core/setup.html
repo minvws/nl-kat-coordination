@@ -4,7 +4,6 @@
 
 {% block content %}
   <h1>{% trans "Enable Two-Factor Authentication" %}</h1>
-  {% if verified and wizard.steps.current == 'generator' %}
     <form class="horizontal-view help">
       <fieldset>
         <div class="explanation"
@@ -46,12 +45,4 @@
       <input type="submit" value="" class="d-none"/>
       {% include "two_factor/_wizard_actions.html" with step=wizard.steps.current %}
     </form>
-  {% else %}
-    <p>
-      {% blocktrans trimmed %}
-        You are not verified as an organization member by your system administrator.
-        Contact your system administrator about your verification to proceed to Two Factor Authentication setup.
-      {% endblocktrans %}
-    </p>
-  {% endif %}
 {% endblock %}
