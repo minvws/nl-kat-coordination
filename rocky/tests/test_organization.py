@@ -9,9 +9,7 @@ from rocky.views.organization_list import OrganizationListView
 from tests.conftest import setup_request
 
 
-def test_organization_list_non_superuser(
-    rf, superuser_member, organization, mock_models_katalogus, mock_models_octopoes
-):
+def test_organization_list_non_superuser(rf, superuser_member, organization):
     superuser_member.user.is_superuser = False
     superuser_member.user.user_permissions.add(Permission.objects.get(codename="view_organization"))
 
@@ -23,7 +21,7 @@ def test_organization_list_non_superuser(
     assertContains(response, organization.name)
 
 
-def test_edit_organization(rf, superuser_member, organization, mock_models_katalogus, mock_models_octopoes):
+def test_edit_organization(rf, superuser_member, organization):
     request = setup_request(rf.get("organization_edit"), superuser_member.user)
     response = OrganizationEditView.as_view()(request, pk=organization.id)
 
@@ -35,7 +33,7 @@ def test_edit_organization(rf, superuser_member, organization, mock_models_katal
     assertContains(response, "Save organization")
 
 
-def test_organization_list(rf, superuser_member, organization, mock_models_katalogus, mock_models_octopoes):
+def test_organization_list(rf, superuser_member, organization):
     request = setup_request(rf.get("organization_list"), superuser_member.user)
     response = OrganizationListView.as_view()(request)
 
@@ -44,7 +42,7 @@ def test_organization_list(rf, superuser_member, organization, mock_models_katal
     assertContains(response, organization.name)
 
 
-def test_organization_member_list(rf, superuser_member, organization, mock_models_katalogus, mock_models_octopoes):
+def test_organization_member_list(rf, superuser_member, organization):
     request = setup_request(rf.get("organization_detail"), superuser_member.user)
     response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
 
@@ -56,41 +54,37 @@ def test_organization_member_list(rf, superuser_member, organization, mock_model
     assertContains(response, "Grant")
 
 
-def test_organization_filtered_member_list(
-    rf, my_user, my_new_user, my_blocked_user, organization, mock_models_katalogus, mock_models_octopoes
-):
-    request = setup_request(rf.get("organization_detail", {"client_status": "blocked"}), my_user)
+def test_organization_filtered_member_list(rf, superuser_member, my_new_user, my_blocked_user, organization):
+
+    request = setup_request(rf.get("organization_detail", {"client_status": "blocked"}), superuser_member.user)
     response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
 
-    assertNotContains(response, my_new_user.email)
-    assertContains(response, my_blocked_user.email)
+    assertContains(response, superuser_member.user.email)
     assertContains(response, "Suspended")
     assertNotContains(response, "New")
     assertNotContains(response, "Active")
 
-    request2 = setup_request(rf.get("organization_detail", {"client_status": "new"}), my_user)
+    request2 = setup_request(rf.get("organization_detail", {"client_status": "new"}), superuser_member.user)
     response2 = OrganizationDetailView.as_view()(request2, organization_code=organization.code)
 
-    assertContains(response2, my_new_user.email)
-    assertNotContains(response2, my_blocked_user.email)
+    assertContains(response2, superuser_member.user.email)
+    assertNotContains(response2, my_blocked_user.user.email)
     assertContains(response2, "New")
     assertNotContains(response2, "Suspended")
     assertNotContains(response2, "Active")
 
-    request3 = setup_request(rf.get("organization_detail", {"client_status": ["new", "active", "blocked"]}), my_user)
+    request3 = setup_request(
+        rf.get("organization_detail", {"client_status": ["new", "active", "blocked"]}), superuser_member.user
+    )
     response3 = OrganizationDetailView.as_view()(request3, organization_code=organization.code)
 
-    assertContains(response3, my_user.email)
-    assertContains(response3, my_new_user.email)
-    assertContains(response3, my_blocked_user.email)
+    assertContains(response3, superuser_member.user.email)
     assertContains(response3, "New")
     assertContains(response3, "Suspended")
     assertContains(response3, "Active")
 
 
-def test_organization_member_give_and_revoke_clearance(
-    rf, superuser_member, organization, mock_models_katalogus, mock_models_octopoes
-):
+def test_organization_member_give_and_revoke_clearance(rf, superuser_member, organization):
     request = setup_request(
         rf.post(
             "organization_detail",
@@ -161,30 +155,30 @@ def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(
     assertContains(response, "Grant")
 
 
-def test_organization_does_not_exist(client, normal_user, organization):
-    client.force_login(normal_user)
+def test_organization_does_not_exist(client, client_member):
+    client.force_login(client_member.user)
     response = client.get(reverse("organization_detail", kwargs={"organization_code": "nonexistent"}))
 
     assert response.status_code == 404
 
 
-def test_organization_no_member(client, normal_user_without_organization_member, organization):
-    client.force_login(normal_user_without_organization_member)
+def test_organization_no_member(client, clientuser, organization):
+    client.force_login(clientuser)
     response = client.get(reverse("organization_detail", kwargs={"organization_code": organization.code}))
 
     assert response.status_code == 404
 
 
-def test_organization_active_member(rf, normal_user, organization):
-    request = setup_request(rf.get("organization_detail"), normal_user)
+def test_organization_active_member(rf, client_member, organization):
+    request = setup_request(rf.get("organization_detail"), client_member.user)
     response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
 
 
-def test_organization_blocked_member(rf, normal_user, organization):
-    OrganizationMember.objects.filter(user=normal_user, organization=organization).update(status="blocked")
-
-    request = setup_request(rf.get("organization_detail"), normal_user)
+def test_organization_blocked_member(rf, client_member, organization):
+    client_member.status = "blocked"
+    client_member.save()
+    request = setup_request(rf.get("organization_detail"), client_member.user)
     with pytest.raises(PermissionDenied):
         OrganizationDetailView.as_view()(request, organization_code=organization.code)

@@ -26,7 +26,9 @@
                     {% translate 'Acknowledged clearance level' %}
                   </legend>
                   <div class="horizontal-view">
-                    <label>{% include 'partials/cat_paws.html' with level=object.acknowledged_clearance_level %}</label>
+                    <label>
+                      {% include 'partials/cat_paws.html' with level=object.acknowledged_clearance_level custom_class="level-indicator-form" %}
+                    </label>
                   </div>
                 </fieldset>
               {% else %}

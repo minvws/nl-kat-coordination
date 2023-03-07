@@ -195,7 +195,7 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     class Meta:
         model = OrganizationMember
-        fields = ["member_name", "trusted_clearance_level", "acknowledged_clearance_level"]
+        fields = ["trusted_clearance_level", "acknowledged_clearance_level"]
 
 
 class OrganizationForm(forms.ModelForm):

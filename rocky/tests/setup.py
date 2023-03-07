@@ -92,34 +92,30 @@ class MemberSetup:
         self,
         user,
         organization,
-        member_is_verified=True,
-        member_authorized=True,
         member_status=OrganizationMember.STATUSES.ACTIVE,
         trusted_clearance_level=-1,
         acknowledged_clearance_level=-1,
+        onboarded=True,
     ):
         self.user = user
         self.organization = organization
-        self.member_is_verified = member_is_verified
-        self.member_is_authorized = member_authorized
         self.member_status = member_status
         self.trusted_clearance_level = trusted_clearance_level
         self.acknowledged_clearance_level = acknowledged_clearance_level
+        self.onboarded = onboarded
 
     def create_member(self):
-        self.set_indemnification(self.organization, self.user)
+        self.set_indemnification()
         return OrganizationMember.objects.create(
             user=self.user,
             organization=self.organization,
-            verified=self.member_is_verified,
-            authorized=self.member_is_authorized,
             status=self.member_status,
             trusted_clearance_level=self.trusted_clearance_level,
             acknowledged_clearance_level=self.acknowledged_clearance_level,
         )
 
-    def set_indemnification(self, organization, user):
+    def set_indemnification(self):
         Indemnification.objects.create(
-            organization=organization,
-            user=user,
+            organization=self.organization,
+            user=self.user,
         )
