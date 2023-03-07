@@ -1,4 +1,3 @@
-from tools.models import OrganizationMember
 from tools.user_helpers import (
     organizations_for_user,
     is_red_team,

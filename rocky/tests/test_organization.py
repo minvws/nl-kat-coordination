@@ -1,12 +1,10 @@
 import pytest
 from django.contrib.auth.models import Permission
 from pytest_django.asserts import assertContains, assertNotContains
-
 from rocky.views.organization_detail import OrganizationDetailView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from tests.conftest import setup_request
-from tools.models import OrganizationMember
 
 
 def test_organization_list_non_superuser(
