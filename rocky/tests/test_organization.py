@@ -55,7 +55,6 @@ def test_organization_member_list(rf, superuser_member, organization):
 
 
 def test_organization_filtered_member_list(rf, superuser_member, my_new_user, my_blocked_user, organization):
-
     request = setup_request(rf.get("organization_detail", {"client_status": "blocked"}), superuser_member.user)
     response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
 
