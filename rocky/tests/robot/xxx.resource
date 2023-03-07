@@ -43,6 +43,8 @@ Logout Normally
     Get Element Count    .login-meta    ==    0    error still logged in
 
 Generate First DNS Report
+    #Debug
+    Click    "Let\'s get started"
     Click    css=#main-content > section > div > p:nth-child(10) > a:nth-child(2)
     Click    "Let\'s choose a report"
     Click    "DNS report"
