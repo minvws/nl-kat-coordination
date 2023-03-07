@@ -1,10 +1,7 @@
 import json
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-import binascii
-from os import urandom
+from unittest.mock import MagicMock
 import pytest
-from django.contrib.auth.models import Permission, Group
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django_otp import DEVICE_ID_SESSION_KEY
@@ -13,8 +10,7 @@ from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
-from tools.models import Organization, OrganizationMember, OOIInformation, Indemnification
-from tools.models import GROUP_REDTEAM, GROUP_ADMIN, GROUP_CLIENT
+from tools.models import OOIInformation
 from tests.setup import OrganizationSetup, UserSetup, MemberSetup
 
 
@@ -30,33 +26,39 @@ def superuser(django_user_model):
 
 @pytest.fixture
 def superuser_member(superuser, organization):
-    member = MemberSetup(superuser, organization).create_member()
-    member.trusted_clearance_level = 4
-    member.acknowledged_clearance_level = 4
-    member.save()
-    return member
+    return MemberSetup(superuser, organization).create_member()
 
 
 @pytest.fixture
-def admin_member(django_user_model, organization):
-    admin_user = UserSetup(django_user_model)._create_admin_user(email="admin@openkat.nl", password="AdminAdmin123!!")
-    return MemberSetup(admin_user, organization).create_member()
+def adminuser(django_user_model):
+    return UserSetup(django_user_model)._create_admin_user(email="admin@openkat.nl", password="AdminAdmin123!!")
 
 
 @pytest.fixture
-def redteam_member(django_user_model, organization):
-    admin_user = UserSetup(django_user_model)._create_redteam_user(
+def admin_member(adminuser, organization):
+    return MemberSetup(adminuser, organization).create_member()
+
+
+@pytest.fixture
+def redteamuser(django_user_model):
+    return UserSetup(django_user_model)._create_redteam_user(
         email="redteamer@openkat.nl", password="RedteamRedteam123!!"
     )
-    return MemberSetup(admin_user, organization).create_member()
 
 
 @pytest.fixture
-def client_member(django_user_model, organization):
-    client_user = UserSetup(django_user_model)._create_client_user(
-        email="clientt@openkat.nl", password="ClientClient123!!"
-    )
-    return MemberSetup(client_user, organization).create_member()
+def redteam_member(redteamuser, organization):
+    return MemberSetup(redteamuser, organization).create_member()
+
+
+@pytest.fixture
+def clientuser(django_user_model):
+    return UserSetup(django_user_model)._create_client_user(email="clientt@openkat.nl", password="ClientClient123!!")
+
+
+@pytest.fixture
+def client_member(clientuser, organization):
+    return MemberSetup(clientuser, organization).create_member()
 
 
 @pytest.fixture

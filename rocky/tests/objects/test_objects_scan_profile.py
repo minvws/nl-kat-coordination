@@ -44,6 +44,9 @@ TREE_DATA = {
 def test_scan_profile(rf, superuser_member, organization, mock_scheduler, mock_organization_view_octopoes, mocker):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+    superuser_member.trusted_clearance_level = 4
+    superuser_member.acknowledged_clearance_level = 4
+    superuser_member.save()
 
     request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), superuser_member.user)
     response = ScanProfileDetailView.as_view()(request, organization_code=organization.code)
