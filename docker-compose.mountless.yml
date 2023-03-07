@@ -5,5 +5,10 @@ services:
     volumes:
       - rocky-code:/app/rocky
 
+  keiko:
+    volumes:
+      - keiko-code:/app/keiko
+
 volumes:
   rocky-code:
+  keiko-code:
