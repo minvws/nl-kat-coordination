@@ -32,11 +32,7 @@
             {% if not member.user.is_superuser or request.user.is_superuser %}
               <tr>
                 <td>
-                  {% if not member.user.full_name %}
-                    {% translate 'Unset' %}
-                  {% else %}
-                    {{ member.user.full_name }}
-                  {% endif %}
+                  {{ member.user.email }}
                   <br>
                 </td>
                 <td>
@@ -87,9 +83,7 @@
                   {% endfor %}
                 </td>
                 <td>
-                  <a href="{% url 'organization_member_edit' organization.code member.id %}">
-                    <button class="icon ti-edit">{% translate 'Edit' %}</button>
-                  </a>
+                  <a href="{% url 'organization_member_edit' organization.code member.id %}"><button class="icon ti-edit">{% translate 'Edit' %}</button></a>
                 </td>
                 <td>
                   {% if member.status == "blocked" %}

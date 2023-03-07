@@ -59,7 +59,8 @@ def test_organization_filtered_member_list(rf, superuser_member, my_new_user, my
     request = setup_request(rf.get("organization_detail", {"client_status": "blocked"}), superuser_member.user)
     response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
 
-    assertContains(response, superuser_member.user.email)
+    assertNotContains(response, my_new_user.user.email)
+    assertContains(response, my_blocked_user.user.email)
     assertContains(response, "Suspended")
     assertNotContains(response, "New")
     assertNotContains(response, "Active")
@@ -67,7 +68,7 @@ def test_organization_filtered_member_list(rf, superuser_member, my_new_user, my
     request2 = setup_request(rf.get("organization_detail", {"client_status": "new"}), superuser_member.user)
     response2 = OrganizationDetailView.as_view()(request2, organization_code=organization.code)
 
-    assertContains(response2, superuser_member.user.email)
+    assertContains(response2, my_new_user.user.email)
     assertNotContains(response2, my_blocked_user.user.email)
     assertContains(response2, "New")
     assertNotContains(response2, "Suspended")
@@ -79,6 +80,8 @@ def test_organization_filtered_member_list(rf, superuser_member, my_new_user, my
     response3 = OrganizationDetailView.as_view()(request3, organization_code=organization.code)
 
     assertContains(response3, superuser_member.user.email)
+    assertContains(response3, my_new_user.user.email)
+    assertContains(response3, my_blocked_user.user.email)
     assertContains(response3, "New")
     assertContains(response3, "Suspended")
     assertContains(response3, "Active")
