@@ -27,8 +27,10 @@ def run(
             u = URL(raw=input_ooi.value, network=network.reference)
         else:
             # url is not a url but a relative path
-            hostname_http_url = input_ooi.reference.tokenized.resource.web_url
-            original_url = f"{hostname_http_url.scheme}://{hostname_http_url.netloc.name}{hostname_http_url.path}"
+            http_url = input_ooi.reference.tokenized.resource.web_url
+            # allow for ipaddress http urls
+            netloc = http_url.netloc.name if "name" in http_url.netloc.__root__ else http_url.netloc.address
+            original_url = f"{http_url.scheme}://{netloc}{http_url.path}"
             u = URL(raw=urljoin(original_url, input_ooi.value), network=network.reference)
         yield u
         http_header_url = HTTPHeaderURL(header=input_ooi.reference, url=u.reference)
