@@ -21,7 +21,7 @@ def organization():
 
 @pytest.fixture
 def superuser(django_user_model):
-    return UserSetup(django_user_model)._create_superuser(email="superuser@openkat.nl", password="SuperSuper123!!")
+    return UserSetup(django_user_model, email="superuser@openkat.nl", password="SuperSuper123!!")._create_superuser()
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ def superuser_member(superuser, organization):
 
 @pytest.fixture
 def adminuser(django_user_model):
-    return UserSetup(django_user_model)._create_admin_user(email="admin@openkat.nl", password="AdminAdmin123!!")
+    return UserSetup(django_user_model, email="admin@openkat.nl", password="AdminAdmin123!!")._create_admin_user()
 
 
 @pytest.fixture
@@ -41,9 +41,9 @@ def admin_member(adminuser, organization):
 
 @pytest.fixture
 def redteamuser(django_user_model):
-    return UserSetup(django_user_model)._create_redteam_user(
-        email="redteamer@openkat.nl", password="RedteamRedteam123!!"
-    )
+    return UserSetup(
+        django_user_model, email="redteamer@openkat.nl", password="RedteamRedteam123!!"
+    )._create_redteam_user()
 
 
 @pytest.fixture
@@ -53,7 +53,7 @@ def redteam_member(redteamuser, organization):
 
 @pytest.fixture
 def clientuser(django_user_model):
-    return UserSetup(django_user_model)._create_client_user(email="clientt@openkat.nl", password="ClientClient123!!")
+    return UserSetup(django_user_model, email="clientt@openkat.nl", password="ClientClient123!!")._create_client_user()
 
 
 @pytest.fixture
@@ -63,7 +63,9 @@ def client_member(clientuser, organization):
 
 @pytest.fixture
 def my_new_user(django_user_model, organization):
-    user = UserSetup(django_user_model)._create_superuser(email="cl1@openkat.nl", password="TestTest123!!")
+    user = UserSetup(
+        django_user_model, full_name="New user", email="cl1@openkat.nl", password="TestTest123!!"
+    )._create_superuser()
     member = MemberSetup(user, organization).create_member()
     member.status = OrganizationMember.STATUSES.NEW
     member.save()
@@ -72,7 +74,9 @@ def my_new_user(django_user_model, organization):
 
 @pytest.fixture
 def my_blocked_user(django_user_model, organization):
-    user = UserSetup(django_user_model)._create_superuser(email="cl2@openkat.nl", password="TestTest123!!")
+    user = UserSetup(
+        django_user_model, full_name="Blocked user", email="cl2@openkat.nl", password="TestTest123!!"
+    )._create_superuser()
     member = MemberSetup(user, organization).create_member()
     member.status = OrganizationMember.STATUSES.BLOCKED
     member.save()

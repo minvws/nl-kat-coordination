@@ -173,6 +173,11 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
 
 
 class OrganizationMemberEditForm(forms.ModelForm):
+    member_name = forms.CharField(
+        required=False,
+        label=_("Member name"),
+        help_text=_("This name we will use to communicate with you."),
+    )
     trusted_clearance_level = forms.ChoiceField(
         required=False,
         label=_("Trusted clearance level"),
@@ -184,9 +189,11 @@ class OrganizationMemberEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["acknowledged_clearance_level"].disabled = True
+        # self.fields["onboarded"].widget.attrs["class"] = "horizontal-view"
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+        User.objects.filter(pk=instance.user.id).update(full_name=self.cleaned_data["member_name"])
         if instance.trusted_clearance_level < instance.acknowledged_clearance_level:
             instance.acknowledged_clearance_level = instance.trusted_clearance_level
         if commit:
@@ -195,7 +202,7 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     class Meta:
         model = OrganizationMember
-        fields = ["trusted_clearance_level", "acknowledged_clearance_level"]
+        fields = ["member_name", "status", "trusted_clearance_level", "acknowledged_clearance_level", "onboarded"]
 
 
 class OrganizationForm(forms.ModelForm):

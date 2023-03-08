@@ -28,11 +28,17 @@ class UserSetup:
     def __init__(
         self,
         user_model,
+        email,
+        password,
+        full_name="OpenKat user",
         is_verified=lambda: True,
         device_name="default",
         device_token=binascii.hexlify(urandom(8)).decode(),
     ):
         self.user_model = user_model
+        self.email = email
+        self.password = password
+        self.full_name = full_name
         self.is_verified = is_verified
         self.device_name = device_name
         self.device_token = device_token
@@ -41,9 +47,11 @@ class UserSetup:
         device = user.staticdevice_set.create(name=self.device_name)
         device.token_set.create(token=self.device_token)
 
-    def _create_admin_user(self, email, password):
-        admin_user = self.user_model.objects.create_user(email=email, password=password)
+    def _create_admin_user(self):
+        admin_user = self.user_model.objects.create_user(email=self.email, password=self.password)
+        admin_user.full_name = self.full_name
         admin_user.is_verified = self.is_verified
+        admin_user.save()
         self.setup_device(admin_user)
         group = Group.objects.create(name=GROUP_ADMIN)
         group.user_set.add(admin_user)
@@ -57,9 +65,11 @@ class UserSetup:
         group.permissions.set(admin_permissions)
         return admin_user
 
-    def _create_redteam_user(self, email, password):
-        redteam_user = self.user_model.objects.create_user(email=email, password=password)
+    def _create_redteam_user(self):
+        redteam_user = self.user_model.objects.create_user(email=self.email, password=self.password)
+        redteam_user.full_name = self.full_name
         redteam_user.is_verified = self.is_verified
+        redteam_user.save()
         self.setup_device(redteam_user)
         group = Group.objects.create(name=GROUP_REDTEAM)
         group.user_set.add(redteam_user)
@@ -72,17 +82,21 @@ class UserSetup:
         group.permissions.set(redteam_permissions)
         return redteam_user
 
-    def _create_client_user(self, email, password):
-        client_user = self.user_model.objects.create_user(email=email, password=password)
+    def _create_client_user(self):
+        client_user = self.user_model.objects.create_user(email=self.email, password=self.password)
+        client_user.full_name = self.full_name
         client_user.is_verified = self.is_verified
+        client_user.save()
         self.setup_device(client_user)
         group = Group.objects.create(name=GROUP_CLIENT)
         group.user_set.add(client_user)
         return client_user
 
-    def _create_superuser(self, email, password):
-        _superuser = self.user_model.objects.create_superuser(email=email, password=password)
+    def _create_superuser(self):
+        _superuser = self.user_model.objects.create_superuser(email=self.email, password=self.password)
+        _superuser.full_name = self.full_name
         _superuser.is_verified = self.is_verified
+        _superuser.save()
         self.setup_device(_superuser)
         return _superuser
 

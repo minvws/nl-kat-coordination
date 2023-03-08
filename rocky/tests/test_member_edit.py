@@ -87,9 +87,9 @@ def test_edit_superusers_from_different_organizations(rf, django_user_model, sup
     a superuser from another organization at the member edit view.
     """
     organization_b = OrganizationSetup("OrganizationB", "org_b").create_organization()
-    superuser_b = UserSetup(django_user_model)._create_superuser(
-        email="superuserB@openkat.nl", password="SuperBSuperB123!!"
-    )
+    superuser_b = UserSetup(
+        django_user_model, email="superuserB@openkat.nl", password="SuperBSuperB123!!"
+    )._create_superuser()
     superuser_member_b = MemberSetup(superuser_b, organization_b).create_member()
     request = setup_request(rf.get("organization_member_edit"), superuser_member.user)
     # from OrganizationView
