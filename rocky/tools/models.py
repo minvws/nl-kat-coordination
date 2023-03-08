@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from requests import RequestException
 
 from katalogus.client import get_katalogus, KATalogusClientV1
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -124,10 +125,20 @@ class Organization(models.Model):
         octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
         katalogus_client = get_katalogus(organization_code)
 
-        if not octopoes_client.root_health().healthy:
+        try:
+            health = octopoes_client.root_health()
+        except RequestException as e:
+            raise RockyError("The Octopoes service is not up") from e
+
+        if not health.healthy:
             raise RockyError("The Octopoes service is not healthy")
 
-        if not katalogus_client.health().healthy:
+        try:
+            health = katalogus_client.health()
+        except RequestException as e:
+            raise RockyError("The Katalogus service is not up") from e
+
+        if not health.healthy:
             raise RockyError("The Katalogus service is not healthy")
 
         return katalogus_client, octopoes_client
