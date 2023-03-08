@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Type, Dict, Set, Iterator, Union
 
 from pydantic.fields import ModelField
@@ -21,6 +22,7 @@ from octopoes.models.ooi.dns.records import (
     DNSCNAMERecord,
     NXDOMAIN,
 )
+from octopoes.models.ooi.dns.zone import Hostname, DNSZone, ResolvedHostname
 from octopoes.models.ooi.email_security import (
     DNSSPFMechanismIP,
     DNSSPFMechanismHostname,
@@ -31,7 +33,6 @@ from octopoes.models.ooi.email_security import (
     DKIMKey,
     DKIMSelector,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone, ResolvedHostname
 from octopoes.models.ooi.findings import (
     Finding,
     ADRFindingType,
@@ -152,6 +153,7 @@ OOIType = Union[
 ]
 
 
+# @lru_cache
 def get_all_types(cls_: Type[OOI]) -> Iterator[Type[OOI]]:
     yield cls_
     for subcls in cls_.__subclasses__():
@@ -161,14 +163,17 @@ def get_all_types(cls_: Type[OOI]) -> Iterator[Type[OOI]]:
 ALL_TYPES = set(get_all_types(OOI))
 
 
+# @lru_cache
 def get_abstract_types() -> Set[Type[OOI]]:
     return {t for t in ALL_TYPES if t.__subclasses__()}
 
 
+# @lru_cache
 def get_concrete_types() -> Set[Type[OOI]]:
     return {t for t in ALL_TYPES if not t.__subclasses__()}
 
 
+# @lru_cache()
 def get_collapsed_types() -> Set[Type[OOI]]:
     abstract_ooi_subtypes = get_abstract_types() - {OOI}
 

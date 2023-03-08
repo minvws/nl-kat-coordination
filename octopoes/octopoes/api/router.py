@@ -26,7 +26,7 @@ from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import type_by_name
+from octopoes.models.types import type_by_name, OOIType
 from octopoes.version import __version__
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
@@ -114,12 +114,12 @@ def health(
 def list_objects(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    types: Set[Type[OOI]] = Depends(extract_types),
+    types: Set[Type[OOIType]] = Depends(extract_types),
     scan_level: Set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
     scan_profile_type: Set[ScanProfileType] = Query(DEFAULT_SCAN_PROFILE_TYPE_FILTER),
     offset: int = 0,
     limit: int = 20,
-) -> Paginated[OOI]:
+) -> Paginated[OOIType]:
     objects = octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
     return objects
 
@@ -129,7 +129,7 @@ def get_object(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     reference: Reference = Depends(extract_reference),
-) -> OOI:
+) -> OOIType:
     return octopoes.get_ooi(reference, valid_time)
 
 
@@ -138,7 +138,7 @@ def list_random_objects(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     amount: int = 1,
-) -> List[OOI]:
+) -> List[OOIType]:
     return octopoes.list_random_ooi(amount, valid_time)
 
 

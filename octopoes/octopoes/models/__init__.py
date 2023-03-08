@@ -287,3 +287,4 @@ def build_token_tree(ooi_class: Type[OOI]) -> Dict:
 DeclaredScanProfile.update_forward_refs()
 InheritedScanProfile.update_forward_refs()
 EmptyScanProfile.update_forward_refs()
+ScanProfileBase.update_forward_refs()
