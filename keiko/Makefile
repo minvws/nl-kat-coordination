@@ -34,7 +34,7 @@ test:
 	python -m unittest discover -s tests -p "test_*.py"
 
 itest:
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build
+	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build && sleep 1
 	robot -d reports tests/robot
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
 

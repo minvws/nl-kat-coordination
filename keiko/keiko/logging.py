@@ -7,10 +7,8 @@ from logging import config, getLogger
 
 from keiko.settings import Settings
 
-settings = Settings()
 
-
-def setup_loggers() -> None:
+def setup_loggers(settings: Settings) -> None:
     """Load logging configuration."""
     logger = getLogger(__name__)
     try:
