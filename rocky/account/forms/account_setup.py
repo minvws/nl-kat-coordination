@@ -188,8 +188,11 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if "admin" in self.instance.user.groups.all() or self.instance.user.is_superuser:
+            # There could be a case where you block yourself out of the system
+            self.fields["status"].disabled = True
+        self.fields["member_name"].initial = self.instance.user.full_name
         self.fields["acknowledged_clearance_level"].disabled = True
-        # self.fields["onboarded"].widget.attrs["class"] = "horizontal-view"
 
     def save(self, commit=True):
         instance = super().save(commit=False)

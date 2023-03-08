@@ -22,11 +22,6 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
     def test_func(self):
         return not self.get_object().user.is_superuser or self.request.user.is_superuser
 
-    def get_initial(self):
-        initial = super().get_initial()
-        initial["member_name"] = self.get_object().user.full_name
-        return initial
-
     def get_success_url(self):
         messages.add_message(
             self.request,
@@ -39,7 +34,10 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
         context = super().get_context_data(**kwargs)
 
         context["breadcrumbs"] = [
-            {"url": reverse("organization_list"), "text": "Organizations"},
+            {
+                "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),
+                "text": self.organization.name,
+            },
             {
                 "url": reverse(
                     "organization_member_edit",
