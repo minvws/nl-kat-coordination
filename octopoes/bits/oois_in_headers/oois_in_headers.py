@@ -10,8 +10,8 @@ from octopoes.models.ooi.web import HTTPHeaderHostname
 from octopoes.models.types import HTTPHeader, URL, Network, HTTPHeaderURL
 
 
-def is_url(input):
-    result = urlparse(input)
+def is_url(input_str):
+    result = urlparse(input_str)
     return bool(result.scheme)
 
 
@@ -19,7 +19,6 @@ def run(
     input_ooi: HTTPHeader,
     additional_oois: List,
 ) -> Iterator[OOI]:
-
     network = Network(name="internet")
 
     if input_ooi.key.lower() == "location":
