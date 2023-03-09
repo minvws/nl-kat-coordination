@@ -4,9 +4,6 @@ version = "0.1.0"
 description = "KAT report engine using LateX to generate PDF"
 authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
-[tool.poetry.group.dev.dependencies]
-httpx = "^0.23.3"
-
 
 [tool.vulture]
 min_confidence = 90
@@ -38,14 +35,15 @@ fastapi = "^0.93.0"
 uvicorn = "^0.20.0"
 vulture = "^2.5"
 
-[tool.poetry.dev-dependencies]
-black = "^22.6.0"
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
 mypy = "^0.971"
 pylint = "^2.14.5"
 robotframework-tidy = "^3.2"
 robotframework = "^5.0.1"
 robotframework-debuglibrary = "^2.3.0"
 robotframework-requests = "^0.9.3"
+pydantic = "^1.10.6"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
