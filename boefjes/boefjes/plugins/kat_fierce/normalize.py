@@ -17,7 +17,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     yield internet
 
     for _, subdomain in results["subdomains"].items():
-        host = Hostname(name=subdomain["url"], network=internet.reference)
+        if subdomain["url"][-1:] == ".":
+            #check trailing dot and remove from domainname in order to stop duplicates
+            host = Hostname(name=subdomain["url"][:-1], network=internet.reference) 
+        else:
+            host = Hostname(name=subdomain["url"], network=internet.reference)
         yield host
 
         sub_ip = subdomain["ip"]
