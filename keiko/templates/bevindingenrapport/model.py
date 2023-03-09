@@ -20,7 +20,7 @@ class Finding(OOI):
     proof: Optional[str]
     description: str
     reproduce: Optional[str]
-    ooi: OOI
+    ooi: str
 
 
 class FindingTypeBase(OOI):

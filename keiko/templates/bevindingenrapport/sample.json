@@ -68,15 +68,7 @@
             "proof": null,
             "description": "Port 3306 is a database port and should not be open.",
             "reproduce": null,
-            "ooi": {
-              "id": "IPPort|internet|134.209.85.72|tcp|3306",
-              "ooi_type": "IPPort",
-              "human_readable": "134.209.85.72:3306/tcp",
-              "object_type": "IPPort",
-              "protocol": "tcp",
-              "port": "3306",
-              "state": "open"
-            },
+            "ooi": "134.209.85.72:3306/tcp",
             "finding_type": {
               "id": "KAT-OPEN-DATABASE-PORT",
               "ooi_type": "KATFindingType",
@@ -117,14 +109,7 @@
             "proof": null,
             "description": "List of CSP findings:\n 1. Unsafe-inline, unsafe-eval and unsafe-hashes should not be used in the CSP settings of an HTTP Header.\n 2. Frame-ancestors has not been defined.\n 3. default-src has not been correctly defined.\n 4. frame-src has not been correctly defined.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPHeader|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/|Content-Security-Policy",
-              "ooi_type": "HTTPHeader",
-              "human_readable": "Content-Security-Policy @ https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPHeader",
-              "key": "Content-Security-Policy",
-              "value": "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';"
-            },
+            "ooi": "Content-Security-Policy @ https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-CSP-VULNERABILITIES",
               "ooi_type": "KATFindingType",
@@ -167,12 +152,7 @@
             "proof": null,
             "description": "Header strict-transport-security is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-HSTS",
               "ooi_type": "KATFindingType",
@@ -216,13 +196,7 @@
             "proof": null,
             "description": "Domain mispo.es. is not signed with DNSSEC.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|mispo.es.",
-              "ooi_type": "Hostname",
-              "human_readable": "mispo.es.",
-              "object_type": "Hostname",
-              "name": "mispo.es."
-            },
+            "ooi": "mispo.es.",
             "finding_type": {
               "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
@@ -246,13 +220,7 @@
             "proof": null,
             "description": "Domain mispo.es is not signed with DNSSEC.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|mispo.es",
-              "ooi_type": "Hostname",
-              "human_readable": "mispo.es",
-              "object_type": "Hostname",
-              "name": "mispo.es"
-            },
+            "ooi": "mispo.es.",
             "finding_type": {
               "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
@@ -276,13 +244,7 @@
             "proof": null,
             "description": "Domain ns1.domaindiscount24.net. is not signed with DNSSEC.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|ns1.domaindiscount24.net.",
-              "ooi_type": "Hostname",
-              "human_readable": "ns1.domaindiscount24.net.",
-              "object_type": "Hostname",
-              "name": "ns1.domaindiscount24.net."
-            },
+            "ooi": "ns1.domaindiscount24.net.",
             "finding_type": {
               "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
@@ -306,13 +268,7 @@
             "proof": null,
             "description": "Domain ns1.domaindiscount24.net is not signed with DNSSEC.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|ns1.domaindiscount24.net",
-              "ooi_type": "Hostname",
-              "human_readable": "ns1.domaindiscount24.net",
-              "object_type": "Hostname",
-              "name": "ns1.domaindiscount24.net"
-            },
+            "ooi": "ns1.domaindiscount24.net",
             "finding_type": {
               "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
@@ -336,13 +292,7 @@
             "proof": null,
             "description": "Domain ns2.domaindiscount24.net. is not signed with DNSSEC.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|ns2.domaindiscount24.net.",
-              "ooi_type": "Hostname",
-              "human_readable": "ns2.domaindiscount24.net.",
-              "object_type": "Hostname",
-              "name": "ns2.domaindiscount24.net."
-            },
+            "ooi": "ns2.domaindiscount24.net.",
             "finding_type": {
               "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
@@ -366,13 +316,7 @@
             "proof": null,
             "description": "Domain ns2.domaindiscount24.net is not signed with DNSSEC.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|ns2.domaindiscount24.net",
-              "ooi_type": "Hostname",
-              "human_readable": "ns2.domaindiscount24.net",
-              "object_type": "Hostname",
-              "name": "ns2.domaindiscount24.net"
-            },
+            "ooi": "ns2.domaindiscount24.net",
             "finding_type": {
               "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
@@ -396,13 +340,7 @@
             "proof": null,
             "description": "Domain ns3.domaindiscount24.net. is not signed with DNSSEC.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|ns3.domaindiscount24.net.",
-              "ooi_type": "Hostname",
-              "human_readable": "ns3.domaindiscount24.net.",
-              "object_type": "Hostname",
-              "name": "ns3.domaindiscount24.net."
-            },
+            "ooi": "ns3.domaindiscount24.net.",
             "finding_type": {
               "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
@@ -426,13 +364,7 @@
             "proof": null,
             "description": "Domain ns3.domaindiscount24.net is not signed with DNSSEC.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|ns3.domaindiscount24.net",
-              "ooi_type": "Hostname",
-              "human_readable": "ns3.domaindiscount24.net",
-              "object_type": "Hostname",
-              "name": "ns3.domaindiscount24.net"
-            },
+            "ooi": "ns3.domaindiscount24.net",
             "finding_type": {
               "id": "KAT-NO-DNSSEC",
               "ooi_type": "KATFindingType",
@@ -473,13 +405,7 @@
             "proof": null,
             "description": "This hostname has at least one website with the following finding(s): This webserver does not have an IPv6 address\nThis webserver is not DNSSEC signed\n",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|mispo.es.",
-              "ooi_type": "Hostname",
-              "human_readable": "mispo.es.",
-              "object_type": "Hostname",
-              "name": "mispo.es."
-            },
+            "ooi": "mispo.es.",
             "finding_type": {
               "id": "KAT-INTERNETNL",
               "ooi_type": "KATFindingType",
@@ -502,13 +428,7 @@
             "proof": null,
             "description": "This hostname has at least one website with the following finding(s): This webserver is not DNSSEC signed\nThis website has at least one webpage with a missing Strict-Transport-Policy header\nThis website has at least one webpage with a missing X-Frame-Options header\nThis website has at least one webpage with a missing X-Content-Type-Options header\nThis website has at least one webpage with a mis-configured CSP header\nThis website does not have an SSL certificate\n",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|mispo.es",
-              "ooi_type": "Hostname",
-              "human_readable": "mispo.es",
-              "object_type": "Hostname",
-              "name": "mispo.es"
-            },
+            "ooi": "mispo.es",
             "finding_type": {
               "id": "KAT-INTERNETNL",
               "ooi_type": "KATFindingType",
@@ -549,15 +469,7 @@
             "proof": null,
             "description": "Port 22 is a system administrator port and should not be open.",
             "reproduce": null,
-            "ooi": {
-              "id": "IPPort|internet|134.209.85.72|tcp|22",
-              "ooi_type": "IPPort",
-              "human_readable": "134.209.85.72:22/tcp",
-              "object_type": "IPPort",
-              "protocol": "tcp",
-              "port": "22",
-              "state": "open"
-            },
+            "ooi": "134.209.85.72:22/tcp",
             "finding_type": {
               "id": "KAT-OPEN-SYSADMIN-PORT",
               "ooi_type": "KATFindingType",
@@ -599,12 +511,7 @@
             "proof": null,
             "description": "This JavaScript Library has known vulnerabilities",
             "reproduce": null,
-            "ooi": {
-              "id": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|jQuery Migrate|1.0.0|",
-              "ooi_type": "SoftwareInstance",
-              "human_readable": "jQuery Migrate 1.0.0 @ https://mispo.es:443/",
-              "object_type": "SoftwareInstance"
-            },
+            "ooi": "jQuery Migrate 1.0.0 @ https://mispo.es:443/",
             "finding_type": {
               "id": "RetireJS-jquerymigrate-f348",
               "ooi_type": "RetireJSFindingType",
@@ -646,12 +553,7 @@
             "proof": null,
             "description": "This JavaScript Library has known vulnerabilities",
             "reproduce": null,
-            "ooi": {
-              "id": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|jQuery Migrate|1.0.0|",
-              "ooi_type": "SoftwareInstance",
-              "human_readable": "jQuery Migrate 1.0.0 @ https://mispo.es:443/",
-              "object_type": "SoftwareInstance"
-            },
+            "ooi": "jQuery Migrate 1.0.0 @ https://mispo.es:443/",
             "finding_type": {
               "id": "RetireJS-jquerymigrate-f901",
               "ooi_type": "RetireJSFindingType",
@@ -690,12 +592,7 @@
             "proof": null,
             "description": "No SSL certificate found",
             "reproduce": null,
-            "ooi": {
-              "id": "Website|internet|134.209.85.72|tcp|443|https|internet|mispo.es",
-              "ooi_type": "Website",
-              "human_readable": "https://mispo.es:443 @ 134.209.85.72",
-              "object_type": "Website"
-            },
+            "ooi": "https://mispo.es:443 @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-CERTIFICATE",
               "ooi_type": "KATFindingType",
@@ -737,12 +634,7 @@
             "proof": null,
             "description": "This JavaScript Library has known vulnerabilities",
             "reproduce": null,
-            "ooi": {
-              "id": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
-              "ooi_type": "SoftwareInstance",
-              "human_readable": "Bootstrap 3.3.7 @ https://mispo.es:443/",
-              "object_type": "SoftwareInstance"
-            },
+            "ooi": "Bootstrap 3.3.7 @ https://mispo.es:443/",
             "finding_type": {
               "id": "CVE-2018-14040",
               "ooi_type": "CVEFindingType",
@@ -786,12 +678,7 @@
             "proof": null,
             "description": "This JavaScript Library has known vulnerabilities",
             "reproduce": null,
-            "ooi": {
-              "id": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
-              "ooi_type": "SoftwareInstance",
-              "human_readable": "Bootstrap 3.3.7 @ https://mispo.es:443/",
-              "object_type": "SoftwareInstance"
-            },
+            "ooi": "Bootstrap 3.3.7 @ https://mispo.es:443/",
             "finding_type": {
               "id": "CVE-2018-14041",
               "ooi_type": "CVEFindingType",
@@ -835,12 +722,7 @@
             "proof": null,
             "description": "This JavaScript Library has known vulnerabilities",
             "reproduce": null,
-            "ooi": {
-              "id": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
-              "ooi_type": "SoftwareInstance",
-              "human_readable": "Bootstrap 3.3.7 @ https://mispo.es:443/",
-              "object_type": "SoftwareInstance"
-            },
+            "ooi": "Bootstrap 3.3.7 @ https://mispo.es:443/",
             "finding_type": {
               "id": "CVE-2018-14042",
               "ooi_type": "CVEFindingType",
@@ -884,12 +766,7 @@
             "proof": null,
             "description": "This JavaScript Library has known vulnerabilities",
             "reproduce": null,
-            "ooi": {
-              "id": "SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap",
-              "ooi_type": "SoftwareInstance",
-              "human_readable": "Bootstrap 3.3.7 @ https://mispo.es:443/",
-              "object_type": "SoftwareInstance"
-            },
+            "ooi": "Bootstrap 3.3.7 @ https://mispo.es:443/",
             "finding_type": {
               "id": "CVE-2019-8331",
               "ooi_type": "CVEFindingType",
@@ -932,13 +809,7 @@
             "proof": null,
             "description": "There are no webservers with an IPv6 address.",
             "reproduce": null,
-            "ooi": {
-              "id": "Hostname|internet|mispo.es.",
-              "ooi_type": "Hostname",
-              "human_readable": "mispo.es.",
-              "object_type": "Hostname",
-              "name": "mispo.es."
-            },
+            "ooi": "mispo.es.",
             "finding_type": {
               "id": "KAT-WEBSERVER-NO-IPV6",
               "ooi_type": "KATFindingType",
@@ -982,12 +853,7 @@
             "proof": null,
             "description": "Header x-permitted-cross-domain-policies is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES",
               "ooi_type": "KATFindingType",
@@ -1033,12 +899,7 @@
             "proof": null,
             "description": "Header x-xss-protection is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-EXPLICIT-XSS-PROTECTION",
               "ooi_type": "KATFindingType",
@@ -1084,12 +945,7 @@
             "proof": null,
             "description": "Header x-frame-options is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-X-FRAME-OPTIONS",
               "ooi_type": "KATFindingType",
@@ -1133,12 +989,7 @@
             "proof": null,
             "description": "Header x-dns-prefetch-control is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-X-DNS-PREFETCH-CONTROL",
               "ooi_type": "KATFindingType",
@@ -1182,12 +1033,7 @@
             "proof": null,
             "description": "Header expect-ct is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-EXCPECT-CT",
               "ooi_type": "KATFindingType",
@@ -1232,12 +1078,7 @@
             "proof": null,
             "description": "Header permissions-policy is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-PERMISSIONS-POLICY",
               "ooi_type": "KATFindingType",
@@ -1282,12 +1123,7 @@
             "proof": null,
             "description": "Header referrer-policy is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-REFERRER-POLICY",
               "ooi_type": "KATFindingType",
@@ -1333,12 +1169,7 @@
             "proof": null,
             "description": "Header x-content-type-options is missing or not configured correctly.",
             "reproduce": null,
-            "ooi": {
-              "id": "HTTPResource|internet|134.209.85.72|tcp|443|https|internet|mispo.es|https|internet|mispo.es|443|/",
-              "ooi_type": "HTTPResource",
-              "human_readable": "https://mispo.es:443/ @ 134.209.85.72",
-              "object_type": "HTTPResource"
-            },
+            "ooi": "https://mispo.es:443/ @ 134.209.85.72",
             "finding_type": {
               "id": "KAT-NO-X-CONTENT-TYPE-OPTIONS",
               "ooi_type": "KATFindingType",

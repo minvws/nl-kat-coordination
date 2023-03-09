@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.exceptions import BadRequest
 from django.http import FileResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -19,21 +20,18 @@ from octopoes.models.ooi.dns.records import (
     DNSSOARecord,
 )
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import (
-    Finding,
-    FindingType,
-)
+from octopoes.models.ooi.findings import Finding, FindingType
+
 from requests import HTTPError
 from two_factor.views.utils import class_view_decorator
 
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from rocky.keiko import keiko_client, ReportNotFoundException
+from rocky.views.finding_list import FindingListView
 from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
-from rocky.views.ooi_view import (
-    BaseOOIDetailView,
-    ConnectorFormMixin,
-)
+from rocky.views.ooi_view import BaseOOIDetailView
+
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
 from tools.ooi_helpers import (
@@ -186,9 +184,56 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
 
 
 @class_view_decorator(otp_required)
-class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
-    connector_form_class = OOIReportSettingsForm
+class ReportPDFView(View):
+    def get_report(self, source_type: str, source_value: str, store: Dict, file_name: str, failure_redirect_url: str):
+        # reuse existing dict structure
+        report_data = build_findings_list_from_store(store)
+        report_data["findings_grouped"] = self._ooi_field_as_string(report_data["findings_grouped"], store)
+        report_data["valid_time"] = str(self.get_observed_at())
+        report_data["report_source_type"] = source_type
+        report_data["report_source_value"] = source_value
 
+        # request pdf from keiko
+        try:
+            report_id = keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
+        except HTTPError as e:
+            messages.error(self.request, _("Error generating report: {}").format(e))
+            return redirect(failure_redirect_url)
+
+        # open pdf as attachment
+        try:
+            return FileResponse(keiko_client.get_report(report_id), as_attachment=True, filename=file_name)
+        except (HTTPError, ReportNotFoundException):
+            messages.error(
+                self.request, _("Error generating report: Timeout reached. See Keiko logs for more information.")
+            )
+            return redirect(failure_redirect_url)
+
+    def _ooi_field_as_string(self, findings_grouped: Dict, store: Dict):
+        new_findings_grouped = {}
+
+        for finding_type, finding_group in findings_grouped.items():
+            list_of_findings = []
+            for finding in finding_group["list"]:
+                # Either take the human_readable or the primary key of the OOI from the Finding in the store
+                if finding["ooi"]:
+                    ooi_field = str(finding["ooi"]["human_readable"])
+                else:
+                    ooi_field = str(store[finding["id"]].ooi)
+
+                updated_x = {**finding, "ooi": ooi_field}
+                list_of_findings.append(updated_x)
+
+            new_findings_grouped[finding_type] = {
+                "list": list_of_findings,
+                "finding_type": finding_group["finding_type"],
+            }
+
+        return new_findings_grouped
+
+
+@class_view_decorator(otp_required)
+class OOIReportPDFView(SingleOOITreeMixin, ReportPDFView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.api_connector = self.octopoes_api_connector
@@ -198,29 +243,13 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
         self.setup(request, *args, **kwargs)
         self.ooi = self.get_ooi()
 
-        # reuse existing dict structure
-        report_data = build_findings_list_from_store(self.tree.store)
-        report_data["valid_time"] = str(self.get_observed_at())
-        report_data["report_source_type"] = self.ooi.object_type
-        report_data["report_source_value"] = self.ooi.human_readable
-
-        # request pdf from keiko
-        try:
-            report_id = keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
-        except HTTPError as e:
-            messages.error(self.request, _("Error generating report: {}").format(e))
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
-
-        report_file_name = self._generate_report_file_name()
-
-        # open pdf as attachment
-        try:
-            return FileResponse(keiko_client.get_report(report_id), as_attachment=True, filename=report_file_name)
-        except (HTTPError, ReportNotFoundException):
-            messages.error(
-                self.request, _("Error generating report: Timeout reached. See Keiko logs for more information.")
-            )
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+        return self.get_report(
+            self.ooi.object_type,
+            self.ooi.human_readable,
+            self.tree.store,
+            self._generate_report_file_name(),
+            get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code),
+        )
 
     def _generate_report_file_name(self):
         report_file_name = "_".join(
@@ -238,6 +267,30 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
         report_file_name = f"{report_file_name}.pdf"
 
         return report_file_name
+
+
+@class_view_decorator(otp_required)
+class FindingReportPDFView(FindingListView, ReportPDFView):
+    paginate_by = None
+
+    def get(self, request, *args, **kwargs):
+        findings = [item["finding"] for item in super().get_queryset()]
+
+        return self.get_report(
+            "Organization",
+            self.organization.name,
+            {finding.primary_key: finding for finding in findings},  # Create store from finding list
+            self._generate_report_file_name(),
+            reverse("finding_list", kwargs={"organization_code": self.organization.code}),
+        )
+
+    def _generate_report_file_name(self):
+        file_name = "_".join(["bevindingenrapport_nl", self.organization.code, datetime.now(timezone.utc).isoformat()])
+        # allow alphanumeric characters, dashes and underscores, replace rest with underscores
+        file_name = re.sub("[^0-9a-zA-Z-]", "_", file_name)
+        file_name = f"{file_name}.pdf"
+
+        return file_name
 
 
 """

@@ -1,13 +1,16 @@
 from io import BytesIO
 
 from django.urls import reverse, resolve
+from octopoes.models import Reference
+from octopoes.models.ooi.findings import Finding
+from octopoes.models.pagination import Paginated
+from octopoes.models.types import OOIType
 from pytest_django.asserts import assertContains
 from requests import HTTPError
 
 from octopoes.models.tree import ReferenceTree
-from rocky.views.ooi_report import OOIReportView, OOIReportPDFView
+from rocky.views.ooi_report import OOIReportView, OOIReportPDFView, FindingReportPDFView
 from tests.conftest import setup_request
-
 
 TREE_DATA = {
     "root": {
@@ -70,6 +73,47 @@ def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organiz
     }
     assert report_data_param["findings_grouped"]["KAT-000"]["finding_type"]["id"] == "KAT-000"
     assert report_data_param["findings_grouped"]["KAT-000"]["list"][0]["description"] == "Fake description..."
+
+
+def test_organization_pdf_report(rf, my_user, organization, ooi_information, mock_organization_view_octopoes, mocker):
+    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+        count=150,
+        items=[
+            Finding(
+                finding_type=Reference.from_str("KATFindingType|KAT-0001"),
+                ooi=Reference.from_str("Network|testnetwork"),
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            )
+        ]
+        * 150,
+    )
+
+    request = setup_request(rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
+    request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
+
+    # Setup Keiko mock
+    mock_keiko_client = mocker.patch("rocky.views.ooi_report.keiko_client")
+    mock_keiko_client.generate_report.return_value = "fake_report_id"
+    mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
+
+    response = FindingReportPDFView.as_view()(request, organization_code=organization.code)
+
+    assert response.status_code == 200
+    assert response.getvalue() == b"fake_binary_pdf_content"
+
+    report_data_param = mock_keiko_client.generate_report.call_args[0][1]
+
+    assert report_data_param["meta"] == {
+        "total": 1,
+        "total_by_finding_type": {"KAT-0001": 1},
+        "total_by_severity": {"critical": 1, "high": 0, "low": 0, "medium": 0, "recommendation": 0},
+        "total_by_severity_per_finding_type": {"critical": 1, "high": 0, "low": 0, "medium": 0, "recommendation": 0},
+        "total_finding_types": 1,
+    }
+    assert report_data_param["findings_grouped"]["KAT-0001"]["finding_type"]["id"] == "KAT-0001"
+    assert report_data_param["findings_grouped"]["KAT-0001"]["list"][0]["description"] == "test description 123"
 
 
 def test_ooi_pdf_report_timeout(rf, my_user, organization, ooi_information, mock_organization_view_octopoes, mocker):
