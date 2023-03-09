@@ -857,7 +857,7 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart", "pyyam
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 files = [
@@ -941,7 +941,7 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 name = "vulture"
 version = "2.7"
 description = "Find dead code"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -1052,4 +1052,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "0e880fa24c7159dd8c269f7347974a37992646ed739ecde642fed8c64620ef7f"
+content-hash = "a65c09e40bb9b7e32fb542e1f8842a80b6fb2eb6a9a729a4e4fd9ccf13007688"
