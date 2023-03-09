@@ -201,7 +201,8 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
         # reuse existing dict structure
         report_data = build_findings_list_from_store(self.tree.store)
         report_data["valid_time"] = str(self.get_observed_at())
-        report_data["ooi"] = get_ooi_dict(self.ooi)
+        report_data["report_source_type"] = self.ooi.object_type
+        report_data["report_source_value"] = self.ooi.human_readable
 
         # request pdf from keiko
         try:
@@ -210,26 +211,7 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
             messages.error(self.request, _("Error generating report: {}").format(e))
             return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
 
-        # generate file name
-        report_name = "bevindingenrapport"
-        org_code = self.organization.code
-        ooi_id = self.ooi.primary_key
-        valid_time = self.get_observed_at().isoformat()
-        current_time = datetime.now(timezone.utc).isoformat()
-        language = "nl"
-        report_file_name = "_".join(
-            [
-                report_name,
-                language,
-                org_code,
-                ooi_id,
-                valid_time,
-                current_time,
-            ]
-        )
-        # allow alphanumeric characters, dashes and underscores, replace rest with underscores
-        report_file_name = re.sub("[^0-9a-zA-Z-]", "_", report_file_name)
-        report_file_name = f"{report_file_name}.pdf"
+        report_file_name = self._generate_report_file_name()
 
         # open pdf as attachment
         try:
@@ -239,6 +221,23 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
                 self.request, _("Error generating report: Timeout reached. See Keiko logs for more information.")
             )
             return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+
+    def _generate_report_file_name(self):
+        report_file_name = "_".join(
+            [
+                "bevindingenrapport",
+                "nl",
+                self.organization.code,
+                self.ooi.primary_key,
+                self.get_observed_at().isoformat(),
+                datetime.now(timezone.utc).isoformat(),
+            ]
+        )
+        # allow alphanumeric characters, dashes and underscores, replace rest with underscores
+        report_file_name = re.sub("[^0-9a-zA-Z-]", "_", report_file_name)
+        report_file_name = f"{report_file_name}.pdf"
+
+        return report_file_name
 
 
 """

@@ -1360,12 +1360,8 @@
       }
     },
     "valid_time": "2022-08-26 08:23:58.373810+00:00",
-    "ooi": {
-      "id": "DNSZone|internet|mispo.es.",
-      "ooi_type": "Hostname",
-      "human_readable": "mispo.es.",
-      "object_type": "Hostname"
-    }
+    "report_source_type": "Hostname",
+    "report_source_value": "mispo.es."
   },
   "glossary": "dutch.hiero.csv",
   "debug": true
