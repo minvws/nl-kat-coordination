@@ -119,22 +119,6 @@ def test_edit_admins_from_different_organizations(rf, admin_member, admin_member
         )
 
 
-def reuse_edit_member_reponse(rf, request, member_to_edit, member_that_views):
-    """Can be reused in multiple tests. After editing a member redirects occurs to OrganizationDetail page."""
-    response = OrganizationMemberEditView.as_view()(
-        request, organization_code=member_to_edit.organization.code, pk=member_to_edit.id
-    )
-
-    assert response.status_code == 302
-    assert response.url == f"/en/{member_that_views.organization.code}/"
-    resulted_request = setup_request(rf.get(response.url), member_that_views.user)
-    resulted_response = OrganizationDetailView.as_view()(
-        resulted_request, organization_code=member_that_views.organization.code
-    )
-    assert resulted_response.status_code == 200
-    return resulted_response
-
-
 def test_admin_edits_redteamer(rf, admin_member, redteam_member):
     request = setup_request(
         rf.post(
