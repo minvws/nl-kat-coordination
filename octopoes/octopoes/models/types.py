@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import lru_cache
 from typing import Type, Dict, Set, Iterator, Union
 
 from pydantic.fields import ModelField
@@ -153,27 +152,29 @@ OOIType = Union[
 ]
 
 
-# @lru_cache
 def get_all_types(cls_: Type[OOI]) -> Iterator[Type[OOI]]:
     yield cls_
-    for subcls in cls_.__subclasses__():
+    for subcls in filter(lambda x: x.__module__.startswith("octopoes."), cls_.__subclasses__()):
         yield from get_all_types(subcls)
 
 
 ALL_TYPES = set(get_all_types(OOI))
 
 
-# @lru_cache
 def get_abstract_types() -> Set[Type[OOI]]:
-    return {t for t in ALL_TYPES if t.__subclasses__()}
+    return {
+        t for t in ALL_TYPES if any(filter(lambda x: not x.__module__.startswith("pydantic.main"), t.__subclasses__()))
+    }
 
 
-# @lru_cache
 def get_concrete_types() -> Set[Type[OOI]]:
-    return {t for t in ALL_TYPES if not t.__subclasses__()}
+    return {
+        t
+        for t in ALL_TYPES
+        if not any(filter(lambda x: not x.__module__.startswith("pydantic.main"), t.__subclasses__()))
+    }
 
 
-# @lru_cache()
 def get_collapsed_types() -> Set[Type[OOI]]:
     abstract_ooi_subtypes = get_abstract_types() - {OOI}
 
