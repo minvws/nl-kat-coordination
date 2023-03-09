@@ -43,9 +43,9 @@ OpenKAT works with a system of indemnities for scanning, linked to intrusion lev
 
 Intrusion levels or indemnities:
 
-:L0: 'do not touch'
+:L0: 'do nothing: do not touch and don't gather information about this object'.
 
-:L1: 'retrieve information from public sources'.
+:L1: 'retrieve information from public sources, but don't touch the object itself'.
 
 :L2: 'touch at normal user level'.
 
