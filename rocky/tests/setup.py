@@ -53,7 +53,7 @@ class UserSetup:
         admin_user.is_verified = self.is_verified
         admin_user.save()
         self.setup_device(admin_user)
-        group = Group.objects.create(name=GROUP_ADMIN)
+        group, _ = Group.objects.get_or_create(name=GROUP_ADMIN)
         group.user_set.add(admin_user)
 
         admin_permissions = [
@@ -71,7 +71,7 @@ class UserSetup:
         redteam_user.is_verified = self.is_verified
         redteam_user.save()
         self.setup_device(redteam_user)
-        group = Group.objects.create(name=GROUP_REDTEAM)
+        group, _ = Group.objects.get_or_create(name=GROUP_REDTEAM)
         group.user_set.add(redteam_user)
 
         redteam_permissions = [
@@ -88,7 +88,7 @@ class UserSetup:
         client_user.is_verified = self.is_verified
         client_user.save()
         self.setup_device(client_user)
-        group = Group.objects.create(name=GROUP_CLIENT)
+        group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
         group.user_set.add(client_user)
         return client_user
 
@@ -109,7 +109,7 @@ class MemberSetup:
         member_status=OrganizationMember.STATUSES.ACTIVE,
         trusted_clearance_level=-1,
         acknowledged_clearance_level=-1,
-        onboarded=True,
+        onboarded=False,
     ):
         self.user = user
         self.organization = organization

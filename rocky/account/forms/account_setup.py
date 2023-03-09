@@ -188,6 +188,8 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.instance.user.is_superuser:
+            self.fields["trusted_clearance_level"].disabled = True
         if "admin" in self.instance.user.groups.all() or self.instance.user.is_superuser:
             # There could be a case where you block yourself out of the system
             self.fields["status"].disabled = True

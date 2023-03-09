@@ -20,6 +20,11 @@ def organization():
 
 
 @pytest.fixture
+def organization_b():
+    return OrganizationSetup("OrganizationB", "org_b").create_organization()
+
+
+@pytest.fixture
 def superuser(django_user_model):
     return UserSetup(django_user_model, email="superuser@openkat.nl", password="SuperSuper123!!")._create_superuser()
 
@@ -30,6 +35,14 @@ def superuser_member(superuser, organization):
 
 
 @pytest.fixture
+def superuser_member_b(django_user_model, organization_b):
+    superuser_b = UserSetup(
+        django_user_model, email="superuserB@openkat.nl", password="SuperBSuperB123!!"
+    )._create_superuser()
+    return MemberSetup(superuser_b, organization_b).create_member()
+
+
+@pytest.fixture
 def adminuser(django_user_model):
     return UserSetup(django_user_model, email="admin@openkat.nl", password="AdminAdmin123!!")._create_admin_user()
 
@@ -37,6 +50,14 @@ def adminuser(django_user_model):
 @pytest.fixture
 def admin_member(adminuser, organization):
     return MemberSetup(adminuser, organization).create_member()
+
+
+@pytest.fixture
+def admin_member_b(django_user_model, organization_b):
+    admin_user_b = UserSetup(
+        django_user_model, email="adminB@openkat.nl", password="AdminBAdminB123!!"
+    )._create_admin_user()
+    return MemberSetup(admin_user_b, organization_b).create_member()
 
 
 @pytest.fixture
@@ -52,13 +73,29 @@ def redteam_member(redteamuser, organization):
 
 
 @pytest.fixture
+def redteam_member_b(django_user_model, organization_b):
+    redteam_user_b = UserSetup(
+        django_user_model, email="redteamerB@openkat.nl", password="RedteamBRedteamB123!!"
+    )._create_redteam_user()
+    return MemberSetup(redteam_user_b, organization_b).create_member()
+
+
+@pytest.fixture
 def clientuser(django_user_model):
-    return UserSetup(django_user_model, email="clientt@openkat.nl", password="ClientClient123!!")._create_client_user()
+    return UserSetup(django_user_model, email="client@openkat.nl", password="ClientClient123!!")._create_client_user()
 
 
 @pytest.fixture
 def client_member(clientuser, organization):
     return MemberSetup(clientuser, organization).create_member()
+
+
+@pytest.fixture
+def client_member_b(django_user_model, organization_b):
+    client_user_b = UserSetup(
+        django_user_model, email="clientB@openkat.nl", password="ClientBClientB123!!"
+    )._create_client_user()
+    return MemberSetup(client_user_b, organization_b).create_member()
 
 
 @pytest.fixture
