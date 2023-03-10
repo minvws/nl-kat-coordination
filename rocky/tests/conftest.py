@@ -27,8 +27,62 @@ def organization():
 
 
 @pytest.fixture
+def normal_user_without_organization_member(django_user_model):
+    user = django_user_model.objects.create(email="normal@openkat.nl", password="TestTest123!!")
+    user.is_verified = lambda: True
+
+    device = user.staticdevice_set.create(name="default")
+    device.token_set.create(token="12345678")
+
+    return user
+
+
+@pytest.fixture
+def normal_user(normal_user_without_organization_member, organization):
+    user = normal_user_without_organization_member
+
+    OrganizationMember.objects.create(
+        user=user,
+        organization=organization,
+        status=OrganizationMember.STATUSES.ACTIVE,
+        trusted_clearance_level=4,
+        acknowledged_clearance_level=4,
+        onboarded=True,
+    )
+    Indemnification.objects.create(
+        organization=organization,
+        user=user,
+    )
+    user.user_permissions.add(Permission.objects.get(codename="can_scan_organization"))
+
+    return user
+
+
+@pytest.fixture
 def user(django_user_model):
     user = django_user_model.objects.create_superuser(email="admin@openkat.nl", password="TestTest123!!")
+    user.is_verified = lambda: True
+
+    device = user.staticdevice_set.create(name="default")
+    device.token_set.create(token=user.get_username())
+
+    return user
+
+
+@pytest.fixture
+def user2(django_user_model):
+    user = django_user_model.objects.create_superuser(email="cl1@openkat.nl", password="TestTest123!!")
+    user.is_verified = lambda: True
+
+    device = user.staticdevice_set.create(name="default")
+    device.token_set.create(token=user.get_username())
+
+    return user
+
+
+@pytest.fixture
+def user3(django_user_model):
+    user = django_user_model.objects.create_superuser(email="cl2@openkat.nl", password="TestTest123!!")
     user.is_verified = lambda: True
 
     device = user.staticdevice_set.create(name="default")
@@ -42,8 +96,6 @@ def my_user(user, organization):
     OrganizationMember.objects.create(
         user=user,
         organization=organization,
-        verified=True,
-        authorized=True,
         status=OrganizationMember.STATUSES.ACTIVE,
         trusted_clearance_level=4,
         acknowledged_clearance_level=4,
@@ -55,6 +107,26 @@ def my_user(user, organization):
     user.user_permissions.add(Permission.objects.get(codename="can_scan_organization"))
 
     return user
+
+
+@pytest.fixture
+def my_new_user(user2, organization):
+    OrganizationMember.objects.create(
+        user=user2,
+        organization=organization,
+        status=OrganizationMember.STATUSES.NEW,
+    )
+    return user2
+
+
+@pytest.fixture
+def my_blocked_user(user3, organization):
+    OrganizationMember.objects.create(
+        user=user3,
+        organization=organization,
+        status=OrganizationMember.STATUSES.BLOCKED,
+    )
+    return user3
 
 
 @pytest.fixture

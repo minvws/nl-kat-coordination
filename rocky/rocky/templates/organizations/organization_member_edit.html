@@ -12,14 +12,14 @@
         <form method="post" class="horizontal-view">
           {% csrf_token %}
           <fieldset>
-            {% with member.member_name as name %}
+            {% with object.user.full_name as name %}
               <legend>
                 {% blocktranslate %}Edit {{ name }}{% endblocktranslate %}
               </legend>
             {% endwith %}
             <div>
               {% translate 'Member name' %}
-              <div>{{ object.member_name }}</div>
+              <div>{{ object.user.full_name }}</div>
             </div>
             <div>
               {% translate 'Role in organization' %}
@@ -28,10 +28,6 @@
             <div>
               {% translate 'Goal' %}
               <div>{{ object.goal }}</div>
-            </div>
-            <div>
-              {% translate 'Authorized to sign' %}
-              <div>{{ object.authorized }}</div>
             </div>
             {% for field in form %}
               {% include 'partials/form/field_input_wrapper.html' %}
