@@ -18,8 +18,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
     for _, subdomain in results["subdomains"].items():
         if subdomain["url"].endswith("."):
-            #check trailing dot and remove from domainname in order to stop duplicates
-            host = Hostname(name=subdomain["url"][:-1], network=internet.reference) 
+            subdomain = subdomain["url"].rstrip(".")
+            host = Hostname(name=subdomain, network=internet.reference) 
         else:
             host = Hostname(name=subdomain["url"], network=internet.reference)
         yield host
