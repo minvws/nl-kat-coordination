@@ -34,7 +34,7 @@ class FindingTypeAddForm(BaseRockyForm):
     )
     description = forms.CharField(
         label=_("Description"),
-        widget=forms.Textarea(attrs={"placeholder": _("Desribe the finding type"), "rows": 3}),
+        widget=forms.Textarea(attrs={"placeholder": _("Describe the finding type"), "rows": 3}),
     )
     risk = forms.CharField(
         label=_("Risk"),
@@ -102,7 +102,7 @@ class FindingAddForm(BaseRockyForm):
     finding_type_ids = forms.CharField(
         label=_("Finding types"),
         widget=forms.Textarea(
-            # Multi line placeholder because this textarea askes the user for every finding type on a new line.
+            # Multi line placeholder because this textarea asks the user for every finding type on a new line.
             attrs={
                 "placeholder": """KAT-999
 KAT-998

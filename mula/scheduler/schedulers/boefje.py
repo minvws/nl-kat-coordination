@@ -477,7 +477,7 @@ class BoefjeScheduler(Scheduler):
         # Boefje intensity score ooi clearance level, range
         # from 0 to 4. 4 being the highest intensity, and 0 being
         # the lowest. OOI clearance level defines what boefje
-        # intesity is allowed to run on.
+        # intensity is allowed to run on.
         if boefje_scan_level > ooi_scan_level:
             self.logger.debug(
                 "Boefje: %s scan level %s is too intense for ooi: %s scan level %s "

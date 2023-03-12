@@ -18,7 +18,7 @@ CSV_ERRORS = {
     "empty_file": _("The uploaded file is empty."),
     "no_org": _("Organization code(s) in CSV does not exist in our database"),
     "bad_columns": _("The number of columns do not meet the requirements."),
-    "bad_ooi_type": _("OOI Type in CSV does not meet the criterias."),
+    "bad_ooi_type": _("OOI Type in CSV does not meet the criteria."),
     "csv_error": _("An error has occurred during the parsing of the csv file:"),
 }
 

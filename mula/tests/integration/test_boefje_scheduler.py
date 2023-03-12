@@ -472,7 +472,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
-        # Task should be in datastore, and queueud
+        # Task should be in datastore, and queued
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
@@ -525,7 +525,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
-        # Task should be in datastore, and queueud
+        # Task should be in datastore, and queued
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)

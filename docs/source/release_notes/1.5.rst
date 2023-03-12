@@ -44,7 +44,7 @@ Containers
 
 The container image of the XTDB container can be changed to
 "ghcr.io/dekkers/xtdb-http-multinode:v1.0.0". This image will automatically
-detect that the volume was created by the orignal XTDB image and migrate
+detect that the volume was created by the original XTDB image and migrate
 everything. By the default it will create a new node with the name "_dev", but
 this can be changed using the XTDB_MIGRATION_NODE_NAME environment variable.
 

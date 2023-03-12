@@ -70,11 +70,11 @@ class Migration(migrations.Migration):
                             ),
                             (
                                 3,
-                                "3. Detectable. Faillure mode is detectable with effort.",
+                                "3. Detectable. Failure mode is detectable with effort.",
                             ),
                             (
                                 4,
-                                "4. Poorly Detectable. Detecting the faillure mode is difficult.",
+                                "4. Poorly Detectable. Detecting the failure mode is difficult.",
                             ),
                             (
                                 5,
