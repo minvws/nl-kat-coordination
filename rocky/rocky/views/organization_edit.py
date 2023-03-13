@@ -7,13 +7,13 @@ from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
-from account.forms import OrganizationForm
+from account.forms import OrganizationUpdateForm
 from tools.models import Organization
 
 
 @class_view_decorator(otp_required)
 class OrganizationEditView(PermissionRequiredMixin, UpdateView):
-    form_class = OrganizationForm
+    form_class = OrganizationUpdateForm
     model = Organization
     template_name = "organizations/organization_edit.html"
     permission_required = "tools.change_organization"
@@ -31,22 +31,11 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
                 "text": self.object.name,
             },
             {
-                "url": reverse("organization_edit", kwargs={"pk": self.object.id}),
+                "url": reverse(
+                    "organization_edit", kwargs={"organization_code": self.object.code, "pk": self.object.id}
+                ),
                 "text": _("Edit"),
             },
         ]
 
         return context
-
-    def handle_no_permission(self):
-        messages.add_message(
-            self.request,
-            messages.ERROR,
-            _("You are not allowed to change organizations."),
-        )
-
-        if self.request.user.has_perm("tools.can_view_organization"):
-            organization = self.get_object()
-            return redirect(reverse("organization_detail", kwargs={"organization_code": organization.code}))
-
-        return redirect("crisis_room")

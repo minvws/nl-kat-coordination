@@ -213,10 +213,20 @@ class OrganizationForm(forms.ModelForm):
         }
 
 
+class OnboardingOrganizationUpdateForm(OrganizationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["code"].disabled = True
+
+
 class OrganizationUpdateForm(OrganizationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["code"].disabled = True
+
+    class Meta:
+        model = Organization
+        fields = ["name", "code", "tags"]
 
 
 class SetPasswordForm(auth_forms.SetPasswordForm):

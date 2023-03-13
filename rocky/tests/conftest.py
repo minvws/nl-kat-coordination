@@ -15,15 +15,12 @@ from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 from tools.models import Organization, OrganizationMember, OOIInformation, Indemnification
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN
+from tests.setup import OrganizationSetup, UserSetup, MemberSetup
 
 
 @pytest.fixture
 def organization():
-    with patch("katalogus.client.KATalogusClientV1"), patch(
-        "octopoes.connector.octopoes.OctopoesAPIConnector.create_node"
-    ):
-        organization = Organization.objects.create(name="Test Organization", code="test")
-    return organization
+    return OrganizationSetup().create_organization()
 
 
 @pytest.fixture
@@ -127,6 +124,48 @@ def my_blocked_user(user3, organization):
         status=OrganizationMember.STATUSES.BLOCKED,
     )
     return user3
+
+
+@pytest.fixture
+def superuser(django_user_model):
+    return UserSetup(django_user_model, email="superuser@openkat.nl", password="SuperSuper123!!")._create_superuser()
+
+
+@pytest.fixture
+def superuser_member(superuser, organization):
+    return MemberSetup(superuser, organization).create_member()
+
+
+@pytest.fixture
+def adminuser(django_user_model):
+    return UserSetup(django_user_model, email="admin@openkat.nl", password="AdminAdmin123!!")._create_admin_user()
+
+
+@pytest.fixture
+def admin_member(adminuser, organization):
+    return MemberSetup(adminuser, organization).create_member()
+
+
+@pytest.fixture
+def redteamuser(django_user_model):
+    return UserSetup(
+        django_user_model, email="redteamer@openkat.nl", password="RedteamRedteam123!!"
+    )._create_redteam_user()
+
+
+@pytest.fixture
+def redteam_member(redteamuser, organization):
+    return MemberSetup(redteamuser, organization).create_member()
+
+
+@pytest.fixture
+def clientuser(django_user_model):
+    return UserSetup(django_user_model, email="client@openkat.nl", password="ClientClient123!!")._create_client_user()
+
+
+@pytest.fixture
+def client_member(clientuser, organization):
+    return MemberSetup(clientuser, organization).create_member()
 
 
 @pytest.fixture
