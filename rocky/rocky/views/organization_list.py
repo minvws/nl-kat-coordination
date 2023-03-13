@@ -4,13 +4,13 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from tools.models import Organization, OrganizationMember
-from tools.view_helpers import OrganizationBreadcrumbsMixin
+from tools.view_helpers import OrganizationsBreadcrumbsMixin
 
 
 @class_view_decorator(otp_required)
 class OrganizationListView(
     PermissionRequiredMixin,
-    OrganizationBreadcrumbsMixin,
+    OrganizationsBreadcrumbsMixin,
     ListView,
 ):
     template_name = "organizations/organization_list.html"

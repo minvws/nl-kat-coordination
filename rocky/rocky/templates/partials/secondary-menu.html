@@ -5,7 +5,7 @@
     {% if request.user.is_superuser or perms.tools.view_organization  %}
       <li>
         <a href="{% url 'organization_list' %}"
-           {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Organizations' %}</a>
+           {% if 'organizations' in request.path|urlencode or 'details' in request.path|urlencode or 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Organizations' %}</a>
       </li>
     {% endif %}
     <li>

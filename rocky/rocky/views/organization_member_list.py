@@ -27,6 +27,7 @@ class OrganizationMemberListView(
 ):
     model = OrganizationMember
     context_object_name = "members"
+    template_name = "organizations/organization_member_list.html"
 
     def get_queryset(self):
         queryset = self.model.objects.filter(organization=self.organization)

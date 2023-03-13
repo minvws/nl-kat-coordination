@@ -27,6 +27,8 @@ from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_add import OrganizationMemberAddView
 from rocky.views.organization_member_edit import OrganizationMemberEditView
+from rocky.views.organization_member_list import OrganizationMemberListView
+from rocky.views.organization_dashboard import OrganizationDashboard
 from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileResetView, ScanProfileDetailView
 from rocky.views.scans import ScanListView
@@ -95,8 +97,18 @@ urlpatterns += i18n_patterns(
     ),
     path(
         "<organization_code>/",
+        OrganizationDashboard.as_view(),
+        name="organization_dashboard",
+    ),
+    path(
+        "<organization_code>/details",
         OrganizationDetailView.as_view(),
         name="organization_detail",
+    ),
+    path(
+        "<organization_code>/members",
+        OrganizationMemberListView.as_view(),
+        name="organization_member_list",
     ),
     path(
         "<organization_code>/members/edit/<path:pk>/",

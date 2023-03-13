@@ -7,7 +7,14 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{% translate 'Organization details' %}</h1>
+        <h1>{% translate 'Organization'  %}: {{ organization.name }}</h1>
+
+        {% blocktranslate with organization_name=organization.name %}
+          An overview of "{{ organization_name }}". This shows general information and its settings.
+        {% endblocktranslate %}
+
+        <h2>{% translate 'Organization details' %}</h2>
+
         <div class="horizontal-scroll">
           <table>
             <thead>
@@ -35,9 +42,6 @@
           {% include 'organizations/organization_tags.html' %}
         </div>
       </section>
-    {% endif %}
-    {% if perms.tools.view_organization or request.user.is_superuser %}
-      {% include 'organizations/organization_member_list.html' %}
     {% endif %}
   </main>
 {% endblock %}
