@@ -244,12 +244,12 @@ jobs:
         run: rfbrowser init
 
       - name: Run Robot Full Onboarding Flow
-        run: robot -d rocky/tests/robot/results-complete_onboarding -v headless:true rocky/tests/robot/complete_onboarding
+        run: robot -d rocky/tests/robot/results-ci -v headless:true rocky/tests/robot/ci
 
       - name: Upload Robot Framework reports
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: rf-results-complete-onboarding
+          name: rf-results-ci
           path: /home/runner/work/nl-kat-coordination/nl-kat-coordination/rocky/tests/robot/results*
 
