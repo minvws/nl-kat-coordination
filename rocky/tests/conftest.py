@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
 from django.contrib.auth.models import Permission, Group
@@ -13,7 +13,7 @@ from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
-from tools.models import Organization, OrganizationMember, OOIInformation, Indemnification
+from tools.models import OrganizationMember, OOIInformation, Indemnification
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN
 from tests.setup import OrganizationSetup, UserSetup, MemberSetup
 

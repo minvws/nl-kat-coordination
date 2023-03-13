@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
@@ -19,6 +18,11 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
     permission_required = "tools.change_organization"
 
     def get_success_url(self):
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _("Organization %s successfully updated.") % (self.object.name),
+        )
         return reverse("organization_detail", kwargs={"organization_code": self.object.code})
 
     def get_context_data(self, **kwargs):
