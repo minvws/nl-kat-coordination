@@ -10,7 +10,7 @@ your own rules for the population, and prioritization of tasks.
 The *scheduler* implements a priority queue for prioritization of tasks to be
 performed by the worker(s). In the implementation of the scheduler within KAT
 the scheduler is tasked with populating the priority queue with 'boefje' and
-'normalizer' tasks. The scheduler is responsible for maintaining and updating
+'normalizer' jobs. The scheduler is responsible for maintaining and updating
 its internal priority queue.
 
 A priority queue is used, in as such, that it allows us to determine what jobs
@@ -34,8 +34,9 @@ scheduler system with their respective level of abstraction.
 
 #### C2 Container level:
 
-First we'll review how the `Scheduler` system interacts with its external
-services.
+First we'll review how the `Scheduler` system interacts and sits in between its
+external services. In this overview arrows from external services indicate how
+and why those services communicate with the scheduler.
 
 ```mermaid
 graph TB
@@ -62,8 +63,7 @@ graph TB
 ```
 
 * The `Scheduler` system combines data from the `Octopoes`, `Katalogus`,
-`Bytes` and `RabbitMQ` systems. With these data it determines what tasks should
-be created and run.
+`Bytes` and `RabbitMQ` systems. 
 
 * The `Scheduler` system implements multiple `schedulers` per organisation.
 
@@ -71,15 +71,27 @@ be created and run.
 
 Following we review how different dataflows, from the `boefjes` and the
 `normalizers` are implemented within the `Scheduler` system. The following
-events within a KAT installation will trigger dataflows in the `Scheduler`:
+events within a KAT installation will trigger dataflows in the `Scheduler`.
+With the current implementation of the scheduler we identify the creation of
+two different type of jobs, `boefje` and `normalizer` jobs.
 
-* When a plugin is enabled or disabled (`monitor_organisations`)
+For a `boefje` job the following events will trigger a dataflow procedure to be
 
-* When an organisation is created or deleted (`monitor_organisations`)
+1. When a scan level is increased on an OOI (`schedulers.boefje.push_tasks_for_scan_profile_mutations`)
 
-* When a scan level is increased (`get_latest_object`)
+2. Rescheduling of oois (`schedulers.boefje.push_tasks_for_random_objects`)
 
-* When a raw file is created (`get_latest_raw_data`)
+3. Scan tasks create by the user in Rocky (`server.push_queue`)
+
+4. When an organisation is created or deleted (`app.monitor_organisations`)
+
+5. When a plugin of type `boefje` is enabled or disabled in Rocky. Triggered when the
+plugin cache of an organisation is flushed, and when a ooi is checked for 
+rescheduling.
+
+For a `normalizer` job the following events will trigger a dataflow procedure
+
+1. When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
 
 When any of these events occur, it will trigger a dataflow procedure to be
 executed in the `Scheduler`.
