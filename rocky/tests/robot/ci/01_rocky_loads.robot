@@ -40,3 +40,13 @@ I can confirm that I can proceed
     Click    "Continue with this account, onboard me!"
 
 # Note: the CI should be extended when the error 500 is properly debugged
+
+
+*** Keywords ***
+Create A User While Onboarding
+    [Arguments]    ${name}    ${email}    ${password}
+    Fill Text    xpath=//*[@id="id_name"]    ${name}
+    Fill Text    xpath=//*[@id="id_email"]    ${email}
+    Fill Text    xpath=//*[@id="id_password"]    ${password}
+    Click    "Submit"
+    #Get Text    .confirmation    contains    succesfully    error account creation failed
