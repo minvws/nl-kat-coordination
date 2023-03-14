@@ -53,14 +53,16 @@
             <a href="{% url 'task_list' organization.code %}"
               {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Tasks' %}</a>
           </li>
-          <li>
-            <a href="{% url 'organization_member_list' organization.code %}"
-              {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Members' %}</a>
-          </li>
-          <li>
-            <a href="{% url 'organization_detail' organization.code %}"
-              {% if 'details' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Settings' %}</a>
-          </li>
+          {% if request.user.is_superuser or perms.tools.view_organization  %}
+            <li>
+              <a href="{% url 'organization_member_list' organization.code %}"
+                {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Members' %}</a>
+            </li>
+            <li>
+              <a href="{% url 'organization_detail' organization.code %}"
+                {% if 'details' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Settings' %}</a>
+            </li>
+          {% endif %}
         {% endif %}
       {% endif %}
       <li class="secondary-menu">{% include 'partials/secondary-menu.html' %}</li>
