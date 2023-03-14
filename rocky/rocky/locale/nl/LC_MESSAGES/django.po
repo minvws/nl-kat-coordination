@@ -3915,15 +3915,15 @@ msgid "Added on"
 msgstr "Toegevoegd op"
 
 #: rocky/templates/organizations/organization_member_list.html:21
-msgid "Has trusted permisson to set OOI clearance levels"
+msgid "Has trusted permission to set OOI clearance levels"
 msgstr "Vertrouwd om vrijwaringsniveau te zetten voor OOI's"
 
 #: rocky/templates/organizations/organization_member_list.html:22
-msgid "Acknowledged permisson to set OOI clearance levels"
+msgid "Acknowledged permission to set OOI clearance levels"
 msgstr "Er is toestemming verleend om vrijgaveniveaus voor OOI vast te stellen"
 
 #: rocky/templates/organizations/organization_member_list.html:23
-msgid "Grant/revoke permisson to set OOI clearance levels"
+msgid "Grant/revoke permission to set OOI clearance levels"
 msgstr "Toestemming verlenen/intrekken om vrijgaveniveaus voor OOI in te stellen"
 
 #: rocky/templates/organizations/organization_page_tabs.html:4
