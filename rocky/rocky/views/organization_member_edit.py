@@ -28,7 +28,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
             messages.SUCCESS,
             _("Member %s successfully updated.") % (self.object.user.full_name),
         )
-        return reverse("organization_detail", kwargs={"organization_code": self.organization.code})
+        return reverse("organization_member_list", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
