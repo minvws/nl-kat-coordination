@@ -3,12 +3,11 @@ from django.views.generic import TemplateView
 from account.mixins import OrganizationView
 from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
-from rocky.views.ooi_report import OOIReportView
 from two_factor.views.utils import class_view_decorator
 
 
 @class_view_decorator(otp_required)
-class OrganizationDashboard(OOIReportView, OrganizationView, TemplateView):
+class OrganizationDashboard(OrganizationView, TemplateView):
     template_name = "organizations/organization_dashboard.html"
 
     def setup(self, request, *args, **kwargs):
