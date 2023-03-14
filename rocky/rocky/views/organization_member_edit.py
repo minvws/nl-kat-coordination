@@ -22,6 +22,13 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
     def test_func(self):
         return not self.get_object().user.is_superuser or self.request.user.is_superuser
 
+    def get_form(self):
+        form = super().get_form()
+        if (self.object.user == self.request.user) or self.request.user.is_superuser:
+            # There could be a case where you block yourself out of the system
+            form.fields["status"].disabled = True
+        return form
+
     def get_success_url(self):
         messages.add_message(
             self.request,
