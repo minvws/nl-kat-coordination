@@ -14,19 +14,18 @@ from keiko.keiko import generate_report
 from keiko.settings import Settings
 from keiko.templates import get_templates, get_samples
 
-settings = Settings()
 logger = logging.getLogger(__name__)
 
 
-def construct_api() -> FastAPI:
+def construct_api(settings: Settings) -> FastAPI:
     """Construct the FastAPI object, with prefilled examples from disk."""
     app = FastAPI()
-    examples = get_samples()
+    examples = get_samples(settings)
 
     @app.get("/templates")
     def get_templates_() -> List[str]:
         """Endpoint to list known templates."""
-        return list(get_templates())
+        return list(get_templates(settings))
 
     class ReportResponse(BaseModel):
         """Response model for the create report endpoint."""
@@ -48,6 +47,7 @@ def construct_api() -> FastAPI:
             glossary=parameters.glossary,
             report_id=report_id,
             debug=parameters.debug,
+            settings=settings,
         )
 
         return ReportResponse(report_id=report_id)
