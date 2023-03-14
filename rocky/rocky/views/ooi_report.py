@@ -185,7 +185,7 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
 
 @class_view_decorator(otp_required)
 class ReportPDFView(View):
-    FILENAME_FRIENDLY_DATE_FORMAT = "%Y_%d_%mT%H_%M_%S_%f_%z"
+    FILE_NAME_FRIENDLY_DATE_FORMAT = "%Y_%d_%mT%H_%M_%S_%f_%z"
 
     def get_report(self, source_type: str, source_value: str, store: Dict, file_name: str, failure_redirect_url: str):
         # reuse existing dict structure
@@ -262,12 +262,12 @@ class OOIReportPDFView(SingleOOITreeMixin, ReportPDFView):
                 "nl",
                 self.organization.code,
                 self.ooi.primary_key,
-                self.get_observed_at().isoformat(),
-                datetime.now(timezone.utc).strftime(self.FILENAME_FRIENDLY_DATE_FORMAT),
+                self.get_observed_at().strftime(self.FILE_NAME_FRIENDLY_DATE_FORMAT),
+                datetime.now(timezone.utc).strftime(self.FILE_NAME_FRIENDLY_DATE_FORMAT),
             ]
         )
         # allow alphanumeric characters, dashes and underscores, replace rest with underscores
-        report_file_name = re.sub("[^\\w-]", "_", report_file_name)
+        report_file_name = re.sub("[^\\w\\+-]", "_", report_file_name)
         report_file_name = f"{report_file_name}.pdf"
 
         return report_file_name
@@ -293,7 +293,7 @@ class FindingReportPDFView(FindingListView, ReportPDFView):
             [
                 "bevindingenrapport_nl",
                 self.organization.code,
-                datetime.now(timezone.utc).strftime(self.FILENAME_FRIENDLY_DATE_FORMAT),
+                datetime.now(timezone.utc).strftime(self.FILE_NAME_FRIENDLY_DATE_FORMAT),
             ]
         )
 

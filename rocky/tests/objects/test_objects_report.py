@@ -52,6 +52,12 @@ def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organiz
     request = setup_request(rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
     request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
 
+    dt_in_filename = "2023_14_03T13_48_19_418402_+0000"
+    mock_datetime = mocker.patch("rocky.views.ooi_report.datetime")
+    mock_mixin_datetime = mocker.patch("rocky.views.mixins.datetime")
+    mock_datetime.now().strftime.return_value = dt_in_filename
+    mock_mixin_datetime.now().strftime.return_value = dt_in_filename
+
     # Setup Keiko mock
     mock_keiko_client = mocker.patch("rocky.views.ooi_report.keiko_client")
     mock_keiko_client.generate_report.return_value = "fake_report_id"
@@ -61,6 +67,10 @@ def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organiz
 
     assert response.status_code == 200
     assert response.getvalue() == b"fake_binary_pdf_content"
+    assert (
+        f"bevindingenrapport_nl_test_Finding_Network_testnetwork_KAT-000_{dt_in_filename}_{dt_in_filename}.pdf"
+        in response.headers["Content-Disposition"]
+    )
 
     report_data_param = mock_keiko_client.generate_report.call_args[0][1]
     # Verify that the data is sent correctly to Keiko
@@ -93,6 +103,10 @@ def test_organization_pdf_report(rf, my_user, organization, ooi_information, moc
     request = setup_request(rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
     request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
 
+    dt_in_filename = "2023_14_03T13_48_19_418402_+0000"
+    mock_datetime = mocker.patch("rocky.views.ooi_report.datetime")
+    mock_datetime.now().strftime.return_value = dt_in_filename
+
     # Setup Keiko mock
     mock_keiko_client = mocker.patch("rocky.views.ooi_report.keiko_client")
     mock_keiko_client.generate_report.return_value = "fake_report_id"
@@ -102,6 +116,7 @@ def test_organization_pdf_report(rf, my_user, organization, ooi_information, moc
 
     assert response.status_code == 200
     assert response.getvalue() == b"fake_binary_pdf_content"
+    assert f"bevindingenrapport_nl_test_{dt_in_filename}.pdf" in response.headers["Content-Disposition"]
 
     report_data_param = mock_keiko_client.generate_report.call_args[0][1]
 
