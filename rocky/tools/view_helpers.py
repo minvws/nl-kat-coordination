@@ -115,22 +115,30 @@ class StepsMixin:
         return context
 
 
-class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
+class OrganizationsBreadcrumbsMixin(BreadcrumbsMixin):
     breadcrumbs = [{"url": reverse_lazy("organization_list"), "text": _("Organizations")}]
+
+
+class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
+    def build_breadcrumbs(self):
+        breadcrumbs = [
+            {
+                "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),
+                "text": "Settings",
+            },
+        ]
+
+        return breadcrumbs
 
 
 class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
     def build_breadcrumbs(self):
         breadcrumbs = [
             {
-                "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),
-                "text": self.organization.name,
+                "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
+                "text": "Members",
             },
         ]
-        permission = self.request.user.has_perm("tools.view_organization")
-        if permission:
-            organization_url = {"url": reverse("organization_list"), "text": _("Organizations")}
-            breadcrumbs.insert(0, organization_url)
 
         return breadcrumbs
 
