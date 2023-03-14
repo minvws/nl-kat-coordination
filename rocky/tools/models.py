@@ -1,6 +1,5 @@
 import logging
 import uuid
-from typing import Tuple
 
 import tagulous.models
 from django.conf import settings
@@ -75,7 +74,8 @@ class Organization(models.Model):
         return reverse("organization_detail", args=[self.pk])
 
     def delete(self, *args, **kwargs):
-        katalogus_client, octopoes_client = self._get_healthy_katalogus_and_octopoes(self.code)
+        katalogus_client = self._get_healthy_katalogus(self.code)
+        octopoes_client = self._get_healthy_octopoes(self.code)
 
         try:
             octopoes_client.delete_node()
@@ -99,7 +99,8 @@ class Organization(models.Model):
 
     @classmethod
     def pre_create(cls, sender, instance, *args, **kwargs):
-        katalogus_client, octopoes_client = cls._get_healthy_katalogus_and_octopoes(instance.code)
+        katalogus_client = cls._get_healthy_katalogus(instance.code)
+        octopoes_client = cls._get_healthy_octopoes(instance.code)
 
         try:
             if not katalogus_client.organization_exists():
@@ -121,17 +122,8 @@ class Organization(models.Model):
             raise RockyError(f"Octopoes returned error creating organization: {e}") from e
 
     @staticmethod
-    def _get_healthy_katalogus_and_octopoes(organization_code) -> Tuple[KATalogusClientV1, OctopoesAPIConnector]:
-        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
+    def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
         katalogus_client = get_katalogus(organization_code)
-
-        try:
-            health = octopoes_client.root_health()
-        except RequestException as e:
-            raise RockyError("The Octopoes service is not up") from e
-
-        if not health.healthy:
-            raise RockyError("The Octopoes service is not healthy")
 
         try:
             health = katalogus_client.health()
@@ -141,7 +133,19 @@ class Organization(models.Model):
         if not health.healthy:
             raise RockyError("The Katalogus service is not healthy")
 
-        return katalogus_client, octopoes_client
+        return katalogus_client
+
+    @staticmethod
+    def _get_healthy_octopoes(organization_code: str) -> OctopoesAPIConnector:
+        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
+        try:
+            health = octopoes_client.root_health()
+        except RequestException as e:
+            raise RockyError("The Octopoes service is not up") from e
+        if not health.healthy:
+            raise RockyError("The Octopoes service is not healthy")
+
+        return octopoes_client
 
 
 pre_save.connect(Organization.pre_create, sender=Organization)
