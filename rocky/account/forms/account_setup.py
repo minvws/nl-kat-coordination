@@ -106,6 +106,7 @@ class UserAddForm(forms.Form):
                 "aria-describedby": "explanation-email",
             }
         ),
+        error_messages={"unique": _("Choose another email.")},
     )
     password = forms.CharField(
         label=_("Password"),
@@ -120,19 +121,6 @@ class UserAddForm(forms.Form):
         validators=[validate_password],
     )
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            self.add_error("email", _("Choose another email."))
-        return email
-
-    def set_user(self):
-        self.user = User.objects.create_user(
-            full_name=self.cleaned_data["name"],
-            email=self.cleaned_data["email"],
-            password=self.cleaned_data["password"],
-        )
-
 
 class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
     """
@@ -145,26 +133,40 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
         self.organization = Organization.objects.get(code=kwargs.pop("organization_code"))
         return super().__init__(*args, **kwargs)
 
+    def set_user(self):
+        return User.objects.create_user(
+            full_name=self.cleaned_data["name"],
+            email=self.cleaned_data["email"],
+            password=self.cleaned_data["password"],
+        )
+
+    def set_member(self, user):
+        if not OrganizationMember.objects.filter(user=user, organization=self.organization).exists():
+            OrganizationMember.objects.create(
+                user=user,
+                organization=self.organization,
+                status=OrganizationMember.STATUSES.ACTIVE,
+            )
+
     def save(self, **kwargs):
         if self.group:
             selected_group = Group.objects.get(name=self.group)
         else:
             selected_group = Group.objects.get(name=self.cleaned_data["account_type"])
         if self.organization and selected_group:
-            self.set_user()
-            OrganizationMember.objects.get_or_create(
-                user=self.user,
-                organization=self.organization,
-                status=OrganizationMember.STATUSES.ACTIVE,
-            )
-
-            selected_group.user_set.add(self.user)
-            self.user.save()
+            if not User.objects.filter(email=self.cleaned_data["email"]).exists():
+                new_user = self.set_user()
+                self.set_member(new_user)
+                selected_group.user_set.add(new_user)
+                new_user.save()
+            else:
+                existing_user = User.objects.get(email=self.cleaned_data["email"])
+                self.set_member(existing_user)
 
 
 class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
     class Meta:
-        model = User
+        model = OrganizationMember
         fields = ("account_type", "name", "email", "password")
 
 

@@ -6,7 +6,7 @@
     {% if perms.tools.add_organizationmember %}
       <div class="horizontal-view toolbar">
         <a href="{% url 'organization_member_add' organization.code %}"
-           class="button">{% translate 'Add new member' %}</a>
+           class="button">{% translate 'Add member' %}</a>
       </div>
     {% endif %}
     {% include 'partials/organization_member_list_filters.html' with checkbox_filters=checkbox_filters %}
@@ -29,21 +29,27 @@
         <tbody>
           {% for member in members %}
             <tr>
-              <td>{{ member.user }}<br>
+              <td>
+                {{ member.user }}
+                <br>
+              </td>
               <td>
                 {% if member.status == "blocked" %}
                   {% translate 'Suspended' %}
                 {% else %}
                   {{ member.status|title }}
                 {% endif %}
-              <br>
+                <br>
+              </td>
               <td>
-              {% if member.user.is_superuser %}
-                {% translate 'Super user' %}
-              {% endif %}
-              {% for group in member.user.groups.all %}
-                  {{ group.name|title }}<br>
-              {% endfor %}
+                {% if member.user.is_superuser %}
+                  {% translate 'Super user' %}
+                {% endif %}
+                {% for group in member.user.groups.all %}
+                  {{ group.name|title }}
+                  <br>
+                {% endfor %}
+              </td>
               <td>{{ member.user.date_joined }}</td>
               <td>
                 {% if member.trusted_clearance_level > 0 %}
