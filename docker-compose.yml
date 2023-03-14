@@ -235,11 +235,13 @@ services:
       - .env
     volumes:
       - ./keiko:/app/keiko
+      - keiko-reports:/reports
 
 volumes:
   rocky-db-data:
   bytes-db-data:
   bytes-data:
+  keiko-reports:
   katalogus-db-data:
   scheduler-db-data:
   xtdb-data:
