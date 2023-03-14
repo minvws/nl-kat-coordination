@@ -158,7 +158,7 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
                 organization=self.organization,
                 status=OrganizationMember.STATUSES.ACTIVE,
             )
-            if selected_group.name == "admin":
+            if selected_group.name == "admin" or self.user.is_superuser:
                 member.acknowledged_clearance_level = 4
                 member.trusted_clearance_level = 4
                 member.save()

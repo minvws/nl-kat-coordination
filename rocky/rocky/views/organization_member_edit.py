@@ -66,7 +66,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
                     )
                     % (tcl, acl, tcl),
                 )
-            else:
+            if int(tcl) > int(acl):
                 messages.add_message(
                     self.request,
                     messages.WARNING,
