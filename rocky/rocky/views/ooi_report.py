@@ -185,6 +185,8 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
 
 @class_view_decorator(otp_required)
 class ReportPDFView(View):
+    FILENAME_FRIENDLY_DATE_FORMAT = "%Y_%d_%mT%H_%M_%S_%f_%z"
+
     def get_report(self, source_type: str, source_value: str, store: Dict, file_name: str, failure_redirect_url: str):
         # reuse existing dict structure
         report_data = build_findings_list_from_store(store)
@@ -203,10 +205,13 @@ class ReportPDFView(View):
         # open pdf as attachment
         try:
             return FileResponse(keiko_client.get_report(report_id), as_attachment=True, filename=file_name)
-        except (HTTPError, ReportNotFoundException):
+        except ReportNotFoundException:
             messages.error(
                 self.request, _("Error generating report: Timeout reached. See Keiko logs for more information.")
             )
+            return redirect(failure_redirect_url)
+        except HTTPError:
+            messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
             return redirect(failure_redirect_url)
 
     def _ooi_field_as_string(self, findings_grouped: Dict, store: Dict):
@@ -221,8 +226,7 @@ class ReportPDFView(View):
                 else:
                     ooi_field = str(store[finding["id"]].ooi)
 
-                updated_x = {**finding, "ooi": ooi_field}
-                list_of_findings.append(updated_x)
+                list_of_findings.append({**finding, "ooi": ooi_field})
 
             new_findings_grouped[finding_type] = {
                 "list": list_of_findings,
@@ -259,11 +263,11 @@ class OOIReportPDFView(SingleOOITreeMixin, ReportPDFView):
                 self.organization.code,
                 self.ooi.primary_key,
                 self.get_observed_at().isoformat(),
-                datetime.now(timezone.utc).isoformat(),
+                datetime.now(timezone.utc).strftime(self.FILENAME_FRIENDLY_DATE_FORMAT),
             ]
         )
         # allow alphanumeric characters, dashes and underscores, replace rest with underscores
-        report_file_name = re.sub("[^0-9a-zA-Z-]", "_", report_file_name)
+        report_file_name = re.sub("[^\\w-]", "_", report_file_name)
         report_file_name = f"{report_file_name}.pdf"
 
         return report_file_name
@@ -285,12 +289,15 @@ class FindingReportPDFView(FindingListView, ReportPDFView):
         )
 
     def _generate_report_file_name(self):
-        file_name = "_".join(["bevindingenrapport_nl", self.organization.code, datetime.now(timezone.utc).isoformat()])
-        # allow alphanumeric characters, dashes and underscores, replace rest with underscores
-        file_name = re.sub("[^0-9a-zA-Z-]", "_", file_name)
-        file_name = f"{file_name}.pdf"
+        file_name = "_".join(
+            [
+                "bevindingenrapport_nl",
+                self.organization.code,
+                datetime.now(timezone.utc).strftime(self.FILENAME_FRIENDLY_DATE_FORMAT),
+            ]
+        )
 
-        return file_name
+        return f"{file_name}.pdf"
 
 
 """

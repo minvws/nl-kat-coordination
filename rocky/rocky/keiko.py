@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Dict, BinaryIO
 from django.conf import settings
 
@@ -33,9 +34,13 @@ class KeikoClient:
         for i in range(15):
             time.sleep(1)
             res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf", stream=True)
-            if res.status_code == 200:
-                return res.raw
-        res.raise_for_status()
+
+            if res.status_code == HTTPStatus.NOT_FOUND:
+                continue
+
+            res.raise_for_status()
+            return res.raw
+
         raise ReportNotFoundException
 
     def health(self) -> ServiceHealth:
