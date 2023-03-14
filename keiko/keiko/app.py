@@ -7,6 +7,6 @@ from keiko.settings import Settings
 settings = Settings()
 
 # Load logging configuration
-setup_loggers()
+setup_loggers(settings)
 
-api = construct_api()
+api = construct_api(settings)

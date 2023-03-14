@@ -15,7 +15,6 @@ from keiko.base_models import DataShapeBase
 from keiko.settings import Settings
 from keiko.templates import get_data_shape
 
-settings = Settings()
 logger = getLogger(__name__)
 
 DATA_SHAPE_CLASS_NAME = "DataShape"
@@ -32,10 +31,11 @@ def generate_report(
     glossary: str,
     report_id: str,
     debug: bool,
+    settings: Settings,
 ) -> None:
     """Generate a preprocessed LateX file from a template, a JSON data file and a glossary CSV file."""
     # load data shape and validate
-    data_shape_class = get_data_shape(template_name)
+    data_shape_class = get_data_shape(template_name, settings)
     data = data_shape_class.parse_obj(report_data.dict())
     logger.info(
         "Data shape validation successful. [report_id=%s] [template=%s]",
@@ -44,7 +44,7 @@ def generate_report(
     )
 
     # build glossary
-    glossary_entries = read_glossary(glossary)
+    glossary_entries = read_glossary(glossary, settings)
     logger.info("Glossary loaded. [report_id=%s] [glossary=%s]", report_id, glossary)
 
     # init jinja2 template
@@ -122,12 +122,7 @@ def generate_report(
         ]
         env = {**os.environ, "TEXMFVAR": tmp_dirname}
         output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
-        logger.info(
-            "pdflatex run. [report_id=%s] [template=%s] [command=%s]",
-            report_id,
-            template_name,
-            " ".join(cmd),
-        )
+        logger.info("pdflatex run. [report_id=%s] [template=%s] [command=%s]", report_id, template_name, " ".join(cmd))
         logger.debug(output.stdout.decode("utf-8"))
         logger.debug(output.stderr.decode("utf-8"))
         if output.returncode:
@@ -161,7 +156,7 @@ def generate_report(
     # ...tempfiles are deleted automatically when leaving the context
 
 
-def read_glossary(glossary: str) -> Dict[str, Tuple[str, str]]:
+def read_glossary(glossary: str, settings: Settings) -> Dict[str, Tuple[str, str]]:
     """Read a glossary CSV file and return a dictionary of entries."""
     glossary_entries = {}
     glossary_file_path = Path(settings.glossaries_folder) / glossary
