@@ -211,7 +211,7 @@ class SchedulerClient:
             "max_created_at": max_created_at,
         }
 
-        res = self.session.get(f"{self._base_uri}/tasks", params=params, json=filters)
+        res = self.session.post(f"{self._base_uri}/tasks", params=params, json=filters)
         return PaginatedTasksResponse.parse_raw(res.text)
 
     def get_lazy_task_list(
