@@ -37,6 +37,10 @@ SCHEDULER_PQ_INTERVAL=
 # default: 86400
 SCHEDULER_PQ_GRACE=
 
+# The maximum of random objects that are requested from the random ooi
+# endpoint from the octopoes api: default: 50
+SCHEDULER_PQ_MAX_RANDOM_OBJECTS=
+
 # Interval in seconds of the execution of the `monitor_organisations` method
 # of the scheduler application to check newly created or removed organisations
 # from katalogus. It updates the organisations, their plugins, and the
@@ -82,6 +86,9 @@ hold, default is `1000`. When set to `0` the queue will be unbounded.
 
 `SCHEDULER_PQ_INTERVAL` is the interval in seconds of the execution of the
 `populate_queue` method of the `scheduler.Scheduler` class, default is `60`.
+
+`SCHEDULER_PQ_MAX_RANDOM_OBJECTS` is the maximum of random objects that are
+requested from the random ooi endpoint from the octopoes api, default is `50`.
 
 `SCHEDULER_PQ_GRACE` is the grace period in seconds of when a task is considered
 to be running again. E.g. a task can be considered to be put onto the queue
