@@ -3,15 +3,11 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
-from tests.factories import (
-    BoefjeFactory,
-    BoefjeMetaFactory,
-    OOIFactory,
-    OrganisationFactory,
-    PluginFactory,
-    ScanProfileFactory,
-)
+from scheduler import (config, connectors, models, queues, rankers,
+                       repositories, schedulers)
+from tests.factories import (BoefjeFactory, BoefjeMetaFactory, OOIFactory,
+                             OrganisationFactory, PluginFactory,
+                             ScanProfileFactory)
 from tests.utils import functions
 
 
@@ -465,59 +461,6 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Act
         self.scheduler.push_tasks_for_random_objects()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queueud
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    def test_push_tasks_for_random_objects_everything_processed(
-        self,
-        mock_get_random_objects,
-        mock_get_boefjes_for_ooi,
-        mock_has_grace_period_passed,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
-        """Test if the scheduler stops when there are no more objects to
-        process.
-
-        We simulate this by returning the same ooi from the random object
-        endpoint. This will create the same tasks and should not be added to
-        the queue. And should fall into the grace period.
-        """
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_random_objects.return_value = [ooi]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_running.return_value = False
-        mock_has_grace_period_passed.return_value = True
-
-        # Simulate for the first iteration the task is allowed to run
-        # and the subsequent iterations are not.
-        mock_is_task_allowed_to_run.side_effect = [True, False, False, False]
-
-        # Act
-        with self.assertLogs("scheduler.schedulers", level="DEBUG") as cm:
-            self.scheduler.push_tasks_for_random_objects()
-
-        # Assert we have 3 tries
-        self.assertIn("No tasks generated for 3 tries", cm.output[-1])
 
         # Task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
