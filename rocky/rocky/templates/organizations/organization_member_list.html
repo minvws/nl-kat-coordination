@@ -60,7 +60,11 @@
                         {% endfor %}
                       </td>
                       <td class="nowrap">
-                        <span class="{{member.status}}"></span><span>&nbsp;{{ member.status|title }}</span>
+                        {% if member.user.is_superuser %}
+                          <span class="active"></span><span>&nbsp;{% translate 'Active' %}</span>
+                        {% else %}
+                          <span class="{{member.status}}"></span><span>&nbsp;{{ member.status|title }}</span>
+                        {% endif %}
                         <br>
                       </td>
                       <td>{{ member.user.date_joined|date:"SHORT_DATE_FORMAT" }}</td>
