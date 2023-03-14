@@ -23,10 +23,12 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, FindingType
 
 from requests import HTTPError
+from rest_framework.viewsets import ViewSet
 from two_factor.views.utils import class_view_decorator
 
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
+
 from rocky.keiko import keiko_client, ReportNotFoundException
 from rocky.views.finding_list import FindingListView
 from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
@@ -298,6 +300,13 @@ class FindingReportPDFView(FindingListView, ReportPDFView):
         )
 
         return f"{file_name}.pdf"
+
+
+class APIFindingReportPDFView(ViewSet, FindingReportPDFView):
+    def retrieve(self, request, pk=None):
+        super().setup(request, organization_code=pk)
+
+        return super().get(request)
 
 
 """
