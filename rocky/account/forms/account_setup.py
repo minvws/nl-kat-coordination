@@ -223,6 +223,7 @@ class OrganizationUpdateForm(OrganizationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["code"].disabled = True
+        self.fields["tags"].widget.attrs["placeholder"] = _("Enter tags seperated by comma.")
 
     class Meta:
         model = Organization
