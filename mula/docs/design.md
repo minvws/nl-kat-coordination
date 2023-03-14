@@ -123,7 +123,8 @@ executed and subsequently the creation of a `boefje` job.:
       system will get the enabled boefjes for this OOI. (`tasks = ooi * boefjes`)
 
     * For each enabled boefje, a `BoefjeTask` will be created and added to the
-     `PriorityQueue` of the `BoefjeScheduler`.
+     `PriorityQueue` of the `BoefjeScheduler`. A `BoefjeTask` is an object
+     with the correct specification for the task runner to execute a boefje.
 
     * Each task will be checked if it is:
 
@@ -135,9 +136,11 @@ executed and subsequently the creation of a `boefje` job.:
 
         * `is_item_on_queue_by_hash()`
 
-    * The `BoefjeScheduler` will then create a `PrioritizedItem`, containing
-      the `BoefjeTask`, to the queue (which is persisted in the database), and
-      add the `BoefjeTask` to the database.
+    * The `BoefjeScheduler` will then create a `PrioritizedItem` and push it to
+      the queue. The `PrioritizedItem` will contain the created `BoefjeTask`.
+      Additionally the `BoefjeTask` will be added to the database
+      (`post_push()`). And serves as a log of the tasks that have been
+      queued/executed, and can be queried through the API.
 
     ```mermaid
     flowchart TB
@@ -176,19 +179,19 @@ executed and subsequently the creation of a `boefje` job.:
         end
     ```
 
-2. Rescheduling of oois (`schedulers.boefje.push_tasks_for_random_objects`), to
-   fill up the queue, and to enforce that we reschedule tasks we get random
-   ooi's from octopoes (`get_random_objects`). The tasks of from these ooi's
-   (`tasks = ooi * boefjes`) will get the priority that has been
-   calculated by the ranker. At the moment a task will get the priority of 3,
-   when 7 days have gone by (e.g. how longer it hasn't been checked the
-   higher the priority it will get). For everything that hasn't been check
-   before the 7 days it will scale the priority appropriately.
+2. Rescheduling of oois (`schedulers.boefje.push_tasks_for_random_objects`). In
+   order to fill up the queue and to enforce that we reschedule tasks. We
+   continuously get a batch of random ooi's from octopoes
+   (`get_random_objects`). The tasks of from these ooi's (`tasks = ooi * boefjes`)
+   will get the priority that has been calculated by the ranker. At the moment
+   a task will get the priority of 3, when 7 days have gone by (e.g. how longer
+   it hasn't been running the higher the priority it will get). For everything
+   before those 7 days it will scale the priority appropriately.
 
     * From Octopoes we get `n` random ooi's (`get_random_objects`)
 
     * For each OOI, the `Scheduler` will get the enabled boefjes for this OOI.
-   (`tasks = ooi * boefjes`)
+      (`tasks = ooi * boefjes`)
 
     * For each enabled boefje, a `BoefjeTask` will be created and added to the
      `PriorityQueue` of the `BoefjeScheduler`.
@@ -203,9 +206,11 @@ executed and subsequently the creation of a `boefje` job.:
 
         * `is_item_on_queue_by_hash()`
 
-    * The `BoefjeScheduler` will then create a `PrioritizedItem`, containing
-      the `BoefjeTask`, to the queue (which is persisted in the database), and
-      add the `BoefjeTask` to the database.
+    * The `BoefjeScheduler` will then create a `PrioritizedItem` and push it to
+      the queue. The `PrioritizedItem` will contain the created `BoefjeTask`.
+      Additionally the `BoefjeTask` will be added to the database
+      (`post_push()`). And serves as a log of the tasks that have been
+      queued/executed, and can be queried through the API.
 
     ```mermaid
     flowchart TB
@@ -279,16 +284,18 @@ executed and subsequently the creation of a `boefje` job.:
     end
    ```
 
-4. When a plugin of type `boefje` is enabled or disabled in Rocky. Triggered
-   when the plugin cache of an organisation is flushed.
+4. When a plugin of type `boefje` is enabled or disabled in Rocky. This is
+   triggered when the plugin cache of an organisation is flushed.
 
    * The cache of the organisation will be flushed at a specified interval.
 
-   * At this moment the `Scheduler` a new boefje is available for the scheduler
-     to generate new tasks for.
+   * Due to the flushing of the cache we get a new list of enabled boefjes for
+     an organisation.
+     (`connectors.services.katalogus._flush_organisations_boefje_type_cache()`)
 
-   * A new task will be generated when the OOIs are rescheduled, when they
-     are referenced when the `push_tasks_for_random_objects` method is called.
+   * New tasks will be created for enabled boefjes, when the OOIs are being
+     rescheduled. This is then done when the `push_tasks_for_random_objects()`
+     method is called.
 
 ##### Creation of normalizer jobs
 
