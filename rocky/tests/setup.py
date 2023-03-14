@@ -119,7 +119,7 @@ class MemberSetup:
         self.acknowledged_clearance_level = acknowledged_clearance_level
         self.onboarded = onboarded
 
-    def create_member(self):
+    def _create_member(self):
         self.set_indemnification()
         return OrganizationMember.objects.create(
             user=self.user,

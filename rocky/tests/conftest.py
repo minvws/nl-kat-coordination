@@ -133,7 +133,7 @@ def superuser(django_user_model):
 
 @pytest.fixture
 def superuser_member(superuser, organization):
-    return MemberSetup(superuser, organization).create_member()
+    return MemberSetup(superuser, organization)._create_member()
 
 
 @pytest.fixture
@@ -143,7 +143,7 @@ def adminuser(django_user_model):
 
 @pytest.fixture
 def admin_member(adminuser, organization):
-    return MemberSetup(adminuser, organization).create_member()
+    return MemberSetup(adminuser, organization)._create_member()
 
 
 @pytest.fixture
@@ -155,7 +155,7 @@ def redteamuser(django_user_model):
 
 @pytest.fixture
 def redteam_member(redteamuser, organization):
-    return MemberSetup(redteamuser, organization).create_member()
+    return MemberSetup(redteamuser, organization)._create_member()
 
 
 @pytest.fixture
@@ -165,7 +165,7 @@ def clientuser(django_user_model):
 
 @pytest.fixture
 def client_member(clientuser, organization):
-    return MemberSetup(clientuser, organization).create_member()
+    return MemberSetup(clientuser, organization)._create_member()
 
 
 @pytest.fixture
