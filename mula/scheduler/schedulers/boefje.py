@@ -8,7 +8,8 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
+from scheduler.models import (OOI, Boefje, BoefjeTask, Organisation, Plugin,
+                              PrioritizedItem, TaskStatus)
 
 from .scheduler import Scheduler
 
@@ -251,7 +252,7 @@ class BoefjeScheduler(Scheduler):
             try:
                 random_oois = self.ctx.services.octopoes.get_random_objects(
                     organisation_id=self.organisation.id,
-                    n=10,
+                    n=self.ctx.config.pq_populate_max_random_objects,
                 )
             except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
                 self.logger.warning(
