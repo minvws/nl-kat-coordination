@@ -1,4 +1,5 @@
 import threading
+from collections import defaultdict
 
 from celery import Celery
 from robot.api import logger
@@ -66,12 +67,19 @@ class Monitor:
             self._started.set()
             self._receiver.capture(limit=None, timeout=None, wakeup=True)
 
+    @property
+    def sum_by_type(self) -> dict:
+        sums = defaultdict(lambda: 0)
+        for task_type in self.tasks.values():
+            sums[task_type["type"]] += 1
+        return sums
+
 
 class CeleryMonitor:
     ROBOT_LIBRARY_SCOPE = "TEST"
 
     def __init__(self):
-        self._monitor = None
+        self._monitor: Monitor = None
 
     def start_monitoring(self, queue_uri: str):
         self._monitor = Monitor(queue_uri)
@@ -84,6 +92,7 @@ class CeleryMonitor:
     def count_tasks(self, event_type: str) -> int:
         event_type = "task-" + event_type.lower()
 
+        logger.info(self._monitor.sum_by_type)
         count = len(list(filter(lambda v: v["type"] == event_type, self._monitor.tasks.values())))
         logger.info(f"Counting tasks of type {event_type}: {count}")
 
