@@ -10,3 +10,8 @@ services:
         - ENVIRONMENT=dev
     ports:
         - "29005:8000"
+    volumes:
+      - keiko-reports:/reports
+
+volumes:
+  keiko-reports:
