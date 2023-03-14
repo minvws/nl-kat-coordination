@@ -44,3 +44,38 @@ class FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
                 "text": _("Findings"),
             }
         ]
+
+
+class Top10FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
+    template_name = "findings/finding_list.html"
+    ooi_types = {Finding}
+
+    # TODO: Move "get findings sorted by severity.desc()" logic to mixin.
+    def get_queryset(self):
+        findings = super().get_queryset()
+        findings_meta = []
+        severity_filter = self.request.GET.get("severity")
+
+        for finding in findings[: findings.count]:
+            finding_type = get_finding_type_from_finding(finding)
+            knowledge_base = get_knowledge_base_data_for_ooi(finding_type)
+            severity = knowledge_base["risk_level_severity"]
+            if not severity_filter or severity_filter.lower() == severity.lower():
+                findings_meta.append(
+                    {
+                        "finding": finding,
+                        "finding_type": finding_type,
+                        "severity": severity.capitalize(),
+                        "risk_level_score": knowledge_base["risk_level_score"],
+                    }
+                )
+        result_set = sort_by_severity_desc(findings_meta)
+        return result_set[:10]
+
+    def build_breadcrumbs(self):
+        return [
+            {
+                "url": reverse_lazy("organization_dashboard", kwargs={"organization_code": self.organization.code}),
+                "text": _("Dashboard"),
+            }
+        ]

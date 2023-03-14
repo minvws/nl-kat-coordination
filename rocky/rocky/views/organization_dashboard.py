@@ -1,13 +1,12 @@
 from django.contrib import messages
-from django.views.generic import TemplateView
-from account.mixins import OrganizationView
 from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
+from rocky.views.finding_list import Top10FindingListView
 
 
 @class_view_decorator(otp_required)
-class OrganizationDashboard(OrganizationView, TemplateView):
+class OrganizationDashboard(Top10FindingListView):
     template_name = "organizations/organization_dashboard.html"
 
     def setup(self, request, *args, **kwargs):
