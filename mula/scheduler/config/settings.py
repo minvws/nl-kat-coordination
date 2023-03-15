@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     pq_maxsize: int = Field(1000, env="SCHEDULER_PQ_MAXSIZE")
     pq_populate_interval: int = Field(60, env="SCHEDULER_PQ_INTERVAL")
     pq_populate_grace_period: int = Field(86400, env="SCHEDULER_PQ_GRACE")
+    pq_populate_max_random_objects: int = Field(50, env="SCHEDULER_PQ_MAX_RANDOM_OBJECTS")
 
     # Database settings
     database_dsn: str = Field(..., env="SCHEDULER_DB_DSN")

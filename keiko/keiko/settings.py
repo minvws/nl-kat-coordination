@@ -14,5 +14,5 @@ class Settings(BaseSettings):
 
     templates_folder: str = Field("templates", env="KEIKO_TEMPLATES_FOLDER")
     glossaries_folder: str = Field("glossaries", env="KEIKO_GLOSSARIES_FOLDER")
-    reports_folder: str = Field("reports", env="KEIKO_REPORTS_FOLDER")
+    reports_folder: str = Field("/reports", env="KEIKO_REPORTS_FOLDER")
     assets_folder: str = Field("assets", env="KEIKO_ASSETS_FOLDER")
