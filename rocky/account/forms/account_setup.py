@@ -173,7 +173,6 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
 
 
 class OrganizationMemberEditForm(forms.ModelForm):
-
     trusted_clearance_level = forms.ChoiceField(
         required=False,
         label=_("Trusted clearance level"),
