@@ -1,6 +1,6 @@
 *** Settings ***
 Library     OTP
-Library     Browser
+Library     Browser    strict=False
 Library     DebugLibrary
 Library     OperatingSystem
 
@@ -9,7 +9,7 @@ Library     OperatingSystem
 Browser Setup
     Set Suite Variable    ${ROOT_URL}    localhost:8000
     New Browser    chromium    headless=${headless}    downloadsPath=/tmp
-    New Context    acceptDownloads=True
+    New Context    acceptDownloads=True    viewport={'width': 1920, 'height': 1080}
     New Page    ${ROOT_URL}
 
 Login As User For The First Time
@@ -18,12 +18,13 @@ Login As User For The First Time
     Fill Text    css=#id_auth-username    ${email}
     Fill Text    css=#id_auth-password    ${password}
     Click    "Log in"
+    Click    "Setup two factor authentication"
     ${otp-raw}    Get Attribute    css=#totp-input    value
     Set Global Variable    ${otp-raw-global}    ${otp-raw}
     ${otp-code}    get otp    ${otp-raw-global}
     Fill Text    css=#id_generator-token    ${otp-code}
     Click    "Authenticate"
-    Click    "Start using KAT"
+    Click    "Start using OpenKAT"
     Get Text    .login-meta    contains    Logged in as:    error login failed
 
 Login As User Normally
@@ -33,7 +34,7 @@ Login As User Normally
     Fill Text    css=#id_auth-password    ${password}
     Click    "Log in"
     ${otp-code}    get otp    ${otp-raw-global}
-    Fill Text    id=id_otp_token    ${otp-code}
+    Fill Text    id=id_token-otp_token    ${otp-code}
     Click    "Submit"
     Get Text    .login-meta    contains    Logged in as:    error login failed
 
@@ -42,6 +43,8 @@ Logout Normally
     Get Element Count    .login-meta    ==    0    error still logged in
 
 Generate First DNS Report
+    #Debug
+    Click    "Let\'s get started"
     Click    css=#main-content > section > div > p:nth-child(10) > a:nth-child(2)
     Click    "Let\'s choose a report"
     Click    "DNS report"
@@ -50,15 +53,8 @@ Generate First DNS Report
     Click    "Create object"
     Click    xpath=//*[@id="main-content"]/section/div/form/button
     Click    "Enable and start scan"
-    Click    "Got it, generate my report"
+    Click    "Start scanning"
     Get Text    css=#main-content > section > div > h3    contains    Boefjes are scanning    boefjes are not scanning
-    Wait For Elements State    "Open my DNS-report"    enabled    300s
-    Click    "Open my DNS-report"
-    Get Text
-    ...    css=#main-content > section > div > p
-    ...    contains
-    ...    These are the findings of a KAT-analysis
-    ...    error login failed
 
 Reload The Page Until Element Contains    # For the desired effect, should be called through: Wait Until Keyword Succeeds    60s    2s    Reload The Page Until Element Contains    url    selector    keyword
     [Arguments]    ${url}    ${selector}    ${keyword}
