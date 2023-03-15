@@ -63,7 +63,7 @@ graph TB
 ```
 
 * The `Scheduler` system combines data from the `Octopoes`, `Katalogus`,
-`Bytes` and `RabbitMQ` systems. 
+`Bytes` and `RabbitMQ` systems.
 
 ```mermaid
 flowchart TB
