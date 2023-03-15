@@ -17,8 +17,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     yield internet
 
     for _, subdomain in results["subdomains"].items():
-        subdomain = subdomain["url"].rstrip(".")
-        host = Hostname(name=subdomain, network=internet.reference)
+        host = Hostname(name=subdomain["url"].rstrip("."), network=internet.reference)
         yield host
 
         sub_ip = subdomain["ip"]
