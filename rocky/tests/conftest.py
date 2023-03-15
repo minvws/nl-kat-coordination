@@ -18,20 +18,11 @@ from django.contrib.auth.models import Permission, Group
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN, GROUP_CLIENT
 
 
-def create_super_user(django_user_model, email, password, name, device_name):
-    user = django_user_model.objects.create_superuser(email=email, password=password)
-    user.full_name = name
-    user.is_verified = lambda: True
-    user.save()
-    device = user.staticdevice_set.create(name=device_name)
-    device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
-    return user
-
-
-def create_user(django_user_model, email, password, name, device_name):
+def create_user(django_user_model, email, password, name, device_name, superuser=False):
     user = django_user_model.objects.create_user(email=email, password=password)
     user.full_name = name
     user.is_verified = lambda: True
+    user.is_superuser = superuser
     user.save()
     device = user.staticdevice_set.create(name=device_name)
     device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
@@ -101,13 +92,15 @@ def organization_b():
 
 @pytest.fixture
 def superuser(django_user_model):
-    return create_super_user(django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default")
+    return create_user(
+        django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default", superuser=True
+    )
 
 
 @pytest.fixture
 def superuser_b(django_user_model):
-    return create_super_user(
-        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b"
+    return create_user(
+        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b", superuser=True
     )
 
 
@@ -213,8 +206,17 @@ def new_member(django_user_model, organization):
 
 
 @pytest.fixture
+def active_member(django_user_model, organization):
+    user = create_user(django_user_model, "cl2@openkat.nl", "TestTest123!!", "Active user", "default_active_user")
+    member = create_member(user, organization)
+    member.status = OrganizationMember.STATUSES.ACTIVE
+    member.save()
+    return member
+
+
+@pytest.fixture
 def blocked_member(django_user_model, organization):
-    user = create_user(django_user_model, "cl2@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
+    user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.BLOCKED
     member.save()
