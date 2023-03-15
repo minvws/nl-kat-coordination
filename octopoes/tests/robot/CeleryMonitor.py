@@ -1,5 +1,6 @@
 import threading
-from collections import defaultdict
+from collections import Counter
+from operator import itemgetter
 
 from celery import Celery
 from robot.api import logger
@@ -67,12 +68,8 @@ class Monitor:
             self._started.set()
             self._receiver.capture(limit=None, timeout=None, wakeup=True)
 
-    @property
-    def sum_by_type(self) -> dict:
-        sums = defaultdict(lambda: 0)
-        for task_type in self.tasks.values():
-            sums[task_type["type"]] += 1
-        return sums
+    def sum_per_type(self) -> Counter:
+        return Counter(map(itemgetter("type"), self.tasks.values()))
 
 
 class CeleryMonitor:
@@ -92,11 +89,12 @@ class CeleryMonitor:
     def count_tasks(self, event_type: str) -> int:
         event_type = "task-" + event_type.lower()
 
-        logger.info(self._monitor.sum_by_type)
-        count = len(list(filter(lambda v: v["type"] == event_type, self._monitor.tasks.values())))
-        logger.info(f"Counting tasks of type {event_type}: {count}")
+        sum_per_type = self._monitor.sum_per_type()
+        logger.info(f"Sum tasks per type: {sum_per_type}")
 
-        return count
+        if event_type not in sum_per_type:
+            return 0
+        return self._monitor.sum_per_type()[event_type]
 
     def remove_tasks(self, event_type: str) -> int:
         event_type = "task-" + event_type.lower()
