@@ -11,29 +11,7 @@
         <h1>{% translate 'Edit member' %} {{ object.user.full_name }}</h1>
         <form method="post" class="horizontal-view help">
           {% csrf_token %}
-          <fieldset>
-            <legend>
-              {% translate 'Edit' %} {{ object.user.full_name }}
-            </legend>
-            {% for field in form %}
-              {% if field.name == "trusted_clearance_level" %}
-                {% include 'organizations/select_clearance_level_radio_input.html' %}
-              {% elif  field.name == "acknowledged_clearance_level" %}
-                <fieldset>
-                  <legend>
-                    {% translate 'Acknowledged clearance level' %}
-                  </legend>
-                  <div class="horizontal-view">
-                    <label>
-                      {% include 'partials/scan_level_indicator.html' with value=forloop.counter0 custom_class="level-indicator-form" %}
-                    </label>
-                  </div>
-                </fieldset>
-              {% else %}
-                {% include 'partials/form/field_input.html' %}
-              {% endif %}
-            {% endfor %}
-          </fieldset>
+          {% include 'partials/form/fieldset.html' with fields=form %}
           <div class="horizontal-view">
             <button type="submit">{% translate 'Save member' %}</button>
             <a class="button ghost"
