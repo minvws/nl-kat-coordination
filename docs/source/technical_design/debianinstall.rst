@@ -202,8 +202,8 @@ Now configure KAT to use the vhost we created and with the kat user. To do this,
 
 .. code-block:: sh
 
-    SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@localhost:5672/kat
-    SCHEDULER_DSP_BROKER_URL=amqp://kat:<password>@localhost:5672/kat
+    SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@127.0.0.1:5672/kat
+    SCHEDULER_DSP_BROKER_URL=amqp://kat:<password>@127.0.0.1:5672/kat
 
 And update the `QUEUE_URI` setting to the same value for the following files:
 
@@ -216,7 +216,7 @@ Or use this command to do it for you:
 
 .. code-block:: sh
 
-    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
+    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@127.0.0.1:5672/kat|" /etc/kat/*.conf
 
 Configure Bytes credentials
 ===========================
