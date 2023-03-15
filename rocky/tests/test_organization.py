@@ -168,9 +168,9 @@ def test_organization_no_member(client, clientuser, organization):
     assert response.status_code == 404
 
 
-def test_organization_active_member(rf, client_member):
-    request = setup_request(rf.get("organization_detail"), client_member.user)
-    response = OrganizationDetailView.as_view()(request, organization_code=client_member.organization.code)
+def test_organization_active_member(rf, active_member):
+    request = setup_request(rf.get("organization_detail"), active_member.user)
+    response = OrganizationDetailView.as_view()(request, organization_code=active_member.organization.code)
 
     assert response.status_code == 200
 
