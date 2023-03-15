@@ -19,7 +19,7 @@ from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_edit import OOIEditView
 from rocky.views.ooi_findings import OOIFindingListView
 from rocky.views.ooi_list import OOIListView, OOIListExportView
-from rocky.views.ooi_report import OOIReportView, OOIReportPDFView, FindingReportPDFView, APIFindingReportPDFView
+from rocky.views.ooi_report import OOIReportView, OOIReportPDFView, FindingReportPDFView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
 from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_detail import OrganizationDetailView
@@ -41,7 +41,6 @@ handler403 = "rocky.views.handler403.handler403"
 
 router = routers.SimpleRouter()
 router.register(r"organization", OrganizationViewSet)
-router.register(r"report", APIFindingReportPDFView, basename="reports")
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),

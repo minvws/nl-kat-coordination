@@ -302,13 +302,6 @@ class FindingReportPDFView(FindingListView, ReportPDFView):
         return f"{file_name}.pdf"
 
 
-class APIFindingReportPDFView(ViewSet, FindingReportPDFView):
-    def retrieve(self, request, pk=None):
-        super().setup(request, organization_code=pk)
-
-        return super().get(request)
-
-
 """
 The new report
 Generates report from a starting point OOI with a filtered set of it's sub OOI's
