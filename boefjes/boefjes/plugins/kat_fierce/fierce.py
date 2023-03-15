@@ -111,7 +111,7 @@ def query(resolver, domain, record_type="A", tcp=False):
         # assume we received information on nameservers we can use and
         # perform the same query with those nameservers
         if resp.response.additional and resp.response.authority:
-            ns = [rdata.address for additionals in resp.response.additional for rdata in additionals.items]
+            ns = [rdata.address for additional in resp.response.additional for rdata in additional.items]
             resolver.nameservers = ns
             return query(resolver, domain, record_type, tcp=tcp)
 

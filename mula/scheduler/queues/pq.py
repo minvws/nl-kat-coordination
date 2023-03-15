@@ -24,7 +24,7 @@ class PriorityQueue(abc.ABC):
         logger:
             The logger for the class.
         pq_id:
-            A sting representing the identifier of the priority queue.
+            A string representing the identifier of the priority queue.
         maxsize:
             A integer representing the maximum size of the queue.
         item_type:
