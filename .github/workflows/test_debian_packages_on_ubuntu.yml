@@ -1,0 +1,259 @@
+name: Test installing the debian packages
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - "release**"
+
+jobs:
+  build-packages:
+    strategy:
+      matrix:
+        dist: [ ubuntu ]
+        package: [ bytes, boefjes, rocky, keiko, octopoes, mula ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get version from release tag or generate one
+        run: |
+          if [ ${GITHUB_REF_TYPE} = "tag" ]; then
+            echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+          else
+            pip install setuptools-scm==7.1.0
+            echo "RELEASE_VERSION=$(python -m setuptools_scm)" >> $GITHUB_ENV
+          fi
+
+      - name: Run debian package build
+        uses: addnab/docker-run-action@v3
+        with:
+          run: packaging/scripts/build-debian-package.sh
+          registry: ghcr.io
+          image: ghcr.io/minvws/nl-kat-${{ matrix.dist }}-build-image:latest
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          options: -v ${{ github.workspace }}/${{ matrix.package }}:/app
+            -v ${{ github.workspace }}/octopoes:/octopoes
+            -e REPOSITORY=${{ github.repository }}
+            -e RELEASE_VERSION=${{ env.RELEASE_VERSION }}
+            -e RELEASE_TAG=${{ env.RELEASE_TAG }}
+            -e PKG_NAME=kat-${{ matrix.package }}
+            --workdir /app
+
+      - name: Upload .deb to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: kat-${{ matrix.package }}_${{ env.RELEASE_VERSION }}_${{ matrix.dist }}.deb
+          path: ${{ matrix.package }}/build/kat-${{ matrix.package }}_${{ env.RELEASE_VERSION }}_amd64.deb
+
+  test-deb-install:
+    needs: build-packages
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-22.04 ]
+
+    env:
+      PGPASSWORD: postgres  # No password prompt
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get version from release tag or generate one
+        run: |
+          if [ ${GITHUB_REF_TYPE} = "tag" ]; then
+            echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
+          else
+            pip install setuptools-scm==7.1.0
+            echo "RELEASE_VERSION=$(python -m setuptools_scm)" >> $GITHUB_ENV
+          fi
+
+      - name: Install dependencies Docker and rabbitmq
+        run: sudo apt-get update && sudo apt-get install -y docker.io containerd runc rabbitmq-server
+
+      - name: Start postgresql and wait until the service is healthy
+        run: |
+          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres:12.8
+          for i in {1..10}; do pg_isready -h localhost && break || sleep 1 ; done
+
+      - name: Prepare rabbitmq configurations
+        run: |
+          echo "export ERL_EPMD_ADDRESS=127.0.0.1" | sudo tee -a /etc/rabbitmq/rabbitmq-env.conf
+          echo "export NODENAME=rabbit@localhost" | sudo tee -a /etc/rabbitmq/rabbitmq-env.conf
+          sudo systemctl stop rabbitmq-server
+          sudo epmd -kill
+          echo "listeners.tcp.local = 127.0.0.1:5672" | sudo tee -a /etc/rabbitmq/rabbitmq.conf
+          echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." | sudo tee -a /etc/rabbitmq/advanced.config
+
+      - name: Start rabbitmq and wait until the service is healthy
+        run: |
+          sudo systemctl start rabbitmq-server
+          for i in {1..10}; do sudo rabbitmq-diagnostics -q ping && break || sleep 1 ; done
+
+      - name: Prepare postgres service Rocky
+        run: |
+          createdb -h localhost -U postgres rocky_db
+          createuser -h localhost -U postgres rocky
+          psql -h localhost -U postgres -d rocky_db -c "ALTER DATABASE rocky_db OWNER TO rocky;"
+          psql -h localhost -U postgres -d rocky_db -c "ALTER USER rocky WITH PASSWORD 'postgres';"
+
+      - name: Prepare postgres service Katalogus
+        run: |
+          createdb -h localhost -U postgres katalogus_db
+          createuser -h localhost -U postgres katalogus
+          psql -h localhost -U postgres -d katalogus_db -c "GRANT ALL ON DATABASE katalogus_db TO katalogus;"
+          psql -h localhost -U postgres -d katalogus_db -c "ALTER USER katalogus WITH PASSWORD 'postgres';"
+
+      - name: Prepare postgres service Bytes
+        run: |
+          createdb -h localhost -U postgres bytes_db
+          createuser -h localhost -U postgres bytes
+          psql -h localhost -U postgres -d bytes_db -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
+          psql -h localhost -U postgres -d bytes_db -c "ALTER USER bytes WITH PASSWORD 'postgres';"
+
+      - name: Create kat vhost in rabbitmq
+        run: |
+          sudo rabbitmqctl add_user kat rabbit
+          sudo rabbitmqctl add_vhost kat
+          sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+
+      - name: Download Bytes artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-bytes_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Boefjes artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-boefjes_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Rocky artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-rocky_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Mula artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-mula_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Keiko artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-keiko_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Download Octopoes artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kat-octopoes_${{ env.RELEASE_VERSION }}_ubuntu.deb
+
+      - name: Get the OpenKAT artifacts
+        run: |
+          curl -Ls https://github.com/dekkers/xtdb-http-multinode/releases/download/v1.0.2/xtdb-http-multinode_1.0.2_all.deb --output xtdb-http-multinode_1.0.2_all.deb;
+
+      - name: Install the artifacts
+        run: |
+          sudo apt install ./kat-*.deb ./xtdb-http-multinode_*_all.deb
+          sudo sed -i "s/WorkingDirectory=\/opt\/venvs\/kat-boefjes\/lib\/python3.9\/site-packages/WorkingDirectory=\/opt\/venvs\/kat-boefjes\//g" /usr/lib/systemd/system/kat-katalogus.service
+
+      - name: Update configs for rabbitmq
+        run: |
+          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN=/SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
+          sudo sed -i "s/SCHEDULER_DSP_BROKER_URL=/SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/rocky.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/bytes.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/boefjes.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/octopoes.conf
+
+      - name: Migrations for Rocky
+        run: |
+          sudo sed -i "s/ROCKY_DB_PASSWORD=/ROCKY_DB_PASSWORD=postgres/g" /etc/kat/rocky.conf
+          sudo -u kat rocky-cli migrate
+          sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
+
+      - name: Migrations for Katalogus
+        run: |
+          sudo sed -i "s/KATALOGUS_DB_URI=/KATALOGUS_DB_URI=postgresql:\/\/katalogus:postgres@localhost\/katalogus_db/g" /etc/kat/boefjes.conf
+          sudo -u kat update-katalogus-db
+
+      - name: Migrations for Bytes
+        run: |
+          sudo sed -i "s/BYTES_DB_URI=/BYTES_DB_URI=postgresql:\/\/bytes:postgres@localhost\/bytes_db/g" /etc/kat/bytes.conf
+          sudo -u kat update-bytes-db
+
+      - name: Setup Bytes credentials
+        run: |
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/rocky.conf
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/boefjes.conf
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/mula.conf
+
+      - name: Setup Octopoes to use xtdb-multinode
+        run: sudo sed -i "s/XTDB_TYPE=\"xtdb\"/XTDB_TYPE=\"xtdb-multinode\"/g" /etc/kat/octopoes.conf
+
+      - name: Restart KAT
+        run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker xtdb-http-multinode
+
+      - name: Setup accounts in Rocky
+        run: |
+          DJANGO_SUPERUSER_PASSWORD=robotpassword sudo -E -u kat rocky-cli createsuperuser --noinput --email robot@localhost
+          sudo -u kat rocky-cli setup_dev_account
+
+      - name: Check Keiko API health or print response and logs
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8005/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -v http://localhost:8005/health) || true && journalctl --no-pager -u kat-keiko.service && exit $s ; fi
+
+      - name: Check Bytes API health or print response and logs
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8002/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -v http://localhost:8002/health) || true && journalctl --no-pager -u kat-bytes.service && exit $s ; fi
+
+      - name: Check Katalogus API health or print response and logs
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8003/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -v http://localhost:8003/health) || true && journalctl --no-pager -u kat-katalogus.service && exit $s ; fi
+
+      - name: Check Scheduler API health or print response and logs
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8004/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -v http://localhost:8004/health) || true && journalctl --no-pager -u kat-mula.service && exit $s ; fi
+
+      - name: Check XTDB health or print response and logs
+        run: |
+          for i in {1..15}; do curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status) || true && journalctl --no-pager -u xtdb-http-multinode.service && exit $s ; fi
+
+      - name: Create _dev node in Octopoes
+        run: curl -s -X POST http://localhost:8001/_dev/node
+
+      - name: Check Octopoes API health or print response and logs
+        run: |
+          for i in {1..15}; do curl -s http://localhost:8001/_dev/health | jq .healthy | grep true -q && s=0 && break || s=$? && sleep 1 ; done
+          if [ $s != 0 ]; then echo $(curl -v http://localhost:8001/_dev/health) || true && journalctl --no-pager -u kat-octopoes.service && exit $s ; fi
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: pip
+
+      - name: Install Robot Framework
+        run: pip3 install robotframework robotframework-browser robotframework-debuglibrary robotframework-otp robotframework-postgresqldb pyotp
+
+      - name: Initialize rfbrowser
+        run: rfbrowser init
+
+      - name: Run Robot Full Onboarding Flow
+        run: robot -d rocky/tests/robot/results-ci -v headless:true rocky/tests/robot/ci
+
+      - name: Upload Robot Framework reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: rf-results-ci
+          path: /home/runner/work/nl-kat-coordination/nl-kat-coordination/rocky/tests/robot/results*
+
