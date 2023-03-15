@@ -12,3 +12,4 @@ Contains documentation for developers and contributors.
    debianinstall
    hardening
    localinstall
+   nginx
