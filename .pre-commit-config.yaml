@@ -62,3 +62,22 @@ repos:
     rev: 'v0.0.247'
     hooks:
       - id: ruff
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.4
+    hooks:
+      - id: codespell
+        additional_dependencies: ['tomli']
+        exclude: |
+          (?x)(
+          \.po$ |
+          poetry.lock$ |
+          requirements-.*.txt$ |
+          retirejs.json$ |
+          ^boefjes/boefjes/plugins/kat_fierce/lists |
+          ^keiko/glossaries |
+          ^keiko/templates/.*/template.tex$ |
+          ^rocky/assets/js/vendor |
+          ^rocky/assets/src/bundles/app/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
+          ^rocky/tests/stubs
+          )

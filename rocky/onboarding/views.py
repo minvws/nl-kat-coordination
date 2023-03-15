@@ -463,7 +463,7 @@ class OnboardingOrganizationSetupView(
             OrganizationMember.objects.get_or_create(user=self.request.user, organization=organization)
 
     def add_success_notification(self, org_name):
-        success_message = _("{org_name} succesfully created.").format(org_name=org_name)
+        success_message = _("{org_name} successfully created.").format(org_name=org_name)
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
@@ -494,7 +494,7 @@ class OnboardingOrganizationUpdateView(
         return super().form_valid(form)
 
     def add_success_notification(self, org_name):
-        success_message = _("{org_name} succesfully updated.").format(org_name=org_name)
+        success_message = _("{org_name} successfully updated.").format(org_name=org_name)
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
@@ -569,7 +569,7 @@ class OnboardingAccountSetupAdminView(
         return super().form_valid(form)
 
     def add_success_notification(self, name):
-        success_message = _("{name} succesfully created.").format(name=name)
+        success_message = _("{name} successfully created.").format(name=name)
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
@@ -597,7 +597,7 @@ class OnboardingAccountSetupRedTeamerView(
         return super().form_valid(form)
 
     def add_success_notification(self, name):
-        success_message = _("{name} succesfully created.").format(name=name)
+        success_message = _("{name} successfully created.").format(name=name)
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
@@ -621,7 +621,7 @@ class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingA
         return super().form_valid(form)
 
     def add_success_notification(self, name):
-        success_message = _("{name} succesfully created.").format(name=name)
+        success_message = _("{name} successfully created.").format(name=name)
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 

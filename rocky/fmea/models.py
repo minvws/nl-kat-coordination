@@ -33,9 +33,9 @@ class FREQUENCY_LEVEL(models.IntegerChoices):
 class DETECTABILITY_LEVEL(models.IntegerChoices):
     L1 = 1, _("Level 1: Always Detectable. Incident (almost) never occurs, almost unthinkable.")
     L2 = 2, _("Level 2: Usually Detectable. Incidents occur less than once a year (3-5).")
-    L3 = 3, _("Level 3: Detectable. Faillure mode is detectable with effort.")
-    L4 = 4, _("Level 4: Poorly Detectable. Detecting the faillure mode is difficult.")
-    L5 = 5, _("Level 5: Almost Undetectable. Faillure mode detection is very difficult or nearly impossible.")
+    L3 = 3, _("Level 3: Detectable. Failure mode is detectable with effort.")
+    L4 = 4, _("Level 4: Poorly Detectable. Detecting the failure mode is difficult.")
+    L5 = 5, _("Level 5: Almost Undetectable. Failure mode detection is very difficult or nearly impossible.")
 
 
 class FailureModeEffect(models.Model):

@@ -146,4 +146,4 @@ Create A User While Onboarding
     Fill Text    xpath=//*[@id="id_email"]    ${email}
     Fill Text    xpath=//*[@id="id_password"]    ${password}
     Click    "Submit"
-    #Get Text    .confirmation    contains    succesfully    error account creation failed
+    #Get Text    .confirmation    contains    successfully    error account creation failed
