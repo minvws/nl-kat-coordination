@@ -9,16 +9,15 @@ from rocky.views.organization_list import OrganizationListView
 from tests.conftest import setup_request
 
 
-def test_organization_list_non_superuser(rf, superuser_member):
-    superuser_member.user.is_superuser = False
-    superuser_member.user.user_permissions.add(Permission.objects.get(codename="view_organization"))
+def test_organization_list_non_superuser(rf, client_member):
+    client_member.user.user_permissions.add(Permission.objects.get(codename="view_organization"))
 
-    request = setup_request(rf.get("organization_list"), superuser_member.user)
+    request = setup_request(rf.get("organization_list"), client_member.user)
     response = OrganizationListView.as_view()(request)
 
     assertContains(response, "Organizations")
     assertNotContains(response, "Add new organization")
-    assertContains(response, superuser_member.organization.name)
+    assertContains(response, client_member.organization.name)
 
 
 def test_edit_organization(rf, superuser_member):
@@ -176,12 +175,10 @@ def test_organization_active_member(rf, client_member):
     assert response.status_code == 200
 
 
-def test_organization_blocked_member(rf, client_member):
-    client_member.status = "blocked"
-    client_member.save()
-    request = setup_request(rf.get("organization_detail"), client_member.user)
+def test_organization_blocked_member(rf, blocked_member):
+    request = setup_request(rf.get("organization_detail"), blocked_member.user)
     with pytest.raises(PermissionDenied):
-        OrganizationDetailView.as_view()(request, organization_code=client_member.organization.code)
+        OrganizationDetailView.as_view()(request, organization_code=blocked_member.organization.code)
 
 
 def test_edit_organization_permissions(rf, redteam_member, client_member):

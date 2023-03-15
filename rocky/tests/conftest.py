@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
 import pytest
 import binascii
 from os import urandom
@@ -9,7 +9,6 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
-from unittest.mock import patch
 from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
@@ -18,20 +17,11 @@ from tools.models import OrganizationMember, OOIInformation, Organization, Indem
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN, GROUP_CLIENT
 
 
-def create_super_user(django_user_model, email, password, name, device_name):
-    user = django_user_model.objects.create_superuser(email=email, password=password)
-    user.full_name = name
-    user.is_verified = lambda: True
-    user.save()
-    device = user.staticdevice_set.create(name=device_name)
-    device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
-    return user
-
-
-def create_user(django_user_model, email, password, name, device_name):
+def create_user(django_user_model, email, password, name, device_name, superuser=False):
     user = django_user_model.objects.create_user(email=email, password=password)
     user.full_name = name
     user.is_verified = lambda: True
+    user.is_superuser = superuser
     user.save()
     device = user.staticdevice_set.create(name=device_name)
     device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
@@ -185,13 +175,15 @@ def my_user(user, organization):
 
 @pytest.fixture
 def superuser(django_user_model):
-    return create_super_user(django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default")
+    return create_user(
+        django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default", superuser=True
+    )
 
 
 @pytest.fixture
 def superuser_b(django_user_model):
-    return create_super_user(
-        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b"
+    return create_user(
+        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b", superuser=True
     )
 
 
