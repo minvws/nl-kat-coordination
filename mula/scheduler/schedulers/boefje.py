@@ -8,7 +8,8 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
+from scheduler.models import (OOI, Boefje, BoefjeTask, Organisation, Plugin,
+                              PrioritizedItem, TaskStatus)
 
 from .scheduler import Scheduler
 
@@ -362,7 +363,7 @@ class BoefjeScheduler(Scheduler):
 
                     if self.queue.is_item_on_queue_by_hash(task.hash):
                         self.logger.debug(
-                            "Task is already on queue: %s [organisation.id=%s, scheduler_id=%s]",
+                            "Boefje task is already on queue: %s [organisation.id=%s, scheduler_id=%s]",
                             task,
                             self.organisation.id,
                             self.scheduler_id,
@@ -376,6 +377,7 @@ class BoefjeScheduler(Scheduler):
                             task=task,
                         )
                     )
+
                     # We need to create a PrioritizedItem for this task, to
                     # push it to the priority queue.
                     p_item = PrioritizedItem(
@@ -431,9 +433,8 @@ class BoefjeScheduler(Scheduler):
         """
         if boefje.enabled is False:
             self.logger.debug(
-                "Boefje: %s is disabled [organisation.id=%s, boefje.id=%s, organisation.id=%s, scheduler_id=%s]",
+                "Boefje: %s is disabled [boefje.id=%s, organisation.id=%s, scheduler_id=%s]",
                 boefje.name,
-                self.organisation.id,
                 boefje.id,
                 self.organisation.id,
                 self.scheduler_id,

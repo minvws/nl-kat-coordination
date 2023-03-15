@@ -7,7 +7,8 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import NormalizerTask, Organisation, PrioritizedItem, RawData
+from scheduler.models import (Normalizer, NormalizerTask, Organisation, Plugin,
+                              PrioritizedItem, RawData)
 
 from .scheduler import Scheduler
 
@@ -41,6 +42,11 @@ class NormalizerScheduler(Scheduler):
         self.organisation: Organisation = organisation
 
     def populate_queue(self) -> None:
+        """Populate the PriorityQueue
+        """
+        self.push_tasks_for_received_raw_file()
+
+    def push_tasks_for_received_raw_file(self) -> None:
         while not self.queue.full():
             time.sleep(1)
 
@@ -70,141 +76,258 @@ class NormalizerScheduler(Scheduler):
                 if self.stop_event.is_set():
                     raise e
 
-                time.sleep(60)
-                continue
 
+            # Stop the loop when we've processed everything from the
+            # messaging queue, so we can continue to the next step.
             if latest_raw_data is None:
                 self.logger.debug(
                     "No new raw data on message queue [organisation.id=%s, scheduler_id=%s]",
                     self.organisation.id,
                     self.scheduler_id,
                 )
-                break
+                return
 
+            self.logger.debug(
+                "Received new raw data from message queue [raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
+                latest_raw_data.raw_data.id,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+
+            # First check if the raw data doesn't contain an error.
             for mime_type in latest_raw_data.raw_data.mime_types:
                 if mime_type.get("value", "").startswith("error/"):
-                    self.logger.info(
-                        "Skipping raw data with error mime type [organisation.id=%s, scheduler_id=%s]",
+                    self.logger.warning(
+                        "Skipping raw data with error mime type [raw_data.id=%s ,organisation.id=%s, scheduler_id=%s]",
+                        latest_raw_data.raw_data.id,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    return
+
+            normalizers = []
+            for mime_type in latest_raw_data.raw_data.mime_types:
+                normalizers_by_mime_type = self.get_normalizers_for_mime_type(mime_type.get("value"))
+                if normalizers_by_mime_type is None or len(normalizers_by_mime_type) == 0:
+                    continue
+
+                normalizers.extend(normalizers_by_mime_type)
+
+            if normalizers is None or len(normalizers) == 0:
+                self.logger.debug(
+                    "No normalizers found for raw data [raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
+                    latest_raw_data.raw_data.id,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+
+            for normalizer in normalizers:
+                task = NormalizerTask(
+                    normalizer=normalizer,
+                    raw_data=latest_raw_data.raw_data,
+                )
+
+                if not self.is_task_allowed_to_run(normalizer):
+                    self.logger.debug(
+                        "Task is not allowed to run: %s [organisation.id=%s, scheduler_id=%s]",
+                        task,
                         self.organisation.id,
                         self.scheduler_id,
                     )
                     continue
 
-            p_items = self.create_tasks_for_raw_data(latest_raw_data.raw_data)
-            if not p_items:
-                continue
+                try:
+                    is_running = self.is_task_running(task)
+                    if is_running:
+                        self.logger.debug(
+                            "Task is already running: %s [organisation.id=%s, scheduler_id=%s]",
+                            task,
+                            self.organisation.id,
+                            self.scheduler_id,
+                        )
+                        continue
+                except Exception as exc_running:
+                    self.logger.warning(
+                        "Could not check if task is running: %s [organisation.id=%s, scheduler_id=%s]",
+                        task,
+                        self.organisation.id,
+                        self.scheduler_id,
+                        exc_info=exc_running,
+                    )
+                    continue
 
-            # NOTE: maxsize 0 means unlimited
-            while len(p_items) > (self.queue.maxsize - self.queue.qsize()) and self.queue.maxsize != 0:
-                self.logger.debug(
-                    "Waiting for queue to have enough space, not adding %d tasks to queue "
-                    "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
-                    len(p_items),
-                    self.queue.qsize(),
-                    self.queue.maxsize,
+                if self.queue.is_item_on_queue_by_hash(task.hash):
+                    self.logger.debug(
+                        "Normalizer task is already on queue: %s [organisation.id=%s, scheduler_id=%s]",
+                        task,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    continue
+
+                score = self.ranker.rank(
+                    SimpleNamespace(
+                        raw_data=latest_raw_data.raw_data, task=task,
+                    ),
+                )
+
+                # We need to create a PrioritizedItem for this task, to
+                # push it to the priority queue.
+                p_item = PrioritizedItem(
+                    id=task.id,
+                    scheduler_id=self.scheduler_id,
+                    priority=score,
+                    data=task,
+                    hash=task.hash,
+                )
+
+                while not self.is_space_on_queue():
+                    self.logger.debug(
+                        "Waiting for queue to have enough space, not adding task to queue "
+                        "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
+                        self.queue.qsize(),
+                        self.queue.maxsize,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    time.sleep(1)
+
+                self.logger.info(
+                    "Created normalizer task: %s for raw data: %s "
+                    "[normalizer.id=%s, raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
+                    normalizer.name,
+                    latest_raw_data.raw_data.id,
+                    normalizer.id,
+                    latest_raw_data.raw_data.id,
                     self.organisation.id,
                     self.scheduler_id,
                 )
-                time.sleep(1)
-
-            self.push_items_to_queue(p_items)
+                self.push_item_to_queue(p_item)
         else:
             self.logger.warning(
                 "Normalizer queue is full, not populating with new tasks "
-                "[queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
+                "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
                 self.queue.qsize(),
                 self.organisation.id,
                 self.scheduler_id,
             )
             return
 
-    def create_tasks_for_raw_data(self, raw_data: RawData) -> List[PrioritizedItem]:
-        """Create normalizer tasks for every boefje that has been processed,
-        and created raw data in Bytes.
+    def get_normalizers_for_mime_type(self, mime_type: str) -> List[Normalizer]:
+        """Get available normalizers for a given mime type.
+
+        Args:
+            mime_type : The mime type to get normalizers for.
+
+        Returns:
+            A list of normalizers for the given mime type.
         """
-        p_items: List[PrioritizedItem] = []
-
-        for mime_type in raw_data.mime_types:
-            try:
-                normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                    self.organisation.id,
-                    mime_type.get("value"),
-                )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
-                self.logger.warning(
-                    "Could not get normalizers for org: %s and mime_type: %s "
-                    "[boefje_meta.id=%s, organisation.id=%s, scheduler_id=%s]",
-                    self.organisation.name,
-                    mime_type,
-                    raw_data.boefje_meta.id,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                continue
-
-            if normalizers is None:
-                self.logger.debug(
-                    "No normalizers found for mime_type: %s [mime_type=%s, organisation.id=%s, scheduler_id=%s]",
-                    mime_type.get("value"),
-                    mime_type.get("value"),
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                continue
-
-            self.logger.debug(
-                "Found %d normalizers for mime_type: %s "
-                "[mime_type=%s, normalizers=%s, organisation.id=%s, scheduler_id=%s]",
-                len(normalizers),
-                mime_type.get("value"),
-                mime_type.get("value"),
-                [normalizer.name for normalizer in normalizers],
+        try:
+            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
+                self.organisation.id,
+                mime_type,
+            )
+        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            self.logger.warning(
+                "Could not get normalizers for mime_type: %s [mime_type=%s, organisation.id=%s, scheduler_id=%s]",
+                mime_type,
+                mime_type,
                 self.organisation.id,
                 self.scheduler_id,
             )
 
-            for normalizer in normalizers:
-                if normalizer.enabled is False:
-                    self.logger.debug(
-                        "Normalizer: %s is disabled for org: %s "
-                        "[normalizer.id=%s, organisation.id=%s, scheduler_id=%s]",
-                        normalizer.name,
-                        self.organisation.name,
-                        normalizer.id,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+            return []
 
-                task = NormalizerTask(
-                    normalizer=normalizer,
-                    raw_data=raw_data,
-                )
+        if normalizers is None:
+            self.logger.debug(
+                "No normalizer found for mime_type: %s [mime_type=%s, organisation.id=%s, scheduler_id=%s]",
+                mime_type,
+                mime_type,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return []
 
-                if self.queue.is_item_on_queue(PrioritizedItem(scheduler_id=self.scheduler_id, data=task)):
-                    self.logger.debug(
-                        "Normalizer task: %s is already on queue "
-                        "[normalizer_id=%s, boefje_meta_id=%s, org_id=%s, scheduler_id=%s]",
-                        normalizer.name,
-                        normalizer.id,
-                        raw_data.boefje_meta.id,
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-                    continue
+        self.logger.debug(
+            "Found %d normalizers for mime_type: %s "
+            "[mime_type=%s, normalizers=%s, organisation.id=%s, scheduler_id=%s]",
+            len(normalizers),
+            mime_type,
+            mime_type,
+            [normalizer.name for normalizer in normalizers],
+            self.organisation.id,
+            self.scheduler_id,
+        )
 
-                score = self.ranker.rank(SimpleNamespace(raw_data=raw_data, task=task))
-                p_items.append(PrioritizedItem(id=task.id, scheduler_id=self.scheduler_id, priority=score, data=task))
+        return normalizers
 
-                self.logger.debug(
-                    "Created normalizer task: %s for raw data: %s "
-                    "[normalizer.id=%s, raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
-                    normalizer.name,
-                    raw_data.id,
-                    normalizer.id,
-                    raw_data.id,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
+    def is_task_allowed_to_run(self, normalizer: Plugin) -> bool:
+        """Check if the task is allowed to run.
 
-        return p_items
+        Args:
+            task: The task to check.
+
+        Returns:
+            True if the task is allowed to run, False otherwise.
+        """
+        if normalizer.enabled is False:
+            self.logger.debug(
+                "Normalizer: %s is disabled [normalizer.id= %s, organisation.id=%s, scheduler_id=%s]",
+                task.normalizer.name,
+                task.normalizer.id,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return False
+
+        return True
+
+    def is_task_running(self, task: NormalizerTask) -> bool:
+        """Check if the same task is already running.
+
+        Args:
+            task: The task to check.
+
+        Returns:
+            True if the task is already running, False otherwise.
+        """
+        # Get the last tasks that have run or are running for the hash
+        # of this particular NormalizerTask.
+        try:
+            task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
+        except Exception as exc_db:
+            self.logger.warning(
+                "Could not get latest task by hash: %s [organisation.id=%s, scheduler_id=%s]",
+                task.hash,
+                self.organisation.id,
+                self.scheduler_id,
+                exc_info=exc_db,
+            )
+            raise exc_db
+
+        # Is task still running according to the datastore?
+        if (
+            task_db is not None
+            and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+        ):
+            self.logger.debug(
+                "Task is still running, according to the datastore "
+                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
+                task_db.id,
+                task.hash,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return True
+
+        return False
+
+    def is_space_on_queue(self) -> bool:
+        """Check if there is space on the queue.
+
+        NOTE: maxsize 0 means unlimited
+        """
+        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
+            return False
+
+        return True
