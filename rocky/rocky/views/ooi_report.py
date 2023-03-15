@@ -23,7 +23,6 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, FindingType
 
 from requests import HTTPError
-from rest_framework.viewsets import ViewSet
 from two_factor.views.utils import class_view_decorator
 
 from account.mixins import OrganizationView
