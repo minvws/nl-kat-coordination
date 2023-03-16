@@ -17,7 +17,7 @@ class ThreadRunner(threading.Thread):
             A float describing the time between loop iterations.
         exception:
             A python Exception that can be set in order to signify that
-            an exception has occured during the execution of the thread.
+            an exception has occurred during the execution of the thread.
     """
 
     def __init__(

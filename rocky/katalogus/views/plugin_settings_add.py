@@ -90,7 +90,7 @@ class PluginSettingsAddView(PermissionRequiredMixin, KATalogusMixin, FormView):
         )
 
     def add_success_notification(self):
-        success_message = _("Setting succesfully added for: ") + self.plugin["name"]
+        success_message = _("Setting successfully added for: ") + self.plugin["name"]
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def add_error_notification(self, message):

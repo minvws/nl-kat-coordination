@@ -44,7 +44,7 @@ class Task(BaseModel):
 
 
 class TaskORM(Base):
-    """A SQLAlchemy datastore model respresentation of a Task"""
+    """A SQLAlchemy datastore model representation of a Task"""
 
     __tablename__ = "tasks"
 
