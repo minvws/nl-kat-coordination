@@ -59,7 +59,7 @@ def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organiz
     mock_mixin_datetime.now().strftime.return_value = dt_in_filename
 
     # Setup Keiko mock
-    mock_keiko_client = mocker.patch("rocky.keiko.keiko_client")
+    mock_keiko_client = mocker.patch("rocky.views.ooi_report.keiko_client")
     mock_keiko_client.generate_report.return_value = "fake_report_id"
     mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
 
@@ -108,7 +108,7 @@ def test_organization_pdf_report(rf, my_user, organization, ooi_information, moc
     mock_datetime.now().strftime.return_value = dt_in_filename
 
     # Setup Keiko mock
-    mock_keiko_client = mocker.patch("rocky.keiko.keiko_client")
+    mock_keiko_client = mocker.patch("rocky.views.ooi_report.keiko_client")
     mock_keiko_client.generate_report.return_value = "fake_report_id"
     mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
 

@@ -96,16 +96,16 @@ class ReportsService:
         source_type: str,
         source_value: str,
         store: Dict,
-    ) -> bytes:
+    ) -> BinaryIO:
         report_data = build_findings_list_from_store(store)  # reuse existing dict structure
         report_data["findings_grouped"] = _ooi_field_as_string(report_data["findings_grouped"], store)
         report_data["valid_time"] = str(valid_time)
         report_data["report_source_type"] = source_type
         report_data["report_source_value"] = source_value
 
-        report_id = keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
+        report_id = self.keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
 
-        return keiko_client.get_report(report_id)
+        return self.keiko_client.get_report(report_id)
 
     @classmethod
     def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str):
@@ -160,6 +160,58 @@ def _ooi_field_as_string(findings_grouped: Dict, store: Dict):
     return new_findings_grouped
 
 
+def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[List[str]] = None) -> Dict:
+    knowledge_base = get_knowledge_base_data_for_ooi_store(ooi_store)
+
+    findings = [
+        build_finding_dict(finding_ooi, ooi_store, knowledge_base)
+        for finding_ooi in ooi_store.values()
+        if isinstance(finding_ooi, Finding)
+    ]
+
+    if finding_filter is not None:
+        findings = [finding for finding in findings if finding["finding_type"]["id"] in finding_filter]
+
+    findings = sorted(findings, key=lambda k: k["finding_type"]["risk_level_score"], reverse=True)
+
+    findings_grouped = {}
+    for finding in findings:
+        if finding["finding_type"]["id"] not in findings_grouped:
+            findings_grouped[finding["finding_type"]["id"]] = {
+                "finding_type": finding["finding_type"],
+                "list": [],
+            }
+
+        findings_grouped[finding["finding_type"]["id"]]["list"].append(finding)
+
+    return {
+        "meta": build_meta(findings),
+        "findings_grouped": findings_grouped,
+    }
+
+
+def build_finding_dict(
+    finding_ooi: Finding,
+    ooi_store: Dict[str, OOI],
+    knowledge_base: Dict,
+) -> Dict:
+    finding_dict = get_ooi_dict(finding_ooi)
+
+    finding_type_ooi = get_finding_type_from_finding(finding_ooi)
+
+    knowledge_base.update({finding_type_ooi.get_information_id(): get_knowledge_base_data_for_ooi(finding_type_ooi)})
+
+    finding_type_dict = build_finding_type_dict(finding_type_ooi, knowledge_base)
+
+    finding_dict["ooi"] = get_ooi_dict(ooi_store[str(finding_ooi.ooi)]) if str(finding_ooi.ooi) in ooi_store else None
+    finding_dict["finding_type"] = finding_type_dict
+
+    if finding_dict["description"] is None:
+        finding_dict["description"] = finding_type_dict["description"]
+
+    return finding_dict
+
+
 def build_meta(findings: List[Dict]) -> Dict:
     meta = {
         "total": len(findings),
@@ -200,28 +252,6 @@ def build_meta(findings: List[Dict]) -> Dict:
     return meta
 
 
-def build_finding_dict(
-    finding_ooi: Finding,
-    ooi_store: Dict[str, OOI],
-    knowledge_base: Dict,
-) -> Dict:
-    finding_dict = get_ooi_dict(finding_ooi)
-
-    finding_type_ooi = get_finding_type_from_finding(finding_ooi)
-
-    knowledge_base.update({finding_type_ooi.get_information_id(): get_knowledge_base_data_for_ooi(finding_type_ooi)})
-
-    finding_type_dict = build_finding_type_dict(finding_type_ooi, knowledge_base)
-
-    finding_dict["ooi"] = get_ooi_dict(ooi_store[str(finding_ooi.ooi)]) if str(finding_ooi.ooi) in ooi_store else None
-    finding_dict["finding_type"] = finding_type_dict
-
-    if finding_dict["description"] is None:
-        finding_dict["description"] = finding_type_dict["description"]
-
-    return finding_dict
-
-
 def build_finding_type_dict(finding_type_ooi: FindingType, knowledge_base: Dict) -> Dict:
     finding_type_dict = get_ooi_dict(finding_type_ooi)
 
@@ -231,33 +261,3 @@ def build_finding_type_dict(finding_type_ooi: FindingType, knowledge_base: Dict)
     finding_type_dict["findings"] = []
 
     return finding_type_dict
-
-
-def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[List[str]] = None) -> Dict:
-    knowledge_base = get_knowledge_base_data_for_ooi_store(ooi_store)
-
-    findings = [
-        build_finding_dict(finding_ooi, ooi_store, knowledge_base)
-        for finding_ooi in ooi_store.values()
-        if isinstance(finding_ooi, Finding)
-    ]
-
-    if finding_filter is not None:
-        findings = [finding for finding in findings if finding["finding_type"]["id"] in finding_filter]
-
-    findings = sorted(findings, key=lambda k: k["finding_type"]["risk_level_score"], reverse=True)
-
-    findings_grouped = {}
-    for finding in findings:
-        if finding["finding_type"]["id"] not in findings_grouped:
-            findings_grouped[finding["finding_type"]["id"]] = {
-                "finding_type": finding["finding_type"],
-                "list": [],
-            }
-
-        findings_grouped[finding["finding_type"]["id"]]["list"].append(finding)
-
-    return {
-        "meta": build_meta(findings),
-        "findings_grouped": findings_grouped,
-    }
