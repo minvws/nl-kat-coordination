@@ -9,6 +9,38 @@ services:
     volumes:
       - keiko-code:/app/keiko
 
+  octopoes_api:
+    volumes:
+      - octopoes-code:/app/octopoes
+
+  octopoes_api_worker:
+    volumes:
+      - octopoes-code:/app/octopoes
+
+  boefje:
+    volumes:
+      - boefjes-code:/app/boefjes
+
+  normalizer:
+    volumes:
+      - boefjes-code:/app/boefjes
+
+  katalogus:
+    volumes:
+      - boefjes-code:/app/boefjes
+
+  bytes:
+    volumes:
+      - bytes-code:/app/bytes
+
+  scheduler:
+    volumes:
+      - scheduler-code:/app/scheduler
+
 volumes:
   rocky-code:
   keiko-code:
+  octopoes-code:
+  boefjes-code:
+  bytes-code:
+  scheduler-code:
