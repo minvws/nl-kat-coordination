@@ -276,6 +276,16 @@ class OctopoesService:
     def _on_create_ooi(self, event: OOIDBEvent) -> None:
         ooi = event.new_data
 
+        # keep old scan profile, or create new scan profile
+        try:
+            self.scan_profile_repository.get(ooi.reference, event.valid_time)
+        except ObjectNotFoundException:
+            self.scan_profile_repository.save(
+                None,
+                EmptyScanProfile(reference=ooi.reference),
+                valid_time=event.valid_time,
+            )
+
         # analyze bit definitions
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():

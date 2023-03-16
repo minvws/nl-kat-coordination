@@ -214,21 +214,10 @@ class XTDBOOIRepository(OOIRepository):
                         :find [(count ?e)]
                         :in [[_object_type ...] [_scan_level ...] [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
-                                (or-join [?e _scan_level _scan_profile_type]
-                                  (and
-                                    [?scan_profile :type "ScanProfile"]
-                                    [?scan_profile :reference ?e]
-                                    [?scan_profile :level _scan_level]
-                                    [?scan_profile :scan_profile_type _scan_profile_type]
-                                  )
-                                  (and
-                                      (not-join [?e]
-                                          [?scan_profile :type "ScanProfile"]
-                                          [?scan_profile :reference ?e])
-                                      [(= _scan_level 0)]
-                                      [(= _scan_profile_type "empty")]
-                                  )
-                          )]
+                                [?scan_profile :type "ScanProfile"]
+                                [?scan_profile :reference ?e]
+                                [?scan_profile :level _scan_level]
+                                [?scan_profile :scan_profile_type _scan_profile_type]]
                     }}
                     :in-args [[{object_types}], [{scan_levels}], [{scan_profile_types}]]
                 }}
@@ -247,21 +236,10 @@ class XTDBOOIRepository(OOIRepository):
                         :find [(pull ?e [*])]
                         :in [[_object_type ...] [_scan_level ...]  [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
-                                (or-join [?e _scan_level _scan_profile_type]
-                                      (and
-                                        [?scan_profile :type "ScanProfile"]
-                                        [?scan_profile :reference ?e]
-                                        [?scan_profile :level _scan_level]
-                                        [?scan_profile :scan_profile_type _scan_profile_type]
-                                      )
-                                      (and
-                                          (not-join [?e]
-                                              [?scan_profile :type "ScanProfile"]
-                                              [?scan_profile :reference ?e])
-                                          [(= _scan_level 0)]
-                                          [(= _scan_profile_type "empty")]
-                                      )
-                              )]
+                                [?scan_profile :type "ScanProfile"]
+                                [?scan_profile :reference ?e]
+                                [?scan_profile :level _scan_level]
+                                [?scan_profile :scan_profile_type _scan_profile_type]]
                         :limit {limit}
                         :offset {offset}
                     }}
