@@ -207,7 +207,7 @@ def test_admin_rights_edits_organization(rf, admin_member):
     assert response.status_code == 200
 
 
-def test_admin_edits_organization(rf, admin_member):
+def test_admin_edits_organization(rf, admin_member, mocker):
     """Admin editing organization values"""
     request = setup_request(
         rf.post(
@@ -216,9 +216,12 @@ def test_admin_edits_organization(rf, admin_member):
         ),
         admin_member.user,
     )
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("tools.models.OctopoesAPIConnector")
     response = OrganizationEditView.as_view()(
         request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
     )
+
     # success post redirects to organization detail page
     assert response.status_code == 302
     assert response.url == f"/en/{admin_member.organization.code}/"
