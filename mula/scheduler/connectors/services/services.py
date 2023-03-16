@@ -95,7 +95,7 @@ class HTTPService(Connector):
             headers:
                 A dict to set additional headers for the request.
             params:
-                A dict to set the query paramaters for the request
+                A dict to set the query parameters for the request
 
         Returns:
             A request.Response object
@@ -129,7 +129,7 @@ class HTTPService(Connector):
             headers:
                 A dict to set additional headers for the request.
             params:
-                A dict to set the query paramaters for the request
+                A dict to set the query parameters for the request
 
         Returns:
             A request.Response object

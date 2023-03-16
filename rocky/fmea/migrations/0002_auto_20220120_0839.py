@@ -89,15 +89,15 @@ class Migration(migrations.Migration):
                     ),
                     (
                         3,
-                        "Level 3: Detectable. Faillure mode is detectable with effort.",
+                        "Level 3: Detectable. Failure mode is detectable with effort.",
                     ),
                     (
                         4,
-                        "Level 4: Poorly Detectable. Detecting the faillure mode is difficult.",
+                        "Level 4: Poorly Detectable. Detecting the failure mode is difficult.",
                     ),
                     (
                         5,
-                        "Level 5: Almost Undetectable. Faillure mode detection is very difficult or nearly impossible.",
+                        "Level 5: Almost Undetectable. Failure mode detection is very difficult or nearly impossible.",
                     ),
                 ]
             ),

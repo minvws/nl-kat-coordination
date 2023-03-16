@@ -31,7 +31,7 @@ def create_user(django_user_model, email, password, name, device_name, superuser
 
 def create_organization(name, organization_code):
     katalogus_client = "katalogus.client.KATalogusClientV1"
-    octopoes_node = "octopoes.connector.octopoes.OctopoesAPIConnector.create_node"
+    octopoes_node = "tools.models.OctopoesAPIConnector"
     with patch(katalogus_client), patch(octopoes_node):
         return Organization.objects.create(name=name, code=organization_code)
 
