@@ -61,7 +61,6 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
     def form_valid(self, form):
         tcl = form.cleaned_data["trusted_clearance_level"]
         acl = form.cleaned_data["acknowledged_clearance_level"]
-        print(tcl, acl)
         if tcl and acl:
             if int(tcl) < int(acl):
                 messages.add_message(
