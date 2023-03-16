@@ -34,7 +34,7 @@ class FailureModeEffectCreateView(FailureModeEffectBreadcrumbsMixin, CreateView)
         return super().form_valid(form)
 
     def add_success_notification(self):
-        success_message = _("Failure mode effect succesfully created.")
+        success_message = _("Failure mode effect successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def build_breadcrumbs(self) -> List[Breadcrumb]:

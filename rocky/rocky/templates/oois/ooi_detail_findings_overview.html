@@ -9,7 +9,7 @@
         {% translate 'Overview of the number of findings found on' %} {{ ooi.get_ooi_type }} "{{ ooi.human_readable }}" {% translate 'and their severity.' %}
       </p>
       <p>
-        {% translate 'Findings can occur multiple times. To give better insight the following table shows the number of unique findings found as well as the number of occurences.' %}
+        {% translate 'Findings can occur multiple times. To give better insight the following table shows the number of unique findings found as well as the number of occurrences.' %}
       </p>
       <a href="{% ooi_url 'ooi_findings' ooi.primary_key organization.code query=mandatory_fields %}"
          class="button">{% translate 'See finding details' %}</a>
@@ -18,7 +18,7 @@
       <table>
         <thead>
           <th>{% translate 'Severity' %}</th>
-          <th>{% translate 'Occurences' %}</th>
+          <th>{% translate 'Occurrences' %}</th>
         </thead>
         <tbody>
           {% for severity in severity_summary %}
@@ -26,13 +26,13 @@
               <td>
                 <span class="{{ severity.risk_level }}">{{ severity.risk_level }}</span>
               </td>
-              <td>{{ severity.occurences }}</td>
+              <td>{{ severity.occurrences }}</td>
             </tr>
           {% endfor %}
         </tbody>
         <tfoot>
           <th>{% translate 'Total findings:' %}</th>
-          <th>{{ severity_summary_totals.total_occurences }}</th>
+          <th>{{ severity_summary_totals.total_occurrences }}</th>
         </tfoot>
       </table>
     </div>

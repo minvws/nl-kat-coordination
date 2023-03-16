@@ -98,5 +98,5 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
         return form_valid
 
     def add_success_notification(self):
-        success_message = "Password reset is succesfully done."
+        success_message = "Password reset is successfully done."
         messages.add_message(self.request, messages.SUCCESS, success_message)

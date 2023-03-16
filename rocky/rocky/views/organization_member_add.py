@@ -42,5 +42,5 @@ class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBread
         return super().form_valid(form)
 
     def add_success_notification(self):
-        success_message = _("Member added succesfully.")
+        success_message = _("Member added successfully.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
