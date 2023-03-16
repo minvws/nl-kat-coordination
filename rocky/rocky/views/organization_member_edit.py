@@ -21,10 +21,8 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
 
     def test_func(self):
         return (
-            not self.get_object().user.is_superuser
-            or self.request.user.is_superuser
-            or self.get_object().organization == self.organization
-        )
+            not self.get_object().user.is_superuser or self.request.user.is_superuser
+        ) and self.get_object().organization == self.organization
 
     def get_form(self):
         form = super().get_form()
@@ -72,7 +70,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
                     _(
                         "The updated trusted clearance level of L%s is lower then the member's "
                         "acknowledged clearance level of L%s. This member only has clearance for level L%s. "
-                        "For this reason the acknowldeged clearance level has been set at the same level "
+                        "For this reason the acknowledged clearance level has been set at the same level "
                         "as trusted clearance level."
                     )
                     % (tcl, acl, tcl),
