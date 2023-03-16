@@ -34,7 +34,7 @@ from onboarding.view_helpers import (
     KatIntroductionRegistrationStepsMixin,
 )
 from rocky.bytes_client import get_bytes_client
-from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
+from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException, RockyError
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_report import Report, DNSReport, build_findings_list_from_store
 from rocky.views.ooi_view import BaseOOIFormView, SingleOOITreeMixin, BaseOOIDetailView
@@ -441,6 +441,14 @@ class OnboardingOrganizationSetupView(
             return redirect(reverse("step_organization_update", kwargs={"organization_code": organization.code}))
         return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except RockyError as e:
+            messages.add_message(request, messages.ERROR, str(e))
+
+        return self.get(request, *args, **kwargs)
+
     def get_success_url(self) -> str:
         organization = Organization.objects.first()
         self.get_or_create_organizationmember(organization)
@@ -448,8 +456,10 @@ class OnboardingOrganizationSetupView(
 
     def form_valid(self, form):
         org_name = form.cleaned_data["name"]
+        result = super().form_valid(form)
         self.add_success_notification(org_name)
-        return super().form_valid(form)
+
+        return result
 
     def get_or_create_organizationmember(self, organization):
         if self.request.user.is_superuser:
