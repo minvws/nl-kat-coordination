@@ -24,12 +24,15 @@ def OnboardingMiddleware(get_response):
                 or request.path.startswith("/api/")
             ):
                 if not member_onboarded:
-                    if is_red_team(request.user):
+                    member = OrganizationMember.objects.filter(user=request.user)
+
+                    # There might be redteamers without an organization after an organization is deleted.
+                    if member.exists() and is_red_team(request.user):
                         # a redteamer can be in many organizations, but we onboard the first one.
-                        member = OrganizationMember.objects.filter(user=request.user)
                         return redirect(
                             reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
                         )
+
                     if request.user.is_superuser:
                         return redirect(reverse("step_introduction_registration"))
 
