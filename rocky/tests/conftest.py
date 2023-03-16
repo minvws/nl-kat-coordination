@@ -19,9 +19,7 @@ from tools.models import GROUP_REDTEAM, GROUP_ADMIN
 
 @pytest.fixture
 def organization():
-    with patch("katalogus.client.KATalogusClientV1"), patch(
-        "octopoes.connector.octopoes.OctopoesAPIConnector.create_node"
-    ):
+    with patch("katalogus.client.KATalogusClientV1"), patch("tools.models.OctopoesAPIConnector"):
         organization = Organization.objects.create(name="Test Organization", code="test")
     return organization
 

@@ -95,7 +95,7 @@ Front end
 
 Find the frontend of your OpenKAT install at port 8000 (http) or 8443 (https) of your localhost depending on your  and follow the 'on boarding flow' to test your setup and start using your development setup of OpenKAT.
 
-Using http works only when connecting to localhost due to the security flags on the session and xsrf cookies. Localhost is whitelisted to allow secure cookies over an unsecure connection. Connecting to any other IP over http results in these cookies being disregarded, resulting in XSRF warnings when logging in.
+Using http works only when connecting to localhost due to the security flags on the session and xsrf cookies. Localhost is whitelisted to allow secure cookies over an insecure connection. Connecting to any other IP over http results in these cookies being disregarded, resulting in XSRF warnings when logging in.
 
 Specific builds
 ***************
