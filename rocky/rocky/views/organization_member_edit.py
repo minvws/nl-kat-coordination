@@ -20,7 +20,11 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
     permission_required = "tools.change_organizationmember"
 
     def test_func(self):
-        return not self.get_object().user.is_superuser or self.request.user.is_superuser
+        return (
+            not self.get_object().user.is_superuser
+            or self.request.user.is_superuser
+            or self.get_object().organization == self.organization
+        )
 
     def get_form(self):
         form = super().get_form()
