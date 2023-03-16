@@ -38,7 +38,7 @@ class FailureModeCreateView(FailureModeBreadcrumbsMixin, CreateView):
         return context
 
     def add_success_notification(self):
-        success_message = _("Failure mode succesfully created.")
+        success_message = _("Failure mode successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def build_breadcrumbs(self) -> List[Dict[str, str]]:

@@ -1,7 +1,7 @@
 # DNS
 
 The DNS lookup tool fetches all the DNS records for a domain. To do that it uses the dsnpython package. Currently, only
-A, AAAA, ans MX records are modelled.
+A, AAAA, and MX records are modelled.
 
 ### Input OOIs
 

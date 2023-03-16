@@ -75,6 +75,6 @@ class PluginSettingsDeleteView(PermissionRequiredMixin, KATalogusMixin, Template
         messages.add_message(
             request,
             messages.SUCCESS,
-            _("Setting {} for plugin {} succesfully deleted.").format(self.name, self.plugin["name"]),
+            _("Setting {} for plugin {} successfully deleted.").format(self.name, self.plugin["name"]),
         )
         return HttpResponseRedirect(self.get_success_url())

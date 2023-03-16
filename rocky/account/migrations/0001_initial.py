@@ -203,7 +203,7 @@ def fix_names(apps, schema_editor):
             "select conname from pg_constraint where conname = 'auth_user_groups_katuser_id_76ed1ca4_fk_auth_user_id'"
         )
         if not len(cursor.fetchall()):
-            # Not upraded so we don't have to fix up the constraint names
+            # Not upgraded so we don't have to fix up the constraint names
             return
 
     schema_editor.execute(
