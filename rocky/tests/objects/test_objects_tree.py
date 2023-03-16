@@ -27,12 +27,10 @@ TREE_DATA = {
 }
 
 
-def test_ooi_tree(rf, superuser_member, organization, mock_organization_view_octopoes):
+def test_ooi_tree(rf, my_user, organization, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(
-        rf.get("ooi_tree", {"ooi_id": "Network|testnetwork", "view": "table"}), superuser_member.user
-    )
+    request = setup_request(rf.get("ooi_tree", {"ooi_id": "Network|testnetwork", "view": "table"}), my_user)
     request.resolver_match = resolve(reverse("ooi_tree", kwargs={"organization_code": organization.code}))
     response = OOITreeView.as_view()(request, organization_code=organization.code)
 

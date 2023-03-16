@@ -33,17 +33,11 @@ TREE_DATA = {
 
 
 def test_ooi_detail(
-    rf,
-    superuser_member,
-    organization,
-    mock_scheduler,
-    mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
-    mocker,
+    rf, my_user, organization, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
-    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), superuser_member.user)
+    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), my_user)
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
@@ -58,7 +52,7 @@ def test_ooi_detail(
 
 def test_ooi_detail_start_scan(
     rf,
-    superuser_member,
+    my_user,
     organization,
     mock_scheduler,
     mock_organization_view_octopoes,
@@ -94,7 +88,7 @@ def test_ooi_detail_start_scan(
                 "action": "start_scan",
             },
         ),
-        superuser_member.user,
+        my_user,
     )
     response = OOIDetailView.as_view()(request, organization_code=organization.code)
 
@@ -106,7 +100,7 @@ def test_ooi_detail_start_scan(
 
 def test_ooi_detail_start_scan_no_indemnification(
     rf,
-    superuser_member,
+    my_user,
     organization,
     mock_scheduler,
     mock_organization_view_octopoes,
@@ -119,7 +113,7 @@ def test_ooi_detail_start_scan_no_indemnification(
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
 
-    Indemnification.objects.get(user=superuser_member.user).delete()
+    Indemnification.objects.get(user=my_user).delete()
 
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
     query_string = urlencode({"ooi_id": network.reference}, doseq=True)
@@ -131,7 +125,7 @@ def test_ooi_detail_start_scan_no_indemnification(
                 "action": "start_scan",
             },
         ),
-        superuser_member.user,
+        my_user,
     )
     response = OOIDetailView.as_view()(request, organization_code=organization.code)
 
@@ -142,7 +136,7 @@ def test_ooi_detail_start_scan_no_indemnification(
 
 def test_ooi_detail_start_scan_no_action(
     rf,
-    superuser_member,
+    my_user,
     organization,
     mock_scheduler,
     mock_organization_view_octopoes,
@@ -164,7 +158,7 @@ def test_ooi_detail_start_scan_no_action(
                 "boefje_id": "nmap",
             },
         ),
-        superuser_member.user,
+        my_user,
     )
     response = OOIDetailView.as_view()(request, organization_code=organization.code)
 

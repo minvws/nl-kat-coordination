@@ -179,3 +179,59 @@ def test_organization_blocked_member(rf, blocked_member):
     request = setup_request(rf.get("organization_detail"), blocked_member.user)
     with pytest.raises(PermissionDenied):
         OrganizationDetailView.as_view()(request, organization_code=blocked_member.organization.code)
+
+
+def test_edit_organization_permissions(rf, redteam_member, client_member):
+    """Redteamers and clients cannot edit organization."""
+    request_redteam = setup_request(rf.get("organization_edit"), redteam_member.user)
+    request_client = setup_request(rf.get("organization_edit"), client_member.user)
+
+    with pytest.raises(PermissionDenied):
+        OrganizationEditView.as_view()(
+            request_redteam, organization_code=redteam_member.organization.code, pk=redteam_member.organization.id
+        )
+
+    with pytest.raises(PermissionDenied):
+        OrganizationEditView.as_view()(
+            request_client, organization_code=client_member.organization.code, pk=client_member.organization.id
+        )
+
+
+def test_admin_rights_edits_organization(rf, admin_member):
+    """Can admin edit organization?"""
+    request = setup_request(rf.get("organization_edit"), admin_member.user)
+    response = OrganizationEditView.as_view()(
+        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
+    )
+
+    assert response.status_code == 200
+
+
+def test_admin_edits_organization(rf, admin_member, mocker):
+    """Admin editing organization values"""
+    request = setup_request(
+        rf.post(
+            "organization_edit",
+            {"name": "This organization name has been edited", "tags": "tag1,tag2"},
+        ),
+        admin_member.user,
+    )
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("tools.models.OctopoesAPIConnector")
+    response = OrganizationEditView.as_view()(
+        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
+    )
+
+    # success post redirects to organization detail page
+    assert response.status_code == 302
+    assert response.url == f"/en/{admin_member.organization.code}/"
+    resulted_request = setup_request(rf.get(response.url), admin_member.user)
+    resulted_response = OrganizationDetailView.as_view()(
+        resulted_request, organization_code=admin_member.organization.code
+    )
+    assert resulted_response.status_code == 200
+
+    assertContains(resulted_response, "Tags")
+    assertContains(resulted_response, "tags-color-1-light plain")  # default color
+    assertContains(resulted_response, "tag1")
+    assertContains(resulted_response, "tag2")

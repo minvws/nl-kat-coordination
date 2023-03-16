@@ -31,29 +31,27 @@ INPUT_TYPES = ["Hostname", "Hostname", "IPAddressV4", "IPAddressV6", "URL", "URL
 EXPECTED_OOI_COUNTS = [2, 2, 6, 4, 4, 2]
 
 
-def test_upload_csv_page(rf, superuser_member, organization):
-    request = setup_request(rf.get("upload_csv"), superuser_member.user)
+def test_upload_csv_page(rf, my_user, organization):
+    request = setup_request(rf.get("upload_csv"), my_user)
 
     response = UploadCSV.as_view()(request, organization_code=organization.code)
     assert response.status_code == 200
     assertContains(response, "Upload CSV")
 
 
-def test_upload_csv_simple(rf, superuser_member, organization):
-    request = setup_request(rf.get("upload_csv"), superuser_member.user)
+def test_upload_csv_simple(rf, my_user, organization):
+    request = setup_request(rf.get("upload_csv"), my_user)
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
 
 
-def test_upload_bad_input(rf, superuser_member, organization, mock_organization_view_octopoes, mock_bytes_client):
+def test_upload_bad_input(rf, my_user, organization, mock_organization_view_octopoes, mock_bytes_client):
     data = b"invalid|'\n4\bcsv|format"
     example_file = BytesIO(data)
     example_file.name = "networks.csv"
 
-    request = setup_request(
-        rf.post("upload_csv", {"object_type": "Hostname", "csv_file": example_file}), superuser_member.user
-    )
+    request = setup_request(rf.post("upload_csv", {"object_type": "Hostname", "csv_file": example_file}), my_user)
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 302
@@ -65,13 +63,11 @@ def test_upload_bad_input(rf, superuser_member, organization, mock_organization_
     assert "could not be created for row number" in messages[0].message
 
 
-def test_upload_bad_name(rf, superuser_member, organization, mock_organization_view_octopoes, mock_bytes_client):
+def test_upload_bad_name(rf, my_user, organization, mock_organization_view_octopoes, mock_bytes_client):
     example_file = BytesIO(b"name,network\n\xa0\xa1,internet")
     example_file.name = "networks.cvs"
 
-    request = setup_request(
-        rf.post("upload_csv", {"object_type": "Hostname", "csv_file": example_file}), superuser_member.user
-    )
+    request = setup_request(rf.post("upload_csv", {"object_type": "Hostname", "csv_file": example_file}), my_user)
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
@@ -79,13 +75,11 @@ def test_upload_bad_name(rf, superuser_member, organization, mock_organization_v
     assertContains(response, "Only CSV file supported")
 
 
-def test_upload_bad_decoding(rf, superuser_member, organization, mock_organization_view_octopoes, mock_bytes_client):
+def test_upload_bad_decoding(rf, my_user, organization, mock_organization_view_octopoes, mock_bytes_client):
     example_file = BytesIO(b"name,network\n\xa0\xa1,internet")
     example_file.name = "networks.csv"
 
-    request = setup_request(
-        rf.post("upload_csv", {"object_type": "Hostname", "csv_file": example_file}), superuser_member.user
-    )
+    request = setup_request(rf.post("upload_csv", {"object_type": "Hostname", "csv_file": example_file}), my_user)
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
@@ -99,7 +93,7 @@ def test_upload_bad_decoding(rf, superuser_member, organization, mock_organizati
 )
 def test_upload_csv(
     rf,
-    superuser_member,
+    my_user,
     mock_organization_view_octopoes,
     organization,
     mock_bytes_client,
@@ -110,9 +104,7 @@ def test_upload_csv(
     example_file = BytesIO(example_input)
     example_file.name = f"{input_type}.csv"
 
-    request = setup_request(
-        rf.post("upload_csv", {"object_type": input_type, "csv_file": example_file}), superuser_member.user
-    )
+    request = setup_request(rf.post("upload_csv", {"object_type": input_type, "csv_file": example_file}), my_user)
     response = UploadCSV.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 302

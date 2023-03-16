@@ -7,7 +7,7 @@ from rocky.views.scans import ScanListView
 from tests.conftest import setup_request
 
 
-def test_katalogus_plugin_listing(superuser_member, rf, organization, mocker):
+def test_katalogus_plugin_listing(my_user, rf, organization, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
     mock_requests.get.return_value = mock_response
@@ -15,7 +15,7 @@ def test_katalogus_plugin_listing(superuser_member, rf, organization, mocker):
         (Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text()
     )
 
-    request = setup_request(rf.get("scan_list"), superuser_member.user)
+    request = setup_request(rf.get("scan_list"), my_user)
     response = ScanListView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
