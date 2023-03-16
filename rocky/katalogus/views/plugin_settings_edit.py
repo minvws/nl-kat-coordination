@@ -98,5 +98,5 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, KATalogusMixin, FormView
     def form_valid(self, form):
         value = form.cleaned_data[self.setting_name]
         self.katalogus_client.update_plugin_setting(plugin_id=self.plugin_id, name=self.setting_name, value=value)
-        messages.add_message(self.request, messages.SUCCESS, _("Setting succesfully updated."))
+        messages.add_message(self.request, messages.SUCCESS, _("Setting successfully updated."))
         return super().form_valid(form)

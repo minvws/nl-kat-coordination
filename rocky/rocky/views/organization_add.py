@@ -39,7 +39,7 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def add_success_notification(self):
-        success_message = _("Organization added succesfully.")
+        success_message = _("Organization added successfully.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def handle_no_permission(self):

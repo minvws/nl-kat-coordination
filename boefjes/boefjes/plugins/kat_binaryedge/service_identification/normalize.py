@@ -86,7 +86,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                         yield Finding(
                             finding_type=malware_ooi.reference,
                             ooi=software_ooi.reference,
-                            description=f"Software '{cpe}' is known te be used as malware.",
+                            description=f"Software '{cpe}' is known to be used as malware.",
                         )
             else:
                 # Less specific than cpe
@@ -111,7 +111,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                         yield Finding(
                             finding_type=malware_ooi.reference,
                             ooi=software_instance_ooi.reference,
-                            description=f"Software '{product_name}' is known te be used as malware.",
+                            description=f"Software '{product_name}' is known to be used as malware.",
                         )
 
             # (possible) TODO: hostname
