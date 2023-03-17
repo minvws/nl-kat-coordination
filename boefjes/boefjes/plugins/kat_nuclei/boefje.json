@@ -1,0 +1,14 @@
+    {
+        "id": "Nuclei",
+        "name": "Nuclei-scan",
+        "description": "Nuclei is used to send requests across targets based on a template, providing fast scanning.",
+        "consumes": [
+            "Hostname"
+        ],
+        "produces": [
+            "Finding",
+            "CVEFindinsgType"
+        ],
+        "environment_keys": [],
+        "scan_level": 3
+    }
