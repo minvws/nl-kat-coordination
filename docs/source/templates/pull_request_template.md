@@ -39,8 +39,8 @@ If a non-trivial PR:
 ```
 ## Checklist for functional reviewer(s):
 - [ ] If a non-trivial PR: This PR is properly linked to an issue on the project board;
-- [ ] I have checked out this branch, and successfully ran `make kat`;
-- [ ] I have ran `make test-rf` and all end-to-end Robot Framework tests pass;
+- [ ] I have checked out this branch, and successfully ran a fresh `make kat`;
+- [ ] In this fresh install, I have managed to pass the onboarding flow and have confirmed that objects, findings, and tasks are created properly.
 - [ ] I confirmed that the PR's advertised `feature` or `hotfix` works as intended;
 - [ ] I confirmed that there are no unintended functional regressions in this branch;
 
