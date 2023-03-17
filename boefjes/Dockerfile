@@ -34,6 +34,7 @@ COPY octopoes/ /tmp/octopoes
 RUN cd /tmp/octopoes && python setup.py bdist_wheel
 RUN pip install /tmp/octopoes/dist/octopoes*.whl
 
+COPY boefjes/entrypoint.sh .
 COPY boefjes/boefjes ./boefjes
 
 # FIXME: We currently have to run as root to be able to start containers using
