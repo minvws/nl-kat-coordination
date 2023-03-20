@@ -58,7 +58,7 @@ class IndemnificationAddForm(BaseRockyForm):
     am_authorized = forms.CharField(
         label=_(
             "I declare that I am authorized to give this indemnification within my organization. "
-            "I have the expierence and knowledge to know what the consequences might be and"
+            "I have the experience and knowledge to know what the consequences might be and"
             " can be held responsible for them."
         ),
         widget=forms.CheckboxInput(),

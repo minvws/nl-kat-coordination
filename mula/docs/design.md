@@ -105,7 +105,7 @@ flowchart TB
     %% External services flow
     %% Bytes--"Check last run of boefje and ooi<br/>HTTP GET"-->create_tasks_for_ooi
     %% Katalogus--"Get available boefjes<br/>HTTP GET"--->create_tasks_for_ooi
-    %% Katalogus--"Get availalble normalizers<br/>HTTP GET"-->create_tasks_for_raw_data
+    %% Katalogus--"Get available normalizers<br/>HTTP GET"-->create_tasks_for_raw_data
     Octopoes--"Get random ooi"--->get_random_objects
     RabbitMQ--"Get latest created object<br/>(scan level increase)"-->get_latest_object
     RabbitMQ--"Get latest raw data file<br/>(boefje finished)"-->get_latest_raw_data

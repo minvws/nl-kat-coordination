@@ -53,8 +53,8 @@ class LowercaseEmailField(models.EmailField):
 
 
 class KATUser(AbstractBaseUser, PermissionsMixin):
-    # Because we mirated from using the standard Django User model, we need
-    # explicitely use AutoField here instead of using BigAutoField by default
+    # Because we migrated from using the standard Django User model, we need
+    # explicitly use AutoField here instead of using BigAutoField by default
     id = models.AutoField(primary_key=True, verbose_name="ID")
     full_name = models.CharField(_("full name"), max_length=150, blank=True)
     email = LowercaseEmailField(_("email"), max_length=254, unique=True)

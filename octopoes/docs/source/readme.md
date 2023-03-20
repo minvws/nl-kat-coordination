@@ -319,7 +319,7 @@ john.primary_key # 'Person/John/Doe'
 
 ## Relationships
 
-OOIs can be related to eachother. At time of writing the OOI data structure looks like this:
+OOIs can be related to each other. At time of writing the OOI data structure looks like this:
 
 *Directional arrows indicate a foreign key pointing to referred object*
 ![KAT Data Structure](img/kat_data_structure.png "KAT Data Structure")
@@ -449,7 +449,7 @@ The OOI class tree is traversed 2 levels deep. Bear in mind that both Finding an
 ....etc
 ```
 
-Hence the 1 and 2 levels markers on Finding and Job in the image belond.
+Hence the 1 and 2 levels markers on Finding and Job in the image below.
 ![KAT Query Plan](img/kat_query_plan.png "KAT Query Plan")
 
 

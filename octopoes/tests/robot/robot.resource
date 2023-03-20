@@ -101,6 +101,7 @@ Cleanup
     Get Messages From Queue    ${SCAN_PROFILE_MUTATION_QUEUE}    ack_requeue_false
 
 Await Sync
+    Sleep     100ms
     Await Tasks Done
     Wait For XTDB Synced
 

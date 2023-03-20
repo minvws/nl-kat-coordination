@@ -25,10 +25,10 @@ from octopoes.models.types import OOIType
 
 
 class OctopoesAPISession(requests.Session):
-    def __init__(self, base_url: str, client: str):
+    def __init__(self, base_url: str):
         super().__init__()
 
-        self._base_uri = f"{base_url}/{client}"
+        self._base_uri = f"{base_url}"
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -70,10 +70,13 @@ class OctopoesAPIConnector:
     def __init__(self, base_uri: str, client: str):
         self.base_uri = base_uri
         self.client = client
-        self.session = OctopoesAPISession(base_uri, client)
+        self.session = OctopoesAPISession(base_uri)
+
+    def root_health(self) -> ServiceHealth:
+        return ServiceHealth.parse_obj(self.session.get("/health").json())
 
     def health(self) -> ServiceHealth:
-        return ServiceHealth.parse_obj(self.session.get("/health").json())
+        return ServiceHealth.parse_obj(self.session.get(f"/{self.client}/health").json())
 
     def list(
         self,
@@ -92,12 +95,12 @@ class OctopoesAPIConnector:
             "scan_level": {s.value for s in scan_level},
             "scan_profile_type": {s.value for s in scan_profile_type},
         }
-        res = self.session.get("/objects", params=params)
+        res = self.session.get(f"/{self.client}/objects", params=params)
         return Paginated[OOIType].parse_obj(res.json())
 
     def get(self, reference: Reference, valid_time: Optional[datetime] = None) -> OOI:
         res = self.session.get(
-            "/object",
+            f"/{self.client}/object",
             params={"reference": str(reference), "valid_time": valid_time},
         )
         return parse_obj_as(OOIType, res.json())
@@ -112,7 +115,7 @@ class OctopoesAPIConnector:
         if types is None:
             types = set()
         res = self.session.get(
-            "/tree",
+            f"/{self.client}/tree",
             params={
                 "reference": str(reference),
                 "types": [t.__name__ for t in types],
@@ -124,25 +127,25 @@ class OctopoesAPIConnector:
 
     def list_origins(self, reference: Reference, valid_time: Optional[datetime] = None) -> List[Origin]:
         params = {"reference": str(reference), "valid_time": valid_time}
-        res = self.session.get("/origins", params=params)
+        res = self.session.get(f"/{self.client}/origins", params=params)
         return parse_obj_as(List[Origin], res.json())
 
     def save_observation(self, observation: Observation) -> None:
-        self.session.post("/observations", data=observation.json())
+        self.session.post(f"/{self.client}/observations", data=observation.json())
 
     def save_declaration(self, declaration: Declaration) -> None:
-        self.session.post("/declarations", data=declaration.json())
+        self.session.post(f"/{self.client}/declarations", data=declaration.json())
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
-        self.session.put("/scan_profiles", params=params, data=scan_profile.json())
+        self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.json())
 
     def delete(self, reference: Reference, valid_time: Optional[datetime] = None) -> None:
         params = {"reference": str(reference), "valid_time": valid_time}
-        self.session.delete("/", params=params)
+        self.session.delete(f"/{self.client}/", params=params)
 
     def create_node(self):
-        self.session.post("/node")
+        self.session.post(f"/{self.client}/node")
 
     def delete_node(self):
-        self.session.delete("/node")
+        self.session.delete(f"/{self.client}/node")
