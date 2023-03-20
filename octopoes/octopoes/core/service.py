@@ -244,7 +244,7 @@ class OctopoesService:
         for reference in references_to_reset:
             old_scan_profile = inherited_scan_profiles[reference]
             self.scan_profile_repository.save(old_scan_profile, EmptyScanProfile(reference=reference), valid_time)
-        logger.info("Resetted scan profiles [len=%i]", len(references_to_reset))
+        logger.info("Reset scan profiles [len=%i]", len(references_to_reset))
 
         # Assign empty scan profiles to OOI's without scan profile
         unset_scan_profile_references = (
@@ -275,6 +275,16 @@ class OctopoesService:
     # OOI events
     def _on_create_ooi(self, event: OOIDBEvent) -> None:
         ooi = event.new_data
+
+        # keep old scan profile, or create new scan profile
+        try:
+            self.scan_profile_repository.get(ooi.reference, event.valid_time)
+        except ObjectNotFoundException:
+            self.scan_profile_repository.save(
+                None,
+                EmptyScanProfile(reference=ooi.reference),
+                valid_time=event.valid_time,
+            )
 
         # analyze bit definitions
         bit_definitions = get_bit_definitions()

@@ -118,6 +118,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 headers = response.split("\r\n\r\n")[0].split("\n\n")[0]
                 for header in headers.splitlines():
                     header = header.split(":", 2)
-                    # remove headers wihout key value structure
+                    # remove headers without key value structure
                     if len(header) == 2:
                         yield HTTPHeader(resource=http_resource.reference, key=header[0], value=header[1])
