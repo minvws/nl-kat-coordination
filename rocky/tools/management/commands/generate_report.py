@@ -43,6 +43,7 @@ class Command(BaseCommand):
             "-s",
             type=RiskLevelSeverity,
             default=RiskLevelSeverity.NONE,
+            choices=[severity.value for severity in RiskLevelSeverity],
             help="Only include Findings with at least this severity in the report.",
         )
 
