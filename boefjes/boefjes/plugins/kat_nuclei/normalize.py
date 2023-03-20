@@ -13,9 +13,9 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         for line in iter(raw.splitlines()):
             # Extract and parse values
             data = json.loads(line)
-            id_ = data['info']['classification']['cve-id'][0]
-            description = data['info']['description']
-            curl_command = data['curl-command']
+            id_ = data["info"]["classification"]["cve-id"][0]
+            description = data["info"]["description"]
+            curl_command = data["curl-command"]
 
             # Create instances of CVEFindingType and Finding classes
             cve_finding_type = CVEFindingType(id=id_)
