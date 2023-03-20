@@ -12,7 +12,7 @@ class RuntimeConfiguration(Enum):
 
 class Settings(BaseSettings):
     base_dir: Path = Path(__file__).parent.resolve()
-    log_cfg: Path = Path(__file__).parent.parent / "logging.json"
+    log_cfg: Path = Path(__file__).parent / "logging.json"
 
     # Worker configuration
     pool_size: int = 2
