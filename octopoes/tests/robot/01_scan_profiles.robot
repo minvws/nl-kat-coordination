@@ -21,17 +21,17 @@ Inheritance Of Two Declared Scan Profiles
     Verify Scan Profile Increment Queue    ${REF_HOSTNAME}    ${4}
     Verify Scan Profile Increment Queue    ${REF_IPADDR}    ${2}
     Verify Scan Profile Increment Queue    ${REF_RESOLVEDHOSTNAME}    ${4}
-    Verify Scan LeveL Filter    0    ${1}
     Verify Scan LeveL Filter    1    ${0}
     Verify Scan LeveL Filter    2    ${2}
     Verify Scan LeveL Filter    3    ${0}
     Verify Scan LeveL Filter    4    ${3}
+    Verify Scan LeveL Filter    0    ${1}
     Verify Scan LeveL Filter    ${{ [2,4] }}    ${5}
     Verify Scan LeveL Filter    ${{ [3,4] }}    ${3}
     Verify Scan LeveL Filter    ${{ [2,0] }}    ${3}
-    Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[4]}}
-    Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[2]}}
-    Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[4]}}
+    Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[0, 4]}}
+    Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[0, 2]}}
+    Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[0, 4]}}
 
 Recalculate Inheritance After Modification
     Declare Scan Profile    ${REF_HOSTNAME}    ${4}
@@ -45,9 +45,9 @@ Recalculate Inheritance After Modification
     Verify Scan Profile Increment Queue    ${REF_HOSTNAME}    ${4}
     Verify Scan Profile Increment Queue    ${REF_IPADDR}    ${2}
     Verify Scan Profile Increment Queue    ${REF_RESOLVEDHOSTNAME}    ${4}
-    Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[4, 0]}}
-    Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[2]}}
-    Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[4, 0]}}
+    Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[0, 4, 0]}}
+    Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[0, 2]}}
+    Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[0, 4, 0]}}
 
 Empty Scan Profiles
     Recalculate Scan Profiles

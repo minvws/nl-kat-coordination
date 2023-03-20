@@ -47,6 +47,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         )
         # walk over the common_name. which might be unrelated to the requested domain, or it might be a parent domain
         # which our dns Boefje should also have picked up.
-        # wilcards also trigger here, and wont be visible from a DNS query
+        # wildcards also trigger here, and won't be visible from a DNS query
         if common_name.endswith(current) or common_name not in unique_domains:
             yield Hostname(name=common_name, network=network_reference)
