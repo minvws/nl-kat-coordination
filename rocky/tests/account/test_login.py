@@ -21,7 +21,7 @@ def test_login_view(rf, clientuser):
     assertContains(response, "csrfmiddlewaretoken")
 
 
-def test_login(clientuser):
+def test_login(superuser):
     client = Client()
 
     response = client.post(
@@ -49,8 +49,8 @@ def test_login(clientuser):
     response = client.post(
         "/account/login/",
         {
-            "auth-username": clientuser.email,
-            "auth-password": clientuser.password,
+            "auth-username": superuser.email,
+            "auth-password": "SuperSuper123!!",
             "login_view-current_step": "auth",
         },
     )
@@ -71,4 +71,4 @@ def test_login(clientuser):
 
     assert not client.login(email="wrong@openkat.nl", password="TestTest123!!")
     assert not client.login(email="admin@openkat.nl", password="Test!!")
-    assert client.login(email=clientuser.email, password=clientuser.password)
+    assert client.login(email=superuser.email, password="SuperSuper123!!")

@@ -30,7 +30,7 @@ TREE_DATA = {
 }
 
 
-def test_ooi_report(rf, client_member, mock_organization_view_octopoes):
+def test_ooi_report(rf, client_member, ooi_information, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
     request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user)
@@ -45,7 +45,7 @@ def test_ooi_report(rf, client_member, mock_organization_view_octopoes):
     assertContains(response, "Fake recommendation...")
 
 
-def test_ooi_pdf_report(rf, client_member, mock_organization_view_octopoes, mocker):
+def test_ooi_pdf_report(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
     request = setup_request(
@@ -78,7 +78,7 @@ def test_ooi_pdf_report(rf, client_member, mock_organization_view_octopoes, mock
     assert report_data_param["findings_grouped"]["KAT-000"]["list"][0]["description"] == "Fake description..."
 
 
-def test_ooi_pdf_report_timeout(rf, client_member, mock_organization_view_octopoes, mocker):
+def test_ooi_pdf_report_timeout(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
     request = setup_request(
