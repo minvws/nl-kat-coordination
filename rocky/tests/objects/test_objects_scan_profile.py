@@ -41,15 +41,12 @@ TREE_DATA = {
 }
 
 
-def test_scan_profile(rf, client_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile(rf, redteam_member, mock_organization_view_octopoes, mocker):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
-    client_member.trusted_clearance_level = 4
-    client_member.acknowledged_clearance_level = 4
-    client_member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
-    response = ScanProfileDetailView.as_view()(request, organization_code=client_member.organization.code)
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2
@@ -57,48 +54,48 @@ def test_scan_profile(rf, client_member, mock_organization_view_octopoes, mocker
     assertContains(response, "Set clearance level")
 
 
-def test_scan_profile_submit(rf, client_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile_submit(rf, redteam_member, mock_organization_view_octopoes, mocker):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
     query_string = urlencode({"ooi_id": "Network|testnetwork"}, doseq=True)
     request = setup_request(
-        rf.post(f"/en/{client_member.organization.code}/objects/scan-profile/?{query_string}", data={"level": "L1"}),
-        client_member.user,
+        rf.post(f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}", data={"level": "L1"}),
+        redteam_member.user,
     )
-    response = ScanProfileDetailView.as_view()(request, organization_code=client_member.organization.code)
+    response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 302
-    assert response.url == f"/en/{client_member.organization.code}/objects/scan-profile/?{query_string}"
+    assert response.url == f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}"
 
 
-def test_scan_profile_submit_no_indemnification(rf, client_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile_submit_no_indemnification(rf, redteam_member, mock_organization_view_octopoes, mocker):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    Indemnification.objects.get(user=client_member.user).delete()
+    Indemnification.objects.get(user=redteam_member.user).delete()
 
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
     query_string = urlencode({"ooi_id": "Network|testnetwork"}, doseq=True)
     request = setup_request(
-        rf.post(f"/en/{client_member.organization.code}/objects/scan-profile/?{query_string}", data={"level": "L1"}),
-        client_member.user,
+        rf.post(f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}", data={"level": "L1"}),
+        redteam_member.user,
     )
-    response = ScanProfileDetailView.as_view()(request, organization_code=client_member.organization.code)
+    response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 403
 
 
-def test_scan_profile_no_permissions_acknowledged(rf, client_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile_no_permissions_acknowledged(rf, redteam_member, mock_organization_view_octopoes, mocker):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    client_member.acknowledged_clearance_level = -1
-    client_member.save()
+    redteam_member.acknowledged_clearance_level = -1
+    redteam_member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
-    response = ScanProfileDetailView.as_view()(request, organization_code=client_member.organization.code)
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2
@@ -106,16 +103,15 @@ def test_scan_profile_no_permissions_acknowledged(rf, client_member, mock_organi
     assertNotContains(response, "Set clearance level")
 
 
-def test_scan_profile_no_permissions_trusted(rf, client_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile_no_permissions_trusted(rf, redteam_member, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mocker.patch("katalogus.utils.get_katalogus")
 
-    member = OrganizationMember.objects.get(user=client_member.user)
-    member.trusted_clearance_level = -1
-    member.save()
+    redteam_member.trusted_clearance_level = -1
+    redteam_member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
-    response = ScanProfileDetailView.as_view()(request, organization_code=client_member.organization.code)
+    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2

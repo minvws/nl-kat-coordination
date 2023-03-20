@@ -7,13 +7,13 @@ from pytest_django.asserts import assertContains, assertNotContains
 from account.views import LoginRockyView
 
 
-def test_login_view(rf, client_member):
+def test_login_view(rf, clientuser):
     request = rf.get("login")
 
     request = SessionMiddleware(lambda r: r)(request)
     request = AuthenticationMiddleware(lambda r: r)(request)
 
-    response = LoginRockyView.as_view()(request, client_member.user)
+    response = LoginRockyView.as_view()(request)
     assert response.status_code == 200
     assertContains(response, "Login")
     assertContains(response, "Email")
@@ -21,7 +21,7 @@ def test_login_view(rf, client_member):
     assertContains(response, "csrfmiddlewaretoken")
 
 
-def test_login():
+def test_login(clientuser):
     client = Client()
 
     response = client.post(
@@ -49,8 +49,8 @@ def test_login():
     response = client.post(
         "/account/login/",
         {
-            "auth-username": "superuser@openkat.nl",
-            "auth-password": "SuperSuper123!!",
+            "auth-username": clientuser.email,
+            "auth-password": clientuser.password,
             "login_view-current_step": "auth",
         },
     )
@@ -71,4 +71,4 @@ def test_login():
 
     assert not client.login(email="wrong@openkat.nl", password="TestTest123!!")
     assert not client.login(email="admin@openkat.nl", password="Test!!")
-    assert client.login(email="superuser@openkat.nl", password="SuperSuper123!!")
+    assert client.login(email=clientuser.email, password=clientuser.password)

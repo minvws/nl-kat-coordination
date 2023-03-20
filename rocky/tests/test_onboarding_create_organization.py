@@ -17,9 +17,11 @@ def test_onboarding_create_organization(rf, superuser_member, mock_models_katalo
     assertContains(response, "Test Organization")
 
 
-def test_onboarding_create_organization_already_exist_katalogus(rf, client_member, mock_models_katalogus):
+def test_onboarding_create_organization_already_exist_katalogus(
+    rf, superuser, mock_models_katalogus, mock_models_octopoes
+):
     request = setup_request(
-        rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), client_member.user
+        rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), superuser
     )
 
     mock_models_katalogus().organization_exists.return_value = True

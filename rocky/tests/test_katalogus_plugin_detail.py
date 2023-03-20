@@ -15,8 +15,7 @@ def mock_mixins_katalogus(mocker):
 
 def test_plugin_detail(
     rf,
-    client_member,
-    organization,
+    redteam_member,
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
@@ -32,9 +31,9 @@ def test_plugin_detail(
     mock_mixins_katalogus().get_plugin_details.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), client_member.user)
+    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), redteam_member.user)
     response = PluginDetailView.as_view()(
-        request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"
+        request, organization_code=redteam_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
     )
 
     assertContains(response, "TestBoefje")

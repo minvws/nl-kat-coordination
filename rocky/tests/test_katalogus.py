@@ -5,6 +5,7 @@ from katalogus.views import KATalogusView, KATalogusSettingsListView, ConfirmClo
 from rocky.health import ServiceHealth
 from tests.conftest import setup_request, get_boefjes_data
 from tools.models import Organization, OrganizationMember
+from tests.conftest import create_member
 
 
 def test_katalogus_plugin_listing(admin_member, redteam_member, client_member, rf, mocker):
@@ -57,14 +58,14 @@ def test_katalogus_settings_list_one_organization(redteam_member, rf, mocker):
     assertNotContains(response, "Organizations:")
 
 
-def test_katalogus_settings_list_multiple_organization(
-    redteam_member, redteam_member_b, rf, mock_models_octopoes, mocker
-):
+def test_katalogus_settings_list_multiple_organization(redteam_member, organization_b, rf, mocker):
     # Mock katalogus calls: return right boefjes and settings
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
     boefjes_data = get_boefjes_data()
     mock_katalogus().get_boefjes.return_value = [parse_plugin(b) for b in boefjes_data if b["type"] == "boefje"]
     mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test"}
+
+    create_member(redteam_member.user, organization_b)
 
     request = setup_request(rf.get("katalogus_settings"), redteam_member.user)
     response = KATalogusSettingsListView.as_view()(request, organization_code=redteam_member.organization.code)
@@ -76,17 +77,20 @@ def test_katalogus_settings_list_multiple_organization(
     assertContains(response, "Value")
     assertContains(response, "BINARYEDGE_API")
     assertContains(response, "test")
+
     assertContains(response, "Clone settings")  # Now they appear
     assertContains(response, "Organizations:")  # Now they appear
-    assertContains(response, redteam_member_b.organization.name)
+    assertContains(response, organization_b.name)
 
 
-def test_katalogus_confirm_clone_settings(client_member, client_member_b, rf, mock_models_octopoes, mocker):
+def test_katalogus_confirm_clone_settings(client_member, organization_b, rf, mock_models_octopoes, mocker):
     mocker.patch("katalogus.client.KATalogusClientV1")
+
+    create_member(client_member.user, organization_b)
 
     request = setup_request(rf.get("confirm_clone_settings"), client_member.user)
     response = ConfirmCloneSettingsView.as_view()(
-        request, organization_code=client_member.organization.code, to_organization=client_member_b.organization.code
+        request, organization_code=client_member.organization.code, to_organization=organization_b.code
     )
     assert response.status_code == 200
 
@@ -96,20 +100,22 @@ def test_katalogus_confirm_clone_settings(client_member, client_member_b, rf, mo
     assertContains(response, "Cancel")
     assertContains(response, "Clone")
     assertContains(response, client_member.organization.name)
-    assertContains(response, client_member_b.organization.name)
+    assertContains(response, organization_b.name)
 
 
-def test_katalogus_clone_settings(client_member, client_member_b, rf, mocker, mock_models_octopoes):
+def test_katalogus_clone_settings(client_member, organization_b, rf, mocker, mock_models_octopoes):
     # Mock katalogus calls: return right boefjes and settings
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
 
+    create_member(client_member.user, organization_b)
+
     request = setup_request(rf.post("confirm_clone_settings"), client_member.user)
     response = ConfirmCloneSettingsView.as_view()(
-        request, organization_code=client_member.organization.code, to_organization=client_member_b.organization.code
+        request, organization_code=client_member.organization.code, to_organization=organization_b.code
     )
     assert response.status_code == 302
 
-    mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(client_member_b.organization.code)
+    mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(organization_b.code)
 
 
 def test_katalogus_client_organization_not_exists(mocker):
