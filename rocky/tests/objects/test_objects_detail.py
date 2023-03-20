@@ -33,16 +33,21 @@ TREE_DATA = {
 
 
 def test_ooi_detail(
-    rf, my_user, organization, mock_scheduler, mock_organization_view_octopoes, lazy_task_list_with_boefje, mocker
+    rf,
+    client_member,
+    mock_scheduler,
+    mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
+    mocker,
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
-    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), my_user)
+    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
-    response = OOIDetailView.as_view()(request, organization_code=organization.code)
+    response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2
@@ -52,11 +57,8 @@ def test_ooi_detail(
 
 def test_ooi_detail_start_scan(
     rf,
-    my_user,
-    organization,
-    mock_scheduler,
+    client_member,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
     mocker,
     network,
 ):
@@ -82,29 +84,26 @@ def test_ooi_detail_start_scan(
 
     request = setup_request(
         rf.post(
-            f"/en/{organization.code}/objects/details/?{query_string}",
+            f"/en/{client_member.organization.code}/objects/details/?{query_string}",
             data={
                 "boefje_id": "nmap",
                 "action": "start_scan",
             },
         ),
-        my_user,
+        client_member.user,
     )
-    response = OOIDetailView.as_view()(request, organization_code=organization.code)
+    response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert mock_organization_view_octopoes().get_tree.call_count == 1
     assert isinstance(response, HttpResponseRedirect)
     assert response.status_code == 302
-    assert response.url == f"/en/{organization.code}/tasks/"
+    assert response.url == f"/en/{client_member.organization.code}/tasks/"
 
 
 def test_ooi_detail_start_scan_no_indemnification(
     rf,
-    my_user,
-    organization,
-    mock_scheduler,
+    client_member,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
     mocker,
     network,
 ):
@@ -113,21 +112,21 @@ def test_ooi_detail_start_scan_no_indemnification(
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
 
-    Indemnification.objects.get(user=my_user).delete()
+    Indemnification.objects.get(user=client_member.user).delete()
 
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
     query_string = urlencode({"ooi_id": network.reference}, doseq=True)
     request = setup_request(
         rf.post(
-            f"/en/{organization.code}/objects/details/?{query_string}",
+            f"/en/{client_member.organization.code}/objects/details/?{query_string}",
             data={
                 "boefje_id": "nmap",
                 "action": "start_scan",
             },
         ),
-        my_user,
+        client_member.user,
     )
-    response = OOIDetailView.as_view()(request, organization_code=organization.code)
+    response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert mock_organization_view_octopoes().get_tree.call_count == 2
     assertContains(response, "Object details", status_code=403)
@@ -136,11 +135,8 @@ def test_ooi_detail_start_scan_no_indemnification(
 
 def test_ooi_detail_start_scan_no_action(
     rf,
-    my_user,
-    organization,
-    mock_scheduler,
+    client_member,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
     mocker,
     network,
 ):
@@ -153,14 +149,14 @@ def test_ooi_detail_start_scan_no_action(
     query_string = urlencode({"ooi_id": network.reference}, doseq=True)
     request = setup_request(
         rf.post(
-            f"/en/{organization.code}/objects/details/?{query_string}",
+            f"/en/{client_member.organization.code}/objects/details/?{query_string}",
             data={
                 "boefje_id": "nmap",
             },
         ),
-        my_user,
+        client_member.user,
     )
-    response = OOIDetailView.as_view()(request, organization_code=organization.code)
+    response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert mock_organization_view_octopoes().get_tree.call_count == 2
     assertContains(response, "Object details", status_code=404)
