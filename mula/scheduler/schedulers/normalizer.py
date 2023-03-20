@@ -50,6 +50,7 @@ class NormalizerScheduler(Scheduler):
         while not self.queue.full():
             time.sleep(1)
 
+            latest_raw_data = None
             try:
                 latest_raw_data = self.ctx.services.raw_data.get_latest_raw_data(
                     queue=f"{self.organisation.id}__raw_file_received",
@@ -195,7 +196,7 @@ class NormalizerScheduler(Scheduler):
                 self.logger.info(
                     "Created normalizer task: %s for raw data: %s "
                     "[normalizer.id=%s, raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
-                    normalizer.name,
+                    normalizer.id,
                     latest_raw_data.raw_data.id,
                     normalizer.id,
                     latest_raw_data.raw_data.id,

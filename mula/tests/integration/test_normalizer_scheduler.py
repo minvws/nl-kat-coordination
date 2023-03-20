@@ -3,9 +3,14 @@ import unittest
 from unittest import mock
 
 from scheduler import config, models, queues, rankers, repositories, schedulers
-from tests.factories import (BoefjeMetaFactory, OOIFactory,
-                             OrganisationFactory, PluginFactory,
-                             RawDataFactory, ScanProfileFactory)
+from tests.factories import (
+    BoefjeMetaFactory,
+    OOIFactory,
+    OrganisationFactory,
+    PluginFactory,
+    RawDataFactory,
+    ScanProfileFactory,
+)
 from tests.utils import functions
 
 
@@ -49,12 +54,16 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
     @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
     def test_push_tasks_for_received_raw_file(
         self,
         mock_get_latest_raw_data,
         mock_get_normalizers_for_mime_type,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -86,12 +95,14 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
                 organization=self.organisation.name,
                 created_at=datetime.datetime.now(),
             ),
-            None
+            None,
         ]
 
         mock_get_normalizers_for_mime_type.return_value = [
             PluginFactory(type="normalizer"),
         ]
+        mock_is_task_allowed_to_run.return_value = True
+        mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_file()
@@ -105,16 +116,18 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
     @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
     def test_push_tasks_for_received_raw_file_no_normalizers_found(
         self,
         mock_get_latest_raw_data,
         mock_get_normalizers_for_mime_type,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
         # Arrange
-
-        # Create associated Boefje Task
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(type="boefje", scan_level=0)
@@ -144,10 +157,12 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
                 organization=self.organisation.name,
                 created_at=datetime.datetime.now(),
             ),
-            None
+            None,
         ]
 
         mock_get_normalizers_for_mime_type.return_value = []
+        mock_is_task_allowed_to_run.return_value = True
+        mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_file()
@@ -155,17 +170,113 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    # TODO
-    def test_push_tasks_for_received_raw_file_still_running(
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
+    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
+    def test_push_tasks_for_received_raw_file_not_allowed_to_run(
         self,
+        mock_get_latest_raw_data,
+        mock_get_normalizers_for_mime_type,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
-        self.assertFail()
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(type="boefje", scan_level=0)
+        boefje_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
 
-    # TODO
+        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        task = functions.create_task(p_item)
+        self.mock_ctx.task_store.create_task(task)
+
+        boefje_meta = BoefjeMetaFactory(
+            id=p_item.id.hex,
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+        )
+
+        # Mocks
+        mock_get_latest_raw_data.side_effect = [
+            models.RawDataReceivedEvent(
+                raw_data=RawDataFactory(
+                    boefje_meta=boefje_meta,
+                    mime_types=[{"value": "text/plain"}],
+                ),
+                organization=self.organisation.name,
+                created_at=datetime.datetime.now(),
+            ),
+            None,
+        ]
+
+        mock_get_normalizers_for_mime_type.return_value = []
+        mock_is_task_allowed_to_run.return_value = False
+        mock_is_task_running.return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_received_raw_file()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
+    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
     def test_push_tasks_for_received_raw_file_still_running(
         self,
+        mock_get_latest_raw_data,
+        mock_get_normalizers_for_mime_type,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
     ):
-        self.assertFail()
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(type="boefje", scan_level=0)
+        boefje_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        task = functions.create_task(p_item)
+        self.mock_ctx.task_store.create_task(task)
+
+        boefje_meta = BoefjeMetaFactory(
+            id=p_item.id.hex,
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+        )
+
+        # Mocks
+        mock_get_latest_raw_data.side_effect = [
+            models.RawDataReceivedEvent(
+                raw_data=RawDataFactory(
+                    boefje_meta=boefje_meta,
+                    mime_types=[{"value": "text/plain"}],
+                ),
+                organization=self.organisation.name,
+                created_at=datetime.datetime.now(),
+            ),
+            None,
+        ]
+
+        mock_get_normalizers_for_mime_type.return_value = []
+        mock_is_task_allowed_to_run.return_value = True
+        mock_is_task_running.return_value = True
+
+        # Act
+        self.scheduler.push_tasks_for_received_raw_file()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
 
     @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
@@ -230,7 +341,6 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
 
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
     def test_push_tasks_for_received_raw_file_error_mimetype(
