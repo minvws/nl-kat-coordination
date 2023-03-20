@@ -1,6 +1,6 @@
 import re
 import time
-from typing import Dict, BinaryIO, List, Optional
+from typing import Dict, BinaryIO, List, Optional, Any
 from http import HTTPStatus
 
 import requests
@@ -106,6 +106,18 @@ class ReportsService:
         report_id = self.keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
 
         return self.keiko_client.get_report(report_id)
+
+    def get_finding_report(
+        self,
+        valid_time: datetime,
+        source_type: str,
+        source_value: str,
+        findings_metadata: List[Dict[str, Any]],
+    ) -> BinaryIO:
+        findings = [item["finding"] for item in findings_metadata]
+        store = {finding.primary_key: finding for finding in findings}
+
+        return self.get_report(valid_time, source_type, source_value, store)
 
     @classmethod
     def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str):

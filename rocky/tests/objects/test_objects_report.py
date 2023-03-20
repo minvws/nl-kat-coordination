@@ -1,5 +1,6 @@
 from io import BytesIO
 
+from django.core.management import call_command
 from django.urls import reverse, resolve
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding
@@ -129,6 +130,37 @@ def test_organization_pdf_report(rf, my_user, organization, ooi_information, moc
     }
     assert report_data_param["findings_grouped"]["KAT-0001"]["finding_type"]["id"] == "KAT-0001"
     assert report_data_param["findings_grouped"]["KAT-0001"]["list"][0]["description"] == "test description 123"
+
+
+def test_pdf_report_command(tmp_path, my_user, organization, ooi_information, mocker):
+    mock_organization_view_octopoes = mocker.patch("tools.management.commands.generate_report.OctopoesAPIConnector")
+    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+        count=1,
+        items=[
+            Finding(
+                finding_type=Reference.from_str("KATFindingType|KAT-0001"),
+                ooi=Reference.from_str("Network|testnetwork"),
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            )
+        ],
+    )
+
+    dt_in_filename = "2023_14_03T13_48_19_418402_+0000"
+    mock_datetime = mocker.patch("rocky.keiko.datetime")
+    mock_datetime.now().strftime.return_value = dt_in_filename
+
+    # Setup Keiko mock
+    mock_keiko_client = mocker.patch("tools.management.commands.generate_report.keiko_client")
+    mock_keiko_client.generate_report.return_value = "fake_report_id"
+    mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
+
+    tmp_file = tmp_path / "test.pdf"
+    call_command("generate_report", code=organization.code, file=tmp_file)
+
+    assert tmp_file.exists()
+    assert tmp_file.read_text() == "fake_binary_pdf_content"
 
 
 def test_ooi_pdf_report_timeout(rf, my_user, organization, ooi_information, mock_organization_view_octopoes, mocker):

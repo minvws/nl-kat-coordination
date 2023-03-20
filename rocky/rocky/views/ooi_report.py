@@ -115,15 +115,14 @@ class FindingReportPDFView(FindingListView):
     paginate_by = None
 
     def get(self, request, *args, **kwargs):
-        findings = [item["finding"] for item in super().get_queryset()]
         reports_service = ReportsService(keiko_client)
 
         try:
-            report = reports_service.get_report(
+            report = reports_service.get_finding_report(
                 self.get_observed_at(),
                 "Organization",
                 self.organization.name,
-                {finding.primary_key: finding for finding in findings},  # Create "store" from finding list
+                super().get_queryset(),
             )
         except GeneratingReportFailed:
             messages.error(request, _("Generating report failed. See Keiko logs for more information."))
