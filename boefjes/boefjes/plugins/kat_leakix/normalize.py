@@ -130,7 +130,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         event_source = event.get("event_source")
         leak_stage = event.get("leak", {}).get("dataset", {}).get("stage")
         if leak_severity or leak_stage:
-            #  Got the differen severities from: https://pkg.go.dev/github.com/LeakIX/l9format#pkg-constants
+            #  Got the different severities from: https://pkg.go.dev/github.com/LeakIX/l9format#pkg-constants
             leak_infected = event.get("leak", {}).get("dataset", {}).get("infected")
             leak_ransomnote = event.get("leak", {}).get("dataset", {}).get("ransom_notes")
             if leak_severity == "critical" or leak_infected or leak_ransomnote:

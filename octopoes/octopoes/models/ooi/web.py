@@ -37,9 +37,9 @@ class Website(OOI):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         t = reference.tokenized
         service = t.ip_service.service.name
-        addres = t.ip_service.ip_port.address.address
+        address = t.ip_service.ip_port.address.address
         port = t.ip_service.ip_port.port
-        return f"{service}://{t.hostname.name}:{port} @ {addres}"
+        return f"{service}://{t.hostname.name}:{port} @ {address}"
 
 
 class WebScheme(Enum):

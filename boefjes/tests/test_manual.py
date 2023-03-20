@@ -37,7 +37,7 @@ FE80:CD00:0000:0CDE:1257:0000:211E:729D,darknet""",
         b"""network,raw
 internet,https://example.com/
 darknet,https://openkat.nl/""",
-        # url withouth network
+        # url without network
         b"raw\nhttps://example.com/",
     ]
 

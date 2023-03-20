@@ -7,8 +7,7 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import (Normalizer, NormalizerTask, Organisation, Plugin,
-                              PrioritizedItem, RawData)
+from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, RawData
 
 from .scheduler import Scheduler
 
@@ -42,8 +41,7 @@ class NormalizerScheduler(Scheduler):
         self.organisation: Organisation = organisation
 
     def populate_queue(self) -> None:
-        """Populate the PriorityQueue
-        """
+        """Populate the PriorityQueue"""
         self.push_tasks_for_received_raw_file()
 
     def push_tasks_for_received_raw_file(self) -> None:
@@ -76,7 +74,6 @@ class NormalizerScheduler(Scheduler):
                 )
                 if self.stop_event.is_set():
                     raise e
-
 
             # Stop the loop when we've processed everything from the
             # messaging queue, so we can continue to the next step.
@@ -168,7 +165,8 @@ class NormalizerScheduler(Scheduler):
 
                 score = self.ranker.rank(
                     SimpleNamespace(
-                        raw_data=latest_raw_data.raw_data, task=task,
+                        raw_data=latest_raw_data.raw_data,
+                        task=task,
                     ),
                 )
 
@@ -307,10 +305,7 @@ class NormalizerScheduler(Scheduler):
             raise exc_db
 
         # Is task still running according to the datastore?
-        if (
-            task_db is not None
-            and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]
-        ):
+        if task_db is not None and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
                 "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
