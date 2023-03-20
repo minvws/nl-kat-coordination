@@ -65,7 +65,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
             if int(tcl) < int(acl):
                 messages.add_message(
                     self.request,
-                    messages.WARNING,
+                    messages.INFO,
                     _(
                         "The updated trusted clearance level of L%s is lower then the member's "
                         "acknowledged clearance level of L%s. This member only has clearance for level L%s. "
@@ -77,7 +77,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
             if int(tcl) > int(acl):
                 messages.add_message(
                     self.request,
-                    messages.WARNING,
+                    messages.INFO,
                     _(
                         "You have trusted this member with a higher trusted level than member acknowledged. "
                         "Member must first accept this level to use it."
