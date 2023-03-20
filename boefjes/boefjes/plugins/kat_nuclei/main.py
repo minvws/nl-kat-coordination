@@ -19,3 +19,4 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     )
 
     return [(set(), output)]
+    

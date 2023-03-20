@@ -26,6 +26,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 ooi=url_reference,
                 proof=curl_command,
                 description=description,
-                reproduce=None  # Set this attribute if you have a reproduce value
+                reproduce=None,  # Set this attribute if you have a reproduce value
             )
             yield finding
