@@ -1,8 +1,12 @@
+from typing import List
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from tools.models import OrganizationMember, Organization
 
 
 class KATUserManager(BaseUserManager):
@@ -79,3 +83,10 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return self.full_name
+
+    def get_organizations(self) -> List[Organization]:
+        """Lists all organizations a user is a member of, excluding organizations to which access is blocked."""
+        if self.is_superuser:
+            return list(Organization.objects.all())
+        members = self.members.exclude(status=OrganizationMember.STATUSES.BLOCKED).select_related("organization")
+        return [member.organization for member in members]

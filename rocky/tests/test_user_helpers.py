@@ -1,22 +1,11 @@
 from tools.models import OrganizationMember
 from tools.user_helpers import (
-    organizations_for_user,
     is_red_team,
     is_admin,
     indemnification_present,
     can_scan_organization,
     can_switch_organization,
 )
-
-
-def test_organizations_for_user(my_user):
-    result = organizations_for_user(my_user)
-    assert len(result) == 1
-
-
-def test_organizations_for_red_teamer(my_red_teamer):
-    result = organizations_for_user(my_red_teamer)
-    assert len(result) == 1
 
 
 def test_is_not_red_team(my_user):
