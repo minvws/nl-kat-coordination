@@ -50,11 +50,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if not options["file"]:
             if self.stdout.isatty():
-                self.stderr.write("Can't print PDF file to stdout. Set a destination path or pipe the output to a file")
+                self.stderr.write(
+                    "Can't print PDF file directly to stdout. Set a destination path or pipe the output to a file"
+                )
                 sys.exit(1)
-
-            # We will print the report to
-            logging.disable(logging.CRITICAL)
 
         organization = self.get_organization(**options)
 
