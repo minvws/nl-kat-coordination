@@ -7,7 +7,7 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, RawData
+from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, TaskStatus
 
 from .scheduler import Scheduler
 
@@ -272,8 +272,8 @@ class NormalizerScheduler(Scheduler):
         if normalizer.enabled is False:
             self.logger.debug(
                 "Normalizer: %s is disabled [normalizer.id= %s, organisation.id=%s, scheduler_id=%s]",
-                task.normalizer.name,
-                task.normalizer.id,
+                normalizer.id,
+                normalizer.id,
                 self.organisation.id,
                 self.scheduler_id,
             )
