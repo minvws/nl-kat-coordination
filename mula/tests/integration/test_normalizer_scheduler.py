@@ -224,6 +224,9 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
+    @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
     @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
     def test_push_tasks_for_received_raw_file_still_running(
         self,
