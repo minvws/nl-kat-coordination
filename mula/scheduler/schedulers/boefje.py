@@ -2,13 +2,14 @@ import logging
 import time
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import List
+from typing import List, Set
 
 import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
+from scheduler.models import (OOI, Boefje, BoefjeTask, Organisation, Plugin,
+                              PrioritizedItem, TaskStatus)
 
 from .scheduler import Scheduler
 
@@ -52,6 +53,8 @@ class BoefjeScheduler(Scheduler):
         random items from octopoes and schedule them accordingly.
         """
         self.push_tasks_for_scan_profile_mutations()
+
+        self.push_tasks_for_new_boefjes()
 
         self.push_tasks_for_random_objects()
 
@@ -242,6 +245,67 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
+    def push_tasks_for_new_boefjes(self) -> None:
+        """When new boefjes are added or enabled we find the ooi's that
+        boefjes can run on, and create tasks for it."""
+        if self.queue.full():
+            self.logger.warning(
+                "Boefjes queue is full, not populating with new tasks "
+                "[queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
+                self.queue.qsize(),
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return
+
+        try:
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
+        except (
+            pika.exceptions.ConnectionClosed,
+            pika.exceptions.ChannelClosed,
+            pika.exceptions.ChannelClosedByBroker,
+            pika.exceptions.AMQPConnectionError,
+        ) as e:
+            self.logger.warning(
+                "Could not connect to rabbitmq queue: %s [org_id=%s, scheduler_id=%s]",
+                f"{self.organisation.id}__scan_profile_increments",
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            if self.stop_event.is_set():
+                raise e
+
+        if new_boefjes is None or len(new_boefjes) < 1:
+            self.logger.debug(
+                "No new boefjes for organisation: %s [organisation.id=%s, scheduler_id=%s]",
+                self.organisation.name,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return
+
+        self.logger.debug(
+            "Received new boefjes: %s [org_id=%s, scheduler_id=%s]",
+            new_boefjes,
+            self.organisation.id,
+            self.scheduler_id,
+        )
+
+        object_types: Set[string] = set()
+        for boefje in new_boefjes:
+            for object_type in boefje.consumes:
+                object_types.add(object_type)
+
+        try:
+            oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_type(boefje.consumes)
+        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            self.logger.warning(
+                "Could not get oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
+                self.organisation.name,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""
         while not self.queue.full():
@@ -261,7 +325,7 @@ class BoefjeScheduler(Scheduler):
                 )
                 return
 
-            if len(random_oois) == 0:
+            if len(random_oois) < 1:
                 self.logger.debug(
                     "No random oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
                     self.organisation.name,
@@ -279,7 +343,7 @@ class BoefjeScheduler(Scheduler):
                 )
 
                 boefjes = self.get_boefjes_for_ooi(ooi)
-                if boefjes is None or len(boefjes) == 0:
+                if boefjes is None or len(boefjes) < 1:
                     self.logger.debug(
                         "No boefjes available for ooi %s, skipping [organisation.id=%s, scheduler_id=%s]",
                         ooi,
