@@ -30,7 +30,10 @@ Object List Should Contain Reported Items
     ${response_data}    Get Objects
     # 6, because 2 objects are created by bits
     Should Be Equal    ${response_data["count"]}    ${6}
-    Should Be Equal    ${response_data["items"][0]["primary_key"]}    ${REF_HOSTNAME}
+
+    # verify that REF_HOSTNAME is in the list
+    ${pks}    Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
+    Should Contain    ${pks}    ${REF_HOSTNAME}    ${REF_HOSTNAME} not found in object list
 
 Verify Object List With Filter
     ${response_data}    Get Objects With ScanLevel 0
