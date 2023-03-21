@@ -132,7 +132,33 @@ VWS_PUBLIC_KEY_B64=""
 
 ## Design
 
-The overall view of the application is as follows.
+We now include two levels of design, according to the [C4 model](https://c4model.com/).
+
+
+### Design: C2 Container level
+The overall view of the code is as follows.
+
+```mermaid
+graph
+    User((User))
+    Rocky["Rocky<br/><i>Django App</i>"]
+    Bytes{"Bytes<br/><i>FastAPI App"}
+    RabbitMQ[["RabbitMQ<br/><i>Message Broker"]]
+    Scheduler["Scheduler<br/><i>Software System"]
+    Boefjes["Boefjes<br/><i>Python App"]
+
+
+    Boefjes -- GET/POST Raw/Meta --> Bytes
+    User -- Interacts with --> Rocky
+    Rocky -- GET/POST Raw/Meta --> Bytes
+
+    Bytes -- "publish(RawFileReceived)" --> RabbitMQ
+    Scheduler --"subscribe(RawFileReceived)"--> RabbitMQ
+    Scheduler --"GET BoefjeMeta"--> Bytes
+```
+
+### Design: C3 Component level
+The overall view of the code is as follows.
 
 ```mermaid
 graph LR
