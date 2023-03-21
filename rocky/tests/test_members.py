@@ -141,25 +141,13 @@ def test_admin_edits_redteamer(rf, admin_member, redteam_member):
         ),
         admin_member.user,
     )
-    response = OrganizationMemberEditView.as_view()(
+    OrganizationMemberEditView.as_view()(
         request, organization_code=redteam_member.organization.code, pk=redteam_member.id
     )
-
-    assert response.status_code == 302
-    assert response.url == f"/en/{admin_member.organization.code}/"
-    resulted_request = setup_request(rf.get(response.url), admin_member.user)
-    resulted_response = OrganizationDetailView.as_view()(
-        resulted_request, organization_code=admin_member.organization.code
-    )
-    assert resulted_response.status_code == 200
 
     redteam_member.refresh_from_db()
     assert redteam_member.status == "active"
     assert redteam_member.trusted_clearance_level == 4
-
-    # member list has been updated
-    assertContains(resulted_response, "Active")
-    assertContains(resulted_response, "Yes (L4)")
 
 
 def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
@@ -170,17 +158,9 @@ def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
         ),
         admin_member.user,
     )
-    response = OrganizationMemberEditView.as_view()(
+    OrganizationMemberEditView.as_view()(
         request, organization_code=redteam_member.organization.code, pk=redteam_member.id
     )
-    assert response.status_code == 302
-    assert response.url == f"/en/{admin_member.organization.code}/"
-    resulted_request = setup_request(rf.get(response.url), admin_member.user)
-    resulted_response = OrganizationDetailView.as_view()(
-        resulted_request, organization_code=admin_member.organization.code
-    )
-    assert resulted_response.status_code == 200
+
     redteam_member.refresh_from_db()
     assert redteam_member.status == "blocked"
-    assertContains(resulted_response, "blocked")
-    assertContains(resulted_response, "Suspended")

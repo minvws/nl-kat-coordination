@@ -22,7 +22,7 @@ def test_organization_list_non_superuser(rf, client_member):
 
 def test_edit_organization(rf, superuser_member):
     request = setup_request(rf.get("organization_edit"), superuser_member.user)
-    response = OrganizationEditView.as_view()(request, pk=superuser_member.organization.id)
+    response = OrganizationEditView.as_view()(request, organization_code=superuser_member.organization.code)
 
     assert response.status_code == 200
     assertContains(response, "Name")
@@ -187,9 +187,7 @@ def test_edit_organization_permissions(rf, redteam_member, client_member):
     request_client = setup_request(rf.get("organization_edit"), client_member.user)
 
     with pytest.raises(PermissionDenied):
-        OrganizationEditView.as_view()(
-            request_redteam, organization_code=redteam_member.organization.code, pk=redteam_member.organization.id
-        )
+        OrganizationEditView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
 
     with pytest.raises(PermissionDenied):
         OrganizationEditView.as_view()(
