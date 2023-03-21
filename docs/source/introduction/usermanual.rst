@@ -256,4 +256,3 @@ Based on the report, object and safeguard, select the relevant boefjes for your 
 - View results: in the web interface or as a PDF report
 
 The scan is an ongoing process, looking for information based on derivation and logical connections in the data model. The results of the scan appear over time, any findings can be viewed by object, at Findings and in the Crisis Room. In each context, reports can also be generated.
-

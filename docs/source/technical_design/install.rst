@@ -43,4 +43,3 @@ An example is shown in the diagram below. OpenKAT runs behind a proxy with firew
 At the backend, a management interface can be added, adapted to the situation where OpenKAT is used. Each module has a healthpoint for monitoring.
 
 Backups are particularly relevant for the raw data in Bytes and the userdata, possibly for speed the objects in Octopoes. Based on Bytes and the userdata, the system can in principle be redeployed and restored.
-
