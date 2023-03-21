@@ -104,5 +104,3 @@ Security settings
 =================
 
 Certbot takes care of several settings and you can find more relevant headers in the 'hardening' section of this manual.
-
-
