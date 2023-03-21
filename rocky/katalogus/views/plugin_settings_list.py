@@ -18,7 +18,7 @@ class PluginSettingsListView(ListView):
         queryset = []
         if self.plugin_schema:
             for schema_props in self.plugin_schema["properties"]:
-                setting = self.katalogus_client.get_plugin_setting(plugin_id=self.plugin["id"], name=schema_props)
+                setting = self.katalogus_client.get_plugin_setting(plugin_id=self.plugin.id, name=schema_props)
                 if "message" in setting:
                     value = ""
                 else:

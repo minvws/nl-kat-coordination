@@ -8,11 +8,11 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.forms import PluginSettingAddEditForm
-from katalogus.views.mixins import KATalogusMixin
+from katalogus.views.mixins import SinglePluginMixin
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsUpdateView(PermissionRequiredMixin, KATalogusMixin, FormView):
+class PluginSettingsUpdateView(PermissionRequiredMixin, SinglePluginMixin, FormView):
     """View to update/edit a plugin setting for all plugins in KAT-alogus"""
 
     template_name = "plugin_settings_edit.html"
@@ -21,15 +21,16 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, KATalogusMixin, FormView
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.setting_name = kwargs["setting_name"]
-        self.setting_value = self.katalogus_client.get_plugin_setting(self.plugin_id, name=self.setting_name)
+        self.setting_value = self.katalogus_client.get_plugin_setting(self.plugin.id, name=self.setting_name)
         self.check_key_already_exists(request)
 
-    def get_form(self):
-        if self.plugin_schema:
-            form = PluginSettingAddEditForm(
-                self.plugin_schema, self.setting_name, self.setting_value, **self.get_form_kwargs()
-            )
-            return form
+    def get_form(self, **kwargs):
+        if not self.plugin_schema:
+            return
+
+        return PluginSettingAddEditForm(
+            self.plugin_schema, self.setting_name, self.setting_value, **self.get_form_kwargs()
+        )
 
     def check_key_already_exists(self, request):
         if "message" in self.setting_value:
@@ -43,8 +44,8 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, KATalogusMixin, FormView
                     "plugin_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                     },
                 )
             )
@@ -54,8 +55,8 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, KATalogusMixin, FormView
             "plugin_detail",
             kwargs={
                 "organization_code": self.organization.code,
-                "plugin_type": self.plugin["type"],
-                "plugin_id": self.plugin_id,
+                "plugin_type": self.plugin.type,
+                "plugin_id": self.plugin.id,
             },
         )
 
@@ -71,32 +72,32 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, KATalogusMixin, FormView
                     "plugin_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                     },
                 ),
-                "text": self.plugin["name"],
+                "text": self.plugin.name,
             },
             {
                 "url": reverse(
                     "plugin_settings_add",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                     },
                 ),
                 "text": _("Edit"),
             },
         ]
         context["setting_name"] = self.setting_name
-        context["plugin_id"] = self.plugin_id
-        context["plugin_type"] = self.plugin["type"]
-        context["plugin_name"] = self.plugin["name"]
+        context["plugin_id"] = self.plugin.id
+        context["plugin_type"] = self.plugin.type
+        context["plugin_name"] = self.plugin.name
         return context
 
     def form_valid(self, form):
         value = form.cleaned_data[self.setting_name]
-        self.katalogus_client.update_plugin_setting(plugin_id=self.plugin_id, name=self.setting_name, value=value)
+        self.katalogus_client.update_plugin_setting(plugin_id=self.plugin.id, name=self.setting_name, value=value)
         messages.add_message(self.request, messages.SUCCESS, _("Setting successfully updated."))
         return super().form_valid(form)

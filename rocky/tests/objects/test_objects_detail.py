@@ -65,7 +65,7 @@ def test_ooi_detail_start_scan(
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
-    mock_katalogus().get_boefje.return_value = Plugin(
+    mock_katalogus().get_plugin.return_value = Plugin(
         id="nmap",
         repository_id="",
         name="",

@@ -14,7 +14,7 @@ from rocky.views.mixins import OctopoesView
 logger = getLogger(__name__)
 
 
-class KATalogusMixin(OrganizationView):
+class SinglePluginMixin(OrganizationView):
     def setup(self, request, *args, **kwargs):
         """
         Prepare organization info and KAT-alogus API client.
@@ -22,12 +22,10 @@ class KATalogusMixin(OrganizationView):
         super().setup(request, *args, **kwargs)
         if request.user.is_anonymous:
             return reverse("login")
-        else:
-            self.katalogus_client = get_katalogus(self.organization.code)
-            if "plugin_id" in kwargs:
-                self.plugin_id = kwargs["plugin_id"]
-                self.plugin = self.katalogus_client.get_plugin_details(self.plugin_id)
-                self.plugin_schema = self.katalogus_client.get_plugin_schema(self.plugin_id)
+
+        self.katalogus_client = get_katalogus(self.organization.code)
+        self.plugin = self.katalogus_client.get_plugin(kwargs["plugin_id"])
+        self.plugin_schema = self.katalogus_client.get_plugin_schema(kwargs["plugin_id"])
 
 
 class BoefjeMixin(OctopoesView):

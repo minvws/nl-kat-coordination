@@ -29,7 +29,7 @@ def test_plugin_detail(
     mock_scheduler_client.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](count=1, items=[network])
-    mock_mixins_katalogus().get_plugin_details.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
     request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), my_user)

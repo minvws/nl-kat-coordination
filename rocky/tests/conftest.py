@@ -12,6 +12,8 @@ from django_otp.middleware import OTPMiddleware
 from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
+
+from katalogus.client import parse_plugin
 from rocky.scheduler import Task
 from tools.models import OrganizationMember, OOIInformation, Organization, Indemnification
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN, GROUP_CLIENT
@@ -430,17 +432,19 @@ def finding():
 
 @pytest.fixture
 def plugin_details():
-    return {
-        "id": "test-boefje",
-        "type": "boefje",
-        "name": "TestBoefje",
-        "description": "Meows to the moon",
-        "repository_id": "test-repository",
-        "scan_level": 1,
-        "consumes": ["Network"],
-        "produces": ["Network"],
-        "enabled": True,
-    }
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "description": "Meows to the moon",
+            "repository_id": "test-repository",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+        }
+    )
 
 
 @pytest.fixture

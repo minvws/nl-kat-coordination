@@ -7,11 +7,11 @@ from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
-from katalogus.views.mixins import KATalogusMixin
+from katalogus.views.mixins import SinglePluginMixin
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsDeleteView(PermissionRequiredMixin, KATalogusMixin, TemplateView):
+class PluginSettingsDeleteView(PermissionRequiredMixin, SinglePluginMixin, TemplateView):
     template_name = "plugin_settings_delete.html"
     permission_required = "tools.can_scan_organization"
 
@@ -34,19 +34,19 @@ class PluginSettingsDeleteView(PermissionRequiredMixin, KATalogusMixin, Template
                     "plugin_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                     },
                 ),
-                "text": self.plugin["name"],
+                "text": self.plugin.name,
             },
             {
                 "url": reverse(
                     "plugin_settings_delete",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                         "name": self.name,
                     },
                 ),
@@ -54,9 +54,9 @@ class PluginSettingsDeleteView(PermissionRequiredMixin, KATalogusMixin, Template
             },
         ]
         context["name"] = self.name
-        context["plugin_id"] = self.plugin_id
-        context["plugin_type"] = self.plugin["type"]
-        context["plugin_name"] = self.plugin["name"]
+        context["plugin_id"] = self.plugin.id
+        context["plugin_type"] = self.plugin.type
+        context["plugin_name"] = self.plugin.name
         context["cancel_url"] = self.get_success_url()
         return context
 
@@ -65,16 +65,16 @@ class PluginSettingsDeleteView(PermissionRequiredMixin, KATalogusMixin, Template
             "plugin_detail",
             kwargs={
                 "organization_code": self.organization.code,
-                "plugin_type": self.plugin["type"],
-                "plugin_id": self.plugin_id,
+                "plugin_type": self.plugin.type,
+                "plugin_id": self.plugin.id,
             },
         )
 
     def delete(self, request, *args, **kwargs):
-        self.katalogus_client.delete_plugin_setting(plugin_id=self.plugin_id, name=self.name)
+        self.katalogus_client.delete_plugin_setting(plugin_id=self.plugin.id, name=self.name)
         messages.add_message(
             request,
             messages.SUCCESS,
-            _("Setting {} for plugin {} successfully deleted.").format(self.name, self.plugin["name"]),
+            _("Setting {} for plugin {} successfully deleted.").format(self.name, self.plugin.name),
         )
         return HttpResponseRedirect(self.get_success_url())

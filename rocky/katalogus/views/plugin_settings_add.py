@@ -8,20 +8,21 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.forms import PluginSchemaForm, PluginSettingAddEditForm
-from katalogus.views.mixins import KATalogusMixin
+from katalogus.views.mixins import SinglePluginMixin
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsAddView(PermissionRequiredMixin, KATalogusMixin, FormView):
+class PluginSettingsAddView(PermissionRequiredMixin, SinglePluginMixin, FormView):
     """View to add a general setting for all plugins in KAT-alogus"""
 
     template_name = "plugin_settings_add.html"
     permission_required = "tools.can_scan_organization"
 
-    def get_form(self):
-        if self.plugin_schema:
-            form = PluginSchemaForm(self.plugin_schema, **self.get_form_kwargs())
-            return form
+    def get_form(self, **kwargs):
+        if not self.plugin_schema:
+            return
+
+        return PluginSchemaForm(self.plugin_schema, **self.get_form_kwargs())
 
     def form_valid(self, form):
         for name, value in form.cleaned_data.items():
@@ -29,12 +30,12 @@ class PluginSettingsAddView(PermissionRequiredMixin, KATalogusMixin, FormView):
                 self.add_error_notification(_("This setting already exists. Use the edit link."))
                 break
 
-            self.katalogus_client.add_plugin_setting(self.plugin_id, name, value)
+            self.katalogus_client.add_plugin_setting(self.plugin.id, name, value)
 
         if "add-enable" in self.request.POST:
-            self.katalogus_client.enable_boefje(self.plugin_id)
+            self.katalogus_client.enable_boefje(self.plugin.id)
             messages.add_message(
-                self.request, messages.SUCCESS, _("Boefje '{boefje_id}' enabled.").format(boefje_id=self.plugin_id)
+                self.request, messages.SUCCESS, _("Boefje '{boefje_id}' enabled.").format(boefje_id=self.plugin.id)
             )
 
         self.add_success_notification()
@@ -52,31 +53,31 @@ class PluginSettingsAddView(PermissionRequiredMixin, KATalogusMixin, FormView):
                     "plugin_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                     },
                 ),
-                "text": self.plugin["name"],
+                "text": self.plugin.name,
             },
             {
                 "url": reverse(
                     "plugin_settings_add",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                     },
                 ),
                 "text": _("Add settings"),
             },
         ]
-        context["plugin_id"] = self.plugin_id
-        context["plugin_type"] = self.plugin["type"]
-        context["plugin_name"] = self.plugin["name"]
+        context["plugin_id"] = self.plugin.id
+        context["plugin_type"] = self.plugin.type
+        context["plugin_name"] = self.plugin.name
         return context
 
     def is_name_duplicate(self, name):
-        setting = self.katalogus_client.get_plugin_setting(self.plugin_id, name=name)
+        setting = self.katalogus_client.get_plugin_setting(self.plugin.id, name=name)
         return "message" not in setting
 
     def get_success_url(self):
@@ -84,13 +85,13 @@ class PluginSettingsAddView(PermissionRequiredMixin, KATalogusMixin, FormView):
             "plugin_detail",
             kwargs={
                 "organization_code": self.organization.code,
-                "plugin_type": self.plugin["type"],
-                "plugin_id": self.plugin_id,
+                "plugin_type": self.plugin.type,
+                "plugin_id": self.plugin.id,
             },
         )
 
     def add_success_notification(self):
-        success_message = _("Setting successfully added for: ") + self.plugin["name"]
+        success_message = _("Setting successfully added for: ") + self.plugin.name
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def add_error_notification(self, message):
@@ -108,10 +109,11 @@ class PluginSingleSettingAddView(PluginSettingsAddView):
         super().setup(request, *args, **kwargs)
         self.setting_name = kwargs["setting_name"]
 
-    def get_form(self):
-        if self.plugin_schema:
-            form = PluginSettingAddEditForm(self.plugin_schema, self.setting_name, **self.get_form_kwargs())
-            return form
+    def get_form(self, **kwargs):
+        if not self.plugin_schema:
+            return
+
+        return PluginSettingAddEditForm(self.plugin_schema, self.setting_name, **self.get_form_kwargs())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

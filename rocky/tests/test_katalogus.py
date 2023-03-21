@@ -10,7 +10,7 @@ from tools.models import Organization, OrganizationMember
 def test_katalogus_plugin_listing(my_user, rf, organization, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
-    mock_requests.get.return_value = mock_response
+    mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = get_boefjes_data()
 
     request = setup_request(rf.get("katalogus"), my_user)
@@ -130,7 +130,7 @@ def test_katalogus_clone_settings(my_user, rf, organization, mocker, mock_models
 
 def test_katalogus_client_organization_not_exists(mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
-    mock_requests.get().status_code = 404
+    mock_requests.Session().get().status_code = 404
 
     client = KATalogusClientV1("test", "test")
 
@@ -139,7 +139,7 @@ def test_katalogus_client_organization_not_exists(mocker):
 
 def test_katalogus_client_organization_exists(mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
-    mock_requests.get().status_code = 200
+    mock_requests.Session().get().status_code = 200
 
     client = KATalogusClientV1("test", "test")
 
@@ -150,7 +150,7 @@ def test_katalogus_client(mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
 
     mock_response = mocker.MagicMock()
-    mock_requests.get.return_value = mock_response
+    mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = {
         "service": "test",
         "healthy": False,

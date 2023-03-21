@@ -11,7 +11,7 @@ from two_factor.views.utils import class_view_decorator
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from katalogus.views import PluginSettingsListView
-from katalogus.views.mixins import KATalogusMixin
+from katalogus.views.mixins import SinglePluginMixin
 from katalogus.views.plugin_detail_scan_oois import PluginDetailScanOOI
 from rocky import scheduler
 
@@ -27,7 +27,7 @@ class PluginCoverImgView(OrganizationView):
 
 @class_view_decorator(otp_required)
 class PluginDetailView(
-    KATalogusMixin,
+    SinglePluginMixin,
     PluginSettingsListView,
     PluginDetailScanOOI,
 ):
@@ -37,13 +37,13 @@ class PluginDetailView(
     scan_history_limit = 10
 
     def get_scan_history(self) -> Page:
-        scheduler_id = f"{self.plugin['type']}-{self.organization.code}"
+        scheduler_id = f"{self.plugin.type}-{self.organization.code}"
 
         filters = [
             {
-                "field": f"data__{self.plugin['type']}__id",
+                "field": f"data__{self.plugin.type}__id",
                 "operator": "eq",
-                "value": self.plugin_id,
+                "value": self.plugin.id,
             }
         ]
 
@@ -80,7 +80,7 @@ class PluginDetailView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugin"] = self.plugin
+        context["plugin"] = self.plugin.dict()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
@@ -91,11 +91,11 @@ class PluginDetailView(
                     "plugin_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                     },
                 ),
-                "text": self.plugin["name"],
+                "text": self.plugin.name,
             },
         ]
 
