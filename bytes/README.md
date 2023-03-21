@@ -193,8 +193,7 @@ graph LR
     EM[EventManager] -- "{'event_id': 123}" --> RabbitMQ[[RabbitMQ]]
 ```
 
-This flow does not show saving the `NormalizerMeta` object in the `MetaRepository`.
-A message is sent through RabbitMQ once a `RawFile` has been saved.
+This diagram roughly covers the C4 level as well, as this is a small service that can be regarded as one component.
 
 
 ## Development
