@@ -5,27 +5,25 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
+
 from rocky.views.organization_detail import OrganizationDetailView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
-from tests.conftest import setup_request
-from tools.models import OrganizationMember, Organization
-
+from tests.conftest import setup_request, create_member
+from tools.models import Organization
 
 AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
 
 @pytest.fixture
-def bulk_organizations(my_new_user, my_red_teamer, my_blocked_user):
+def bulk_organizations(active_member, blocked_member):
     with patch("katalogus.client.KATalogusClientV1"), patch("tools.models.OctopoesAPIConnector"):
         organizations = []
         for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
             org = Organization.objects.create(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
 
-            for user in [my_new_user, my_red_teamer, my_blocked_user]:
-                OrganizationMember.objects.create(
-                    user=user, organization=org, status=OrganizationMember.STATUSES.ACTIVE
-                )
+            for member in [active_member, blocked_member]:
+                create_member(member.user, org)
             organizations.append(org)
     return organizations
 
@@ -59,7 +57,6 @@ def test_organization_list(rf, superuser_member, bulk_organizations, django_asse
     with django_assert_max_num_queries(
         AMOUNT_OF_TEST_ORGANIZATIONS, info="Too many queries for organization list view"
     ):
-
         request = setup_request(rf.get("organization_list"), superuser_member.user)
         response = OrganizationListView.as_view()(request)
 
