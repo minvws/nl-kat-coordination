@@ -16,6 +16,9 @@
         <span class="icon ti-chevron-down"></span>
       </button>
       <ul class="dropdown-list">
+        <li>
+          <a href="{% url 'crisis_room' %}">{% translate "All organizations" %}</a>
+        </li>
         {% for single_organization in organizations_dropdown_list %}
           {% if organization.code != single_organization.code %}
             <li>

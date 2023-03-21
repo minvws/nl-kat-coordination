@@ -7,15 +7,20 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{{ organization.name|title }} ({{ organization.code }}) - {% translate "Dashboard" %}</h1>
+        <h1>{% translate "Crisis room" %}: {{ organization.name|title }} ({{ organization.code }})</h1>
+
         <p>
           {% translate 'An overview of the top 10 most severe findings OpenKAT found. Check the detail section for additional severity information.' %}
         </p>
 
+        <h2>
+          {% translate 'Top 10 most severe Findings' %}
+        </h2>
+
         {{ object_type_filters }}
 
         {% translate 'Object list' as filter_title %}
-        {% comment %} {% include 'partials/ooi_list_filters.html' with title=filter_title %} {% endcomment %}
+
         <div class="horizontal-scroll">
           <table class="action-buttons nowrap">
             <caption>{% translate 'Showing ' %}{{ ooi_list|length }} {% translate 'of' %} {{ total_oois }} {% translate 'objects' %}</caption>
