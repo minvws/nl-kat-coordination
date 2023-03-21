@@ -136,13 +136,35 @@ The overall view of the application is as follows.
 
 ```mermaid
 graph LR
-    U[User] -- BoefjeMeta --> A1[API] -- save BoefjeMeta --> B1[Meta Repository]
-    B1[Meta Repository] -- BoefjeMeta --> RDB
-    B[Meta Repository] -- hash RawFile --> HR[Hasher] -- Hash --> B[Meta Repository]
-    U[User] -- RawFile --> A2[API] -- save RawFile --> B[Meta Repository] -- save Hash --> H[Hash Repository]
-    H[Hash Repository] -- Hash --> T[Third Party]
-    B[Meta Repository] -- save RawFile --> R[Raw Repository] -- RawFile --> E[EnriptionMiddleware]
-    E[EnriptionMiddleware] -- Encrypted Data --> Disk -- Encrypted Data  --> E[EnriptionMiddleware]
+    User -- BoefjeMeta --> APIR1
+    User -- NormalizerMeta --> APIR2
+    User -- RawFile --> APIR3
+
+
+    User[User]
+
+    APIR1 -- save BoefjeMeta --> MR
+    APIR2 -- save NormalizerMeta --> MR
+    APIR3 -- save RawFile --> MR
+
+    subgraph API["Bytes API"]
+        APIR1[API Route]
+        APIR2[API Route]
+        APIR3[API Route]
+    end
+
+    subgraph Bytes["Bytes Domain"]
+        APIR3 -- "publish(RawFileReceived)" --> EM[EventManager]
+        MR[Meta Repository] -- Raw  --> H[Hasher] -- Hash --> MR[Meta Repository]
+        MR[Meta Repository] -- save Hash --> HR[Hash Repository]
+        MR[Meta Repository] -- save RawFile --> R[Raw Repository]
+        R[Raw Repository] -- RawFile --> E[EnriptionMiddleware]
+    end
+
+    E[EnriptionMiddleware] -- Encrypted Data --> Disk[[Disk]] -- Encrypted Data  --> E[EnriptionMiddleware]
+    HR[Hash Repository] -- Hash --> T[[Third Party]]
+    MR[Meta Repository] -- BoefjeMeta/NormalizerMeta --> RDB[(Psql)]
+    EM[EventManager] -- "{'event_id': 123}" --> RabbitMQ[[RabbitMQ]]
 ```
 
 This flow does not show saving the `NormalizerMeta` object in the `MetaRepository`.
