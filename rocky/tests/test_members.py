@@ -4,7 +4,6 @@ from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from tests.conftest import setup_request
 from rocky.views.organization_member_edit import OrganizationMemberEditView
-from rocky.views.organization_detail import OrganizationDetailView
 
 
 def test_admin_can_edit_itself(rf, admin_member):
@@ -108,7 +107,7 @@ def test_edit_superusers_from_different_organizations(rf, superuser_member, supe
 def test_edit_admins_from_different_organizations(rf, admin_member, admin_member_b):
     """
     This will test if a admin from one organization can edit
-    a admin from another organization at the member edit view.
+    an admin from another organization at the member edit view.
     """
 
     request = setup_request(rf.get("organization_member_edit"), admin_member.user)

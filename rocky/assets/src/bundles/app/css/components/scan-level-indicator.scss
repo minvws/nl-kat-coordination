@@ -46,4 +46,5 @@ $levels: l1, l2, l3, l4;
   .level-indicator.#{$level}>li:nth-child(-n + #{$i}) {
     @extend %level-indicator--is-active;
   }
+
 }
