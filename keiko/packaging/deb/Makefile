@@ -14,4 +14,3 @@ uninstall:
 	-rm -rf $(DESTDIR)/usr/share/kat-keiko
 
 .PHONY: all install clean distclean uninstall
-

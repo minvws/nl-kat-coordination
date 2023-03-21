@@ -28,7 +28,7 @@ class TestHash(TestCase):
 
     def test_generate_hash(self):
         self.assertEqual(
-            "b6ca0868bca6a2926b70aa1a71592038d9030fe26d4214edcfbd6cf41f2f4654",
+            "71766c401d73e854443bd032bec52e54f0e527bfa81dcd0e8db0f1eca3cf035e",
             self.hasher.generate_hash(FILE_1),
         )
 
@@ -39,19 +39,19 @@ class TestHash(TestCase):
             mock_generate_hash.side_effect = generate_hash
 
             self.assertEqual(
-                "b6ca0868bca6a2926b70aa1a71592038d9030fe26d4214edcfbd6cf41f2f4654",
+                "71766c401d73e854443bd032bec52e54f0e527bfa81dcd0e8db0f1eca3cf035e",
                 self.hasher.get_or_generate_hash(FILE_1),
             )
             # call again to confirm
             self.assertEqual(
-                "b6ca0868bca6a2926b70aa1a71592038d9030fe26d4214edcfbd6cf41f2f4654",
+                "71766c401d73e854443bd032bec52e54f0e527bfa81dcd0e8db0f1eca3cf035e",
                 self.hasher.get_or_generate_hash(FILE_1),
             )
             mock_generate_hash.assert_called_once_with(FILE_1)
 
     def test_generate_combined_hash(self):
         self.assertEqual(
-            "064d85189dc5b718bf0f1e8005fce8d86a4c364c548566c1db5faddb26600b85",
+            "4dc4ff81d59355ec043ec00aa9f6240d908be2cbb188e6784e57a3c4054521b5",
             self.hasher.generate_combined_hash(FILE_1, FILE_2),
         )
 
@@ -62,12 +62,12 @@ class TestHash(TestCase):
             mock_generate_combined_hash.side_effect = generate_combined_hash
 
             self.assertEqual(
-                "064d85189dc5b718bf0f1e8005fce8d86a4c364c548566c1db5faddb26600b85",
+                "4dc4ff81d59355ec043ec00aa9f6240d908be2cbb188e6784e57a3c4054521b5",
                 self.hasher.get_or_generate_combined_hash(FILE_1, FILE_2),
             )
             # call again to confirm
             self.assertEqual(
-                "064d85189dc5b718bf0f1e8005fce8d86a4c364c548566c1db5faddb26600b85",
+                "4dc4ff81d59355ec043ec00aa9f6240d908be2cbb188e6784e57a3c4054521b5",
                 self.hasher.get_or_generate_combined_hash(FILE_1, FILE_2),
             )
             mock_generate_combined_hash.assert_called_once_with(FILE_1, FILE_2)

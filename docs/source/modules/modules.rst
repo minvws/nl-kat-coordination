@@ -54,5 +54,3 @@ Manon - styling
 Content and form are separated in Rocky. The form is contained in Manon, which as far as OpenKAT is applied in the context of the central government helps to comply with the central government house style. For Web sites outside this context, Manon is also applicable, but with a different style.
 
 `NL-RDO-Manon <https://github.com/minvws/nl-rdo-manon>`_ is the repository containing Manon's source code.
-
-
