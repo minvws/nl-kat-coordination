@@ -72,4 +72,3 @@ jobs:
         with:
           name: octopoes_${{ env.RELEASE_VERSION }}
           path: ../octopoes_${{ env.RELEASE_VERSION }}.tar.gz
-
