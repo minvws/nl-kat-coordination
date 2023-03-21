@@ -4,7 +4,6 @@ from katalogus.client import KATalogusClientV1, parse_plugin
 from katalogus.views import KATalogusView, KATalogusSettingsListView, ConfirmCloneSettingsView
 from rocky.health import ServiceHealth
 from tests.conftest import setup_request, get_boefjes_data
-from tools.models import Organization, OrganizationMember
 from tests.conftest import create_member
 
 

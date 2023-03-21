@@ -5,7 +5,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from octopoes.models.tree import ReferenceTree
 from rocky.views.scan_profile import ScanProfileDetailView
 from tests.conftest import setup_request
-from tools.models import OrganizationMember, Indemnification
+from tools.models import Indemnification
 
 TREE_DATA = {
     "root": {
