@@ -12,7 +12,7 @@
              {% if choice.data.attrs.checked %} checked{% endif %}/>
       <label>
         {% if choice.data.attrs.radio_paws %}
-          {% include 'partials/scan_level_indicator.html' with value=forloop.counter0 custom_class=choice.data.attrs.class %}
+          {% include 'partials/scan_level_indicator.html' with value=choice.data.value custom_class=choice.data.attrs.class %}
         {% else %}
           {{ choice.choice_label }}
         {% endif %}
