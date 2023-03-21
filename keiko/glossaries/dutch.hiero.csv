@@ -179,7 +179,7 @@
 Disclosure.","Coordinated Vulnerability Disclosure","INFOSEC",,,,,
 "CVE","Common Vulnerabilities and Exposures. Een openbare lijst van bekende zwakke plekken in software. De lijst staat wordt door Mitre beheerd en is \href{https://cve.mitre.org}{openbaar toegankelijk}",,"INFOSEC",,,,,
 "CVSS","Common Vulnerability Scoring System. Systeem om een score te geven aan een zwakke plek in soft - ware. Hoe hoger de score, hoe zwakker de plek. Een organisatie kan deze score gebruiken om te bepalen welke zwakke plekken ze als eerste gaat oplossen. Meer informatie over het scoresysteem staat op \\href{https://www.first.org/cvss/}.",,"INFOSEC",,,,,
-"CWE","Common Weakness Enume - ration. Een openbare lijst met bekende soorten zwak - ke plekken in software. De lijst is te vinden op \\url{https:// cwe.mitre.org/}. ",,"INFOSEC",,,,,
+"CWE","Common Weakness Enume - ration. Een openbare lijst met bekende soorten zwak - ke plekken in software. De lijst is te vinden op \url{https://cwe.mitre.org/}. ",,"INFOSEC",,,,,
 "Cyber","""Cyber-"" is een voorvoegsel dat gebruikt wordt voor iets wat met internettechnologie samenhangt. (wikipedia) \newline Iets wat te maken heeft met digitale informatie en sys - temen die verbonden zijn met het internet. (cyber woordenboek)",,"INFOSEC",,,,,
 "Cyber defense","Het hebben van middelen om cyberaanvallen af te slaan. Bijvoorbeeld strate - gische of militaire midde - len. Term wordt met name gebruikt in de context van nationale veiligheid.",,"INFOSEC",,,,,
 "Cyber kill chain","Een model waarin staat welke stappen een aanval - ler zet bij een cyberaanval. Het bekendste voorbeeld van een cyber kill chain is de Lockheed Martin Kill Chain.",,"INFOSEC",,,,,
