@@ -275,7 +275,7 @@ class BoefjeScheduler(Scheduler):
             if self.stop_event.is_set():
                 raise e
 
-        if new_boefjes is None or len(new_boefjes) < 1:
+        if new_boefjes is None or len(new_boefjes) == 0:
             self.logger.debug(
                 "No new boefjes for organisation: %s [organisation.id=%s, scheduler_id=%s]",
                 self.organisation.name,
@@ -291,20 +291,132 @@ class BoefjeScheduler(Scheduler):
             self.scheduler_id,
         )
 
-        object_types: Set[string] = set()
         for boefje in new_boefjes:
+            object_types: Set[string] = set()
             for object_type in boefje.consumes:
                 object_types.add(object_type)
 
-        try:
-            oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_type(boefje.consumes)
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
-            self.logger.warning(
-                "Could not get oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
-                self.organisation.name,
-                self.organisation.id,
-                self.scheduler_id,
-            )
+            oois_by_object_type: List[OOI] = []
+            try:
+                oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
+                    self.organisation.id, boefje.consumes,
+                )
+            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+                self.logger.warning(
+                    "Could not get oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
+                    self.organisation.name,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+
+            for ooi in oois_by_object_type:
+                task = BoefjeTask(
+                    boefje=boefje,
+                    input_ooi=ooi.primary_key,
+                    organization=self.organisation.id,
+                )
+
+                if not self.is_task_allowed_to_run(boefje, ooi):
+                    self.logger.debug(
+                        "Task is not allowed to run: %s [organisation.id=%s, scheduler_id=%s]",
+                        task,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    continue
+
+                try:
+                    is_running = self.is_task_running(task)
+                    if is_running:
+                        self.logger.debug(
+                            "Task is already running: %s [organisation.id=%s, scheduler_id=%s]",
+                            task,
+                            self.organisation.id,
+                            self.scheduler_id,
+                        )
+                        continue
+                except Exception as exc_running:
+                    self.logger.warning(
+                        "Could not check if task is running: %s [organisation.id=%s, scheduler_id=%s]",
+                        task,
+                        self.organisation.id,
+                        self.scheduler_id,
+                        exc_info=exc_running,
+                    )
+                    continue
+
+                try:
+                    grace_period_passed = self.has_grace_period_passed(task)
+                    if not grace_period_passed:
+                        self.logger.debug(
+                            "Task has not passed grace period: %s [organisation.id=%s, scheduler_id=%s]",
+                            task,
+                            self.organisation.id,
+                            self.scheduler_id,
+                        )
+                        continue
+                except Exception as exc_grace_period:
+                    self.logger.warning(
+                        "Could not check if grace period has passed: %s [organisation.id=%s, scheduler_id=%s]",
+                        task,
+                        self.organisation.id,
+                        self.scheduler_id,
+                        exc_info=exc_grace_period,
+                    )
+                    continue
+
+                if self.queue.is_item_on_queue_by_hash(task.hash):
+                    self.logger.debug(
+                        "Task is already on queue: %s [organisation.id=%s, scheduler_id=%s]",
+                        task,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    continue
+
+                prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
+                score = self.ranker.rank(
+                    SimpleNamespace(
+                        prior_tasks=prior_tasks,
+                        task=task,
+                    )
+                )
+
+                # We need to create a PrioritizedItem for this task, to push
+                # it to the priority queue.
+                p_item = PrioritizedItem(
+                    id=task.id,
+                    scheduler_id=self.scheduler_id,
+                    priority=score,
+                    data=task,
+                    hash=task.hash,
+                )
+
+                while not self.is_space_on_queue():
+                    self.logger.debug(
+                        "Waiting for queue to have enough space, not adding task to queue "
+                        "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
+                        self.queue.qsize(),
+                        self.queue.maxsize,
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+                    time.sleep(1)
+
+                self.logger.info(
+                    "Created boefje task: %s for ooi: %s "
+                    "[boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
+                    boefje.name,
+                    ooi.primary_key,
+                    boefje.id,
+                    ooi.primary_key,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+
+                self.push_item_to_queue(p_item)
+
+
 
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""
@@ -325,7 +437,7 @@ class BoefjeScheduler(Scheduler):
                 )
                 return
 
-            if len(random_oois) < 1:
+            if len(random_oois) == 0:
                 self.logger.debug(
                     "No random oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
                     self.organisation.name,
@@ -343,7 +455,7 @@ class BoefjeScheduler(Scheduler):
                 )
 
                 boefjes = self.get_boefjes_for_ooi(ooi)
-                if boefjes is None or len(boefjes) < 1:
+                if boefjes is None or len(boefjes) == 0:
                     self.logger.debug(
                         "No boefjes available for ooi %s, skipping [organisation.id=%s, scheduler_id=%s]",
                         ooi,
