@@ -176,7 +176,7 @@ class OrganizationMemberEditForm(forms.ModelForm):
     trusted_clearance_level = forms.ChoiceField(
         required=False,
         label=_("Trusted clearance level"),
-        choices=SCAN_LEVEL.choices,
+        choices=[(-1, "")] + SCAN_LEVEL.choices,
         help_text=_("Select a clearance level you trust this member with."),
         widget=forms.RadioSelect(attrs={"radio_paws": True}),
     )
