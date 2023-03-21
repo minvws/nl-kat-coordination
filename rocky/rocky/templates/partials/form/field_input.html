@@ -1,13 +1,19 @@
 {% load i18n %}
 
-{% if form_view != 'vertical' %}
-  <div {% if field.field.required %} class="required"{% endif %}>
+<fieldset>
+  <legend>
     {{ field.label_tag }}
-    {% if field.field.required %}
-      <span class="nota-bene">{% translate 'This field is required' %}</span>
-    {% endif %}
-    <div>
-      {{ field }}
+  </legend>
+  {% if form_view != 'vertical' %}
+    <div {% if field.field.required %} class="required"{% endif %}>
+      {% if field.field.required %}
+        <span class="nota-bene">{% translate 'This field is required' %}</span>
+      {% endif %}
+      {% if field.field.widget.attrs.fixed_paws %}
+        {% include 'partials/scan_level_indicator.html' with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
+      {% else %}
+        {{ field }}
+      {% endif %}
       {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
       {% include 'partials/form/field_input_errors.html' %}
       {% if form_name == 'login' and field.name == 'username' %}
@@ -21,7 +27,7 @@
         </div>
       {% endif %}
     </div>
-  </div>
+  </fieldset>
 {% else %}
   {{ field.label_tag }}
   <div {% if field.field.required %} class="required"{% endif %}>

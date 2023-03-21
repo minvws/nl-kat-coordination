@@ -244,14 +244,13 @@ class BoefjeScheduler(Scheduler):
 
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""
-        tries = 0
         while not self.queue.full():
             time.sleep(1)
 
             try:
                 random_oois = self.ctx.services.octopoes.get_random_objects(
                     organisation_id=self.organisation.id,
-                    n=10,
+                    n=self.ctx.config.pq_populate_max_random_objects,
                 )
             except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
                 self.logger.warning(
@@ -290,20 +289,6 @@ class BoefjeScheduler(Scheduler):
                     continue
 
                 for boefje in boefjes:
-                    # NOTE: It is possible that a random ooi will not generate
-                    # any tasks, for instance when all ooi's and their boefjes
-                    # have already run. When this happens 3 times in a row we
-                    # will break out of the loop. We reset the tries counter to
-                    # 0 when we do get new tasks from an ooi.
-                    if tries >= 3:
-                        self.logger.debug(
-                            "No tasks generated for 3 tries, breaking out of loop "
-                            "[organisation.id=%s, scheduler_id=%s]",
-                            self.organisation.id,
-                            self.scheduler_id,
-                        )
-                        return
-
                     task = BoefjeTask(
                         boefje=Boefje.parse_obj(boefje),
                         input_ooi=ooi.primary_key,
@@ -317,7 +302,6 @@ class BoefjeScheduler(Scheduler):
                             self.organisation.id,
                             self.scheduler_id,
                         )
-                        tries += 1
                         continue
 
                     try:
@@ -477,7 +461,7 @@ class BoefjeScheduler(Scheduler):
         # Boefje intensity score ooi clearance level, range
         # from 0 to 4. 4 being the highest intensity, and 0 being
         # the lowest. OOI clearance level defines what boefje
-        # intesity is allowed to run on.
+        # intensity is allowed to run on.
         if boefje_scan_level > ooi_scan_level:
             self.logger.debug(
                 "Boefje: %s scan level %s is too intense for ooi: %s scan level %s "

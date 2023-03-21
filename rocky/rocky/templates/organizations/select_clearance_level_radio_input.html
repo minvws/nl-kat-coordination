@@ -12,14 +12,7 @@
              id="id_{{ field.name }}_{{ forloop.counter0 }}"
              {% if choice.data.attrs.disabled %} disabled{% endif %}
              {% if choice.data.attrs.checked %} checked{% endif %}/>
-      <label>
-        <ul class="level-indicator l{{ forloop.counter0 }}">
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
-      </label>
+      <label>{% include 'partials/scan_level_indicator.html' with value=forloop.counter0 %}</label>
     </div>
   {% endfor %}
   {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}

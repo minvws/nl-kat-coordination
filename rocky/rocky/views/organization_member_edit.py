@@ -7,7 +7,7 @@ from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 from account.forms import OrganizationMemberEditForm
-from tools.models import OrganizationMember
+from tools.models import OrganizationMember, GROUP_CLIENT
 from account.mixins import OrganizationView
 
 
@@ -20,7 +20,18 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
     permission_required = "tools.change_organizationmember"
 
     def test_func(self):
-        return not self.get_object().user.is_superuser or self.request.user.is_superuser
+        return (
+            not self.get_object().user.is_superuser or self.request.user.is_superuser
+        ) and self.get_object().organization == self.organization
+
+    def get_form(self):
+        form = super().get_form()
+        if (self.object.user == self.request.user) or self.request.user.is_superuser:
+            # There could be a case where you block yourself out of the system
+            form.fields["status"].disabled = True
+        if self.object.user.groups.filter(name=GROUP_CLIENT).exists():
+            form.fields["trusted_clearance_level"].disabled = True
+        return form
 
     def get_success_url(self):
         messages.add_message(
@@ -52,16 +63,15 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
     def form_valid(self, form):
         tcl = form.cleaned_data["trusted_clearance_level"]
         acl = form.cleaned_data["acknowledged_clearance_level"]
-
         if tcl and acl:
             if int(tcl) < int(acl):
                 messages.add_message(
                     self.request,
-                    messages.WARNING,
+                    messages.INFO,
                     _(
                         "The updated trusted clearance level of L%s is lower then the member's "
                         "acknowledged clearance level of L%s. This member only has clearance for level L%s. "
-                        "For this reason the acknowldeged clearance level has been set at the same level "
+                        "For this reason the acknowledged clearance level has been set at the same level "
                         "as trusted clearance level."
                     )
                     % (tcl, acl, tcl),
@@ -69,7 +79,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
             if int(tcl) > int(acl):
                 messages.add_message(
                     self.request,
-                    messages.WARNING,
+                    messages.INFO,
                     _(
                         "You have trusted this member with a higher trusted level than member acknowledged. "
                         "Member must first accept this level to use it."

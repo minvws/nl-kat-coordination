@@ -14,8 +14,8 @@ from onboarding.views import (
 from tests.conftest import setup_request
 
 
-def test_onboarding_introduction(rf, redteam_member, organization, mock_models_katalogus, mock_models_octopoes):
-    request = setup_request(rf.get("step_introduction"), redteam_member.user)
+def test_onboarding_introduction(rf, my_red_teamer, organization, mock_models_katalogus, mock_models_octopoes):
+    request = setup_request(rf.get("step_introduction"), my_red_teamer)
     response = OnboardingIntroductionView.as_view()(request, organization_code=organization.code)
     assert response.status_code == 200
     assertContains(response, "Welcome to OpenKAT")
@@ -23,8 +23,8 @@ def test_onboarding_introduction(rf, redteam_member, organization, mock_models_k
     assertContains(response, "Let's get started")
 
 
-def test_onboarding_choose_report_info(rf, redteam_member, organization, mock_models_katalogus, mock_models_octopoes):
-    request = setup_request(rf.get("step_choose_report_info"), redteam_member.user)
+def test_onboarding_choose_report_info(rf, my_red_teamer, organization, mock_models_katalogus, mock_models_octopoes):
+    request = setup_request(rf.get("step_choose_report_info"), my_red_teamer)
     response = OnboardingChooseReportInfoView.as_view()(request, organization_code=organization.code)
     assert response.status_code == 200
     assertContains(response, "KAT introduction")
@@ -34,8 +34,8 @@ def test_onboarding_choose_report_info(rf, redteam_member, organization, mock_mo
     assertContains(response, "Let's choose a report")
 
 
-def test_onboarding_choose_report_type(rf, redteam_member, organization, mock_models_katalogus, mock_models_octopoes):
-    request = setup_request(rf.get("step_choose_report_type"), redteam_member.user)
+def test_onboarding_choose_report_type(rf, my_red_teamer, organization, mock_models_katalogus, mock_models_octopoes):
+    request = setup_request(rf.get("step_choose_report_type"), my_red_teamer)
     response = OnboardingChooseReportTypeView.as_view()(request, organization_code=organization.code)
     assert response.status_code == 200
     assertContains(response, "KAT introduction")
@@ -47,8 +47,8 @@ def test_onboarding_choose_report_type(rf, redteam_member, organization, mock_mo
     assertContains(response, "DigiD")
 
 
-def test_onboarding_setup_scan(rf, redteam_member, organization, mock_models_katalogus, mock_models_octopoes):
-    request = setup_request(rf.get("step_setup_scan_ooi_info"), redteam_member.user)
+def test_onboarding_setup_scan(rf, my_red_teamer, organization, mock_models_katalogus, mock_models_octopoes):
+    request = setup_request(rf.get("step_setup_scan_ooi_info"), my_red_teamer)
     response = OnboardingSetupScanOOIInfoView.as_view()(request, organization_code=organization.code)
     assert response.status_code == 200
     assertContains(response, "KAT introduction")
@@ -60,11 +60,11 @@ def test_onboarding_setup_scan(rf, redteam_member, organization, mock_models_kat
 
 
 def test_onboarding_setup_scan_detail(
-    rf, redteam_member, organization, mock_models_katalogus, mock_organization_view_octopoes, network
+    rf, my_red_teamer, organization, mock_models_katalogus, mock_organization_view_octopoes, network
 ):
     mock_organization_view_octopoes().get.return_value = network
 
-    request = setup_request(rf.get("step_setup_scan_ooi_add"), redteam_member.user)
+    request = setup_request(rf.get("step_setup_scan_ooi_add"), my_red_teamer)
     response = OnboardingSetupScanOOIAddView.as_view()(request, ooi_type="Network", organization_code=organization.code)
 
     assert response.status_code == 200
@@ -77,11 +77,11 @@ def test_onboarding_setup_scan_detail(
 
 
 def test_onboarding_set_clearance_level(
-    rf, redteam_member, organization, mock_models_katalogus, mock_organization_view_octopoes, network
+    rf, my_red_teamer, organization, mock_models_katalogus, mock_organization_view_octopoes, network
 ):
     mock_organization_view_octopoes().get.return_value = network
 
-    request = setup_request(rf.get("step_set_clearance_level", {"ooi_id": "Network|internet"}), redteam_member.user)
+    request = setup_request(rf.get("step_set_clearance_level", {"ooi_id": "Network|internet"}), my_red_teamer)
     response = OnboardingSetClearanceLevelView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
@@ -93,13 +93,11 @@ def test_onboarding_set_clearance_level(
 
 
 def test_onboarding_select_plugins(
-    rf, redteam_member, organization, mock_views_katalogus, mock_organization_view_octopoes, network
+    rf, my_red_teamer, organization, mock_views_katalogus, mock_organization_view_octopoes, network
 ):
     mock_organization_view_octopoes().get.return_value = network
 
-    request = setup_request(
-        rf.get("step_setup_scan_select_plugins", {"ooi_id": "Network|internet"}), redteam_member.user
-    )
+    request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi_id": "Network|internet"}), my_red_teamer)
     request.session["clearance_level"] = "2"
     response = OnboardingSetupScanSelectPluginsView.as_view()(request, organization_code=organization.code)
 
@@ -115,11 +113,11 @@ def test_onboarding_select_plugins(
 
 
 def test_onboarding_ooi_detail_scan(
-    rf, redteam_member, organization, mock_models_katalogus, mock_organization_view_octopoes, network
+    rf, my_red_teamer, organization, mock_models_katalogus, mock_organization_view_octopoes, network
 ):
     mock_organization_view_octopoes().get.return_value = network
 
-    request = setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi_id": "Network|internet"}), redteam_member.user)
+    request = setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi_id": "Network|internet"}), my_red_teamer)
     request.session["clearance_level"] = "2"
     response = OnboardingSetupScanOOIDetailView.as_view()(request, organization_code=organization.code)
 
@@ -133,11 +131,11 @@ def test_onboarding_ooi_detail_scan(
 
 
 def test_onboarding_scanning_boefjes(
-    rf, redteam_member, organization, mock_models_katalogus, mock_organization_view_octopoes, network
+    rf, my_red_teamer, organization, mock_models_katalogus, mock_organization_view_octopoes, network
 ):
     mock_organization_view_octopoes().get.return_value = network
 
-    request = setup_request(rf.get("step_report", {"ooi_id": "Network|internet"}), redteam_member.user)
+    request = setup_request(rf.get("step_report", {"ooi_id": "Network|internet"}), my_red_teamer)
     response = OnboardingReportView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200

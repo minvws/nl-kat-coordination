@@ -6,10 +6,8 @@ from onboarding.views import OnboardingOrganizationSetupView
 from tests.conftest import setup_request
 
 
-def test_onboarding_create_organization(rf, superuser_member, mock_models_katalogus, mock_models_octopoes):
-    request = setup_request(
-        rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), superuser_member.user
-    )
+def test_onboarding_create_organization(rf, my_user, mock_models_katalogus, mock_models_octopoes):
+    request = setup_request(rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), my_user)
     mock_models_katalogus().organization_exists.return_value = False
 
     response = OnboardingOrganizationSetupView.as_view()(request)
@@ -17,12 +15,8 @@ def test_onboarding_create_organization(rf, superuser_member, mock_models_katalo
     assertContains(response, "Test Organization")
 
 
-def test_onboarding_create_organization_already_exist_katalogus(
-    rf, superuser, mock_models_katalogus, mock_models_octopoes
-):
-    request = setup_request(
-        rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), superuser
-    )
+def test_onboarding_create_organization_already_exist_katalogus(rf, user, mock_models_katalogus, mock_models_octopoes):
+    request = setup_request(rf.post("step_organization_setup", {"name": "Test Organization", "code": "test"}), user)
 
     mock_models_katalogus().organization_exists.return_value = True
     mock_models_katalogus().create_organization.side_effect = HTTPError()

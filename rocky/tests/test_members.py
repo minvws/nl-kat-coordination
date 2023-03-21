@@ -4,7 +4,6 @@ from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from tests.conftest import setup_request
 from rocky.views.organization_member_edit import OrganizationMemberEditView
-from rocky.views.organization_detail import OrganizationDetailView
 
 
 def test_admin_can_edit_itself(rf, admin_member):
@@ -108,7 +107,7 @@ def test_edit_superusers_from_different_organizations(rf, superuser_member, supe
 def test_edit_admins_from_different_organizations(rf, admin_member, admin_member_b):
     """
     This will test if a admin from one organization can edit
-    a admin from another organization at the member edit view.
+    an admin from another organization at the member edit view.
     """
 
     request = setup_request(rf.get("organization_member_edit"), admin_member.user)
@@ -119,44 +118,48 @@ def test_edit_admins_from_different_organizations(rf, admin_member, admin_member
         )
 
 
+def test_admin_edits_client_different_orgs(rf, admin_member, client_member_b):
+    request = setup_request(
+        rf.post(
+            "organization_member_edit",
+            {"status": "blocked", "trusted_clearance_level": 4},
+        ),
+        admin_member.user,
+    )
+    with pytest.raises(Http404):
+        OrganizationMemberEditView.as_view()(
+            request, organization_code=client_member_b.organization.code, pk=client_member_b.id
+        )
+
+
 def test_admin_edits_redteamer(rf, admin_member, redteam_member):
     request = setup_request(
         rf.post(
             "organization_member_edit",
-            {"member_name": "Member name test", "status": "active", "trusted_clearance_level": 4},
+            {"status": "active", "trusted_clearance_level": 4},
         ),
         admin_member.user,
     )
-    response = OrganizationMemberEditView.as_view()(
+    OrganizationMemberEditView.as_view()(
         request, organization_code=redteam_member.organization.code, pk=redteam_member.id
     )
 
-    assert response.status_code == 302
-    assert response.url == f"/en/{admin_member.organization.code}/"
-    resulted_request = setup_request(rf.get(response.url), admin_member.user)
-    resulted_response = OrganizationDetailView.as_view()(
-        resulted_request, organization_code=admin_member.organization.code
-    )
-    assert resulted_response.status_code == 200
-
-    # member list has been updated
-    assertContains(resulted_response, "Member name test")
-    assertContains(resulted_response, "Active")
-    assertContains(resulted_response, "Yes (L4)")
+    redteam_member.refresh_from_db()
+    assert redteam_member.status == "active"
+    assert redteam_member.trusted_clearance_level == 4
 
 
 def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
     request = setup_request(
         rf.post(
             "organization_member_edit",
-            {"member_name": "Member name test", "status": "blocked", "trusted_clearance_level": -1},
+            {"status": "blocked", "trusted_clearance_level": 4},
         ),
         admin_member.user,
     )
-    response = OrganizationMemberEditView.as_view()(
+    OrganizationMemberEditView.as_view()(
         request, organization_code=redteam_member.organization.code, pk=redteam_member.id
     )
-    assert response.status_code == 200
-    assertContains(response, "Member name test")
-    assertContains(response, "blocked")
-    assertContains(response, "l0")
+
+    redteam_member.refresh_from_db()
+    assert redteam_member.status == "blocked"

@@ -59,7 +59,7 @@ class IndemnificationAddForm(BaseRockyForm):
     am_authorized = forms.CharField(
         label=_(
             "I declare that I am authorized to give this indemnification within my organization. "
-            "I have the expierence and knowledge to know what the consequences might be and"
+            "I have the experience and knowledge to know what the consequences might be and"
             " can be held responsible for them."
         ),
         widget=forms.CheckboxInput(),
@@ -176,14 +176,21 @@ class OrganizationMemberEditForm(forms.ModelForm):
     trusted_clearance_level = forms.ChoiceField(
         required=False,
         label=_("Trusted clearance level"),
-        choices=SCAN_LEVEL.choices,
-        widget=forms.RadioSelect(),
+        choices=[(-1, "")] + SCAN_LEVEL.choices,
         help_text=_("Select a clearance level you trust this member with."),
+        widget=forms.RadioSelect(attrs={"radio_paws": True}),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["acknowledged_clearance_level"].disabled = True
+        self.fields["acknowledged_clearance_level"].required = False
+        self.fields["acknowledged_clearance_level"].widget.attrs[
+            "fixed_paws"
+        ] = self.instance.acknowledged_clearance_level
+        self.fields["acknowledged_clearance_level"].widget.attrs["class"] = "level-indicator-form"
+        if self.instance.user.is_superuser:
+            self.fields["trusted_clearance_level"].disabled = True
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -195,7 +202,7 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     class Meta:
         model = OrganizationMember
-        fields = ["trusted_clearance_level", "acknowledged_clearance_level"]
+        fields = ["status", "trusted_clearance_level", "acknowledged_clearance_level"]
 
 
 class OrganizationForm(forms.ModelForm):
@@ -237,10 +244,21 @@ class OrganizationForm(forms.ModelForm):
         }
 
 
+class OnboardingOrganizationUpdateForm(OrganizationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["code"].disabled = True
+
+
 class OrganizationUpdateForm(OrganizationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["code"].disabled = True
+        self.fields["tags"].widget.attrs["placeholder"] = _("Enter tags separated by comma.")
+
+    class Meta:
+        model = Organization
+        fields = ["name", "code", "tags"]
 
 
 class SetPasswordForm(auth_forms.SetPasswordForm):

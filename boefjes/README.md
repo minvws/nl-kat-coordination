@@ -75,7 +75,7 @@ Boefjes will run as containerized workers pulling jobs from a centralized job qu
 ![design](docs/design.png)
 
 Connections to other components, represented by the yellow squares, are abstracted by the modules inside them. The red
-components live outside the boefjes module. The green core files however is what can be focussed on and can be
+components live outside the boefjes module. The green core files however is what can be focused on and can be
 developed/refactored further to support boefjes of all different kinds.
 
 ### Running as a Docker container
@@ -220,7 +220,7 @@ Objects that have been added by a normalizer run for a given input will also aut
 By now we have mostly just gathered datapoints, and stored them in the graph. We have not yet ‘decided’ what they mean yet.
 For example, a scanned IP-address might reveal a list of open Ports.
 Those ports and the IP now exists in the database, but we have not applied any business rules yet.
-A business rule or “bit” might be very straighforward. “If port X is open, add a finding.”
+A business rule or “bit” might be very straightforward. “If port X is open, add a finding.”
 Or, a bit more complex:
 “if there’s an ipv6 and an ipv4 address linked to a hostname, both should carry the same website content, of not, add finding.”
 Building these rules comes down to looking at the graph, and deciding which objects, lack of objects or combinations of objects does not fit the check you are building.
@@ -247,6 +247,5 @@ it is a good idea to separate various bits of logic into separate normalizers.
 Each normalizer will tell KAT what is can process based on two settings. First a list of known Boefjes it knows it can process,
 (you can use this to couple your normalizer to your boefje and others) and a list of content-types or mime-types it can read.
 Using the latter, you might just create a normalizer and skip the data-gathering altogether instead relying on other unspecified boefjes to do that for you.
-Since you can couple more normalizers to boefjes, it allows you to keep each normalizer focusses on one specific job.
+Since you can couple more normalizers to boefjes, it allows you to keep each normalizer focuses on one specific job.
 For example a normalizer which extracts new url’s from text/html output, and another that reads that same output and instead looks for forms.
-
