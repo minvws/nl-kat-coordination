@@ -25,8 +25,10 @@ class PluginSettingsAddView(PermissionRequiredMixin, SinglePluginMixin, FormView
         return PluginSchemaForm(self.plugin_schema, **self.get_form_kwargs())
 
     def form_valid(self, form):
+        settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
+
         for name, value in form.cleaned_data.items():
-            if self.is_name_duplicate(name):
+            if name in settings:
                 self.add_error_notification(_("This setting already exists. Use the edit link."))
                 break
 
@@ -75,10 +77,6 @@ class PluginSettingsAddView(PermissionRequiredMixin, SinglePluginMixin, FormView
         context["plugin_type"] = self.plugin.type
         context["plugin_name"] = self.plugin.name
         return context
-
-    def is_name_duplicate(self, name):
-        setting = self.katalogus_client.get_plugin_setting(self.plugin.id, name=name)
-        return "message" not in setting
 
     def get_success_url(self):
         return reverse(

@@ -21,24 +21,11 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, SinglePluginMixin, FormV
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.setting_name = kwargs["setting_name"]
-        self.setting_value = self.katalogus_client.get_plugin_setting(self.plugin.id, name=self.setting_name)
-        self.check_key_already_exists(request)
+        self.setting_value = self.katalogus_client.get_plugin_settings(self.plugin.id).get(self.setting_name)
 
-    def get_form(self, **kwargs):
-        if not self.plugin_schema:
-            return
+        if not self.setting_value:
+            messages.add_message(self.request, messages.ERROR, _("The setting you are trying to edit does not exist."))
 
-        return PluginSettingAddEditForm(
-            self.plugin_schema, self.setting_name, self.setting_value, **self.get_form_kwargs()
-        )
-
-    def check_key_already_exists(self, request):
-        if "message" in self.setting_value:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("The setting you are trying to edit does not exist."),
-            )
             return HttpResponseRedirect(
                 reverse(
                     "plugin_detail",
@@ -49,6 +36,14 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, SinglePluginMixin, FormV
                     },
                 )
             )
+
+    def get_form(self, **kwargs):
+        if not self.plugin_schema or not self.setting_value:
+            return
+
+        return PluginSettingAddEditForm(
+            self.plugin_schema, self.setting_name, self.setting_value, **self.get_form_kwargs()
+        )
 
     def get_success_url(self):
         return reverse(
@@ -97,6 +92,9 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, SinglePluginMixin, FormV
         return context
 
     def form_valid(self, form):
+        if not self.setting_value:
+            return False
+
         value = form.cleaned_data[self.setting_name]
         self.katalogus_client.update_plugin_setting(plugin_id=self.plugin.id, name=self.setting_name, value=value)
         messages.add_message(self.request, messages.SUCCESS, _("Setting successfully updated."))

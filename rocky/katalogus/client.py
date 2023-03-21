@@ -75,10 +75,6 @@ class KATalogusClientV1:
         response = self.session.post(f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body)
         response.raise_for_status()
 
-    def get_plugin_setting(self, plugin_id: str, name: str) -> str:
-        response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings/{name}")
-        return response.json()
-
     def update_plugin_setting(self, plugin_id: str, name: str, value: str) -> None:
         body = {"value": value}
         response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body)

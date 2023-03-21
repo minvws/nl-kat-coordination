@@ -15,15 +15,16 @@ class PluginSettingsListView(ListView):
 
     def get_queryset(self):
         """Gets schema setting with additional info of the value of a setting."""
-        queryset = []
-        if self.plugin_schema:
-            for schema_props in self.plugin_schema["properties"]:
-                setting = self.katalogus_client.get_plugin_setting(plugin_id=self.plugin.id, name=schema_props)
-                if "message" in setting:
-                    value = ""
-                else:
-                    value = setting
-                queryset.append(
-                    {"name": schema_props, "value": value, "required": schema_props in self.plugin_schema["required"]}
-                )
-        return queryset
+        if not self.plugin_schema:
+            return []
+
+        settings = self.katalogus_client.get_plugin_settings(plugin_id=self.plugin.id)
+
+        return [
+            {
+                "name": schema_props,
+                "value": settings.get(schema_props, ""),
+                "required": schema_props in self.plugin_schema["required"],
+            }
+            for schema_props in self.plugin_schema["properties"]
+        ]
