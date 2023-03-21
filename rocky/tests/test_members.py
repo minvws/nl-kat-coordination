@@ -4,6 +4,7 @@ from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from tests.conftest import setup_request
 from rocky.views.organization_member_edit import OrganizationMemberEditView
+from tests.conftest import create_user, create_member
 
 
 def test_admin_can_edit_itself(rf, admin_member):
@@ -127,6 +128,23 @@ def test_admin_edits_client_different_orgs(rf, admin_member, client_member_b):
         admin_member.user,
     )
     with pytest.raises(Http404):
+        OrganizationMemberEditView.as_view()(
+            request, organization_code=client_member_b.organization.code, pk=client_member_b.id
+        )
+
+
+def test_admin_in_one_org_and_client_in_another_org(rf, admin_member, client_member_b):
+    none_admin_orgb = create_member(admin_member.user, client_member_b.organization)
+    none_admin_orgb.user.groups.clear()
+
+    request = setup_request(
+        rf.post(
+            "organization_member_edit",
+            {"status": "active", "trusted_clearance_level": 2},
+        ),
+        none_admin_orgb.user,
+    )
+    with pytest.raises(PermissionDenied):
         OrganizationMemberEditView.as_view()(
             request, organization_code=client_member_b.organization.code, pk=client_member_b.id
         )
