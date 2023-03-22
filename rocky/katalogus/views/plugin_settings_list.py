@@ -6,7 +6,7 @@ from katalogus.views import SinglePluginMixin
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsListView(ListView, SinglePluginMixin):
+class PluginSettingsListView(SinglePluginMixin, ListView):
     """
     Shows all settings available for a specific plugin (plugin schema settings).
     """
