@@ -14,4 +14,3 @@ Welcome to the OpenKAT documentation!
    guidelines/index
    templates/index
    ux_design/index
-

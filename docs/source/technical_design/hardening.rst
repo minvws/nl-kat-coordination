@@ -108,6 +108,3 @@ Much more information is available on this topic. When applying OpenKAT in a pro
 - https://developer.mozilla.org/en-US/docs/Learn/Server-side/Django/web_application_security
 - https://owasp.org/www-project-secure-headers/
 - https://docs.djangoproject.com/en/4.0/topics/security/
-
-
-
