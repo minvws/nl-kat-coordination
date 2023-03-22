@@ -15,6 +15,7 @@ def mock_mixins_katalogus(mocker):
 
 def test_plugin_detail(
     rf,
+    superuser_member,
     redteam_member,
     mock_mixins_katalogus,
     plugin_details,
@@ -31,7 +32,7 @@ def test_plugin_detail(
     mock_mixins_katalogus().get_plugin_details.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), redteam_member.user)
+    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), superuser_member.user)
     response = PluginDetailView.as_view()(
         request, organization_code=redteam_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
     )
@@ -41,9 +42,18 @@ def test_plugin_detail(
     assertContains(response, "testnetwork")
 
 
-def test_plugin_detail_data_missing(rf, client_member):
-    request = setup_request(rf.post("step_organization_setup"), client_member.user)
+def test_plugin_detail_data_missing(
+    rf,
+    superuser_member,
+    mock_mixins_katalogus,
+    plugin_details,
+    plugin_schema,
+    mock_organization_view_octopoes,
+    network,
+    lazy_task_list_with_boefje,
+):
+    request = setup_request(rf.post("step_organization_setup"), superuser_member.user)
     with pytest.raises(BadRequest):
         PluginDetailView.as_view()(
-            request, organization_code=client_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
+            request, organization_code=superuser_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
         )
