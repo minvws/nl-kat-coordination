@@ -71,7 +71,7 @@ services:
 
   rocky-db:
     restart: on-failure
-    image: postgres:12.8
+    image: postgres:12
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -86,7 +86,7 @@ services:
 
   bytes-db:
     restart: on-failure
-    image: postgres:12.8
+    image: postgres:12
     ports:
       - "127.0.0.1:5433:5432"
     volumes:
@@ -146,7 +146,7 @@ services:
 
   katalogus-db:
     restart: on-failure
-    image: postgres:12.8
+    image: postgres:12
     ports:
       - "127.0.0.1:5434:5432"
     volumes:
@@ -174,7 +174,7 @@ services:
       - katalogus
 
   scheduler-db:
-    image: postgres:12.8
+    image: postgres:12
     ports:
       - "127.0.0.1:5435:5432"
     volumes:

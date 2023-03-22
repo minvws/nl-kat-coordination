@@ -91,7 +91,7 @@ services:
       - .env
 
   rocky-db:
-    image: postgres:12.8
+    image: postgres:12
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -106,7 +106,7 @@ services:
       - APP_DB_PASSWORD=ROCKY_DB_PASSWORD
 
   bytes-db:
-    image: postgres:12.8
+    image: postgres:12
     ports:
       - "127.0.0.1:5433:5432"
     volumes:
@@ -178,7 +178,7 @@ services:
       - .env
 
   katalogus-db:
-    image: postgres:12.8
+    image: postgres:12
     ports:
       - "127.0.0.1:5434:5432"
     volumes:
@@ -211,7 +211,7 @@ services:
       - katalogus
 
   scheduler-db:
-    image: postgres:12.8
+    image: postgres:12
     ports:
       - "127.0.0.1:5435:5432"
     volumes:
