@@ -13,6 +13,6 @@ pynacl==1.5.0
 sqlalchemy==1.4.44
 
 # Dev dependencies
-pre-commit==2.20.0
+pre-commit==3.2.0
 pytest==7.2.0
 black==22.10.0
