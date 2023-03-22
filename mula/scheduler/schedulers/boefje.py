@@ -260,12 +260,7 @@ class BoefjeScheduler(Scheduler):
 
         try:
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
-        except (
-            pika.exceptions.ConnectionClosed,
-            pika.exceptions.ChannelClosed,
-            pika.exceptions.ChannelClosedByBroker,
-            pika.exceptions.AMQPConnectionError,
-        ) as e:
+        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError) as e:
             self.logger.warning(
                 "Could not connect to rabbitmq queue: %s [org_id=%s, scheduler_id=%s]",
                 f"{self.organisation.id}__scan_profile_increments",
@@ -296,6 +291,7 @@ class BoefjeScheduler(Scheduler):
             for object_type in boefje.consumes:
                 object_types.add(object_type)
 
+            # TODO: add scan level, set van scan levels (enum) 0,1,2,4 
             oois_by_object_type: List[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(

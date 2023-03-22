@@ -14,14 +14,33 @@ class Octopoes(HTTPService):
         self.orgs: List[Organisation] = orgs
         super().__init__(host, source)
 
-    # TODO: method needs to be added to octopoes_api
     @exception_handler
-    def get_objects_by_object_types(self, organisation_id: str, object_types: List[str]) -> List[OOI]:
+    def get_objects_by_object_types(self, organisation_id: str, object_types: List[str], scan_level: List[int] = []) -> List[OOI]:
         """Get all oois from octopoes"""
         url = f"{self.host}/{organisation_id}/objects/"
-        response = self.get(url, params={"object_types": object_types})
 
-        return [OOI(**ooi) for ooi in response.json().get("items", [])]
+        params = {
+            "types": object_types,
+            "scan_level": {s for s in scan_level},
+            "offset": 0,
+            "limit": 1,
+        }
+
+        # Get the total count of objects
+        response = self.get(url, params=params)
+        count = response.json().get("count")
+
+        # Set the limit to 1000
+        params["limit"] = 1000
+
+        # Loop over the paginated results
+        oois = []
+        for offset in range(0, count, 1000):
+            params["offset"] = offset
+            response = self.get(url, params=params)
+            oois.extend([OOI(**ooi) for ooi in response.json().get("items", [])])
+
+        return oois
 
     @exception_handler
     def get_random_objects(self, organisation_id: str, n: int) -> List[OOI]:

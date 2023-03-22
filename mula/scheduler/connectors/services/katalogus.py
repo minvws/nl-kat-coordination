@@ -79,19 +79,19 @@ class Katalogus(HTTPService):
         for org in orgs:
             if org.id not in self.organisations_plugin_cache:
                 self.organisations_plugin_cache[org.id] = {}
+                self.organisations_new_boefjes_cache[org.id] = {}
 
             plugins = self.get_plugins_by_organisation(org.id, enabled=True)
+            enabled_plugins = {plugin.id: plugin for plugin in plugins if plugin.enabled is True}
 
-            for plugin in plugins:
-                if plugin.enabled is False:
-                    continue
+            # Check if there are new boefjes enabled for this organisation,
+            # and add that to the new boefjes cache.
+            new_plugins = set(enabled_plugins.keys()).difference(set(self.organisations_plugin_cache[org.id].keys()))
+            self.organisations_new_boefjes_cache[org.id] = {plugin_id: enabled_plugins[plugin_id] for plugin_id in new_plugins}
+            if len(new_plugins) > 0:
+                self.logger.debug("new boefjes enabled for organisation [organisation=%s, boefjes=%s]", org.id, new_plugins)
 
-                # New plugin found: add to new boefje cache
-                if plugin.type == "boefje" and plugin.id not in self.organisations_plugin_cache[org.id]:
-                    self.organisations_new_boefjes_cache.setdefault(org.id, {})[plugin.id] = plugin
-                    self.logger.debug("new boefje added [organisation=%s, plugin=%s]", org.id, plugin.id)
-
-                self.organisations_plugin_cache[org.id][plugin.id] = plugin
+            self.organisations_plugin_cache[org.id] = enabled_plugins
 
         self.logger.debug("flushed plugins cache [cache=%s]", self.organisations_plugin_cache.cache)
 
