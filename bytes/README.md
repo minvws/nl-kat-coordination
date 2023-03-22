@@ -184,10 +184,10 @@ graph LR
         MR[Meta Repository] -- Raw  --> H[Hasher] -- Hash --> MR[Meta Repository]
         MR[Meta Repository] -- save Hash --> HR[Hash Repository]
         MR[Meta Repository] -- save RawFile --> R[Raw Repository]
-        R[Raw Repository] -- RawFile --> E[EnriptionMiddleware]
+        R[Raw Repository] -- RawFile --> F[FileMiddleware]
     end
 
-    E[EnriptionMiddleware] -- Encrypted Data --> Disk[[Disk]] -- Encrypted Data  --> E[EnriptionMiddleware]
+    F[FileMiddleware] -- Encrypted Data --> Disk[[Disk]] -- Encrypted Data  --> F[FileMiddleware]
     HR[Hash Repository] -- Hash --> T[[Third Party]]
     MR[Meta Repository] -- BoefjeMeta/NormalizerMeta --> RDB[(Psql)]
     EM[EventManager] -- "{'event_id': 123}" --> RabbitMQ[[RabbitMQ]]
