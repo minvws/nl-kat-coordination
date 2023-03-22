@@ -42,11 +42,7 @@ class Command(BaseCommand):
         self.setup_kat_groups()
 
         admin_permissions = self.get_permissions(
-            [
-                "view_organization",
-                "view_organizationmember",
-                "add_organizationmember",
-            ]
+            ["view_organization", "view_organizationmember", "add_organizationmember", "change_organization"]
         )
         self.group_admin.permissions.set(admin_permissions)
 

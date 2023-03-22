@@ -28,7 +28,7 @@ from tools.forms.upload_csv import (
     CSV_ERRORS,
 )
 
-CSV_CRITERIAS = [
+CSV_CRITERIA = [
     _("Add column titles. Followed by each object on a new line."),
     _(
         "For URL object type, a column 'raw' with URL values is required, starting with http:// or https://, "
@@ -77,7 +77,7 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
                 "text": _("Upload CSV"),
             },
         ]
-        context["criterias"] = CSV_CRITERIAS
+        context["criteria"] = CSV_CRITERIA
         return context
 
     def get_or_create_reference(self, ooi_type_name: str, value: str):

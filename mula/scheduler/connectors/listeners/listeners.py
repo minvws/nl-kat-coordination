@@ -34,7 +34,7 @@ class RabbitMQ(Listener):
     channel and procedure that needs to be dispatched when receiving messages
     from a RabbitMQ queue.
 
-    Attibutes:
+    Attributes:
         dsn:
             A string defining the data source name of the RabbitMQ host to
             connect to.
