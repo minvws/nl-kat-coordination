@@ -63,10 +63,9 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
         context = super().get_context_data(**kwargs)
 
         user: KATUser = self.request.user
-        organizations = user.get_organizations()
 
         findings_per_org = []
-        for org in organizations:
+        for org in user.organizations:
             findings = self.get_list_for_org(org)
             findings_store = {finding.primary_key: finding for finding in findings}
 
@@ -78,7 +77,7 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
             {"url": reverse("crisis_room"), "text": "CRISIS ROOM"},
         ]
 
-        context["organizations"] = organizations
+        context["organizations"] = user.organizations
         context["findings_per_org_total"] = self.sort_finding_list_by_total(findings_per_org)
         context["findings_per_org_critical"] = self.sort_finding_list_by_critical(findings_per_org)
         context["observed_at_form"] = self.get_connector_form()

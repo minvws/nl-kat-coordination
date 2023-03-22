@@ -22,7 +22,7 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
 
     def test_func(self):
         user: KATUser = self.request.user
-        return self.kwargs["to_organization"] in [org.code for org in user.get_organizations()]
+        return self.kwargs["to_organization"] in {org.code for org in user.organizations}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

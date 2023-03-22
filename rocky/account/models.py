@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import List
 
 from django.contrib.auth.base_user import BaseUserManager
@@ -84,8 +85,12 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
     def get_full_name(self):
         return self.full_name
 
-    def get_organizations(self) -> List[Organization]:
-        """Lists all organizations a user is a member of, excluding organizations to which access is blocked."""
+    @cached_property
+    def organizations(self) -> List[Organization]:
+        """Lists all organizations a user is a member of, excluding organizations to which access is blocked.
+
+        Superusers are considered to be members of all organizations.
+        """
         if self.is_superuser:
             return list(Organization.objects.all())
         members = self.members.exclude(status=OrganizationMember.STATUSES.BLOCKED).select_related("organization")

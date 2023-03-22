@@ -25,5 +25,5 @@ class OrganizationListView(
         return (
             Organization.objects.annotate(member_count=Count("members"))
             .prefetch_related("tags")
-            .filter(id__in=[organization.id for organization in user.get_organizations()])
+            .filter(id__in=[organization.id for organization in user.organizations])
         )
