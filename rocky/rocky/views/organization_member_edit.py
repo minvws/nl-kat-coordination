@@ -63,26 +63,30 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
     def form_valid(self, form):
         tcl = form.cleaned_data["trusted_clearance_level"]
         acl = form.cleaned_data["acknowledged_clearance_level"]
-        if tcl and acl:
-            if int(tcl) < int(acl):
-                messages.add_message(
-                    self.request,
-                    messages.INFO,
-                    _(
-                        "The updated trusted clearance level of L%s is lower then the member's "
-                        "acknowledged clearance level of L%s. This member only has clearance for level L%s. "
-                        "For this reason the acknowledged clearance level has been set at the same level "
-                        "as trusted clearance level."
-                    )
-                    % (tcl, acl, tcl),
+        if not tcl:
+            tcl = -1
+        if not acl:
+            acl = -1
+
+        if int(tcl) < int(acl):
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                _(
+                    "The updated trusted clearance level of L%s is lower then the member's "
+                    "acknowledged clearance level of L%s. This member only has clearance for level L%s. "
+                    "For this reason the acknowledged clearance level has been set at the same level "
+                    "as trusted clearance level."
                 )
-            if int(tcl) > int(acl):
-                messages.add_message(
-                    self.request,
-                    messages.INFO,
-                    _(
-                        "You have trusted this member with a higher trusted level than member acknowledged. "
-                        "Member must first accept this level to use it."
-                    ),
-                )
+                % (tcl, acl, tcl),
+            )
+        if int(tcl) > int(acl):
+            messages.add_message(
+                self.request,
+                messages.INFO,
+                _(
+                    "You have trusted this member with a higher trusted level than member acknowledged. "
+                    "Member must first accept this level to use it."
+                ),
+            )
         return super().form_valid(form)
