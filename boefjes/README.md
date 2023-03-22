@@ -249,4 +249,3 @@ Each normalizer will tell KAT what is can process based on two settings. First a
 Using the latter, you might just create a normalizer and skip the data-gathering altogether instead relying on other unspecified boefjes to do that for you.
 Since you can couple more normalizers to boefjes, it allows you to keep each normalizer focuses on one specific job.
 For example a normalizer which extracts new url’s from text/html output, and another that reads that same output and instead looks for forms.
-
