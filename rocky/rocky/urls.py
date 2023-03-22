@@ -36,6 +36,8 @@ from rocky.views.upload_raw import UploadRaw
 from tools.viewsets import OrganizationViewSet
 
 handler404 = "rocky.views.handler404.handler404"
+handler403 = "rocky.views.handler403.handler403"
+
 
 router = routers.SimpleRouter()
 router.register(r"organization", OrganizationViewSet)
@@ -82,7 +84,7 @@ urlpatterns += i18n_patterns(
         name="organization_add",
     ),
     path(
-        "organizations/<path:pk>/edit/",
+        "<organization_code>/<path:pk>/edit/",
         OrganizationEditView.as_view(),
         name="organization_edit",
     ),

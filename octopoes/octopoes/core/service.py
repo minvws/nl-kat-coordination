@@ -244,7 +244,7 @@ class OctopoesService:
         for reference in references_to_reset:
             old_scan_profile = inherited_scan_profiles[reference]
             self.scan_profile_repository.save(old_scan_profile, EmptyScanProfile(reference=reference), valid_time)
-        logger.info("Resetted scan profiles [len=%i]", len(references_to_reset))
+        logger.info("Reset scan profiles [len=%i]", len(references_to_reset))
 
         # Assign empty scan profiles to OOI's without scan profile
         unset_scan_profile_references = (
@@ -275,6 +275,16 @@ class OctopoesService:
     # OOI events
     def _on_create_ooi(self, event: OOIDBEvent) -> None:
         ooi = event.new_data
+
+        # keep old scan profile, or create new scan profile
+        try:
+            self.scan_profile_repository.get(ooi.reference, event.valid_time)
+        except ObjectNotFoundException:
+            self.scan_profile_repository.save(
+                None,
+                EmptyScanProfile(reference=ooi.reference),
+                valid_time=event.valid_time,
+            )
 
         # analyze bit definitions
         bit_definitions = get_bit_definitions()
@@ -314,7 +324,16 @@ class OctopoesService:
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
-        ...
+        inference_origins = self.origin_repository.list_by_source(event.new_data.reference, valid_time=event.valid_time)
+        inference_params = self.origin_parameter_repository.list_by_reference(
+            event.new_data.reference, valid_time=event.valid_time
+        )
+        for inference_param in inference_params:
+            inference_origins.append(self.origin_repository.get(inference_param.origin_id, event.valid_time))
+
+        inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
+        for inference_origin in inference_origins:
+            self._run_inference(inference_origin, event.valid_time)
 
     def _on_delete_ooi(self, event: OOIDBEvent) -> None:
         reference = event.old_data.reference

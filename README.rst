@@ -136,7 +136,7 @@ You can submit PRs directly via Github, or contact the community manager at meed
 OpenKAT uses the following principles for writing code:
 
 * python 3.8
-* All code via pullrequests with reviews
+* All code via pull requests with reviews
 * `Python with PEP8 <https://peps.python.org/pep-0008/>`_.
 * Pylint
 * `[Black], 120 characters line length: <https://pypi.org/project/black/>`_

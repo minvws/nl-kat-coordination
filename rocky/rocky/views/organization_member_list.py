@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import List
 
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -17,6 +16,8 @@ from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 class PageActions(Enum):
     GIVE_CLEARANCE = "give_clearance"
     WITHDRAW_CLEARANCE = "withdraw_clearance"
+    BLOCK = "block"
+    UNBLOCK = "unblock"
 
 
 @class_view_decorator(otp_required)
@@ -25,11 +26,17 @@ class OrganizationMemberListView(
     ListView,
 ):
     model = OrganizationMember
-    filters_active: List[str] = []
     context_object_name = "members"
 
     def get_queryset(self):
-        return self.model.objects.filter(organization=self.organization)
+        queryset = self.model.objects.filter(organization=self.organization)
+        if "client_status" in self.request.GET:
+            status_filter = self.request.GET.getlist("client_status", [])
+            queryset = self.filter_queryset(queryset, status_filter)
+        return queryset
+
+    def filter_queryset(self, queryset, blocked_status_filter):
+        return [member for member in queryset if member.status in blocked_status_filter]
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -57,6 +64,10 @@ class OrganizationMemberListView(
             elif action == PageActions.WITHDRAW_CLEARANCE.value:
                 organizationmember.trusted_clearance_level = 0
                 organizationmember.acknowledged_clearance_level = 0
+            elif action == PageActions.BLOCK.value:
+                organizationmember.status = OrganizationMember.STATUSES.BLOCKED
+            elif action == PageActions.UNBLOCK.value:
+                organizationmember.status = OrganizationMember.STATUSES.ACTIVE
             else:
                 raise Exception(f"Unhandled allowed action: {action}")
             organizationmember.save()

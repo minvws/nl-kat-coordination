@@ -4,7 +4,6 @@
 
 {% block content %}
   <h1>{% trans "Enable Two-Factor Authentication" %}</h1>
-  {% if verified and wizard.steps.current == 'generator' %}
     <form class="horizontal-view help">
       <fieldset>
         <div class="explanation"
@@ -30,7 +29,7 @@
              data-open-label="Explanation of the secret key."
              data-close-label="Close explanation of the secret key">
             {% blocktrans trimmed %}
-             The secret key is a 32 characters represenation of the QR code.
+             The secret key is a 32 characters representation of the QR code.
              There are 2 options to setup the two factor authtentication.
              You can scan the QR code above or you can insert this key
              using the secret key option of the authenticator app.
@@ -46,12 +45,4 @@
       <input type="submit" value="" class="d-none"/>
       {% include "two_factor/_wizard_actions.html" with step=wizard.steps.current %}
     </form>
-  {% else %}
-    <p>
-      {% blocktrans trimmed %}
-        You are not verified as an organization member by your system administrator.
-        Contact your system administrator about your verification to proceed to Two Factor Authentication setup.
-      {% endblocktrans %}
-    </p>
-  {% endif %}
 {% endblock %}

@@ -14,19 +14,36 @@
               <tr>
                 <th>{% translate 'Name' %}</th>
                 <th>{% translate 'Code' %}</th>
+                <th>{% translate 'Edit' %}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>{{ organization.name }}</td>
                 <td>{{ organization.code }}</td>
+                <td>
+                  {% spaceless %}
+                    <a href="{% url 'organization_edit' organization.code organization.id %}">
+                      <button class="icon ti-edit">{% translate 'Edit' %}</button>
+                    </a>
+                  {% endspaceless %}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <a href="{% url 'indemnification_add' organization.code %}" class="button ghost">{% translate 'Add indemnification' %}</a>
+        <a href="{% url 'indemnification_add' organization.code %}"
+           class="button ghost">{% translate 'Add indemnification' %}</a>
       </div>
     </section>
+    {% if organization.tags.all %}
+      <section>
+        <div>
+          <h2>{% translate 'Tags' %}</h2>
+          {% include 'organizations/organization_tags.html' %}
+        </div>
+      </section>
+    {% endif %}
     {% if perms.tools.view_organization or request.user.is_superuser %}
       {% include 'organizations/organization_member_list.html' %}
     {% endif %}

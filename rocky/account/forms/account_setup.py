@@ -58,7 +58,7 @@ class IndemnificationAddForm(BaseRockyForm):
     am_authorized = forms.CharField(
         label=_(
             "I declare that I am authorized to give this indemnification within my organization. "
-            "I have the expierence and knowledge to know what the consequences might be and"
+            "I have the experience and knowledge to know what the consequences might be and"
             " can be held responsible for them."
         ),
         widget=forms.CheckboxInput(),
@@ -153,7 +153,9 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
         if self.organization and selected_group:
             self.set_user()
             OrganizationMember.objects.get_or_create(
-                user=self.user, organization=self.organization, member_name=self.cleaned_data["name"]
+                user=self.user,
+                organization=self.organization,
+                status=OrganizationMember.STATUSES.ACTIVE,
             )
 
             selected_group.user_set.add(self.user)
@@ -211,10 +213,21 @@ class OrganizationForm(forms.ModelForm):
         }
 
 
+class OnboardingOrganizationUpdateForm(OrganizationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["code"].disabled = True
+
+
 class OrganizationUpdateForm(OrganizationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["code"].disabled = True
+        self.fields["tags"].widget.attrs["placeholder"] = _("Enter tags separated by comma.")
+
+    class Meta:
+        model = Organization
+        fields = ["name", "code", "tags"]
 
 
 class SetPasswordForm(auth_forms.SetPasswordForm):
