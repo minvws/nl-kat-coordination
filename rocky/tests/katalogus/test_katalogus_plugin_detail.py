@@ -8,11 +8,6 @@ from katalogus.views.plugin_detail import PluginDetailView
 from tests.conftest import setup_request
 
 
-@pytest.fixture()
-def mock_mixins_katalogus(mocker):
-    return mocker.patch("katalogus.views.mixins.get_katalogus")
-
-
 def test_plugin_detail(
     rf,
     my_user,

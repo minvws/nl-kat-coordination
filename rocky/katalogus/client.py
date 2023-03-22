@@ -64,10 +64,12 @@ class KATalogusClientV1:
 
     def get_plugin_schema(self, plugin_id) -> Optional[Dict]:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/schema.json")
+        response.raise_for_status()
         return response.json()
 
     def get_plugin_settings(self, plugin_id: str) -> Dict:
         response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
+        response.raise_for_status()
         return response.json()
 
     def add_plugin_setting(self, plugin_id: str, name: str, value: str) -> None:
@@ -82,6 +84,7 @@ class KATalogusClientV1:
 
     def delete_plugin_setting(self, plugin_id: str, name: str):
         response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings/{name}")
+        response.raise_for_status()
         return response
 
     def clone_all_configuration_to_organization(self, to_organization: str):

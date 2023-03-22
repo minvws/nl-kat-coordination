@@ -27,6 +27,12 @@ class SinglePluginMixin(OrganizationView):
         self.plugin = self.katalogus_client.get_plugin(kwargs["plugin_id"])
         self.plugin_schema = self.katalogus_client.get_plugin_schema(kwargs["plugin_id"])
 
+    def is_required(self, field: str) -> bool:
+        return field in self.plugin_schema["required"]
+
+    def is_setting(self, setting_name: str) -> bool:
+        return setting_name in self.plugin_schema["properties"]
+
 
 class BoefjeMixin(OctopoesView):
     """

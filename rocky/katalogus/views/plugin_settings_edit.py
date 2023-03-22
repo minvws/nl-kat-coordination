@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
+from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.forms import PluginSettingAddEditForm
@@ -21,21 +22,29 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, SinglePluginMixin, FormV
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.setting_name = kwargs["setting_name"]
-        self.setting_value = self.katalogus_client.get_plugin_settings(self.plugin.id).get(self.setting_name)
 
-        if not self.setting_value:
+        try:
+            self.setting_value = self.katalogus_client.get_plugin_settings(self.plugin.id).get(self.setting_name)
+
+            if self.setting_value:
+                return
+
             messages.add_message(self.request, messages.ERROR, _("The setting you are trying to edit does not exist."))
-
-            return HttpResponseRedirect(
-                reverse(
-                    "plugin_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_type": self.plugin.type,
-                        "plugin_id": self.plugin.id,
-                    },
-                )
+        except RequestException:
+            messages.add_message(
+                self.request, messages.ERROR, _("Failed getting settings for boefje {}").format(self.plugin.id)
             )
+
+        return HttpResponseRedirect(
+            reverse(
+                "plugin_detail",
+                kwargs={
+                    "organization_code": self.organization.code,
+                    "plugin_type": self.plugin.type,
+                    "plugin_id": self.plugin.id,
+                },
+            )
+        )
 
     def get_form(self, **kwargs):
         if not self.plugin_schema or not self.setting_value:

@@ -458,7 +458,13 @@ def plugin_schema():
                 "maxLength": 128,
                 "type": "string",
                 "description": "Test description",
-            }
+            },
+            "TEST_PROPERTY2": {
+                "title": "TEST_PROPERTY2",
+                "maxLength": 128,
+                "type": "integer",
+                "description": "Test description2",
+            },
         },
         "required": ["TEST_PROPERTY"],
     }
@@ -489,3 +495,8 @@ def mock_scheduler(mocker):
 
 def get_boefjes_data():
     return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())
+
+
+@pytest.fixture()
+def mock_mixins_katalogus(mocker):
+    return mocker.patch("katalogus.views.mixins.get_katalogus")

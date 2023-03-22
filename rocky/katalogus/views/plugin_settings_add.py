@@ -1,14 +1,21 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
+from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.forms import PluginSchemaForm, PluginSettingAddEditForm
 from katalogus.views.mixins import SinglePluginMixin
+
+
+logger = logging.getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
@@ -25,7 +32,13 @@ class PluginSettingsAddView(PermissionRequiredMixin, SinglePluginMixin, FormView
         return PluginSchemaForm(self.plugin_schema, **self.get_form_kwargs())
 
     def form_valid(self, form):
-        settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
+        try:
+            settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
+        except RequestException:
+            messages.add_message(
+                self.request, messages.ERROR, _("Failed getting settings for boefje {}").format(self.plugin.id)
+            )
+            return super().form_valid(form)
 
         for name, value in form.cleaned_data.items():
             if name in settings:
@@ -103,17 +116,43 @@ class PluginSingleSettingAddView(PluginSettingsAddView):
     template_name = "plugin_settings_add.html"
     permission_required = "tools.can_scan_organization"
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.setting_name = kwargs["setting_name"]
+    def dispatch(self, request, *args, **kwargs):
+        if not self.plugin_schema:
+            messages.add_message(
+                self.request,
+                messages.WARNING,
+                _("No plugin schema found. You do not need to add settings to enable this plugin."),
+            )
+            return redirect(
+                reverse(
+                    "plugin_detail",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
+                    },
+                )
+            )
+
+        if not self.is_setting(self.kwargs["setting_name"]):
+            messages.add_message(self.request, messages.ERROR, _("Invalid setting name."))
+            return redirect(
+                reverse(
+                    "plugin_detail",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
+                    },
+                )
+            )
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form(self, **kwargs):
-        if not self.plugin_schema:
-            return
-
-        return PluginSettingAddEditForm(self.plugin_schema, self.setting_name, **self.get_form_kwargs())
+        return PluginSettingAddEditForm(self.plugin_schema, self.kwargs["setting_name"], **self.get_form_kwargs())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["setting_name"] = self.setting_name
+        context["setting_name"] = self.kwargs["setting_name"]
         return context
