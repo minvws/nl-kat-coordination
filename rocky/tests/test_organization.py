@@ -197,37 +197,37 @@ def test_edit_organization_permissions(rf, redteam_member, client_member):
         )
 
 
-def test_admin_rights_edits_organization(rf, admin_member):
+def test_admin_rights_edits_organization(rf, superuser_member):
     """Can admin edit organization?"""
-    request = setup_request(rf.get("organization_edit"), admin_member.user)
+    request = setup_request(rf.get("organization_edit"), superuser_member.user)
     response = OrganizationEditView.as_view()(
-        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
+        request, organization_code=superuser_member.organization.code, pk=superuser_member.organization.id
     )
 
     assert response.status_code == 200
 
 
-def test_admin_edits_organization(rf, admin_member, mocker):
+def test_admin_edits_organization(rf, superuser_member, mocker):
     """Admin editing organization values"""
     request = setup_request(
         rf.post(
             "organization_edit",
             {"name": "This organization name has been edited", "tags": "tag1,tag2"},
         ),
-        admin_member.user,
+        superuser_member.user,
     )
     mocker.patch("katalogus.client.KATalogusClientV1")
     mocker.patch("tools.models.OctopoesAPIConnector")
     response = OrganizationEditView.as_view()(
-        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
+        request, organization_code=superuser_member.organization.code, pk=superuser_member.organization.id
     )
 
     # success post redirects to organization detail page
     assert response.status_code == 302
-    assert response.url == f"/en/{admin_member.organization.code}/"
-    resulted_request = setup_request(rf.get(response.url), admin_member.user)
+    assert response.url == f"/en/{superuser_member.organization.code}/"
+    resulted_request = setup_request(rf.get(response.url), superuser_member.user)
     resulted_response = OrganizationDetailView.as_view()(
-        resulted_request, organization_code=admin_member.organization.code
+        resulted_request, organization_code=superuser_member.organization.code
     )
     assert resulted_response.status_code == 200
 

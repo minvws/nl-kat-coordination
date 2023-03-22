@@ -41,7 +41,7 @@ TREE_DATA = {
 }
 
 
-def test_scan_profile(rf, redteam_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
@@ -54,7 +54,7 @@ def test_scan_profile(rf, redteam_member, mock_organization_view_octopoes, mocke
     assertContains(response, "Set clearance level")
 
 
-def test_scan_profile_submit(rf, redteam_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile_submit(rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
@@ -70,7 +70,9 @@ def test_scan_profile_submit(rf, redteam_member, mock_organization_view_octopoes
     assert response.url == f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}"
 
 
-def test_scan_profile_submit_no_indemnification(rf, redteam_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile_submit_no_indemnification(
+    rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker
+):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
@@ -87,7 +89,9 @@ def test_scan_profile_submit_no_indemnification(rf, redteam_member, mock_organiz
     assert response.status_code == 403
 
 
-def test_scan_profile_no_permissions_acknowledged(rf, redteam_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile_no_permissions_acknowledged(
+    rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker
+):
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
@@ -103,7 +107,9 @@ def test_scan_profile_no_permissions_acknowledged(rf, redteam_member, mock_organ
     assertNotContains(response, "Set clearance level")
 
 
-def test_scan_profile_no_permissions_trusted(rf, redteam_member, mock_organization_view_octopoes, mocker):
+def test_scan_profile_no_permissions_trusted(
+    rf, redteam_member, mock_scheduler, mock_organization_view_octopoes, mocker
+):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mocker.patch("katalogus.utils.get_katalogus")
 

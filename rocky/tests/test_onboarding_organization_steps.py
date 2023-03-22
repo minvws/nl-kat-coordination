@@ -90,7 +90,7 @@ def test_onboarding_set_clearance_level(rf, redteam_member, mock_organization_vi
     assertContains(response, "Skip onboarding")
 
 
-def test_onboarding_select_plugins(rf, redteam_member, mock_organization_view_octopoes, network):
+def test_onboarding_select_plugins(rf, redteam_member, mock_views_katalogus, mock_organization_view_octopoes, network):
     mock_organization_view_octopoes().get.return_value = network
 
     request = setup_request(

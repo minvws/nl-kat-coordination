@@ -92,7 +92,7 @@ def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octo
     assert mock_organization_view_octopoes().delete.call_count == 2
 
 
-def test_ooi_list_delete_none(rf, client_member):
+def test_ooi_list_delete_none(rf, client_member, mock_organization_view_octopoes):
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -106,7 +106,7 @@ def test_ooi_list_delete_none(rf, client_member):
     assert response.status_code == 422
 
 
-def test_ooi_list_unknown_action(rf, client_member):
+def test_ooi_list_unknown_action(rf, client_member, mock_organization_view_octopoes):
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -221,7 +221,7 @@ def test_update_scan_profile_to_inherit_object_not_found(rf, client_member, mock
     assert response.status_code == 404
 
 
-def test_update_scan_profiles_forbidden_acknowledged(rf, client_member):
+def test_update_scan_profiles_forbidden_acknowledged(rf, client_member, mock_organization_view_octopoes):
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -244,7 +244,7 @@ def test_update_scan_profiles_forbidden_acknowledged(rf, client_member):
     assert response.status_code == 403
 
 
-def test_update_scan_profiles_forbidden_trusted(rf, client_member):
+def test_update_scan_profiles_forbidden_trusted(rf, client_member, mock_organization_view_octopoes):
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -267,8 +267,8 @@ def test_update_scan_profiles_forbidden_trusted(rf, client_member):
     assert response.status_code == 403
 
 
-def test_update_scan_profiles_no_indemnification(rf, client_member):
-    kwargs = {"organization_code": client_member.organization.code}
+def test_update_scan_profiles_no_indemnification(rf, redteam_member, mock_organization_view_octopoes):
+    kwargs = {"organization_code": redteam_member.organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
     request = rf.post(
@@ -280,11 +280,11 @@ def test_update_scan_profiles_no_indemnification(rf, client_member):
         },
     )
 
-    Indemnification.objects.get(user=client_member.user).delete()
+    Indemnification.objects.get(user=redteam_member.user).delete()
 
-    setup_request(request, client_member.user)
+    setup_request(request, redteam_member.user)
 
-    response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
+    response = OOIListView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 403
 

@@ -103,7 +103,9 @@ def test_ooi_detail_start_scan(
 def test_ooi_detail_start_scan_no_indemnification(
     rf,
     client_member,
+    mock_scheduler,
     mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
     mocker,
     network,
 ):
@@ -136,7 +138,9 @@ def test_ooi_detail_start_scan_no_indemnification(
 def test_ooi_detail_start_scan_no_action(
     rf,
     client_member,
+    mock_scheduler,
     mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
     mocker,
     network,
 ):

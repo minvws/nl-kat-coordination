@@ -46,7 +46,7 @@ def test_upload_csv_simple(rf, redteam_member):
     assert response.status_code == 200
 
 
-def test_upload_bad_input(rf, redteam_member, mock_bytes_client):
+def test_upload_bad_input(rf, redteam_member, mock_organization_view_octopoes, mock_bytes_client):
     data = b"invalid|'\n4\bcsv|format"
     example_file = BytesIO(data)
     example_file.name = "networks.csv"
