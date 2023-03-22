@@ -11,7 +11,6 @@ from two_factor.views.utils import class_view_decorator
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from katalogus.views import PluginSettingsListView
-from katalogus.views.mixins import SinglePluginMixin
 from katalogus.views.plugin_detail_scan_oois import PluginDetailScanOOI
 from rocky import scheduler
 
@@ -26,11 +25,7 @@ class PluginCoverImgView(OrganizationView):
 
 
 @class_view_decorator(otp_required)
-class PluginDetailView(
-    SinglePluginMixin,
-    PluginSettingsListView,
-    PluginDetailScanOOI,
-):
+class PluginDetailView(PluginSettingsListView, PluginDetailScanOOI):
     """Detail view for a specific plugin. Shows plugin settings and consumable oois for scanning."""
 
     template_name = "plugin_detail.html"

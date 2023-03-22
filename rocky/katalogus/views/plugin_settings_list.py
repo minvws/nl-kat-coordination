@@ -2,9 +2,11 @@ from django.views.generic import ListView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
+from katalogus.views import SinglePluginMixin
+
 
 @class_view_decorator(otp_required)
-class PluginSettingsListView(ListView):
+class PluginSettingsListView(ListView, SinglePluginMixin):
     """
     Shows all settings available for a specific plugin (plugin schema settings).
     """
@@ -19,12 +21,9 @@ class PluginSettingsListView(ListView):
             return []
 
         settings = self.katalogus_client.get_plugin_settings(plugin_id=self.plugin.id)
+        props = self.plugin_schema["properties"]
 
-        return [
-            {
-                "name": schema_props,
-                "value": settings.get(schema_props, ""),
-                "required": schema_props in self.plugin_schema["required"],
-            }
-            for schema_props in self.plugin_schema["properties"]
-        ]
+        return [{"name": prop, "value": settings.get(prop, ""), "required": self.is_required(prop)} for prop in props]
+
+    def is_required(self, field: str):
+        return field in self.plugin_schema["required"]
