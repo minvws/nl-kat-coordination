@@ -7,7 +7,7 @@ from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 from account.forms import OrganizationMemberEditForm
-from tools.models import OrganizationMember, GROUP_CLIENT
+from tools.models import OrganizationMember, GROUP_CLIENT, GROUP_ADMIN
 from account.mixins import OrganizationView
 
 
@@ -26,7 +26,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
 
     def get_form(self):
         form = super().get_form()
-        if (self.object.user == self.request.user) or self.request.user.is_superuser:
+        if self.object.user.is_superuser or self.object.user.groups.filter(name=GROUP_ADMIN).exists():
             # There could be a case where you block yourself out of the system
             form.fields["status"].disabled = True
         if self.object.user.groups.filter(name=GROUP_CLIENT).exists():

@@ -9,10 +9,12 @@
       {% if field.field.required %}
         <span class="nota-bene">{% translate 'This field is required' %}</span>
       {% endif %}
-      {% if field.field.widget.attrs.fixed_paws %}
-        {% include 'partials/scan_level_indicator.html' with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
-      {% else %}
+      {% if not field.field.widget.attrs.fixed_paws %}
         {{ field }}
+      {% elif field.field.widget.attrs.fixed_paws < 0 %}
+        {% translate 'Unset' %}
+      {% else %}
+        {% include 'partials/scan_level_indicator.html' with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
       {% endif %}
       {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
       {% include 'partials/form/field_input_errors.html' %}

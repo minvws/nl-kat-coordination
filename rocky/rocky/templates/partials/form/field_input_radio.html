@@ -4,7 +4,7 @@
   </legend>
   {% for choice in field %}
     <div class="horizontal-view">
-      <input type="radio"
+      <input type="{% if choice.data.value < 0 %}hidden{% else %}radio{% endif %}"
              name="{{ field.name }}"
              value="{{ choice.data.value }}"
              id="id_{{ field.name }}_{{ forloop.counter0 }}"

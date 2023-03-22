@@ -1,10 +1,8 @@
 {% load static %}
 {% load i18n %}
 
-{% if value < 0 %}
-  {% translate 'Unset' %}
-{% else %}
-  <ul class="level-indicator l{{ value }}{{ custom_class }}">
+{% if value >= 0 %}
+  <ul class="level-indicator l{{ value }} {{ custom_class }}">
     {% get_scan_levels as scan_levels %}
     {% for level in scan_levels %}<li></li>{% endfor %}
   </ul>

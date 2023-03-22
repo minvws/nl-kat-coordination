@@ -183,7 +183,6 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["acknowledged_clearance_level"].disabled = True
         self.fields["acknowledged_clearance_level"].required = False
         self.fields["acknowledged_clearance_level"].widget.attrs[
             "fixed_paws"
