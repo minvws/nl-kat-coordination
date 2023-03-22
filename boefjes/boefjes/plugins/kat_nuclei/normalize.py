@@ -10,7 +10,7 @@ from boefjes.job_models import NormalizerMeta
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
     url_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
     if raw:
-        for line in iter(raw.splitlines()):
+        for line in raw.splitlines():
             # Extract and parse values
             data = json.loads(line)
             id_ = data["info"]["classification"]["cve-id"][0]
