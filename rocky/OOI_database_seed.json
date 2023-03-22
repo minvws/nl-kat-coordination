@@ -1099,6 +1099,19 @@
   },
   {
     "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-NO-HTTPS-REDIRECT",
+    "fields": {
+      "last_updated": "2021-12-07T17:24:09.835Z",
+      "data": {
+        "description": "This HTTP URL may not redirect to HTTPS; 'location' was not found in HTTPHeader.",
+        "recommendation": "Check if redirection is setup properly.",
+        "risk": "Low"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
     "pk": "KATFindingType|KAT-CERTIFICATE-EXPIRING-SOON",
     "fields": {
       "last_updated": "2022-12-20T15:59:09.835Z",
