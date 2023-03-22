@@ -88,7 +88,6 @@ main section {
   div {
     div,
     section {
-    	border: 1px dashed red;
     	padding-top: var(--content-nested-padding-top);
     	padding-right: var(--content-nested-padding-right);
     	padding-bottom: var(--content-nested-padding-bottom);
@@ -101,22 +100,17 @@ main section {
 }
 
 body > main  {
-	background-color: palegreen;
-
 	@media screen and (min-width: $grid-m) {
-		background-color: pink;
 		padding-top: var(--page-whitespace-top-grid-m);
 		padding-bottom: var(--page-whitespace-bottom-grid-m);
 
 		section {
-			border: 1px dashed black;
 			padding-right: var(--page-whitespace-right-grid-m);
 			padding-left: var(--page-whitespace-left-grid-m);
 		}
 	}
 
 	@media screen and (min-width: $grid-l) {
-		background-color: lavender;
 		padding-top: var(--page-whitespace-top-grid-l);
 		padding-bottom: var(--page-whitespace-bottom-grid-l);
 
@@ -127,7 +121,6 @@ body > main  {
 	}
 
 	@media screen and (min-width: $grid-xl) {
-		background-color: palegoldenrod;
 		padding-top: var(--page-whitespace-top-grid-xl);
 		padding-bottom: var(--page-whitespace-bottom-grid-xl);
 
@@ -138,7 +131,6 @@ body > main  {
 	}
 
 	@media screen and (min-width: $grid-xxl) {
-		background-color: indianred;
 		padding-top: var(--page-whitespace-top-grid-xxl);
 		padding-bottom: var(--page-whitespace-bottom-grid-xxl);
 
