@@ -155,7 +155,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
     def test_update_normalizer_task(self):
         pass
 
-    # TODO: when boefje task isnt available, but it should make a normalizers
+    # TODO: when boefje task isn't available, but it should make a normalizers
     # task
     def test_populate_normalizer_queue_boefje_task_not_available(self):
         pass

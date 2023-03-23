@@ -42,9 +42,15 @@ Indemnification
 OpenKAT works with a system of indemnities for scanning, linked to intrusion levels. An organization gives an indemnification for a certain intensity of scan. For each intrusion level, the level is specified, in order to prevent unexpected problems for a production system.
 
 Intrusion levels or indemnities:
-:L1: 'do not touch'
+
+:L0: 'do nothing: do not touch and don't gather information about this object'.
+
+:L1: 'retrieve information from public sources, but don't touch the object itself'.
+
 :L2: 'touch at normal user level'.
+
 :L3: 'detectable scanning'.
+
 :L4: 'intensive scanning'.
 
 If scanning with OpenKAT poses a risk then it applies to all actors who have access to this particular system and is already worthy of a finding.

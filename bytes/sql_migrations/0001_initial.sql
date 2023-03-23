@@ -49,4 +49,3 @@ CREATE TABLE output_ooi (
 Alter table output_ooi owner to bytes_dba;
 
 grant all on output_ooi to bytes;
-

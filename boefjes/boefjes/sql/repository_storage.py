@@ -35,6 +35,12 @@ class SQLRepositoryStorage(SessionMixin, RepositoryStorage):
         repository_in_db = self.to_repository_in_db(repository)
         self.session.add(repository_in_db)
 
+    def delete_by_id(self, repository_id: str) -> None:
+        logger.info("Deleting repository %s", repository_id)
+        instance = self._db_instance_by_id(repository_id)
+
+        self.session.delete(instance)
+
     def _db_instance_by_id(self, repository_id: str) -> RepositoryInDB:
         instance = self.session.query(RepositoryInDB).filter(RepositoryInDB.id == repository_id).first()
 
