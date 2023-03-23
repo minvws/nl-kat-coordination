@@ -269,7 +269,7 @@ class NormalizerScheduler(Scheduler):
         Returns:
             True if the task is allowed to run, False otherwise.
         """
-        if normalizer.enabled is False:
+        if not normalizer.enabled:
             self.logger.debug(
                 "Normalizer: %s is disabled [normalizer.id= %s, organisation.id=%s, scheduler_id=%s]",
                 normalizer.id,
