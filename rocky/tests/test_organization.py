@@ -8,7 +8,6 @@ from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_list import OrganizationMemberListView
 from tests.conftest import setup_request
-from tools.models import GROUP_ADMIN
 
 
 def test_organization_list_non_superuser(rf, client_member):

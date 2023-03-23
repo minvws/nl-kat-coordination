@@ -8,19 +8,12 @@
     <section>
       <div>
         <h1>{% translate "Crisis room" %}: {{ organization.name|title }} ({{ organization.code }})</h1>
-
         <p>
           {% translate 'An overview of the top 10 most severe findings OpenKAT found. Check the detail section for additional severity information.' %}
         </p>
-
-        <h2>
-          {% translate 'Top 10 most severe Findings' %}
-        </h2>
-
+        <h2>{% translate 'Top 10 most severe Findings' %}</h2>
         {{ object_type_filters }}
-
         {% translate 'Object list' as filter_title %}
-
         <div class="horizontal-scroll">
           <table class="action-buttons nowrap">
             <caption>{% translate 'Showing ' %}{{ ooi_list|length }} {% translate 'of' %} {{ total_oois }} {% translate 'objects' %}</caption>
@@ -86,8 +79,4 @@
   </main>
 {% endblock %}
 
-{% block html_at_end_body %}
-  {{ block.super }}
-{% endblock %}
-
-
+{% block html_at_end_body %}{{ block.super }}{% endblock %}

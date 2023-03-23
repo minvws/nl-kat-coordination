@@ -3,7 +3,8 @@ table td span {
     position: static;
     font-family: var(--icon-base-font-family);
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale; /* Firefox */
+    -moz-osx-font-smoothing: grayscale;
+    /* Firefox */
   }
 
   &.new {
