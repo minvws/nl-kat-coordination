@@ -107,6 +107,9 @@ def parse_ptr_exists_include_mechanism(
         yield DNSSPFMechanismHostname(spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism="ptr")
     else:
         mechanism_type, domain = mechanism.split(":", 1)
+        # currently, the model only supports hostnames and not domains
+        if domain.startswith("_"):
+            return
         hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
         yield hostname
         yield DNSSPFMechanismHostname(
@@ -116,6 +119,9 @@ def parse_ptr_exists_include_mechanism(
 
 def parse_redirect_mechanism(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[str]:
     mechanism_type, domain = mechanism.split("=", 1)
+    # currently, the model only supports hostnames and not domains
+    if domain.startswith("_"):
+        return
     hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
     yield hostname
     yield DNSSPFMechanismHostname(
