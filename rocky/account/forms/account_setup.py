@@ -15,6 +15,7 @@ from tools.models import (
     OrganizationMember,
 )
 from tools.models import ORGANIZATION_CODE_LENGTH
+from tools.enums import SCAN_LEVEL
 
 User = get_user_model()
 
@@ -170,10 +171,36 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
         fields = ("account_type", "name", "email", "password")
 
 
-class OrganizationMemberForm(forms.ModelForm):
+class OrganizationMemberEditForm(forms.ModelForm):
+    trusted_clearance_level = forms.ChoiceField(
+        required=False,
+        label=_("Trusted clearance level"),
+        choices=[(-1, "")] + SCAN_LEVEL.choices,
+        help_text=_("Select a clearance level you trust this member with."),
+        widget=forms.RadioSelect(attrs={"radio_paws": True}),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["acknowledged_clearance_level"].required = False
+        self.fields["acknowledged_clearance_level"].widget.attrs[
+            "fixed_paws"
+        ] = self.instance.acknowledged_clearance_level
+        self.fields["acknowledged_clearance_level"].widget.attrs["class"] = "level-indicator-form"
+        if self.instance.user.is_superuser:
+            self.fields["trusted_clearance_level"].disabled = True
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if instance.trusted_clearance_level < instance.acknowledged_clearance_level:
+            instance.acknowledged_clearance_level = instance.trusted_clearance_level
+        if commit:
+            instance.save()
+        return instance
+
     class Meta:
         model = OrganizationMember
-        fields = ["status"]
+        fields = ["status", "trusted_clearance_level", "acknowledged_clearance_level"]
 
 
 class OrganizationForm(forms.ModelForm):
