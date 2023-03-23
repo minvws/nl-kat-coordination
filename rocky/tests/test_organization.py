@@ -6,7 +6,9 @@ from pytest_django.asserts import assertContains, assertNotContains
 from rocky.views.organization_detail import OrganizationDetailView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
+from rocky.views.organization_member_list import OrganizationMemberListView
 from tests.conftest import setup_request
+from tools.models import GROUP_ADMIN
 
 
 def test_organization_list_non_superuser(rf, client_member):
@@ -41,117 +43,63 @@ def test_organization_list(rf, superuser_member):
     assertContains(response, superuser_member.organization.name)
 
 
-def test_organization_member_list(rf, superuser_member):
-    request = setup_request(rf.get("organization_detail"), superuser_member.user)
-    response = OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
+def test_organization_member_list(rf, admin_member):
+    request = setup_request(rf.get("organization_member_list"), admin_member.user)
+    response = OrganizationMemberListView.as_view()(request, organization_code=admin_member.organization.code)
 
-    assertContains(response, "Organization details")
-    assertContains(response, superuser_member.organization.name)
+    assertContains(response, "Organization")
+    assertContains(response, admin_member.organization.name)
     assertContains(response, "Members")
     assertContains(response, "Add new member")
-    assertContains(response, superuser_member.user.email)
-    assertContains(response, "Grant")
+    assertContains(response, "Name")
+    assertContains(response, admin_member.user.full_name)
+    assertContains(response, "E-mail")
+    assertContains(response, admin_member.user.email)
+    assertContains(response, "Role")
+    assertContains(response, "Admin")
+    assertContains(response, "Status")
+    assertContains(response, admin_member.status)
+    assertContains(response, "Added")
+    assertContains(response, admin_member.user.date_joined.strftime("%m/%d/%Y"))
+    assertContains(response, "Assigned clearance level")
+    assertContains(response, admin_member.trusted_clearance_level)
+    assertContains(response, "Agreed clearance level")
+    assertContains(response, admin_member.acknowledged_clearance_level)
+    assertContains(response, "Edit")
+    assertContains(response, admin_member.id)
+    assertContains(response, "Blocked")
 
 
 def test_organization_filtered_member_list(rf, superuser_member, new_member, blocked_member):
-    request = setup_request(rf.get("organization_detail", {"client_status": "blocked"}), superuser_member.user)
-    response = OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
+    request = setup_request(rf.get("organization_member_list", {"client_status": "blocked"}), superuser_member.user)
+    response = OrganizationMemberListView.as_view()(request, organization_code=superuser_member.organization.code)
 
     assertNotContains(response, new_member.user.full_name)
     assertContains(response, blocked_member.user.full_name)
-    assertContains(response, "Suspended")
+    assertContains(response, 'class="blocked"')
     assertNotContains(response, "New")
     assertNotContains(response, "Active")
 
-    request2 = setup_request(rf.get("organization_detail", {"client_status": "new"}), superuser_member.user)
-    response2 = OrganizationDetailView.as_view()(request2, organization_code=superuser_member.organization.code)
+    request2 = setup_request(rf.get("organization_member_list", {"client_status": "new"}), superuser_member.user)
+    response2 = OrganizationMemberListView.as_view()(request2, organization_code=superuser_member.organization.code)
 
     assertContains(response2, new_member.user.full_name)
     assertNotContains(response2, blocked_member.user.full_name)
     assertContains(response2, "New")
-    assertNotContains(response2, "Suspended")
+    assertNotContains(response2, 'class="blocked"')
     assertNotContains(response2, "Active")
 
     request3 = setup_request(
-        rf.get("organization_detail", {"client_status": ["new", "active", "blocked"]}), superuser_member.user
+        rf.get("organization_member_list", {"client_status": ["new", "active", "blocked"]}), superuser_member.user
     )
-    response3 = OrganizationDetailView.as_view()(request3, organization_code=superuser_member.organization.code)
+    response3 = OrganizationMemberListView.as_view()(request3, organization_code=superuser_member.organization.code)
 
     assertContains(response3, superuser_member.user.full_name)
     assertContains(response3, new_member.user.full_name)
     assertContains(response3, blocked_member.user.full_name)
     assertContains(response3, "New")
-    assertContains(response3, "Suspended")
+    assertContains(response3, 'class="blocked"')
     assertContains(response3, "Active")
-
-
-def test_organization_member_give_and_revoke_clearance(rf, superuser_member):
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "action": "give_clearance",
-                "member_id": superuser_member.id,
-            },
-        ),
-        superuser_member.user,
-    )
-    response = OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
-
-    assert response.status_code == 302
-    assert response.url == f"/en/{superuser_member.organization.code}/"
-
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "action": "withdraw_clearance",
-                "member_id": superuser_member.id,
-            },
-        ),
-        superuser_member.user,
-    )
-    response = OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
-
-    assert response.status_code == 302
-    assert response.url == f"/en/{superuser_member.organization.code}/"
-
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "action": "wrong_test",
-                "member_id": superuser_member.id,
-            },
-        ),
-        superuser_member.user,
-    )
-
-    with pytest.raises(Exception) as exc_info:
-        OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
-
-    assert exc_info.exconly() == "Exception: Unhandled allowed action: wrong_test"
-
-
-def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(rf, superuser_member, organization):
-    # No action in the POST means we simply reload the page
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "wrong": "withdraw_clearance",
-                "member_id": superuser_member.id,
-            },
-        ),
-        superuser_member.user,
-    )
-    response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
-    assertContains(response, "Organization details")
-    assertContains(response, organization.name)
-    assertContains(response, "Members")
-    assertContains(response, "Add new member")
-    assertContains(response, superuser_member.user.email)
-    assertContains(response, "Grant")
 
 
 def test_organization_does_not_exist(client, client_member):
@@ -205,27 +153,27 @@ def test_admin_rights_edits_organization(rf, admin_member):
     assert response.status_code == 200
 
 
-def test_admin_edits_organization(rf, admin_member, mocker):
+def test_admin_edits_organization(rf, superuser_member, mocker):
     """Admin editing organization values"""
     request = setup_request(
         rf.post(
             "organization_edit",
             {"name": "This organization name has been edited", "tags": "tag1,tag2"},
         ),
-        admin_member.user,
+        superuser_member.user,
     )
     mocker.patch("katalogus.client.KATalogusClientV1")
     mocker.patch("tools.models.OctopoesAPIConnector")
     response = OrganizationEditView.as_view()(
-        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
+        request, organization_code=superuser_member.organization.code, pk=superuser_member.organization.id
     )
 
     # success post redirects to organization detail page
     assert response.status_code == 302
-    assert response.url == f"/en/{admin_member.organization.code}/"
-    resulted_request = setup_request(rf.get(response.url), admin_member.user)
+    assert response.url == f"/en/{superuser_member.organization.code}/details"
+    resulted_request = setup_request(rf.get(response.url), superuser_member.user)
     resulted_response = OrganizationDetailView.as_view()(
-        resulted_request, organization_code=admin_member.organization.code
+        resulted_request, organization_code=superuser_member.organization.code
     )
     assert resulted_response.status_code == 200
 
