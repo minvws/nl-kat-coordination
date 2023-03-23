@@ -7,11 +7,11 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.views.mixins import BoefjeMixin
-from katalogus.views.mixins import SinglePluginMixin
+from katalogus.views.mixins import SinglePluginView
 
 
 @class_view_decorator(otp_required)
-class ChangeClearanceLevel(BoefjeMixin, SinglePluginMixin, TemplateView):
+class ChangeClearanceLevel(BoefjeMixin, SinglePluginView, TemplateView):
     template_name = "change_clearance_level.html"
 
     def setup(self, request, *args, **kwargs):

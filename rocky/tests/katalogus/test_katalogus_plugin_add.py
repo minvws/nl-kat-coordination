@@ -1,3 +1,5 @@
+import pytest
+from django.http import Http404
 from pytest_django.asserts import assertContains, assertNotContains
 
 from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
@@ -11,12 +13,11 @@ def test_plugin_settings_add_view(
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
-    mock_organization_view_octopoes,
 ):
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), my_user)
     response = PluginSettingsAddView.as_view()(
         request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"
     )
@@ -35,12 +36,11 @@ def test_plugin_single_settings_add_view(
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
-    mock_organization_view_octopoes,
 ):
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), my_user)
     response = PluginSingleSettingAddView.as_view()(
         request,
         organization_code=organization.code,
@@ -60,22 +60,20 @@ def test_plugin_single_settings_add_view_invalid_name(
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
-    mock_organization_view_octopoes,
 ):
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), my_user)
-    response = PluginSingleSettingAddView.as_view()(
-        request,
-        organization_code=organization.code,
-        plugin_type="boefje",
-        plugin_id="test-plugin",
-        setting_name="BAD_PROPERTY",
-    )
+    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), my_user)
 
-    assert response.headers["location"] == "/en/test/kat-alogus/plugins/boefje/test-boefje/"
-    assert "Invalid setting name" in list(request._messages)[0].message
+    with pytest.raises(Http404):
+        PluginSingleSettingAddView.as_view()(
+            request,
+            organization_code=organization.code,
+            plugin_type="boefje",
+            plugin_id="test-plugin",
+            setting_name="BAD_PROPERTY",
+        )
 
 
 def test_plugin_single_settings_add_view_no_schema(
@@ -84,21 +82,16 @@ def test_plugin_single_settings_add_view_no_schema(
     organization,
     mock_mixins_katalogus,
     plugin_details,
-    mock_organization_view_octopoes,
 ):
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = None
 
-    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), my_user)
-    response = PluginSingleSettingAddView.as_view()(
-        request,
-        organization_code=organization.code,
-        plugin_type="boefje",
-        plugin_id="test-plugin",
-        setting_name="BAD_PROPERTY",
-    )
-
-    assert response.headers["location"] == "/en/test/kat-alogus/plugins/boefje/test-boefje/"
-
-    messages = list(request._messages)
-    assert "No plugin schema found. You do not need to add settings to enable this plugin." in messages[0].message
+    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), my_user)
+    with pytest.raises(Http404):
+        PluginSingleSettingAddView.as_view()(
+            request,
+            organization_code=organization.code,
+            plugin_type="boefje",
+            plugin_id="test-plugin",
+            setting_name="BAD_PROPERTY",
+        )

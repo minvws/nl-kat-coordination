@@ -8,13 +8,13 @@ from django.utils.translation import gettext_lazy as _
 from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
-from katalogus.views import SinglePluginMixin
+from katalogus.views import SinglePluginView
 
 logger = logging.getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsListView(SinglePluginMixin, ListView):
+class PluginSettingsListView(SinglePluginView, ListView):
     """
     Shows all settings available for a specific plugin (plugin schema settings).
     """
@@ -38,4 +38,4 @@ class PluginSettingsListView(SinglePluginMixin, ListView):
         settings = self.katalogus_client.get_plugin_settings(plugin_id=self.plugin.id)
         props = self.plugin_schema["properties"]
 
-        return [{"name": prop, "value": settings.get(prop, ""), "required": self.is_required(prop)} for prop in props]
+        return [{"name": prop, "value": settings.get(prop), "required": self.is_required_field(prop)} for prop in props]
