@@ -106,21 +106,22 @@ class KATalogusClientV1:
 
         return [parse_plugin(boefje) for boefje in response.json() if boefje["type"] == "boefje"]
 
-    def enable_boefje(self, boefje_id: str) -> None:
-        self._patch_boefje_state(boefje_id, True)
+    def enable_boefje(self, plugin: Plugin) -> None:
+        self._patch_boefje_state(plugin.id, True, plugin.repository_id)
 
-    def disable_boefje(self, boefje_id: str) -> None:
-        self._patch_boefje_state(boefje_id, False)
+    def enable_boefje_by_id(self, boefje_id: str) -> None:
+        self.enable_boefje(self.get_plugin(boefje_id))
+
+    def disable_boefje(self, plugin: Plugin) -> None:
+        self._patch_boefje_state(plugin.id, False, plugin.repository_id)
 
     def get_enabled_boefjes(self) -> List[Plugin]:
         return [boefje for boefje in self.get_boefjes() if boefje.enabled]
 
-    def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
-        boefje = self.get_plugin(boefje_id)
-
+    def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
         body = {"enabled": enabled}
         response = self.session.patch(
-            f"{self.organization_uri}/repositories/{boefje.repository_id}/plugins/{boefje_id}",
+            f"{self.organization_uri}/repositories/{repository_id}/plugins/{boefje_id}",
             data=json.dumps(body),
         )
         response.raise_for_status()

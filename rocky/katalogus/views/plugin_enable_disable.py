@@ -26,7 +26,7 @@ class PluginEnableDisableView(SinglePluginView):
     def post(self, request, *args, **kwargs):
         plugin_state = kwargs["plugin_state"]
         if plugin_state == "True":
-            self.katalogus_client.disable_boefje(self.plugin.id)
+            self.katalogus_client.disable_boefje(self.plugin)
             messages.add_message(
                 self.request, messages.WARNING, _("Boefje '{boefje_id}' disabled.").format(boefje_id=self.plugin.id)
             )
@@ -72,7 +72,7 @@ class PluginEnableDisableView(SinglePluginView):
                 )
             )
 
-        self.katalogus_client.enable_boefje(self.plugin.id)
+        self.katalogus_client.enable_boefje(self.plugin)
         messages.add_message(
             self.request, messages.SUCCESS, _("Boefje '{boefje_id}' enabled.").format(boefje_id=self.plugin.id)
         )

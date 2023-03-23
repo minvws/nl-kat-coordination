@@ -62,7 +62,7 @@ class PluginSettingsAddView(PermissionRequiredMixin, SinglePluginView, FormView)
 
         if "add-enable" in self.request.POST:
             try:
-                self.katalogus_client.enable_boefje(self.plugin.id)
+                self.katalogus_client.enable_boefje(self.plugin)
             except RequestException:
                 messages.add_message(self.request, messages.ERROR, _("Enabling {} failed").format(self.plugin.id))
                 return redirect(self.get_success_url())

@@ -276,7 +276,7 @@ class OnboardingSetupScanOOIDetailView(
         if not self.request.session.get("selected_boefjes"):
             return
         for boefje_id in self.request.session["selected_boefjes"]:
-            get_katalogus(self.organization.code).enable_boefje(boefje_id)
+            get_katalogus(self.organization.code).enable_boefje_by_id(boefje_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
