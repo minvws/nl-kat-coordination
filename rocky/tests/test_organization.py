@@ -41,7 +41,7 @@ def test_organization_list_non_superuser(rf, client_member):
 
 def test_edit_organization(rf, superuser_member):
     request = setup_request(rf.get("organization_edit"), superuser_member.user)
-    response = OrganizationEditView.as_view()(request, pk=superuser_member.organization.id)
+    response = OrganizationEditView.as_view()(request, organization_code=superuser_member.organization.code)
 
     assert response.status_code == 200
     assertContains(response, "Name")
@@ -84,8 +84,8 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     request = setup_request(rf.get("organization_detail", {"client_status": "blocked"}), superuser_member.user)
     response = OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
 
-    assertNotContains(response, new_member.user.email)
-    assertContains(response, blocked_member.user.email)
+    assertNotContains(response, new_member.user.full_name)
+    assertContains(response, blocked_member.user.full_name)
     assertContains(response, "Suspended")
     assertNotContains(response, "New")
     assertNotContains(response, "Active")
@@ -93,8 +93,8 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     request2 = setup_request(rf.get("organization_detail", {"client_status": "new"}), superuser_member.user)
     response2 = OrganizationDetailView.as_view()(request2, organization_code=superuser_member.organization.code)
 
-    assertContains(response2, new_member.user.email)
-    assertNotContains(response2, blocked_member.user.email)
+    assertContains(response2, new_member.user.full_name)
+    assertNotContains(response2, blocked_member.user.full_name)
     assertContains(response2, "New")
     assertNotContains(response2, "Suspended")
     assertNotContains(response2, "Active")
@@ -104,9 +104,9 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     )
     response3 = OrganizationDetailView.as_view()(request3, organization_code=superuser_member.organization.code)
 
-    assertContains(response3, superuser_member.user.email)
-    assertContains(response3, new_member.user.email)
-    assertContains(response3, blocked_member.user.email)
+    assertContains(response3, superuser_member.user.full_name)
+    assertContains(response3, new_member.user.full_name)
+    assertContains(response3, blocked_member.user.full_name)
     assertContains(response3, "New")
     assertContains(response3, "Suspended")
     assertContains(response3, "Active")
@@ -214,9 +214,7 @@ def test_edit_organization_permissions(rf, redteam_member, client_member):
     request_client = setup_request(rf.get("organization_edit"), client_member.user)
 
     with pytest.raises(PermissionDenied):
-        OrganizationEditView.as_view()(
-            request_redteam, organization_code=redteam_member.organization.code, pk=redteam_member.organization.id
-        )
+        OrganizationEditView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
 
     with pytest.raises(PermissionDenied):
         OrganizationEditView.as_view()(
