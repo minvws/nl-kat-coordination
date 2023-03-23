@@ -268,7 +268,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        if len(random_oois) == 0:
+        if not random_oois:
             self.logger.debug(
                 "No random oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
                 self.organisation.name,
