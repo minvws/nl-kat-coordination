@@ -110,18 +110,18 @@ direction BT
     class PluginEnableDisableView
     class SingleSettingView
     class PluginSettingsListView
-    
+
     OrganizationView : organization
     OrganizationView : octopoes_api_connector
     OrganizationView : organization_member
     OrganizationView : indemnification_present
-     
+
     SinglePluginView : katalogus_client
     SinglePluginView : plugin
     SinglePluginView : plugin_schema
-    
+
     SingleSettingView : setting_name
-    
+
     class PluginSettingsUpdateView
     class PluginSettingsDeleteView
     class PluginDetailView
