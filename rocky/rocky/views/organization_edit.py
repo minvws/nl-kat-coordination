@@ -17,6 +17,9 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
     template_name = "organizations/organization_edit.html"
     permission_required = "tools.change_organization"
 
+    def get_object(self):
+        return self.model.objects.get(code=self.kwargs["organization_code"])
+
     def get_success_url(self):
         messages.add_message(
             self.request,
@@ -35,9 +38,7 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
                 "text": self.object.name,
             },
             {
-                "url": reverse(
-                    "organization_edit", kwargs={"organization_code": self.object.code, "pk": self.object.id}
-                ),
+                "url": reverse("organization_edit", kwargs={"organization_code": self.object.code}),
                 "text": _("Edit"),
             },
         ]
