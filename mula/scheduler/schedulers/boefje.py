@@ -52,6 +52,9 @@ class BoefjeScheduler(Scheduler):
         When this is done we will try and fill the rest of the queue with
         random items from octopoes and schedule them accordingly.
         """
+        self.logger.info(
+            "Populating queue [organisation.id=%s, scheduler_id=%s]",
+        )
         self.push_tasks_for_scan_profile_mutations()
 
         self.push_tasks_for_new_boefjes()
@@ -287,10 +290,6 @@ class BoefjeScheduler(Scheduler):
         )
 
         for boefje in new_boefjes:
-            object_types: Set[string] = set()
-            for object_type in boefje.consumes:
-                object_types.add(object_type)
-
             # TODO: add scan level, set van scan levels (enum) 0,1,2,4 
             oois_by_object_type: List[OOI] = []
             try:
@@ -411,8 +410,6 @@ class BoefjeScheduler(Scheduler):
                 )
 
                 self.push_item_to_queue(p_item)
-
-
 
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""
@@ -710,7 +707,7 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            raise RuntimeError("Task has been finished, but no results found in bytes")
+            return True
 
         # Is boefje still running according to bytes?
         if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:

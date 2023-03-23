@@ -82,16 +82,7 @@ class Katalogus(HTTPService):
                 self.organisations_new_boefjes_cache[org.id] = {}
 
             plugins = self.get_plugins_by_organisation(org.id, enabled=True)
-            enabled_plugins = {plugin.id: plugin for plugin in plugins if plugin.enabled is True}
-
-            # Check if there are new boefjes enabled for this organisation,
-            # and add that to the new boefjes cache.
-            new_plugins = set(enabled_plugins.keys()).difference(set(self.organisations_plugin_cache[org.id].keys()))
-            self.organisations_new_boefjes_cache[org.id] = {plugin_id: enabled_plugins[plugin_id] for plugin_id in new_plugins}
-            if len(new_plugins) > 0:
-                self.logger.debug("new boefjes enabled for organisation [organisation=%s, boefjes=%s]", org.id, new_plugins)
-
-            self.organisations_plugin_cache[org.id] = enabled_plugins
+            self.organisations_plugin_cache[org.id] = {plugin.id: plugin for plugin in plugins if plugin.enabled is True}
 
         self.logger.debug("flushed plugins cache [cache=%s]", self.organisations_plugin_cache.cache)
 
@@ -166,11 +157,17 @@ class Katalogus(HTTPService):
         response = self.get(url)
         return [Organisation(**organisation) for organisation in response.json().values()]
 
-    # TODO: katalogus needs to add filter to return only enabled plugins
     def get_plugins_by_organisation(self, organisation_id: str, enabled: bool) -> List[Plugin]:
         url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
         response = self.get(url)
         return [Plugin(**plugin) for plugin in response.json()]
+
+    def get_plugins_by_org_id(self, organisation_id: str) -> List[Plugin]:
+        try:
+            return dict_utils.deep_get(self.organisations_plugin_cache, [organisation_id])
+        except dict_utils.ExpiredError:
+            self._flush_organisations_plugin_cache()
+            return dict_utils.deep_get(self.organisations_plugin_cache, [organisation_id])
 
     def get_plugin_by_id_and_org_id(self, plugin_id: str, organisation_id: str) -> Plugin:
         try:
@@ -194,15 +191,24 @@ class Katalogus(HTTPService):
             return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
 
     def get_new_boefjes_by_org_id(self, organisation_id: str) -> List[Plugin]:
-        # First check if we need to flush the cache
-        try:
-            dict_utils.deep_get(self.organisations_plugin_cache, [organisation_id])
-        except dict_utils.ExpiredError:
-            self._flush_organisations_new_boefje_cache()
+        self.logger.info("-" * 80)
 
-        new_boefjes = self.organisations_new_boefjes_cache.get(organisation_id, {}).values()
+        # Get the enabled boefjes for the organisation from katalogus
+        plugins = self.get_plugins_by_organisation(organisation_id, enabled=True)
+        enabled_boefjes = {plugin.id: plugin for plugin in plugins if plugin.enabled is True and plugin.type == "boefje"}
+        self.logger.info("enabled boefjes: %s", enabled_boefjes.keys())
 
-        # Clear the new boefjes cache
-        self.organisations_new_boefjes_cache[organisation_id] = {}
+        new_boefjes = []
+        for boefje_id, boefje in enabled_boefjes.items():
+            if boefje_id in self.organisations_new_boefjes_cache.get(organisation_id, {}):
+                continue
+
+            new_boefjes.append(boefje)
+
+        self.organisations_new_boefjes_cache[organisation_id] = enabled_boefjes
+
+        self.logger.info("new boefjes: %s", new_boefjes)
+
+        self.logger.info("-" * 80)
 
         return new_boefjes
