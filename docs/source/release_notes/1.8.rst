@@ -1,0 +1,23 @@
+===========
+OpenKAT 1.8
+===========
+
+Upgrading
+=========
+
+Containers
+----------
+
+The Docker Compose configuration has been changed from four PostgreSQL
+containers with one database each to a single container with four databases.
+In addition, PostgreSQL is upgraded from version 12.8 to version 15.
+
+To migrate your data from separate containers to the new single container setup,
+you can run |pg_dump|_ using ``docker-compose exec`` on the four PostgreSQL
+containers. After creating a new PostgreSQL 15 container, use |psql|_ to restore
+your data into the new container.
+
+.. |pg_dump| replace:: ``pg_dump``
+.. _pg_dump: https://www.postgresql.org/docs/12/app-pgdump.html
+.. |psql| replace:: ``psql``
+.. _psql: https://www.postgresql.org/docs/15/app-psql.html
