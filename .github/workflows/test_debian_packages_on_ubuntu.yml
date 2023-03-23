@@ -77,7 +77,7 @@ jobs:
 
       - name: Start postgresql and wait until the service is healthy
         run: |
-          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres:12
+          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres:15
           for i in {1..10}; do pg_isready -h localhost && break || sleep 1 ; done
 
       - name: Prepare rabbitmq configurations

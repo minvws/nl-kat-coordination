@@ -15,7 +15,7 @@ services:
       - .env
 
   postgres:
-    image: postgres:12
+    image: postgres:15
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
