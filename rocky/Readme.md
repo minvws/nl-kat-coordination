@@ -111,16 +111,16 @@ direction BT
     class SingleSettingView
     class PluginSettingsListView
     
-    OrganizationView : self.organization
-    OrganizationView : self.octopoes_api_connector
-    OrganizationView : self.organization_member
-    OrganizationView : self.indemnification_present
+    OrganizationView : organization
+    OrganizationView : octopoes_api_connector
+    OrganizationView : organization_member
+    OrganizationView : indemnification_present
      
-    SinglePluginView : self.katalogus_client
-    SinglePluginView : self.plugin
-    SinglePluginView : self.plugin_schema
+    SinglePluginView : katalogus_client
+    SinglePluginView : plugin
+    SinglePluginView : plugin_schema
     
-    SingleSettingView : self.setting_name
+    SingleSettingView : setting_name
     
     class PluginSettingsUpdateView
     class PluginSettingsDeleteView
