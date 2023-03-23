@@ -23,7 +23,7 @@
                 <td>{{ organization.code }}</td>
                 <td>
                   {% spaceless %}
-                    <a href="{% url 'organization_edit' organization.code organization.id %}">
+                    <a href="{% url 'organization_edit' organization.code %}">
                       <button class="icon ti-edit">{% translate 'Edit' %}</button>
                     </a>
                   {% endspaceless %}
