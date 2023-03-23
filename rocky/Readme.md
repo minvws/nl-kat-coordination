@@ -93,6 +93,54 @@ sequenceDiagram
     c->>-r: task.status = done
 ```
 
+## KATalogus View Structure
+
+This diagram shows the current view structure and what properties are set in each class for the KATalogus.
+
+```mermaid
+%%{ init : {"theme" : "base"}}%%
+
+classDiagram
+direction BT
+    class FormView
+    class OrganizationView
+    class SinglePluginView
+    class KATalogusView
+    class PluginSettingsAddView
+    class PluginEnableDisableView
+    class SingleSettingView
+    class PluginSettingsListView
+    
+    OrganizationView : self.organization
+    OrganizationView : self.octopoes_api_connector
+    OrganizationView : self.organization_member
+    OrganizationView : self.indemnification_present
+     
+    SinglePluginView : self.katalogus_client
+    SinglePluginView : self.plugin
+    SinglePluginView : self.plugin_schema
+    
+    SingleSettingView : self.setting_name
+    
+    class PluginSettingsUpdateView
+    class PluginSettingsDeleteView
+    class PluginDetailView
+
+    KATalogusView  <|--  OrganizationView
+    KATalogusView  <|--  FormView
+    SinglePluginView  <|--  OrganizationView
+    SingleSettingView  <|--  SinglePluginView
+    PluginDetailView  <|--  PluginSettingsListView
+    PluginEnableDisableView  <|--  SinglePluginView
+    PluginSettingsAddView  <|--  FormView
+    PluginSettingsAddView  <|--  SinglePluginView
+    PluginSettingsDeleteView  <|--  SingleSettingView
+    PluginSettingsUpdateView  <|--  FormView
+    PluginSettingsUpdateView  <|--  SingleSettingView
+    PluginSettingsListView  <|--  SinglePluginView
+```
+
+
 ## Fonts license
 
 All fonts used within Rocky remain under their own license. For example: Fredoka, Open Sans & Tabler icons.
