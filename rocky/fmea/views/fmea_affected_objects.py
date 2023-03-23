@@ -41,7 +41,7 @@ class FailureModeAffectedObjectCreateView(AffectedObjectBreadcrumbsMixin, Create
         return context
 
     def add_success_notification(self):
-        success_message = _("Failure mode affected objects succesfully created.")
+        success_message = _("Failure mode affected objects successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def build_breadcrumbs(self) -> List[Dict[str, str]]:
@@ -146,7 +146,7 @@ class FMEATreeObjectView(View):
             self.add_error_notification()
 
     def add_success_notification(self):
-        success_message = _("Treeobjects succesfully added.")
+        success_message = _("Treeobjects successfully added.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def add_error_notification(self):

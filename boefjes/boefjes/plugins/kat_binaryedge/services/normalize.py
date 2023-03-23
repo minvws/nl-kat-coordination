@@ -17,14 +17,14 @@ from boefjes.job_models import NormalizerMeta
 
 
 def get_name_from_cpe(cpe: str) -> str:
-    splitted = []
+    split = []
     if cpe[0:5] == "cpe:/":
-        splitted = cpe[5:].split(":")
+        split = cpe[5:].split(":")
     elif cpe[0:8] == "cpe:2.3:":
-        splitted = cpe[8:].split(":")
+        split = cpe[8:].split(":")
 
-    if len(splitted) > 3:
-        return splitted[2]
+    if len(split) > 3:
+        return split[2]
     else:
         return cpe
 

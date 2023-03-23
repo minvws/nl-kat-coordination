@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     log_cfg: Path = BASE_DIR / "dev.logging.conf"
 
     bytes_db_uri: str
-    bytes_data_dir: Optional[str]
+    bytes_data_dir: Path = Path("/data")
 
     bytes_log_file: str = "bytes.log"
     access_token_expire_minutes: float = 15.0
@@ -39,15 +39,6 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()
-
-
-def get_bytes_data_directory() -> Path:
-    settings = get_settings()
-
-    if settings.bytes_data_dir:
-        return Path(settings.bytes_data_dir)
-
-    return Path(BASE_DIR) / "bytes-data"
 
 
 def has_pastebin_key() -> bool:

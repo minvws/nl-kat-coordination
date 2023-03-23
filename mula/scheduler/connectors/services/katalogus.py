@@ -42,7 +42,7 @@ class Katalogus(HTTPService):
                 if plugin.type != "boefje":
                     continue
 
-                # NOTE: backwards compatability, when it is a boefje the
+                # NOTE: backwards compatibility, when it is a boefje the
                 # consumes field is a string field.
                 if isinstance(plugin.consumes, str):
                     self.organisations_boefje_type_cache[org.id].setdefault(plugin.consumes, []).append(plugin)
