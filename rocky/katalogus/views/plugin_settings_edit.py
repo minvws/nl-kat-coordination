@@ -56,11 +56,12 @@ class PluginSettingsUpdateView(PermissionRequiredMixin, SingleSettingView, FormV
             },
             {
                 "url": reverse(
-                    "plugin_settings_add",
+                    "plugin_settings_edit",
                     kwargs={
                         "organization_code": self.organization.code,
                         "plugin_type": self.plugin.type,
                         "plugin_id": self.plugin.id,
+                        "setting_name": self.setting_name,
                     },
                 ),
                 "text": _("Edit"),
