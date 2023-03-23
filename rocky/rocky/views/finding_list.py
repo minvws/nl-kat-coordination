@@ -21,7 +21,7 @@ def generate_findings_metadata(
 ) -> List[Dict[str, Any]]:
     findings_meta = []
 
-    for finding in findings[: findings.count]:
+    for finding in findings[: OOIList.HARD_LIMIT]:
         finding_type = get_finding_type_from_finding(finding)
         knowledge_base = get_knowledge_base_data_for_ooi(finding_type)
         severity = RiskLevelSeverity(knowledge_base["risk_level_severity"])

@@ -157,7 +157,7 @@ def test_pdf_report_command(tmp_path, my_user, organization, ooi_information, mo
     mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
 
     tmp_file = tmp_path / "test.pdf"
-    call_command("generate_report", code=organization.code, file=tmp_file)
+    call_command("generate_report", code=organization.code, output=tmp_file)
 
     assert tmp_file.exists()
     assert tmp_file.read_text() == "fake_binary_pdf_content"

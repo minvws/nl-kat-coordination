@@ -26,17 +26,18 @@ class Command(BaseCommand):
     help = (
         "Generates a Finding report for all findings in an organization. "
         "Requires either the id (-i) or the unique code (-c) of an organization."
+        "When no output file is specified (-o), you have to pipe the output to a file yourself."
     )
 
     def add_arguments(self, parser):
         parser.add_argument("--id", "-i", type=int, help="The primary key of the organization.")
         parser.add_argument("--code", "-c", type=str, help="The unique organization code.")
         parser.add_argument(
-            "--file",
-            "-f",
+            "--output",
+            "-o",
             type=Path,
             help="Destination path of the report. "
-            "When no file is specified, you have to pipe the output to a file yourself.",
+            "When no output file is specified, you have to pipe the output to a file yourself.",
         )
         parser.add_argument(
             "--min-severity",
@@ -48,7 +49,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if not options["file"]:
+        if not options["output"]:
             if self.stdout.isatty():
                 self.stderr.write(
                     "Can't print PDF file directly to stdout. Set a destination path or pipe the output to a file"
@@ -69,8 +70,8 @@ class Command(BaseCommand):
             self.get_findings_metadata(organization, valid_time, options),
         )
 
-        if options["file"]:
-            file_path = options["file"]
+        if options["output"]:
+            file_path = options["output"]
             file_path.write_bytes(report.read())
             return
 

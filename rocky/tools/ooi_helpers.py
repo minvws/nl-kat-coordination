@@ -40,7 +40,7 @@ class RiskLevelSeverity(Enum):
     LOW = "low"
     NONE = "recommendation"
 
-    def __gt__(self, other: "RiskLevelSeverity"):
+    def __gt__(self, other: "RiskLevelSeverity") -> bool:
         severity_order = ["recommendation", "low", "medium", "high", "critical"]
 
         return severity_order.index(self.value) > severity_order.index(other.value)

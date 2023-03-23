@@ -60,7 +60,7 @@ class KeikoClient:
     def get_report(self, report_id: str) -> BinaryIO:
         # try max 15 times to get the report, 1 second interval
         try:
-            for i in range(15):
+            for _ in range(15):
                 time.sleep(1)
                 res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf", stream=True)
 
