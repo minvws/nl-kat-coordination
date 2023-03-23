@@ -48,7 +48,7 @@ def test_organization_member_list(rf, superuser_member):
     assertContains(response, "Organization details")
     assertContains(response, superuser_member.organization.name)
     assertContains(response, "Members")
-    assertContains(response, "Add new member")
+    assertContains(response, "Add member")
     assertContains(response, superuser_member.user.email)
     assertContains(response, "Grant")
 
@@ -149,7 +149,7 @@ def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(rf
     assertContains(response, "Organization details")
     assertContains(response, organization.name)
     assertContains(response, "Members")
-    assertContains(response, "Add new member")
+    assertContains(response, "Add member")
     assertContains(response, superuser_member.user.email)
     assertContains(response, "Grant")
 
