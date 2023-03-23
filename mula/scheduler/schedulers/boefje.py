@@ -440,7 +440,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        if len(random_oois) == 0:
+        if not random_oois:
             self.logger.debug(
                 "No random oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
                 self.organisation.name,
@@ -458,7 +458,7 @@ class BoefjeScheduler(Scheduler):
             )
 
             boefjes = self.get_boefjes_for_ooi(ooi)
-            if boefjes is None or len(boefjes) == 0:
+            if boefjes is None or not boefjes:
                 self.logger.debug(
                     "No boefjes available for ooi %s, skipping [organisation.id=%s, scheduler_id=%s]",
                     ooi,
