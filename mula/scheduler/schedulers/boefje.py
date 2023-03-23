@@ -286,7 +286,7 @@ class BoefjeScheduler(Scheduler):
             )
 
             boefjes = self.get_boefjes_for_ooi(ooi)
-            if boefjes is None or len(boefjes) == 0:
+            if boefjes is None or not boefjes:
                 self.logger.debug(
                     "No boefjes available for ooi %s, skipping [organisation.id=%s, scheduler_id=%s]",
                     ooi,
