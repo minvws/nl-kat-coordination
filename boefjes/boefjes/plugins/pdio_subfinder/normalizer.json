@@ -1,0 +1,9 @@
+{
+    "id": "pdio-subfinder-normalizer",
+    "consumes": [
+        "pdio-subfinder"
+    ],
+    "produces": [
+        "Hostname"
+    ]
+}
