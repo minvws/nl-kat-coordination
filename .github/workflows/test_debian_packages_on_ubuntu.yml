@@ -256,4 +256,3 @@ jobs:
         with:
           name: rf-results-ci
           path: /home/runner/work/nl-kat-coordination/nl-kat-coordination/rocky/tests/robot/results*
-

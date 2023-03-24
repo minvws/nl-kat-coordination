@@ -18,7 +18,7 @@ from octopoes.models.ooi.network import Network
 from octopoes.models.types import type_by_name
 from two_factor.views.utils import class_view_decorator
 
-from account.forms import OrganizationForm, OrganizationUpdateForm
+from account.forms import OrganizationForm, OnboardingOrganizationUpdateForm
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from onboarding.forms import (
@@ -489,7 +489,7 @@ class OnboardingOrganizationUpdateView(
 
     model = Organization
     template_name = "account/step_2a_organization_update.html"
-    form_class = OrganizationUpdateForm
+    form_class = OnboardingOrganizationUpdateForm
     current_step = 2
 
     def get_object(self, queryset=None):
