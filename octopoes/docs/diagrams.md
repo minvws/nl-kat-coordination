@@ -42,3 +42,23 @@ graph LR
     C -- Entities --> D
 
 ```
+
+OWA vs CWA
+```mermaid
+
+graph LR
+
+    subgraph all ["All knowledge"]
+        C["..."]
+        D["..."]
+        C --- D
+        subgraph kat ["KAT's knowledge"]
+            direction LR
+            A("IPv4 \n1.1.1.1")
+            B("Port 80 \nOpen")
+
+            A --- B
+        end
+    end
+
+```
