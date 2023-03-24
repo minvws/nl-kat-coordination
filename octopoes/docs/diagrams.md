@@ -63,11 +63,8 @@ graph LR
 
 System that tracks orders
 ```mermaid
----
-title: DB Table
----
 graph LR
-    subgraph
+    subgraph ["DB Table"]
       direction LR
       A("Order 1")
       B("Order 2")
