@@ -45,7 +45,6 @@ graph LR
 
 OWA vs CWA
 ```mermaid
-
 graph LR
 
     subgraph all ["All knowledge"]
@@ -60,5 +59,17 @@ graph LR
             A --- B
         end
     end
+```
 
+System that tracks orders
+```mermaid
+graph LR
+
+    subgraph kat ["DB Table"]
+        direction TB
+        A("Order 1")
+        B("Order 2")
+        C("...")
+        D("Order 30")
+    end
 ```
