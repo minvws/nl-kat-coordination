@@ -63,13 +63,12 @@ graph LR
 
 System that tracks orders
 ```mermaid
-graph LR
-
-    subgraph kat ["DB Table"]
-        direction TB
-        A("Order 1")
-        B("Order 2")
-        C("...")
-        D("Order 30")
-    end
+---
+title: DB Table
+---
+flowchart TB
+      A("Order 1")
+      B("Order 2")
+      C("...")
+      D("Order 30")
 ```
