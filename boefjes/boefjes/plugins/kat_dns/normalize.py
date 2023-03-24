@@ -53,7 +53,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     def register_hostname(name: str) -> Hostname:
         hostname = Hostname(
             network=internet.reference,
-            name=name,
+            name=name.rstrip("."),
         )
         hostname_store[hostname.name] = hostname
         return hostname
@@ -177,7 +177,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 rr: Rdata
                 if isinstance(rr, TXT):
                     yield DMARCTXTRecord(
-                        hostname=input_hostname.fqdn,
+                        hostname=input_hostname.fqdn.rstrip("."),
                         value=str(rr).strip('"'),
                         ttl=rrset.ttl,
                     )

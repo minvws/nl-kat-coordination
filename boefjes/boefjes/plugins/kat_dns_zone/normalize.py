@@ -26,20 +26,20 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["hostname"]["name"],
     )
 
-    input_zone = DNSZone(hostname=input_zone_hostname.reference)
+    input_zone = DNSZone(hostname=input_zone_hostname.reference.rstrip("."))
 
     for rrset in message.answer:
         for rr in rrset:
             rr: Rdata
 
             if isinstance(rr, SOA):
-                parent_zone_hostname = Hostname(network=internet.reference, name=str(rrset.name))
+                parent_zone_hostname = Hostname(network=internet.reference, name=str(rrset.name).rstrip("."))
                 parent_zone = DNSZone(hostname=parent_zone_hostname.reference)
                 parent_zone_hostname.dns_zone = parent_zone.reference
 
                 input_zone.parent = parent_zone.reference
 
-                soa_hostname = Hostname(network=internet.reference, name=str(rr.mname))
+                soa_hostname = Hostname(network=internet.reference, name=str(rr.mname).rstrip("."))
 
                 yield DNSSOARecord(
                     hostname=parent_zone_hostname.reference,
