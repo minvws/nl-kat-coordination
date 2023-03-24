@@ -3,6 +3,8 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
+
+from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.organization_detail import OrganizationDetailView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
@@ -191,6 +193,20 @@ def test_edit_organization_permissions(rf, redteam_member, client_member):
 
     with pytest.raises(PermissionDenied):
         OrganizationEditView.as_view()(
+            request_client, organization_code=client_member.organization.code, pk=client_member.organization.id
+        )
+
+
+def test_edit_organization_indemnification(rf, redteam_member, client_member):
+    """Redteamers and clients cannot add idemnification."""
+    request_redteam = setup_request(rf.get("indemnification_add"), redteam_member.user)
+    request_client = setup_request(rf.get("indemnification_add"), client_member.user)
+
+    with pytest.raises(PermissionDenied):
+        IndemnificationAddView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
+
+    with pytest.raises(PermissionDenied):
+        IndemnificationAddView.as_view()(
             request_client, organization_code=client_member.organization.code, pk=client_member.organization.id
         )
 
