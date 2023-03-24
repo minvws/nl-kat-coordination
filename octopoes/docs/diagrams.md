@@ -66,14 +66,17 @@ System that tracks orders
 ---
 title: DB Table
 ---
-graph TB
-    A("Order 1")
-    B("Order 2")
-    C("...")
-    D("Order 30")
-    
-    Orders --- A
-    Orders --- B
-    Orders --- C
-    Orders --- D
+graph LR
+    subgraph
+      direction LR
+      A("Order 1")
+      B("Order 2")
+      C("...")
+      D("Order 30")
+      
+      Orders --- A
+      Orders --- B
+      Orders --- C
+      Orders --- D
+    end
 ```
