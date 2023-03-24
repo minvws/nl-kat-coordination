@@ -9,7 +9,10 @@ from account.mixins import OrganizationView
 
 
 def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
-    return sorted(findings, key=lambda x: x["risk_level_score"], reverse=True)
+    sorted_findings = sorted(findings, key=lambda x: x["risk_level_score"], reverse=True)
+    for index, finding in enumerate(sorted_findings, start=1):
+        finding["finding_number"] = index
+    return sorted_findings
 
 
 class FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
@@ -21,7 +24,6 @@ class FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
         findings = super().get_queryset()
         findings_meta = []
         severity_filter = self.request.GET.get("severity")
-
         for finding in findings[: findings.count]:
             finding_type = get_finding_type_from_finding(finding)
             knowledge_base = get_knowledge_base_data_for_ooi(finding_type)
@@ -29,6 +31,7 @@ class FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
             if not severity_filter or severity_filter.lower() == severity.lower():
                 findings_meta.append(
                     {
+                        "finding_number": 0,
                         "finding": finding,
                         "finding_type": finding_type,
                         "severity": severity.capitalize(),
