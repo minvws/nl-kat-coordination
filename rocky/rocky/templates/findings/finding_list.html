@@ -25,6 +25,7 @@
             <caption>{% translate 'Showing ' %}{{ ooi_list|length }} {% translate 'of' %} {{ total_oois }} {% translate 'objects' %}</caption>
             <thead>
               <tr>
+                <th>Nr</th>
                 <th>{% translate 'Severity' %}</th>
                 <th>{% translate 'Finding' %}</th>
                 <th>{% translate 'Tree' %}</th>
@@ -35,6 +36,7 @@
             <tbody>
               {% for ooi in ooi_list %}
                 <tr>
+                  <td>{{ ooi.finding_number }}</td>
                   <td>
                     <span class="{{ ooi.severity|lower }}">{{ ooi.severity }}</span>
                   </td>
