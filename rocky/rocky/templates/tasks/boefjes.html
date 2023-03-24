@@ -10,6 +10,7 @@
       <div>
         {% include 'tasks/partials/tab_navigation.html' with view="boefjes_tasks" %}
         <h1>{% translate 'Boefjes' %}</h1>
+        {% include 'tasks/partials/task_filter.html' %}
         {% if not object_list %}
           <p class="emphasized">
             {% translate 'There are no tasks for boefjes' %}
@@ -66,4 +67,9 @@
       </div>
     </section>
   </main>
+{% endblock %}
+
+{% block html_at_end_body %}
+  {{ block.super }}
+  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

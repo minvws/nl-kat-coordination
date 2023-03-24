@@ -13,6 +13,8 @@ from two_factor.views.utils import class_view_decorator
 from account.mixins import OrganizationView
 from rocky.scheduler import client
 
+from datetime import datetime
+
 TASK_LIMIT = 50
 
 
@@ -59,8 +61,26 @@ class TaskListView(OrganizationView, ListView):
         scheduler_id = self.request.GET.get("scheduler_id", self.scheduler_id)
         type_ = self.request.GET.get("type", self.plugin_type)
         status = self.request.GET.get("status", None)
-        min_created_at = self.request.GET.get("min_created_at", None)
-        max_created_at = self.request.GET.get("max_created_at", None)
+        filters = []
+
+        if self.request.GET.get("scan_history_search"):
+            filters.append(
+                {
+                    "field": "data__input_ooi",
+                    "operator": "eq",
+                    "value": self.request.GET.get("scan_history_search"),
+                }
+            )
+
+        min_created_at = None
+        if self.request.GET.get("scan_history_from"):
+            min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+
+        max_created_at = None
+        if self.request.GET.get("scan_history_to"):
+            max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
+
+        status = self.request.GET.get("scan_history_status")
 
         try:
             return client.get_lazy_task_list(
@@ -69,7 +89,9 @@ class TaskListView(OrganizationView, ListView):
                 status=status,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
+                filters=filters,
             )
+
         except HTTPError:
             error_message = _("Fetching tasks failed: no connection with scheduler")
             messages.add_message(self.request, messages.ERROR, error_message)
