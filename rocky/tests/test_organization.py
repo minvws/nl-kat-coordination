@@ -156,6 +156,24 @@ def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(rf
     assertContains(response, "Grant")
 
 
+@pytest.mark.parametrize("user", ["redteam_member", "client_member"])
+@pytest.mark.parametrize("action", ["give_clearance", "withdraw_clearance", "block", "unblock"])
+def test_organization_member_give_and_revoke_clearance_permissions(rf, superuser_member, user, action, request):
+    """Redteamers and clients cannot give/revoke clearances or block/unblock users."""
+    request = setup_request(
+        rf.post(
+            "organization_detail",
+            {
+                "action": action,
+                "member_id": superuser_member.id,
+            },
+        ),
+        request.getfixturevalue(user).user,
+    )
+    with pytest.raises(PermissionDenied):
+        OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
+
+
 def test_organization_does_not_exist(client, client_member):
     client.force_login(client_member.user)
     response = client.get(reverse("organization_detail", kwargs={"organization_code": "nonexistent"}))
