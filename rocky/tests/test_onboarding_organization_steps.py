@@ -80,13 +80,13 @@ def test_onboarding_set_clearance_level(
     rf, my_red_teamer, organization, mock_models_katalogus, mock_organization_view_octopoes, network
 ):
     mock_organization_view_octopoes().get.return_value = network
-
-    request = setup_request(rf.get("step_set_clearance_level", {"ooi_id": "Network|internet"}), my_red_teamer)
+    ooi_id = "Network|internet"
+    request = setup_request(rf.get("step_set_clearance_level", {"ooi_id": ooi_id}), my_red_teamer)
     response = OnboardingSetClearanceLevelView.as_view()(request, organization_code=organization.code)
 
     assert response.status_code == 200
-    assertContains(response, "KAT introduction")
-    assertContains(response, "Set clearance level for")
+    assertContains(response, "OpenKAT introduction")
+    assertContains(response, "Set clearance level for " + ooi_id)
     assertContains(response, "How to know required clearance level")
     assertContains(response, "Set clearance level")
     assertContains(response, "Skip onboarding")
