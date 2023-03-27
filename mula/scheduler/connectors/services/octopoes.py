@@ -30,12 +30,13 @@ class Octopoes(HTTPService):
         response = self.get(url, params=params)
         count = response.json().get("count")
 
-        # Set the limit to 1000
-        params["limit"] = 1000
+        # Set the limit
+        limit = 1000
+        params["limit"] = limit
 
         # Loop over the paginated results
         oois = []
-        for offset in range(0, count, 1000):
+        for offset in range(0, count, limit):
             params["offset"] = offset
             response = self.get(url, params=params)
             oois.extend([OOI(**ooi) for ooi in response.json().get("items", [])])

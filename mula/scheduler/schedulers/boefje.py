@@ -290,11 +290,10 @@ class BoefjeScheduler(Scheduler):
         )
 
         for boefje in new_boefjes:
-            # TODO: add scan level, set van scan levels (enum) 0,1,2,4 
             oois_by_object_type: List[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-                    self.organisation.id, boefje.consumes,
+                    self.organisation.id, boefje.consumes, [i for i in range(1, boefje.scan_level+1)],
                 )
             except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
                 self.logger.warning(
