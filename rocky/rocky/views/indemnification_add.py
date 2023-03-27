@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
@@ -10,9 +11,10 @@ from tools.models import Indemnification
 
 
 @class_view_decorator(otp_required)
-class IndemnificationAddView(OrganizationView, FormView):
+class IndemnificationAddView(PermissionRequiredMixin, OrganizationView, FormView):
     template_name = "indemnification_add.html"
     form_class = IndemnificationAddForm
+    permission_required = "tools.change_organization"
 
     def post(self, request, *args, **kwargs):
         Indemnification.objects.get_or_create(

@@ -1,6 +1,7 @@
 from enum import Enum
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.views.generic import ListView
@@ -44,6 +45,8 @@ class OrganizationMemberListView(
         self.filters_active = self.get_filters_active()
 
     def post(self, request, *args, **kwargs):
+        if not self.request.user.has_perms("tools.change_organizationmember"):
+            raise PermissionDenied()
         if "action" not in self.request.POST:
             return self.get(request, *args, **kwargs)
         self.handle_page_action(request.POST.get("action"))
