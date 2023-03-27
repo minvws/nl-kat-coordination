@@ -293,7 +293,7 @@ class BoefjeScheduler(Scheduler):
             oois_by_object_type: List[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-                    self.organisation.id, boefje.consumes, [i for i in range(1, boefje.scan_level+1)],
+                    self.organisation.id, boefje.consumes, [i for i in range(boefje.scan_level, 5)],
                 )
             except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
                 self.logger.warning(
