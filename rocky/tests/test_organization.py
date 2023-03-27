@@ -3,6 +3,8 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
+
+from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.organization_detail import OrganizationDetailView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
@@ -154,6 +156,24 @@ def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(rf
     assertContains(response, "Grant")
 
 
+@pytest.mark.parametrize("user", ["redteam_member", "client_member"])
+@pytest.mark.parametrize("action", ["give_clearance", "withdraw_clearance", "block", "unblock"])
+def test_organization_member_give_and_revoke_clearance_permissions(rf, superuser_member, user, action, request):
+    """Redteamers and clients cannot give/revoke clearances or block/unblock users."""
+    request = setup_request(
+        rf.post(
+            "organization_detail",
+            {
+                "action": action,
+                "member_id": superuser_member.id,
+            },
+        ),
+        request.getfixturevalue(user).user,
+    )
+    with pytest.raises(PermissionDenied):
+        OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
+
+
 def test_organization_does_not_exist(client, client_member):
     client.force_login(client_member.user)
     response = client.get(reverse("organization_detail", kwargs={"organization_code": "nonexistent"}))
@@ -195,37 +215,51 @@ def test_edit_organization_permissions(rf, redteam_member, client_member):
         )
 
 
-def test_admin_rights_edits_organization(rf, superuser_member):
+def test_edit_organization_indemnification(rf, redteam_member, client_member):
+    """Redteamers and clients cannot add idemnification."""
+    request_redteam = setup_request(rf.get("indemnification_add"), redteam_member.user)
+    request_client = setup_request(rf.get("indemnification_add"), client_member.user)
+
+    with pytest.raises(PermissionDenied):
+        IndemnificationAddView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
+
+    with pytest.raises(PermissionDenied):
+        IndemnificationAddView.as_view()(
+            request_client, organization_code=client_member.organization.code, pk=client_member.organization.id
+        )
+
+
+def test_admin_rights_edits_organization(rf, admin_member):
     """Can admin edit organization?"""
-    request = setup_request(rf.get("organization_edit"), superuser_member.user)
+    request = setup_request(rf.get("organization_edit"), admin_member.user)
     response = OrganizationEditView.as_view()(
-        request, organization_code=superuser_member.organization.code, pk=superuser_member.organization.id
+        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
     )
 
     assert response.status_code == 200
 
 
-def test_admin_edits_organization(rf, superuser_member, mocker):
+def test_admin_edits_organization(rf, admin_member, mocker):
     """Admin editing organization values"""
     request = setup_request(
         rf.post(
             "organization_edit",
             {"name": "This organization name has been edited", "tags": "tag1,tag2"},
         ),
-        superuser_member.user,
+        admin_member.user,
     )
     mocker.patch("katalogus.client.KATalogusClientV1")
     mocker.patch("tools.models.OctopoesAPIConnector")
     response = OrganizationEditView.as_view()(
-        request, organization_code=superuser_member.organization.code, pk=superuser_member.organization.id
+        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
     )
 
     # success post redirects to organization detail page
     assert response.status_code == 302
-    assert response.url == f"/en/{superuser_member.organization.code}/"
-    resulted_request = setup_request(rf.get(response.url), superuser_member.user)
+    assert response.url == f"/en/{admin_member.organization.code}/"
+    resulted_request = setup_request(rf.get(response.url), admin_member.user)
     resulted_response = OrganizationDetailView.as_view()(
-        resulted_request, organization_code=superuser_member.organization.code
+        resulted_request, organization_code=admin_member.organization.code
     )
     assert resulted_response.status_code == 200
 
