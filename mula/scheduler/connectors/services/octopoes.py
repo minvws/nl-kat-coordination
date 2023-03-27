@@ -15,7 +15,9 @@ class Octopoes(HTTPService):
         super().__init__(host, source)
 
     @exception_handler
-    def get_objects_by_object_types(self, organisation_id: str, object_types: List[str], scan_level: List[int] = []) -> List[OOI]:
+    def get_objects_by_object_types(
+        self, organisation_id: str, object_types: List[str], scan_level: List[int] = []
+    ) -> List[OOI]:
         """Get all oois from octopoes"""
         url = f"{self.host}/{organisation_id}/objects"
 

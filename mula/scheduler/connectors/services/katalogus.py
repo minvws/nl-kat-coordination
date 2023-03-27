@@ -82,7 +82,9 @@ class Katalogus(HTTPService):
                 self.organisations_new_boefjes_cache[org.id] = {}
 
             plugins = self.get_plugins_by_organisation(org.id, enabled=True)
-            self.organisations_plugin_cache[org.id] = {plugin.id: plugin for plugin in plugins if plugin.enabled is True}
+            self.organisations_plugin_cache[org.id] = {
+                plugin.id: plugin for plugin in plugins if plugin.enabled is True
+            }
 
         self.logger.debug("flushed plugins cache [cache=%s]", self.organisations_plugin_cache.cache)
 
@@ -193,7 +195,9 @@ class Katalogus(HTTPService):
     def get_new_boefjes_by_org_id(self, organisation_id: str) -> List[Plugin]:
         # Get the enabled boefjes for the organisation from katalogus
         plugins = self.get_plugins_by_organisation(organisation_id, enabled=True)
-        enabled_boefjes = {plugin.id: plugin for plugin in plugins if plugin.enabled is True and plugin.type == "boefje"}
+        enabled_boefjes = {
+            plugin.id: plugin for plugin in plugins if plugin.enabled is True and plugin.type == "boefje"
+        }
 
         # Check if there are new boefjes
         new_boefjes = []
@@ -205,6 +209,8 @@ class Katalogus(HTTPService):
 
         self.organisations_new_boefjes_cache[organisation_id] = enabled_boefjes
 
-        self.logger.debug("%d new boefjes found [organisation_id=%s, new_boefjes=%s]", len(new_boefjes), organisation_id, new_boefjes)
+        self.logger.debug(
+            "%d new boefjes found [organisation_id=%s, new_boefjes=%s]", len(new_boefjes), organisation_id, new_boefjes
+        )
 
         return new_boefjes

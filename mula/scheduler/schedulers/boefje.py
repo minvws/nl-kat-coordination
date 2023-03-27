@@ -8,8 +8,7 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import (OOI, Boefje, BoefjeTask, Organisation, Plugin,
-                              PrioritizedItem, TaskStatus)
+from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
 
 from .scheduler import Scheduler
 
@@ -293,7 +292,9 @@ class BoefjeScheduler(Scheduler):
             oois_by_object_type: List[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-                    self.organisation.id, boefje.consumes, [i for i in range(boefje.scan_level, 5)],
+                    self.organisation.id,
+                    boefje.consumes,
+                    [i for i in range(boefje.scan_level, 5)],
                 )
             except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
                 self.logger.warning(
