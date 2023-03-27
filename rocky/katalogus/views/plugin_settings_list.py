@@ -32,7 +32,7 @@ class PluginSettingsListView(SinglePluginView, ListView):
 
     def get_queryset(self):
         """Gets schema setting with additional info of the value of a setting."""
-        if not self.plugin_schema:
+        if self.plugin_schema is None:
             return []
 
         settings = self.katalogus_client.get_plugin_settings(plugin_id=self.plugin.id)

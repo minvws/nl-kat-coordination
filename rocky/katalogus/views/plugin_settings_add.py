@@ -24,13 +24,13 @@ class PluginSettingsAddView(PermissionRequiredMixin, SinglePluginView, FormView)
     permission_required = "tools.can_scan_organization"
 
     def get_form(self, **kwargs):
-        if not self.plugin_schema:
+        if self.plugin_schema is None:
             return None
 
         return PluginSchemaForm(self.plugin_schema, **self.get_form_kwargs())
 
     def form_valid(self, form):
-        if not self.plugin_schema:
+        if self.plugin_schema is None:
             messages.add_message(
                 self.request,
                 messages.WARNING,

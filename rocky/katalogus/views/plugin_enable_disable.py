@@ -18,7 +18,7 @@ logger = getLogger(__name__)
 @class_view_decorator(otp_required)
 class PluginEnableDisableView(SinglePluginView):
     def check_required_settings(self, settings: Dict):
-        if not self.plugin_schema:
+        if self.plugin_schema is None:
             return True
 
         return all([field in settings for field in self.plugin_schema["required"]])
