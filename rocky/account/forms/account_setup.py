@@ -183,6 +183,14 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["status"].widget = forms.CheckboxInput()
+        self.fields["status"].label = _("Blocked")
+        self.fields["status"].help_text = _(
+            "Set the members status to blocked, so they don't have access to the organization anymore."
+        )
+        self.fields["status"].widget.attrs["checked"] = self.instance.status == "blocked"
+        self.fields["status"].disabled = False
+
         self.fields["acknowledged_clearance_level"].required = False
         self.fields["acknowledged_clearance_level"].widget.attrs[
             "fixed_paws"

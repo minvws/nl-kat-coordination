@@ -123,7 +123,7 @@ class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
     def build_breadcrumbs(self):
         breadcrumbs = [
             {
-                "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),
+                "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
                 "text": "Settings",
             },
         ]

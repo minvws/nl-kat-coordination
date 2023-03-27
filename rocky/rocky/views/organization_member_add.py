@@ -30,7 +30,7 @@ class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBread
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("organization_detail", kwargs={"organization_code": self.organization.code})
+        return reverse_lazy("organization_settings", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

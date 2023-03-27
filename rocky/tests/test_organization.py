@@ -3,7 +3,7 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
-from rocky.views.organization_detail import OrganizationDetailView
+from rocky.views.organization_settings import OrganizationSettingsView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_list import OrganizationMemberListView
@@ -103,29 +103,29 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
 
 def test_organization_does_not_exist(client, client_member):
     client.force_login(client_member.user)
-    response = client.get(reverse("organization_detail", kwargs={"organization_code": "nonexistent"}))
+    response = client.get(reverse("organization_settings", kwargs={"organization_code": "nonexistent"}))
 
     assert response.status_code == 404
 
 
 def test_organization_no_member(client, clientuser, organization):
     client.force_login(clientuser)
-    response = client.get(reverse("organization_detail", kwargs={"organization_code": organization.code}))
+    response = client.get(reverse("organization_settings", kwargs={"organization_code": organization.code}))
 
     assert response.status_code == 404
 
 
 def test_organization_active_member(rf, active_member):
-    request = setup_request(rf.get("organization_detail"), active_member.user)
-    response = OrganizationDetailView.as_view()(request, organization_code=active_member.organization.code)
+    request = setup_request(rf.get("organization_settings"), active_member.user)
+    response = OrganizationSettingsView.as_view()(request, organization_code=active_member.organization.code)
 
     assert response.status_code == 200
 
 
 def test_organization_blocked_member(rf, blocked_member):
-    request = setup_request(rf.get("organization_detail"), blocked_member.user)
+    request = setup_request(rf.get("organization_settings"), blocked_member.user)
     with pytest.raises(PermissionDenied):
-        OrganizationDetailView.as_view()(request, organization_code=blocked_member.organization.code)
+        OrganizationSettingsView.as_view()(request, organization_code=blocked_member.organization.code)
 
 
 def test_edit_organization_permissions(rf, redteam_member, client_member):
@@ -171,7 +171,7 @@ def test_admin_edits_organization(rf, superuser_member, mocker):
     assert response.status_code == 302
     assert response.url == f"/en/{superuser_member.organization.code}/details"
     resulted_request = setup_request(rf.get(response.url), superuser_member.user)
-    resulted_response = OrganizationDetailView.as_view()(
+    resulted_response = OrganizationSettingsView.as_view()(
         resulted_request, organization_code=superuser_member.organization.code
     )
     assert resulted_response.status_code == 200

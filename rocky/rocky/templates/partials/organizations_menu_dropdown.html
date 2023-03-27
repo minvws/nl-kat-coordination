@@ -22,7 +22,7 @@
         {% for single_organization in organizations_dropdown_list %}
           {% if organization.code != single_organization.code %}
             <li>
-              <a href="{% url 'organization_dashboard' single_organization.code %}">{{ single_organization.name }}</a>
+              <a href="{% url 'organization_crisis_room' single_organization.code %}">{{ single_organization.name }}</a>
             </li>
           {% endif %}
         {% endfor %}

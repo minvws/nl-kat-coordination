@@ -56,7 +56,7 @@ class Top10FindingListView(FindingListView):
     def build_breadcrumbs(self):
         return [
             {
-                "url": reverse_lazy("organization_dashboard", kwargs={"organization_code": self.organization.code}),
+                "url": reverse_lazy("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
                 "text": _("Crisis room"),
             }
         ]

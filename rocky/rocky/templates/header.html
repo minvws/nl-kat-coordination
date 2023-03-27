@@ -32,8 +32,8 @@
           </li>
         {% else %}
           <li>
-            <a href="{% url 'organization_dashboard' organization.code %}"
-              {% if 'organization_dashboard' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Crisis room' %}</a>
+            <a href="{% url 'organization_crisis_room' organization.code %}"
+              {% if 'organization_crisis_room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Crisis room' %}</a>
           </li>
         {% endif %}
         {% if organization.code and not view_type == "onboarding" %}
@@ -59,7 +59,7 @@
                 {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Members' %}</a>
             </li>
             <li>
-              <a href="{% url 'organization_detail' organization.code %}"
+              <a href="{% url 'organization_settings' organization.code %}"
                 {% if 'details' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Settings' %}</a>
             </li>
           {% endif %}

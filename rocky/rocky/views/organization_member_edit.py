@@ -47,7 +47,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
 
         context["breadcrumbs"] = [
             {
-                "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),
+                "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
                 "text": self.organization.name,
             },
             {
