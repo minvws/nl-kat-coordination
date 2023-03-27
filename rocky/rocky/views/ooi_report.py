@@ -29,10 +29,10 @@ from two_factor.views.utils import class_view_decorator
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from rocky.keiko import keiko_client, ReportNotFoundException
-from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
+from rocky.views.mixins import SingleOOITreeMixin
 from rocky.views.ooi_view import (
-    BaseOOIDetailView,
     ConnectorFormMixin,
+    OOIBreadcrumbsMixin,
 )
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
@@ -150,7 +150,7 @@ def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[Lis
 
 
 @class_view_decorator(otp_required)
-class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
+class OOIReportView(OOIBreadcrumbsMixin):
     template_name = "oois/ooi_report.html"
     connector_form_class = OOIReportSettingsForm
 

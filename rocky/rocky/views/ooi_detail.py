@@ -13,9 +13,8 @@ from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
 from octopoes.models import OOI
 from rocky import scheduler
-from rocky.views.mixins import OOIBreadcrumbsMixin
-from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
-from rocky.views.ooi_view import BaseOOIDetailView
+from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView, OOIFindingManager
+from rocky.views.ooi_view import OOIBreadcrumbsMixin
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification, OrganizationMember
@@ -29,7 +28,7 @@ class PageActions(Enum):
 class OOIDetailView(
     BoefjeMixin,
     OOIRelatedObjectAddView,
-    BaseOOIDetailView,
+    OOIFindingManager,
     OOIBreadcrumbsMixin,
 ):
     template_name = "oois/ooi_detail.html"

@@ -3,8 +3,7 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from fmea.models import DEPARTMENTS
-from rocky.views.mixins import OOIBreadcrumbsMixin
-from rocky.views.ooi_view import BaseOOIDetailView
+from rocky.views.ooi_view import OOIBreadcrumbsMixin
 from tools.forms.ooi import OoiTreeSettingsForm
 from tools.ooi_helpers import (
     get_ooi_types_from_tree,
@@ -14,7 +13,7 @@ from tools.ooi_helpers import (
 from tools.view_helpers import get_ooi_url, Breadcrumb
 
 
-class OOITreeView(OOIBreadcrumbsMixin, BaseOOIDetailView):
+class OOITreeView(OOIBreadcrumbsMixin):
     template_name = "oois/ooi_tree.html"
     connector_form_class = OoiTreeSettingsForm
 

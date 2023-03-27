@@ -22,10 +22,6 @@ from tools.view_helpers import existing_ooi_type, url_with_querystring
 
 
 class OOIRelatedObjectManager(SingleOOITreeMixin):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.api_connector = self.octopoes_api_connector
-
     def get_related_objects(self):
         related = []
         for relation_name, children in self.tree.root.children.items():
@@ -40,10 +36,6 @@ class OOIRelatedObjectManager(SingleOOITreeMixin):
 
 
 class OOIFindingManager(SingleOOITreeMixin):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.api_connector = self.octopoes_api_connector
-
     def get_findings(self) -> List[Dict]:
         findings: List[Dict] = []
         for relation_name, children in self.tree.root.children.items():
@@ -101,7 +93,7 @@ class OOIFindingManager(SingleOOITreeMixin):
 
 
 @class_view_decorator(otp_required)
-class OOIRelatedObjectAddView(OOIRelatedObjectManager, OOIFindingManager, TemplateView):
+class OOIRelatedObjectAddView(OOIRelatedObjectManager, TemplateView):
     template_name = "oois/ooi_detail_add_related_object.html"
 
     def get(self, request, *args, **kwargs):

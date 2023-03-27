@@ -15,8 +15,7 @@ from two_factor.views.utils import class_view_decorator
 from octopoes.connector import RemoteException
 from octopoes.models import Reference, EmptyScanProfile
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.types import get_collapsed_types, type_by_name
+from octopoes.models.types import type_by_name
 from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
 from rocky.views.ooi_view import BaseOOIListView
 from tools.forms.ooi import SelectOOIForm
@@ -33,7 +32,6 @@ class PageActions(Enum):
 class OOIListView(BaseOOIListView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
-    ooi_types = get_collapsed_types().difference({Finding, FindingType})
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -200,10 +198,8 @@ class OOIListView(BaseOOIListView):
         return Indemnification.objects.filter(organization=self.organization).exists()
 
 
-class OOIListExportView(OOIListView):
+class OOIListExportView(BaseOOIListView):
     def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
-
         file_type = request.GET.get("file_type")
         observed_at = self.get_observed_at()
         filters = self.get_ooi_types_display()

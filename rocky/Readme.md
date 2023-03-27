@@ -93,6 +93,106 @@ sequenceDiagram
     c->>-r: task.status = done
 ```
 
+
+## Rocky View Structure
+
+### Overview of OrganizationView's
+
+```mermaid
+%%{ init : {"theme" : "base"}}%%
+
+classDiagram
+direction RL
+    class OrganizationView
+    OrganizationView : organization
+    OrganizationView : octopoes_api_connector
+    OrganizationView : organization_member
+    OrganizationView : indemnification_present
+
+    OrganizationView <|-- View
+    SinglePluginView <|-- OrganizationView
+    BytesRawView <|-- OrganizationView
+    Health <|-- OrganizationView
+    HealthChecks <|-- OrganizationView
+    FindingListView  <|-- OrganizationView
+    IndemnificationAddView <|-- OrganizationView
+    OctopoesView <|-- OrganizationView
+    OOIAddTypeSelectView <|-- OrganizationView
+    Report <|-- OrganizationView
+    OrganizationDetailView <|-- OrganizationView
+    OrganizationMemberEditView <|-- OrganizationView
+    DownloadTaskDetail <|-- OrganizationView
+    TaskListView <|-- OrganizationView
+    UploadCSV <|-- OrganizationView
+    UploadRaw <|-- OrganizationView
+    ObjectsBreadcrumbsMixin <|-- OrganizationView
+    OrganizationMemberBreadcrumbsMixin <|-- OrganizationView
+    FindingTypeAddView <|-- OrganizationView
+```
+
+### Exhaustive overview of OctopoesView's
+
+```mermaid
+%%{ init : {"theme" : "base"}}%%
+
+classDiagram
+direction RL
+    class OrganizationView
+    class OctopoesView
+    class BoefjeMixin
+
+    OctopoesView <|-- OrganizationView
+
+    BoefjeMixin <|-- OctopoesView
+    PluginDetailView <|-- BoefjeMixin
+    OOIDetailView <|-- BoefjeMixin
+    OOIDetailView <|-- OOIRelatedObjectAddView
+    OOIDetailView <|-- OOIFindingManager
+    ChangeClearanceLevel <|-- BoefjeMixin
+
+    SingleOOIMixin <|-- OctopoesView
+    SingleOOITreeMixin <|-- SingleOOIMixin
+
+    BaseOOIDetailView <|-- SingleOOITreeMixin
+    BaseOOIDetailView <|-- ConnectorFormMixin
+    OOIDetailView <|-- OOIBreadcrumbsMixin
+    OOIBreadcrumbsMixin <|-- BaseOOIDetailView
+    BaseReportView <|-- BaseOOIDetailView
+    DnsReportView <|-- BaseReportView
+
+    OOIReportView <|-- OOIBreadcrumbsMixin
+    OOITreeView <|-- OOIBreadcrumbsMixin
+    OOISummaryView <|-- OOITreeView
+    OOIGraphView <|-- OOITreeView
+
+    OOIRelatedObjectManager <|-- SingleOOITreeMixin
+    OOIFindingManager <|-- SingleOOITreeMixin
+    OOIFindingListView <|-- OOIFindingManager
+    OOIRelatedObjectAddView <|-- OOIRelatedObjectManager
+
+    OOIReportPDFView <|-- SingleOOITreeMixin
+    OnboardingSetupScanOOIDetailView <|-- SingleOOITreeMixin
+
+    BaseOOIFormView <|-- SingleOOIMixin
+    OOIDeleteView <|-- SingleOOIMixin
+
+    OnboardingSetupScanOOIAddView <|-- BaseOOIFormView
+    OOIEditView <|-- BaseOOIFormView
+    OOIAddView <|-- BaseOOIFormView
+    FindingAddView <|-- BaseOOIFormView
+
+    MultipleOOIMixin <|-- OctopoesView
+    BaseOOIListView <|-- MultipleOOIMixin
+    BaseOOIListView <|-- ConnectorFormMixin
+    OOIListView <|-- BaseOOIListView
+    FindingListView <|-- BaseOOIListView
+    OOIListExportView <|-- BaseOOIListView
+
+    ScanProfileDetailView <|-- OOIDetailView
+    ScanProfileResetView <|-- OOIDetailView
+```
+
+
 ## KATalogus View Structure
 
 This diagram shows the current view structure and what properties are set in each class for the KATalogus.
@@ -131,6 +231,7 @@ direction BT
     SinglePluginView  <|--  OrganizationView
     SingleSettingView  <|--  SinglePluginView
     PluginDetailView  <|--  PluginSettingsListView
+    PluginDetailView  <|--  BoefjeMixin
     PluginEnableDisableView  <|--  SinglePluginView
     PluginSettingsAddView  <|--  FormView
     PluginSettingsAddView  <|--  SinglePluginView

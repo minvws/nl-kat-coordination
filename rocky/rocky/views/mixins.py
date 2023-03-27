@@ -28,8 +28,6 @@ from tools.ooi_helpers import (
 from tools.view_helpers import (
     get_ooi_url,
     convert_date_to_datetime,
-    BreadcrumbsMixin,
-    Breadcrumb,
 )
 
 logger = logging.getLogger(__name__)
@@ -213,27 +211,6 @@ class MultipleOOIMixin(OctopoesView):
             return _("All")
 
         return ", ".join(self.filtered_ooi_types)
-
-
-class OOIBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
-        if isinstance(self.ooi, Finding):
-            start = {
-                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Findings"),
-            }
-        else:
-            start = {
-                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Objects"),
-            }
-        return [
-            start,
-            {
-                "url": get_ooi_url("ooi_detail", self.ooi.primary_key, self.organization.code),
-                "text": self.ooi.human_readable,
-            },
-        ]
 
 
 class ConnectorFormMixin:

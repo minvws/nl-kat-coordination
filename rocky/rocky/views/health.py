@@ -9,6 +9,7 @@ from django_otp.decorators import otp_required
 from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
+from account.mixins import OrganizationView
 from katalogus.health import get_katalogus_health
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.bytes_client import get_bytes_client
@@ -16,13 +17,12 @@ from rocky.health import ServiceHealth
 from rocky.keiko import keiko_client
 from rocky.scheduler import client
 from rocky.version import __version__
-from rocky.views.mixins import OctopoesView
 
 logger = logging.getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
-class Health(OctopoesView, View):
+class Health(OrganizationView, View):
     def get(self, request, *args, **kwargs) -> JsonResponse:
         octopoes_connector = self.octopoes_api_connector
         rocky_health = get_rocky_health(octopoes_connector)
@@ -112,7 +112,7 @@ def flatten_health(health_: ServiceHealth) -> List[ServiceHealth]:
 
 
 @class_view_decorator(otp_required)
-class HealthChecks(OctopoesView, TemplateView):
+class HealthChecks(OrganizationView, TemplateView):
     template_name = "health.html"
 
     def get_context_data(self, **kwargs):

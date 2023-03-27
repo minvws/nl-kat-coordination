@@ -1,16 +1,15 @@
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
-from katalogus.views.mixins import BoefjeMixin
 from rocky.views.ooi_detail_related_object import OOIFindingManager
-from rocky.views.ooi_view import BaseOOIDetailView
-from rocky.views.mixins import OOIBreadcrumbsMixin
+from rocky.views.ooi_view import OOIBreadcrumbsMixin
 from tools.forms.base import ObservedAtForm
 from tools.view_helpers import Breadcrumb, get_ooi_url
 
 
-class OOIFindingListView(OOIFindingManager, BoefjeMixin, BaseOOIDetailView, OOIBreadcrumbsMixin):
+class OOIFindingListView(OOIFindingManager, OOIBreadcrumbsMixin, TemplateView):
     template_name = "oois/ooi_findings.html"
     connector_form_class = ObservedAtForm
 
