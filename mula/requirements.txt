@@ -7,5 +7,5 @@ psycopg2-binary==2.9.5
 pydantic==1.10.4
 python-dotenv==1.0.0
 requests==2.27.1
-sqlalchemy==1.4.31
+sqlalchemy==2.0.7
 uvicorn==0.17.1
