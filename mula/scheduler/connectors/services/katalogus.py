@@ -191,13 +191,11 @@ class Katalogus(HTTPService):
             return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
 
     def get_new_boefjes_by_org_id(self, organisation_id: str) -> List[Plugin]:
-        self.logger.info("-" * 80)
-
         # Get the enabled boefjes for the organisation from katalogus
         plugins = self.get_plugins_by_organisation(organisation_id, enabled=True)
         enabled_boefjes = {plugin.id: plugin for plugin in plugins if plugin.enabled is True and plugin.type == "boefje"}
-        self.logger.info("enabled boefjes: %s", enabled_boefjes.keys())
 
+        # Check if there are new boefjes
         new_boefjes = []
         for boefje_id, boefje in enabled_boefjes.items():
             if boefje_id in self.organisations_new_boefjes_cache.get(organisation_id, {}):
@@ -207,8 +205,6 @@ class Katalogus(HTTPService):
 
         self.organisations_new_boefjes_cache[organisation_id] = enabled_boefjes
 
-        self.logger.info("new boefjes: %s", new_boefjes)
-
-        self.logger.info("-" * 80)
+        self.logger.debug("%d new boefjes found [organisation_id=%s, new_boefjes=%s]", len(new_boefjes), organisation_id, new_boefjes)
 
         return new_boefjes
