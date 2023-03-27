@@ -45,6 +45,9 @@ class RiskLevelSeverity(Enum):
 
         return severity_order.index(self.value) > severity_order.index(other.value)
 
+    def __str__(self):
+        return self.value
+
 
 def format_attr_name(s: str) -> str:
     return s.replace("_", " ").replace("/", " -> ").title()

@@ -12,6 +12,7 @@ from requests import HTTPError
 from octopoes.models.tree import ReferenceTree
 from rocky.views.ooi_report import OOIReportView, OOIReportPDFView, FindingReportPDFView
 from tests.conftest import setup_request
+from tools.ooi_helpers import RiskLevelSeverity
 
 TREE_DATA = {
     "root": {
@@ -157,7 +158,7 @@ def test_pdf_report_command(tmp_path, my_user, organization, ooi_information, mo
     mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
 
     tmp_file = tmp_path / "test.pdf"
-    call_command("generate_report", code=organization.code, output=tmp_file)
+    call_command("generate_report", code=organization.code, output=tmp_file, min_severity=RiskLevelSeverity.HIGH)
 
     assert tmp_file.exists()
     assert tmp_file.read_text() == "fake_binary_pdf_content"
