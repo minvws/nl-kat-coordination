@@ -59,6 +59,7 @@ def add_admin_group_permissions(user):
         Permission.objects.get(codename="view_organization").id,
         Permission.objects.get(codename="view_organizationmember").id,
         Permission.objects.get(codename="add_organizationmember").id,
+        Permission.objects.get(codename="change_organization").id,
         Permission.objects.get(codename="change_organizationmember").id,
     ]
     group.permissions.set(admin_permissions)
