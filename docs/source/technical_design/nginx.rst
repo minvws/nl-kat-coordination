@@ -22,7 +22,7 @@ Install the appropriate packages for this:
 
 .. code-block:: sh
 
-$ sudo apt-get install nginx certbot python3-certbot-nginx
+    $ sudo apt-get install nginx certbot python3-certbot-nginx
 
 Next, we will build a basic configuration for nginx. In the example below, we use the server name openkat.example.com, obviously change this to the name of your own server.
 
@@ -30,7 +30,7 @@ By default, on Ubuntu systems, nginx puts its configurations in the directory /e
 
 .. code-block:: sh
 
-$ nano /etc/nginx/sites-available/openkat.example.com
+    $ nano /etc/nginx/sites-available/openkat.example.com
 
 Then put the following content in there:
 
@@ -64,7 +64,7 @@ Now that we have the configuration, we need to activate it. To do this, use the 
 
 .. code-block:: sh
 
-$ ln -sf /etc/nginx/sites-available/openkat.example.com /etc/nginx/sites-enabled/openkat.example.com
+    $ ln -sf /etc/nginx/sites-available/openkat.example.com /etc/nginx/sites-enabled/openkat.example.com
 
 (Obviously adjust the file names to what you have used yourself)
 
@@ -72,7 +72,7 @@ You can check that the configuration is correct with the following command:
 
 .. code-block:: sh
 
-$ nginx -t
+    $ nginx -t
 
 If everything is okay, it will report it that way. If there is an error in the configuration (because you forgot an ; somewhere, for example), it will show you the line number where the problem is near. Note: So you might need to add an ; on the previous line.
 
@@ -85,7 +85,7 @@ This is very simple: you just need to start Certbot and answer the questions. St
 
 .. code-block:: sh
 
-$ certbot
+    $ certbot
 
 If all went well, you now have an nginx configuration containing an SSL certificate configured.
 
@@ -96,7 +96,7 @@ Restart nginx to load all the configurations and you can use OpenKAT! The comman
 
 .. code-block:: sh
 
-$ service nginx restart
+    $ service nginx restart
 
 Once everything has rebooted, you can access your installation via the hostname you set up, e.g. https://openkat.example.com/
 
@@ -104,5 +104,3 @@ Security settings
 =================
 
 Certbot takes care of several settings and you can find more relevant headers in the 'hardening' section of this manual.
-
-
