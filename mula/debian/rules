@@ -19,6 +19,7 @@ override_dh_fixperms:
 	dh_fixperms
 	chmod 750 $(DESTDIR)/etc/kat/
 	find $(DESTDIR)/etc/kat -type f -exec chmod 640 {} \;
+	chmod 755 $(DESTDIR)/usr/bin/update-mula-db
 
 override_dh_virtualenv:
 	dh_virtualenv $(DH_VENV_ARGS)
