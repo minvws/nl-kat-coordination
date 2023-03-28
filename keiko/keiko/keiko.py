@@ -123,8 +123,8 @@ def generate_report(
         env = {**os.environ, "TEXMFVAR": tmp_dirname}
         output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
         logger.info("pdflatex run. [report_id=%s] [template=%s] [command=%s]", report_id, template_name, " ".join(cmd))
-        logger.debug(output.stdout.decode("utf-8"))
-        logger.debug(output.stderr.decode("utf-8"))
+        logger.debug(output.stdout.decode("cp1252").encode("utf-8"))
+        logger.debug(output.stderr.decode("cp1252").encode("utf-8"))
         if output.returncode:
             raise Exception("Error running pdflatex")
 
@@ -135,8 +135,8 @@ def generate_report(
             template_name,
             " ".join(cmd),
         )
-        logger.debug(output.stdout.decode("utf-8"))
-        logger.debug(output.stderr.decode("utf-8"))
+        logger.debug(output.stdout.decode("cp1252").encode("utf-8"))
+        logger.debug(output.stderr.decode("cp1252").encode("utf-8"))
         if output.returncode:
             raise Exception("Error running pdflatex")
 
