@@ -2,7 +2,7 @@ import logging
 import time
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import List, Set
+from typing import List
 
 import pika
 import requests

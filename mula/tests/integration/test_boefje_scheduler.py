@@ -313,7 +313,6 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Mocks
         mock_is_task_running.return_value = False

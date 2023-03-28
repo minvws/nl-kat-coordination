@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import Boefje, Organisation, Plugin
@@ -15,56 +15,20 @@ class Katalogus(HTTPService):
 
         # For every organisation we cache its plugins, it references the
         # plugin-id as key and the plugin as value.
-        #
-        # Example:
-        #
-        # {
-        #     "organisation_id": {
-        #          "plugin-id": {}
-        #     }
-        # }
         self.organisations_plugin_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
 
         # For every organisation we cache on which type of object (consumes)
         # the boefjes consume, it references the object type (consumes)
         # as the key and a dict of boefjes as value.
-        #
-        # Example:
-        #
-        # {
-        #     "organisation_id": {
-        #         "object-type": {
-        #             "plugin-id": {}
-        #         }
-        #     }
-        # }
         self.organisations_boefje_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
 
         # For every organisation we cache on which type of object (consumes)
         # the normalizers consume, it references the object type (consumes)
         # as the key and a dict of normalizers as value.
-        #
-        # Example:
-        #
-        # {
-        #     "organisation_id": {
-        #         "object-type": {
-        #             "plugin-id": {}
-        #         }
-        #     }
-        # }
         self.organisations_normalizer_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
 
         # For every organisation we cache which new boefjes for an organisation
         # have been enabled.
-        #
-        # Example:
-        #
-        # {
-        #     "organisation_id": {
-        #          "plugin-id": {}
-        #     }
-        # }
         self.organisations_new_boefjes_cache: Dict = {}
 
         # Initialise the cache.
