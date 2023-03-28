@@ -51,7 +51,7 @@ I want to login again
     Click    "Skip onboarding"
 
 Is user onboarded?
-    Go to    ${ROOT_URL}/en/admin/tools/organizationmember/1/change/
+    Go to    ${ROOT_URL}/admin/tools/organizationmember/1/change/
     Get Checkbox State    id=id_onboarded    ==    True    user not onboarded
 
 I am on the Crisis Room page

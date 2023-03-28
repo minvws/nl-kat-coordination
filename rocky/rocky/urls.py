@@ -52,9 +52,9 @@ urlpatterns = [
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
+    path("admin/", admin.site.urls),
 ]
 urlpatterns += i18n_patterns(
-    path("admin/", admin.site.urls),
     path("", LandingPageView.as_view(), name="landing_page"),
     path("onboarding/", include("onboarding.urls"), name="onboarding"),
     path("crisis-room/", include("crisis_room.urls"), name="crisis_room"),
