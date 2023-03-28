@@ -11,7 +11,5 @@ def languages(request):
 def organizations_including_blocked(request):
     context = {}
     if isinstance(request.user, KATUser):
-        context["organizations_including_blocked"] = [
-            m.organization for m in request.user.members.select_related("organization")
-        ]
+        context["organizations_including_blocked"] = request.user.organizations_including_blocked
     return context

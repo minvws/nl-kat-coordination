@@ -86,12 +86,37 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         return self.full_name
 
     @cached_property
+    def all_organizations(self) -> List[Organization]:
+        return list(Organization.objects.all())
+
+    @cached_property
+    def organization_members(self) -> List[OrganizationMember]:
+        """
+        Lists the user's OrganizationMembers including the related Organizations.
+        """
+        return self.members.select_related("organization")
+
+    @cached_property
     def organizations(self) -> List[Organization]:
-        """Lists all organizations a user is a member of, excluding organizations to which access is blocked.
+        """
+        Lists all organizations a user is a member of, excluding organizations to which access is blocked.
 
         Superusers are considered to be members of all organizations.
         """
         if self.is_superuser:
-            return list(Organization.objects.all())
-        members = self.members.exclude(status=OrganizationMember.STATUSES.BLOCKED).select_related("organization")
-        return [member.organization for member in members]
+            return self.all_organizations
+        return [
+            m.organization
+            for m in filter(lambda o: o.status is not OrganizationMember.STATUSES.BLOCKED, self.organization_members)
+        ]
+
+    @cached_property
+    def organizations_including_blocked(self) -> List[Organization]:
+        """
+        Lists all organizations a user is a member of, including organizations to which access is blocked.
+
+        Superusers are considered to be members of all organizations.
+        """
+        if self.is_superuser:
+            return self.all_organizations
+        return [m.organization for m in self.organization_members]
