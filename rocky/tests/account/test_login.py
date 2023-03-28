@@ -7,7 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from account.views import LoginRockyView
 
 
-def test_login_view(rf, my_user):
+def test_login_view(rf, clientuser):
     request = rf.get("login")
 
     request = SessionMiddleware(lambda r: r)(request)
@@ -21,13 +21,14 @@ def test_login_view(rf, my_user):
     assertContains(response, "csrfmiddlewaretoken")
 
 
-def test_login(rf, my_user):
+def test_login(superuser):
     client = Client()
 
     response = client.post(
         "/account/login/",
         {"auth-username": "wrong@openkat.nl", "auth-password": "TestTest123!!", "login_view-current_step": "auth"},
     )
+
     assert response.status_code == 200
     assertNotContains(response, "Explanation:")
     assertContains(response, "Login")
@@ -47,7 +48,11 @@ def test_login(rf, my_user):
 
     response = client.post(
         "/account/login/",
-        {"auth-username": "admin@openkat.nl", "auth-password": "TestTest123!!", "login_view-current_step": "auth"},
+        {
+            "auth-username": superuser.email,
+            "auth-password": "SuperSuper123!!",
+            "login_view-current_step": "auth",
+        },
     )
 
     assert response.status_code == 200
@@ -66,4 +71,4 @@ def test_login(rf, my_user):
 
     assert not client.login(email="wrong@openkat.nl", password="TestTest123!!")
     assert not client.login(email="admin@openkat.nl", password="Test!!")
-    assert client.login(email="admin@openkat.nl", password="TestTest123!!")
+    assert client.login(email=superuser.email, password="SuperSuper123!!")
