@@ -58,3 +58,8 @@ html_static_path = ["_static"]
 html_css_files = [
     "openkat.css",
 ]
+
+# mermaid-9.4.3
+html_js_files = [
+    "mermaid.min.js",
+]
