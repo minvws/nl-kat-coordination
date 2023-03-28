@@ -46,8 +46,15 @@ def test_ooi_detail(
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2
-    assertContains(response, "TestBoefje")
+    assertContains(response, "Object")
+    assertContains(response, 'href="/en/_dev/objects/detail/?ooi_id=Hostname|internet|mispo.es."')
+    assertContains(response, "Hostname|internet|mispo.es.")
+
+    assertContains(response, "Plugin ID")
     assertContains(response, "test-boefje")
+
+    assertContains(response, "Status")
+    assertContains(response, "Created date")
 
 
 def test_ooi_detail_start_scan(
