@@ -102,6 +102,38 @@ flowchart LR
   class E derived
 ```
 
+## Logic chaining
+```mermaid
+flowchart LR
+
+    A(["Fact A"])
+    B(["Fact B"])
+    C(["Fact C"])
+    D(["Fact D"])
+    
+    C1["Conclusion 1"]
+    C2["Conclusion 2"]
+    C3["Conclusion 3"]
+    
+    O1(("AND"))
+    O2(("OR"))
+    O3(("AND"))
+    
+    A --> O1 --> C1 --> O3 --> C3
+    B --> O1
+    
+    C --> O2 --> C2 --> O3
+    D --> O2
+    
+    classDef fact fill:#ca005d,stroke:#333,stroke-width:2px;
+    classDef conclusion #154273:#eee,stroke:#333,stroke-width:2px;
+    classDef operator fill:#eee,stroke:#333,stroke-width:2px;
+    class A,B,C,D fact
+    class C1,C2,C3 conclusion
+    class O1,O2,O3 operator
+    
+```
+
 
 ## Knowledge base, rules and derived knowledge
 ```mermaid
@@ -143,3 +175,4 @@ flowchart LR
     class a1,b1,c1,d1,a2,b2,c2,d2 base
     class e2,f2,g2 derived
 ```
+
