@@ -59,7 +59,7 @@ html_css_files = [
     "openkat.css",
 ]
 
-# mermaid-9.4.3
+mermaid_version = ""  # Do not fetch from the CDN
 html_js_files = [
-    "mermaid.min.js",
+    "mermaid-9.4.3.min.js",
 ]
