@@ -7,7 +7,8 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, TaskStatus
+from scheduler.models import (Normalizer, NormalizerTask, Organisation, Plugin,
+                              PrioritizedItem, TaskStatus)
 
 from .scheduler import Scheduler
 
@@ -106,12 +107,12 @@ class NormalizerScheduler(Scheduler):
             normalizers = []
             for mime_type in latest_raw_data.raw_data.mime_types:
                 normalizers_by_mime_type = self.get_normalizers_for_mime_type(mime_type.get("value"))
-                if normalizers_by_mime_type is None or len(normalizers_by_mime_type) == 0:
+                if not normalizers_by_mime_type:
                     continue
 
                 normalizers.extend(normalizers_by_mime_type)
 
-            if normalizers is None or len(normalizers) == 0:
+            if not normalizers:
                 self.logger.debug(
                     "No normalizers found for raw data [raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
                     latest_raw_data.raw_data.id,
@@ -150,7 +151,6 @@ class NormalizerScheduler(Scheduler):
                         task,
                         self.organisation.id,
                         self.scheduler_id,
-                        exc_info=exc_running,
                     )
                     continue
 
