@@ -6,6 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 
+from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.organization_detail import OrganizationDetailView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
@@ -181,6 +182,24 @@ def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(rf
     assertContains(response, "Grant")
 
 
+@pytest.mark.parametrize("user", ["redteam_member", "client_member"])
+@pytest.mark.parametrize("action", ["give_clearance", "withdraw_clearance", "block", "unblock"])
+def test_organization_member_give_and_revoke_clearance_permissions(rf, superuser_member, user, action, request):
+    """Redteamers and clients cannot give/revoke clearances or block/unblock users."""
+    request = setup_request(
+        rf.post(
+            "organization_detail",
+            {
+                "action": action,
+                "member_id": superuser_member.id,
+            },
+        ),
+        request.getfixturevalue(user).user,
+    )
+    with pytest.raises(PermissionDenied):
+        OrganizationDetailView.as_view()(request, organization_code=superuser_member.organization.code)
+
+
 def test_organization_does_not_exist(client, client_member):
     client.force_login(client_member.user)
     response = client.get(reverse("organization_detail", kwargs={"organization_code": "nonexistent"}))
@@ -218,6 +237,20 @@ def test_edit_organization_permissions(rf, redteam_member, client_member):
 
     with pytest.raises(PermissionDenied):
         OrganizationEditView.as_view()(
+            request_client, organization_code=client_member.organization.code, pk=client_member.organization.id
+        )
+
+
+def test_edit_organization_indemnification(rf, redteam_member, client_member):
+    """Redteamers and clients cannot add idemnification."""
+    request_redteam = setup_request(rf.get("indemnification_add"), redteam_member.user)
+    request_client = setup_request(rf.get("indemnification_add"), client_member.user)
+
+    with pytest.raises(PermissionDenied):
+        IndemnificationAddView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
+
+    with pytest.raises(PermissionDenied):
+        IndemnificationAddView.as_view()(
             request_client, organization_code=client_member.organization.code, pk=client_member.organization.id
         )
 
