@@ -74,7 +74,7 @@ graph LR
     end
 ```
 
-### Simple rule
+## Simple rule
 
 ```mermaid
 flowchart LR
