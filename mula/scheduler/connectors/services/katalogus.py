@@ -81,7 +81,7 @@ class Katalogus(HTTPService):
                 self.organisations_plugin_cache[org.id] = {}
                 self.organisations_new_boefjes_cache[org.id] = {}
 
-            plugins = self.get_plugins_by_organisation(org.id, enabled=True)
+            plugins = self.get_plugins_by_organisation(org.id)
             self.organisations_plugin_cache[org.id] = {
                 plugin.id: plugin for plugin in plugins if plugin.enabled is True
             }
@@ -97,7 +97,7 @@ class Katalogus(HTTPService):
         for org in orgs:
             self.organisations_boefje_type_cache[org.id] = {}
 
-            for plugin in self.get_plugins_by_organisation(org.id, enabled=True):
+            for plugin in self.get_plugins_by_organisation(org.id):
                 if plugin.type != "boefje":
                     continue
 
@@ -123,7 +123,7 @@ class Katalogus(HTTPService):
         for org in orgs:
             self.organisations_normalizer_type_cache[org.id] = {}
 
-            for plugin in self.get_plugins_by_organisation(org.id, enabled=True):
+            for plugin in self.get_plugins_by_organisation(org.id):
                 if plugin.type != "normalizer":
                     continue
 
@@ -159,7 +159,7 @@ class Katalogus(HTTPService):
         response = self.get(url)
         return [Organisation(**organisation) for organisation in response.json().values()]
 
-    def get_plugins_by_organisation(self, organisation_id: str, enabled: bool) -> List[Plugin]:
+    def get_plugins_by_organisation(self, organisation_id: str) -> List[Plugin]:
         url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
         response = self.get(url)
         return [Plugin(**plugin) for plugin in response.json()]
@@ -194,7 +194,7 @@ class Katalogus(HTTPService):
 
     def get_new_boefjes_by_org_id(self, organisation_id: str) -> List[Plugin]:
         # Get the enabled boefjes for the organisation from katalogus
-        plugins = self.get_plugins_by_organisation(organisation_id, enabled=True)
+        plugins = self.get_plugins_by_organisation(organisation_id)
         enabled_boefjes = {
             plugin.id: plugin for plugin in plugins if plugin.enabled is True and plugin.type == "boefje"
         }

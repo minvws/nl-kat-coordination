@@ -707,7 +707,7 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            return True
+            raise RuntimeError("Task has been finished, but no results found in bytes")
 
         # Is boefje still running according to bytes?
         if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
