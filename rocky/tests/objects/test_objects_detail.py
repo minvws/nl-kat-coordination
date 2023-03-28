@@ -52,14 +52,17 @@ def test_ooi_detail(
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2
     assertContains(response, "Object")
-    assertContains(response, 'href="/en/_dev/objects/detail/?ooi_id=Hostname|internet|mispo.es."')
     assertContains(response, "Hostname|internet|mispo.es.")
 
-    assertContains(response, "Plugin ID")
+    assertContains(response, "Plugin")
     assertContains(response, "test-boefje")
-
+    assertContains(
+        response, f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">test-boefje</a>'
+    )
     assertContains(response, "Status")
+    assertContains(response, "Completed")
     assertContains(response, "Created date")
+    assertContains(response, "9, 2022, 11:53 a.m.")
 
 
 def test_ooi_detail_start_scan(
