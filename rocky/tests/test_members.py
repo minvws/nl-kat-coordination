@@ -153,7 +153,7 @@ def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
     request = setup_request(
         rf.post(
             "organization_member_edit",
-            {"status": "blocked", "trusted_clearance_level": 4},
+            {"status": True, "trusted_clearance_level": 4},
         ),
         admin_member.user,
     )

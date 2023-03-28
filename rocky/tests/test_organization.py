@@ -103,93 +103,6 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     assertContains(response3, "Active")
 
 
-def test_organization_member_give_and_revoke_clearance(rf, superuser_member):
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "action": "give_clearance",
-                "member_id": superuser_member.id,
-            },
-        ),
-        superuser_member.user,
-    )
-    response = OrganizationSettingsView.as_view()(request, organization_code=superuser_member.organization.code)
-
-    assert response.status_code == 302
-    assert response.url == f"/en/{superuser_member.organization.code}/"
-
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "action": "withdraw_clearance",
-                "member_id": superuser_member.id,
-            },
-        ),
-        superuser_member.user,
-    )
-    response = OrganizationSettingsView.as_view()(request, organization_code=superuser_member.organization.code)
-
-    assert response.status_code == 302
-    assert response.url == f"/en/{superuser_member.organization.code}/"
-
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "action": "wrong_test",
-                "member_id": superuser_member.id,
-            },
-        ),
-        superuser_member.user,
-    )
-
-    with pytest.raises(Exception) as exc_info:
-        OrganizationSettingsView.as_view()(request, organization_code=superuser_member.organization.code)
-
-    assert exc_info.exconly() == "Exception: Unhandled allowed action: wrong_test"
-
-
-def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(rf, superuser_member, organization):
-    # No action in the POST means we simply reload the page
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "wrong": "withdraw_clearance",
-                "member_id": superuser_member.id,
-            },
-        ),
-        superuser_member.user,
-    )
-    response = OrganizationSettingsView.as_view()(request, organization_code=organization.code)
-    assertContains(response, "Organization details")
-    assertContains(response, organization.name)
-    assertContains(response, "Members")
-    assertContains(response, "Add new member")
-    assertContains(response, superuser_member.user.email)
-    assertContains(response, "Grant")
-
-
-@pytest.mark.parametrize("user", ["redteam_member", "client_member"])
-@pytest.mark.parametrize("action", ["give_clearance", "withdraw_clearance", "block", "unblock"])
-def test_organization_member_give_and_revoke_clearance_permissions(rf, superuser_member, user, action, request):
-    """Redteamers and clients cannot give/revoke clearances or block/unblock users."""
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "action": action,
-                "member_id": superuser_member.id,
-            },
-        ),
-        request.getfixturevalue(user).user,
-    )
-    with pytest.raises(PermissionDenied):
-        OrganizationSettingsView.as_view()(request, organization_code=superuser_member.organization.code)
-
-
 def test_organization_does_not_exist(client, client_member):
     client.force_login(client_member.user)
     response = client.get(reverse("organization_settings", kwargs={"organization_code": "nonexistent"}))
@@ -255,27 +168,27 @@ def test_admin_rights_edits_organization(rf, admin_member):
     assert response.status_code == 200
 
 
-def test_admin_edits_organization(rf, superuser_member, mocker):
+def test_admin_edits_organization(rf, admin_member, mocker):
     """Admin editing organization values"""
     request = setup_request(
         rf.post(
             "organization_edit",
             {"name": "This organization name has been edited", "tags": "tag1,tag2"},
         ),
-        superuser_member.user,
+        admin_member.user,
     )
     mocker.patch("katalogus.client.KATalogusClientV1")
     mocker.patch("tools.models.OctopoesAPIConnector")
     response = OrganizationEditView.as_view()(
-        request, organization_code=superuser_member.organization.code, pk=superuser_member.organization.id
+        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
     )
 
     # success post redirects to organization detail page
     assert response.status_code == 302
-    assert response.url == f"/en/{superuser_member.organization.code}/details"
-    resulted_request = setup_request(rf.get(response.url), superuser_member.user)
+    assert response.url == f"/en/{admin_member.organization.code}/settings"
+    resulted_request = setup_request(rf.get(response.url), admin_member.user)
     resulted_response = OrganizationSettingsView.as_view()(
-        resulted_request, organization_code=superuser_member.organization.code
+        resulted_request, organization_code=admin_member.organization.code
     )
     assert resulted_response.status_code == 200
 
