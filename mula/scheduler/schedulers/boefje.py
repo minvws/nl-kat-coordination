@@ -272,7 +272,7 @@ class BoefjeScheduler(Scheduler):
             if self.stop_event.is_set():
                 raise e
 
-        if new_boefjes is None or len(new_boefjes) == 0:
+        if new_boefjes is None or not new_boefjes:
             self.logger.debug(
                 "No new boefjes for organisation: %s [organisation.id=%s, scheduler_id=%s]",
                 self.organisation.name,
