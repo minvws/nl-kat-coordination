@@ -1,69 +1,64 @@
 {% load i18n %}
 
 <div class="horizontal-scroll">
-  <h2>{% translate 'Scans' %}</h2>
-  <div class="filter">
-    <div>
-      <p>
-        {% translate 'Filter' %}
-      </p>
-      <button aria-expanded="false"
-              data-hide-filters-label="{% translate 'Hide filters' %}">
-        {% translate 'Show filters' %}
-      </button>
+    <h2>{% translate 'Scans' %}</h2>
+
+    <div class="filter">
+
+        <div>
+            <p>{% translate 'Filter' %}</p>
+            <button aria-expanded="false"
+                    data-hide-filters-label="{% translate 'Hide filters' %}">
+              {% translate 'Show filters' %}
+            </button>
+        </div>
+
+        <form action="" method="get" novalidate method="get">
+
+            <fieldset>
+                <label for="scan_history_from">{% translate 'From' %}</label>
+                <input type="date" name="scan_history_from" id="scan_history-from" value="{{ request.GET.scan_history_from }}">
+            </fieldset>
+
+            <fieldset>
+                <label for="scan_history_to">{% translate 'To' %}</label>
+                <input type="date" name="scan_history_to" id="scan_history-to" value="{{ request.GET.scan_history_to }}">
+            </fieldset>
+
+            <fieldset>
+                <label for="scan_history_status">{% translate 'Status' %}</label>
+                <select name="scan_history_status" id="scan_history_status">
+                    <option value="" disabled selected>{% translate 'Select status' %}</option>
+                    <option value="completed" {% if request.GET.scan_history_status == 'completed' %}selected{% endif %}>{% translate 'Success' %}</option>
+                    <option value="failed" {% if request.GET.scan_history_status == 'failed' %}selected{% endif %}>{% translate 'Failure' %}</option>
+                </select>
+            </fieldset>
+
+            <fieldset>
+                <label for"scan_history_search">{% translate 'Search' %}</label>
+                <input type="text" name="scan_history_search" id="scan_history_search" value="{{ request.GET.scan_history_search }}" placeholder="{% translate 'Search by object name' %}">
+            </fieldset>
+
+            {% for key, value in request.GET.items %}
+                {% if key not in scan_history_form_fields %}
+                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                {% endif %}
+            {% endfor %}
+
+            <fieldset>
+                <button type="submit">{% translate 'Submit' %}</button>
+            </fieldset>
+
+        </form>
+
     </div>
-    <form action="" method="get" novalidate method="get">
-      <fieldset>
-        <label for="scan_history_from">{% translate 'From' %}</label>
-        <input type="date"
-               name="scan_history_from"
-               id="scan_history-from"
-               value="{{ request.GET.scan_history_from }}">
-      </fieldset>
-      <fieldset>
-        <label for="scan_history_to">{% translate 'To' %}</label>
-        <input type="date"
-               name="scan_history_to"
-               id="scan_history-to"
-               value="{{ request.GET.scan_history_to }}">
-      </fieldset>
-      <fieldset>
-        <label for="scan_history_status">{% translate 'Status' %}</label>
-        <select name="scan_history_status" id="scan_history_status">
-          <option value="" disabled selected>
-            {% translate 'Select status' %}
-          </option>
-          <option value="completed"
-                  {% if request.GET.scan_history_status == 'completed' %}selected{% endif %}>
-            {% translate 'Success' %}
-          </option>
-          <option value="failed"
-                  {% if request.GET.scan_history_status == 'failed' %}selected{% endif %}>
-            {% translate 'Failure' %}
-          </option>
-        </select>
-      </fieldset>
-      <fieldset>
-        <label for"scan_history_search">{% translate 'Search' %}</label>
-        <input type="text"
-               name="scan_history_search"
-               id="scan_history_search"
-               value="{{ request.GET.scan_history_search }}"
-               placeholder="{% translate 'Search by object name' %}">
-      </fieldset>
-      {% for key, value in request.GET.items %}
-        {% if key not in scan_history_form_fields %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
-      {% endfor %}
-      <fieldset>
-        <button type="submit">{% translate 'Submit' %}</button>
-      </fieldset>
-    </form>
-  </div>
-  {% if not scan_history %}
-    {% translate 'No scans found for this object' %}
-  {% else %}
-    <table rf-selector="table-scan-history">
-      <thead>
+
+    {% if not scan_history %}
+      {% translate 'No scans found for this object' %}
+    {% else %}
+
+      <table rf-selector="table-scan-history">
+        <thead>
         <tr>
           <th scope="col">{% translate 'Object' %}</th>
           <th scope="col">{% translate 'Plugin' %}</th>
@@ -72,8 +67,8 @@
           {# FIXME: implement detail page according to designs #}
           {# <th scope="col">{% translate 'Scan Details' %}</th> #}
         </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
         {% for scan in scan_history %}
           <tr>
             <td>
@@ -94,6 +89,7 @@
                 {{ scan.id }}
               {% endif %}
             </td>
+
             {% if scan.status.value == 'completed' %}
               <td class="confirmation">{{ scan.status.value|capfirst }}</td>
             {% elif scan.status.value == 'failed' %}
@@ -101,13 +97,18 @@
             {% else %}
               <td>{{ scan.status.value|capfirst }}</td>
             {% endif %}
+
             <td>{{ scan.created_at }}</td>
+
             {# FIXME: implement detail page according to designs #}
             {# <td><a href="">{% translate 'View Details' %}</a></td> #}
           </tr>
         {% endfor %}
-      </tbody>
-    </table>
-  {% endif %}
+        </tbody>
+      </table>
+
+    {% endif %}
+
 </div>
+
 {% include 'partials/list_paginator.html' with page_obj=scan_history page_param='scan_history_page' %}
