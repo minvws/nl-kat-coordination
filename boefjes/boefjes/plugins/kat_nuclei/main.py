@@ -10,7 +10,7 @@ def verify_hostname_meta(input):
     # if the input object is HostnameHTTPURL then the hostname is located in netloc
     if "netloc" in input and "name" in input["netloc"]:
         netloc_name = input["netloc"]["name"]
-        port = input.get("port")
+        port = input["port"]
         return f"{netloc_name}:{port}"
     else:
         # otherwise the Hostname input object is used
