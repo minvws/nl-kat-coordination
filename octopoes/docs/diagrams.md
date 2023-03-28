@@ -1,7 +1,4 @@
-
-
-Services
-
+## Services
 ```mermaid
 
 graph TD
@@ -27,8 +24,7 @@ graph TD
 
 ```
 
-Dataflow
-
+## Dataflow
 ```mermaid
 graph LR
 
@@ -43,7 +39,7 @@ graph LR
 
 ```
 
-OWA vs CWA
+## OWA vs CWA
 ```mermaid
 graph LR
 
@@ -61,7 +57,7 @@ graph LR
     end
 ```
 
-System that tracks orders
+## System that tracks orders
 ```mermaid
 graph LR
     subgraph db ["DB Table"]
@@ -76,4 +72,45 @@ graph LR
       Orders --- C
       Orders --- D
     end
+```
+
+## Knowledge base, rules and derived knowledge
+```mermaid
+
+flowchart LR
+    
+    subgraph kb [knowledge base]
+        a1("a")
+        b1("b")
+        c1("c")
+        d1("d")
+        
+        a1 --- b1
+        a1 --- c1
+        c1 --- d1
+    end
+   
+   subgraph dk [derived knowledge]
+        a2("a")
+        b2("b")
+        c2("c")
+        d2("d")
+        e2("e")
+        f2("f")
+        g2("g")
+        
+        a2 --- b2
+        a2 --- c2
+        c2 --- d2
+        a2 --- e2
+        d2 --- f2
+        c2 --- g2
+    end
+    
+    kb --> rules --> dk
+   
+    classDef base fill:#ca005d,color:white,stroke:#333,stroke-width:2px;
+    classDef derived fill:#eee,stroke:#333,stroke-width:2px;
+    class a1,b1,c1,d1,a2,b2,c2,d2 base
+    class e,f,g derived
 ```
