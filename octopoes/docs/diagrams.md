@@ -80,7 +80,6 @@ graph LR
 flowchart LR
 
   subgraph kb [knowledge base]
-    direction LR
     A("IPv4\n1.1.1.1")
     B("Port 3306\nOpen")
     
@@ -88,7 +87,6 @@ flowchart LR
   end
   
   subgraph dk [derived knowledge]
-    direction LR
     C("IPv4\n1.1.1.1")
     D("Port 3306\nOpen")
     E("Vulnerability\nSeverity: high")
