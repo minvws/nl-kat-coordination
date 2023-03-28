@@ -47,7 +47,7 @@ class Katalogus(HTTPService):
 
             plugins = self.get_plugins_by_organisation(org.id)
             self.organisations_plugin_cache[org.id] = {
-                plugin.id: plugin for plugin in plugins if plugin.enabled is True
+                plugin.id: plugin for plugin in plugins if plugin.enabled
             }
 
         self.logger.debug("flushed plugins cache [cache=%s]", self.organisations_plugin_cache.cache)
