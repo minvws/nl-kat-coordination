@@ -126,7 +126,7 @@ flowchart LR
     D --> O2
     
     classDef fact fill:#ca005d,stroke:#333,color:white,stroke-width:2px;
-    classDef conclusion #154273:#eee,stroke:#333,stroke-width:2px;
+    classDef conclusion fill:#154273,stroke:#333,stroke-width:2px;
     classDef operator fill:#eee,stroke:#333,stroke-width:2px;
     class A,B,C,D fact
     class C1,C2,C3 conclusion
