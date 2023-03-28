@@ -8,15 +8,19 @@ sequenceDiagram
     participant Rocky
     participant Scheduler
     participant Boefje
+    participant Bytes
     participant Normalizer
     participant Octopoes
     Rocky->>+Scheduler: Push Boefje Task
     Boefje->>Scheduler: Pull Boefje Task
     Scheduler-->>Rocky: boefje_task.status = dispatched
+    Boefje->>Bytes: Save Raw
     Boefje->>Scheduler: boefje_task.status = completed
     Scheduler->>-Rocky: boefje_task.status = completed
+    Bytes-->>Scheduler: Raw File Received
     Scheduler->>+Scheduler: Push Normalizer Task
     Normalizer->>Scheduler: Pull Normalizer Task
+    Normalizer->>Bytes: Get Raw
     Scheduler-->>Rocky: normalizer_task.status = dispatched
     Normalizer->>Octopoes: Add object(s)
     Normalizer->>Scheduler: normalizer_task.status = completed
