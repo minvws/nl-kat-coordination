@@ -74,6 +74,37 @@ graph LR
     end
 ```
 
+### Simple rule
+
+```mermaid
+flowchart LR
+
+  subgraph kb [knowledge base]
+    direction LR
+    A("IPv4\n1.1.1.1")
+    B("Port 3306\nOpen")
+    
+    A --- B
+  end
+  
+  subgraph dk [derived knowledge]
+    direction LR
+    C("IPv4\n1.1.1.1")
+    D("Port 3306\nOpen")
+    E("Vulnerability\nSeverity: high")
+    
+    C --- D --- E
+  end
+  
+  kb --> rules --> dk
+  
+  classDef base fill:#eee,stroke:#333,stroke-width:2px;
+  classDef derived fill:#ca005d,color:white,stroke:#333,stroke-width:2px;
+  class A,B,C,D base
+  class E derived
+```
+
+
 ## Knowledge base, rules and derived knowledge
 ```mermaid
 
@@ -109,8 +140,8 @@ flowchart LR
     
     kb --> rules --> dk
    
-    classDef base fill:#ca005d,color:white,stroke:#333,stroke-width:2px;
-    classDef derived fill:#eee,stroke:#333,stroke-width:2px;
+    classDef base fill:#eee,stroke:#333,stroke-width:2px;
+    classDef derived fill:#ca005d,color:white,stroke:#333,stroke-width:2px;
     class a1,b1,c1,d1,a2,b2,c2,d2 base
-    class e,f,g derived
+    class e2,f2,g2 derived
 ```
