@@ -39,6 +39,13 @@ class Server:
         )
 
         self.api.add_api_route(
+            path="/metrics",
+            endpoint=self.metrics,
+            methods=["GET"],
+            status_code=200,
+        )
+
+        self.api.add_api_route(
             path="/schedulers",
             endpoint=self.get_schedulers,
             methods=["GET"],
@@ -137,6 +144,41 @@ class Server:
 
         for service in self.ctx.services.__dict__.values():
             response.externals[service.name] = service.is_healthy()
+
+        return response
+
+    def metrics(self) -> Any:
+        response = {
+            "settings": {
+                "monitor_organisations_interval": self.ctx.config.monitor_organisations_interval,
+                "pq_maxsize": self.ctx.config.pq_maxsize,
+                "pq_populate_interval": self.ctx.config.pq_populate_interval,
+                "pq_populate_grace_period": self.ctx.config.pq_populate_grace_period,
+                "pq_populate_max_random_objects": self.ctx.config.pq_populate_max_random_objects,
+            },
+            "schedulers": {scheduler.dict().get("id"): scheduler.dict() for scheduler in self.schedulers.values()},
+            "katalogus": {
+                "katalogus_cache_ttl": self.ctx.config.katalogus_cache_ttl,
+                "organisations_plugin_cache": {
+                    "start_time": self.ctx.services.katalogus.organisations_plugin_cache.start_time,
+                    "expiration_time": self.ctx.services.katalogus.organisations_plugin_cache.expiration_time,
+                    "lifetime": self.ctx.services.katalogus.organisations_plugin_cache.lifetime,
+                    "cache": self.ctx.services.katalogus.organisations_plugin_cache.cache,
+                },
+                "organisations_boefje_type_cache": {
+                    "start_time": self.ctx.services.katalogus.organisations_boefje_type_cache.start_time,
+                    "expiration_time": self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time,
+                    "lifetime": self.ctx.services.katalogus.organisations_boefje_type_cache.lifetime,
+                    "cache": self.ctx.services.katalogus.organisations_boefje_type_cache.cache,
+                },
+                "organisations_normalizer_type_cache": {
+                    "start_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time,
+                    "expiration_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time,
+                    "lifetime": self.ctx.services.katalogus.organisations_normalizer_type_cache.lifetime,
+                    "cache": self.ctx.services.katalogus.organisations_normalizer_type_cache.cache,
+                },
+            },
+        }
 
         return response
 

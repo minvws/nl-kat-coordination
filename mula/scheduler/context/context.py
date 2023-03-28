@@ -38,6 +38,7 @@ class AppContext:
         katalogus_service = services.Katalogus(
             host=self.config.host_katalogus,
             source=f"scheduler/{scheduler.__version__}",
+            cache_ttl=self.config.katalogus_cache_ttl,
         )
 
         bytes_service = services.Bytes(

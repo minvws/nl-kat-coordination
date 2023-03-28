@@ -10,12 +10,12 @@ from .services import HTTPService
 class Katalogus(HTTPService):
     name = "katalogus"
 
-    def __init__(self, host: str, source: str, timeout: int = 5):
+    def __init__(self, host: str, source: str, timeout: int = 5, cache_ttl: int = 30):
         super().__init__(host, source, timeout)
 
-        self.organisations_plugin_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
-        self.organisations_boefje_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
-        self.organisations_normalizer_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
+        self.organisations_plugin_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(cache_ttl)
+        self.organisations_boefje_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(cache_ttl)
+        self.organisations_normalizer_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(cache_ttl)
 
         self._flush_organisations_plugin_cache()
         self._flush_organisations_normalizer_type_cache()
