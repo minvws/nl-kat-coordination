@@ -79,5 +79,6 @@ repos:
           ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |
           ^rocky/assets/src/bundles/app/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
-          ^rocky/tests/stubs
+          ^rocky/tests/stubs |
+          ^docs/source/_static
           )
