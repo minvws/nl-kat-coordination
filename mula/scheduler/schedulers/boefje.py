@@ -255,10 +255,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-            random_oois = self.ctx.services.octopoes.get_random_objects(
-                organisation_id=self.organisation.id,
-                n=self.ctx.config.pq_populate_max_random_objects,
-            )
+            random_oois = self.ctx.services.octopoes.get_random_objects(organisation_id=self.organisation.id, n=10)
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
                 "Could not get random oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
