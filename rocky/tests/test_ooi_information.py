@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from tools.add_ooi_information import retirejs_info, cve_info, snyk_info, port_info, service_info, cwe_info, get_info
+from tools.ooi_helpers import RiskLevelSeverity
 
 
 def test_retirejs_info():
@@ -117,3 +118,18 @@ def test_cwe_info():
         "description": "Not found",
         "risk": "Very low",
     }
+
+
+def test_risk_level_comparisons():
+    assert RiskLevelSeverity.CRITICAL >= RiskLevelSeverity.CRITICAL
+    assert RiskLevelSeverity.CRITICAL <= RiskLevelSeverity.CRITICAL
+    assert not RiskLevelSeverity.CRITICAL < RiskLevelSeverity.CRITICAL
+    assert not RiskLevelSeverity.CRITICAL > RiskLevelSeverity.CRITICAL
+
+    assert RiskLevelSeverity.CRITICAL >= RiskLevelSeverity.NONE
+    assert RiskLevelSeverity.CRITICAL > RiskLevelSeverity.NONE
+    assert RiskLevelSeverity.NONE <= RiskLevelSeverity.CRITICAL
+    assert RiskLevelSeverity.NONE < RiskLevelSeverity.CRITICAL
+
+    assert not RiskLevelSeverity.NONE >= RiskLevelSeverity.CRITICAL
+    assert not RiskLevelSeverity.NONE > RiskLevelSeverity.CRITICAL
