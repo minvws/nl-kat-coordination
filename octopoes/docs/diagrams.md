@@ -219,3 +219,27 @@ flowchart LR
     
     A --- ClaimSet
 ```
+
+## Factspace
+The stage where claims are consolidated into (assumed) facts.
+
+```mermaid
+
+graph LR
+    
+    subgraph ClaimSpace
+        A["Claim:\nIPv4 1.1.1.1 does not exist\nSource: Shodan\nTimestamp: 1 day ago"]
+        B["Claim:\nIPv4 1.1.1.1 exists\nSource: HTTPRequest\nTimestamp: 1 hour ago"]
+        C["Claim:\nPort 80 of IPv4 exists\nSource: HTTPRequest\nTimestamp: 1 hour ago"]
+        D["Claim:\nState of Port 80 of IPv4 1.1.1.1 = open\nSource: HTTPRequest\nTimestamp: 1 hour ago"]
+    end
+    
+    E(("IPv4\n1.1.1.1"))
+    F(("Port\n1.1.1.1:80\nState: open"))
+    
+    A -- confidence: 0.4 --- E
+    B -- confidence: 0.8 --- E
+    C -- confidence: 0.9 --- F
+    D -- condifence: 0.85 --- F
+    
+```
