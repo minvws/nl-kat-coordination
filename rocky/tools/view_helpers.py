@@ -115,7 +115,7 @@ class StepsMixin:
         return context
 
 
-class OrganizationsBreadcrumbsMixin(BreadcrumbsMixin):
+class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
     breadcrumbs = [{"url": reverse_lazy("organization_list"), "text": _("Organizations")}]
 
 
