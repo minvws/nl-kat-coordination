@@ -3,8 +3,11 @@
 <section>
   <div class="column-2">
     <div>
-      <h1>{% translate 'Findings overview' %}</h1>
-
+      {% if is_red_teamer %}
+        <h1>{% translate 'Findings per organization' %}</h1>
+      {% else %}
+        <h1>{% translate 'Total findings' %}</h1>
+      {% endif %}
       {% if organizations %}
         <table>
           <thead>
@@ -18,7 +21,7 @@
             {% for findings in findings_per_org_total %}
               <tr>
                 <td>
-                  <a href="{% url 'organization_settings' findings.organization.code %}">{{ findings.organization.name }}</a>
+                  <a href="{% url 'organization_crisis_room' findings.organization.code %}">{{ findings.organization.name }}</a>
                 </td>
                 <td class="number">{{ findings|get_item:"meta"|get_item:"total" }}</td>
                 <td>
@@ -87,7 +90,7 @@
             {% for findings in findings_per_org_critical %}
               <tr>
                 <td>
-                  <a href="{% url 'organization_settings' findings.organization.code %}">{{ findings.organization.name }}</a>
+                  <a href="{% url 'organization_crisis_room' findings.organization.code %}">{{ findings.organization.name }}</a>
                 </td>
                 <td class="number">{{ findings|get_item:"meta"|get_item:"total_by_severity"|get_item:"critical" }}</td>
                 <td>
