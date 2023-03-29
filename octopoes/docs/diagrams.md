@@ -203,18 +203,6 @@ graph
 
 ## ClaimSpace
 
-A graph where the output of a plugin is a set of claims
-
-Plugin output = Claim Set
-
-Claim can be:
-Entity exists
-Entity does not exist (note: this is not supported in Octopoes v2)
-Entity has attribute, with value x
-
-The Claim Set of a plugin-OOI combination replaces the previous Claim Set of the same combination.
-
-
 ```mermaid
 flowchart LR
 
