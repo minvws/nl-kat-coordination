@@ -32,7 +32,7 @@
                   {% if perms.tools.change_organization %}
                     {% spaceless %}
                       <a href="{% url 'organization_edit' organization.code %}">
-                        <button class="icon ti-edit">{% translate 'Edit' %}</button>
+                        <button class="icon ti-edit action-button">{% translate 'Edit' %}</button>
                       </a>
                     {% endspaceless %}
                   {% endif %}
