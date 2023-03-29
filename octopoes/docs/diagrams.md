@@ -176,3 +176,26 @@ flowchart LR
     class e2,f2,g2 derived
 ```
 
+```mermaid  
+graph
+ 
+
+    A[Raw data]
+    B[ClaimSpace]
+    C[FactSpace]
+    D[Materialized Knowledge Graph]
+    
+    p1["entity extraction \n(whiskers)"]
+    p2["entity recognition \n(model)"]
+    p3["conflict resolution"]
+    p4["inference \n(bits)"]
+    
+    A --> p1 
+    p1 --> p2 --> B --> p3 --> C --> p4 --> D
+    p4 -.-> B
+    
+    classDef stage fill:#ca005d,color:white,stroke:#333,stroke-width:2px;  
+    classDef processor fill:#eee,stroke:#333,stroke-width:2px;
+    class A,B,C,D stage
+    class p1,p2,p3,p4 processor
+```
