@@ -12,8 +12,8 @@ from tests.conftest import setup_request
 
 def test_plugin_detail(
     rf,
-    my_user,
-    organization,
+    superuser_member,
+    redteam_member,
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
@@ -29,9 +29,9 @@ def test_plugin_detail(
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("plugin_detail", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("plugin_detail", data={"boefje_id": 123}), superuser_member.user)
     response = PluginDetailView.as_view()(
-        request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"
+        request, organization_code=redteam_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
     )
 
     assertContains(response, "TestBoefje")
@@ -41,8 +41,7 @@ def test_plugin_detail(
 
 def test_plugin_detail_data_missing(
     rf,
-    my_user,
-    organization,
+    superuser_member,
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
@@ -50,17 +49,16 @@ def test_plugin_detail_data_missing(
     network,
     lazy_task_list_with_boefje,
 ):
-    request = setup_request(rf.post("plugin_detail"), my_user)
+    request = setup_request(rf.post("step_organization_setup"), superuser_member.user)
     with pytest.raises(BadRequest):
         PluginDetailView.as_view()(
-            request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"
+            request, organization_code=superuser_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
         )
 
 
 def test_plugin_detail_bad_plugin_id(
     rf,
-    my_user,
-    organization,
+    superuser_member,
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
@@ -75,9 +73,9 @@ def test_plugin_detail_bad_plugin_id(
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](count=1, items=[network])
     mock_mixins_katalogus().get_plugin.side_effect = HTTPError(response=mocker.MagicMock(status_code=404))
 
-    request = setup_request(rf.post("plugin_detail", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("plugin_detail", data={"boefje_id": 123}), superuser_member.user)
 
     with pytest.raises(Http404):
         PluginDetailView.as_view()(
-            request, organization_code=organization.code, plugin_type="boefje", plugin_id="bad-plugin"
+            request, organization_code=superuser_member.organization.code, plugin_type="boefje", plugin_id="bad-plugin"
         )

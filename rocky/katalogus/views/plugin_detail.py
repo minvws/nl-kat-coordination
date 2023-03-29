@@ -26,7 +26,9 @@ class PluginCoverImgView(OrganizationView):
     """Get the cover image of a plugin."""
 
     def get(self, request, *args, **kwargs):
-        return FileResponse(get_katalogus(self.organization.code).get_cover(kwargs["plugin_id"]))
+        file = FileResponse(get_katalogus(self.organization.code).get_cover(kwargs["plugin_id"]))
+        file.headers["Cache-Control"] = "max-age=604800"
+        return file
 
 
 @class_view_decorator(otp_required)
