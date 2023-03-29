@@ -19,7 +19,7 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
     ended_at = Column(DateTime(timezone=True))
 
 
-Index("organization_boefje_id", BoefjeMetaInDB.organization, BoefjeMetaInDB.boefje_id)
+Index("boefje_meta_organization_boefje_id", BoefjeMetaInDB.organization, BoefjeMetaInDB.boefje_id)
 
 
 class RawFileInDB(SQL_BASE):  # type: ignore
