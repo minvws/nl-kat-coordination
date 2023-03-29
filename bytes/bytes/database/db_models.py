@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, String
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Index
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 
@@ -17,6 +17,9 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
 
     started_at = Column(DateTime(timezone=True))
     ended_at = Column(DateTime(timezone=True))
+
+
+Index("organization_boefje_id", BoefjeMetaInDB.organization, BoefjeMetaInDB.boefje_id)
 
 
 class RawFileInDB(SQL_BASE):  # type: ignore
