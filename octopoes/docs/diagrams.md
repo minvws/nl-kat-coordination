@@ -200,3 +200,34 @@ graph
     class A,B,C,D stage
     class p1,p2,p3,p4 processor
 ```
+
+## ClaimSpace
+
+A graph where the output of a plugin is a set of claims
+
+Plugin output = Claim Set
+
+Claim can be:
+Entity exists
+Entity does not exist (note: this is not supported in Octopoes v2)
+Entity has attribute, with value x
+
+The Claim Set of a plugin-OOI combination replaces the previous Claim Set of the same combination.
+
+
+```mermaid
+flowchart LR
+
+    A["PluginOutput\nNmap on IPv4 1.1.1.1"]
+    
+    subgraph ClaimSet
+        direction TB
+        B["Claim:\nIPv4 1.1.1.1 exists"]
+        C["Claim:\nPort 80 of IPv4 1.1.1.1 exists"]
+        D["Claim:\nState of Port 80 of IPv4 1.1.1.1 = open"]
+
+        B ~~~ C ~~~ D
+    end
+    
+    A --- ClaimSet
+```
