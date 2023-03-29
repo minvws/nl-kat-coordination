@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
@@ -9,7 +11,23 @@ from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_list import OrganizationMemberListView
-from tests.conftest import setup_request
+from tests.conftest import setup_request, create_member
+from tools.models import Organization
+
+AMOUNT_OF_TEST_ORGANIZATIONS = 50
+
+
+@pytest.fixture
+def bulk_organizations(active_member, blocked_member):
+    with patch("katalogus.client.KATalogusClientV1"), patch("tools.models.OctopoesAPIConnector"):
+        organizations = []
+        for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
+            org = Organization.objects.create(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
+
+            for member in [active_member, blocked_member]:
+                create_member(member.user, org)
+            organizations.append(org)
+    return organizations
 
 
 def test_organization_list_non_superuser(rf, client_member):
@@ -35,13 +53,21 @@ def test_edit_organization(rf, superuser_member):
     assertContains(response, "Save organization")
 
 
-def test_organization_list(rf, superuser_member):
-    request = setup_request(rf.get("organization_list"), superuser_member.user)
-    response = OrganizationListView.as_view()(request)
+def test_organization_list(rf, superuser_member, bulk_organizations, django_assert_max_num_queries):
+    """Verify that this view does not query the database for each organization."""
 
-    assertContains(response, "Organizations")
-    assertContains(response, "Add new organization")
-    assertContains(response, superuser_member.organization.name)
+    with django_assert_max_num_queries(
+        AMOUNT_OF_TEST_ORGANIZATIONS, info="Too many queries for organization list view"
+    ):
+        request = setup_request(rf.get("organization_list"), superuser_member.user)
+        response = OrganizationListView.as_view()(request)
+
+        assertContains(response, "Organizations")
+        assertContains(response, "Add new organization")
+        assertContains(response, superuser_member.organization.name)
+
+        for org in bulk_organizations:
+            assertContains(response, org.name)
 
 
 def test_organization_member_list(rf, admin_member):
