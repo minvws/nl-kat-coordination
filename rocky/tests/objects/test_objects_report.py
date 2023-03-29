@@ -35,12 +35,14 @@ TREE_DATA = {
 }
 
 
-def test_ooi_report(rf, my_user, organization, ooi_information, mock_organization_view_octopoes):
+def test_ooi_report(rf, client_member, ooi_information, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
-    request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
-    response = OOIReportView.as_view()(request, organization_code=organization.code)
+    request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user)
+    request.resolver_match = resolve(
+        reverse("ooi_report", kwargs={"organization_code": client_member.organization.code})
+    )
+    response = OOIReportView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
     assertContains(response, "testnetwork")
@@ -48,11 +50,15 @@ def test_ooi_report(rf, my_user, organization, ooi_information, mock_organizatio
     assertContains(response, "Fake recommendation...")
 
 
-def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organization_view_octopoes, mocker):
+def test_ooi_pdf_report(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
-    request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
+    request = setup_request(
+        rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
+    )
+    request.resolver_match = resolve(
+        reverse("ooi_report", kwargs={"organization_code": client_member.organization.code})
+    )
 
     dt_in_filename = "2023_14_03T13_48_19_418402_+0000"
     mock_datetime = mocker.patch("rocky.keiko.datetime")
@@ -65,7 +71,7 @@ def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organiz
     mock_keiko_client.generate_report.return_value = "fake_report_id"
     mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
 
-    response = OOIReportPDFView.as_view()(request, organization_code=organization.code)
+    response = OOIReportPDFView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
     assert response.getvalue() == b"fake_binary_pdf_content"
@@ -87,7 +93,7 @@ def test_ooi_pdf_report(rf, my_user, organization, ooi_information, mock_organiz
     assert report_data_param["findings_grouped"]["KAT-000"]["list"][0]["description"] == "Fake description..."
 
 
-def test_organization_pdf_report(rf, my_user, organization, ooi_information, mock_organization_view_octopoes, mocker):
+def test_organization_pdf_report(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
         count=150,
         items=[
@@ -102,8 +108,12 @@ def test_organization_pdf_report(rf, my_user, organization, ooi_information, moc
         * 150,
     )
 
-    request = setup_request(rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
-    request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
+    request = setup_request(
+        rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
+    )
+    request.resolver_match = resolve(
+        reverse("ooi_report", kwargs={"organization_code": client_member.organization.code})
+    )
 
     dt_in_filename = "2023_14_03T13_48_19_418402_+0000"
     mock_datetime = mocker.patch("rocky.keiko.datetime")
@@ -114,7 +124,7 @@ def test_organization_pdf_report(rf, my_user, organization, ooi_information, moc
     mock_keiko_client.generate_report.return_value = "fake_report_id"
     mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
 
-    response = FindingReportPDFView.as_view()(request, organization_code=organization.code)
+    response = FindingReportPDFView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
     assert response.getvalue() == b"fake_binary_pdf_content"
@@ -133,7 +143,7 @@ def test_organization_pdf_report(rf, my_user, organization, ooi_information, moc
     assert report_data_param["findings_grouped"]["KAT-0001"]["list"][0]["description"] == "test description 123"
 
 
-def test_pdf_report_command(tmp_path, my_user, organization, ooi_information, mocker):
+def test_pdf_report_command(tmp_path, client_member, ooi_information, mocker):
     mock_organization_view_octopoes = mocker.patch("tools.management.commands.generate_report.OctopoesAPIConnector")
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
         count=1,
@@ -158,26 +168,32 @@ def test_pdf_report_command(tmp_path, my_user, organization, ooi_information, mo
     mock_keiko_client.get_report.return_value = BytesIO(b"fake_binary_pdf_content")
 
     tmp_file = tmp_path / "test.pdf"
-    call_command("generate_report", code=organization.code, output=tmp_file, min_severity=RiskLevelSeverity.HIGH)
+    call_command(
+        "generate_report", code=client_member.organization.code, output=tmp_file, min_severity=RiskLevelSeverity.HIGH
+    )
 
     assert tmp_file.exists()
     assert tmp_file.read_text() == "fake_binary_pdf_content"
 
 
-def test_ooi_pdf_report_timeout(rf, my_user, organization, ooi_information, mock_organization_view_octopoes, mocker):
+def test_ooi_pdf_report_timeout(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), my_user)
-    request.resolver_match = resolve(reverse("ooi_report", kwargs={"organization_code": organization.code}))
+    request = setup_request(
+        rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
+    )
+    request.resolver_match = resolve(
+        reverse("ooi_report", kwargs={"organization_code": client_member.organization.code})
+    )
 
     mock_keiko_session = mocker.patch("rocky.views.ooi_report.keiko_client.session")
     mock_keiko_session.post.side_effect = HTTPError
 
-    response = OOIReportPDFView.as_view()(request, organization_code=organization.code)
+    response = OOIReportPDFView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 302
     assert (
         response.url
-        == reverse("ooi_report", kwargs={"organization_code": organization.code})
+        == reverse("ooi_report", kwargs={"organization_code": client_member.organization.code})
         + "?ooi_id=Finding%7CNetwork%7Ctestnetwork%7CKAT-000"
     )

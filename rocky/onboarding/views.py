@@ -299,6 +299,7 @@ class OnboardingSetClearanceLevelView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["boefjes"] = self.get_boefjes_tiles()
+        context["ooi"] = self.request.GET.get("ooi_id", None)
         return context
 
     def get_success_url(self, **kwargs):
