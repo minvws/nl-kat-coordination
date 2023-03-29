@@ -15,9 +15,14 @@ services:
       - .env
 
   postgres:
+    restart: on-failure
     image: postgres:15
     ports:
       - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD", "gosu", "postgres", "pg_isready"]
+      interval: 10s
+      retries: 10
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
