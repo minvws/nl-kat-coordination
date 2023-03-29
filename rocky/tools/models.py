@@ -10,7 +10,7 @@ from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from requests import RequestException
-
+from django.contrib.auth.models import Group
 from katalogus.client import get_katalogus, KATalogusClientV1
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.exceptions import RockyError
@@ -161,6 +161,7 @@ class OrganizationMember(models.Model):
 
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
+    groups = models.ManyToManyField(Group, related_name="members", blank=True)
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
