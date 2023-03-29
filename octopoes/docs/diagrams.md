@@ -237,9 +237,9 @@ graph LR
     E(("IPv4\n1.1.1.1"))
     F(("Port\n1.1.1.1:80\nState: open"))
     
-    A -- confidence: 0.4 --- E
-    B -- confidence: 0.8 --- E
-    C -- confidence: 0.9 --- F
-    D -- condifence: 0.85 --- F
+    A -. confidence: 0.4 -.- E
+    B == confidence: 0.8 === E
+    C == confidence: 0.9 === F
+    D == condifence: 0.85 === F
     
 ```
