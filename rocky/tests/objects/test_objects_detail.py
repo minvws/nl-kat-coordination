@@ -51,9 +51,7 @@ def test_ooi_detail(
 
     assertContains(response, "Plugin")
     assertContains(response, "test-boefje")
-    assertContains(
-        response, f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">test-boefje</a>'
-    )
+    assertContains(response, f'href="/en/{organization.code}/kat-alogus/plugins/boefje/test-boefje/">test-boefje</a>')
     assertContains(response, "Status")
     assertContains(response, "Completed")
     assertContains(response, "Created date")
