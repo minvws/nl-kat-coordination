@@ -193,6 +193,7 @@ graph
     A --> p1 
     p1 --> p2 --> B --> p3 --> C --> p4 --> D
     p4 -.-> B
+    p4 -.-> C
     
     classDef stage fill:#ca005d,color:white,stroke:#333,stroke-width:2px;  
     classDef processor fill:#eee,stroke:#333,stroke-width:2px;
