@@ -19,7 +19,7 @@ from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_edit import OOIEditView
 from rocky.views.ooi_findings import OOIFindingListView
 from rocky.views.ooi_list import OOIListView, OOIListExportView
-from rocky.views.ooi_report import OOIReportView, OOIReportPDFView
+from rocky.views.ooi_report import OOIReportView, OOIReportPDFView, FindingReportPDFView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
 from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_detail import OrganizationDetailView
@@ -71,6 +71,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/findings/", FindingListView.as_view(), name="finding_list"),
     path("<organization_code>/findings/add/", FindingAddView.as_view(), name="finding_add"),
     path("<organization_code>/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
+    path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
     path("<organization_code>/objects/report/", OOIReportView.as_view(), name="ooi_report"),
     path("<organization_code>/objects/report/pdf/", OOIReportPDFView.as_view(), name="ooi_pdf_report"),
@@ -84,7 +85,7 @@ urlpatterns += i18n_patterns(
         name="organization_add",
     ),
     path(
-        "<organization_code>/<path:pk>/edit/",
+        "<organization_code>/edit/",
         OrganizationEditView.as_view(),
         name="organization_edit",
     ),
@@ -99,7 +100,7 @@ urlpatterns += i18n_patterns(
         name="organization_detail",
     ),
     path(
-        "organization_members/<path:pk>/edit/",
+        "<organization_code>/members/edit/<int:pk>/",
         OrganizationMemberEditView.as_view(),
         name="organization_member_edit",
     ),

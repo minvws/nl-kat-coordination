@@ -35,6 +35,20 @@
         <div class="explanation"
              role="group"
              aria-label="{% translate 'explanation' %}">
+          <span>{% translate 'Explanation' %}:</span>
+          <p>
+            {% if 'safe' in message.tags %}
+              {{ message|safe }}
+            {% else %}
+              {{ message }}
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    {% elif 'warning' in message.tags %}
+      <div class="message">
+        <div class="warning" role="group" aria-label="{% translate 'warning' %}">
+          <span>{% translate 'Warning' %}:</span>
           <p>
             {% if 'safe' in message.tags %}
               {{ message|safe }}

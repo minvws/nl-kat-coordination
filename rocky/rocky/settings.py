@@ -125,6 +125,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "tools.context_processors.languages",
+                "tools.context_processors.organizations_including_blocked",
             ],
             "builtins": ["tools.templatetags.ooi_extra"],
         },
