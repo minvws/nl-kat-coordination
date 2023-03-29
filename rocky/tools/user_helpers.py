@@ -1,5 +1,3 @@
-from typing import List
-
 from django.contrib.auth import get_user_model
 
 from tools.models import (
@@ -8,13 +6,6 @@ from tools.models import (
 )
 
 User = get_user_model()
-
-
-def organizations_for_user(user: User) -> List[Organization]:
-    if is_red_team(user):
-        return Organization.objects.all()
-
-    return [OrganizationMember.objects.get(user=user).organization]
 
 
 def is_red_team(user: User) -> bool:
