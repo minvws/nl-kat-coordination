@@ -19,8 +19,8 @@ class Settings(BaseSettings):
     api_port: int = Field(8000, env="SCHEDULER_API_PORT")
 
     # Application settings
-    boefje_populate: bool = Field(False, env="SCHEDULER_BOEFJE_POPULATE")  # FIXME: remove
-    normalizer_populate: bool = Field(True, env="SCHEDULER_NORMALIZER_POPULATE")  # FIXME: remove
+    boefje_populate: bool = Field(False, env="SCHEDULER_BOEFJE_POPULATE")
+    normalizer_populate: bool = Field(True, env="SCHEDULER_NORMALIZER_POPULATE")
     katalogus_cache_ttl: int = Field(30, env="SCHEDULER_KATALOGUS_CACHE_TTL")
     monitor_organisations_interval: int = Field(60, env="SCHEDULER_MONITOR_ORGANISATIONS_INTERVAL")
 
