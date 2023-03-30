@@ -1,22 +1,10 @@
 from tools.user_helpers import (
-    organizations_for_user,
     is_red_team,
     is_admin,
     indemnification_present,
     can_scan_organization,
     can_switch_organization,
 )
-
-
-def test_organizations_for_user(superuser_member):
-    result = organizations_for_user(superuser_member.user)
-
-    assert len(result) == 1
-
-
-def test_organizations_for_red_teamer(redteam_member):
-    result = organizations_for_user(redteam_member.user)
-    assert len(result) == 1
 
 
 def test_is_not_red_team(superuser_member):
