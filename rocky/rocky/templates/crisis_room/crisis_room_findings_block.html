@@ -17,7 +17,7 @@
             {% for findings in findings_per_org_total %}
               <tr>
                 <td>
-                  <a href="{% url 'organization_detail' findings.organization.code %}">{{ findings.organization.name }}</a>
+                  <a href="{% url 'organization_crisis_room' findings.organization.code %}">{{ findings.organization.name }}</a>
                 </td>
                 <td class="number">{{ findings|get_item:"meta"|get_item:"total" }}</td>
                 <td>
@@ -86,7 +86,7 @@
             {% for findings in findings_per_org_critical %}
               <tr>
                 <td>
-                  <a href="{% url 'organization_detail' findings.organization.code %}">{{ findings.organization.name }}</a>
+                  <a href="{% url 'organization_crisis_room' findings.organization.code %}">{{ findings.organization.name }}</a>
                 </td>
                 <td class="number">{{ findings|get_item:"meta"|get_item:"total_by_severity"|get_item:"critical" }}</td>
                 <td>
