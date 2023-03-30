@@ -27,7 +27,7 @@ After downloading they can be installed as follows:
 .. code-block:: sh
 
     tar zvxf kat-*.tar.gz
-    apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
+    sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
 
 Set up the databases
 ====================
@@ -38,7 +38,7 @@ If you will be running the database on the same machine as KAT, you can install 
 
 .. code-block:: sh
 
-    apt install postgresql
+    sudo apt install postgresql
 
 Rocky DB
 --------
@@ -213,7 +213,7 @@ Or use this command to do it for you:
 
 .. code-block:: sh
 
-    sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
+    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
 
 Configure Bytes credentials
 ===========================
@@ -228,7 +228,7 @@ This oneliner will do it for you:
 
 .. code-block:: sh
 
-    sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
+    sudo sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
 
 Restart KAT
 ===========
@@ -260,8 +260,8 @@ You can upgrade OpenKAT by installing the newer packages:
 
 .. code-block:: sh
 
-    tar zvxf kat-debian-packages.tar.gz -C /opt && cd /opt/kat-debian-packages
-    apt install --no-install-recommends ./kat-*_all.deb
+    sudo tar zvxf kat-debian-packages.tar.gz -C /opt && cd /opt/kat-debian-packages
+    sudo apt install --no-install-recommends ./kat-*_all.deb
 
 After installation you need to run the database migrations and load fixture again. For Rocky DB:
 
