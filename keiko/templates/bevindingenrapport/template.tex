@@ -36,7 +36,7 @@
 
 %KEIKO-specific variables
 \newcommand\application{KEIKO @@{keiko_version}@@}
-\newcommand\reporttitle{Bevindingenrapport voor @@{ooi.object_type}@@ @@{ooi.human_readable}@@}
+\newcommand\reporttitle{Bevindingenrapport voor @@{report_source_type}@@ @@{report_source_value}@@}
 \newcommand\tlp{AMBER}
 \newcommand\tlpbox{\colorbox{black}{\color{orange}TLP:AMBER}}
 %END-KEIKO
@@ -168,7 +168,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 
 	\subsection{Voorvallen}
 	{% for finding in occurrence.list %}
-		\subsubsection{@@{finding.ooi.human_readable}@@}
+		\subsubsection{@@{finding.ooi}@@}
 		@@{finding.description}@@
 	{% endfor %}
 

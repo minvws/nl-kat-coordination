@@ -34,7 +34,10 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
 
     def form_valid(self, form):
         self.object = form.save()
-        OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
+        member, _ = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
+        member.acknowledged_clearance_level = 4
+        member.trusted_clearance_level = 4
+        member.save()
         self.add_success_notification()
         return super().form_valid(form)
 
