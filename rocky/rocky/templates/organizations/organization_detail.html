@@ -22,18 +22,22 @@
                 <td>{{ organization.name }}</td>
                 <td>{{ organization.code }}</td>
                 <td>
-                  {% spaceless %}
-                    <a href="{% url 'organization_edit' organization.code %}">
-                      <button class="icon ti-edit">{% translate 'Edit' %}</button>
-                    </a>
-                  {% endspaceless %}
+                  {% if perms.tools.change_organization %}
+                    {% spaceless %}
+                      <a href="{% url 'organization_edit' organization.code %}">
+                        <button class="icon ti-edit">{% translate 'Edit' %}</button>
+                      </a>
+                    {% endspaceless %}
+                  {% endif %}
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <a href="{% url 'indemnification_add' organization.code %}"
-           class="button ghost">{% translate 'Add indemnification' %}</a>
+        {% if perms.tools.change_organization %}
+          <a href="{% url 'indemnification_add' organization.code %}"
+             class="button ghost">{% translate 'Add indemnification' %}</a>
+        {% endif %}
       </div>
     </section>
     {% if organization.tags.all %}

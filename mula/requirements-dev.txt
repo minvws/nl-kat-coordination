@@ -1,7 +1,7 @@
 -r requirements.txt
 factory_boy==3.2.1
 mypy==1.0.1
-black==22.10.0
+black==23.1.0
 pylint==2.15.6
 click==8.0.4
 psutil==5.9.4

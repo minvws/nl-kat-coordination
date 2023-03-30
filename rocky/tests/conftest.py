@@ -1,10 +1,9 @@
 import json
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 import pytest
 import binascii
 from os import urandom
-from django.contrib.auth.models import Permission, Group
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django_otp import DEVICE_ID_SESSION_KEY
@@ -13,7 +12,9 @@ from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
-from tools.models import OrganizationMember, OOIInformation, Organization, Indemnification
+from unittest.mock import patch
+from tools.models import OOIInformation, Organization, OrganizationMember, Indemnification
+from django.contrib.auth.models import Permission, Group
 from tools.models import GROUP_REDTEAM, GROUP_ADMIN, GROUP_CLIENT
 
 
@@ -30,8 +31,8 @@ def create_user(django_user_model, email, password, name, device_name, superuser
 
 def create_organization(name, organization_code):
     katalogus_client = "katalogus.client.KATalogusClientV1"
-    octopoes_connector = "tools.models.OctopoesAPIConnector"
-    with patch(katalogus_client), patch(octopoes_connector):
+    octopoes_node = "tools.models.OctopoesAPIConnector"
+    with patch(katalogus_client), patch(octopoes_node):
         return Organization.objects.create(name=name, code=organization_code)
 
 
@@ -58,8 +59,8 @@ def add_admin_group_permissions(user):
         Permission.objects.get(codename="view_organization").id,
         Permission.objects.get(codename="view_organizationmember").id,
         Permission.objects.get(codename="add_organizationmember").id,
-        Permission.objects.get(codename="change_organizationmember").id,
         Permission.objects.get(codename="change_organization").id,
+        Permission.objects.get(codename="change_organizationmember").id,
     ]
     group.permissions.set(admin_permissions)
 
@@ -88,89 +89,6 @@ def organization():
 @pytest.fixture
 def organization_b():
     return create_organization("OrganizationB", "org_b")
-
-
-@pytest.fixture
-def normal_user_without_organization_member(django_user_model):
-    user = django_user_model.objects.create(email="normal@openkat.nl", password="TestTest123!!")
-    user.is_verified = lambda: True
-
-    device = user.staticdevice_set.create(name="default")
-    device.token_set.create(token="12345678")
-
-    return user
-
-
-@pytest.fixture
-def normal_user(normal_user_without_organization_member, organization):
-    user = normal_user_without_organization_member
-
-    OrganizationMember.objects.create(
-        user=user,
-        organization=organization,
-        status=OrganizationMember.STATUSES.ACTIVE,
-        trusted_clearance_level=4,
-        acknowledged_clearance_level=4,
-        onboarded=True,
-    )
-    Indemnification.objects.create(
-        organization=organization,
-        user=user,
-    )
-    user.user_permissions.add(Permission.objects.get(codename="can_scan_organization"))
-
-    return user
-
-
-@pytest.fixture
-def user(django_user_model):
-    user = django_user_model.objects.create_superuser(email="admin@openkat.nl", password="TestTest123!!")
-    user.is_verified = lambda: True
-
-    device = user.staticdevice_set.create(name="default")
-    device.token_set.create(token=user.get_username())
-
-    return user
-
-
-@pytest.fixture
-def user2(django_user_model):
-    user = django_user_model.objects.create_superuser(email="cl1@openkat.nl", password="TestTest123!!")
-    user.is_verified = lambda: True
-
-    device = user.staticdevice_set.create(name="default")
-    device.token_set.create(token=user.get_username())
-
-    return user
-
-
-@pytest.fixture
-def user3(django_user_model):
-    user = django_user_model.objects.create_superuser(email="cl2@openkat.nl", password="TestTest123!!")
-    user.is_verified = lambda: True
-
-    device = user.staticdevice_set.create(name="default")
-    device.token_set.create(token=user.get_username())
-
-    return user
-
-
-@pytest.fixture
-def my_user(user, organization):
-    OrganizationMember.objects.create(
-        user=user,
-        organization=organization,
-        status=OrganizationMember.STATUSES.ACTIVE,
-        trusted_clearance_level=4,
-        acknowledged_clearance_level=4,
-    )
-    Indemnification.objects.create(
-        organization=organization,
-        user=user,
-    )
-    user.user_permissions.add(Permission.objects.get(codename="can_scan_organization"))
-
-    return user
 
 
 @pytest.fixture
@@ -304,17 +222,6 @@ def blocked_member(django_user_model, organization):
     member.status = OrganizationMember.STATUSES.BLOCKED
     member.save()
     return member
-
-
-@pytest.fixture
-def my_red_teamer(my_user, organization):
-    group = Group.objects.create(name=GROUP_ADMIN)
-    group.user_set.add(my_user)
-
-    group = Group.objects.create(name=GROUP_REDTEAM)
-    group.user_set.add(my_user)
-
-    return my_user
 
 
 @pytest.fixture
