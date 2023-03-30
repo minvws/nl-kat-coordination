@@ -6,3 +6,4 @@ Release notes
    :caption: Releases
 
    1.5
+   1.8
