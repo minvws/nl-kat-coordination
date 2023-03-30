@@ -24,6 +24,7 @@ def test_boefjes_tasks(rf, client_member, mocker, lazy_task_list_empty):
                 status=None,
                 min_created_at=None,
                 max_created_at=None,
+                filters=[],
             )
         ]
     )
@@ -47,6 +48,7 @@ def test_tasks_view_simple(rf, client_member, mocker, lazy_task_list_with_boefje
                 status=None,
                 min_created_at=None,
                 max_created_at=None,
+                filters=[],
             )
         ]
     )

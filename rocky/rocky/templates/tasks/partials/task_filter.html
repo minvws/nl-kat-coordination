@@ -8,7 +8,7 @@
       </button>
   </div>
 
-  <form action="" method="get" novalidate method="get">
+  <form>
     <fieldset>
         <label for="scan_history_from">{% translate 'From' %}</label>
         <input type="date" name="scan_history_from" id="scan_history-from" value="{{ request.GET.scan_history_from }}">
@@ -18,20 +18,20 @@
         <label for="scan_history_to">{% translate 'To' %}</label>
         <input type="date" name="scan_history_to" id="scan_history-to" value="{{ request.GET.scan_history_to }}">
     </fieldset>
-    <input type="submit"
-            value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}"/>
 
     <fieldset>
       <label for="scan_history_status">{% translate 'Status' %}</label>
       <select name="scan_history_status" id="scan_history_status">
           <option value="" disabled selected>{% translate 'Select status' %}</option>
+          <option value="queued" {% if request.GET.scan_history_status == 'queued' %}selected{% endif %}>{% translate 'Queued' %}</option>
+          <option value="dispatched" {% if request.GET.scan_history_status == 'dispatched' %}selected{% endif %}>{% translate 'Dispatched' %}</option>
           <option value="completed" {% if request.GET.scan_history_status == 'completed' %}selected{% endif %}>{% translate 'Success' %}</option>
           <option value="failed" {% if request.GET.scan_history_status == 'failed' %}selected{% endif %}>{% translate 'Failure' %}</option>
       </select>
     </fieldset>
 
     <fieldset>
-        <label for"scan_history_search">{% translate 'Search' %}</label>
+        <label for="scan_history_search">{% translate 'Search' %}</label>
         <input type="text" name="scan_history_search" id="scan_history_search" value="{{ request.GET.scan_history_search }}" placeholder="{% translate 'Search by object name' %}">
         {% for key, value in request.GET.items %}
           {% if key not in scan_history_form_fields %}
@@ -41,6 +41,6 @@
     </fieldset>
     <input type="submit"
     value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}"/>
-
+    <a href="../tasks">Clear filters</a>
   </form>
 </div>
