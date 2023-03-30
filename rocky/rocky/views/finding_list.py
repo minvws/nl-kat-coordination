@@ -62,3 +62,19 @@ class FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
                 "text": _("Findings"),
             }
         ]
+
+
+class Top10FindingListView(FindingListView):
+    template_name = "findings/finding_list.html"
+    ooi_types = {Finding}
+
+    def get_queryset(self):
+        return super().get_queryset()[:10]
+
+    def build_breadcrumbs(self):
+        return [
+            {
+                "url": reverse_lazy("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
+                "text": _("Crisis room"),
+            }
+        ]
