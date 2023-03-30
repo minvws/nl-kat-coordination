@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% if organizations_dropdown_list|length > 0 %}
+{% if organizations_including_blocked|length > 0 %}
   <div class="dropdown">
     <button class="dropdown-button ghost">
       {% if not organization.code %}
@@ -17,7 +17,7 @@
       {% for org in organizations_including_blocked %}
         {% if organization.code != org.code %}
           <li>
-            <a href="{% url 'organization_detail' org.code %}">{{ org.name }}</a>
+            <a href="{% url 'organization_crisis_room' org.code %}">{{ org.name }}</a>
           </li>
         {% endif %}
       {% endfor %}
