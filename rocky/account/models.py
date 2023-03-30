@@ -1,8 +1,13 @@
+from functools import cached_property
+from typing import List
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from tools.models import OrganizationMember, Organization
 
 
 class KATUserManager(BaseUserManager):
@@ -79,3 +84,39 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return self.full_name
+
+    @cached_property
+    def all_organizations(self) -> List[Organization]:
+        return list(Organization.objects.all())
+
+    @cached_property
+    def organization_members(self) -> List[OrganizationMember]:
+        """
+        Lists the user's OrganizationMembers including the related Organizations.
+        """
+        return self.members.select_related("organization")
+
+    @cached_property
+    def organizations(self) -> List[Organization]:
+        """
+        Lists all organizations a user is a member of, excluding organizations to which access is blocked.
+
+        Superusers are considered to be members of all organizations.
+        """
+        if self.is_superuser:
+            return self.all_organizations
+        return [
+            m.organization
+            for m in filter(lambda o: o.status is not OrganizationMember.STATUSES.BLOCKED, self.organization_members)
+        ]
+
+    @cached_property
+    def organizations_including_blocked(self) -> List[Organization]:
+        """
+        Lists all organizations a user is a member of, including organizations to which access is blocked.
+
+        Superusers are considered to be members of all organizations.
+        """
+        if self.is_superuser:
+            return self.all_organizations
+        return [m.organization for m in self.organization_members]
