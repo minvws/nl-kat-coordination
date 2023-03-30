@@ -1,10 +1,6 @@
 {% load static %}
 {% load i18n %}
-{% load organization_management %}
 
-{% if request.user.is_authenticated %}
-  {% get_organizations request.user as organizations_dropdown_list %}
-{% endif %}
 <header>
   {% include 'partials/skip-to-content.html' %}
   {% include 'partials/page-meta.html' %}

@@ -61,7 +61,7 @@
         <thead>
         <tr>
           <th scope="col">{% translate 'Object' %}</th>
-          <th scope="col">{% translate 'Boefje' %}</th>
+          <th scope="col">{% translate 'Plugin' %}</th>
           <th scope="col">{% translate 'Status' %}</th>
           <th scope="col">{% translate 'Created date' %}</th>
           {# FIXME: implement detail page according to designs #}
@@ -82,9 +82,9 @@
             </td>
             <td>
               {% if scan.type == 'boefje' %}
-                <a href="{% url 'plugin_detail' scan.type scan.p_item.data.boefje.id organization.code %}">{{ scan.p_item.data.boefje.name }}</a>
+                <a href="{% url 'plugin_detail' organization.code scan.type scan.p_item.data.boefje.id  %}">{{ scan.p_item.data.boefje.id }}</a>
               {% elif scan.type == 'normalizer' %}
-                <a href="{% url 'plugin_detail' scan.type scan.p_item.data.normalizer.id organization.code %}">{{ scan.p_item.data.normalizer.name }}</a>
+                {{ scan.p_item.data.normalizer.id }}
               {% else %}
                 {{ scan.id }}
               {% endif %}
