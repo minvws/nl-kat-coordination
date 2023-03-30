@@ -63,9 +63,8 @@ class Command(BaseCommand):
             sys.exit(1)
 
         valid_time = datetime.now(timezone.utc)
-        report = ReportsService(keiko_client).get_finding_report(
+        report = ReportsService(keiko_client).get_organization_finding_report(
             valid_time,
-            "Organization",
             organization.name,
             self.get_findings_metadata(organization, valid_time, options),
         )
