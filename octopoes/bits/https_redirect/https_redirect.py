@@ -15,7 +15,9 @@ def run(
         return
 
     if "location" not in header_keys:
-        ft = KATFindingType(id="KAT-HTTPS-REDIRECT")
+        ft = KATFindingType(id="KAT-NO-HTTPS-REDIRECT")
         yield Finding(
-            ooi=input_ooi.reference, finding_type=ft.reference, description="This HTTP URL does not redirect to HTTPS"
+            ooi=input_ooi.reference,
+            finding_type=ft.reference,
+            description="This HTTP URL may not redirect to HTTPS; 'location' was not found in HTTPHeader.",
         )
