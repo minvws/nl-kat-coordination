@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import scheduler
 from scheduler.config import settings
 from scheduler.connectors import listeners, services
+from scheduler.metrics import Metrics
 from scheduler.repositories import sqlalchemy, stores
 
 
@@ -86,3 +87,6 @@ class AppContext:
         datastore = sqlalchemy.SQLAlchemy(self.config.database_dsn)
         self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
         self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
+
+        # Metrics collector registry
+        self.metrics_registry = Metrics()
