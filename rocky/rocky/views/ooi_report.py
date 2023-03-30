@@ -118,9 +118,8 @@ class FindingReportPDFView(FindingListView):
         reports_service = ReportsService(keiko_client)
 
         try:
-            report = reports_service.get_finding_report(
+            report = reports_service.get_organization_finding_report(
                 self.get_observed_at(),
-                "Organization",
                 self.organization.name,
                 super().get_queryset(),
             )

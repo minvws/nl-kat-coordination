@@ -26,7 +26,7 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
             messages.SUCCESS,
             _("Organization %s successfully updated.") % (self.object.name),
         )
-        return reverse("organization_detail", kwargs={"organization_code": self.object.code})
+        return reverse("organization_settings", kwargs={"organization_code": self.object.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,7 +34,7 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
         context["breadcrumbs"] = [
             {"url": reverse("organization_list"), "text": "Organizations"},
             {
-                "url": reverse("organization_detail", kwargs={"organization_code": self.object.code}),
+                "url": reverse("organization_settings", kwargs={"organization_code": self.object.code}),
                 "text": self.object.name,
             },
             {
