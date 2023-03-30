@@ -47,12 +47,22 @@ If you want to add factual information, use a boefje. Want to add an opinion or 
 
 OpenKAT assumes that you collect and process all information in the smallest possible units so that they can contribute back to other combinations and results. This is how you maintain the modular nature of the package.
 
-To make a finding about a CVE to a software version, you have a string of objects: the finding of the software, the version, the CVE. That combination then leads to the object of the finding.
+To make a finding about a CVE to a software version, you need multiple objects: the finding of the software, the version, the CVE. That combination then leads to the object of the finding.
+
 
 Existing boefjes
 ================
 
 The existing boefjes can be viewed via the KATalog in OpenKAT and are on `GitHUB in the boefjes repository. <https://github.com/minvws/nl-kat-boefjes/tree/main/boefjes>`_
+
+Object-types, classes and objects.
+----------------------------------
+
+When we talk about object-types, we mean things like IPAddressV4. These have corresponding python classes that are all derived from the OOI base class.  These classes are defined in the Octopoes models directory.
+
+They are used everywhere, both in code and as strings in json definition files.
+
+When we talk about objects, we usually mean instance of such a class, or a 'record' in the database.
 
 Example: the boefje for shodan
 ------------------------------
@@ -60,7 +70,7 @@ Example: the boefje for shodan
 The boefje calling shodan gives a good first impression of its capabilities. The boefje includes the following files.
 
 - __init.py__, which remains empty
-- boefje.json, containing the normalizers and objects in the data model
+- boefje.json, containing the normalizers and object-types in the data model
 - cover.jpg, with a matching cat picture for the KATalog
 - description.md, simple documentation of the boefje
 - main.py, the actual boefje
@@ -72,11 +82,9 @@ The boefje calling shodan gives a good first impression of its capabilities. The
 boefje.json
 ***********
 
-boefje.json is the definition of the boefje, with its position in the data model, the associated normalizer, the objects and the findings that the combination of boefje and normalizer can deliver.
+boefje.json is the definition of the boefje, with its position in the data model, the associated normalizer, the object-types and the findings that the combination of boefje and normalizer can deliver.
 
-The objects associated with this boefje are IPAddressV4, IPAddressV6, Finding, CVEFindingType. This boefje consumes IP addresses and produces findings about the open ports, supplemented by the information about these ports.
-
-Shodan comes with an API key, which you can add in the web interface.
+An example:
 
 .. code-block:: json
 
@@ -97,40 +105,16 @@ Shodan comes with an API key, which you can add in the web interface.
         "scan_level": 1
     }
 
-Using the template as a base, you can create a boefje.json for your own boefje. The template starts with the name of your new boefje:
+The object-types associated with this boefje are *IPAddressV4, IPAddressV6, Finding, CVEFindingType.*
 
+This boefje consumes IP addresses and produces findings about the open ports, supplemented by the information about these ports.
 
-.. code-block:: json
+Using the template as a base, you can create a boefje.json for your own boefje. Just change the *name* and *id* to the name your boefje.
 
-    {
-        "id": "boefje",
-        "name": "Boefje",
-        "description": "Beschrijving"
-    }
+NOTE: If your boefje needs object-types that do not exist, you will need to create those. This will be described later in the document.
 
-Your boefje collects information to turn it into objects. Specify the objects your boefje needs. Those objects come from the data model. Should the information you want to retrieve not yet be incorporated into the data model, you need to modify it separately. How this works is described in general terms later in this document.
+The boefje also uses variables from the web interface, like the Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface. Use *environment_keys* for this. The schema.json file defines the metadata for these fields.
 
-.. code-block:: json
-
-        {
-            "consumes": [
-                "object uit het datamodel",
-                "nog een object uit het datamodel"
-            ],
-            "produces": [
-                "informatie",
-                "informatie"
-            ]
-        }
-
-The boefje can also bring variables from the web interface, like in Shodan the API key. There are more possibilities, you can be creative with this and let the end user bring settings from the web interface.
-
-.. code-block:: json
-
-    {
-        "environment_keys": ["SHODAN_API"],
-        "scan_level": 1
-    }
 
 schema.json
 ***********
@@ -206,7 +190,7 @@ The normalizer imports the raw information, extracts the objects from it and giv
 normalizer.json
 ***************
 
-The normalizers translate the output of a boefje into objects that fit the data model. Each normalizer defines what input it accepts and what it provides. In the case of the shodan normalizer, it involves the entire output of the shodan boefje (created based on IP address), where findings and ports come out. The normalizer.json defines these:
+The normalizers translate the output of a boefje into objects that fit the data model. Each normalizer defines what input it accepts and what object-types it provides. In the case of the shodan normalizer, it involves the entire output of the shodan boefje (created based on IP address), where findings and ports come out. The normalizer.json defines these:
 
 .. code-block:: json
 
@@ -225,7 +209,8 @@ The normalizers translate the output of a boefje into objects that fit the data 
 normalize.py
 ************
 
-The file normalize.py contains the actual normalizer. From octopoes, the normalizer retrieves the objects and their references: from the findings list the CVEFindingType for the CVEs and the Finding for the findings, from the network objects list the IPPort, the Protocol and the PortState. Then the information about those objects is extracted from the imported data and stored as objects.
+The file normalize.py contains the actual normalizer: Its only job is to parse raw data and create, fill and yield the actual objects. (of valid object-types that are subclassed from OOI like IPPort)
+
 
 .. code-block:: python
 
@@ -261,14 +246,14 @@ The file normalize.py contains the actual normalizer. From octopoes, the normali
                 yield ft
                 yield f
 
-Adding objects
-==============
+Adding object-types
+===================
 
-If you want to add an object, you need to know with which other objects there is a logical relationship. An object is as simple as possible. As a result, a seemingly simple query sometimes explodes into a whole tree of parts.
+If you want to add an object-type, you need to know with which other object-types there is a logical relationship. An object-type is as simple as possible. As a result, a seemingly simple query sometimes explodes into a whole tree of objects.
 
-Adding objects to the data model requires an addition in octopus. Here, an object can be added if it is connected to other objects. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_.
+Adding object-types to the data model requires an addition in octopus. Here, an object-type can be added if it is connected to other object-types. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_.
 
-As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object in the data model, in this case an IPPort, looks like this:
+As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object-type in the data model, in this case an IPPort, looks like this:
 
 
 .. code-block:: python
@@ -286,7 +271,7 @@ As with the boefje for shodan, here we again use the example from the functional
     _information_value = ["protocol", "port"]
 
 
-Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document.
+Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object-type and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document.
 
 The PortState is defined separately. This can be done for information that has a very specific nature so you can describe it.
 
@@ -313,7 +298,7 @@ The example below comes from the functional documentation and discusses the Bit 
 - bit.py, which defines the structure
 - port_classification.py, which contains the business rules
 
-Bit.py gives the structure of the bit, containing the input and the businessrules against which it is tested. An example is included below. The bit accepts input belonging to the objects IPPort and IPAddress. It then calls the module port_classification, which contains the businessrules.
+Bit.py gives the structure of the bit, containing the input and the businessrules against which it is tested. An example is included below. The bit consumes input objects of type IPPort:
 
 
 .. code-block:: python
@@ -328,9 +313,9 @@ Bit.py gives the structure of the bit, containing the input and the businessrule
     module="bits.port_classification.port_classification",
  )
 
-The businessrules are contained in the module port_classification, in the file port_classification.py. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed.
+The businessrules are contained in the module *port_classification*, in the file *port_classification.py*. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed.
 
-The specification for a bit is broad, but limited by the data model. Boefjes retrieve information externally, bits only look at the objects in Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT.
+The specification for a bit is broad, but limited by the data model: Whereas Boefjes are actively gathering information externally, bits only look at the existing objects they receive from Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT.
 
 .. code-block:: python
 
@@ -352,7 +337,7 @@ The specification for a bit is broad, but limited by the data model. Boefjes ret
 
     port = input_ooi.port
     if port in SA_PORTS:
-        open_sa_port = KATFindingType(id="KAT-560")
+        open_sa_port = KATFindingType(id="KAT-OPEN-SYSADMIN-PORT")
         yield open_sa_port
         yield Finding(
             finding_type=open_sa_port.reference,
@@ -361,7 +346,7 @@ The specification for a bit is broad, but limited by the data model. Boefjes ret
         )
 
     if port in DB_PORTS:
-        ft = KATFindingType(id="KAT-561")
+        ft = KATFindingType(id="KAT-OPEN-DATABASE-PORT")
         yield ft
         yield Finding(
             finding_type=ft.reference,
@@ -370,7 +355,7 @@ The specification for a bit is broad, but limited by the data model. Boefjes ret
         )
 
     if port not in COMMON_TCP_PORTS and port not in SA_PORTS and port not in DB_PORTS:
-        kat = KATFindingType(id="KAT-562")
+        kat = KATFindingType(id="KAT-UNCOMMON-OPEN-PORT")
         yield kat
         yield Finding(
             finding_type=kat.reference,
@@ -378,7 +363,9 @@ The specification for a bit is broad, but limited by the data model. Boefjes ret
             description=f"Port {port} is not a common port and should possibly not be open.",
         )
 
-Bits can recognize patterns and derive objects from them. The Bit for internet.nl can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions.
+Bits can recognize patterns and derive new objects from them.
+
+For example: The Bit for *internet.nl* can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions:
 
 .. code-block:: python
 
@@ -413,4 +400,3 @@ There are a number of ways to add your new boefje to OpenKAT.
 ``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the Github CI.
 
 The goal is to set up a separate Github repo with a complete CI to create artifacts based on a template boefje. You can clone this repo. Your OpenKAT installation points you to the artifacts so they are usable from your system. This is now being worked on by the OpenKAT community. Send an email to meedoen@openkat.nl if you want to help. (status: Dec. 2022)
-

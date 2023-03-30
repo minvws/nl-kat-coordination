@@ -1,23 +1,34 @@
-==================
-Installation Guide
-==================
+=========================
+How do I install OpenKAT?
+=========================
 
-OpenKAT can be installed in a number of ways. You can use OpenKAT in a way that suits your situation. For developers and for introductory purposes, there is a local installation, there are debian packages that are automatically built from each release, there are pre-built docker containers, and there is community work on kubernetes and nomad scripts. At VWS, OpenKAT is installed based on ansible script. Use the hardening guide for a production install.
+OpenKAT can be installed in a number of ways. You can use OpenKAT in a way that suits your situation. For developers and for introductory purposes, there is a local installation. For production application there are debian packages that are automatically built from each release or pre-built docker containers. Also there is community work on kubernetes and nomad scripts. At VWS, OpenKAT is installed based on ansible script. Use the hardening guide for a production install.
 
-Pre-built Docker images
+Production environments
 =======================
 
-The pre-built docker images are on the Github Container Registry. The deployment manual based on the pre-built docker images is included in this manual. A kubernetes script is being worked on for automatic deploy.
+Pre-built Docker images
+***********************
+
+The pre-built docker images can be used for production installations of OpenKAT and can be found on the Github Container Registry. The deployment manual based on the pre-built docker images is included in this manual. A kubernetes script is being worked on for automatic deploy.
 
 Debian packages
-===============
+***************
 
-The Debian packages are now available as artifacts from the Github actions in the repository of each module and the artifacts are added to the GitHub release on the main repository. How to install them is explained in the manual and there is also an unofficial installation script for this. A repository to enable ``apt install kat`` is under construction.
+The Debian packages can be used for production installations of OpenKAT and are available as artifacts from the Github actions in the repository of each module. How to install them is explained in the manual. A repository to enable ``apt install kat`` is under construction. The packages cannot easily be converted to RPM's, for this we do not have a solution yet.
+
+Development environment
+=======================
 
 make kat
-========
+********
 
-The 'developer option' or local install of OpenKAT, which builds the system from the source using docker containers. The manual for this install explains how to set up your computer for an install of OpenKAT.
+The 'developer option' or local install of OpenKAT builds the system from the source using make kat or make kat-stable. The manual for this install explains how to set up your computer for an install of OpenKAT.
+
+Minimum requirements
+====================
+
+OpenKAT can run from a single computer or VM, but this limits the functionality in the long run. The starting point for a development setup would include about 25 GB of diskspace, 4GB of RAM and 2 cores. Diskspace is mostly used by the databases and some logging. More of everything is more fun.
 
 Example infrastructure
 ======================
@@ -32,4 +43,3 @@ An example is shown in the diagram below. OpenKAT runs behind a proxy with firew
 At the backend, a management interface can be added, adapted to the situation where OpenKAT is used. Each module has a healthpoint for monitoring.
 
 Backups are particularly relevant for the raw data in Bytes and the userdata, possibly for speed the objects in Octopoes. Based on Bytes and the userdata, the system can in principle be redeployed and restored.
-

@@ -1,0 +1,20 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' with view_type="onboarding" %}
+  <main id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Member account setup' %}</h1>
+        <form novalidate  method="post" class="horizontal-view help">
+          {% csrf_token %}
+          {% translate 'Member details' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+          <button type="submit">{% translate 'Submit' %}</button>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock content %}

@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<dl>
+  {% include 'partials/elements/definition_list_item.html' with label='Time of testing' %}
+  {% if finding.proof %}
+    {% translate 'Proof' as label %}
+    {% include 'partials/elements/definition_list_item.html' with label=label description=finding.proof %}
+  {% endif %}
+
+  {% if finding.reproduce %}
+    {% translate 'Reproduction' as label %}
+    {% include 'partials/elements/definition_list_item.html' with label=label description=finding.reproduce %}
+  {% endif %}
+
+  {% if finding.items %}
+    {% include 'partials/elements/definition_list_items.html' with items=finding.items exclude_keys='id,human_readable,ooi_type,ooi,finding_type,proof,reproduce' %}
+  {% endif %}
+</dl>

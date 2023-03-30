@@ -1,0 +1,2 @@
+packaging/deb/data/etc/kat/* etc/kat
+packaging/deb/data/usr/lib/systemd/system/* usr/lib/systemd/system

@@ -1,0 +1,10 @@
+include README.md
+include LICENSE
+include boefjes/alembic.ini
+
+recursive-include boefjes/katalogus/static *
+recursive-include boefjes/plugins *.json
+recursive-include boefjes/plugins *.md
+recursive-include boefjes/plugins *.png
+recursive-include boefjes/plugins *.jpg
+recursive-include boefjes/plugins *.txt

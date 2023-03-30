@@ -1,0 +1,14 @@
+include README.md
+include LICENSE
+
+recursive-include rocky/templates *.html
+recursive-include rocky/templates *.txt
+recursive-include rocky/locale *.mo
+recursive-include fmea/templates *.html
+recursive-include fmea/templates *.txt
+recursive-include katalogus/templates *.html
+recursive-include katalogus/templates *.txt
+recursive-include account/templates *.html
+recursive-include account/templates *.txt
+recursive-include onboarding/templates *.html
+recursive-include onboarding/templates *.txt

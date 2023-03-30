@@ -1,0 +1,19 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% url "object" ooi.primary_key as ooi_detail_url %}
+  {% include "header.html" with breadcrumbList=breadcrumbList %}
+  <main class="report-tmp" id="main-content">
+    <section>
+      <div>
+        <h1>{% translate 'Manual creation' %}</h1>
+        <p>
+          {% translate 'Select the type of object you want to create.' %}
+        </p>
+        {% include 'partials/elements/ooi_add_type_select_form.html' %}
+      </div>
+    </section>
+  </main>
+{% endblock %}

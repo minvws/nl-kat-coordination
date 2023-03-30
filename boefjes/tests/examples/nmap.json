@@ -1,0 +1,13 @@
+{
+  "id": "nmap",
+  "organization": "_dev",
+  "arguments": {
+    "host": "213.239.154.31"
+  },
+  "dispatches": {
+    "normalizers": [
+      "kat_nmap.normalize"
+    ],
+    "boefjes": []
+  }
+}

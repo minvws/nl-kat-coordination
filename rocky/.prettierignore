@@ -1,0 +1,4 @@
+*.html
+*.min.js
+assets/dist/
+assets/js/vendor/

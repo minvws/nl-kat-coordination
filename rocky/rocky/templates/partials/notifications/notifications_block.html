@@ -1,0 +1,11 @@
+{% if messages %}
+  <section>
+    <div>
+      {% for message in messages %}
+        <div{% if message.tags %} class="{% if message.tags == 'info' %}confirmation {% endif %}{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}

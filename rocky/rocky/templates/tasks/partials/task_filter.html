@@ -1,0 +1,20 @@
+{% load i18n %}
+
+{% if task_filter %}
+  <form method="get">
+    {% csrf_token %}
+    <label for="selected-tasks">{% translate 'Number of tasks showed' %}</label>
+    <select id="selected-tasks" name="selected-tasks">
+      {% for task in task_filter %}
+        <option {% if task == show_tasks %}selected{% endif %} value={{ task }}>
+          {% if task == "*" %}
+            {% translate 'Show all' %}
+          {% else %}
+            {{ task }}
+          {% endif %}
+        </option>
+      {% endfor %}
+    </select>
+    <button type="submit">{% translate 'Show tasks' %}</button>
+  </form>
+{% endif %}

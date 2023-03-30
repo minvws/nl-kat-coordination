@@ -1,0 +1,12 @@
+{
+  "id": "website-similarity-job",
+  "organization": "_dev",
+  "arguments": {
+    "domain": "Hostname|internet|rijksoverheid.nl."
+  },
+  "dispatches": {
+    "normalizers": [
+    ],
+    "boefjes": []
+  }
+}

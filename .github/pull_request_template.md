@@ -18,6 +18,7 @@ _This section may be skipped or omitted. Uncomment and answer the below question
 -->
 
 ## Checklist for author(s):
+- [ ] All the commits in this PR are properly PGP-signed and verified;
 - [ ] This PR comes from a `feature` or `hotfix` branch, in line with our git branching strategy;
 - [ ] This PR is "bite-sized" and only focuses on a single issue, problem, or feature;
 - [ ] I am not reinventing the wheel: there is no high-quality library that already has this feature;

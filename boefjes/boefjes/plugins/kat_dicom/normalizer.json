@@ -1,0 +1,13 @@
+{
+    "id": "kat_dicom_normalize",
+    "consumes": [
+        "dicom"
+    ],
+    "produces": [
+        "KATFindingType",
+        "SoftwareInstance",
+        "IPPort",
+        "Finding",
+        "Software"
+    ]
+}

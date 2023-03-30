@@ -1,0 +1,15 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "SHODAN_API": {
+      "title": "SHODAN_API",
+      "maxLength": 128,
+      "type": "string",
+      "description": "A Shodan API key (see https://developer.shodan.io/api/requirements)."
+    }
+  },
+  "required": [
+    "SHODAN_API"
+  ]
+}

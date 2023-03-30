@@ -1,0 +1,42 @@
+{% extends 'layouts/base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+  {% include 'header.html' %}
+	<main id="main-content">
+		<section>
+			<div>
+				{% if object %}
+          <h1>{% translate 'Failure mode report' %}</h1>
+					<div class="horizontal-scroll auth bg-color-offset">
+            <div>
+              <h4>{% translate 'Summary' %}</h4>
+              <ol>
+                <li><b>{% translate 'Failure mode: ' %}</b>{{ object.failure_mode }}</li>
+                <li><b>{% translate 'Severity: ' %}</b>{{ object.get_severity_level_display }}</li>
+                <li><b>{% translate 'Detectability: ' %}</b>{{ object.get_detectability_level_display }}</li>
+                <li><b>{% translate 'Frequency: ' %}</b>{{ object.get_frequency_level_display }}</li>
+                <li><b>{% translate 'Effect: ' %}</b>{{ object.effect }}</li>
+                <li><b>{% translate 'Description: ' %}</b>{{ object.description }}</li>
+                <li class="affected-objects"><b>{% translate 'Affected Departments: ' %}</b>
+                  {% for department_object in failure_mode_affected_departments %}
+                    <span>{{ department_object.affected_department }}</span>
+                  {% endfor %}
+                </li>
+                <li class="affected-objects"><b>{% translate "Affected OOI's: "%}</b>
+                  {% for ooi_type_object in failure_mode_affected_ooi_types %}
+                    <span>{{ ooi_type_object.affected_ooi_type }}</span>
+                  {% endfor %}
+                </li>
+              </ol>
+              <a class="button cta" href="{% url 'fmea_failure_mode_report_pdf' object.id %}">Export to PDF</a>
+            </div>
+          </div>
+        {% else %}
+          <p>{% translate 'Report cannot be viewed, failure mode not found.' %}</p>
+        {% endif %}
+      </div>
+    </section>
+	</main>
+{% endblock %}

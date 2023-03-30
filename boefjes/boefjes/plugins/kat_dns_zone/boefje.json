@@ -1,0 +1,15 @@
+{
+    "id": "dns-zone",
+    "name": "DnsZone",
+    "description": "Fetch the parent DNS zone of a DNS zone",
+    "consumes": [
+        "DNSZone"
+    ],
+    "produces": [
+        "Hostname",
+        "DNSZone",
+        "DNSSOARecord"
+    ],
+    "environment_keys": [],
+    "scan_level": 1
+}

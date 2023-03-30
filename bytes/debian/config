@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+#set -v
+
+export DEBCONF_DEBUG=developer
+. /usr/share/debconf/confmodule
+
+db_go || echo nogo

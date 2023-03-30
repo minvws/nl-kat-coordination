@@ -83,19 +83,17 @@ The current release of OpenKAT can be found via the `release page on this reposi
 What code does OpenKAT contain?
 ===============================
 
-OpenKAT includes the following repositories:
+OpenKAT includes the following subsystems, which can all be found in the `NL-KAT-Coordination <https://github.com/minvws/nl-kat-coordination>`_ repository (aka this one):
 
-:Overview: `NL-KAT-Coordination <https://github.com/minvws/nl-kat-coordination>`_
+:Scheduler: `Mula <https://github.com/minvws/nl-kat-coordination/tree/main/mula>`_
 
-:Mula: `NL-KAT-mula <https://github.com/minvws/nl-kat-mula>`_
+:Datamodel with object types and objects: `Octopoes <https://github.com/minvws/nl-kat-coordination/tree/main/octopoes>`_
 
-:Octopoes: `NL-KAT-octopoes <https://github.com/minvws/nl-kat-octopoes>`_
+:Front end: `Rocky <https://github.com/minvws/nl-kat-coordination/tree/main/rocky>`_
 
-:Rocky: `NL-KAT-rocky <https://github.com/minvws/nl-kat-rocky>`_
+:Raw data storage: `Bytes <https://github.com/minvws/nl-kat-coordination/tree/main/bytes>`_
 
-:Bytes: `NL-KAT-bytes <https://github.com/minvws/nl-kat-bytes>`_
-
-:Boefjes and normalizers: `NL-KAT-boefjes <https://github.com/minvws/nl-kat-boefjes>`_
+:Boefjes and normalizers: `Boefjes <https://github.com/minvws/nl-kat-coordination/tree/main/boefjes>`_
 
 Which licence applies to OpenKAT?
 =================================
@@ -138,7 +136,7 @@ You can submit PRs directly via Github, or contact the community manager at meed
 OpenKAT uses the following principles for writing code:
 
 * python 3.8
-* All code via pullrequests with reviews
+* All code via pull requests with reviews
 * `Python with PEP8 <https://peps.python.org/pep-0008/>`_.
 * Pylint
 * `[Black], 120 characters line length: <https://pypi.org/project/black/>`_

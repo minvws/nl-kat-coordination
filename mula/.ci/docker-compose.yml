@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  mula:
+    build:
+      context: .
+      args:
+        ENVIRONMENT: dev
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - .:/app/scheduler
+
+  mula_integration:
+    build:
+      context: .
+      args:
+        ENVIRONMENT: dev
+    command: python -m unittest discover tests/integration
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - .:/app/scheduler
+
+  mula_simulation:
+    build:
+      context: .
+      args:
+        ENVIRONMENT: dev
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - .:/app/scheduler

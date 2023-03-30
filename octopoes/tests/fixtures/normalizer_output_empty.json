@@ -1,0 +1,7 @@
+{
+  "method": "boefje_normalizer_x",
+  "source": "Hostname|internet|example.com",
+  "result": [],
+  "valid_time": "2019-01-01T00:00:00+00:00",
+  "task_id": "1234"
+}

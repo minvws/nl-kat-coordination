@@ -1,0 +1,49 @@
+{% extends "layouts/base.html" %}
+{% load i18n %}
+
+{% block content %}
+{% translate type as display_type %}
+{% include 'header.html' %}
+
+<main id="main-content">
+  <article>
+    <div class="form-view">
+      <h1>{% blocktranslate %}Edit {{ display_type }}{% endblocktranslate %}</h1>
+
+      <p>
+        {% blocktranslate %}Here you can edit the {{ display_type }}.{% endblocktranslate %}
+      </p>
+
+      <p>
+        {% blocktranslate %}Some fields are disabled:<br>In this version primary key fields can't be edited.{% endblocktranslate %}
+      </p>
+
+      <form  method="post" class="horizontal-view">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="warning">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <fieldset>
+          <legend>{% translate type %}</legend>
+
+          <div>
+            <label for="ooi_type">Type</label>
+
+            <input id="ooi_type" type="text" name="ooi_type" value="{{ type }}" readonly>
+          </div>
+
+          {% for field in form %}
+            {% include "partials/form/field_input_wrapper.html" %}
+          {% endfor %}
+        </fieldset>
+
+        <button type="submit">{% blocktranslate %}Save {{ display_type }}{% endblocktranslate %}</button>
+      </form>
+    </div>
+  </article>
+</main>
+{% endblock %}

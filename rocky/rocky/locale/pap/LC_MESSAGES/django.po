@@ -1,0 +1,4937 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-19 11:03+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: pap\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: account/admin.py:18
+msgid "Permissions"
+msgstr "Permisonan"
+
+#: account/admin.py:19
+msgid "Important dates"
+msgstr "Fechanan importante"
+
+#: account/forms/account_setup.py:26 tools/forms/settings.py:12
+msgid "--- Please select one of the available options ----"
+msgstr "--- Por fabor selektá ún di e opshonnan disponibel ----"
+
+#: account/forms/account_setup.py:33
+msgid "Account Type"
+msgstr "Tipo di account"
+
+#: account/forms/account_setup.py:34
+msgid "Every member of OpenKAT must be part of a group."
+msgstr "Kada miembro di OpenKAT mester ta parti di un grupo."
+
+#: account/forms/account_setup.py:37
+msgid "Please select a group to proceed."
+msgstr "Por favor selektá un grupo pa por sigi."
+
+#: account/forms/account_setup.py:52
+msgid ""
+"I declare that OpenKAT may scan the assets of my organization and that I "
+"have permission to scan these assets. I am aware of the implications a scan "
+"with a higher scan level brings on my systems."
+msgstr ""
+"Mi ta deklara ku OpenKAT por skèn e propiedatnan di mi organisashon i ku mi "
+"tin pèrmit pa skèn e propiedatnan aki. Mi ta konsiente di e implikashonnan un skèn "
+"ku nivel di skèn haltu tin riba mi sistemanan."
+
+#: account/forms/account_setup.py:60
+msgid ""
+"I declare that I am authorized to give this indemnification within my "
+"organization. I have the expierence and knowledge to know what the "
+"consequences might be and can be held responsible for them."
+msgstr ""
+"Mi ta deklara ku mi tin autorisashon pa duna e indemnifikashon den mi "
+"organisashon. Mi tin e experiensia i konosimientu pa sa ki e"
+"konsequensianan lo ta i tambe mi ta para responsabel pa nan."
+
+#: account/forms/account_setup.py:70
+msgid "Trusted to change Clearance Levels."
+msgstr "Konfiansa pa kambia nivél di autorisashonnan."
+
+#: account/forms/account_setup.py:76
+
+msgid "Acknowledged to change Clearance Levels."
+msgstr "Atmití pa kambia nivél di autorisashonnan."
+
+#: account/forms/account_setup.py:87
+#: katalogus/templates/katalogus_settings.html:26
+#: katalogus/templates/plugin_settings_list.html:16 onboarding/forms.py:62
+#: rocky/templates/organizations/organization_detail.html:15
+#: rocky/templates/organizations/organization_list.html:21
+#: rocky/templates/partials/ooi_detail_related_object.html:24
+msgid "Name"
+msgstr "Nòmber"
+
+#: account/forms/account_setup.py:89
+msgid "This name we will use to communicate with you."
+msgstr "E nomber aki nos lo huza pa komuniká ku bo."
+
+#: account/forms/account_setup.py:93
+msgid "What do we call you?"
+msgstr "Kon nos por jama'bu?"
+
+#: account/forms/account_setup.py:99
+msgid "Email"
+msgstr "Email"
+
+#: account/forms/account_setup.py:101
+msgid "Enter your email address."
+msgstr "Yena bo email adres"
+
+#: account/forms/account_setup.py:111
+msgid "Password"
+msgstr "Password"
+
+#: account/forms/account_setup.py:115
+msgid "Choose your super secret password"
+msgstr "Skohé bo password super sekreto"
+
+#: account/forms/account_setup.py:126
+msgid "Choose another email."
+msgstr "Skoké un otro email."
+
+#: account/forms/account_setup.py:188
+msgid "The name of the organization."
+msgstr "E nòmber di e organisashon."
+
+#: account/forms/account_setup.py:190 onboarding/forms.py:72
+msgid "explanation-organization-name"
+msgstr "splikashon-nomber-organisashon"
+
+#: account/forms/account_setup.py:195
+#, python-brace-format
+msgid "A unique code of {code_length} characters."
+msgstr "Un codigo uniko di {code_length} letras."
+
+#: account/forms/account_setup.py:199
+msgid "explanation-organization-code"
+msgstr "splikashon-codigo-organisashon"
+
+#: account/forms/account_setup.py:205 onboarding/forms.py:78
+msgid "Organization name is required to proceed."
+msgstr "Nòmber di organisashon ta requerí pa sigi."
+
+#: account/forms/account_setup.py:206 onboarding/forms.py:79
+msgid "Choose another organization."
+msgstr "Skohé un otro organisashon."
+
+#: account/forms/account_setup.py:209
+msgid "Organization code is required to proceed."
+msgstr "Codigo di organisashon ta requerí pa sigi."
+
+#: account/forms/account_setup.py:210
+msgid "Choose another code for your organization."
+msgstr "Skohé un otro codigo pa bo organisashon."
+
+#: account/forms/account_setup.py:228
+msgid "The two password fields didn’t match."
+msgstr "E dos vèldnan di password no ta igual."
+
+#: account/forms/account_setup.py:231
+msgid "New password"
+msgstr "Password nobo"
+
+#: account/forms/account_setup.py:235
+msgid "Enter your new password"
+msgstr "Yena bo password nobo"
+
+#: account/forms/account_setup.py:243
+msgid "New password confirmation"
+msgstr "Konfirmashon password nobo"
+
+#: account/forms/account_setup.py:248
+msgid "Repeat your new password"
+msgstr "Ripiti bo password nobo"
+
+#: account/forms/account_setup.py:251
+msgid "Confirm your new password"
+msgstr "Konfirmá bo password nobo"
+
+#: account/forms/login.py:12
+msgid "Please enter a correct email address and password."
+msgstr "Por fabor yena un email adrès i password korekto."
+
+#: account/forms/login.py:13
+msgid "This account is inactive."
+msgstr "E account aki no ta activá."
+
+#: account/forms/login.py:18
+msgid "Insert the email you registered with or got at OpenKAT installation."
+msgstr "Yena e email ku b'a registrá ku ne òf ora di instalá OpenKAT."
+
+#: account/forms/password_reset.py:8
+msgid "Email address"
+msgstr "Email adrès"
+
+#: account/forms/password_reset.py:10
+msgid "A reset link will be sent to this email"
+msgstr "Un resèt link lo wòrdu manda na e email adrès aki"
+
+#: account/forms/password_reset.py:13
+msgid "The email address connected to your OpenKAT-account"
+msgstr "E email adrès konektá ku bo OpenKAT account"
+
+#: account/forms/token.py:16
+msgid ""
+"Insert the token generated by the authenticator app to setup the two factor "
+"authentication."
+msgstr ""
+"Pone e token ku a wordu genera dor di bo authenticator app pa aktivá two "
+"factor authentication."
+
+#: account/forms/token.py:29
+msgid "Insert the token generated by your token authenticator app."
+msgstr "Por favor yena e token ku a wordu generá door di e authenticator app."
+
+#: account/forms/token.py:42
+msgid "Backup token"
+msgstr "Backup token"
+
+#: account/mixins.py:62
+msgid "No indemnification present for organization."
+msgstr "Ningun Indemnizashon presente pa organisashon."
+
+#: account/mixins.py:66
+msgid "Acknowledged clearance level too low."
+msgstr "Nivél di autorisashon ku ba atmití ta hopi abou."
+
+#: account/mixins.py:70
+msgid "Trusted clearance level too low."
+msgstr "Nivél di autorisashon konfiabel muchu abou."
+
+#: account/models.py:19
+msgid "The Email must be set"
+msgstr "E email adrès mester wordu yena"
+
+#: account/models.py:34
+msgid "Superuser must have is_staff=True."
+msgstr "Superuser mester tin is_staff=True."
+
+#: account/models.py:36
+msgid "Superuser must have is_superuser=True."
+msgstr "Superuser mester tin is_superuser=True."
+
+#: account/models.py:59
+msgid "full name"
+msgstr "nòmber full"
+
+#: account/models.py:60
+msgid "email"
+msgstr "email"
+
+#: account/models.py:62
+msgid "staff status"
+msgstr "status di personál"
+
+#: account/models.py:64
+msgid "Designates whether the user can log into this admin site."
+msgstr "Designa si e user por log in den e admin site aki."
+
+#: account/models.py:67 tools/models.py:116
+msgid "active"
+msgstr "aktivo"
+
+#: account/models.py:70
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Designa si e user aki por wordu trata komo aktivo. Deselekta esaki embes di "
+"delete accountnan."
+
+#: account/models.py:73
+msgid "date joined"
+msgstr "fecha di registro"
+
+#: account/templates/account_detail.html:12
+msgid "Account details"
+msgstr "Habri detayes"
+
+#: account/templates/account_detail.html:15
+#: account/templates/password_reset.html:11
+#: account/templates/password_reset.html:21 account/views/password_reset.py:36
+msgid "Reset password"
+msgstr "Resèt password"
+
+#: account/templates/account_detail.html:21
+msgid "Full name"
+msgstr "Nòmber Kompletu"
+
+#: account/templates/account_detail.html:29
+msgid "E-mail address"
+msgstr "Email adrès"
+
+#: account/templates/account_detail.html:37
+msgid "Member type"
+msgstr "Tipo di miembro"
+
+#: account/templates/account_detail.html:45
+#: onboarding/templates/account/step_2a_organization_setup.html:13
+#: onboarding/templates/account/step_2a_organization_update.html:13
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:14
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:79
+msgid "Organization"
+msgstr "Organisashon"
+
+#: account/templates/account_detail.html:54
+msgid "Permission to set OOI clearance levels "
+msgstr "Pèrmit pa pone nivél di autorisashonnan pa OOI "
+
+#: account/templates/account_detail.html:67
+msgid "OOI clearance"
+msgstr "OOI autorisá"
+
+#: account/templates/account_detail.html:70
+msgid ""
+"\n"
+"              You don't have any clearance to scan objects.<br>\n"
+"              Get in contact with the admin to give you the necessary "
+"clearance level.\n"
+"            "
+msgstr ""
+"\n"
+"              Bo no tin autorisashon pa skèn ophetonan.<br>\n"
+"              Tuma kontacto ku e admin pa duna'bo e necesario "
+"nivél di autorisashon.\n"
+"            "
+
+#: account/templates/account_detail.html:77
+msgid "You have currently accepted clearance up to level"
+msgstr "Bo a acceptá nivél di autorisashon te na nivel"
+
+#: account/templates/account_detail.html:83
+msgid ""
+"You are granted clearance for level 4 by your admin. Before you can change "
+"OOI clearance levels up to this level, you need to accept this permission. "
+"Remember: <strong>with great power comes great responsibility.</strong>"
+msgstr ""
+"Bo tin nivél di autorisashon pa nivél 4 duna pa bo admin. Prome ku bo kambia "
+"nivél di autorisashonnan pa OOI te na e nivel aki, bo mester prome acceptá e autorisashonnan aki. "
+"Korda: <strong>gran poder ta bin ku gran responsabilidat.</strong>"
+
+#: account/templates/account_detail.html:88
+msgid ""
+"You can withdraw this at anytime you like, but know that you're not able to "
+"change clearance levels anymore when you do."
+msgstr ""
+"Bo por retirá esaki n'e momento ku bo ke, pero sa ku bo no por "
+"kambia nivél di autorisashon mas ora bo hasi esaki."
+
+#: account/templates/login.html:7 rocky/templates/two_factor/core/login.html:7
+msgid "You are logged in."
+msgstr "Bo ta logged in"
+
+#: account/templates/login.html:10
+#: rocky/templates/two_factor/core/login.html:10
+msgid "Two factor authentication is enabled for your account."
+msgstr "Two factor authentication ta aktivá pa bo account."
+
+#: account/templates/login.html:14
+#: rocky/templates/two_factor/core/login.html:14
+msgid ""
+"Two factor authentication is not enabled for your account. Enable it to "
+"continue."
+msgstr ""
+"Two factor authentication no ta aktivá pa bo account. Aktivá esaki pa "
+"kontinuá."
+
+#: account/templates/login.html:16
+#: rocky/templates/two_factor/core/login.html:16
+msgid "Setup two factor authentication"
+msgstr "Desactivá Two-factor Authentication"
+
+#: account/templates/login.html:21 account/views/login.py:65
+#: account/views/login.py:102 account/views/password_reset.py:32
+#: account/views/recover_email.py:21
+#: rocky/templates/partials/secondary-menu.html:17
+#: rocky/templates/two_factor/core/login.html:21
+msgid "Login"
+msgstr "Login"
+
+#: account/templates/login.html:27
+#: rocky/templates/two_factor/core/login.html:27
+msgid "Credentials"
+msgstr "Kredenshalnan"
+
+#: account/templates/login.html:32 account/templates/login.html:39
+#: rocky/templates/partials/form/field_input_help_text.html:10
+#: rocky/templates/partials/notifications/confirmation.html:37
+#: rocky/templates/two_factor/core/login.html:32
+#: rocky/templates/two_factor/core/login.html:39
+msgid "explanation"
+msgstr "explikashon"
+
+#: account/templates/login.html:33 account/templates/login.html:40
+#: rocky/templates/partials/form/field_input_help_text.html:12
+#: rocky/templates/two_factor/core/login.html:33
+#: rocky/templates/two_factor/core/login.html:40
+msgid "Explanation"
+msgstr "Deklarashon"
+
+#: account/templates/login.html:34
+#: rocky/templates/two_factor/core/login.html:34
+msgid "Please enter the token generated by your token generator."
+msgstr "Por favor yena e token ku a wordu generá via di bo tokens generator."
+
+#: account/templates/login.html:41
+#: rocky/templates/two_factor/core/login.html:41
+msgid ""
+"Use this form for entering backup tokens for logging in. These tokens have "
+"been generated for you to print and keep safe. Please enter one of these "
+"backup tokens to login to your account."
+msgstr ""
+"Huza e formulario aki pa yena backup tokens pa log in. E tokens nan aki a "
+"wordu generá pa bo, pa print i warda un kaminda sigur. Por favor yena un di "
+"e backup tokens nan aki pa log in den bo account."
+
+#: account/templates/login.html:54
+#: rocky/templates/two_factor/core/login.html:54
+msgid "As a last resort, you can use a backup token:"
+msgstr "Delaster kos ku por hasi ta, uza un backup token:"
+
+#: account/templates/login.html:61
+#: rocky/templates/two_factor/core/login.html:61
+msgid "Use Backup Token"
+msgstr "Uza Backup Token"
+
+#: account/templates/password_reset.html:13
+msgid "Use the form below to reset your password."
+msgstr "Uza e formulario abou pa konfirmá bo password resèt"
+
+#: account/templates/password_reset.html:24
+#: account/templates/password_reset_confirm.html:24
+msgid "Back"
+msgstr "Bai bèk"
+
+#: account/templates/password_reset.html:25
+#: account/templates/password_reset_confirm.html:25
+msgid "Send"
+msgstr "Mánda"
+
+#: account/templates/password_reset_confirm.html:12
+msgid "Confirm reset password"
+msgstr "Konfirmá password resèt"
+
+#: account/templates/password_reset_confirm.html:14
+msgid "Use the form below to confirm resetting your password"
+msgstr "Uza e formulario abou pa konfirmá bo password resèt"
+
+#: account/templates/password_reset_confirm.html:21
+msgid "Confirm password"
+msgstr "Konfirmá password"
+
+#: account/templates/password_reset_confirm.html:30
+msgid "The link is invalid"
+msgstr "E link ta inbalido"
+
+#: account/templates/password_reset_confirm.html:32
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr "Por fabor pidi un password nobo."
+
+#: account/templates/password_reset_email.html:4
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"Bo ta risibiendo e mensahe aki paso bo a pidi un password resèt pa bo user "
+"account riba %(site_name)s."
+
+#: account/templates/password_reset_email.html:5
+msgid "Please go to the following page and choose a new password:"
+msgstr "Por fabor bai na e siguinte página i skohé un password nobo:"
+
+#: account/templates/password_reset_email.html:10
+msgid "Sincerely,"
+msgstr "Sinseramente"
+
+#: account/templates/password_reset_email.html:11
+msgid "The OpenKAT team"
+msgstr "Tìm OpenKAT"
+
+#: account/templates/password_reset_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Password resèt riba %(site_name)s"
+
+#: account/templates/recover_email.html:11 account/views/recover_email.py:25
+msgid "Recover email address"
+msgstr "Rekuperá bo email adrès"
+
+#: account/templates/recover_email.html:13
+msgid "Information on how to recover your connected email address"
+msgstr "Informashon kon pa rekuperá bo email adrès"
+
+#: account/templates/recover_email.html:16
+msgid "Forgotten email address?"
+msgstr "Ba lubida bo email adrès?"
+
+#: account/templates/recover_email.html:19
+msgid ""
+"If you don’t remember the email address connected to your account, contact: "
+msgstr ""
+"Si bo no ta kòrda e email adrès konektá ku bo account, tuma kontákto ku: "
+
+#: account/templates/recover_email.html:24
+msgid "Please contact the system administrator."
+msgstr "Por fabor tuma kontakto ku e administradó di sistema."
+
+#: account/templates/recover_email.html:31
+msgid "Back to Home"
+msgstr "Bèk na Home"
+
+#: account/templates/recover_email.html:32
+msgid "Back to login"
+msgstr "Bèk na login"
+
+#: account/validators.py:13
+msgid "Your password must contain at least the following:"
+msgstr "Bo password mester kontené por lo menos lo siguinte:"
+
+#: account/validators.py:17
+msgid " characters"
+msgstr " karakternan"
+
+#: account/validators.py:18
+msgid " digits"
+msgstr " sifranan"
+
+#: account/validators.py:19
+msgid " letters"
+msgstr " lèternan"
+
+#: account/validators.py:21
+msgid " special characters such as: "
+msgstr " karakternan speshal manera: "
+
+#: account/validators.py:23
+msgid " lower case letters"
+msgstr " lèternan chiki"
+
+#: account/validators.py:24
+msgid " upper case letters"
+msgstr " lèternan kapital"
+
+#: account/views/login.py:49
+msgid "Your session has timed out. Please login again."
+msgstr "Bo seshon a tèrminá. Por fabor log in dinobo."
+
+#: account/views/login.py:61 rocky/templates/header.html:19
+msgid "OpenKAT"
+msgstr "OpenKAT"
+
+#: account/views/login.py:106
+msgid "Two factor authentication"
+msgstr "Desaktivá Two-factor Authentication"
+
+#: account/views/password_reset.py:58
+msgid "We couldn't send a password reset link. Contact "
+msgstr "Nos no por a manda un reset link. Tuma kontakto ku "
+
+#: account/views/password_reset.py:60
+msgid ""
+"We couldn't send a password reset link. Contact your system administrator."
+msgstr ""
+"Nos no por a manda un reset link. Tuma kontakto ku bo administradó di "
+"sistema."
+
+#: fmea/forms.py:31 fmea/forms.py:123
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:17
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html:17
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:10
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:38
+msgid "Failure mode"
+msgstr "Failure mode"
+
+#: fmea/forms.py:32 fmea/templates/fmea/fmea_failure_mode_detail.html:90
+#: katalogus/templates/plugin_detail.html:24 tools/forms/finding_type.py:37
+#: tools/forms/finding_type.py:122 rocky/templates/oois/ooi_detail.html:54
+#: rocky/templates/oois/ooi_detail_findings_list.html:20
+#: rocky/templates/scan.html:16
+msgid "Description"
+msgstr "Deklarashon"
+
+#: fmea/forms.py:33
+msgid "Frequency Level"
+msgstr "Nivél di frequensidat"
+
+#: fmea/forms.py:34
+msgid "Detectability Level"
+msgstr "Nivél di detectabilidat"
+
+#: fmea/forms.py:35
+msgid "Effect(s)"
+msgstr "Efekto"
+
+#: fmea/forms.py:39
+msgid "Describe in one sentence what type of failure mode you are creating."
+msgstr "Deskribi den un sentencia ki tipo di failure mode bo ta kreando."
+
+#: fmea/forms.py:40
+msgid "Describe the failure mode in details."
+msgstr "Reprodusí búskeda"
+
+#: fmea/forms.py:42
+msgid ""
+"From 1 to 5, how often does this failure mode occurs. 1: Almost unthinkable "
+"and 5: occurs daily."
+msgstr ""
+"Di 1 te 5, kwantu biaha e failure mode aki ta occurí. 1: Kasi imposibeli 5: "
+"occurí diariamente."
+
+#: fmea/forms.py:45
+msgid ""
+"Is this failure mode easy detectable? Give it a score from 1 to 5. 1: always "
+"detectable and 5: almost undetectable."
+msgstr ""
+"E failure mode aki por wordu detektá fasil? Duné un score for di 1 te 5. 1: "
+"semper detektábel i 5: kasi imposibel."
+
+#: fmea/forms.py:54
+msgid "Describe the type of failure mode"
+msgstr "Deskribi e tipo di failure mode"
+
+#: fmea/forms.py:55
+msgid "explanation-failure-mode"
+msgstr "splikashon-failure-mode"
+
+#: fmea/forms.py:61
+msgid "Describe in more detail what the failure mode is about."
+msgstr "Deskribi mas detayá kiko e failure mode aki ta."
+
+#: fmea/forms.py:62
+msgid "explanation-description"
+msgstr "splikashon-diskripshon"
+
+#: fmea/forms.py:67
+msgid "explanation-frequency-level"
+msgstr "splikashon-nivel-di-freqeuncia"
+
+#: fmea/forms.py:72
+msgid "explanation-detectability_level"
+msgstr "splikashon-nivel-detektebilidat"
+
+#: fmea/forms.py:81
+msgid "You must at least set a failure mode."
+msgstr "Bo mester por lo menos pone un failure mode."
+
+#: fmea/forms.py:84
+msgid "Choose a frequency level."
+msgstr "Nivél di frequensidat"
+
+#: fmea/forms.py:87
+msgid "Choose a detectability level."
+msgstr "Nivél di detectabilidat"
+
+#: fmea/forms.py:90
+msgid "Choose at least one effect."
+msgstr "Skohé por lo menos ùn efekto"
+
+#: fmea/forms.py:124
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:18
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html:18
+msgid "Affected Department"
+msgstr "Departamentu afektá"
+
+#: fmea/forms.py:125
+msgid "Affected Objects"
+msgstr "Ophetonan afektá"
+
+#: fmea/forms.py:128
+msgid "Choose a failure mode which applies to "
+msgstr "Skohé un failure mode ku ta aplika na "
+
+#: fmea/forms.py:129
+msgid "When this failure mode occurs, which department is affected?"
+msgstr "Ora a failure mode aki occurí, kwa departamentu ta afekta?"
+
+#: fmea/forms.py:130
+msgid "Which objects does this failure mode affect when it occurs?"
+msgstr "Kwa opheto e failure mode aki ta afekta ora e occurí?"
+
+#: fmea/forms.py:136
+msgid "explanation-affected-ooi-type"
+msgstr "splikashon-tipo-di-ooi-afekta"
+
+#: fmea/forms.py:148
+#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html:26
+msgid "Effect"
+msgstr "Efekto"
+
+#: fmea/forms.py:149
+msgid "Severity Level"
+msgstr "Nivél di severedat"
+
+#: fmea/forms.py:153
+msgid "Name a possible effect of any type of failure mode that can occur."
+msgstr "Duna un ehempel di un posibel efekto di e failre mode aki."
+
+#: fmea/forms.py:154
+msgid ""
+"Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
+msgstr ""
+"Diskribi e seviridat di e efekto aki, por ehempel 1: no severo i 5: "
+"katastrófiko"
+
+#: fmea/forms.py:161
+msgid "Describe a possible effect for FMEA"
+msgstr "Deskibri un posibel efekto pa FMEA"
+
+#: fmea/forms.py:162
+msgid "explanation-effect"
+msgstr "splikashon-efekto"
+
+#: fmea/forms.py:167
+msgid "explanation-severity-level"
+msgstr "splikashon-nivel-severo"
+
+#: fmea/forms.py:174
+msgid "The effect is required."
+msgstr "E vak aki ta obligatorio"
+
+#: fmea/forms.py:175
+msgid "This effect already exists."
+msgstr "E organisashon aki ta eksistí kaba"
+
+#: fmea/forms.py:178
+msgid "Choose a severity level."
+msgstr "Nivel di rísiko"
+
+#: fmea/models.py:9
+msgid "Finances"
+msgstr "Finansiasnan"
+
+#: fmea/models.py:10
+msgid "Marketing"
+msgstr "Marketing"
+
+#: fmea/models.py:11
+msgid "Human Resources"
+msgstr "Human Resources"
+
+#: fmea/models.py:12
+msgid "Research & Development"
+msgstr "Research & Development"
+
+#: fmea/models.py:13
+msgid "Administration"
+msgstr "Indemnizashon"
+
+#: fmea/models.py:14 rocky/templates/footer.html:13
+#: rocky/templates/health.html:15
+msgid "Service"
+msgstr "Sèrvicio"
+
+#: fmea/models.py:18
+msgid "Level 1: Not Severe"
+msgstr "Nivèl 1: No Severo"
+
+#: fmea/models.py:19
+msgid "Level 2: Harmful"
+msgstr "Nivel 2: Dañoso"
+
+#: fmea/models.py:20
+msgid "Level 3: Severe"
+msgstr "Nivel 3: Severo"
+
+#: fmea/models.py:21
+msgid "Level 4: Very Harmful"
+msgstr "Nivel 4: Hopi Dañoso"
+
+#: fmea/models.py:22
+msgid "Level 5: Catastrophic"
+msgstr "Nivel 5: Katastrófiko"
+
+#: fmea/models.py:26
+msgid "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
+msgstr ""
+"Nivel 1: Hopi Straño. Insidente (kasi) nunka ta okuri, kasi inpensabel."
+
+#: fmea/models.py:27
+msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
+msgstr "Nivel 2: Straño. Insidente ta okuri menos ku un biaha pa aña (3-5)."
+
+#: fmea/models.py:28
+msgid "Level 3: Occurs. Incidents occur several times a year."
+msgstr "Nivel 3: Ta okuri, Insidente ta okuri par di biaha pa aña."
+
+#: fmea/models.py:29
+msgid "Level 4: Regularly. Incidents occur weekly."
+msgstr "Nivel 4: Regularmente. Insidente ta pasa tur siman."
+
+#: fmea/models.py:30
+msgid "Level 5: Frequent. Incidents occur daily."
+msgstr "Nivel 5: Frquente. Incidente ta pasa tur dia."
+
+#: fmea/models.py:34
+msgid ""
+"Level 1: Always Detectable. Incident (almost) never occurs, almost "
+"unthinkable."
+msgstr ""
+"Nivel 1: Semper Detektabel. Insidente (kasi) nunka ta okuri, kasi imposibel."
+
+#: fmea/models.py:35
+msgid ""
+"Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
+msgstr ""
+"Nivel 2: Normalmente Dektetabel. Insidente ta okuri menos ku un biaha pa aña "
+"(3-5)."
+
+#: fmea/models.py:36
+msgid "Level 3: Detectable. Faillure mode is detectable with effort."
+msgstr "Nivel 3: Detektabel. Faillure mode ta detektabel ku eksfuerzo."
+
+#: fmea/models.py:37
+msgid "Level 4: Poorly Detectable. Detecting the faillure mode is difficult."
+msgstr "Nivel 4: "
+
+#: fmea/models.py:38
+msgid ""
+"Level 5: Almost Undetectable. Faillure mode detection is very difficult or "
+"nearly impossible."
+msgstr ""
+"Nivel 5: Pobremente Detektabel. Faillure mode detekshon ta hopi difisil òf "
+"kasi imposibel."
+
+#: fmea/models.py:66 fmea/templates/fmea/fmea_failure_mode_list.html:11
+#: fmea/views/view_helpers.py:16
+msgid "Failure modes"
+msgstr "Failure modes"
+
+#: fmea/models.py:88 fmea/views/view_helpers.py:34
+msgid "Failure Mode Affected Objects"
+msgstr "Failure Mode Ophetonan afektá"
+
+#: fmea/templates/fmea/fmea_department_heatmap.html:13
+msgid "FMEA Departments Heatmap:"
+msgstr "Departamento di FMEA Heatmap:"
+
+#: fmea/templates/fmea/fmea_department_heatmap.html:40
+msgid "No data to build heatmap"
+msgstr "Ningun data pa kontruí heatmap "
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:14
+msgid "Failure mode affected object tabel:"
+msgstr "Failure mode tabèl di opheto afektá "
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:19
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html:19
+msgid "Affected Object"
+msgstr "Ophetonan afektá"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:20
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html:20
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html:29
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:104
+#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html:50
+#: fmea/templates/fmea/fmea_failure_mode_effect_list.html:19
+#: fmea/templates/fmea/fmea_failure_mode_list.html:20
+#: fmea/templates/fmea/fmea_failure_mode_list.html:39
+#: fmea/views/fmea_affected_objects.py:90 fmea/views/fmea_failure_mode.py:87
+#: fmea/views/fmea_failure_mode_effect.py:81
+#: katalogus/templates/plugin_settings_list.html:51
+#: katalogus/views/plugin_settings_edit.py:89 rocky/views/ooi_edit.py:37
+#: rocky/views/organization_edit.py:69
+msgid "Edit"
+msgstr "Editá"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:33
+msgid "Failure mode affected objects cannot be found."
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html:11
+msgid "Define which objects are affected for a failure mode"
+msgstr "Defini kwa ophetonan ta afekta pa un failure mode"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html:16
+msgid "Failure mode affected objects"
+msgstr "No por decódifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html:19
+#: fmea/templates/fmea/fmea_failure_mode_effect_form.html:18
+#: fmea/templates/fmea/fmea_failure_mode_form.html:19
+msgid "Save"
+msgstr "Warda"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html:21
+#: fmea/templates/fmea/fmea_failure_mode_effect_form.html:20
+#: fmea/templates/fmea/fmea_failure_mode_form.html:21
+#: onboarding/templates/account/step_2a_organization_setup.html:29
+#: onboarding/templates/account/step_4_account_setup_admin.html:25
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html:21
+#: onboarding/templates/account/step_6_account_setup_client.html:24
+#: rocky/templates/organizations/organization_add.html:22
+#: rocky/templates/organizations/organization_member_add.html:15
+#: rocky/templates/partials/elements/ooi_detail_settings.html:9
+#: rocky/templates/partials/elements/ooi_report_settings.html:9
+#: rocky/templates/partials/form/indemnification_add_form.html:27
+#: rocky/templates/partials/scan_history.html:49
+#: rocky/templates/two_factor/_wizard_actions.html:12
+msgid "Submit"
+msgstr "Abdiká"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html:25
+#: fmea/templates/fmea/fmea_failure_mode_list.html:70
+msgid "No failure mode yet defined."
+msgstr "Ningun failure mode ahinda defini"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html:26
+msgid "To add affected objects to a failure mode, first create one."
+msgstr "Pa agregá ophetonan afektá na un failure mode, krea un prome."
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html:27
+#: fmea/templates/fmea/fmea_failure_mode_list.html:71
+msgid "Create failure mode"
+msgstr "Krea failure mode"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html:14
+msgid "Failure mode affected objects tabel:"
+msgstr "Failure mode tabèl di ophetonan afekta:"
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html:37
+msgid "No failure mode affected objects yet defined."
+msgstr "Ningun failure mode ophetonan afekta ahinda defini."
+
+#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html:38
+msgid "Create failure mode Affected Objects"
+msgstr "Reprodusí búskeda"
+
+#: fmea/templates/fmea/fmea_failure_mode_departments.html:10
+msgid "Departments failure modes"
+msgstr "Failure modes departamentonan"
+
+#: fmea/templates/fmea/fmea_failure_mode_departments.html:13
+msgid "Failure modes and affected departments tabel:"
+msgstr "Failure modes i tabèl di departamentonan afekta:"
+
+#: fmea/templates/fmea/fmea_failure_mode_departments.html:16
+#: fmea/templates/fmea/fmea_failure_mode_list.html:18
+msgid "Failure Mode"
+msgstr "Failure Mode"
+
+#: fmea/templates/fmea/fmea_failure_mode_departments.html:17
+msgid "Affected Departments"
+msgstr "Departementonan Afektá"
+
+#: fmea/templates/fmea/fmea_failure_mode_departments.html:27
+msgid "Nothing found."
+msgstr "Nada enkontra."
+
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:14
+msgid "Failure mode properties"
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:18
+#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html:18
+msgid "Properties"
+msgstr "Karakteristikanan"
+
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:26
+msgid "Risk class"
+msgstr "Nivel di rísiko"
+
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:48
+msgid "Frequency level"
+msgstr "Nivel di frequensidat"
+
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:58
+msgid "Detectability level"
+msgstr "Nivel di detektabilidat"
+
+#: fmea/templates/fmea/fmea_failure_mode_detail.html:70
+msgid ""
+"\n"
+"                        Effect and severity level\n"
+"                        "
+msgid_plural ""
+"\n"
+"                        Effects and severity levels\n"
+"                      "
+msgstr[0] ""
+"\n"
+"                        Nivel di efekto i severidat\n"
+"                        "
+msgstr[1] ""
+"\n"
+"                        Nivel di efektonan i severidatnan\n"
+"                      "
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html:11
+#: fmea/templates/fmea/fmea_failure_mode_effect_list.html:17
+msgid "Failure mode effect"
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html:14
+msgid "Failure mode effect properties"
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html:36
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:40
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:105
+#: rocky/templates/findings/finding_list.html:28
+#: rocky/templates/oois/ooi_detail_findings_list.html:18
+#: rocky/templates/oois/ooi_detail_findings_overview.html:20
+#: rocky/templates/partials/ooi_report_severity_totals_table.html:6
+msgid "Severity"
+msgstr "Nivél di severedat"
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_form.html:10
+msgid "FMEA effect and severity"
+msgstr "FMEA efekto i seviridat"
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_form.html:15
+msgid "FMEA effect"
+msgstr "FMEA efekto"
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_list.html:14
+msgid "Failure mode effects tabel:"
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_list.html:18
+msgid "Severity level"
+msgstr "Nivel di rísiko"
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_list.html:35
+msgid "No failure mode effect yet defined."
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_effect_list.html:36
+msgid "Create a failure mode effect"
+msgstr "Reprodusí búskeda"
+
+#: fmea/templates/fmea/fmea_failure_mode_form.html:11
+#: fmea/templates/fmea/fmea_index.html:33
+msgid "Create a new failure mode"
+msgstr "Krea un failure mode nobo"
+
+#: fmea/templates/fmea/fmea_failure_mode_form.html:16
+msgid "Failure mode and effects"
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_form.html:25
+msgid "No failure mode effects created."
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_form.html:26
+msgid ""
+"First create failure mode effects wich can be added later to a failure mode."
+msgstr ""
+"Prome krea efektonan di failure mode pa despues añadi esaki na un failure "
+"mode."
+
+#: fmea/templates/fmea/fmea_failure_mode_form.html:27
+#: fmea/templates/fmea/fmea_index.html:32
+msgid "Create failure mode effects"
+msgstr "Reprodusí búskeda"
+
+#: fmea/templates/fmea/fmea_failure_mode_list.html:14
+msgid "Failure mode tabel:"
+msgstr "Tabèl di failure mode:"
+
+#: fmea/templates/fmea/fmea_failure_mode_list.html:17
+msgid "Risk Class"
+msgstr "Nivel di rísiko"
+
+#: fmea/templates/fmea/fmea_failure_mode_list.html:19
+#: fmea/templates/fmea/fmea_failure_mode_list.html:38
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:16
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:81
+#: rocky/templates/findings/finding_list.html:32
+#: rocky/templates/organizations/organization_page_tabs.html:7
+#: rocky/templates/partials/ooi_report_findings_block_table.html:27
+msgid "Details"
+msgstr "Detayes"
+
+#: fmea/templates/fmea/fmea_failure_mode_list.html:38
+msgid "Sluit details"
+msgstr "Habri detayes"
+
+#: fmea/templates/fmea/fmea_failure_mode_list.html:44
+msgid "Description:"
+msgstr "Deklarashon"
+
+#: fmea/templates/fmea/fmea_failure_mode_list.html:45
+msgid "Frequency level:"
+msgstr "Nivel di frequencidat:"
+
+#: fmea/templates/fmea/fmea_failure_mode_list.html:46
+msgid "Detectability level:"
+msgstr "Nivel di detektabilidat"
+
+#: fmea/templates/fmea/fmea_failure_mode_list.html:49
+msgid ""
+"\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffect and severity level\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+msgid_plural ""
+"\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffects and severity levels\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+msgstr[0] ""
+"\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNivel di efekto i severidat\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+msgstr[1] ""
+"\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNivel di efektonan i severidatnan\n"
+"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:11
+msgid "Failure mode report"
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:14
+#: rocky/templates/partials/ooi_report_severity_totals.html:5
+#: rocky/views/ooi_tree.py:72
+msgid "Summary"
+msgstr "Resúmen"
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:16
+msgid "Failure mode: "
+msgstr "No por decodifica e archivo"
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:17
+msgid "Severity: "
+msgstr "Seviridat:"
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:18
+msgid "Detectability: "
+msgstr "Detektabilidat"
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:19
+msgid "Frequency: "
+msgstr "Frequencia: "
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:20
+msgid "Effect: "
+msgstr "Efekto: "
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:21
+msgid "Description: "
+msgstr "Deklarashon: "
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:22
+msgid "Affected Departments: "
+msgstr "Departamentonan afekta: "
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:27
+msgid "Affected OOI's: "
+msgstr "OOI's afekta:"
+
+#: fmea/templates/fmea/fmea_failure_mode_report.html:37
+msgid "Report cannot be viewed, failure mode not found."
+msgstr "Rapòrt no por wordu mira, no por haña failure mode."
+
+#: fmea/templates/fmea/fmea_index.html:10
+msgid "FMEA introduction"
+msgstr "FMEA introdukshon"
+
+#: fmea/templates/fmea/fmea_index.html:12
+msgid ""
+"FMEA (failure mode and effective analysis) is a step-by-step approach for "
+"collecting knowledge about possible points of failure in a design, "
+"manufacturing process, product or service."
+msgstr ""
+"FMEA (failure mode and effective analysis) ta un enfoque paso a paso pa "
+"kolekta konosimentu tokante puntonan posibel di fayo den un diseño, proseso "
+"fabriká, produkto òf servicio."
+
+#: fmea/templates/fmea/fmea_index.html:19
+msgid ""
+"Failure mode (FM) refers to the way in which something might break down and "
+"includes potential errors that may occur, especially errors that may affect "
+"a system. Effective analysis (EA) involves deciphering the consequences of "
+"those break downs by making sure that all failures can be detected, "
+"determining how frequently a failure might occur and identifying which "
+"potential failures should be prioritized."
+msgstr ""
+"Failure mode (FM) ta referi na e manera kaminda algu por posibelmente kibra "
+"i inkluí errornan potenshal ku por okuri, speshalmente errornan ku por "
+"afektá un sistema. Effective analysis (EA) ta envolvi den buska e "
+"konsekuensiasnan di loke por kibra dor di detekta tur failure modes, "
+"determiná kon frequente failure modes ta okuri i identifiká kwa failure "
+"modes mester wordu prioritisa."
+
+#: fmea/templates/fmea/fmea_index.html:34
+msgid "Create affected objects of a failure mode"
+msgstr "Kreá ophetonan afektá di un failure mode"
+
+#: fmea/templates/fmea/fmea_index.html:40
+msgid "View all failure modes"
+msgstr "Mustrami tur failue modes"
+
+#: fmea/templates/fmea/fmea_index.html:41
+msgid "View all failure mode effects"
+msgstr "Mustrami tur efektonan di failure mode"
+
+#: fmea/templates/fmea/fmea_index.html:42
+msgid "View all affected objects for a failure modes"
+msgstr "Mustrami tur ophetonan afektá pa failure modes"
+
+#: fmea/templates/fmea/fmea_index.html:43 fmea/views/fmea_analytics.py:89
+msgid "Heatmap"
+msgstr "Mapa kayente"
+
+#: fmea/tools.py:11
+msgid "--- Select an option ----"
+msgstr "-- Selecta un opshon --"
+
+#: fmea/views/fmea_affected_objects.py:44
+msgid "Failure mode affected objects succesfully created."
+msgstr "Failure mode i ophetonan afektá a wòrdu kreá ku èksito."
+
+#: fmea/views/fmea_affected_objects.py:51 fmea/views/fmea_failure_mode.py:48
+#: fmea/views/fmea_failure_mode_effect.py:44
+msgid "Create"
+msgstr "Kreá"
+
+#: fmea/views/fmea_affected_objects.py:149
+msgid "Treeobjects succesfully added."
+msgstr "Mapa di ophetonan añadi ku èxito."
+
+#: fmea/views/fmea_affected_objects.py:153
+msgid "Please select a department or ooi."
+msgstr "Por fabor selekta un departamentu òf ooi."
+
+#: fmea/views/fmea_analytics.py:40 onboarding/templates/step_4_report.html:12
+msgid "Report"
+msgstr "Rapòrt"
+
+#: fmea/views/fmea_failure_mode.py:41
+msgid "Failure mode succesfully created."
+msgstr "Failure mode a wòrdu kreá ku èksito."
+
+#: fmea/views/fmea_failure_mode_effect.py:37
+msgid "Failure mode effect succesfully created."
+msgstr "Failure mode a wòrdu kreá ku èksito."
+
+#: fmea/views/view_helpers.py:9 fmea/views/view_helpers.py:15
+#: fmea/views/view_helpers.py:22 fmea/views/view_helpers.py:32
+#: rocky/templates/dashboard_redteam.html:38
+msgid "FMEA"
+msgstr "FMEA"
+
+#: fmea/views/view_helpers.py:24
+msgid "Failure mode effects"
+msgstr "Efektonan di failure mode"
+
+#: katalogus/forms/katalogus_filter.py:7
+msgid "Enabled"
+msgstr "Aktivá"
+
+#: katalogus/forms/katalogus_filter.py:8
+msgid "Disabled"
+msgstr "Desaktivá"
+
+#: katalogus/forms/katalogus_filter.py:11
+msgid "Enabled-Disabled"
+msgstr "Desaktivá-Aktivá"
+
+#: katalogus/forms/katalogus_filter.py:12
+msgid "Disabled-Enabled"
+msgstr "Desaktivá-Aktivá"
+
+#: katalogus/forms/katalogus_filter.py:20
+#: rocky/templates/partials/katalogus_list_filters.html:13
+msgid "Filter options"
+msgstr "Opshonnan di filter"
+
+#: katalogus/forms/plugin_settings.py:13 katalogus/forms/plugin_settings.py:46
+msgid "This field is required."
+msgstr "E vèld aki ta obligatorio"
+
+#: katalogus/templates/change_clearance_level.html:10
+#: katalogus/templates/partials/objects_to_scan.html:32
+msgid "scan level warning"
+msgstr "Advertensia di nivél di skèn"
+
+#: katalogus/templates/change_clearance_level.html:12
+#, python-format
+msgid ""
+"%(plugin_name)s will only scan objects with a corresponding clearance level "
+"of <strong>L%(scan_level)s</strong> or higher."
+msgstr ""
+"%(plugin_name)s ta skèn solamente ophetonan ku tin un nivel di autorisashon "
+"adequa di <strong>L%(scan_level)s</strong> òf mas haltu."
+
+#: katalogus/templates/change_clearance_level.html:19
+msgid "Scan OOI"
+msgstr "Skèn OOI"
+
+#: katalogus/templates/change_clearance_level.html:21
+#, python-format
+msgid ""
+"The following objects are not yet cleared for level %(scan_level)s, please "
+"be advised that by continuing you will declare a level %(scan_level)s on "
+"these objects."
+msgstr ""
+"E sigiente ophetonan no ta pone na e nivel di autorisashon number "
+"%(scan_level)s, por fabor ta consiente ku pa sigi bo ta deklara un nivel di "
+"autorisashon di %(scan_level)s riba e ophetonan."
+
+#: katalogus/templates/change_clearance_level.html:26
+msgid "Selected OOIs:"
+msgstr "OOI's selektá:"
+
+#: katalogus/templates/change_clearance_level.html:29
+#: rocky/templates/tasks/boefjes.html:26
+#: rocky/templates/tasks/normalizers.html:26
+msgid "OOI"
+msgstr "OOI"
+
+#: katalogus/templates/change_clearance_level.html:30 onboarding/forms.py:32
+#: tools/forms/ooi.py:109 rocky/templates/oois/ooi_page_tabs.html:18
+#: rocky/templates/oois/ooi_page_tabs.html:20
+#: rocky/templates/scan_profiles/scan_profile_detail.html:13
+msgid "Clearance level"
+msgstr "Nivél di autorisashon"
+
+#: katalogus/templates/change_clearance_level.html:47
+msgid "Are you sure you want to scan anyways?"
+msgstr "Bo ta sigur ku bo ke skèn numa?"
+
+#: katalogus/templates/change_clearance_level.html:53
+#: katalogus/templates/plugin_settings_delete.html:17
+#: rocky/templates/oois/ooi_delete.html:46
+#: rocky/templates/oois/ooi_delete.html:55
+#: rocky/templates/organizations/organization_edit.html:31
+#: rocky/templates/organizations/organization_member_edit.html:43
+#: rocky/templates/two_factor/_wizard_actions.html:5
+msgid "Cancel"
+msgstr "Kanselá"
+
+#: katalogus/templates/change_clearance_level.html:54
+#: rocky/templates/oois/ooi_detail.html:30
+#: rocky/templates/oois/ooi_detail.html:56
+msgid "Scan"
+msgstr "Skèn"
+
+#: katalogus/templates/katalogus.html:12
+#: katalogus/views/change_clearance_level.py:63 katalogus/views/katalogus.py:64
+#: katalogus/views/katalogus_settings.py:26 katalogus/views/plugin_detail.py:87
+#: katalogus/views/plugin_settings_add.py:41
+#: katalogus/views/plugin_settings_delete.py:30
+#: katalogus/views/plugin_settings_edit.py:67 rocky/templates/404.html:22
+#: rocky/templates/dashboard_client.html:29
+#: rocky/templates/dashboard_redteam.html:29 rocky/templates/header.html:35
+msgid "KAT-alogus"
+msgstr "KAT-alogus"
+
+#: katalogus/templates/katalogus.html:14
+msgid ""
+"\n"
+"                An overview of all available boefjes.\n"
+"                Boefjes can be used to scan for vulnerablilities and "
+"security issues within specified objects.\n"
+"                Each boefje has his own focus area and strengths.\n"
+"              "
+msgstr ""
+"\n"
+"                Un relato generál di tur boefjes ku tin.\n"
+"                Boefjes por wordu úza pa investigashón pa ophetonan "
+"specífiko vulnerabel i ku problemanan di siguridát.\n"
+"                Kada boefje tin su mes área di enfoké i fortalesanan.\n"
+"              "
+
+#: katalogus/templates/katalogus.html:24
+#: katalogus/templates/plugin_settings_edit.html:12
+#: katalogus/templates/plugin_settings_list.html:9
+#: katalogus/views/katalogus_settings.py:30
+msgid "Settings"
+msgstr "Settings"
+
+#: katalogus/templates/katalogus.html:37 rocky/templates/scan.html:12
+msgid "Boefjes overview:"
+msgstr "Relato general di Boefjes:"
+
+#: katalogus/templates/katalogus.html:40
+msgid "Boefje name"
+msgstr "Nòmber di Boefje"
+
+#: katalogus/templates/katalogus.html:41
+msgid "Boefje description"
+msgstr "Boefje informashon"
+
+#: katalogus/templates/katalogus.html:42
+msgid "Actions"
+msgstr "Akshonnan"
+
+#: katalogus/templates/katalogus.html:53
+#: katalogus/templates/partials/boefje_tile.html:29
+#: katalogus/templates/partials/plugin_tile.html:20
+msgid "See details"
+msgstr "Habri detayes"
+
+#: katalogus/templates/katalogus_settings.html:10
+msgid "KAT-alogus Settings"
+msgstr "KAT-alogus Settings"
+
+#: katalogus/templates/katalogus_settings.html:13
+msgid ""
+"There are currently no settings defined. Add settings at plugin detail page."
+msgstr ""
+"Na e momentonan aki no tin settings pone. Añadi settings na e página detaya "
+"di plugin."
+
+#: katalogus/templates/katalogus_settings.html:15
+#: rocky/templates/two_factor/core/otp_required.html:16
+msgid "Go back"
+msgstr "Bai bèk"
+
+#: katalogus/templates/katalogus_settings.html:18
+msgid "This is an overview of the latest settings of all plugins."
+msgstr "Esaki ta un lista di e settings mas reciente pa tur plugins."
+
+#: katalogus/templates/katalogus_settings.html:22
+msgid "Latest plugin settings:"
+msgstr "Reciente plugin settings:"
+
+#: katalogus/templates/katalogus_settings.html:25
+msgid "Plugin"
+msgstr "Plugin"
+
+#: katalogus/templates/katalogus_settings.html:27
+#: katalogus/templates/plugin_settings_list.html:17
+#: rocky/templates/oois/ooi_delete.html:25
+msgid "Value"
+msgstr "Balor"
+
+#: katalogus/templates/partials/boefje_tile.html:16
+#: katalogus/templates/partials/plugin_tile.html:8
+#: onboarding/templates/partials/boefje_tile_static.html:8
+msgid "Scan level:"
+msgstr "Nivél di skèn:"
+
+#: katalogus/templates/partials/boefje_tile.html:25
+msgid "Publisher"
+msgstr "Editora"
+
+#: katalogus/templates/partials/enable_disable_plugin.html:12
+msgid "Enable"
+msgstr "Aktivá"
+
+#: katalogus/templates/partials/enable_disable_plugin.html:14
+#: rocky/templates/two_factor/profile/disable.html:14
+msgid "Disable"
+msgstr "Desactivá"
+
+#: katalogus/templates/partials/enable_disable_plugin.html:19
+msgid "Redteam can enable "
+msgstr "Red team por activá "
+
+#: katalogus/templates/partials/katalogus_filter.html:8
+msgid "Available plugins"
+msgstr "Plugins disponibel"
+
+#: katalogus/templates/partials/katalogus_filter.html:11
+#: rocky/templates/partials/scan_history.html:11
+msgid "Hide filters"
+msgstr "Skonde filters"
+
+#: katalogus/templates/partials/katalogus_filter.html:12
+#: rocky/templates/partials/scan_history.html:12
+msgid "Show filters"
+msgstr "Mustra filters"
+
+#: katalogus/templates/partials/katalogus_filter.html:19
+#: rocky/templates/partials/katalogus_list_filters.html:45
+#: rocky/templates/partials/ooi_type_filters.html:33
+#: rocky/templates/partials/organization_member_list_filters.html:27
+msgid "Update List"
+msgstr "Update Lista"
+
+#: katalogus/templates/partials/katalogus_toolbar.html:5
+msgid "Gridview"
+msgstr "Mustra Grid"
+
+#: katalogus/templates/partials/katalogus_toolbar.html:7
+msgid "Tableview"
+msgstr "Aparensia tablatura"
+
+#: katalogus/templates/partials/objects_to_scan.html:4
+#: rocky/templates/findings/finding_list.html:21
+#: rocky/templates/oois/ooi_list.html:11
+msgid "Object list"
+msgstr "Lista di opheto"
+
+#: katalogus/templates/partials/objects_to_scan.html:8
+msgid ""
+"This boefje will only scan objects with a corresponding clearance level of "
+"<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
+"this boefje to scan an OOI with a lower clearance level than "
+"<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
+"clearance level."
+msgstr ""
+"E boefje aki ta skèn solamente ophetonan ku un nivél di autorisashon di "
+"<strong>L%(scan_level)s</strong> òf mas haltu. No tin indemnizashon pa "
+"e boefje pa skèn un OOI ku un nivél di autorisashon mas abou ku "
+"<strong>L%(scan_level)s</strong>. Uza e filter pa mustra OOI's ku un nivél di autorisashon "
+"mas abou."
+
+#: katalogus/templates/partials/objects_to_scan.html:33
+msgid ""
+"\n"
+"          <span>Warning scan level:</span>\n"
+"          Scanning OOI's with a lower clearance level will result in OpenKAT "
+"increasing the clearance level on that OOI,\n"
+"          not only for this scan but from now on out, until it manually gets "
+"set to something else again.\n"
+"          This means that all other enabled Boefjes will use this higher "
+"clearance level aswel.\n"
+"        "
+msgstr ""
+"\n"
+"          <span>Advertensia nivel di skèn:</span>\n"
+"          Skèn OOI's ku nivel di authorisashon mas abou lo resulta ku OpenKAT "
+"mester subi e nivel di authorisashon pa e OOI,\n"
+"          no solamente pa e skèn aki for di awor i adelante, te ora manualmente e wordu pone "
+"na algu otro atrobe.\n"
+"          Esaki ta nifika ku tur otro Boefjes aktivo lo huza e nivel di authorisashon  "
+"aki tambe.\n"
+"        "
+
+#: katalogus/templates/partials/objects_to_scan.html:44
+msgid ""
+"\n"
+"          You currently don't have any objects that meet the scan level of "
+"%(name)s.\n"
+"          Add objects with a complying clearance level, or alter the "
+"clearance level of existing objects.\n"
+"        "
+msgstr ""
+"\n"
+"              Na e momento aki bo no tin ophetonan ku ta kwarda ku e nivel "
+"di autorisashon di %(name)s. \n"
+"              Añadi ophetonan ku un nivel di authorisashon adequa, òf kambia "
+"e nivel di authorisashon di ophetonan eksistente.\n"
+"            "
+
+#: katalogus/templates/partials/objects_to_scan.html:49
+msgid ""
+"\n"
+"          You currently don't have scannable objects for %(name)s.\n"
+"          Add objects to use this boefje. This boefje is able to scan "
+"objects of the following types:\n"
+"        "
+msgstr ""
+"\n"
+"              Na e momento aki bo no tin ophetonan pa skèn pa %(name)s. \n"
+"              Añadi ophetonan pa uza e boefje. E boefje aki ta dispuesto di "
+"skèn ophetonan di e sigiente tiponan:\n"
+"            "
+
+#: katalogus/templates/partials/plugin_settings_required.html:9
+msgid "The form could not be initialized."
+msgstr "E formulario no por wordu initialisa."
+
+#: katalogus/templates/partials/plugin_settings_required.html:13
+msgid "Required settings"
+msgstr "Settings requeri"
+
+#: katalogus/templates/partials/plugin_settings_required.html:15
+#: katalogus/templates/plugin_settings_list.html:47
+#: rocky/templates/findings/finding_add.html:17
+#: rocky/templates/partials/ooi_list_toolbar.html:8
+msgid "Add"
+msgstr "Añadí"
+
+#: katalogus/templates/partials/plugin_tile.html:19
+msgid "Publisher:"
+msgstr "Editora:"
+
+#: katalogus/templates/plugin_detail.html:20
+msgid "Scan level"
+msgstr "Nivél di skèn"
+
+#: katalogus/templates/plugin_detail.html:37
+msgid "Consumes"
+msgstr "Ta konsumí"
+
+#: katalogus/templates/plugin_detail.html:39
+#, python-format
+msgid "%(plugin_name)s is able to scan the following object types:"
+msgstr "%(plugin_name)s ta dispuesto di skèn e siguinte tipo di ophetonan:"
+
+#: katalogus/templates/plugin_detail.html:49
+msgid "Produces"
+msgstr "Ta Produsí"
+
+#: katalogus/templates/plugin_detail.html:51
+#, python-format
+msgid "%(plugin_name)s can produce the following output:"
+msgstr "%(plugin_name)s por produsi lo sigiente:"
+
+#: katalogus/templates/plugin_settings_add.html:10
+msgid "Add setting - "
+msgstr "Añadi setting - "
+
+#: katalogus/templates/plugin_settings_add.html:12
+msgid "Setting"
+msgstr "Setting"
+
+#: katalogus/templates/plugin_settings_add.html:18
+msgid "Add setting"
+msgstr "Añadi setting"
+
+#: katalogus/templates/plugin_settings_delete.html:10
+msgid "Delete setting"
+msgstr "Kita setting"
+
+#: katalogus/templates/plugin_settings_delete.html:12
+#, python-format
+msgid ""
+"Are you sure you want to delete setting %(name)s for the plugin "
+"%(plugin_name)s?"
+msgstr "Bo ta sigur pa kita setting %(name)s pa e plugin %(plugin_name)s?"
+
+#: katalogus/templates/plugin_settings_delete.html:18
+#: katalogus/templates/plugin_settings_list.html:22
+#: katalogus/templates/plugin_settings_list.html:54
+#: katalogus/views/plugin_settings_delete.py:53 rocky/views/ooi_delete.py:22
+msgid "Delete"
+msgstr "Eliminá"
+
+#: katalogus/templates/plugin_settings_edit.html:10
+msgid "Edit setting"
+msgstr "Kambia setting"
+
+#: katalogus/templates/plugin_settings_edit.html:18
+msgid "Update setting"
+msgstr "Kambia setting"
+
+#: katalogus/templates/plugin_settings_list.html:7
+msgid " Details"
+msgstr "Detayes"
+
+#: katalogus/templates/plugin_settings_list.html:13
+msgid "Overview of settings:"
+msgstr "Relato di settings:"
+
+#: katalogus/templates/plugin_settings_list.html:18
+msgid "Required"
+msgstr "Requerido"
+
+#: katalogus/templates/plugin_settings_list.html:19
+msgid "Action"
+msgstr "Akshon"
+
+#: katalogus/templates/plugin_settings_list.html:33
+msgid "Unset"
+msgstr "Bashi"
+
+#: katalogus/templates/plugin_settings_list.html:40
+#: rocky/templates/organizations/organization_member_list.html:34
+msgid "Yes"
+msgstr "Si"
+
+#: katalogus/templates/plugin_settings_list.html:42
+#: rocky/templates/organizations/organization_member_list.html:36
+msgid "No"
+msgstr "Nò"
+
+#: katalogus/views/change_clearance_level.py:25
+msgid "Session has terminated, please select OOIs again."
+msgstr "Seshon a wòrdu tèrminá. Por fabor selekta OOIs dinobo."
+
+#: katalogus/views/change_clearance_level.py:49
+#: katalogus/views/plugin_detail_scan_oois.py:53
+msgid "Scanning successfully scheduled."
+msgstr "Skèn a start ku èxito."
+
+#: katalogus/views/change_clearance_level.py:86
+msgid "Change clearance level"
+msgstr "Kambia nivél di autorisashon"
+
+#: katalogus/views/mixins.py:101
+#, python-brace-format
+msgid "Trying to run disabled boefje '{boefje_id}'."
+msgstr "Ta purbando di start boefje desaktivá '{boefje_id}'."
+
+#: katalogus/views/mixins.py:114
+msgid ""
+"Your scan is running successfully in the background. \n"
+" Results will be added to the object list when they are in. It may take some "
+"time, a refresh of the page may be needed to show the results."
+msgstr ""
+"Bo skèn ta koriendo den background ku èxito. \n"
+" E resultadonan lo wordu pone na e lista di opheto ora e ta kla. E ta tuma "
+"algun tempu, pagina refresh lo tin mester pa mustra e resulatadonan."
+
+#: katalogus/views/plugin_detail_scan_oois.py:51
+msgid "Scanning has failed to start."
+msgstr "Skèn a faya pa start."
+
+#: katalogus/views/plugin_enable_disable.py:38
+#, python-brace-format
+msgid "Boefje '{boefje_id}' disabled."
+msgstr "Boefje '{boefje_id}' desaktivá."
+
+#: katalogus/views/plugin_enable_disable.py:42
+#, python-brace-format
+msgid "Boefje '{boefje_id}' enabled."
+msgstr "Boefje '{boefje_id}' aktivá."
+
+#: katalogus/views/plugin_enable_disable.py:45
+#, python-brace-format
+msgid ""
+"Before enabling, please set the required settings for boefje '{boefje_id}'."
+msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_id}'."
+
+#: katalogus/views/plugin_settings_add.py:29
+msgid "This setting already exists. Use the edit link."
+msgstr "E setting aki ta èksisti kaba. Kambia e setting e ora ey."
+
+#: katalogus/views/plugin_settings_add.py:63
+msgid "Add settings"
+msgstr "Añadi settings"
+
+#: katalogus/views/plugin_settings_add.py:86
+msgid "Setting succesfully added for: "
+msgstr "Setting a wordu agregá ku èxito pa: "
+
+#: katalogus/views/plugin_settings_delete.py:78
+msgid "Setting {} for plugin {} succesfully deleted."
+msgstr "Setting {} pa plugin {} a wordu kita ku èxito."
+
+#: katalogus/views/plugin_settings_edit.py:39
+msgid "The setting you are trying to edit does not exist."
+msgstr "E setting ku bo ta purba na kambia no ta èksisti."
+
+#: katalogus/views/plugin_settings_edit.py:101
+msgid "Setting succesfully updated."
+msgstr "Setting kambia ku èxito."
+
+#: onboarding/forms.py:34 tools/forms/ooi.py:111
+msgid ""
+"Boefjes that has a scan level below or equal to the clearance level, is "
+"permitted to scan an object."
+msgstr ""
+"Boefjes ku tin un nivél di skèn mas abou of parew ku e nivél di "
+"autorisashon, tin pèrmit pa skèn un opheto."
+
+#: onboarding/forms.py:38 tools/forms/ooi.py:115
+msgid "Please select a clearance level to proceed."
+msgstr "Por fabor selektá un nivél di autorisashon pa sigi."
+
+#: onboarding/forms.py:44 tools/forms/ooi.py:121
+msgid "explanation-clearance-level"
+msgstr "splikashon-nivel-di-autorisashon"
+
+#: onboarding/forms.py:65
+msgid "What is the name of your organization."
+msgstr "Kiko ta bo nòmber di organisashon?"
+
+#: onboarding/forms.py:70
+msgid "The name of the organization this OpenKAT account is for."
+msgstr "E nòmber di e organisashon e OpenKAT account aki ta pe."
+
+#: onboarding/forms.py:101
+msgid "Trusted to set clearance levels on OOI's"
+msgstr "Konfiá pa pone nivél di autorisashon riba OOI's"
+
+#: onboarding/forms.py:103
+msgid "Give this user permission to set clearance levels on OOI's"
+msgstr "Duna e usario pèrmiso pa pone nivel di authorisashon riba OOI's"
+
+#: onboarding/templates/account/step_1_registration_intro.html:10
+msgid "Register"
+msgstr "Registrá"
+
+#: onboarding/templates/account/step_1_registration_intro.html:13
+msgid "Create a new account for your organization"
+msgstr "Krea un account nobo pa bo organisashon"
+
+#: onboarding/templates/account/step_1_registration_intro.html:16
+msgid ""
+"All user  accounts are part of an organization. So if you’re new and your "
+"company is also new to OpenKAT you can register here to create a OpenKAT "
+"account for your company including an admin account for you. If you like a "
+"user account that is connected to an already existing organization within "
+"OpenKAT you can ask the admin to create an account for you."
+msgstr ""
+"Tur account ta parti di un organisashon. Kèmèn si bo ta nobo i bo kompania "
+"tambe ta nobo na OpenKAT bo por registrá akinan pa krea un OpenKAT account pa bo "
+"kompania inkluéndo un admin account pa bo. Si bo ke un account ku ta konekta "
+"ku un organisashon ku ta èksisti kaba na KAT bo por puntra e admin pa krea "
+"un account pa bo."
+
+#: onboarding/templates/account/step_1_registration_intro.html:26
+#: onboarding/templates/account/step_1_registration_intro.html:37
+#: onboarding/templates/step_1_introduction.html:18
+#: onboarding/templates/step_1_introduction.html:48
+msgid "Let's get started"
+msgstr "Laga nos kuminsa"
+
+#: onboarding/templates/account/step_1_registration_intro.html:27
+#: onboarding/templates/step_1_introduction.html:19
+msgid "How does OpenKAT work"
+msgstr "Kon OpenKAT ta functiona?"
+
+#: onboarding/templates/account/step_1_registration_intro.html:29
+msgid ""
+"OpenKAT is able to give insight into security risks on your online objects. "
+"For example, your websites, mailservers or online data. OpenKAT uses scans "
+"to find and assess the area's that might be at risk and reports these back "
+"to you. As a user you decide which insight you would like and OpenKAT guides "
+"you to through the process. During this introduction you will be guided "
+"through the steps to create a report."
+msgstr ""
+"OpenKAT tin e posibilidàt di duna informashon mas detaya den riésgonan di "
+"siguridát di bo online ophetonan. Por ehempel, bo websites, mailservers òf "
+"online data. OpenKAT ta úza scans pa enkontra i asertà areanan ku por kore "
+"riésgo i rapòrta esaki bèk na abo. Komo kliente bo ta skohè ki informashon "
+"bo ke i OpenKAT ta guiá'bu dor di e proceso Durante e introdukshon aki bo lo "
+"wòrdu guiá dor di e stapnan pa traha un rapòrt."
+
+#: onboarding/templates/account/step_2a_organization_setup.html:10
+#: onboarding/templates/account/step_2a_organization_update.html:10
+#: onboarding/templates/account/step_2b_indemnification_setup.html:10
+#: onboarding/templates/account/step_2c_account_setup_intro.html:10
+#: onboarding/templates/account/step_3_account_user_type.html:10
+#: onboarding/templates/account/step_4_account_setup_admin.html:10
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html:10
+#: onboarding/templates/account/step_6_account_setup_client.html:10
+msgid "OpenKAT setup"
+msgstr "OpenKAT setup"
+
+#: onboarding/templates/account/step_2a_organization_setup.html:12
+#: onboarding/templates/account/step_2a_organization_update.html:12
+#: rocky/templates/organizations/organization_add.html:10
+msgid "Organization setup"
+msgstr "Setup organisashon"
+
+#: onboarding/templates/account/step_2a_organization_setup.html:15
+msgid ""
+"Please enter the following organization details. These details can be edited "
+"within the organization page within OpenKAT when necesarry. Adding a new "
+"organization requires a new database."
+msgstr ""
+"Por favor hinka e siguinte detayesnan pa e organisashon. E detayes nan aki "
+"por wordu editá den di pagina di organisashon den di OpenKAT si ta necesario. "
+"Añadi un organisashon nobo ta requerì un database nobo."
+
+#: onboarding/templates/account/step_2a_organization_setup.html:27
+#: onboarding/templates/account/step_2a_organization_update.html:23
+#: rocky/templates/organizations/organization_add.html:20
+#: rocky/templates/organizations/organization_detail.html:10
+msgid "Organization details"
+msgstr "Detayes di organisashon"
+
+#: onboarding/templates/account/step_2a_organization_update.html:15
+#: rocky/templates/organizations/organization_add.html:12
+msgid ""
+"Please enter the following organization details. These details can be edited "
+"within the organization page within OpenKAT when necesarry."
+msgstr ""
+"Por fabor hinka e siguinte detayesnan pa e organisashon. E detayes nan aki "
+"por wordu editá den di e pagina di organisashon den di OpenKAT ora ta necessario."
+
+#: onboarding/templates/account/step_2a_organization_update.html:25
+msgid "Submit changes"
+msgstr "Enviá kambionan"
+
+#: onboarding/templates/account/step_2a_organization_update.html:28
+#: onboarding/templates/account/step_2b_indemnification_setup.html:18
+msgid "Continue"
+msgstr "Sigi"
+
+#: onboarding/templates/account/step_2b_indemnification_setup.html:12
+msgid "Indemnification setup"
+msgstr "Setup Indemnizashon"
+
+#: onboarding/templates/account/step_2b_indemnification_setup.html:15
+msgid "Indemnification on the organization is already present."
+msgstr "Indemnizashon riba e organisashon ta presente kaba."
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html:12
+#: onboarding/templates/account/step_3_account_user_type.html:12
+msgid "Account setup"
+msgstr "Account setup"
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html:13
+msgid "Accounts"
+msgstr "Habri detayes"
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html:14
+msgid "Organization setup with separate accounts:"
+msgstr "Konfigurá organisashon ku accountnan separá:"
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html:16
+msgid ""
+"Within OpenKAT it is possible to create separate user accounts with the "
+"specific roles. Each with their own functionalities and permissions. This is "
+"useful when multiple people will be working with the same OpenKAT-setup. You "
+"can choose to create the separate accounts during this introduction or when "
+"you’re ready from the OpenKAT users page."
+msgstr ""
+"Den OpenKAT ta posibel pa krea accountnan separá ku e ròlnan specìfiko kada un "
+"ku nan mes functionalidat ì pèrmitnan. Esaki ta útil ora mayoria hende ke "
+"traha ku e mesun OpenKAT-setup. Bo por skohé pa krea e accountnan separá durante "
+"e introdukshon aki of ora bo ta kla."
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html:24
+msgid "Single account setup:"
+msgstr "Setup account pa mi mes:"
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html:26
+msgid ""
+"Alternatively it is also an option to run OpenKAT from a single user "
+"account. Which is useful when you are the only user in the account. You will "
+"be able to access the functionality of the different roles from your "
+"account. You can always add additional user accounts If you’re team expands "
+"in the future."
+msgstr ""
+"Alternativamente tambe ta un opshón pa huza OpenKAT for di un solo account. Ku "
+"ta útil si bo ta e úniko usadó di e account. Bo lo por tin e posibilidát pa "
+"tin accesso na functionalidatnan di e diferente ròlnan for di bo account. "
+"Abo por semper añadi accountnan adishonál si bo tìm expandé den futuro."
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html:36
+msgid "Create separate accounts"
+msgstr "Krea accountnan separá"
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html:38
+msgid "Continue with this account, onboard me!"
+msgstr "Sigi ku e account aki, abòrdami!"
+
+#: onboarding/templates/account/step_3_account_user_type.html:13
+msgid "Users"
+msgstr "Usarionan"
+
+#: onboarding/templates/account/step_3_account_user_type.html:15
+msgid ""
+"Within OpenKAT there are three types of user accounts. Each has its own "
+"functions."
+msgstr ""
+"Den OpenKAT tin trés diferente tipo di user accounts. Kada ún tin su mes funkshón."
+
+#: onboarding/templates/account/step_3_account_user_type.html:19
+#: onboarding/templates/account/step_4_account_setup_admin.html:13
+msgid "Admin"
+msgstr "Admin"
+
+#: onboarding/templates/account/step_3_account_user_type.html:20
+#: onboarding/templates/account/step_4_account_setup_admin.html:15
+msgid ""
+"Each organization must have an admin. The admin can create and manage user "
+"accounts as well as organization details."
+msgstr ""
+"Kada organisashon mester tin un admin. E admin por krea i manehá accountnan "
+"pa usudonan i tambe detayes di organisashon."
+
+#: onboarding/templates/account/step_3_account_user_type.html:23
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html:13
+msgid "Red teamer"
+msgstr "Tìm kòrá"
+
+#: onboarding/templates/account/step_3_account_user_type.html:24
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html:15
+msgid "A red teamer account can run scans and generate reports."
+msgstr "Un account pa tìm kòrá por start scans òf generá rapòrtnan."
+
+#: onboarding/templates/account/step_3_account_user_type.html:27
+#: onboarding/templates/account/step_6_account_setup_client.html:13
+msgid "Client account"
+msgstr "Account pa kliénte"
+
+#: onboarding/templates/account/step_3_account_user_type.html:28
+msgid "A client account can access reports."
+msgstr "Un account pa kliénte por tin accesso na rapòrtnan."
+
+#: onboarding/templates/account/step_3_account_user_type.html:32
+msgid ""
+"Each organization requires at least one admin and one red teamer account to "
+"function. This introduction will guide you through the setup of both. After "
+"that you can choose to add a client account as well."
+msgstr ""
+"Kada organisashon ta requerì sikiera ún admin ì ún tìm kòrá account pa "
+"functioná. É introdukshon aki ta guiabu pa setup tur dós. Despues ku bo por "
+"skohé pa añadi ún account pa kliénte tambe."
+
+#: onboarding/templates/account/step_3_account_user_type.html:39
+msgid "Let's add accounts"
+msgstr "Laga nos añadi accounts"
+
+#: onboarding/templates/account/step_4_account_setup_admin.html:12
+msgid "Admin account setup"
+msgstr "Account setup pa admin"
+
+#: onboarding/templates/account/step_4_account_setup_admin.html:23
+msgid "Admin details"
+msgstr "Admin detayes"
+
+#: onboarding/templates/account/step_4_account_setup_admin.html:29
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html:25
+#: onboarding/templates/account/step_6_account_setup_client.html:29
+msgid "Go back to previous step"
+msgstr "Bai bèk na e stèp anterior"
+
+#: onboarding/templates/account/step_4_account_setup_admin.html:31
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html:27
+msgid "Skip this step"
+msgstr "Salta e stèp aki"
+
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html:12
+msgid "Red teamer account setup"
+msgstr "Setup account pa tìm kòrà"
+
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html:19
+msgid "Red teamer details"
+msgstr "Tìm kòrà detayes"
+
+#: onboarding/templates/account/step_6_account_setup_client.html:12
+msgid "Client account setup (optional)"
+msgstr "Setup account pa kliénte (opshonàl)"
+
+#: onboarding/templates/account/step_6_account_setup_client.html:15
+msgid ""
+"A client account can access reports. Adding a client account to the "
+"organization is optional."
+msgstr ""
+"Un account pa kliénte por tin accesso na rapòrtnan. Añadi un account pa "
+"kliénte na e organisashon ta optionàl."
+
+#: onboarding/templates/account/step_6_account_setup_client.html:22
+msgid "User details"
+msgstr "Usario detayes"
+
+#: onboarding/templates/account/step_6_account_setup_client.html:31
+msgid "Finish organization setup"
+msgstr "Finalisá setup organisashon"
+
+#: onboarding/templates/dns_report.html:10
+#: onboarding/templates/step_2a_choose_report_info.html:10
+#: onboarding/templates/step_2b_choose_report_type.html:10
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:10
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:10
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:10
+#: onboarding/templates/step_4_report.html:10 onboarding/views.py:60
+msgid "OpenKAT introduction"
+msgstr "OpenKAT introdukshon"
+
+#: onboarding/templates/dns_report.html:11
+msgid "DNS Report"
+msgstr "DNS Rapòrt"
+
+#: onboarding/templates/dns_report.html:13
+msgid ""
+"These are the findings of a OpenKAT-analysis (%(observed_at)s). Click a "
+"finding for more detailed information about the issue, its origin, severity "
+"and possible solutions."
+msgstr ""
+"Esakinan ta e resultadonan di un OpenKAT-analysis riba %(observed_at)s. Click un "
+"resultadopa mas informashon detayá tokante e problema, su orígen, severidat "
+"i posibel solushonnan."
+
+#: onboarding/templates/dns_report.html:22
+msgid "DNS Tree"
+msgstr "DNS Mapa"
+
+#: onboarding/templates/step_1_introduction.html:10
+#: rocky/templates/landing_page.html:12
+msgid "Welcome to OpenKAT"
+msgstr "Bon Biní na OpenKAT"
+
+#: onboarding/templates/step_1_introduction.html:12
+msgid ""
+"OpenKAT is the \"Kwetsbaarheden Analyse Tool\" (Vulnerabilities Analysis "
+"Tool). An Open-Source-project developed by the Ministery of Public Health, "
+"Wellbeing and Sports to make your and our world a safer place."
+msgstr ""
+"OpenKAT ta nifiká \"Kwetsbaarheden Analyse Tool\" (Vulnerebilidát Analysis "
+"Tool). Un Open-Source-projecto traha dor di Ministerio di Salubridat, Medio "
+"Ambiente i Sport, pa hasi bo mundu i nos mundu un luga mas sigurá."
+
+#: onboarding/templates/step_1_introduction.html:21
+msgid ""
+"OpenKAT is able to give insight into security risks on your online objects. "
+"For example, your websites, mailservers or online data."
+msgstr ""
+"OpenKAT tin e abilidát di duna revelashon di riésgonan di siguridát di bo online "
+"ophetonan. Por ehèmpel, bo website nan, mailservers òf online data."
+
+#: onboarding/templates/step_1_introduction.html:27
+msgid ""
+"OpenKAT uses plugins to find and assess the area's that might be at risk and "
+"reports these back to you. Each plugin has its own skillset which could be "
+"scanning, normalizing or analyzing data. As a user you decide which areas "
+"you would like to monitor or scan and which insight you would like to "
+"receive."
+msgstr ""
+"OpenKAT ta huza plugins pa deskubrì i evalúa e areanan ku por ta un riésgo i "
+"rapòrta esaki bèk na bo. Kada plugin tin nan mes sèt di abilidát ku por ta "
+"scan, nòrmalisá òf analisá data. Komo usario bo ta disidì kwa area bo tin "
+"gana di monitoriá òf skèn i tambe ki tipo di revelashon bo tin gana di "
+"recibí."
+
+#: onboarding/templates/step_1_introduction.html:33
+msgid ""
+"Within OpenKAT you can view the insights as well as all the data OpenKAT has "
+"found. You can choose to browse through the data or view reports."
+msgstr ""
+"Den OpenKAT bo por mira e insights i tambe tur data ku KAT a deskubrì. Bo por "
+"skohé pa buska den e data òf wak rapòrt nan."
+
+#: onboarding/templates/step_1_introduction.html:38
+msgid ""
+"During this introduction you will be guided through the steps to create a "
+"report."
+msgstr ""
+"Durante e introdukshon aki bo lo wordu guiá dor di e stap nan pa krea un "
+"rapòrt."
+
+#: onboarding/templates/step_1_introduction.html:45
+#: onboarding/templates/step_2a_choose_report_info.html:56
+#: onboarding/templates/step_2b_choose_report_type.html:32
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:44
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:52
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:55
+#: onboarding/templates/step_3d_set_clearance_level.html:68
+#: rocky/templates/partials/form/boefje_tiles_form.html:12
+msgid "Skip onboarding"
+msgstr "Legumai onboarding"
+
+#: onboarding/templates/step_2a_choose_report_info.html:12
+msgid "Choose a report - Introduction"
+msgstr "Skohé un rapòrt - Introduskhon"
+
+#: onboarding/templates/step_2a_choose_report_info.html:13
+msgid "Reports"
+msgstr "Rapport"
+
+#: onboarding/templates/step_2a_choose_report_info.html:15
+msgid ""
+"Reports within OpenKAT contain an overview of the scanned objects, issues "
+"found within them and known security risks that the object might be "
+"vulnerable to. Each report gives a high overview of the state of the object "
+"as well as detailed information on what OpenKAT found and possible solutions."
+msgstr ""
+"Rapòrtnan den OpenKAT ta kontene un lista di ophetonan di skèn, problemanan haña "
+"serka nan i riesgo di siguridat nan ku e opheto por ta vulnerabel na dje. "
+"Kada rapòrt ta duna un lista prioritá di e estado di e opheto i tambe "
+"informashon detaya di tur loke KAT a enkontra i solushonanan posibel."
+
+#: onboarding/templates/step_2a_choose_report_info.html:22
+msgid "Data"
+msgstr "Data"
+
+#: onboarding/templates/step_2a_choose_report_info.html:24
+msgid ""
+"OpenKAT can scan and analyze by using plugins. Each plugin has it's unique "
+"skillset and will collect specific data or give specific insights. You "
+"manage the plugins within your account which let's OpenKAT know which "
+"plugins to run and on which objects or areas."
+msgstr ""
+"OpenKAT por skèn i analisá dor di huza plugins. Kada plugin tin nan mas sèt di "
+"skills uniko i lo kolekta data spesifiko of duna mas informashon spesifiko. "
+"Bo ta maneha plugins den bo account ku ta laga OpenKAT sa kwa plugins mester "
+"huza riba kwa opheto òf areanan."
+
+#: onboarding/templates/step_2a_choose_report_info.html:31
+msgid "Generating a report"
+msgstr "Generándo un rapport"
+
+#: onboarding/templates/step_2a_choose_report_info.html:33
+msgid ""
+"When you choose a report type OpenKAT will guide you through the setup. "
+"OpenKAT will ask the necesarry questions based on the input the report "
+"needs, as well as asks for permission to run plugins that you haven’t "
+"enabled yet but are needed to collect or analyze the data."
+msgstr ""
+"Ora bo skohe un tipo di rapòrt, OpenKAT lo guiabu pa ku e setup. OpenKAT lo "
+"puntranan preguntanan nesesario basá riba e input ku e rapòrt mester, i "
+"tambe puntra pa pèrmiso pa run plugins ku bo no a aktiva ahinda pero ku ta "
+"nesesario pa pa kolekta òf analisa data."
+
+#: onboarding/templates/step_2a_choose_report_info.html:38
+msgid ""
+"You can also choose to look at the collected data directly or generate your "
+"own report by selecting and running plugins on objects of your choice. "
+"OpenKAT will present the results."
+msgstr ""
+"Bo por tambe skohé pa mira e data kolekta direktamente òf genera bo mes "
+"rapòrt dor di selekta i start plugins riba ophetonan si bo eskoho. OpenKAT lo "
+"presentabu ku e resultadonan."
+
+#: onboarding/templates/step_2a_choose_report_info.html:42
+msgid "Permission"
+msgstr "Permiso Nenga"
+
+#: onboarding/templates/step_2a_choose_report_info.html:44
+msgid ""
+"Plugins can be provided by OpenKAT but they can also come from the "
+"community. Before a plugin can run, you need to give it permission by "
+"enabling it."
+msgstr ""
+"Plugins ta bin di OpenKAT pero nan tambe por bini dor di e komunidát. Promé un "
+"plugin por wordu huza, bo mester dunele pèrmiso dor di activé"
+
+#: onboarding/templates/step_2a_choose_report_info.html:49
+msgid ""
+"When you generate a report. OpenKAT will let you know which plugins it "
+"requires or suggests so you can choose to enable them."
+msgstr ""
+"Ora bo genera un rapòrt. OpenKAT ta lagabu sa kwa plugins e mester òf duna'bu "
+"sugerencias pa skohé kwa pa activá."
+
+#: onboarding/templates/step_2a_choose_report_info.html:59
+msgid "Let's choose a report"
+msgstr "Ban skohé un rapòrt"
+
+#: onboarding/templates/step_2b_choose_report_type.html:12
+msgid "Choose a report - Type"
+msgstr "Skohé un rapòrt - Tipo"
+
+#: onboarding/templates/step_2b_choose_report_type.html:14
+msgid ""
+"Within OpenKAT you can view reports for each of your current objects. For "
+"specific reports you can choose one of the available report types and "
+"generate a report. Such as a pen-test, a DNS-report or a mail report to give "
+"some examples."
+msgstr ""
+"Den OpenKAT bo por mira rapòrtnan pa kada un di bo ophetonan. Pa rapòrtnan "
+"specifikó bo por skohé un di e tipo rapòrtnan obtenibel i generá un rapòrt. "
+"Manera un pen-test, un DNS-rapòrt òf un mail rapòrt pa duna algun ehempel."
+
+#: onboarding/templates/step_2b_choose_report_type.html:19
+msgid "For this tutorial we suggest a DNS-report to get you started."
+msgstr "Pa a tutoriál aki nos ta sugerí un DNS-rapòrt pa kuminsa ku ne."
+
+#: onboarding/templates/step_2b_choose_report_type.html:24
+msgid ""
+"When you start to generate this report. OpenKAT will guide you through the "
+"necessary steps."
+msgstr ""
+"Ora bo kuminsa generá e rapòrt aki. OpenKAT lo guiá'bu dor di e stapnan "
+"necesario."
+
+#: onboarding/templates/step_2b_choose_report_type.html:34
+msgid "DNS report"
+msgstr "DNS Rapòrt"
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:12
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:12
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:12
+msgid "Setup scan"
+msgstr "Setup skèn"
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:13
+msgid "Let OpenKAT know what object to scan"
+msgstr "Laga OpenKAT sa kwa opheto e tinku skèn"
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:15
+msgid ""
+"Plugins scan and analyze objects. OpenKAT needs to know which object(s) you "
+"would like to scan and analyze for the DNS-report. So it can tell you which "
+"plugins are available for the choosen object."
+msgstr ""
+"Plugins skèn i analisá ophetonan. OpenKAT mester sa kwa opheto(nan) abo tin gana "
+"di skèn òf analisá pa e DNS-rapòrt. Pa e por bisa'bu kwa plugins ta "
+"obtenibel pa e opheto ku b'a skohé."
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:19
+msgid "Understanding objects"
+msgstr "Kompronde ophetonan"
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:21
+msgid ""
+"A lot of things can be an object within the scope of OpenKAT. For example a "
+"mailserver, an ip-address, a URL, a DNS record, a hostname or a network to "
+"name a few.  While these objects can be related to each other they are all "
+"objects within OpenKAT that can be scanned to gain valuable insight."
+msgstr ""
+"Hopi kos por ta un opheto den di e alkanse di OpenKAT. Por ehempel un "
+"mailserver, un ip-adrès, un URL, un DNS record, un hostname òf un netwèrk pa "
+"nombra un par. Mientras tantu e ophetonan aki por ta relatá na otro nan tur "
+"ta ophetonan den di OpenKAT ku por wordu di skèn pa haña informashon balioso."
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:29
+msgid "Creating, adding and editing objects"
+msgstr "Kreando, añadiando i editá ophetonan"
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:31
+msgid ""
+"Within OpenKAT you can view, add and edit objects from the organization’s "
+"object page."
+msgstr ""
+"Den OpenKAT bo por mira, añadi i editá ophetonan di e organisashon su page di "
+"opheto."
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:36
+msgid ""
+"Let’s add an object to scan for the DNS-Report. For this introduction we "
+"suggest adding a URL."
+msgstr ""
+"Ban añadi un opheto pa skèn pa traha e DNS-rapòrt. Pa e introdukshon aki nos "
+"ta sugerí añadi un URL."
+
+#: onboarding/templates/step_3a_setup_scan_ooi_info.html:46
+msgid "Add URL"
+msgstr "Añadi URL"
+
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:13
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:13
+#: onboarding/views.py:230
+msgid "Creating an object"
+msgstr "Kreando un opheto"
+
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:15
+msgid "Create your first object, a URL by filling out the form below."
+msgstr "Krea bo promé opheto, un URL dor di yena e formulario abou."
+
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:20
+msgid ""
+"Additional details and examples can be found by pressing on the help button "
+"next to the input field."
+msgstr ""
+"Detayesnan i ehempelnan adishonal bo por haña dor di primi e help botón "
+"banda di e vèld."
+
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:25
+msgid "Dependencies"
+msgstr "Dependesianan"
+
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:27
+msgid ""
+"Most objects have dependencies on the existence of other objects. For "
+"example a URL needs to be connected to a network, hostname, fqdn (fully "
+"qualified domain name) and ip-address. OpenKAT collects these additional "
+"object automatically when possible. By running plugins to collect or extract "
+"this data."
+msgstr ""
+"Mayoria ophetonan tin dependesianan riba e exsistencia di otro ophetonan. "
+"Por ehempel un URL mester ta konektá ku un nètwèrk, hostname, fqdn (fúl "
+"kwalifiká nòmber di domèin) i ip-adrès. OpenKAT ta kolektá e ophetonan adishonal "
+"automatikamente si ta posibel. Dor di start plugins pa kolektá òf extrahé "
+"data."
+
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:36
+msgid ""
+"The additional objects that OpenKAT created will be added to your object "
+"list as separate objects. If OpenKAT can’t add them automatically it will "
+"guide you through the process of creating them manually."
+msgstr ""
+"E ophetonan adishonal ku OpenKAT á krea lo wordu agregá na e lista di opehto "
+"komo ophetonan separá. Si OpenKAT no por agregá esakinan automatikamente e ta "
+"guia'bu dor di e processo pa kreanan manualmente."
+
+#: onboarding/templates/step_3b_setup_scan_ooi_add.html:47
+msgid "Create object"
+msgstr "Krea opheto"
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:15
+msgid ""
+"Based on the url you provided OpenKAT added the necesarry additional objects "
+"to create a url object."
+msgstr ""
+"Á base di e url ku b'a duna, OpenKAT a añadi e ophetonan necesario pa krea un "
+"url opheto."
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:23
+msgid "URL"
+msgstr "URL"
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:27
+#: tools/forms/ooi.py:57
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html:9
+#: rocky/templates/partials/ooi_detail_related_object.html:25
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:22
+msgid "Type"
+msgstr "Tipo"
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:31
+msgid "Path"
+msgstr "Routa"
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:35
+msgid "Hostname"
+msgstr "Hostname"
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:39
+msgid "scheme"
+msgstr "programa"
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:43
+msgid "DNS Zone"
+msgstr "Zona DNS"
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:47
+msgid "Network"
+msgstr "Nètwèrk"
+
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html:57
+msgid "Start scanning"
+msgstr "Start skèn"
+
+#: onboarding/templates/step_3d_set_clearance_level.html:10
+msgid "OpenKAT Introduction"
+msgstr "OpenKAT Introdukshon"
+
+#: onboarding/templates/step_3d_set_clearance_level.html:12
+msgid "Setup - Set clearance level for example.org"
+msgstr "Sètup - Pone clearance level pa example.org"
+
+#: onboarding/templates/step_3d_set_clearance_level.html:13
+msgid "Introduction"
+msgstr "Introdukshon"
+
+#: onboarding/templates/step_3d_set_clearance_level.html:15
+#: rocky/templates/partials/form/indemnification_add_form.html:6
+msgid ""
+"Some scans are lightweight while others might be a bit more agressive with "
+"their scanning. OpenKAT requires you to set a clearance level for each "
+"object to prevent you from unintentionally running agressive scans. For "
+"example you might have the right to run any type of scan on your own server "
+"but you probably don’t have the right to do so for objects owned by other "
+"people of companies."
+msgstr ""
+"Tin skènnan ta ligero mientras otronan por ta mas agresivo ku scanning. OpenKAT "
+"ta requerí abo pa pone un nivél di autorisashon pa kada opheto pa prevení "
+"abo pa in-intenshonalmente start skènnan agresivo. Por ehempel bo tin "
+"pèrmiso pa start kwalkièr tipo di skèn riba bo mes server pero abo "
+"probablemente no tin e pèrmit pa ophetonan ku ta propiedat di otro hende òf "
+"kompanianan."
+
+#: onboarding/templates/step_3d_set_clearance_level.html:26
+msgid "How to know required clearance level"
+msgstr "Kon pa sa nivél di autorisashon requerí"
+
+#: onboarding/templates/step_3d_set_clearance_level.html:28
+msgid ""
+"Each plugin that scans will have a scan intesity score. The intesity of the "
+"scan must be equal to or below the clearance level you set for your object. "
+"If the scan has an intesity level that is too high, OpenKAT will notify you "
+"before running it. Visually clearance levels and intesity scores are "
+"indicated with little cat paws."
+msgstr ""
+"Kada plugin ku skèn tin un score di nivél di intensidát. E nivél di "
+"intesidát di e skèn mester ta parew òf bou di e nivel di autorisashon ku b'a "
+"pone riba bo opheto. Si e skèn tin un intensidát ku ta muchu haltu, OpenKAT lo "
+"notiká'bu prome ku start e scan. Visualmente nivél di autorisashon i nivél "
+"di intensidát ta wordu indikà ku patanan di pushi."
+
+#: onboarding/templates/step_3d_set_clearance_level.html:36
+msgid ""
+"This scan has a scan intensity score of 1, requiring a level 1 clearance "
+"level to be run. This means that the scan does not touch the object itself, "
+"but only searches for information about the object."
+msgstr ""
+"E skèn tin un score di nivél di intensidat di 1, ku ta requerí nivél 1 di "
+"autorisashon pa start. Esaki ta nifika ku e skèn no ta mishi ku e opheto "
+"riba su mes, pero solamente ta buska informashon tokante e opheto."
+
+#: onboarding/templates/step_3d_set_clearance_level.html:44
+msgid ""
+"An example of a more agressive scan. Which has a scan intesity score of 3. "
+"Meaning it requires at least a level 3 clearance level to be set on your "
+"object."
+msgstr ""
+"Un ehempel di un skèn mas agresivo. Ku tin un score di nivél di intensidát "
+"di 3. Ku ta nifiká, e ta requerí ku por lo menos bo opheto mester wòrdu pone "
+"na nivél 3 di autorisashon."
+
+#: onboarding/templates/step_3d_set_clearance_level.html:51
+msgid "Setting and changing your clearance level"
+msgstr "Poniendo i kambiando bo nivél di autorisashon"
+
+#: onboarding/templates/step_3d_set_clearance_level.html:53
+msgid ""
+"After creating a new object OpenKAT will ask you to set a clearance level. "
+"On the object detail page you can always change the clearance level. For the "
+"onboarding we will suggest to set the clearance level to L2."
+msgstr ""
+"Despues di krea un opheto nobo OpenKAT lo puntra'bu pa pone un nivél di "
+"autorisashon. Riba e opheto su página detaya por por semper kambia e nivél "
+"di authorisahon. Pa e abòrdamentu aki nos lo sugerí'bu pa pone e nivél na L2."
+
+#: onboarding/templates/step_3d_set_clearance_level.html:61
+#: onboarding/templates/step_3d_set_clearance_level.html:63
+#: rocky/templates/oois/ooi_list.html:48
+#: rocky/templates/scan_profiles/scan_profile_detail.html:51
+#: rocky/templates/scan_profiles/scan_profile_detail.html:53
+#: rocky/templates/scan_profiles/scan_profile_reset.html:21
+msgid "Set clearance level"
+msgstr "Pone nivél di autorisashon"
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:10
+msgid "Setup scan - Enable plugins"
+msgstr "Configurá skèn - Aktivá plugins"
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:12
+msgid "Plugins introduction"
+msgstr "Plugins su introduskhon"
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:14
+msgid ""
+"OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a "
+"specific skillset that will help to generate your report. There are three "
+"types of plugins."
+msgstr ""
+"OpenKAT ta huza plugins pa scan, check i analisá. Kada plugin ta trese un "
+"abilidát specifikó ku lo juda pa generá bo rapòrt. Tin tres tipo di plugins."
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:22
+#: tools/forms/boefje.py:38 rocky/templates/scan.html:9
+#: rocky/templates/tasks/boefjes.html:12
+#: rocky/templates/tasks/partials/tab_navigation.html:6
+msgid "Boefjes"
+msgstr "Boefjes"
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:23
+msgid ""
+"Scan objects for data. Each boefje has a scan intensity score to prevent "
+"invasive scanning on objects where you don’t have the clearance to do so."
+msgstr ""
+"Skèn ophetonan pa data. Kada boefje tin un intesidát score pa skèn pa "
+"prevení scannan invasivo riba opheto kaminda bo no tin autorisashon pa hasi "
+"esaki."
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:30
+#: rocky/templates/tasks/normalizers.html:12
+#: rocky/templates/tasks/partials/tab_navigation.html:9
+msgid "Normalizers"
+msgstr "Normalizers"
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:31
+msgid ""
+"Check the data for specific objects and add these object to your object list."
+msgstr ""
+"Chèk e data pa ophetonan specifikó i añadi e ophetonan aki na bo lista di "
+"opheto."
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:36
+msgid "Bits"
+msgstr "Bits"
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:37
+msgid "Analyze the available data to come to insights and conclusions."
+msgstr "Analisá e data disponibel pa yega na konklushonnan i perspectivanan."
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:43
+msgid ""
+"OpenKAT will be able to generate a full report when all the required and "
+"suggested plugins are enabled. If you choose not to give a plugin permission "
+"to run, the data that plugin would collect or produce will be left out of "
+"the report which will then be generated based on the available data "
+"collected by the enabled plugins. Below are the suggested and required "
+"plugins for this report."
+msgstr ""
+"OpenKAT ta dispuesto pa generá un fúl rapòrt ora tur e plugins nan requerí i "
+"sugerá ta aktivá. Si bo skohé pa no duna un plugin pèrmiso  pa start, e data "
+"ku e plugin lo mester kolektá òf produsí lo wordu saka for di e rapòrt ku lo "
+"generá a base di e data ku tin disponibel kolektá pa e plugins aktivo. Abou "
+"bo por mira e plugins nan ku ta requerí pa e rapòrt aki."
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:53
+msgid "Let’s setup your scan by enabling the plugins of your choice below."
+msgstr "Laga nos ban setup e skèn dor di aktivá e plugins di bo eskoho abou."
+
+#: onboarding/templates/step_3e_setup_scan_select_plugins.html:57
+msgid "Suggested plugins"
+msgstr "Plugins sugerí"
+
+#: onboarding/templates/step_4_report.html:13
+msgid "Boefjes are scanning"
+msgstr "Boefjes ta bezig ta scan"
+
+#: onboarding/templates/step_4_report.html:15
+msgid ""
+"The enabled boefjes are collecting the data needed to generate the DNS-"
+"report. This may take some time based on the type of scans and the number of "
+"objects found. For the current scan we expect boefjes to take about 3 "
+"minutes."
+msgstr ""
+"E Boefjes nan aktivá ta bezig ta kolektando e data necesario pa generá e DNS-"
+"rapòrt. Esaki ta bai tuma tempu a base di e tipo di scannan i e kantidát di "
+"ophetonan enkontrá."
+
+#: onboarding/templates/step_4_report.html:22
+msgid ""
+"During this introduction we ask you to wait till the scan is ready. After "
+"which you can view the report."
+msgstr ""
+"Durante e introdukshon aki nos ta pidibu pa warda te ora e skèn kaba. "
+"Despues bo por mira e rapòrt."
+
+#: onboarding/templates/step_4_report.html:27
+msgid ""
+"After the onboarding, boefjes run in the background. This enables you to use "
+"OpenKAT in the meantime without waiting for scans to finish. When you would "
+"like to see the status of a scan you can open the \"tasks\" page."
+msgstr ""
+"Despues di e onboarding, boefjes nan ta sigi den background. Esaki ta pone "
+"ku bo por uza OpenKAT mientras tantu sin mester warda te ora e skènnan kaba. "
+"Kaminda bo lo por ke mira e status di un skèn bo por habri e pagina di "
+"\"tarea\". "
+
+#: onboarding/templates/step_4_report.html:35
+msgid "Open my DNS-report"
+msgstr "Habri mi DNS-rapòrt"
+
+#: onboarding/view_helpers.py:12 onboarding/view_helpers.py:35
+#: onboarding/view_helpers.py:52
+msgid "1: Introduction"
+msgstr "Introdukshon"
+
+#: onboarding/view_helpers.py:16
+msgid "2: Choose a report"
+msgstr "Skohé un rapòrt"
+
+#: onboarding/view_helpers.py:20
+msgid "3: Setup scan"
+msgstr "Setup scan"
+
+#: onboarding/view_helpers.py:24
+msgid "4: Open report"
+msgstr "Habri rapòrt"
+
+#: onboarding/view_helpers.py:39 onboarding/view_helpers.py:56
+msgid "2: Organization setup"
+msgstr "Konfiguráß organisashon"
+
+#: onboarding/view_helpers.py:42 onboarding/view_helpers.py:60
+msgid "3: Indemnification"
+msgstr "3: Indemnizashon"
+
+#: onboarding/view_helpers.py:43 onboarding/view_helpers.py:64
+msgid "4: Account setup"
+msgstr "4: Account setup"
+
+#: onboarding/views.py:204
+msgid ""
+"OpenKAT added the following required object to your object list to complete "
+"your request: {}"
+msgstr ""
+"OpenKAT a añadi e siguinte opheton na bo lista di ophetonan pa kompleta bo "
+"petishon: {}"
+
+#: onboarding/views.py:313
+msgid "Clearance level has been set"
+msgstr "Clearance nivél a wòrdu poné"
+
+#: onboarding/views.py:395
+msgid "No DNS zone found."
+msgstr "Zona di DNS no por a wòrdu enkontrá."
+
+#: onboarding/views.py:401
+msgid "OpenKAT Setup"
+msgstr "OpenKAT Setup"
+
+#: onboarding/views.py:462
+msgid "{org_name} succesfully created."
+msgstr "{org_name} a wòrdu krea ku èksito."
+
+#: onboarding/views.py:493
+msgid "{org_name} succesfully updated."
+msgstr "{org_name} a wòrdu kambia ku èksito."
+
+#: onboarding/views.py:568 onboarding/views.py:596 onboarding/views.py:620
+msgid "{name} succesfully created."
+msgstr "{name} a wòrdu krea ku èksito."
+
+#: tools/forms/base.py:64
+msgid "Date"
+msgstr "Fecha"
+
+#: tools/forms/boefje.py:59
+msgid ""
+"Not all required boefjes are selected. Please select all required boefjes."
+msgstr ""
+"No tur boefjes necesario ta selektá. Por fabor selektá tur boefjes necesario."
+
+#: tools/forms/finding_type.py:26
+msgid "KAT-ID"
+msgstr "KAT-ID"
+
+#: tools/forms/finding_type.py:28
+msgid "Unique ID within OpenKAT, for this type"
+msgstr "ID úniko den OpenKAT, pa e tipo aki"
+
+#: tools/forms/finding_type.py:32
+msgid "Title"
+msgstr "Título"
+
+#: tools/forms/finding_type.py:34
+msgid "Give the finding type a fitting title"
+msgstr "Duna e tipo di diskubrimentu un título adequá"
+
+#: tools/forms/finding_type.py:38
+msgid "Desribe the finding type"
+msgstr "Deskribí e tipo di diskubrimentu"
+
+#: tools/forms/finding_type.py:41
+msgid "Risk"
+msgstr "Riésgo"
+
+#: tools/forms/finding_type.py:46
+msgid "Solution"
+msgstr "Solushón"
+
+#: tools/forms/finding_type.py:47
+msgid "How can this be solved?"
+msgstr "Kon esaki por wordu solushoná?"
+
+#: tools/forms/finding_type.py:49
+msgid "Describe how this type of finding can be solved"
+msgstr "Deskribí kon e tipo di diskubrimientu aki por wordu solushoná"
+
+#: tools/forms/finding_type.py:52
+msgid "References"
+msgstr "Referensia"
+
+#: tools/forms/finding_type.py:55
+msgid "Please give some references on the solution"
+msgstr "For fabor duna algún referensianan riba e solushon"
+
+#: tools/forms/finding_type.py:60
+msgid "Please give sources and references on the suggested solution"
+msgstr "For fabor duna fuente i referensia di e solushon sugerá"
+
+#: tools/forms/finding_type.py:63
+msgid "Impact description"
+msgstr "Diskripshon di impákto"
+
+#: tools/forms/finding_type.py:64
+msgid "Describe the solutions impact"
+msgstr "Deskribi e impaktonan di e solushon"
+
+#: tools/forms/finding_type.py:68
+msgid "Solution chance"
+msgstr "Solushon oportunidát"
+
+#: tools/forms/finding_type.py:73
+msgid "Solution impact"
+msgstr "Impakto di solushon"
+
+#: tools/forms/finding_type.py:78
+msgid "Solution effort"
+msgstr "Esfuerso di Solushon"
+
+#: tools/forms/finding_type.py:87
+msgid "ID should start with "
+msgstr "ID mester kuminsa ku "
+
+#: tools/forms/finding_type.py:95
+msgid "Finding type already exists"
+msgstr "Tipo di diskubrimientu no ta èksisti"
+
+#: tools/forms/finding_type.py:101
+msgid "Click to select one of the available options"
+msgstr "Klik pa selektá ùn di e opshonnan dísponibel"
+
+#: tools/forms/finding_type.py:104
+msgid "Finding types"
+msgstr "Tipo di diskubrimientu"
+
+#: tools/forms/finding_type.py:117
+#: rocky/templates/partials/finding_occurrence_definition_list.html:6
+msgid "Proof"
+msgstr "Prueba"
+
+#: tools/forms/finding_type.py:118
+msgid "Provide evidence of your finding"
+msgstr "Duna evidencia di bo diskubrimientu"
+
+#: tools/forms/finding_type.py:123
+msgid "Describe your finding"
+msgstr "Reprodusí diskubrimentu"
+
+#: tools/forms/finding_type.py:126
+msgid "Reproduce finding"
+msgstr "Reprodusí diskubrimentu"
+
+#: tools/forms/finding_type.py:129
+msgid "Please explain how to reproduce your finding"
+msgstr "Por fabor splika kon ta reprodusí bo diskubrimentu"
+
+#: tools/forms/finding_type.py:136
+msgid "Date/Time (UTC)"
+msgstr "Fecha/Tempu (UTC)"
+
+#: tools/forms/finding_type.py:161
+msgid "Doc! I'm from the future, I'm here to take you back!"
+msgstr "Doc! Mi ta bin di futuro, mi tei pa hibabu bèk!"
+
+#: tools/forms/finding_type.py:171 rocky/views/ooi_list.py:121
+#: rocky/views/ooi_list.py:146
+msgid "OOI doesn't exist"
+msgstr "OOI no ta èksisti"
+
+#: tools/forms/ooi.py:34
+msgid "Filter types"
+msgstr "Tipo di filternan"
+
+#: tools/forms/ooi.py:55 tools/view_helpers.py:185
+#: rocky/templates/dashboard_client.html:35
+#: rocky/templates/dashboard_redteam.html:35 rocky/templates/header.html:43
+#: rocky/templates/indemnification_present.html:10 rocky/views/mixins.py:229
+#: rocky/views/ooi_add.py:48 rocky/views/ooi_add.py:78
+#: rocky/views/ooi_list.py:30 rocky/views/tasks.py:81
+#: rocky/views/upload_csv.py:71
+msgid "Objects"
+msgstr "Ophetonan"
+
+#: tools/forms/ooi.py:57
+msgid "Clearance Level"
+msgstr "Nivél di Autorisashon"
+
+#: tools/forms/ooi.py:90
+msgid "Show objects that don't meet the Boefjes scan level"
+msgstr "Mustra ophetonan ku no tin nivel di skèn pa Boefjes"
+
+#: tools/forms/ooi.py:100
+msgid "Show Boefjes that exceed the OOI's scan level"
+msgstr "Mustra Boefjes ku ku a surpasa OOI's su nivel di skèn"
+
+#: tools/forms/settings.py:13
+msgid "--- Show all ----"
+msgstr "--- Mustra tur ---"
+
+#: tools/forms/settings.py:17
+msgid "recommendation"
+msgstr "Rekomendashon"
+
+#: tools/forms/settings.py:18 tools/forms/settings.py:28
+#: tools/forms/settings.py:35
+msgid "low"
+msgstr "bajo"
+
+#: tools/forms/settings.py:19 tools/forms/settings.py:29
+#: tools/forms/settings.py:36
+msgid "medium"
+msgstr "mediano"
+
+#: tools/forms/settings.py:20 tools/forms/settings.py:30
+#: tools/forms/settings.py:37
+msgid "high"
+msgstr "haltu"
+
+#: tools/forms/settings.py:21
+msgid "very high"
+msgstr "hopi haltu"
+
+#: tools/forms/settings.py:22
+msgid "critical"
+msgstr "kritikó"
+
+#: tools/forms/settings.py:27
+msgid "quickfix"
+msgstr "quickfix"
+
+#: tools/forms/settings.py:41
+#: rocky/templates/scan_profiles/scan_profile_detail.html:16
+msgid "Declared"
+msgstr "Deklará"
+
+#: tools/forms/settings.py:42
+#: rocky/templates/scan_profiles/scan_profile_detail.html:43
+msgid "Inherited"
+msgstr "Heredá"
+
+#: tools/forms/settings.py:43
+#: rocky/templates/scan_profiles/scan_profile_detail.html:34
+msgid "Empty"
+msgstr "Bashi"
+
+#: tools/forms/settings.py:49
+msgid "Add one finding type ID per line."
+msgstr "Añadí un tipo di diskubrimentu ID pa kada liña."
+
+#: tools/forms/settings.py:51
+msgid "Add the date and time of your finding (UTC)"
+msgstr "Agrega e fecha y ora di bo diskubrimentu (UTC)"
+
+#: tools/forms/settings.py:54
+msgid ""
+"OpenKAT stores a time indication with every observation, so it is possible "
+"to see the status of your network through time. Select a datetime to change "
+"the view to represent that moment in time."
+msgstr ""
+"OpenKAT ta warda indikashon di tempu pa kada obserbashon, kèmèn ta posíbel pa "
+"mira kada status di bo nètwèrk via di e orario. Selektá un orario pa kambia "
+"e aparensia pa representá e momento ey den tempu."
+
+#: tools/forms/settings.py:61
+msgid "Depth of the tree."
+msgstr "Profundidát di mapa"
+
+#: tools/forms/upload_csv.py:15
+msgid "Only CSV file supported"
+msgstr "Únikamente CSV ta posibel"
+
+#: tools/forms/upload_csv.py:16
+msgid "File could not be decoded"
+msgstr "No por decodifiká e archivo"
+
+#: tools/forms/upload_csv.py:17
+msgid "No file selected"
+msgstr "Ningun file no a wordu selektá."
+
+#: tools/forms/upload_csv.py:18
+msgid "The uploaded file is empty."
+msgstr "E file ku a wordu manda ta bashi"
+
+#: tools/forms/upload_csv.py:19
+msgid "Organization code(s) in CSV does not exist in our database"
+msgstr "Codigo di organisashon den e CSV no ta èksisti den nos database"
+
+#: tools/forms/upload_csv.py:20
+msgid "The number of columns do not meet the requirements."
+msgstr "E kantidat di kòlòm nan no ta bon."
+
+#: tools/forms/upload_csv.py:21
+msgid "OOI Type in CSV does not meet the criterias."
+msgstr "Tipo di OOI den e CSV no ta bon."
+
+#: tools/forms/upload_csv.py:22
+msgid "An error has occurred during the parsing of the csv file:"
+msgstr "Un error a surgi durante ku e CSV a wordu procesá:"
+
+#: tools/forms/upload_csv.py:28
+msgid "Object Type"
+msgstr "Tipo di opheto"
+
+#: tools/forms/upload_csv.py:30
+msgid "Choose a type of which objects are added."
+msgstr "Eskohé un tipo kaminda ophetonan lo wordu agrega na dje."
+
+#: tools/forms/upload_csv.py:34
+msgid "Upload CSV file"
+msgstr "Upload CSV"
+
+#: tools/forms/upload_csv.py:35
+msgid "Only accepts CSV file."
+msgstr "Ta accepta solamente CSV."
+
+#: tools/models.py:49
+
+msgid "The name of the organisation"
+msgstr "E nòmber di e organisashon"
+
+#: tools/models.py:55
+msgid ""
+"A slug containing only lower-case unicode letters, numbers, hyphens or "
+"underscores that will be used in URLs and paths"
+msgstr ""
+"Un slug ta kontene solamente lower-case unicode letras, numbernan, hyphens òf "
+"underscores ku lo wordu huza den URLs i paths"
+
+#: tools/models.py:117
+msgid "new"
+msgstr "nobo"
+
+#: tools/models.py:118
+msgid "blocked"
+msgstr "blòkiá"
+
+#: tools/ooi_form.py:76
+msgid "option"
+msgstr "opshon"
+
+#: tools/ooi_form.py:78
+#, python-brace-format
+msgid "Optionally choose a {option_label}"
+msgstr "Opshonalmente skohé un {option_label}"
+
+#: tools/ooi_form.py:81
+#, python-brace-format
+msgid "Please choose a {option_label}"
+msgstr "Por favor skohé un {option_label}"
+
+#: tools/view_helpers.py:160 tools/view_helpers.py:174
+#: rocky/templates/dashboard_redteam.html:26
+#: rocky/templates/organizations/organization_list.html:10
+#: rocky/templates/partials/secondary-menu.html:8
+#: rocky/views/organization_add.py:30
+msgid "Organizations"
+msgstr "Organisashonnan"
+
+#: rocky/settings.py:355
+msgid "Blue light"
+msgstr "Blòw kla"
+
+#: rocky/settings.py:356
+msgid "Blue medium"
+msgstr "Blòw mediano"
+
+#: rocky/settings.py:357
+msgid "Blue dark"
+msgstr "Blòw skur"
+
+#: rocky/settings.py:358
+msgid "Green light"
+msgstr "Bèrdè kla"
+
+#: rocky/settings.py:359
+msgid "Green medium"
+msgstr "Bèrdè mediano"
+
+#: rocky/settings.py:360
+msgid "Green dark"
+msgstr "Bèrdè skur"
+
+#: rocky/settings.py:361
+msgid "Yellow light"
+msgstr "Hel kla"
+
+#: rocky/settings.py:362
+msgid "Yellow medium"
+msgstr "Hel mediano"
+
+#: rocky/settings.py:363
+msgid "Yellow dark"
+msgstr "Hel skur"
+
+#: rocky/settings.py:364
+msgid "Orange light"
+msgstr "Oraño kla"
+
+#: rocky/settings.py:365
+msgid "Orange medium"
+msgstr "Oraño mediano"
+
+#: rocky/settings.py:366
+msgid "Orange dark"
+msgstr "Oraño skur"
+
+#: rocky/settings.py:367
+msgid "Red light"
+msgstr "Kòra kla"
+
+#: rocky/settings.py:368
+msgid "Red medium"
+msgstr "Kòra mediano"
+
+#: rocky/settings.py:369
+msgid "Red dark"
+msgstr "Kòra skur"
+
+#: rocky/settings.py:370
+msgid "Violet light"
+msgstr "Violeta kla"
+
+#: rocky/settings.py:371
+msgid "Violet medium"
+msgstr "Violeta mediano"
+
+#: rocky/settings.py:372
+msgid "Violet dark"
+msgstr "Violeta skur"
+
+#: rocky/settings.py:376
+msgid "Plain"
+msgstr "Plano"
+
+#: rocky/settings.py:377
+msgid "Solid"
+msgstr "Solido"
+
+#: rocky/settings.py:378
+msgid "Dashed"
+msgstr "Strepiá"
+
+#: rocky/settings.py:379
+msgid "Dotted"
+msgstr "Puntá"
+
+#: rocky/templates/404.html:10
+msgid "Error code 404: Page not found"
+msgstr "Codigo di error 404: Página no enkontrá"
+
+#: rocky/templates/404.html:12
+msgid ""
+"The page you wanted to see or the file you wanted to view was not found."
+msgstr ""
+"E página ku bo kera wak òf e file ku bo kera mira no por wordu enkontra."
+
+#: rocky/templates/404.html:15
+msgid ""
+"You may be able to find the information you are looking for through the "
+"following pages:"
+msgstr ""
+"Porta bo por haña e informashon ku bo ta buskando riba e siguinte paginanan: "
+
+#: rocky/templates/404.html:19 rocky/templates/crisis_room/crisis_room.html:10
+msgid "Crisis Room"
+msgstr "Sala di krísis"
+
+#: rocky/templates/404.html:25 rocky/templates/dashboard_client.html:32
+#: rocky/templates/dashboard_redteam.html:32
+#: rocky/templates/findings/finding_list.html:12 rocky/templates/header.html:39
+#: rocky/templates/oois/ooi_detail_findings_list.html:6
+#: rocky/templates/oois/ooi_detail_findings_overview.html:7
+#: rocky/templates/oois/ooi_page_tabs.html:23
+#: rocky/templates/partials/ooi_report_findings_block.html:5
+#: rocky/views/finding_list.py:44 rocky/views/finding_type_add.py:29
+#: rocky/views/mixins.py:224
+msgid "Findings"
+msgstr "Diskubrimentu"
+
+#: rocky/templates/404.html:29
+msgid "Or go back to the main page"
+msgstr "Òf bai bèk na e prome pagina"
+
+#: rocky/templates/404.html:31
+msgid "Homepage"
+msgstr "Homepage"
+
+#: rocky/templates/crisis_room/crisis_room.html:12
+msgid ""
+"An overview of all (critical) findings OpenKAT found. Check the detail "
+"section for additional severity information."
+msgstr ""
+"Un relato general di tur diskubrimentu (krítiko) ku OpenKAT a enkontrá. Chèk e "
+"sekshon detayá pa informashon addishonal severo."
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:7
+msgid "Findings per organization"
+msgstr "Diskubrimentu pa kada organisashon"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:9
+msgid "Total findings"
+msgstr "Totál diskubrimentu"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:15
+msgid "Total Findings"
+msgstr "Diskubrimentu Totál"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:30
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:95
+#: rocky/templates/findings/finding_list.html:59
+msgid "Close details"
+msgstr "Sera detayes"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:31
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:96
+#: rocky/templates/findings/finding_list.html:60
+msgid "Open details"
+msgstr "Habri detayes"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:37
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:102
+msgid " Finding Details"
+msgstr "Detayes di diskubrimentu"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:41
+#: rocky/templates/partials/ooi_report_findings_block_table.html:23
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:60
+msgid "Occurrences"
+msgstr "Occurencianan"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:72
+msgid "Top critical organizations"
+msgstr "Top organisashonnan krítiko"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:74
+msgid "Critical findings"
+msgstr "Diskubrimentu Kritiko"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:80
+msgid "Critical Findings"
+msgstr "Diskubrimentu Kritiko"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html:106
+#: rocky/templates/oois/ooi_detail_findings_overview.html:21
+msgid "Occurences"
+msgstr "Occurencianan"
+
+#: rocky/templates/dashboard_client.html:16
+#: rocky/templates/dashboard_redteam.html:16
+msgid "Close menu"
+msgstr "Sera mènu"
+
+#: rocky/templates/dashboard_client.html:17
+#: rocky/templates/dashboard_redteam.html:17
+msgid "Main navigation"
+msgstr "Nagegashon principal"
+
+#: rocky/templates/dashboard_client.html:26
+msgid "Indemnifications"
+msgstr "Indemnizashon"
+
+#: rocky/templates/dashboard_client.html:41
+#: rocky/templates/dashboard_redteam.html:44
+#: rocky/templates/partials/secondary-menu.html:12
+msgid "Logout"
+msgstr "Logout"
+
+#: rocky/templates/dashboard_client.html:49
+#: rocky/templates/dashboard_redteam.html:52
+msgid "Welcome"
+msgstr "Bon Biní"
+
+#: rocky/templates/dashboard_client.html:52
+#: rocky/templates/dashboard_redteam.html:55
+msgid "User overview:"
+msgstr "Resúmen di kliente:"
+
+#: rocky/templates/dashboard_redteam.html:70
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:11
+msgid "warning"
+msgstr "advertensia"
+
+#: rocky/templates/dashboard_redteam.html:71
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:12
+msgid "Warning"
+msgstr "Advertensia"
+
+#: rocky/templates/dashboard_redteam.html:71
+msgid "Organization code missing"
+msgstr "Falta e codigo di organisashon"
+
+#: rocky/templates/finding_type_add.html:10
+#: rocky/templates/finding_type_add.html:17
+#: rocky/templates/partials/findings_list_toolbar.html:6
+#: rocky/views/finding_type_add.py:33
+msgid "Add finding type"
+msgstr "Añadí tipo di diskubrimentu"
+
+#: rocky/templates/finding_type_add.html:15
+msgid "Finding Type"
+msgstr "Tipo di diskubrimentu"
+
+#: rocky/templates/findings/finding_add.html:10
+#: rocky/templates/oois/ooi_detail_findings_list.html:10
+#: rocky/templates/oois/ooi_findings.html:18
+#: rocky/templates/partials/findings_list_toolbar.html:4
+msgid "Add finding"
+msgstr "Añadí diskubrimentu"
+
+#: rocky/templates/findings/finding_add.html:15
+#: rocky/templates/findings/finding_add.html:17
+#: rocky/templates/findings/finding_list.html:29
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:30
+msgid "Finding"
+msgstr "Diskubrimentu"
+
+#: rocky/templates/findings/finding_list.html:14
+msgid ""
+"An overview of all findings OpenKAT found on %(date)s. Each finding relates "
+"to an object. Click a finding for additional information."
+msgstr ""
+"Un relato general di tur diskubrimentu OpenKAT á enkontrá riba %(date)s. Kada "
+"diskubrimentu ta relatá na un opheto. Klék un diskubrimentu pa informashon "
+"adishonál."
+
+#: rocky/templates/findings/finding_list.html:25
+msgid "Showing "
+msgstr "Mustra "
+
+#: rocky/templates/findings/finding_list.html:25
+#: rocky/templates/partials/pagination.html:5
+msgid "of"
+msgstr "di"
+
+#: rocky/templates/findings/finding_list.html:25
+msgid "objects"
+msgstr "ophetonan"
+
+#: rocky/templates/findings/finding_list.html:30
+#: rocky/templates/findings/finding_list.html:48
+#: rocky/templates/oois/ooi_page_tabs.html:10
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html:10
+#: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html:19
+msgid "Tree"
+msgstr "Mapa"
+
+#: rocky/templates/findings/finding_list.html:31
+#: rocky/templates/findings/finding_list.html:53
+#: rocky/templates/oois/ooi_page_tabs.html:13
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html:11
+#: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html:23
+msgid "Graph"
+msgstr "Grafa"
+
+#: rocky/templates/findings/finding_list.html:43
+#: rocky/templates/findings/finding_list.html:85
+msgid "Show details for %(finding)s"
+msgstr "Mustra detayes pa %(finding)s"
+
+#: rocky/templates/findings/finding_list.html:68
+msgid "Finding type:"
+msgstr "Tipo di diskubrimentu:"
+
+#: rocky/templates/findings/finding_list.html:71
+msgid "Show details for %(finding_type)s"
+msgstr "Mustra detayes pa %(finding_type)s"
+
+#: rocky/templates/findings/finding_list.html:75
+msgid "OOI type:"
+msgstr "Tipo di opheto"
+
+#: rocky/templates/findings/finding_list.html:78
+#, python-format
+msgid "Show %(ooi_type)s objects"
+msgstr "Mustra %(ooi_type)s ophetonan"
+
+#: rocky/templates/findings/finding_list.html:82
+msgid "Source OOI:"
+msgstr "Orígen OOI:"
+
+#: rocky/templates/footer.html:19 rocky/views/privacy_statement.py:13
+msgid "Privacy Statement"
+msgstr "Deklarashon di privasidat"
+
+#: rocky/templates/footer.html:23 rocky/views/health.py:121
+msgid "Health"
+msgstr "Saludabel"
+
+#: rocky/templates/forms/widgets/checkbox_group_table.html:22
+msgid "this field is required"
+msgstr "E vèld aki ta obligatorio"
+
+#: rocky/templates/graph-d3.html:13
+msgid ""
+"Click a circle top collapse / expand the tree, click the text to view the "
+"tree from that OOI and hover over the text to see details."
+msgstr ""
+"Click e sírkulo top collapse / expande e mapa, click e teksto pa habri e "
+"mapa di e OOI y hover riba a teksto pa mira detayes."
+
+#: rocky/templates/graph-d3.html:15
+msgid "Tree graph"
+msgstr "Mapa di Grafa"
+
+#: rocky/templates/header.html:18
+msgid "OpenKAT logo, go to the homepage of OpenKAT"
+msgstr "KAT logo, bai na e homepage di OpenKAT"
+
+#: rocky/templates/header.html:30
+msgid "Crisis room"
+msgstr "Sala di krísis"
+
+#: rocky/templates/header.html:47 rocky/views/tasks.py:82
+msgid "Tasks"
+msgstr "Enkargonan"
+
+#: rocky/templates/header.html:55
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
+
+#: rocky/templates/health.html:10
+msgid "Health Checks"
+msgstr "Checknan di salubridat"
+
+#: rocky/templates/health.html:16
+msgid "Healthy"
+msgstr "Salú"
+
+#: rocky/templates/health.html:17
+msgid "Version"
+msgstr "Vershon"
+
+#: rocky/templates/health.html:18
+msgid "Additional"
+msgstr "Adishonal"
+
+#: rocky/templates/indemnification_present.html:4
+msgid "Indemnification"
+msgstr "Indemnizashon"
+
+#: rocky/templates/indemnification_present.html:7
+msgid ""
+"Indemnification on the organization present. You may now add objects and "
+"start scans."
+msgstr ""
+"Indemnizashon presente pa e organisashon. Bo por awor añadi ophetonan i "
+"kuminsa skèn."
+
+#: rocky/templates/indemnification_present.html:10
+#: rocky/templates/indemnification_present.html:13
+msgid "Go to"
+msgstr "Bai na:"
+
+#: rocky/templates/landing_page.html:13
+msgid "Kwetsbaarheden Analyse Tool"
+msgstr "Kwetsbaarheden Analyse Tool"
+
+#: rocky/templates/landing_page.html:19
+msgid "What is OpenKAT?"
+msgstr "Kiko ta OpenKAT?"
+
+#: rocky/templates/landing_page.html:21
+msgid ""
+"OpenKAT is a vulnerability analysis tool. An Open Source-project developed "
+"by the Ministry of Health, Welfare and Sport to make your and our world "
+"safer."
+msgstr ""
+"OpenKAT ta un tool pa analisá vulnerabilidat. Un Open Source projekto diseña dor "
+"di Ministerio di Salubridat, bienestar i spòrt pa hasi bo i nos mundu mas "
+"sigur."
+
+#: rocky/templates/landing_page.html:30
+msgid "OpenKAT sees"
+msgstr "OpenKAT ta mira"
+
+#: rocky/templates/landing_page.html:32
+msgid ""
+"Dozens of tools are integrated in OpenKAT to view the world (digital and "
+"analog). <br>Our motto is therefore: I see, I see, what you do not see."
+msgstr ""
+"Mayoria tools ta integra den OpenKAT pa mira e mundu (digital i anologo). "
+"<br>Nos motto ta e ora ey: Mi ta mira, mi ta mira loke bo no ta mira."
+
+#: rocky/templates/landing_page.html:39
+msgid "OpenKAT knows"
+msgstr "OpenKAT sá"
+
+#: rocky/templates/landing_page.html:41
+msgid ""
+"OpenKAT does not forget (just like that), and can be queried without "
+"scanning again. Also about a historical situation."
+msgstr ""
+"OpenKAT no ta lubida (simplemente asina), i por kore sin mester skèn atrobe. "
+"Tambe tokante situashonnan historiko."
+
+#: rocky/templates/landing_page.html:48
+msgid "OpenKAT is secure"
+msgstr "OpenKAT ta sigurá"
+
+#: rocky/templates/landing_page.html:50
+msgid ""
+"Forensically secured storage of evidence is one of the basic ingredients of "
+"OpenKAT."
+msgstr "Evidensia forénsiko sigurá ta un di e íngredientenan basiko di OpenKAT."
+
+#: rocky/templates/landing_page.html:56
+msgid "OpenKAT is sweet"
+msgstr "OpenKAT ta dushi"
+
+#: rocky/templates/landing_page.html:58
+msgid ""
+"OpenKAT thinks about privacy, and stores what is necessary, within the rules "
+"of your organization and the law."
+msgstr ""
+"OpenKAT ta pensa riba privacy, i ta warda loke ta nesesario, den e reglanan di "
+"bo organisashon i e lèi."
+
+#: rocky/templates/landing_page.html:68
+msgid "A wide playing field"
+msgstr "Un vèld grandi pa hunga"
+
+#: rocky/templates/landing_page.html:70
+msgid ""
+"OpenKAT makes a copy of the actual reality by means of the integrated tools. "
+"Within this copy you can search for answers to countless security and policy "
+"questions. Expected and unexpected changes in the world are made visible, "
+"and where necessary reported or made known directly to the right people."
+msgstr ""
+"OpenKAT ta traha un kopia di e realidat aktual dor di e tools nan integrá. Den e "
+"kopianan aki bo por buska pa kontestanan pa yen di preguntanan di siguridat "
+"i policy Kambionan den mundu espera i inespera ta wordu hasi visibel, i "
+"kaminda ta nesesario wordu rapòrta òf pa e hendenan apropia haña sa."
+
+#: rocky/templates/legal/privacy_statement.html:11
+msgid "OpenKAT Privacy Statement"
+msgstr "OpenKAT Deklarashon di Privasidat"
+
+#: rocky/templates/legal/privacy_statement.html:14
+msgid ""
+"OpenKAT is dedicated to protecting the confidentiality and privacy of "
+"information entrusted to it. As part of this fundamental obligation, OpenKAT "
+"is committed to the appropriate protection and use of personal information "
+"(sometimes referred to as \"personal data\", \"personally identifiable "
+"information\" or \"PII\") that has been collected online."
+msgstr ""
+"OpenKAT is dedicated to protecting the confidentiality and privacy of "
+"information entrusted to it. As part of this fundamental obligation, OpenKAT is "
+"committed to the appropriate protection and use of personal information "
+"(sometimes referred to as \"personal data\", \"personally identifiable "
+"information\" or \"PII\") that has been collected online."
+
+#: rocky/templates/oois/error.html:11
+msgid "Object List"
+msgstr "Lista di opheto"
+
+#: rocky/templates/oois/error.html:14
+msgid "An error occurred. Please contact a system administrator."
+msgstr ""
+"Un problema a surgi. Por fabor tuma kontakto ku e atministradó di sistema."
+
+#: rocky/templates/oois/ooi_add.html:11
+#, python-format
+msgid "Add a %(display_type)s"
+msgstr "Añadí un %(display_type)s"
+
+#: rocky/templates/oois/ooi_add.html:13
+msgid ""
+"Here you can add the asset of the client. Findings can be added to these in "
+"the findings page."
+msgstr ""
+"Akinan bo por agregá e propiedát di un kliénte. Diskubrimentunan por wordu "
+"agregá na e propiedát den e página di diskubrimentunan."
+
+#: rocky/templates/oois/ooi_add.html:38
+msgid "Add %(display_type)s"
+msgstr "Añadí %(display_type)s"
+
+#: rocky/templates/oois/ooi_add_type_select.html:11
+msgid "Manual creation"
+msgstr "Kreashon manual"
+
+#: rocky/templates/oois/ooi_add_type_select.html:13
+msgid "Select the type of object you want to create."
+msgstr "Selektá e tipo di opheto ku bo ke krea"
+
+#: rocky/templates/oois/ooi_delete.html:12
+msgid "Delete %(primary_key)s"
+msgstr "Kita %(primary_key)s"
+
+#: rocky/templates/oois/ooi_delete.html:15
+#: rocky/templates/scan_profiles/scan_profile_reset.html:27
+msgid "Are you sure?"
+msgstr "Bo ta sigur?"
+
+#: rocky/templates/oois/ooi_delete.html:18
+msgid "Here you can delete the %(display_type)s."
+msgstr "Akinan bo por kita e %(display_type)s."
+
+#: rocky/templates/oois/ooi_delete.html:24
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html:8
+msgid "Key"
+msgstr "Jabi"
+
+#: rocky/templates/oois/ooi_delete.html:43
+#: rocky/templates/partials/ooi_detail_toolbar.html:12
+msgid "Delete %(display_type)s"
+msgstr "Kita %(display_type)s"
+
+#: rocky/templates/oois/ooi_delete.html:51
+msgid "Deletion not possible for types: KATFindingType and CVEFindingType"
+msgstr ""
+"Kitamentu no ta posibel pa e tiponan: KATFindingType and CVEFindingType"
+
+#: rocky/templates/oois/ooi_detail.html:30
+msgid "using boefjes"
+msgstr "uzando boefjes"
+
+#: rocky/templates/oois/ooi_detail.html:53
+#: rocky/templates/oois/ooi_detail_origins_observations.html:11
+#: rocky/templates/partials/scan_history.html:64 rocky/templates/scan.html:15
+#: rocky/templates/tasks/boefjes.html:27
+#: rocky/templates/tasks/normalizers.html:27
+msgid "Boefje"
+msgstr "Boefje"
+
+#: rocky/templates/oois/ooi_detail.html:55 rocky/templates/scan.html:17
+#: rocky/views/scan_profile.py:34
+msgid "Scan profile"
+msgstr "Investigá profíl"
+
+#: rocky/templates/oois/ooi_detail.html:79
+msgid "There are no boefjes enabled to scan an OOI of type"
+msgstr "No tin Boefjes activá pa skèn un OOI di tipo"
+
+#: rocky/templates/oois/ooi_detail.html:79
+#: rocky/templates/oois/ooi_detail.html:83
+#: rocky/templates/partials/ooi_report_severity_totals.html:9
+msgid "See"
+msgstr "Mira"
+
+#: rocky/templates/oois/ooi_detail.html:79
+#: rocky/templates/oois/ooi_detail.html:83
+msgid "to find and enable boefjes that can scan within the current level."
+msgstr "pa haña i aktivá boefjes ku por skèn den e nivel recién."
+
+#: rocky/templates/oois/ooi_detail.html:83
+msgid "There are no boefjes available within the current clearance level of"
+msgstr "No tin boefjes disponibel den e nivel di authorisashon di"
+
+#: rocky/templates/oois/ooi_detail.html:86
+msgid "Or if you have the authorization, upgrade the clearance level of"
+msgstr "Òf si bo tin authorisashon, subi e nivel di authorisason di"
+
+#: rocky/templates/oois/ooi_detail_add_related_object.html:12
+msgid "Add related object"
+msgstr "Añadí ophetonan relatáß"
+
+#: rocky/templates/oois/ooi_detail_add_related_object.html:17
+#: rocky/templates/oois/ooi_detail_object.html:3
+#: rocky/templates/partials/elements/ooi_add_type_select_form.html:8
+msgid "Object details"
+msgstr "Detayes di opheto"
+
+#: rocky/templates/oois/ooi_detail_add_related_object.html:20
+#: rocky/templates/partials/elements/ooi_add_type_select_form.html:11
+msgid "Object type"
+msgstr "Tipo di opheto"
+
+#: rocky/templates/oois/ooi_detail_add_related_object.html:25
+#: rocky/templates/partials/elements/ooi_add_type_select_form.html:15
+msgid "Choose an object type to add"
+msgstr "Eskohé un tipo di opheto pa agregá"
+
+#: rocky/templates/oois/ooi_detail_add_related_object.html:36
+#: rocky/templates/partials/elements/ooi_add_type_select_form.html:25
+msgid "Select an object type to add."
+msgstr "Eskohé un tipo di opheto pa agregá"
+
+#: rocky/templates/oois/ooi_detail_add_related_object.html:39
+#: rocky/templates/partials/elements/ooi_add_type_select_form.html:30
+#: rocky/templates/partials/ooi_list_toolbar.html:12 rocky/views/ooi_add.py:51
+msgid "Add object"
+msgstr "Añadí opheto"
+
+#: rocky/templates/oois/ooi_detail_findings_list.html:15
+msgid "Overview of findings for "
+msgstr "Reprodusí búskeda"
+
+#: rocky/templates/oois/ooi_detail_findings_list.html:19
+msgid "Score"
+msgstr "Punto"
+
+#: rocky/templates/oois/ooi_detail_findings_list.html:21
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:9
+msgid "Finding details"
+msgstr "Detaye di búskeda"
+
+#: rocky/templates/oois/ooi_detail_findings_list.html:33
+msgid "marked \"critical\" because of unknown score"
+msgstr "marka \"kritiko\" pa medio di punto deskonosi"
+
+#: rocky/templates/oois/ooi_detail_findings_overview.html:9
+msgid "Overview of the number of findings found on"
+msgstr "Lista di e montante di diskubrimentunan haña riba"
+
+#: rocky/templates/oois/ooi_detail_findings_overview.html:9
+msgid "and their severity."
+msgstr "i nan severidat"
+
+#: rocky/templates/oois/ooi_detail_findings_overview.html:12
+msgid ""
+"Findings can occur multiple times. To give better insight the following "
+"table shows the number of unique findings found as well as the number of "
+"occurences."
+msgstr ""
+"Diskubrimentunan por okuri yen biaha. Pa duna un mihor vishon e sigiente "
+"tabèl ta mustra e montante di diskubrimentunan uniko i tambe e montante di "
+"okurenshanan."
+
+#: rocky/templates/oois/ooi_detail_findings_overview.html:15
+msgid "See finding details"
+msgstr "Habri detaye di diskubrimentu"
+
+#: rocky/templates/oois/ooi_detail_findings_overview.html:34
+msgid "Total findings:"
+msgstr "Totál diskubrimentu:"
+
+#: rocky/templates/oois/ooi_detail_origins_declarations.html:9
+msgid "Declarations"
+msgstr "Deklarashon"
+
+#: rocky/templates/oois/ooi_detail_origins_inference.html:7
+msgid "Inferred by"
+msgstr "Enferido na"
+
+#: rocky/templates/oois/ooi_detail_origins_inference.html:11
+msgid "Bit"
+msgstr "Bit"
+
+#: rocky/templates/oois/ooi_detail_origins_inference.html:12
+#: rocky/templates/oois/ooi_detail_origins_observations.html:12
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:50
+msgid "Source"
+msgstr "Orígen"
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html:7
+msgid "Observed by"
+msgstr "Obserbá pa"
+
+#: rocky/templates/oois/ooi_detail_origins_observations.html:13
+msgid "Task ID"
+msgstr "Tarea ID"
+
+#: rocky/templates/oois/ooi_edit.html:11
+#: rocky/templates/partials/ooi_detail_toolbar.html:8
+msgid "Edit %(display_type)s"
+msgstr "Editá %(display_type)s"
+
+#: rocky/templates/oois/ooi_edit.html:14
+msgid "Here you can edit the %(display_type)s."
+msgstr "Akinan bo por editá e %(display_type)s."
+
+#: rocky/templates/oois/ooi_edit.html:18
+msgid ""
+"Some fields are disabled:<br>In this version primary key fields can't be "
+"edited."
+msgstr ""
+"Algun vak ta disabled:<br>Den e version aki primary key vaknan no por wordu "
+"editá."
+
+#: rocky/templates/oois/ooi_edit.html:44
+msgid "Save %(display_type)s"
+msgstr "Save %(display_type)s"
+
+#: rocky/templates/oois/ooi_findings.html:15
+msgid "Currently there are no findings for OOI"
+msgstr "Aktualmente no a diskubri nada pa OOI"
+
+#: rocky/templates/oois/ooi_list.html:13
+msgid ""
+"An overview of your object list. Objects can be added manually or by running "
+"boefjes.</br> Click an object for additional information."
+msgstr ""
+"Un relato general di bo lista di opheto. Ophetonan por wordu agregá "
+"manualmente òf ora start boefjes. Klék un opheto pa informashon adishonál."
+
+#: rocky/templates/oois/ooi_list.html:19
+msgid "Currently filtered on:"
+msgstr "Aktuálmente filtrá riba:"
+
+#: rocky/templates/oois/ooi_list.html:22
+#: rocky/templates/partials/scan_history.html:9
+msgid "Filter"
+msgstr "Filtrá"
+
+#: rocky/templates/oois/ooi_list.html:25
+msgid "Showing %(length)s of %(total)s objects"
+msgstr "Mustrando %(length)s di %(total)s ophetonan"
+
+#: rocky/templates/oois/ooi_list.html:50 rocky/templates/oois/ooi_list.html:52
+msgid "Delete object(s)"
+msgstr "Kita opheto(nan)"
+
+#: rocky/templates/oois/ooi_page_tabs.html:4
+msgid "List of views for OOI"
+msgstr "Lista di resulatadonan pa OOI"
+
+#: rocky/templates/oois/ooi_page_tabs.html:7
+msgid "Overview"
+msgstr "Resúmen"
+
+#: rocky/templates/oois/ooi_past_due_warning.html:6
+msgid "This object is past due"
+msgstr "E opheto aki a kaduka"
+
+#: rocky/templates/oois/ooi_past_due_warning.html:8
+msgid "This object is past due and has been deleted"
+msgstr "E opheto aki a kaduka i a wordu kita"
+
+#: rocky/templates/oois/ooi_past_due_warning.html:12
+msgid ""
+"This object is past due. You are viewing the object state in a past state."
+msgstr ""
+"E opheto aki a kaduka. Bo ta mirando e opheto aki den un estado den pasado."
+
+#: rocky/templates/oois/ooi_past_due_warning.html:16
+msgid ""
+"You will not be able to add Findings or other OOI's to past due objects."
+msgstr ""
+"Bo no por añadi diskubrimentunan òf otro OOI's na ophetonan ku a kaduka."
+
+#: rocky/templates/oois/ooi_past_due_warning.html:19
+#: rocky/templates/partials/hyperlink_ooi_id.html:5
+msgid "Show details for %(name)s"
+msgstr "Mustra detayes pa %(name)s"
+
+#: rocky/templates/oois/ooi_past_due_warning.html:19
+msgid "View the current state"
+msgstr "Mustra e estado aktual"
+
+#: rocky/templates/oois/ooi_past_due_warning.html:23
+msgid ""
+"You will not be able to add Findings or other OOI's, this object has been "
+"deleted and is no longer available."
+msgstr ""
+"Bo no por añadi diskubrimentunan òf otro OOI's, e opheto aki a wordu kita i "
+"no ta aktualmente disponibel."
+
+#: rocky/templates/oois/ooi_report.html:12
+msgid "Download PDF"
+msgstr "Download PDF"
+
+#: rocky/templates/oois/ooi_report.html:17
+#, python-format
+msgid "Findings report for %(name)s"
+msgstr "Rapport di resultadonan pa %(name)s"
+
+#: rocky/templates/oois/ooi_report.html:22
+msgid ""
+"These are the findings of a OpenKAT-analysis on %(observed_at)s. Click a "
+"finding for more detailed information about the issue, its origin, severity "
+"and possible solutions."
+msgstr ""
+"Esakinan ta e resultadonan di un OpenKAT-analysis riba %(observed_at)s. Click un "
+"resultadopa mas informashon detayá tokante e problema, su orígen, severidat "
+"i posibel solushonnan."
+
+#: rocky/templates/oois/ooi_report_404.html:15
+msgid "A report for %(name)s wasn't found."
+msgstr "Un rapport pa %(name)s no por a wordu haña."
+
+#: rocky/templates/oois/ooi_report_404.html:19
+msgid ""
+"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
+"Try some other dates!"
+msgstr ""
+"Probablemente e no tabata, probablemente e nunka a eksistí riba "
+"%(observed_at)s<br> Purba algun otro fechanan!"
+
+#: rocky/templates/oois/ooi_summary.html:12
+msgid "Summary for"
+msgstr "Resúmen pa"
+
+#: rocky/templates/oois/ooi_summary.html:20
+msgid "Below you can see findings that were found for"
+msgstr "Abou bo por mira diskubrimentunan ku a wordu haña pa"
+
+#: rocky/templates/oois/ooi_summary.html:21
+msgid "and direct  children of this"
+msgstr "i direktamente yiu di esaki"
+
+#: rocky/templates/oois/ooi_summary.html:24
+msgid "This"
+msgstr "Esaki"
+
+#: rocky/templates/oois/ooi_summary.html:24
+msgid "tree view"
+msgstr "mapa di resultado"
+
+#: rocky/templates/oois/ooi_summary.html:24
+msgid "of the"
+msgstr "di e"
+
+#: rocky/templates/oois/ooi_summary.html:25
+msgid "shows the same objects."
+msgstr "mustrando e mesun ophetonan."
+
+#: rocky/templates/oois/ooi_tree.html:13
+msgid "Object tree"
+msgstr "Mapa di opheto"
+
+#: rocky/templates/organizations/organization_detail.html:16
+#: rocky/templates/organizations/organization_list.html:22
+msgid "Code"
+msgstr "Código"
+
+#: rocky/templates/organizations/organization_detail.html:27
+msgid "Add indemnification"
+msgstr "Añadi indemnizashon"
+
+#: rocky/templates/organizations/organization_edit.html:11
+msgid "Edit organization"
+msgstr "Organisashon"
+
+#: rocky/templates/organizations/organization_edit.html:15
+#, python-format
+msgid ""
+"\n"
+"            Set signal username for %(name)s.<br>\n"
+"            You can register your signal username with the QR code here:"
+"<br>\n"
+"            <a href=\"%(url)s\">Signal QR Code</a>\n"
+"          "
+msgstr ""
+"\n"
+"            Pone signal username pa %(name)s.<br>\n"
+"            Bo por registra bo signal username ku e QR code akinan:<br>\n"
+"            <a href=\"%(url)s\">Signal QR Code</a>\n"
+"          "
+
+#: rocky/templates/organizations/organization_edit.html:29
+msgid "Save organization"
+msgstr "Warda organisashon"
+
+#: rocky/templates/organizations/organization_list.html:13
+msgid "Add new organization"
+msgstr "Añadi organisashon nobo"
+
+#: rocky/templates/organizations/organization_list.html:18
+msgid "Organization overview:"
+msgstr "Resúmen di organisashon"
+
+#: rocky/templates/organizations/organization_list.html:23
+#: rocky/templates/organizations/organization_member_list.html:5
+#: rocky/templates/organizations/organization_page_tabs.html:11
+#: rocky/templates/partials/organization_member_list_filters.html:5
+msgid "Members"
+msgstr "Miembronan"
+
+#: rocky/templates/organizations/organization_member_add.html:10
+msgid "Member account setup"
+msgstr "Account setup pa miembro"
+
+#: rocky/templates/organizations/organization_member_add.html:13
+msgid "Member details"
+msgstr "Detayes di miembro"
+
+#: rocky/templates/organizations/organization_member_edit.html:11
+#: rocky/views/organization_member_edit.py:56
+msgid "Edit member"
+msgstr "Editá miembronan"
+
+#: rocky/templates/organizations/organization_member_edit.html:17
+#, python-format
+msgid "Edit %(name)s"
+msgstr "Editá %(name)s"
+
+#: rocky/templates/organizations/organization_member_edit.html:21
+#: rocky/templates/organizations/organization_member_list.html:18
+msgid "Member name"
+msgstr "Nòmber di miembro"
+
+#: rocky/templates/organizations/organization_member_edit.html:25
+msgid "Role in organization"
+msgstr "Ròl den organisashon"
+
+#: rocky/templates/organizations/organization_member_edit.html:29
+msgid "Goal"
+msgstr "Gól"
+
+#: rocky/templates/organizations/organization_member_edit.html:33
+msgid "Authorized to sign"
+msgstr "Autorisá pa firma"
+
+#: rocky/templates/organizations/organization_member_edit.html:41
+msgid "Save member"
+msgstr "Warda miembronan"
+
+#: rocky/templates/organizations/organization_member_list.html:9
+msgid "Add new member"
+msgstr "Añadí miembro nobo"
+
+#: rocky/templates/organizations/organization_member_list.html:15
+msgid "Member overview:"
+msgstr "Resúmen di kliénte:"
+
+#: rocky/templates/organizations/organization_member_list.html:19
+#: rocky/templates/partials/scan_history.html:29
+#: rocky/templates/partials/scan_history.html:65
+#: rocky/templates/tasks/boefjes.html:28
+#: rocky/templates/tasks/normalizers.html:29
+msgid "Status"
+msgstr "Estádo"
+
+#: rocky/templates/organizations/organization_member_list.html:20
+msgid "Added on"
+msgstr "Añadi riba"
+
+#: rocky/templates/organizations/organization_member_list.html:21
+msgid "Has trusted permission to set OOI clearance levels"
+msgstr "Tin pèrmiso konfiabel pa pone nivel di authorisashon pa OOI"
+
+#: rocky/templates/organizations/organization_member_list.html:22
+msgid "Acknowledged permission to set OOI clearance levels"
+msgstr "Pèrmiso atmitido pa pone nivel di authorisashon pa OOI"
+
+#: rocky/templates/organizations/organization_member_list.html:23
+msgid "Grant/revoke permission to set OOI clearance levels"
+msgstr "Otorgá/revokà pèrmiso pa pone nivel di authorisashon pa OOI"
+
+#: rocky/templates/organizations/organization_page_tabs.html:4
+msgid "List of views for organization"
+msgstr "Lista di resulatadonan pa organisashon"
+
+#: rocky/templates/partials/elements/ooi_detail_settings.html:4
+msgid "Observed at"
+msgstr "Observá na"
+
+#: rocky/templates/partials/elements/ooi_detail_settings.html:5
+#: rocky/templates/partials/elements/ooi_report_settings.html:5
+msgid "Show settings"
+msgstr "Mustra settings"
+
+#: rocky/templates/partials/elements/ooi_detail_settings.html:6
+#: rocky/templates/partials/elements/ooi_report_settings.html:6
+msgid "Hide settings"
+msgstr "Skonde settings"
+
+#: rocky/templates/partials/elements/ooi_list_settings_form.html:12
+msgid "Filter by OOI types"
+msgstr "Filtra pa tiponan di OOI"
+
+#: rocky/templates/partials/elements/ooi_list_settings_form.html:33
+#: rocky/templates/partials/ooi_type_filters.html:30
+msgid "Toggle all"
+msgstr "Pone tur"
+
+#: rocky/templates/partials/elements/ooi_list_settings_form.html:37
+#: rocky/templates/partials/elements/ooi_list_settings_form.html:48
+msgid "Set filters"
+msgstr "Pone filternan"
+
+#: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html:10
+msgid "Show details for %(object_id)s, with %(child_count)s children."
+msgstr "Mustra detayes pa %(object_id)s, ku %(child_count)s su yiunan."
+
+#: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html:15
+msgid ""
+"Show tree for %(object_id)s with only children of type %(object_ooi_type)s"
+msgstr ""
+"Mustra resultado pa %(object_id)s ku solamente yiunan di e tipo "
+"%(object_ooi_type)s"
+
+#: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html:40
+msgid "Unfold %(object_id)s with %(child_count)s children"
+msgstr "Habri %(object_id)s ku %(child_count)s su yiunan"
+
+#: rocky/templates/partials/elements/ooi_tree_table.html:24
+msgid "go to:"
+msgstr "bai na:"
+
+#: rocky/templates/partials/elements/ooi_tree_table.html:26
+msgid "Go to detailpage"
+msgstr "Bai na página detayá"
+
+#: rocky/templates/partials/elements/ooi_tree_table.html:26
+msgid "detail"
+msgstr "Detaye"
+
+#: rocky/templates/partials/elements/ooi_tree_table.html:28
+msgid "Go to tree view"
+msgstr "Bai na mapa di resultado"
+
+#: rocky/templates/partials/elements/ooi_tree_table.html:28
+msgid "tree"
+msgstr "mapa"
+
+#: rocky/templates/partials/elements/ooi_tree_table.html:30
+msgid "Go to graph view"
+msgstr "Mustra mapa di grafa"
+
+#: rocky/templates/partials/elements/ooi_tree_table.html:30
+msgid "graph"
+msgstr "grafa"
+
+#: rocky/templates/partials/finding_occurrence_definition_list.html:11
+msgid "Reproduction"
+msgstr "Reprodusí"
+
+#: rocky/templates/partials/form/checkbox_group_table_form.html:17
+msgid "Please enable plugin to start scanning"
+msgstr "Por fabor sende plugin prome ku kuminsa start ku skèn"
+
+#: rocky/templates/partials/form/field_input.html:7
+#: rocky/templates/partials/form/field_input.html:29
+#: rocky/templates/partials/form/field_input_checkbox.html:8
+msgid "This field is required"
+msgstr "E vèld aki ta obligatorio"
+
+#: rocky/templates/partials/form/field_input.html:15
+msgid "Forgot email"
+msgstr "Lubida email"
+
+#: rocky/templates/partials/form/field_input.html:20
+msgid "Forgot password"
+msgstr "Lubida password"
+
+#: rocky/templates/partials/form/field_input_errors.html:4
+#: rocky/templates/partials/form/form_errors.html:4
+#: rocky/templates/partials/notifications/confirmation.html:22
+msgid "error"
+msgstr "error"
+
+#: rocky/templates/partials/form/field_input_errors.html:5
+#: rocky/templates/partials/form/form_errors.html:5
+#: rocky/templates/partials/notifications/confirmation.html:23
+msgid "Error"
+msgstr "Error"
+
+#: rocky/templates/partials/form/field_input_help_text.html:8
+msgid "Open explanation"
+msgstr "Habri deklarashon"
+
+#: rocky/templates/partials/form/field_input_help_text.html:9
+msgid "Close explanation"
+msgstr "Sera deklarashon"
+
+#: rocky/templates/partials/form/indemnification_add_form.html:4
+msgid "Here, an indemnification can be given on behalf of your organization"
+msgstr "Akinan, un indemnizashon por wordu duna p’e organisashon"
+
+#: rocky/templates/partials/form/indemnification_add_form.html:18
+msgid ""
+"Before you're able to add assets to OpenKAT and to assign clearance levels, "
+"you have to give indemnification on the organization and declare that you as "
+"a person can be held accountable."
+msgstr ""
+"Prome ku bo por añadi propiedatnan na OpenKAT i pone nivelnan di authorisashon, "
+"bo mester duna indemnizashon na e organisashon i deklara ku abo komo persona "
+"por wordu pone responsabel."
+
+#: rocky/templates/partials/form/indemnification_add_form.html:25
+msgid "Register an indemnification"
+msgstr "Registrá un indemnizashon"
+
+#: rocky/templates/partials/hyperlink_ooi_type.html:5
+msgid "Only show objects of type %(type)s"
+msgstr "Solamente mustra ophetonan di e tipo %(type)s"
+
+#: rocky/templates/partials/katalogus_list_filters.html:5
+msgid "Boefjes available"
+msgstr "Boefjes obtenibel"
+
+#: rocky/templates/partials/katalogus_list_filters.html:29
+msgid "Sorting options"
+msgstr "Opshonnan súrtí"
+
+#: rocky/templates/partials/list_filters.html:10
+msgid "Hide filter options"
+msgstr "Skonde opshonnan di filter"
+
+#: rocky/templates/partials/list_filters.html:12
+msgid "Show filter options"
+msgstr "Mustra opshonnan di filter"
+
+#: rocky/templates/partials/list_paginator.html:6
+msgid "List pagination"
+msgstr "Listra pagina"
+
+#: rocky/templates/partials/list_paginator.html:10
+msgid "Previous Page"
+msgstr "Página anterior"
+
+#: rocky/templates/partials/list_paginator.html:12
+msgid "Previous"
+msgstr "Anterior"
+
+#: rocky/templates/partials/list_paginator.html:18
+msgid "Five Pages Back"
+msgstr "Sinku página bèk"
+
+#: rocky/templates/partials/list_paginator.html:27
+#: rocky/templates/partials/list_paginator.html:31
+#: rocky/templates/partials/pagination.html:5
+msgid "Page"
+msgstr "Página"
+
+#: rocky/templates/partials/list_paginator.html:38
+msgid "Five Pages Forward"
+msgstr "Sinku pagina dilanti"
+
+#: rocky/templates/partials/list_paginator.html:46
+msgid "Next Page"
+msgstr "Sigiénte página"
+
+#: rocky/templates/partials/list_paginator.html:48
+msgid "Next"
+msgstr "Sigiénte"
+
+#: rocky/templates/partials/notifications/confirmation.html:9
+msgid "confirmation"
+msgstr "konfirmashon"
+
+#: rocky/templates/partials/notifications/confirmation.html:10
+msgid "Confirmation"
+msgstr "Indemnizashon"
+
+#: rocky/templates/partials/ooi_detail_related_object.html:4
+msgid "Related objects"
+msgstr "Ophetonan relatá"
+
+#: rocky/templates/partials/ooi_detail_related_object.html:7
+msgid "No related objects added to "
+msgstr "Ningún ophetonan relatá añadi na"
+
+#: rocky/templates/partials/ooi_detail_related_object.html:9
+msgid "Use the button below to add a related object. "
+msgstr "Huza e botón abou pa añadi un opheto relatá. "
+
+#: rocky/templates/partials/ooi_detail_toolbar.html:16
+msgid "Generate report"
+msgstr "Generá rapòrt"
+
+#: rocky/templates/partials/ooi_head.html:6
+msgid "An overview of"
+msgstr "Resúmen di resultado"
+
+#: rocky/templates/partials/ooi_head.html:6
+msgid "object type"
+msgstr "tipo di opheto"
+
+#: rocky/templates/partials/ooi_head.html:6
+msgid ""
+"This shows general information and its related objects. It also gives the "
+"possibility to add additonal related objects, or to scan for them."
+msgstr ""
+"Esaki ta mustra informashon generál i su ophetonan relatá. E tambe ta mustra "
+"e posibilidát pa añadi ophetonan relatá adishonál òf pa skèn nan."
+
+#: rocky/templates/partials/ooi_list_toolbar.html:15
+msgid "Scan for objects"
+msgstr "Skèn pa ophetonan"
+
+#: rocky/templates/partials/ooi_list_toolbar.html:18
+#: rocky/templates/upload_csv.html:10 rocky/templates/upload_csv.html:26
+#: rocky/views/upload_csv.py:74
+msgid "Upload CSV"
+msgstr "Subi CSV"
+
+#: rocky/templates/partials/ooi_list_toolbar.html:24
+msgid "Export"
+msgstr "Exportá"
+
+#: rocky/templates/partials/ooi_list_toolbar.html:29
+msgid "Download as JSON"
+msgstr "Download komo JSON"
+
+#: rocky/templates/partials/ooi_list_toolbar.html:32
+msgid "Download as CSV"
+msgstr "Download komo CSV"
+
+#: rocky/templates/partials/ooi_report_findings_block.html:7
+#, python-format
+msgid "%(total)s findings on %(name)s"
+msgstr "%(total)s diskubrimentunan na %(name)s"
+
+#: rocky/templates/partials/ooi_report_findings_block_table.html:7
+#, python-format
+msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
+msgstr "Diskubrimentu pa %(type)s %(name)s na %(observed_at)s:"
+
+#: rocky/templates/partials/ooi_report_findings_block_table.html:15
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:39
+msgid "Risk level"
+msgstr "Nivél di rièsgo"
+
+#: rocky/templates/partials/ooi_report_findings_block_table.html:19
+msgid "Finding type"
+msgstr "Tipo di diskubrimentu"
+
+#: rocky/templates/partials/ooi_report_findings_block_table.html:48
+msgid "Open finding details"
+msgstr "Habri detaye di búskeda"
+
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:7
+msgid "Details of %(object_id)s"
+msgstr "Detayes di %(object_id)s"
+
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:13
+msgid ""
+"Findings of this findingtype have been marked 'critical' because of unknown "
+"CVSS. This requires manual investigation due to lack of CVSS score."
+msgstr ""
+"Diskubrimentu di e tipo di diskubrimentu aki a wordu marka 'krítiko' paso di "
+"CVSS deskonosí. Esaki ta requerí investigashon manuál dor di falta di CVSS "
+"score."
+
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:64
+#: rocky/templates/partials/ooi_report_severity_totals_table.html:8
+msgid "Total occurrences"
+msgstr "Occurencianan totál"
+
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:72
+msgid "Occurrence"
+msgstr "Occurencia"
+
+#: rocky/templates/partials/ooi_report_severity_totals_table.html:7
+msgid "Unique"
+msgstr "Úniko"
+
+#: rocky/templates/partials/ooi_tree_toolbar_bottom.html:6
+msgid "Tree - dense view"
+msgstr "Mapa - aparensia denso"
+
+#: rocky/templates/partials/ooi_tree_toolbar_bottom.html:8
+msgid "Tree - table view"
+msgstr "Mapa - aparensia tablatura"
+
+#: rocky/templates/partials/ooi_type_filters.html:13
+msgid "Shown types"
+msgstr "Tiponan mustra"
+
+#: rocky/templates/partials/ooi_type_filters_linklist.html:6
+msgid "Quickly filter by type"
+msgstr "Rapidamente filtrá pa tipo"
+
+#: rocky/templates/partials/ooi_type_filters_linklist.html:14
+msgid "Filter by"
+msgstr "Filtra pa"
+
+#: rocky/templates/partials/organization_member_list_filters.html:12
+msgid "Shown status types"
+msgstr "Muestra di tiponan di status"
+
+#: rocky/templates/partials/organization_properties_table.html:6
+msgid "Organization name"
+msgstr "Nòmber di Organisashon"
+
+#: rocky/templates/partials/organization_properties_table.html:10
+msgid "Organization code"
+msgstr "Kódigo di organisashon"
+
+#: rocky/templates/partials/organizations_menu_dropdown.html:10
+msgid "Select organization"
+msgstr "Selektá organisashon"
+
+#: rocky/templates/partials/page-meta.html:8
+msgid "Logged in as"
+msgstr "Logged in komo"
+
+#: rocky/templates/partials/pagination.html:7
+msgid "first"
+msgstr "prome"
+
+#: rocky/templates/partials/pagination.html:8
+msgid "previous"
+msgstr "anterior"
+
+#: rocky/templates/partials/pagination.html:11
+msgid "next"
+msgstr "siguinte"
+
+#: rocky/templates/partials/pagination.html:12
+msgid "last"
+msgstr "ultimo"
+
+#: rocky/templates/partials/scan_history.html:4
+msgid "Scans"
+msgstr "Skènnan"
+
+#: rocky/templates/partials/scan_history.html:19
+msgid "From"
+msgstr "Di"
+
+#: rocky/templates/partials/scan_history.html:24
+msgid "To"
+msgstr "Pa"
+
+#: rocky/templates/partials/scan_history.html:31
+msgid "Select status"
+msgstr "Selektá status"
+
+#: rocky/templates/partials/scan_history.html:32
+msgid "Success"
+msgstr "Èxito"
+
+#: rocky/templates/partials/scan_history.html:33
+msgid "Failure"
+msgstr "Failure"
+
+#: rocky/templates/partials/scan_history.html:38
+msgid "Search"
+msgstr "Buska"
+
+#: rocky/templates/partials/scan_history.html:39
+msgid "Search by object name"
+msgstr "Buska riba nómber di opheto"
+
+#: rocky/templates/partials/scan_history.html:57
+msgid "No scans found for this object"
+msgstr "Ningun skèn enkontra pa e opheto"
+
+#: rocky/templates/partials/scan_history.html:63
+msgid "Object"
+msgstr "Opheto"
+
+#: rocky/templates/partials/scan_history.html:66
+#: rocky/templates/tasks/boefjes.html:29
+#: rocky/templates/tasks/normalizers.html:30
+msgid "Created date"
+msgstr "Fecha kreá"
+
+#: rocky/templates/partials/skip-to-content.html:3
+msgid "Go to content"
+msgstr "Bai na e kontenido"
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html:18
+#, python-format
+msgid ""
+"\n"
+"              This means that this object will be scanned by Boefjes with "
+"scan level\n"
+"              %(scan_level)s and lower. Setting the clearance level from "
+"“declared”\n"
+"              to “inherit” means that this object will inherit its level "
+"from neighbouring\n"
+"              objects. This means that the clearance level might stay the "
+"same, increase,\n"
+"              or decrease depending on other declared clearance levels. "
+"Clearance levels\n"
+"              of objects that inherit from this clearance level will also be "
+"recalculated.\n"
+"            "
+msgstr ""
+"\n"
+"              Esaki ta nifiká ku e opheto aki lo wordu di skèn dor di "
+"Boefjes ku nivél di skèn\n"
+"              %(scan_level)s i mas abou. Pone e nivél di autorisashon for di "
+"deklará\n"
+"              na “heredá” ta nifiká ku e opheto aki lo heredá su nivél for "
+"di ophetonan den bisindario.\n"
+"              Esaki ta nifiká ku e nivél di autorisashon por keda meskos, "
+"subi,\n"
+"              òf baha depende di e otro nivél di autorisashonnan. Nivél di "
+"autorisashonnan\n"
+"              di ophetonan ku ta heredá for di e nivél di autorisashon tambe "
+"lo wordu rekalkulá.\n"
+"            "
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html:30
+msgid "Set clearance level to inherit"
+msgstr "Pone nivél di autorisashon na heredá"
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html:36
+msgid ""
+"\n"
+"                This object has a clearance level of \"L0\". This means that "
+"this object will not be scanned by any Boefje until that\n"
+"                Boefje is run manually for this object again. Objects with a "
+"clearance level higher than \"L0\" will be scanned automatically by Boefjes "
+"with\n"
+"                corresponding scan levels.\n"
+"            "
+msgstr ""
+"\n"
+"                E opheto aki tin un nivel di authorisashon di \"L0\". Esaki ta nifika ku "
+"e opheto aki no por wòrdu di skèn dor di ningun Boefje te ora\n"
+"                e Boefje aki ta wordu di skèn manualmente atrobe pe e opheto. Ophetonan ku un "
+"nivel di authorisashon mas haltu ku \"L0\" ta wòrdu di skèn automatikamente dor di Boefjes "
+"ku\n"
+"                nivelnan di skèn korespondiente.\n"
+"            "
+
+#: rocky/templates/scan_profiles/scan_profile_reset.html:12
+msgid "Set clearance level for:"
+msgstr "Pone nivél di autorisashon pa:"
+
+#: rocky/templates/scan_profiles/scan_profile_reset.html:14
+msgid ""
+"Setting the scan level from \"declared\" to \"inherit\" means it will "
+"inherit a clearance level from other objects, or that no clearance level "
+"will be inherited. "
+msgstr ""
+"Pone e nivél di skèn for di \"deklará\" pa \"heredá\" ta nifiká ku e ta "
+"heredá un nivél di autorisashon for di otro opheto, òf ningun nivél di "
+"autorisashon lo wordu heredá. "
+
+#: rocky/templates/scan_profiles/scan_profile_reset.html:24
+msgid ""
+"You are about to set the clearance level from \"declared\" to \"inherit\"."
+msgstr ""
+"Bo ta na e punto di pone e nivél di autorisashon for di \"deklará\" na "
+"\"heredá\"."
+
+#: rocky/templates/scan_profiles/scan_profile_reset.html:31
+msgid "Yes, set to inherit"
+msgstr "Si, poné na heredá"
+
+#: rocky/templates/signal_qr.html:9 rocky/views/signal.py:33
+msgid "Signal QR"
+msgstr "Signal QR"
+
+#: rocky/templates/signal_qr.html:12
+msgid ""
+"Scan this QR code to link Signal and add your number to registered users."
+msgstr ""
+"Scan e QR code aki pa link Signal i añadí bo number na hendenan registrá."
+
+#: rocky/templates/signal_qr.html:17
+msgid "Scan QR code"
+msgstr "Skèn QR code"
+
+#: rocky/templates/signal_qr.html:20
+msgid "No QR code available."
+msgstr "Boefjes optenibel"
+
+#: rocky/templates/tasks/boefjes.html:15
+msgid "There are no tasks for boefjes"
+msgstr "No tin tareanan pa boefjes"
+
+#: rocky/templates/tasks/boefjes.html:19
+msgid "List of tasks for boefjes"
+msgstr "Lista di tareanan pa boefjes"
+
+#: rocky/templates/tasks/boefjes.html:23
+#: rocky/templates/tasks/normalizers.html:23
+msgid "List of tasks for "
+msgstr "Lista di tareanan pa "
+
+#: rocky/templates/tasks/boefjes.html:30
+#: rocky/templates/tasks/normalizers.html:31
+msgid "Download task details"
+msgstr "Download detayes di tarea"
+
+#: rocky/templates/tasks/boefjes.html:50
+#: rocky/templates/tasks/normalizers.html:52
+msgid "Download meta and raw data"
+msgstr "Download meta data i data krudo"
+
+#: rocky/templates/tasks/boefjes.html:52
+#: rocky/templates/tasks/normalizers.html:54
+msgid "Download meta data"
+msgstr "Download meta data"
+
+#: rocky/templates/tasks/normalizers.html:15
+msgid "There are no tasks for normalizers"
+msgstr "No tin tareanan pa normalizers"
+
+#: rocky/templates/tasks/normalizers.html:19
+msgid "List of tasks for normalizers"
+msgstr "Lista di tareanan pa normalizers"
+
+#: rocky/templates/tasks/normalizers.html:28
+msgid "Normalizer"
+msgstr "Normalizer"
+
+#: rocky/templates/tasks/partials/tab_navigation.html:3
+msgid "List of tasks"
+msgstr "Lista di tareanan"
+
+#: rocky/templates/tasks/partials/task_filter.html:6
+msgid "Number of tasks showed"
+msgstr "Kantidat di tareanan mustrá"
+
+#: rocky/templates/tasks/partials/task_filter.html:11
+msgid "Show all"
+msgstr "Mustra tur"
+
+#: rocky/templates/tasks/partials/task_filter.html:18
+msgid "Show tasks"
+msgstr "Mustra tareanan"
+
+#: rocky/templates/two_factor/_wizard_actions.html:8
+msgid "Log in"
+msgstr "Log in"
+
+#: rocky/templates/two_factor/_wizard_actions.html:10
+msgid "Authenticate"
+msgstr "Authentiká"
+
+#: rocky/templates/two_factor/core/backup_tokens.html:5
+#: rocky/templates/two_factor/profile/profile.html:48
+msgid "Backup Tokens"
+msgstr "Backup Tokens"
+
+#: rocky/templates/two_factor/core/backup_tokens.html:9
+msgid ""
+"Backup tokens can be used when your primary and backup phone numbers aren't "
+"available. The backup tokens below can be used for login verification. If "
+"you've used up all your backup tokens, you can generate a new set of backup "
+"tokens. Only the backup tokens shown below will be valid."
+msgstr ""
+"Backup tokens por wordu huza ora bo prome/backup number di telefón no ta "
+"alkansabel. E backup token nan akibounan por wordu huza pa verifika login. "
+"Si ba huza tur bo backup tokens nan, bo por generá un set nobo di backup "
+"tokens. Solamente e backup tokens nan akibounan ta bálido."
+
+#: rocky/templates/two_factor/core/backup_tokens.html:22
+msgid "Print these tokens and keep them somewhere safe."
+msgstr "Print e tokens nan aki i warda esakinan na un kaminda sigur. "
+
+#: rocky/templates/two_factor/core/backup_tokens.html:24
+msgid "You don't have any backup codes yet."
+msgstr "Ahinda bo no tin ningun backup tokens."
+
+#: rocky/templates/two_factor/core/backup_tokens.html:30
+#: rocky/templates/two_factor/core/setup_complete.html:16
+#: rocky/templates/two_factor/core/setup_complete.html:27
+msgid "Back to Account Security"
+msgstr "Bai bèk na Account Seguridat"
+
+#: rocky/templates/two_factor/core/backup_tokens.html:31
+msgid "Generate Tokens"
+msgstr "Generá Tokens"
+
+#: rocky/templates/two_factor/core/otp_required.html:5
+msgid "Permission Denied"
+msgstr "Permiso Nengá"
+
+#: rocky/templates/two_factor/core/otp_required.html:7
+msgid ""
+"The page you requested, enforces users to verify using two-factor "
+"authentication for security reasons. You need to enable these security "
+"features in order to access this page."
+msgstr ""
+"E página ku ba pidi ta obligá kliénte pa verifika nan mes ku two-factor "
+"authentication pa rasonnan di seguridat. Bo mester aktivá e features nan di "
+"seguridat aki pa por tin accesso na e página aki."
+
+#: rocky/templates/two_factor/core/otp_required.html:11
+#: rocky/templates/two_factor/profile/profile.html:71
+msgid ""
+"Two-factor authentication is not enabled for your account. Enable two-factor "
+"authentication for enhanced account security."
+msgstr ""
+"Two-factor authentication no ta aktivá pa bo account. Aktivá two-factor "
+"authentication pa mejorá seguridat di account."
+
+#: rocky/templates/two_factor/core/otp_required.html:18
+#: rocky/templates/two_factor/core/setup.html:6
+#: rocky/templates/two_factor/core/setup_complete.html:7
+#: rocky/templates/two_factor/profile/profile.html:76
+msgid "Enable Two-Factor Authentication"
+msgstr "Aktivá Two-Factor Authentication"
+
+#: rocky/templates/two_factor/core/phone_register.html:7
+msgid "Add Backup Phone"
+msgstr "Añadí Backup Telefón"
+
+#: rocky/templates/two_factor/core/phone_register.html:15
+msgid ""
+"You'll be adding a backup phone number to your account. This number will be "
+"used if your primary method of registration is not available."
+msgstr ""
+"Lo bo bai añadí un backup number di telefón na bo account. E number aki lo "
+"wordu uza ora bo prome methodo di registrashon no ta alkansabel."
+
+#: rocky/templates/two_factor/core/phone_register.html:21
+msgid ""
+"We've sent a token to your phone number. Please enter the token you've "
+"received."
+msgstr ""
+"Nos a mandabu un token na bo number di telefón. Por favor hinka e token ku "
+"ba ricibi."
+
+#: rocky/templates/two_factor/core/setup.html:14
+msgid ""
+"To start using a token generator, please use your smartphone to scan the QR "
+"code below or use the setup key. For example, use GoogleAuthenticator. Then, "
+"enter the token generated by the app."
+msgstr ""
+"Pa kuminsa uza un generadó di token, por favor uza bo smartphone pa skèn e "
+"QR codigo abou. Por ehempel, uza Google Authenticator. Despues, yena e token "
+"ku e app a generá."
+
+#: rocky/templates/two_factor/core/setup.html:23
+msgid "QR code"
+msgstr "QR code"
+
+#: rocky/templates/two_factor/core/setup.html:27
+msgid "Setup key"
+msgstr "Jabi sekreto"
+
+#: rocky/templates/two_factor/core/setup.html:32
+msgid ""
+"The secret key is a 32 characters represenation of the QR code. There are 2 "
+"options to setup the two factor authtentication. You can scan the QR code "
+"above or you can insert this key using the secret key option of the "
+"authenticator app."
+msgstr ""
+"E jabi sekreto ta un 32 karakter representashon di e QR code. Tin 2 opshón "
+"pa setup e two factor authtentication. Bo por skèn e QR code ariba òf bo por "
+"hinka e jabi sekreto aki huzando e secret key opshón den e authenticator app."
+
+#: rocky/templates/two_factor/core/setup.html:51
+msgid ""
+"You are not verified as an organization member by your system administrator. "
+"Contact your system administrator about your verification to proceed to Two "
+"Factor Authentication setup."
+msgstr ""
+"Bo no ta verifika komo un miembro di un organisashon serka bo administrado di systema. "
+"Tuma kontakto ku bo administrado di systema pa e verifikashon pa sigi pa setup Two "
+"Factor Authentication."
+
+#: rocky/templates/two_factor/core/setup_complete.html:12
+msgid "Congratulations, you've successfully enabled two-factor authentication."
+msgstr "Pabién, bo á activá two-factor authentication ku èksito."
+
+#: rocky/templates/two_factor/core/setup_complete.html:17
+msgid "Start using OpenKAT"
+msgstr "Kuminsa huza OpenKAT"
+
+#: rocky/templates/two_factor/core/setup_complete.html:21
+msgid ""
+"However, it might happen that you don't have access to your primary token "
+"device. To enable account recovery, add a phone number."
+msgstr ""
+"Sin embargo, por pasa ku bo no tin acceso na bo prome token aparato. Pa "
+"activá rekuperashon di account, añadí un number di telefón."
+
+#: rocky/templates/two_factor/core/setup_complete.html:29
+#: rocky/templates/two_factor/profile/profile.html:45
+msgid "Add Phone Number"
+msgstr "Añadí Number di Telefòn"
+
+#: rocky/templates/two_factor/profile/disable.html:5
+msgid "Disable Two-factor Authentication"
+msgstr "Desactivá Two-factor Authentication"
+
+#: rocky/templates/two_factor/profile/disable.html:9
+msgid ""
+"You are about to disable two-factor authentication. This weakens your "
+"account security, are you sure?"
+msgstr ""
+"Bo ta na e punto di desactivá two-factor authentication. Esaki ta bai baha "
+"bo seguridat di account, bo ta sigur?"
+
+#: rocky/templates/two_factor/profile/profile.html:7
+msgid "Account Security"
+msgstr "Seguridát di Account"
+
+#: rocky/templates/two_factor/profile/profile.html:14
+msgid "Tokens will be generated by your token generator."
+msgstr "Tokens lo wòrdu generá via di bo token generadór."
+
+#: rocky/templates/two_factor/profile/profile.html:18
+#, python-format
+msgid "Primary method: %(primary)s"
+msgstr "Promé methodó: %(primary)s"
+
+#: rocky/templates/two_factor/profile/profile.html:22
+msgid "Tokens will be generated by your YubiKey."
+msgstr "Tokens lo wordu generá via di bo YubiKey."
+
+#: rocky/templates/two_factor/profile/profile.html:26
+msgid "Backup Phone Numbers"
+msgstr "Backup Number di Telefòn"
+
+#: rocky/templates/two_factor/profile/profile.html:28
+msgid ""
+"If your primary method is not available, we are able to send backup tokens "
+"to the phone numbers listed below."
+msgstr ""
+"Si bo prome methodó no ta alkansabel, nos tin e posibilidát di manda backup "
+"tokens na e numbernan di telefòn den e lista abou."
+
+#: rocky/templates/two_factor/profile/profile.html:39
+msgid "Unregister"
+msgstr "De-registrá"
+
+#: rocky/templates/two_factor/profile/profile.html:50
+msgid ""
+"If you don't have any device with you, you can access your account using "
+"backup tokens."
+msgstr ""
+"Si bo no tin ningún aparato serka bo, bo por haya acceso na bo account dor "
+"di uza backup tokens."
+
+#: rocky/templates/two_factor/profile/profile.html:52
+#, python-format
+msgid "You have only one backup token remaining."
+msgid_plural "You have %(counter)s backup tokens remaining."
+msgstr[0] "Bo a sobra solamente un backup token."
+msgstr[1] "Bo a sobra %(counter)s backup tokens."
+
+#: rocky/templates/two_factor/profile/profile.html:59
+msgid "Show Codes"
+msgstr "Mustra Codigónan"
+
+#: rocky/templates/two_factor/profile/profile.html:61
+#: rocky/templates/two_factor/profile/profile.html:67
+msgid "Disable Two-Factor Authentication"
+msgstr "Desaktivá Two-Factor Authentication"
+
+#: rocky/templates/two_factor/profile/profile.html:63
+msgid ""
+"However we strongly discourage you to do so, you can also disable two-factor "
+"authentication for your account."
+msgstr ""
+"Sin embargo, nos no ta rekomendá bo hasi esaki, tambe bo por desaktivá two-"
+"factor authentication pa bo account."
+
+#: rocky/templates/two_factor/twilio/sms_message.html:2
+#, python-format
+msgid "Your OTP token is %(token)s"
+msgstr "Bo OTP token ta %(token)s"
+
+#: rocky/templates/upload_csv.html:12
+msgid "Automate the creation of multiple objects by uploading a CSV file."
+msgstr ""
+"Automatisá a kreashon di diferente ophetonan dor di upload un CSV file."
+
+#: rocky/templates/upload_csv.html:15
+msgid "These are the criterias for CSV upload:"
+msgstr "Esakinan ta e kriterianan pa upload CSV:"
+
+#: rocky/views/finding_add.py:59
+msgid "Add Finding"
+msgstr "Añadí Diskubrimentu"
+
+#: rocky/views/health.py:40
+msgid "Could not connect to Bytes. Service is possibly down"
+msgstr "No por konektá ku Bytes. Servicio ta down"
+
+#: rocky/views/health.py:53
+msgid "Could not connect to Octopoes. Service is possibly down"
+msgstr "No por konektá ku Octopoes. Servicio ta down"
+
+#: rocky/views/health.py:66
+msgid "Could not connect to Scheduler. Service is possibly down"
+msgstr "No por konektá ku Scheduler. Servicio ta down"
+
+#: rocky/views/health.py:95
+msgid "Rocky will not function properly. Not all services are healthy."
+msgstr "Rocky no lo functiona mane debe ser. No tur servicio ta saludabel."
+
+#: rocky/views/health.py:124
+msgid "Beautified"
+msgstr "Bunitifiká"
+
+#: rocky/views/indemnification_add.py:29
+msgid "Indemnification successfully set."
+msgstr "Indemnizashon pone ku èxito."
+
+#: rocky/views/mixins.py:214
+msgid "All"
+msgstr "Tur"
+
+#: rocky/views/ooi_add.py:81
+msgid "Type select"
+msgstr "Selektá tipo"
+
+#: rocky/views/ooi_add.py:88
+msgid "Add %(ooi_type)s"
+msgstr "Añadí %(ooi_type)s"
+
+#: rocky/views/ooi_detail_related_object.py:171
+msgid " (as "
+msgstr " (mane "
+
+#: rocky/views/ooi_findings.py:25
+msgid "Object findings"
+msgstr "Diskubrimentunan di opheto"
+
+#: rocky/views/ooi_list.py:63
+msgid "No OOIs selected."
+msgstr "Ningun OOI selektá."
+
+#: rocky/views/ooi_list.py:75
+msgid "Unknown action."
+msgstr "Akshon deskonosí."
+
+#: rocky/views/ooi_list.py:96 rocky/views/scan_profile.py:65
+msgid ""
+"You do not have clearance for level %s.                         You are "
+"trusted with clearance level %s and you acknowledged a clearance level of %s."
+msgstr ""
+"Bo no tin authorisashon pa nivel %s.                         Bo ta "
+"konfiabel pa nivel di authorisashon %s i bo a atmití un nivel di authorisashon di %s."
+
+#: rocky/views/ooi_list.py:114 rocky/views/ooi_list.py:121
+msgid "An error occurred while saving clearance level for %s."
+msgstr "Un eror a surgi wardando nivel di authorisashon pa %s."
+
+#: rocky/views/ooi_list.py:128
+msgid "Successfully set scan profile to %s for %d oois."
+msgstr "Ku exito a pone profil di skén pa %s pa %d oois."
+
+#: rocky/views/ooi_list.py:132
+msgid "Unknown Scan Profile: %s."
+msgstr "Skèn profil deskonosi: %s."
+
+#: rocky/views/ooi_list.py:142 rocky/views/ooi_list.py:146
+msgid "An error occurred deleting %s."
+msgstr "Un eror a surgi kitando %s."
+
+#: rocky/views/ooi_list.py:153
+msgid ""
+"Successfully deleted %d ooi(s). Note: Bits can recreate objects "
+"automatically."
+msgstr ""
+"Ku exito a kita %d ooi(s). Nota: Bits por automatikamente krea ophetonan dinobo."
+
+
+#: rocky/views/ooi_report.py:160
+msgid "You can't generate a report for an OOI on a date in the future."
+msgstr "Bo no por generà un rapòrt pa un OOI ku un fecha den futuro."
+
+#: rocky/views/ooi_report.py:175
+msgid "Findings report"
+msgstr "Rapòrt di diskubrimentu"
+
+#: rocky/views/ooi_report.py:205
+msgid "Error generating report: {}"
+msgstr "Error generándo rapòrt: {}"
+
+#: rocky/views/ooi_report.py:234
+msgid ""
+"Error generating report: Timeout reached. See Keiko logs for more "
+"information."
+msgstr "Error generándo rapòrt: Tempu a pasa. Mira Keiko su registros pa mas "
+"informashon."
+
+#: rocky/views/ooi_tree.py:49
+msgid "Tree Visualisation"
+msgstr "Visualisá mapa di resultado"
+
+#: rocky/views/ooi_tree.py:87
+msgid "Graph Visualisation"
+msgstr "Visualisá grafa"
+
+#: rocky/views/organization_add.py:31
+msgid "Setup"
+msgstr "Setup"
+
+#: rocky/views/organization_add.py:42
+msgid "Organization added succesfully."
+msgstr "Organisashon a wòrdu agregá ku èksito."
+
+#: rocky/views/organization_add.py:46
+msgid "You are not allowed to add organizations."
+msgstr "Bo no ta pèrmiti pa añadi organisashonnan"
+
+#: rocky/views/organization_edit.py:79
+msgid "You are not allowed to change organizations."
+msgstr "Bo no ta pèrmiti pa kambia organisashonnan."
+
+#: rocky/views/organization_member_add.py:45
+msgid "Member added succesfully."
+msgstr "Miembro a wòrdu agregá ku èksito."
+
+#: rocky/views/organization_member_edit.py:66
+msgid "You are not allowed to edit organization members."
+msgstr "Bo no ta pèrmiti pa editá e miembronan di organisashon."
+
+#: rocky/views/scan_profile.py:86
+msgid "Choose a valid level"
+msgstr "Skohé un nivél balido"
+
+#: rocky/views/scan_profile.py:108
+msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
+msgstr "No por resèt nivél di skèn. Nivél di skèn òf {ooi_name} no ta deklará"
+
+#: rocky/views/scan_profile.py:129
+msgid "Reset"
+msgstr "Resèt"
+
+#: rocky/views/tasks.py:37
+msgid "Task details not found."
+msgstr "Detayes di tarea no por wordu haña."
+
+#: rocky/views/tasks.py:51
+msgid "Organization could not be found"
+msgstr "Organisashon no ta èksisti"
+
+#: rocky/views/tasks.py:74
+msgid "Fetching tasks failed: no connection with scheduler"
+msgstr "No por haña tarea: no tin konekshon ku scheduler"
+
+#: rocky/views/upload_csv.py:29
+msgid "Add column titles. Followed by each object on a new line."
+msgstr "Añadi titulo pa kòlòm. Sigi pa kada opheto riba un liña nobo."
+
+#: rocky/views/upload_csv.py:31
+msgid ""
+"For URL object type, a column 'raw' with URL values is required, starting "
+"with http:// or https://, optionally a second column 'network' is supported "
+msgstr ""
+"Pa tipo di opheto URL, un kòlòm 'raw' ku balornan URL ta requerí, kuminsando ku "
+"http:// òf https://, optionalmente un siguinte kòlòm 'network' ta atmiti "
+
+#: rocky/views/upload_csv.py:35
+msgid ""
+"For Hostname object type, a column with 'name' values is required, "
+"optionally a second column 'network' is supported "
+msgstr "Pa tipo di opheto Hostname, un kòlòm ku 'name' balornan ta requerí, "
+"opshonalmente un siguinte kòlòm 'network' ta atmiti "
+
+#: rocky/views/upload_csv.py:39
+msgid ""
+"For IPAddressV4 and IPAddressV6 object types, a column of 'address' is "
+"required, optionally a second column 'network' is supported "
+msgstr ""
+"Pa tipo di ophetonan IPAddressV4 and IPAddressV6, un kòlòm di 'address' "
+"ta requerí, opshonalmente un siguinte kòlòm 'network' ta atmiti "
+
+#: rocky/views/upload_csv.py:162
+msgid "Object(s) could not be created for row number(s): "
+msgstr "Opheto(nan) no por a wordu krea pa e liña(nan): "
+
+#: rocky/views/upload_csv.py:165
+msgid "Object(s) successfully added."
+msgstr "Opheto(nan) añadi ku èxito."

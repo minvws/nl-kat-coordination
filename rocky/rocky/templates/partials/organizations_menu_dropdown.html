@@ -1,0 +1,27 @@
+{% load i18n %}
+
+{% if organizations_including_blocked|length > 0 %}
+  {% if organizations_including_blocked|length == 1 and organization.code %}
+    <li>{{ organization.name }}</li>
+  {% else %}
+    <div class="dropdown">
+      <button class="dropdown-button ghost">
+        {% if not organization.code %}
+            {% translate 'Select organization' %}
+        {% else %}
+          {{ organization.name }}
+        {% endif %}
+        <span class="icon ti-chevron-down"></span>
+      </button>
+      <ul class="dropdown-list">
+        {% for org in organizations_including_blocked %}
+          {% if organization.code != org.code %}
+            <li>
+              <a href="{% url 'organization_detail' org.code %}">{{ org.name }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endif %}

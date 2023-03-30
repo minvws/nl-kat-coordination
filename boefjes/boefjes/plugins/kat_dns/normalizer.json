@@ -1,0 +1,21 @@
+{
+    "id": "kat_dns_normalize",
+    "consumes": [
+        "dns-records"
+    ],
+    "produces": [
+        "IPAddressV6",
+        "DNSARecord",
+        "DNSNSRecord",
+        "DNSTXTRecord",
+        "DNSSOARecord",
+        "NXDOMAIN",
+        "DNSCNAMERecord",
+        "DNSMXRecord",
+        "Hostname",
+        "Network",
+        "DNSAAAARecord",
+        "IPAddressV4",
+        "DNSZone"
+    ]
+}

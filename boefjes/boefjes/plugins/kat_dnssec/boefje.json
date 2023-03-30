@@ -1,0 +1,14 @@
+{
+    "id": "dns-sec",
+    "name": "Dnssec",
+    "description": "Validates DNSSec of a hostname",
+    "consumes": [
+        "Hostname"
+    ],
+    "produces": [
+        "KATFindingType",
+        "Finding"
+    ],
+    "environment_keys": [],
+    "scan_level": 1
+}

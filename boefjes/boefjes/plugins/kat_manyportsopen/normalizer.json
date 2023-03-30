@@ -1,0 +1,10 @@
+{
+    "id": "kat_manyportsopen_normalize",
+    "consumes": [
+        "many-ports-open"
+    ],
+    "produces": [
+        "KATFindingType",
+        "Finding"
+    ]
+}

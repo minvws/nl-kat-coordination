@@ -1,6 +1,6 @@
-===============
-Debian packages
-===============
+===========================
+Production: Debian packages
+===========================
 
 OpenKAT has Debian packages available. In the near future we will have an apt
 repository that will allow you to keep your installation up-to-date using apt.
@@ -11,8 +11,11 @@ steps for installing it on a single machine.
 Prerequisites
 =============
 
-We will be using sudo in this guide, so make sure you have sudo installed on
+We will be using ``sudo`` in this guide, so make sure you have ``sudo`` installed on
 your system.
+
+The packages are built with Ubuntu 22.04 and Debian 11 in mind.
+They may or may not work on other versions or distributions.
 
 Downloading and installing
 ==========================
@@ -166,7 +169,7 @@ Create a new file `/etc/rabbitmq/rabbitmq.conf` and add the following lines:
 
     listeners.tcp.local = 127.0.0.1:5672
 
-Create a new file `/etc/rabbitmq/advanced.config` and add the following lines:
+Create a new file `/etc/rabbitmq/advanced.conf` and add the following lines:
 
 .. code-block:: erlang
 
@@ -193,14 +196,14 @@ Now create a KAT user for RabbitMQ, create the virtual host and set the permissi
 
     sudo rabbitmqctl add_user kat ${rabbitmq_pass}
     sudo rabbitmqctl add_vhost kat
-    sudo rabbitmqctl set_permissions -p kat kat ".*" ".*" ".*"
+    sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
 Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for `/etc/kat/mula.conf`:
 
 .. code-block:: sh
 
-    SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@localhost:5672/kat
-    SCHEDULER_DSP_BROKER_URL=amqp://kat:<password>@localhost:5672/kat
+    SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@127.0.0.1:5672/kat
+    SCHEDULER_DSP_BROKER_URL=amqp://kat:<password>@127.0.0.1:5672/kat
 
 And update the `QUEUE_URI` setting to the same value for the following files:
 
@@ -213,7 +216,7 @@ Or use this command to do it for you:
 
 .. code-block:: sh
 
-    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@localhost:5672/kat|" /etc/kat/*.conf
+    sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@127.0.0.1:5672/kat|" /etc/kat/*.conf
 
 Configure Bytes credentials
 ===========================
@@ -224,7 +227,7 @@ copy the value of `BYTES_PASSWORD` in `/etc/kat/bytes.conf` to the setting with 
 - `/etc/kat/boefjes.conf`
 - `/etc/kat/mula.conf`
 
-This oneliner will do it for you:
+This oneliner will do it for you, executed as root:
 
 .. code-block:: sh
 
@@ -251,17 +254,23 @@ To start KAT when the system boots, enable all KAT services:
 Start using OpenKAT
 ===================
 
-By default OpenKAT will be accessible in your browser through `https://<server IP>:8000`. There, Rocky will take you through the steps of setting up your account and running your first boefjes.
+By default OpenKAT will be accessible in your browser through `https://<server IP>:8443` (http://<server IP>:8000 for docker based installs). There, Rocky will take you through the steps of setting up your account and running your first boefjes.
 
 Upgrading OpenKAT
 =================
 
-You can upgrade OpenKAT by installing the newer packages:
+You can upgrade OpenKAT by installing the newer packages. Make a backup of your files, download the packages and remove the old ones if needed:
 
 .. code-block:: sh
 
-    sudo tar zvxf kat-debian-packages.tar.gz -C /opt && cd /opt/kat-debian-packages
-    sudo apt install --no-install-recommends ./kat-*_all.deb
+    tar zvxf kat-*.tar.gz
+    sudo apt install --no-install-recommends ./kat-*_amd64.deb
+
+If a newer version of the xtdb multinode is available install it as well:
+
+.. code-block:: sh
+
+    apt install --no-install-recommends ./xtdb-http-multinode_*_all.deb
 
 After installation you need to run the database migrations and load fixture again. For Rocky DB:
 
@@ -269,6 +278,8 @@ After installation you need to run the database migrations and load fixture agai
 
     sudo -u kat rocky-cli migrate
     sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
+
+When running "sudo -u kat rocky-cli migrate" you might get the warning "Your models in app(s): 'password_history', 'two_factor' have changes that are not yet reflected in a migration, and so won't be applied." This can be ignored.
 
 For KAT-alogus DB
 
@@ -281,3 +292,9 @@ For Bytes DB:
 .. code-block:: sh
 
     sudo -u kat update-bytes-db
+
+Restart all processes:
+
+.. code-block:: sh
+
+sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker

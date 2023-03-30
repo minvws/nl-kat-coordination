@@ -1,0 +1,12 @@
+Source: kat-mula
+Build-Depends: python3, dh-virtualenv, python3-setuptools, python3-pip, python3-dev, debhelper-compat (= 12)
+Maintainer: OpenKAT <maintainer@openkat.nl>
+
+Package: kat-mula
+Section: python
+Priority: optional
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: ${python}, ${misc:Depends}
+Description: mula
+    Scheduler for KAT

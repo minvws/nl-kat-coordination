@@ -1,0 +1,14 @@
+    {
+        "id": "website-software",
+        "name": "Wappalyzer - Software Scan",
+        "description": "Scan for software on websites using Wappalyzer",
+        "consumes": [
+            "HostnameHTTPURL"
+        ],
+        "produces": [
+            "Software",
+            "SoftwareInstance"
+        ],
+        "environment_keys": [],
+        "scan_level": 2
+    }

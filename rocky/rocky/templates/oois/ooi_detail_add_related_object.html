@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% translate type as display_type %}
+  {% include 'header.html' %}
+  {% if not ooi_past_due and ooi_types %}
+    <main id="main-content">
+      <section>
+        <div>
+          <h3>{% translate 'Add related object' %}</h3>
+          <form method="get" class="horizontal-view help">
+            {% if ooi_id %}<input type="hidden" name="ooi_id" value="{{ ooi_id }}"/>{% endif %}
+            <fieldset>
+              <legend>
+                {% translate 'Object details' %}
+              </legend>
+              <div class="required">
+                <label for="select_ooi_type">{% translate 'Object type' %}</label>
+                <span class="nota-bene">This field is required</span>
+                <div>
+                  <select id="select_ooi_type" name="add_ooi_type" required>
+                    <option disabled selected value="">
+                      -- {% translate 'Choose an object type to add' %} --
+                    </option>
+                    {% for option in ooi_types %}
+                      {% if option.text != "Finding" %}
+                        <option value="{{ option.value }}">
+                          {{ option.text }}
+                        </option>
+                      {% endif %}
+                    {% endfor %}
+                  </select>
+                </div>
+                {% translate 'Select an object type to add.' as help_text %}
+                {% include 'partials/form/field_input_help_text.html' with help_text=help_text %}
+              </fieldset>
+              <input class="button" type="submit" value="{% translate 'Add object' %}"/>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  {% endif %}
+{% endblock %}

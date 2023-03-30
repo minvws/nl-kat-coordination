@@ -1,0 +1,32 @@
+{% load i18n %}
+
+{% spaceless %}
+  <form method="get" class="horizontal-view help">
+    {% if ooi %}<input type="hidden" name="ooi_id" value="{{ ooi.primary_key }}"/>{% endif %}
+    <fieldset>
+      <legend>
+        {% translate 'Object details' %}
+      </legend>
+      <div>
+        <label for="select_ooi_type">{% translate 'Object type' %}</label>
+        <div>
+          <select id="select_ooi_type" name="add_ooi_type" required>
+            <option disabled selected value="">
+              -- {% translate 'Choose an object type to add' %} --
+            </option>
+            {% for option in ooi_types %}
+              {% if option.text != "Finding" %}
+                <option value="{{ option.value }}">
+                  {{ option.text }}
+                </option>
+              {% endif %}
+            {% endfor %}
+          </select>
+          {% translate 'Select an object type to add.' as help_text %}
+          {% include 'partials/form/field_input_help_text.html' with help_text=help_text %}
+        </div>
+      </div>
+    </fieldset>
+    <input class="button" type="submit" value="{% translate 'Add object' %}"/>
+  </form>
+{% endspaceless %}
