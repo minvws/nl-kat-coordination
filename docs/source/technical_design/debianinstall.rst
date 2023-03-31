@@ -30,7 +30,7 @@ After downloading they can be installed as follows:
 .. code-block:: sh
 
     tar zvxf kat-*.tar.gz
-    apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
+    sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
 
 Set up the databases
 ====================
@@ -41,7 +41,7 @@ If you will be running the database on the same machine as KAT, you can install 
 
 .. code-block:: sh
 
-    apt install postgresql
+    sudo apt install postgresql
 
 Rocky DB
 --------
@@ -194,9 +194,9 @@ Now create a KAT user for RabbitMQ, create the virtual host and set the permissi
 
 .. code-block:: sh
 
-   sudo rabbitmqctl add_user kat ${rabbitmq_pass}
-   sudo rabbitmqctl add_vhost kat
-   sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+    sudo rabbitmqctl add_user kat ${rabbitmq_pass}
+    sudo rabbitmqctl add_vhost kat
+    sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
 Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for `/etc/kat/mula.conf`:
 
@@ -231,7 +231,7 @@ This oneliner will do it for you, executed as root:
 
 .. code-block:: sh
 
-    sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
+    sudo sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
 
 Restart KAT
 ===========
@@ -264,7 +264,7 @@ You can upgrade OpenKAT by installing the newer packages. Make a backup of your 
 .. code-block:: sh
 
     tar zvxf kat-*.tar.gz
-    apt install --no-install-recommends ./kat-*_amd64.deb
+    sudo apt install --no-install-recommends ./kat-*_amd64.deb
 
 If a newer version of the xtdb multinode is available install it as well:
 
