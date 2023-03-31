@@ -26,9 +26,9 @@ def test_katalogus_plugin_listing(admin_member, redteam_member, client_member, r
     assertContains(response_admin, "Redteam can enable boefje")
     assertContains(response_client, "Redteam can enable boefje")
 
-    assertContains(response_redteam, "Settings")
-    assertNotContains(response_client, "Settings")
-    assertNotContains(response_admin, "Settings")
+    assertContains(response_redteam, "KAT-alogus Settings")
+    assertNotContains(response_client, "KAT-alogus Settings")
+    assertNotContains(response_admin, "KAT-alogus Settings")
 
     assertContains(response_client, "Enable")
     assertContains(response_client, "BinaryEdge")
