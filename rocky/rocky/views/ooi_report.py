@@ -1,14 +1,13 @@
-import re
 from datetime import datetime
-from typing import Dict, List, Set, Type, Optional
+from typing import List, Set, Type
 
 from django.contrib import messages
 from django.core.exceptions import BadRequest
 from django.http import FileResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.views import View
 from django_otp.decorators import otp_required
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
@@ -19,134 +18,26 @@ from octopoes.models.ooi.dns.records import (
     DNSSOARecord,
 )
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import (
-    Finding,
-    FindingType,
-)
-from requests import HTTPError
+
 from two_factor.views.utils import class_view_decorator
 
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
-from rocky.keiko import keiko_client, ReportNotFoundException
-from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
-from rocky.views.ooi_view import (
-    BaseOOIDetailView,
-    ConnectorFormMixin,
+
+from rocky.keiko import (
+    keiko_client,
+    ReportNotFoundException,
+    GeneratingReportFailed,
+    ReportsService,
+    build_findings_list_from_store,
 )
+from rocky.views.finding_list import FindingListView
+from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
+from rocky.views.ooi_view import BaseOOIDetailView
+
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
-from tools.ooi_helpers import (
-    get_ooi_dict,
-    get_knowledge_base_data_for_ooi_store,
-    get_knowledge_base_data_for_ooi,
-    get_finding_type_from_finding,
-    RiskLevelSeverity,
-)
 from tools.view_helpers import get_ooi_url, convert_date_to_datetime
-
-
-def build_meta(findings: List[Dict]) -> Dict:
-    meta = {
-        "total": len(findings),
-        "total_by_severity": {
-            RiskLevelSeverity.CRITICAL.value: 0,
-            RiskLevelSeverity.HIGH.value: 0,
-            RiskLevelSeverity.MEDIUM.value: 0,
-            RiskLevelSeverity.LOW.value: 0,
-            RiskLevelSeverity.NONE.value: 0,
-        },
-        "total_by_finding_type": {},
-        "total_finding_types": 0,
-        "total_by_severity_per_finding_type": {
-            RiskLevelSeverity.CRITICAL.value: 0,
-            RiskLevelSeverity.HIGH.value: 0,
-            RiskLevelSeverity.MEDIUM.value: 0,
-            RiskLevelSeverity.LOW.value: 0,
-            RiskLevelSeverity.NONE.value: 0,
-        },
-    }
-
-    finding_type_ids = []
-    for finding in findings:
-        finding_type_id = finding["finding_type"]["id"]
-        severity = finding["finding_type"]["risk_level_severity"]
-
-        meta["total_by_severity"][severity] = meta["total_by_severity"].get(severity, 0) + 1
-        meta["total_by_finding_type"][finding_type_id] = meta["total_by_finding_type"].get(finding_type_id, 0) + 1
-
-        # count and append finding type id if not already present
-        if finding_type_id not in finding_type_ids:
-            finding_type_ids.append(finding_type_id)
-            meta["total_by_severity_per_finding_type"][severity] = (
-                meta["total_by_severity_per_finding_type"].get(severity, 0) + 1
-            )
-            meta["total_finding_types"] += 1
-
-    return meta
-
-
-def build_finding_dict(
-    finding_ooi: Finding,
-    ooi_store: Dict[str, OOI],
-    knowledge_base: Dict,
-) -> Dict:
-    finding_dict = get_ooi_dict(finding_ooi)
-
-    finding_type_ooi = get_finding_type_from_finding(finding_ooi)
-
-    knowledge_base.update({finding_type_ooi.get_information_id(): get_knowledge_base_data_for_ooi(finding_type_ooi)})
-
-    finding_type_dict = build_finding_type_dict(finding_type_ooi, knowledge_base)
-
-    finding_dict["ooi"] = get_ooi_dict(ooi_store[str(finding_ooi.ooi)]) if str(finding_ooi.ooi) in ooi_store else None
-    finding_dict["finding_type"] = finding_type_dict
-
-    if finding_dict["description"] is None:
-        finding_dict["description"] = finding_type_dict["description"]
-
-    return finding_dict
-
-
-def build_finding_type_dict(finding_type_ooi: FindingType, knowledge_base: Dict) -> Dict:
-    finding_type_dict = get_ooi_dict(finding_type_ooi)
-
-    if knowledge_base[finding_type_ooi.get_information_id()]:
-        finding_type_dict.update(knowledge_base[finding_type_ooi.get_information_id()])
-
-    finding_type_dict["findings"] = []
-
-    return finding_type_dict
-
-
-def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[List[str]] = None) -> Dict:
-    knowledge_base = get_knowledge_base_data_for_ooi_store(ooi_store)
-
-    findings = [
-        build_finding_dict(finding_ooi, ooi_store, knowledge_base)
-        for finding_ooi in ooi_store.values()
-        if isinstance(finding_ooi, Finding)
-    ]
-
-    if finding_filter is not None:
-        findings = [finding for finding in findings if finding["finding_type"]["id"] in finding_filter]
-
-    findings = sorted(findings, key=lambda k: k["finding_type"]["risk_level_score"], reverse=True)
-
-    findings_grouped = {}
-    for finding in findings:
-        if finding["finding_type"]["id"] not in findings_grouped:
-            findings_grouped[finding["finding_type"]["id"]] = {
-                "finding_type": finding["finding_type"],
-                "list": [],
-            }
-
-        findings_grouped[finding["finding_type"]["id"]]["list"].append(finding)
-
-    return {
-        "meta": build_meta(findings),
-        "findings_grouped": findings_grouped,
-    }
 
 
 @class_view_decorator(otp_required)
@@ -186,9 +77,7 @@ class OOIReportView(OOIBreadcrumbsMixin, BaseOOIDetailView):
 
 
 @class_view_decorator(otp_required)
-class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
-    connector_form_class = OOIReportSettingsForm
-
+class OOIReportPDFView(SingleOOITreeMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.api_connector = self.octopoes_api_connector
@@ -197,48 +86,55 @@ class OOIReportPDFView(SingleOOITreeMixin, ConnectorFormMixin, View):
     def get(self, request, *args, **kwargs):
         self.setup(request, *args, **kwargs)
         self.ooi = self.get_ooi()
+        valid_time = self.get_observed_at()
+        reports_service = ReportsService(keiko_client)
 
-        # reuse existing dict structure
-        report_data = build_findings_list_from_store(self.tree.store)
-        report_data["valid_time"] = str(self.get_observed_at())
-        report_data["ooi"] = get_ooi_dict(self.ooi)
-
-        # request pdf from keiko
         try:
-            report_id = keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
-        except HTTPError as e:
-            messages.error(self.request, _("Error generating report: {}").format(e))
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
-
-        # generate file name
-        report_name = "bevindingenrapport"
-        org_code = self.organization.code
-        ooi_id = self.ooi.primary_key
-        valid_time = self.get_observed_at().isoformat()
-        current_time = datetime.now(timezone.utc).isoformat()
-        language = "nl"
-        report_file_name = "_".join(
-            [
-                report_name,
-                language,
-                org_code,
-                ooi_id,
+            report = reports_service.get_report(
                 valid_time,
-                current_time,
-            ]
-        )
-        # allow alphanumeric characters, dashes and underscores, replace rest with underscores
-        report_file_name = re.sub("[^0-9a-zA-Z-]", "_", report_file_name)
-        report_file_name = f"{report_file_name}.pdf"
-
-        # open pdf as attachment
-        try:
-            return FileResponse(keiko_client.get_report(report_id), as_attachment=True, filename=report_file_name)
-        except (HTTPError, ReportNotFoundException):
-            messages.error(
-                self.request, _("Error generating report: Timeout reached. See Keiko logs for more information.")
+                self.ooi.object_type,
+                self.ooi.human_readable,
+                self.tree.store,
             )
+        except GeneratingReportFailed:
+            messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
             return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+        except ReportNotFoundException:
+            messages.error(self.request, _("Timeout reached generating report. See Keiko logs for more information."))
+            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+
+        return FileResponse(
+            report,
+            as_attachment=True,
+            filename=ReportsService.ooi_report_file_name(valid_time, self.organization.code, self.ooi.primary_key),
+        )
+
+
+@class_view_decorator(otp_required)
+class FindingReportPDFView(FindingListView):
+    paginate_by = None
+
+    def get(self, request, *args, **kwargs):
+        reports_service = ReportsService(keiko_client)
+
+        try:
+            report = reports_service.get_organization_finding_report(
+                self.get_observed_at(),
+                self.organization.name,
+                super().get_queryset(),
+            )
+        except GeneratingReportFailed:
+            messages.error(request, _("Generating report failed. See Keiko logs for more information."))
+            return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
+        except ReportNotFoundException:
+            messages.error(request, _("Timeout reached generating report. See Keiko logs for more information."))
+            return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
+
+        return FileResponse(
+            report,
+            as_attachment=True,
+            filename=ReportsService.organization_report_file_name(self.organization.code),
+        )
 
 
 """

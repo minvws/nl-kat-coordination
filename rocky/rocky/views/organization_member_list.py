@@ -2,6 +2,7 @@ from enum import Enum
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.views.generic import ListView
@@ -9,25 +10,25 @@ from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
 from two_factor.views.utils import class_view_decorator
 
-from tools.enums import SCAN_LEVEL
 from tools.models import OrganizationMember
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
 
 class PageActions(Enum):
-    GIVE_CLEARANCE = "give_clearance"
-    WITHDRAW_CLEARANCE = "withdraw_clearance"
     BLOCK = "block"
     UNBLOCK = "unblock"
 
 
 @class_view_decorator(otp_required)
 class OrganizationMemberListView(
+    PermissionRequiredMixin,
     OrganizationMemberBreadcrumbsMixin,
     ListView,
 ):
     model = OrganizationMember
     context_object_name = "members"
+    template_name = "organizations/organization_member_list.html"
+    permission_required = "tools.view_organization"
 
     def get_queryset(self):
         queryset = self.model.objects.filter(organization=self.organization)
@@ -49,25 +50,13 @@ class OrganizationMemberListView(
         if "action" not in self.request.POST:
             return self.get(request, *args, **kwargs)
         self.handle_page_action(request.POST.get("action"))
-        return redirect(reverse("organization_detail", kwargs={"organization_code": self.organization.code}))
+        return redirect(reverse("organization_member_list", kwargs={"organization_code": self.organization.code}))
 
     def handle_page_action(self, action: str):
         member_id = self.request.POST.get("member_id")
         organizationmember = self.model.objects.get(id=member_id)
         try:
-            new_trusted_level = max(
-                [scan_level.value for scan_level in SCAN_LEVEL]
-            )  # This will be set in the form in the future, but for now we hardcode it.
-            if action == PageActions.GIVE_CLEARANCE.value:
-                # If the newly assigned "trusted level" is lower than the previous trusted and acknowledged level,
-                # we lower the acknowledged level to the newly assigned level.
-                if new_trusted_level < organizationmember.acknowledged_clearance_level:
-                    organizationmember.acknowledged_clearance_level = new_trusted_level
-                organizationmember.trusted_clearance_level = new_trusted_level
-            elif action == PageActions.WITHDRAW_CLEARANCE.value:
-                organizationmember.trusted_clearance_level = 0
-                organizationmember.acknowledged_clearance_level = 0
-            elif action == PageActions.BLOCK.value:
+            if action == PageActions.BLOCK.value:
                 organizationmember.status = OrganizationMember.STATUSES.BLOCKED
             elif action == PageActions.UNBLOCK.value:
                 organizationmember.status = OrganizationMember.STATUSES.ACTIVE

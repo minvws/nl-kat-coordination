@@ -3,7 +3,6 @@ import uuid
 
 import tagulous.models
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -18,8 +17,6 @@ from rocky.exceptions import RockyError
 from tools.add_ooi_information import get_info, SEPARATOR
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
-
-User = get_user_model()
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
@@ -71,7 +68,7 @@ class Organization(models.Model):
         )
 
     def get_absolute_url(self):
-        return reverse("organization_detail", args=[self.pk])
+        return reverse("organization_settings", args=[self.pk])
 
     def delete(self, *args, **kwargs):
         katalogus_client = self._get_healthy_katalogus(self.code)
@@ -162,7 +159,7 @@ class OrganizationMember(models.Model):
 
     scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
 
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
     onboarded = models.BooleanField(default=False)
@@ -185,7 +182,7 @@ class OrganizationMember(models.Model):
 
 
 class Indemnification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey("account.KATUser", on_delete=models.SET_NULL, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 
 
