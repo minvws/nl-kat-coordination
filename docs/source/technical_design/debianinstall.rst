@@ -179,7 +179,11 @@ Create a new file `/etc/rabbitmq/advanced.conf` and add the following lines:
         ]}
     ].
 
-Now start RabbitMQ again with `systemctl start rabbitmq-server` and check if it only listens on localhost for ports 5672 and 25672.
+Now start RabbitMQ again and check if it only listens on localhost for ports 5672 and 25672:
+
+.. code-block:: sh
+
+    systemctl start rabbitmq-server
 
 Add the 'kat' vhost
 -------------------
@@ -203,7 +207,6 @@ Now configure KAT to use the vhost we created and with the kat user. To do this,
 .. code-block:: sh
 
     SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@127.0.0.1:5672/kat
-    SCHEDULER_DSP_BROKER_URL=amqp://kat:<password>@127.0.0.1:5672/kat
 
 And update the `QUEUE_URI` setting to the same value for the following files:
 
