@@ -80,7 +80,9 @@
             </p>
             {% if member.acknowledged_clearance_level < member.trusted_clearance_level %}
               <p class="explanation">
-                {% translate 'You are granted clearance for level 4 by your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>' %}
+                {% blocktranslate trimmed with cl=member.trusted_clearance_level %}
+                  You are granted clearance for {{ cl }} your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>
+                {% endblocktranslate %}
               </p>
               {% include 'partials/single_action_form.html' with btn_text="Accept level 4 clearance and responsibility" action='accept_clearance' key='member_id' value=member.id btn_class="ghost" %}
             {% else %}
