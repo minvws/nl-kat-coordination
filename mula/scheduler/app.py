@@ -4,6 +4,8 @@ import threading
 import time
 from typing import Any, Callable, Dict
 
+from prometheus_client import Gauge, Info
+
 from scheduler import context, queues, rankers, schedulers, server
 from scheduler.connectors import listeners
 from scheduler.models import BoefjeTask, NormalizerTask, Organisation
@@ -55,6 +57,9 @@ class App:
 
         # Initialize listeners
         self.listeners: Dict[str, listeners.Listener] = {}
+
+        # Initialize metrics
+        self._register_metrics()
 
         # Initialize API server
         self.server: server.Server = server.Server(self.ctx, self.schedulers)
@@ -252,8 +257,56 @@ class App:
             interval=self.ctx.config.monitor_organisations_interval,
         )
 
+        # Start metrics collecting
+        self.run_in_thread(
+            name="metrics_collector",
+            func=self.collect_metrics,
+            interval=1,
+        )
+
         # Main thread
         while not self.stop_event.is_set():
             time.sleep(0.01)
 
         self.shutdown()
+
+    # TODO: labels
+    def _register_metrics(self) -> None:
+        """Register metrics for application level metrics.
+        """
+
+        # Application configuration settings 
+        Info(
+            "app_settings",
+            "Scheduler configuration settings",
+            registry=self.ctx.metrics_registry,
+        ).info({
+                "monitor_organisations_interval": str(self.ctx.config.monitor_organisations_interval),
+                "pq_maxsize": str(self.ctx.config.pq_maxsize),
+                "pq_populate_interval": str(self.ctx.config.pq_populate_interval),
+                "pq_populate_grace_period": str(self.ctx.config.pq_populate_grace_period),
+                "pq_populate_max_random_objects": str(self.ctx.config.pq_populate_max_random_objects),
+        })
+
+        # Katalogus service information
+        Info(
+            "katalogus_info",
+            "Katalogus service information",
+            registry=self.ctx.metrics_registry,
+        ).info({
+            "organisations_plugin_cache_start_time": self.ctx.services.katalogus.organisations_plugin_cache.start_time.isoformat(),
+            "organisations_plugin_cache_expiration_time": self.ctx.services.katalogus.organisations_plugin_cache.expiration_time.isoformat(),
+            "organisations_boefje_type_cache_start_time": self.ctx.services.katalogus.organisations_boefje_type_cache.start_time.isoformat(),
+            "organisations_boefje_type_cache_expiration_time": self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time.isoformat(),
+            "organisations_normalizer_type_cache_start_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time.isoformat(),
+            "organisations_normalizer_type_cache_expiration_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time.isoformat(),
+        })
+
+    def collect_metrics(self) -> None:
+        """Collect application metrics
+
+        This method that allows to collect metrics throughout the application.
+        """
+        # Schedulers implement the set_metrics method to collect metrics
+        for s in self.schedulers.values():
+            s.set_metrics()

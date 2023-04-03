@@ -4,9 +4,9 @@ import threading
 from types import SimpleNamespace
 
 import scheduler
+from prometheus_client import CollectorRegistry
 from scheduler.config import settings
 from scheduler.connectors import listeners, services
-from scheduler.metrics import Metrics
 from scheduler.repositories import sqlalchemy, stores
 
 
@@ -30,9 +30,6 @@ class AppContext:
     def __init__(self) -> None:
         """Initializer of the AppContext class."""
         self.config: settings.Settings = settings.Settings()
-
-        if not self.config.database_dsn.startswith("postgresql"):
-            raise Exception("PostgreSQL is the only supported database backend")
 
         # Load logging configuration
         with open(self.config.log_cfg, "rt", encoding="utf-8") as f:
@@ -92,4 +89,4 @@ class AppContext:
         self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
 
         # Metrics collector registry
-        self.metrics_registry = Metrics()
+        self.metrics_registry = CollectorRegistry()

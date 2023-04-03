@@ -150,41 +150,8 @@ class Server:
         return response
 
     def metrics(self) -> Any:
-        # response = {
-        #     "settings": {
-        #         "monitor_organisations_interval": self.ctx.config.monitor_organisations_interval,
-        #         "pq_maxsize": self.ctx.config.pq_maxsize,
-        #         "pq_populate_interval": self.ctx.config.pq_populate_interval,
-        #         "pq_populate_grace_period": self.ctx.config.pq_populate_grace_period,
-        #         "pq_populate_max_random_objects": self.ctx.config.pq_populate_max_random_objects,
-        #     },
-        #     "schedulers": {scheduler.dict().get("id"): scheduler.dict() for scheduler in self.schedulers.values()},
-        #     "katalogus": {
-        #         "katalogus_cache_ttl": self.ctx.config.katalogus_cache_ttl,
-        #         "organisations_plugin_cache": {
-        #             "start_time": self.ctx.services.katalogus.organisations_plugin_cache.start_time,
-        #             "expiration_time": self.ctx.services.katalogus.organisations_plugin_cache.expiration_time,
-        #             "lifetime": self.ctx.services.katalogus.organisations_plugin_cache.lifetime,
-        #             "cache": self.ctx.services.katalogus.organisations_plugin_cache.cache,
-        #         },
-        #         "organisations_boefje_type_cache": {
-        #             "start_time": self.ctx.services.katalogus.organisations_boefje_type_cache.start_time,
-        #             "expiration_time": self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time,
-        #             "lifetime": self.ctx.services.katalogus.organisations_boefje_type_cache.lifetime,
-        #             "cache": self.ctx.services.katalogus.organisations_boefje_type_cache.cache,
-        #         },
-        #         "organisations_normalizer_type_cache": {
-        #             "start_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time,
-        #             "expiration_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time,
-        #             "lifetime": self.ctx.services.katalogus.organisations_normalizer_type_cache.lifetime,
-        #             "cache": self.ctx.services.katalogus.organisations_normalizer_type_cache.cache,
-        #         },
-        #     },
-        # }
-
-        data = prometheus_client.generate_latest(self.ctx.metrics.registry)
+        data = prometheus_client.generate_latest(self.ctx.metrics_registry)
         response = fastapi.Response(media_type="text/plain", content=data)
-
         return response
 
     def get_schedulers(self) -> Any:
