@@ -2,18 +2,6 @@
 Debugging and troubleshooting
 =============================
 
-
-Checking the health status of the KAT modules
-=============================================
-
-
-If you see any errors or warnings, please check the logs of the affected module.
-
-
-=================
-Debugging OpenKAT
-=================
-
 If OpenKAT does not function in the way you expect, there are several options to help you find the cause and solve the problem. Checking the healthpage, logs, services and usersettings are the basics.
 
 If you can't find it, we look forward to bugreports as well. Squashing bugs makes everyone happy. Create an issue on GitHub or send us a report on meedoen@openkat.nl.
