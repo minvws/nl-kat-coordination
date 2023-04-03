@@ -1,14 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from account.mixins import OrganizationView
 
-from tools.models import GROUP_ADMIN, GROUP_REDTEAM
 
-
-class SuperOrAdminUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+class SuperOrAdminUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin, OrganizationView):
     def test_func(self):
-        is_admin = self.request.user.groups.filter(name=GROUP_ADMIN).exists()
-        return self.request.user.is_superuser or is_admin
+        return self.request.user.is_superuser or self.organization_member.is_admin
 
 
-class RedTeamUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+class RedTeamUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin, OrganizationView):
     def test_func(self):
-        return self.request.user.groups.filter(name=GROUP_REDTEAM).exists()
+        return self.organization_member.is_redteam

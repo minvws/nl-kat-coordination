@@ -23,6 +23,9 @@ def OnboardingMiddleware(get_response):
                 or "/introduction/" in request.path
                 or request.path.startswith("/api/")
             ):
+                if request.user.is_superuser:
+                    return redirect(reverse("step_introduction_registration"))
+
                 if not member_onboarded:
                     member = OrganizationMember.objects.filter(user=request.user)
 
@@ -32,9 +35,6 @@ def OnboardingMiddleware(get_response):
                         return redirect(
                             reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
                         )
-
-                    if request.user.is_superuser:
-                        return redirect(reverse("step_introduction_registration"))
 
         return response
 

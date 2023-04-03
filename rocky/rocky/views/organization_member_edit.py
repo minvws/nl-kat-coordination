@@ -26,7 +26,7 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
 
     def get_form(self):
         form = super().get_form()
-        group = self.object.user.groups.all().values_list("name", flat=True)
+        group = self.object.groups.all().values_list("name", flat=True)
         if self.object.user.is_superuser or GROUP_ADMIN in group:
             # There could be a case where you block yourself out of the system
             form.fields["status"].disabled = True

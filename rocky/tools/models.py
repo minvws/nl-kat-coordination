@@ -175,6 +175,18 @@ class OrganizationMember(models.Model):
     def blocked(self):
         return self.status == OrganizationMember.STATUSES.BLOCKED
 
+    @property
+    def is_admin(self):
+        return self.groups.filter(name=GROUP_ADMIN).exists()
+
+    @property
+    def is_redteam(self):
+        return self.groups.filter(name=GROUP_REDTEAM).exists()
+
+    @property
+    def is_client(self):
+        return self.groups.filter(name=GROUP_CLIENT).exists()
+
     class Meta:
         unique_together = ["user", "organization"]
 

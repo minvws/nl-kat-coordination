@@ -51,7 +51,7 @@
                   {% if member.user.is_superuser %}
                     {% translate 'Super user' %}
                   {% endif %}
-                  {% for group in member.user.groups.all %}
+                  {% for group in member.groups.all %}
                     {{ group.name|title }}
                     <br>
                   {% endfor %}
@@ -72,7 +72,7 @@
                   {% endif %}
                 </td>
                 <td>
-                  {% for group in member.user.groups.all %}
+                  {% for group in member.groups.all %}
                     {% for permission in group.permissions.all %}
                       {% if 'can_set_clearance_level' in permission.codename %}
                         {% if not member.user.is_superuser %}

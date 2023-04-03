@@ -27,7 +27,7 @@ from onboarding.forms import (
     OnboardingCreateUserClientForm,
     OnboardingSetClearanceLevelForm,
 )
-from onboarding.mixins import RedTeamUserRequiredMixin, SuperOrAdminUserRequiredMixin
+from onboarding.mixins import RedTeamUserRequiredMixin, SuperOrAdminUserRequiredMixin, UserPassesTestMixin
 from onboarding.view_helpers import (
     KatIntroductionStepsMixin,
     KatIntroductionAdminStepsMixin,
@@ -39,7 +39,7 @@ from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_report import Report, DNSReport, build_findings_list_from_store
 from rocky.views.ooi_view import BaseOOIFormView, SingleOOITreeMixin, BaseOOIDetailView
 from tools.forms.boefje import SelectBoefjeForm
-from tools.models import Organization, OrganizationMember
+from tools.models import Organization, OrganizationMember, GROUP_REDTEAM
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     get_or_create_ooi,
@@ -409,9 +409,7 @@ class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):
 
 # account flow
 @class_view_decorator(otp_required)
-class OnboardingIntroductionRegistrationView(
-    SuperOrAdminUserRequiredMixin, KatIntroductionRegistrationStepsMixin, TemplateView
-):
+class OnboardingIntroductionRegistrationView(UserPassesTestMixin, KatIntroductionRegistrationStepsMixin, TemplateView):
     """
     Step: 1 - Registration introduction
     """
@@ -419,10 +417,17 @@ class OnboardingIntroductionRegistrationView(
     template_name = "account/step_1_registration_intro.html"
     current_step = 1
 
+    def test_func(self):
+        member = OrganizationMember.objects.first()
+        admin = None
+        if member:
+            admin = member.is_admin
+        return self.request.user.is_superuser or admin
+
 
 @class_view_decorator(otp_required)
 class OnboardingOrganizationSetupView(
-    SuperOrAdminUserRequiredMixin,
+    UserPassesTestMixin,
     KatIntroductionRegistrationStepsMixin,
     CreateView,
 ):
@@ -434,6 +439,13 @@ class OnboardingOrganizationSetupView(
     template_name = "account/step_2a_organization_setup.html"
     form_class = OrganizationForm
     current_step = 2
+
+    def test_func(self):
+        member = OrganizationMember.objects.first()
+        admin = None
+        if member:
+            admin = member.is_admin
+        return self.request.user.is_superuser or admin
 
     def get(self, request, *args, **kwargs):
         organization = Organization.objects.first()
@@ -643,11 +655,10 @@ class CompleteOnboarding(OrganizationView):
     """
 
     def get(self, request, *args, **kwargs):
-        member, _ = OrganizationMember.objects.get_or_create(user=request.user, organization=self.organization)
-        redteam_group = Group.objects.get(name="redteam")
-        if self.request.user.is_superuser and redteam_group not in self.request.user.groups.all():
-            redteam_group.user_set.add(self.request.user)
+        if self.request.user.is_superuser:
+            self.organization_member.groups.set(Group.objects.get(name=GROUP_REDTEAM))
+            self.organization_member.save()
             return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
-        member.onboarded = True
-        member.save()
+        self.organization_member.onboarded = True
+        self.organization_member.save()
         return redirect(reverse("crisis_room"))
