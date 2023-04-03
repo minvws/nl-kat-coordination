@@ -3,7 +3,7 @@ celery==5.2.7
 fastapi==0.86.0
 mmh3==3.0.0
 pika==1.2.0
-psycopg2==2.9.5
+psycopg2==2.9.6
 pydantic==1.10.4
 python-dotenv==1.0.0
 requests==2.27.1
