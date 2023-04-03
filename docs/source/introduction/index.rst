@@ -11,3 +11,4 @@ Contains introduction into OpenKAT
    howdoesitwork
    usermanual
    makeyourown
+   debuggingtroubleshooting
