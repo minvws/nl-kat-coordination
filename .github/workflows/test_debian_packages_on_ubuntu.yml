@@ -6,6 +6,10 @@ on:
       - v*
     branches:
       - "release**"
+      - "main"
+  pull_request:
+    branches:
+      - "release**"
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -75,12 +79,11 @@ jobs:
           fi
 
       - name: Install dependencies Docker and rabbitmq
-        run: sudo apt-get update && sudo apt-get install -y docker.io containerd runc rabbitmq-server
+        run: sudo apt-get update && sudo apt-get install -y docker.io containerd runc rabbitmq-server postgresql
 
-      - name: Start postgresql and wait until the service is healthy
+      - name: Start postgresql
         run: |
-          docker run -d --rm --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -d postgres:15
-          for i in {1..10}; do pg_isready -h localhost && break || sleep 1 ; done
+          sudo systemctl start postgresql.service
 
       - name: Prepare rabbitmq configurations
         run: |
@@ -91,38 +94,45 @@ jobs:
           echo "listeners.tcp.local = 127.0.0.1:5672" | sudo tee -a /etc/rabbitmq/rabbitmq.conf
           echo "[{kernel,[ {inet_dist_use_interface,{127,0,0,1}}]}]." | sudo tee -a /etc/rabbitmq/advanced.config
 
-      - name: Start rabbitmq and wait until the service is healthy
+      - name: Start rabbitmq
         run: |
           sudo systemctl start rabbitmq-server
-          for i in {1..10}; do sudo rabbitmq-diagnostics -q ping && break || sleep 1 ; done
+
+      - name: Wait until postgresql is healthy
+        run: |
+          for i in {1..10}; do pg_isready -h localhost && break || sleep 1 ; done
 
       - name: Prepare postgres service Rocky
         run: |
-          createdb -h localhost -U postgres rocky_db
-          createuser -h localhost -U postgres rocky
-          psql -h localhost -U postgres -d rocky_db -c "ALTER DATABASE rocky_db OWNER TO rocky;"
-          psql -h localhost -U postgres -d rocky_db -c "ALTER USER rocky WITH PASSWORD 'postgres';"
+          sudo -u postgres createdb rocky_db
+          sudo -u postgres createuser rocky
+          sudo -u postgres psql -c "GRANT ALL ON DATABASE rocky_db TO rocky;"
+          sudo -u postgres psql -c "ALTER USER rocky WITH PASSWORD 'postgres';"
 
       - name: Prepare postgres service Katalogus
         run: |
-          createdb -h localhost -U postgres katalogus_db
-          createuser -h localhost -U postgres katalogus
-          psql -h localhost -U postgres -d katalogus_db -c "GRANT ALL ON DATABASE katalogus_db TO katalogus;"
-          psql -h localhost -U postgres -d katalogus_db -c "ALTER USER katalogus WITH PASSWORD 'postgres';"
+          sudo -u postgres createdb katalogus_db
+          sudo -u postgres createuser katalogus
+          sudo -u postgres psql -c "GRANT ALL ON DATABASE katalogus_db TO katalogus;"
+          sudo -u postgres psql -c "ALTER USER katalogus WITH PASSWORD 'postgres';"
 
       - name: Prepare postgres service Bytes
         run: |
-          createdb -h localhost -U postgres bytes_db
-          createuser -h localhost -U postgres bytes
-          psql -h localhost -U postgres -d bytes_db -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
-          psql -h localhost -U postgres -d bytes_db -c "ALTER USER bytes WITH PASSWORD 'postgres';"
+          sudo -u postgres createdb bytes_db
+          sudo -u postgres createuser bytes
+          sudo -u postgres psql -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
+          sudo -u postgres psql -c "ALTER USER bytes WITH PASSWORD 'postgres';"
 
       - name: Prepare postgres service Mula
         run: |
-          createdb -h localhost -U postgres mula_db
-          createuser -h localhost -U postgres mula
-          psql -h localhost -U postgres -d mula_db -c "GRANT ALL ON DATABASE mula_db TO mula;"
-          psql -h localhost -U postgres -d mula_db -c "ALTER USER mula WITH PASSWORD 'postgres';"
+          sudo -u postgres createdb mula_db
+          sudo -u postgres createuser mula
+          sudo -u postgres psql -c "GRANT ALL ON DATABASE mula_db TO mula;"
+          sudo -u postgres psql -c "ALTER USER mula WITH PASSWORD 'postgres';"
+
+      - name: Wait until rabbitmq is healthy
+        run: |
+          for i in {1..10}; do sudo rabbitmq-diagnostics -q ping && break || sleep 1 ; done
 
       - name: Create kat vhost in rabbitmq
         run: |
@@ -167,7 +177,6 @@ jobs:
       - name: Install the artifacts
         run: |
           sudo apt install ./kat-*.deb ./xtdb-http-multinode_*_all.deb
-          sudo sed -i "s/WorkingDirectory=\/opt\/venvs\/kat-boefjes\/lib\/python3.9\/site-packages/WorkingDirectory=\/opt\/venvs\/kat-boefjes\//g" /usr/lib/systemd/system/kat-katalogus.service
 
       - name: Update configs for rabbitmq
         run: |
@@ -196,14 +205,14 @@ jobs:
 
       - name: Migrations for Mula
         run: |
-          sudo sed -i "s/SCHEDULER_DB_DSN=/SCHEDULER_DB_DSN=postgresql:\/\/mula:postgres@localhost\/mula_db/g" /etc/kat/bytes.conf
+          sudo sed -i "s/SCHEDULER_DB_DSN=/SCHEDULER_DB_DSN=postgresql:\/\/mula:postgres@localhost\/mula_db/g" /etc/kat/mula.conf
           sudo -u kat update-mula-db
 
       - name: Setup Bytes credentials
         run: |
-          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/rocky.conf
-          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/boefjes.conf
-          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/mula.conf
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(sudo grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/rocky.conf
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(sudo grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/boefjes.conf
+          sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(sudo grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/mula.conf
 
       - name: Setup Octopoes to use xtdb-multinode
         run: sudo sed -i "s/XTDB_TYPE=\"xtdb\"/XTDB_TYPE=\"xtdb-multinode\"/g" /etc/kat/octopoes.conf
