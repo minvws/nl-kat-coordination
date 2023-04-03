@@ -83,7 +83,3 @@ Check in the user interface if the users have permission to perform scans and ar
 The current usermodel also needs a superuser that is part of an organization. Normally this is set automagically. With several organizations in your instance the superuser might end up alone. This must be corrected through the django interface, in which the superuser can be added to the organization.
 
 You can reach the django admin interface through /admin on the rocky instance. While you are there, do check the `hardening settings <https://docs.openkat.nl/technical_design/hardening.html>`_ if you have not already done so.
-
-
-
-
