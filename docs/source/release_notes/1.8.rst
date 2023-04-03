@@ -1,0 +1,46 @@
+===========
+OpenKAT 1.8
+===========
+
+Upgrading
+=========
+
+Development containers
+----------------------
+
+The development Docker Compose configuration has been changed from four
+PostgreSQL containers with one database each to a single container with four
+databases. In addition, PostgreSQL is upgraded from version 12.8 to version 15.
+
+If you don't need to keep the data in your development instance you only need to
+update your .env. If you do want to keep the data you need to dump the databases
+with the following commands before you update the git repository (the commands
+need to run using the old docker-compose.yml):
+
+.. code-block:: sh
+
+    docker-compose exec bytes-db pg_dump -U postgres bytes > bytes.sql
+    docker-compose exec katalogus-db pg_dump -U postgres katalogus > katalogus.sql
+    docker-compose exec rocky-db pg_dump -U postgres rocky > rocky.sql
+    docker-compose exec scheduler-db pg_dump -U postgres scheduler > scheduler.sql
+
+In .env, you need to change ROCKY_DB_HOST to "postgres" and also change
+BYTES_DB_URI, KATALOGUS_DB_URI, SCHEDULER_DB_DSN to use "postgres" as hostname
+by changing the "@{bytes,katalogus,scheduler}-db:5432/" part to
+"@postgres:5432/".
+
+After that you can pull in the changes you can start the new PostgreSQL
+container using:
+
+.. code-block:: sh
+
+    docker-compose up -d postgres
+
+And load the dumps back in with psql:
+
+.. code-block:: sh
+
+    docker-compose exec -T postgres psql -U postgres bytes < bytes.sql
+    docker-compose exec -T postgres psql -U postgres katalogus < katalogus.sql
+    docker-compose exec -T postgres psql -U postgres rocky < rocky.sql
+    docker-compose exec -T postgres psql -U postgres scheduler < scheduler.sql

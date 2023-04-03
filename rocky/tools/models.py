@@ -68,7 +68,7 @@ class Organization(models.Model):
         )
 
     def get_absolute_url(self):
-        return reverse("organization_detail", args=[self.pk])
+        return reverse("organization_settings", args=[self.pk])
 
     def delete(self, *args, **kwargs):
         katalogus_client = self._get_healthy_katalogus(self.code)
