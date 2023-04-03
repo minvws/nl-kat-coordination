@@ -26,7 +26,7 @@ The admin and superuser accounts have access to the health page. In the footer o
 This page shows the status of all containerized KAT modules, their version, and any self-reported warnings or errors.
 If you KAT deployment is not working properly, this is the first place to check.
 
-... image:: img/healthpage.png
+.. image:: img/healthpage.png
   :alt: healthpage
 
 You can also access the health JSON endpoint programmatically at ``http<s>://<rocky-host>/<org-code>/health``.
@@ -43,7 +43,7 @@ Dockers
 
 ``dockerps`` gives you an overview of all running dockers.
 
-... image:: img/dockerps.png
+.. image:: img/dockerps.png
   :alt: docker containers
 
 Packaged versions
