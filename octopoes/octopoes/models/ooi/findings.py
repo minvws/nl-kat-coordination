@@ -74,8 +74,9 @@ class MuteFinding(OOI):
     finding: Reference = ReferenceField(Finding)
     reason: Optional[str]
 
+    _natural_key_attrs = ["finding"]
     _reverse_relation_names = {"finding": "mutes"}
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"Mute {reference.tokenized.finding.human_readable}"
+        return f"Mute {reference.natural_key}"
