@@ -224,14 +224,6 @@ class OctopoesService:
         for reference, scan_level in assigned_scan_levels.items():
             # Skip source scan profiles
             if reference in source_scan_profile_references:
-                # run inference on source scan profile
-                inference_origins = [
-                    o
-                    for o in self.origin_repository.list_by_source(reference, valid_time=valid_time)
-                    if o.origin_type == OriginType.INFERENCE
-                ]
-                for inference_origin in inference_origins:
-                    self._run_inference(inference_origin, valid_time)
                 continue
 
             new_scan_profile = InheritedScanProfile(reference=reference, level=scan_level)
@@ -239,14 +231,6 @@ class OctopoesService:
             # Save new inherited scan profile
             if reference not in inherited_scan_profiles:
                 self.scan_profile_repository.save(None, new_scan_profile, valid_time)
-                # run inference on new scan profile
-                inference_origins = [
-                    o
-                    for o in self.origin_repository.list_by_source(reference, valid_time=valid_time)
-                    if o.origin_type == OriginType.INFERENCE
-                ]
-                for inference_origin in inference_origins:
-                    self._run_inference(inference_origin, valid_time)
                 update_count += 1
                 continue
 
@@ -269,14 +253,6 @@ class OctopoesService:
         for reference in references_to_reset:
             old_scan_profile = inherited_scan_profiles[reference]
             self.scan_profile_repository.save(old_scan_profile, EmptyScanProfile(reference=reference), valid_time)
-            # run inference on reset scan profile
-            inference_origins = [
-                o
-                for o in self.origin_repository.list_by_source(reference, valid_time=valid_time)
-                if o.origin_type == OriginType.INFERENCE
-            ]
-            for inference_origin in inference_origins:
-                self._run_inference(inference_origin, valid_time)
         logger.info("Reset scan profiles [len=%i]", len(references_to_reset))
 
         # Assign empty scan profiles to OOI's without scan profile
@@ -288,14 +264,6 @@ class OctopoesService:
         )
         for reference in unset_scan_profile_references:
             self.scan_profile_repository.save(None, EmptyScanProfile(reference=reference), valid_time)
-            # run inference on unset scan profile
-            inference_origins = [
-                o
-                for o in self.origin_repository.list_by_source(reference, valid_time=valid_time)
-                if o.origin_type == OriginType.INFERENCE
-            ]
-            for inference_origin in inference_origins:
-                self._run_inference(inference_origin, valid_time)
         logger.info(
             "Assigned empty scan profiles to OOI's without scan profile [len=%i]", len(unset_scan_profile_references)
         )
@@ -431,15 +399,21 @@ class OctopoesService:
         except ObjectNotFoundException:
             return
 
+    def _run_inferences(self, event: ScanProfileDBEvent) -> None:
+        inference_origins = self.origin_repository.list_by_source(event.new_data.reference, valid_time=event.valid_time)
+        inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
+        for inference_origin in inference_origins:
+            self._run_inference(inference_origin, event.valid_time)
+
     # Scan profile events
     def _on_create_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
     def _on_update_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
     def _on_delete_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
     def list_random_ooi(self, amount: int, valid_time: datetime) -> List[OOI]:
         oois = self.ooi_repository.list_random(amount, valid_time)
