@@ -272,21 +272,19 @@ Wikipedia has a nice explanation of the protocol, including lovely images:
 
 `https://en.wikipedia.org/wiki/Trusted_timestamping <https://en.wikipedia.org/wiki/Trusted_timestamping>`_
 
-The RFC 3161 itself is human readable as well:
+The `RFC 3161 itself is human readable as well <https://www.ietf.org/rfc/rfc3161.txt>`_
 
-`https://www.ietf.org/rfc/rfc3161.txt <https://www.ietf.org/rfc/rfc3161.txt>`_
-
-Available timestamp servers 
+Available timestamp servers
 ---------------------------
 
-The .env file in Bytes specifies a time stamp server. The default specification is empty in order to prevent you from querying an external server without prior knowledge. OpenKAT will sign the data itself but for proper timestamping an external server is required. Find a list of public servers here: `https://github.com/trbs/rfc3161ng <https://github.com/trbs/rfc3161ng>`_
+The .env file in Bytes specifies a time stamp server. The default specification is empty in order to prevent you from querying an external server without prior knowledge. OpenKAT will sign the data itself but for proper timestamping an external server is required. `Find a list of public servers here <https://github.com/trbs/rfc3161ng>`_.
 
 Add the timestamp server adress and the certificate to the .env file in Bytes and restart OpenKAT. It will automatically use the specified server for all new data.
 
 How to verify a timestamp?
 --------------------------
 
-The verification process involves the raw data, the hash from it and the timestamp that was set using this hash. Using the following steps we can verify the data: 
+The verification process involves the raw data, the hash from it and the timestamp that was set using this hash. Using the following steps we can verify the data:
 
 * download the raw data
 * verify the hash
@@ -295,7 +293,7 @@ The verification process involves the raw data, the hash from it and the timesta
 Download the raw data
 *********************
 
-The raw data of your object can be found in the object page or task that created it. Download the zip file, open it and locate the raw_meta json. Inside are the hash of the data and the retrieval link for the timestamp. In this document we will check an object timestamped with the freetsa.org server, so parts of this example might be different depending on the service you have configured. 
+The raw data of your object can be found in the object page or task that created it. Download the zip file, open it and locate the raw_meta json. Inside are the hash of the data and the retrieval link for the timestamp. In this document we will check an object timestamped with the freetsa.org server, so parts of this example might be different depending on the service you have configured.
 
 * Raw data filename (example): ``[example file name]``
 * JSON filename (example): ``raw_meta_[example file name].json``
