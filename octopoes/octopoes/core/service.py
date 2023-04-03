@@ -238,7 +238,6 @@ class OctopoesService:
             old_scan_profile = inherited_scan_profiles[reference]
             if old_scan_profile.level != scan_level:
                 self.scan_profile_repository.save(old_scan_profile, new_scan_profile, valid_time)
-                # we do not have to run inference on updated inherited scan profiles because L0 is not inherited
                 update_count += 1
 
         logger.info("Updated inherited scan profiles [count=%i]", update_count)
