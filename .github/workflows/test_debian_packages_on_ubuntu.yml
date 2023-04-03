@@ -6,6 +6,8 @@ on:
       - v*
     branches:
       - "release**"
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build-packages:
@@ -115,6 +117,13 @@ jobs:
           psql -h localhost -U postgres -d bytes_db -c "GRANT ALL ON DATABASE bytes_db TO bytes;"
           psql -h localhost -U postgres -d bytes_db -c "ALTER USER bytes WITH PASSWORD 'postgres';"
 
+      - name: Prepare postgres service Mula
+        run: |
+          createdb -h localhost -U postgres mula_db
+          createuser -h localhost -U postgres mula
+          psql -h localhost -U postgres -d mula_db -c "GRANT ALL ON DATABASE mula_db TO mula;"
+          psql -h localhost -U postgres -d mula_db -c "ALTER USER mula WITH PASSWORD 'postgres';"
+
       - name: Create kat vhost in rabbitmq
         run: |
           sudo rabbitmqctl add_user kat rabbit
@@ -183,6 +192,11 @@ jobs:
         run: |
           sudo sed -i "s/BYTES_DB_URI=/BYTES_DB_URI=postgresql:\/\/bytes:postgres@localhost\/bytes_db/g" /etc/kat/bytes.conf
           sudo -u kat update-bytes-db
+
+      - name: Migrations for Mula
+        run: |
+          sudo sed -i "s/SCHEDULER_DB_DSN=/SCHEDULER_DB_DSN=postgresql:\/\/mula:postgres@localhost\/mula_db/g" /etc/kat/bytes.conf
+          sudo -u kat update-mula-db
 
       - name: Setup Bytes credentials
         run: |
