@@ -14,7 +14,7 @@
         </li>
         {% if organization %}
           <li>
-            <a href="{% url 'health_beautified' organization_code=organization.code %}">{% translate "Health status of modules" %}</a>
+            <a href="{% url 'health_beautified' organization_code=organization.code %}">{% translate "Health" %}</a>
           </li>
         {% endif %}
       </ul>

@@ -6,7 +6,7 @@ Debugging and troubleshooting
 Checking the health status of the KAT modules
 =============================================
 
-In the footer of every page, you can find a link to the health page.
+In the footer of every page, you can find a link to the Health page.
 This page shows the status of all containerized KAT modules, their version, and any self-reported warnings or errors.
 If you KAT deployment is not working properly, this is the first place to check.
 
