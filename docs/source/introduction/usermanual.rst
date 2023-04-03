@@ -266,7 +266,7 @@ OpenKAT can use a trusted timestamp provider for the raw data in Bytes. This tim
 About the protocol
 ------------------
 
-The RFC3161 time stap protocol is a simple and effective way to add a timestamp to data. The data concerned is hashed to provide an identifier. The hash is uploaded and timestamped by the server. As long as you trust the server, you can proof the data existed at the point in time indicated by the server.
+The RFC3161 timestamp protocol is a simple and effective way to add a timestamp to data. The data concerned is hashed to provide an identifier. The hash is uploaded and timestamped by the server. As long as you trust the server, you can proof the data existed at the point in time indicated by the server.
 
 Wikipedia has a nice explanation of the protocol, including lovely images:
 
@@ -279,7 +279,7 @@ Available timestamp servers
 
 The .env file in Bytes specifies a time stamp server. The default specification is empty in order to prevent you from querying an external server without prior knowledge. OpenKAT will sign the data itself but for proper timestamping an external server is required. `Find a list of public servers here <https://github.com/trbs/rfc3161ng>`_.
 
-Add the timestamp server adress and the certificate to the .env file in Bytes and restart OpenKAT. It will automatically use the specified server for all new data.
+Add the timestamp server address and the certificate to the .env file in Bytes and restart OpenKAT. It will automatically use the specified server for all new data.
 
 How to verify a timestamp?
 --------------------------
