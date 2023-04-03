@@ -120,7 +120,7 @@ class OctopoesService:
             self.ooi_repository.save(ooi, valid_time=valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
 
-    def get_level(self, reference, valid_time):
+    def get_level(self, reference, valid_time) -> int:
         try:
             return self.scan_profile_repository.get(reference, valid_time).level
         except ObjectNotFoundException:
