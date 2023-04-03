@@ -129,10 +129,18 @@ class OctopoesService:
         parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
         try:
-            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
+            try:
+                level = self.scan_profile_repository.get(source.reference, valid_time).level
+            except ObjectNotFoundException:
+                level = 0
+            if level >= 1:
+                resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
+            else:
+                resulting_oois = []
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
             return
+
         self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
@@ -216,6 +224,14 @@ class OctopoesService:
         for reference, scan_level in assigned_scan_levels.items():
             # Skip source scan profiles
             if reference in source_scan_profile_references:
+                # run inference on source scan profile
+                inference_origins = [
+                    o
+                    for o in self.origin_repository.list_by_source(reference, valid_time=valid_time)
+                    if o.origin_type == OriginType.INFERENCE
+                ]
+                for inference_origin in inference_origins:
+                    self._run_inference(inference_origin, valid_time)
                 continue
 
             new_scan_profile = InheritedScanProfile(reference=reference, level=scan_level)
@@ -223,6 +239,14 @@ class OctopoesService:
             # Save new inherited scan profile
             if reference not in inherited_scan_profiles:
                 self.scan_profile_repository.save(None, new_scan_profile, valid_time)
+                # run inference on new scan profile
+                inference_origins = [
+                    o
+                    for o in self.origin_repository.list_by_source(reference, valid_time=valid_time)
+                    if o.origin_type == OriginType.INFERENCE
+                ]
+                for inference_origin in inference_origins:
+                    self._run_inference(inference_origin, valid_time)
                 update_count += 1
                 continue
 
@@ -230,6 +254,7 @@ class OctopoesService:
             old_scan_profile = inherited_scan_profiles[reference]
             if old_scan_profile.level != scan_level:
                 self.scan_profile_repository.save(old_scan_profile, new_scan_profile, valid_time)
+                # we do not have to run inference on updated inherited scan profiles because L0 is not inherited
                 update_count += 1
 
         logger.info("Updated inherited scan profiles [count=%i]", update_count)
@@ -244,6 +269,14 @@ class OctopoesService:
         for reference in references_to_reset:
             old_scan_profile = inherited_scan_profiles[reference]
             self.scan_profile_repository.save(old_scan_profile, EmptyScanProfile(reference=reference), valid_time)
+            # run inference on reset scan profile
+            inference_origins = [
+                o
+                for o in self.origin_repository.list_by_source(reference, valid_time=valid_time)
+                if o.origin_type == OriginType.INFERENCE
+            ]
+            for inference_origin in inference_origins:
+                self._run_inference(inference_origin, valid_time)
         logger.info("Reset scan profiles [len=%i]", len(references_to_reset))
 
         # Assign empty scan profiles to OOI's without scan profile
@@ -255,6 +288,14 @@ class OctopoesService:
         )
         for reference in unset_scan_profile_references:
             self.scan_profile_repository.save(None, EmptyScanProfile(reference=reference), valid_time)
+            # run inference on unset scan profile
+            inference_origins = [
+                o
+                for o in self.origin_repository.list_by_source(reference, valid_time=valid_time)
+                if o.origin_type == OriginType.INFERENCE
+            ]
+            for inference_origin in inference_origins:
+                self._run_inference(inference_origin, valid_time)
         logger.info(
             "Assigned empty scan profiles to OOI's without scan profile [len=%i]", len(unset_scan_profile_references)
         )
