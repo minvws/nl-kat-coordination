@@ -46,7 +46,6 @@ from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
     filter_ooi_tree,
 )
-from tools.user_helpers import is_red_team
 from tools.view_helpers import get_ooi_url, BreadcrumbsMixin, Breadcrumb
 
 User = get_user_model()
@@ -66,7 +65,7 @@ class OnboardingStart(OrganizationView):
     def get(self, request, *args, **kwargs):
         if request.user.is_superuser:
             return redirect("step_introduction_registration")
-        if is_red_team(request.user):
+        if self.organization_member.is_redteam:
             return redirect("step_introduction", kwargs={"organization_code": self.organization.code})
         return redirect("crisis_room")
 
@@ -656,9 +655,7 @@ class CompleteOnboarding(OrganizationView):
 
     def get(self, request, *args, **kwargs):
         if self.request.user.is_superuser:
-            self.organization_member.groups.set(Group.objects.get(name=GROUP_REDTEAM))
-            self.organization_member.save()
-            return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
+            self.organization_member.groups.add(Group.objects.get(name=GROUP_REDTEAM))
         self.organization_member.onboarded = True
         self.organization_member.save()
         return redirect(reverse("crisis_room"))

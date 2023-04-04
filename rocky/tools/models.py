@@ -187,6 +187,16 @@ class OrganizationMember(models.Model):
     def is_client(self):
         return self.groups.filter(name=GROUP_CLIENT).exists()
 
+    def has_member_perm(self, permission_codename):
+        if self.user.is_superuser and self.user.is_active and self.status is not OrganizationMember.STATUSES.BLOCKED:
+            return True
+        for group in self.groups.all():
+            for permission in group.permissions.all():
+                if permission_codename in permission.codename:
+                    return True
+                else:
+                    continue
+
     class Meta:
         unique_together = ["user", "organization"]
 

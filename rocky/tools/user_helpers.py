@@ -8,24 +8,18 @@ from tools.models import (
 User = get_user_model()
 
 
-def is_red_team(user: User) -> bool:
-    return user.groups.filter(name="redteam").exists()
-
-
-def is_admin(user: User) -> bool:
-    return user.groups.filter(name="admin").exists()
-
-
 def indemnification_present(user: User) -> bool:
     return user.indemnification_set.exists()
 
 
 def can_scan_organization(user: User, organization: Organization) -> bool:
-    if is_red_team(user):
+    member = OrganizationMember.objects.filter(user=user, organization=organization)
+
+    if member[0].is_redteam:
         return True
 
     # Ensure the user is scanning its own organization
-    if not OrganizationMember.objects.filter(user=user, organization=organization).exists():
+    if not member:
         return False
 
     return indemnification_present(user)

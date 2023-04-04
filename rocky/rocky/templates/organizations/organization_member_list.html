@@ -1,6 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% load i18n %}
 {% load static %}
+{% load permissions %}
 
 {% block content %}
   {% include 'header.html' %}
@@ -12,7 +13,8 @@
           An overview of "{{ organization_name }}" its members.
         {% endblocktranslate %}
         <h2>{% translate 'Members' %}</h2>
-        {% if perms.tools.add_organizationmember %}
+        {% has_member_perm "add_organizationmember" organization_member as can_add_member %}
+        {% if can_add_member %}
           <div class="horizontal-view toolbar">
             <a href="{% url 'organization_member_add' organization.code %}"
                class="button">{% translate 'Add new member' %}</a>
@@ -48,7 +50,7 @@
                       {% if member.user.is_superuser %}
                         {% translate 'Super user' %}
                       {% endif %}
-                      {% for group in member.user.groups.all %}
+                      {% for group in member.groups.all %}
                         {{ group.name|title }}
                         <br>
                       {% endfor %}

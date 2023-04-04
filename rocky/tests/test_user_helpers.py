@@ -1,6 +1,4 @@
 from tools.user_helpers import (
-    is_red_team,
-    is_admin,
     indemnification_present,
     can_scan_organization,
     can_switch_organization,
@@ -8,19 +6,19 @@ from tools.user_helpers import (
 
 
 def test_is_not_red_team(superuser_member):
-    assert not is_red_team(superuser_member.user)
+    assert not superuser_member.is_redteam
 
 
 def test_is_red_team(redteam_member):
-    assert is_red_team(redteam_member.user)
+    assert redteam_member.is_redteam
 
 
 def test_is_not_admin(superuser_member):
-    assert not is_admin(superuser_member.user)
+    assert not superuser_member.is_admin
 
 
 def test_is_admin(admin_member):
-    assert is_admin(admin_member.user)
+    assert admin_member.is_admin
 
 
 def test_indemnification_present(superuser_member):

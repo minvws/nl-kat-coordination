@@ -127,7 +127,7 @@ TEMPLATES = [
                 "tools.context_processors.languages",
                 "tools.context_processors.organizations_including_blocked",
             ],
-            "builtins": ["tools.templatetags.ooi_extra"],
+            "builtins": ["tools.templatetags.ooi_extra", "tools.templatetags.permissions"],
         },
     },
 ]
