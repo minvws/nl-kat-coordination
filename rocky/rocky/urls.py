@@ -29,6 +29,7 @@ from rocky.views.organization_member_add import OrganizationMemberAddView
 from rocky.views.organization_member_edit import OrganizationMemberEditView
 from rocky.views.organization_member_list import OrganizationMemberListView
 from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
+from rocky.views.ooi_mute import MuteObjectView
 from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileResetView, ScanProfileDetailView
 from rocky.views.scans import ScanListView
@@ -132,6 +133,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/objects/edit/", OOIEditView.as_view(), name="ooi_edit"),
     path("<organization_code>/objects/delete/", OOIDeleteView.as_view(), name="ooi_delete"),
     path("<organization_code>/objects/detail/", OOIDetailView.as_view(), name="ooi_detail"),
+    path("<organization_code>/objects/detail/mute/", MuteObjectView.as_view(), name="mute_object"),
     path("<organization_code>/objects/export", OOIListExportView.as_view(), name="ooi_list_export"),
     path(
         "<organization_code>/objects/indemnification/reset/",

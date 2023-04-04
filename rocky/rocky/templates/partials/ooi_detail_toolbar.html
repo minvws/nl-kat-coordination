@@ -14,4 +14,13 @@
   {% endif %}
   <a href="{% ooi_url 'ooi_report' ooi_id organization.code query=mandatory_fields %}"
      class="button ghost">{% translate 'Generate report' %}</a>
+  {% if ooi|is_finding %}
+    <form action="{% url 'mute_object' organization.code %}"
+          method="post"
+          class="inline">
+      {% csrf_token %}
+      <input type="hidden" name="muted_ooi" value="{{ ooi_id }}"/>
+      <button type="submit">{% translate 'Mute finding' %}</button>
+    </form>
+  {% endif %}
 </div>
