@@ -12,7 +12,7 @@
       {% if not field.field.widget.attrs.fixed_paws %}
         {{ field }}
       {% elif field.field.widget.attrs.fixed_paws < 0 %}
-        {% translate 'Unset' %}
+        {% translate 'Not set' %}
       {% else %}
         {% include 'partials/scan_level_indicator.html' with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
       {% endif %}

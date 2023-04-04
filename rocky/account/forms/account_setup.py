@@ -175,7 +175,7 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
 class OrganizationMemberEditForm(forms.ModelForm):
     trusted_clearance_level = forms.ChoiceField(
         required=False,
-        label=_("Trusted clearance level"),
+        label=_("Assigned clearance level"),
         choices=[(-1, "")] + SCAN_LEVEL.choices,
         help_text=_("Select a clearance level you trust this member with."),
         widget=forms.RadioSelect(attrs={"radio_paws": True}),
@@ -190,8 +190,10 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["status"].widget.attrs["horizontal_form_cb"] = True
         if self.instance.user.is_superuser:
             self.fields["trusted_clearance_level"].disabled = True
+        self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
         self.fields["acknowledged_clearance_level"].required = False
         self.fields["acknowledged_clearance_level"].widget.attrs[
             "fixed_paws"
