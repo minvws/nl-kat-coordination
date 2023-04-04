@@ -1,7 +1,7 @@
 FROM python:3.8 as boefjes-requirements
 
 COPY boefjes/boefjes ./boefjes
-COPY requirements.txt ./boefjes
+COPY boefjes/requirements.txt ./boefjes
 
 # The echo since cat does not add a newline
 RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
