@@ -9,9 +9,10 @@ def run(
     hostname: Hostname,
     additional_oois: List[Union[DNSARecord, DNSAAAARecord]],
 ) -> Iterator[OOI]:
-    # only run bit on fqdns
-    if not hostname.name.endswith("."):
-        return
+    # only run bit on fqdns 
+    # (NOTE: as of 04-04-2023 we remove all trailing dots for deduplication)
+    # if not hostname.name.endswith("."):
+    #    return
 
     non_fqdn_hostname = Hostname(network=hostname.network, name=hostname.name.rstrip("."))
     yield non_fqdn_hostname
