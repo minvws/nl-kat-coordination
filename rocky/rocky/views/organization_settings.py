@@ -1,15 +1,14 @@
 from django.contrib import messages
-from account.mixins import OrganizationView
+from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
+from tools.view_helpers import OrganizationDetailBreadcrumbsMixin
 from two_factor.views.utils import class_view_decorator
-
-from rocky.views.organization_member_list import OrganizationMemberListView
 
 
 @class_view_decorator(otp_required)
-class OrganizationDetailView(OrganizationMemberListView, OrganizationView):
-    template_name = "organizations/organization_detail.html"
+class OrganizationSettingsView(OrganizationDetailBreadcrumbsMixin, TemplateView):
+    template_name = "organizations/organization_settings.html"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

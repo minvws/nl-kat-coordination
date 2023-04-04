@@ -25,7 +25,7 @@ class IndemnificationAddView(PermissionRequiredMixin, OrganizationView, FormView
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self) -> str:
-        return reverse_lazy("organization_detail", kwargs={"organization_code": self.organization.code})
+        return reverse_lazy("organization_settings", kwargs={"organization_code": self.organization.code})
 
     def add_success_notification(self):
         success_message = _("Indemnification successfully set.")
