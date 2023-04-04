@@ -51,9 +51,6 @@ class BoefjeScheduler(Scheduler):
         When this is done we will try and fill the rest of the queue with
         random items from octopoes and schedule them accordingly.
         """
-        self.logger.info(
-            "Populating queue [organisation.id=%s, scheduler_id=%s]",
-        )
         self.push_tasks_for_scan_profile_mutations()
 
         self.push_tasks_for_new_boefjes()
