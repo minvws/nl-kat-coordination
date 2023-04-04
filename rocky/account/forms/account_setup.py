@@ -182,22 +182,14 @@ class OrganizationMemberEditForm(forms.ModelForm):
     )
 
     status = forms.BooleanField(
-        initial=False,
+        required=False,
         label=_("Blocked"),
         help_text=_("Set the members status to blocked, so they don't have access to the organization anymore."),
-        widget=forms.CheckboxInput(),
+        widget=forms.CheckboxInput(check_test=lambda value: value == OrganizationMember.STATUSES.BLOCKED),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if self.instance.status == OrganizationMember.STATUSES.BLOCKED:
-            self.fields["status"].widget.initial = True
-        else:
-            self.fields["status"].widget.initial = False
-        self.fields["status"].widget.attrs["checked"] = False
-        self.fields["status"].required = False
-
         if self.instance.user.is_superuser:
             self.fields["trusted_clearance_level"].disabled = True
         self.fields["acknowledged_clearance_level"].required = False
@@ -208,15 +200,18 @@ class OrganizationMemberEditForm(forms.ModelForm):
         if self.instance.user.is_superuser:
             self.fields["trusted_clearance_level"].disabled = True
 
+    def clean(self):
+        cleaned_data = super().clean()
+        # Check if status "Blocked" checkbox is checked/True
+        if cleaned_data["status"]:
+            cleaned_data["status"] = OrganizationMember.STATUSES.BLOCKED
+        else:
+            cleaned_data["status"] = OrganizationMember.STATUSES.NEW
+
     def save(self, commit=True):
         instance = super().save(commit=False)
         if instance.trusted_clearance_level < instance.acknowledged_clearance_level:
             instance.acknowledged_clearance_level = instance.trusted_clearance_level
-        # Check if status "Blocked" checkbox is checked/True:
-        if instance.status:
-            instance.status = OrganizationMember.STATUSES.BLOCKED
-        else:
-            instance.status = OrganizationMember.STATUSES.NEW
         if commit:
             instance.save()
         return instance
