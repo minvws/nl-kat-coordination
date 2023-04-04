@@ -10,7 +10,7 @@ def run(
     additional_oois: List[Union[DNSARecord, DNSAAAARecord]],
 ) -> Iterator[OOI]:
     # ruff: noqa: ERA001
-    # only run bit on fqdns 
+    # only run bit on fqdns
     # (NOTE: as of 04-04-2023 we remove all trailing dots for deduplication)
     # if not hostname.name.endswith("."):
     #    return
