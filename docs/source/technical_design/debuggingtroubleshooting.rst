@@ -26,10 +26,10 @@ Processes
 
 When debugging, check if the actual processes are running. Depending on the way you run OpenKAT, there are several ways to do this:
 
-Dockers
--------
+Docker containers
+-----------------
 
-``dockerps`` gives you an overview of all running dockers.
+``dockerps`` gives you an overview of all running Docker containers.
 
 .. image:: img/dockerps.png
   :alt: docker containers
@@ -51,8 +51,8 @@ The relevant services for OpenKAT:
 * kat-normalizers.service
 * kat-bytes.service
 
-Logs
-----
+Debian package service logs
+---------------------------
 
 Sometimes, the logs might give output that is useful.
 
@@ -68,6 +68,6 @@ Permissions
 
 Check in the user interface if the users have permission to perform scans and are part of an organization.
 
-The current usermodel also needs a superuser that is part of an organization. Normally this is set automagically. With several organizations in your instance the superuser might end up alone. This must be corrected through the django interface, in which the superuser can be added to the organization.
+The current usermodel also needs a superuser that is part of an organization. Normally this is set automagically. With several organizations in your instance the superuser might end up alone. This must be corrected through the Django interface, in which the superuser can be added to the organization.
 
-You can reach the django admin interface through /admin on the rocky instance. While you are there, do check the `hardening settings <https://docs.openkat.nl/technical_design/hardening.html>`_ if you have not already done so.
+You can reach the Django admin interface through ``/admin`` on the rocky instance. While you are there, do check the :ref:`Production: Hardening OpenKAT` page if you have not already done so.
