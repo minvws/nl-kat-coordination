@@ -30,7 +30,7 @@ After downloading they can be installed as follows:
 .. code-block:: sh
 
     tar zvxf kat-*.tar.gz
-    apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
+    sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
 
 Set up the databases
 ====================
@@ -41,7 +41,7 @@ If you will be running the database on the same machine as KAT, you can install 
 
 .. code-block:: sh
 
-    apt install postgresql
+    sudo apt install postgresql
 
 Rocky DB
 --------
@@ -99,8 +99,9 @@ Initialize the database using the update-katalogus-db tool:
 Bytes DB
 --------
 
-Generate a unique password for the Bytes database user. Insert it into the connection string for the Bytes database.
-Insert this password into the connection string for the Bytes DB in `/etc/kat/bytes.conf`. For example:
+Generate a unique password for the Bytes database user. Insert this password
+into the connection string for the Bytes DB in `/etc/kat/bytes.conf`. For
+example:
 
 .. code-block:: sh
 
@@ -119,6 +120,30 @@ Initialize the Bytes database:
 .. code-block:: sh
 
     sudo -u kat update-bytes-db
+
+Mula DB
+--------
+
+Generate a unique password for the Mula database user. Insert this password into
+the connection string for the Mula DB in `/etc/kat/mula.conf`. For example:
+
+.. code-block:: sh
+
+    SCHEDULER_DB_DSN=postgresql://mula:<password>@localhost/mula_db
+
+Create a new database and user for Mula:
+
+.. code-block:: sh
+
+    sudo -u postgres createdb mula_db
+    sudo -u postgres createuser mula -P
+    sudo -u postgres psql -c 'GRANT ALL ON DATABASE mula_db TO mula;'
+
+Initialize the Mula database:
+
+.. code-block:: sh
+
+    sudo -u kat update-mula-db
 
 Create Rocky superuser and set up default groups and permissions
 ================================================================
@@ -194,9 +219,9 @@ Now create a KAT user for RabbitMQ, create the virtual host and set the permissi
 
 .. code-block:: sh
 
-   sudo rabbitmqctl add_user kat ${rabbitmq_pass}
-   sudo rabbitmqctl add_vhost kat
-   sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+    sudo rabbitmqctl add_user kat ${rabbitmq_pass}
+    sudo rabbitmqctl add_vhost kat
+    sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
 Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for `/etc/kat/mula.conf`:
 
@@ -231,7 +256,7 @@ This oneliner will do it for you, executed as root:
 
 .. code-block:: sh
 
-    sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
+    sudo sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
 
 Restart KAT
 ===========
@@ -264,7 +289,7 @@ You can upgrade OpenKAT by installing the newer packages. Make a backup of your 
 .. code-block:: sh
 
     tar zvxf kat-*.tar.gz
-    apt install --no-install-recommends ./kat-*_amd64.deb
+    sudo apt install --no-install-recommends ./kat-*_amd64.deb
 
 If a newer version of the xtdb multinode is available install it as well:
 
@@ -293,8 +318,14 @@ For Bytes DB:
 
     sudo -u kat update-bytes-db
 
+For Mula DB:
+
+.. code-block:: sh
+
+    sudo -u kat update-mula-db
+
 Restart all processes:
 
 .. code-block:: sh
 
-sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+    sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker

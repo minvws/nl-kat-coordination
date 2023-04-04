@@ -26,16 +26,16 @@
                 </tr>
               </thead>
               <tbody>
-                {% for object in object_list %}
+                {% for organization in object_list %}
                   <tr>
                     <td>
-                      <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.name }}</a>
+                      <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.name }}</a>
                     </td>
                     <td>
-                      <a href="{% url 'organization_detail' organization_code=object.organization.code %}">{{ object.organization.code }}</a>
+                      <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.code }}</a>
                     </td>
-                    <td>{% include 'organizations/organization_tags.html' with organization=object.organization %}</td>
-                    <td>{{ object.total_members }}</td>
+                    <td>{% include 'organizations/organization_tags.html' %}</td>
+                    <td>{{ organization.member_count }}</td>
                   </tr>
                 {% endfor %}
               </tbody>
