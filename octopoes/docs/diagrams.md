@@ -246,26 +246,43 @@ graph LR
 
 ## Claimspace ERD
 ```mermaid
-
 erDiagram
-    erDiagram
-    CUSTOMER ||--o{ ORDER : places
-    CUSTOMER {
+    
+    METHOD {
         string name
-        string custNumber
-        string sector
+        string description
+        float confidence
     }
-    ORDER ||--|{ LINE-ITEM : contains
-    ORDER {
-        int orderNumber
-        string deliveryAddress
+    
+    CLAIMSOURCE {
+        datetime validFrom
     }
-    LINE-ITEM {
-        string productCode
-        int quantity
-        float pricePerUnit
+    
+    EXISTANCECLAIM {
+        string ooi_primary_key
+        bool exists
     }
+    
+    PROPERTYCLAIM {
+        string ooi_primary_key
+        string key
+        string value
+    }
+    
+    OOI {
+        string primary_key
+        string object_type
+    }
+    
+    CLAIMSOURCE }|--|| METHOD : uses
 
+    CLAIMSOURCE ||--o{ EXISTANCECLAIM : claims
+    CLAIMSOURCE ||--o{ PROPERTYCLAIM : claims
+    
+    EXISTANCECLAIM }|--|| OOI : resolves_to
+    PROPERTYCLAIM }|--|| OOI : resolves_to
+    
+    OOI |o--o| CLAIMSOURCE : source_of
 
 
 ```
