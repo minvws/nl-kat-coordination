@@ -58,8 +58,7 @@ def construct_api(settings: Settings) -> FastAPI:
         return get_health()
 
     # mount reports as static files
-    if not Path(settings.reports_folder).exists():
-        Path(settings.reports_folder).mkdir(parents=True)
+    Path(settings.reports_folder).mkdir(parents=True, exist_ok=True)
     app.mount("/reports", StaticFiles(directory=settings.reports_folder), name="reports")
 
     return app
