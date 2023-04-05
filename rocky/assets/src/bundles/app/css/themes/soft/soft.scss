@@ -1,6 +1,6 @@
 /* theme: Soft */
 /* Fonts */
-@import "fonts/fonts.scss"; /* Fonts */
+@import "fonts/fonts"; /* Fonts */
 
 /* Styling sets. E.g color sets */
 @import "manon/spot-large"; /* Branding colors */
@@ -10,7 +10,7 @@
 @import "manon/application-base"; /* Styling on the highest level */
 
 /* Manon variables */
-@import "manon/manon-variables.scss";
+@import "manon/manon-variables";
 
 /* Base components */
 @import "manon/button";

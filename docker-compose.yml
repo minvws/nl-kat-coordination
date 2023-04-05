@@ -14,6 +14,23 @@ services:
     env_file:
       - .env
 
+  postgres:
+    restart: on-failure
+    image: postgres:15
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD", "gosu", "postgres", "pg_isready"]
+      interval: 10s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env
+    environment:
+      APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
+
   crux:
     image: "ghcr.io/dekkers/xtdb-http-multinode:main"
     restart: on-failure
@@ -65,6 +82,7 @@ services:
         ENVIRONMENT: dev
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 1
@@ -84,47 +102,19 @@ services:
         ENVIRONMENT: dev
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
     deploy:
       replicas: 1
     command: normalizer
     env_file:
       - .env
 
-  rocky-db:
-    image: postgres:12.8
-    ports:
-      - "127.0.0.1:5432:5432"
-    volumes:
-      - rocky-db-data:/var/lib/postgresql/data
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env
-    environment:
-      - APP_DB=ROCKY_DB
-      - APP_DB_USER=ROCKY_DB_USER
-      - APP_DB_USER_CREATEDB=CREATEDB
-      - APP_DB_PASSWORD=ROCKY_DB_PASSWORD
-
-  bytes-db:
-    image: postgres:12.8
-    ports:
-      - "127.0.0.1:5433:5432"
-    volumes:
-      - bytes-db-data:/var/lib/postgresql/data
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env
-    environment:
-      - APP_DB=BYTES_DB
-      - APP_DB_USER=BYTES_DB_USER
-      - APP_DB_PASSWORD=BYTES_DB_PASSWORD
-
   rocky:
     restart: on-failure
     depends_on:
       - octopoes_api_worker
       - octopoes_api
-      - rocky-db
+      - postgres
       - boefje
       - normalizer
       - katalogus
@@ -140,13 +130,14 @@ services:
     command: python3 manage.py runserver 0.0.0.0:80
     volumes:
       - ./rocky:/app/rocky
+      - ./octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .env
 
   bytes:
     restart: on-failure
     depends_on:
-      - bytes-db
+      - postgres
     ports:
       - "127.0.0.1:8002:8000"
     build:
@@ -163,7 +154,7 @@ services:
   katalogus:
     restart: on-failure
     depends_on:
-      - katalogus-db
+      - postgres
     build:
       context: .
       dockerfile: boefjes/Dockerfile
@@ -172,24 +163,11 @@ services:
     command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
       - .env
-
-  katalogus-db:
-    image: postgres:12.8
-    ports:
-      - "127.0.0.1:5434:5432"
-    volumes:
-      - katalogus-db-data:/var/lib/postgresql/data
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env
-    environment:
-      - APP_DB=KATALOGUS_DB
-      - APP_DB_USER=KATALOGUS_DB_USER
-      - APP_DB_PASSWORD=KATALOGUS_DB_PASSWORD
 
   scheduler:
     restart: on-failure
@@ -204,25 +182,11 @@ services:
     volumes:
       - ./mula:/app/scheduler
     depends_on:
-      - scheduler-db
+      - postgres
       - boefje
       - normalizer
       - octopoes_api
       - katalogus
-
-  scheduler-db:
-    image: postgres:12.8
-    ports:
-      - "127.0.0.1:5435:5432"
-    volumes:
-      - scheduler-db-data:/var/lib/postgresql/data
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env
-    environment:
-      - APP_DB=SCHEDULER_DB
-      - APP_DB_USER=SCHEDULER_DB_USER
-      - APP_DB_PASSWORD=SCHEDULER_DB_PASSWORD
 
   keiko:
     restart: on-failure
@@ -238,10 +202,7 @@ services:
       - keiko-reports:/reports
 
 volumes:
-  rocky-db-data:
-  bytes-db-data:
+  postgres-data:
   bytes-data:
   keiko-reports:
-  katalogus-db-data:
-  scheduler-db-data:
   xtdb-data:

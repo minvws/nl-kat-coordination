@@ -7,7 +7,14 @@
   <main id="main-content">
     <section>
       <div>
-        <h1>{% translate 'Organization details' %}</h1>
+        <h1>{% translate 'Organization'  %}: {{ organization.name }}</h1>
+
+        {% blocktranslate with organization_name=organization.name %}
+          An overview of "{{ organization_name }}". This shows general information and its settings.
+        {% endblocktranslate %}
+
+        <h2>{% translate 'Organization details' %}</h2>
+
         <div class="horizontal-scroll">
           <table>
             <thead>
@@ -22,18 +29,22 @@
                 <td>{{ organization.name }}</td>
                 <td>{{ organization.code }}</td>
                 <td>
-                  {% spaceless %}
-                    <a href="{% url 'organization_edit' organization.code organization.id %}">
-                      <button class="icon ti-edit">{% translate 'Edit' %}</button>
-                    </a>
-                  {% endspaceless %}
+                  {% if perms.tools.change_organization %}
+                    {% spaceless %}
+                      <a href="{% url 'organization_edit' organization.code %}">
+                        <button class="icon ti-edit action-button">{% translate 'Edit' %}</button>
+                      </a>
+                    {% endspaceless %}
+                  {% endif %}
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <a href="{% url 'indemnification_add' organization.code %}"
-           class="button ghost">{% translate 'Add indemnification' %}</a>
+        {% if perms.tools.change_organization %}
+          <a href="{% url 'indemnification_add' organization.code %}"
+             class="button ghost">{% translate 'Add indemnification' %}</a>
+        {% endif %}
       </div>
     </section>
     {% if organization.tags.all %}
@@ -43,9 +54,6 @@
           {% include 'organizations/organization_tags.html' %}
         </div>
       </section>
-    {% endif %}
-    {% if perms.tools.view_organization or request.user.is_superuser %}
-      {% include 'organizations/organization_member_list.html' %}
     {% endif %}
   </main>
 {% endblock %}
