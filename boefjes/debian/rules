@@ -35,3 +35,6 @@ override_dh_virtualenv:
 
 override_dh_gencontrol:
 	dh_gencontrol -- -Vpython=`py3versions -d`
+
+execute_after_dh_install:
+	sed -i s/python3.9/`py3versions -d`/ debian/kat-boefjes/usr/lib/systemd/system/*.service
