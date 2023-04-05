@@ -46,6 +46,7 @@ class SQLAlchemy(Datastore):
                 dsn,
                 pool_pre_ping=True,
                 pool_size=25,
+                pool_recycle=300,
                 json_serializer=serializer,
             )
 
