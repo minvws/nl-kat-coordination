@@ -1,19 +1,32 @@
 {% extends 'layouts/base.html' %}
+
 {% load static %}
 {% load i18n %}
 
 {% block content %}
   {% include 'header.html' %}
+
   <main id="main-content">
     <section>
       <div class="form-view">
         <h1>{% translate 'Mute finding' %}</h1>
+        <p>
+          {% translate 'Give a reason below why you want to mute this finding.' %}
+        </p>
         <form novalidate method="post" class="horizontal-view help">
           {% csrf_token %}
           {% translate 'Mute finding' as fieldset_legend %}
           {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
-          <button class="cta" type="submit" name="cancel">{% translate 'Cancel' %}</button>
-          <button type="submit">{% translate 'Mute' %}</button>
+
+          <div class="horizontal-view">
+            <fieldset>
+              <button type="submit">{% translate 'Mute' %}</button>
+              <a href="{% ooi_url 'ooi_detail' request.GET.ooi_id view.kwargs.organization_code %}"
+                 class="button ghost"
+                 type="submit"
+                 name="cancel">{% translate 'Cancel' %}</a>
+            </fieldset>
+          </div>
         </form>
       </div>
     </section>
