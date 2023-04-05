@@ -68,6 +68,8 @@ class Hostname(OOI):
         return reference.tokenized.name
 
     def __init__(self, **data: Any):
+        name = data.get("name", "")
+        data["name"] = name + "." if not name.endswith(".") else name
         super().__init__(**data)
         fqdn = str(dns.name.from_text(self.name))
         if fqdn == self.name:
