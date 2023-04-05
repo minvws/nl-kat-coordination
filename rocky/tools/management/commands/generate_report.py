@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
-from octopoes.models.ooi.findings import Finding, MuteFinding
+from octopoes.models.ooi.findings import Finding, MutedFinding
 
 from django.conf import settings
 from rocky.keiko import keiko_client, ReportsService
@@ -87,7 +87,7 @@ class Command(BaseCommand):
         )
         muted_list = OOIList(
             OctopoesAPIConnector(settings.OCTOPOES_API, organization.code),
-            {MuteFinding},
+            {MutedFinding},
             valid_time,
             scan_level=DEFAULT_SCAN_LEVEL_FILTER,
             scan_profile_type=DEFAULT_SCAN_PROFILE_TYPE_FILTER,

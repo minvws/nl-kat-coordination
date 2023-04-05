@@ -3,7 +3,7 @@ from io import BytesIO
 from django.core.management import call_command
 from django.urls import reverse, resolve
 from octopoes.models import Reference
-from octopoes.models.ooi.findings import Finding, MuteFinding
+from octopoes.models.ooi.findings import Finding, MutedFinding
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
 from pytest_django.asserts import assertContains
@@ -155,7 +155,7 @@ def test_pdf_report_command(tmp_path, client_member, ooi_information, mocker):
         Paginated[OOIType](
             count=1,
             items=[
-                MuteFinding(finding=Reference.from_str("Finding|Network|testnetwork|KAT-0003")),
+                MutedFinding(finding=Reference.from_str("Finding|Network|testnetwork|KAT-0003")),
             ],
         ),
         Paginated[OOIType](

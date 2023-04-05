@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
-from octopoes.models.ooi.findings import Finding, MuteFinding
+from octopoes.models.ooi.findings import Finding, MutedFinding
 
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
@@ -58,7 +58,7 @@ class FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
         findings = super().get_queryset()
         muted_findings = OOIList(
             self.octopoes_api_connector,
-            {MuteFinding},
+            {MutedFinding},
             self.get_observed_at(),
             scan_level=DEFAULT_SCAN_LEVEL_FILTER,
             scan_profile_type=DEFAULT_SCAN_PROFILE_TYPE_FILTER,
