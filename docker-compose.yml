@@ -38,6 +38,8 @@ services:
       - "127.0.0.1:3000:3000"
     volumes:
       - xtdb-data:/var/lib/xtdb
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xms128M -Xmx512M -XX:MaxDirectMemorySize=512M -XX:+ExitOnOutOfMemoryError"
 
   octopoes_api:
     restart: on-failure
