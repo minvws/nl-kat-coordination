@@ -2,14 +2,14 @@
 
 {% if messages %}
     {% for message in messages %}
-        {% if 'success' in message.tags %}
+        {% if "success" in message.tags %}
             <div class="message">
                 <div class="confirmation"
                      role="group"
-                     aria-label="{% translate 'confirmation' %}">
-                    <span>{% translate 'Confirmation' %}:</span>
+                     aria-label="{% translate "confirmation" %}">
+                    <span>{% translate "Confirmation" %}:</span>
                     <p>
-                        {% if 'safe' in message.tags %}
+                        {% if "safe" in message.tags %}
                             {{ message|safe }}
                         {% else %}
                             {{ message }}
@@ -17,12 +17,12 @@
                     </p>
                 </div>
             </div>
-        {% elif 'error' in message.tags %}
+        {% elif "error" in message.tags %}
             <div class="message">
-                <div class="error" role="group" aria-label="{% translate 'error' %}">
-                    <span>{% translate 'Error' %}:</span>
+                <div class="error" role="group" aria-label="{% translate "error" %}">
+                    <span>{% translate "Error" %}:</span>
                     <p>
-                        {% if 'safe' in message.tags %}
+                        {% if "safe" in message.tags %}
                             {{ message|safe }}
                         {% else %}
                             {{ message }}
@@ -30,14 +30,14 @@
                     </p>
                 </div>
             </div>
-        {% elif 'info' in message.tags %}
+        {% elif "info" in message.tags %}
             <div class="message">
                 <div class="explanation"
                      role="group"
-                     aria-label="{% translate 'explanation' %}">
-                    <span>{% translate 'Explanation' %}:</span>
+                     aria-label="{% translate "explanation" %}">
+                    <span>{% translate "Explanation" %}:</span>
                     <p>
-                        {% if 'safe' in message.tags %}
+                        {% if "safe" in message.tags %}
                             {{ message|safe }}
                         {% else %}
                             {{ message }}
@@ -45,12 +45,12 @@
                     </p>
                 </div>
             </div>
-        {% elif 'warning' in message.tags %}
+        {% elif "warning" in message.tags %}
             <div class="message">
-                <div class="warning" role="group" aria-label="{% translate 'warning' %}">
-                    <span>{% translate 'Warning' %}:</span>
+                <div class="warning" role="group" aria-label="{% translate "warning" %}">
+                    <span>{% translate "Warning" %}:</span>
                     <p>
-                        {% if 'safe' in message.tags %}
+                        {% if "safe" in message.tags %}
                             {{ message|safe }}
                         {% else %}
                             {{ message }}

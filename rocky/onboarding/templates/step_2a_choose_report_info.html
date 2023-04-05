@@ -1,19 +1,19 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' with view_type="onboarding" %}
+    {% include "header.html" with view_type="onboarding" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'OpenKAT introduction' %}</h1>
-                {% include 'partials/stepper.html' %}
+                <h1>{% translate "OpenKAT introduction" %}</h1>
+                {% include "partials/stepper.html" %}
 
-                <h2>{% translate 'Choose a report - Introduction' %}</h2>
-                <h3>{% translate 'Reports' %}</h3>
+                <h2>{% translate "Choose a report - Introduction" %}</h2>
+                <h3>{% translate "Reports" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             Reports within OpenKAT contain an overview of the scanned objects, issues found
@@ -22,7 +22,7 @@
             detailed information on what OpenKAT found and possible solutions.
           {% endblocktranslate %}
                 </p>
-                <h3>{% translate 'Data' %}</h3>
+                <h3>{% translate "Data" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             OpenKAT can scan and analyze by using plugins. Each plugin has it's unique
@@ -31,7 +31,7 @@
             on which objects or areas.
           {% endblocktranslate %}
                 </p>
-                <h3>{% translate 'Generating a report' %}</h3>
+                <h3>{% translate "Generating a report" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             When you choose a report type OpenKAT will guide you through the setup. OpenKAT will ask the necessary questions based on the input the report needs, as well as asks for permission to run plugins that you haven’t enabled yet but are needed to collect or analyze the data.
@@ -42,7 +42,7 @@
             You can also choose to look at the collected data directly or generate your own report by selecting and running plugins on objects of your choice. OpenKAT will present the results.
           {% endblocktranslate %}
                 </p>
-                <h3>{% translate 'Permission' %}</h3>
+                <h3>{% translate "Permission" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             Plugins can be provided by OpenKAT but they can also come from the community. Before a plugin can run, you need to give it permission by enabling it.
@@ -55,10 +55,10 @@
                 </p>
                 <p>
                     {% if organization %}
-                        <a href="{% url 'complete_onboarding' organization.code %}"
-                           class="button ghost">{% translate 'Skip onboarding' %}</a>
+                        <a href="{% url "complete_onboarding" organization.code %}"
+                           class="button ghost">{% translate "Skip onboarding" %}</a>
                     {% endif %}
-                    <a href="{% url 'step_choose_report_type' organization.code %}"
+                    <a href="{% url "step_choose_report_type" organization.code %}"
                        class="button">{% translate "Let's choose a report" %}</a>
                 </p>
             </div>

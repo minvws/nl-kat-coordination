@@ -22,9 +22,9 @@
     </p>
     <form method="post">
         {% csrf_token %}
-        {% translate 'Register an indemnification' as fieldset_legend %}
-        {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+        {% translate "Register an indemnification" as fieldset_legend %}
+        {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-        <button type="submit">{% translate 'Submit' %}</button>
+        <button type="submit">{% translate "Submit" %}</button>
     </form>
 </div>
