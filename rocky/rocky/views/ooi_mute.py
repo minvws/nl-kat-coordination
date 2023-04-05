@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from typing import Type
-from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import MuteFinding
