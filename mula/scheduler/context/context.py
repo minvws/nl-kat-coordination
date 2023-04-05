@@ -95,13 +95,15 @@ class AppContext:
             name="app_settings",
             documentation="Scheduler configuration settings",
             registry=self.metrics_registry,
-        ).info({
-            "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
-            "pq_maxsize": str(self.config.pq_maxsize),
-            "pq_populate_interval": str(self.config.pq_populate_interval),
-            "pq_populate_grace_period": str(self.config.pq_populate_grace_period),
-            "pq_populate_max_random_objects": str(self.config.pq_populate_max_random_objects),
-        })
+        ).info(
+            {
+                "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
+                "pq_maxsize": str(self.config.pq_maxsize),
+                "pq_populate_interval": str(self.config.pq_populate_interval),
+                "pq_populate_grace_period": str(self.config.pq_populate_grace_period),
+                "pq_populate_max_random_objects": str(self.config.pq_populate_max_random_objects),
+            }
+        )
 
         self.metrics_qsize = Gauge(
             name="scheduler_qsize",
