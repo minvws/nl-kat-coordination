@@ -1,12 +1,9 @@
 import abc
 import logging
-import re
 import threading
 import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
-
-from prometheus_client import Gauge
 
 from scheduler import context, models, queues, rankers, utils
 from scheduler.utils import thread

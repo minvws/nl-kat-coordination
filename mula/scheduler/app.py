@@ -4,8 +4,6 @@ import threading
 import time
 from typing import Any, Callable, Dict
 
-from prometheus_client import Gauge, Info
-
 from scheduler import context, queues, rankers, schedulers, server
 from scheduler.connectors import listeners
 from scheduler.models import BoefjeTask, NormalizerTask, Organisation
@@ -274,18 +272,18 @@ class App:
         """
         # Collect metrics from the schedulers
         for s in self.schedulers.values():
-            self.ctx.metrics_qsize.labels(scheduler_id=s.scheduler_id,).set(
+            self.ctx.metrics_qsize.labels(
+                scheduler_id=s.scheduler_id,
+            ).set(
                 s.queue.qsize(),
             )
 
         # Collect metrics from the katalogus
-        self.ctx.metrics_katalogus.info(
-            {
-                "plugin_cache_expiry_time": self.ctx.services.katalogus.organisations_plugin_cache.start_time.isoformat(),
-                "plugin_cache_start_time": self.ctx.services.katalogus.organisations_plugin_cache.expiration_time.isoformat(),
-                "boefje_cache_start_time": self.ctx.services.katalogus.organisations_boefje_type_cache.start_time.isoformat(),
-                "boefje_cache_expiry_time": self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time.isoformat(),
-                "normalizer_cache_start_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time.isoformat(),
-                "normalizer_cache_expiry_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time.isoformat(),
-            }
-        )
+        self.ctx.metrics_katalogus.info({
+            "plugin_cache_expiry_time": self.ctx.services.katalogus.organisations_plugin_cache.start_time.isoformat(),
+            "plugin_cache_start_time": self.ctx.services.katalogus.organisations_plugin_cache.expiration_time.isoformat(),
+            "boefje_cache_start_time": self.ctx.services.katalogus.organisations_boefje_type_cache.start_time.isoformat(),
+            "boefje_cache_expiry_time": self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time.isoformat(),
+            "normalizer_cache_start_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time.isoformat(),
+            "normalizer_cache_expiry_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time.isoformat(),
+        })
