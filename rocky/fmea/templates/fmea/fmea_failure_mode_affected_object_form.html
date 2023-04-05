@@ -16,7 +16,7 @@
                           class="horizontal-view help">
                         {% csrf_token %}
                         {% translate 'Failure mode affected objects' as fieldset_legend %}
-                        {% include 'partials/form/fieldset.html' with legend=fieldset_legend fieldset='failure_mode affected_department affected_ooi_type' fields=form  %}
+                        {% include 'partials/form/fieldset.html' with legend=fieldset_legend fieldset='failure_mode affected_department affected_ooi_type' fields=form %}
 
                         {% if editing_view %}
                             <button class="cta" type="submit">{% translate 'Save' %}</button>

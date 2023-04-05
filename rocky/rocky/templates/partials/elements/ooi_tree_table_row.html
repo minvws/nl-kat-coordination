@@ -21,7 +21,7 @@
     <tr>
         <td colspan="2">
             {% for listItem in item %}
-                {% include "partials/elements/ooi_tree_table.html" with list=listItem current_position=current_position|add:'-r'  %}
+                {% include "partials/elements/ooi_tree_table.html" with list=listItem current_position=current_position|add:'-r' %}
 
             {% endfor %}
         </td>
