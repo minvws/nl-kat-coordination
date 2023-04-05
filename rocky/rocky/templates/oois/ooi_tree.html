@@ -1,33 +1,36 @@
 {% extends "layouts/base.html" %}
+
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-  {% include 'header.html' %}
+    {% include 'header.html' %}
 
-  <main id="main-content">
-    <section>
-      <div>
-        {% include 'partials/ooi_head.html' with ooi=ooi view='ooi_tree' %}
+    <main id="main-content">
+        <section>
+            <div>
+                {% include 'partials/ooi_head.html' with ooi=ooi view='ooi_tree' %}
 
-        {% translate 'Object tree' as filter_title %}
-        {% include 'partials/ooi_list_filters.html' with title=filter_title ooi_id=ooi.primary_key %}
+                {% translate 'Object tree' as filter_title %}
+                {% include 'partials/ooi_list_filters.html' with title=filter_title ooi_id=ooi.primary_key %}
 
-        {% if tree_view == 'table' %}
-          {% include "partials/elements/ooi_tree_table.html" with list=tree ooi_id=ooi.primary_key %}
-        {% else %}
-          {% include "partials/elements/ooi_tree_condensed_table.html" with list=tree ooi_id=ooi.primary_key %}
-        {% endif %}
+                {% if tree_view == 'table' %}
+                    {% include "partials/elements/ooi_tree_table.html" with list=tree ooi_id=ooi.primary_key %}
 
-        {% include 'partials/ooi_tree_toolbar_bottom.html' with  ooi_id=ooi.primary_key %}
-      </div>
-    </section>
+                {% else %}
+                    {% include "partials/elements/ooi_tree_condensed_table.html" with list=tree ooi_id=ooi.primary_key %}
 
-    {% include 'partials/ooi_type_filters_linklist.html' %}
-  </main>
+                {% endif %}
+                {% include 'partials/ooi_tree_toolbar_bottom.html' with  ooi_id=ooi.primary_key %}
+
+            </div>
+        </section>
+        {% include 'partials/ooi_type_filters_linklist.html' %}
+
+    </main>
 {% endblock %}
-
 {% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
+    {{ block.super }}
+    <script src="{% static '/js/checkboxToggler.js' %}"
+            nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}
