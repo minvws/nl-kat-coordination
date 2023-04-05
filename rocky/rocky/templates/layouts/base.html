@@ -3,17 +3,16 @@
 {% load i18n %}
 
 <html lang="nl">
-  {% block head %}
-    {% include 'head.html' %}
-  {% endblock %}
+    {% block head %}
+        {% include 'head.html' %}
 
-  <body>
-    {% block content_wrapper %}
-      {% block content %}{% endblock %}
     {% endblock %}
+    <body>
+        {% block content_wrapper %}
+            {% block content %}{% endblock %}
+        {% endblock %}
+        {% include 'footer.html' %}
 
-    {% include 'footer.html' %}
-    {% block html_at_end_body %}{% endblock %}
-
-  </body>
+        {% block html_at_end_body %}{% endblock %}
+    </body>
 </html>
