@@ -37,8 +37,6 @@ class Scheduler(abc.ABC):
             concurrently.
         stop_event: A threading.Event object used for communicating a stop
             event across threads.
-        metrics:
-            A dict of metrics that can be used for monitoring.
     """
 
     organisation: models.Organisation
