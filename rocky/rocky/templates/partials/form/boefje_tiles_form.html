@@ -1,18 +1,19 @@
 {% load i18n %}
 
 <form class="inline" method="post" class="help">
-  {% csrf_token %}
-  {% if checkbox_group_table_form %}
-    {% include 'partials/form/form_errors.html' with form=field %}
-    {% for choices in checkbox_group_table_form %}{{ choices }}{% endfor %}
-  {% endif %}
-  <div class="horizontal-view">
-    {% if skip_onboarding == 'yes' and organization.code %}
-      <a href="{% url 'complete_onboarding' organization.code %}"
-         class="button ghost">{% translate 'Skip onboarding' %}</a>
+    {% csrf_token %}
+    {% if checkbox_group_table_form %}
+        {% include 'partials/form/form_errors.html' with form=field %}
+
+        {% for choices in checkbox_group_table_form %}{{ choices }}{% endfor %}
     {% endif %}
-    <button type="submit"
-            class="{{ btn_class }}"
-            {% if btn_disabled %}disabled{% endif %}>{{ btn_text }}</button>
-  </div>
+    <div class="horizontal-view">
+        {% if skip_onboarding == 'yes' and organization.code %}
+            <a href="{% url 'complete_onboarding' organization.code %}"
+               class="button ghost">{% translate 'Skip onboarding' %}</a>
+        {% endif %}
+        <button type="submit"
+                class="{{ btn_class }}"
+                {% if btn_disabled %}disabled{% endif %}>{{ btn_text }}</button>
+    </div>
 </form>

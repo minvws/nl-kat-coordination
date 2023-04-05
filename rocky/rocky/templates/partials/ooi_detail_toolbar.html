@@ -12,10 +12,15 @@
          class="button ghost">{% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}</a>
     {% endif %}
   {% endif %}
-  <a href="{% ooi_url 'ooi_report' ooi_id organization.code query=mandatory_fields %}"
-     class="button ghost">{% translate 'Generate report' %}</a>
-  {% if ooi|is_finding %}
-    <a href="{% ooi_url 'finding_mute' ooi_id organization.code %}"
-       class="button">{% translate 'Mute Finding' %}</a>
+  {% if not ooi|is_finding_type %}
+    <a href="{% ooi_url 'ooi_delete' ooi_id organization.code %}"
+       class="button ghost">{% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}</a>
   {% endif %}
+{% endif %}
+<a href="{% ooi_url 'ooi_report' ooi_id organization.code query=mandatory_fields %}"
+   class="button ghost">{% translate 'Generate report' %}</a>
+{% if ooi|is_finding %}
+  <a href="{% ooi_url 'finding_mute' ooi_id organization.code %}"
+     class="button">{% translate 'Mute Finding' %}</a>
+{% endif %}
 </div>
