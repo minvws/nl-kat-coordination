@@ -6,7 +6,7 @@
     <h1>
         {% block title %}
             {% trans "Backup Tokens" %}
-        {% endblock %}
+        {% endblock title %}
     </h1>
     <form method="post">
         {% csrf_token %}
@@ -32,4 +32,4 @@
             <button type="submit">{% trans "Generate Tokens" %}</button>
         </div>
     </form>
-{% endblock %}
+{% endblock content %}

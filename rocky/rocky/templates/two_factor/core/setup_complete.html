@@ -6,7 +6,7 @@
     <h1>
         {% block title %}
             {% trans "Enable Two-Factor Authentication" %}
-        {% endblock %}
+        {% endblock title %}
     </h1>
     <p>{% trans "Congratulations, you've successfully enabled two-factor authentication." %}</p>
     {% if not phone_methods %}
@@ -27,4 +27,4 @@
             <a href="{% url "two_factor:phone_create" %}" class="button">{% trans "Add Phone Number" %}</a>
         </p>
     {% endif %}
-{% endblock %}
+{% endblock content %}

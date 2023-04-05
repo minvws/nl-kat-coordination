@@ -4,7 +4,7 @@
 
 {% block title %}
     {{ total_plugins }} {% translate "Available plugins" %}
-{% endblock %}
+{% endblock title %}
 {% block filter_form %}
     <form novalidate method="get" class="help">
         {% csrf_token %}
@@ -14,4 +14,4 @@
             <button type="submit">{% translate "Update List" %}</button>
         </fieldset>
     </form>
-{% endblock %}
+{% endblock filter_form %}

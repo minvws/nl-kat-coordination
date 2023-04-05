@@ -30,7 +30,7 @@
         {% include "partials/ooi_type_filters_linklist.html" %}
 
     </main>
-{% endblock %}
+{% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
     {{ ooi_types|json_script:"ooi-types" }}
@@ -41,4 +41,4 @@
             nonce="{{ request.csp_nonce }}"></script>
     <script src="{% static "/dist/graph.js" %}" nonce="{{ request.csp_nonce }}"></script>
     <link href="{% static "/dist/graph.css" %}" rel="stylesheet">
-{% endblock %}
+{% endblock html_at_end_body %}

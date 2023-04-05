@@ -6,7 +6,7 @@
     <h1>
         {% block title %}
             {% trans "Add Backup Phone" %}
-        {% endblock %}
+        {% endblock title %}
     </h1>
     <form action="" method="post">
         {% csrf_token %}
@@ -29,4 +29,4 @@
         {% include "two_factor/_wizard_actions.html" %}
 
     </form>
-{% endblock %}
+{% endblock content %}

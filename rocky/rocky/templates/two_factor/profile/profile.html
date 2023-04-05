@@ -6,7 +6,7 @@
     <h1>
         {% block title %}
             {% trans "Account Security" %}
-        {% endblock %}
+        {% endblock title %}
     </h1>
     {% if default_device %}
         {% if default_device_type == "TOTPDevice" %}
@@ -72,4 +72,4 @@
             <a href="{% url "two_factor:setup" %}" class="button">{% trans "Enable Two-Factor Authentication" %}</a>
         </p>
     {% endif %}
-{% endblock %}
+{% endblock content %}

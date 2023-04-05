@@ -100,9 +100,9 @@
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
     <script src="{% static "/js/autoSubmit.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+{% endblock html_at_end_body %}

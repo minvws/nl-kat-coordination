@@ -4,7 +4,7 @@
 
 {% block title %}
     {{ members.count }} {% translate "Members" %}
-{% endblock %}
+{% endblock title %}
 {% block filter_form %}
     <form method="get">
         <fieldset>
@@ -26,4 +26,4 @@
         </fieldset>
         <input type="submit" value="{% translate "Update List" %}">
     </form>
-{% endblock %}
+{% endblock filter_form %}

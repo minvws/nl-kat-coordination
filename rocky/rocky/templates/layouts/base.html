@@ -6,13 +6,13 @@
     {% block head %}
         {% include "head.html" %}
 
-    {% endblock %}
+    {% endblock head %}
     <body>
         {% block content_wrapper %}
-            {% block content %}{% endblock %}
-        {% endblock %}
+            {% block content %}{% endblock content %}
+        {% endblock content_wrapper %}
         {% include "footer.html" %}
 
-        {% block html_at_end_body %}{% endblock %}
+        {% block html_at_end_body %}{% endblock html_at_end_body %}
     </body>
 </html>

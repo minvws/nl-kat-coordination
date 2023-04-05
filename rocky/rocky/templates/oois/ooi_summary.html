@@ -31,5 +31,5 @@
         {% include "partials/ooi_summary_block.html" with tree_node=tree %}
 
     </main>
-{% endblock %}
-{% block html_at_end_body %}{{ block.super }}{% endblock %}
+{% endblock content %}
+{% block html_at_end_body %}{{ block.super }}{% endblock html_at_end_body %}
