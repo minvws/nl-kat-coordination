@@ -1,15 +1,15 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'FMEA introduction' %}</h1>
+                <h1>{% translate "FMEA introduction" %}</h1>
                 <p>
                     {% blocktranslate trimmed %}
             FMEA (failure mode and effective analysis) is a step-by-step approach
@@ -32,29 +32,29 @@
                     <nav aria-label="document-navigation">
                         <ul>
                             <li>
-                                <a href="{% url 'fmea_failure_mode_effect_create' %}">{% translate 'Create failure mode effects' %}</a>
+                                <a href="{% url 'fmea_failure_mode_effect_create' %}">{% translate "Create failure mode effects" %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'fmea_failure_mode_create' %}">{% translate 'Create a new failure mode' %}</a>
+                                <a href="{% url 'fmea_failure_mode_create' %}">{% translate "Create a new failure mode" %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'fmea_failure_mode_affected_object_create' %}">{% translate 'Create affected objects of a failure mode' %}</a>
+                                <a href="{% url 'fmea_failure_mode_affected_object_create' %}">{% translate "Create affected objects of a failure mode" %}</a>
                             </li>
                         </ul>
                     </nav>
                     <nav aria-label="document-navigation">
                         <ul>
                             <li>
-                                <a href="{% url 'fmea_failure_mode_list' %}">{% translate 'View all failure modes' %}</a>
+                                <a href="{% url 'fmea_failure_mode_list' %}">{% translate "View all failure modes" %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'fmea_failure_mode_effect_list' %}">{% translate 'View all failure mode effects' %}</a>
+                                <a href="{% url 'fmea_failure_mode_effect_list' %}">{% translate "View all failure mode effects" %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'fmea_failure_mode_affected_object_list' %}">{% translate 'View all affected objects for a failure modes' %}</a>
+                                <a href="{% url 'fmea_failure_mode_affected_object_list' %}">{% translate "View all affected objects for a failure modes" %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'fmea_department_heatmap' %}">{% translate 'Heatmap' %}</a>
+                                <a href="{% url 'fmea_department_heatmap' %}">{% translate "Heatmap" %}</a>
                             </li>
                         </ul>
                     </nav>
@@ -62,4 +62,4 @@
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}

@@ -5,16 +5,16 @@
         {% if request.user.is_authenticated %}
             <div class="login-meta">
                 <p>
-                    {% translate 'Logged in as' %}:
+                    {% translate "Logged in as" %}:
                     {% if organization %}
-                        <a href="{% url 'account_detail' organization_code=organization.code %}">{{ request.user }}</a>
+                        <a href="{% url "account_detail" organization_code=organization.code %}">{{ request.user }}</a>
                     {% else %}
                         {{ request.user }}
                     {% endif %}
                 </p>
             </div>
         {% endif %}
-        {% include 'partials/language-switcher.html' %}
+        {% include "partials/language-switcher.html" %}
 
     </div>
 </section>

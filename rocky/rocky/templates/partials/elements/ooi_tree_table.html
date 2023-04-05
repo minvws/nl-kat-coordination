@@ -21,13 +21,13 @@
                                 {{ list.ooi_type }}: {{ list.human_readable }}
                             </label>
                             <nav>
-                                {% translate 'go to:' %}
-                                <a href="{% ooi_url 'ooi_detail' list.id organization.code %}"
-                                   title="{% translate 'Go to detailpage' %}">{% translate 'detail' %}</a>
-                                <a href="{% ooi_url 'ooi_tree' list.id organization.code %}"
-                                   title="{% translate 'Go to tree view' %}">{% translate 'tree' %}</a>
-                                <a href="{% ooi_url 'ooi_graph' list.id organization.code %}"
-                                   title="{% translate 'Go to graph view' %}">{% translate 'graph' %}</a>
+                                {% translate "go to:" %}
+                                <a href="{% ooi_url "ooi_detail" list.id organization.code %}"
+                                   title="{% translate "Go to detailpage" %}">{% translate "detail" %}</a>
+                                <a href="{% ooi_url "ooi_tree" list.id organization.code %}"
+                                   title="{% translate "Go to tree view" %}">{% translate "tree" %}</a>
+                                <a href="{% ooi_url "ooi_graph" list.id organization.code %}"
+                                   title="{% translate "Go to graph view" %}">{% translate "graph" %}</a>
                             </nav>
                         </div>
                     </th>

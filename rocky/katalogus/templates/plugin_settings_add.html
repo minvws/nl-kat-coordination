@@ -1,10 +1,10 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load static %}
 {% load i18n %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -26,7 +26,7 @@
                 <div class="form-view">
                     <form novalidate method="post" class="horizontal-view help">
                         {% csrf_token %}
-                        {% include 'partials/form/fieldset.html' with legend=name fields=form %}
+                        {% include "partials/form/fieldset.html" with legend=name fields=form %}
 
                         <div class="horizontal-view">
                             <button type="submit" class="ghost" name="add">
@@ -49,4 +49,4 @@
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}
