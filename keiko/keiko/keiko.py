@@ -121,7 +121,7 @@ def generate_report(
             tex_output_file_name,
         ]
         env = {**os.environ, "TEXMFVAR": tmp_dirname}
-        for i in enumerate(range(2), 1):
+        for i in (1, 2):
             output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
             logger.info(
                 "pdflatex [run=%d] [report_id=%s] [template=%s] [command=%s]",
