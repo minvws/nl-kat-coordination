@@ -1,9 +1,9 @@
-{% extends 'partials/list_filters.html' %}
+{% extends "partials/list_filters.html" %}
 
 {% load i18n %}
 
 {% block title %}
-    {{ members.count }} {% translate 'Members' %}
+    {{ members.count }} {% translate "Members" %}
 {% endblock %}
 {% block filter_form %}
     <form method="get">
@@ -24,6 +24,6 @@
                 {% endfor %}
             </div>
         </fieldset>
-        <input type="submit" value="{% translate 'Update List' %}">
+        <input type="submit" value="{% translate "Update List" %}">
     </form>
 {% endblock %}

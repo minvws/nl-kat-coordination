@@ -1,19 +1,19 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' with view_type="onboarding" %}
+    {% include "header.html" with view_type="onboarding" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'OpenKAT introduction' %}</h1>
-                {% include 'partials/stepper.html' %}
+                <h1>{% translate "OpenKAT introduction" %}</h1>
+                {% include "partials/stepper.html" %}
 
-                <h2>{% translate 'Report' %}</h2>
-                <h3>{% translate 'Boefjes are scanning' %}</h3>
+                <h2>{% translate "Report" %}</h2>
+                <h3>{% translate "Boefjes are scanning" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             The enabled boefjes are collecting the data needed to generate the DNS-report.
@@ -32,11 +32,11 @@
             When you would like to see the status of a scan you can open the "tasks" page.
           {% endblocktranslate %}
                 </p>
-                {% include 'partials/cat_loader.html' %}
+                {% include "partials/cat_loader.html" %}
 
                 <form method="post" class="inline">
                     {% csrf_token %}
-                    <button disabled type="submit" class="button" id="js-disabled-for-10">{% translate 'Open my DNS-report' %}</button>
+                    <button disabled type="submit" class="button" id="js-disabled-for-10">{% translate "Open my DNS-report" %}</button>
                 </form>
             </div>
         </section>
@@ -44,6 +44,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static '/js/enableButtonTimeout.js' %}"
+    <script src="{% static "/js/enableButtonTimeout.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

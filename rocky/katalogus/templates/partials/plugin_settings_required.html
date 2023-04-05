@@ -6,14 +6,14 @@
         <section>
             <div class="form-view">
                 {% if not form %}
-                    <h1>{% translate 'The form could not be initialized.' %}</h1>
+                    <h1>{% translate "The form could not be initialized." %}</h1>
                 {% else %}
                     <form novalidate method="post" class="horizontal-view help">
                         {% csrf_token %}
-                        {% translate 'Required settings' as fieldset_legend %}
-                        {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+                        {% translate "Required settings" as fieldset_legend %}
+                        {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-                        <button type="submit">{% translate 'Add' %}</button>
+                        <button type="submit">{% translate "Add" %}</button>
                     </form>
                 {% endif %}
             </div>

@@ -1,10 +1,10 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -12,7 +12,7 @@
                 <div class="vertical-scroll">
                     {% if heatmap_data %}
                         <table>
-                            <caption>{% translate 'FMEA Departments Heatmap:' %}</caption>
+                            <caption>{% translate "FMEA Departments Heatmap:" %}</caption>
                             <tbody>
                                 <tr>
                                     <td></td>
@@ -35,7 +35,7 @@
                             </tbody>
                         </table>
                     {% else %}
-                        <p>{% translate 'No data to build heatmap' %}</p>
+                        <p>{% translate "No data to build heatmap" %}</p>
                     {% endif %}
                 </div>
             </div>

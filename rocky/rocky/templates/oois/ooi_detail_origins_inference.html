@@ -4,12 +4,12 @@
 {% spaceless %}
     {% if inferences %}
         <div class="horizontal-scroll">
-            <h2>{% translate 'Inferred by' %}</h2>
+            <h2>{% translate "Inferred by" %}</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>{% translate 'Bit' %}</th>
-                        <th>{% translate 'Source' %}</th>
+                        <th>{% translate "Bit" %}</th>
+                        <th>{% translate "Source" %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -17,7 +17,7 @@
                         <tr>
                             <td>{{ inference.origin.method }}</td>
                             <td>
-                                <a href="{% ooi_url 'ooi_detail' inference.origin.source organization.code %}">{{ inference.origin.source }}</a>
+                                <a href="{% ooi_url "ooi_detail" inference.origin.source organization.code %}">{{ inference.origin.source }}</a>
                             </td>
                         </tr>
                     {% endfor %}

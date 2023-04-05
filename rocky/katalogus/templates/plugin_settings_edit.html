@@ -1,22 +1,22 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load static %}
 {% load i18n %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Edit setting' %} - {{ setting_name }}</h1>
-                <p class="emphasized">{% translate 'Settings' %}</p>
+                <h1>{% translate "Edit setting" %} - {{ setting_name }}</h1>
+                <p class="emphasized">{% translate "Settings" %}</p>
                 <div class="form-view">
                     <form novalidate method="post" class="horizontal-view help">
                         {% csrf_token %}
-                        {% include 'partials/form/fieldset.html' with legend=name fields=form %}
+                        {% include "partials/form/fieldset.html" with legend=name fields=form %}
 
-                        <button class="button" type="submit">{% translate 'Update setting' %}</button>
+                        <button class="button" type="submit">{% translate "Update setting" %}</button>
                     </form>
                 </div>
             </div>

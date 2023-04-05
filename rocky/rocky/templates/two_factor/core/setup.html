@@ -20,11 +20,11 @@
                 </p>
             </div>
             <div>
-                <label>{% translate 'QR code' %}</label>
+                <label>{% translate "QR code" %}</label>
                 <img class="qr-code-image" src="{{ QR_URL }}" alt="QR Code"/>
             </div>
             <div>
-                <label>{% translate 'Setup key' %}</label>
+                <label>{% translate "Setup key" %}</label>
                 <input id="totp-input" type="text" value="{{ secret_key }}"/>
                 <p class="explanation"
                    data-open-label="Explanation of the secret key."

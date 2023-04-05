@@ -1,17 +1,17 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content" tabindex="-1" class="katalogus">
         <section>
             <div>
                 <div class="fifty-fifty">
                     <div>
-                        <h1>{% translate 'KAT-alogus' %}</h1>
+                        <h1>{% translate "KAT-alogus" %}</h1>
                         <p class="emphasized">
                             {% blocktranslate %}
                 An overview of all available boefjes.
@@ -23,29 +23,29 @@
                     {% if perms.tools.can_scan_organization %}
                         <div class="horizontal-view toolbar">
                             <a class="button ghost"
-                               href="{% url 'katalogus_settings' organization.code %}">{% translate 'KAT-alogus Settings' %}</a>
+                               href="{% url 'katalogus_settings' organization.code %}">{% translate "KAT-alogus Settings" %}</a>
                         </div>
                     {% endif %}
                 </div>
             </div>
         </section>
         <section>
-            {% include 'partials/katalogus_filter.html' with total_plugins=object_list|length form=form %}
+            {% include "partials/katalogus_filter.html" with total_plugins=object_list|length form=form %}
 
         </section>
-        {% if view == 'table' %}
+        {% if view == "table" %}
             <section>
                 <div>
-                    {% include 'partials/katalogus_toolbar.html' with view=view %}
+                    {% include "partials/katalogus_toolbar.html" with view=view %}
 
                     <div class="horizontal-scroll">
                         <table>
-                            <caption>{% translate 'Boefjes overview:' %}</caption>
+                            <caption>{% translate "Boefjes overview:" %}</caption>
                             <thead>
                                 <tr>
-                                    <th>{% translate 'Boefje name' %}</th>
-                                    <th>{% translate 'Boefje description' %}</th>
-                                    <th colspan="2">{% translate 'Actions' %}</th>
+                                    <th>{% translate "Boefje name" %}</th>
+                                    <th>{% translate "Boefje description" %}</th>
+                                    <th colspan="2">{% translate "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -54,12 +54,12 @@
                                         <td scope="row">{{ plugin.name }}</td>
                                         <td>{{ plugin.description }}</td>
                                         <td>
-                                            {% include 'partials/enable_disable_plugin.html' with plugin=plugin %}
+                                            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
                                         </td>
                                         <td>
-                                            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
-                                               class="nowrap">{% translate 'See details' %}</a>
+                                            <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
+                                               class="nowrap">{% translate "See details" %}</a>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -71,7 +71,7 @@
         {% else %}
             <section>
                 <div>
-                    {% include 'partials/katalogus_toolbar.html' with view=view %}
+                    {% include "partials/katalogus_toolbar.html" with view=view %}
 
                     <div class="column-4 tiles plugins images-cover">
                         {% for plugin in object_list %}
@@ -86,6 +86,6 @@
 {% endblock %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static '/js/checkboxToggler.js' %}"
+    <script src="{% static "/js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

@@ -1,16 +1,16 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' with view_type="onboarding" %}
+    {% include "header.html" with view_type="onboarding" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Setup scan - Enable plugins' %}</h1>
-                {% include 'partials/stepper.html' %}
+                <h1>{% translate "Setup scan - Enable plugins" %}</h1>
+                {% include "partials/stepper.html" %}
 
                 <h2>{% translate "Plugins introduction" %}</h2>
                 <p>
@@ -22,7 +22,7 @@
                 </p>
                 <ul>
                     <li>
-                        <strong>{% translate 'Boefjes' %}:</strong>
+                        <strong>{% translate "Boefjes" %}:</strong>
                         {% blocktranslate trimmed %}
                 Scan objects for data. Each boefje has a scan intensity score to
                 prevent invasive scanning on objects where you don’t have the clearance to
@@ -30,13 +30,13 @@
             {% endblocktranslate %}
                     </li>
                     <li>
-                        <strong>{% translate 'Normalizers' %}:</strong>
+                        <strong>{% translate "Normalizers" %}:</strong>
                         {% blocktranslate trimmed %}
                 Check the data for specific objects and add these object to your object list.
             {% endblocktranslate %}
                     </li>
                     <li>
-                        <strong>{% translate 'Bits' %}:</strong>
+                        <strong>{% translate "Bits" %}:</strong>
                         {% blocktranslate trimmed %}
                 Analyze the available data to come to insights and conclusions.
             {% endblocktranslate %}
@@ -57,12 +57,12 @@
               Let’s setup your scan by enabling the plugins of your choice below.
           {% endblocktranslate %}
                 </p>
-                <h2>{% translate 'Suggested plugins' %}</h2>
-                {% if form_view == 'table' %}
-                    {% include 'partials/form/checkbox_group_table_form.html' with checkbox_group_table_form=select_boefjes_form btn_text='Enable and start scan' btn_disabled=boefje_disabled skip_onboarding="yes" %}
+                <h2>{% translate "Suggested plugins" %}</h2>
+                {% if form_view == "table" %}
+                    {% include "partials/form/checkbox_group_table_form.html' with checkbox_group_table_form=select_boefjes_form btn_text='Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
 
                 {% else %}
-                    {% include 'partials/form/boefje_tiles_form.html' with checkbox_group_table_form=select_boefjes_form btn_text='Enable and start scan' btn_disabled=boefje_disabled skip_onboarding="yes" %}
+                    {% include "partials/form/boefje_tiles_form.html' with checkbox_group_table_form=select_boefjes_form btn_text='Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
 
                 {% endif %}
             </div>
@@ -71,6 +71,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static '/js/checkboxToggler.js' %}"
+    <script src="{% static "/js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

@@ -4,21 +4,21 @@
 {% load i18n %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section class="hero">
-            <img src="{% static 'img/keiko.jpg' %}" alt="Keiko image">
+            <img src="{% static "img/keiko.jpg" %}" alt="Keiko image">
             <div class="one-third-two-thirds">
                 <div class="tile">
-                    <h1>{% translate 'Welcome to OpenKAT' %}</h1>
-                    <h2>{% translate 'Kwetsbaarheden Analyse Tool' %}</h2>
+                    <h1>{% translate "Welcome to OpenKAT" %}</h1>
+                    <h2>{% translate "Kwetsbaarheden Analyse Tool" %}</h2>
                 </div>
             </div>
         </section>
         <section class="bg-color-offset condensed" id="OpenKAT">
             <div>
-                <h2>{% translate 'What is OpenKAT?' %}</h2>
+                <h2>{% translate "What is OpenKAT?" %}</h2>
                 <p>
                     {% blocktranslate trimmed %}
         OpenKAT is a vulnerability analysis tool.
@@ -29,7 +29,7 @@
             </div>
             <div class="column-2">
                 <div>
-                    <h3 class="icon ti-eye">{% translate 'OpenKAT sees' %}</h3>
+                    <h3 class="icon ti-eye">{% translate "OpenKAT sees" %}</h3>
                     <p>
                         {% blocktranslate trimmed %}
             Dozens of tools are integrated in OpenKAT to view the world (digital and analog).
@@ -38,7 +38,7 @@
                     </p>
                 </div>
                 <div>
-                    <h3 class="icon ti-bulb">{% translate 'OpenKAT knows' %}</h3>
+                    <h3 class="icon ti-bulb">{% translate "OpenKAT knows" %}</h3>
                     <p>
                         {% blocktranslate trimmed %}
           OpenKAT does not forget (just like that), and can be queried without scanning again.
@@ -47,7 +47,7 @@
                     </p>
                 </div>
                 <div>
-                    <h3 class="icon ti-lock">{% translate 'OpenKAT is secure' %}</h3>
+                    <h3 class="icon ti-lock">{% translate "OpenKAT is secure" %}</h3>
                     <p>
                         {% blocktranslate trimmed %}
           Forensically secured storage of evidence is one of the basic ingredients of OpenKAT.
@@ -55,7 +55,7 @@
                     </p>
                 </div>
                 <div>
-                    <h3 class="icon ti-heart">{% translate 'OpenKAT is sweet' %}</h3>
+                    <h3 class="icon ti-heart">{% translate "OpenKAT is sweet" %}</h3>
                     <p>
                         {% blocktranslate trimmed %}
           OpenKAT thinks about privacy, and stores what is necessary,
@@ -67,7 +67,7 @@
         </section>
         <section>
             <div>
-                <h3>{% translate 'A wide playing field' %}</h3>
+                <h3>{% translate "A wide playing field" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
         OpenKAT makes a copy of the actual reality by means of the integrated tools.

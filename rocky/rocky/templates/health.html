@@ -1,23 +1,23 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Health Checks' %}</h1>
+                <h1>{% translate "Health Checks" %}</h1>
                 <div class="horizontal-scroll">
                     <table>
                         <thead>
                             <tr>
-                                <th scope="col">{% translate 'Service' %}</th>
-                                <th scope="col">{% translate 'Healthy' %}</th>
-                                <th scope="col">{% translate 'Version' %}</th>
-                                <th scope="col">{% translate 'Additional' %}</th>
+                                <th scope="col">{% translate "Service" %}</th>
+                                <th scope="col">{% translate "Healthy" %}</th>
+                                <th scope="col">{% translate "Version" %}</th>
+                                <th scope="col">{% translate "Additional" %}</th>
                             </tr>
                         </thead>
                         <tbody>

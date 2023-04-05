@@ -8,8 +8,8 @@
         </span>
         <h1>{% translate "Finding details" %}</h1>
         {% if not finding_type.risk_level_source %}
-            <p class="warning" role="group" aria-label="{% translate 'warning' %}">
-                <span>{% translate 'Warning' %}:</span>
+            <p class="warning" role="group" aria-label="{% translate "warning" %}">
+                <span>{% translate "Warning" %}:</span>
                 {% blocktranslate trimmed %}
           Findings of this findingtype have been marked 'critical' because of unknown CVSS. This requires manual
           investigation due to lack of CVSS score.
@@ -30,10 +30,10 @@
                     {% translate "Finding" %}
                 </dt>
                 <dd>
-                    <a href="{% ooi_url 'ooi_detail' finding_type.ooi_type|add:'|'|add:finding_type.id organization.code %}">{{ finding_type.id }}</a>
+                    <a href="{% ooi_url "ooi_detail' finding_type.ooi_type|add:'|"|add:finding_type.id organization.code %}">{{ finding_type.id }}</a>
                 </dd>
             </div>
-            {% include 'partials/elements/definition_list_item.html' with label='Description' description=finding_type.description %}
+            {% include "partials/elements/definition_list_item.html' with label='Description" description=finding_type.description %}
 
             <div>
                 <dt>
@@ -43,8 +43,8 @@
                     {{ finding_type.risk_level_score }} / 10
                 </dd>
             </div>
-            {% include 'partials/elements/definition_list_item.html' with label='Severity' description=finding_type.risk_level_severity %}
-            {% include 'partials/elements/definition_list_item.html' with label='Impact' description=finding_type.impact_description %}
+            {% include "partials/elements/definition_list_item.html' with label='Severity" description=finding_type.risk_level_severity %}
+            {% include "partials/elements/definition_list_item.html' with label='Impact" description=finding_type.impact_description %}
 
             {% if finding_type.source %}
                 <div>
@@ -56,7 +56,7 @@
                     </dd>
                 </div>
             {% endif %}
-            {% include 'partials/elements/definition_list_items.html' with items=finding_type.items exclude_keys='id,human_readable,ooi_type,description,risk_level_score,impact_description,source,findings,risk_level_severity' %}
+            {% include "partials/elements/definition_list_items.html' with items=finding_type.items exclude_keys='id,human_readable,ooi_type,description,risk_level_score,impact_description,source,findings,risk_level_severity" %}
 
         </dl>
         <div>
@@ -74,9 +74,9 @@
             <div>
                 <h3>{% translate "Occurrence" %}</h3>
                 {% for finding in findings.list %}
-                    <a href="{% ooi_url 'ooi_detail' finding.ooi.id organization.code %}">{{ finding.ooi.human_readable }}</a>
+                    <a href="{% ooi_url "ooi_detail" finding.ooi.id organization.code %}">{{ finding.ooi.human_readable }}</a>
                     <div id="{{ findings.grouper.id }}-{{ finding.ooi.id }}">
-                        {% include 'partials/finding_occurrence_definition_list.html' %}
+                        {% include "partials/finding_occurrence_definition_list.html" %}
 
                     </div>
                 {% endfor %}

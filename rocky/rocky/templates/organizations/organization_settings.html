@@ -1,26 +1,26 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Organization' %}: {{ organization.name }}</h1>
+                <h1>{% translate "Organization" %}: {{ organization.name }}</h1>
                 {% blocktranslate with organization_name=organization.name %}
           An overview of "{{ organization_name }}". This shows general information and its settings.
 {% endblocktranslate %}
-                <h2>{% translate 'Organization details' %}</h2>
+                <h2>{% translate "Organization details" %}</h2>
                 <div class="horizontal-scroll">
                     <table>
                         <thead>
                             <tr>
-                                <th>{% translate 'Name' %}</th>
-                                <th>{% translate 'Code' %}</th>
-                                <th>{% translate 'Edit' %}</th>
+                                <th>{% translate "Name" %}</th>
+                                <th>{% translate "Code" %}</th>
+                                <th>{% translate "Edit" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -30,8 +30,8 @@
                                 <td>
                                     {% if perms.tools.change_organization %}
                                         {% spaceless %}
-                                            <a href="{% url 'organization_edit' organization.code %}">
-                                                <button class="icon ti-edit action-button">{% translate 'Edit' %}</button>
+                                            <a href="{% url "organization_edit" organization.code %}">
+                                                <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
                                             </a>
                                         {% endspaceless %}
                                     {% endif %}
@@ -41,16 +41,16 @@
                     </table>
                 </div>
                 {% if perms.tools.change_organization %}
-                    <a href="{% url 'indemnification_add' organization.code %}"
-                       class="button ghost">{% translate 'Add indemnification' %}</a>
+                    <a href="{% url "indemnification_add" organization.code %}"
+                       class="button ghost">{% translate "Add indemnification" %}</a>
                 {% endif %}
             </div>
         </section>
         {% if organization.tags.all %}
             <section>
                 <div>
-                    <h2>{% translate 'Tags' %}</h2>
-                    {% include 'organizations/organization_tags.html' %}
+                    <h2>{% translate "Tags" %}</h2>
+                    {% include "organizations/organization_tags.html" %}
 
                 </div>
             </section>
@@ -59,6 +59,6 @@
 {% endblock %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static '/js/checkboxToggler.js' %}"
+    <script src="{% static "/js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
 {% endblock %}

@@ -4,14 +4,14 @@
 
 <html lang="nl">
     {% block head %}
-        {% include 'head.html' %}
+        {% include "head.html" %}
 
     {% endblock %}
     <body>
         {% block content_wrapper %}
             {% block content %}{% endblock %}
         {% endblock %}
-        {% include 'footer.html' %}
+        {% include "footer.html" %}
 
         {% block html_at_end_body %}{% endblock %}
     </body>

@@ -1,15 +1,15 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load static %}
 {% load i18n %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Clone settings' %}</h1>
+                <h1>{% translate "Clone settings" %}</h1>
                 <p class="emphasized">
                     Override both the KAT-alogus settings as well as enabled and disabled plugins of organization <i>{{ to_organization }}</i>.
                 </p>
@@ -34,9 +34,9 @@
                 <form class="inline" method="post">
                     {% csrf_token %}
                     <fieldset>
-                        <a href="{% url 'katalogus_settings' organization.code %}"
-                           class="button ghost">{% translate 'Cancel' %}</a>
-                        <button type="submit">{% translate 'Clone' %}</button>
+                        <a href="{% url "katalogus_settings" organization.code %}"
+                           class="button ghost">{% translate "Cancel" %}</a>
+                        <button type="submit">{% translate "Clone" %}</button>
                     </fieldset>
                 </form>
             </div>
