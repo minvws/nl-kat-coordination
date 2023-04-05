@@ -1,5 +1,6 @@
 from typing import Dict, BinaryIO
 from django.conf import settings
+from io import BytesIO
 
 import requests
 import time
@@ -32,9 +33,9 @@ class KeikoClient:
         # try max 15 times to get the report, 1 second interval
         for i in range(15):
             time.sleep(1)
-            res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf", stream=True)
+            res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf")
             if res.status_code == 200:
-                return res.raw
+                return BytesIO(res.content)
         res.raise_for_status()
         raise ReportNotFoundException
 
