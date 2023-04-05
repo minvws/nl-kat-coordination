@@ -52,7 +52,10 @@ class Katalogus(HTTPService):
 
     def _flush_organisations_boefje_type_cache(self) -> None:
         """boefje.consumes -> plugin type boefje"""
-        self.logger.debug("flushing boefje cache [cache=%s]", self.organisations_boefje_type_cache.cache)
+        self.logger.debug(
+            "flushing boefje cache [cache=%s]",
+            self.organisations_boefje_type_cache.cache,
+        )
 
         orgs = self.get_organisations()
 
@@ -75,11 +78,17 @@ class Katalogus(HTTPService):
                 for type_ in plugin.consumes:
                     self.organisations_boefje_type_cache[org.id].setdefault(type_, []).append(plugin)
 
-        self.logger.debug("flushed boefje cache [cache=%s]", self.organisations_boefje_type_cache.cache)
+        self.logger.debug(
+            "flushed boefje cache [cache=%s]",
+            self.organisations_boefje_type_cache.cache,
+        )
 
     def _flush_organisations_normalizer_type_cache(self) -> None:
         """normalizer.consumes -> plugin type normalizer"""
-        self.logger.debug("flushing normalizer cache [cache=%s]", self.organisations_normalizer_type_cache.cache)
+        self.logger.debug(
+            "flushing normalizer cache [cache=%s]",
+            self.organisations_normalizer_type_cache.cache,
+        )
         orgs = self.get_organisations()
 
         for org in orgs:
@@ -95,7 +104,10 @@ class Katalogus(HTTPService):
                 for type_ in plugin.consumes:
                     self.organisations_normalizer_type_cache[org.id].setdefault(type_, []).append(plugin)
 
-        self.logger.debug("flushed normalizer cache [cache=%s]", self.organisations_normalizer_type_cache.cache)
+        self.logger.debug(
+            "flushed normalizer cache [cache=%s]",
+            self.organisations_normalizer_type_cache.cache,
+        )
 
     @exception_handler
     def get_boefjes(self) -> List[Boefje]:
@@ -149,10 +161,16 @@ class Katalogus(HTTPService):
 
     def get_normalizers_by_org_id_and_type(self, organisation_id: str, normalizer_type: str) -> List[Plugin]:
         try:
-            return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
+            return dict_utils.deep_get(
+                self.organisations_normalizer_type_cache,
+                [organisation_id, normalizer_type],
+            )
         except dict_utils.ExpiredError:
             self._flush_organisations_normalizer_type_cache()
-            return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
+            return dict_utils.deep_get(
+                self.organisations_normalizer_type_cache,
+                [organisation_id, normalizer_type],
+            )
 
     def get_new_boefjes_by_org_id(self, organisation_id: str) -> List[Plugin]:
         # Get the enabled boefjes for the organisation from katalogus
@@ -172,7 +190,10 @@ class Katalogus(HTTPService):
         self.organisations_new_boefjes_cache[organisation_id] = enabled_boefjes
 
         self.logger.debug(
-            "%d new boefjes found [organisation_id=%s, new_boefjes=%s]", len(new_boefjes), organisation_id, new_boefjes
+            "%d new boefjes found [organisation_id=%s, new_boefjes=%s]",
+            len(new_boefjes),
+            organisation_id,
+            new_boefjes,
         )
 
         return new_boefjes

@@ -58,7 +58,10 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type")
     @mock.patch("scheduler.schedulers.NormalizerScheduler.create_tasks_for_raw_data")
     def test_populate_normalizer_queue_get_latest_raw_data(
-        self, mock_create_tasks_for_raw_data, mock_get_normalizers, mock_get_latest_raw_data
+        self,
+        mock_create_tasks_for_raw_data,
+        mock_get_normalizers,
+        mock_get_latest_raw_data,
     ):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)

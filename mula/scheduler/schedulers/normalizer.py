@@ -48,7 +48,10 @@ class NormalizerScheduler(Scheduler):
                 latest_raw_data = self.ctx.services.raw_data.get_latest_raw_data(
                     queue=f"{self.organisation.id}__raw_file_received",
                 )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            except (
+                requests.exceptions.RetryError,
+                requests.exceptions.ConnectionError,
+            ):
                 self.logger.warning(
                     "Could not get last run boefjes [organisation.id=%s, scheduler_id=%s]",
                     self.organisation.id,
@@ -130,7 +133,10 @@ class NormalizerScheduler(Scheduler):
                     self.organisation.id,
                     mime_type.get("value"),
                 )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            except (
+                requests.exceptions.RetryError,
+                requests.exceptions.ConnectionError,
+            ):
                 self.logger.warning(
                     "Could not get normalizers for org: %s and mime_type: %s "
                     "[boefje_meta.id=%s, organisation.id=%s, scheduler_id=%s]",
@@ -194,7 +200,14 @@ class NormalizerScheduler(Scheduler):
                     continue
 
                 score = self.ranker.rank(SimpleNamespace(raw_data=raw_data, task=task))
-                p_items.append(PrioritizedItem(id=task.id, scheduler_id=self.scheduler_id, priority=score, data=task))
+                p_items.append(
+                    PrioritizedItem(
+                        id=task.id,
+                        scheduler_id=self.scheduler_id,
+                        priority=score,
+                        data=task,
+                    )
+                )
 
                 self.logger.debug(
                     "Created normalizer task: %s for raw data: %s "

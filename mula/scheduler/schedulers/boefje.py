@@ -8,7 +8,15 @@ import pika
 import requests
 
 from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
+from scheduler.models import (
+    OOI,
+    Boefje,
+    BoefjeTask,
+    Organisation,
+    Plugin,
+    PrioritizedItem,
+    TaskStatus,
+)
 
 from .scheduler import Scheduler
 
@@ -260,7 +268,10 @@ class BoefjeScheduler(Scheduler):
 
         try:
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError) as e:
+        except (
+            requests.exceptions.RetryError,
+            requests.exceptions.ConnectionError,
+        ) as e:
             self.logger.warning(
                 "Could not connect to rabbitmq queue: %s [org_id=%s, scheduler_id=%s]",
                 f"{self.organisation.id}__scan_profile_increments",
@@ -294,7 +305,10 @@ class BoefjeScheduler(Scheduler):
                     boefje.consumes,
                     [i for i in range(boefje.scan_level, 5)],
                 )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            except (
+                requests.exceptions.RetryError,
+                requests.exceptions.ConnectionError,
+            ):
                 self.logger.warning(
                     "Could not get oois for organisation: %s [organisation.id=%s, scheduler_id=%s]",
                     self.organisation.name,

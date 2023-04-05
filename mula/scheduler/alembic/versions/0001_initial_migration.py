@@ -29,7 +29,15 @@ def upgrade():
             sa.Column("task", sa.JSON(), nullable=False),
             sa.Column(
                 "status",
-                sa.Enum("PENDING", "QUEUED", "DISPATCHED", "RUNNING", "COMPLETED", "FAILED", name="taskstatus"),
+                sa.Enum(
+                    "PENDING",
+                    "QUEUED",
+                    "DISPATCHED",
+                    "RUNNING",
+                    "COMPLETED",
+                    "FAILED",
+                    name="taskstatus",
+                ),
                 nullable=False,
             ),
             sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
