@@ -62,10 +62,10 @@ $grid-xxl: 215rem;
 	--content-nested-padding-bottom: 0;
 	--content-nested-padding-left: 0;
 	--content-nested-max-width: 100%;
-	--content-nested-gap: 2.5rem;
+	--content-nested-gap: var(--spacing-grid-normal);
 
 	/* Main */
-	--main-padding-top: var(--page-whitespace-top);
+		--main-padding-top: var(--page-whitespace-top);
   	--main-padding-right: var(--page-whitespace-right);
   	--main-padding-bottom: var(--page-whitespace-bottom);
   	--main-padding-left: var(--page-whitespace-left);
@@ -99,11 +99,11 @@ main section {
   }
 }
 
-body > main  {
+body > main {
 	@media screen and (min-width: $grid-m) {
-		padding-top: var(--page-whitespace-top-grid-m);
 		padding-bottom: var(--page-whitespace-bottom-grid-m);
-
+		padding-top: var(--page-whitespace-top-grid-m);
+		
 		section {
 			padding-right: var(--page-whitespace-right-grid-m);
 			padding-left: var(--page-whitespace-left-grid-m);
@@ -111,9 +111,9 @@ body > main  {
 	}
 
 	@media screen and (min-width: $grid-l) {
-		padding-top: var(--page-whitespace-top-grid-l);
 		padding-bottom: var(--page-whitespace-bottom-grid-l);
-
+		padding-top: var(--page-whitespace-top-grid-l);
+		
 		section {
 			padding-right: var(--page-whitespace-right-grid-l);
 			padding-left: var(--page-whitespace-left-grid-l);
@@ -121,8 +121,8 @@ body > main  {
 	}
 
 	@media screen and (min-width: $grid-xl) {
-		padding-top: var(--page-whitespace-top-grid-xl);
 		padding-bottom: var(--page-whitespace-bottom-grid-xl);
+		padding-top: var(--page-whitespace-top-grid-xl);
 
 		section {
 			padding-right: var(--page-whitespace-right-grid-xl);
@@ -131,13 +131,12 @@ body > main  {
 	}
 
 	@media screen and (min-width: $grid-xxl) {
-		padding-top: var(--page-whitespace-top-grid-xxl);
 		padding-bottom: var(--page-whitespace-bottom-grid-xxl);
-
+		padding-top: var(--page-whitespace-top-grid-xxl);
+		
 		section {
 			padding-right: var(--page-whitespace-right-grid-xxl);
 			padding-left: var(--page-whitespace-left-grid-xxl);
 		}
 	}
 }
-

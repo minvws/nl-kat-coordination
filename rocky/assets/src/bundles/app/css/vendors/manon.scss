@@ -52,11 +52,9 @@
 	@use "@minvws/manon/layout-column-4";
 	@use "@minvws/manon/layout-centered";
 
-/* Header */
+/* Header navigation */
 @use "@minvws/manon/header";
-
-/* Navigation */
-@use "@minvws/manon/navigation";
+@use "@minvws/manon/header-navigation";
 
 /* Footer */
 @use "@minvws/manon/footer";

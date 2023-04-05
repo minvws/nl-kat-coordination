@@ -3,8 +3,11 @@
 @import "fonts/fonts"; /* Fonts */
 
 /* Styling sets. E.g color sets */
+@import "manon/body-text-set";
 @import "manon/spot-large"; /* Branding colors */
 @import "manon/headings-base-set"; /* Defining available heading styles */
+@import "manon/spacing";
+@import "manon/layout-set";
 
 /* Base - Top level styling */
 @import "manon/application-base"; /* Styling on the highest level */
@@ -23,8 +26,10 @@
 @import "manon/breadcrumb-bar";
 @import "manon/button-ghost"; /* Ghost button */
 @import "manon/button-icon"; /* Icon button */
+@import "manon/emphasized";
 @import "manon/filter";
-@import "manon/layout-set";
+@import "manon/header-navigation";
+@import "manon/layout-column-4.scss";
 @import "manon/login-meta";
 @import "manon/navigation";
 @import "manon/tabs";
