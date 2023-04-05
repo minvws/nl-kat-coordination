@@ -121,24 +121,22 @@ def generate_report(
             tex_output_file_name,
         ]
         env = {**os.environ, "TEXMFVAR": tmp_dirname}
-        output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
-        logger.info("pdflatex run. [report_id=%s] [template=%s] [command=%s]", report_id, template_name, " ".join(cmd))
-        logger.debug(output.stdout.decode("utf-8"))
-        logger.debug(output.stderr.decode("utf-8"))
-        if output.returncode:
-            raise Exception("Error running pdflatex")
-
-        output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
-        logger.info(
-            "pdflatex run. [report_id=%s] [template=%s] [command=%s]",
-            report_id,
-            template_name,
-            " ".join(cmd),
-        )
-        logger.debug(output.stdout.decode("utf-8"))
-        logger.debug(output.stderr.decode("utf-8"))
-        if output.returncode:
-            raise Exception("Error running pdflatex")
+        for i in range(2):
+            output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
+            logger.info(
+                "pdflatex [run=%d] [report_id=%s] [template=%s] [command=%s]",
+                i,
+                report_id,
+                template_name,
+                " ".join(cmd),
+            )
+            if output.returncode:
+                logger.error(output.stdout.decode("utf-8"))
+                logger.error(output.stderr.decode("utf-8"))
+                raise Exception("Error in pdflatex run %d", i)
+            else:
+                logger.debug(output.stdout.decode("utf-8"))
+                logger.debug(output.stderr.decode("utf-8"))
 
         # copy result back to output folder
         Path(settings.reports_folder).mkdir(parents=True, exist_ok=True)
