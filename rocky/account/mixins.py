@@ -51,7 +51,6 @@ class OrganizationView(View):
 
         if self.organization_member.status == OrganizationMember.STATUSES.BLOCKED:
             raise PermissionDenied()
-        print(self.organization)
         self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)
 
     def get_context_data(self, **kwargs):
