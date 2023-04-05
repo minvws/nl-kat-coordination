@@ -272,7 +272,9 @@ class App:
         """
         # Collect metrics from the schedulers
         for s in self.schedulers.values():
-            self.ctx.metrics_qsize.labels(scheduler_id=s.scheduler_id,).set(
+            self.ctx.metrics_qsize.labels(
+                    scheduler_id=s.scheduler_id,
+            ).set(
                 s.queue.qsize(),
             )
 
