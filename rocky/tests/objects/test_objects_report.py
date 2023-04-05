@@ -3,7 +3,7 @@ from io import BytesIO
 from django.core.management import call_command
 from django.urls import reverse, resolve
 from octopoes.models import Reference
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, MuteFinding
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
 from pytest_django.asserts import assertContains
@@ -94,19 +94,25 @@ def test_ooi_pdf_report(rf, client_member, ooi_information, mock_organization_vi
 
 
 def test_organization_pdf_report(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
-        count=150,
-        items=[
-            Finding(
-                finding_type=Reference.from_str("KATFindingType|KAT-0001"),
-                ooi=Reference.from_str("Network|testnetwork"),
-                proof="proof",
-                description="test description 123",
-                reproduce="reproduce",
-            )
-        ]
-        * 150,
-    )
+    mock_organization_view_octopoes().list.side_effect = [
+        Paginated[OOIType](
+            count=0,
+            items=[],
+        ),
+        Paginated[OOIType](
+            count=150,
+            items=[
+                Finding(
+                    finding_type=Reference.from_str("KATFindingType|KAT-0001"),
+                    ooi=Reference.from_str("Network|testnetwork"),
+                    proof="proof",
+                    description="test description 123",
+                    reproduce="reproduce",
+                )
+            ]
+            * 150,
+        ),
+    ]
 
     request = setup_request(
         rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
@@ -145,18 +151,40 @@ def test_organization_pdf_report(rf, client_member, ooi_information, mock_organi
 
 def test_pdf_report_command(tmp_path, client_member, ooi_information, mocker):
     mock_organization_view_octopoes = mocker.patch("tools.management.commands.generate_report.OctopoesAPIConnector")
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
-        count=1,
-        items=[
-            Finding(
-                finding_type=Reference.from_str("KATFindingType|KAT-0001"),
-                ooi=Reference.from_str("Network|testnetwork"),
-                proof="proof",
-                description="test description 123",
-                reproduce="reproduce",
-            )
-        ],
-    )
+    mock_organization_view_octopoes().list.side_effect = [
+        Paginated[OOIType](
+            count=1,
+            items=[
+                MuteFinding(finding=Reference.from_str("Finding|Network|testnetwork|KAT-0003")),
+            ],
+        ),
+        Paginated[OOIType](
+            count=3,
+            items=[
+                Finding(
+                    finding_type=Reference.from_str("KATFindingType|KAT-0001"),
+                    ooi=Reference.from_str("Network|testnetwork"),
+                    proof="proof",
+                    description="test description 123",
+                    reproduce="reproduce",
+                ),
+                Finding(
+                    finding_type=Reference.from_str("KATFindingType|KAT-0002"),
+                    ooi=Reference.from_str("Network|testnetwork"),
+                    proof="proof",
+                    description="test description 123",
+                    reproduce="reproduce",
+                ),
+                Finding(
+                    finding_type=Reference.from_str("KATFindingType|KAT-0003"),
+                    ooi=Reference.from_str("Network|testnetwork"),
+                    proof="proof",
+                    description="test description 123",
+                    reproduce="reproduce",
+                ),
+            ],
+        ),
+    ]
 
     dt_in_filename = "2023_14_03T13_48_19_418402_+0000"
     mock_datetime = mocker.patch("rocky.keiko.datetime")
@@ -174,6 +202,16 @@ def test_pdf_report_command(tmp_path, client_member, ooi_information, mocker):
 
     assert tmp_file.exists()
     assert tmp_file.read_text() == "fake_binary_pdf_content"
+
+    report_data_param = mock_keiko_client.generate_report.call_args[0][1]
+
+    assert report_data_param["meta"] == {
+        "total": 2,
+        "total_by_finding_type": {"KAT-0001": 1, "KAT-0002": 1},
+        "total_by_severity": {"critical": 2, "high": 0, "low": 0, "medium": 0, "recommendation": 0},
+        "total_by_severity_per_finding_type": {"critical": 2, "high": 0, "low": 0, "medium": 0, "recommendation": 0},
+        "total_finding_types": 2,
+    }
 
 
 def test_ooi_pdf_report_timeout(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
