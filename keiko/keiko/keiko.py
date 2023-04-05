@@ -106,11 +106,15 @@ def generate_report(
         preprocessed_tex = Path(tmp_dirname) / tex_output_file_name
         preprocessed_tex.write_text(out_document)
 
-        # copy preprocessed tex file if debug is enabled
+        # if debug is enabled copy preprocessed tex file and input data
         if debug or settings.debug:
             shutil.copyfile(
                 Path(tmp_dirname) / tex_output_file_name,
                 Path(settings.reports_folder) / tex_output_file_name,
+            )
+
+            Path(settings.reports_folder).joinpath(report_id).with_suffix(".json").write_text(
+                report_data.json(indent=4)
             )
 
         # run pdflatex
