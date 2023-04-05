@@ -279,14 +279,38 @@ class App:
             )
 
         # Collect metrics from the katalogus
-        k = self.ctx.services.katalogus
-        self.ctx.metrics_katalogus.info(
-            {
-                "plugin_cache_expiry_time": k.organisations_plugin_cache.start_time.isoformat(),
-                "plugin_cache_start_time": k.organisations_plugin_cache.expiration_time.isoformat(),
-                "boefje_cache_start_time": k.organisations_boefje_type_cache.start_time.isoformat(),
-                "boefje_cache_expiry_time": k.organisations_boefje_type_cache.expiration_time.isoformat(),
-                "normalizer_cache_start_time": k.organisations_normalizer_type_cache.start_time.isoformat(),
-                "normalizer_cache_expiry_time": k.organisations_normalizer_type_cache.expiration_time.isoformat(),
-            }
+        self.ctx.metrics_katalogus_cache_start.labels(
+            cache_type="plugin",
+        ).set(
+            int(self.ctx.services.katalogus.organisations_plugin_cache.start_time.timestamp()),
+        )
+
+        self.ctx.metrics_katalogus_cache_expiry.labels(
+            cache_type="plugin",
+        ).set(
+            int(self.ctx.services.katalogus.organisations_plugin_cache.expiration_time.timestamp()),
+        )
+
+        self.ctx.metrics_katalogus_cache_start.labels(
+            cache_type="boefje",
+        ).set(
+            int(self.ctx.services.katalogus.organisations_boefje_type_cache.start_time.timestamp()),
+        )
+
+        self.ctx.metrics_katalogus_cache_expiry.labels(
+            cache_type="boefje",
+        ).set(
+            int(self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time.timestamp()),
+        )
+
+        self.ctx.metrics_katalogus_cache_start.labels(
+            cache_type="normalizer",
+        ).set(
+            int(self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time.timestamp()),
+        )
+
+        self.ctx.metrics_katalogus_cache_expiry.labels(
+            cache_type="normalizer",
+        ).set(
+            int(self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time.timestamp()),
         )

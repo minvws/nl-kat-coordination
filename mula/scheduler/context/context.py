@@ -120,3 +120,18 @@ class AppContext:
             documentation="Katalogus service information",
             registry=self.metrics_registry,
         )
+
+        self.metrics_katalogus_cache_expiry = Gauge(
+            name="katalogus_cache_expiry",
+            documentation="Katalogus cache expiry",
+            registry=self.metrics_registry,
+            labelnames=["cache_type"],
+        )
+
+        self.metrics_katalogus_cache_start = Gauge(
+            name="katalogus_cache_start",
+            documentation="Katalogus cache start",
+            registry=self.metrics_registry,
+            labelnames=["cache_type"],
+        )
+
