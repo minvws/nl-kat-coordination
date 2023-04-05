@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -a
+set -ae
 source /etc/kat/rocky.conf
 
 /opt/venvs/kat-rocky/bin/manage.py "$@"
