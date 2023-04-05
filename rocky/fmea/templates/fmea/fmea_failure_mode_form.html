@@ -17,7 +17,7 @@
                           class="horizontal-view help">
                         {% csrf_token %}
                         {% translate "Failure mode and effects" as fieldset_legend %}
-                        {% include "partials/form/fieldset.html' with legend=fieldset_legend fieldset='failure_mode description frequency_level detectability_level effect" fields=form %}
+                        {% include "partials/form/fieldset.html" with legend=fieldset_legend fieldset="failure_mode description frequency_level detectability_level effect" fields=form %}
 
                         {% if editing_view %}
                             <button class="cta" type="submit">{% translate "Save" %}</button>

@@ -30,10 +30,10 @@
                     {% translate "Finding" %}
                 </dt>
                 <dd>
-                    <a href="{% ooi_url "ooi_detail' finding_type.ooi_type|add:'|"|add:finding_type.id organization.code %}">{{ finding_type.id }}</a>
+                    <a href="{% ooi_url 'ooi_detail' finding_type.ooi_type|add:'|'|add:finding_type.id organization.code %}">{{ finding_type.id }}</a>
                 </dd>
             </div>
-            {% include "partials/elements/definition_list_item.html' with label='Description" description=finding_type.description %}
+            {% include "partials/elements/definition_list_item.html" with label="Description" description=finding_type.description %}
 
             <div>
                 <dt>
@@ -43,8 +43,8 @@
                     {{ finding_type.risk_level_score }} / 10
                 </dd>
             </div>
-            {% include "partials/elements/definition_list_item.html' with label='Severity" description=finding_type.risk_level_severity %}
-            {% include "partials/elements/definition_list_item.html' with label='Impact" description=finding_type.impact_description %}
+            {% include "partials/elements/definition_list_item.html" with label="Severity" description=finding_type.risk_level_severity %}
+            {% include "partials/elements/definition_list_item.html" with label="Impact" description=finding_type.impact_description %}
 
             {% if finding_type.source %}
                 <div>
@@ -56,7 +56,7 @@
                     </dd>
                 </div>
             {% endif %}
-            {% include "partials/elements/definition_list_items.html' with items=finding_type.items exclude_keys='id,human_readable,ooi_type,description,risk_level_score,impact_description,source,findings,risk_level_severity" %}
+            {% include "partials/elements/definition_list_items.html" with items=finding_type.items exclude_keys="id,human_readable,ooi_type,description,risk_level_score,impact_description,source,findings,risk_level_severity" %}
 
         </dl>
         <div>

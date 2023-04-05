@@ -94,10 +94,10 @@
                                         </td>
                                         <td>
                                             {% if member.status == "blocked" %}
-                                                {% include "partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='unblock' key='member_id" value=member.id %}
+                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
 
                                             {% else %}
-                                                {% include "partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='block' key='member_id" value=member.id %}
+                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="block" key="member_id" value=member.id %}
 
                                             {% endif %}
                                         </td>

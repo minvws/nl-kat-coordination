@@ -19,7 +19,7 @@
         <section>
             <div>
                 <p>
-                    {% translate "Below you can see findings that were found for" %} <a href="{% ooi_url "ooi_detail" ooi.primary_key organization.code %}">{{ ooi.human_readable }}</a>
+                    {% translate "Below you can see findings that were found for" %} <a href="{% ooi_url 'ooi_detail' ooi.primary_key organization.code %}">{{ ooi.human_readable }}</a>
                     {% translate "and direct  children of this" %} <em>{{ ooi.get_ooi_type }}</em>.
                 </p>
                 <p>

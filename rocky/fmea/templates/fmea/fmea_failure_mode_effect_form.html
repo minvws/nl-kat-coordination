@@ -16,7 +16,7 @@
                       class="horizontal-view help">
                     {% csrf_token %}
                     {% translate "FMEA effect" as fieldset_legend %}
-                    {% include "partials/form/fieldset.html' with legend=fieldset_legend fieldset='effect severity_level" fields=form %}
+                    {% include "partials/form/fieldset.html" with legend=fieldset_legend fieldset="effect severity_level" fields=form %}
 
                     {% if editing_view %}
                         <button class="cta" type="submit">{% translate "Save" %}</button>

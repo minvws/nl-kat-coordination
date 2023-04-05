@@ -9,7 +9,7 @@
     <main id="main-content">
         <section>
             <div>
-                {% include "partials/ooi_head.html' with ooi=ooi view='ooi_tree" %}
+                {% include "partials/ooi_head.html" with ooi=ooi view="ooi_tree" %}
 
                 {% translate "Object tree" as filter_title %}
                 {% include "partials/ooi_list_filters.html" with title=filter_title ooi_id=ooi.primary_key %}

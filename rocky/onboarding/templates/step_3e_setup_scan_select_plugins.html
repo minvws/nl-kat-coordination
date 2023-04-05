@@ -59,10 +59,10 @@
                 </p>
                 <h2>{% translate "Suggested plugins" %}</h2>
                 {% if form_view == "table" %}
-                    {% include "partials/form/checkbox_group_table_form.html' with checkbox_group_table_form=select_boefjes_form btn_text='Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
+                    {% include "partials/form/checkbox_group_table_form.html" with checkbox_group_table_form=select_boefjes_form btn_text="Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
 
                 {% else %}
-                    {% include "partials/form/boefje_tiles_form.html' with checkbox_group_table_form=select_boefjes_form btn_text='Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
+                    {% include "partials/form/boefje_tiles_form.html" with checkbox_group_table_form=select_boefjes_form btn_text="Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
 
                 {% endif %}
             </div>
@@ -73,4 +73,4 @@
     {{ block.super }}
     <script src="{% static "/js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
-{% endblock content %}
+{% endblock html_at_end_body %}

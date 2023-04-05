@@ -14,7 +14,7 @@
                     {% include "oois/ooi_past_due_warning.html" with ooi_current=ooi_current %}
 
                 {% endif %}
-                {% include "partials/ooi_head.html' with ooi=ooi view='ooi_detail" %}
+                {% include "partials/ooi_head.html" with ooi=ooi view="ooi_detail" %}
                 {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
 
             </div>
@@ -75,7 +75,7 @@
 
                                         </td>
                                         <td>
-                                            {% include "partials/single_action_form.html' with btn_text="Start Scan" action='start_scan' key='boefje_id" value=boefje.id %}
+                                            {% include "partials/single_action_form.html" with btn_text="Start Scan" action="start_scan" key="boefje_id" value=boefje.id %}
 
                                         </td>
                                     </tr>
@@ -87,11 +87,11 @@
                     <div class="system">
                         {% if not enabled_boefjes_available %}
                             <p >
-                                {% translate "There are no boefjes enabled to scan an OOI of type" %} "{{ ooi.get_ooi_type }}". {% translate "See" %} <a href="{% url 'katalogus' organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
+                                {% translate "There are no boefjes enabled to scan an OOI of type" %} "{{ ooi.get_ooi_type }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
                             </p>
                         {% else %}
                             <p>
-                                {% translate "There are no boefjes available within the current clearance level of" %} "{{ ooi.human_readable }}". {% translate "See" %} <a href="{% url 'katalogus' organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
+                                {% translate "There are no boefjes available within the current clearance level of" %} "{{ ooi.human_readable }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
                             </p>
                             <p>{% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".</p>
                         {% endif %}
