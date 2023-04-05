@@ -120,3 +120,10 @@ class SetClearanceLevelForm(forms.Form):
             },
         ),
     )
+
+
+class MuteFindingForm(forms.Form):
+    finding_id = forms.CharField(widget=forms.HiddenInput(), required=False)
+    mute_explanation = forms.CharField(
+        widget=forms.Textarea(attrs={"name": "mute_explanation", "rows": "3", "cols": "5"})
+    )

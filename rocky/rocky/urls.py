@@ -29,7 +29,7 @@ from rocky.views.organization_member_add import OrganizationMemberAddView
 from rocky.views.organization_member_edit import OrganizationMemberEditView
 from rocky.views.organization_member_list import OrganizationMemberListView
 from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
-from rocky.views.ooi_mute import MuteObjectView
+from rocky.views.ooi_mute import MuteFindingView
 from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileResetView, ScanProfileDetailView
 from rocky.views.scans import ScanListView
@@ -73,6 +73,7 @@ urlpatterns += i18n_patterns(
     ),
     path("<organization_code>/findings/", FindingListView.as_view(), name="finding_list"),
     path("<organization_code>/findings/add/", FindingAddView.as_view(), name="finding_add"),
+    path("<organization_code>/findings/mute/", MuteFindingView.as_view(), name="finding_mute"),
     path("<organization_code>/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
     path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
@@ -133,7 +134,6 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/objects/edit/", OOIEditView.as_view(), name="ooi_edit"),
     path("<organization_code>/objects/delete/", OOIDeleteView.as_view(), name="ooi_delete"),
     path("<organization_code>/objects/detail/", OOIDetailView.as_view(), name="ooi_detail"),
-    path("<organization_code>/objects/detail/mute/", MuteObjectView.as_view(), name="mute_object"),
     path("<organization_code>/objects/export", OOIListExportView.as_view(), name="ooi_list_export"),
     path(
         "<organization_code>/objects/indemnification/reset/",

@@ -1,0 +1,21 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+  {% include 'header.html' %}
+  <main id="main-content">
+    <section>
+      <div class="form-view">
+        <h1>{% translate 'Mute finding' %}</h1>
+        <form novalidate method="post" class="horizontal-view help">
+          {% csrf_token %}
+          {% translate 'Mute finding' as fieldset_legend %}
+          {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+          <button class="cta" type="submit" name="cancel">{% translate 'Cancel' %}</button>
+          <button type="submit">{% translate 'Mute' %}</button>
+        </form>
+      </div>
+    </section>
+  </main>
+{% endblock %}
