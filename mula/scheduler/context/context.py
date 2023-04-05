@@ -92,7 +92,7 @@ class AppContext:
         self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
 
         # Metrics collector registry
-        self.metrics_registry = CollectorRegistry()
+        self.metrics_registry: CollectorRegistry = CollectorRegistry()
 
         Info(
             name="app_settings",
