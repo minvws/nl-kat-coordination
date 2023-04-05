@@ -134,4 +134,3 @@ class AppContext:
             registry=self.metrics_registry,
             labelnames=["cache_type"],
         )
-
