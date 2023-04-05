@@ -2,7 +2,7 @@
 
 {% if perms.tools.can_enable_disable_boefje %}
     <form id="enableform_{{ plugin.id|slugify }}"
-          action="{% url 'plugin_enable_disable' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id plugin_state=plugin.enabled %}"
+          action="{% url "plugin_enable_disable" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id plugin_state=plugin.enabled %}"
           method="post"
           class="inline">
         {% csrf_token %}
@@ -12,12 +12,12 @@
         <button type="submit"
                 class="{% if not plugin.enabled %}button{% else %}ghost{% endif %}">
             {% if not plugin.enabled %}
-                {% translate 'Enable' %}
+                {% translate "Enable" %}
             {% else %}
-                {% translate 'Disable' %}
+                {% translate "Disable" %}
             {% endif %}
         </button>
     </form>
 {% else %}
-    <span class="de-emphasized">{% translate 'Redteam can enable ' %}{{ plugin.type }}</span>
+    <span class="de-emphasized">{% translate "Redteam can enable " %}{{ plugin.type }}</span>
 {% endif %}

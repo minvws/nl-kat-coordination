@@ -1,17 +1,17 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load static %}
 {% load i18n %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Upload CSV' %}</h1>
-                <p class="emphasized">{% translate 'Automate the creation of multiple objects by uploading a CSV file.' %}</p>
-                <p>{% translate 'These are the criteria for CSV upload:' %}</p>
+                <h1>{% translate "Upload CSV" %}</h1>
+                <p class="emphasized">{% translate "Automate the creation of multiple objects by uploading a CSV file." %}</p>
+                <p>{% translate "These are the criteria for CSV upload:" %}</p>
                 <ul>
                     {% for criterion in criteria %}<li>{{ criterion }}</li>{% endfor %}
                 </ul>
@@ -20,11 +20,11 @@
                       enctype="multipart/form-data"
                       class="horizontal-view help">
                     {% csrf_token %}
-                    {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+                    {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-                    <button type="submit">{% translate 'Upload CSV' %}</button>
+                    <button type="submit">{% translate "Upload CSV" %}</button>
                 </form>
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}

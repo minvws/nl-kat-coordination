@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
@@ -10,7 +10,7 @@
     <main class="report-tmp" id="main-content">
         <section>
             <div>
-                {% include 'partials/elements/ooi_report_settings_form.html' %}
+                {% include "partials/elements/ooi_report_settings_form.html" %}
 
                 <h1>
                     {% blocktranslate trimmed with name=ooi.human_readable %}
@@ -26,9 +26,9 @@
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static '/js/checkboxToggler.js' %}"
+    <script src="{% static "/js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+{% endblock html_at_end_body %}

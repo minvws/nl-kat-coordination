@@ -1,19 +1,19 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' with view_type="onboarding" %}
+    {% include "header.html" with view_type="onboarding" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'OpenKAT introduction' %}</h1>
-                {% include 'partials/stepper.html' %}
+                <h1>{% translate "OpenKAT introduction" %}</h1>
+                {% include "partials/stepper.html" %}
 
-                <h2>{% translate 'Setup scan' %}</h2>
-                <h3>{% translate 'Creating an object' %}</h3>
+                <h2>{% translate "Setup scan" %}</h2>
+                <h3>{% translate "Creating an object" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             Based on the url you provided OpenKAT added the necessary additional
@@ -22,11 +22,11 @@
                 </p>
             </div>
             <div>
-                <p>{% translate 'URL' %}</p>
+                <p>{% translate "URL" %}</p>
                 <dl>
                     <div>
                         <dt>
-                            {% translate 'Type' %}
+                            {% translate "Type" %}
                         </dt>
                         <dd>
                             {{ ooi.ooi_type }}
@@ -34,7 +34,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate 'Path' %}
+                            {% translate "Path" %}
                         </dt>
                         <dd>
                             {{ ooi.raw }}
@@ -42,7 +42,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate 'Hostname' %}
+                            {% translate "Hostname" %}
                         </dt>
                         <dd>
                             {{ ooi.raw.host }}
@@ -50,7 +50,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate 'scheme' %}
+                            {% translate "scheme" %}
                         </dt>
                         <dd>
                             {{ ooi.raw.scheme }}
@@ -58,7 +58,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate 'DNS Zone' %}
+                            {% translate "DNS Zone" %}
                         </dt>
                         <dd>
                             {{ ooi.raw.tld }}
@@ -66,7 +66,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate 'Network' %}
+                            {% translate "Network" %}
                         </dt>
                         <dd>
                             {{ ooi.network }}
@@ -77,10 +77,10 @@
                     {% csrf_token %}
                     <div class="horizontal-view">
                         {% if organization %}
-                            <a href="{% url 'complete_onboarding' organization.code %}"
-                               class="button ghost">{% translate 'Skip onboarding' %}</a>
+                            <a href="{% url "complete_onboarding" organization.code %}"
+                               class="button ghost">{% translate "Skip onboarding" %}</a>
                         {% endif %}
-                        <button type="submit" class="button">{% translate 'Start scanning' %}</button>
+                        <button type="submit" class="button">{% translate "Start scanning" %}</button>
                     </div>
                 </form>
             </div>
