@@ -80,9 +80,6 @@ class Scheduler(abc.ABC):
         self.threads: Dict[str, thread.ThreadRunner] = {}
         self.stop_event: threading.Event = self.ctx.stop_event
 
-        self.metrics: Dict[str, Any] = {}
-        self._register_metrics()
-
     @abc.abstractmethod
     def populate_queue(self) -> None:
         raise NotImplementedError
@@ -289,26 +286,3 @@ class Scheduler(abc.ABC):
                 "allow_priority_updates": self.queue.allow_priority_updates,
             },
         }
-
-    def _register_metrics(self) -> None:
-        """Register metrics for the scheduler.
-
-        We allow for additional metrics by adding them to a Dict.
-        """
-        scheduler_id = re.sub('([a-z])(-)([a-z])', r'\1_\3', self.scheduler_id)
-        self.metrics["qsize"] = Gauge(
-            f"scheduler_{scheduler_id}_qsize",
-            "Size of the scheduler queue",
-            registry=self.ctx.metrics_registry,
-        ).set(
-            self.queue.qsize(),
-        )
-
-    def set_metrics(self) -> None:
-        """Set metrics for the scheduler.
-
-        When this method is called, we allow for intermittingly set the
-        metrics for the scheduler. By the collect_metrics method in App class.
-        """
-        if self.metrics.get("qsize"):
-            self.metrics["qsize"].set(self.queue.qsize())

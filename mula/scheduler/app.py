@@ -58,9 +58,6 @@ class App:
         # Initialize listeners
         self.listeners: Dict[str, listeners.Listener] = {}
 
-        # Initialize metrics
-        self._register_metrics()
-
         # Initialize API server
         self.server: server.Server = server.Server(self.ctx, self.schedulers)
 
@@ -270,43 +267,25 @@ class App:
 
         self.shutdown()
 
-    # TODO: labels
-    def _register_metrics(self) -> None:
-        """Register metrics for application level metrics.
-        """
-
-        # Application configuration settings 
-        Info(
-            "app_settings",
-            "Scheduler configuration settings",
-            registry=self.ctx.metrics_registry,
-        ).info({
-                "monitor_organisations_interval": str(self.ctx.config.monitor_organisations_interval),
-                "pq_maxsize": str(self.ctx.config.pq_maxsize),
-                "pq_populate_interval": str(self.ctx.config.pq_populate_interval),
-                "pq_populate_grace_period": str(self.ctx.config.pq_populate_grace_period),
-                "pq_populate_max_random_objects": str(self.ctx.config.pq_populate_max_random_objects),
-        })
-
-        # Katalogus service information
-        Info(
-            "katalogus_info",
-            "Katalogus service information",
-            registry=self.ctx.metrics_registry,
-        ).info({
-            "organisations_plugin_cache_start_time": self.ctx.services.katalogus.organisations_plugin_cache.start_time.isoformat(),
-            "organisations_plugin_cache_expiration_time": self.ctx.services.katalogus.organisations_plugin_cache.expiration_time.isoformat(),
-            "organisations_boefje_type_cache_start_time": self.ctx.services.katalogus.organisations_boefje_type_cache.start_time.isoformat(),
-            "organisations_boefje_type_cache_expiration_time": self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time.isoformat(),
-            "organisations_normalizer_type_cache_start_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time.isoformat(),
-            "organisations_normalizer_type_cache_expiration_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time.isoformat(),
-        })
-
     def collect_metrics(self) -> None:
         """Collect application metrics
 
         This method that allows to collect metrics throughout the application.
         """
-        # Schedulers implement the set_metrics method to collect metrics
+        # Collect metrics from the schedulers
         for s in self.schedulers.values():
-            s.set_metrics()
+            self.ctx.metrics_qsize.labels(
+                scheduler_id=s.scheduler_id,
+            ).set(
+                s.queue.qsize(),
+            )
+
+        # Collect metrics from the katalogus
+        self.ctx.metrics_katalogus.info({
+            "plugin_cache_expiry_time": self.ctx.services.katalogus.organisations_plugin_cache.start_time.isoformat(),
+            "plugin_cache_start_time": self.ctx.services.katalogus.organisations_plugin_cache.expiration_time.isoformat(),
+            "boefje_cache_start_time": self.ctx.services.katalogus.organisations_boefje_type_cache.start_time.isoformat(),
+            "boefje_cache_expiry_time": self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time.isoformat(),
+            "normalizer_cache_start_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time.isoformat(),
+            "normalizer_cache_expiry_time": self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time.isoformat(),
+        })
