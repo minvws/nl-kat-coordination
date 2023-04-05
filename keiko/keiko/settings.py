@@ -1,4 +1,5 @@
 """Keiko settings module."""
+from pathlib import Path
 
 from pydantic import BaseSettings, Field, DirectoryPath, FilePath
 
@@ -11,7 +12,7 @@ class Settings(BaseSettings):
     templates_folder: DirectoryPath = Field("templates", description="Folder containing the templates")
     glossaries_folder: DirectoryPath = Field("glossaries", description="Folder containing the glossaries")
     assets_folder: DirectoryPath = Field("assets", description="Folder containing the assets")
-    reports_folder: DirectoryPath = Field("/reports", description="Output folder containing the reports")
+    reports_folder: Path = Field("/reports", description="Output folder containing the reports")
 
     class Config:
         env_prefix = "KEIKO_"
