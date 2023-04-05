@@ -9,11 +9,14 @@
   <main id="main-content">
     <section>
       <div class="form-view">
-        <h1>{% translate 'Mute finding' %}</h1>
+        <h1>{% translate 'Mute finding' %}: {{ finding.human_readable }}</h1>
         <p>
           {% translate 'Give a reason below why you want to mute this finding.' %}
         </p>
-        <form novalidate method="post" class="horizontal-view help">
+        <form action="{% url 'ooi_add' ooi_type=ooi_type organization_code=organization.code %}"
+              novalidate
+              method="post"
+              class="horizontal-view help">
           {% csrf_token %}
           {% translate 'Mute finding' as fieldset_legend %}
           {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
@@ -21,7 +24,7 @@
           <div class="horizontal-view">
             <fieldset>
               <button type="submit">{% translate 'Mute' %}</button>
-              <a href="{% ooi_url 'ooi_detail' request.GET.ooi_id view.kwargs.organization_code %}"
+              <a href="{% ooi_url 'ooi_detail' finding.primary_key organization.code %}"
                  class="button ghost"
                  type="submit"
                  name="cancel">{% translate 'Cancel' %}</a>
