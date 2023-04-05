@@ -131,8 +131,8 @@ def generate_report(
                 " ".join(cmd),
             )
             if output.returncode:
-                logger.error(output.stdout.decode("utf-8"))
-                logger.error(output.stderr.decode("utf-8"))
+                logger.error("stdout: %s", output.stdout.decode("utf-8"))
+                logger.error("stderr: %s", output.stderr.decode("utf-8"))
                 raise Exception("Error in pdflatex run %d", i)
             else:
                 logger.debug(output.stdout.decode("utf-8"))
