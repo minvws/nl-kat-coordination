@@ -87,46 +87,47 @@ def generate_report(
     logger.info("Template rendered. [report_id=%s] [template=%s]", report_id, template_name)
 
     # create temp folder
-    with tempfile.TemporaryDirectory() as tmp_dirname:
+    with tempfile.TemporaryDirectory() as directory:
         logger.info(
-            "Temporary folder created. [report_id=%s] [template=%s] [tmp_dirname=%s]",
+            "Temporary folder created. [report_id=%s] [template=%s] [directory=%s]",
             report_id,
             template_name,
-            tmp_dirname,
+            directory,
         )
 
         # copy assets
-        shutil.copytree(settings.assets_folder, tmp_dirname, dirs_exist_ok=True)
+        shutil.copytree(settings.assets_folder, directory, dirs_exist_ok=True)
         logger.info("Assets copied. [report_id=%s] [template=%s]", report_id, template_name)
 
-        # tex file
-        tex_output_file_name = report_id + ".keiko.tex"
-        pdf_output_file_name = report_id + ".keiko.pdf"
+        output_file = settings.reports_folder / report_id
 
-        preprocessed_tex = Path(tmp_dirname) / tex_output_file_name
-        preprocessed_tex.write_text(out_document)
+        # tex file
+        tex_output_file_path = output_file.with_suffix(".keiko.tex")
+        pdf_output_file_path = output_file.with_suffix(".keiko.pdf")
+
+        preprocessed_tex_path = Path(directory).joinpath(f"{report_id}.keiko.tex")
+        preprocessed_tex_path.write_text(out_document)
 
         # if debug is enabled copy preprocessed tex file and input data
         if debug or settings.debug:
             shutil.copyfile(
-                Path(tmp_dirname) / tex_output_file_name,
-                Path(settings.reports_folder) / tex_output_file_name,
+                preprocessed_tex_path,
+                tex_output_file_path,
             )
 
-            Path(settings.reports_folder).joinpath(report_id).with_suffix(".json").write_text(
-                report_data.json(indent=4)
-            )
+            json_output_file_path = output_file.with_suffix(".keiko.json")
+            json_output_file_path.write_text(report_data.json(indent=4))
 
         # run pdflatex
         cmd = [
             "pdflatex",
             "-synctex=1",
             "-interaction=nonstopmode",
-            tex_output_file_name,
+            preprocessed_tex_path.as_posix(),
         ]
-        env = {**os.environ, "TEXMFVAR": tmp_dirname}
+        env = {**os.environ, "TEXMFVAR": directory}
         for i in (1, 2):
-            output = subprocess.run(cmd, cwd=tmp_dirname, env=env, capture_output=True, check=False)
+            output = subprocess.run(cmd, cwd=directory, env=env, capture_output=True, check=False)
             logger.info(
                 "pdflatex [run=%d] [report_id=%s] [template=%s] [command=%s]",
                 i,
@@ -143,16 +144,15 @@ def generate_report(
                 logger.debug(output.stderr.decode("utf-8"))
 
         # copy result back to output folder
-        Path(settings.reports_folder).mkdir(parents=True, exist_ok=True)
         shutil.copyfile(
-            Path(tmp_dirname) / pdf_output_file_name,
-            Path(settings.reports_folder) / pdf_output_file_name,
+            preprocessed_tex_path.with_suffix(".pdf"),
+            pdf_output_file_path,
         )
         logger.info(
             "Report copied to reports folder. [report_id=%s] [template=%s] [output_file=%s]",
             report_id,
             template_name,
-            Path(settings.reports_folder) / pdf_output_file_name,
+            pdf_output_file_path,
         )
 
     # ...tempfiles are deleted automatically when leaving the context
@@ -161,8 +161,8 @@ def generate_report(
 def read_glossary(glossary: str, settings: Settings) -> Dict[str, Tuple[str, str]]:
     """Read a glossary CSV file and return a dictionary of entries."""
     glossary_entries = {}
-    glossary_file_path = Path(settings.glossaries_folder) / glossary
-    with open(glossary_file_path, encoding="utf-8") as glossary_file:
+    glossary_file_path = settings.glossaries_folder / glossary
+    with glossary_file_path.open(encoding="utf-8") as glossary_file:
         csvreader = csv.reader(glossary_file)
         # skip header
         _ = next(csvreader)
@@ -170,5 +170,5 @@ def read_glossary(glossary: str, settings: Settings) -> Dict[str, Tuple[str, str
             # only allow words with baretext representation
             bare_word = baretext(row[0])
             if bare_word != "":
-                glossary_entries[baretext(row[0])] = (row[0], row[1])
+                glossary_entries[baretext(row[0])] = row[0], row[1]
     return glossary_entries
