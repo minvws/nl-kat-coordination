@@ -29,20 +29,27 @@ TREE_DATA = {
     },
 }
 
+
 MUTED_FINDING_TREE_DATA = {
     "root": {
-        "reference": "Mute Network|testnetwork|KAT-000",
-        "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        "reference": "MutedFinding|Network|testnetwork|KAT-000",
+        "children": {"ooi": [{"reference": "Finding|Network|testnetwork|KAT-000", "children": {}}]},
     },
     "store": {
+        "MutedFinding|Network|testnetwork|KAT-000": {
+            "object_type": "MutedFinding",
+            "primary_key": "MutedFinding|Network|testnetwork|KAT-000",
+            "finding": "Finding|Network|testnetwork|KAT-000",
+            "reason": "Hallo",
+        },
         "Network|testnetwork": {
             "object_type": "Network",
             "primary_key": "Network|testnetwork",
             "name": "testnetwork",
         },
-        "Mute Network|testnetwork|KAT-000": {
-            "object_type": "MuteFinding",
-            "primary_key": "MuteFinding|Network|testnetwork|KAT-000",
+        "Finding|Network|testnetwork|KAT-000": {
+            "object_type": "Finding",
+            "primary_key": "Finding|Network|testnetwork|KAT-000",
             "ooi": "Network|testnetwork",
             "finding_type": "KATFindingType|KAT-000",
         },
@@ -124,19 +131,22 @@ def test_mute_finding_post(
     mocker,
 ):
     # post from the finding mute view
+    muted_finding = MUTED_FINDING_TREE_DATA["store"]["MutedFinding|Network|testnetwork|KAT-000"]
     request = setup_request(
         rf.post(
             "finding_mute",
             {
-                "ooi_type": "MuteFinding",
-                "finding": "Finding|Network|testnetwork|KAT-000",
-                "reason": "I want to mute this finding because I am testing.",
+                "ooi_type": muted_finding["object_type"],
+                "finding": muted_finding["finding"],
+                "reason": muted_finding["reason"],
             },
         ),
         redteam_member.user,
     )
     # Uses same ooi_add post request to add a MuteFinding object
-    response = OOIAddView.as_view()(request, organization_code=redteam_member.organization.code, ooi_type="MuteFinding")
+    response = OOIAddView.as_view()(
+        request, organization_code=redteam_member.organization.code, ooi_type="MutedFinding"
+    )
 
     # Redirects to ooi_detail
     assert response.status_code == 302
@@ -148,6 +158,10 @@ def test_mute_finding_post(
     mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     resulted_response = OOIDetailView.as_view()(resulted_request, organization_code=redteam_member.organization.code)
-    assert resulted_response.status_code == 200
 
-    assertContains(resulted_response, "I want to mute this finding because I am testing.")
+    assert resulted_response.status_code == 200
+    assertContains(resulted_response, "Reason")
+    assertContains(resulted_response, "Muted Network|testnetwork|KAT-000")
+    assertContains(resulted_response, "MutedFinding")
+    assertContains(resulted_response, muted_finding["reason"])
+    assertContains(resulted_response, "KAT-000 @ testnetwork")
