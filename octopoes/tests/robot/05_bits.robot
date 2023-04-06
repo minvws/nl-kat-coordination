@@ -14,7 +14,10 @@ Bit With Scan Level 1
     Await Sync
     Object List Should Contain    KATFindingType|KAT-NXDOMAIN
     Object List Should Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
-
+    Declare Scan Profile    Hostname|internet|example.com   0
+    Await Sync
+    Object List Should Not Contain    KATFindingType|KAT-NXDOMAIN
+    Object List Should Not Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
 
 *** Keywords ***
 Setup Test
