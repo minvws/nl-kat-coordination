@@ -6,7 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
 
 from account.validators import get_password_validators_help_texts
-from tools.forms.base import BaseRockyForm
+from tools.forms.base import BaseRockyForm, BaseRockyModelForm
 from tools.models import (
     GROUP_CLIENT,
     GROUP_ADMIN,
@@ -135,7 +135,7 @@ class UserAddForm(forms.Form):
         )
 
 
-class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
+class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
     """
     Form to add a new member
     """
@@ -172,7 +172,7 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
         fields = ("account_type", "name", "email", "password")
 
 
-class OrganizationMemberEditForm(forms.ModelForm):
+class OrganizationMemberEditForm(BaseRockyModelForm):
     trusted_clearance_level = forms.ChoiceField(
         required=False,
         label=_("Assigned clearance level"),
@@ -190,6 +190,7 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["status"].widget.attrs["field_form_label"] = "Status"
         if self.instance.user.is_superuser:
             self.fields["trusted_clearance_level"].disabled = True
         self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
@@ -222,7 +223,7 @@ class OrganizationMemberEditForm(forms.ModelForm):
         fields = ["status", "trusted_clearance_level", "acknowledged_clearance_level"]
 
 
-class OrganizationForm(forms.ModelForm):
+class OrganizationForm(BaseRockyModelForm):
     """
     Form to create a new organization.
     """
