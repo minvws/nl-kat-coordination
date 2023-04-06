@@ -1,55 +1,60 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
+
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-  {% include 'header.html' %}
-  <main id="main-content">
-    <section>
-      <div>
-        <h1>{% translate 'Organizations' %}</h1>
-        {% if perms.tools.add_organization %}
-          <div class="horizontal-view toolbar">
-            <a href="{% url 'organization_add' %}" class="button">{% translate 'Add new organization' %}</a>
-          </div>
-        {% endif %}
-        <div class="horizontal-scroll">
-          {% if object_list %}
-            <table>
-              <caption>{% translate 'Organization overview:' %}</caption>
-              <thead>
-                <tr>
-                  <th>{% translate 'Name' %}</th>
-                  <th>{% translate 'Code' %}</th>
-                  <th>{% translate 'Tags' %}</th>
-                  <th>{% translate 'Members' %}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for organization in object_list %}
-                  <tr>
-                    <td>
-                      <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.name }}</a>
-                    </td>
-                    <td>
-                      <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.code }}</a>
-                    </td>
-                    <td>{% include 'organizations/organization_tags.html' %}</td>
-                    <td>{{ organization.member_count }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            {% translate 'There where no organizations found for your user account' %}.
-          {% endif %}
-        </div>
-      </div>
-    </section>
-  </main>
-{% endblock %}
+    {% include "header.html" %}
 
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Organizations" %}</h1>
+                {% if perms.tools.add_organization %}
+                    <div class="horizontal-view toolbar">
+                        <a href="{% url 'organization_add' %}" class="button">{% translate "Add new organization" %}</a>
+                    </div>
+                {% endif %}
+                <div class="horizontal-scroll">
+                    {% if object_list %}
+                        <table>
+                            <caption>{% translate "Organization overview:" %}</caption>
+                            <thead>
+                                <tr>
+                                    <th>{% translate "Name" %}</th>
+                                    <th>{% translate "Code" %}</th>
+                                    <th>{% translate "Tags" %}</th>
+                                    <th>{% translate "Members" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for organization in object_list %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url "organization_crisis_room" organization_code=organization.code %}">{{ organization.name }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url "organization_crisis_room" organization_code=organization.code %}">{{ organization.code }}</a>
+                                        </td>
+                                        <td>
+                                            {% include "organizations/organization_tags.html" %}
+
+                                        </td>
+                                        <td>{{ organization.member_count }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        {% translate "There where no organizations found for your user account" %}.
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
 {% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+    {{ block.super }}
+    <script src="{% static "/js/checkboxToggler.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

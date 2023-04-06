@@ -13,7 +13,7 @@ djlint==1.12.1
 idna==3.4
 lxml==4.9.2
 phonenumbers==8.12.57
-psycopg2-binary==2.9.5
+psycopg2==2.9.6
 pydantic==1.8.2
 python-dotenv>=0.19.0
 qrcode==7.3.1
