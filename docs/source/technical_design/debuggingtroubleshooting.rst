@@ -29,7 +29,7 @@ When debugging, check if the actual processes are running. Depending on the way 
 Docker containers
 -----------------
 
-``dockerps`` gives you an overview of all running Docker containers.
+``docker ps`` gives you an overview of all running Docker containers.
 
 .. image:: img/dockerps.png
   :alt: docker containers
