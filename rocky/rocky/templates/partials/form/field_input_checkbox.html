@@ -15,7 +15,7 @@
         {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
         {% include "partials/form/field_input_errors.html" %}
       </div>
-    {% else %}
+    {% comment %} {% else %}
       <fieldset>
         <legend>
           {{ field.label_tag }}
@@ -23,6 +23,6 @@
         <div class="horizontal-view">
           {{ field }}
         </div>
-      </fieldset>
+      </fieldset> {% endcomment %}
     {% endif %}
 {% endif %}

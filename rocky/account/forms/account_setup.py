@@ -190,7 +190,6 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["status"].widget.attrs["horizontal_form_cb"] = True
         if self.instance.user.is_superuser:
             self.fields["trusted_clearance_level"].disabled = True
         self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
