@@ -10,5 +10,5 @@
            {% if input_disabled %}disabled{% endif %}>
     {% if label_text %}<label>{{ label_text }}</label>{% endif %}
 </form>
-<script src="{% static '/js/autoSubmit.js' %}"
+<script src="{% static "/js/autoSubmit.js" %}"
         nonce="{{ request.csp_nonce }}"></script>

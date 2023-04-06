@@ -1,40 +1,40 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
                 {% if object %}
-                    <h1>{% translate 'Failure mode report' %}</h1>
+                    <h1>{% translate "Failure mode report" %}</h1>
                     <div class="horizontal-scroll auth bg-color-offset">
                         <div>
-                            <h4>{% translate 'Summary' %}</h4>
+                            <h4>{% translate "Summary" %}</h4>
                             <ol>
                                 <li>
-                                    <b>{% translate 'Failure mode: ' %}</b>{{ object.failure_mode }}
+                                    <b>{% translate "Failure mode: " %}</b>{{ object.failure_mode }}
                                 </li>
                                 <li>
-                                    <b>{% translate 'Severity: ' %}</b>{{ object.get_severity_level_display }}
+                                    <b>{% translate "Severity: " %}</b>{{ object.get_severity_level_display }}
                                 </li>
                                 <li>
-                                    <b>{% translate 'Detectability: ' %}</b>{{ object.get_detectability_level_display }}
+                                    <b>{% translate "Detectability: " %}</b>{{ object.get_detectability_level_display }}
                                 </li>
                                 <li>
-                                    <b>{% translate 'Frequency: ' %}</b>{{ object.get_frequency_level_display }}
+                                    <b>{% translate "Frequency: " %}</b>{{ object.get_frequency_level_display }}
                                 </li>
                                 <li>
-                                    <b>{% translate 'Effect: ' %}</b>{{ object.effect }}
+                                    <b>{% translate "Effect: " %}</b>{{ object.effect }}
                                 </li>
                                 <li>
-                                    <b>{% translate 'Description: ' %}</b>{{ object.description }}
+                                    <b>{% translate "Description: " %}</b>{{ object.description }}
                                 </li>
                                 <li class="affected-objects">
-                                    <b>{% translate 'Affected Departments: ' %}</b>
+                                    <b>{% translate "Affected Departments: " %}</b>
                                     {% for department_object in failure_mode_affected_departments %}
                                         <span>{{ department_object.affected_department }}</span>
                                     {% endfor %}
@@ -47,13 +47,13 @@
                                 </li>
                             </ol>
                             <a class="button cta"
-                               href="{% url 'fmea_failure_mode_report_pdf' object.id %}">Export to PDF</a>
+                               href="{% url "fmea_failure_mode_report_pdf" object.id %}">Export to PDF</a>
                         </div>
                     </div>
                 {% else %}
-                    <p>{% translate 'Report cannot be viewed, failure mode not found.' %}</p>
+                    <p>{% translate "Report cannot be viewed, failure mode not found." %}</p>
                 {% endif %}
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}

@@ -1,25 +1,25 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' with view_type="onboarding" %}
+    {% include "header.html" with view_type="onboarding" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'OpenKAT introduction' %}</h1>
-                {% include 'partials/stepper.html' %}
+                <h1>{% translate "OpenKAT introduction" %}</h1>
+                {% include "partials/stepper.html" %}
 
-                <h2>{% translate 'Setup scan' %}</h2>
-                <h3>{% translate 'Let OpenKAT know what object to scan' %}</h3>
+                <h2>{% translate "Setup scan" %}</h2>
+                <h3>{% translate "Let OpenKAT know what object to scan" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             Plugins scan and analyze objects. OpenKAT needs to know which object(s) you would like to scan and analyze for the DNS-report. So it can tell you which plugins are available for the chosen object.
          {% endblocktranslate %}
                 </p>
-                <h3>{% translate 'Understanding objects' %}</h3>
+                <h3>{% translate "Understanding objects" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             A lot of things can be an object within the scope of OpenKAT.
@@ -29,7 +29,7 @@
             scanned to gain valuable insight.
          {% endblocktranslate %}
                 </p>
-                <h3>{% translate 'Creating, adding and editing objects' %}</h3>
+                <h3>{% translate "Creating, adding and editing objects" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             Within OpenKAT you can view, add and edit objects from the organization’s object page.
@@ -43,10 +43,10 @@
                 </p>
                 {% if organization %}
                     <p>
-                        <a href="{% url 'complete_onboarding' organization.code %}"
-                           class="button ghost">{% translate 'Skip onboarding' %}</a>
-                        <a href="{% url 'step_setup_scan_ooi_add' ooi_type='URL' organization_code=organization.code %}"
-                           class="button">{% translate 'Add URL' %}</a>
+                        <a href="{% url "complete_onboarding" organization.code %}"
+                           class="button ghost">{% translate "Skip onboarding" %}</a>
+                        <a href="{% url "step_setup_scan_ooi_add" ooi_type="URL" organization_code=organization.code %}"
+                           class="button">{% translate "Add URL" %}</a>
                     </p>
                 {% endif %}
             </div>

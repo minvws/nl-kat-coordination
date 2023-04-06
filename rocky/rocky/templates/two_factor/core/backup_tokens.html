@@ -6,7 +6,7 @@
     <h1>
         {% block title %}
             {% trans "Backup Tokens" %}
-        {% endblock %}
+        {% endblock title %}
     </h1>
     <form method="post">
         {% csrf_token %}
@@ -28,8 +28,8 @@
         {% include "partials/form/fieldset.html" with fields=form %}
 
         <div class="horizontal-view">
-            <a href="{% url 'two_factor:profile' %}" class="button ghost">{% trans "Back to Account Security" %}</a>
+            <a href="{% url "two_factor:profile" %}" class="button ghost">{% trans "Back to Account Security" %}</a>
             <button type="submit">{% trans "Generate Tokens" %}</button>
         </div>
     </form>
-{% endblock %}
+{% endblock content %}
