@@ -5,7 +5,7 @@
   <a href="{% ooi_url 'ooi_report' ooi_id organization.code query=mandatory_fields %}"
      class="button">{% translate 'Generate report' %}</a>
   {% if not ooi_past_due %}
-    {% if ooi|is_finding %}
+    {% if ooi|is_finding and perms.tools.can_scan_organization %}
       <a href="{% ooi_url 'finding_mute' ooi_id organization.code %}"
          class="button">{% translate 'Mute Finding' %}</a>
     {% endif %}

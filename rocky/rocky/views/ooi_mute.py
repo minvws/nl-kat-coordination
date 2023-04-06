@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Type
 from django.views.generic import FormView
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import MuteFinding
 from tools.forms.ooi import MuteFindingForm
@@ -8,10 +9,11 @@ from rocky.views.mixins import OctopoesView
 from rocky.views.mixins import OOIBreadcrumbsMixin
 
 
-class MuteFindingView(OctopoesView, OOIBreadcrumbsMixin, FormView):
+class MuteFindingView(PermissionRequiredMixin, OctopoesView, OOIBreadcrumbsMixin, FormView):
     template_name = "oois/ooi_mute_finding.html"
     ooi_class: Type[OOI] = MuteFinding
     form_class = MuteFindingForm
+    permission_required = "tools.can_scan_organization"
 
     def get(self, request, *args, **kwargs):
         # ooi needed for breadcrumbs
