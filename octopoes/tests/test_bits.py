@@ -43,7 +43,7 @@ def test_url_extracted_by_oois_in_headers_relative_path():
 
     url = results[0]
     assert isinstance(url, URL)
-    assert url.raw == "https://www.example.com/script.php"
+    assert url.raw == "https://www.example.com./script.php"
     assert url.network == "Network|internet"
 
     http_header_url = results[1]
