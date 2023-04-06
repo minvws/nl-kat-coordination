@@ -136,7 +136,7 @@ class DnsTest(TestCase):
 
         # noinspection PyTypeChecker
         expected = (
-            [zone_hostname, zone, input_hostname]
+            [zone, input_hostname]
             + ip_v4_addresses
             + dns_a_records
             + ip_v6_addresses
@@ -268,10 +268,7 @@ class DnsTest(TestCase):
         answer = get_dummy_data("inputs/dns-result-mx-example.nl.json")
 
         internet = Network(name="internet")
-        input_hostname = Hostname(
-            network=internet.reference,
-            name="english.example.nl.",
-        )
+
         input_fqdn = Hostname(
             network=internet.reference,
             name="english.example.nl.",
@@ -296,7 +293,7 @@ class DnsTest(TestCase):
         results = runner.run(meta, answer)
 
         self.assertCountEqual(
-            [cname_target, cname_record, mx_record, input_fqdn, input_hostname],
+            [cname_target, cname_record, mx_record, input_fqdn],
             results.observations[0].results,
         )
 
@@ -311,12 +308,6 @@ class DnsTest(TestCase):
             hostname=zone_hostname.reference,
         )
         zone_hostname.dns_zone = zone.reference
-
-        input_hostname = Hostname(
-            network=internet.reference,
-            name="www.example.com",
-            dns_zone=zone.reference,
-        )
 
         input_fqdn = Hostname(
             network=internet.reference,
@@ -385,10 +376,10 @@ class DnsTest(TestCase):
                     id="1234",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
-                    input_ooi="Hostname|internet|www.example.com.",
+                    input_ooi="Hostname|internet|example.com.",
                     arguments={
-                        "domain": "www.example.com.",
-                        "input": {"name": "www.example.com."},
+                        "domain": "example.com.",
+                        "input": {"name": "example.com."},
                     },
                 ),
                 mime_types=[{"value": "boefje/dns-records"}],
@@ -409,7 +400,6 @@ class DnsTest(TestCase):
                 soa_record,
                 txt_record,
                 mx_record,
-                input_hostname,
                 soa_hostname,
             ]
             + ns_hostnames

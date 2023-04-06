@@ -15,15 +15,15 @@ from tests.test_snyk import get_dummy_data
 class ManualTest(TestCase):
     TEST_DECLARATIONS_DATA = (
         b"["
-        b'{"ooi": {"object_type": "Network", "scan_profile": null, "primary_key": "Network|net1", "name": "net1"}},'
-        b'{"ooi": {"object_type": "Network", "scan_profile": null, "primary_key": "Network|net2", "name": "net2"}}'
+        b'{"ooi": {"object_type": "Network", "scan_profile": null, "primary_key": "Network|net1", "name": "net1."}},'
+        b'{"ooi": {"object_type": "Network", "scan_profile": null, "primary_key": "Network|net2", "name": "net2."}}'
         b"]"
     )
     CSV_EXAMPLES = [
         # hostname
-        b"name,network\nexample.com,internet",
+        b"name,network\nexample.com.,internet",
         # hostname without network
-        b"name\nexample.net",
+        b"name\nexample.net.",
         # ipv4s
         b"""address,network
 1.1.1.1,internet
@@ -52,11 +52,11 @@ darknet,https://openkat.nl/""",
         self.assertEqual(0, len(output.observations))
 
         self.assertEqual(
-            {"name": "net1", "object_type": "Network", "primary_key": "Network|net1", "scan_profile": None},
+            {"name": "net1.", "object_type": "Network", "primary_key": "Network|net1", "scan_profile": None},
             output.declarations[0].ooi.dict(),
         )
         self.assertEqual(
-            {"name": "net2", "object_type": "Network", "primary_key": "Network|net2", "scan_profile": None},
+            {"name": "net2.", "object_type": "Network", "primary_key": "Network|net2", "scan_profile": None},
             output.declarations[1].ooi.dict(),
         )
 
@@ -84,10 +84,10 @@ darknet,https://openkat.nl/""",
             {
                 "dns_zone": None,
                 "fqdn": Reference("Hostname|internet|example.net."),
-                "name": "example.net",
+                "name": "example.net.",
                 "network": Reference("Network|internet"),
                 "object_type": "Hostname",
-                "primary_key": "Hostname|internet|example.net",
+                "primary_key": "Hostname|internet|example.net.",
                 "scan_profile": None,
             },
             output.declarations[1].ooi.dict(),
