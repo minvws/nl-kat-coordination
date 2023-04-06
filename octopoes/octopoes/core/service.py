@@ -135,9 +135,6 @@ class OctopoesService:
         except ObjectNotFoundException:
             level = 0
 
-        if bit_definition.id == "url-discovery":
-            print(bit_definition.id, bit_definition.min_scan_level, level)
-
         if level >= bit_definition.min_scan_level:
             try:
                 resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
