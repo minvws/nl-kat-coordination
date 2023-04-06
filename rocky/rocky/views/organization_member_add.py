@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.urls.base import reverse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
@@ -34,7 +35,21 @@ class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBread
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
+                "text": "Members",
+            },
+            {
+                "url": reverse(
+                    "organization_member_add",
+                    kwargs={"organization_code": self.organization.code},
+                ),
+                "text": _("Add member"),
+            },
+        ]
         context["organization"] = self.organization
+
         return context
 
     def form_valid(self, form):

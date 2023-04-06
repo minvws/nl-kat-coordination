@@ -1,6 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
@@ -47,8 +46,8 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
 
         context["breadcrumbs"] = [
             {
-                "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
-                "text": self.organization.name,
+                "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
+                "text": "Members",
             },
             {
                 "url": reverse(
