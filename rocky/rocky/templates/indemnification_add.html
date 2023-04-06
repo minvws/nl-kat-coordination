@@ -1,22 +1,22 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html'  %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
                 {% if indemnification_present %}
-                    {% include 'indemnification_present.html' %}
+                    {% include "indemnification_present.html" %}
 
                 {% else %}
-                    {% include 'partials/form/indemnification_add_form.html' %}
+                    {% include "partials/form/indemnification_add_form.html" %}
 
                 {% endif %}
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}
