@@ -89,7 +89,6 @@ def test_mute_finding_button_is_visible(
 
 
 def test_mute_finding_form_view(rf, admin_member, redteam_member, client_member, mock_organization_view_octopoes):
-
     request_admin = setup_request(
         rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), admin_member.user
     )
@@ -124,7 +123,6 @@ def test_mute_finding_post(
     lazy_task_list_with_boefje,
     mocker,
 ):
-
     # post from the finding mute view
     request = setup_request(
         rf.post(

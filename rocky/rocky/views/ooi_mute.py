@@ -3,7 +3,7 @@ from typing import Type
 from django.views.generic import FormView
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import MuteFinding
+from octopoes.models.ooi.findings import MutedFinding
 from tools.forms.ooi import MuteFindingForm
 from rocky.views.mixins import OctopoesView
 from rocky.views.mixins import OOIBreadcrumbsMixin
@@ -11,7 +11,7 @@ from rocky.views.mixins import OOIBreadcrumbsMixin
 
 class MuteFindingView(PermissionRequiredMixin, OctopoesView, OOIBreadcrumbsMixin, FormView):
     template_name = "oois/ooi_mute_finding.html"
-    ooi_class: Type[OOI] = MuteFinding
+    ooi_class: Type[OOI] = MutedFinding
     form_class = MuteFindingForm
     permission_required = "tools.can_scan_organization"
 
