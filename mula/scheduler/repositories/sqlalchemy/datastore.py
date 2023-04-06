@@ -1,5 +1,6 @@
+import time
 import json
-from functools import partial
+from functools import partial,wraps
 
 from scheduler import models
 
@@ -56,3 +57,19 @@ class SQLAlchemy(Datastore):
         self.session = orm.sessionmaker(
             bind=self.engine,
         )
+
+def retry(max_retries=3, retry_delay=5):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for i in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if i == max_retries - 1:
+                        raise e
+
+                    print(f"Retrying {func.__name__} in {retry_delay} seconds ({i+1}/{max_retries}): {str(e)}")
+                    time.sleep(retry_delay)
+        return wrapper
+    return decorator
