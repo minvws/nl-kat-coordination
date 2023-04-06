@@ -1,22 +1,22 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Departments failure modes' %}</h1>
+                <h1>{% translate "Departments failure modes" %}</h1>
                 <div class="horizontal-scroll">
                     <table>
-                        <caption>{% translate 'Failure modes and affected departments table:' %}</caption>
+                        <caption>{% translate "Failure modes and affected departments table:" %}</caption>
                         <thead>
                             <tr>
-                                <th scope="col">{% translate 'Failure Mode' %}</th>
-                                <th scope="col">{% translate 'Affected Departments' %}</th>
+                                <th scope="col">{% translate "Failure Mode" %}</th>
+                                <th scope="col">{% translate "Affected Departments" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -26,7 +26,7 @@
                                     <td>{{ object.affected_department }}</td>
                                 </tr>
                             {% empty %}
-                                <p>{% translate 'Nothing found.' %}</p>
+                                <p>{% translate "Nothing found." %}</p>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -34,4 +34,4 @@
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}

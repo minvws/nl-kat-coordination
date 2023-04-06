@@ -1,18 +1,18 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' with view_type="onboarding" %}
+    {% include "header.html" with view_type="onboarding" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Register' %}</h1>
-                {% include 'partials/stepper.html' %}
+                <h1>{% translate "Register" %}</h1>
+                {% include "partials/stepper.html" %}
 
-                <p>{% translate 'Create a new account for your organization' %}</p>
+                <p>{% translate "Create a new account for your organization" %}</p>
                 <p>
                     {% blocktranslate trimmed %}
             All user  accounts are part of an organization.
@@ -25,7 +25,7 @@
          {% endblocktranslate %}
                 </p>
                 <h2>{% translate "Let's get started" %}</h2>
-                <strong>{% translate 'How does OpenKAT work' %}</strong>
+                <strong>{% translate "How does OpenKAT work" %}</strong>
                 <p>
                     {% blocktranslate trimmed %}
            OpenKAT is able to give insight into security risks on your online objects. For example,
@@ -35,7 +35,7 @@
            During this introduction you will be guided through the steps to create a report.
          {% endblocktranslate %}
                 </p>
-                <a href="{% url 'step_organization_setup' %}" class="button">{% translate "Let's get started" %}</a>
+                <a href="{% url "step_organization_setup" %}" class="button">{% translate "Let's get started" %}</a>
             </div>
         </section>
     </main>

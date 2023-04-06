@@ -68,15 +68,14 @@ class Finding(OOI):
         return f"{finding_type} @ {ooi_reference.human_readable}"
 
 
-class MuteFinding(OOI):
-    object_type: Literal["MuteFinding"] = "MuteFinding"
+class MutedFinding(OOI):
+    object_type: Literal["MutedFinding"] = "MutedFinding"
 
     finding: Reference = ReferenceField(Finding)
     reason: Optional[str]
 
-    _natural_key_attrs = ["finding"]
     _reverse_relation_names = {"finding": "mutes"}
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"Mute {reference.natural_key}"
+        return f"Muted {reference.tokenized.finding.human_readable}"

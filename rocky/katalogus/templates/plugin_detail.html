@@ -1,40 +1,40 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load static %}
 {% load i18n %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div class="one-third-two-thirds">
                 <div>
-                    <img src="{% url 'plugin_cover' organization_code=organization.code plugin_id=plugin.id %}"
+                    <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
                          alt="boefje placeholder image"/>
                 </div>
                 <div>
                     <div class="horizontal-view toolbar">
                         <div>
-                            {% include 'partials/enable_disable_plugin.html' with plugin=plugin %}
+                            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
                         </div>
                     </div>
                     <h1>{{ plugin.name }}</h1>
                     <div class="horizontal-view scan-intensity">
-                        <span class="de-emphasized">{% translate 'Scan level' %}</span>
-                        {% include 'partials/scan_level_indicator.html' with value=plugin.scan_level %}
+                        <span class="de-emphasized">{% translate "Scan level" %}</span>
+                        {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
 
                     </div>
                     <p>
-                        <strong>{% translate 'Description' %}</strong>
+                        <strong>{% translate "Description" %}</strong>
                     </p>
                     <p>{{ plugin.description }}</p>
                 </div>
             </div>
         </section>
         {% if perms.tools.can_scan_organization %}
-            {% include 'plugin_settings_list.html' with object_list=object_list plugin=plugin %}
+            {% include "plugin_settings_list.html" with object_list=object_list plugin=plugin %}
 
         {% endif %}
         <section>
@@ -47,7 +47,7 @@
                 </p>
                 <p>
                     {% for ooi in plugin.consumes %}
-                        <a href="{% url 'ooi_add' organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
+                        <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
                         {% if ooi != plugin.consumes|last %}-{% endif %}
                     {% endfor %}
                 </p>
@@ -59,26 +59,26 @@
                 </p>
                 <p>
                     {% for ooi in plugin.produces %}
-                        <a href="{% url 'ooi_add' organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
+                        <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
                         {% if ooi != plugin.produces|last %}-{% endif %}
                     {% endfor %}
                 </p>
                 <p>
-                    {% include 'partials/scan_history.html' %}
+                    {% include "partials/scan_history.html" %}
 
                 </p>
             </div>
         </section>
         {% if perms.tools.can_scan_organization %}
-            {% include 'partials/objects_to_scan.html' with plugin=plugin %}
+            {% include "partials/objects_to_scan.html" with plugin=plugin %}
 
         {% endif %}
     </main>
-{% endblock %}
+{% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static '/js/checkboxToggler.js' %}"
+    <script src="{% static "/js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
-    <script src="{% static '/js/autoSubmit.js' %}"
+    <script src="{% static "/js/autoSubmit.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+{% endblock html_at_end_body %}

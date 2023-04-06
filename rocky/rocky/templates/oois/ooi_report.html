@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
@@ -11,10 +11,10 @@
         <section>
             <div class="horizontal-view toolbar">
                 <a href="{% ooi_url 'ooi_pdf_report' ooi.primary_key organization.code query=mandatory_fields %}"
-                   class="button ghost">{% translate 'Download PDF' %}</a>
+                   class="button ghost">{% translate "Download PDF" %}</a>
             </div>
             <div>
-                {% include 'partials/elements/ooi_report_settings.html' %}
+                {% include "partials/elements/ooi_report_settings.html" %}
 
                 <h1>
                     {% blocktranslate trimmed with name=ooi.human_readable %}
@@ -33,9 +33,9 @@
         {% include "partials/ooi_report_findings_block.html" %}
 
     </main>
-{% endblock %}
+{% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static '/js/checkboxToggler.js' %}"
+    <script src="{% static "/js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+{% endblock html_at_end_body %}
