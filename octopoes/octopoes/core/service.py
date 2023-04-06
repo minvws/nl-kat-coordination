@@ -120,12 +120,6 @@ class OctopoesService:
             self.ooi_repository.save(ooi, valid_time=valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
 
-    def get_level(self, reference, valid_time) -> int:
-        try:
-            return self.scan_profile_repository.get(reference, valid_time).level
-        except ObjectNotFoundException:
-            return 0
-
     def _run_inference(self, origin: Origin, valid_time: datetime):
         bit_definition = get_bit_definitions()[origin.method]
 
@@ -134,15 +128,22 @@ class OctopoesService:
         parameters_references = self.origin_parameter_repository.list_by_origin(origin.id, valid_time)
         parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
-        level = self.get_level(origin.source, valid_time)
-        if level > 0:
+        resulting_oois = []
+
+        try:
+            level = self.scan_profile_repository.get(origin.source, valid_time).level
+        except ObjectNotFoundException:
+            level = 0
+
+        if bit_definition.id == "url-discovery":
+            print(bit_definition.id, bit_definition.min_scan_level, level)
+
+        if level >= bit_definition.min_scan_level:
             try:
                 resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
             except Exception as e:
                 logger.exception("Error running inference", exc_info=e)
                 return
-        else:
-            resulting_oois = []
 
         self.save_origin(origin, resulting_oois, valid_time)
 

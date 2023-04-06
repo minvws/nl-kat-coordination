@@ -6,4 +6,5 @@ BIT = BitDefinition(
     consumes=URL,
     parameters=[],
     module="bits.url_classification.url_classification",
+    min_scan_level=0,
 )
