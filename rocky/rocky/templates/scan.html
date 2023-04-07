@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -11,7 +11,7 @@
                 <h1>{% translate "Boefjes" %}:</h1>
                 <div class="horizontal-scroll">
                     <table>
-                        <caption>{% translate 'Boefjes overview:' %}</caption>
+                        <caption>{% translate "Boefjes overview:" %}</caption>
                         <thead>
                             <tr>
                                 <th>{% translate "Boefje" %}</th>
@@ -23,7 +23,7 @@
                             {% for boefje in boefjes %}
                                 <tr>
                                     <td>
-                                        <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=boefje.id %}">{{ boefje.name }}</a>
+                                        <a href="{% url "plugin_detail" organization_code=organization.code plugin_type="boefje" plugin_id=boefje.id %}">{{ boefje.name }}</a>
                                     </td>
                                     <td>{{ boefje.description }}</td>
                                     <td>{{ boefje.scan_level.label }}</td>
@@ -35,4 +35,4 @@
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}

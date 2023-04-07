@@ -13,12 +13,12 @@
                    {% if choice.data.attrs.disabled %} disabled{% endif %}
                    {% if choice.data.attrs.checked %} checked{% endif %}/>
             <label>
-                {% include 'partials/scan_level_indicator.html' with value=forloop.counter0 %}
+                {% include "partials/scan_level_indicator.html" with value=forloop.counter0 %}
 
             </label>
         </div>
     {% endfor %}
-    {% include 'partials/form/field_input_help_text.html' with help_text=field.help_text %}
-    {% include 'partials/form/field_input_errors.html' %}
+    {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+    {% include "partials/form/field_input_errors.html" %}
 
 </fieldset>

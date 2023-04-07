@@ -10,7 +10,7 @@
                 {% if finding.ooi_type == "Finding" %}
                     {% include "partials/ooi_summary_finding.html" with parent=ooi_tree finding=finding %}
 
-                {% endif  %}
+                {% endif %}
             {% endfor %}
             {% if tree_node.tree_meta.depth > 1 %}
                 <h3>Details for {{ tree_node.ooi_type }} {{ tree_node.human_readable }}</h3>
@@ -70,7 +70,7 @@
                 {% if finding.ooi_type == "Finding" %}
                     {% include "partials/ooi_summary_finding.html" with parent=ooi_tree finding=finding %}
 
-                {% endif  %}
+                {% endif %}
             {% endfor %}
             {% if tree_node.tree_meta.depth > 1 %}
                 <h3>Details for {{ tree_node.ooi_type }} {{ tree_node.human_readable }}</h3>

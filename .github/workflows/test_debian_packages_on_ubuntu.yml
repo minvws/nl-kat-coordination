@@ -172,7 +172,7 @@ jobs:
 
       - name: Get the OpenKAT artifacts
         run: |
-          curl -Ls https://github.com/dekkers/xtdb-http-multinode/releases/download/v1.0.2/xtdb-http-multinode_1.0.2_all.deb --output xtdb-http-multinode_1.0.2_all.deb;
+          curl -Ls https://github.com/dekkers/xtdb-http-multinode/releases/download/v1.0.4/xtdb-http-multinode_1.0.4_all.deb --output xtdb-http-multinode_1.0.4_all.deb;
 
       - name: Install the artifacts
         run: |
@@ -181,7 +181,6 @@ jobs:
       - name: Update configs for rabbitmq
         run: |
           sudo sed -i "s/SCHEDULER_RABBITMQ_DSN=/SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
-          sudo sed -i "s/SCHEDULER_DSP_BROKER_URL=/SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/rocky.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/bytes.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/boefjes.conf
