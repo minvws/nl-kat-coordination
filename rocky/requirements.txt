@@ -25,7 +25,7 @@ typing-extensions==4.4.0
 urllib3==1.26.15
 xhtml2pdf==0.2.8
 dnspython~=2.1.0
-django-password-validators==1.7.0
+django-password-validators==1.7.1
 colorama==0.4.6
 django-csp==3.7
 uwsgi==2.0.21
