@@ -1283,5 +1283,18 @@
       },
       "consult_api": false
     }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|EXPOSED-PANELS",
+    "fields": {
+      "last_updated": "2023-04-05T15:42:42.000Z",
+      "data": {
+        "description": "Exposed login panels for services can pose security risks as they can be targeted by malicious actors for brute-force attacks, phishing attempts, and other forms of unauthorized access.",
+        "recommendation": "Ideally to minimize the attack surface as much as possible these panels should not be directly exposed to the internet",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
   }
 ]
