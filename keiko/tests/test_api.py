@@ -12,12 +12,14 @@ class APITest(TestCase):
     maxDiff = None
 
     def setUp(self) -> None:
-        fixtures = Path(__file__).parent / "fixtures"
-
-        keiko.templates.settings.templates_folder = str(fixtures / "templates")
+        self.orig_templates_folder = keiko.templates.settings.templates_folder
+        keiko.templates.settings.templates_folder = Path(__file__).parent / "fixtures" / "templates"
 
         self.api = construct_api()
         self.client = TestClient(self.api)
+
+    def tearDown(self):
+        keiko.templates.settings.templates_folder = self.orig_templates_folder
 
     def test_health(self):
         response = self.client.get("/health")

@@ -10,7 +10,11 @@ from keiko.templates import get_templates, get_data_shape, get_samples
 class KeikoTemplatesTest(TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
+        self.orig_templates_folder = keiko.templates.settings.templates_folder
         keiko.templates.settings.templates_folder = Path(__file__).parent / "fixtures" / "templates"
+
+    def tearDown(self):
+        keiko.templates.settings.templates_folder = self.orig_templates_folder
 
     def test_list_templates(self):
         templates = get_templates()
