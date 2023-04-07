@@ -13,7 +13,7 @@
                 {% include "tasks/partials/tab_navigation.html" with view="boefjes_tasks" %}
 
                 <h1>{% translate "Boefjes" %}</h1>
-                {% include 'tasks/partials/task_filter.html' %}
+                {% include "tasks/partials/task_filter.html" %}
                 {% if not object_list %}
                     <p class="emphasized">{% translate "There are no tasks for boefjes" %}</p>
                 {% else %}
@@ -69,8 +69,7 @@
     </main>
 {% endblock content %}
 
-{% block html_at_end_body %}
+{% block script %}
     {{ block.super }}
     <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
-
+{% endblock script %}
