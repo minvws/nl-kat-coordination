@@ -1,0 +1,10 @@
+{
+    "id": "kat_nuclei__cve_normalize",
+    "consumes": [
+        "nuclei-cve"
+    ],
+    "produces": [
+        "Findings",
+        "CVEFindingType"
+    ]
+}
