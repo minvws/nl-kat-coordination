@@ -9,10 +9,10 @@
         "name": "DnsResolve"
       },
       "organization": "_dev",
-      "input_ooi": "Hostname|internet|example.nl",
+      "input_ooi": "Hostname|internet|example.nl.",
       "arguments": {
         "input": {
-          "name": "example.nl"
+          "name": "example.nl."
         }
       },
       "dispatches": [

@@ -34,7 +34,7 @@ class DnsTest(TestCase):
         zone = DNSZone(hostname=zone_hostname.reference)
         zone_hostname.dns_zone = zone.reference
 
-        input_hostname = Hostname(name="example.nl", network=internet.reference, dns_zone=zone.reference)
+        input_hostname = Hostname(name="example.nl.", network=internet.reference, dns_zone=zone.reference)
 
         ip_v4_addresses = [
             IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.35")),
@@ -257,8 +257,8 @@ class DnsTest(TestCase):
                     organization="_dev",
                     input_ooi="Hostname|internet|english.example.nl.",
                     arguments={
-                        "domain": "english.example.nl",
-                        "input": {"name": "english.example.nl"},
+                        "domain": "english.example.nl.",
+                        "input": {"name": "english.example.nl."},
                     },
                 ),
                 mime_types=[{"value": "boefje/dns-records"}],
@@ -268,10 +268,6 @@ class DnsTest(TestCase):
         answer = get_dummy_data("inputs/dns-result-mx-example.nl.json")
 
         internet = Network(name="internet")
-        input_hostname = Hostname(
-            network=internet.reference,
-            name="english.example.nl",
-        )
         input_fqdn = Hostname(
             network=internet.reference,
             name="english.example.nl.",
@@ -296,7 +292,7 @@ class DnsTest(TestCase):
         results = runner.run(meta, answer)
 
         self.assertCountEqual(
-            [cname_target, cname_record, mx_record, input_fqdn, input_hostname],
+            [cname_target, cname_record, mx_record, input_fqdn],
             results.observations[0].results,
         )
 
@@ -311,12 +307,6 @@ class DnsTest(TestCase):
             hostname=zone_hostname.reference,
         )
         zone_hostname.dns_zone = zone.reference
-
-        input_hostname = Hostname(
-            network=internet.reference,
-            name="www.example.com",
-            dns_zone=zone.reference,
-        )
 
         input_fqdn = Hostname(
             network=internet.reference,
@@ -385,10 +375,10 @@ class DnsTest(TestCase):
                     id="1234",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
-                    input_ooi="Hostname|internet|www.example.com",
+                    input_ooi="Hostname|internet|www.example.com.",
                     arguments={
-                        "domain": "www.example.com",
-                        "input": {"name": "www.example.com"},
+                        "domain": "www.example.com.",
+                        "input": {"name": "www.example.com."},
                     },
                 ),
                 mime_types=[{"value": "boefje/dns-records"}],
@@ -409,7 +399,6 @@ class DnsTest(TestCase):
                 soa_record,
                 txt_record,
                 mx_record,
-                input_hostname,
                 soa_hostname,
             ]
             + ns_hostnames

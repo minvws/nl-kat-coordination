@@ -21,9 +21,9 @@ class ManualTest(TestCase):
     )
     CSV_EXAMPLES = [
         # hostname
-        b"name,network\nexample.com,internet",
+        b"name,network\nexample.com.,internet",
         # hostname without network
-        b"name\nexample.net",
+        b"name\nexample.net.",
         # ipv4s
         b"""address,network
 1.1.1.1,internet
@@ -68,10 +68,10 @@ darknet,https://openkat.nl/""",
             {
                 "dns_zone": None,
                 "fqdn": Reference("Hostname|internet|example.com."),
-                "name": "example.com",
+                "name": "example.com.",
                 "network": Reference("Network|internet"),
                 "object_type": "Hostname",
-                "primary_key": "Hostname|internet|example.com",
+                "primary_key": "Hostname|internet|example.com.",
                 "scan_profile": None,
             },
             output.declarations[1].ooi.dict(),
@@ -84,10 +84,10 @@ darknet,https://openkat.nl/""",
             {
                 "dns_zone": None,
                 "fqdn": Reference("Hostname|internet|example.net."),
-                "name": "example.net",
+                "name": "example.net.",
                 "network": Reference("Network|internet"),
                 "object_type": "Hostname",
-                "primary_key": "Hostname|internet|example.net",
+                "primary_key": "Hostname|internet|example.net.",
                 "scan_profile": None,
             },
             output.declarations[1].ooi.dict(),
