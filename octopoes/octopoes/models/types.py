@@ -41,6 +41,7 @@ from octopoes.models.ooi.findings import (
     RetireJSFindingType,
     SnykFindingType,
     CAPECFindingType,
+    MutedFinding,
 )
 from octopoes.models.ooi.monitoring import Incident, Application
 from octopoes.models.ooi.network import (
@@ -148,6 +149,7 @@ OOIType = Union[
     MonitoringType,
     EmailSecurityType,
     Finding,
+    MutedFinding,
     FindingTypeType,
 ]
 
