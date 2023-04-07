@@ -136,7 +136,7 @@ class DnsTest(TestCase):
 
         # noinspection PyTypeChecker
         expected = (
-            [zone_hostname, zone, input_hostname]
+            [zone, input_hostname]
             + ip_v4_addresses
             + dns_a_records
             + ip_v6_addresses
