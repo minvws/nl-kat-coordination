@@ -1,116 +1,118 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
+
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-  {% include 'header.html' %}
-  <main id="main-content">
-    <section>
-      <div>
-        <h1>{% translate 'Organization'  %}: {{ organization.name }}</h1>
+    {% include "header.html" %}
 
-        {% blocktranslate with organization_name=organization.name %}
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Organization" %}: {{ organization.name }}</h1>
+                {% blocktranslate with organization_name=organization.name %}
           An overview of "{{ organization_name }}" its members.
-        {% endblocktranslate %}
-
-
-        <h2>{% translate 'Members' %}</h2>
-        {% if perms.tools.add_organizationmember %}
-          <div class="horizontal-view toolbar">
-            <a href="{% url 'organization_member_add' organization.code %}"
-              class="button">{% translate 'Add new member' %}</a>
-          </div>
-        {% endif %}
-        {% include 'partials/organization_member_list_filters.html' with checkbox_filters=checkbox_filters %}
-        <div class="horizontal-scroll">
-          <table>
-            <caption>{% translate 'Member overview:' %}</caption>
-            <thead>
-              <tr>
-                <th>{% translate 'Name' %}</th>
-                <th>{% translate 'E-mail' %}</th>
-                <th>{% translate 'Role' %}</th>
-                <th>{% translate 'Status' %}</th>
-                <th>{% translate 'Added' %}</th>
-                <th>{% translate 'Assigned clearance level' %}</th>
-                <th>{% translate 'Agreed clearance level' %}</th>
-                <th>{% translate 'Edit' %}</th>
-                <th>{% translate 'Blocked' %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for member in members %}
-                {% if not member.user.is_superuser or request.user.is_superuser %}
-                  <tr>
-                    <td>
-                      {{ member.user.full_name }}
-                    </td>
-                    <td>
-                      {{ member.user.email }}
-                      <br>
-                    </td>
-                    <td>
-                      {% if member.user.is_superuser %}
-                        {% translate 'Super user' %}
-                      {% endif %}
-                      {% for group in member.user.groups.all %}
-                        {{ group.name|title }}
-                        <br>
-                      {% endfor %}
-                    </td>
-                    <td class="nowrap">
-                      {% if member.user.is_superuser %}
-                        <span class="active"></span><span>&nbsp;{% translate 'Active' %}</span>
-                      {% else %}
-                        <span class="{{member.status}}"></span><span>&nbsp;{{ member.status|title }}</span>
-                      {% endif %}
-                      <br>
-                    </td>
-                    <td>{{ member.user.date_joined|date:"SHORT_DATE_FORMAT" }}</td>
-                    <td>
-                      {% if member.user.is_superuser %}
-                        L4
-                      {% else %}
-                        {% if member.trusted_clearance_level < 0 %}
-                          None
-                        {% else %}
-                          L{{ member.trusted_clearance_level }}
-                        {% endif %}
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if member.user.is_superuser %}
-                        L4
-                      {% else %}
-                        {% if member.trusted_clearance_level < 0 %}
-                          None
-                        {% else %}
-                          L{{ member.acknowledged_clearance_level }}
-                        {% endif %}
-                      {% endif %}
-                    </td>
-                    <td>
-                      <a href="{% url 'organization_member_edit' organization.code member.id %}"><button class="icon ti-edit action-button">{% translate 'Edit' %}</button></a>
-                    </td>
-                    <td>
-                      {% if member.status == "blocked" %}
-                        {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='unblock' key='member_id' value=member.id %}
-                      {% else %}
-                        {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='block' key='member_id' value=member.id %}
-                      {% endif %}
-                    </td>
-                  </tr>
+{% endblocktranslate %}
+                <h2>{% translate "Members" %}</h2>
+                {% if perms.tools.add_organizationmember %}
+                    <div class="horizontal-view toolbar">
+                        <a href="{% url "organization_member_add" organization.code %}"
+                           class="button">{% translate "Add new member" %}</a>
+                    </div>
                 {% endif %}
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  </main>
-{% endblock %}
+                {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}
 
+                <div class="horizontal-scroll">
+                    <table>
+                        <caption>{% translate "Member overview:" %}</caption>
+                        <thead>
+                            <tr>
+                                <th>{% translate "Name" %}</th>
+                                <th>{% translate "E-mail" %}</th>
+                                <th>{% translate "Role" %}</th>
+                                <th>{% translate "Status" %}</th>
+                                <th>{% translate "Added" %}</th>
+                                <th>{% translate "Assigned clearance level" %}</th>
+                                <th>{% translate "Agreed clearance level" %}</th>
+                                <th>{% translate "Edit" %}</th>
+                                <th>{% translate "Blocked" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in members %}
+                                {% if not member.user.is_superuser or request.user.is_superuser %}
+                                    <tr>
+                                        <td>{{ member.user.full_name }}</td>
+                                        <td>
+                                            {{ member.user.email }}
+                                            <br>
+                                        </td>
+                                        <td>
+                                            {% if member.user.is_superuser %}
+                                                {% translate "Super user" %}
+                                            {% endif %}
+                                            {% for group in member.user.groups.all %}
+                                                {{ group.name|title }}
+                                                <br>
+                                            {% endfor %}
+                                        </td>
+                                        <td class="nowrap">
+                                            {% if member.user.is_superuser %}
+                                                <span class="active"></span><span>&nbsp;{% translate "Active" %}</span>
+                                            {% else %}
+                                                <span class="{{ member.status }}"></span><span>&nbsp;{{ member.status|title }}</span>
+                                            {% endif %}
+                                            <br>
+                                        </td>
+                                        <td>{{ member.user.date_joined|date:"SHORT_DATE_FORMAT" }}</td>
+                                        <td>
+                                            {% if member.user.is_superuser %}
+                                                L4
+                                            {% else %}
+                                                {% if member.trusted_clearance_level < 0 %}
+                                                    None
+                                                {% else %}
+                                                    L{{ member.trusted_clearance_level }}
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if member.user.is_superuser %}
+                                                L4
+                                            {% else %}
+                                                {% if member.trusted_clearance_level < 0 %}
+                                                    None
+                                                {% else %}
+                                                    L{{ member.acknowledged_clearance_level }}
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url "organization_member_edit" organization.code member.id %}">
+                                                <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if member.status == "blocked" %}
+                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
+
+                                            {% else %}
+                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="block" key="member_id" value=member.id %}
+
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
 {% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+    {{ block.super }}
+    <script src="{% static "/js/checkboxToggler.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

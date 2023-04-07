@@ -99,8 +99,9 @@ Initialize the database using the update-katalogus-db tool:
 Bytes DB
 --------
 
-Generate a unique password for the Bytes database user. Insert it into the connection string for the Bytes database.
-Insert this password into the connection string for the Bytes DB in `/etc/kat/bytes.conf`. For example:
+Generate a unique password for the Bytes database user. Insert this password
+into the connection string for the Bytes DB in `/etc/kat/bytes.conf`. For
+example:
 
 .. code-block:: sh
 
@@ -119,6 +120,30 @@ Initialize the Bytes database:
 .. code-block:: sh
 
     sudo -u kat update-bytes-db
+
+Mula DB
+--------
+
+Generate a unique password for the Mula database user. Insert this password into
+the connection string for the Mula DB in `/etc/kat/mula.conf`. For example:
+
+.. code-block:: sh
+
+    SCHEDULER_DB_DSN=postgresql://mula:<password>@localhost/mula_db
+
+Create a new database and user for Mula:
+
+.. code-block:: sh
+
+    sudo -u postgres createdb mula_db
+    sudo -u postgres createuser mula -P
+    sudo -u postgres psql -c 'GRANT ALL ON DATABASE mula_db TO mula;'
+
+Initialize the Mula database:
+
+.. code-block:: sh
+
+    sudo -u kat update-mula-db
 
 Create Rocky superuser and set up default groups and permissions
 ================================================================
@@ -179,7 +204,11 @@ Create a new file `/etc/rabbitmq/advanced.conf` and add the following lines:
         ]}
     ].
 
-Now start RabbitMQ again with `systemctl start rabbitmq-server` and check if it only listens on localhost for ports 5672 and 25672.
+Now start RabbitMQ again and check if it only listens on localhost for ports 5672 and 25672:
+
+.. code-block:: sh
+
+    systemctl start rabbitmq-server
 
 Add the 'kat' vhost
 -------------------
@@ -203,7 +232,6 @@ Now configure KAT to use the vhost we created and with the kat user. To do this,
 .. code-block:: sh
 
     SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@127.0.0.1:5672/kat
-    SCHEDULER_DSP_BROKER_URL=amqp://kat:<password>@127.0.0.1:5672/kat
 
 And update the `QUEUE_URI` setting to the same value for the following files:
 
@@ -293,8 +321,14 @@ For Bytes DB:
 
     sudo -u kat update-bytes-db
 
+For Mula DB:
+
+.. code-block:: sh
+
+    sudo -u kat update-mula-db
+
 Restart all processes:
 
 .. code-block:: sh
 
-sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
+    sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker

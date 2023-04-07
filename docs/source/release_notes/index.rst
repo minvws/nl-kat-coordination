@@ -5,5 +5,7 @@ Release notes
    :maxdepth: 1
    :caption: Releases
 
-   1.5
    1.8
+   1.7
+   1.6
+   1.5

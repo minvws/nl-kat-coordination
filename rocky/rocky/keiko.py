@@ -2,6 +2,7 @@ import re
 import time
 from typing import Dict, BinaryIO, List, Optional, Any
 from http import HTTPStatus
+from io import BytesIO
 
 import requests
 from requests import HTTPError
@@ -62,13 +63,13 @@ class KeikoClient:
         try:
             for _ in range(15):
                 time.sleep(1)
-                res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf", stream=True)
+                res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf")
 
                 if res.status_code == HTTPStatus.NOT_FOUND:
                     continue
 
                 res.raise_for_status()
-                return res.raw
+                return BytesIO(res.content)
         except HTTPError as e:
             raise GeneratingReportFailed from e
 
