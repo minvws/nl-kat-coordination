@@ -8,4 +8,5 @@ BIT = BitDefinition(
         BitParameterDefinition(ooi_type=SoftwareInstance, relation_path="software"),
     ],
     module="bits.retire_js.retire_js",
+    min_scan_level=1,
 )
