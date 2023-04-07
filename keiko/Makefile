@@ -31,7 +31,7 @@ check-latex:
 	done
 
 test:
-	python -m unittest discover -s tests -p "test_*.py"
+	pytest
 
 itest:
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build
@@ -75,5 +75,4 @@ clean:
 
 export-requirements: ## Export the requirements to requirements.txt
 	poetry export --output requirements.txt --without-hashes && \
-	poetry export --output requirements-dev.txt --with dev --without-hashes && \
-	poetry export --output requirements-check.txt --only dev --without-hashes
+	poetry export --output requirements-dev.txt --with dev --without-hashes
