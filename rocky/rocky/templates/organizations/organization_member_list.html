@@ -88,10 +88,12 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="{% url "organization_member_edit" organization.code member.id %}"><button class="icon ti-edit action-button">{% translate "Edit" %}</button></a>
+                                            {% if not member.user.is_superuser %}
+                                                <a href="{% url "organization_member_edit" organization.code member.id %}"><button class="icon ti-edit action-button">{% translate "Edit" %}</button></a>
+                                            {% endif %}
                                         </td>
                                         <td>
-                                            {% if member.status == "blocked" %}
+                                            {% if member.blocked %}
                                                 {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
                                             {% else %}
                                                 {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="block" key="member_id" value=member.id %}

@@ -181,16 +181,16 @@ class OrganizationMemberEditForm(BaseRockyModelForm):
         widget=forms.RadioSelect(attrs={"radio_paws": True}),
     )
 
-    status = forms.BooleanField(
+    blocked = forms.BooleanField(
         required=False,
         label=_("Blocked"),
         help_text=_("Set the members status to blocked, so they don't have access to the organization anymore."),
-        widget=forms.CheckboxInput(check_test=lambda value: value == OrganizationMember.STATUSES.BLOCKED),
+        widget=forms.CheckboxInput(),
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["status"].widget.attrs["field_form_label"] = "Status"
+        self.fields["blocked"].widget.attrs["field_form_label"] = "Status"
         if self.instance.user.is_superuser:
             self.fields["trusted_clearance_level"].disabled = True
         self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
@@ -202,14 +202,6 @@ class OrganizationMemberEditForm(BaseRockyModelForm):
         if self.instance.user.is_superuser:
             self.fields["trusted_clearance_level"].disabled = True
 
-    def clean(self):
-        cleaned_data = super().clean()
-        # Check if status "Blocked" checkbox is checked/True
-        if cleaned_data["status"]:
-            cleaned_data["status"] = OrganizationMember.STATUSES.BLOCKED
-        else:
-            cleaned_data["status"] = OrganizationMember.STATUSES.NEW
-
     def save(self, commit=True):
         instance = super().save(commit=False)
         if instance.trusted_clearance_level < instance.acknowledged_clearance_level:
@@ -220,7 +212,7 @@ class OrganizationMemberEditForm(BaseRockyModelForm):
 
     class Meta:
         model = OrganizationMember
-        fields = ["status", "trusted_clearance_level", "acknowledged_clearance_level"]
+        fields = ["blocked", "trusted_clearance_level", "acknowledged_clearance_level"]
 
 
 class OrganizationForm(BaseRockyModelForm):

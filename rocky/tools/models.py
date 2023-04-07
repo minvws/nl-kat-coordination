@@ -162,6 +162,7 @@ class OrganizationMember(models.Model):
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
+    blocked = models.BooleanField(default=False)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
@@ -169,10 +170,6 @@ class OrganizationMember(models.Model):
     acknowledged_clearance_level = models.IntegerField(
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
     )
-
-    @property
-    def blocked(self):
-        return self.status == OrganizationMember.STATUSES.BLOCKED
 
     class Meta:
         unique_together = ["user", "organization"]

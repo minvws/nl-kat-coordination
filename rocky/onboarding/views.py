@@ -355,6 +355,7 @@ class OnboardingReportView(
     def set_member_onboarded(self):
         member = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
         member.onboarded = True
+        member.status = OrganizationMember.STATUSES.ACTIVE
         member.save()
 
 
@@ -649,5 +650,6 @@ class CompleteOnboarding(OrganizationView):
             redteam_group.user_set.add(self.request.user)
             return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
         member.onboarded = True
+        member.status = OrganizationMember.STATUSES.ACTIVE
         member.save()
         return redirect(reverse("crisis_room"))

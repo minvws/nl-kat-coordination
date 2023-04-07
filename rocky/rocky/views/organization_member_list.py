@@ -57,9 +57,9 @@ class OrganizationMemberListView(
         organizationmember = self.model.objects.get(id=member_id)
         try:
             if action == PageActions.BLOCK.value:
-                organizationmember.status = OrganizationMember.STATUSES.BLOCKED
+                organizationmember.blocked = True
             elif action == PageActions.UNBLOCK.value:
-                organizationmember.status = OrganizationMember.STATUSES.ACTIVE
+                organizationmember.blocked = False
             else:
                 raise Exception(f"Unhandled allowed action: {action}")
             organizationmember.save()

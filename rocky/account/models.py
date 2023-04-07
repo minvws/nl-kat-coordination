@@ -107,7 +107,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
             return self.all_organizations
         return [
             m.organization
-            for m in filter(lambda o: o.status is not OrganizationMember.STATUSES.BLOCKED, self.organization_members)
+            for m in filter(lambda o: o.status is not OrganizationMember.blocked, self.organization_members)
         ]
 
     @cached_property
