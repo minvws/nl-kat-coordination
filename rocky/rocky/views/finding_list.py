@@ -1,16 +1,22 @@
+import logging
+
 from typing import Any, Dict, List, Optional
 
 from django.contrib import messages
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+
 from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models.ooi.findings import Finding, MutedFinding
+from octopoes.connector import ConnectorException
 
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
 from tools.view_helpers import BreadcrumbsMixin
 from tools.ooi_helpers import get_finding_type_from_finding, get_knowledge_base_data_for_ooi, RiskLevelSeverity
 from account.mixins import OrganizationView
+
+logger = logging.getLogger(__name__)
 
 
 def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
@@ -71,7 +77,14 @@ class FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
             except ValueError as e:
                 messages.error(self.request, _(str(e)))
 
-        return generate_findings_metadata(findings, muted_findings, severity_filter)
+        try:
+            return generate_findings_metadata(findings, muted_findings, severity_filter)
+        except ConnectorException:
+            messages.add_message(
+                self.request, messages.ERROR, _("Failed to get list of findings, check server logs for more details.")
+            )
+            logger.exception("Failed get list of findings")
+            return []
 
     def build_breadcrumbs(self):
         return [
