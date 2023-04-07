@@ -375,10 +375,10 @@ class DnsTest(TestCase):
                     id="1234",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
-                    input_ooi="Hostname|internet|www.example.com.",
+                    input_ooi="Hostname|internet|example.com.",
                     arguments={
-                        "domain": "www.example.com.",
-                        "input": {"name": "www.example.com."},
+                        "domain": "example.com.",
+                        "input": {"name": "example.com."},
                     },
                 ),
                 mime_types=[{"value": "boefje/dns-records"}],
