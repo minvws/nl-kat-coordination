@@ -116,7 +116,7 @@ Each container needs to be configured using a set of environment variables
 | `WORKER_CONCURRENCY`         | no       | 10            |                                      | Number of worker processes to start                                                    |
 | `QUEUE_NAME_BOEFJES`         | no       | boefjes       |                                      | Queue name for boefjes                                                                 |
 | `QUEUE_NAME_NORMALIZERS`     | no       | normalizers   |                                      | Queue name for normalizers                                                             |
-| `QUEUE_URI`                  | yes      |               | amqp://user:pass@host:5672/vhost     | RabbitMQ used by celery, should be the same as Mula `SCHEDULER_DSP_BROKER_URL`         |
+| `QUEUE_URI`                  | yes      |               | amqp://user:pass@host:5672/vhost     | RabbitMQ used by celery, should be the same as Mula `SCHEDULER_RABBITMQ_DSN`           |
 | `BYTES_API`                  | yes      |               | http://bytes:8000                    | URI for the Bytes API                                                                  |
 | `BYTES_USERNAME`             | yes      |               |                                      | Username for Bytes API                                                                 |
 | `BYTES_PASSWORD`             | yes      |               |                                      | Password for Bytes API                                                                 |
@@ -170,7 +170,6 @@ See also https://github.com/minvws/nl-kat-octopoes#environment-variables
 |---------------------------------|----------|---------------|--------------------------------------|--------------------------------------------------------------------|
 | `SCHEDULER_BOEFJE_POPULATE`     | no       | False         |                                      | Set to True to enable queueing of boefjes                          |
 | `SCHEDULER_NORMALIZER_POPULATE` | no       | True          |                                      | Set to True to enable queueing of normalizers                      |
-| `SCHEDULER_DSP_BROKER_URL`      | yes      |               | amqp://user:pass@host:5672/vhost     | RabbitMQ instance used by celery                                   |
 | `SCHEDULER_RABBITMQ_DSN`        | yes      |               | amqp://user:pass@host:5672/vhost     | RabbitMQ instance used by scheduler, can be the same as celery     |
 | `SCHEDULER_DB_DSN`              | yes      |               | postgresql://user:paswd@host:5432/db | URI for scheduler DB                                               |
 | `BYTES_API`                     | yes      |               | http://bytes:8000                    | URI for the Bytes API                                              |
@@ -194,7 +193,7 @@ See also https://github.com/minvws/nl-kat-mula/blob/main/docs/configuration.md
 | `SECRET_KEY`             | yes      |               | String                           | Key of at least 50 characters, see https://docs.djangoproject.com/en/4.1/ref/settings/#secret-key |
 | `QUEUE_NAME_BOEFJES`     | no       | boefjes       |                                  | Queue name for boefjes                                                                            |
 | `QUEUE_NAME_NORMALIZERS` | no       | normalizers   |                                  | Queue name for normalizers                                                                        |
-| `QUEUE_URI`              | yes      |               | amqp://user:pass@host:5672/vhost | RabbitMQ used by celery, should be the same as Mula `SCHEDULER_DSP_BROKER_URL`                    |
+| `QUEUE_URI`              | yes      |               | amqp://user:pass@host:5672/vhost | RabbitMQ used by celery, should be the same as Mula `SCHEDULER_RABBITMQ_DSN`                    |
 | `BYTES_API`              | yes      |               | http://bytes:8000                | URI for the Bytes API                                                                             |
 | `BYTES_USERNAME`         | yes      |               |                                  | Username for Bytes API                                                                            |
 | `BYTES_PASSWORD`         | yes      |               |                                  | Password for Bytes API                                                                            |

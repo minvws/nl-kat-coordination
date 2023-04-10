@@ -23,6 +23,16 @@ ${SCAN_PROFILE_MUTATION_QUEUE}      _dev__scan_profile_mutations
 
 
 *** Keywords ***
+Declare Scan Profile
+    [Arguments]    ${reference}    ${scan_level}
+    ${params}    Get Valid Time Params
+    ${data}    Create Dictionary    reference=${reference}    level=${scan_level}    scan_profile_type=declared
+    ${response}    Put
+    ...    ${OCTOPOES_URI}/scan_profiles
+    ...    json=${data}
+    ...    params=${params}
+    Should Be Equal As Integers    ${response.status_code}    200
+
 Insert Observation
     [Arguments]    ${origin_file}
     ${norm_output_json}    Get File    ${origin_file}
@@ -122,3 +132,20 @@ Task Type Empty
     [Arguments]    ${task_type}
     ${count}    Count Tasks    ${task_type}
     Should Be Equal As Integers    ${count}    0
+
+Object List Should Contain
+    [Arguments]    ${reference}
+    ${response_data}    Get Objects
+    ${pks} =   Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
+    Should Contain    ${pks}    ${reference}   ${reference} not found in object list
+
+Object List Should Not Contain
+     [Arguments]    ${reference}
+    ${response_data}    Get Objects
+    ${pks} =   Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
+    Should Not Contain    ${pks}    ${reference}   ${reference} found in object list
+
+Total Object Count Should Be
+    [Arguments]    ${length}
+    ${response_data}    Get Objects
+    Should Be Equal As Integers    ${response_data["count"]}    ${length}   Object count should be ${length}
