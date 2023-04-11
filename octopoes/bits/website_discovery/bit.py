@@ -11,4 +11,5 @@ BIT = BitDefinition(
         BitParameterDefinition(ooi_type=ResolvedHostname, relation_path="address"),
     ],
     module="bits.website_discovery.website_discovery",
+    min_scan_level=0,
 )
