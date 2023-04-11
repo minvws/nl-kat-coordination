@@ -46,7 +46,7 @@
                                         <a href="{% url 'plugin_settings_edit' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate "Edit" %}</a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'plugin_settings_delete' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id name=setting.name %}">{% translate "Delete" %}</a>
+                                        <a href="{% url 'plugin_settings_delete' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate "Delete" %}</a>
                                     </td>
                                 {% endif %}
                             </tr>
