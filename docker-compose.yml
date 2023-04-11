@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   rabbitmq:
-    restart: on-failure
+    restart: unless-stopped
     image: "rabbitmq:3.9-management"
     ports:
       - "127.0.0.1:5672:5672"
@@ -15,7 +15,7 @@ services:
       - .env
 
   postgres:
-    restart: on-failure
+    restart: unless-stopped
     image: postgres:15
     ports:
       - "127.0.0.1:5432:5432"
@@ -33,14 +33,14 @@ services:
 
   crux:
     image: "ghcr.io/dekkers/xtdb-http-multinode:main"
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
       - xtdb-data:/var/lib/xtdb
 
   octopoes_api:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - crux
     ports:
@@ -56,7 +56,7 @@ services:
       - ./octopoes:/app/octopoes
 
   octopoes_api_worker:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - crux
       - rabbitmq
@@ -71,7 +71,7 @@ services:
       - ./octopoes:/app/octopoes
 
   boefje:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - rabbitmq
       - bytes
@@ -82,6 +82,7 @@ services:
         ENVIRONMENT: dev
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 1
@@ -90,7 +91,7 @@ services:
       - .env
 
   normalizer:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - rabbitmq
       - bytes
@@ -101,6 +102,7 @@ services:
         ENVIRONMENT: dev
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
     deploy:
       replicas: 1
     command: normalizer
@@ -108,7 +110,7 @@ services:
       - .env
 
   rocky:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - octopoes_api_worker
       - octopoes_api
@@ -128,11 +130,12 @@ services:
     command: python3 manage.py runserver 0.0.0.0:80
     volumes:
       - ./rocky:/app/rocky
+      - ./octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .env
 
   bytes:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - postgres
     ports:
@@ -149,7 +152,7 @@ services:
       - .env
 
   katalogus:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - postgres
     build:
@@ -160,13 +163,14 @@ services:
     command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
       - .env
 
   scheduler:
-    restart: on-failure
+    restart: unless-stopped
     build:
       context: mula/
       args:
@@ -185,7 +189,7 @@ services:
       - katalogus
 
   keiko:
-    restart: on-failure
+    restart: unless-stopped
     build:
       context: keiko/
     ports:
