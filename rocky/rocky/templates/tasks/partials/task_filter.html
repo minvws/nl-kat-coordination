@@ -29,7 +29,7 @@
 
         <fieldset>
             <label for="scan_history_search">{% translate "Search" %}</label>
-            <input type="text" name="scan_history_search" id="scan_history_search" value='{{ request.GET.scan_history_search }}" placeholder="{% translate "Search by object name" %}'>
+            <input type="text" name="scan_history_search" id="scan_history_search" value="{{ request.GET.scan_history_search }}" placeholder="{% translate "Search by object name" %}">
             {% for key, value in request.GET.items %}
                 {% if key not in scan_history_form_fields %}
                     <input type="hidden" name="{{ key }}" value="{{ value }}">
