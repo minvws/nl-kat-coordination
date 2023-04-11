@@ -53,13 +53,6 @@ class NormalizerScheduler(Scheduler):
                 latest_raw_data = self.ctx.services.raw_data.get_latest_raw_data(
                     queue=f"{self.organisation.id}__raw_file_received",
                 )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
-                self.logger.warning(
-                    "Could not get last run boefjes [organisation.id=%s, scheduler_id=%s]",
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                continue
             except (
                 pika.exceptions.ConnectionClosed,
                 pika.exceptions.ChannelClosed,
@@ -92,7 +85,9 @@ class NormalizerScheduler(Scheduler):
                 self.scheduler_id,
             )
 
-            # First check if the raw data doesn't contain an error.
+            # Check if the raw data doesn't contain an error mime-type,
+            # we don't need to create normalizers when the raw data returned
+            # an error.
             for mime_type in latest_raw_data.raw_data.mime_types:
                 if mime_type.get("value", "").startswith("error/"):
                     self.logger.warning(
@@ -144,7 +139,7 @@ class NormalizerScheduler(Scheduler):
                             self.scheduler_id,
                         )
                         continue
-                except Exception as exc_running:
+                except Exception:
                     self.logger.warning(
                         "Could not check if task is running: %s [organisation.id=%s, scheduler_id=%s]",
                         task,
