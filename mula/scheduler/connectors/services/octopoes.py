@@ -46,10 +46,17 @@ class Octopoes(HTTPService):
         return oois
 
     @exception_handler
-    def get_random_objects(self, organisation_id: str, n: int) -> List[OOI]:
+    def get_random_objects(self, organisation_id: str, n: int, scan_level: List[int] = []) -> List[OOI]:
         """Get `n` random oois from octopoes"""
         url = f"{self.host}/{organisation_id}/objects/random"
-        response = self.get(url, params={"amount": str(n)})
+
+        params = {
+            "amount": str(n),
+            "scan_level": {s for s in scan_level},
+        }
+
+        response = self.get(url, params=params)
+
         return [OOI(**ooi) for ooi in response.json()]
 
     @exception_handler

@@ -424,6 +424,7 @@ class BoefjeScheduler(Scheduler):
             random_oois = self.ctx.services.octopoes.get_random_objects(
                 organisation_id=self.organisation.id,
                 n=self.ctx.config.pq_populate_max_random_objects,
+                scan_level=[1, 2, 3, 4],
             )
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
