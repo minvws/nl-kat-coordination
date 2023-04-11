@@ -12,3 +12,7 @@ class ConnectorException(Exception):
 
 class RemoteException(ConnectorException):
     pass
+
+
+class DecodeException(ConnectorException):
+    pass

@@ -219,7 +219,7 @@ def build_finding_dict(
     finding_dict["finding_type"] = finding_type_dict
 
     if finding_dict["description"] is None:
-        finding_dict["description"] = finding_type_dict["description"]
+        finding_dict["description"] = finding_type_dict.get("description", "")
 
     return finding_dict
 
