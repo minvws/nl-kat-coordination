@@ -99,7 +99,7 @@ def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
     assert response.status_code == 302
 
     messages = list(request._messages)
-    assert "The Katalogus service is not up" in messages[0].message
+    assert "An issue occurred in the Katalogus while creating the organization" in messages[0].message
 
 
 def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker):
@@ -124,7 +124,7 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
     assert response.status_code == 302
 
     messages = list(request._messages)
-    assert "An issue occurred creating organization new. Check the Katalogus logs for more info." in messages[0].message
+    assert "An issue occurred in the Katalogus while creating the organization" in messages[0].message
 
 
 def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
@@ -144,7 +144,7 @@ def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, moc
     assert response.status_code == 302
 
     messages = list(request._messages)
-    assert "The Katalogus service is not healthy" in messages[0].message
+    assert "An issue occurred in the Katalogus while creating the organization" in messages[0].message
 
 
 def test_organization_list(rf, superuser_member, bulk_organizations, django_assert_max_num_queries):

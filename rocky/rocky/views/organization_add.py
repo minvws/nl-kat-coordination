@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
@@ -9,8 +11,11 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from account.forms import OrganizationForm
-from rocky.exceptions import RockyError
+from katalogus.exceptions import KatalogusException
+from rocky.exceptions import OctopoesException
 from tools.models import Organization, OrganizationMember
+
+logger = logging.getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
@@ -36,16 +41,25 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         try:
             self.object = form.save()
-        except RockyError as e:
-            messages.add_message(self.request, messages.ERROR, _(str(e)))
+        except (OctopoesException, KatalogusException) as e:
+            service = "Octopoes" if isinstance(e, OctopoesException) else "the Katalogus"
+            message = f"An issue occurred in {service} while creating the organization"
+            logger.exception(message)
+            messages.add_message(self.request, messages.ERROR, _(message))
 
-            # get_success_url() assumes self.object was successfully set, see ModelFormMixin
+            return redirect(self.success_url)  # get_success_url() assumes self.object is set, see ModelFormMixin
+
+        try:
+            member, created = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
+            member.acknowledged_clearance_level = 4
+            member.trusted_clearance_level = 4
+            member.save()
+        except Exception:
+            message = "An issue occurred while creating the organization"
+            logger.exception(message)
+            messages.add_message(self.request, messages.ERROR, _(message))
+
             return redirect(self.success_url)
-
-        member, created = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
-        member.acknowledged_clearance_level = 4
-        member.trusted_clearance_level = 4
-        member.save()
 
         self.add_success_notification()
         return redirect(self.get_success_url())
