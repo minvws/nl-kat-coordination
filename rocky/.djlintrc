@@ -1,6 +1,0 @@
-{
-  "profile": "django",
-  "ignore": "T002,T003",
-  "indent": "2",
-  "blank_line_after_tag": "load,endblock"
-}

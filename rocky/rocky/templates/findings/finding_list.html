@@ -1,16 +1,16 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Findings' %}</h1>
+                <h1>{% translate "Findings" %}</h1>
                 <p>
                     {% blocktranslate trimmed with observed_at|date as date %}
         An overview of all findings OpenKAT found on {{ date }}. Each finding relates to an object.
@@ -18,21 +18,21 @@
       {% endblocktranslate %}
                 </p>
                 {{ object_type_filters }}
-                {% include 'partials/findings_list_toolbar.html' %}
+                {% include "partials/findings_list_toolbar.html" %}
 
-                {% translate 'Object list' as filter_title %}
-                {% include 'partials/ooi_list_filters.html' with title=filter_title %}
+                {% translate "Object list" as filter_title %}
+                {% include "partials/ooi_list_filters.html" with title=filter_title %}
 
                 <div class="horizontal-scroll">
                     <table class="action-buttons nowrap">
-                        <caption>{% translate 'Showing ' %}{{ ooi_list|length }} {% translate 'of' %} {{ total_oois }} {% translate 'objects' %}</caption>
+                        <caption>{% translate "Showing " %}{{ ooi_list|length }} {% translate "of" %} {{ total_oois }} {% translate "objects" %}</caption>
                         <thead>
                             <tr>
-                                <th>{% translate 'Severity' %}</th>
-                                <th>{% translate 'Finding' %}</th>
-                                <th>{% translate 'Tree' %}</th>
-                                <th>{% translate 'Graph' %}</th>
-                                <th>{% translate 'Details' %}</th>
+                                <th>{% translate "Severity" %}</th>
+                                <th>{% translate "Finding" %}</th>
+                                <th>{% translate "Tree" %}</th>
+                                <th>{% translate "Graph" %}</th>
+                                <th>{% translate "Details" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -42,25 +42,25 @@
                                         <span class="{{ ooi.severity|lower }}">{{ ooi.severity }}</span>
                                     </td>
                                     <td>
-                                        <a href="{% ooi_url 'ooi_detail' ooi.finding.primary_key organization.code query=mandatory_fields %}"
+                                        <a href="{% ooi_url "ooi_detail" ooi.finding.primary_key organization.code query=mandatory_fields %}"
                                            title="{% blocktranslate trimmed with finding=ooi.finding.primary_key %} Show details for {{ finding }} {% endblocktranslate %}">{{ ooi.finding.human_readable }}</a>
                                     </td>
                                     <td class="actions">
                                         <a aria-label="Navigate to tree view of {{ ooi.finding.human_readable }}"
                                            class="icon ti-subtask button"
-                                           href="{% ooi_url 'ooi_tree' ooi.finding.primary_key organization.code query=mandatory_fields %}">{% translate 'Tree' %}</a>
+                                           href="{% ooi_url 'ooi_tree' ooi.finding.primary_key organization.code query=mandatory_fields %}">{% translate "Tree" %}</a>
                                     </td>
                                     <td class="actions">
                                         <a aria-label="Navigate to graph view of {{ ooi.finding.human_readable }}"
                                            class="icon ti-affiliate button"
-                                           href="{% ooi_url 'ooi_graph' ooi.finding.primary_key organization.code query=mandatory_fields %}">{% translate 'Graph' %}</a>
+                                           href="{% ooi_url 'ooi_graph' ooi.finding.primary_key organization.code query=mandatory_fields %}">{% translate "Graph" %}</a>
                                     </td>
                                     <td class="actions">
                                         <button class="expando-button"
                                                 data-icon-open-class="icon ti-chevron-down"
                                                 data-icon-close-class="icon ti-chevron-up"
-                                                data-close-label="{% translate 'Close details' %}">
-                                            {% translate 'Open details' %}
+                                                data-close-label="{% translate "Close details" %}">
+                                            {% translate "Open details" %}
                                         </button>
                                     </td>
                                 </tr>
@@ -68,23 +68,23 @@
                                     <td colspan="6">
                                         <table>
                                             <tr>
-                                                <td>{% translate 'Finding type:' %}</td>
+                                                <td>{% translate "Finding type:" %}</td>
                                                 <td>
-                                                    <a href="{% ooi_url 'ooi_detail' ooi.finding_type organization.code query=mandatory_fields %}"
+                                                    <a href="{% ooi_url "ooi_detail" ooi.finding_type organization.code query=mandatory_fields %}"
                                                        title="{% blocktranslate trimmed with finding_type=ooi.finding_type.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ ooi.finding_type.human_readable }}</a>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>{% translate 'OOI type:' %}</td>
+                                                <td>{% translate "OOI type:" %}</td>
                                                 <td>
-                                                    <a href="{% url 'ooi_list' organization_code=organization.code %}?ooi_type={{ ooi.finding_type.object_type }}"
+                                                    <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi.finding_type.object_type }}"
                                                        title="{% blocktranslate trimmed with ooi_type=ooi.finding_type.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ ooi.finding_type.object_type }}</a>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>{% translate 'Source OOI:' %}</td>
+                                                <td>{% translate "Source OOI:" %}</td>
                                                 <td>
-                                                    <a href="{% ooi_url 'ooi_detail' ooi.finding.ooi organization.code query=mandatory_fields %}"
+                                                    <a href="{% ooi_url "ooi_detail" ooi.finding.ooi organization.code query=mandatory_fields %}"
                                                        title="{% blocktranslate trimmed with finding=ooi.finding.ooi %} Show details for {{ finding }} {% endblocktranslate %}">{{ ooi.finding.ooi }}</a>
                                                 </td>
                                             </tr>
@@ -95,14 +95,14 @@
                         </tbody>
                     </table>
                 </div>
-                {% include 'partials/pagination.html' %}
+                {% include "partials/pagination.html" %}
 
             </div>
         </section>
     </main>
-{% endblock %}
+{% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static '/js/checkboxToggler.js' %}"
+    <script src="{% static "/js/checkboxToggler.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+{% endblock html_at_end_body %}

@@ -6,7 +6,7 @@
     <h1>
         {% block title %}
             {% trans "Permission Denied" %}
-        {% endblock %}
+        {% endblock title %}
     </h1>
     <p>
         {% blocktrans trimmed %}The page you requested, enforces users to verify using
@@ -20,6 +20,6 @@
     </p>
     <p>
         <a href="javascript:history.go(-1)" class="button">{% trans "Go back" %}</a>
-        <a href="{% url 'two_factor:setup' %}" class="button">{% trans "Enable Two-Factor Authentication" %}</a>
+        <a href="{% url "two_factor:setup" %}" class="button">{% trans "Enable Two-Factor Authentication" %}</a>
     </p>
-{% endblock %}
+{% endblock content %}

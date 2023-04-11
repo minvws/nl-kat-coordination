@@ -5,7 +5,7 @@
       class="help">
     {% if ooi_id %}<input type="hidden" name="ooi_id" value="{{ ooi_id }}"/>{% endif %}
     {% include "partials/form/field_hidden_from_list.html" with list=mandatory_fields form=observed_at_form %}
-    {% include 'partials/form/fieldset.html' with fields=observed_at_form %}
+    {% include "partials/form/fieldset.html" with fields=observed_at_form %}
 
     {% if object_type_filters %}
         <fieldset>
@@ -35,7 +35,7 @@
             </button>
         {% endif %}
         <input type="submit"
-               value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}"/>
+               value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}"/>
     </fieldset>
     {% for field in clearance_level_filter_form %}
         <fieldset>
@@ -46,6 +46,6 @@
         </fieldset>
     {% endfor %}
     <input type="submit"
-           value="{% if submit_text %}{{ submit_text }}{% else %}{% translate 'Set filters' %}{% endif %}"/>
+           value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}"/>
 </fieldset>
 </form>

@@ -1,15 +1,15 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate 'Organization setup' %}</h1>
+                <h1>{% translate "Organization setup" %}</h1>
                 <p>
                     {% blocktranslate trimmed %}
             Please enter the following organization details.
@@ -19,10 +19,10 @@
                 </p>
                 <form novalidate method="post" class="horizontal-view help">
                     {% csrf_token %}
-                    {% translate 'Organization details' as fieldset_legend %}
-                    {% include 'partials/form/fieldset.html' with legend=fieldset_legend fields=form %}
+                    {% translate "Organization details" as fieldset_legend %}
+                    {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-                    <button type="submit">{% translate 'Submit' %}</button>
+                    <button type="submit">{% translate "Submit" %}</button>
                 </form>
             </div>
         </section>

@@ -10,6 +10,14 @@ repos that need to be merged in the correct order. The way KAT is released and
 deployed has not changed, we still provide container images and Debian packages
 for each service.
 
+There is also a new release of xtdb-http-multinode. The 1.0.4 version changes
+the JVM options to make the JVM exit on an out of memory error instead of
+continuing in a broken state. Upgrading to this version is recommended. The
+Debian package can be found
+`here <https://github.com/dekkers/xtdb-http-multinode/releases/tag/v1.0.4>`__
+and the container image
+`here <https://github.com/dekkers/xtdb-http-multinode/pkgs/container/xtdb-http-multinode/83293625?tag=v1.0.4>`__.
+
 New Features
 ============
 
