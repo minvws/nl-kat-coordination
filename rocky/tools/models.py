@@ -155,7 +155,6 @@ class OrganizationMember(models.Model):
     class STATUSES(models.TextChoices):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
-        BLOCKED = "blocked", _("blocked")
 
     scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
 
