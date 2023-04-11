@@ -19,7 +19,7 @@
     security.{% endblocktrans %}
     </p>
     <p>
-        <a href="javascript:history.go(-1)" class="button">{% trans "Go back" %}</a>
+        <a href="#" onclick="history.back()" class="button">{% trans "Go back" %}</a>
         <a href="{% url "two_factor:setup" %}" class="button">{% trans "Enable Two-Factor Authentication" %}</a>
     </p>
 {% endblock content %}
