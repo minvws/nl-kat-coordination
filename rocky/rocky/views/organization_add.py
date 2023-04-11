@@ -9,6 +9,7 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from account.forms import OrganizationForm
+from rocky.exceptions import RockyError
 from tools.models import Organization, OrganizationMember
 
 
@@ -33,13 +34,21 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        self.object = form.save()
-        member, _ = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
+        try:
+            self.object = form.save()
+        except RockyError as e:
+            messages.add_message(self.request, messages.ERROR, _(str(e)))
+
+            # get_success_url() assumes self.object was successfully set, see ModelFormMixin
+            return redirect(self.success_url)
+
+        member, created = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
         member.acknowledged_clearance_level = 4
         member.trusted_clearance_level = 4
         member.save()
+
         self.add_success_notification()
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
 
     def add_success_notification(self):
         success_message = _("Organization added successfully.")

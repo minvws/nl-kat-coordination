@@ -123,7 +123,8 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Katalogus returned error creating organization: Test error",
+                        "detail": "An issue occurred creating organization Test Org 3."
+                        " Check the Katalogus logs for more info.",
                         "attr": None,
                     }
                 ],
@@ -152,7 +153,8 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Octopoes returned error creating organization: Test error",
+                        "detail": "An issue occurred creating organization Test Org 3."
+                        " Check the Octopoes logs for more info.",
                         "attr": None,
                     }
                 ],
@@ -245,7 +247,8 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Katalogus returned error deleting organization: Test error",
+                        "detail": "An issue occurred deleting organization Test Organization 1."
+                        " Check the Katalogus logs for more info.",
                         "attr": None,
                     }
                 ],
@@ -270,7 +273,8 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Octopoes returned error deleting organization: Test error",
+                        "detail": "An issue occurred deleting organization Test Organization 1."
+                        " Check the Octopoes logs for more info.",
                         "attr": None,
                     }
                 ],

@@ -77,7 +77,9 @@ class Organization(models.Model):
         try:
             octopoes_client.delete_node()
         except Exception as e:
-            raise RockyError(f"Octopoes returned error deleting organization: {e}") from e
+            raise RockyError(
+                f"An issue occurred deleting organization {self.name}. Check the Octopoes logs for more info."
+            ) from e
 
         try:
             katalogus_client.delete_organization()
@@ -90,7 +92,9 @@ class Organization(models.Model):
                     f"organization in the Katalogus: {e}"
                 ) from e
 
-            raise RockyError(f"Katalogus returned error deleting organization: {e}") from e
+            raise RockyError(
+                f"An issue occurred deleting organization {self.name}. Check the Katalogus logs for more info."
+            ) from e
 
         super().delete(*args, **kwargs)
 
@@ -103,7 +107,9 @@ class Organization(models.Model):
             if not katalogus_client.organization_exists():
                 katalogus_client.create_organization(instance.name)
         except Exception as e:
-            raise RockyError(f"Katalogus returned error creating organization: {e}") from e
+            raise RockyError(
+                f"An issue occurred creating organization {instance.name}. Check the Katalogus logs for more info."
+            ) from e
 
         try:
             octopoes_client.create_node()
@@ -112,11 +118,13 @@ class Organization(models.Model):
                 katalogus_client.delete_organization()
             except Exception as e:
                 raise RockyError(
-                    f"Could not delete organization in the Katalogus after failing to create the "
-                    f"organization in the Katalogus: {e}"
+                    f"Could not delete organization {instance.name} in the Katalogus after failing to create "
+                    f"it in Octopoes. Check the Katalogus logs for more info."
                 ) from e
 
-            raise RockyError(f"Octopoes returned error creating organization: {e}") from e
+            raise RockyError(
+                f"An issue occurred creating organization {instance.name}. Check the Octopoes logs for more info."
+            ) from e
 
     @staticmethod
     def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
