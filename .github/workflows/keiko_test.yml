@@ -27,6 +27,9 @@ jobs:
           python-version: ${{ matrix.version }}
           cache: 'pip' # caching pip dependencies
 
+      - name: Install Latex
+        run: sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-latex-extra texlive-latex-recommended texlive-lang-european texlive-fonts-recommended
+
       - name: Install requirements-dev.txt
         run: pip install -r requirements-dev.txt
         working-directory: ./keiko
