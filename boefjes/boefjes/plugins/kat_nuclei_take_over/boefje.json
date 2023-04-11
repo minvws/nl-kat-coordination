@@ -1,0 +1,15 @@
+    {
+        "id": "nuclei-takeover",
+        "name": "Nuclei takeover scan",
+        "description": "Nuclei is used to send requests across targets based on a template, providing fast scanning.(sub-domain takeover)",
+        "consumes": [
+            "Hostname",
+            "HostnameHTTPURL"
+        ],
+        "produces": [
+            "Finding",
+            "KATFindingType"
+        ],
+        "environment_keys": [],
+        "scan_level": 3
+    }

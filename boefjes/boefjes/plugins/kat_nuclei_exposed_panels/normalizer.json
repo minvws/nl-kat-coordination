@@ -1,0 +1,10 @@
+{
+    "id": "kat_nuclei_exposed_panels_normalize",
+    "consumes": [
+        "nuclei-exposed-panels"
+    ],
+    "produces": [
+        "Findings",
+        "KATFindingType"
+    ]
+}
