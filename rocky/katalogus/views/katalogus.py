@@ -37,7 +37,7 @@ class KATalogusView(ListView, OrganizationView, FormView):
             messages.add_message(
                 self.request, messages.ERROR, _("Loading plugins in KATalogus failed. Please check the KATalogus logs.")
             )
-            return redirect(reverse("organization_detail", kwargs={"organization_code": self.organization.code}))
+            return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
 
         self.set_katalogus_view(kwargs)
         return super().get(request, *args, **kwargs)
