@@ -43,7 +43,6 @@ class ExpiringDict:
     def __getitem__(self, key: str) -> Any:
         with self.lock:
             if self._is_expired():
-
                 # Using this instead of reset(), else we would lock
                 self.cache.clear()
                 self.expiration_time = datetime.now(timezone.utc) + self.lifetime
