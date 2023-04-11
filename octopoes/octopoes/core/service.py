@@ -128,11 +128,20 @@ class OctopoesService:
         parameters_references = self.origin_parameter_repository.list_by_origin(origin.id, valid_time)
         parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
+        resulting_oois = []
+
         try:
-            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
-        except Exception as e:
-            logger.exception("Error running inference", exc_info=e)
-            return
+            level = self.scan_profile_repository.get(origin.source, valid_time).level
+        except ObjectNotFoundException:
+            level = 0
+
+        if level >= bit_definition.min_scan_level:
+            try:
+                resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
+            except Exception as e:
+                logger.exception("Error running inference", exc_info=e)
+                return
+
         self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
@@ -390,15 +399,21 @@ class OctopoesService:
         except ObjectNotFoundException:
             return
 
+    def _run_inferences(self, event: ScanProfileDBEvent) -> None:
+        inference_origins = self.origin_repository.list_by_source(event.new_data.reference, valid_time=event.valid_time)
+        inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
+        for inference_origin in inference_origins:
+            self._run_inference(inference_origin, event.valid_time)
+
     # Scan profile events
     def _on_create_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
     def _on_update_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
     def _on_delete_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
     def list_random_ooi(
         self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER

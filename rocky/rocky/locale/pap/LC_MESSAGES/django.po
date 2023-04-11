@@ -68,7 +68,7 @@ msgstr "Atmití pa kambia nivél di autorisashonnan."
 #: account/forms/account_setup.py:87
 #: katalogus/templates/katalogus_settings.html:26
 #: katalogus/templates/plugin_settings_list.html:16 onboarding/forms.py:62
-#: rocky/templates/organizations/organization_detail.html:15
+#: rocky/templates/organizations/organization_settings.html:15
 #: rocky/templates/organizations/organization_list.html:21
 #: rocky/templates/partials/ooi_detail_related_object.html:24
 msgid "Name"
@@ -1827,7 +1827,7 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_setup.html:27
 #: onboarding/templates/account/step_2a_organization_update.html:23
 #: rocky/templates/organizations/organization_add.html:20
-#: rocky/templates/organizations/organization_detail.html:10
+#: rocky/templates/organizations/organization_settings.html:10
 msgid "Organization details"
 msgstr "Detayes di organisashon"
 
@@ -3813,12 +3813,12 @@ msgstr "mustrando e mesun ophetonan."
 msgid "Object tree"
 msgstr "Mapa di opheto"
 
-#: rocky/templates/organizations/organization_detail.html:16
+#: rocky/templates/organizations/organization_settings.html:16
 #: rocky/templates/organizations/organization_list.html:22
 msgid "Code"
 msgstr "Código"
 
-#: rocky/templates/organizations/organization_detail.html:27
+#: rocky/templates/organizations/organization_settings.html:27
 msgid "Add indemnification"
 msgstr "Añadi indemnizashon"
 

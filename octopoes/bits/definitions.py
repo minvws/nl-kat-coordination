@@ -24,6 +24,7 @@ class BitDefinition(BaseModel):
     consumes: Type[OOI]
     parameters: List[BitParameterDefinition]
     module: str
+    min_scan_level: int = 1
 
 
 def get_bit_definitions() -> Dict[str, BitDefinition]:

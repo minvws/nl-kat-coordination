@@ -10,4 +10,5 @@ BIT = BitDefinition(
         BitParameterDefinition(ooi_type=DNSCNAMERecord, relation_path="target_hostname"),
     ],
     module="bits.dns_alias_resolving.dns_alias_resolving",
+    min_scan_level=0,
 )

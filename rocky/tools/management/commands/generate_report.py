@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, MutedFinding
 
 from django.conf import settings
 from rocky.keiko import keiko_client, ReportsService
@@ -63,9 +63,8 @@ class Command(BaseCommand):
             sys.exit(1)
 
         valid_time = datetime.now(timezone.utc)
-        report = ReportsService(keiko_client).get_finding_report(
+        report = ReportsService(keiko_client).get_organization_finding_report(
             valid_time,
-            "Organization",
             organization.name,
             self.get_findings_metadata(organization, valid_time, options),
         )
@@ -86,9 +85,16 @@ class Command(BaseCommand):
             scan_level=DEFAULT_SCAN_LEVEL_FILTER,
             scan_profile_type=DEFAULT_SCAN_PROFILE_TYPE_FILTER,
         )
+        muted_list = OOIList(
+            OctopoesAPIConnector(settings.OCTOPOES_API, organization.code),
+            {MutedFinding},
+            valid_time,
+            scan_level=DEFAULT_SCAN_LEVEL_FILTER,
+            scan_profile_type=DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        )
         severities = [item for item in RiskLevelSeverity if item >= options["min_severity"]]
 
-        return generate_findings_metadata(ooi_list, severities)
+        return generate_findings_metadata(ooi_list, muted_list, severities)
 
     @staticmethod
     def get_organization(**options) -> Optional[Organization]:

@@ -2,6 +2,7 @@ import re
 import time
 from typing import Dict, BinaryIO, List, Optional, Any
 from http import HTTPStatus
+from io import BytesIO
 
 import requests
 from requests import HTTPError
@@ -62,13 +63,13 @@ class KeikoClient:
         try:
             for _ in range(15):
                 time.sleep(1)
-                res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf", stream=True)
+                res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf")
 
                 if res.status_code == HTTPStatus.NOT_FOUND:
                     continue
 
                 res.raise_for_status()
-                return res.raw
+                return BytesIO(res.content)
         except HTTPError as e:
             raise GeneratingReportFailed from e
 
@@ -107,17 +108,16 @@ class ReportsService:
 
         return self.keiko_client.get_report(report_id)
 
-    def get_finding_report(
+    def get_organization_finding_report(
         self,
         valid_time: datetime,
-        source_type: str,
-        source_value: str,
+        organization_name: str,
         findings_metadata: List[Dict[str, Any]],
     ) -> BinaryIO:
         findings = [item["finding"] for item in findings_metadata]
         store = {finding.primary_key: finding for finding in findings}
 
-        return self.get_report(valid_time, source_type, source_value, store)
+        return self.get_report(valid_time, "Organisatie", organization_name, store)
 
     @classmethod
     def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str):
@@ -219,7 +219,7 @@ def build_finding_dict(
     finding_dict["finding_type"] = finding_type_dict
 
     if finding_dict["description"] is None:
-        finding_dict["description"] = finding_type_dict["description"]
+        finding_dict["description"] = finding_type_dict.get("description", "")
 
     return finding_dict
 
