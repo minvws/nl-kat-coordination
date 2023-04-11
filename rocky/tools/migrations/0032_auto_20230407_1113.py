@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
-from rocky.tools.models import OrganizationMember
+from tools.models import OrganizationMember
 
 
 def migrate_organizationmember_status_blocked_to_blocked_attribute(apps, schema_editor):
