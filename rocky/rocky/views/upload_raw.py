@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from account.mixins import RockyPermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
@@ -16,10 +16,10 @@ from tools.forms.upload_raw import UploadRawForm, RAW_ERRORS
 
 
 @class_view_decorator(otp_required)
-class UploadRaw(PermissionRequiredMixin, OrganizationView, FormView):
+class UploadRaw(RockyPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_raw.html"
     form_class = UploadRawForm
-    permission_required = "tools.can_scan_organization"
+    permission_required = "can_scan_organization"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

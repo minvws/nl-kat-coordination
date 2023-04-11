@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from account.mixins import RockyPermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.urls import reverse_lazy
@@ -13,7 +13,7 @@ from tools.models import Organization, OrganizationMember
 
 
 @class_view_decorator(otp_required)
-class OrganizationAddView(PermissionRequiredMixin, CreateView):
+class OrganizationAddView(RockyPermissionRequiredMixin, CreateView):
     """
     View to create a new organization
     """
@@ -22,7 +22,7 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
     template_name = "organizations/organization_add.html"
     form_class = OrganizationForm
     success_url = reverse_lazy("organization_list")
-    permission_required = "tools.add_organization"
+    permission_required = "add_organization"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from account.mixins import RockyPermissionRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -51,12 +51,12 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
 
 
 @class_view_decorator(otp_required)
-class KATalogusSettingsListView(PermissionRequiredMixin, OrganizationView, FormView, ListView):
+class KATalogusSettingsListView(RockyPermissionRequiredMixin, OrganizationView, FormView, ListView):
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"
     paginate_by = 10
-    permission_required = "tools.can_scan_organization"
+    permission_required = "can_scan_organization"
     plugin_type = "boefjes"
 
     def get_context_data(self, **kwargs):

@@ -2,7 +2,7 @@ from enum import Enum
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from account.mixins import RockyPermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.views.generic import ListView
@@ -21,14 +21,14 @@ class PageActions(Enum):
 
 @class_view_decorator(otp_required)
 class OrganizationMemberListView(
-    PermissionRequiredMixin,
+    RockyPermissionRequiredMixin,
     OrganizationMemberBreadcrumbsMixin,
     ListView,
 ):
     model = OrganizationMember
     context_object_name = "members"
     template_name = "organizations/organization_member_list.html"
-    permission_required = "tools.view_organization"
+    permission_required = "view_organization"
 
     def get_queryset(self):
         queryset = self.model.objects.filter(organization=self.organization)

@@ -5,7 +5,7 @@ from typing import Dict, ClassVar, Any
 from uuid import uuid4
 
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from account.mixins import RockyPermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
@@ -46,10 +46,10 @@ CSV_CRITERIA = [
 
 
 @class_view_decorator(otp_required)
-class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
+class UploadCSV(RockyPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
     form_class = UploadCSVForm
-    permission_required = "tools.can_scan_organization"
+    permission_required = "can_scan_organization"
     reference_cache: Dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
     ooi_types: ClassVar[Dict[str, Any]] = {
         "Hostname": {"type": Hostname},

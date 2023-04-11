@@ -2,11 +2,11 @@ from datetime import datetime, timezone
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 
@@ -118,3 +118,25 @@ class OrganizationView(View):
             )
             raise exc
         return True
+
+
+class RockyPermissionRequiredMixin(PermissionRequiredMixin):
+    """
+    An organization member can have different roles and set of permssions based on which organization they belong to.
+    We do not want to check permissions based soley on the user but instead on the organization member.
+    """
+
+    def has_permission(self) -> bool:
+        if self.permission_required is None:
+            raise ImproperlyConfigured(
+                "{0} is missing the permission_required attribute. Define {0}.permission_required, or override "
+                "{0}.get_permission_required().".format(self.__class__.__name__)
+            )
+        try:
+            organization = Organization.objects.get(code=self.kwargs["organization_code"])
+            member = OrganizationMember.objects.get(user=self.request.user, organization=organization)
+        except Organization.DoesNotExist:
+            raise Http404()
+
+        perm = self.permission_required
+        return member.has_member_perm(perm)

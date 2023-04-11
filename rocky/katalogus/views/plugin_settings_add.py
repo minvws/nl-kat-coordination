@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from account.mixins import RockyPermissionRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -12,11 +12,11 @@ from katalogus.views.mixins import KATalogusMixin
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsAddView(PermissionRequiredMixin, KATalogusMixin, FormView):
+class PluginSettingsAddView(RockyPermissionRequiredMixin, KATalogusMixin, FormView):
     """View to add a general setting for all plugins in KAT-alogus"""
 
     template_name = "plugin_settings_add.html"
-    permission_required = "tools.can_scan_organization"
+    permission_required = "can_scan_organization"
 
     def get_form(self):
         if self.plugin_schema:

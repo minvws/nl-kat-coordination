@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from account.mixins import RockyPermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
@@ -14,7 +14,7 @@ User = get_user_model()
 
 
 @class_view_decorator(otp_required)
-class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, CreateView):
+class OrganizationMemberAddView(RockyPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, CreateView):
     """
     View to create a new member for a specific organization.
     """
@@ -22,7 +22,7 @@ class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBread
     model = User
     template_name = "organizations/organization_member_add.html"
     form_class = OrganizationMemberToGroupAddForm
-    permission_required = "tools.add_organizationmember"
+    permission_required = "add_organizationmember"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

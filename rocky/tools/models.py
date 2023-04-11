@@ -194,8 +194,7 @@ class OrganizationMember(models.Model):
             for permission in group.permissions.all():
                 if permission_codename in permission.codename:
                     return True
-                else:
-                    continue
+        return False
 
     class Meta:
         unique_together = ["user", "organization"]
