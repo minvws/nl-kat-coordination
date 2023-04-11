@@ -1,20 +1,20 @@
 {% load i18n %}
 
 <ul>
-  {% if request.user.is_authenticated %}
-    {% if request.user.is_superuser or perms.tools.view_organization  %}
-      <li>
-        <a href="{% url 'organization_list' %}"
-           {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Organizations' %}</a>
-      </li>
+    {% if request.user.is_authenticated %}
+        {% if request.user.is_superuser or perms.tools.view_organization %}
+            <li>
+                <a href="{% url "organization_list" %}"
+                   {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Organizations" %}</a>
+            </li>
+        {% endif %}
+        <li>
+            <a href="{% url 'logout' %}">{% translate "Logout" %}</a>
+        </li>
+    {% else %}
+        <li>
+            <a href="{% url "two_factor:login" %}"
+               {% if 'login' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Login" %}</a>
+        </li>
     {% endif %}
-    <li>
-      <a href="{% url 'logout' %}">{% translate 'Logout' %}</a>
-    </li>
-  {% else %}
-    <li>
-      <a href="{% url 'two_factor:login' %}"
-         {% if 'login' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate 'Login' %}</a>
-    </li>
-  {% endif %}
 </ul>

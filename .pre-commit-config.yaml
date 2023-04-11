@@ -79,5 +79,12 @@ repos:
           ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |
           ^rocky/assets/src/bundles/app/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
-          ^rocky/tests/stubs
+          ^rocky/tests/stubs |
+          ^docs/source/_static
           )
+
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.19.16
+    hooks:
+      - id: djlint-django
+        files: '^rocky/.*/templates/.*$'

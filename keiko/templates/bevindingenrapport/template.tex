@@ -12,7 +12,7 @@
 \usepackage{ragged2e}
 \usepackage{titlepic}
 \usepackage{xcolor}
-
+\usepackage{underscore}
 
 \hypersetup{
 	colorlinks=true,
@@ -22,21 +22,21 @@
 	pdftitle={KEIKO Document by KAT},
 }
 
-\definecolor{box_color_critical}{HTML}{42145F}
-\definecolor{box_color_high}{HTML}{D6293E}
-\definecolor{box_color_medium}{HTML}{C36100}
-\definecolor{box_color_low}{HTML}{00519C}
-\definecolor{box_color_recommendation}{HTML}{C3DDF6}
+\definecolor{box-color-critical}{HTML}{42145F}
+\definecolor{box-color-high}{HTML}{D6293E}
+\definecolor{box-color-medium}{HTML}{C36100}
+\definecolor{box-color-low}{HTML}{00519C}
+\definecolor{box-color-recommendation}{HTML}{C3DDF6}
 
-\definecolor{color_critical}{HTML}{FFFFFF}
-\definecolor{color_high}{HTML}{FFFFFF}
-\definecolor{color_medium}{HTML}{FFFFFF}
-\definecolor{color_low}{HTML}{FFFFFF}
-\definecolor{color_recommendation}{HTML}{000000}
+\definecolor{color-critical}{HTML}{FFFFFF}
+\definecolor{color-high}{HTML}{FFFFFF}
+\definecolor{color-medium}{HTML}{FFFFFF}
+\definecolor{color-low}{HTML}{FFFFFF}
+\definecolor{color-recommendation}{HTML}{000000}
 
 %KEIKO-specific variables
 \newcommand\application{KEIKO @@{keiko_version}@@}
-\newcommand\reporttitle{Bevindingenrapport voor @@{ooi.object_type}@@ @@{ooi.human_readable}@@}
+\newcommand\reporttitle{Bevindingenrapport voor @@{report_source_type}@@ @@{report_source_value}@@}
 \newcommand\tlp{AMBER}
 \newcommand\tlpbox{\colorbox{black}{\color{orange}TLP:AMBER}}
 %END-KEIKO
@@ -117,7 +117,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 	Niveau & Uniek & Totaal aantal voorvallen \\\toprule
 	\toprule
 	{% for level_name, level_sum in meta.total_by_severity.items() %}
-		\colorbox{box_color_@@{ level_name }@@}{ \color{color_@@{ level_name }@@} @@{ level_name }@@ } & @@{ meta.total_by_severity_per_finding_type[level_name] }@@ & @@{ level_sum }@@ \\
+		\colorbox{box-color-@@{ level_name }@@}{ \color{color-@@{ level_name }@@} @@{ level_name }@@ } & @@{ meta.total_by_severity_per_finding_type[level_name] }@@ & @@{ level_sum }@@ \\
 	{% endfor %}
 	\bottomrule
 	Totaal & @@{meta.total_finding_types}@@ & @@{meta.total}@@
@@ -131,7 +131,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 	Risico niveau & Bevindingstype & Voorvallen \\\toprule
 	\midrule
 	{% for finding_type_id, occurrence in findings_grouped.items()|sort(attribute='1.finding_type.risk_level_score', reverse=True) %}
-		\colorbox{box_color_@@{ occurrence.finding_type.risk_level_severity }@@}{ \color{color_@@{ occurrence.finding_type.risk_level_severity }@@} @@{ occurrence.finding_type.risk_level_severity }@@ } & @@{ occurrence.finding_type.id }@@ & @@{occurrence.list|length}@@ \\
+		\colorbox{box-color-@@{ occurrence.finding_type.risk_level_severity }@@}{ \color{color-@@{ occurrence.finding_type.risk_level_severity }@@} @@{ occurrence.finding_type.risk_level_severity }@@ } & @@{ occurrence.finding_type.id }@@ & @@{occurrence.list|length}@@ \\
 	{% endfor %}
 	\bottomrule
 \end{tabular}
@@ -168,7 +168,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 
 	\subsection{Voorvallen}
 	{% for finding in occurrence.list %}
-		\subsubsection{@@{finding.ooi.human_readable}@@}
+		\subsubsection{@@{finding.ooi}@@}
 		@@{finding.description}@@
 	{% endfor %}
 
