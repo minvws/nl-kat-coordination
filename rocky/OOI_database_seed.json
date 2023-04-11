@@ -1270,5 +1270,31 @@
       },
       "consult_api": false
     }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|SUB-DOMAIN-TAKEOVER",
+    "fields": {
+      "last_updated": "2023-04-05T15:42:42.000Z",
+      "data": {
+        "description": "Subdomain takeover is when an attacker takes control of an unused or improperly configured subdomain, potentially accessing sensitive information or conducting phishing attacks.",
+        "recommendation": "To prevent subdomain takeover, organizations should regularly monitor their DNS records to identify and remove any unused subdomains. Additionally, they should ensure that all subdomains are properly configured and point to valid services.",
+        "risk": "High"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|EXPOSED-PANELS",
+    "fields": {
+      "last_updated": "2023-04-05T15:42:42.000Z",
+      "data": {
+        "description": "Exposed login panels for services can pose security risks as they can be targeted by malicious actors for brute-force attacks, phishing attempts, and other forms of unauthorized access.",
+        "recommendation": "Ideally to minimize the attack surface as much as possible these panels should not be directly exposed to the internet",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
   }
 ]
