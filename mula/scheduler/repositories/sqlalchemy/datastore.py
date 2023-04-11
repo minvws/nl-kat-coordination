@@ -1,6 +1,6 @@
 import time
 import json
-from functools import partial,wraps
+from functools import partial, wraps
 
 from scheduler import models
 
@@ -58,6 +58,7 @@ class SQLAlchemy(Datastore):
             bind=self.engine,
         )
 
+
 def retry(max_retries=3, retry_delay=5):
     def decorator(func):
         @wraps(func)
@@ -71,5 +72,7 @@ def retry(max_retries=3, retry_delay=5):
 
                     print(f"Retrying {func.__name__} in {retry_delay} seconds ({i+1}/{max_retries}): {str(e)}")
                     time.sleep(retry_delay)
+
         return wrapper
+
     return decorator
