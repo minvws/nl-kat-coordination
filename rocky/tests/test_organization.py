@@ -68,7 +68,7 @@ def test_add_organization_page(rf, superuser_member):
     assertContains(response, "Organization setup")
 
 
-def test_add_organization_submit_success(rf, superuser_member, mocker):
+def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes):
     mocker.patch("katalogus.client.KATalogusClientV1")
     request = setup_request(
         rf.post(
@@ -102,7 +102,7 @@ def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
     assert "An issue occurred in the Katalogus while creating the organization" in messages[0].message
 
 
-def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker):
+def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker, mock_models_octopoes):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_health_response = mocker.MagicMock()
     mock_health_response.json.return_value = {"service": "test", "healthy": True}
