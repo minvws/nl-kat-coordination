@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import string
-from typing import Optional, Literal, Any
+from typing import Optional, Literal
 
 from pydantic import constr, validator
 
@@ -60,12 +60,6 @@ class Hostname(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.name
-
-    def __init__(self, **data: Any):
-        name = data.get("name")
-        if name:
-            data["name"] = name.rstrip(".")
-        super().__init__(**data)
 
 
 class ResolvedHostname(OOI):
