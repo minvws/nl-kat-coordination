@@ -18,6 +18,7 @@ from octopoes.models import (
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
 )
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.explanation import InheritanceSection
 from octopoes.models.origin import Origin
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
@@ -149,3 +150,8 @@ class OctopoesAPIConnector:
 
     def delete_node(self):
         self.session.delete(f"/{self.client}/node")
+
+    def get_explanation(self, reference: Reference, valid_time: Optional[datetime] = None) -> List[InheritanceSection]:
+        params = {"reference": str(reference), "valid_time": valid_time}
+        res = self.session.get(f"/{self.client}/explanations", params=params)
+        return parse_obj_as(List[InheritanceSection], res.json())
