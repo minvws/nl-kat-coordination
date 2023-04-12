@@ -59,7 +59,7 @@ class SQLAlchemy(Datastore):
         )
 
 
-def retry(max_retries=3, retry_delay=5):
+def retry(max_retries: int = 3, retry_delay: float = 5.):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
