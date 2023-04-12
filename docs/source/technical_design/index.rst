@@ -13,3 +13,4 @@ Contains documentation for developers and contributors.
    hardening
    localinstall
    nginx
+   debuggingtroubleshooting
