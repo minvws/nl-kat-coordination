@@ -1,7 +1,4 @@
-
 # Feature flow
-
----
 
 ## Getting features in the main branch
 Most features should follow the path laid out on our project board. This document describes the requirements for features to move between columns of the board.
