@@ -181,4 +181,6 @@ class OOIDetailView(
             "scan_history_page",
         ]
 
+        context["explanation"] = self.octopoes_api_connector.get_explanation(self.ooi.reference)
+
         return context

@@ -10,6 +10,8 @@
     <main id="main-content">
         <section>
             <div>
+              {{ explanation }}
+
                 {% if ooi_past_due %}
                     {% include "oois/ooi_past_due_warning.html" with ooi_current=ooi_current %}
 

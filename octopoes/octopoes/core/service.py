@@ -447,16 +447,23 @@ class OctopoesService:
         for path, neighbours in neighbour_cache.items():
             segment = path.segments[0]
             for neighbour in neighbours:
-                if neighbour.reference not in visited and neighbour.scan_profile.level >= last_inheritance_level:
-                    inherited_level = min(get_max_scan_level_inheritance(segment), neighbour.scan_profile.level)
-                    inheritances.append(
-                        InheritanceSection(
-                            segment=str(segment),
-                            reference=neighbour.reference,
-                            level=inherited_level,
-                            scan_profile_type=neighbour.scan_profile.scan_profile_type,
-                        )
+                segment_inheritance = get_max_scan_level_inheritance(segment)
+                if (
+                    segment_inheritance is None
+                    or neighbour.reference in visited
+                    or neighbour.scan_profile.level < last_inheritance_level
+                ):
+                    continue
+
+                inherited_level = min(get_max_scan_level_inheritance(segment), neighbour.scan_profile.level)
+                inheritances.append(
+                    InheritanceSection(
+                        segment=str(segment),
+                        reference=neighbour.reference,
+                        level=inherited_level,
+                        scan_profile_type=neighbour.scan_profile.scan_profile_type,
                     )
+                )
 
         # sort per ooi, per level, ascending
         inheritances.sort(key=lambda x: x.level)
@@ -469,10 +476,13 @@ class OctopoesService:
             return inheritance_chain + [declared_inheritances[-1]]
 
         # group by ooi, as the list is already sorted, it will contain the highest inheritance
-        highest_inheritance_per_neighbour = {inheritance.reference: inheritance for inheritance in inheritances}
-        # traverse depth-first
-        for neighbour, inheritance in highest_inheritance_per_neighbour.items():
-            expl = self.get_explanation(neighbour, valid_time, inheritance_chain + [inheritance])
+        highest_inheritance_per_neighbour = {
+            inheritance.reference: inheritance for inheritance in reversed(inheritances)
+        }
+
+        # traverse depth-first, highest levels first
+        for inheritance in sorted(highest_inheritance_per_neighbour.values(), key=lambda x: x.level, reverse=True):
+            expl = self.get_explanation(inheritance.reference, valid_time, inheritance_chain + [inheritance])
             if expl[-1].scan_profile_type == ScanProfileType.DECLARED:
                 return expl
 
