@@ -79,7 +79,7 @@ def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octo
     request = rf.post(
         url,
         data={
-            "ooi": ["Network|internet", "Hostname|internet|scanme.org."],
+            "ooi": ["Network|internet", "Hostname|internet|scanme.org"],
             "scan-profile": "L0",
             "action": "delete",
         },
@@ -129,7 +129,7 @@ def test_update_scan_profile_multiple(rf, client_member, mock_organization_view_
     request = rf.post(
         url,
         data={
-            "ooi": ["Network|internet", "Hostname|internet|scanme.org."],
+            "ooi": ["Network|internet", "Hostname|internet|scanme.org"],
             "scan-profile": "L1",
             "action": "update-scan-profile",
         },
@@ -151,7 +151,7 @@ def test_update_scan_profile_single(rf, client_member, mock_organization_view_oc
     request = rf.post(
         url,
         data={
-            "ooi": ["Hostname|internet|scanme.org."],
+            "ooi": ["Hostname|internet|scanme.org"],
             "scan-profile": "L4",
             "action": "update-scan-profile",
         },
@@ -171,7 +171,7 @@ def test_update_scan_profile_to_inherit(rf, client_member, mock_organization_vie
     request = rf.post(
         url,
         data={
-            "ooi": ["Hostname|internet|scanme.org."],
+            "ooi": ["Hostname|internet|scanme.org"],
             "scan-profile": "inherit",
             "action": "update-scan-profile",
         },
@@ -191,7 +191,7 @@ def test_update_scan_profile_to_inherit_connection_error(rf, client_member, mock
     request = rf.post(
         url,
         data={
-            "ooi": ["Hostname|internet|scanme.org."],
+            "ooi": ["Hostname|internet|scanme.org"],
             "scan-profile": "inherit",
             "action": "update-scan-profile",
         },
@@ -210,7 +210,7 @@ def test_update_scan_profile_to_inherit_object_not_found(rf, client_member, mock
     request = rf.post(
         url,
         data={
-            "ooi": ["Hostname|internet|scanme.org."],
+            "ooi": ["Hostname|internet|scanme.org"],
             "scan-profile": "inherit",
             "action": "update-scan-profile",
         },
@@ -228,7 +228,7 @@ def test_update_scan_profiles_forbidden_acknowledged(rf, client_member, mock_org
     request = rf.post(
         url,
         data={
-            "ooi": ["Network|internet", "Hostname|internet|scanme.org."],
+            "ooi": ["Network|internet", "Hostname|internet|scanme.org"],
             "scan-profile": "L1",
             "action": "update-scan-profile",
         },
@@ -274,7 +274,7 @@ def test_update_scan_profiles_no_indemnification(rf, redteam_member, mock_organi
     request = rf.post(
         url,
         data={
-            "ooi": ["Network|internet", "Hostname|internet|scanme.org."],
+            "ooi": ["Network|internet", "Hostname|internet|scanme.org"],
             "scan-profile": "L1",
             "action": "update-scan-profile",
         },
@@ -297,7 +297,7 @@ def test_update_scan_profiles_octopoes_down(rf, client_member, mock_organization
     request = rf.post(
         "ooi_list",
         data={
-            "ooi": ["Network|internet", "Hostname|internet|scanme.org."],
+            "ooi": ["Network|internet", "Hostname|internet|scanme.org"],
             "scan-profile": "L2",
             "action": "update-scan-profile",
         },
@@ -319,7 +319,7 @@ def test_update_scan_profiles_object_not_found(rf, client_member, mock_organizat
     request = rf.post(
         "ooi_list",
         data={
-            "ooi": ["Network|internet", "Hostname|internet|scanme.org."],
+            "ooi": ["Network|internet", "Hostname|internet|scanme.org"],
             "scan-profile": "L2",
             "action": "update-scan-profile",
         },
@@ -338,7 +338,7 @@ def test_delete_octopoes_down(rf, client_member, mock_organization_view_octopoes
     request = rf.post(
         "ooi_list",
         data={
-            "ooi": ["Network|internet", "Hostname|internet|scanme.org."],
+            "ooi": ["Network|internet", "Hostname|internet|scanme.org"],
             "scan-profile": "L2",
             "action": "delete",
         },
@@ -359,7 +359,7 @@ def test_delete_object_not_found(rf, client_member, mock_organization_view_octop
     request = rf.post(
         "ooi_list",
         data={
-            "ooi": ["Network|internet", "Hostname|internet|scanme.org."],
+            "ooi": ["Network|internet", "Hostname|internet|scanme.org"],
             "scan-profile": "L2",
             "action": "delete",
         },

@@ -19,48 +19,48 @@ xtdb_sample = {
 xtdb_sample_2 = {
     "child_dns_zones": [
         {
-            "crux.db/id": "DNSZone|internet|minvws.nl.",
-            "hostnames": [{"crux.db/id": "Hostname|internet|minvws.nl."}],
+            "crux.db/id": "DNSZone|internet|minvws.nl",
+            "hostnames": [{"crux.db/id": "Hostname|internet|minvws.nl"}],
             "name_servers": [
-                {"crux.db/id": "Hostname|internet|ns3.ssonet.nl."},
-                {"crux.db/id": "Hostname|internet|ns2.ssonet.nl."},
-                {"crux.db/id": "Hostname|internet|ns1.ssonet.nl."},
+                {"crux.db/id": "Hostname|internet|ns3.ssonet.nl"},
+                {"crux.db/id": "Hostname|internet|ns2.ssonet.nl"},
+                {"crux.db/id": "Hostname|internet|ns1.ssonet.nl"},
             ],
             "network": {"crux.db/id": "Network|internet"},
-            "soa": {"crux.db/id": "Hostname|internet|ns3.ssonet.nl."},
+            "soa": {"crux.db/id": "Hostname|internet|ns3.ssonet.nl"},
         }
     ],
-    "crux.db/id": "DNSZone|internet|nl.",
+    "crux.db/id": "DNSZone|internet|nl",
     "name_servers": [
         {
-            "crux.db/id": "Hostname|internet|ns3.dns.nl.",
+            "crux.db/id": "Hostname|internet|ns3.dns.nl",
             "dns_zone": {},
             "network": {"crux.db/id": "Network|internet"},
         },
         {
-            "crux.db/id": "Hostname|internet|ns2.dns.nl.",
+            "crux.db/id": "Hostname|internet|ns2.dns.nl",
             "dns_zone": {},
             "network": {"crux.db/id": "Network|internet"},
         },
         {
-            "crux.db/id": "Hostname|internet|ns1.dns.nl.",
+            "crux.db/id": "Hostname|internet|ns1.dns.nl",
             "dns_zone": {},
-            "dns_zones": [{"crux.db/id": "DNSZone|internet|nl."}],
+            "dns_zones": [{"crux.db/id": "DNSZone|internet|nl"}],
             "network": {"crux.db/id": "Network|internet"},
         },
     ],
     "network": {
         "crux.db/id": "Network|internet",
         "hostnames": [
-            {"crux.db/id": "Hostname|internet|mail.ssonet.nl."},
-            {"crux.db/id": "Hostname|internet|mail2.ssonet.nl."},
-            {"crux.db/id": "Hostname|internet|minvws.nl."},
-            {"crux.db/id": "Hostname|internet|ns1.dns.nl."},
-            {"crux.db/id": "Hostname|internet|ns1.ssonet.nl."},
-            {"crux.db/id": "Hostname|internet|ns2.dns.nl."},
-            {"crux.db/id": "Hostname|internet|ns2.ssonet.nl."},
-            {"crux.db/id": "Hostname|internet|ns3.dns.nl."},
-            {"crux.db/id": "Hostname|internet|ns3.ssonet.nl."},
+            {"crux.db/id": "Hostname|internet|mail.ssonet.nl"},
+            {"crux.db/id": "Hostname|internet|mail2.ssonet.nl"},
+            {"crux.db/id": "Hostname|internet|minvws.nl"},
+            {"crux.db/id": "Hostname|internet|ns1.dns.nl"},
+            {"crux.db/id": "Hostname|internet|ns1.ssonet.nl"},
+            {"crux.db/id": "Hostname|internet|ns2.dns.nl"},
+            {"crux.db/id": "Hostname|internet|ns2.ssonet.nl"},
+            {"crux.db/id": "Hostname|internet|ns3.dns.nl"},
+            {"crux.db/id": "Hostname|internet|ns3.ssonet.nl"},
         ],
         "ip_v4_addresses": [
             {"crux.db/id": "IPAddressV4|internet|1.1.1.1"},
@@ -69,20 +69,20 @@ xtdb_sample_2 = {
     },
     "parent": {
         "hostnames": [
-            {"crux.db/id": "Hostname|internet|mail.ssonet.nl."},
-            {"crux.db/id": "Hostname|internet|mail2.ssonet.nl."},
-            {"crux.db/id": "Hostname|internet|ns1.dns.nl."},
-            {"crux.db/id": "Hostname|internet|ns1.ssonet.nl."},
-            {"crux.db/id": "Hostname|internet|ns2.dns.nl."},
-            {"crux.db/id": "Hostname|internet|ns2.ssonet.nl."},
-            {"crux.db/id": "Hostname|internet|ns3.dns.nl."},
-            {"crux.db/id": "Hostname|internet|ns3.ssonet.nl."},
+            {"crux.db/id": "Hostname|internet|mail.ssonet.nl"},
+            {"crux.db/id": "Hostname|internet|mail2.ssonet.nl"},
+            {"crux.db/id": "Hostname|internet|ns1.dns.nl"},
+            {"crux.db/id": "Hostname|internet|ns1.ssonet.nl"},
+            {"crux.db/id": "Hostname|internet|ns2.dns.nl"},
+            {"crux.db/id": "Hostname|internet|ns2.ssonet.nl"},
+            {"crux.db/id": "Hostname|internet|ns3.dns.nl"},
+            {"crux.db/id": "Hostname|internet|ns3.ssonet.nl"},
         ]
     },
     "soa": {
-        "crux.db/id": "Hostname|internet|ns1.dns.nl.",
+        "crux.db/id": "Hostname|internet|ns1.dns.nl",
         "dns_zone": {},
-        "name_server_of": [{"crux.db/id": "DNSZone|internet|nl."}],
+        "name_server_of": [{"crux.db/id": "DNSZone|internet|nl"}],
         "network": {"crux.db/id": "Network|internet"},
     },
 }
@@ -133,4 +133,4 @@ class ReferenceNodeTest(TestCase):
         root = XTDBReferenceNode.parse_obj(xtdb_sample_2)
         reference_node = root.to_reference_node("crux.db/id")
 
-        self.assertEqual("DNSZone|internet|nl.", str(reference_node.reference))
+        self.assertEqual("DNSZone|internet|nl", str(reference_node.reference))
