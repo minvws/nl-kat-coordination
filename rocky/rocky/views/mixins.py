@@ -118,6 +118,12 @@ class OctopoesView(OrganizationView):
         except ValueError:
             return default_depth
 
+    def get_explanation(self, ooi: OOI) -> List[Dict[str, str]]:
+        if ooi.scan_profile == 0 or ooi.scan_profile.scan_profile_type != ScanProfileType.INHERITED.value:
+            return []
+        explanations = self.octopoes_api_connector.get_explanation(ooi.reference)
+        return explanations
+
 
 class OOIList:
     HARD_LIMIT = 99_999_999

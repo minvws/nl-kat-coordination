@@ -1,0 +1,38 @@
+{% load i18n %}
+{% load ooi_extra %}
+
+{% spaceless %}
+        <div class="horizontal-scroll">
+            <h2>{% translate "Explanation" %}</h2>
+            {% if explanations %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% translate "Type" %}</th>
+                        <th>{% translate "URL" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for explanation in explanations %}
+                        <tr>
+                        {% if forloop.first %}
+                       <td>{% translate "OOI" %}</td>
+                          {% elif forloop.last %}
+                          <td>{% translate "Origin" %}</td>
+                          {% else %}
+                          <td>Object</td>
+                          {% endif %}
+
+                            <td>
+                              <a href="{% ooi_url 'ooi_detail' explanation.reference organization.code %}">{{ explanation.reference }}</a>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+              {% else %}
+              {% include "partials/single_action_form.html" with btn_text="Show explanation of existence" action="get_explanation" %}
+              {% endif %}
+        </div>
+{% endspaceless %}

@@ -12,6 +12,7 @@ from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
 from octopoes.models import OOI
+
 from rocky import scheduler
 from rocky.views.mixins import OOIBreadcrumbsMixin
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
@@ -24,6 +25,7 @@ from tools.ooi_helpers import format_display
 
 class PageActions(Enum):
     START_SCAN = "start_scan"
+    GET_EXPLANATION = "get_explanation"
 
 
 class OOIDetailView(
@@ -48,7 +50,12 @@ class OOIDetailView(
 
         self.ooi = self.get_ooi()
 
-        if not self.handle_page_action(request.POST.get("action")):
+        action = self.request.POST.get("action")
+
+        if action == PageActions.GET_EXPLANATION.value:
+            return super().get(request, get_explanations=True, *args, **kwargs)
+
+        if not self.handle_page_action(action):
             return self.get(request, status_code=500, *args, **kwargs)
 
         success_message = (
@@ -180,5 +187,6 @@ class OOIDetailView(
             "scan_history_search",
             "scan_history_page",
         ]
-
+        if kwargs.get("get_explanations"):
+            context["explanations"] = [explanation for explanation in self.get_explanation(self.ooi)]
         return context
