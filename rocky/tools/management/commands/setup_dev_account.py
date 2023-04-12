@@ -46,6 +46,8 @@ class Command(BaseCommand):
                 "view_organization",
                 "view_organizationmember",
                 "add_organizationmember",
+                "change_organization",
+                "change_organizationmember",
             ]
         )
         self.group_admin.permissions.set(admin_permissions)

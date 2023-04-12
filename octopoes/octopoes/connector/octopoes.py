@@ -7,7 +7,7 @@ from pydantic.tools import parse_obj_as
 from requests import Response, HTTPError
 
 from octopoes.api.models import Observation, Declaration, ServiceHealth
-from octopoes.connector import RemoteException
+from octopoes.connector import RemoteException, DecodeException
 from octopoes.models import (
     Reference,
     OOI,
@@ -42,8 +42,8 @@ class OctopoesAPISession(requests.Session):
                 data = response.json()
                 raise RemoteException(value=data["value"])
             raise error
-        except json.decoder.JSONDecodeError:
-            pass
+        except json.decoder.JSONDecodeError as error:
+            raise DecodeException("JSON decode error") from error
 
     def request(
         self,

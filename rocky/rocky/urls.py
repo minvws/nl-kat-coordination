@@ -19,14 +19,16 @@ from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_edit import OOIEditView
 from rocky.views.ooi_findings import OOIFindingListView
 from rocky.views.ooi_list import OOIListView, OOIListExportView
-from rocky.views.ooi_report import OOIReportView, OOIReportPDFView
+from rocky.views.ooi_report import OOIReportView, OOIReportPDFView, FindingReportPDFView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
 from rocky.views.organization_add import OrganizationAddView
-from rocky.views.organization_detail import OrganizationDetailView
+from rocky.views.organization_settings import OrganizationSettingsView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_add import OrganizationMemberAddView
 from rocky.views.organization_member_edit import OrganizationMemberEditView
+from rocky.views.organization_member_list import OrganizationMemberListView
+from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
 from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileResetView, ScanProfileDetailView
 from rocky.views.scans import ScanListView
@@ -71,6 +73,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/findings/", FindingListView.as_view(), name="finding_list"),
     path("<organization_code>/findings/add/", FindingAddView.as_view(), name="finding_add"),
     path("<organization_code>/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
+    path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
     path("<organization_code>/objects/report/", OOIReportView.as_view(), name="ooi_report"),
     path("<organization_code>/objects/report/pdf/", OOIReportPDFView.as_view(), name="ooi_pdf_report"),
@@ -84,7 +87,7 @@ urlpatterns += i18n_patterns(
         name="organization_add",
     ),
     path(
-        "organizations/<path:pk>/edit/",
+        "<organization_code>/edit/",
         OrganizationEditView.as_view(),
         name="organization_edit",
     ),
@@ -95,11 +98,21 @@ urlpatterns += i18n_patterns(
     ),
     path(
         "<organization_code>/",
-        OrganizationDetailView.as_view(),
-        name="organization_detail",
+        OrganizationCrisisRoomView.as_view(),
+        name="organization_crisis_room",
     ),
     path(
-        "organization_members/<path:pk>/edit/",
+        "<organization_code>/settings",
+        OrganizationSettingsView.as_view(),
+        name="organization_settings",
+    ),
+    path(
+        "<organization_code>/members",
+        OrganizationMemberListView.as_view(),
+        name="organization_member_list",
+    ),
+    path(
+        "<organization_code>/members/edit/<int:pk>/",
         OrganizationMemberEditView.as_view(),
         name="organization_member_edit",
     ),

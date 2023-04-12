@@ -18,7 +18,7 @@ from octopoes.models.ooi.network import Network
 from octopoes.models.types import type_by_name
 from two_factor.views.utils import class_view_decorator
 
-from account.forms import OrganizationForm, OrganizationUpdateForm
+from account.forms import OrganizationForm, OnboardingOrganizationUpdateForm
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from onboarding.forms import (
@@ -299,6 +299,7 @@ class OnboardingSetClearanceLevelView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["boefjes"] = self.get_boefjes_tiles()
+        context["ooi"] = self.request.GET.get("ooi_id", None)
         return context
 
     def get_success_url(self, **kwargs):
@@ -489,7 +490,7 @@ class OnboardingOrganizationUpdateView(
 
     model = Organization
     template_name = "account/step_2a_organization_update.html"
-    form_class = OrganizationUpdateForm
+    form_class = OnboardingOrganizationUpdateForm
     current_step = 2
 
     def get_object(self, queryset=None):

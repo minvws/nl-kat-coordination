@@ -14,7 +14,7 @@ ENV PATH=/home/keiko/.local/bin:${PATH}
 # LateX dependencies
 RUN apt update -y \
     && apt install -y --no-install-recommends \
-    texlive-latex-base texlive-latex-extra texlive-latex-recommended texlive-lang-european chktex
+    texlive-latex-base texlive-latex-extra texlive-latex-recommended texlive-lang-european texlive-fonts-recommended chktex
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
 # dependencies
