@@ -120,3 +120,9 @@ class SetClearanceLevelForm(forms.Form):
             },
         ),
     )
+
+
+class MuteFindingForm(forms.Form):
+    finding = forms.CharField(widget=forms.HiddenInput(), required=False)
+    ooi_type = forms.CharField(widget=forms.HiddenInput(), required=False)
+    reason = forms.CharField(widget=forms.Textarea(attrs={"name": "reason", "rows": "3", "cols": "5"}), required=False)
