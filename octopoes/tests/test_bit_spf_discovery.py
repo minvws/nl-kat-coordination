@@ -8,7 +8,7 @@ from octopoes.models.ooi.network import IPAddressV4
 
 def test_spf_discovery_simple_success():
     dnstxt_record = DNSTXTRecord(
-        hostname=Reference.from_str("Hostname|internet|example.com."),
+        hostname=Reference.from_str("Hostname|internet|example.com"),
         value="v=spf1 ip4:1.1.1.1 ~all exp=explain._spf.example.com",
     )
 
@@ -36,7 +36,7 @@ def test_spf_discovery_simple_success():
 
 def test_spf_discovery_invalid_():
     dnstxt_record = DNSTXTRecord(
-        hostname=Reference.from_str("Hostname|internet|example.com."),
+        hostname=Reference.from_str("Hostname|internet|example.com"),
         value="v=spf1 assdfsdf w rgw",
     )
 
@@ -47,7 +47,7 @@ def test_spf_discovery_invalid_():
 
 def test_spf_discovery_intermediate_success():
     dnstxt_record = DNSTXTRecord(
-        hostname=Reference.from_str("Hostname|internet|example1.com."),
+        hostname=Reference.from_str("Hostname|internet|example1.com"),
         value="v=spf1 a:example.com mx mx:deferrals.domain.com ptr:otherdomain.com "
         "exists:example4.com ?include:example2.com ~all",
     )
