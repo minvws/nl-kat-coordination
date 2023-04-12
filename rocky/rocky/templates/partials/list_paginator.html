@@ -17,7 +17,7 @@
                 <li>
                     <a aria-label="{% translate "Five Pages Back" %}"
                        href="{{ request.path }}?{% url_replace page_param|default:"page" page_obj.number|add:'-5' %}">
-                        &hellip;
+                        …
                     </a>
                 </li>
             {% endif %}
@@ -37,7 +37,7 @@
                 <li>
                     <a aria-label="{% translate "Five Pages Forward" %}"
                        href="{{ request.path }}?{% url_replace page_param|default:"page" page_obj.number|add:'5' %}">
-                        &hellip;
+                        …
                     </a>
                 </li>
             {% endif %}
