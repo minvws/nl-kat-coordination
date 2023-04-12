@@ -53,7 +53,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     def register_hostname(name: str) -> Hostname:
         hostname = Hostname(
             network=internet.reference,
-            name=name,
+            name=name.rstrip("."),
         )
         hostname_store[hostname.name] = hostname
         return hostname
