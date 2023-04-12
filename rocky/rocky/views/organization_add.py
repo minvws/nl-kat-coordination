@@ -11,8 +11,7 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from account.forms import OrganizationForm
-from katalogus.exceptions import KatalogusException
-from rocky.exceptions import OctopoesException
+from rocky.exceptions import ServiceException
 from tools.models import Organization, OrganizationMember
 
 logger = logging.getLogger(__name__)
@@ -41,9 +40,8 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         try:
             self.object = form.save()
-        except (OctopoesException, KatalogusException) as e:
-            service = "Octopoes" if isinstance(e, OctopoesException) else "the Katalogus"
-            message = f"An issue occurred in {service} while creating the organization"
+        except ServiceException as e:
+            message = f"An issue occurred in {e.service} while creating the organization"
             logger.exception(message)
             messages.add_message(self.request, messages.ERROR, _(message))
 

@@ -1,15 +1,14 @@
-from rocky.exceptions import RockyError
+from rocky.exceptions import ServiceException
 
 
-class KatalogusException(RockyError):
+class KATalogusException(ServiceException):
+    def __init__(self, *args):
+        super().__init__("KATalogus", *args)
+
+
+class KATalogusDownException(KATalogusException):
     pass
 
 
-class KatalogusDownException(KatalogusException):
-    def __init__(self):
-        super().__init__("The Katalogus is down")
-
-
-class KatalogusUnhealthyException(KatalogusException):
-    def __init__(self):
-        super().__init__("The Katalogus is not healthy")
+class KATalogusUnhealthyException(KATalogusException):
+    pass

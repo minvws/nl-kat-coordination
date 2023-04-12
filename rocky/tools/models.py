@@ -14,7 +14,7 @@ from requests import RequestException
 from katalogus.client import get_katalogus, KATalogusClientV1
 from octopoes.connector.octopoes import OctopoesAPIConnector
 
-from katalogus.exceptions import KatalogusDownException, KatalogusUnhealthyException, KatalogusException
+from katalogus.exceptions import KATalogusDownException, KATalogusUnhealthyException, KATalogusException
 from rocky.exceptions import OctopoesDownException, OctopoesUnhealthyException, OctopoesException
 from tools.add_ooi_information import get_info, SEPARATOR
 from tools.enums import SCAN_LEVEL
@@ -89,7 +89,7 @@ class Organization(models.Model):
             except Exception as e:
                 raise OctopoesException("Failed creating organization in Octopoes") from e
 
-            raise KatalogusException("Failed deleting organization in the Katalogus") from e
+            raise KATalogusException("Failed deleting organization in the Katalogus") from e
 
         super().delete(*args, **kwargs)
 
@@ -102,7 +102,7 @@ class Organization(models.Model):
             if not katalogus_client.organization_exists():
                 katalogus_client.create_organization(instance.name)
         except Exception as e:
-            raise KatalogusException("Failed creating organization in the Katalogus") from e
+            raise KATalogusException("Failed creating organization in the Katalogus") from e
 
         try:
             octopoes_client.create_node()
@@ -110,7 +110,7 @@ class Organization(models.Model):
             try:
                 katalogus_client.delete_organization()
             except Exception as e:
-                raise KatalogusException("Failed deleting organization in the Katalogus") from e
+                raise KATalogusException("Failed deleting organization in the Katalogus") from e
 
             raise OctopoesException("Failed creating organization in Octopoes") from e
 
@@ -121,10 +121,10 @@ class Organization(models.Model):
         try:
             health = katalogus_client.health()
         except RequestException as e:
-            raise KatalogusDownException from e
+            raise KATalogusDownException from e
 
         if not health.healthy:
-            raise KatalogusUnhealthyException
+            raise KATalogusUnhealthyException
 
         return katalogus_client
 

@@ -18,15 +18,20 @@ class TrustedClearanceLevelTooLowException(ClearanceLevelTooLowException):
     pass
 
 
-class OctopoesException(RockyError):
-    pass
+class ServiceException(RockyError):
+    def __init__(self, service: str, *args):
+        super().__init__(*args)
+        self.service = service
+
+
+class OctopoesException(ServiceException):
+    def __init__(self, *args):
+        super().__init__("Octopoes", *args)
 
 
 class OctopoesDownException(OctopoesException):
-    def __init__(self):
-        super().__init__("Octopoes is down")
+    pass
 
 
 class OctopoesUnhealthyException(OctopoesException):
-    def __init__(self):
-        super().__init__("Octopoes is not healthy")
+    pass
