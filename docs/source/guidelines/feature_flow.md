@@ -48,15 +48,15 @@ Also, we need to assure that there is no regression between the different suppor
 
 Ideally we would follow the following QA procedure on each of these environments:
 
-### Checklist for QA:
+### Checklist for QA
 - [ ] I confirmed that there are no unintended functional regressions in this branch:
   - [ ] I have managed to pass the onboarding flow
   - [ ] Objects and Findings are created properly
   - [ ] Tasks are created and completed properly
 
-### Extended checklist for QA:
+### Extended checklist for QA
 
-#### Checking the UI/UX of:
+#### Checking the UI/UX
   - [ ] Turning Boefjes on and off  in the KATalogus
   - [ ] Create, turn off, and delete Boefjes-settings
   - [ ] Perform scans
@@ -73,11 +73,11 @@ Ideally we would follow the following QA procedure on each of these environments
   - [ ] Inspection of all pages interfaces, including de tree- and graph view of objects
   - [ ] UI/UX in general
 
-#### User/Organization management functionality:
+#### Checking User/Organization management functionality
   - [ ] I can create and delete an organization
   - [ ] I can create and delete users
   - [ ] I can assign and revoke rights to these users
   - [ ] I can reset 2FA
 
-#### Performance
+#### Checking Performance
 - [ ] Verify that there is no significant performance regression
