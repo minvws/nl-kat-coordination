@@ -1,12 +1,16 @@
+import logging
 import time
 import json
 from functools import partial, wraps
 
 from scheduler import models
 
+import sqlalchemy
 from sqlalchemy import create_engine, orm, pool
 
 from ..stores import Datastore  # noqa: TID252
+
+logger = logging.getLogger(__name__)
 
 
 class SQLAlchemy(Datastore):
@@ -66,11 +70,16 @@ def retry(max_retries: int = 3, retry_delay: float = 5.):
             for i in range(max_retries):
                 try:
                     return func(*args, **kwargs)
-                except Exception as e:
+                except (
+                    sqlalchemy.exc.OperationalError,
+                    sqlalchemy.exc.DBAPIError,
+                ) as e:
                     if i == max_retries - 1:
                         raise e
 
-                    print(f"Retrying {func.__name__} in {retry_delay} seconds ({i+1}/{max_retries}): {str(e)}")
+                    logger.warning(
+                        f"Retrying {func.__module__}.{func.__name__} in {retry_delay} seconds ({i+1}/{max_retries}): {e}"
+                    )
                     time.sleep(retry_delay)
 
         return wrapper
