@@ -51,9 +51,6 @@ class BoefjeScheduler(Scheduler):
         When this is done we will try and fill the rest of the queue with
         random items from octopoes and schedule them accordingly.
         """
-        self.logger.info(
-            "Populating queue [organisation.id=%s, scheduler_id=%s]",
-        )
         self.push_tasks_for_scan_profile_mutations()
 
         self.push_tasks_for_new_boefjes()
@@ -582,9 +579,8 @@ class BoefjeScheduler(Scheduler):
         """
         if boefje.enabled is False:
             self.logger.debug(
-                "Boefje: %s is disabled [organisation.id=%s, boefje.id=%s, organisation.id=%s, scheduler_id=%s]",
+                "Boefje: %s is disabled [boefje.id=%s, organisation.id=%s, scheduler_id=%s]",
                 boefje.name,
-                self.organisation.id,
                 boefje.id,
                 self.organisation.id,
                 self.scheduler_id,

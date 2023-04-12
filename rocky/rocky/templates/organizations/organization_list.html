@@ -1,10 +1,12 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
+
 {% load i18n %}
 {% load static %}
 {% load permissions %}
 
 {% block content %}
   {% include 'header.html' %}
+
   <main id="main-content">
     <section>
       <div>
@@ -37,7 +39,10 @@
                       <td>
                         <a href="{% url 'organization_crisis_room' organization_code=organization.code %}">{{ organization.code }}</a>
                       </td>
-                      <td>{% include 'organizations/organization_tags.html' %}</td>
+                      <td>
+                        {% include 'organizations/organization_tags.html' %}
+
+                      </td>
                       <td>{{ organization.member_count }}</td>
                     </tr>
                   {% endif %}
@@ -51,9 +56,8 @@
       </div>
     </section>
   </main>
-{% endblock %}
-
+{% endblock content %}
 {% block html_at_end_body %}
   {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+  <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

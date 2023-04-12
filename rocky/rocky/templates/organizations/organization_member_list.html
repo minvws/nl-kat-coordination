@@ -1,10 +1,12 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
+
 {% load i18n %}
 {% load static %}
 {% load permissions %}
 
 {% block content %}
   {% include 'header.html' %}
+
   <main id="main-content">
     <section>
       <div>
@@ -21,6 +23,7 @@
           </div>
         {% endif %}
         {% include 'partials/organization_member_list_filters.html' with checkbox_filters=checkbox_filters %}
+
         <div class="horizontal-scroll">
           <table>
             <caption>{% translate 'Member overview:' %}</caption>
@@ -94,12 +97,16 @@
                     <td>
                       {% if member.status == "blocked" %}
                         {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='unblock' key='member_id' value=member.id %}
+
                       {% else %}
                         {% include 'partials/single_action_checkbox_form.html' with input_checked=member.blocked input_disabled=member.user.is_superuser action='block' key='member_id' value=member.id %}
+
                       {% endif %}
                     </td>
                   </tr>
                 {% endif %}
+                {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}
+
               {% endfor %}
             </tbody>
           </table>
@@ -107,9 +114,8 @@
       </div>
     </section>
   </main>
-{% endblock %}
-
+{% endblock content %}
 {% block html_at_end_body %}
   {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+  <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

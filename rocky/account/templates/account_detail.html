@@ -1,9 +1,12 @@
 {% extends 'layouts/base.html' %}
+
 {% load static %}
 {% load i18n %}
+{% load permissions %}
 
 {% block content %}
   {% include 'header.html' %}
+
   <main id="main-content">
     <section>
       <div>
@@ -93,11 +96,13 @@
                 {% endblocktranslate %}
               </p>
               {% include 'partials/single_action_form.html' with btn_text="Accept level 4 clearance and responsibility" action='accept_clearance' key='member_id' value=member.id btn_class="ghost" %}
+
             {% else %}
               <p class="explanation">
                 {% translate "You can withdraw this at anytime you like, but know that you're not able to change clearance levels anymore when you do." %}
               </p>
               {% include 'partials/single_action_form.html' with btn_text="Withdraw acceptance up to level 4 clearance and responsibility" action='withdraw_acceptance' key='member_id' value=member.id btn_class="ghost" %}
+
             {% endif %}
           {% endif %}
         {% endif %}

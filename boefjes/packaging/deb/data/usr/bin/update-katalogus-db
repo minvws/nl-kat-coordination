@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -a
+set -ae
 source /etc/kat/boefjes.conf
 cd /opt/venvs/kat-boefjes/lib/python*/site-packages
 
@@ -8,5 +8,3 @@ cd /opt/venvs/kat-boefjes/lib/python*/site-packages
 
 cd boefjes
 /opt/venvs/kat-boefjes/bin/python -m boefjes.seed
-
-set +a
