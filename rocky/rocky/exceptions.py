@@ -19,9 +19,11 @@ class TrustedClearanceLevelTooLowException(ClearanceLevelTooLowException):
 
 
 class ServiceException(RockyError):
-    def __init__(self, service: str, *args):
+    """Base exception representing an issue with an (external) service"""
+
+    def __init__(self, service_name: str, *args):
         super().__init__(*args)
-        self.service = service
+        self.service_name = service_name
 
 
 class OctopoesException(ServiceException):

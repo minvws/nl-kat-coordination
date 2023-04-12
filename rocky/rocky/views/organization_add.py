@@ -41,7 +41,7 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
         try:
             self.object = form.save()
         except ServiceException as e:
-            message = f"An issue occurred in {e.service} while creating the organization"
+            message = f"An issue occurred in {e.service_name} while creating the organization"
             logger.exception(message)
             messages.add_message(self.request, messages.ERROR, _(message))
 
