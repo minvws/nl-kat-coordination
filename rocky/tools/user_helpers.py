@@ -26,4 +26,4 @@ def can_scan_organization(user: User, organization: Organization) -> bool:
 
 
 def can_switch_organization(user: User) -> bool:
-    return user.has_perm("tools.can_switch_organization")
+    return user.has_perm("can_switch_organization")

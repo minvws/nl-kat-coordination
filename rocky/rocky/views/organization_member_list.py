@@ -45,7 +45,7 @@ class OrganizationMemberListView(
         self.filters_active = self.get_filters_active()
 
     def post(self, request, *args, **kwargs):
-        if not self.request.user.has_perms("tools.change_organizationmember"):
+        if not self.organization_member.has_member_perm("change_organizationmember"):
             raise PermissionDenied()
         if "action" not in self.request.POST:
             return self.get(request, *args, **kwargs)

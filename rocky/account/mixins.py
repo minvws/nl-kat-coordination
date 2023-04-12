@@ -127,16 +127,10 @@ class RockyPermissionRequiredMixin(PermissionRequiredMixin):
     """
 
     def has_permission(self) -> bool:
-        if self.permission_required is None:
-            raise ImproperlyConfigured(
-                "{0} is missing the permission_required attribute. Define {0}.permission_required, or override "
-                "{0}.get_permission_required().".format(self.__class__.__name__)
-            )
+        user_perm = super().has_permission()
         try:
             organization = Organization.objects.get(code=self.kwargs["organization_code"])
             member = OrganizationMember.objects.get(user=self.request.user, organization=organization)
-        except Organization.DoesNotExist:
+        except OrganizationMember.DoesNotExist:
             raise Http404()
-
-        perm = self.permission_required
-        return member.has_member_perm(perm)
+        return user_perm or member.has_member_perm(self.permission_required)
