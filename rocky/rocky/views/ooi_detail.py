@@ -25,7 +25,6 @@ from tools.ooi_helpers import format_display
 
 class PageActions(Enum):
     START_SCAN = "start_scan"
-    GET_EXPLANATION = "get_explanation"
 
 
 class OOIDetailView(
@@ -51,10 +50,6 @@ class OOIDetailView(
         self.ooi = self.get_ooi()
 
         action = self.request.POST.get("action")
-
-        if action == PageActions.GET_EXPLANATION.value:
-            return super().get(request, get_explanations=True, *args, **kwargs)
-
         if not self.handle_page_action(action):
             return self.get(request, status_code=500, *args, **kwargs)
 
@@ -187,6 +182,6 @@ class OOIDetailView(
             "scan_history_search",
             "scan_history_page",
         ]
-        if kwargs.get("get_explanations"):
+        if self.request.GET.get("get_explanations"):
             context["explanations"] = [explanation for explanation in self.get_explanation(self.ooi)]
         return context
