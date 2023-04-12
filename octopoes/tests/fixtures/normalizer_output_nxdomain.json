@@ -1,0 +1,18 @@
+{
+  "method": "boefje_normalizer_x",
+  "source": "Hostname|internet|example.com",
+  "result": [
+    {
+      "object_type": "Hostname",
+      "network": "Network|internet",
+      "name": "example.com",
+      "fqdn": "Hostname|internet|example.com."
+    },
+    {
+      "object_type": "NXDOMAIN",
+      "hostname": "Hostname|internet|example.com"
+    }
+  ],
+  "valid_time": "2019-01-01T00:00:00+00:00",
+  "task_id": "1234"
+}
