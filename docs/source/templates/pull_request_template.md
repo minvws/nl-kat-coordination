@@ -13,7 +13,7 @@ _Please add some proof of your working change here, unless this is not required 
 ## Checklists for authors:
 
 ### Code Checklist
-- [ ] This PR only contains functionality relevant to the issue; tickets have been created for newly discovered issues. 
+- [ ] This PR only contains functionality relevant to the issue; tickets have been created for newly discovered issues.
 - [ ] I have written unit tests for the changes or fixes I made.
 - [ ] For any non-trivial functionality, I have added integration and/or end-to-end tests.
 - [ ] I have performed a self-review of my code and refactored it to the best of my abilities.
@@ -48,3 +48,4 @@ _Please add some proof of your working change here, unless this is not required 
 
 ### Bug or feature?:
 * _bullet point + screenshot (if useful) if it is unclear whether something is a bug or an intended feature._
+````

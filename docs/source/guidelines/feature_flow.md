@@ -31,7 +31,7 @@ The required procedure to merge a feature into main are as follows.
 
 The procedures above should guarantee that members of the _kat-managers_ group can merge these features directly.
 We should actively aim to resolve any discussions about the implementation at stages 1 and 2.
-It is the responsibility of the authors to bring possible issues to the attention of anyone that might have an opinion about the issue. 
+It is the responsibility of the authors to bring possible issues to the attention of anyone that might have an opinion about the issue.
 
 ---
 
