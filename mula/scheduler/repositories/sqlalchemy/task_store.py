@@ -19,7 +19,7 @@ class TaskStore(TaskStorer):
 
         self.datastore = datastore
 
-    @retry(3, 5)
+    @retry()
     def get_tasks(
         self,
         scheduler_id: Optional[str],
@@ -61,7 +61,7 @@ class TaskStore(TaskStorer):
 
             return tasks, count
 
-    @retry(3, 5)
+    @retry()
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = session.query(models.TaskORM).filter(models.TaskORM.id == task_id).first()
@@ -72,7 +72,7 @@ class TaskStore(TaskStorer):
 
             return task
 
-    @retry(3, 5)
+    @retry()
     def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
         with self.datastore.session.begin() as session:
             tasks_orm = (
@@ -89,7 +89,7 @@ class TaskStore(TaskStorer):
 
             return tasks
 
-    @retry(3, 5)
+    @retry()
     def get_latest_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = (
@@ -106,7 +106,7 @@ class TaskStore(TaskStorer):
 
             return task
 
-    @retry(3, 5)
+    @retry()
     def create_task(self, task: models.Task) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = models.TaskORM(**task.dict())
@@ -116,7 +116,7 @@ class TaskStore(TaskStorer):
 
             return created_task
 
-    @retry(3, 5)
+    @retry()
     def update_task(self, task: models.Task) -> None:
         with self.datastore.session.begin() as session:
             (session.query(models.TaskORM).filter(models.TaskORM.id == task.id).update(task.dict()))

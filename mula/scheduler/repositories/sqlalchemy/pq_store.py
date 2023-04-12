@@ -20,7 +20,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
         self.datastore = datastore
 
-    @retry(3, 5)
+    @retry()
     def pop(self, scheduler_id: str, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
         with self.datastore.session.begin() as session:
             query = session.query(models.PrioritizedItemORM).filter(
@@ -38,7 +38,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
             return models.PrioritizedItem.from_orm(item_orm)
 
-    @retry(3, 5)
+    @retry()
     def push(self, scheduler_id: str, item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
         with self.datastore.session.begin() as session:
             item_orm = models.PrioritizedItemORM(**item.dict())
@@ -46,7 +46,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
             return models.PrioritizedItem.from_orm(item_orm)
 
-    @retry(3, 5)
+    @retry()
     def peek(self, scheduler_id: str, index: int) -> Optional[models.PrioritizedItem]:
         with self.datastore.session.begin() as session:
             item_orm = (
@@ -63,7 +63,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
             return models.PrioritizedItem.from_orm(item_orm)
 
-    @retry(3, 5)
+    @retry()
     def update(self, scheduler_id: str, item: models.PrioritizedItem) -> None:
         with self.datastore.session.begin() as session:
             (
@@ -73,7 +73,7 @@ class PriorityQueueStore(PriorityQueueStorer):
                 .update(item.dict())
             )
 
-    @retry(3, 5)
+    @retry()
     def remove(self, scheduler_id: str, item_id: str) -> None:
         with self.datastore.session.begin() as session:
             (
@@ -83,7 +83,7 @@ class PriorityQueueStore(PriorityQueueStorer):
                 .delete()
             )
 
-    @retry(3, 5)
+    @retry()
     def get(self, scheduler_id, item_id: str) -> Optional[models.PrioritizedItem]:
         with self.datastore.session.begin() as session:
             item_orm = (
@@ -98,7 +98,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
             return models.PrioritizedItem.from_orm(item_orm)
 
-    @retry(3, 5)
+    @retry()
     def empty(self, scheduler_id: str) -> bool:
         with self.datastore.session.begin() as session:
             count = (
@@ -108,7 +108,7 @@ class PriorityQueueStore(PriorityQueueStorer):
             )
             return count == 0
 
-    @retry(3, 5)
+    @retry()
     def qsize(self, scheduler_id: str) -> int:
         with self.datastore.session.begin() as session:
             count = (
@@ -119,7 +119,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
             return count
 
-    @retry(3, 5)
+    @retry()
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> Optional[models.PrioritizedItem]:
         with self.datastore.session.begin() as session:
             item_orm = (
@@ -135,7 +135,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
             return models.PrioritizedItem.from_orm(item_orm)
 
-    @retry(3, 5)
+    @retry()
     def get_items_by_scheduler_id(self, scheduler_id: str) -> List[models.PrioritizedItem]:
         with self.datastore.session.begin() as session:
             items_orm = (
