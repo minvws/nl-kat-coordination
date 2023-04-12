@@ -129,7 +129,8 @@ class RockyPermissionRequiredMixin(PermissionRequiredMixin):
     def has_permission(self) -> bool:
         user_perm = super().has_permission()
         try:
-            organization = Organization.objects.get(code=self.kwargs["organization_code"])
+            organization_code = self.kwargs["organization_code"]
+            organization = Organization.objects.get(code=organization_code)
             member = OrganizationMember.objects.get(user=self.request.user, organization=organization)
         except OrganizationMember.DoesNotExist:
             raise Http404()

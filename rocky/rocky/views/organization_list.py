@@ -13,12 +13,10 @@ from tools.view_helpers import OrganizationBreadcrumbsMixin
 
 @class_view_decorator(otp_required)
 class OrganizationListView(
-    RockyPermissionRequiredMixin,
     OrganizationBreadcrumbsMixin,
     ListView,
 ):
     template_name = "organizations/organization_list.html"
-    permission_required = "view_organization"
 
     def get_queryset(self) -> List[Organization]:
         user: KATUser = self.request.user
