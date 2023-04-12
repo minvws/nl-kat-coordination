@@ -10,9 +10,22 @@
         <section>
             <div>
                 <h1>{% translate "Organization" %}: {{ organization.name }}</h1>
-                {% blocktranslate with organization_name=organization.name %}
-          An overview of "{{ organization_name }}". This shows general information and its settings.
-{% endblocktranslate %}
+                <p>
+                    {% blocktranslate with organization_name=organization.name %}
+                    An overview of "{{ organization_name }}". This shows general information and its settings.
+                    {% endblocktranslate %}
+                </p>
+                {% if not self.indemnification_present %}
+                    <p class="warning"
+                       role="group"
+                       aria-label="{% translate "indemnification warning" %}">
+                        {% url "organization_settings" organization.code as organization_settings %}
+                        {% blocktranslate %}
+                            <strong>Warning:</strong>
+                            Indemnification is not set for this organization.
+                        {% endblocktranslate %}
+                    </p>
+                {% endif %}
                 <h2>{% translate "Organization details" %}</h2>
                 <div class="horizontal-scroll">
                     <table>
@@ -59,6 +72,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}
