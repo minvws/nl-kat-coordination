@@ -14,7 +14,7 @@ from tools.models import Indemnification
 class IndemnificationAddView(RockyPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "indemnification_add.html"
     form_class = IndemnificationAddForm
-    permission_required = "change_organization"
+    permission_required = "add_indemnification"
 
     def post(self, request, *args, **kwargs):
         Indemnification.objects.get_or_create(
