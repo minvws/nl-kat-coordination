@@ -3,9 +3,9 @@ from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from fastapi.responses import Response
-from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
+from bytes.api.api_models import RawResponse
 from bytes.auth import authenticate_token
 from bytes.events.events import RawFileReceived, NormalizerMetaReceived
 from bytes.events.manager import EventManager
@@ -102,12 +102,6 @@ def get_normalizer_meta(
 ) -> NormalizerMeta:
     with meta_repository:
         return meta_repository.get_normalizer_meta(normalizer_meta_id)
-
-
-class RawResponse(BaseModel):
-    status: str
-    message: str
-    id: Optional[str]
 
 
 @router.post("/raw/{boefje_meta_id}", tags=[RAW_TAG])

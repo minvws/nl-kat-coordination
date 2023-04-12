@@ -3,13 +3,16 @@ from typing import List, Optional, Any, Union
 
 from fastapi import Depends, APIRouter
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 from fastapi.security import OAuth2PasswordRequestForm
+from prometheus_client import CollectorRegistry
 from pydantic import BaseModel, ValidationError
+import prometheus_client
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
+from bytes.api.metrics import get_registry
 from bytes.auth import TokenResponse, get_access_token
 from bytes.version import __version__
 
@@ -44,6 +47,13 @@ def health() -> RedirectResponse:
 def root() -> ServiceHealth:
     bytes_health = ServiceHealth(service="bytes", healthy=True, version=__version__)
     return bytes_health
+
+
+@router.get("/metrics")
+def metrics(collector_registry: CollectorRegistry = Depends(get_registry)):
+    data = prometheus_client.generate_latest(collector_registry)
+
+    return Response(media_type="text/plain", content=data)
 
 
 @router.post("/token", response_model=TokenResponse)
