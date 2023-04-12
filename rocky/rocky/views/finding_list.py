@@ -48,6 +48,7 @@ def generate_findings_metadata(
         if not severity_filter or severity in severity_filter:
             findings_meta.append(
                 {
+                    "finding_number": 0,
                     "finding": finding,
                     "finding_type": finding_type,
                     "severity": severity.value.capitalize(),
