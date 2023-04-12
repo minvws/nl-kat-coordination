@@ -250,19 +250,19 @@ def recalculate_scan_profiles(
     xtdb_session_.commit()
 
 
-@router.get("/explanations")
-def get_explanations(
+@router.get("/scan_profiles/inheritance")
+def get_scan_profile_inheritance(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     reference: Reference = Depends(extract_reference),
 ) -> List[InheritanceSection]:
     ooi = octopoes.get_ooi(reference, valid_time)
-    root = InheritanceSection(
+    start = InheritanceSection(
         reference=ooi.reference, level=ooi.scan_profile.level, scan_profile_type=ooi.scan_profile.scan_profile_type
     )
     if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED:
-        return [root]
-    return octopoes.get_explanation(reference, valid_time, [root])
+        return [start]
+    return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
 
 
 @router.post("/node")

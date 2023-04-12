@@ -3,36 +3,40 @@
 
 {% spaceless %}
         <div class="horizontal-scroll">
-            <h2>{% translate "Explanation" %}</h2>
-            {% if explanations %}
+            <h2>{% translate "Clearance level inheritance" %}</h2>
+            {% if clearance_level_inheritance %}
             <table>
                 <thead>
                     <tr>
                         <th>{% translate "Type" %}</th>
-                        <th>{% translate "URL" %}</th>
+                        <th>{% translate "Object Type" %}</th>
+                        <th>{% translate "OOI" %}</th>
+                        <th>{% translate "Clearance level" %}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for explanation in explanations %}
+                    {% for section in clearance_level_inheritance %}
                         <tr>
-                        {% if forloop.first %}
-                       <td>{% translate "OOI" %}</td>
-                          {% elif forloop.last %}
-                          <td>{% translate "Origin" %}</td>
-                          {% else %}
-                          <td>Object</td>
-                          {% endif %}
 
+                            {% if forloop.first %}
+                                <td>{% translate "OOI" %}</td>
+                            {% elif forloop.last %}
+                                <td>{% translate "Origin" %}</td>
+                            {% else %}
+                                <td>Object</td>
+                            {% endif %}
                             <td>
-                              <a href="{% ooi_url 'ooi_detail' explanation.reference organization.code %}">{{ explanation.reference }}</a>
+                              <a href="{% ooi_url 'ooi_detail' section.primary_key organization.code %}">{{ section.human_readable }}</a>
                             </td>
+                            <td>{{ section.object_type }}</td>
+                            <td>L{{ section.level }}</td>
                         </tr>
 
                     {% endfor %}
                 </tbody>
             </table>
               {% else %}
-                <a href="{% ooi_url 'ooi_detail' ooi_id=ooi organization_code=organization.code get_explanations=True %}">{% translate "Show explanation of existence" %}</a>
+                <a href="{% ooi_url 'ooi_detail' ooi_id=ooi organization_code=organization.code show_clearance_level_inheritance=True %}">{% translate "Show clearance level inheritance" %}</a>
               {% endif %}
         </div>
 {% endspaceless %}

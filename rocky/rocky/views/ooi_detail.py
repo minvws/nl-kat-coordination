@@ -11,7 +11,7 @@ from requests.exceptions import RequestException
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 
 from rocky import scheduler
 from rocky.views.mixins import OOIBreadcrumbsMixin
@@ -182,6 +182,16 @@ class OOIDetailView(
             "scan_history_search",
             "scan_history_page",
         ]
-        if self.request.GET.get("get_explanations"):
-            context["explanations"] = [explanation for explanation in self.get_explanation(self.ooi)]
+        if self.request.GET.get("show_clearance_level_inheritance"):
+            clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)
+            formatted_inheritance = [
+                {
+                    "object_type": Reference.from_str(section.reference).class_,
+                    "primary_key": section.reference,
+                    "human_readable": Reference.from_str(section.reference).human_readable,
+                    "level": section.level,
+                }
+                for section in clearance_level_inheritance
+            ]
+            context["clearance_level_inheritance"] = formatted_inheritance
         return context

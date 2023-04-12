@@ -14,6 +14,7 @@ from katalogus.client import Plugin, get_katalogus
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
+from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
@@ -118,10 +119,10 @@ class OctopoesView(OrganizationView):
         except ValueError:
             return default_depth
 
-    def get_explanation(self, ooi: OOI) -> List[Dict[str, str]]:
-        if ooi.scan_profile == 0 or ooi.scan_profile.scan_profile_type != ScanProfileType.INHERITED.value:
+    def get_scan_profile_inheritance(self, ooi: OOI) -> List[InheritanceSection]:
+        explanations = self.octopoes_api_connector.get_scan_profile_inheritance(ooi.reference)
+        if len(explanations) == 1:
             return []
-        explanations = self.octopoes_api_connector.get_explanation(ooi.reference)
         return explanations
 
 

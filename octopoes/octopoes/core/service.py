@@ -425,7 +425,7 @@ class OctopoesService:
         self._populate_scan_profiles(oois, valid_time)
         return oois
 
-    def get_explanation(
+    def get_scan_profile_inheritance(
         self, reference: Reference, valid_time: datetime, inheritance_chain: List[InheritanceSection]
     ) -> List[InheritanceSection]:
         neighbour_cache = self.ooi_repository.get_neighbours(reference, valid_time)
@@ -482,7 +482,9 @@ class OctopoesService:
 
         # traverse depth-first, highest levels first
         for inheritance in sorted(highest_inheritance_per_neighbour.values(), key=lambda x: x.level, reverse=True):
-            expl = self.get_explanation(inheritance.reference, valid_time, inheritance_chain + [inheritance])
+            expl = self.get_scan_profile_inheritance(
+                inheritance.reference, valid_time, inheritance_chain + [inheritance]
+            )
             if expl[-1].scan_profile_type == ScanProfileType.DECLARED:
                 return expl
 
