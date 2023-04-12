@@ -38,8 +38,11 @@ class Katalogus(HTTPService):
 
     def _flush_organisations_plugin_cache(self) -> None:
         self.logger.debug("flushing plugin cache [cache=%s]", self.organisations_plugin_cache.cache)
-        orgs = self.get_organisations()
 
+        # First, we reset the cache, to make sure we won't get any ExpiredError
+        self.organisations_plugin_cache.reset()
+
+        orgs = self.get_organisations()
         for org in orgs:
             if org.id not in self.organisations_plugin_cache:
                 self.organisations_plugin_cache[org.id] = {}
@@ -57,8 +60,10 @@ class Katalogus(HTTPService):
             self.organisations_boefje_type_cache.cache,
         )
 
-        orgs = self.get_organisations()
+        # First, we reset the cache, to make sure we won't get any ExpiredError
+        self.organisations_boefje_type_cache.reset()
 
+        orgs = self.get_organisations()
         for org in orgs:
             self.organisations_boefje_type_cache[org.id] = {}
 
@@ -85,12 +90,12 @@ class Katalogus(HTTPService):
 
     def _flush_organisations_normalizer_type_cache(self) -> None:
         """normalizer.consumes -> plugin type normalizer"""
-        self.logger.debug(
-            "flushing normalizer cache [cache=%s]",
-            self.organisations_normalizer_type_cache.cache,
-        )
-        orgs = self.get_organisations()
+        self.logger.debug("flushing normalizer cache [cache=%s]", self.organisations_normalizer_type_cache.cache)
 
+        # First, we reset the cache, to make sure we won't get any ExpiredError
+        self.organisations_normalizer_type_cache.reset()
+
+        orgs = self.get_organisations()
         for org in orgs:
             self.organisations_normalizer_type_cache[org.id] = {}
 
