@@ -50,33 +50,32 @@
     </header>
     <main id="main-content">
         <section>
-            <div>
-                <h1>{% translate "Welcome" %}</h1>
-                <div class="horizontal-scroll">
-                    <table>
-                        <caption>{% translate "User overview:" %}</caption>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Active organization</th>
-                                <th>Code</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ user.username }}</td>
-                                <td>{{ organization.name }}</td>
-                                {% if organization.code %}
-                                    <td>{{ organization.code }}</td>
-                                {% else %}
-                                    <td class="warning" aria-label="{% translate "warning" %}">
-                                        <span>{% translate "Warning" %}:</span> {% translate "Organization code missing" %}
-                                    </td>
-                                {% endif %}
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-    {% endblock content %}
+            <h1>{% translate "Welcome" %}</h1>
+            <div class="horizontal-scroll">
+                <table>
+                    <caption>{% translate "User overview:" %}</caption>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Active organization</th>
+                            <th>Code</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ organization.name }}</td>
+                            {% if organization.code %}
+                                <td>{{ organization.code }}</td>
+                            {% else %}
+                                <td class="warning" aria-label="{% translate "warning" %}">
+                                    <span>{% translate "Warning" %}:</span> {% translate "Organization code missing" %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
