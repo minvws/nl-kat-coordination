@@ -476,9 +476,9 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "A system administration port is open.",
-        "recommendation": "Secure this port",
-        "risk": "Middle"
+        "description": "A port commonly used for system administration is open.",
+        "recommendation": "Manually validate whether this open port should actually be open.",
+        "risk": "Low"
       },
       "consult_api": false
     }
@@ -489,8 +489,8 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "A database port is open.",
-        "recommendation": "Secure this port",
+        "description": "A port commonly used by databases is open.",
+        "recommendation": "Manually validate whether this open port should actually be open.",
         "risk": "High"
       },
       "consult_api": false
@@ -502,9 +502,22 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "The firewall may be configured in a riskful manner.",
-        "recommendation": "Manually validate whether this open ports should actually be open.",
+        "description": "An uncommon open port was found to be open. A firewall may be configured in a riskful manner.",
+        "recommendation": "Manually validate whether this open port should actually be open.",
         "risk": "Middle"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-OPEN-COMMON-TCP-PORT",
+    "fields": {
+      "last_updated": "2021-08-09T14:50:09.835Z",
+      "data": {
+        "description": "A port commonly used for TCP traffic was found to be open.",
+        "recommendation": "Manually validate whether this open port should be open.",
+        "risk": "Recommendation"
       },
       "consult_api": false
     }
