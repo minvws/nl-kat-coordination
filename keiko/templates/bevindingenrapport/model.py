@@ -20,7 +20,7 @@ class Finding(OOI):
     proof: Optional[str]
     description: Optional[str]
     reproduce: Optional[str]
-    ooi: OOI
+    ooi: str
 
 
 class FindingTypeBase(OOI):
@@ -70,4 +70,5 @@ class DataShape(DataShapeBase):
     meta: Meta
     findings_grouped: Dict[str, FindingOccurrence]
     valid_time: datetime
-    ooi: OOI
+    report_source_type: str
+    report_source_value: str
