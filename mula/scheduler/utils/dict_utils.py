@@ -32,14 +32,21 @@ class ExpiringDict:
         except KeyError:
             return default
 
+    def reset(self) -> None:
+        with self.lock:
+            self.cache.clear()
+            self.expiration_time = datetime.now(timezone.utc) + self.lifetime
+
     def _is_expired(self) -> bool:
         return datetime.now(timezone.utc) > self.expiration_time
 
     def __getitem__(self, key: str) -> Any:
         with self.lock:
             if self._is_expired():
+                # Using this instead of reset(), else we would lock
                 self.cache.clear()
                 self.expiration_time = datetime.now(timezone.utc) + self.lifetime
+
                 raise ExpiredError
 
             if key not in self.cache:
