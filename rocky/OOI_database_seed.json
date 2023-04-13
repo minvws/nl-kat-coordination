@@ -478,7 +478,7 @@
       "data": {
         "description": "A port commonly used for system administration is open.",
         "recommendation": "Manually validate whether this open port should actually be open.",
-        "risk": "Low"
+        "risk": "Middle"
       },
       "consult_api": false
     }
