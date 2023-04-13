@@ -30,7 +30,7 @@
                             <td>
                                 {{ finding.risk_level_score }}
                                 {% if not finding.risk_level_source %}
-                                    <span>({% translate "marked "critical" because of unknown score" %})</span>
+                                    <span>({% translate "marked \"critical\" because of unknown score" %})</span>
                                 {% endif %}
                             </td>
                             <td>{{ finding.description }}</td>
