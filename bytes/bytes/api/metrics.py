@@ -40,7 +40,7 @@ def get_registry():
 
     for organization_path in organization_paths:
         cnt = 0
-        # os.listdir approach seems to be the fastest
+        # os.listdir approach seems to be the fastest python-native way for now to do this.
         for index_path in os.listdir(settings.bytes_data_dir / organization_path):
             cnt += len(os.listdir(settings.bytes_data_dir / organization_path / index_path))
 
