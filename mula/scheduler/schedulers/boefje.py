@@ -580,9 +580,8 @@ class BoefjeScheduler(Scheduler):
         """
         if boefje.enabled is False:
             self.logger.debug(
-                "Boefje: %s is disabled [organisation.id=%s, boefje.id=%s, organisation.id=%s, scheduler_id=%s]",
+                "Boefje: %s is disabled [boefje.id=%s, organisation.id=%s, scheduler_id=%s]",
                 boefje.name,
-                self.organisation.id,
                 boefje.id,
                 self.organisation.id,
                 self.scheduler_id,

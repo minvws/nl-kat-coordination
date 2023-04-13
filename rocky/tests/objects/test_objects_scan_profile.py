@@ -10,7 +10,7 @@ from tools.models import Indemnification
 TREE_DATA = {
     "root": {
         "reference": "Network|testnetwork",
-        "children": {"urls": [{"reference": "URL|testnetwork|https://scanme.org./", "children": {}}]},
+        "children": {"urls": [{"reference": "URL|testnetwork|https://scanme.org/", "children": {}}]},
     },
     "store": {
         "Network|testnetwork": {
@@ -23,19 +23,19 @@ TREE_DATA = {
                 "level": 1,
             },
         },
-        "HostnameHTTPURL|https|internet|scanme.org.|443|/": {
+        "HostnameHTTPURL|https|internet|scanme.org|443|/": {
             "object_type": "HostnameHTTPURL",
             "scan_profile": {
                 "scan_profile_type": "inherited",
-                "reference": "HostnameHTTPURL|https|internet|scanme.org.|443|/",
+                "reference": "HostnameHTTPURL|https|internet|scanme.org|443|/",
                 "level": 2,
             },
-            "primary_key": "HostnameHTTPURL|https|internet|scanme.org.|443|/",
+            "primary_key": "HostnameHTTPURL|https|internet|scanme.org|443|/",
             "network": "Network|internet",
             "scheme": "https",
             "port": 443,
             "path": "/",
-            "netloc": "Hostname|internet|scanme.org.",
+            "netloc": "Hostname|internet|scanme.org",
         },
     },
 }
