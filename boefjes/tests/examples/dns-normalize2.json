@@ -1,11 +1,11 @@
 {
   "id": "dns-lookup-job",
   "organization": "_dev",
-  "input_ooi": "Hostname|internet|www.example.nl.",
+  "input_ooi": "Hostname|internet|www.example.nl",
   "arguments": {
-    "domain": "www.example.nl.",
+    "domain": "www.example.nl",
     "input": {
-        "id": "www.example.nl."
+        "id": "www.example.nl"
       }
   },
   "dispatches": {

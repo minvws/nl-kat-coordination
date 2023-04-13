@@ -59,6 +59,7 @@ class OrganizationView(View):
         context["organization"] = self.organization
         context["organization_member"] = self.organization_member
         context["may_update_clearance_level"] = self.may_update_clearance_level
+        context["indemnification_present"] = self.indemnification_present
         return context
 
     @property

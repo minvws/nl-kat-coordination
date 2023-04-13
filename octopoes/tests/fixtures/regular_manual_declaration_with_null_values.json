@@ -2,8 +2,7 @@
   "ooi": {
     "object_type": "Hostname",
     "network": "Network|internet",
-    "name": "test.org.",
-    "fqdn": "Hostname|internet|test.org."
+    "name": "test.org"
   },
   "valid_time": "2019-01-02T00:00:00+00:00",
   "method": null,
