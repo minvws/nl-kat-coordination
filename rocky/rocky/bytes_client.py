@@ -106,19 +106,19 @@ class BytesClient:
         headers.update(self.session.headers)
 
         response = self.session.post(
-            f"{self.base_url}/bytes/raw/{boefje_meta_id}",
+            f"{self.base_url}/bytes/raw",
             raw,
             headers=headers,
-            params={"mime_types": mime_types},
+            params={"mime_types": mime_types, "boefje_meta_id": boefje_meta_id},
         )
 
         response.raise_for_status()
         return response.json()["id"]
 
-    def get_raw(self, boefje_meta_id: str, raw_id: str) -> bytes:
+    def get_raw(self, raw_id: str) -> bytes:
         # Note: we assume organization permissions are handled before requesting raw data.
 
-        response = self.session.get(f"{self.base_url}/bytes/raw/{boefje_meta_id}/{raw_id}")
+        response = self.session.get(f"{self.base_url}/bytes/raw/{raw_id}")
         response.raise_for_status()
 
         return response.content

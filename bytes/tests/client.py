@@ -6,7 +6,7 @@ from functools import wraps
 from requests.models import HTTPError
 
 from bytes.models import BoefjeMeta, NormalizerMeta
-from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter
+from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter, NormalizerMetaFilter
 
 BYTES_API_CLIENT_VERSION = "0.2"
 
@@ -99,12 +99,20 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def get_normalizer_meta(self, normalizer_meta_id: str) -> NormalizerMeta:
+    def get_normalizer_meta_by_id(self, normalizer_meta_id: str) -> NormalizerMeta:
         response = self._session.get(f"/bytes/normalizer_meta/{normalizer_meta_id}", headers=self.headers)
         self._verify_response(response)
 
         normalizer_meta_json = response.json()
         return NormalizerMeta.parse_obj(normalizer_meta_json)
+
+    @retry_with_login
+    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
+        response = self._session.get("/bytes/normalizer_meta", headers=self.headers, params=query_filter.dict())
+        self._verify_response(response)
+
+        normalizer_meta_json = response.json()
+        return [NormalizerMeta.parse_obj(normalizer_meta) for normalizer_meta in normalizer_meta_json]
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Optional[List[str]] = None) -> Optional[str]:
@@ -115,7 +123,7 @@ class BytesAPIClient:
         headers.update(self.headers)
 
         response = self._session.post(
-            f"/bytes/raw/{boefje_meta_id}", raw, headers=headers, params={"mime_types": mime_types}
+            "/bytes/raw", raw, headers=headers, params={"mime_types": mime_types, "boefje_meta_id": boefje_meta_id}
         )
 
         self._verify_response(response)
@@ -124,13 +132,8 @@ class BytesAPIClient:
         return str(raw_id) if raw_id else None
 
     @retry_with_login
-    def get_raw(self, boefje_meta_id: str, mime_types: Optional[List[str]] = None) -> bytes:
-        if not mime_types:
-            mime_types = []
-
-        response = self._session.get(
-            f"/bytes/raw/{boefje_meta_id}", headers=self.headers, stream=True, params={"mime_types": mime_types}
-        )
+    def get_raw(self, raw_id: str) -> bytes:
+        response = self._session.get(f"/bytes/raw/{raw_id}", headers=self.headers, stream=True)
         self._verify_response(response)
 
         return response.content

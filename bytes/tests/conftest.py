@@ -48,23 +48,16 @@ def nacl_middleware(settings: Settings) -> NaclBoxMiddleware:
 
 
 @pytest.fixture
-def hash_repository(settings: Settings) -> HashRepository:
+def pastebin_hash_repository(settings: Settings) -> HashRepository:
     return PastebinHashRepository(api_dev_key=settings.pastebin_api_dev_key)
 
 
 @pytest.fixture
-def mock_hash_repository(rfc3616_repository: RFC3161HashRepository, settings: Settings) -> HashRepository:
-    if settings.rfc3161_provider:
-        return rfc3616_repository
+def mock_hash_repository(settings: Settings) -> HashRepository:
+    if settings.rfc3161_cert_file and settings.rfc3161_provider:
+        return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), settings.rfc3161_provider)
 
     return InMemoryHashRepository()
-
-
-@pytest.fixture
-def rfc3616_repository(settings: Settings) -> HashRepository:
-    assert settings.rfc3161_cert_file and settings.rfc3161_provider
-
-    return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), settings.rfc3161_provider)
 
 
 @pytest.fixture

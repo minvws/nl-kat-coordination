@@ -126,17 +126,17 @@ class BytesAPIClient:
         headers.update(self.headers)
 
         response = self._session.post(
-            f"/bytes/raw/{boefje_meta_id}",
+            "/bytes/raw",
             raw,
             headers=headers,
-            params={"mime_types": mime_types},
+            params={"mime_types": mime_types, "boefje_meta_id": boefje_meta_id},
         )
 
         self._verify_response(response)
 
     @retry_with_login
-    def get_raw(self, boefje_meta_id: str, raw_data_id: str) -> bytes:
-        response = self._session.get(f"/bytes/raw/{boefje_meta_id}/{raw_data_id}", headers=self.headers)
+    def get_raw(self, raw_data_id: str) -> bytes:
+        response = self._session.get(f"/bytes/raw/{raw_data_id}", headers=self.headers)
         self._verify_response(response)
 
         return response.content

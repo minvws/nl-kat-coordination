@@ -167,7 +167,7 @@ class NormalizerHandler(Handler):
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
         bytes_api_client.login()
-        raw = bytes_api_client.get_raw(normalizer_meta.raw_data.boefje_meta.id, normalizer_meta.raw_data.id)
+        raw = bytes_api_client.get_raw(normalizer_meta.raw_data.id)
 
         normalizer_meta.started_at = datetime.now(timezone.utc)
 

@@ -20,7 +20,7 @@ from bytes.timestamping.provider import create_hash_repository
 from bytes.timestamping.hashing import hash_data
 from bytes.database.db import SQL_BASE, get_engine
 from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
-from bytes.repositories.meta_repository import MetaDataRepository, BoefjeMetaFilter, RawDataFilter
+from bytes.repositories.meta_repository import MetaDataRepository, BoefjeMetaFilter, RawDataFilter, NormalizerMetaFilter
 from bytes.repositories.raw_repository import RawRepository
 from bytes.raw.file_raw_repository import create_raw_repository
 
@@ -76,7 +76,7 @@ class SQLMetaDataRepository(MetaDataRepository):
             query = query.filter(BoefjeMetaInDB.input_ooi == query_filter.input_ooi)
 
         ordering_fn = BoefjeMetaInDB.started_at.desc if query_filter.descending else BoefjeMetaInDB.started_at.asc
-        query = query.order_by(ordering_fn()).limit(query_filter.limit)
+        query = query.order_by(ordering_fn()).offset(query_filter.offset).limit(query_filter.limit)
 
         return [to_boefje_meta(boefje_meta) for boefje_meta in query]
 
@@ -86,13 +86,37 @@ class SQLMetaDataRepository(MetaDataRepository):
         normalizer_meta_in_db = to_normalizer_meta_in_db(normalizer_meta)
         self.session.add(normalizer_meta_in_db)
 
-    def get_normalizer_meta(self, normalizer_meta_id: str) -> NormalizerMeta:
+    def get_normalizer_meta_by_id(self, normalizer_meta_id: str) -> NormalizerMeta:
         normalizer_meta_in_db = self.session.get(NormalizerMetaInDB, normalizer_meta_id)
 
         if normalizer_meta_in_db is None:
             raise ObjectNotFoundException(NormalizerMetaInDB, id=normalizer_meta_id)
 
         return to_normalizer_meta(normalizer_meta_in_db)
+
+    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
+        logger.info("Querying normalizer meta")
+
+        if query_filter.raw_id is not None:
+            query = self.session.query(NormalizerMetaInDB).filter(NormalizerMetaInDB.raw_file_id == query_filter.raw_id)
+        else:
+            query = (
+                self.session.query(NormalizerMetaInDB)
+                .join(RawFileInDB)
+                .join(BoefjeMetaInDB)
+                .filter(RawFileInDB.boefje_meta_id == BoefjeMetaInDB.id)
+                .filter(BoefjeMetaInDB.organization == query_filter.organization)
+            )
+
+        if query_filter.normalizer_id is not None:
+            query = query.filter(NormalizerMetaInDB.normalizer_id == query_filter.normalizer_id)
+
+        ordering_fn = (
+            NormalizerMetaInDB.started_at.desc if query_filter.descending else NormalizerMetaInDB.started_at.asc
+        )
+        query = query.order_by(ordering_fn()).offset(query_filter.offset).limit(query_filter.limit)
+
+        return [to_normalizer_meta(normalizer_meta) for normalizer_meta in query]
 
     def save_raw(self, raw: RawData) -> str:
         logger.info("Saving raw")
@@ -115,7 +139,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return str(raw_file_in_db.id)
 
-    def get_raws(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
+    def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
         if query_filter.boefje_meta_id:
             query = self.session.query(RawFileInDB).filter(RawFileInDB.boefje_meta_id == query_filter.boefje_meta_id)
         else:
@@ -134,11 +158,11 @@ class SQLMetaDataRepository(MetaDataRepository):
         if query_filter.mime_types:
             query = query.filter(RawFileInDB.mime_types.contains([m.value for m in query_filter.mime_types]))
 
-        query = query.limit(query_filter.limit)
+        query = query.offset(query_filter.offset).limit(query_filter.limit)
 
         return [self._to_raw_meta(raw_file_in_db) for raw_file_in_db in query]
 
-    def get_raw(self, raw_id: str) -> RawData:
+    def get_raw_by_id(self, raw_id: str) -> RawData:
         raw_in_db: Optional[RawFileInDB] = self.session.get(RawFileInDB, raw_id)
 
         if raw_in_db is None:
