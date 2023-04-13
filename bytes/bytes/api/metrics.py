@@ -35,12 +35,16 @@ bytes_filesystem_size_bytes = prometheus_client.Gauge(
 
 def get_registry():
     settings = get_settings()
-    organization_paths = list(settings.bytes_data_dir.iterdir())
+    organization_paths = os.listdir(settings.bytes_data_dir)
     bytes_data_organizations_total.set(len(organization_paths))
 
     for organization_path in organization_paths:
-        number_of_files = sum([len(a[-1]) for a in list(os.walk(organization_path))])
-        bytes_data_raw_files_total.labels(organization_path.name).set(number_of_files)
+        cnt = 0
+        # os.listdir approach seems to be the fastest
+        for index_path in os.listdir(settings.bytes_data_dir / organization_path):
+            cnt += len(os.listdir(settings.bytes_data_dir / organization_path / index_path))
+
+        bytes_data_raw_files_total.labels(organization_path).set(cnt)
 
     mountpoint = "/"
     total, used, free = shutil.disk_usage(mountpoint)
