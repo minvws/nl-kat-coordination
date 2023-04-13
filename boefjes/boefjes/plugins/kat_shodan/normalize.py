@@ -16,7 +16,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     if not results:
         logging.info("No Shodan results available for normalization.")
     elif "data" not in results:
-        raise ValueError("Shodan results exist without data.")
+        logger.warning("Shodan results exist without data.")
     else:
         for scan in results["data"]:
             port_nr = scan["port"]
