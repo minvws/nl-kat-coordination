@@ -37,7 +37,7 @@ def test_tasks_view_simple(rf, client_member, mocker, lazy_task_list_with_boefje
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
     assertContains(response, "1b20f85f")
-    assertContains(response, "Hostname|internet|mispo.es.")
+    assertContains(response, "Hostname|internet|mispo.es")
 
     mock_scheduler_client.get_lazy_task_list.assert_has_calls(
         [
