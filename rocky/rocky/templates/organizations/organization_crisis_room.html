@@ -10,6 +10,18 @@
         <section>
             <div>
                 <h1>{% translate "Crisis room" %}: {{ organization.name|title }} ({{ organization.code }})</h1>
+                {% if not indemnification_present %}
+                    <p class="warning"
+                       role="group"
+                       aria-label="{% translate "indemnification warning" %}">
+                        {% url "organization_settings" organization.code as organization_settings %}
+                        {% blocktranslate %}
+                            <strong>Warning:</strong>
+                            Indemnification is not set for this organization.
+                            Go to the <a href="{{ organization_settings }}">organization settings page</a> to add one.
+                        {% endblocktranslate %}
+                    </p>
+                {% endif %}
                 <p>
                     {% translate "An overview of the top 10 most severe findings OpenKAT found. Check the detail section for additional severity information." %}
                 </p>
@@ -49,21 +61,21 @@
                                     <td colspan="6">
                                         <table>
                                             <tr>
-                                                <td>{% translate "Finding type:" %}</td>
+                                                <td>{% translate "Finding type" %}:</td>
                                                 <td>
                                                     <a href="{% ooi_url "ooi_detail" ooi.finding_type organization.code query=mandatory_fields %}"
                                                        title="{% blocktranslate trimmed with finding_type=ooi.finding_type.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ ooi.finding_type.human_readable }}</a>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>{% translate "OOI type:" %}</td>
+                                                <td>{% translate "OOI type" %}:</td>
                                                 <td>
                                                     <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi.finding_type.object_type }}"
                                                        title="{% blocktranslate trimmed with ooi_type=ooi.finding_type.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ ooi.finding_type.object_type }}</a>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>{% translate "Source OOI:" %}</td>
+                                                <td>{% translate "Source OOI" %}:</td>
                                                 <td>
                                                     <a href="{% ooi_url "ooi_detail" ooi.finding.ooi organization.code query=mandatory_fields %}"
                                                        title="{% blocktranslate trimmed with finding=ooi.finding.ooi %} Show details for {{ finding }} {% endblocktranslate %}">{{ ooi.finding.ooi }}</a>
@@ -80,4 +92,6 @@
         </section>
     </main>
 {% endblock content %}
-{% block html_at_end_body %}{{ block.super }}{% endblock html_at_end_body %}
+{% block html_at_end_body %}
+    {{ block.super }}
+{% endblock html_at_end_body %}

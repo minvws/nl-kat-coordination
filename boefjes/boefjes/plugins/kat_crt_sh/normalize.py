@@ -14,7 +14,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     results = json.loads(raw)
     input_ = normalizer_meta.raw_data.boefje_meta.arguments["input"]
     fqdn = input_["hostname"]["name"]
-    current = fqdn.lstrip(".").rstrip(".")
+    current = fqdn.lstrip(".")
 
     network = Network(name="internet")
     yield network
