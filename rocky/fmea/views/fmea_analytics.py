@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from django.http import HttpResponse
 from django.urls.base import reverse
@@ -6,16 +6,16 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View
 from django.views.generic.detail import DetailView
 from django_otp.decorators import otp_required
+from tools.view_helpers import Breadcrumb
 from two_factor.views.utils import class_view_decorator
 
 from fmea.models import (
+    DEPARTMENTS,
     FailureMode,
     FailureModeAffectedObject,
-    DEPARTMENTS,
 )
 from fmea.tools import html_to_pdf
 from fmea.views.view_helpers import FMEABreadcrumbsMixin
-from tools.view_helpers import Breadcrumb
 
 
 @class_view_decorator(otp_required)

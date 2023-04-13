@@ -1,8 +1,9 @@
-from typing import Type, List
+from typing import List, Type
 
-from katalogus.client import get_katalogus, Plugin
-from octopoes.models import OOI
 from tools.models import Organization
+
+from katalogus.client import Plugin, get_katalogus
+from octopoes.models import OOI
 
 
 def get_enabled_boefjes_for_ooi_class(ooi_class: Type[OOI], organization: Organization) -> List[Plugin]:

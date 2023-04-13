@@ -3,7 +3,7 @@ import pkgutil
 from logging import getLogger
 from pathlib import Path
 from types import ModuleType
-from typing import Type, List, Dict
+from typing import Dict, List, Type
 
 from pydantic import BaseModel
 

@@ -1,4 +1,4 @@
-from typing import Literal, Any, Dict
+from typing import Any, Dict, Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField

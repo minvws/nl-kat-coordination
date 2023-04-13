@@ -1,16 +1,15 @@
 import json
 from io import BytesIO
-from typing import Dict, Type, Set, List
+from typing import Dict, List, Set, Type
 
-from django.conf import settings
 import requests
+from django.conf import settings
 from pydantic import BaseModel
+from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
 from octopoes.models.types import type_by_name
-
 from rocky.health import ServiceHealth
-from tools.enums import SCAN_LEVEL
 
 
 class Plugin(BaseModel):

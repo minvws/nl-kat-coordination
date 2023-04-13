@@ -1,24 +1,24 @@
 import uuid
 from datetime import datetime, timezone
+from http import HTTPStatus
 from logging import getLogger
 from typing import List, Optional, Set, Type
-from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, status
-from requests import RequestException, HTTPError
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from requests import HTTPError, RequestException
 
-from octopoes.api.models import ServiceHealth, ValidatedObservation, ValidatedDeclaration
+from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.models import (
-    OOI,
-    Reference,
-    ScanProfileBase,
-    ScanProfile,
-    ScanLevel,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    OOI,
+    Reference,
+    ScanLevel,
+    ScanProfile,
+    ScanProfileBase,
     ScanProfileType,
 )
 from octopoes.models.datetime import TimezoneAwareDatetime

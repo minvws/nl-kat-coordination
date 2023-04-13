@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 from keiko.base_models import DataShapeBase
 
-
 # pylint: disable=missing-class-docstring
 
 

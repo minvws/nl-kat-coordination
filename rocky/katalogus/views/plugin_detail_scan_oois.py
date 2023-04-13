@@ -5,11 +5,11 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
-from octopoes.models.types import type_by_name
+from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.views.mixins import BoefjeMixin
-from tools.forms.ooi import SelectOOIForm, SelectOOIFilterForm
+from octopoes.models.types import type_by_name
 
 
 @class_view_decorator(otp_required)

@@ -1,6 +1,6 @@
-from setuptools import setup, find_packages
-from rocky.version import __version__
+from setuptools import find_packages, setup
 
+from rocky.version import __version__
 
 setup(
     name="rocky",

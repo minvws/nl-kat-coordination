@@ -1,6 +1,6 @@
 from typing import Dict
 
-from fastapi import APIRouter, status, Depends, Body, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 
 from boefjes.katalogus.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.katalogus.routers.organisations import check_organisation_exists

@@ -1,10 +1,12 @@
 from typing import Any, Dict
+
+from account.mixins import OrganizationView
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, FormView
+from django.views.generic import FormView, ListView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
-from account.mixins import OrganizationView
+
 from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 

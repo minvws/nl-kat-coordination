@@ -1,10 +1,9 @@
+from katalogus.client import KATalogusClientV1, parse_plugin
+from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsListView, KATalogusView
 from pytest_django.asserts import assertContains, assertNotContains
 
-from katalogus.client import KATalogusClientV1, parse_plugin
-from katalogus.views import KATalogusView, KATalogusSettingsListView, ConfirmCloneSettingsView
 from rocky.health import ServiceHealth
-from tests.conftest import setup_request, get_boefjes_data
-from tests.conftest import create_member
+from tests.conftest import create_member, get_boefjes_data, setup_request
 
 
 def test_katalogus_plugin_listing(admin_member, redteam_member, client_member, rf, mocker):

@@ -1,21 +1,29 @@
-import json
-from pathlib import Path
-from unittest.mock import MagicMock
-import pytest
 import binascii
+import json
 from os import urandom
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
-from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
+from tools.models import (
+    GROUP_ADMIN,
+    GROUP_CLIENT,
+    GROUP_REDTEAM,
+    Indemnification,
+    OOIInformation,
+    Organization,
+    OrganizationMember,
+)
+
+from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
-from unittest.mock import patch
-from tools.models import OOIInformation, Organization, OrganizationMember, Indemnification
-from django.contrib.auth.models import Permission, Group
-from tools.models import GROUP_REDTEAM, GROUP_ADMIN, GROUP_CLIENT
 
 
 def create_user(django_user_model, email, password, name, device_name, superuser=False):

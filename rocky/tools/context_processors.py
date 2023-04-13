@@ -1,6 +1,5 @@
-from django.conf import settings
-
 from account.models import KATUser
+from django.conf import settings
 
 
 def languages(request):

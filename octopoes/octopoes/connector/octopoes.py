@@ -1,21 +1,21 @@
 import json
 from datetime import datetime
-from typing import Optional, List, Type, Set, Union
+from typing import List, Optional, Set, Type, Union
 
 import requests
 from pydantic.tools import parse_obj_as
-from requests import Response, HTTPError
+from requests import HTTPError, Response
 
-from octopoes.api.models import Observation, Declaration, ServiceHealth
-from octopoes.connector import RemoteException, DecodeException
+from octopoes.api.models import Declaration, Observation, ServiceHealth
+from octopoes.connector import DecodeException, RemoteException
 from octopoes.models import (
-    Reference,
-    OOI,
-    ScanProfile,
-    ScanLevel,
     DEFAULT_SCAN_LEVEL_FILTER,
-    ScanProfileType,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    OOI,
+    Reference,
+    ScanLevel,
+    ScanProfile,
+    ScanProfileType,
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import Origin

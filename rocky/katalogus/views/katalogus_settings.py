@@ -1,19 +1,18 @@
+from account.forms.organization import OrganizationListForm
+from account.mixins import OrganizationView
+from account.models import KATUser
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, FormView, TemplateView
+from django.views.generic import FormView, ListView, TemplateView
 from django_otp.decorators import otp_required
+from tools.models import Organization
 from two_factor.views.utils import class_view_decorator
 
-from account.forms.organization import OrganizationListForm
-from account.mixins import OrganizationView
-from account.models import KATUser
 from katalogus.client import get_katalogus
-from tools.models import Organization
 
 
 @class_view_decorator(otp_required)

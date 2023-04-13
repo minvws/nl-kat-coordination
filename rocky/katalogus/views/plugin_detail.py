@@ -1,14 +1,14 @@
 from datetime import datetime
 from logging import getLogger
 
-from django.core.paginator import Paginator, Page
+from account.mixins import OrganizationView
+from django.core.paginator import Page, Paginator
 from django.http import FileResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
-from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from katalogus.views import PluginSettingsListView
 from katalogus.views.mixins import KATalogusMixin
