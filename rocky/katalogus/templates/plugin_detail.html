@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load i18n %}
+{% load permissions %}
 
 {% block content %}
     {% include "header.html" %}
@@ -29,11 +30,14 @@
                     <p>
                         <strong>{% translate "Description" %}</strong>
                     </p>
-                    <p>{{ plugin.description }}</p>
+                    <p>
+                        {{ plugin.description }}
+                    </p>
                 </div>
             </div>
         </section>
-        {% if perms.tools.can_scan_organization %}
+        {% has_organization_perm "can_scan_organization" request.user organization as can_scan_organization %}
+        {% if can_scan_organization %}
             {% include "plugin_settings_list.html" with object_list=object_list plugin=plugin %}
 
         {% endif %}
@@ -69,7 +73,8 @@
                 </p>
             </div>
         </section>
-        {% if perms.tools.can_scan_organization %}
+        {% has_organization_perm "can_scan_organization" request.user organization as can_scan_organization %}
+        {% if can_scan_organization %}
             {% include "partials/objects_to_scan.html" with plugin=plugin %}
 
         {% endif %}
@@ -77,8 +82,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
-    <script src="{% static "/js/autoSubmit.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

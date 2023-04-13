@@ -64,7 +64,8 @@
         </dl>
       </div>
     </section>
-    {% if perms.tools.can_scan_organization %}
+    {% has_organization_perm "can_scan_organization" request.user organization as can_scan_organization %}
+    {% if can_scan_organization %}
       <section>
         <div>
           <h2>{% translate 'OOI clearance' %}</h2>

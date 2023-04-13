@@ -1,6 +1,8 @@
 {% load i18n %}
+{% load permissions %}
 
-{% if perms.tools.can_enable_disable_boefje %}
+{% has_organization_perm "can_enable_disable_boefje" request.user organization as can_enable_disable_boefje %}
+{% if can_enable_disable_boefje %}
     <form id="enableform_{{ plugin.id|slugify }}"
           action="{% url "plugin_enable_disable" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id plugin_state=plugin.enabled %}"
           method="post"

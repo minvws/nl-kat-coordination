@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load static %}
+{% load permissions %}
 
 {% block content %}
     {% include "header.html" %}
@@ -20,7 +21,8 @@
               {% endblocktranslate %}
                         </p>
                     </div>
-                    {% if perms.tools.can_scan_organization %}
+                    {% has_organization_perm "can_scan_organization" request.user organization as can_scan_organization %}
+                    {% if can_scan_organization %}
                         <div class="horizontal-view toolbar">
                             <a class="button ghost"
                                href="{% url 'katalogus_settings' organization.code %}">{% translate "KAT-alogus Settings" %}</a>
@@ -86,6 +88,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

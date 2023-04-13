@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load permissions %}
 
 <section>
     <div class="column-2">
@@ -68,7 +69,7 @@
             {% endif %}
         </div>
         <div class="horizontal-scroll">
-            {% if perms.tools.view_organization or request.user.is_superuser %}
+            {% if perms.tools.view_organization %}
                 <h1>{% translate "Top critical organizations" %}</h1>
             {% else %}
                 <h1>{% translate "Critical findings" %}</h1>
@@ -85,9 +86,14 @@
                     <tbody>
                         {% for findings in findings_per_org_critical %}
                             <tr>
-                                <td>
-                                    <a href="{% url "organization_crisis_room" findings.organization.code %}">{{ findings.organization.name }}</a>
-                                </td>
+                                {% has_organization_perm "view_organization" request.user findings.organization as can_view_organization %}
+                                {% if can_view_organization %}
+                                    <td>
+                                        <a href="{% url "organization_crisis_room" findings.organization.code %}">{{ findings.organization.name }}</a>
+                                    </td>
+                                {% else %}
+                                    <td>{{ findings.organization.name }}</td>
+                                {% endif %}
                                 <td class="number">{{ findings|get_item:"meta"|get_item:"total_by_severity"|get_item:"critical" }}</td>
                                 <td>
                                     <button class="expando-button"

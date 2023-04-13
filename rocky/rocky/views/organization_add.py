@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib import messages
-from account.mixins import RockyPermissionRequiredMixin
+from account.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.urls import reverse_lazy
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
-class OrganizationAddView(RockyPermissionRequiredMixin, CreateView):
+class OrganizationAddView(PermissionRequiredMixin, CreateView):
     """
     View to create a new organization
     """

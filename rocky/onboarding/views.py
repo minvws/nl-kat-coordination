@@ -28,7 +28,7 @@ from onboarding.forms import (
     OnboardingSetClearanceLevelForm,
 )
 
-from account.mixins import RockyPermissionRequiredMixin
+from account.mixins import PermissionRequiredMixin, RockyPermissionRequiredMixin
 from onboarding.view_helpers import (
     KatIntroductionStepsMixin,
     KatIntroductionAdminStepsMixin,
@@ -433,7 +433,7 @@ class OnboardingIntroductionRegistrationView(
 
 @class_view_decorator(otp_required)
 class OnboardingOrganizationSetupView(
-    RockyPermissionRequiredMixin,
+    PermissionRequiredMixin,
     KatIntroductionRegistrationStepsMixin,
     CreateView,
 ):
