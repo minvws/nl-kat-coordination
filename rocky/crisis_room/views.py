@@ -1,20 +1,27 @@
+import logging
+
 from datetime import timezone, datetime
 from typing import List, Union
 
+from django.contrib import messages
 from django.conf import settings
 from django.urls.base import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
-from octopoes.connector import RemoteException
+from account.models import KATUser
+from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.findings import Finding
 from rocky.views.ooi_report import build_findings_list_from_store
 from rocky.views.ooi_view import ConnectorFormMixin
 from tools.forms.base import ObservedAtForm
-from tools.models import Organization, OrganizationMember
+from tools.models import Organization
 from tools.view_helpers import BreadcrumbsMixin, convert_date_to_datetime
+
+logger = logging.getLogger(__name__)
 
 
 class CrisisRoomBreadcrumbsMixin(BreadcrumbsMixin):
@@ -40,16 +47,16 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
         finding_list.sort(key=lambda x: x["meta"]["total_by_severity"]["critical"], reverse=is_desc)
         return finding_list
 
-    def get_user_organizations(self) -> List:
-        members = OrganizationMember.objects.filter(user=self.request.user)
-        return [member.organization for member in members if member.status != OrganizationMember.STATUSES.BLOCKED]
-
     def get_list_for_org(self, organization: Organization) -> Union[List, None]:
         try:
             api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
 
             return api_connector.list(self.ooi_types, valid_time=self.get_observed_at()).items
-        except RemoteException:
+        except ConnectorException:
+            messages.add_message(
+                self.request, messages.ERROR, _("Failed to get list of findings, check server logs for more details.")
+            )
+            logger.exception("Failed to get list of findings for organization %s", organization.code)
             return []
 
     def get_observed_at(self) -> datetime:
@@ -64,12 +71,11 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.is_superuser:
-            organizations = Organization.objects.all()
-        else:
-            organizations = self.get_user_organizations()
+
+        user: KATUser = self.request.user
+
         findings_per_org = []
-        for org in organizations:
+        for org in user.organizations:
             findings = self.get_list_for_org(org)
             findings_store = {finding.primary_key: finding for finding in findings}
 
@@ -80,7 +86,8 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
         context["breadcrumb_list"] = [
             {"url": reverse("crisis_room"), "text": "CRISIS ROOM"},
         ]
-        context["organizations"] = self.get_user_organizations()
+
+        context["organizations"] = user.organizations
         context["findings_per_org_total"] = self.sort_finding_list_by_total(findings_per_org)
         context["findings_per_org_critical"] = self.sort_finding_list_by_critical(findings_per_org)
         context["observed_at_form"] = self.get_connector_form()

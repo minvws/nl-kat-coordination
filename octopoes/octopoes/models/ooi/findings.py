@@ -66,3 +66,17 @@ class Finding(OOI):
         finding_type = parts.pop()
         ooi_reference = Reference.from_str("|".join(parts))
         return f"{finding_type} @ {ooi_reference.human_readable}"
+
+
+class MutedFinding(OOI):
+    object_type: Literal["MutedFinding"] = "MutedFinding"
+
+    finding: Reference = ReferenceField(Finding)
+    reason: Optional[str]
+
+    _natural_key_attrs = ["finding"]
+    _reverse_relation_names = {"finding": "mutes"}
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"Muted {reference.natural_key}"

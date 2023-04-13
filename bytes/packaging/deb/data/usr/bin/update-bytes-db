@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -a
+set -ae
 source /etc/kat/bytes.conf
 cd /opt/venvs/kat-bytes/lib/python*/site-packages
 /opt/venvs/kat-bytes/bin/python -m alembic --config bytes/alembic.ini upgrade head
-set +a
