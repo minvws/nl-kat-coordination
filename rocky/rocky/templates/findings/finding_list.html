@@ -28,6 +28,7 @@
                         <caption>{% translate "Showing " %}{{ ooi_list|length }} {% translate "of" %} {{ total_oois }} {% translate "objects" %}</caption>
                         <thead>
                             <tr>
+                                <th>Nr</th>
                                 <th>{% translate "Severity" %}</th>
                                 <th>{% translate "Finding" %}</th>
                                 <th>{% translate "Tree" %}</th>
@@ -38,6 +39,7 @@
                         <tbody>
                             {% for ooi in ooi_list %}
                                 <tr>
+                                    <td>{{ ooi.finding_number }}</td>
                                     <td>
                                         <span class="{{ ooi.severity|lower }}">{{ ooi.severity }}</span>
                                     </td>
@@ -103,6 +105,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}
