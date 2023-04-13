@@ -5,10 +5,10 @@
     "version": null
   },
   "organization": "_dev",
-  "input_ooi": "Hostname|internet|rijksoverheid.nl.",
+  "input_ooi": "Hostname|internet|rijksoverheid.nl",
   "arguments": {
-    "hostname": "rijksoverheid.nl.",
-    "pk": "Hostname|internet|rijksoverheid.nl.",
+    "hostname": "rijksoverheid.nl",
+    "pk": "Hostname|internet|rijksoverheid.nl",
     "dns_records": "[{\"hostname\": \"ns0.rijksoverheidnl.com.\", \"ip\": \"2a06:fb00:1::1:82\"}, {\"hostname\": \"ns1.rijksoverheidnl.nl.\", \"ip\": \"2a00:d00:3:6::130\"}]"
   },
   "dispatches": [
