@@ -386,7 +386,7 @@ class DnsReportView(OnboardingBreadcrumbsMixin, BaseReportView):
 
     def get_dns_zone_for_url(self):
         """
-        Path to DNSZone: url > hostnamehttpurl > netloc > fqdn > dns_zone
+        Path to DNSZone: url > hostnamehttpurl > netloc > dns_zone
         """
         if self.ooi.ooi_type != "URL":
             return self.ooi
@@ -394,8 +394,7 @@ class DnsReportView(OnboardingBreadcrumbsMixin, BaseReportView):
         try:
             web_url = self.tree.store[str(self.ooi.web_url)]
             netloc = self.tree.store[str(web_url.netloc)]
-            fqdn = self.tree.store[str(netloc.fqdn)]
-            dns_zone = super().get_ooi(pk=str(fqdn.dns_zone))
+            dns_zone = super().get_ooi(pk=str(netloc.dns_zone))
             return dns_zone
         except KeyError:
             messages.add_message(self.request, messages.ERROR, _("No DNS zone found."))

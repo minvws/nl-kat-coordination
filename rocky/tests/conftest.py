@@ -302,7 +302,7 @@ def lazy_task_list_with_boefje() -> MagicMock:
                                 "NXDOMAIN",
                             ],
                         },
-                        "input_ooi": "Hostname|internet|mispo.es.",
+                        "input_ooi": "Hostname|internet|mispo.es",
                         "organization": "_dev",
                     },
                 },
