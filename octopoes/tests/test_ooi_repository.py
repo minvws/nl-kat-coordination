@@ -51,17 +51,17 @@ class OOIRepositoryTest(TestCase):
     def test_extract_node(self):
         internet = Network(name="internet")
         raw_node = {
-            "crux.db/id": "DNSZone|internet|test.nl.",
+            "crux.db/id": "DNSZone|internet|test.nl",
             "object_type": "DNSZone",
             "DNSZone/object_type": "DNSZone",
-            "DNSZone/hostname": "Hostname|internet|test.nl.",
+            "DNSZone/hostname": "Hostname|internet|test.nl",
             "DNSZone/name_servers": [],
         }
 
         serial = cast(DNSZone, self.repository.deserialize(raw_node))
         self.assertEqual("DNSZone", serial.object_type)
         self.assertEqual(internet.name, serial.hostname.tokenized.network.name)
-        self.assertEqual("test.nl.", serial.hostname.tokenized.name)
+        self.assertEqual("test.nl", serial.hostname.tokenized.name)
 
     @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
     def test_construct_neighbour_query(self):

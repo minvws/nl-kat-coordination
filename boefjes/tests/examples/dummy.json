@@ -5,7 +5,7 @@
     "version": null
   },
   "organization": "_dev",
-  "input_ooi": "Hostname|internet|rijksoverheid.nl.",
+  "input_ooi": "Hostname|internet|rijksoverheid.nl",
   "arguments": {
     "domain": "domain.com"
   },
