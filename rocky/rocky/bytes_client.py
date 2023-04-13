@@ -63,7 +63,7 @@ class BytesClient:
                 raw_data=RawData(
                     id=raw_id,
                     boefje_meta=boefje_meta,
-                    mime_types=[{"value": mime_type} for mime_type in all_mime_types]
+                    mime_types=[{"value": mime_type} for mime_type in all_mime_types],
                 ),
                 normalizer=Normalizer(id="normalizer/manual"),
                 started_at=datetime.now(timezone.utc),
@@ -92,9 +92,7 @@ class BytesClient:
         response.raise_for_status()
 
     def _save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self.session.post(
-            f"{self.base_url}/bytes/normalizer_meta", data=normalizer_meta.json()
-        )
+        response = self.session.post(f"{self.base_url}/bytes/normalizer_meta", data=normalizer_meta.json())
 
         response.raise_for_status()
 
