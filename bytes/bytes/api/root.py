@@ -13,7 +13,7 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from bytes.api.metrics import get_registry
-from bytes.auth import TokenResponse, get_access_token
+from bytes.auth import TokenResponse, get_access_token, authenticate_token
 from bytes.version import __version__
 
 router = APIRouter()
@@ -49,7 +49,7 @@ def root() -> ServiceHealth:
     return bytes_health
 
 
-@router.get("/metrics")
+@router.get("/metrics", dependencies=[Depends(authenticate_token)])
 def metrics(collector_registry: CollectorRegistry = Depends(get_registry)):
     data = prometheus_client.generate_latest(collector_registry)
 

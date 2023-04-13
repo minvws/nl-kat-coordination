@@ -1,6 +1,8 @@
 import uuid
 
 import pytest
+from prometheus_client.parser import text_string_to_metric_families
+
 import requests
 from requests import HTTPError
 
@@ -15,6 +17,51 @@ def test_login(bytes_api_client: BytesAPIClient) -> None:
     bytes_api_client.login()
     assert "Authorization" in bytes_api_client.headers
     assert "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" in bytes_api_client.headers["Authorization"]
+
+
+def test_metrics(bytes_api_client: BytesAPIClient) -> None:
+    metrics = bytes_api_client.get_metrics()
+
+    metrics = list(text_string_to_metric_families(metrics.decode()))
+    assert len(metrics) == 4
+
+    assert metrics[0].name == "bytes_data_organizations_total"
+    assert metrics[0].samples[0].value == 0.0
+
+    assert metrics[1].name == "bytes_data_raw_files_total"
+    assert len(metrics[1].samples) == 0
+
+    assert metrics[2].name == "bytes_filesystem_avail_bytes"
+    assert metrics[2].samples[0].labels == {"mountpoint": "/"}
+
+    assert metrics[3].name == "bytes_filesystem_size_bytes"
+    assert metrics[3].samples[0].labels == {"mountpoint": "/"}
+
+    boefje_meta = get_boefje_meta()
+    bytes_api_client.save_boefje_meta(boefje_meta)
+    bytes_api_client.save_raw(boefje_meta.id, b"test 123")
+    bytes_api_client.save_raw(boefje_meta.id, b"test 12334", ["text/boefje"])
+
+    metrics = bytes_api_client.get_metrics()
+    metrics = list(text_string_to_metric_families(metrics.decode()))
+
+    assert metrics[0].samples[0].value == 1.0
+    assert metrics[1].samples[0].value == 2.0
+    assert len(metrics[1].samples) == 1
+
+    boefje_meta = get_boefje_meta()
+    boefje_meta.id = str(uuid.uuid4())
+    boefje_meta.organization = "test2"
+    bytes_api_client.save_boefje_meta(boefje_meta)
+    bytes_api_client.save_raw(boefje_meta.id, b"test 123")
+
+    metrics = bytes_api_client.get_metrics()
+    metrics = list(text_string_to_metric_families(metrics.decode()))
+
+    assert metrics[0].samples[0].value == 2.0
+    assert metrics[1].samples[0].value == 2.0
+    assert metrics[1].samples[1].value == 1.0
+    assert len(metrics[1].samples) == 2
 
 
 def test_boefje_meta(bytes_api_client: BytesAPIClient) -> None:
