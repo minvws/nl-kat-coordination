@@ -102,7 +102,7 @@ def network(ooi_repository, scan_profile_repository, valid_time):
 @pytest.fixture
 def dns_zone(network, ooi_repository, hostname, scan_profile_repository, valid_time):
     ooi = add_ooi(
-        DNSZone(name="example.com.", hostname=hostname.reference, network=network.reference),
+        DNSZone(name="example.com", hostname=hostname.reference, network=network.reference),
         ooi_repository,
         scan_profile_repository,
         valid_time,
@@ -114,7 +114,7 @@ def dns_zone(network, ooi_repository, hostname, scan_profile_repository, valid_t
 @pytest.fixture
 def hostname(network, ooi_repository, scan_profile_repository, valid_time):
     return add_ooi(
-        Hostname(name="example.com.", network=network.reference),
+        Hostname(name="example.com", network=network.reference),
         ooi_repository,
         scan_profile_repository,
         valid_time,
