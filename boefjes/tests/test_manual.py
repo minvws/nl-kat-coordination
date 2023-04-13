@@ -67,7 +67,6 @@ darknet,https://openkat.nl/""",
         self.assertEqual(
             {
                 "dns_zone": None,
-                "fqdn": Reference("Hostname|internet|example.com."),
                 "name": "example.com",
                 "network": Reference("Network|internet"),
                 "object_type": "Hostname",
@@ -83,7 +82,6 @@ darknet,https://openkat.nl/""",
         self.assertEqual(
             {
                 "dns_zone": None,
-                "fqdn": Reference("Hostname|internet|example.net."),
                 "name": "example.net",
                 "network": Reference("Network|internet"),
                 "object_type": "Hostname",
