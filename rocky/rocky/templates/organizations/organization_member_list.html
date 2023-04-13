@@ -60,7 +60,8 @@
                                             {% if member.user.is_superuser %}
                                                 <span class="active"></span><span>&nbsp;{% translate "Active" %}</span>
                                             {% else %}
-                                                <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span><span>&nbsp;{% if member.blocked %}{% translate "Blocked" %}{% else %}{{ member.status|title }}{% endif %} </span>
+                                                <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span>
+                                                <span>&nbsp;{% if member.blocked %}{% translate "Blocked" %}{% else %}{{ member.status|title }}{% endif %}</span>
                                             {% endif %}
                                             <br>
                                         </td>
