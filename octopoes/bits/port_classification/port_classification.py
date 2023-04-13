@@ -35,9 +35,8 @@ def run(
         finding_id = "KAT-UNCOMMON-OPEN-PORT"
         port_type = "not a common"
 
-    for finding in yield_port(
+    yield from yield_port(
         ooi_reference=input_ooi.reference,
         finding_id=finding_id,
         finding_description=f"Port {port} is usually {port_type} port and found to be open.",
-    ):
-        yield finding
+    )
