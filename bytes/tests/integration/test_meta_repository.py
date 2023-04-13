@@ -237,9 +237,13 @@ def test_save_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:
         meta_repository.save_normalizer_meta(normalizer_meta)
 
     normalizer_meta_from_db = meta_repository.get_normalizer_meta_by_id(normalizer_meta.id)
-    boefje_meta_from_db = meta_repository.get_boefje_meta_by_id(normalizer_meta.boefje_meta.id)
+    boefje_meta_from_db = meta_repository.get_boefje_meta_by_id(normalizer_meta.raw_data.boefje_meta.id)
 
-    assert boefje_meta_from_db == normalizer_meta.boefje_meta
+    assert boefje_meta_from_db == normalizer_meta.raw_data.boefje_meta
+
+    normalizer_meta.raw_data.secure_hash = normalizer_meta_from_db.raw_data.secure_hash
+    normalizer_meta.raw_data.hash_retrieval_link = normalizer_meta_from_db.raw_data.hash_retrieval_link
+
     assert normalizer_meta == normalizer_meta_from_db
 
 
@@ -275,7 +279,11 @@ def test_normalizer_meta_pointing_to_raw_id(meta_repository: SQLMetaDataReposito
         meta_repository.save_normalizer_meta(normalizer_meta)
 
     normalizer_meta_from_db = meta_repository.get_normalizer_meta_by_id(normalizer_meta.id)
-    boefje_meta_from_db = meta_repository.get_boefje_meta_by_id(normalizer_meta.boefje_meta.id)
+    boefje_meta_from_db = meta_repository.get_boefje_meta_by_id(normalizer_meta.raw_data.boefje_meta.id)
 
-    assert boefje_meta_from_db == normalizer_meta.boefje_meta
+    assert boefje_meta_from_db == normalizer_meta.raw_data.boefje_meta
+
+    normalizer_meta.raw_data.secure_hash = normalizer_meta_from_db.raw_data.secure_hash
+    normalizer_meta.raw_data.hash_retrieval_link = normalizer_meta_from_db.raw_data.hash_retrieval_link
+
     assert normalizer_meta == normalizer_meta_from_db

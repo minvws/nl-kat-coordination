@@ -115,7 +115,7 @@ class BytesAPIClient:
         return [NormalizerMeta.parse_obj(normalizer_meta) for normalizer_meta in normalizer_meta_json]
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Optional[List[str]] = None) -> Optional[str]:
+    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Optional[List[str]] = None) -> str:
         if not mime_types:
             mime_types = []
 
@@ -127,9 +127,9 @@ class BytesAPIClient:
         )
 
         self._verify_response(response)
-        raw_id = response.json().get("id")
+        raw_id = response.json()["id"]
 
-        return str(raw_id) if raw_id else None
+        return str(raw_id)
 
     @retry_with_login
     def get_raw(self, raw_id: str) -> bytes:

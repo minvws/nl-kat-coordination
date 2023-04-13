@@ -19,7 +19,7 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
     ended_at = Column(DateTime(timezone=True))
 
 
-Index("boefje_meta_organization_boefje_id", BoefjeMetaInDB.organization, BoefjeMetaInDB.boefje_id)
+Index("ix_boefje_meta_organization_boefje_id", BoefjeMetaInDB.organization, BoefjeMetaInDB.boefje_id)
 
 
 class RawFileInDB(SQL_BASE):  # type: ignore
@@ -44,10 +44,6 @@ class NormalizerMetaInDB(SQL_BASE):  # type: ignore
     started_at = Column(DateTime(timezone=True))
     ended_at = Column(DateTime(timezone=True))
 
-    # To be phased out for backward compatibility with the boefjes: normalizers should run on raw files
-    boefje_meta_id = Column(UUID, ForeignKey("boefje_meta.id", ondelete="CASCADE"), nullable=False)
-    boefje_meta = relationship("BoefjeMetaInDB")
-
     # Nullable because of backward compatibility
-    raw_file_id = Column(UUID, ForeignKey("raw_file.id", ondelete="CASCADE"), nullable=True, index=True)
+    raw_file_id = Column(UUID, ForeignKey("raw_file.id", ondelete="CASCADE"), nullable=False, index=True)
     raw_file = relationship("RawFileInDB")

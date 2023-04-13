@@ -1,4 +1,3 @@
-import json
 import logging
 import typing
 from functools import wraps
@@ -99,23 +98,9 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        dehydrated_normalizer_meta = json.loads(normalizer_meta.json(exclude={"raw_data"}))
-        dehydrated_normalizer_meta["raw_file_id"] = normalizer_meta.raw_data.id
-        dehydrated_normalizer_meta["boefje_meta"] = json.loads(normalizer_meta.raw_data.boefje_meta.json())
-
-        response = self._session.post(
-            "/bytes/normalizer_meta", data=json.dumps(dehydrated_normalizer_meta), headers=self.headers
-        )
+        response = self._session.post("/bytes/normalizer_meta", data=normalizer_meta.json(), headers=self.headers)
 
         self._verify_response(response)
-
-    @retry_with_login
-    def get_normalizer_meta(self, normalizer_meta_id: str) -> NormalizerMeta:
-        response = self._session.get(f"/bytes/normalizer_meta/{normalizer_meta_id}", headers=self.headers)
-        self._verify_response(response)
-
-        normalizer_meta_json = response.json()
-        return NormalizerMeta.parse_obj(normalizer_meta_json)
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Set[str] = None) -> None:

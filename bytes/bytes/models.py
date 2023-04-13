@@ -90,6 +90,5 @@ class RawData(BaseModel):
 
 
 class NormalizerMeta(Job):
-    raw_file_id: Optional[str]
-    boefje_meta: BoefjeMeta  # To be phased out?
+    raw_data: RawDataMeta
     normalizer: Normalizer

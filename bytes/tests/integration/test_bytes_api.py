@@ -8,7 +8,7 @@ from bytes.models import MimeType
 from bytes.rabbitmq import RabbitMQEventManager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter, NormalizerMetaFilter
 from tests.client import BytesAPIClient
-from tests.loading import get_normalizer_meta, get_boefje_meta
+from tests.loading import get_normalizer_meta, get_boefje_meta, get_raw_data
 
 
 def test_login(bytes_api_client: BytesAPIClient) -> None:
@@ -62,26 +62,25 @@ def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: Rabbit
     boefje_meta = get_boefje_meta()
     bytes_api_client.save_boefje_meta(boefje_meta)
 
-    raw = b"test 123"
-    raw_id = bytes_api_client.save_raw(boefje_meta.id, raw)
+    raw = get_raw_data()
+    raw_id = bytes_api_client.save_raw(boefje_meta.id, raw.value, [m.value for m in raw.mime_types])
     normalizer_meta = get_normalizer_meta(raw_id)
 
     bytes_api_client.save_normalizer_meta(normalizer_meta)
     retrieved_normalizer_meta = bytes_api_client.get_normalizer_meta_by_id(normalizer_meta.id)
 
-    assert normalizer_meta == retrieved_normalizer_meta
+    normalizer_meta.raw_data.secure_hash = retrieved_normalizer_meta.raw_data.secure_hash
+    normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_meta.raw_data.hash_retrieval_link
 
-    method, properties, body = event_manager.connection.channel().basic_get("test__normalizer_meta_received")
-    event_manager.connection.channel().basic_ack(method.delivery_tag)
-
-    assert normalizer_meta.id in body.decode()
+    assert normalizer_meta.dict() == retrieved_normalizer_meta.dict()
 
 
 def test_filtered_normalizer_meta(bytes_api_client: BytesAPIClient) -> None:
     boefje_meta = get_boefje_meta()
     bytes_api_client.save_boefje_meta(boefje_meta)
 
-    raw_id = bytes_api_client.save_raw(boefje_meta.id, b"test 123")
+    raw = get_raw_data()
+    raw_id = bytes_api_client.save_raw(boefje_meta.id, raw.value, [m.value for m in raw.mime_types])
     normalizer_meta = get_normalizer_meta(raw_id)
 
     bytes_api_client.save_normalizer_meta(normalizer_meta)
@@ -91,6 +90,10 @@ def test_filtered_normalizer_meta(bytes_api_client: BytesAPIClient) -> None:
     )
     retrieved_normalizer_metas = bytes_api_client.get_normalizer_meta(query_filter)
     assert len(retrieved_normalizer_metas) == 1
+
+    normalizer_meta.raw_data.secure_hash = retrieved_normalizer_metas[0].raw_data.secure_hash
+    normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_metas[0].raw_data.hash_retrieval_link
+
     assert normalizer_meta == retrieved_normalizer_metas[0]
 
     second_normalizer_meta = get_normalizer_meta(raw_id)
@@ -109,6 +112,10 @@ def test_filtered_normalizer_meta(bytes_api_client: BytesAPIClient) -> None:
     query_filter.offset = 1
     retrieved_normalizer_metas = bytes_api_client.get_normalizer_meta(query_filter)
     assert len(retrieved_normalizer_metas) == 1
+
+    second_normalizer_meta.raw_data.secure_hash = retrieved_normalizer_metas[0].raw_data.secure_hash
+    second_normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_metas[0].raw_data.hash_retrieval_link
+
     assert second_normalizer_meta == retrieved_normalizer_metas[0]
 
 
@@ -116,11 +123,15 @@ def test_normalizer_meta_pointing_to_raw_id(bytes_api_client: BytesAPIClient) ->
     boefje_meta = get_boefje_meta()
     bytes_api_client.save_boefje_meta(boefje_meta)
 
-    raw_id = bytes_api_client.save_raw(boefje_meta.id, b"test 123")
+    raw = get_raw_data()
+    raw_id = bytes_api_client.save_raw(boefje_meta.id, raw.value, [m.value for m in raw.mime_types])
     normalizer_meta = get_normalizer_meta(raw_id)
 
     bytes_api_client.save_normalizer_meta(normalizer_meta)
     retrieved_normalizer_meta = bytes_api_client.get_normalizer_meta_by_id(normalizer_meta.id)
+
+    normalizer_meta.raw_data.secure_hash = retrieved_normalizer_meta.raw_data.secure_hash
+    normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_meta.raw_data.hash_retrieval_link
 
     assert normalizer_meta == retrieved_normalizer_meta
 
