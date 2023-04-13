@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import string
-from typing import Optional, Literal, Any
+from typing import Optional, Literal
 
-import dns
-import dns.name
 from pydantic import constr, validator
 
 from octopoes.models import OOI, Reference
@@ -37,9 +35,6 @@ class Hostname(OOI):
     network: Reference = ReferenceField(Network)
     name: constr(to_lower=True)
 
-    fqdn: Optional[Reference] = ReferenceField(
-        "Hostname", max_issue_scan_level=4, max_inherit_scan_level=4, default=None
-    )
     dns_zone: Optional[Reference] = ReferenceField(
         DNSZone, max_issue_scan_level=1, max_inherit_scan_level=2, default=None
     )
@@ -49,7 +44,6 @@ class Hostname(OOI):
     _reverse_relation_names = {
         "network": "hostnames",
         "dns_zone": "hostnames",
-        "fqdn": "fqdn_of",
     }
 
     @validator("name")
@@ -66,14 +60,6 @@ class Hostname(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.name
-
-    def __init__(self, **data: Any):
-        super().__init__(**data)
-        fqdn = str(dns.name.from_text(self.name))
-        if fqdn == self.name:
-            self.fqdn = self.reference
-        else:
-            self.fqdn = Hostname(network=self.network, name=fqdn).reference
 
 
 class ResolvedHostname(OOI):

@@ -22,7 +22,7 @@ def run(
             # Also the non-fqdn variant
             yield ResolvedHostname(
                 hostname=Hostname(
-                    name=cname_record.hostname.tokenized.name.rstrip("."),
+                    name=cname_record.hostname.tokenized.name,
                     network=Network(name=cname_record.hostname.tokenized.network.name).reference,
                 ).reference,
                 address=resolved_hostname.address,
