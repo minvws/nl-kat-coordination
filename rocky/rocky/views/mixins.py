@@ -120,10 +120,7 @@ class OctopoesView(OrganizationView):
             return default_depth
 
     def get_scan_profile_inheritance(self, ooi: OOI) -> List[InheritanceSection]:
-        explanations = self.octopoes_api_connector.get_scan_profile_inheritance(ooi.reference)
-        if len(explanations) == 1:
-            return []
-        return explanations
+        return self.octopoes_api_connector.get_scan_profile_inheritance(ooi.reference)
 
 
 class OOIList:
