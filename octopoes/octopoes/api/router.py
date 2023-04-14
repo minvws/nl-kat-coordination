@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime, timezone
+from http import HTTPStatus
 from logging import getLogger
 from typing import List, Optional, Set, Type
-from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, status
 from requests import RequestException, HTTPError
@@ -23,6 +23,7 @@ from octopoes.models import (
 )
 from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.explanation import InheritanceSection
 from octopoes.models.origin import Origin, OriginType, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
@@ -256,6 +257,21 @@ def recalculate_scan_profiles(
 ) -> None:
     octopoes.recalculate_scan_profiles(valid_time)
     xtdb_session_.commit()
+
+
+@router.get("/scan_profiles/inheritance")
+def get_scan_profile_inheritance(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    reference: Reference = Depends(extract_reference),
+) -> List[InheritanceSection]:
+    ooi = octopoes.get_ooi(reference, valid_time)
+    start = InheritanceSection(
+        reference=ooi.reference, level=ooi.scan_profile.level, scan_profile_type=ooi.scan_profile.scan_profile_type
+    )
+    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED:
+        return [start]
+    return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
 
 
 @router.post("/node")
