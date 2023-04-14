@@ -14,6 +14,7 @@ follow_imports = "skip"
 disallow_untyped_decorators = false # Needed for FastAPI decorators
 
 [tool.setuptools_scm]
+write_to = "_version.py"
 
 [tool.vulture]
 min_confidence = 90
