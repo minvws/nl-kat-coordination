@@ -26,6 +26,7 @@ from tools.view_helpers import (
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
+from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
@@ -39,6 +40,7 @@ class OriginData(BaseModel):
     origin: Origin
     normalizer: Optional[dict]
     boefje: Optional[Plugin]
+    params: Optional[Dict[str, str]]
 
 
 class OOIAttributeError(AttributeError):
@@ -82,7 +84,7 @@ class OctopoesView(OrganizationView):
                     normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
                     boefje_id = normalizer_data["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
-                    origin.boefje = get_katalogus(organization.code).get_boefje(boefje_id)
+                    origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
                 except requests.exceptions.RequestException as e:
                     logger.error(e)
 
@@ -117,6 +119,9 @@ class OctopoesView(OrganizationView):
             return min(depth, DEPTH_MAX)
         except ValueError:
             return default_depth
+
+    def get_scan_profile_inheritance(self, ooi: OOI) -> List[InheritanceSection]:
+        return self.octopoes_api_connector.get_scan_profile_inheritance(ooi.reference)
 
 
 class OOIList:

@@ -18,7 +18,8 @@ from octopoes.models import (
     ScanProfileType,
 )
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.origin import Origin
+from octopoes.models.explanation import InheritanceSection
+from octopoes.models.origin import Origin, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
@@ -144,8 +145,20 @@ class OctopoesAPIConnector:
         params = {"reference": str(reference), "valid_time": valid_time}
         self.session.delete(f"/{self.client}/", params=params)
 
+    def list_origin_parameters(self, origin_id: Set[str], valid_time: Optional[datetime] = None) -> List[str]:
+        params = {"origin_id": origin_id, "valid_time": valid_time}
+        res = self.session.get(f"/{self.client}/origin_parameters", params=params)
+        return parse_obj_as(List[OriginParameter], res.json())
+
     def create_node(self):
         self.session.post(f"/{self.client}/node")
 
     def delete_node(self):
         self.session.delete(f"/{self.client}/node")
+
+    def get_scan_profile_inheritance(
+        self, reference: Reference, valid_time: Optional[datetime] = None
+    ) -> List[InheritanceSection]:
+        params = {"reference": str(reference), "valid_time": valid_time}
+        res = self.session.get(f"/{self.client}/scan_profiles/inheritance", params=params)
+        return parse_obj_as(List[InheritanceSection], res.json())

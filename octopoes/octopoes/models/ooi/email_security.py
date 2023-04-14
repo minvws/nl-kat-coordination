@@ -59,7 +59,7 @@ class DNSSPFMechanismIP(DNSSPFMechanism):
 class DNSSPFMechanismHostname(DNSSPFMechanism):
     object_type: Literal["DNSSPFMechanismHostname"] = "DNSSPFMechanismHostname"
 
-    hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=1)
+    hostname: Reference = ReferenceField(Hostname)
 
     _natural_key_attrs = ["spf_record", "mechanism", "hostname"]
     _information_value = ["mechanism"]

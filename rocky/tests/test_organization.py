@@ -85,7 +85,7 @@ def test_add_organization_submit_success(rf, superuser_member, mocker, mock_mode
 
 def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
-    mock_requests.get.side_effect = RequestException
+    mock_requests.Session().get.side_effect = RequestException
 
     request = setup_request(
         rf.post(
@@ -109,8 +109,8 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
     mock_organization_exists_response = mocker.MagicMock()
     mock_organization_exists_response.status_code = 404
 
-    mock_requests.get.side_effect = [mock_health_response, mock_organization_exists_response]
-    mock_requests.post.side_effect = RequestException
+    mock_requests.Session().get.side_effect = [mock_health_response, mock_organization_exists_response]
+    mock_requests.Session().post.side_effect = RequestException
 
     request = setup_request(
         rf.post(
@@ -129,7 +129,7 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
 def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
-    mock_requests.get.return_value = mock_response
+    mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = {"service": "test", "healthy": False}
 
     request = setup_request(

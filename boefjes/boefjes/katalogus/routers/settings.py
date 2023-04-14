@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=Dict[str, str])
+@router.get("", response_model=Dict)
 def list_settings(
     organisation_id: str,
     plugin_id: str,
@@ -22,7 +22,7 @@ def list_settings(
         return p.get_all_settings(organisation_id, plugin_id)
 
 
-@router.get("/{key}", response_model=str)
+@router.get("/{key}")
 def get_setting(
     key: str,
     organisation_id: str,

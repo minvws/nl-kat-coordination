@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - bytes/**
+      - .github/workflows/bytes_container_image.yml
   pull_request:
     paths:
       - bytes/**
+      - .github/workflows/bytes_container_image.yml
 
 jobs:
   create_container_image:
@@ -36,6 +38,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate version.py
+        run: |
+          pip install setuptools-scm==7.1.0
+          python -m setuptools_scm
+          cp _version.py bytes/bytes/version.py
 
       - name: Build container image
         uses: docker/build-push-action@v3
