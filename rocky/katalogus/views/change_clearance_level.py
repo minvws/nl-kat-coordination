@@ -7,11 +7,11 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.views.mixins import BoefjeMixin
-from katalogus.views.mixins import KATalogusMixin
+from katalogus.views.mixins import SinglePluginView
 
 
 @class_view_decorator(otp_required)
-class ChangeClearanceLevel(BoefjeMixin, KATalogusMixin, TemplateView):
+class ChangeClearanceLevel(BoefjeMixin, SinglePluginView, TemplateView):
     template_name = "change_clearance_level.html"
 
     def setup(self, request, *args, **kwargs):
@@ -40,8 +40,7 @@ class ChangeClearanceLevel(BoefjeMixin, KATalogusMixin, TemplateView):
         if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
 
-        boefje = self.katalogus_client.get_boefje(self.plugin_id)
-        self.run_boefje_for_oois(boefje=boefje, oois=self.oois)
+        self.run_boefje_for_oois(boefje=self.plugin, oois=self.oois)
         messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
         del request.session["selected_oois"]  # delete session
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
@@ -51,7 +50,7 @@ class ChangeClearanceLevel(BoefjeMixin, KATalogusMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugin"] = self.plugin
+        context["plugin"] = self.plugin.dict()
         context["oois"] = self.oois
         context["breadcrumbs"] = [
             {
@@ -63,20 +62,20 @@ class ChangeClearanceLevel(BoefjeMixin, KATalogusMixin, TemplateView):
                     "plugin_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
                     },
                 ),
-                "text": self.plugin["name"],
+                "text": self.plugin.name,
             },
             {
                 "url": reverse(
                     "change_clearance_level",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin["type"],
-                        "plugin_id": self.plugin_id,
-                        "scan_level": self.plugin["scan_level"],
+                        "plugin_type": self.plugin.type,
+                        "plugin_id": self.plugin.id,
+                        "scan_level": self.plugin.scan_level.value,
                     },
                 ),
                 "text": _("Change clearance level"),

@@ -61,7 +61,7 @@ urlpatterns = [
         name="plugin_settings_edit",
     ),
     path(
-        "plugins/<plugin_type>/<plugin_id>/settings/delete/<name>/",
+        "plugins/<plugin_type>/<plugin_id>/settings/delete/<setting_name>/",
         PluginSettingsDeleteView.as_view(),
         name="plugin_settings_delete",
     ),

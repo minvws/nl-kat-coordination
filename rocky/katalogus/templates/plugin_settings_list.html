@@ -23,7 +23,7 @@
                             <tr>
                                 <td>{{ setting.name }}</td>
                                 <td>
-                                    {% if not setting.value %}
+                                    {% if setting.value is None %}
                                         {% translate "Unset" %}
                                     {% else %}
                                         {{ setting.value }}
@@ -36,7 +36,7 @@
                                         {% translate "No" %}
                                     {% endif %}
                                 </td>
-                                {% if not setting.value %}
+                                {% if setting.value is None %}
                                     <td>
                                         <a href="{% url 'plugin_settings_add_single' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate "Add" %}</a>
                                     </td>
@@ -46,7 +46,7 @@
                                         <a href="{% url 'plugin_settings_edit' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate "Edit" %}</a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'plugin_settings_delete' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id name=setting.name %}">{% translate "Delete" %}</a>
+                                        <a href="{% url 'plugin_settings_delete' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate "Delete" %}</a>
                                     </td>
                                 {% endif %}
                             </tr>
