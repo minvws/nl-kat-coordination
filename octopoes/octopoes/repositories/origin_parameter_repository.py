@@ -1,7 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
 
 from requests import HTTPError
 
@@ -31,7 +31,7 @@ class OriginParameterRepository:
     def delete(self, origin_parameter: OriginParameter, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def list_by_origin(self, origin_id: str, valid_time: datetime) -> List[OriginParameter]:
+    def list_by_origin(self, origin_id: Set[str], valid_time: datetime) -> List[OriginParameter]:
         raise NotImplementedError
 
     def list_by_reference(self, reference: Reference, valid_time: datetime) -> List[OriginParameter]:
@@ -70,12 +70,12 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             else:
                 raise e
 
-    def list_by_origin(self, origin_id: str, valid_time: datetime) -> List[OriginParameter]:
+    def list_by_origin(self, origin_id: Set[str], valid_time: datetime) -> List[OriginParameter]:
         query = generate_pull_query(
             self.xtdb_type,
             FieldSet.ALL_FIELDS,
             {
-                "origin_id": str(origin_id),
+                "origin_id": origin_id,
                 "type": OriginParameter.__name__,
             },
         )
