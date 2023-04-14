@@ -7,6 +7,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, FormView, TemplateView
 from django_otp.decorators import otp_required
+from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
 from account.forms.organization import OrganizationListForm
@@ -80,7 +81,15 @@ class KATalogusSettingsListView(PermissionRequiredMixin, OrganizationView, FormV
         boefjes = katalogus_client.get_boefjes()
         for boefje in boefjes:
             plugin_settings = {}
-            plugin_setting = katalogus_client.get_plugin_settings(boefje.id)
+
+            try:
+                plugin_setting = katalogus_client.get_plugin_settings(boefje.id)
+            except RequestException:
+                messages.add_message(
+                    self.request, messages.ERROR, _("Failed getting settings for boefje {}").format(self.plugin.id)
+                )
+                continue
+
             if plugin_setting:
                 plugin_settings["plugin_id"] = boefje.id
                 plugin_settings["plugin_name"] = boefje.name
