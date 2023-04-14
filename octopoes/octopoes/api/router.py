@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import List, Optional, Set, Type, Union
+from typing import List, Optional, Set, Type
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, status
@@ -191,7 +191,6 @@ def list_origin_parameters(
     valid_time: datetime = Depends(extract_valid_time),
     origin_id: Set[str] = Query(default=set()),
 ) -> List[OriginParameter]:
-    # return octopoes.origin_parameter_repository.list(valid_time)
     return octopoes.origin_parameter_repository.list_by_origin(origin_id, valid_time)
 
 
