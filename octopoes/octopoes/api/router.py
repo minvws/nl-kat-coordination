@@ -60,12 +60,6 @@ def extract_reference(reference: str = Query("")) -> Reference:
     return Reference.from_str(reference)
 
 
-def extract_references(references: List[str] = None) -> List[Reference]:
-    if references:
-        return [Reference.from_str(r) for r in references]
-    return []
-
-
 def settings() -> Settings:
     return Settings()
 
