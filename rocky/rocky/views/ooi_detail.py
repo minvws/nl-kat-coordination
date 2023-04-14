@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
@@ -161,12 +162,9 @@ class OOIDetailView(
         inference_params = self.octopoes_api_connector.list_origin_parameters(
             {inference.origin.id for inference in inferences}
         )
-        inference_params_per_inference = {}
+        inference_params_per_inference = defaultdict(list)
         for inference_param in inference_params:
-            if inference_param.origin_id not in inference_params_per_inference:
-                inference_params_per_inference[inference_param.origin_id] = [inference_param]
-            else:
-                inference_params_per_inference[inference_param.origin_id].append(inference_param)
+            inference_params_per_inference[inference_param.origin_id].append(inference_param)
 
         for inference in inferences:
             inference.params = inference_params_per_inference.get(inference.origin.id, [])
