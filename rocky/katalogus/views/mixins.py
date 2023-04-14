@@ -2,7 +2,13 @@ from logging import getLogger
 from typing import List, Optional
 from uuid import uuid4
 
+from django.contrib import messages
+from django.http import Http404
+from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+from requests import RequestException, HTTPError
+from rest_framework.status import HTTP_404_NOT_FOUND
 
 from account.mixins import OrganizationView
 from katalogus.client import get_katalogus, Plugin
@@ -14,20 +20,64 @@ from rocky.views.mixins import OctopoesView
 logger = getLogger(__name__)
 
 
-class KATalogusMixin(OrganizationView):
+class SinglePluginView(OrganizationView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.katalogus_client = None
+        self.plugin_schema = None
+        self.plugin = None
+
     def setup(self, request, *args, **kwargs):
         """
         Prepare organization info and KAT-alogus API client.
         """
         super().setup(request, *args, **kwargs)
+        self.katalogus_client = get_katalogus(self.organization.code)
+        plugin_id = kwargs.get("plugin_id")
+
+        try:
+            self.plugin = self.katalogus_client.get_plugin(plugin_id)
+            self.plugin_schema = self.katalogus_client.get_plugin_schema(plugin_id)
+        except HTTPError as e:
+            if e.response.status_code == HTTP_404_NOT_FOUND:
+                raise Http404("Plugin {} not found.".format(plugin_id))
+
+            raise
+        except RequestException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _("Getting information for plugin {} failed. Please check the KATalogus logs.").format(plugin_id),
+            )
+
+    def dispatch(self, request, *args, **kwargs):
         if request.user.is_anonymous:
-            return reverse("login")
-        else:
-            self.katalogus_client = get_katalogus(self.organization.code)
-            if "plugin_id" in kwargs:
-                self.plugin_id = kwargs["plugin_id"]
-                self.plugin = self.katalogus_client.get_plugin_details(self.plugin_id)
-                self.plugin_schema = self.katalogus_client.get_plugin_schema(self.plugin_id)
+            return redirect(reverse("login"))
+
+        if not self.plugin:
+            return redirect(reverse("katalogus", kwargs={"organization_code": self.organization.code}))
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def is_required_field(self, field: str) -> bool:
+        return self.plugin_schema and field in self.plugin_schema.get("required", [])
+
+    def is_valid_setting(self, setting_name: str) -> bool:
+        return self.plugin_schema and setting_name in self.plugin_schema.get("properties", [])
+
+
+class SingleSettingView(SinglePluginView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setting_name = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        if not self.is_valid_setting(kwargs.get("setting_name")):
+            raise Http404("Setting {} is not valid for this plugin.".format(kwargs.get("setting_name")))
+
+        self.setting_name = kwargs.get("setting_name")
 
 
 class BoefjeMixin(OctopoesView):

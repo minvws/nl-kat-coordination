@@ -68,7 +68,7 @@ class OOIDetailView(
                 boefje_id = self.request.POST.get("boefje_id")
                 ooi_id = self.request.GET.get("ooi_id")
 
-                boefje = get_katalogus(self.organization.code).get_boefje(boefje_id)
+                boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
                 ooi = self.get_single_ooi(pk=ooi_id)
                 self.run_boefje_for_oois(boefje, [ooi])
                 return True

@@ -11,6 +11,8 @@ from django_otp.middleware import OTPMiddleware
 from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
+
+from katalogus.client import parse_plugin
 from rocky.scheduler import Task
 from unittest.mock import patch
 from tools.models import OOIInformation, Organization, OrganizationMember, Indemnification
@@ -337,17 +339,19 @@ def finding():
 
 @pytest.fixture
 def plugin_details():
-    return {
-        "id": "test-boefje",
-        "type": "boefje",
-        "name": "TestBoefje",
-        "description": "Meows to the moon",
-        "repository_id": "test-repository",
-        "scan_level": 1,
-        "consumes": ["Network"],
-        "produces": ["Network"],
-        "enabled": True,
-    }
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "description": "Meows to the moon",
+            "repository_id": "test-repository",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+        }
+    )
 
 
 @pytest.fixture
@@ -361,7 +365,13 @@ def plugin_schema():
                 "maxLength": 128,
                 "type": "string",
                 "description": "Test description",
-            }
+            },
+            "TEST_PROPERTY2": {
+                "title": "TEST_PROPERTY2",
+                "maxLength": 128,
+                "type": "integer",
+                "description": "Test description2",
+            },
         },
         "required": ["TEST_PROPERTY"],
     }
@@ -392,3 +402,8 @@ def mock_scheduler(mocker):
 
 def get_boefjes_data():
     return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())
+
+
+@pytest.fixture()
+def mock_mixins_katalogus(mocker):
+    return mocker.patch("katalogus.views.mixins.get_katalogus")
