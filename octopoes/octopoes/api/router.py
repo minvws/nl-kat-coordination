@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import List, Optional, Set, Type
+from typing import List, Optional, Set, Type, Union
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, status
@@ -23,7 +23,7 @@ from octopoes.models import (
 )
 from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.origin import Origin, OriginType
+from octopoes.models.origin import Origin, OriginType, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
@@ -58,6 +58,12 @@ def extract_types(types: List[str] = Query(["OOI"])) -> Set[Type[OOI]]:
 
 def extract_reference(reference: str = Query("")) -> Reference:
     return Reference.from_str(reference)
+
+
+def extract_references(references: List[str] = None) -> List[Reference]:
+    if references:
+        return [Reference.from_str(r) for r in references]
+    return []
 
 
 def settings() -> Settings:
@@ -177,6 +183,16 @@ def list_origins(
     reference: Reference = Depends(extract_reference),
 ) -> List[Origin]:
     return octopoes.origin_repository.list_by_result(reference, valid_time)
+
+
+@router.get("/origin_parameters")
+def list_origin_parameters(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    origin_id: Set[str] = Query(default=set()),
+) -> List[OriginParameter]:
+    # return octopoes.origin_parameter_repository.list(valid_time)
+    return octopoes.origin_parameter_repository.list_by_origin(origin_id, valid_time)
 
 
 @router.post("/observations")

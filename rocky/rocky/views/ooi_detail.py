@@ -157,6 +157,12 @@ class OOIDetailView(
         declarations, observations, inferences = self.get_origins(
             self.ooi.reference, self.get_observed_at(), self.organization
         )
+
+        inference_params = self.octopoes_api_connector.list_origin_parameters({inference.id for inference in inferences})
+        inference_params_per_inference = {}
+        for origin_param in inference_params:
+            inference_params_per_inference[origin_param.origin_id] = origin_param
+
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
