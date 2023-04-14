@@ -158,10 +158,18 @@ class OOIDetailView(
             self.ooi.reference, self.get_observed_at(), self.organization
         )
 
-        inference_params = self.octopoes_api_connector.list_origin_parameters({inference.id for inference in inferences})
+        inference_params = self.octopoes_api_connector.list_origin_parameters(
+            {inference.origin.id for inference in inferences}
+        )
         inference_params_per_inference = {}
-        for origin_param in inference_params:
-            inference_params_per_inference[origin_param.origin_id] = origin_param
+        for inference_param in inference_params:
+            if inference_param.origin_id not in inference_params_per_inference:
+                inference_params_per_inference[inference_param.origin_id] = [inference_param]
+            else:
+                inference_params_per_inference[inference_param.origin_id].append(inference_param)
+
+        for inference in inferences:
+            inference.params = inference_params_per_inference.get(inference.origin.id, [])
 
         context["declarations"] = declarations
         context["observations"] = observations
@@ -186,5 +194,4 @@ class OOIDetailView(
             "scan_history_search",
             "scan_history_page",
         ]
-
         return context

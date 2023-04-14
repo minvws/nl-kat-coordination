@@ -145,7 +145,7 @@ class OctopoesAPIConnector:
         self.session.delete(f"/{self.client}/", params=params)
 
     def list_origin_parameters(self, origin_id: Set[str], valid_time: Optional[datetime] = None) -> List[str]:
-        params = {"reference": origin_id, "valid_time": valid_time}
+        params = {"origin_id": origin_id, "valid_time": valid_time}
         res = self.session.get(f"/{self.client}/origin_parameters", params=params)
         return parse_obj_as(List[OriginParameter], res.json())
 
