@@ -18,7 +18,7 @@ from octopoes.models import (
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
 )
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.origin import Origin
+from octopoes.models.origin import Origin, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
@@ -143,6 +143,11 @@ class OctopoesAPIConnector:
     def delete(self, reference: Reference, valid_time: Optional[datetime] = None) -> None:
         params = {"reference": str(reference), "valid_time": valid_time}
         self.session.delete(f"/{self.client}/", params=params)
+
+    def list_origin_parameters(self, origin_id: Set[str], valid_time: Optional[datetime] = None) -> List[str]:
+        params = {"origin_id": origin_id, "valid_time": valid_time}
+        res = self.session.get(f"/{self.client}/origin_parameters", params=params)
+        return parse_obj_as(List[OriginParameter], res.json())
 
     def create_node(self):
         self.session.post(f"/{self.client}/node")

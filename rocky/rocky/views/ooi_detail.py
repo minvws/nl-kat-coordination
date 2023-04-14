@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
@@ -157,6 +158,17 @@ class OOIDetailView(
         declarations, observations, inferences = self.get_origins(
             self.ooi.reference, self.get_observed_at(), self.organization
         )
+
+        inference_params = self.octopoes_api_connector.list_origin_parameters(
+            {inference.origin.id for inference in inferences}
+        )
+        inference_params_per_inference = defaultdict(list)
+        for inference_param in inference_params:
+            inference_params_per_inference[inference_param.origin_id].append(inference_param)
+
+        for inference in inferences:
+            inference.params = inference_params_per_inference.get(inference.origin.id, [])
+
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
@@ -180,5 +192,4 @@ class OOIDetailView(
             "scan_history_search",
             "scan_history_page",
         ]
-
         return context
