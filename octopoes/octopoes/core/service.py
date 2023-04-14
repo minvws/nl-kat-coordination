@@ -130,7 +130,7 @@ class OctopoesService:
 
         source = self.ooi_repository.get(origin.source, valid_time)
 
-        parameters_references = self.origin_parameter_repository.list_by_origin(origin.id, valid_time)
+        parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
         parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
         resulting_oois = []

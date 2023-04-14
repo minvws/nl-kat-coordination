@@ -24,7 +24,7 @@ from octopoes.models import (
 from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
-from octopoes.models.origin import Origin, OriginType
+from octopoes.models.origin import Origin, OriginType, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
@@ -178,6 +178,15 @@ def list_origins(
     reference: Reference = Depends(extract_reference),
 ) -> List[Origin]:
     return octopoes.origin_repository.list_by_result(reference, valid_time)
+
+
+@router.get("/origin_parameters")
+def list_origin_parameters(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    origin_id: Set[str] = Query(default=set()),
+) -> List[OriginParameter]:
+    return octopoes.origin_parameter_repository.list_by_origin(origin_id, valid_time)
 
 
 @router.post("/observations")
