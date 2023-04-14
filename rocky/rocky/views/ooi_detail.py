@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
@@ -11,7 +12,8 @@ from requests.exceptions import RequestException
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
+
 from rocky import scheduler
 from rocky.views.mixins import OOIBreadcrumbsMixin
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
@@ -48,7 +50,8 @@ class OOIDetailView(
 
         self.ooi = self.get_ooi()
 
-        if not self.handle_page_action(request.POST.get("action")):
+        action = self.request.POST.get("action")
+        if not self.handle_page_action(action):
             return self.get(request, status_code=500, *args, **kwargs)
 
         success_message = (
@@ -157,6 +160,17 @@ class OOIDetailView(
         declarations, observations, inferences = self.get_origins(
             self.ooi.reference, self.get_observed_at(), self.organization
         )
+
+        inference_params = self.octopoes_api_connector.list_origin_parameters(
+            {inference.origin.id for inference in inferences}
+        )
+        inference_params_per_inference = defaultdict(list)
+        for inference_param in inference_params:
+            inference_params_per_inference[inference_param.origin_id].append(inference_param)
+
+        for inference in inferences:
+            inference.params = inference_params_per_inference.get(inference.origin.id, [])
+
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
@@ -180,5 +194,16 @@ class OOIDetailView(
             "scan_history_search",
             "scan_history_page",
         ]
-
+        if self.request.GET.get("show_clearance_level_inheritance"):
+            clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)
+            formatted_inheritance = [
+                {
+                    "object_type": Reference.from_str(section.reference).class_,
+                    "primary_key": section.reference,
+                    "human_readable": Reference.from_str(section.reference).human_readable,
+                    "level": section.level,
+                }
+                for section in clearance_level_inheritance
+            ]
+            context["clearance_level_inheritance"] = formatted_inheritance
         return context
