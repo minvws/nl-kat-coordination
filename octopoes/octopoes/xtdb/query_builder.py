@@ -1,5 +1,5 @@
 import re
-from typing import Set, Optional, Iterator, List
+from typing import Set, Optional, Iterator, List, Dict, Union
 
 from octopoes.config.settings import XTDBType
 from octopoes.xtdb.related_field_generator import (
@@ -22,7 +22,7 @@ def str_val(val):
 def generate_pull_query(
     xtdb_type: XTDBType,
     field_set: Optional[FieldSet] = FieldSet.ALL_FIELDS,
-    where: Optional[dict] = None,
+    where: Optional[Dict[str, Union[str, int, List[Union[str, int]], Set[Union[str, int]]]]] = None,
     offset: Optional[int] = None,
     limit: Optional[int] = None,
     field_node: Optional[RelatedFieldNode] = None,

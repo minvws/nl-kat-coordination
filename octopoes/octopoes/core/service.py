@@ -26,9 +26,14 @@ from octopoes.models import (
     ScanProfileType,
 )
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.explanation import InheritanceSection
 from octopoes.models.origin import Origin, OriginType, OriginParameter
 from octopoes.models.pagination import Paginated
-from octopoes.models.path import get_max_scan_level_issuance, get_paths_to_neighours
+from octopoes.models.path import (
+    get_max_scan_level_issuance,
+    get_paths_to_neighours,
+    get_max_scan_level_inheritance,
+)
 from octopoes.models.tree import ReferenceTree
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
@@ -138,7 +143,7 @@ class OctopoesService:
             if level >= bit_definition.min_scan_level:
                 source = self.ooi_repository.get(origin.source, valid_time)
 
-                parameters_references = self.origin_parameter_repository.list_by_origin(origin.id, valid_time)
+                parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
                 parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
                 try:
@@ -424,3 +429,68 @@ class OctopoesService:
         oois = self.ooi_repository.list_random(amount, valid_time)
         self._populate_scan_profiles(oois, valid_time)
         return oois
+
+    def get_scan_profile_inheritance(
+        self, reference: Reference, valid_time: datetime, inheritance_chain: List[InheritanceSection]
+    ) -> List[InheritanceSection]:
+        neighbour_cache = self.ooi_repository.get_neighbours(reference, valid_time)
+
+        last_inheritance_level = inheritance_chain[-1].level
+        visited = {inheritance.reference for inheritance in inheritance_chain}
+
+        # load scan profiles for all neighbours
+        neighbours_: List[OOI] = [
+            neighbour
+            for neighbours in neighbour_cache.values()
+            for neighbour in neighbours
+            if neighbour.reference not in visited
+        ]
+        self._populate_scan_profiles(neighbours_, valid_time)
+
+        # collect all inheritances
+        inheritances = []
+        for path, neighbours in neighbour_cache.items():
+            segment = path.segments[0]
+            for neighbour in neighbours:
+                segment_inheritance = get_max_scan_level_inheritance(segment)
+                if (
+                    segment_inheritance is None
+                    or neighbour.reference in visited
+                    or neighbour.scan_profile.level < last_inheritance_level
+                ):
+                    continue
+
+                inherited_level = min(get_max_scan_level_inheritance(segment), neighbour.scan_profile.level)
+                inheritances.append(
+                    InheritanceSection(
+                        segment=str(segment),
+                        reference=neighbour.reference,
+                        level=inherited_level,
+                        scan_profile_type=neighbour.scan_profile.scan_profile_type,
+                    )
+                )
+
+        # sort per ooi, per level, ascending
+        inheritances.sort(key=lambda x: x.level)
+
+        # if any declared, return highest straight away
+        declared_inheritances = [
+            inheritance for inheritance in inheritances if inheritance.scan_profile_type == ScanProfileType.DECLARED
+        ]
+        if declared_inheritances:
+            return inheritance_chain + [declared_inheritances[-1]]
+
+        # group by ooi, as the list is already sorted, it will contain the highest inheritance
+        highest_inheritance_per_neighbour = {
+            inheritance.reference: inheritance for inheritance in reversed(inheritances)
+        }
+
+        # traverse depth-first, highest levels first
+        for inheritance in sorted(highest_inheritance_per_neighbour.values(), key=lambda x: x.level, reverse=True):
+            expl = self.get_scan_profile_inheritance(
+                inheritance.reference, valid_time, inheritance_chain + [inheritance]
+            )
+            if expl[-1].scan_profile_type == ScanProfileType.DECLARED:
+                return expl
+
+        return inheritance_chain
