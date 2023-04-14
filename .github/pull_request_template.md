@@ -22,14 +22,16 @@ _Please add some proof of your working change here, unless this is not required 
 - [ ] I have made corresponding changes to the documentation, if necessary.
 
 ---
+```
 ## Checklist for code reviewers:
 - [ ] The code does not violate Model-View-Template and our other architectural principles.
 - [ ] The code prioritizes readability over performance where appropriate.
 - [ ] The code does not bypass authentication or security mechanisms.
 - [ ] The code does not introduce any dependency on a library that has not been properly vetted.
 - [ ] The code contains docstrings, comments, and documentation where needed.
-
+```
 ---
+```
 ## Checklist for QA:
 - [ ] I have checked out this branch, and successfully ran a fresh `make kat`.
 - [ ] I confirmed that there are no unintended functional regressions in this branch:
@@ -46,3 +48,4 @@ _Please add some proof of your working change here, unless this is not required 
 
 ### Bug or feature?:
 * _bullet point + screenshot (if useful) if it is unclear whether something is a bug or an intended feature._
+```
