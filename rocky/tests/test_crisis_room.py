@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 
-from django.urls import reverse, resolve
+from crisis_room.views import CrisisRoomView
+from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
 
-from crisis_room.views import CrisisRoomView
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.pagination import Paginated

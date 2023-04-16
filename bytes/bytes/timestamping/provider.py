@@ -1,8 +1,8 @@
-from bytes.config import has_pastebin_key, Settings
+from bytes.config import Settings, has_pastebin_key
 from bytes.models import HashingRepositoryReference
 from bytes.repositories.hash_repository import HashRepository
-from bytes.timestamping.pastebin import PastebinHashRepository
 from bytes.timestamping.in_memory import InMemoryHashRepository
+from bytes.timestamping.pastebin import PastebinHashRepository
 from bytes.timestamping.rfc3161 import RFC3161HashRepository
 
 

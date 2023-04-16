@@ -7,9 +7,9 @@ import subprocess
 import tempfile
 from logging import getLogger
 from pathlib import Path
-from typing import Set, Tuple, Dict
+from typing import Dict, Set, Tuple
 
-from jinja2 import Environment, select_autoescape, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from keiko.base_models import DataShapeBase
 from keiko.settings import Settings

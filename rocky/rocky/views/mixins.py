@@ -1,16 +1,28 @@
 import logging
 from datetime import datetime, timezone
 from functools import cached_property
-from typing import Set, Type, List, Dict, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Type
 
 import requests.exceptions
+from account.mixins import OrganizationView
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from pydantic import BaseModel
-
-from account.mixins import OrganizationView
 from katalogus.client import Plugin, get_katalogus
+from pydantic import BaseModel
+from tools.forms.base import ObservedAtForm
+from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
+from tools.models import Organization
+from tools.ooi_helpers import (
+    get_knowledge_base_data_for_ooi_store,
+)
+from tools.view_helpers import (
+    Breadcrumb,
+    BreadcrumbsMixin,
+    convert_date_to_datetime,
+    get_ooi_url,
+)
+
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
@@ -18,20 +30,8 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import get_relations, get_collapsed_types, type_by_name
+from octopoes.models.types import get_collapsed_types, get_relations, type_by_name
 from rocky.bytes_client import get_bytes_client
-from tools.forms.base import ObservedAtForm
-from tools.forms.settings import DEPTH_MAX, DEPTH_DEFAULT
-from tools.models import Organization
-from tools.ooi_helpers import (
-    get_knowledge_base_data_for_ooi_store,
-)
-from tools.view_helpers import (
-    get_ooi_url,
-    convert_date_to_datetime,
-    BreadcrumbsMixin,
-    Breadcrumb,
-)
 
 logger = logging.getLogger(__name__)
 

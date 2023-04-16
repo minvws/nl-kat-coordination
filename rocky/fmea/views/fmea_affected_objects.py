@@ -1,10 +1,9 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.urls.base import reverse_lazy, reverse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, View
 from django.views.generic.detail import DetailView

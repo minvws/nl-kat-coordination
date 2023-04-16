@@ -1,28 +1,28 @@
 import logging
 import uuid
-from typing import Type, List, Iterator, Optional
+from typing import Iterator, List, Optional, Type
 
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from bytes.config import Settings, get_settings
+from bytes.database.db import SQL_BASE, get_engine
+from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
 from bytes.models import (
     Boefje,
     BoefjeMeta,
+    MimeType,
     Normalizer,
     NormalizerMeta,
     RawData,
-    MimeType,
     RawDataMeta,
 )
-from bytes.repositories.hash_repository import HashRepository
-from bytes.timestamping.provider import create_hash_repository
-from bytes.timestamping.hashing import hash_data
-from bytes.database.db import SQL_BASE, get_engine
-from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
-from bytes.repositories.meta_repository import MetaDataRepository, BoefjeMetaFilter, RawDataFilter
-from bytes.repositories.raw_repository import RawRepository
 from bytes.raw.file_raw_repository import create_raw_repository
+from bytes.repositories.hash_repository import HashRepository
+from bytes.repositories.meta_repository import BoefjeMetaFilter, MetaDataRepository, RawDataFilter
+from bytes.repositories.raw_repository import RawRepository
+from bytes.timestamping.hashing import hash_data
+from bytes.timestamping.provider import create_hash_repository
 
 logger = logging.getLogger(__name__)
 

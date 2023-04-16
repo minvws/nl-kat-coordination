@@ -12,7 +12,8 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import OriginParameter
 from octopoes.xtdb import FieldSet
-from octopoes.xtdb.client import XTDBSession, OperationType as XTDBOperationType
+from octopoes.xtdb.client import OperationType as XTDBOperationType
+from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
 
 logger = getLogger(__name__)

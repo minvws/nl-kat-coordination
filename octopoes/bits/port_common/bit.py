@@ -1,4 +1,5 @@
 from bits.definitions import BitDefinition
+
 from octopoes.models.ooi.network import IPPort
 
 BIT = BitDefinition(

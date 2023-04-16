@@ -1,8 +1,8 @@
 import json
 from ipaddress import IPv4Address, IPv6Address
-from typing import Iterator, Union, List, Dict
+from typing import Dict, Iterator, List, Union
 
-from dns.message import from_text, Message
+from dns.message import Message, from_text
 from dns.rdata import Rdata
 from dns.rdtypes.ANY.CNAME import CNAME
 from dns.rdtypes.ANY.MX import MX
@@ -11,23 +11,23 @@ from dns.rdtypes.ANY.SOA import SOA
 from dns.rdtypes.ANY.TXT import TXT
 from dns.rdtypes.IN.A import A
 from dns.rdtypes.IN.AAAA import AAAA
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.dns.records import (
-    DNSARecord,
-    DNSAAAARecord,
-    DNSTXTRecord,
-    DNSMXRecord,
-    DNSNSRecord,
-    DNSSOARecord,
-    DNSCNAMERecord,
-    DNSRecord,
-    NXDOMAIN,
-)
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
-from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.dns.records import (
+    NXDOMAIN,
+    DNSAAAARecord,
+    DNSARecord,
+    DNSCNAMERecord,
+    DNSMXRecord,
+    DNSNSRecord,
+    DNSRecord,
+    DNSSOARecord,
+    DNSTXTRecord,
+)
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname
+from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

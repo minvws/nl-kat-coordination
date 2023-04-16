@@ -1,14 +1,13 @@
 from unittest import TestCase
 
+from boefjes.job_models import NormalizerMeta
+from boefjes.plugins.kat_snyk.normalize import run
+from octopoes.models.ooi.findings import SnykFindingType
 from octopoes.models.types import (
     CVEFindingType,
     Finding,
     Software,
 )
-from octopoes.models.ooi.findings import SnykFindingType
-
-from boefjes.plugins.kat_snyk.normalize import run
-from boefjes.job_models import NormalizerMeta
 from tests.stubs import get_dummy_data
 
 

@@ -1,13 +1,13 @@
-from typing import List, Iterator
 import re
-from urllib.parse import urlparse, urljoin
+from typing import Iterator, List
+from urllib.parse import urljoin, urlparse
 
 from pydantic import ValidationError
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.web import HTTPHeaderHostname
-from octopoes.models.types import HTTPHeader, URL, Network, HTTPHeaderURL
+from octopoes.models.types import URL, HTTPHeader, HTTPHeaderURL, Network
 
 
 def is_url(input_str):

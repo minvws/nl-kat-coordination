@@ -1,7 +1,7 @@
 import json
 import math
 from os import getenv
-from typing import Tuple, Union, Dict, List
+from typing import Dict, List, Tuple, Union
 
 from pybinaryedge import BinaryEdge
 
