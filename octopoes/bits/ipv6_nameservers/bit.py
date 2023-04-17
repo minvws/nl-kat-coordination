@@ -1,4 +1,4 @@
-from bits.definitions import BitParameterDefinition, BitDefinition
+from bits.definitions import BitDefinition, BitParameterDefinition
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
 

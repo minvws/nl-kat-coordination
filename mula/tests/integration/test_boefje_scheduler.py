@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
+
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -247,7 +248,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations()
 
-        # Task should be on priority queue
+        # Task should be on priority queue (only one)
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)

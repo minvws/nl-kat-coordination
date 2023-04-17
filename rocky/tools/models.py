@@ -9,12 +9,13 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from katalogus.client import KATalogusClientV1, get_katalogus
+from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 from requests import RequestException
 
-from katalogus.client import get_katalogus, KATalogusClientV1
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from rocky.exceptions import RockyError
-from tools.add_ooi_information import get_info, SEPARATOR
+from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
+from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
 
@@ -77,7 +78,7 @@ class Organization(models.Model):
         try:
             octopoes_client.delete_node()
         except Exception as e:
-            raise RockyError(f"Octopoes returned error deleting organization: {e}") from e
+            raise OctopoesException("Failed deleting organization in Octopoes") from e
 
         try:
             katalogus_client.delete_organization()
@@ -85,12 +86,9 @@ class Organization(models.Model):
             try:
                 octopoes_client.create_node()
             except Exception as e:
-                raise RockyError(
-                    f"Could not recreate the organization in Octopoes after failing to delete the "
-                    f"organization in the Katalogus: {e}"
-                ) from e
+                raise OctopoesException("Failed creating organization in Octopoes") from e
 
-            raise RockyError(f"Katalogus returned error deleting organization: {e}") from e
+            raise KATalogusException("Failed deleting organization in the Katalogus") from e
 
         super().delete(*args, **kwargs)
 
@@ -103,7 +101,7 @@ class Organization(models.Model):
             if not katalogus_client.organization_exists():
                 katalogus_client.create_organization(instance.name)
         except Exception as e:
-            raise RockyError(f"Katalogus returned error creating organization: {e}") from e
+            raise KATalogusException("Failed creating organization in the Katalogus") from e
 
         try:
             octopoes_client.create_node()
@@ -111,12 +109,9 @@ class Organization(models.Model):
             try:
                 katalogus_client.delete_organization()
             except Exception as e:
-                raise RockyError(
-                    f"Could not delete organization in the Katalogus after failing to create the "
-                    f"organization in the Katalogus: {e}"
-                ) from e
+                raise KATalogusException("Failed deleting organization in the Katalogus") from e
 
-            raise RockyError(f"Octopoes returned error creating organization: {e}") from e
+            raise OctopoesException("Failed creating organization in Octopoes") from e
 
     @staticmethod
     def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
@@ -125,10 +120,10 @@ class Organization(models.Model):
         try:
             health = katalogus_client.health()
         except RequestException as e:
-            raise RockyError("The Katalogus service is not up") from e
+            raise KATalogusDownException from e
 
         if not health.healthy:
-            raise RockyError("The Katalogus service is not healthy")
+            raise KATalogusUnhealthyException
 
         return katalogus_client
 
@@ -138,9 +133,10 @@ class Organization(models.Model):
         try:
             health = octopoes_client.root_health()
         except RequestException as e:
-            raise RockyError("The Octopoes service is not up") from e
+            raise OctopoesDownException from e
+
         if not health.healthy:
-            raise RockyError("The Octopoes service is not healthy")
+            raise OctopoesUnhealthyException
 
         return octopoes_client
 

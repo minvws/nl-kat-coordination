@@ -1,14 +1,13 @@
 import json
 from pathlib import Path
-
-from requests.models import Response, CaseInsensitiveDict
 from unittest import TestCase, mock
 from unittest.mock import MagicMock
 
-from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.local import LocalNormalizerJobRunner, LocalBoefjeJobRunner
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from requests.models import CaseInsensitiveDict, Response
 
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from tests.stubs import get_dummy_data
 
 

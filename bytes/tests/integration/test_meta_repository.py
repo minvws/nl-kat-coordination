@@ -3,11 +3,11 @@ from datetime import timedelta
 
 import pytest
 from sqlalchemy.exc import DataError
-
-from bytes.models import RetrievalLink, SecureHash, MimeType
-from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter
-from bytes.database.sql_meta_repository import SQLMetaDataRepository
 from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
+
+from bytes.database.sql_meta_repository import SQLMetaDataRepository
+from bytes.models import MimeType, RetrievalLink, SecureHash
+from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter
 
 
 def test_save_boefje_meta(meta_repository: SQLMetaDataRepository) -> None:

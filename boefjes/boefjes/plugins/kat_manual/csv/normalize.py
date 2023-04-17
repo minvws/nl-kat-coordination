@@ -1,17 +1,17 @@
 import csv
 import io
 import logging
-from ipaddress import ip_network, IPv4Network
-from typing import Union, Iterator, Dict, Tuple, List
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
-from octopoes.models.ooi.web import URL
-from octopoes.models.types import OOIType
+from ipaddress import IPv4Network, ip_network
+from typing import Dict, Iterator, List, Tuple, Union
+
 from pydantic import ValidationError
 
 from boefjes.job_models import NormalizerMeta
-
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
+from octopoes.models.ooi.web import URL
+from octopoes.models.types import OOIType
 
 OOI_TYPES = {
     "Hostname": {"type": Hostname},

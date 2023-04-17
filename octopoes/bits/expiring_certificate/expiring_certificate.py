@@ -3,7 +3,7 @@ from typing import Iterator, List
 
 from octopoes.models import OOI
 from octopoes.models.ooi.certificate import X509Certificate
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import Website
 
 THRESHOLD = datetime.timedelta(weeks=2)

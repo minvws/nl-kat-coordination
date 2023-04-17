@@ -3,24 +3,21 @@ from pathlib import Path
 from unittest import TestCase
 
 from boefjes.job_handler import serialize_ooi
-
+from boefjes.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, ObservationsWithoutInputOOI, RawDataMeta
+from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.local import LocalNormalizerJobRunner
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import (
-    DNSARecord,
     DNSAAAARecord,
-    DNSTXTRecord,
+    DNSARecord,
+    DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSSOARecord,
-    DNSCNAMERecord,
+    DNSTXTRecord,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone
-from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
-
-from boefjes.job_models import NormalizerMeta, BoefjeMeta, Normalizer, Boefje, RawDataMeta, ObservationsWithoutInputOOI
-from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.local import LocalNormalizerJobRunner
-
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from tests.stubs import get_dummy_data
 
 
@@ -30,11 +27,9 @@ class DnsTest(TestCase):
     def test_dns_normalizer(self):
         internet = Network(name="internet")
 
-        zone_hostname = Hostname(name="example.nl.", network=internet.reference)
+        zone_hostname = Hostname(name="example.nl", network=internet.reference)
         zone = DNSZone(hostname=zone_hostname.reference)
         zone_hostname.dns_zone = zone.reference
-
-        input_hostname = Hostname(name="example.nl", network=internet.reference, dns_zone=zone.reference)
 
         ip_v4_addresses = [
             IPAddressV4(network=internet.reference, address=IPv4Address("94.198.159.35")),
@@ -79,17 +74,17 @@ class DnsTest(TestCase):
         mx_hostnames = [
             Hostname(
                 network=internet.reference,
-                name="mail.example.nl.",
+                name="mail.example.nl",
             ),
             Hostname(
                 network=internet.reference,
-                name="mail2.example.nl.",
+                name="mail2.example.nl",
             ),
         ]
         dns_mx_records = [
             DNSMXRecord(
                 hostname=zone_hostname.reference,
-                value=f"10 {mx_rec.name}",
+                value=f"10 {mx_rec.name}.",
                 ttl=14400,
                 mail_hostname=mx_rec.reference,
                 preference=10,
@@ -100,17 +95,17 @@ class DnsTest(TestCase):
         ns_hostnames = [
             Hostname(name=value, network=internet.reference)
             for value in [
-                "ns3.examplenl.org.",
-                "ns1.examplenl.nl.",
-                "ns2.examplenl.eu.",
-                "ns0.examplenl.com.",
+                "ns3.examplenl.org",
+                "ns1.examplenl.nl",
+                "ns2.examplenl.eu",
+                "ns0.examplenl.com",
             ]
         ]
 
         ns_records = [
             DNSNSRecord(
                 hostname=zone_hostname.reference,
-                value=ns_hostname.name,
+                value=ns_hostname.name + ".",
                 name_server_hostname=ns_hostname.reference,
                 ttl=2634,
             )
@@ -119,7 +114,7 @@ class DnsTest(TestCase):
 
         soa_hostname = Hostname(
             network=internet.reference,
-            name="ns1.examplenl.nl.",
+            name="ns1.examplenl.nl",
             dns_zone=zone.reference,
         )
         soa_record = DNSSOARecord(
@@ -136,7 +131,7 @@ class DnsTest(TestCase):
 
         # noinspection PyTypeChecker
         expected = (
-            [zone_hostname, zone, input_hostname]
+            [zone_hostname, zone]
             + ip_v4_addresses
             + dns_a_records
             + ip_v6_addresses
@@ -163,7 +158,7 @@ class DnsTest(TestCase):
 
         zone_hostname = Hostname(
             network=internet.reference,
-            name="example.nl.",
+            name="example.nl",
         )
         zone = DNSZone(
             hostname=zone_hostname.reference,
@@ -172,15 +167,15 @@ class DnsTest(TestCase):
 
         input_hostname = Hostname(
             network=internet.reference,
-            name="www.example.nl.",
+            name="www.example.nl",
             dns_zone=zone.reference,
         )
         cname_target = Hostname(
             network=internet.reference,
-            name="webredir.examplenl.nl.",
+            name="webredir.examplenl.nl",
         )
 
-        soa_hostname = Hostname(network=internet.reference, name="ns1.examplenl.nl.")
+        soa_hostname = Hostname(network=internet.reference, name="ns1.examplenl.nl")
         soa_record = DNSSOARecord(
             hostname=zone_hostname.reference,
             value="ns1.examplenl.nl. hostmaster.sidn.nl. 2021111101 14400 7200 1209600 86400",
@@ -195,7 +190,7 @@ class DnsTest(TestCase):
 
         cname_record = DNSCNAMERecord(
             hostname=input_hostname.reference,
-            value=cname_target.name,
+            value=cname_target.name + ".",
             ttl=10800,
             target_hostname=cname_target.reference,
         )
@@ -229,7 +224,7 @@ class DnsTest(TestCase):
                     id="1234",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
-                    input_ooi="Hostname|internet|www.example.nl.",
+                    input_ooi="Hostname|internet|www.example.nl",
                     arguments={
                         "domain": "www.example.nl.",
                         "input": {"name": "www.example.nl."},
@@ -255,7 +250,7 @@ class DnsTest(TestCase):
                     id="1234",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
-                    input_ooi="Hostname|internet|english.example.nl.",
+                    input_ooi="Hostname|internet|english.example.nl",
                     arguments={
                         "domain": "english.example.nl",
                         "input": {"name": "english.example.nl"},
@@ -272,14 +267,10 @@ class DnsTest(TestCase):
             network=internet.reference,
             name="english.example.nl",
         )
-        input_fqdn = Hostname(
-            network=internet.reference,
-            name="english.example.nl.",
-        )
 
-        cname_target = Hostname(network=internet.reference, name="redir.example.nl.")
+        cname_target = Hostname(network=internet.reference, name="redir.example.nl")
         cname_record = DNSCNAMERecord(
-            hostname=input_fqdn.reference,
+            hostname=input_hostname.reference,
             value="redir.example.nl.",
             ttl=60,
             target_hostname=cname_target.reference,
@@ -296,7 +287,7 @@ class DnsTest(TestCase):
         results = runner.run(meta, answer)
 
         self.assertCountEqual(
-            [cname_target, cname_record, mx_record, input_fqdn, input_hostname],
+            [cname_target, cname_record, mx_record, input_hostname],
             results.observations[0].results,
         )
 
@@ -305,7 +296,7 @@ class DnsTest(TestCase):
 
         zone_hostname = Hostname(
             network=internet.reference,
-            name="example.com.",
+            name="example.com",
         )
         zone = DNSZone(
             hostname=zone_hostname.reference,
@@ -318,12 +309,8 @@ class DnsTest(TestCase):
             dns_zone=zone.reference,
         )
 
-        input_fqdn = Hostname(
-            network=internet.reference,
-            name="www.example.com.",
-        )
         cname_record = DNSCNAMERecord(
-            hostname=input_fqdn.reference,
+            hostname=input_hostname.reference,
             value="example.com.",
             ttl=60,
             target_hostname=zone_hostname.reference,
@@ -335,18 +322,18 @@ class DnsTest(TestCase):
             value=str(ip_address.address),
             ttl=60,
         )
-        soa_hostname = Hostname(network=internet.reference, name="ns.icann.org.")
+        soa_hostname = Hostname(network=internet.reference, name="ns.icann.org")
         ns_hostnames = [
             Hostname(name=value, network=internet.reference)
             for value in [
-                "a.iana-servers.net.",
-                "b.iana-servers.net.",
+                "a.iana-servers.net",
+                "b.iana-servers.net",
             ]
         ]
         ns_records = [
             DNSNSRecord(
                 hostname=zone_hostname.reference,
-                value=ns_hostname.name,
+                value=ns_hostname.name + ".",
                 name_server_hostname=ns_hostname.reference,
                 ttl=60,
             )
@@ -402,7 +389,6 @@ class DnsTest(TestCase):
             [
                 zone,
                 zone_hostname,
-                input_fqdn,
                 cname_record,
                 ip_address,
                 a_record,
@@ -423,12 +409,12 @@ class DnsTest(TestCase):
         requested_zone = DNSZone(
             hostname=Hostname(
                 network=internet.reference,
-                name="sub.example.nl.",
+                name="sub.example.nl",
             ).reference
         )
         parent_zone_hostname = Hostname(
             network=internet.reference,
-            name="example.nl.",
+            name="example.nl",
         )
         parent_zone = DNSZone(hostname=parent_zone_hostname.reference)
         parent_zone_hostname.dns_zone = parent_zone.reference
@@ -437,7 +423,7 @@ class DnsTest(TestCase):
 
         name_server_hostname = Hostname(
             network=internet.reference,
-            name="ns1.examplenl.nl.",
+            name="ns1.examplenl.nl",
         )
 
         soa_record = DNSSOARecord(
@@ -456,7 +442,7 @@ class DnsTest(TestCase):
             DNSZone(
                 hostname=Hostname(
                     network=Reference.from_str("Network|internet"),
-                    name="sub.example.nl.",
+                    name="sub.example.nl",
                 ).reference
             )
         )
@@ -470,7 +456,7 @@ class DnsTest(TestCase):
                     id="1234",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
-                    input_ooi="DnsZone|internet|sub.example.nl.",
+                    input_ooi="DnsZone|internet|sub.example.nl",
                     arguments={"input": input_},
                 ),
                 mime_types=[{"value": "boefje/dns-records"}],

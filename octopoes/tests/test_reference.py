@@ -3,7 +3,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from octopoes.models import Reference
-from tests.mocks.mock_ooi_types import ALL_OOI_TYPES, MockNetwork, MockIPAddressV4
+from tests.mocks.mock_ooi_types import ALL_OOI_TYPES, MockIPAddressV4, MockNetwork
 
 
 @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)

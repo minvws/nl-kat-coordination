@@ -11,9 +11,9 @@ from requests import RequestException
 
 from octopoes.api.models import ServiceHealth
 from octopoes.api.router import router
-from octopoes.version import __version__
 from octopoes.config.settings import Settings
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.version import __version__
 
 settings = Settings()
 logger = logging.getLogger(__name__)

@@ -1,12 +1,13 @@
-from typing import Tuple, Union, List, Generator, ByteString
+import io
+import logging
+import os
+import tarfile
+from typing import ByteString, Generator, List, Tuple, Union
+
+import docker
+from PIL import Image
 
 from boefjes.job_models import BoefjeMeta
-from PIL import Image
-import io
-import os
-import docker
-import logging
-import tarfile
 
 PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.30.0-focal"
 BROWSER = "chromium"

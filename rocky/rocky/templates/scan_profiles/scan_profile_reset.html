@@ -15,16 +15,15 @@
 
                 <h1>{% translate "Set clearance level for:" %} {{ ooi.human_readable }}</h1>
                 <p>
-                    {% translate "Setting the scan level from "declared" to "inherit" means it will inherit a clearance level from other objects, or that no clearance level will be inherited. " %}
+                    {% translate "Setting the scan level from \"declared\" to \"inherit\" means it will inherit a clearance level from other objects, or that no clearance level will be inherited. " %}
                 </p>
-                <form action="{% ooi_url 'scan_profile_reset' ooi.primary_key organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
-                    " method="post">
+                <form action="{% ooi_url 'scan_profile_reset' ooi.primary_key organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}" method="post">
                     {% csrf_token %}
                     <fieldset>
                         <legend>
                             {% translate "Set clearance level" %}
                         </legend>
-                        <p>{% translate "You are about to set the clearance level from "declared" to "inherit"." %}</p>
+                        <p>{% translate "You are about to set the clearance level from \"declared\" to \"inherit\"." %}</p>
                         <p>{% translate "Are you sure?" %}</p>
                     </fieldset>
                     <div class="horizontal-view">

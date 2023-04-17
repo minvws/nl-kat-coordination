@@ -3,6 +3,7 @@ import uuid
 from unittest import mock
 
 from scheduler import config, models, queues, rankers, schedulers
+
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,

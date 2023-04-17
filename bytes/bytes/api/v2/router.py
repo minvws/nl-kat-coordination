@@ -1,18 +1,18 @@
 import logging
-from typing import Optional, List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
 from starlette.responses import JSONResponse
 
 from bytes.api.api_models import RawResponse
 from bytes.auth import authenticate_token
-from bytes.events.events import RawFileReceived, NormalizerMetaReceived
+from bytes.database.sql_meta_repository import MetaIntegrityError, ObjectNotFoundException, create_meta_data_repository
+from bytes.events.events import NormalizerMetaReceived, RawFileReceived
 from bytes.events.manager import EventManager
 from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataMeta
 from bytes.rabbitmq import create_event_manager
-from bytes.database.sql_meta_repository import create_meta_data_repository, ObjectNotFoundException, MetaIntegrityError
-from bytes.repositories.meta_repository import MetaDataRepository, BoefjeMetaFilter, RawDataFilter
+from bytes.repositories.meta_repository import BoefjeMetaFilter, MetaDataRepository, RawDataFilter
 
 logger = logging.getLogger(__name__)
 router = APIRouter(dependencies=[Depends(authenticate_token)])

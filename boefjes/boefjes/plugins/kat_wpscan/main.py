@@ -1,6 +1,6 @@
 """Boefje script for scanning wordpress sites using wpscan"""
 from os import getenv
-from typing import Union, Tuple, List
+from typing import List, Tuple, Union
 
 import docker
 

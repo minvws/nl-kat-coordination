@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -74,8 +74,9 @@ class MutedFinding(OOI):
     finding: Reference = ReferenceField(Finding)
     reason: Optional[str]
 
+    _natural_key_attrs = ["finding"]
     _reverse_relation_names = {"finding": "mutes"}
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        return f"Muted {reference.tokenized.finding.human_readable}"
+        return f"Muted {reference.natural_key}"

@@ -1,4 +1,4 @@
-from bits.definitions import BitParameterDefinition, BitDefinition
+from bits.definitions import BitDefinition, BitParameterDefinition
 from octopoes.models.ooi.network import IPAddress, IPPort
 from octopoes.models.ooi.web import Website
 

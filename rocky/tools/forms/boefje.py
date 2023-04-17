@@ -1,12 +1,12 @@
-from typing import Dict, List, Union, Any
+from typing import Any, Dict, List, Union
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
 from katalogus.client import Plugin
-from tools.forms.settings import Choice
+
 from tools.forms.base import BaseRockyForm, CheckboxGroup, Choices, ChoicesGroups
+from tools.forms.settings import Choice
 from tools.models import Organization
 
 

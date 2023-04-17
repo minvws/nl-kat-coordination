@@ -1,5 +1,5 @@
 import json
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
 from censys.search import CensysHosts
 

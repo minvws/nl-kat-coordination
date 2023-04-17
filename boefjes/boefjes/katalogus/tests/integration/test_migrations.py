@@ -2,14 +2,13 @@ import os
 from unittest import TestCase, skipIf
 
 import alembic.config
-
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
+from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
 from boefjes.katalogus.dependencies.encryption import NaclBoxMiddleware
 from boefjes.katalogus.models import Organisation
-from boefjes.sql.db import get_engine, SQL_BASE
+from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
 

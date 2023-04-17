@@ -1,8 +1,8 @@
-from typing import List, Iterator, Union
+from typing import Iterator, List, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSCNAMERecord
-from octopoes.models.ooi.dns.zone import ResolvedHostname, Hostname
+from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.network import Network
 
 
@@ -22,7 +22,7 @@ def run(
             # Also the non-fqdn variant
             yield ResolvedHostname(
                 hostname=Hostname(
-                    name=cname_record.hostname.tokenized.name.rstrip("."),
+                    name=cname_record.hostname.tokenized.name,
                     network=Network(name=cname_record.hostname.tokenized.network.name).reference,
                 ).reference,
                 address=resolved_hostname.address,
