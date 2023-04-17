@@ -85,6 +85,7 @@ QUEUE_URI=
 # Optional environment variables
 BYTES_LOG_FILE=  # Optional file with Bytes logs.
 BYTES_DATA_DIR=  # Root for all the data. A change means that you no longer have access to old data unless you move it!
+BYTES_METRICS_MOUNTPOINTS=["/"]
 ```
 
 Most of these are self-explanatory, but a few sets of variables require more explanation.

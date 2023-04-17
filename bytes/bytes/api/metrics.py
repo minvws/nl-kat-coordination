@@ -60,10 +60,10 @@ def get_registry():
         )
         bytes_data_raw_files_total.labels(organization_path).set(count)
 
-    mountpoint = "/"
-    total, used, free = shutil.disk_usage(mountpoint)
+    for mountpoint in settings.bytes_metrics_mountpoints:
+        total, used, free = shutil.disk_usage(mountpoint)
 
-    bytes_filesystem_avail_bytes.labels(mountpoint).set(free)
-    bytes_filesystem_size_bytes.labels(mountpoint).set(total)
+        bytes_filesystem_avail_bytes.labels(mountpoint).set(free)
+        bytes_filesystem_size_bytes.labels(mountpoint).set(total)
 
     return collector_registry

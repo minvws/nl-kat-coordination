@@ -1,6 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseSettings
 
@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     bytes_db_uri: str
     bytes_data_dir: Path = Path("/data")
+    bytes_metrics_mountpoints: List[Path] = [Path("/")]
 
     bytes_log_file: str = "bytes.log"
     access_token_expire_minutes: float = 15.0

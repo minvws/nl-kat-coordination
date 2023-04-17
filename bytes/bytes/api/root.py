@@ -1,19 +1,19 @@
 import logging
 from typing import Any, List, Optional, Union
 
+import prometheus_client
 from fastapi import APIRouter, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import RedirectResponse, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from prometheus_client import CollectorRegistry
 from pydantic import BaseModel, ValidationError
-import prometheus_client
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from bytes.api.metrics import get_registry
-from bytes.auth import TokenResponse, get_access_token, authenticate_token
+from bytes.auth import TokenResponse, authenticate_token, get_access_token
 from bytes.version import __version__
 
 router = APIRouter()
