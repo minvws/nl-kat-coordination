@@ -36,7 +36,7 @@ bytes_filesystem_size_bytes = prometheus_client.Gauge(
 )
 
 
-@functools.lru_cache(maxsize=get_settings().metrics_cache_ttl_seconds)
+@functools.lru_cache(maxsize=get_settings().bytes_metrics_cache_ttl_seconds)
 def get_number_of_raw_files_for_organization(organization_path: str, ttl_hash: Optional[int] = None):  # noqa: F841
     count = 0
 
@@ -56,7 +56,7 @@ def get_registry():
         count = get_number_of_raw_files_for_organization(
             str(settings.bytes_data_dir.joinpath(organization_path).absolute()),
             # Second argument changes every `metrics_cache_ttl_seconds` seconds, keeping the result cached for that time
-            round(time.time() / settings.metrics_cache_ttl_seconds),
+            round(time.time() / settings.bytes_metrics_cache_ttl_seconds),
         )
         bytes_data_raw_files_total.labels(organization_path).set(count)
 

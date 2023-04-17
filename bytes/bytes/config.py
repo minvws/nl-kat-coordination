@@ -18,7 +18,6 @@ class Settings(BaseSettings):
 
     bytes_db_uri: str
     bytes_data_dir: Path = Path("/data")
-    bytes_metrics_mountpoints: List[Path] = [Path("/")]
 
     bytes_log_file: str = "bytes.log"
     access_token_expire_minutes: float = 15.0
@@ -36,8 +35,9 @@ class Settings(BaseSettings):
     kat_private_key_b64: str = ""
     vws_public_key_b64: str = ""
 
-    metrics_cache_ttl_seconds: int = 5
-    metrics_cache_size: int = 1024
+    bytes_metrics_mountpoints: List[Path] = [Path("/")]
+    bytes_metrics_cache_ttl_seconds: int = 30
+    bytes_metrics_cache_size: int = 1024
 
 
 @lru_cache()

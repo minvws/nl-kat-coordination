@@ -86,6 +86,8 @@ QUEUE_URI=
 BYTES_LOG_FILE=  # Optional file with Bytes logs.
 BYTES_DATA_DIR=  # Root for all the data. A change means that you no longer have access to old data unless you move it!
 BYTES_METRICS_MOUNTPOINTS=["/"]
+BYTES_METRICS_CACHE_TTL_SECONDS=30  # Time to wait to invalidate the cache for raw files per organization
+BYTES_METRICS_CACHE_SIZE=1024  # Amount of entries to save in memory for raw files per organization
 ```
 
 Most of these are self-explanatory, but a few sets of variables require more explanation.
