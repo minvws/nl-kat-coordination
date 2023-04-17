@@ -6,16 +6,15 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 from requests import RequestException
-
-from rocky.views.organization_add import OrganizationAddView
-from rocky.views.organization_settings import OrganizationSettingsView
+from tools.models import Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
+from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_list import OrganizationMemberListView
-from tests.conftest import setup_request, create_member
-from tools.models import Organization
+from rocky.views.organization_settings import OrganizationSettingsView
+from tests.conftest import create_member, setup_request
 
 AMOUNT_OF_TEST_ORGANIZATIONS = 50
 

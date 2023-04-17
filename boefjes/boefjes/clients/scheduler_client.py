@@ -1,17 +1,14 @@
+import datetime
 import logging
+import uuid
+from enum import Enum
 from typing import List, Optional, Union
 
 import requests
-import uuid
-
-from enum import Enum
-import datetime
-
+from pydantic import BaseModel, parse_obj_as
 from requests.adapters import HTTPAdapter, Retry
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from pydantic import BaseModel, parse_obj_as
-
 
 logger = logging.getLogger(__name__)
 

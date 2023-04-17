@@ -1,8 +1,7 @@
 import logging
+from typing import Any, List, Optional
 
-from typing import List, Optional, Any
-
-from fastapi import FastAPI, status, Request
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 

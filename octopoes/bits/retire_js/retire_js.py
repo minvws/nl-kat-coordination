@@ -1,11 +1,11 @@
 import hashlib
 import json
 from os import path
-from typing import List, Iterator, Dict, Union
+from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import Finding, CVEFindingType, RetireJSFindingType
-from octopoes.models.ooi.software import SoftwareInstance, Software
+from octopoes.models.ooi.findings import CVEFindingType, Finding, RetireJSFindingType
+from octopoes.models.ooi.software import Software, SoftwareInstance
 from packaging import version
 
 

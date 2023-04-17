@@ -3,12 +3,12 @@ from pathlib import Path
 from typing import Tuple
 from unittest import TestCase
 
-from octopoes.models import Reference
 from pydantic import AnyUrl
 
 from boefjes.job_models import NormalizerMeta, NormalizerOutput
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from octopoes.models import Reference
 from tests.test_snyk import get_dummy_data
 
 

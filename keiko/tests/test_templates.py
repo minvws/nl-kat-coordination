@@ -4,7 +4,7 @@ from unittest import TestCase
 from pydantic import BaseModel
 
 from keiko.settings import Settings
-from keiko.templates import get_templates, get_data_shape, get_samples
+from keiko.templates import get_data_shape, get_samples, get_templates
 
 
 class KeikoTemplatesTest(TestCase):

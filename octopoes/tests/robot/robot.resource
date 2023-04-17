@@ -63,14 +63,6 @@ Insert Regular Declarations
 
     Await Sync
 
-Get Url
-    [Arguments]    ${url}
-    ${response}    Get    ${url}
-    Should Be Equal As Integers    ${response.status_code}    200
-    Should Be Equal    ${response.headers["content-type"]}    application/json
-    ${response_data}    Set Variable    ${response.json()}
-    RETURN    ${response_data}
-
 Get Messages From Queue
     [Arguments]    ${queue}    ${ackmode}
     &{data}    Create dictionary    count=10000    ackmode=${ackmode}    encoding=auto    truncate=50000
@@ -116,7 +108,10 @@ Await Sync
     Wait For XTDB Synced
 
 Get Objects
-    ${response_data}    Get Url    ${OCTOPOES_URI}/objects
+    ${response}    Get   ${OCTOPOES_URI}/objects
+    Should Be Equal As Integers    ${response.status_code}    200
+    Should Be Equal    ${response.headers["content-type"]}    application/json
+    ${response_data}    Set Variable    ${response.json()}
     RETURN    ${response_data}
 
 Get Valid Time Params

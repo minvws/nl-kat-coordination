@@ -8,7 +8,6 @@ from bytes.config import get_settings
 from bytes.events.events import Event
 from bytes.events.manager import EventManager
 
-
 logger = logging.getLogger(__name__)
 
 

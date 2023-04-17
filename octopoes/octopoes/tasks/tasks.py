@@ -1,7 +1,7 @@
 import timeit
 import uuid
-from datetime import timezone, datetime
-from logging import getLogger, config
+from datetime import datetime, timezone
+from logging import config, getLogger
 from typing import Dict
 
 import yaml

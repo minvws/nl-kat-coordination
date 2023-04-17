@@ -1,4 +1,4 @@
-from typing import Optional, Literal
+from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField

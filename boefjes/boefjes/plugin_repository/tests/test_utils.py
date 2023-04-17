@@ -1,7 +1,7 @@
 from unittest import TestCase
 
+from boefjes.plugin_repository.models import Boefje, File, Image
 from boefjes.plugin_repository.tests.common import load_plugin
-from boefjes.plugin_repository.models import Boefje, Image, File
 
 EXAMPLE_BOEFJE_FILE = load_plugin("test-boefje.yml")
 

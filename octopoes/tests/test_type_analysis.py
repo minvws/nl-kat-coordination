@@ -5,24 +5,24 @@ from unittest.mock import patch
 
 from octopoes.models import OOI
 from octopoes.models.types import (
-    get_concrete_types,
     get_abstract_types,
+    get_collapsed_types,
+    get_concrete_types,
+    get_relations,
     to_concrete,
     type_by_name,
-    get_relations,
-    get_collapsed_types,
 )
 from tests.mocks.mock_ooi_types import (
-    MockNetwork,
+    ALL_OOI_TYPES,
+    MockDNSCNAMERecord,
+    MockDNSZone,
+    MockHostname,
     MockIPAddress,
     MockIPAddressV4,
     MockIPAddressV6,
     MockIPPort,
-    MockDNSCNAMERecord,
+    MockNetwork,
     MockResolvedHostname,
-    MockHostname,
-    ALL_OOI_TYPES,
-    MockDNSZone,
 )
 
 

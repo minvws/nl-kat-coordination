@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
 from pynetdicom import AE
 

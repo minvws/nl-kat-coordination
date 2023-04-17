@@ -1,10 +1,8 @@
+from account.views import LoginRockyView
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import Client
-
 from pytest_django.asserts import assertContains, assertNotContains
-
-from account.views import LoginRockyView
 
 
 def test_login_view(rf, clientuser):
