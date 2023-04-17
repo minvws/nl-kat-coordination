@@ -21,8 +21,8 @@ _Please add some proof of your working change here, unless this is not required 
 
 ---
 ## Checklist for code reviewers:
-Copy-paste the checklist from (/docs/source/templates/pull_request_template_review_code.md)
+Copy-paste the checklist from [the docs/source/templates folder](/docs/source/templates/pull_request_template_review_code.md).
 
 ---
 ## Checklist for QA:
-Copy-paste the checklist from (/docs/source/templates/pull_request_template_review_qa.md)
+Copy-paste the checklist from [the docs/source/templates folder](/docs/source/templates/pull_request_template_review_qa.md).
