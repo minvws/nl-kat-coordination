@@ -4,12 +4,12 @@ from typing import Any, Dict, Optional
 
 from bytes.config import BASE_DIR
 from bytes.models import (
-    BoefjeMeta,
     Boefje,
-    NormalizerMeta,
-    Normalizer,
-    RawData,
+    BoefjeMeta,
     MimeType,
+    Normalizer,
+    NormalizerMeta,
+    RawData,
     RawDataMeta,
     TimezoneAwareDatetime,
 )

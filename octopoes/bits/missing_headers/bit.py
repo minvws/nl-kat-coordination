@@ -1,5 +1,5 @@
-from bits.definitions import BitParameterDefinition, BitDefinition
-from octopoes.models.ooi.web import HTTPResource, HTTPHeader
+from bits.definitions import BitDefinition, BitParameterDefinition
+from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
 BIT = BitDefinition(
     id="missing-headers",

@@ -9,7 +9,6 @@ from boefjes.katalogus.storage.interfaces import (
     RepositoryStorage,
 )
 
-
 # todo: improve duplicate code
 
 

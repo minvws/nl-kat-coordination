@@ -1,16 +1,15 @@
 from sqlalchemy import (
+    Boolean,
     Column,
-    String,
     ForeignKey,
     Integer,
-    UniqueConstraint,
+    String,
     Table,
-    Boolean,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
 from boefjes.sql.db import SQL_BASE
-
 
 organisation_repo_association_table = Table(
     "organisation_repository",

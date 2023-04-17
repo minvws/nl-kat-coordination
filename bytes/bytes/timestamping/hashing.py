@@ -5,8 +5,8 @@ from typing import Any
 from bytes.models import (
     HashingAlgorithm,
     RawData,
-    TimezoneAwareDatetime,
     SecureHash,
+    TimezoneAwareDatetime,
 )
 
 logger = logging.getLogger(__name__)

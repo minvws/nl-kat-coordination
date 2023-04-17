@@ -1,4 +1,4 @@
-from typing import List, Iterator
+from typing import Iterator, List
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import CVEFindingType, Finding

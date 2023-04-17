@@ -1,7 +1,7 @@
 """Boefje script checking if dnssec has been correctly configured and is valid for given hostname"""
 import json
 import re
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
 import docker
 

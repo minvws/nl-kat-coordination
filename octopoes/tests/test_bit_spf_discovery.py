@@ -1,7 +1,8 @@
 from bits.spf_discovery.spf_discovery import run
+
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import DNSTXTRecord
-from octopoes.models.ooi.email_security import DNSSPFRecord, DNSSPFMechanismIP
+from octopoes.models.ooi.email_security import DNSSPFMechanismIP, DNSSPFRecord
 from octopoes.models.ooi.findings import KATFindingType
 from octopoes.models.ooi.network import IPAddressV4
 

@@ -4,18 +4,18 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
-
-from account.validators import get_password_validators_help_texts
+from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm
 from tools.models import (
-    GROUP_CLIENT,
     GROUP_ADMIN,
+    GROUP_CLIENT,
     GROUP_REDTEAM,
+    ORGANIZATION_CODE_LENGTH,
     Organization,
     OrganizationMember,
 )
-from tools.models import ORGANIZATION_CODE_LENGTH
-from tools.enums import SCAN_LEVEL
+
+from account.validators import get_password_validators_help_texts
 
 User = get_user_model()
 

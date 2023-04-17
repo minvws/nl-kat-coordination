@@ -1,6 +1,5 @@
-from pytest_django.asserts import assertContains
-
 from katalogus.views.plugin_settings_edit import PluginSettingsUpdateView
+from pytest_django.asserts import assertContains
 from tests.conftest import setup_request
 
 

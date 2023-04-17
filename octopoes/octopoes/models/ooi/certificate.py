@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional, Literal
+from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname

@@ -8,15 +8,15 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
+from tools.forms.base import BaseRockyForm, DataListInput, DateTimeInput
 from tools.forms.settings import (
-    RISK_RATING_CHOICES,
+    FINDING_DATETIME_HELP_TEXT,
+    FINDING_TYPE_IDS_HELP_TEXT,
+    MANUAL_FINDING_ID_PREFIX,
     PIE_SCALE_CHOICES,
     PIE_SCALE_EFFORT_CHOICES,
-    MANUAL_FINDING_ID_PREFIX,
-    FINDING_TYPE_IDS_HELP_TEXT,
+    RISK_RATING_CHOICES,
 )
-from tools.forms.base import DateTimeInput, BaseRockyForm, DataListInput
-from tools.forms.settings import FINDING_DATETIME_HELP_TEXT
 from tools.models import OOIInformation
 
 
