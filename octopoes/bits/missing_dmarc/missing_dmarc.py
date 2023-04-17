@@ -1,12 +1,11 @@
 from typing import Iterator, List
 
+import tldextract
+
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.email_security import DMARCTXTRecord
-
-import tldextract
-
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def run(

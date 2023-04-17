@@ -1,7 +1,7 @@
 import logging
-from typing import List, Optional, Any, Union
+from typing import Any, List, Optional, Union
 
-from fastapi import Depends, APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm

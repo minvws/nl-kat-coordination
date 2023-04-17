@@ -2,8 +2,8 @@ from django.urls import path
 
 from katalogus import views
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
-from katalogus.views.plugin_detail import PluginDetailView, PluginCoverImgView
-from katalogus.views.plugin_settings_add import PluginSingleSettingAddView, PluginSettingsAddView
+from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
+from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 from katalogus.views.plugin_settings_edit import PluginSettingsUpdateView
 

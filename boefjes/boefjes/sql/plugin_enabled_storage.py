@@ -1,17 +1,17 @@
 import logging
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from boefjes.config import Settings, settings
 from boefjes.katalogus.storage.interfaces import (
+    OrganisationNotFound,
     PluginEnabledStorage,
     PluginNotFound,
-    OrganisationNotFound,
     RepositoryNotFound,
 )
-from boefjes.sql.db import get_engine, ObjectNotFoundException
-from boefjes.sql.db_models import PluginStateInDB, OrganisationInDB, RepositoryInDB
+from boefjes.sql.db import ObjectNotFoundException, get_engine
+from boefjes.sql.db_models import OrganisationInDB, PluginStateInDB, RepositoryInDB
 from boefjes.sql.session import SessionMixin
 
 logger = logging.getLogger(__name__)

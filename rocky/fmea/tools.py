@@ -4,9 +4,8 @@ from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
-from xhtml2pdf import pisa
-
 from tools.ooi_helpers import OOI_TYPES_WITHOUT_FINDINGS
+from xhtml2pdf import pisa
 
 translated_blank_choice = _("--- Select an option ----")
 BLANK_CHOICE = [("", translated_blank_choice)]

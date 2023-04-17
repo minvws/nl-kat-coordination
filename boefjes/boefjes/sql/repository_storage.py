@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings
 from boefjes.katalogus.models import Repository
-from boefjes.katalogus.storage.interfaces import RepositoryStorage, RepositoryNotFound
+from boefjes.katalogus.storage.interfaces import RepositoryNotFound, RepositoryStorage
 from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.db_models import RepositoryInDB
 from boefjes.sql.session import SessionMixin

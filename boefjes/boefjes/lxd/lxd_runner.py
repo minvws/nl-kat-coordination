@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Union, Optional, Tuple, Dict
+from typing import Dict, Optional, Tuple, Union
 
 import pylxd
 import pylxd.exceptions

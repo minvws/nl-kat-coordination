@@ -1,7 +1,7 @@
 import json
 import re
 from os import getenv
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 from urllib.parse import quote_plus
 
 import requests

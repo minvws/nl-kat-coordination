@@ -1,7 +1,7 @@
 from _datetime import datetime, timedelta
+from bits.expiring_certificate.expiring_certificate import run
 
 from octopoes.models.ooi.certificate import X509Certificate
-from bits.expiring_certificate.expiring_certificate import run
 
 
 def test_expiring_cert_simple_success():

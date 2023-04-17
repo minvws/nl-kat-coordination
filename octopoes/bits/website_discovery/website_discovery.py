@@ -1,4 +1,4 @@
-from typing import List, Iterator, Union
+from typing import Iterator, List, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import ResolvedHostname

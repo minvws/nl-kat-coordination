@@ -1,7 +1,7 @@
 """Keiko settings module."""
 from pathlib import Path
 
-from pydantic import BaseSettings, Field, DirectoryPath, FilePath
+from pydantic import BaseSettings, DirectoryPath, Field, FilePath
 
 
 class Settings(BaseSettings):

@@ -6,6 +6,7 @@ import threading
 from typing import Any, Dict, List, Optional
 
 import pydantic
+
 from scheduler import models, repositories
 
 from .errors import (

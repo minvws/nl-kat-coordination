@@ -2,18 +2,18 @@ from logging import getLogger
 from typing import List, Optional
 from uuid import uuid4
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from requests import RequestException, HTTPError
+from requests import HTTPError, RequestException
 from rest_framework.status import HTTP_404_NOT_FOUND
 
-from account.mixins import OrganizationView
-from katalogus.client import get_katalogus, Plugin
+from katalogus.client import Plugin, get_katalogus
 from octopoes.models import OOI
-from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
+from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
 from rocky.scheduler import Boefje, BoefjeTask, QueuePrioritizedItem, client
 from rocky.views.mixins import OctopoesView
 

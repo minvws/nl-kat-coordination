@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, List, Set, Callable
+from typing import Callable, Dict, List, Set
 
 from pydantic.main import BaseModel
 

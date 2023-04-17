@@ -1,12 +1,12 @@
 import json
-from typing import Any, List, Type, Set
+from typing import Any, List, Set, Type
 from urllib import parse
 
 from django import template
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType
-from tools.models import GROUP_REDTEAM, GROUP_ADMIN
+from tools.models import GROUP_ADMIN, GROUP_REDTEAM
 from tools.view_helpers import get_ooi_url
 
 register = template.Library()
