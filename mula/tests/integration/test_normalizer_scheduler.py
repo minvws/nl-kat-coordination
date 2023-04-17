@@ -13,6 +13,7 @@ from tests.factories import (
 )
 from tests.utils import functions
 
+
 class NormalizerSchedulerBaseTestCase(unittest.TestCase):
     def setUp(self):
         cfg = config.settings.Settings()
@@ -54,12 +55,11 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
         )
 
 
-@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")                # index: 3
-@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")         # index: 2
+@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")  # index: 3
+@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")  # index: 2
 @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")  # index: 1
-@mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")      # index: 0
+@mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")  # index: 0
 class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
-
     def test_push_tasks_for_received_raw_file(self, *mocks):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)

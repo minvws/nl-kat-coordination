@@ -649,13 +649,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
 
-@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")                                   # index: 4
-@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")                            # index: 3
-@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")                           # index: 2
-@mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")                               # index: 1
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")  # index: 4
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")  # index: 3
+@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")  # index: 2
+@mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")  # index: 1
 @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")  # index: 0
 class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
-
     def test_push_tasks_for_scan_profile_mutations(self, *mocks):
         """Scan level change"""
         # Arrange
@@ -785,10 +784,10 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
 
-@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")                        # index: 4
-@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")                 # index: 3
-@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")                # index: 2
-@mock.patch("scheduler.context.AppContext.services.katalogus.get_new_boefjes_by_org_id")   # index: 1
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")  # index: 4
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")  # index: 3
+@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")  # index: 2
+@mock.patch("scheduler.context.AppContext.services.katalogus.get_new_boefjes_by_org_id")  # index: 1
 @mock.patch("scheduler.context.AppContext.services.octopoes.get_objects_by_object_types")  # index: 0
 class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
     def test_push_tasks_for_new_boefjes(self, *mocks):
@@ -928,10 +927,10 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
 
-@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")               # index: 4
-@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")        # index: 3
-@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")       # index: 2
-@mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")           # index: 1
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")  # index: 4
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")  # index: 3
+@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")  # index: 2
+@mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")  # index: 1
 @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")  # index: 0
 class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
     def test_push_tasks_for_random_objects(self, *mocks):
