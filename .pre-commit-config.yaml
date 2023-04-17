@@ -62,7 +62,6 @@ repos:
     rev: 'v0.0.247'
     hooks:
       - id: ruff
-        args: [ --fix ]
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.4
