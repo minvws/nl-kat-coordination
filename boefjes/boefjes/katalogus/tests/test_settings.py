@@ -10,7 +10,7 @@ from boefjes.katalogus.dependencies.encryption import (
 )
 from boefjes.katalogus.dependencies.organisations import get_organisations_store
 from boefjes.katalogus.dependencies.plugins import get_plugin_service
-from boefjes.katalogus.models import Organisation, Base64Str
+from boefjes.katalogus.models import Base64Str, Organisation
 from boefjes.katalogus.storage.memory import (
     OrganisationStorageMemory,
 )

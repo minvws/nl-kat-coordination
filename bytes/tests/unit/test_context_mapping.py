@@ -1,15 +1,15 @@
 from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
 from bytes.database.sql_meta_repository import (
-    to_boefje_meta_in_db,
+    raw_meta_to_raw_file_in_db,
     to_boefje_meta,
-    to_normalizer_meta_in_db,
+    to_boefje_meta_in_db,
+    to_mime_type,
     to_normalizer_meta,
+    to_normalizer_meta_in_db,
     to_raw_data,
     to_raw_file_in_db,
-    to_mime_type,
-    raw_meta_to_raw_file_in_db,
 )
-from tests.loading import get_normalizer_meta, get_raw_data, get_boefje_meta
+from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 
 def test_context_mapping_boefje() -> None:

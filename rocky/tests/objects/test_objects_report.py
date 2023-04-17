@@ -1,18 +1,18 @@
 from io import BytesIO
 
 from django.core.management import call_command
-from django.urls import reverse, resolve
+from django.urls import resolve, reverse
+from pytest_django.asserts import assertContains
+from requests import HTTPError
+from tools.ooi_helpers import RiskLevelSeverity
+
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, MutedFinding
 from octopoes.models.pagination import Paginated
-from octopoes.models.types import OOIType
-from pytest_django.asserts import assertContains
-from requests import HTTPError
-
 from octopoes.models.tree import ReferenceTree
-from rocky.views.ooi_report import OOIReportView, OOIReportPDFView, FindingReportPDFView
+from octopoes.models.types import OOIType
+from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from tests.conftest import setup_request
-from tools.ooi_helpers import RiskLevelSeverity
 
 TREE_DATA = {
     "root": {

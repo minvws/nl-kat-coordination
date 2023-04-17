@@ -1,22 +1,11 @@
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, List, Dict, Set
+from typing import Any, Dict, List, Set
 
 import requests
-
-from octopoes.models.types import OOIType
 from pydantic.tools import parse_obj_as
-
-from boefjes.katalogus.local_repository import LocalPluginRepository
-from octopoes.api.models import Observation, Declaration
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
 from requests import RequestException
-
-from boefjes.runtime_interfaces import Handler, BoefjeJobRunner, NormalizerJobRunner
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
@@ -25,6 +14,13 @@ from boefjes.job_models import (
     NormalizerMeta,
     NormalizerPlainOOI,
 )
+from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
+from octopoes.api.models import Declaration, Observation
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI, Reference
+from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.types import OOIType
 
 logger = logging.getLogger(__name__)
 bytes_api_client = BytesAPIClient(

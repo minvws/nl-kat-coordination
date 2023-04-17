@@ -1,7 +1,7 @@
 import logging
 import typing
 from functools import wraps
-from typing import Callable, Dict, Union, Any, Set
+from typing import Any, Callable, Dict, Set, Union
 
 import requests
 from requests.adapters import HTTPAdapter

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Union, Optional, Literal
+from typing import Literal, Optional, Union
 
 from pydantic.types import conint
 

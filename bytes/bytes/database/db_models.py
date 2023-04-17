@@ -1,5 +1,5 @@
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, Index
-from sqlalchemy.dialects.postgresql import UUID, ARRAY
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, Index, String
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import relationship
 
 from bytes.database.db import SQL_BASE

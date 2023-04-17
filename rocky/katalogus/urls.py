@@ -2,8 +2,8 @@ from django.urls import path
 
 from katalogus import views
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
-from katalogus.views.plugin_detail import PluginDetailView, PluginCoverImgView
-from katalogus.views.plugin_settings_add import PluginSingleSettingAddView, PluginSettingsAddView
+from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
+from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 from katalogus.views.plugin_settings_edit import PluginSettingsUpdateView
 
@@ -61,7 +61,7 @@ urlpatterns = [
         name="plugin_settings_edit",
     ),
     path(
-        "plugins/<plugin_type>/<plugin_id>/settings/delete/<name>/",
+        "plugins/<plugin_type>/<plugin_id>/settings/delete/<setting_name>/",
         PluginSettingsDeleteView.as_view(),
         name="plugin_settings_delete",
     ),

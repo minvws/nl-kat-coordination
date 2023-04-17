@@ -1,7 +1,6 @@
+from account.mixins import OrganizationView
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-
-from account.mixins import OrganizationView
 from tools.view_helpers import StepsMixin
 
 

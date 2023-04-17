@@ -1,13 +1,13 @@
-from pytest_django.asserts import assertContains, assertNotContains
 import pytest
-from octopoes.models.tree import ReferenceTree
-from rocky.views.ooi_findings import OOIFindingListView
-from rocky.views.ooi_detail import OOIDetailView
-from rocky.views.ooi_add import OOIAddView
-from rocky.views.ooi_mute import MuteFindingView
 from django.core.exceptions import PermissionDenied
-from tests.conftest import setup_request
+from pytest_django.asserts import assertContains, assertNotContains
 
+from octopoes.models.tree import ReferenceTree
+from rocky.views.ooi_add import OOIAddView
+from rocky.views.ooi_detail import OOIDetailView
+from rocky.views.ooi_findings import OOIFindingListView
+from rocky.views.ooi_mute import MuteFindingView
+from tests.conftest import setup_request
 
 TREE_DATA = {
     "root": {

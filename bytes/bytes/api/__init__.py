@@ -7,8 +7,6 @@ from pydantic import ValidationError
 from bytes.api.root import router as root_router
 from bytes.api.root import validation_exception_handler
 from bytes.api.router import router
-
-
 from bytes.config import get_settings
 
 logging.config.fileConfig(get_settings().log_cfg, disable_existing_loggers=False)

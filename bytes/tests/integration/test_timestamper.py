@@ -1,8 +1,9 @@
+from tests.loading import get_boefje_meta, get_raw_data
+
 from bytes.config import has_rfc3161_provider  # noqa: F401
-from bytes.repositories.meta_repository import RawDataFilter
 from bytes.database.sql_meta_repository import SQLMetaDataRepository
+from bytes.repositories.meta_repository import RawDataFilter
 from bytes.timestamping.rfc3161 import RFC3161HashRepository
-from tests.loading import get_raw_data, get_boefje_meta
 
 
 def test_rfc3161_external_api(

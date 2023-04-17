@@ -1,18 +1,18 @@
 import datetime
 import hashlib
 import json
+import logging
 import os
 import re
 from dataclasses import dataclass
-from typing import Optional, Tuple, List, Dict, Union
+from itertools import product
+from typing import Dict, List, Optional, Tuple, Union
 
 import requests
 from ares import CVESearch
 from bs4 import BeautifulSoup
 from cwe import Database
 from django.conf import settings
-from itertools import product
-import logging
 
 RETIREJS_SOURCE = "https://github.com/RetireJS/retire.js/blob/master/repository/jsrepository.json"
 

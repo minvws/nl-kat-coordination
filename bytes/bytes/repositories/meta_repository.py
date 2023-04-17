@@ -1,8 +1,8 @@
-from typing import Type, List, Optional, Any, Dict
+from typing import Any, Dict, List, Optional, Type
 
 from pydantic import BaseModel, Field, root_validator
 
-from bytes.models import BoefjeMeta, NormalizerMeta, RawData, MimeType, RawDataMeta
+from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataMeta
 
 
 class BoefjeMetaFilter(BaseModel):

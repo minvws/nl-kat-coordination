@@ -1,9 +1,8 @@
 import pytest
+from templates.bevindingenrapport.model import DataShape
 
 from keiko.keiko import generate_report
 from keiko.settings import Settings
-
-from templates.bevindingenrapport.model import DataShape
 
 report_data_empty = {
     "meta": {

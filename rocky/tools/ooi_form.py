@@ -1,11 +1,11 @@
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Type, Dict, Union, List
+from typing import Dict, List, Type, Union
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from pydantic import AnyUrl
-from pydantic.fields import ModelField, SHAPE_LIST
+from pydantic.fields import SHAPE_LIST, ModelField
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI

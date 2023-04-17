@@ -1,12 +1,12 @@
 import typing
-from typing import Callable, Dict, Union, Any, Optional, List
+from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import requests
-from functools import wraps
 from requests.models import HTTPError
 
 from bytes.models import BoefjeMeta, NormalizerMeta
-from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter, NormalizerMetaFilter
+from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
 
 BYTES_API_CLIENT_VERSION = "0.2"
 

@@ -1,10 +1,10 @@
 from ipaddress import ip_address
-from typing import List, Iterator
+from typing import Iterator, List
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
-from octopoes.models.ooi.web import HostnameHTTPURL, URL, WebScheme, IPAddressHTTPURL
+from octopoes.models.ooi.web import URL, HostnameHTTPURL, IPAddressHTTPURL, WebScheme
 
 
 def run(

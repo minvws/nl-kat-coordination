@@ -1,16 +1,16 @@
 from typing import Iterator, Union
 
-from dns.message import from_text, Message
+from dns.message import Message, from_text
 from dns.rdata import Rdata
 from dns.rdtypes.ANY.SOA import SOA
+
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSSOARecord,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.network import Network
-
-from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

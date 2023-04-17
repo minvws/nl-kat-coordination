@@ -3,12 +3,12 @@ import uuid
 import pytest
 import requests
 from requests import HTTPError
+from tests.client import BytesAPIClient
+from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 from bytes.models import MimeType
 from bytes.rabbitmq import RabbitMQEventManager
-from bytes.repositories.meta_repository import BoefjeMetaFilter, RawDataFilter, NormalizerMetaFilter
-from tests.client import BytesAPIClient
-from tests.loading import get_normalizer_meta, get_boefje_meta, get_raw_data
+from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
 
 
 def test_login(bytes_api_client: BytesAPIClient) -> None:

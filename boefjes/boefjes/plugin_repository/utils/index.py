@@ -6,8 +6,8 @@ from typing import Dict, List
 import diskcache
 
 from boefjes.plugin_repository.config import PLUGINS_DIR
+from boefjes.plugin_repository.models import CombinedFile, File, Image, Index
 from boefjes.plugin_repository.utils.hash import Hasher
-from boefjes.plugin_repository.models import Index, Image, File, CombinedFile
 from boefjes.plugin_repository.utils.utils import load_config_file
 
 logging.basicConfig(level=logging.INFO)

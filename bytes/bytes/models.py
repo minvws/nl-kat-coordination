@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Iterable, Callable, Union, Optional, Dict, Any, NewType, List
+from typing import Any, Callable, Dict, Iterable, List, NewType, Optional, Union
 
 from pydantic import BaseModel, Field
-from pydantic.datetime_parse import parse_datetime, StrBytesIntFloat
+from pydantic.datetime_parse import StrBytesIntFloat, parse_datetime
 
 RetrievalLink = NewType("RetrievalLink", str)
 SecureHash = NewType("SecureHash", str)

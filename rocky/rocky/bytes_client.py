@@ -1,14 +1,14 @@
 import logging
 import uuid
 from datetime import datetime, timezone
-from typing import Dict, List, Set, Optional
+from typing import Dict, List, Optional, Set
 
-from django.conf import settings
 import requests
-from octopoes.api.models import Declaration
+from django.conf import settings
 
+from octopoes.api.models import Declaration
 from rocky.health import ServiceHealth
-from rocky.scheduler import BoefjeMeta, NormalizerMeta, Boefje, Normalizer, RawData
+from rocky.scheduler import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, RawData
 
 logger = logging.getLogger(__name__)
 

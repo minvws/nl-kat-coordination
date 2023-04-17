@@ -1,24 +1,23 @@
-from datetime import timezone, datetime
-from pathlib import Path
-
-import pytest
 import sys
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import List
 from unittest import TestCase, mock
 
+import pytest
+
+from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.job_models import (
     BoefjeMeta,
-    NormalizerMeta,
-    UnsupportedReturnTypeNormalizer,
     InvalidReturnValueNormalizer,
+    NormalizerMeta,
     NormalizerPlainOOI,
+    UnsupportedReturnTypeNormalizer,
 )
-from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.katalogus.models import Boefje, Normalizer, Bit, PluginType
-
-from tests.stubs import get_dummy_data
+from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from tests.stubs import get_dummy_data
 
 
 class TaskTest(TestCase):
