@@ -1,6 +1,6 @@
 import base64
 
-from nacl.public import PrivateKey, PublicKey, Box
+from nacl.public import Box, PrivateKey, PublicKey
 
 from bytes.config import get_settings
 from bytes.models import EncryptionMiddleware

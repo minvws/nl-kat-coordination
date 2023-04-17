@@ -1,10 +1,9 @@
-from typing import Union, Iterator
-
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.network import Network
-from octopoes.models.ooi.dns.zone import Hostname
+from typing import Iterator, Union
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import Network
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

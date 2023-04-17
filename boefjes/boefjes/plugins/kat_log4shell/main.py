@@ -1,9 +1,8 @@
 import json
 import logging
-
-from os import getenv
 from base64 import b64encode
-from typing import Tuple, Union, Optional, Dict, List
+from os import getenv
+from typing import Dict, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import requests

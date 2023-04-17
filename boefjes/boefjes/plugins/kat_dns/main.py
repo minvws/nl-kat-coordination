@@ -1,7 +1,7 @@
 """Boefje script for getting dns records"""
 import json
 import logging
-from typing import Union, Tuple, List
+from typing import List, Tuple, Union
 
 import dns.resolver
 from dns.name import Name

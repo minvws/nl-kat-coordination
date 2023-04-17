@@ -1,4 +1,4 @@
-from typing import Tuple, Dict, Set, Optional
+from typing import Dict, Optional, Set, Tuple
 
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 

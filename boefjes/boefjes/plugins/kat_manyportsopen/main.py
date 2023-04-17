@@ -1,5 +1,5 @@
 import json
-from typing import Union, Tuple, List
+from typing import List, Tuple, Union
 
 from boefjes.job_models import BoefjeMeta
 

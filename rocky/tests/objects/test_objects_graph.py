@@ -1,10 +1,9 @@
-from django.urls import reverse, resolve
+from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
 
 from octopoes.models.tree import ReferenceTree
 from rocky.views.ooi_tree import OOIGraphView
 from tests.conftest import setup_request
-
 
 TREE_DATA = {
     "root": {

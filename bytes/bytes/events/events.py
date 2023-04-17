@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
 
-from bytes.models import RawDataMeta, NormalizerMeta
+from bytes.models import NormalizerMeta, RawDataMeta
 
 
 def utc_now() -> datetime:
