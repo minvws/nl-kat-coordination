@@ -290,6 +290,9 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             PluginFactory(type="normalizer"),
         ]
 
+        mocks[2].return_value = True
+        mocks[3].return_value = False
+
         # Act
         self.scheduler.push_tasks_for_received_raw_file()
 
