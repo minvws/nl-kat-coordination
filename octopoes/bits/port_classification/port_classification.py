@@ -5,6 +5,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPPort, Protocol
 
 COMMON_TCP_PORTS = [25, 53, 110, 143, 993, 995, 80, 443]
+COMMON_UDP_PORTS = [53]
 SA_PORTS = [21, 22, 23, 3389, 5900]
 DB_PORTS = [1433, 1434, 3050, 3306, 5432]
 
@@ -31,6 +32,9 @@ def run(
     elif port in COMMON_TCP_PORTS and input_ooi.protocol == Protocol.TCP:
         finding_id = "KAT-OPEN-COMMON-TCP-PORT"
         port_type = "a common TCP"
+    elif port in COMMON_TCP_PORTS and input_ooi.protocol == Protocol.UDP:
+        finding_id = "KAT-OPEN-COMMON-UDP-PORT"
+        port_type = "a common UDP"
     else:
         finding_id = "KAT-UNCOMMON-OPEN-PORT"
         port_type = "not a common"
