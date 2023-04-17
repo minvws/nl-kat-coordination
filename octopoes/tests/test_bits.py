@@ -1,10 +1,11 @@
 from bits.https_availability.https_availability import run as run_https_availability
 from bits.oois_in_headers.oois_in_headers import run as run_oois_in_headers
+
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
-from octopoes.models.ooi.network import IPPort, IPAddressV4, Network
+from octopoes.models.ooi.network import IPAddressV4, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
-from octopoes.models.ooi.web import HTTPHeader, URL, HTTPHeaderURL, Website, HostnameHTTPURL, HTTPResource
+from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPHeaderURL, HTTPResource, Website
 
 
 def test_url_extracted_by_oois_in_headers_url():

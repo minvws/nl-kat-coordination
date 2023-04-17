@@ -1,13 +1,13 @@
 import tempfile
 import time
 from pathlib import Path
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 from unittest import TestCase
 
 from pydantic import parse_raw_as
 
 from boefjes.app import SchedulerRuntimeManager
-from boefjes.clients.scheduler_client import SchedulerClientInterface, QueuePrioritizedItem, Queue, TaskStatus
+from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, RuntimeManager

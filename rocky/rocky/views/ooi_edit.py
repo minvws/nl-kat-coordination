@@ -1,8 +1,8 @@
 from django.utils.translation import gettext_lazy as _
+from tools.view_helpers import get_ooi_url
 
 from octopoes.models import Reference
 from rocky.views.ooi_view import BaseOOIFormView
-from tools.view_helpers import get_ooi_url
 
 
 class OOIEditView(BaseOOIFormView):

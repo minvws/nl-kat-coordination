@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List, Set, Type
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.core.exceptions import BadRequest
 from django.http import FileResponse
@@ -9,35 +10,31 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
+from katalogus.client import get_katalogus
+from tools.forms.ooi import OOIReportSettingsForm
+from tools.models import Organization
+from tools.view_helpers import convert_date_to_datetime, get_ooi_url
+from two_factor.views.utils import class_view_decorator
+
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
-    DNSARecord,
     DNSAAAARecord,
+    DNSARecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSSOARecord,
 )
 from octopoes.models.ooi.dns.zone import Hostname
-
-from two_factor.views.utils import class_view_decorator
-
-from account.mixins import OrganizationView
-from katalogus.client import get_katalogus
-
 from rocky.keiko import (
-    keiko_client,
-    ReportNotFoundException,
     GeneratingReportFailed,
+    ReportNotFoundException,
     ReportsService,
     build_findings_list_from_store,
+    keiko_client,
 )
 from rocky.views.finding_list import FindingListView
 from rocky.views.mixins import OOIBreadcrumbsMixin, SingleOOITreeMixin
 from rocky.views.ooi_view import BaseOOIDetailView
-
-from tools.forms.ooi import OOIReportSettingsForm
-from tools.models import Organization
-from tools.view_helpers import get_ooi_url, convert_date_to_datetime
 
 
 @class_view_decorator(otp_required)

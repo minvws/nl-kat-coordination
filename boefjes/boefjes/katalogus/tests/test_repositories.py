@@ -1,12 +1,13 @@
 import json
 from unittest import TestCase
+
 from fastapi.testclient import TestClient
 
 from boefjes.katalogus.api import app
+from boefjes.katalogus.dependencies.repositories import get_repository_store
 from boefjes.katalogus.models import Repository
 from boefjes.katalogus.routers.organisations import check_organisation_exists
 from boefjes.katalogus.storage.memory import RepositoryStorageMemory
-from boefjes.katalogus.dependencies.repositories import get_repository_store
 
 
 class TestRepositories(TestCase):

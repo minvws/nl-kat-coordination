@@ -1,3 +1,4 @@
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
@@ -7,12 +8,10 @@ from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from django_otp.decorators import otp_required
 from requests import HTTPError
+from tools.forms.upload_raw import RAW_ERRORS, UploadRawForm
 from two_factor.views.utils import class_view_decorator
 
-from account.mixins import OrganizationView
 from rocky.bytes_client import get_bytes_client
-
-from tools.forms.upload_raw import UploadRawForm, RAW_ERRORS
 
 
 @class_view_decorator(otp_required)

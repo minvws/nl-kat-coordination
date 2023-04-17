@@ -1,28 +1,25 @@
 import re
 import time
-from typing import Dict, BinaryIO, List, Optional, Any
+from datetime import datetime, timezone
 from http import HTTPStatus
 from io import BytesIO
+from typing import Any, BinaryIO, Dict, List, Optional
 
 import requests
-from requests import HTTPError
-
-from datetime import datetime, timezone
 from django.conf import settings
+from requests import HTTPError
+from tools.ooi_helpers import (
+    RiskLevelSeverity,
+    get_finding_type_from_finding,
+    get_knowledge_base_data_for_ooi,
+    get_knowledge_base_data_for_ooi_store,
+    get_ooi_dict,
+)
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType
-
-from rocky.health import ServiceHealth
 from rocky.exceptions import RockyError
-
-from tools.ooi_helpers import (
-    get_ooi_dict,
-    get_knowledge_base_data_for_ooi_store,
-    get_knowledge_base_data_for_ooi,
-    get_finding_type_from_finding,
-    RiskLevelSeverity,
-)
+from rocky.health import ServiceHealth
 
 
 class ReportException(RockyError):

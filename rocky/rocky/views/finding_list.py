@@ -1,20 +1,18 @@
 import logging
-
 from typing import Any, Dict, List, Optional
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from tools.ooi_helpers import RiskLevelSeverity, get_finding_type_from_finding, get_knowledge_base_data_for_ooi
+from tools.view_helpers import BreadcrumbsMixin
 
+from octopoes.connector import ConnectorException
 from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models.ooi.findings import Finding, MutedFinding
-from octopoes.connector import ConnectorException
-
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
-from tools.view_helpers import BreadcrumbsMixin
-from tools.ooi_helpers import get_finding_type_from_finding, get_knowledge_base_data_for_ooi, RiskLevelSeverity
-from account.mixins import OrganizationView
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +22,10 @@ def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
     # order is preserved) so if we first sort by finding id the findings with
     # the same risk score will be sorted by finding id
     sorted_by_finding_id = sorted(findings, key=lambda x: x["finding_type"].id)
-    return sorted(sorted_by_finding_id, key=lambda x: x["risk_level_score"], reverse=True)
+    sorted_findings = sorted(sorted_by_finding_id, key=lambda x: x["risk_level_score"], reverse=True)
+    for index, finding in enumerate(sorted_findings, start=1):
+        finding["finding_number"] = index
+    return sorted_findings
 
 
 def generate_findings_metadata(
@@ -45,6 +46,7 @@ def generate_findings_metadata(
         if not severity_filter or severity in severity_filter:
             findings_meta.append(
                 {
+                    "finding_number": 0,
                     "finding": finding,
                     "finding_type": finding_type,
                     "severity": severity.value.capitalize(),
