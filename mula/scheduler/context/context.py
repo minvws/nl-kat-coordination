@@ -115,12 +115,6 @@ class AppContext:
             labelnames=["scheduler_id"],
         )
 
-        self.metrics_katalogus = Info(
-            name="app_katalogus",
-            documentation="Katalogus service information",
-            registry=self.metrics_registry,
-        )
-
         self.metrics_katalogus_cache_expiry = Gauge(
             name="katalogus_cache_expiry",
             documentation="Katalogus cache expiry",
