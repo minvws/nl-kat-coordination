@@ -3,3 +3,18 @@
 section dl div {
   display: grid;
 }
+
+/* Fix whitespace issue after linter adds spaces. */
+dl {
+  dt,
+  dd {
+    white-space: initial;
+  }
+}
+
+/* Add option to style borders */
+dl {
+  > div {
+    border-bottom: 1px solid #d4d4d4;
+  }
+}

@@ -31,7 +31,7 @@
             ],
             "dispatches": null
         },
-        "input_ooi": "Hostname|internet|test.test.",
+        "input_ooi": "Hostname|internet|test.test",
         "organization": "_dev",
         "dispatches": []
     }

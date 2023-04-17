@@ -1,7 +1,7 @@
-from typing import List, Iterator, Union
+from typing import Iterator, List, Union
 
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPPort, Protocol
 
 COMMON_TCP_PORTS = [25, 53, 110, 143, 993, 995, 80, 443]

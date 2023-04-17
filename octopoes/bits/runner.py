@@ -1,6 +1,6 @@
 from importlib import import_module
-from inspect import signature, isfunction
-from typing import List, Iterator, Any, cast, Protocol
+from inspect import isfunction, signature
+from typing import Any, Iterator, List, Protocol, cast
 
 from bits.definitions import BitDefinition
 from octopoes.models import OOI

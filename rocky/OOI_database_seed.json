@@ -524,6 +524,19 @@
   },
   {
     "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-OPEN-COMMON-UDP-PORT",
+    "fields": {
+      "last_updated": "2021-08-09T14:50:09.835Z",
+      "data": {
+        "description": "A port commonly used for UDP traffic was found to be open.",
+        "recommendation": "Manually validate whether this open port should be open.",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
     "pk": "KATFindingType|KAT-WEBSERVER-NO-IPV6",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",

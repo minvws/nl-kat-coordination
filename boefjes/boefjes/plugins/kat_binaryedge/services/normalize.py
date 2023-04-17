@@ -2,18 +2,17 @@ import ipaddress
 import json
 from typing import Iterator, Union
 
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import (
-    IPPort,
-    Protocol,
-    PortState,
     IPAddressV4,
     IPAddressV6,
+    IPPort,
     Network,
+    PortState,
+    Protocol,
 )
 from octopoes.models.ooi.software import Software, SoftwareInstance
-
-from boefjes.job_models import NormalizerMeta
 
 
 def get_name_from_cpe(cpe: str) -> str:

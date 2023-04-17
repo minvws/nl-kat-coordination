@@ -1,7 +1,7 @@
 import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional, List, Literal, Dict, Union
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 

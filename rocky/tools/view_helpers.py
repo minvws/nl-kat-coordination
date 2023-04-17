@@ -1,12 +1,12 @@
 import uuid
 from datetime import date, datetime, timezone
 from typing import List, TypedDict
-from urllib.parse import urlparse, urlunparse, urlencode
-
-from django.urls.base import reverse_lazy, reverse
-from django.utils.translation import gettext_lazy as _
+from urllib.parse import urlencode, urlparse, urlunparse
 
 from account.mixins import OrganizationView
+from django.urls.base import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
 from octopoes.models.types import OOI_TYPES
 
 

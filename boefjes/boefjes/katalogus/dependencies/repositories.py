@@ -7,7 +7,6 @@ from boefjes.katalogus.storage.memory import RepositoryStorageMemory
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.repository_storage import create_repository_storage
 
-
 logger = logging.getLogger(__name__)
 
 

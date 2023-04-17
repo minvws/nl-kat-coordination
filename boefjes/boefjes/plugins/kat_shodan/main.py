@@ -1,11 +1,10 @@
 import json
 import logging
-from typing import Tuple, Union, List
+from ipaddress import ip_address
+from os import getenv
+from typing import List, Tuple, Union
 
 import shodan
-
-from os import getenv
-from ipaddress import ip_address
 
 from boefjes.job_models import BoefjeMeta
 
