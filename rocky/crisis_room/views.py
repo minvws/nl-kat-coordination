@@ -1,25 +1,24 @@
 import logging
-
-from datetime import timezone, datetime
+from datetime import datetime, timezone
 from typing import List, Union
 
-from django.contrib import messages
+from account.models import KATUser
 from django.conf import settings
+from django.contrib import messages
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+from tools.forms.base import ObservedAtForm
+from tools.models import Organization
+from tools.view_helpers import BreadcrumbsMixin, convert_date_to_datetime
 from two_factor.views.utils import class_view_decorator
 
-from account.models import KATUser
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.findings import Finding
 from rocky.views.ooi_report import build_findings_list_from_store
 from rocky.views.ooi_view import ConnectorFormMixin
-from tools.forms.base import ObservedAtForm
-from tools.models import Organization
-from tools.view_helpers import BreadcrumbsMixin, convert_date_to_datetime
 
 logger = logging.getLogger(__name__)
 

@@ -3,6 +3,7 @@ import unittest
 from unittest import mock
 
 from scheduler import config, models, queues, rankers, repositories, schedulers
+
 from tests.factories import (
     BoefjeMetaFactory,
     OOIFactory,

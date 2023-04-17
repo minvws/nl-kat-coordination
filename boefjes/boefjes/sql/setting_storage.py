@@ -8,10 +8,10 @@ from boefjes.config import settings
 from boefjes.katalogus.dependencies.context import get_context
 from boefjes.katalogus.dependencies.encryption import EncryptMiddleware, IdentityMiddleware, NaclBoxMiddleware
 from boefjes.katalogus.models import EncryptionMiddleware
-from boefjes.katalogus.storage.interfaces import SettingsStorage, SettingsNotFound
+from boefjes.katalogus.storage.interfaces import SettingsNotFound, SettingsStorage
 from boefjes.katalogus.storage.memory import SettingsStorageMemory
 from boefjes.sql.db import ObjectNotFoundException
-from boefjes.sql.db_models import SettingsInDB, OrganisationInDB
+from boefjes.sql.db_models import OrganisationInDB, SettingsInDB
 from boefjes.sql.session import SessionMixin
 
 logger = logging.getLogger(__name__)

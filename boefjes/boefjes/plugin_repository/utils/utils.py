@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Union, Dict
+from typing import Dict, Union
 
 import yaml
 from pydantic import parse_obj_as

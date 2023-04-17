@@ -432,3 +432,4 @@ $RECYCLE.BIN/
 deployment/github_config.sh
 
 nl-kat-*
+/_version.py

@@ -1,14 +1,12 @@
-from fastapi import HTTPException
-
 from typing import Dict
 
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from boefjes.katalogus.dependencies.organisations import get_organisations_store
 from boefjes.katalogus.models import Organisation
 from boefjes.katalogus.storage.interfaces import (
-    OrganisationStorage,
     OrganisationNotFound,
+    OrganisationStorage,
 )
 from boefjes.sql.db import ObjectNotFoundException
 

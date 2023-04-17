@@ -9,7 +9,7 @@ Test Teardown       Teardown Test
 List Objects
     Insert Normalizer Output
     Await Sync
-    Object List Should Contain      ${REF_HOSTNAME}
+    Object List Should Contain    ${REF_HOSTNAME}
     Total Object Count Should Be    ${6}
 
 List Objects With Filter

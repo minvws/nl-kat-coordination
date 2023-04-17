@@ -7,7 +7,6 @@ from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.version import __version__
 
-
 client = TestClient(app)
 
 

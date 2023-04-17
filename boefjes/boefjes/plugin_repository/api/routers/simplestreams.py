@@ -3,9 +3,9 @@ import logging
 
 from fastapi import APIRouter
 
-from boefjes.plugin_repository.config import PLUGINS_DIR, BASE_URL
-from boefjes.plugin_repository.utils.index import get_or_create_index
+from boefjes.plugin_repository.config import BASE_URL, PLUGINS_DIR
 from boefjes.plugin_repository.models import CombinedFile
+from boefjes.plugin_repository.utils.index import get_or_create_index
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

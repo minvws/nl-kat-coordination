@@ -3,9 +3,9 @@ from unittest import TestCase
 
 from octopoes.config.settings import XTDBType
 from octopoes.xtdb import (
+    Datamodel,
     FieldSet,
     ForeignKey,
-    Datamodel,
 )
 from octopoes.xtdb.query_builder import generate_pull_query
 from octopoes.xtdb.related_field_generator import RelatedFieldNode

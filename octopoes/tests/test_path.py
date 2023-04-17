@@ -2,22 +2,22 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from octopoes.models.path import (
+    Direction,
     Path,
     Segment,
-    Direction,
-    incoming_step_grammar,
-    get_paths_to_neighours,
     get_max_scan_level_inheritance,
+    get_paths_to_neighours,
+    incoming_step_grammar,
 )
 from tests.mocks.mock_ooi_types import (
-    MockResolvedHostname,
+    ALL_OOI_TYPES,
+    MockDNSCNAMERecord,
+    MockDNSZone,
     MockHostname,
+    MockIPAddress,
     MockIPAddressV4,
     MockIPPort,
-    MockDNSCNAMERecord,
-    MockIPAddress,
-    ALL_OOI_TYPES,
-    MockDNSZone,
+    MockResolvedHostname,
 )
 
 

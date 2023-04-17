@@ -59,7 +59,6 @@ Empty Scan Profiles
     Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[0]}}
     Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[0]}}
 
-
 *** Keywords ***
 Setup Test
     Start Monitoring    ${QUEUE_URI}

@@ -1,25 +1,26 @@
 import datetime
 import ipaddress
+import logging
 import re
-from typing import Union, Iterator, List, Tuple
+from typing import Iterator, List, Tuple, Union
 
 import cryptography
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from dateutil.parser import parse
-import logging
+
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
-    X509Certificate,
     AlgorithmType,
+    SubjectAlternativeName,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
-    SubjectAlternativeName,
+    X509Certificate,
 )
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6, IPPort, Protocol, PortState
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
 

@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from enum import Enum
 from functools import total_ordering
-from typing import Dict, Optional, Any, Union, TypedDict, Tuple
+from typing import Any, Dict, Optional, Tuple, TypedDict, Union
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -12,18 +12,17 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import (
+    CAPECFindingType,
+    CVEFindingType,
+    CWEFindingType,
     Finding,
     FindingType,
     KATFindingType,
-    CVEFindingType,
-    CWEFindingType,
     RetireJSFindingType,
     SnykFindingType,
-    CAPECFindingType,
 )
 from octopoes.models.tree import ReferenceNode
-from octopoes.models.types import get_relations, OOI_TYPES
-
+from octopoes.models.types import OOI_TYPES, get_relations
 from rocky.bytes_client import BytesClient
 from tools.models import OOIInformation
 

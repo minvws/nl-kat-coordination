@@ -1,11 +1,10 @@
-from typing import Dict, Iterator, Union
 import json
+from typing import Dict, Iterator, Union
 
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import ADRFindingType, Finding
 from octopoes.models.ooi.web import APIDesignRule, APIDesignRuleResult
-
-from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[Dict]:
