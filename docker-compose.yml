@@ -126,6 +126,7 @@ services:
     build:
       context: .
       dockerfile: rocky/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     command: python3 manage.py runserver 0.0.0.0:80
