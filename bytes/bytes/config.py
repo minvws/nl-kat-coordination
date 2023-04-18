@@ -36,8 +36,6 @@ class Settings(BaseSettings):
     vws_public_key_b64: str = ""
 
     bytes_metrics_mountpoints: List[Path] = [Path("/")]
-    bytes_metrics_cache_ttl_seconds: int = 30
-    bytes_metrics_cache_size: int = 1024
 
 
 @lru_cache()

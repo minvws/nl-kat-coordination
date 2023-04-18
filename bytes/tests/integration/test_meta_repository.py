@@ -146,6 +146,8 @@ def test_save_boefje_meta_hash(meta_repository: SQLMetaDataRepository) -> None:
     non_empty_raws = meta_repository.get_raws(query_filter)
     assert len(non_empty_raws) == 1
 
+    assert meta_repository.get_raw_file_count_per_organization() == {"test": 1}
+
 
 def test_save_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:
     with meta_repository:

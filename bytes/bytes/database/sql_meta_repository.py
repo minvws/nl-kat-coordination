@@ -1,7 +1,8 @@
 import logging
 import uuid
-from typing import Iterator, List, Optional, Type
+from typing import Dict, Iterator, List, Optional, Type
 
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -156,6 +157,15 @@ class SQLMetaDataRepository(MetaDataRepository):
         count: int = query.count()
 
         return count > 0
+
+    def get_raw_file_count_per_organization(self) -> Dict[str, int]:
+        query = (
+            self.session.query(BoefjeMetaInDB.organization, func.count(RawFileInDB.id))
+            .join(BoefjeMetaInDB)
+            .group_by(BoefjeMetaInDB.organization)
+        )
+
+        return {organization_id: count for organization_id, count in query}
 
     def _to_raw(self, raw_file_in_db: RawFileInDB) -> RawData:
         boefje_meta = to_boefje_meta(raw_file_in_db.boefje_meta)

@@ -45,10 +45,7 @@ class MetaDataRepository:
     def get_boefje_meta_by_id(self, boefje_meta_id: str) -> BoefjeMeta:
         raise NotImplementedError()
 
-    def get_boefje_meta(
-        self,
-        query_filter: BoefjeMetaFilter,
-    ) -> List[BoefjeMeta]:
+    def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
         raise NotImplementedError()
 
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
@@ -67,4 +64,7 @@ class MetaDataRepository:
         raise NotImplementedError()
 
     def get_raw(self, raw_id: str) -> RawData:
+        raise NotImplementedError()
+
+    def get_raw_file_count_per_organization(self) -> Dict[str, int]:
         raise NotImplementedError()
