@@ -31,6 +31,7 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import (
+    Path,
     get_max_scan_level_inheritance,
     get_max_scan_level_issuance,
     get_paths_to_neighours,
@@ -148,7 +149,27 @@ class OctopoesService:
                 parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
                 try:
-                    resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
+                    path = Path.parse(f"{source.__class__.__name__}.{bit_definition.config_ooi_relation_path}")
+                    obj = self.ooi_repository.list_neighbours(
+                        references={source.reference}, paths={path}, valid_time=valid_time
+                    ).pop()
+                # catches both the KeyError if no relation path is configured and the pop() if no neighbours are found
+                except KeyError:
+                    obj = None
+
+                config = ""
+                if obj:
+                    config_ooi_reference = Reference.from_str(
+                        f"Config|{path.segments[-1].target_type.parse_obj(obj).primary_key}"
+                    )
+                    try:
+                        config_ooi = self.ooi_repository.get(config_ooi_reference, valid_time)
+                        config = config_ooi.config
+                    except ObjectNotFoundException:
+                        pass
+
+                try:
+                    resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
                 except Exception as e:
                     logger.exception("Error running inference", exc_info=e)
                     return
