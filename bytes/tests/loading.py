@@ -4,12 +4,12 @@ from typing import Any, Dict, Optional
 
 from bytes.config import BASE_DIR
 from bytes.models import (
-    BoefjeMeta,
     Boefje,
-    NormalizerMeta,
-    Normalizer,
-    RawData,
+    BoefjeMeta,
     MimeType,
+    Normalizer,
+    NormalizerMeta,
+    RawData,
     RawDataMeta,
     TimezoneAwareDatetime,
 )
@@ -30,7 +30,7 @@ def load_stub_raw(relative_path: str) -> bytes:
 def get_boefje_meta(
     meta_id: str = "d63d755b-6c23-44ab-8de6-8d144c448a71",
     boefje_id: str = "kat_test.main",
-    input_ooi: Optional[str] = "Hostname|internet|test.org.",
+    input_ooi: Optional[str] = "Hostname|internet|test.org",
 ) -> BoefjeMeta:
     return BoefjeMeta(
         id=meta_id,

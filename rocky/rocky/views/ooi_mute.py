@@ -2,11 +2,13 @@ from datetime import datetime, timezone
 from typing import Type
 from django.views.generic import FormView
 from account.mixins import RockyPermissionRequiredMixin
+
+from django.views.generic import FormView
+from tools.forms.ooi import MuteFindingForm
+
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import MutedFinding
-from tools.forms.ooi import MuteFindingForm
-from rocky.views.mixins import OctopoesView
-from rocky.views.mixins import OOIBreadcrumbsMixin
+from rocky.views.mixins import OctopoesView, OOIBreadcrumbsMixin
 
 
 class MuteFindingView(RockyPermissionRequiredMixin, OctopoesView, OOIBreadcrumbsMixin, FormView):

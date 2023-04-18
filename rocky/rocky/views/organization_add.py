@@ -1,18 +1,17 @@
 import logging
 
+from account.forms import OrganizationForm
 from django.contrib import messages
 from account.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
-from django.urls import reverse
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
 from django_otp.decorators import otp_required
+from tools.models import Organization, OrganizationMember
 from two_factor.views.utils import class_view_decorator
 
-from account.forms import OrganizationForm
 from rocky.exceptions import ServiceException
-from tools.models import Organization, OrganizationMember
 
 logger = logging.getLogger(__name__)
 

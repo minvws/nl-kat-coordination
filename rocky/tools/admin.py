@@ -7,7 +7,7 @@ from django.db.models import JSONField
 from django.forms import widgets
 
 from rocky.admin import AdminErrorMessageMixin
-from tools.models import Organization, OrganizationMember, Indemnification, OOIInformation, OrganizationTag
+from tools.models import Indemnification, OOIInformation, Organization, OrganizationMember, OrganizationTag
 
 
 class JSONInfoWidget(widgets.Textarea):

@@ -4,10 +4,10 @@ from django.contrib import messages
 from django.views.generic.detail import DetailView
 from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
+from tools.models import OrganizationMember
 from two_factor.views.utils import class_view_decorator
 
 from account.mixins import OrganizationView
-from tools.models import OrganizationMember
 
 
 class PageActions(Enum):

@@ -1,23 +1,23 @@
 from datetime import datetime, timezone
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
-
-from octopoes.models import InheritedScanProfile, EmptyScanProfile
-from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
-from rocky.views.ooi_detail import OOIDetailView
 from tools.forms.ooi import SetClearanceLevelForm
 from tools.models import Indemnification, OrganizationMember
 from tools.view_helpers import (
+    Breadcrumb,
     get_mandatory_fields,
     get_ooi_url,
-    Breadcrumb,
 )
+from two_factor.views.utils import class_view_decorator
+
+from octopoes.models import EmptyScanProfile, InheritedScanProfile
+from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
+from rocky.views.ooi_detail import OOIDetailView
 
 
 @class_view_decorator(otp_required)

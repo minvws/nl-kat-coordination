@@ -1,3 +1,4 @@
+from account.forms import OrganizationMemberToGroupAddForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from account.mixins import RockyPermissionRequiredMixin
@@ -5,10 +6,8 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
 from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
-
-from account.forms import OrganizationMemberToGroupAddForm
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
+from two_factor.views.utils import class_view_decorator
 
 User = get_user_model()
 

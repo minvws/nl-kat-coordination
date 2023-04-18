@@ -7,7 +7,6 @@ from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.version import __version__
 
-
 client = TestClient(app)
 
 
@@ -91,9 +90,9 @@ def test_get_scan_profiles(requests_mock, patch_pika):
     scan_profile = {
         "type": "ScanProfile",
         "level": 0,
-        "reference": "Hostname|internet|mispo.es.",
+        "reference": "Hostname|internet|mispo.es",
         "scan_profile_type": "empty",
-        "xt/id": "ScanProfile|DNSZone|internet|mispo.es.",
+        "xt/id": "ScanProfile|DNSZone|internet|mispo.es",
     }
     requests_mock.post(
         "http://crux:3000/_crux/query",
@@ -102,7 +101,7 @@ def test_get_scan_profiles(requests_mock, patch_pika):
     )
     response = client.get("/_dev/scan_profiles")
     assert response.status_code == 200
-    assert response.json() == [{"level": 0, "reference": "Hostname|internet|mispo.es.", "scan_profile_type": "empty"}]
+    assert response.json() == [{"level": 0, "reference": "Hostname|internet|mispo.es", "scan_profile_type": "empty"}]
 
 
 def test_create_node():

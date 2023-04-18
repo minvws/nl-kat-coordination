@@ -1,13 +1,12 @@
+from account.forms import OrganizationUpdateForm
 from django.contrib import messages
 from account.mixins import RockyPermissionRequiredMixin
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
-
-from account.forms import OrganizationUpdateForm
 from tools.models import Organization
+from two_factor.views.utils import class_view_decorator
 
 
 @class_view_decorator(otp_required)

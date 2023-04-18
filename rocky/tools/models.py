@@ -9,14 +9,14 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 from requests import RequestException
 from django.contrib.auth.models import Group
 from katalogus.client import get_katalogus, KATalogusClientV1
-from octopoes.connector.octopoes import OctopoesAPIConnector
 
-from katalogus.exceptions import KATalogusDownException, KATalogusUnhealthyException, KATalogusException
-from rocky.exceptions import OctopoesDownException, OctopoesUnhealthyException, OctopoesException
-from tools.add_ooi_information import get_info, SEPARATOR
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
+from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
 

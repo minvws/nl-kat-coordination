@@ -4,11 +4,12 @@ from unittest import TestCase
 from unittest.mock import Mock, patch
 
 from bits.definitions import BitDefinition
+
 from octopoes.core.service import OctopoesService
 from octopoes.events.events import OOIDBEvent, OperationType, OriginDBEvent
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddress, Network, IPAddressV4
+from octopoes.models.ooi.network import IPAddress, IPAddressV4, Network
 from octopoes.models.origin import Origin, OriginType
 
 

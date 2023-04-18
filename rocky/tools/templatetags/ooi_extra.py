@@ -1,5 +1,5 @@
 import json
-from typing import Any, List, Type, Set
+from typing import Any, List, Set, Type
 from urllib import parse
 
 from django import template

@@ -2,21 +2,21 @@ from datetime import datetime, timezone
 
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied, ImproperlyConfigured
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
+from tools.models import Indemnification, Organization, OrganizationMember
 
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
 from rocky.exceptions import (
-    IndemnificationNotPresentException,
     AcknowledgedClearanceLevelTooLowException,
-    TrustedClearanceLevelTooLowException,
     ClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    TrustedClearanceLevelTooLowException,
 )
-from tools.models import Organization, OrganizationMember, Indemnification
 
 
 class OrganizationView(View):
@@ -59,6 +59,7 @@ class OrganizationView(View):
         context["organization"] = self.organization
         context["organization_member"] = self.organization_member
         context["may_update_clearance_level"] = self.may_update_clearance_level
+        context["indemnification_present"] = self.indemnification_present
         return context
 
     @property

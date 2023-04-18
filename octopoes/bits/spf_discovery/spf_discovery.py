@@ -1,12 +1,11 @@
 from typing import Iterator
 
+from bits.spf_discovery.internetnl_spf_parser import parse
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSTXTRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.email_security import DNSSPFRecord, DNSSPFMechanismIP, DNSSPFMechanismHostname
-from bits.spf_discovery.internetnl_spf_parser import parse
+from octopoes.models.ooi.email_security import DNSSPFMechanismHostname, DNSSPFMechanismIP, DNSSPFRecord
 from octopoes.models.ooi.findings import Finding, KATFindingType
-
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 

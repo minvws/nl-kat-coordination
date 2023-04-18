@@ -2,7 +2,7 @@ import ipaddress
 from unittest import TestCase
 
 from octopoes.models import Reference
-from tests.mocks.mock_ooi_types import MockNetwork, MockIPAddressV4, MockLabel
+from tests.mocks.mock_ooi_types import MockIPAddressV4, MockLabel, MockNetwork
 
 
 class OOITest(TestCase):
