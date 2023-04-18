@@ -3,12 +3,11 @@ from typing import Type
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import FormView
-
-from rocky.views.ooi_view import OOIBreadcrumbsMixin
 from tools.forms.ooi import MuteFindingForm
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import MutedFinding
+from rocky.views.ooi_view import OOIBreadcrumbsMixin
 
 
 class MuteFindingView(PermissionRequiredMixin, OOIBreadcrumbsMixin, FormView):

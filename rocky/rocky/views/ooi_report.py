@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
-from rocky.views.ooi_view import OOIBreadcrumbsMixin
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
 from tools.view_helpers import convert_date_to_datetime, get_ooi_url
@@ -35,6 +34,7 @@ from rocky.keiko import (
 )
 from rocky.views.finding_list import FindingListView
 from rocky.views.mixins import SingleOOITreeMixin
+from rocky.views.ooi_view import OOIBreadcrumbsMixin
 
 
 @class_view_decorator(otp_required)
