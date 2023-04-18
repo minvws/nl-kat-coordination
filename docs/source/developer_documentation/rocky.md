@@ -49,7 +49,6 @@ direction RL
     BytesRawView <|-- OrganizationView
     Health <|-- OrganizationView
     HealthChecks <|-- OrganizationView
-    FindingListView  <|-- OrganizationView
     IndemnificationAddView <|-- OrganizationView
     OctopoesView <|-- OrganizationView
     OOIAddTypeSelectView <|-- OrganizationView
