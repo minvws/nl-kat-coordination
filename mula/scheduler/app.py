@@ -277,26 +277,38 @@ class App:
             )
 
         # Collect metrics from the katalogus
-        self.ctx.metrics_katalogus_cache_start.labels(cache_type="plugin",).set(
+        self.ctx.metrics_katalogus_cache_start.labels(
+            cache_type="plugin",
+        ).set(
             int(self.ctx.services.katalogus.organisations_plugin_cache.start_time.timestamp()),
         )
 
-        self.ctx.metrics_katalogus_cache_expiry.labels(cache_type="plugin",).set(
+        self.ctx.metrics_katalogus_cache_expiry.labels(
+            cache_type="plugin",
+        ).set(
             int(self.ctx.services.katalogus.organisations_plugin_cache.expiration_time.timestamp()),
         )
 
-        self.ctx.metrics_katalogus_cache_start.labels(cache_type="boefje",).set(
+        self.ctx.metrics_katalogus_cache_start.labels(
+            cache_type="boefje",
+        ).set(
             int(self.ctx.services.katalogus.organisations_boefje_type_cache.start_time.timestamp()),
         )
 
-        self.ctx.metrics_katalogus_cache_expiry.labels(cache_type="boefje",).set(
+        self.ctx.metrics_katalogus_cache_expiry.labels(
+            cache_type="boefje",
+        ).set(
             int(self.ctx.services.katalogus.organisations_boefje_type_cache.expiration_time.timestamp()),
         )
 
-        self.ctx.metrics_katalogus_cache_start.labels(cache_type="normalizer",).set(
+        self.ctx.metrics_katalogus_cache_start.labels(
+            cache_type="normalizer",
+        ).set(
             int(self.ctx.services.katalogus.organisations_normalizer_type_cache.start_time.timestamp()),
         )
 
-        self.ctx.metrics_katalogus_cache_expiry.labels(cache_type="normalizer",).set(
+        self.ctx.metrics_katalogus_cache_expiry.labels(
+            cache_type="normalizer",
+        ).set(
             int(self.ctx.services.katalogus.organisations_normalizer_type_cache.expiration_time.timestamp()),
         )
