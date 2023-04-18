@@ -191,7 +191,7 @@ class OrganizationMember(models.Model):
             return True
         for group in self.groups.all():
             for permission in group.permissions.all():
-                if permission_codename in permission.codename:
+                if permission_codename == permission.codename:
                     return True
         return False
 

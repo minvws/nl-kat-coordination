@@ -69,7 +69,8 @@
             {% endif %}
         </div>
         <div class="horizontal-scroll">
-            {% if perms.tools.view_organization %}
+            {% has_organization_perm "view_organization" request.user '' as view_organization %}
+            {% if view_organization %}
                 <h1>{% translate "Top critical organizations" %}</h1>
             {% else %}
                 <h1>{% translate "Critical findings" %}</h1>

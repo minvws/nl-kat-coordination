@@ -9,7 +9,11 @@ register = template.Library()
 def has_organization_perm(perm: str, user: KATUser, organization: Organization) -> bool:
     if user.has_perm(perm):
         return True
-    member = OrganizationMember.objects.get(user=user, organization=organization)
-    if member.has_member_perm(perm):
-        return True
+    if organization:
+        member = OrganizationMember.objects.get(user=user, organization=organization)
+        return member.has_member_perm(perm)
+    members = OrganizationMember.objects.filter(user=user)
+    for member in members:
+        if member.has_member_perm(perm):
+            return True
     return False

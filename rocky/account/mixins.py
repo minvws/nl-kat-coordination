@@ -124,17 +124,26 @@ class OrganizationView(View):
 class RockyPermissionRequiredMixin(PermissionRequiredMixin):
     """
     An organization member can have different roles and set of permssions based on which organization they belong to.
-    We do not want to check permissions based soley on the user but instead on the organization member.
+    We do not want to check permissions based soley on the user but also on the organization member.
     """
 
     def has_permission(self) -> bool:
         user_perm = super().has_permission()
         if user_perm:
             return user_perm
-        try:
+        if "organization_code" in self.kwargs:
             organization_code = self.kwargs["organization_code"]
-            organization = Organization.objects.get(code=organization_code)
-            member = OrganizationMember.objects.get(user=self.request.user, organization=organization)
-        except OrganizationMember.DoesNotExist:
-            raise Http404()
-        return member.has_member_perm(self.permission_required)
+            if organization_code:
+                try:
+                    organization = Organization.objects.get(code=organization_code)
+                    member = OrganizationMember.objects.get(user=self.request.user, organization=organization)
+                    return member.has_member_perm(self.permission_required)
+                except OrganizationMember.DoesNotExist:
+                    raise Http404()
+        # if no organization is giving, check if permission exists in one of member's organzation
+        members = OrganizationMember.objects.filter(user=self.request.user)
+        if members:
+            for member in members:
+                if member.has_member_perm(self.permission_required):
+                    return True
+        return False
