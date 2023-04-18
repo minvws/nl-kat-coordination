@@ -91,6 +91,7 @@ direction RL
     BaseOOIDetailView <|-- SingleOOITreeMixin
     BaseOOIDetailView <|-- ConnectorFormMixin
     OOIDetailView <|-- OOIBreadcrumbsMixin
+    MuteFindingView <|-- OOIBreadcrumbsMixin
     OOIBreadcrumbsMixin <|-- BaseOOIDetailView
     BaseReportView <|-- BaseOOIDetailView
     DnsReportView <|-- BaseReportView
