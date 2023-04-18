@@ -1,7 +1,7 @@
 import uuid
 from typing import Dict
 
-from bytes.models import SecureHash, RetrievalLink
+from bytes.models import RetrievalLink, SecureHash
 from bytes.repositories.hash_repository import HashRepository
 
 

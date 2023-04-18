@@ -2,7 +2,7 @@
 DNS Report Datamodel
 """
 from datetime import datetime
-from typing import Dict, List, Optional, Union, Literal
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 

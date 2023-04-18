@@ -3,24 +3,21 @@ from pathlib import Path
 from unittest import TestCase
 
 from boefjes.job_handler import serialize_ooi
-
+from boefjes.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, ObservationsWithoutInputOOI, RawDataMeta
+from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.local import LocalNormalizerJobRunner
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import (
-    DNSARecord,
     DNSAAAARecord,
-    DNSTXTRecord,
+    DNSARecord,
+    DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSSOARecord,
-    DNSCNAMERecord,
+    DNSTXTRecord,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone
-from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
-
-from boefjes.job_models import NormalizerMeta, BoefjeMeta, Normalizer, Boefje, RawDataMeta, ObservationsWithoutInputOOI
-from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.local import LocalNormalizerJobRunner
-
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from tests.stubs import get_dummy_data
 
 

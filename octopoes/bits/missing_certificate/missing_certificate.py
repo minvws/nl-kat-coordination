@@ -1,7 +1,7 @@
 from typing import Iterator
 
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import Website
 
 

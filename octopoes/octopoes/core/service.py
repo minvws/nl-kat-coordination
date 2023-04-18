@@ -1,38 +1,39 @@
 import json
 from datetime import datetime
 from logging import getLogger
-from typing import List, Optional, Callable, Set, Dict, Type
+from typing import Callable, Dict, List, Optional, Set, Type
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
+
 from octopoes.config.settings import Settings
 from octopoes.events.events import (
+    DBEvent,
     OOIDBEvent,
     OriginDBEvent,
     OriginParameterDBEvent,
     ScanProfileDBEvent,
-    DBEvent,
 )
 from octopoes.models import (
-    OOI,
-    Reference,
-    EmptyScanProfile,
-    DeclaredScanProfile,
-    InheritedScanProfile,
-    format_id_short,
-    ScanLevel,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    OOI,
+    DeclaredScanProfile,
+    EmptyScanProfile,
+    InheritedScanProfile,
+    Reference,
+    ScanLevel,
     ScanProfileType,
+    format_id_short,
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
-from octopoes.models.origin import Origin, OriginType, OriginParameter
+from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import (
+    get_max_scan_level_inheritance,
     get_max_scan_level_issuance,
     get_paths_to_neighours,
-    get_max_scan_level_inheritance,
 )
 from octopoes.models.tree import ReferenceTree
 from octopoes.repositories.ooi_repository import OOIRepository

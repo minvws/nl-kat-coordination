@@ -1,7 +1,6 @@
 import logging
-
 from pathlib import Path
-from typing import Dict, Iterable, List, Iterator, Optional
+from typing import Dict, Iterable, Iterator, List, Optional
 
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
@@ -16,11 +15,11 @@ from boefjes.katalogus.local_repository import (
     LocalPluginRepository,
     get_local_repository,
 )
-from boefjes.katalogus.models import Repository, PluginType, RESERVED_LOCAL_ID
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, PluginType, Repository
 from boefjes.katalogus.storage.interfaces import (
-    RepositoryStorage,
-    PluginEnabledStorage,
     NotFound,
+    PluginEnabledStorage,
+    RepositoryStorage,
     SettingsNotConformingToSchema,
     SettingsStorage,
 )

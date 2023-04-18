@@ -1,5 +1,6 @@
 import json
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect
@@ -10,7 +11,6 @@ from django_otp.decorators import otp_required
 from requests import HTTPError
 from two_factor.views.utils import class_view_decorator
 
-from account.mixins import OrganizationView
 from rocky.scheduler import client
 
 from datetime import datetime

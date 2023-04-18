@@ -2,10 +2,9 @@ import logging
 from pathlib import Path
 
 from bytes.config import Settings
-from bytes.raw.middleware import make_middleware, FileMiddleware
-from bytes.models import RawData, BoefjeMeta
-from bytes.repositories.raw_repository import RawRepository, BytesFileNotFoundException
-
+from bytes.models import BoefjeMeta, RawData
+from bytes.raw.middleware import FileMiddleware, make_middleware
+from bytes.repositories.raw_repository import BytesFileNotFoundException, RawRepository
 
 logger = logging.getLogger(__name__)
 

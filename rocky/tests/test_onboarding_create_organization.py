@@ -1,8 +1,8 @@
 from django.urls import reverse
+from onboarding.views import OnboardingOrganizationSetupView
 from pytest_django.asserts import assertContains
 from requests import HTTPError
 
-from onboarding.views import OnboardingOrganizationSetupView
 from tests.conftest import setup_request
 
 

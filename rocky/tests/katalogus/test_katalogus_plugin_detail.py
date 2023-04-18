@@ -1,13 +1,13 @@
 import pytest
 from django.core.exceptions import BadRequest
 from django.http import Http404
-from octopoes.models.pagination import Paginated
-from octopoes.models.types import OOIType
+from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains
 from requests import HTTPError
-
-from katalogus.views.plugin_detail import PluginDetailView
 from tests.conftest import setup_request
+
+from octopoes.models.pagination import Paginated
+from octopoes.models.types import OOIType
 
 
 def test_plugin_detail(

@@ -1,22 +1,23 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List, Set, Optional
+from typing import Any, Dict, List, Optional, Set
 
 from pydantic import parse_obj_as
 from requests import HTTPError
 
 from octopoes.config.settings import XTDBType
-from octopoes.events.events import ScanProfileDBEvent, OperationType
+from octopoes.events.events import OperationType, ScanProfileDBEvent
 from octopoes.events.manager import EventManager
 from octopoes.models import (
     Reference,
-    ScanProfileBase,
     ScanProfile,
+    ScanProfileBase,
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.xtdb import FieldSet
-from octopoes.xtdb.client import XTDBSession, OperationType as XTDBOperationType
+from octopoes.xtdb.client import OperationType as XTDBOperationType
+from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
 
 logger = getLogger(__name__)

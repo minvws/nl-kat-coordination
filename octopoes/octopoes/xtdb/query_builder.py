@@ -1,10 +1,10 @@
 import re
-from typing import Set, Optional, Iterator, List, Dict, Union
+from typing import Dict, Iterator, List, Optional, Set, Union
 
 from octopoes.config.settings import XTDBType
 from octopoes.xtdb.related_field_generator import (
-    RelatedFieldNode,
     FieldSet,
+    RelatedFieldNode,
 )
 
 

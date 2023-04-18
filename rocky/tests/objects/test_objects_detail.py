@@ -1,15 +1,14 @@
 from urllib.parse import urlencode
 
 from django.http import HttpResponseRedirect
-from pytest_django.asserts import assertContains
-
-from octopoes.models.tree import ReferenceTree
-
 from katalogus.client import Plugin
-from rocky.views.ooi_detail import OOIDetailView
-from tests.conftest import setup_request
+from pytest_django.asserts import assertContains
 from tools.enums import SCAN_LEVEL
 from tools.models import Indemnification
+
+from octopoes.models.tree import ReferenceTree
+from rocky.views.ooi_detail import OOIDetailView
+from tests.conftest import setup_request
 
 TREE_DATA = {
     "root": {

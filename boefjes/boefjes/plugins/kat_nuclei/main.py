@@ -1,7 +1,8 @@
-from typing import Tuple, Union, List
-import docker
-from boefjes.job_models import BoefjeMeta
+from typing import List, Tuple, Union
 
+import docker
+
+from boefjes.job_models import BoefjeMeta
 
 NUCLEI_IMAGE = "projectdiscovery/nuclei:latest"
 

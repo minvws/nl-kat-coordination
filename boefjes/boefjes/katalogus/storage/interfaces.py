@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Dict, Type, List
+from typing import Dict, List, Type
 
 from boefjes.katalogus.models import Organisation, Repository
 

@@ -4,24 +4,23 @@ from enum import Enum
 from typing import Optional
 
 from django.contrib import messages
-from django.core.paginator import Paginator, Page
+from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
-from requests.exceptions import RequestException
-
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from octopoes.models import OOI, Reference
-
-from rocky import scheduler
-from rocky.views.mixins import OOIBreadcrumbsMixin
-from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
-from rocky.views.ooi_view import BaseOOIDetailView
+from requests.exceptions import RequestException
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification, OrganizationMember
 from tools.ooi_helpers import format_display
+
+from octopoes.models import OOI, Reference
+from rocky import scheduler
+from rocky.views.mixins import OOIBreadcrumbsMixin
+from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
 class PageActions(Enum):

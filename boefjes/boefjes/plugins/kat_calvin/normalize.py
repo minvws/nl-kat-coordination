@@ -1,9 +1,8 @@
 import json
-from typing import Iterator, Union, Dict
-
-from octopoes.models.ooi.monitoring import Application, Incident
+from typing import Dict, Iterator, Union
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models.ooi.monitoring import Application, Incident
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[str, bytes]) -> Iterator[Dict]:

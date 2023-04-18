@@ -1,18 +1,17 @@
-from pathlib import Path
-
 import sys
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import Optional, List, Dict, Any
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand
+
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models.ooi.findings import Finding, MutedFinding
-
-from django.conf import settings
-from rocky.keiko import keiko_client, ReportsService
+from rocky.keiko import ReportsService, keiko_client
 from rocky.views.finding_list import generate_findings_metadata
 from rocky.views.mixins import OOIList
 from tools.models import Organization

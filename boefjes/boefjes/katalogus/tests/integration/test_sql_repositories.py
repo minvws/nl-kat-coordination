@@ -2,24 +2,24 @@ import os
 import time
 from unittest import TestCase, skipIf
 
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
 from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
-from boefjes.katalogus.models import Organisation, Repository, Boefje
+from boefjes.katalogus.models import Boefje, Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
     PluginNotFound,
-    SettingsNotFound,
     RepositoryNotFound,
+    SettingsNotFound,
     StorageError,
 )
-from boefjes.sql.db import get_engine, SQL_BASE
+from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 from boefjes.sql.repository_storage import SQLRepositoryStorage
 from boefjes.sql.setting_storage import SQLSettingsStorage
-from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
