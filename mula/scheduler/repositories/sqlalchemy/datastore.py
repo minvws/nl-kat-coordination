@@ -3,7 +3,7 @@ import logging
 import time
 from functools import partial, wraps
 
-from sqlalchemy import create_engine, orm, pool
+import sqlalchemy
 
 from scheduler import models
 
@@ -38,15 +38,15 @@ class SQLAlchemy(Datastore):
         serializer = partial(json.dumps, default=str)
 
         if dsn.startswith("sqlite"):
-            self.engine = create_engine(
+            self.engine = sqlalchemy.create_engine(
                 dsn,
                 connect_args={"check_same_thread": False},
-                poolclass=pool.StaticPool,
+                poolclass=sqlalchemy.pool.StaticPool,
                 json_serializer=serializer,
             )
             models.Base.metadata.create_all(self.engine)
         else:
-            self.engine = create_engine(
+            self.engine = sqlalchemy.create_engine(
                 dsn,
                 pool_pre_ping=True,
                 pool_size=25,
@@ -57,7 +57,7 @@ class SQLAlchemy(Datastore):
         if self.engine is None:
             raise Exception("Invalid datastore type")
 
-        self.session = orm.sessionmaker(
+        self.session = sqlalchemy.orm.sessionmaker(
             bind=self.engine,
         )
 
