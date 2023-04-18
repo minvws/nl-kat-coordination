@@ -3,8 +3,9 @@ import logging.config
 import threading
 from types import SimpleNamespace
 
-import scheduler
 from prometheus_client import CollectorRegistry, Gauge, Info
+
+import scheduler
 from scheduler.config import settings
 from scheduler.connectors import listeners, services
 from scheduler.repositories import sqlalchemy, stores
