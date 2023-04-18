@@ -1,8 +1,7 @@
 from enum import Enum
 
-from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from account.mixins import RockyPermissionRequiredMixin
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.urls.base import reverse
@@ -28,7 +27,7 @@ class OrganizationMemberListView(
     model = OrganizationMember
     context_object_name = "members"
     template_name = "organizations/organization_member_list.html"
-    permission_required = "view_organization"
+    permission_required = "tools.view_organization"
 
     def get_queryset(self):
         queryset = self.model.objects.filter(organization=self.organization)
@@ -45,7 +44,7 @@ class OrganizationMemberListView(
         self.filters_active = self.get_filters_active()
 
     def post(self, request, *args, **kwargs):
-        if not self.organization_member.has_member_perm("change_organizationmember"):
+        if not self.organization_member.has_member_perms("tools.change_organizationmember"):
             raise PermissionDenied()
         if "action" not in self.request.POST:
             return self.get(request, *args, **kwargs)

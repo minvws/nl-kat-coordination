@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0034_copy_user_groups_to_organizationmember"),
     ]

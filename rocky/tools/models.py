@@ -3,22 +3,30 @@ import uuid
 
 import tagulous.models
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.contrib.auth.models import Group
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
+from katalogus.client import KATalogusClientV1, get_katalogus
+from katalogus.exceptions import (
+    KATalogusDownException,
+    KATalogusException,
+    KATalogusUnhealthyException,
+)
 from requests import RequestException
-from django.contrib.auth.models import Group
-from katalogus.client import get_katalogus, KATalogusClientV1
-
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
+
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from rocky.exceptions import (
+    OctopoesDownException,
+    OctopoesException,
+    OctopoesUnhealthyException,
+)
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
@@ -186,13 +194,41 @@ class OrganizationMember(models.Model):
     def is_client(self):
         return self.groups.filter(name=GROUP_CLIENT).exists()
 
-    def has_member_perm(self, permission_codename) -> bool:
+    def get_permissions_codenames(self, permissions):
+        codenames = []
+        if permissions is None:
+            raise ImproperlyConfigured("Permission(s) not defined")
+        if isinstance(permissions, str):
+            perms = (permissions,)
+        else:
+            perms = permissions
+        for perm in perms:
+            try:
+                _, codename = perm.split(".", 1)
+            except IndexError:
+                raise AttributeError(
+                    "The format of identifier string permission (perm) is wrong. "
+                    "It should be in 'app_label.codename'."
+                )
+            codenames.append(codename)
+        return codenames
+
+    def has_member_perms(self, permissions) -> bool:
+
         if self.user.is_superuser and self.user.is_active and self.status is not OrganizationMember.STATUSES.BLOCKED:
             return True
-        for group in self.groups.all():
-            for permission in group.permissions.all():
-                if permission_codename == permission.codename:
-                    return True
+        codenames = self.get_permissions_codenames(permissions)
+        has_permissions = []
+        for codename in codenames:
+            for group in self.groups.all():
+                group_permissions_codenames = group.permissions.values_list("codename", flat=True)
+                if codename in group_permissions_codenames:
+                    has_permissions.append(True)
+                    break
+                else:
+                    has_permissions.append(False)
+        if all(has_permissions):
+            return True
         return False
 
     class Meta:

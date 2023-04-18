@@ -15,11 +15,11 @@
             An overview of "{{ organization_name }}" its members.
         {% endblocktranslate %}
         <h2>{% translate "Members" %}</h2>
-        {% has_organization_perm "add_organizationmember" request.user organization as can_add_member %}
+        {% has_organization_perms "tools.add_organizationmember" request.user organization as can_add_member %}
         {% if can_add_member %}
           <div class="horizontal-view toolbar">
             <a href="{% url 'organization_member_add' organization.code %}"
-               class="button">{% translate 'Add new member' %}</a>
+               class="button">{% translate "Add new member" %}</a>
           </div>
         {% endif %}
         {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}

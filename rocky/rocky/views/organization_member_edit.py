@@ -1,7 +1,6 @@
 from account.forms import OrganizationMemberEditForm
-from account.mixins import OrganizationView
+from account.mixins import OrganizationView, RockyPermissionRequiredMixin
 from django.contrib import messages
-from account.mixins import RockyPermissionRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -17,7 +16,7 @@ class OrganizationMemberEditView(RockyPermissionRequiredMixin, UserPassesTestMix
     model = OrganizationMember
     template_name = "organizations/organization_member_edit.html"
     object: OrganizationMember
-    permission_required = "change_organizationmember"
+    permission_required = "tools.change_organizationmember"
 
     def test_func(self):
         return (

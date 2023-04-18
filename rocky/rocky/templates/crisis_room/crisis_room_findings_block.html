@@ -69,7 +69,7 @@
             {% endif %}
         </div>
         <div class="horizontal-scroll">
-            {% has_organization_perm "view_organization" request.user '' as view_organization %}
+            {% has_organization_perms "tools.view_organization" request.user '' as view_organization %}
             {% if view_organization %}
                 <h1>{% translate "Top critical organizations" %}</h1>
             {% else %}
@@ -87,7 +87,7 @@
                     <tbody>
                         {% for findings in findings_per_org_critical %}
                             <tr>
-                                {% has_organization_perm "view_organization" request.user findings.organization as can_view_organization %}
+                                {% has_organization_perms "tools.view_organization" request.user findings.organization as can_view_organization %}
                                 {% if can_view_organization %}
                                     <td>
                                         <a href="{% url "organization_crisis_room" findings.organization.code %}">{{ findings.organization.name }}</a>

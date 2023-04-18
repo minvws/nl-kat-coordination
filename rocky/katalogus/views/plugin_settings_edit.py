@@ -16,7 +16,7 @@ class PluginSettingsUpdateView(RockyPermissionRequiredMixin, SingleSettingView, 
     """View to update/edit a plugin setting for all plugins in KAT-alogus"""
 
     template_name = "plugin_settings_edit.html"
-    permission_required = "can_scan_organization"
+    permission_required = "tools.can_scan_organization"
 
     def get_form(self, **kwargs):
         settings_value = self.katalogus_client.get_plugin_settings(self.plugin.id).get(self.setting_name)

@@ -4,9 +4,8 @@ from datetime import datetime, timezone
 from typing import Any, ClassVar, Dict
 from uuid import uuid4
 
-from account.mixins import OrganizationView
+from account.mixins import OrganizationView, RockyPermissionRequiredMixin
 from django.contrib import messages
-from account.mixins import RockyPermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
@@ -14,10 +13,7 @@ from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from django_otp.decorators import otp_required
 from pydantic import ValidationError
-from tools.forms.upload_csv import (
-    CSV_ERRORS,
-    UploadCSVForm,
-)
+from tools.forms.upload_csv import CSV_ERRORS, UploadCSVForm
 from two_factor.views.utils import class_view_decorator
 
 from octopoes.api.models import Declaration
@@ -48,7 +44,7 @@ CSV_CRITERIA = [
 class UploadCSV(RockyPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
     form_class = UploadCSVForm
-    permission_required = "can_scan_organization"
+    permission_required = "tools.can_scan_organization"
     reference_cache: Dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
     ooi_types: ClassVar[Dict[str, Any]] = {
         "Hostname": {"type": Hostname},

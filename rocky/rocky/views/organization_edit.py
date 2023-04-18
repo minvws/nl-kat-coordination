@@ -1,6 +1,6 @@
 from account.forms import OrganizationUpdateForm
-from django.contrib import messages
 from account.mixins import RockyPermissionRequiredMixin
+from django.contrib import messages
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
@@ -14,7 +14,7 @@ class OrganizationEditView(RockyPermissionRequiredMixin, UpdateView):
     form_class = OrganizationUpdateForm
     model = Organization
     template_name = "organizations/organization_edit.html"
-    permission_required = "change_organization"
+    permission_required = "tools.change_organization"
 
     def get_object(self):
         return self.model.objects.get(code=self.kwargs["organization_code"])

@@ -22,7 +22,6 @@ def clear_group_from_users(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0033_organizationmember_groups"),
     ]

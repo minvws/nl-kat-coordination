@@ -2,11 +2,11 @@ from datetime import datetime, timezone
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -123,8 +123,8 @@ class OrganizationView(View):
 
 class RockyPermissionRequiredMixin(PermissionRequiredMixin):
     """
-    An organization member can have different roles and set of permssions based on which organization they belong to.
-    We do not want to check permissions based soley on the user but also on the organization member.
+    An organization member can have different roles and set of permissions based on which organization they belong to.
+    We do not want to check permissions based solely on the user but also on the organization member.
     """
 
     def has_permission(self) -> bool:
@@ -137,13 +137,13 @@ class RockyPermissionRequiredMixin(PermissionRequiredMixin):
                 try:
                     organization = Organization.objects.get(code=organization_code)
                     member = OrganizationMember.objects.get(user=self.request.user, organization=organization)
-                    return member.has_member_perm(self.permission_required)
+                    return member.has_member_perms(self.permission_required)
                 except OrganizationMember.DoesNotExist:
                     raise Http404()
         # if no organization is giving, check if permission exists in one of member's organzation
         members = OrganizationMember.objects.filter(user=self.request.user)
         if members:
             for member in members:
-                if member.has_member_perm(self.permission_required):
+                if member.has_member_perms(self.permission_required):
                     return True
         return False

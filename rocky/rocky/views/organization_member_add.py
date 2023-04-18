@@ -1,7 +1,7 @@
 from account.forms import OrganizationMemberToGroupAddForm
+from account.mixins import RockyPermissionRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from account.mixins import RockyPermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
@@ -21,7 +21,7 @@ class OrganizationMemberAddView(RockyPermissionRequiredMixin, OrganizationMember
     model = User
     template_name = "organizations/organization_member_add.html"
     form_class = OrganizationMemberToGroupAddForm
-    permission_required = "add_organizationmember"
+    permission_required = "tools.add_organizationmember"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

@@ -1,7 +1,11 @@
 from typing import Any, Dict, List, Type
 
 from account.forms import OnboardingOrganizationUpdateForm, OrganizationForm
-from account.mixins import OrganizationView
+from account.mixins import (
+    OrganizationView,
+    PermissionRequiredMixin,
+    RockyPermissionRequiredMixin,
+)
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -17,31 +21,23 @@ from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
 from onboarding.forms import (
     OnboardingCreateUserAdminForm,
-    OnboardingCreateUserRedTeamerForm,
     OnboardingCreateUserClientForm,
+    OnboardingCreateUserRedTeamerForm,
     OnboardingSetClearanceLevelForm,
 )
-
-from account.mixins import PermissionRequiredMixin, RockyPermissionRequiredMixin
 from onboarding.view_helpers import (
-    KatIntroductionStepsMixin,
     KatIntroductionAdminStepsMixin,
     KatIntroductionRegistrationStepsMixin,
+    KatIntroductionStepsMixin,
 )
-from rocky.bytes_client import get_bytes_client
-from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException, RockyError
-from rocky.views.indemnification_add import IndemnificationAddView
-from rocky.views.ooi_report import Report, DNSReport, build_findings_list_from_store
-from rocky.views.ooi_view import BaseOOIFormView, SingleOOITreeMixin, BaseOOIDetailView
 from tools.forms.boefje import SelectBoefjeForm
-from tools.models import Organization, OrganizationMember, GROUP_REDTEAM
+from tools.models import GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
     filter_ooi_tree,
     get_or_create_ooi,
 )
-from tools.view_helpers import get_ooi_url, BreadcrumbsMixin, Breadcrumb
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_ooi_url
 from two_factor.views.utils import class_view_decorator
 
@@ -49,19 +45,12 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
 from octopoes.models.types import type_by_name
-from onboarding.forms import (
-    OnboardingCreateUserAdminForm,
-    OnboardingCreateUserClientForm,
-    OnboardingCreateUserRedTeamerForm,
-    OnboardingSetClearanceLevelForm,
-)
-from onboarding.view_helpers import (
-    KatIntroductionAdminStepsMixin,
-    KatIntroductionRegistrationStepsMixin,
-    KatIntroductionStepsMixin,
-)
 from rocky.bytes_client import get_bytes_client
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException, RockyError
+from rocky.exceptions import (
+    ClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    RockyError,
+)
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_report import DNSReport, Report, build_findings_list_from_store
 from rocky.views.ooi_view import BaseOOIDetailView, BaseOOIFormView, SingleOOITreeMixin
@@ -97,7 +86,7 @@ class OnboardingIntroductionView(
 ):
     template_name = "step_1_introduction.html"
     current_step = 1
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
 
 @class_view_decorator(otp_required)
@@ -108,7 +97,7 @@ class OnboardingChooseReportInfoView(
 ):
     template_name = "step_2a_choose_report_info.html"
     current_step = 2
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
 
 @class_view_decorator(otp_required)
@@ -119,7 +108,7 @@ class OnboardingChooseReportTypeView(
 ):
     template_name = "step_2b_choose_report_type.html"
     current_step = 2
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
 
 @class_view_decorator(otp_required)
@@ -131,7 +120,7 @@ class OnboardingSetupScanSelectPluginsView(
     template_name = "step_3e_setup_scan_select_plugins.html"
     current_step = 3
     report: Type[Report] = DNSReport
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
     def get_form(self):
         boefjes = self.report.get_boefjes(self.organization)
@@ -178,7 +167,7 @@ class OnboardingSetupScanOOIInfoView(
 ):
     template_name = "step_3a_setup_scan_ooi_info.html"
     current_step = 3
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
 
 class OnboardingOOIForm(OOIForm):
@@ -210,7 +199,7 @@ class OnboardingSetupScanOOIAddView(
             "ooi": Network(name="internet"),
         }
     }
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -274,7 +263,7 @@ class OnboardingSetupScanOOIDetailView(
 ):
     template_name = "step_3c_setup_scan_ooi_detail.html"
     current_step = 3
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
     def get_ooi_id(self) -> str:
         if "ooi_id" in self.request.session:
@@ -319,7 +308,7 @@ class OnboardingSetClearanceLevelView(
     form_class = OnboardingSetClearanceLevelForm
     current_step = 3
     initial = {"level": 2}
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -368,7 +357,7 @@ class OnboardingReportView(
 ):
     template_name = "step_4_report.html"
     current_step = 4
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
     def post(self, request, *args, **kwargs):
         if "ooi_id" not in request.GET:
@@ -387,7 +376,7 @@ class OnboardingReportView(
 class BaseReportView(RockyPermissionRequiredMixin, BaseOOIDetailView):
     report: Type[Report]
     depth = 15
-    permission_required = "can_view_redteam_onboarding"
+    permission_required = "tools.can_view_redteam_onboarding"
 
     def get_tree_dict(self):
         return create_object_tree_item_from_ref(self.tree.root, self.tree.store)
@@ -444,7 +433,7 @@ class OnboardingIntroductionRegistrationView(
 
     template_name = "account/step_1_registration_intro.html"
     current_step = 1
-    permission_required = "can_view_admin_onboarding"
+    permission_required = "tools.can_view_admin_onboarding"
 
 
 @class_view_decorator(otp_required)
@@ -461,7 +450,7 @@ class OnboardingOrganizationSetupView(
     template_name = "account/step_2a_organization_setup.html"
     form_class = OrganizationForm
     current_step = 2
-    permission_required = "add_organization"
+    permission_required = "tools.add_organization"
 
     def get(self, request, *args, **kwargs):
         organization = Organization.objects.first()
@@ -520,7 +509,7 @@ class OnboardingOrganizationUpdateView(
     template_name = "account/step_2a_organization_update.html"
     form_class = OnboardingOrganizationUpdateForm
     current_step = 2
-    permission_required = "change_organization"
+    permission_required = "tools.change_organization"
 
     def get_object(self, queryset=None):
         return self.organization
@@ -562,14 +551,14 @@ class OnboardingAccountSetupIntroView(RockyPermissionRequiredMixin, KatIntroduct
 
     template_name = "account/step_2c_account_setup_intro.html"
     current_step = 4
-    permission_required = "can_view_admin_onboarding"
+    permission_required = "tools.can_view_admin_onboarding"
 
 
 @class_view_decorator(otp_required)
 class OnboardingAccountCreationMixin(RockyPermissionRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
     """ """
 
-    permission_required = "add_organizationmember"
+    permission_required = "tools.add_organizationmember"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

@@ -14,7 +14,7 @@ from katalogus.views.mixins import SingleSettingView
 @class_view_decorator(otp_required)
 class PluginSettingsDeleteView(RockyPermissionRequiredMixin, SingleSettingView, TemplateView):
     template_name = "plugin_settings_delete.html"
-    permission_required = "can_scan_organization"
+    permission_required = "tools.can_scan_organization"
 
     def post(self, request, *args, **kwargs):
         return self.delete(request, *args, **kwargs)

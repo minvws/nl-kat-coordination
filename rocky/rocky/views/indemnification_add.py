@@ -1,7 +1,6 @@
 from account.forms import IndemnificationAddForm
-from account.mixins import OrganizationView
+from account.mixins import OrganizationView, RockyPermissionRequiredMixin
 from django.contrib import messages
-from account.mixins import RockyPermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
@@ -14,7 +13,7 @@ from two_factor.views.utils import class_view_decorator
 class IndemnificationAddView(RockyPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "indemnification_add.html"
     form_class = IndemnificationAddForm
-    permission_required = "add_indemnification"
+    permission_required = "tools.add_indemnification"
 
     def post(self, request, *args, **kwargs):
         Indemnification.objects.get_or_create(

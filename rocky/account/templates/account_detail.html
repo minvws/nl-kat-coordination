@@ -12,16 +12,16 @@
             <div>
                 <div class="column-2">
                     <div>
-                        <h1>{% translate 'Account details' %}</h1>
+                        <h1>{% translate "Account details" %}</h1>
                     </div>
                     <div class="horizontal-view toolbar">
-                        <a class="button" href="{% url 'password_reset' %}">{% translate 'Reset password' %}</a>
+                        <a class="button" href="{% url 'password_reset' %}">{% translate "Reset password" %}</a>
                     </div>
                 </div>
                 <dl>
                     <div>
                         <dt>
-                            {% translate 'Full name' %}
+                            {% translate "Full name" %}
                         </dt>
                         <dd>
                             {{ member.user.full_name }}
@@ -29,7 +29,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate  'E-mail address' %}
+                            {% translate  "E-mail address" %}
                         </dt>
                         <dd>
                             {{ member.user }}
@@ -37,7 +37,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate  'Member type' %}
+                            {% translate  "Member type" %}
                         </dt>
                         <dd>
                             {{ member.groups.all.0 }}
@@ -45,7 +45,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate 'Organization' %}
+                            {% translate "Organization" %}
                         </dt>
                         <dd>
                             {{ member.organization }}
@@ -54,7 +54,7 @@
                     {% if member.acknowledged_clearance_level > 0 %}
                         <div>
                             <dt>
-                                {% translate 'Permission to set OOI clearance levels ' %}
+                                {% translate "Permission to set OOI clearance levels" %}
                             </dt>
                             <dd>
                                 L{{ member.acknowledged_clearance_level }}
@@ -64,11 +64,11 @@
                 </dl>
             </div>
         </section>
-        {% has_organization_perm "can_scan_organization" request.user organization as can_scan_organization %}
+        {% has_organization_perms "tools.can_scan_organization" request.user organization as can_scan_organization %}
         {% if can_scan_organization %}
             <section>
                 <div>
-                    <h2>{% translate 'OOI clearance' %}</h2>
+                    <h2>{% translate "OOI clearance" %}</h2>
                     {% if member.trusted_clearance_level <= 0 %}
                         <p>
                             {% blocktranslate%}
@@ -78,7 +78,7 @@
                         </p>
                     {% else %}
                         <p>
-                            {% translate 'You have currently accepted clearance up to level' %}
+                            {% translate "You have currently accepted clearance up to level" %}
                             <strong>
                                 {% if member.acknowledged_clearance_level < 0 %}
                                     L0
@@ -89,7 +89,7 @@
                         </p>
                         {% if member.acknowledged_clearance_level < member.trusted_clearance_level %}
                             <p class="explanation">
-                                {% translate 'You are granted clearance for level 4 by your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>' %}
+                                {% translate "You are granted clearance for level 4 by your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>" %}
                             </p>
                             {% if member.acknowledged_clearance_level < member.trusted_clearance_level %}
                                 <p class="explanation">

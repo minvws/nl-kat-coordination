@@ -1,8 +1,7 @@
 from account.forms.organization import OrganizationListForm
-from account.mixins import OrganizationView
+from account.mixins import OrganizationView, RockyPermissionRequiredMixin
 from account.models import KATUser
 from django.contrib import messages
-from account.mixins import RockyPermissionRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -57,7 +56,7 @@ class KATalogusSettingsListView(RockyPermissionRequiredMixin, OrganizationView, 
 
     template_name = "katalogus_settings.html"
     paginate_by = 10
-    permission_required = "can_scan_organization"
+    permission_required = "tools.can_scan_organization"
     plugin_type = "boefjes"
 
     def get_context_data(self, **kwargs):

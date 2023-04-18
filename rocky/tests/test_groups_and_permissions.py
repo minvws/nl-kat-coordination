@@ -19,6 +19,6 @@ def test_indemnification_present(superuser_member):
 
 
 def test_red_teamer_can_scan_organization(redteam_member):
-    assert redteam_member.user.has_perm("can_scan_organization") or redteam_member.has_member_perm(
-        "can_scan_organization"
+    assert redteam_member.user.has_perm("tools.can_scan_organization") or redteam_member.has_member_perms(
+        "tools.can_scan_organization"
     )

@@ -1,8 +1,8 @@
 import logging
 
 from account.forms import OrganizationForm
-from django.contrib import messages
 from account.mixins import PermissionRequiredMixin
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -26,7 +26,7 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
     template_name = "organizations/organization_add.html"
     form_class = OrganizationForm
     success_url = reverse_lazy("organization_list")
-    permission_required = "add_organization"
+    permission_required = "tools.add_organization"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
