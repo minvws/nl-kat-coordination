@@ -1,6 +1,5 @@
 from django.shortcuts import redirect
 from django.urls.base import reverse
-
 from tools.models import OrganizationMember
 from tools.user_helpers import is_red_team
 
@@ -9,7 +8,8 @@ def OnboardingMiddleware(get_response):
     def middleware(request):
         response = get_response(request)
         if request.user.is_authenticated:
-            member_onboarded = OrganizationMember.objects.filter(user=request.user, onboarded=True)
+            member_onboarded = list(filter(lambda o: o.onboarded, request.user.organization_members))
+
             # do not redirect itself, otherwise it will endup in endless loop
             # with too many redirects
             # exclude admin urls

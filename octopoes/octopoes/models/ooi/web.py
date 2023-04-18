@@ -1,10 +1,10 @@
 from abc import ABC
 from enum import Enum
-from typing import Literal, Optional, Dict
+from typing import Dict, Literal, Optional
 
 from pydantic import AnyUrl
 
-from octopoes.models import OOI, Reference, PrimaryKeyToken
+from octopoes.models import OOI, PrimaryKeyToken, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, Network
@@ -27,7 +27,7 @@ class Website(OOI):
 
     ip_service: Reference = ReferenceField(IPService, max_issue_scan_level=0, max_inherit_scan_level=4)
     hostname: Reference = ReferenceField(Hostname, max_inherit_scan_level=4)
-    certificate: Optional[Reference] = ReferenceField(X509Certificate, default=None)
+    certificate: Optional[Reference] = ReferenceField(X509Certificate, default=None, max_issue_scan_level=1)
 
     _natural_key_attrs = ["ip_service", "hostname"]
 

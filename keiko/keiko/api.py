@@ -4,15 +4,15 @@ import uuid
 from pathlib import Path
 from typing import List
 
-from fastapi import FastAPI, BackgroundTasks, Body
+from fastapi import BackgroundTasks, Body, FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from keiko.base_models import ReportArgumentsBase
-from keiko.health import get_health, ServiceHealth
+from keiko.health import ServiceHealth, get_health
 from keiko.keiko import generate_report
 from keiko.settings import Settings
-from keiko.templates import get_templates, get_samples
+from keiko.templates import get_samples, get_templates
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +58,7 @@ def construct_api(settings: Settings) -> FastAPI:
         return get_health()
 
     # mount reports as static files
-    if not Path(settings.reports_folder).exists():
-        Path(settings.reports_folder).mkdir(parents=True)
+    Path(settings.reports_folder).mkdir(parents=True, exist_ok=True)
     app.mount("/reports", StaticFiles(directory=settings.reports_folder), name="reports")
 
     return app

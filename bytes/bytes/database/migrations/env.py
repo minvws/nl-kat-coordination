@@ -1,14 +1,12 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 from bytes.config import get_settings
-from bytes.database.db import SQL_BASE
+from bytes.database.db_models import SQL_BASE
 
 config = context.config
 

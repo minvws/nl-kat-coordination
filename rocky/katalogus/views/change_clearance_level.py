@@ -6,8 +6,7 @@ from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
-from katalogus.views.mixins import BoefjeMixin
-from katalogus.views.mixins import SinglePluginView
+from katalogus.views.mixins import BoefjeMixin, SinglePluginView
 
 
 @class_view_decorator(otp_required)

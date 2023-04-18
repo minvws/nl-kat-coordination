@@ -1,14 +1,13 @@
+from account.forms import OrganizationMemberEditForm
+from account.mixins import OrganizationView
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, OrganizationMember
 from two_factor.views.utils import class_view_decorator
-from account.forms import OrganizationMemberEditForm
-from tools.models import OrganizationMember, GROUP_CLIENT, GROUP_ADMIN
-from account.mixins import OrganizationView
 
 
 @class_view_decorator(otp_required)
@@ -40,14 +39,14 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
             messages.SUCCESS,
             _("Member %s successfully updated.") % (self.object.user.full_name),
         )
-        return reverse("organization_detail", kwargs={"organization_code": self.organization.code})
+        return reverse("organization_member_list", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["breadcrumbs"] = [
             {
-                "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),
+                "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
                 "text": self.organization.name,
             },
             {

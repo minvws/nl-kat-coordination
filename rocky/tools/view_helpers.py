@@ -1,12 +1,12 @@
 import uuid
 from datetime import date, datetime, timezone
 from typing import List, TypedDict
-from urllib.parse import urlparse, urlunparse, urlencode
-
-from django.urls.base import reverse_lazy, reverse
-from django.utils.translation import gettext_lazy as _
+from urllib.parse import urlencode, urlparse, urlunparse
 
 from account.mixins import OrganizationView
+from django.urls.base import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
+
 from octopoes.models.types import OOI_TYPES
 
 
@@ -119,18 +119,26 @@ class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
     breadcrumbs = [{"url": reverse_lazy("organization_list"), "text": _("Organizations")}]
 
 
+class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
+    def build_breadcrumbs(self):
+        breadcrumbs = [
+            {
+                "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
+                "text": "Settings",
+            },
+        ]
+
+        return breadcrumbs
+
+
 class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
     def build_breadcrumbs(self):
         breadcrumbs = [
             {
-                "url": reverse("organization_detail", kwargs={"organization_code": self.organization.code}),
-                "text": self.organization.name,
+                "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
+                "text": "Members",
             },
         ]
-        permission = self.request.user.has_perm("tools.view_organization")
-        if permission:
-            organization_url = {"url": reverse("organization_list"), "text": _("Organizations")}
-            breadcrumbs.insert(0, organization_url)
 
         return breadcrumbs
 

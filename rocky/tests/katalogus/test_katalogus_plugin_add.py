@@ -1,15 +1,13 @@
 import pytest
 from django.http import Http404
-from pytest_django.asserts import assertContains, assertNotContains
-
 from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
+from pytest_django.asserts import assertContains, assertNotContains
 from tests.conftest import setup_request
 
 
 def test_plugin_settings_add_view(
     rf,
-    my_user,
-    organization,
+    superuser_member,
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
@@ -17,9 +15,9 @@ def test_plugin_settings_add_view(
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), superuser_member.user)
     response = PluginSettingsAddView.as_view()(
-        request, organization_code=organization.code, plugin_type="boefje", plugin_id="test-plugin"
+        request, organization_code=superuser_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
     )
 
     assertContains(response, "TestBoefje")
@@ -31,8 +29,7 @@ def test_plugin_settings_add_view(
 
 def test_plugin_single_settings_add_view(
     rf,
-    my_user,
-    organization,
+    superuser_member,
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
@@ -40,10 +37,10 @@ def test_plugin_single_settings_add_view(
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), superuser_member.user)
     response = PluginSingleSettingAddView.as_view()(
         request,
-        organization_code=organization.code,
+        organization_code=superuser_member.organization.code,
         plugin_type="boefje",
         plugin_id="test-plugin",
         setting_name="TEST_PROPERTY",
@@ -55,8 +52,7 @@ def test_plugin_single_settings_add_view(
 
 def test_plugin_single_settings_add_view_invalid_name(
     rf,
-    my_user,
-    organization,
+    superuser_member,
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
@@ -64,12 +60,12 @@ def test_plugin_single_settings_add_view_invalid_name(
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), superuser_member.user)
 
     with pytest.raises(Http404):
         PluginSingleSettingAddView.as_view()(
             request,
-            organization_code=organization.code,
+            organization_code=superuser_member.organization.code,
             plugin_type="boefje",
             plugin_id="test-plugin",
             setting_name="BAD_PROPERTY",
@@ -78,19 +74,18 @@ def test_plugin_single_settings_add_view_invalid_name(
 
 def test_plugin_single_settings_add_view_no_schema(
     rf,
-    my_user,
-    organization,
+    superuser_member,
     mock_mixins_katalogus,
     plugin_details,
 ):
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = None
 
-    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), my_user)
+    request = setup_request(rf.post("plugin_settings_add", data={"boefje_id": 123}), superuser_member.user)
     with pytest.raises(Http404):
         PluginSingleSettingAddView.as_view()(
             request,
-            organization_code=organization.code,
+            organization_code=superuser_member.organization.code,
             plugin_type="boefje",
             plugin_id="test-plugin",
             setting_name="BAD_PROPERTY",

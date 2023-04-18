@@ -1,8 +1,8 @@
 import re
-from typing import List, Iterator
+from typing import Iterator, List
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import HTTPHeader
 
 

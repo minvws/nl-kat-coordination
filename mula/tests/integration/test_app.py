@@ -4,6 +4,7 @@ from unittest import mock
 import scheduler
 from fastapi.testclient import TestClient
 from scheduler import config, models, repositories
+
 from tests.factories import OrganisationFactory
 
 

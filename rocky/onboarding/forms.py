@@ -1,15 +1,14 @@
+from account.forms import OrganizationMemberAddForm
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.utils.translation import gettext_lazy as _
-
-from account.forms import OrganizationMemberAddForm
 from tools.forms.settings import SCAN_LEVEL_CHOICES
 from tools.models import (
-    Organization,
     GROUP_ADMIN,
-    GROUP_REDTEAM,
     GROUP_CLIENT,
+    GROUP_REDTEAM,
+    Organization,
     OrganizationMember,
 )
 

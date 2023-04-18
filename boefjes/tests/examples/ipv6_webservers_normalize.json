@@ -7,9 +7,9 @@
       "version": null
     },
     "organization": "_dev",
-    "input_ooi": "Hostname|internet|rijksoverheid.nl.",
+    "input_ooi": "Hostname|internet|rijksoverheid.nl",
     "arguments": {
-      "pk": "Hostname|internet|rijksoverheid.nl.",
+      "pk": "Hostname|internet|rijksoverheid.nl",
       "dns_records": "[\"2a00:d00:3:2::3\", \"2a00:d00:3:2::4\", \"2a00:d00:3:2::5\", \"2a00:d00:3:2::6\"]"
     },
     "dispatches": [

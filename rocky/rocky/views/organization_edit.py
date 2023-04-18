@@ -1,13 +1,12 @@
+from account.forms import OrganizationUpdateForm
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
-
-from account.forms import OrganizationUpdateForm
 from tools.models import Organization
+from two_factor.views.utils import class_view_decorator
 
 
 @class_view_decorator(otp_required)
@@ -26,7 +25,7 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
             messages.SUCCESS,
             _("Organization %s successfully updated.") % (self.object.name),
         )
-        return reverse("organization_detail", kwargs={"organization_code": self.object.code})
+        return reverse("organization_settings", kwargs={"organization_code": self.object.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,7 +33,7 @@ class OrganizationEditView(PermissionRequiredMixin, UpdateView):
         context["breadcrumbs"] = [
             {"url": reverse("organization_list"), "text": "Organizations"},
             {
-                "url": reverse("organization_detail", kwargs={"organization_code": self.object.code}),
+                "url": reverse("organization_settings", kwargs={"organization_code": self.object.code}),
                 "text": self.object.name,
             },
             {

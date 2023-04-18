@@ -11,7 +11,7 @@ from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.forms import PluginSchemaForm, PluginSettingAddEditForm
-from katalogus.views.mixins import SingleSettingView, SinglePluginView
+from katalogus.views.mixins import SinglePluginView, SingleSettingView
 
 logger = logging.getLogger(__name__)
 

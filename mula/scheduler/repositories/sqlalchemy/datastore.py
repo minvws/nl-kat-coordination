@@ -1,9 +1,9 @@
 import json
 from functools import partial
 
-from scheduler import models
-
 from sqlalchemy import create_engine, orm, pool
+
+from scheduler import models
 
 from ..stores import Datastore  # noqa: TID252
 

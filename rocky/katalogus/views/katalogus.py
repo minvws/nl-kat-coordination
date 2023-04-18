@@ -1,14 +1,15 @@
 from typing import Any, Dict
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, FormView
+from django.views.generic import FormView, ListView
 from django_otp.decorators import otp_required
 from requests import RequestException
 from two_factor.views.utils import class_view_decorator
-from account.mixins import OrganizationView
+
 from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 
@@ -37,7 +38,7 @@ class KATalogusView(ListView, OrganizationView, FormView):
             messages.add_message(
                 self.request, messages.ERROR, _("Loading plugins in KATalogus failed. Please check the KATalogus logs.")
             )
-            return redirect(reverse("organization_detail", kwargs={"organization_code": self.organization.code}))
+            return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
 
         self.set_katalogus_view(kwargs)
         return super().get(request, *args, **kwargs)

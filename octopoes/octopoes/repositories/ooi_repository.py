@@ -4,7 +4,7 @@ import json
 import logging
 from datetime import datetime
 from http import HTTPStatus
-from typing import Type, List, Optional, Set, Dict, Union, Any, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
 from pydantic import BaseModel, parse_obj_as
 from requests import HTTPError
@@ -13,20 +13,21 @@ from octopoes.config.settings import XTDBType
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
 from octopoes.models import (
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     OOI,
     Reference,
     ScanLevel,
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ScanProfileType,
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.pagination import Paginated
-from octopoes.models.path import Path, get_paths_to_neighours, Direction, Segment
-from octopoes.models.tree import ReferenceTree, ReferenceNode
-from octopoes.models.types import get_relations, type_by_name, to_concrete, get_concrete_types, get_relation
-from octopoes.xtdb import FieldSet, Datamodel, ForeignKey
-from octopoes.xtdb.client import XTDBSession, OperationType as XTDBOperationType
+from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
+from octopoes.models.tree import ReferenceNode, ReferenceTree
+from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
+from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
+from octopoes.xtdb.client import OperationType as XTDBOperationType
+from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 

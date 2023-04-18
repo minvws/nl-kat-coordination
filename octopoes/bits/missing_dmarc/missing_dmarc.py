@@ -1,12 +1,11 @@
 from typing import Iterator, List
 
+import tldextract
+
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.email_security import DMARCTXTRecord
-
-import tldextract
-
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def run(
@@ -14,10 +13,8 @@ def run(
     additional_oois: List[DMARCTXTRecord],
 ) -> Iterator[OOI]:
     if (
-        # only report on findings on the fqdn because of double findings
-        input_ooi.name == input_ooi.fqdn.tokenized.name
         # don't report on findings on subdomains because it's not needed on subdomains
-        and not tldextract.extract(input_ooi.name).subdomain
+        not tldextract.extract(input_ooi.name).subdomain
         # don't report on findings on tlds
         and tldextract.extract(input_ooi.name).domain
     ):

@@ -1,10 +1,10 @@
 import logging
 from functools import lru_cache
-from typing import Type, Callable, Any, Iterator
+from typing import Any, Callable, Iterator, Type
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import declarative_base, Session, sessionmaker
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from boefjes.config import settings
 

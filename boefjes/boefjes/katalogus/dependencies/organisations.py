@@ -8,7 +8,6 @@ from boefjes.katalogus.storage.memory import OrganisationStorageMemory
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.organisation_storage import create_organisation_storage
 
-
 logger = logging.getLogger(__name__)
 
 

@@ -1,24 +1,23 @@
-from typing import List, Dict
-from typing import Set, Type, Tuple, Union
+from typing import Dict, List, Set, Tuple, Type, Union
 
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+from tools.ooi_helpers import (
+    RiskLevelSeverity,
+    format_attr_name,
+    get_finding_type_from_finding,
+    get_knowledge_base_data_for_ooi,
+)
+from tools.view_helpers import existing_ooi_type, url_with_querystring
 from two_factor.views.utils import class_view_decorator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.types import get_relations, OOI_TYPES, to_concrete
+from octopoes.models.types import OOI_TYPES, get_relations, to_concrete
 from rocky.views.ooi_view import SingleOOITreeMixin
-from tools.ooi_helpers import (
-    get_knowledge_base_data_for_ooi,
-    get_finding_type_from_finding,
-    format_attr_name,
-    RiskLevelSeverity,
-)
-from tools.view_helpers import existing_ooi_type, url_with_querystring
 
 
 class OOIRelatedObjectManager(SingleOOITreeMixin):

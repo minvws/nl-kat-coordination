@@ -2,15 +2,14 @@ import logging
 
 from colorama import Fore
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
 
 from tools.models import (
+    GROUP_ADMIN,
     GROUP_CLIENT,
     GROUP_REDTEAM,
-    GROUP_ADMIN,
 )
 
 User = get_user_model()
@@ -42,7 +41,13 @@ class Command(BaseCommand):
         self.setup_kat_groups()
 
         admin_permissions = self.get_permissions(
-            ["view_organization", "view_organizationmember", "add_organizationmember", "change_organizationmember"]
+            [
+                "view_organization",
+                "view_organizationmember",
+                "add_organizationmember",
+                "change_organization",
+                "change_organizationmember",
+            ]
         )
         self.group_admin.permissions.set(admin_permissions)
 

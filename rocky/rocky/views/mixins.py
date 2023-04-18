@@ -1,34 +1,35 @@
 import logging
 from datetime import datetime, timezone
 from functools import cached_property
-from typing import Set, Type, List, Dict, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Type
 
 import requests.exceptions
+from account.mixins import OrganizationView
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from pydantic import BaseModel
-
-from account.mixins import OrganizationView
 from katalogus.client import Plugin, get_katalogus
-from octopoes.connector import ObjectNotFoundException
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
-from octopoes.models.ooi.findings import Finding
-from octopoes.models.origin import Origin, OriginType
-from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import get_relations, get_collapsed_types, type_by_name
-from rocky.bytes_client import get_bytes_client
+from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
-from tools.forms.settings import DEPTH_MAX, DEPTH_DEFAULT
+from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
 from tools.models import Organization
 from tools.ooi_helpers import (
     get_knowledge_base_data_for_ooi_store,
 )
 from tools.view_helpers import (
-    get_ooi_url,
     convert_date_to_datetime,
+    get_ooi_url,
 )
+
+from octopoes.connector import ObjectNotFoundException
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
+from octopoes.models.explanation import InheritanceSection
+from octopoes.models.ooi.findings import Finding
+from octopoes.models.origin import Origin, OriginType
+from octopoes.models.tree import ReferenceTree
+from octopoes.models.types import get_collapsed_types, get_relations, type_by_name
+from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ class OriginData(BaseModel):
     origin: Origin
     normalizer: Optional[dict]
     boefje: Optional[Plugin]
+    params: Optional[Dict[str, str]]
 
 
 class OOIAttributeError(AttributeError):
@@ -116,8 +118,13 @@ class OctopoesView(OrganizationView):
         except ValueError:
             return default_depth
 
+    def get_scan_profile_inheritance(self, ooi: OOI) -> List[InheritanceSection]:
+        return self.octopoes_api_connector.get_scan_profile_inheritance(ooi.reference)
+
 
 class OOIList:
+    HARD_LIMIT = 99_999_999
+
     def __init__(
         self,
         octopoes_connector: OctopoesAPIConnector,

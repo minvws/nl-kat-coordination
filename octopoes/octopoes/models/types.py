@@ -1,72 +1,73 @@
 from __future__ import annotations
 
-from typing import Type, Dict, Set, Iterator, Union
+from typing import Dict, Iterator, Set, Type, Union
 
 from pydantic.fields import ModelField
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
-    X509Certificate,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
+    X509Certificate,
 )
 from octopoes.models.ooi.dns.records import (
-    DNSARecord,
+    NXDOMAIN,
     DNSAAAARecord,
+    DNSARecord,
+    DNSCNAMERecord,
     DNSMXRecord,
-    DNSTXTRecord,
     DNSNSRecord,
     DNSSOARecord,
-    DNSCNAMERecord,
-    NXDOMAIN,
+    DNSTXTRecord,
 )
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname, ResolvedHostname
 from octopoes.models.ooi.email_security import (
-    DNSSPFMechanismIP,
-    DNSSPFMechanismHostname,
-    DNSSPFMechanismNetBlock,
-    DNSSPFRecord,
-    DMARCTXTRecord,
     DKIMExists,
     DKIMKey,
     DKIMSelector,
+    DMARCTXTRecord,
+    DNSSPFMechanismHostname,
+    DNSSPFMechanismIP,
+    DNSSPFMechanismNetBlock,
+    DNSSPFRecord,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone, ResolvedHostname
 from octopoes.models.ooi.findings import (
-    Finding,
     ADRFindingType,
-    KATFindingType,
+    CAPECFindingType,
     CVEFindingType,
     CWEFindingType,
+    Finding,
+    KATFindingType,
+    MutedFinding,
     RetireJSFindingType,
     SnykFindingType,
-    CAPECFindingType,
 )
-from octopoes.models.ooi.monitoring import Incident, Application
+from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
-    Network,
+    AutonomousSystem,
     IPAddressV4,
     IPAddressV6,
     IPPort,
-    AutonomousSystem,
     IPV4NetBlock,
     IPV6NetBlock,
+    Network,
 )
-from octopoes.models.ooi.service import Service, IPService
+from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
-    Website,
-    HostnameHTTPURL,
-    IPAddressHTTPURL,
-    HTTPResource,
-    HTTPHeader,
-    URL,
-    HTTPHeaderURL,
-    HTTPHeaderHostname,
-    ImageMetadata,
     RESTAPI,
+    URL,
     APIDesignRule,
     APIDesignRuleResult,
+    HostnameHTTPURL,
+    HTTPHeader,
+    HTTPHeaderHostname,
+    HTTPHeaderURL,
+    HTTPResource,
+    ImageMetadata,
+    IPAddressHTTPURL,
+    Website,
 )
 
 CertificateType = Union[
@@ -148,6 +149,7 @@ OOIType = Union[
     MonitoringType,
     EmailSecurityType,
     Finding,
+    MutedFinding,
     FindingTypeType,
 ]
 

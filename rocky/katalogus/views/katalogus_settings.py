@@ -1,18 +1,19 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.urls import reverse
-from django.urls.base import reverse_lazy
-from django.http import HttpResponseRedirect
-from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
-from django.views.generic import ListView, FormView, TemplateView
-from django_otp.decorators import otp_required
-from requests import RequestException
-from two_factor.views.utils import class_view_decorator
 from account.forms.organization import OrganizationListForm
 from account.mixins import OrganizationView
+from account.models import KATUser
+from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.urls.base import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import FormView, ListView, TemplateView
+from django_otp.decorators import otp_required
+from requests import RequestException
+from tools.models import Organization
+from two_factor.views.utils import class_view_decorator
+
 from katalogus.client import get_katalogus
-from tools.models import Organization, OrganizationMember
 
 
 @class_view_decorator(otp_required)
@@ -20,9 +21,8 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
     template_name = "confirmation_clone_settings.html"
 
     def test_func(self):
-        to_organization = Organization.objects.get(code=self.kwargs["to_organization"])
-
-        return OrganizationMember.objects.filter(user=self.request.user, organization=to_organization).exists()
+        user: KATUser = self.request.user
+        return self.kwargs["to_organization"] in {org.code for org in user.organizations}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

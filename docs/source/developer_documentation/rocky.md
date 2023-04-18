@@ -31,7 +31,7 @@ sequenceDiagram
 ## Rocky View Structure
 
 Rocky has a hierarchical set of views that are not easy to capture in a single diagram.
-We therefore made several diagrams to show the most coherent components. 
+We therefore made several diagrams to show the most coherent components.
 
 ### Overview of child Views of the OrganizationViews
 

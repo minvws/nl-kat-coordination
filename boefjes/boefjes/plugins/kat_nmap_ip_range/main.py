@@ -1,8 +1,9 @@
+from ipaddress import IPv6Network, ip_network
 from os import getenv
-from ipaddress import ip_network, IPv6Network
 from typing import List, Tuple, Union
 
 import docker
+
 from boefjes.job_models import BoefjeMeta
 
 NMAP_IMAGE = "instrumentisto/nmap:latest"

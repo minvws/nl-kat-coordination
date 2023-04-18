@@ -1,34 +1,33 @@
 from datetime import datetime, timezone
-from typing import Type, List
+from time import sleep
+from typing import List, Type
 from uuid import uuid4
 
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView, ListView
+from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
 from django_otp.decorators import otp_required
-from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.types import get_collapsed_types
 from pydantic import ValidationError
-from time import sleep
-from two_factor.views.utils import class_view_decorator
-
-from octopoes.api.models import Declaration
-from octopoes.models import OOI, ScanLevel, DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, ScanProfileType
-
-from rocky.bytes_client import get_bytes_client, BytesClient
-from rocky.views.mixins import (
-    SingleOOIMixin,
-    SingleOOITreeMixin,
-    MultipleOOIMixin,
-    ConnectorFormMixin,
-)
 from tools.forms.base import BaseRockyForm, ObservedAtForm
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
-from tools.ooi_form import OOIForm, ClearanceFilterForm
-from tools.view_helpers import get_ooi_url, get_mandatory_fields, BreadcrumbsMixin, Breadcrumb
+from tools.ooi_form import ClearanceFilterForm, OOIForm
+from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
+from two_factor.views.utils import class_view_decorator
+
+from octopoes.api.models import Declaration
+from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, OOI, ScanLevel, ScanProfileType
+from octopoes.models.ooi.findings import Finding, FindingType
+from octopoes.models.types import get_collapsed_types
+from rocky.bytes_client import BytesClient, get_bytes_client
+from rocky.views.mixins import (
+    ConnectorFormMixin,
+    MultipleOOIMixin,
+    SingleOOIMixin,
+    SingleOOITreeMixin,
+)
 
 
 @class_view_decorator(otp_required)

@@ -3,10 +3,10 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+from tools.view_helpers import get_ooi_url
 from two_factor.views.utils import class_view_decorator
 
 from rocky.views.mixins import SingleOOIMixin
-from tools.view_helpers import get_ooi_url
 
 
 @class_view_decorator(otp_required)
