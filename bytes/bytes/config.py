@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseSettings
 
-from bytes.models import HashingAlgorithm, HashingRepositoryReference, EncryptionMiddleware
+from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
 BASE_DIR = Path(__file__).parent.parent
 

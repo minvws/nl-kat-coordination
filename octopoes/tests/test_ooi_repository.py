@@ -1,20 +1,20 @@
 import re
 from datetime import datetime
 from ipaddress import IPv4Address
-from typing import cast, List, Literal
+from typing import List, Literal, cast
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
 from octopoes.config.settings import XTDBType
 from octopoes.events.manager import EventManager
-from octopoes.models import Reference, OOI
-from octopoes.models.persistence import ReferenceField
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import DNSZone
 from octopoes.models.ooi.network import IPAddressV4, Network
-from octopoes.models.path import Segment, Path, Direction
+from octopoes.models.path import Direction, Path, Segment
+from octopoes.models.persistence import ReferenceField
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
-from octopoes.xtdb.client import XTDBSession, XTDBHTTPClient
-from tests.mocks.mock_ooi_types import ALL_OOI_TYPES, MockIPAddressV4, MockIPPort, MockIPAddress, MockNetwork
+from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
+from tests.mocks.mock_ooi_types import ALL_OOI_TYPES, MockIPAddress, MockIPAddressV4, MockIPPort, MockNetwork
 
 
 class OOIRepositoryTest(TestCase):

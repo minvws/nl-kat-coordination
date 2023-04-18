@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from tools.add_ooi_information import retirejs_info, cve_info, snyk_info, port_info, service_info, cwe_info, get_info
+from tools.add_ooi_information import cve_info, cwe_info, get_info, port_info, retirejs_info, service_info, snyk_info
 from tools.ooi_helpers import RiskLevelSeverity
 
 

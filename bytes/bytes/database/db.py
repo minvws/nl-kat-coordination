@@ -5,7 +5,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base
 
-
 logger = logging.getLogger(__name__)
 
 SQL_BASE = declarative_base()

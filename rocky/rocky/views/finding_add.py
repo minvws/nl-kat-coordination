@@ -1,30 +1,28 @@
 from datetime import datetime, timezone
-from typing import List, Dict
+from typing import Dict, List
 from uuid import uuid4
 
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
+from tools.forms.finding_type import FindingAddForm
+from tools.view_helpers import get_ooi_url
 
 from octopoes.api.models import Declaration
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import (
+    CAPECFindingType,
     CVEFindingType,
-    KATFindingType,
+    CWEFindingType,
     Finding,
+    FindingType,
+    KATFindingType,
     RetireJSFindingType,
     SnykFindingType,
-    FindingType,
-    CWEFindingType,
-    CAPECFindingType,
 )
 from octopoes.models.types import OOI_TYPES
-
-from rocky.bytes_client import get_bytes_client, BytesClient
+from rocky.bytes_client import BytesClient, get_bytes_client
 from rocky.views.ooi_view import BaseOOIFormView
-from tools.forms.finding_type import FindingAddForm
-from tools.view_helpers import get_ooi_url
-
 
 FINDING_TYPES_PREFIXES = {
     "CVE": CVEFindingType,

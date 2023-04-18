@@ -1,8 +1,8 @@
 from enum import Enum
 
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.shortcuts import redirect
 from django.urls.base import reverse
@@ -10,10 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
-from two_factor.views.utils import class_view_decorator
-
 from tools.models import OrganizationMember
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
+from two_factor.views.utils import class_view_decorator
 
 
 class BLOCK_STATUSES(models.TextChoices):

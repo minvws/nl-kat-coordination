@@ -1,10 +1,10 @@
 from abc import ABC
 from enum import Enum
-from typing import Literal, Optional, Dict
+from typing import Dict, Literal, Optional
 
 from pydantic import AnyUrl
 
-from octopoes.models import OOI, Reference, PrimaryKeyToken
+from octopoes.models import OOI, PrimaryKeyToken, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, Network

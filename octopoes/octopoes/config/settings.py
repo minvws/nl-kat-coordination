@@ -1,6 +1,7 @@
 import os
 from enum import Enum
 from pathlib import Path
+from typing import Set
 
 from pydantic import BaseSettings
 
@@ -26,3 +27,5 @@ class Settings(BaseSettings):
     katalogus_api: str = "http://localhost:8003"
 
     scan_level_recalculation_interval: int = 60
+    bits_enabled: Set[str] = set()
+    bits_disabled: Set[str] = set()

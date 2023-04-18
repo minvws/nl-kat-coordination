@@ -1,13 +1,13 @@
+from account.forms import OrganizationMemberEditForm
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, OrganizationMember
 from two_factor.views.utils import class_view_decorator
-from account.forms import OrganizationMemberEditForm
-from tools.models import OrganizationMember, GROUP_CLIENT, GROUP_ADMIN
-from account.mixins import OrganizationView
 
 
 @class_view_decorator(otp_required)

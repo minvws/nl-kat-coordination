@@ -1,14 +1,14 @@
+from account.forms import IndemnificationAddForm
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
-from django.urls import reverse_lazy
-from account.forms import IndemnificationAddForm
-from account.mixins import OrganizationView
 from tools.models import Indemnification
+from two_factor.views.utils import class_view_decorator
 
 
 @class_view_decorator(otp_required)

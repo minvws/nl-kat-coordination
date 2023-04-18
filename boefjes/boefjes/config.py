@@ -1,9 +1,8 @@
 from enum import Enum
-
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseSettings, AnyHttpUrl, PostgresDsn
+from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn
 
 
 class RuntimeConfiguration(Enum):

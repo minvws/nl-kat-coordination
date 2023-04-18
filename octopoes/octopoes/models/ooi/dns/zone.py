@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import string
-from typing import Optional, Literal
+from typing import Literal, Optional
 
 from pydantic import constr, validator
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.network import Network, IPAddress
+from octopoes.models.ooi.network import IPAddress, Network
 from octopoes.models.persistence import ReferenceField
 
 VALID_HOSTNAME_CHARACTERS = string.ascii_letters + string.digits + "-."

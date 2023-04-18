@@ -4,23 +4,22 @@ import re
 from collections.abc import Iterable
 from typing import Iterator, Union
 
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import KATFindingType, Finding, CVEFindingType
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType
 from octopoes.models.ooi.network import (
-    IPPort,
-    Protocol,
-    PortState,
+    AutonomousSystem,
     IPAddressV4,
     IPAddressV6,
-    AutonomousSystem,
-    Network,
+    IPPort,
     IPV4NetBlock,
     IPV6NetBlock,
+    Network,
+    PortState,
+    Protocol,
 )
 from octopoes.models.ooi.software import Software, SoftwareInstance
-
-from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

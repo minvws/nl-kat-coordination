@@ -1,9 +1,10 @@
 import pytest
-from pytest_django.asserts import assertContains
-from django.http import Http404
 from django.core.exceptions import PermissionDenied
-from tests.conftest import setup_request
+from django.http import Http404
+from pytest_django.asserts import assertContains
+
 from rocky.views.organization_member_edit import OrganizationMemberEditView
+from tests.conftest import setup_request
 
 
 def test_admin_can_edit_itself(rf, admin_member):

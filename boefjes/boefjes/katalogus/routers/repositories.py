@@ -1,12 +1,11 @@
 from typing import Dict
 
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from boefjes.katalogus.dependencies.repositories import get_repository_store
-from boefjes.katalogus.models import Repository, RESERVED_LOCAL_ID
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, Repository
 from boefjes.katalogus.routers.organisations import check_organisation_exists
 from boefjes.katalogus.storage.interfaces import RepositoryStorage
-
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}/repositories",

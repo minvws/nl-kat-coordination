@@ -1,16 +1,18 @@
 import csv
 import io
 import json
-from django.urls import reverse, resolve
-from octopoes.models.exception import ObjectNotFoundException
+
+from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
+from tools.models import Indemnification
+
 from octopoes.models import ScanLevel, ScanProfileType
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.network import Network
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
-from rocky.views.ooi_list import OOIListView, OOIListExportView
+from rocky.views.ooi_list import OOIListExportView, OOIListView
 from tests.conftest import setup_request
-from tools.models import Indemnification
 
 
 def test_ooi_list(rf, client_member, mock_organization_view_octopoes):

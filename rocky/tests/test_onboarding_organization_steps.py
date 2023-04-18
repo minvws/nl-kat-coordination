@@ -1,16 +1,16 @@
-from pytest_django.asserts import assertContains
-
 from onboarding.views import (
-    OnboardingIntroductionView,
     OnboardingChooseReportInfoView,
     OnboardingChooseReportTypeView,
-    OnboardingSetupScanOOIInfoView,
-    OnboardingSetupScanOOIDetailView,
-    OnboardingSetClearanceLevelView,
-    OnboardingSetupScanSelectPluginsView,
-    OnboardingSetupScanOOIAddView,
+    OnboardingIntroductionView,
     OnboardingReportView,
+    OnboardingSetClearanceLevelView,
+    OnboardingSetupScanOOIAddView,
+    OnboardingSetupScanOOIDetailView,
+    OnboardingSetupScanOOIInfoView,
+    OnboardingSetupScanSelectPluginsView,
 )
+from pytest_django.asserts import assertContains
+
 from tests.conftest import setup_request
 
 
