@@ -103,7 +103,7 @@ Cleanup
     Get Messages From Queue    ${SCAN_PROFILE_MUTATION_QUEUE}    ack_requeue_false
 
 Await Sync
-    Sleep     100ms
+    Sleep    100ms
     Await Tasks Done
     Wait For XTDB Synced
 
@@ -131,16 +131,16 @@ Task Type Empty
 Object List Should Contain
     [Arguments]    ${reference}
     ${response_data}    Get Objects
-    ${pks} =   Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
-    Should Contain    ${pks}    ${reference}   ${reference} not found in object list
+    ${pks}    Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
+    Should Contain    ${pks}    ${reference}    ${reference} not found in object list
 
 Object List Should Not Contain
-     [Arguments]    ${reference}
+    [Arguments]    ${reference}
     ${response_data}    Get Objects
-    ${pks} =   Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
-    Should Not Contain    ${pks}    ${reference}   ${reference} found in object list
+    ${pks}    Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
+    Should Not Contain    ${pks}    ${reference}    ${reference} found in object list
 
 Total Object Count Should Be
     [Arguments]    ${length}
     ${response_data}    Get Objects
-    Should Be Equal As Integers    ${response_data["count"]}    ${length}   Object count should be ${length}
+    Should Be Equal As Integers    ${response_data["count"]}    ${length}    Object count should be ${length}
