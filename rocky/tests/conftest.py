@@ -46,6 +46,7 @@ def create_member(user, organization):
         user=user,
         organization=organization,
         status=OrganizationMember.STATUSES.ACTIVE,
+        blocked=False,
         trusted_clearance_level=4,
         acknowledged_clearance_level=4,
         onboarded=False,

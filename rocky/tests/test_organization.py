@@ -198,17 +198,17 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     assertNotContains(response, new_member.user.full_name)
     assertContains(response, blocked_member.user.full_name)
     assertContains(response, 'class="blocked"')
-    assertNotContains(response, "New")
-    assertNotContains(response, "Active")
+    assertNotContains(response, 'class="new"')
+    assertNotContains(response, 'class="active"')
 
     request2 = setup_request(rf.get("organization_member_list", {"client_status": "new"}), superuser_member.user)
     response2 = OrganizationMemberListView.as_view()(request2, organization_code=superuser_member.organization.code)
 
     assertContains(response2, new_member.user.full_name)
     assertNotContains(response2, blocked_member.user.full_name)
-    assertContains(response2, "New")
+    assertContains(response2, 'class="new"')
     assertNotContains(response2, 'class="blocked"')
-    assertNotContains(response2, "Active")
+    assertNotContains(response2, 'class="active"')
 
     request3 = setup_request(
         rf.get("organization_member_list", {"client_status": ["new", "active", "blocked"]}), superuser_member.user
@@ -218,9 +218,9 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     assertContains(response3, superuser_member.user.full_name)
     assertContains(response3, new_member.user.full_name)
     assertContains(response3, blocked_member.user.full_name)
-    assertContains(response3, "New")
+    assertContains(response3, 'class="new"')
     assertContains(response3, 'class="blocked"')
-    assertContains(response3, "Active")
+    assertContains(response3, 'class="active"')
 
 
 def test_organization_does_not_exist(client, client_member):
