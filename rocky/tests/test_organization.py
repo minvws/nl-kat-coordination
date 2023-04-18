@@ -192,7 +192,7 @@ def test_organization_member_list(rf, admin_member):
 
 
 def test_organization_filtered_member_list(rf, superuser_member, new_member, blocked_member):
-    request = setup_request(rf.get("organization_member_list", {"client_status": "blocked"}), superuser_member.user)
+    request = setup_request(rf.get("organization_member_list", {"blocked": "true"}), superuser_member.user)
     response = OrganizationMemberListView.as_view()(request, organization_code=superuser_member.organization.code)
 
     assertNotContains(response, new_member.user.full_name)

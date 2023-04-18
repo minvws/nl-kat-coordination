@@ -3,8 +3,10 @@ from enum import Enum
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db import models
 from django.shortcuts import redirect
 from django.urls.base import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
@@ -12,6 +14,11 @@ from two_factor.views.utils import class_view_decorator
 
 from tools.models import OrganizationMember
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
+
+
+class BLOCK_STATUSES(models.TextChoices):
+    BLOCKED = _("Blocked"), "blocked"
+    UNBLOCKED = _("Not blocked"), "unblocked"
 
 
 class PageActions(Enum):
@@ -34,11 +41,21 @@ class OrganizationMemberListView(
         queryset = self.model.objects.filter(organization=self.organization)
         if "client_status" in self.request.GET:
             status_filter = self.request.GET.getlist("client_status", [])
-            queryset = self.filter_queryset(queryset, status_filter)
-        return queryset
+            queryset = [member for member in queryset if member.status in status_filter]
 
-    def filter_queryset(self, queryset, blocked_status_filter):
-        return [member for member in queryset if member.status in blocked_status_filter]
+        if "blocked_status" in self.request.GET:
+            blocked_filter = self.request.GET.getlist("blocked_status", [])
+            blocked_filter_bools = []
+
+            # Conversion from string values to boolean values
+            for filter_option in blocked_filter:
+                if filter_option == "blocked":
+                    blocked_filter_bools.append(True)
+                if filter_option == "unblocked":
+                    blocked_filter_bools.append(False)
+
+            queryset = [member for member in queryset if member.blocked in blocked_filter_bools]
+        return queryset
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -67,9 +84,11 @@ class OrganizationMemberListView(
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
 
     def get_filters_active(self):
-        return self.request.GET.getlist("client_status", [])
+        active_filters = self.request.GET.getlist("client_status", [])
+        active_filters += [item.lower() for item in self.request.GET.getlist("blocked_status", [])]
+        return active_filters
 
-    def get_checkbox_filters(self):
+    def get_status_filters(self):
         return [
             {
                 "label": choice[0],
@@ -79,7 +98,19 @@ class OrganizationMemberListView(
             for choice in OrganizationMember.STATUSES.choices
         ]
 
+    def get_blocked_filters(self):
+        return [
+            {
+                "label": choice[0],
+                "value": choice[1],
+                "checked": not self.filters_active or choice[1] in self.filters_active,
+            }
+            for choice in BLOCK_STATUSES.choices
+        ]
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["checkbox_filters"] = self.get_checkbox_filters()
+        context["status_filters"] = self.get_status_filters()
+        context["blocked_filters"] = self.get_blocked_filters()
+
         return context
