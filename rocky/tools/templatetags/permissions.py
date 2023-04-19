@@ -7,7 +7,7 @@ register = template.Library()
 
 
 @register.simple_tag()
-def has_organization_perms(perms: str, user: KATUser, organization: Organization) -> bool:
+def has_organization_perms(perms: str, user: KATUser, organization: Organization = None) -> bool:
     if user.has_perms(perms):
         return True
     if organization:

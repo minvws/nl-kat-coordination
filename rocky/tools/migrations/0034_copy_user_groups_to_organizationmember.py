@@ -2,6 +2,7 @@
 
 from django.contrib.auth import get_user_model
 from django.db import migrations
+
 from tools.models import OrganizationMember
 
 User = get_user_model()

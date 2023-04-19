@@ -17,6 +17,7 @@ from katalogus.exceptions import (
     KATalogusUnhealthyException,
 )
 from requests import RequestException
+
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.exceptions import (
     OctopoesDownException,
