@@ -30,10 +30,6 @@ class OrganizationView(View):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        # authentication/otp flow happens before setup
-        if not request.user.is_authenticated:
-            return
-
         organization_code = kwargs["organization_code"]
         try:
             self.organization = Organization.objects.get(code=organization_code)
