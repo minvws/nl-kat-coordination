@@ -89,7 +89,9 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if not member.user.is_superuser %}
+                                            {% if member.user.is_superuser %}
+                                                <button class="icon ti-edit action-button disabled">{% translate "Edit" %}</button>
+                                            {% else %}
                                                 <a href="{% url "organization_member_edit" organization.code member.id %}"><button class="icon ti-edit action-button">{% translate "Edit" %}</button></a>
                                             {% endif %}
                                         </td>
