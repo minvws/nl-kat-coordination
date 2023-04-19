@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "/schema/port-specification",
+  "type": "object",
+  "default": {},
+  "Port Configuration": "Root Schema",
+  "required": [],
+  "properties": {
+    "common": {
+      "type": "object",
+      "default": {},
+      "Common Ports": "Allowed ports",
+      "required": [],
+      "properties": {
+        "udp": {
+          "title": "Allowed UDP ports",
+          "type": "array",
+          "default": [
+            53
+          ],
+          "items": {
+            "type": "integer",
+            "examples": [
+              53
+            ]
+          }
+        },
+        "tcp": {
+          "type": "array",
+          "default": [25, 53,
+            110,
+            143,
+            993,
+            995,
+            80,
+            443],
+          "title": "Allowed TCP ports",
+          "items": {
+            "type": "integer",
+            "examples": [
+              25,
+              53,
+              110,
+              143,
+              993,
+              995,
+              80,
+              443
+            ]
+          }
+        }
+      }
+    },
+
+    "admin": {
+      "type": "object",
+      "default": {},
+      "Common Ports": "Disallowed admin ports",
+      "required": [],
+      "properties": {
+        "udp": {
+          "title": "Disallowed UDP ports",
+          "type": "array",
+          "default": [
+            53
+          ],
+          "items": {
+            "type": "integer",
+            "examples": [
+              53
+            ]
+          }
+        },
+        "tcp": {
+          "type": "array",
+          "default": [21,
+            22,
+            23,
+            3389,
+            5900
+          ],
+          "title": "Disallowed TCP ports",
+          "items": {
+            "type": "integer",
+            "examples": [
+              21,
+              22,
+              23,
+              3389,
+              5900
+            ]
+          }
+        }
+      }
+    },
+
+    "database": {
+      "type": "object",
+      "default": {},
+      "Common Ports": "Disallowed database ports",
+      "required": [],
+      "properties": {
+        "tcp": {
+          "type": "array",
+          "default": [1433,
+            1434,
+            3050,
+            3306,
+            5432
+          ],
+          "title": "Disallowed TCP ports",
+          "items": {
+            "type": "integer",
+            "examples": [
+              1433,
+              1434,
+              3050,
+              3306,
+              5432
+            ]
+          }
+        }
+      }
+    }
+  }
+}

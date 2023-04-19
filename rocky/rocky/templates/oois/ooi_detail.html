@@ -16,7 +16,18 @@
                 {% endif %}
                 {% include "partials/ooi_head.html" with ooi=ooi view="ooi_detail" %}
                 {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
-
+              <div class="form-view">
+                <form method="post" class="inline">
+                  {% csrf_token %}
+                  {% if form.non_field_errors %}<div class="warning">{{ form.non_field_errors }}</div>{% endif %}
+                  <fieldset>
+                    {% for field in question_form %}
+                    {% include "partials/form/field_input_wrapper.html" %}
+                    {% endfor %}
+                  </fieldset>
+                  <button type="submit">{% blocktranslate %}Answer {{ display_type }}{% endblocktranslate %}</button>
+                </form>
+              </div>
             </div>
             <div>
                 {% include "oois/ooi_detail_origins_declarations.html" %}

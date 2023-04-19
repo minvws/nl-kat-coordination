@@ -17,7 +17,7 @@ from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
 from tools.models import Organization, OrganizationMember
-from tools.ooi_form import OOIForm
+from tools.forms.ooi_form import OOIForm
 from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
     filter_ooi_tree,

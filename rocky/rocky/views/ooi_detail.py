@@ -1,3 +1,5 @@
+import json
+import logging
 from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
@@ -10,17 +12,22 @@ from django.shortcuts import redirect
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from requests.exceptions import RequestException
+from requests.exceptions import RequestException, JSONDecodeError
 from tools.forms.base import ObservedAtForm
+from tools.forms.json_schema_form import JsonSchemaForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification, OrganizationMember
 from tools.ooi_helpers import format_display
 
 from octopoes.models import OOI, Reference
+from octopoes.models.ooi.question import Question
+
 from rocky import scheduler
 from rocky.views.mixins import OOIBreadcrumbsMixin
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
+
+logger = logging.getLogger(__name__)
 
 
 class PageActions(Enum):
@@ -175,6 +182,14 @@ class OOIDetailView(
         context["inferences"] = inferences
         context["member"] = self.get_organizationmember()
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi))
+        context["question_form"] = None
+
+        if isinstance(self.ooi, Question):
+            try:
+                context["question_form"] = JsonSchemaForm(json.loads(self.ooi.json_schema))
+            except JSONDecodeError:
+                logger.warning("Could not parse json schema from Question OOI.")
+
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.get_observed_at()

@@ -12,6 +12,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "pydantic~=1.10.2",
+        "jsonschema~=4.17.0",
         "dnspython~=2.1.0",
     ],
 )

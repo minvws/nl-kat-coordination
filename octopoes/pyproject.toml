@@ -52,6 +52,7 @@ celery = "^5.2.7"
 pyparsing = "^3.0.9"
 packaging = "^23.0"
 tldextract = "^3.4.0"
+jsonschema = "^4.17.0"
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"
