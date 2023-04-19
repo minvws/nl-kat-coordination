@@ -37,6 +37,7 @@ from octopoes.models.path import (
     get_paths_to_neighours,
 )
 from octopoes.models.tree import ReferenceTree
+from octopoes.models.types import Config, to_concrete
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 from octopoes.repositories.origin_repository import OriginRepository
@@ -148,25 +149,23 @@ class OctopoesService:
                 parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
                 parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
-                try:
-                    path = Path.parse(f"{source.__class__.__name__}.{bit_definition.config_ooi_relation_path}")
+                obj = source
+                path_oois = bit_definition.config_ooi_relation_path.split(".")
+                for ooi in path_oois:
+                    path = Path.parse(f"{obj.__class__.__name__}.{ooi}")
                     obj = self.ooi_repository.list_neighbours(
-                        references={source.reference}, paths={path}, valid_time=valid_time
+                        references={obj.reference}, paths={path}, valid_time=valid_time
                     ).pop()
-                # catches both the KeyError if no relation path is configured and the pop() if no neighbours are found
-                except KeyError:
-                    obj = None
+
+                config_oois = self.get_ooi_tree(
+                    reference=obj.reference, valid_time=valid_time, search_types=to_concrete({Config})
+                )
 
                 config = ""
-                if obj:
-                    config_ooi_reference = Reference.from_str(
-                        f"Config|{path.segments[-1].target_type.parse_obj(obj).primary_key}"
-                    )
-                    try:
-                        config_ooi = self.ooi_repository.get(config_ooi_reference, valid_time)
-                        config = config_ooi.config
-                    except ObjectNotFoundException:
-                        pass
+                for config_ooi in config_oois.store.values():
+                    if isinstance(config_ooi, Config):
+                        if config_ooi.bit_id == bit_definition.id:
+                            config = config_ooi.config
 
                 try:
                     resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)

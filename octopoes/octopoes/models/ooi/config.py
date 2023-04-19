@@ -8,6 +8,7 @@ class Config(OOI):
     object_type: Literal["Config"] = "Config"
 
     ooi: Reference = ReferenceField(OOI)
+    bit_id: str
     config: str
 
     @property
