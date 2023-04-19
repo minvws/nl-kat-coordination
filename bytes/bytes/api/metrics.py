@@ -53,10 +53,10 @@ def get_registry(meta_repository: MetaDataRepository, raw_repository: RawReposit
     for organization in organizations:
         bytes_data_raw_files_total.labels(organization).set(raw_repository.get_raw_file_count(organization))
 
-    counts_per_organization = meta_repository.get_raw_file_count_per_organization().items()
+    counts_per_organization = meta_repository.get_raw_file_count_per_organization()
     bytes_database_organizations_total.set(len(counts_per_organization))
 
-    for organization_id, count in counts_per_organization:
+    for organization_id, count in counts_per_organization.items():
         bytes_database_raw_files_total.labels(organization_id).set(count)
 
     for mountpoint in settings.bytes_metrics_mountpoints:
