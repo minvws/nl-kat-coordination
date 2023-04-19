@@ -1,10 +1,9 @@
 from account.views import AccountView
 from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains, assertNotContains
-from tests.conftest import setup_request
-
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
+from tests.conftest import setup_request
 
 
 def test_is_not_red_team(superuser_member):
@@ -34,7 +33,6 @@ def test_red_teamer_can_scan_organization(redteam_member):
 
 
 def test_account_detail_perms(rf, superuser_member, admin_member, redteam_member, client_member):
-
     response_superuser = AccountView.as_view()(
         setup_request(rf.get("account_detail"), superuser_member.user),
         organization_code=superuser_member.organization.code,

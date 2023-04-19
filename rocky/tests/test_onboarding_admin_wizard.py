@@ -9,6 +9,7 @@ from onboarding.views import (
     OnboardingOrganizationSetupView,
     OnboardingOrganizationUpdateView,
 )
+
 from tests.conftest import setup_request
 
 
