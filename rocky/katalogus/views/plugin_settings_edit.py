@@ -6,6 +6,7 @@ from django.views.generic import FormView
 from django_otp.decorators import otp_required
 from requests import RequestException
 from two_factor.views.utils import class_view_decorator
+
 from katalogus.forms import PluginSettingAddEditForm
 from katalogus.views.mixins import SingleSettingView
 
