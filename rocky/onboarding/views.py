@@ -19,6 +19,21 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
+
+from tools.forms.boefje import SelectBoefjeForm
+from tools.models import GROUP_REDTEAM, Organization, OrganizationMember
+from tools.ooi_form import OOIForm
+from tools.ooi_helpers import (
+    create_object_tree_item_from_ref,
+    filter_ooi_tree,
+    get_or_create_ooi,
+)
+from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_ooi_url
+from two_factor.views.utils import class_view_decorator
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI
+from octopoes.models.ooi.network import Network
+from octopoes.models.types import type_by_name
 from onboarding.forms import (
     OnboardingCreateUserAdminForm,
     OnboardingCreateUserClientForm,
@@ -30,21 +45,6 @@ from onboarding.view_helpers import (
     KatIntroductionRegistrationStepsMixin,
     KatIntroductionStepsMixin,
 )
-from tools.forms.boefje import SelectBoefjeForm
-from tools.models import GROUP_REDTEAM, Organization, OrganizationMember
-from tools.ooi_form import OOIForm
-from tools.ooi_helpers import (
-    create_object_tree_item_from_ref,
-    filter_ooi_tree,
-    get_or_create_ooi,
-)
-from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_ooi_url
-from two_factor.views.utils import class_view_decorator
-
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models.ooi.network import Network
-from octopoes.models.types import type_by_name
 from rocky.bytes_client import get_bytes_client
 from rocky.exceptions import (
     ClearanceLevelTooLowException,

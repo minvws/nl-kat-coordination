@@ -1,14 +1,13 @@
-from django.contrib import messages
 from account.mixins import RockyPermissionRequiredMixin
+from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
-from requests import RequestException
-from two_factor.views.utils import class_view_decorator
-
 from katalogus.forms import PluginSettingAddEditForm
 from katalogus.views.mixins import SingleSettingView
+from requests import RequestException
+from two_factor.views.utils import class_view_decorator
 
 
 @class_view_decorator(otp_required)

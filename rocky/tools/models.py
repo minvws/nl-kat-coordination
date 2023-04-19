@@ -17,16 +17,15 @@ from katalogus.exceptions import (
     KATalogusUnhealthyException,
 )
 from requests import RequestException
-from tools.add_ooi_information import SEPARATOR, get_info
-from tools.enums import SCAN_LEVEL
-from tools.fields import LowerCaseSlugField
-
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.exceptions import (
     OctopoesDownException,
     OctopoesException,
     OctopoesUnhealthyException,
 )
+from tools.add_ooi_information import SEPARATOR, get_info
+from tools.enums import SCAN_LEVEL
+from tools.fields import LowerCaseSlugField
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
@@ -214,7 +213,6 @@ class OrganizationMember(models.Model):
         return codenames
 
     def has_member_perms(self, permissions) -> bool:
-
         if self.user.is_superuser and self.user.is_active and self.status is not OrganizationMember.STATUSES.BLOCKED:
             return True
         codenames = self.get_permissions_codenames(permissions)

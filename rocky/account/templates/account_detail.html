@@ -1,11 +1,11 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
 
 {% load static %}
 {% load i18n %}
 {% load permissions %}
 
 {% block content %}
-    {% include 'header.html' %}
+    {% include "header.html" %}
 
     <main id="main-content">
         <section>
@@ -29,7 +29,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate  "E-mail address" %}
+                            {% translate "E-mail address" %}
                         </dt>
                         <dd>
                             {{ member.user }}
@@ -37,7 +37,7 @@
                     </div>
                     <div>
                         <dt>
-                            {% translate  "Member type" %}
+                            {% translate "Member type" %}
                         </dt>
                         <dd>
                             {{ member.groups.all.0 }}
