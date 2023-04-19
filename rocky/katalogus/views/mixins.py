@@ -51,9 +51,6 @@ class SinglePluginView(OrganizationView):
             )
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_anonymous:
-            return redirect(reverse("login"))
-
         if not self.plugin:
             return redirect(reverse("katalogus", kwargs={"organization_code": self.organization.code}))
 
