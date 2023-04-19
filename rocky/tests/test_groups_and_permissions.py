@@ -1,12 +1,8 @@
-from unittest.mock import patch
-
-import pytest
-
-from pytest_django.asserts import assertContains, assertNotContains
-
-from tests.conftest import setup_request
 from account.views import AccountView
 from katalogus.views.plugin_detail import PluginDetailView
+from pytest_django.asserts import assertContains, assertNotContains
+from tests.conftest import setup_request
+
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
 

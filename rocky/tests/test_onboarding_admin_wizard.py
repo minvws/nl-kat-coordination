@@ -1,20 +1,18 @@
 import pytest
 from django.core.exceptions import PermissionDenied
 from onboarding.views import (
+    OnboardingAccountSetupAdminView,
+    OnboardingAccountSetupClientView,
+    OnboardingAccountSetupIntroView,
+    OnboardingAccountSetupRedTeamerView,
     OnboardingIntroductionRegistrationView,
     OnboardingOrganizationSetupView,
     OnboardingOrganizationUpdateView,
-    OnboardingAccountSetupIntroView,
-    OnboardingAccountSetupAdminView,
-    OnboardingAccountSetupRedTeamerView,
-    OnboardingAccountSetupClientView,
 )
-
 from tests.conftest import setup_request
 
 
 def test_admin_onboarding_registration(rf, superuser_member, admin_member, redteam_member, client_member):
-
     response_superuser = OnboardingIntroductionRegistrationView.as_view()(
         setup_request(rf.get("step_introduction_registration"), superuser_member.user),
         organization_code=superuser_member.organization.code,
@@ -42,7 +40,6 @@ def test_admin_onboarding_registration(rf, superuser_member, admin_member, redte
 
 
 def test_onboarding_organization_setup(rf, superuser, adminuser, redteamuser, clientuser):
-
     response_superuser = OnboardingOrganizationSetupView.as_view()(
         setup_request(rf.get("step_organization_setup"), superuser)
     )
@@ -67,7 +64,6 @@ def test_onboarding_organization_setup(rf, superuser, adminuser, redteamuser, cl
 
 
 def test_onboarding_organization_update(rf, superuser_member, admin_member, redteam_member, client_member):
-
     response_superuser = OnboardingOrganizationUpdateView.as_view()(
         setup_request(rf.get("step_organization_update"), superuser_member.user),
         organization_code=superuser_member.organization.code,
@@ -95,7 +91,6 @@ def test_onboarding_organization_update(rf, superuser_member, admin_member, redt
 
 
 def test_onboarding_account_setup_intro(rf, superuser_member, admin_member, redteam_member, client_member):
-
     response_superuser = OnboardingAccountSetupIntroView.as_view()(
         setup_request(rf.get("step_account_setup_intro"), superuser_member.user),
         organization_code=superuser_member.organization.code,
@@ -123,7 +118,6 @@ def test_onboarding_account_setup_intro(rf, superuser_member, admin_member, redt
 
 
 def test_onboarding_create_admin_member(rf, superuser_member, admin_member, redteam_member, client_member):
-
     response_superuser = OnboardingAccountSetupAdminView.as_view()(
         setup_request(rf.get("step_account_setup_admin"), superuser_member.user),
         organization_code=superuser_member.organization.code,
@@ -151,7 +145,6 @@ def test_onboarding_create_admin_member(rf, superuser_member, admin_member, redt
 
 
 def test_onboarding_create_redteam_member(rf, superuser_member, admin_member, redteam_member, client_member):
-
     response_superuser = OnboardingAccountSetupRedTeamerView.as_view()(
         setup_request(rf.get("step_account_setup_red_teamer"), superuser_member.user),
         organization_code=superuser_member.organization.code,
@@ -179,7 +172,6 @@ def test_onboarding_create_redteam_member(rf, superuser_member, admin_member, re
 
 
 def test_onboarding_create_client_member(rf, superuser_member, admin_member, redteam_member, client_member):
-
     response_superuser = OnboardingAccountSetupClientView.as_view()(
         setup_request(rf.get("step_account_setup_client"), superuser_member.user),
         organization_code=superuser_member.organization.code,
