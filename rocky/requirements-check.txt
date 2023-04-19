@@ -10,4 +10,4 @@ djlint==1.19.16
 black==23.1.0
 
 # Robot formatter
-robotframework-tidy==3.4.0
+robotframework-tidy==4.1.0
