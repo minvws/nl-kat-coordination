@@ -66,9 +66,7 @@ When OpenKAT runs in debug mode, it produces large logfiles. Several hours of de
 XTDB memory size
 ================
 
-In bigger installations, xtdb/crux might need more memory to function properly. This will show up as xtdb repeatedly crashing with::
-
-Terminating due to java.lang.OutOfMemoryError: Java heap space
+In bigger installations, xtdb/crux might need more memory to function properly. This will show up as xtdb repeatedly crashing with: ``Terminating due to java.lang.OutOfMemoryError: Java heap space``
 
 Giving xtdb more memory can help to solve this issue. The xtdb-http-multinode README contains some short instructions for this, namely increasing the ``Xmx (max heap)`` and maybe also ``MaxDirectMemorySize`` in the ``JAVA_TOOL_OPTIONS`` environment variable for the crux Docker container. The default for this variable is ``-Xms128M -Xmx512M -XX:MaxDirectMemorySize=512M -XX:+ExitOnOutOfMemoryError``.
 
