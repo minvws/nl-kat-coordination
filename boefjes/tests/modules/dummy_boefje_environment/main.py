@@ -1,6 +1,5 @@
-from typing import Tuple, Union, List
-
 from os import environ
+from typing import List, Tuple, Union
 
 from boefjes.job_models import BoefjeMeta
 

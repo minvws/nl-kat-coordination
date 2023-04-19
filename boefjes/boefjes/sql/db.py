@@ -1,10 +1,10 @@
 import logging
 from functools import lru_cache
-from typing import Type, Callable, Any, Iterator
+from typing import Any, Callable, Iterator, Type
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import declarative_base, Session, sessionmaker
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from boefjes.config import settings
 
@@ -33,7 +33,7 @@ def session_managed_iterator(service_factory: Callable[[Session], Any]) -> Itera
     try:
         yield service
     except Exception as error:
-        logger.error("An error occured: %s. Rolling back session", error, exc_info=True)
+        logger.error("An error occurred: %s. Rolling back session", error, exc_info=True)
         session.rollback()
         raise error
     finally:

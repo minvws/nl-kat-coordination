@@ -116,10 +116,11 @@ class Scheduler(abc.ABC):
         # lookup.
         task = self.ctx.task_store.get_task_by_id(str(p_item.id))
         if task is None:
-            self.logger.error(
-                "Task %s not found in datastore, not updating status [task_id = %s]",
+            self.logger.warning(
+                "Task %s not found in datastore, not updating status [task_id=%s, queue_id=%s]",
                 p_item.data.get("id"),
                 p_item.data.get("id"),
+                self.queue.pq_id,
             )
             return None
 
@@ -177,7 +178,7 @@ class Scheduler(abc.ABC):
             )
             raise exc
 
-        self.logger.info(
+        self.logger.debug(
             "Pushed item (%s) to queue %s with priority %s "
             "[p_item.id=%s, p_item.hash=%s, queue.pq_id=%s, queue.qsize=%d]",
             p_item.id,

@@ -1,8 +1,8 @@
 import json
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
-from boefjes.plugins.kat_fierce.fierce import fierce, parse_args
 from boefjes.job_models import BoefjeMeta
+from boefjes.plugins.kat_fierce.fierce import fierce, parse_args
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:

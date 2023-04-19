@@ -1,5 +1,7 @@
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
+
 import requests
+
 from boefjes.job_models import BoefjeMeta
 
 API_URL = "https://admin.thegreenwebfoundation.org"

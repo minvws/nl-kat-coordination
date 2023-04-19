@@ -24,8 +24,7 @@ update: down pull
 	make up
 
 clean: down # This should clean up all persistent data
-	-docker volume rm nl-kat-coordination_rocky-db-data nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
-	-docker-compose run --rm --no-deps --entrypoint /bin/rm -u root bytes -rf bytes-data
+	-docker volume rm nl-kat-coordination_postgres-data nl-kat-coordination_bytes-data nl-kat-coordination_xtdb-data
 
 export version
 
@@ -39,9 +38,8 @@ else
 	make up
 endif
 
-reset: down
-	-docker volume rm nl-kat-coordination_bytes-db-data nl-kat-coordination_katalogus-db-data nl-kat-coordination_xtdb-data nl-kat-coordination_scheduler-db-data
-	-docker-compose run --rm --no-deps --entrypoint /bin/rm -u root bytes -rf bytes-data
+reset:
+	-docker-compose down --remove-orphans --volumes --timeout 0
 	make up
 	make -C boefjes build
 	make -C rocky almost-flush

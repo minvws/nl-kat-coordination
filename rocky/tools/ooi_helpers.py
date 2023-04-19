@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, Optional, Any, Union, TypedDict, Tuple
+from functools import total_ordering
+from typing import Any, Dict, Optional, Tuple, TypedDict, Union
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -11,17 +12,17 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import (
+    CAPECFindingType,
+    CVEFindingType,
+    CWEFindingType,
     Finding,
     FindingType,
     KATFindingType,
-    CVEFindingType,
-    CWEFindingType,
     RetireJSFindingType,
     SnykFindingType,
 )
 from octopoes.models.tree import ReferenceNode
-from octopoes.models.types import get_relations, OOI_TYPES
-
+from octopoes.models.types import OOI_TYPES, get_relations
 from rocky.bytes_client import BytesClient
 from tools.models import OOIInformation
 
@@ -30,12 +31,21 @@ User = get_user_model()
 RISK_LEVEL_SCORE_DEFAULT = 10
 
 
+@total_ordering
 class RiskLevelSeverity(Enum):
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
     NONE = "recommendation"
+
+    def __gt__(self, other: "RiskLevelSeverity") -> bool:
+        severity_order = ["recommendation", "low", "medium", "high", "critical"]
+
+        return severity_order.index(self.value) > severity_order.index(other.value)
+
+    def __str__(self):
+        return self.value
 
 
 def format_attr_name(s: str) -> str:
@@ -343,6 +353,7 @@ def get_finding_type_from_finding(finding: Finding) -> FindingType:
             CWEFindingType,
             RetireJSFindingType,
             SnykFindingType,
+            CAPECFindingType,
         ],
         {
             "object_type": finding.finding_type.class_,

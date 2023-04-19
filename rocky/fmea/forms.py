@@ -1,13 +1,13 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from tools.forms.base import CheckboxGroup
 
 from fmea.models import (
     FailureMode,
     FailureModeAffectedObject,
     FailureModeEffect,
 )
-from fmea.tools import OOI_TYPES, translated_blank_choice, calculate_risk_class
-from tools.forms.base import CheckboxGroup
+from fmea.tools import OOI_TYPES, calculate_risk_class, translated_blank_choice
 
 
 class FailureModeForm(forms.ModelForm):

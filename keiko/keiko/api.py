@@ -4,29 +4,28 @@ import uuid
 from pathlib import Path
 from typing import List
 
-from fastapi import FastAPI, BackgroundTasks, Body
+from fastapi import BackgroundTasks, Body, FastAPI
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from keiko.base_models import ReportArgumentsBase
-from keiko.health import get_health, ServiceHealth
+from keiko.health import ServiceHealth, get_health
 from keiko.keiko import generate_report
 from keiko.settings import Settings
-from keiko.templates import get_templates, get_samples
+from keiko.templates import get_samples, get_templates
 
-settings = Settings()
 logger = logging.getLogger(__name__)
 
 
-def construct_api() -> FastAPI:
+def construct_api(settings: Settings) -> FastAPI:
     """Construct the FastAPI object, with prefilled examples from disk."""
     app = FastAPI()
-    examples = get_samples()
+    examples = get_samples(settings)
 
     @app.get("/templates")
     def get_templates_() -> List[str]:
         """Endpoint to list known templates."""
-        return list(get_templates())
+        return list(get_templates(settings))
 
     class ReportResponse(BaseModel):
         """Response model for the create report endpoint."""
@@ -48,6 +47,7 @@ def construct_api() -> FastAPI:
             glossary=parameters.glossary,
             report_id=report_id,
             debug=parameters.debug,
+            settings=settings,
         )
 
         return ReportResponse(report_id=report_id)
@@ -58,8 +58,7 @@ def construct_api() -> FastAPI:
         return get_health()
 
     # mount reports as static files
-    if not Path(settings.reports_folder).exists():
-        Path(settings.reports_folder).mkdir(parents=True)
+    Path(settings.reports_folder).mkdir(parents=True, exist_ok=True)
     app.mount("/reports", StaticFiles(directory=settings.reports_folder), name="reports")
 
     return app

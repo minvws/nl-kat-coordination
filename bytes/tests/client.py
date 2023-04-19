@@ -1,8 +1,8 @@
 import typing
-from typing import Callable, Dict, Union, Any, Optional, List
+from functools import wraps
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import requests
-from functools import wraps
 from requests.models import HTTPError
 
 from bytes.models import BoefjeMeta, NormalizerMeta

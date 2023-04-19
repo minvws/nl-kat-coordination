@@ -1,9 +1,8 @@
 from enum import Enum
-
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseSettings, AnyHttpUrl, PostgresDsn
+from pydantic import AnyHttpUrl, BaseSettings, PostgresDsn
 
 
 class RuntimeConfiguration(Enum):
@@ -12,7 +11,7 @@ class RuntimeConfiguration(Enum):
 
 class Settings(BaseSettings):
     base_dir: Path = Path(__file__).parent.resolve()
-    log_cfg: Path = Path(__file__).parent.parent / "logging.json"
+    log_cfg: Path = Path(__file__).parent / "logging.json"
 
     # Worker configuration
     pool_size: int = 2

@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Optional
 
 import requests
 from requests.models import HTTPError
+
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import BoefjeMeta
 

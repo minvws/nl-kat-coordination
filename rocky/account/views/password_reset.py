@@ -6,7 +6,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
-from account.forms import SetPasswordForm, PasswordResetForm
+from account.forms import PasswordResetForm, SetPasswordForm
 
 
 class PasswordResetView(auth_views.PasswordResetView):
@@ -98,5 +98,5 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
         return form_valid
 
     def add_success_notification(self):
-        success_message = "Password reset is succesfully done."
+        success_message = "Password reset is successfully done."
         messages.add_message(self.request, messages.SUCCESS, success_message)

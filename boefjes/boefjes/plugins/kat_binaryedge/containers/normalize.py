@@ -2,19 +2,18 @@ import ipaddress
 import json
 from typing import Iterator, Union
 
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import (
-    IPPort,
-    Protocol,
-    PortState,
     IPAddressV4,
     IPAddressV6,
+    IPPort,
     Network,
+    PortState,
+    Protocol,
 )
 from octopoes.models.ooi.software import Software, SoftwareInstance
-
-from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
@@ -70,7 +69,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         yield Finding(
             finding_type=kat_ooi.reference,
             ooi=software_instance_ooi.reference,
-            description=f"Container {module.capitalize()} is accessable from the internet, check if this intended.",
+            description=f"Container {module.capitalize()} is accessible from the internet, check if this intended.",
         )
 
         # TODO: use auth_required=False to determine urgency/impact

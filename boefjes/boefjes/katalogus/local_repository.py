@@ -1,24 +1,21 @@
-import pkgutil
-
-import os
-
 import json
 import logging
+import os
+import pkgutil
 from pathlib import Path
-from typing import List, Optional, Dict, Tuple
+from typing import Dict, List, Optional, Tuple
 
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, Boefje, Normalizer, PluginType
 from boefjes.plugins.models import (
-    BoefjeResource,
-    NormalizerResource,
-    BOEFJES_DIR,
     BOEFJE_DEFINITION_FILE,
-    NORMALIZER_DEFINITION_FILE,
+    BOEFJES_DIR,
     ENTRYPOINT_BOEFJES,
     ENTRYPOINT_NORMALIZERS,
+    NORMALIZER_DEFINITION_FILE,
+    BoefjeResource,
     ModuleException,
+    NormalizerResource,
 )
-from boefjes.katalogus.models import PluginType, Boefje, Normalizer, RESERVED_LOCAL_ID
-
 
 logger = logging.getLogger(__name__)
 
@@ -150,7 +147,10 @@ class LocalPluginRepository:
         def_obj = json.loads(def_file.read_text())
         def_obj["repository_id"] = RESERVED_LOCAL_ID
 
-        return Normalizer.parse_obj(def_obj)
+        normalizer: Normalizer = Normalizer.parse_obj(def_obj)
+        normalizer.consumes.append(f"normalizer/{normalizer.id}")
+
+        return normalizer
 
 
 def get_local_repository():

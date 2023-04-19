@@ -1,7 +1,7 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from django.contrib import messages
-from django.urls.base import reverse_lazy, reverse
+from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django.views.generic.detail import DetailView
@@ -38,7 +38,7 @@ class FailureModeCreateView(FailureModeBreadcrumbsMixin, CreateView):
         return context
 
     def add_success_notification(self):
-        success_message = _("Failure mode succesfully created.")
+        success_message = _("Failure mode successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def build_breadcrumbs(self) -> List[Dict[str, str]]:

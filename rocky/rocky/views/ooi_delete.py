@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
+from tools.view_helpers import get_ooi_url
 
 from rocky.views.ooi_view import BaseDeleteOOIView
-from tools.view_helpers import get_ooi_url
 
 
 class OOIDeleteView(BaseDeleteOOIView):

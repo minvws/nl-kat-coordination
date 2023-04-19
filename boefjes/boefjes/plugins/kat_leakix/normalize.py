@@ -4,23 +4,22 @@ import re
 from collections.abc import Iterable
 from typing import Iterator, Union
 
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import KATFindingType, Finding, CVEFindingType
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType
 from octopoes.models.ooi.network import (
-    IPPort,
-    Protocol,
-    PortState,
+    AutonomousSystem,
     IPAddressV4,
     IPAddressV6,
-    AutonomousSystem,
-    Network,
+    IPPort,
     IPV4NetBlock,
     IPV6NetBlock,
+    Network,
+    PortState,
+    Protocol,
 )
 from octopoes.models.ooi.software import Software, SoftwareInstance
-
-from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
@@ -130,7 +129,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         event_source = event.get("event_source")
         leak_stage = event.get("leak", {}).get("dataset", {}).get("stage")
         if leak_severity or leak_stage:
-            #  Got the differen severities from: https://pkg.go.dev/github.com/LeakIX/l9format#pkg-constants
+            #  Got the different severities from: https://pkg.go.dev/github.com/LeakIX/l9format#pkg-constants
             leak_infected = event.get("leak", {}).get("dataset", {}).get("infected")
             leak_ransomnote = event.get("leak", {}).get("dataset", {}).get("ransom_notes")
             if leak_severity == "critical" or leak_infected or leak_ransomnote:

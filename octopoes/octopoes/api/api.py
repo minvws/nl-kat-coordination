@@ -9,9 +9,11 @@ from fastapi.responses import JSONResponse
 from fastapi_utils.timing import add_timing_middleware
 from requests import RequestException
 
+from octopoes.api.models import ServiceHealth
 from octopoes.api.router import router
 from octopoes.config.settings import Settings
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.version import __version__
 
 settings = Settings()
 logger = logging.getLogger(__name__)
@@ -69,6 +71,15 @@ def uncaught_exception_handler(request: Request, exc: Exception) -> JSONResponse
             "value": f"{exc.__class__.__name__}: {exc}",
         },
         status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
+
+
+@app.get("/health")
+def root_health() -> ServiceHealth:
+    return ServiceHealth(
+        service="octopoes",
+        healthy=True,
+        version=__version__,
     )
 
 

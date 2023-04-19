@@ -2,7 +2,7 @@ import json
 import logging
 import typing
 from functools import wraps
-from typing import Callable, Dict, Union, Any, Set
+from typing import Any, Callable, Dict, Set, Union
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -65,9 +65,11 @@ class BytesAPIClient:
 
     @staticmethod
     def _verify_response(response: requests.Response) -> None:
-        if response.status_code != 200:
+        try:
+            response.raise_for_status()
+        except HTTPError:
             logger.error(response.text)
-        response.raise_for_status()
+            raise
 
     def _get_authentication_headers(self) -> Dict[str, str]:
         return {"Authorization": f"bearer {self._get_token()}"}

@@ -3,21 +3,21 @@ from unittest import TestCase
 
 from pydantic import BaseModel
 
-import keiko.templates
-from keiko.templates import get_templates, get_data_shape, get_samples
+from keiko.settings import Settings
+from keiko.templates import get_data_shape, get_samples, get_templates
 
 
 class KeikoTemplatesTest(TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
-        keiko.templates.settings.templates_folder = Path(__file__).parent / "fixtures" / "templates"
+        self.settings = Settings(templates_folder=str(Path(__file__).parent / "fixtures" / "templates"))
 
     def test_list_templates(self):
-        templates = get_templates()
+        templates = get_templates(self.settings)
         self.assertEqual(templates, {"template1", "template2"})
 
     def test_get_data_shape(self):
-        shape: BaseModel = get_data_shape("template1")
+        shape: BaseModel = get_data_shape("template1", self.settings)
 
         self.assertEqual(shape.__name__, "DataShape")
         self.assertEqual(
@@ -26,7 +26,7 @@ class KeikoTemplatesTest(TestCase):
         )
 
     def test_get_samples(self):
-        samples = get_samples()
+        samples = get_samples(self.settings)
         self.assertDictEqual(
             {
                 "summary": "template2",
@@ -40,6 +40,6 @@ class KeikoTemplatesTest(TestCase):
         )
 
     def test_get_samples_error(self):
-        keiko.templates.settings.templates_folder = "gibberish"
+        self.settings.templates_folder = "gibberish"
         with self.assertRaises(FileNotFoundError):
-            get_samples()
+            get_samples(self.settings)

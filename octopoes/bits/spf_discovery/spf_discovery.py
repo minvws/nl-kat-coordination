@@ -1,12 +1,11 @@
 from typing import Iterator
 
+from bits.spf_discovery.internetnl_spf_parser import parse
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSTXTRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.email_security import DNSSPFRecord, DNSSPFMechanismIP, DNSSPFMechanismHostname
-from bits.spf_discovery.internetnl_spf_parser import parse
+from octopoes.models.ooi.email_security import DNSSPFMechanismHostname, DNSSPFMechanismIP, DNSSPFRecord
 from octopoes.models.ooi.findings import Finding, KATFindingType
-
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
@@ -20,7 +19,7 @@ def run(
         # check if spf record passes the internet.nl parser
         if parsed is not None:
             spf_record = DNSSPFRecord(dns_txt_record=input_ooi.reference, value=input_ooi.value, ttl=input_ooi.ttl)
-            # walk thourgh all mechanisms
+            # walk through all mechanisms
             for mechanism in parsed[1]:
                 # ip4 and ip6 mechanisms
                 if mechanism.startswith(("ip4:", "ip6:")):
@@ -107,6 +106,9 @@ def parse_ptr_exists_include_mechanism(
         yield DNSSPFMechanismHostname(spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism="ptr")
     else:
         mechanism_type, domain = mechanism.split(":", 1)
+        # currently, the model only supports hostnames and not domains
+        if domain.startswith("_"):
+            return
         hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
         yield hostname
         yield DNSSPFMechanismHostname(
@@ -116,6 +118,9 @@ def parse_ptr_exists_include_mechanism(
 
 def parse_redirect_mechanism(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[str]:
     mechanism_type, domain = mechanism.split("=", 1)
+    # currently, the model only supports hostnames and not domains
+    if domain.startswith("_"):
+        return
     hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
     yield hostname
     yield DNSSPFMechanismHostname(

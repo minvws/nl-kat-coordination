@@ -5,8 +5,7 @@
     {
       "object_type": "Hostname",
       "network": "Network|internet",
-      "name": "example.com",
-      "fqdn": "Hostname|internet|example.com."
+      "name": "example.com"
     },
     {
       "object_type": "ResolvedHostname",

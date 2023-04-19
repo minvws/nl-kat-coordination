@@ -1,7 +1,7 @@
 from datetime import timezone
 from unittest import TestCase
 
-from bytes.models import TimezoneAwareDatetime, HashingAlgorithm
+from bytes.models import HashingAlgorithm, TimezoneAwareDatetime
 from bytes.timestamping.hashing import hash_data
 from tests.loading import get_raw_data
 

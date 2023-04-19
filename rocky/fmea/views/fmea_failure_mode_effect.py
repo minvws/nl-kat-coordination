@@ -8,12 +8,12 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django_otp.decorators import otp_required
+from tools.view_helpers import Breadcrumb
 from two_factor.views.utils import class_view_decorator
 
 from fmea.forms import FailureModeEffectForm
 from fmea.models import FailureModeEffect
 from fmea.views.view_helpers import FailureModeEffectBreadcrumbsMixin
-from tools.view_helpers import Breadcrumb
 
 
 @class_view_decorator(otp_required)
@@ -34,7 +34,7 @@ class FailureModeEffectCreateView(FailureModeEffectBreadcrumbsMixin, CreateView)
         return super().form_valid(form)
 
     def add_success_notification(self):
-        success_message = _("Failure mode effect succesfully created.")
+        success_message = _("Failure mode effect successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def build_breadcrumbs(self) -> List[Breadcrumb]:

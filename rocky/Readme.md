@@ -8,7 +8,6 @@ See [nl-kat-coordination](https://github.com/minvws/nl-kat-coordination) for mor
 As said, Django is the framework for this project.
 To comply to government standards, use [Manon](https://github.com/minvws/nl-rdo-manon) for style and accessibility.
 Yarn is used as package manager and ParcelJS is used as bundler to compile the frontend (CSS and Javascript).
-For browsertests we are using [Cypress](https://www.cypress.io/).
 You can find the Manon repository here: [https://github.com/minvws/nl-rdo-manon](https://github.com/minvws/nl-rdo-manon)
 
 ## Running Rocky
@@ -61,43 +60,6 @@ To run all tests, run:
 $ make test
 ```
 
-But first you will need to setup Cypress.
-
-### Setting up Cypress
-
-Cypress is installed in a separate directory `roeltje`.
-You will need to run the django command `setup_test_users` to create users and credentials used in cypress
-see: [cypress.json](https://github.com/minvws/nl-kat-rocky/blob/develop/roeltje/cypress.json).
-
-```bash
-$ python manage.py setup_test_users
-$ yarn --cwd roeltje
-$ yarn --cwd roeltje cypress open
-```
-
-add to 1Password:
-
-```json
-otpauth://totp/localhost%3A8000%3A%20admin?secret=TAAVFPQD3C3NLRSZQBD3CJ7ZUVDJXDS5&digits=6&issuer=localhost%3A8000
-```
-
-So eventually your `cypress.json` shapes like this:
-
-```json
-{
-  "viewportWidth": 1280,
-  "viewportHeight": 1024,
-  "env": {
-    "base_url": "http://localhost:8000/",
-    "client_user": "admin",
-    "client_pass": "admin",
-    "client_otp_secret": "TAAVFPQD3C3NLRSZQBD3CJ7ZUVDJXDS5"
-  }
-}
-```
-
-!! WARNING !! DON'T DO THIS IN ANY PUBLIC FACING INSTALL!
-
 ## Database
 
 To connect to the PostgreSQL database, set the following environment variables (e.g. "localhost", "5432" etc.):
@@ -130,6 +92,54 @@ sequenceDiagram
     n->>o: Add object(s)
     c->>-r: task.status = done
 ```
+
+## KATalogus View Structure
+
+This diagram shows the current view structure and what properties are set in each class for the KATalogus.
+
+```mermaid
+%%{ init : {"theme" : "base"}}%%
+
+classDiagram
+direction BT
+    class FormView
+    class OrganizationView
+    class SinglePluginView
+    class KATalogusView
+    class PluginSettingsAddView
+    class PluginEnableDisableView
+    class SingleSettingView
+    class PluginSettingsListView
+
+    OrganizationView : organization
+    OrganizationView : octopoes_api_connector
+    OrganizationView : organization_member
+    OrganizationView : indemnification_present
+
+    SinglePluginView : katalogus_client
+    SinglePluginView : plugin
+    SinglePluginView : plugin_schema
+
+    SingleSettingView : setting_name
+
+    class PluginSettingsUpdateView
+    class PluginSettingsDeleteView
+    class PluginDetailView
+
+    KATalogusView  <|--  OrganizationView
+    KATalogusView  <|--  FormView
+    SinglePluginView  <|--  OrganizationView
+    SingleSettingView  <|--  SinglePluginView
+    PluginDetailView  <|--  PluginSettingsListView
+    PluginEnableDisableView  <|--  SinglePluginView
+    PluginSettingsAddView  <|--  FormView
+    PluginSettingsAddView  <|--  SinglePluginView
+    PluginSettingsDeleteView  <|--  SingleSettingView
+    PluginSettingsUpdateView  <|--  FormView
+    PluginSettingsUpdateView  <|--  SingleSettingView
+    PluginSettingsListView  <|--  SinglePluginView
+```
+
 
 ## Fonts license
 

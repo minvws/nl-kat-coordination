@@ -5,24 +5,23 @@ from enum import Enum
 from typing import List
 
 from django.contrib import messages
-from django.http import HttpResponse, Http404, HttpRequest
-from django.urls import reverse_lazy
+from django.http import Http404, HttpRequest, HttpResponse
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django_otp.decorators import otp_required
-from django.urls import reverse
 from requests import RequestException
+from tools.enums import CUSTOM_SCAN_LEVEL
+from tools.forms.ooi import SelectOOIForm
+from tools.models import Indemnification
 from two_factor.views.utils import class_view_decorator
 
 from octopoes.connector import RemoteException
-from octopoes.models import Reference
+from octopoes.models import EmptyScanProfile, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types, type_by_name
-from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
+from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
 from rocky.views.ooi_view import BaseOOIListView
-from tools.forms.ooi import SelectOOIForm
-from tools.models import Indemnification
-from tools.models import SCAN_LEVEL
 
 
 class PageActions(Enum):
@@ -49,7 +48,7 @@ class OOIListView(BaseOOIListView):
             context.get("ooi_list", []), organization_code=self.organization.code
         )
         context["member"] = self.organization_member
-        context["scan_levels"] = [alias for level, alias in SCAN_LEVEL.choices]
+        context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
         context["organization_indemnification"] = self.get_organization_indemnification
         context["breadcrumbs"] = [
             {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
@@ -77,16 +76,18 @@ class OOIListView(BaseOOIListView):
             return self._delete_oois(selected_oois, request, *args, **kwargs)
 
         if action == PageActions.UPDATE_SCAN_PROFILE.value:
-            return self._set_scan_profiles(selected_oois, request, *args, **kwargs)
+            scan_profile = request.POST.get("scan-profile")
+            level = CUSTOM_SCAN_LEVEL[str(scan_profile).upper()]
+            if level.value == "inherit":
+                return self._set_oois_to_inherit(selected_oois, request, *args, **kwargs)
+            return self._set_scan_profiles(selected_oois, level, request, *args, **kwargs)
 
         messages.add_message(request, messages.ERROR, _("Unknown action."))
         return self.get(request, status=404, *args, **kwargs)
 
-    def _set_scan_profiles(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        scan_profile = request.POST.get("scan-profile")
-
-        level = SCAN_LEVEL[scan_profile]
-
+    def _set_scan_profiles(
+        self, selected_oois: List[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
+    ) -> HttpResponse:
         try:
             self.verify_raise_clearance_level(level.value)
         except IndemnificationNotPresentException:
@@ -139,6 +140,36 @@ class OOIListView(BaseOOIListView):
             request,
             messages.SUCCESS,
             _("Successfully set scan profile to %s for %d oois.") % (level.name, len(selected_oois)),
+        )
+        return self.get(request, *args, **kwargs)
+
+    def _set_oois_to_inherit(
+        self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs
+    ) -> HttpResponse:
+        for ooi in selected_oois:
+            try:
+                self.octopoes_api_connector.save_scan_profile(
+                    EmptyScanProfile(reference=Reference.from_str(ooi)),
+                    valid_time=datetime.now(timezone.utc),
+                )
+            except (RequestException, RemoteException, ConnectionError):
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    _("An error occurred while setting clearance level to inherit for %s.") % ooi,
+                )
+                return self.get(request, status=500, *args, **kwargs)
+            except ObjectNotFoundException:
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    _("An error occurred while setting clearance level to inherit for %s. OOI doesn't exist.") % ooi,
+                )
+                return self.get(request, status=404, *args, **kwargs)
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois),
         )
         return self.get(request, *args, **kwargs)
 

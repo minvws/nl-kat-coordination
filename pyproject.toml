@@ -14,6 +14,7 @@ follow_imports = "skip"
 disallow_untyped_decorators = false # Needed for FastAPI decorators
 
 [tool.setuptools_scm]
+write_to = "_version.py"
 
 [tool.vulture]
 min_confidence = 90
@@ -23,8 +24,9 @@ paths = ["."]
 
 [tool.ruff]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
-# To be extended with I, UP, DJ, PT, RUF, C90, D, PL
-select = ["E", "F", "ERA", "W", "TID"]
+# To be extended with UP, DJ, PT, RUF, C90, D, PL
+select = ["E", "F", "ERA", "W", "TID", "I"]
+fix = true
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -73,3 +75,6 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 [tool.ruff.flake8-tidy-imports]
 [tool.ruff.flake8-tidy-imports.banned-api]
 "rocky.settings".msg = "Use django.conf.settings"
+
+[tool.codespell]
+ignore-words-list = 'edn,juxt'

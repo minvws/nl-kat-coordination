@@ -1,10 +1,9 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.urls.base import reverse_lazy, reverse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, View
 from django.views.generic.detail import DetailView
@@ -41,7 +40,7 @@ class FailureModeAffectedObjectCreateView(AffectedObjectBreadcrumbsMixin, Create
         return context
 
     def add_success_notification(self):
-        success_message = _("Failure mode affected objects succesfully created.")
+        success_message = _("Failure mode affected objects successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def build_breadcrumbs(self) -> List[Dict[str, str]]:
@@ -146,7 +145,7 @@ class FMEATreeObjectView(View):
             self.add_error_notification()
 
     def add_success_notification(self):
-        success_message = _("Treeobjects succesfully added.")
+        success_message = _("Treeobjects successfully added.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def add_error_notification(self):

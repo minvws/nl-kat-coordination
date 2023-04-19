@@ -1,71 +1,236 @@
+import binascii
 import json
+from os import urandom
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-from django.contrib.auth.models import Permission, Group
+from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
+from katalogus.client import parse_plugin
+from tools.models import (
+    GROUP_ADMIN,
+    GROUP_CLIENT,
+    GROUP_REDTEAM,
+    Indemnification,
+    OOIInformation,
+    Organization,
+    OrganizationMember,
+)
 
-from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
+from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
-from tools.models import Organization, OrganizationMember, OOIInformation, Indemnification
-from tools.models import GROUP_REDTEAM, GROUP_ADMIN
+
+
+def create_user(django_user_model, email, password, name, device_name, superuser=False):
+    user = django_user_model.objects.create_user(email=email, password=password)
+    user.full_name = name
+    user.is_verified = lambda: True
+    user.is_superuser = superuser
+    user.save()
+    device = user.staticdevice_set.create(name=device_name)
+    device.token_set.create(token=binascii.hexlify(urandom(8)).decode())
+    return user
+
+
+def create_organization(name, organization_code):
+    katalogus_client = "katalogus.client.KATalogusClientV1"
+    octopoes_node = "tools.models.OctopoesAPIConnector"
+    with patch(katalogus_client), patch(octopoes_node):
+        return Organization.objects.create(name=name, code=organization_code)
+
+
+def create_member(user, organization):
+    Indemnification.objects.create(
+        user=user,
+        organization=organization,
+    )
+
+    return OrganizationMember.objects.create(
+        user=user,
+        organization=organization,
+        status=OrganizationMember.STATUSES.ACTIVE,
+        trusted_clearance_level=4,
+        acknowledged_clearance_level=4,
+        onboarded=False,
+    )
+
+
+def add_admin_group_permissions(user):
+    group, _ = Group.objects.get_or_create(name=GROUP_ADMIN)
+    group.user_set.add(user)
+    admin_permissions = [
+        Permission.objects.get(codename="view_organization").id,
+        Permission.objects.get(codename="view_organizationmember").id,
+        Permission.objects.get(codename="add_organizationmember").id,
+        Permission.objects.get(codename="change_organization").id,
+        Permission.objects.get(codename="change_organizationmember").id,
+    ]
+    group.permissions.set(admin_permissions)
+
+
+def add_redteam_group_permissions(user):
+    group, _ = Group.objects.get_or_create(name=GROUP_REDTEAM)
+    group.user_set.add(user)
+    redteam_permissions = [
+        Permission.objects.get(codename="can_scan_organization").id,
+        Permission.objects.get(codename="can_enable_disable_boefje").id,
+        Permission.objects.get(codename="can_set_clearance_level").id,
+    ]
+    group.permissions.set(redteam_permissions)
+
+
+def add_client_group(user):
+    group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
+    group.user_set.add(user)
 
 
 @pytest.fixture
 def organization():
-    with patch("katalogus.client.KATalogusClientV1"), patch(
-        "octopoes.connector.octopoes.OctopoesAPIConnector.create_node"
-    ):
-        organization = Organization.objects.create(name="Test Organization", code="test")
-    return organization
+    return create_organization("Test Organization", "test")
 
 
 @pytest.fixture
-def user(django_user_model):
-    user = django_user_model.objects.create_superuser(email="admin@openkat.nl", password="TestTest123!!")
-    user.is_verified = lambda: True
-
-    device = user.staticdevice_set.create(name="default")
-    device.token_set.create(token=user.get_username())
-
-    return user
+def organization_b():
+    return create_organization("OrganizationB", "org_b")
 
 
 @pytest.fixture
-def my_user(user, organization):
-    OrganizationMember.objects.create(
-        user=user,
-        organization=organization,
-        verified=True,
-        authorized=True,
-        status=OrganizationMember.STATUSES.ACTIVE,
-        trusted_clearance_level=4,
-        acknowledged_clearance_level=4,
+def superuser(django_user_model):
+    return create_user(
+        django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default", superuser=True
     )
-    Indemnification.objects.create(
-        organization=organization,
-        user=user,
-    )
-    user.user_permissions.add(Permission.objects.get(codename="can_scan_organization"))
-
-    return user
 
 
 @pytest.fixture
-def my_red_teamer(my_user, organization):
-    group = Group.objects.create(name=GROUP_ADMIN)
-    group.user_set.add(my_user)
+def superuser_b(django_user_model):
+    return create_user(
+        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b", superuser=True
+    )
 
-    group = Group.objects.create(name=GROUP_REDTEAM)
-    group.user_set.add(my_user)
 
-    return my_user
+@pytest.fixture
+def superuser_member(superuser, organization):
+    return create_member(superuser, organization)
+
+
+@pytest.fixture
+def superuser_member_b(superuser_b, organization_b):
+    return create_member(superuser_b, organization_b)
+
+
+@pytest.fixture
+def adminuser(django_user_model):
+    admin_user = create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
+    add_admin_group_permissions(admin_user)
+    return admin_user
+
+
+@pytest.fixture
+def adminuser_b(django_user_model):
+    admin_user = create_user(
+        django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b"
+    )
+    add_admin_group_permissions(admin_user)
+    return admin_user
+
+
+@pytest.fixture
+def admin_member(adminuser, organization):
+    return create_member(adminuser, organization)
+
+
+@pytest.fixture
+def admin_member_b(adminuser_b, organization_b):
+    return create_member(adminuser_b, organization_b)
+
+
+@pytest.fixture
+def redteamuser(django_user_model):
+    redteam_user = create_user(
+        django_user_model, "redteamer@openkat.nl", "RedteamRedteam123!!", "Redteam name", "default_redteam"
+    )
+    add_redteam_group_permissions(redteam_user)
+    return redteam_user
+
+
+@pytest.fixture
+def redteamuser_b(django_user_model):
+    redteam_user = create_user(
+        django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
+    )
+    add_redteam_group_permissions(redteam_user)
+    return redteam_user
+
+
+@pytest.fixture
+def redteam_member(redteamuser, organization):
+    return create_member(redteamuser, organization)
+
+
+@pytest.fixture
+def redteam_member_b(redteamuser_b, organization_b):
+    return create_member(redteamuser_b, organization_b)
+
+
+@pytest.fixture
+def clientuser(django_user_model):
+    client_user = create_user(
+        django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client"
+    )
+    add_client_group(client_user)
+    return client_user
+
+
+@pytest.fixture
+def clientuser_b(django_user_model):
+    client_user_b = create_user(
+        django_user_model, "clientB@openkat.nl", "ClientBClientB123!!", "Client B name", "default_client_b"
+    )
+    add_client_group(client_user_b)
+    return client_user_b
+
+
+@pytest.fixture
+def client_member(clientuser, organization):
+    return create_member(clientuser, organization)
+
+
+@pytest.fixture
+def client_member_b(clientuser_b, organization_b):
+    return create_member(clientuser_b, organization_b)
+
+
+@pytest.fixture
+def new_member(django_user_model, organization):
+    user = create_user(django_user_model, "cl1@openkat.nl", "TestTest123!!", "New user", "default_new_user")
+    member = create_member(user, organization)
+    member.status = OrganizationMember.STATUSES.NEW
+    member.save()
+    return member
+
+
+@pytest.fixture
+def active_member(django_user_model, organization):
+    user = create_user(django_user_model, "cl2@openkat.nl", "TestTest123!!", "Active user", "default_active_user")
+    member = create_member(user, organization)
+    member.status = OrganizationMember.STATUSES.ACTIVE
+    member.save()
+    return member
+
+
+@pytest.fixture
+def blocked_member(django_user_model, organization):
+    user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
+    member = create_member(user, organization)
+    member.status = OrganizationMember.STATUSES.BLOCKED
+    member.save()
+    return member
 
 
 @pytest.fixture
@@ -146,7 +311,7 @@ def lazy_task_list_with_boefje() -> MagicMock:
                                 "NXDOMAIN",
                             ],
                         },
-                        "input_ooi": "Hostname|internet|mispo.es.",
+                        "input_ooi": "Hostname|internet|mispo.es",
                         "organization": "_dev",
                     },
                 },
@@ -181,17 +346,19 @@ def finding():
 
 @pytest.fixture
 def plugin_details():
-    return {
-        "id": "test-boefje",
-        "type": "boefje",
-        "name": "TestBoefje",
-        "description": "Meows to the moon",
-        "repository_id": "test-repository",
-        "scan_level": 1,
-        "consumes": ["Network"],
-        "produces": ["Network"],
-        "enabled": True,
-    }
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "description": "Meows to the moon",
+            "repository_id": "test-repository",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+        }
+    )
 
 
 @pytest.fixture
@@ -205,7 +372,13 @@ def plugin_schema():
                 "maxLength": 128,
                 "type": "string",
                 "description": "Test description",
-            }
+            },
+            "TEST_PROPERTY2": {
+                "title": "TEST_PROPERTY2",
+                "maxLength": 128,
+                "type": "integer",
+                "description": "Test description2",
+            },
         },
         "required": ["TEST_PROPERTY"],
     }
@@ -236,3 +409,8 @@ def mock_scheduler(mocker):
 
 def get_boefjes_data():
     return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())
+
+
+@pytest.fixture()
+def mock_mixins_katalogus(mocker):
+    return mocker.patch("katalogus.views.mixins.get_katalogus")

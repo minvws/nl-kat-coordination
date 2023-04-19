@@ -1,4 +1,5 @@
 import mmh3
+
 from scheduler import models
 from scheduler.utils import dict_utils
 

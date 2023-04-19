@@ -14,7 +14,7 @@ ENV PATH=/home/keiko/.local/bin:${PATH}
 # LateX dependencies
 RUN apt update -y \
     && apt install -y --no-install-recommends \
-    texlive-latex-base texlive-latex-extra texlive-latex-recommended texlive-lang-european chktex
+    texlive-latex-base texlive-latex-extra texlive-latex-recommended texlive-lang-european texlive-fonts-recommended chktex
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
 # dependencies
@@ -27,8 +27,9 @@ RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
 
 COPY . .
 
-RUN mkdir -p /app/keiko/reports
-RUN chown -f -R keiko:keiko /app/keiko/reports
+ENV KEIKO_REPORTS_FOLDER=/reports
+RUN mkdir -p "$KEIKO_REPORTS_FOLDER" && chown -f -R keiko:keiko "$KEIKO_REPORTS_FOLDER"
+VOLUME /reports
 
 USER keiko
 

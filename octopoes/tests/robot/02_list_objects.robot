@@ -9,7 +9,8 @@ Test Teardown       Teardown Test
 List Objects
     Insert Normalizer Output
     Await Sync
-    Object List Should Contain Reported Items
+    Object List Should Contain    ${REF_HOSTNAME}
+    Total Object Count Should Be    ${6}
 
 List Objects With Filter
     Insert Normalizer Output
@@ -25,12 +26,6 @@ Teardown Test
     Cleanup
     Await Sync
     Stop Monitoring
-
-Object List Should Contain Reported Items
-    ${response_data}    Get Objects
-    # 6, because 2 objects are created by bits
-    Should Be Equal    ${response_data["count"]}    ${6}
-    Should Be Equal    ${response_data["items"][0]["primary_key"]}    ${REF_HOSTNAME}
 
 Verify Object List With Filter
     ${response_data}    Get Objects With ScanLevel 0
