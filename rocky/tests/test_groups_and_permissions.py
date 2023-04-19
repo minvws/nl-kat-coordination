@@ -1,6 +1,7 @@
 from account.views import AccountView
 from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains, assertNotContains
+
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
 from tests.conftest import setup_request
