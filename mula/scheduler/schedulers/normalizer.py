@@ -188,7 +188,7 @@ class NormalizerScheduler(Scheduler):
                 self.logger.info(
                     "Created normalizer task: %s for raw data: %s "
                     "[normalizer.id=%s, raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
-                    normalizer.id,
+                    task,
                     latest_raw_data.raw_data.id,
                     normalizer.id,
                     latest_raw_data.raw_data.id,
