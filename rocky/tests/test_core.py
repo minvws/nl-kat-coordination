@@ -4,6 +4,7 @@ def test_root(client):
     assert response.headers["Location"] == "/en/"
 
 
-def test_404(client):
+def test_404(client, clientuser):
+    client.force_login(clientuser)
     response = client.get("/en/does/not/exist/")
     assert response.status_code == 404
