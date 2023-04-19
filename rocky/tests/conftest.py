@@ -229,6 +229,7 @@ def active_member(django_user_model, organization):
 def blocked_member(django_user_model, organization):
     user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
     member = create_member(user, organization)
+    member.status = OrganizationMember.STATUSES.ACTIVE
     member.blocked = True
     member.save()
     return member
