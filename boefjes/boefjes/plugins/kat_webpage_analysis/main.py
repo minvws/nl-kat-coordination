@@ -2,7 +2,7 @@ import ipaddress
 import json
 import mimetypes
 from os import getenv
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 from urllib.parse import urlparse, urlunsplit
 
 import requests

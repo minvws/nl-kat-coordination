@@ -1,15 +1,13 @@
-from typing import Union, Iterator
+from typing import Iterator, Union
 from urllib.parse import urljoin
 
+import validators
 from bs4 import BeautifulSoup
 
-import validators
-
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
-
-from boefjes.job_models import NormalizerMeta
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:

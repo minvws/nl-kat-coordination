@@ -1,14 +1,14 @@
 import datetime
-from typing import Dict, List, Union, Any, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from django import forms
 from django.forms import Widget
 from django.utils.translation import gettext_lazy as _
 
 from tools.forms.settings import (
+    OBSERVED_AT_HELP_TEXT,
     Choices,
     ChoicesGroups,
-    OBSERVED_AT_HELP_TEXT,
 )
 
 

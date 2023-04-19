@@ -1,8 +1,7 @@
 from fastapi import APIRouter
 from fastapi.responses import RedirectResponse
 
-from boefjes.katalogus.routers import organisations, repositories
-from boefjes.katalogus.routers import plugins, settings
+from boefjes.katalogus.routers import organisations, plugins, repositories, settings
 
 router = APIRouter()
 router.include_router(organisations.router)

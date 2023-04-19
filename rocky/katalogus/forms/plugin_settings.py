@@ -1,7 +1,6 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-
 FIELD_TYPES = {"string": forms.CharField, "integer": forms.IntegerField, "enum": forms.Select}
 MAX_SETTINGS_VALUE_LENGTH = 128
 

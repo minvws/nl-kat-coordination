@@ -63,14 +63,6 @@ Insert Regular Declarations
 
     Await Sync
 
-Get Url
-    [Arguments]    ${url}
-    ${response}    Get    ${url}
-    Should Be Equal As Integers    ${response.status_code}    200
-    Should Be Equal    ${response.headers["content-type"]}    application/json
-    ${response_data}    Set Variable    ${response.json()}
-    RETURN    ${response_data}
-
 Get Messages From Queue
     [Arguments]    ${queue}    ${ackmode}
     &{data}    Create dictionary    count=10000    ackmode=${ackmode}    encoding=auto    truncate=50000
@@ -111,12 +103,15 @@ Cleanup
     Get Messages From Queue    ${SCAN_PROFILE_MUTATION_QUEUE}    ack_requeue_false
 
 Await Sync
-    Sleep     100ms
+    Sleep    100ms
     Await Tasks Done
     Wait For XTDB Synced
 
 Get Objects
-    ${response_data}    Get Url    ${OCTOPOES_URI}/objects
+    ${response}    Get   ${OCTOPOES_URI}/objects
+    Should Be Equal As Integers    ${response.status_code}    200
+    Should Be Equal    ${response.headers["content-type"]}    application/json
+    ${response_data}    Set Variable    ${response.json()}
     RETURN    ${response_data}
 
 Get Valid Time Params
@@ -136,16 +131,16 @@ Task Type Empty
 Object List Should Contain
     [Arguments]    ${reference}
     ${response_data}    Get Objects
-    ${pks} =   Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
-    Should Contain    ${pks}    ${reference}   ${reference} not found in object list
+    ${pks}    Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
+    Should Contain    ${pks}    ${reference}    ${reference} not found in object list
 
 Object List Should Not Contain
-     [Arguments]    ${reference}
+    [Arguments]    ${reference}
     ${response_data}    Get Objects
-    ${pks} =   Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
-    Should Not Contain    ${pks}    ${reference}   ${reference} found in object list
+    ${pks}    Evaluate    [item["primary_key"] for item in ${response_data["items"]}]
+    Should Not Contain    ${pks}    ${reference}    ${reference} found in object list
 
 Total Object Count Should Be
     [Arguments]    ${length}
     ${response_data}    Get Objects
-    Should Be Equal As Integers    ${response_data["count"]}    ${length}   Object count should be ${length}
+    Should Be Equal As Integers    ${response_data["count"]}    ${length}    Object count should be ${length}

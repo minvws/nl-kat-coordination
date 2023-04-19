@@ -1,8 +1,8 @@
-from typing import List, Iterator, Union
+from typing import Iterator, List, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.web import Website, HostnameHTTPURL, HTTPResource
+from octopoes.models.ooi.web import HostnameHTTPURL, HTTPResource, Website
 
 
 def run(

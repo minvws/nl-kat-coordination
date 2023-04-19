@@ -1,23 +1,23 @@
 from datetime import datetime
 from logging import getLogger
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.core.exceptions import BadRequest
-from django.core.paginator import Paginator, Page
+from django.core.paginator import Page, Paginator
 from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 from two_factor.views.utils import class_view_decorator
 
-from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
 from katalogus.views import PluginSettingsListView
 from katalogus.views.mixins import BoefjeMixin
 from rocky import scheduler
-from tools.forms.ooi import SelectOOIForm, SelectOOIFilterForm
 
 logger = getLogger(__name__)
 

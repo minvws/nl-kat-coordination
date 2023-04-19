@@ -3,9 +3,10 @@ Revision ID: 0002
 Revises: 0001
 Create Date: 2022-11-02 10:33:34.403970
 """
-import scheduler
 import sqlalchemy as sa
 from alembic import op
+
+import scheduler
 
 # revision identifiers, used by Alembic.
 revision = "0002"

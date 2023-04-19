@@ -178,7 +178,7 @@ class Scheduler(abc.ABC):
             )
             raise exc
 
-        self.logger.info(
+        self.logger.debug(
             "Pushed item (%s) to queue %s with priority %s "
             "[p_item.id=%s, p_item.hash=%s, queue.pq_id=%s, queue.qsize=%d]",
             p_item.id,

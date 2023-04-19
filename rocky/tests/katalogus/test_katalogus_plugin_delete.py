@@ -1,8 +1,7 @@
 import pytest
 from django.http import Http404
-from pytest_django.asserts import assertContains, assertNotContains
-
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
+from pytest_django.asserts import assertContains, assertNotContains
 from tests.conftest import setup_request
 
 

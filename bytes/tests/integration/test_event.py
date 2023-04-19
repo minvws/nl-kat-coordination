@@ -1,9 +1,10 @@
 import json
 from datetime import datetime
 
+from tests.loading import get_raw_data_meta
+
 from bytes.events.events import RawFileReceived
 from bytes.rabbitmq import RabbitMQEventManager
-from tests.loading import get_raw_data_meta
 
 
 def test_event_published_successfully(event_manager: RabbitMQEventManager) -> None:

@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.core.management import BaseCommand, call_command
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
-from tools.models import OrganizationMember, Indemnification
+from tools.models import Indemnification, OrganizationMember
 
 User = get_user_model()
 logger = getLogger(__name__)

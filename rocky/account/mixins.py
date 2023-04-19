@@ -6,17 +6,16 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
-
+from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
 from rocky.exceptions import (
-    IndemnificationNotPresentException,
     AcknowledgedClearanceLevelTooLowException,
-    TrustedClearanceLevelTooLowException,
     ClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    TrustedClearanceLevelTooLowException,
 )
-from tools.models import Organization, OrganizationMember, Indemnification
 
 
 class OrganizationView(View):
@@ -29,10 +28,6 @@ class OrganizationView(View):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-
-        # authentication/otp flow happens before setup
-        if not request.user.is_authenticated:
-            return
 
         organization_code = kwargs["organization_code"]
         try:
