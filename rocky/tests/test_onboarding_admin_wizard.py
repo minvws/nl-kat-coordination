@@ -101,7 +101,7 @@ def test_onboarding_account_setup_intro(rf, superuser_member, admin_member, redt
         organization_code=admin_member.organization.code,
     )
 
-    # Only superusers and admins can see introduction view for single account or multiple acount creation
+    # Only superusers and admins can see the introduction view for single account or multiple accounts creation
     assert response_superuser.status_code == 200
     assert response_admin.status_code == 200
 
