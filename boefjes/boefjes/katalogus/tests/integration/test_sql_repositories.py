@@ -6,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 
 from boefjes.config import settings
-from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
 from boefjes.katalogus.models import Organisation, Repository, Boefje
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
