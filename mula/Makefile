@@ -23,7 +23,7 @@ export file
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
 
 ##
 ##+------------------------------------------------------------------------+
@@ -75,8 +75,8 @@ cov: ## Generate a test coverage report
 ##+------------------------------------------------------------------------+
 
 sql: ## Generate raw sql for the migrations.
-	docker-compose exec scheduler \
-		alembic --config /app/scheduler/alembic.ini \
+	docker-compose run scheduler \
+		alembic --config /app/scheduler/scheduler/alembic.ini \
 		upgrade $(rev1):$(rev2) --sql
 
 migrations: ## Create migration.
