@@ -97,4 +97,4 @@ repos:
         additional_dependencies:
                - stylelint@15.4.0
                - stylelint-config-standard-scss@8.0.0
-        files:  "^(rocky\/(assets|templates)\/|docs\/source\/).*.(css|scss|sass)$"
+        files:  "^(rocky\/assets\/src\/|docs\/source\/).*.(css|scss|sass)$"
