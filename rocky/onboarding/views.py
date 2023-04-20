@@ -663,8 +663,9 @@ class CompleteOnboarding(OrganizationView):
     """
 
     def get(self, request, *args, **kwargs):
-        if self.request.user.is_superuser:
+        if self.request.user.is_superuser and not self.organization_member.is_redteam:
             self.organization_member.groups.add(Group.objects.get(name=GROUP_REDTEAM))
+            return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
         self.organization_member.onboarded = True
         self.organization_member.save()
         return redirect(reverse("crisis_room"))
