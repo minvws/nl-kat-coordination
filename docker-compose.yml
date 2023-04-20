@@ -201,6 +201,7 @@ services:
     restart: unless-stopped
     build:
       context: keiko/
+      target: dev
     ports:
       - "127.0.0.1:8005:8000"
     command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko
