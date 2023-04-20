@@ -11,9 +11,9 @@ from django.views.generic.edit import FormView
 from django_otp.decorators import otp_required
 from pydantic import ValidationError
 from tools.forms.base import BaseRockyForm, ObservedAtForm
+from tools.forms.ooi_form import ClearanceFilterForm, OOIForm
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
-from tools.forms.ooi_form import ClearanceFilterForm, OOIForm
 from tools.view_helpers import get_mandatory_fields, get_ooi_url
 from two_factor.views.utils import class_view_decorator
 

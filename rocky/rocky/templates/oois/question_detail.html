@@ -1,0 +1,32 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+{% load ooi_extra %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+
+            <div>
+                {% if ooi_past_due %}
+                    {% include "oois/ooi_past_due_warning.html" with ooi_current=ooi_current %}
+                {% endif %}
+                {% include "partials/ooi_head.html" with ooi=ooi view="ooi_detail" %}
+                {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
+            </div>
+            <div>
+                {% include "oois/ooi_detail_origins_declarations.html" %}
+                {% include "oois/ooi_detail_origins_observations.html" %}
+                {% include "oois/ooi_detail_origins_inference.html" %}
+                {% include "partials/ooi_detail_related_object.html" with query=mandatory_fields ooi_past_due=ooi_past_due related=related ooi=ooi %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "/js/forms.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

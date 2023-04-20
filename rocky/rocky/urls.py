@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import TemplateView
 from rest_framework import routers
+
+from rocky.views.question_detail import QuestionDetailView
 from tools.viewsets import OrganizationViewSet
 from two_factor.urls import urlpatterns as tf_urls
 
@@ -145,6 +147,7 @@ urlpatterns += i18n_patterns(
         ScanProfileDetailView.as_view(),
         name="scan_profile_detail",
     ),
+    path("<organization_code>/question/detail/", QuestionDetailView.as_view(), name="question_detail"),
     path("<organization_code>/scans/", ScanListView.as_view(), name="scan_list"),
     path("<organization_code>/upload/csv/", UploadCSV.as_view(), name="upload_csv"),
     path("<organization_code>/upload/raw/", UploadRaw.as_view(), name="upload_raw"),

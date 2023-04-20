@@ -1,16 +1,10 @@
-import json
-import logging
 from datetime import datetime, timezone
 from enum import Enum
 from functools import total_ordering
-from json import JSONDecodeError
 from typing import Any, Dict, Optional, Tuple, TypedDict, Union
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
-from django.utils.translation import gettext_lazy as _
-
-from django.utils.safestring import mark_safe
 from pydantic import parse_obj_as
 
 from octopoes.api.models import Declaration
@@ -37,9 +31,6 @@ User = get_user_model()
 RISK_LEVEL_SCORE_DEFAULT = 10
 
 
-logger = logging.getLogger(__name__)
-
-
 @total_ordering
 class RiskLevelSeverity(Enum):
     CRITICAL = "critical"
@@ -61,22 +52,14 @@ def format_attr_name(s: str) -> str:
     return s.replace("_", " ").replace("/", " -> ").title()
 
 
-def format_value(key: str, value: Any) -> str:
+def format_value(value: Any) -> str:
     if isinstance(value, Enum):
         return value.value
-
-    if key == "json_schema" and "$schema" in value:
-        try:
-            json.loads(value)
-            return mark_safe(_("<a href=\"/abcd\">Answer this question<a>"))
-        except JSONDecodeError as e:
-            logger.warning("Failed parsing potential json schema.")
-
     return value
 
 
 def format_display(data: Dict) -> Dict[str, str]:
-    return {format_attr_name(k): format_value(k, v) for k, v in data.items()}
+    return {format_attr_name(k): format_value(v) for k, v in data.items()}
 
 
 def get_knowledge_base_data_for_ooi_store(ooi_store) -> Dict[str, Dict]:

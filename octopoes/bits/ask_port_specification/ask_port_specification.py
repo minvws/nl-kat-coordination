@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Iterator, List
 
 from octopoes.models import OOI
-from octopoes.models.ooi.question import Question
 from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.question import Question
 
 
 def run(
