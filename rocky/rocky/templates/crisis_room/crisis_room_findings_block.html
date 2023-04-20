@@ -87,14 +87,9 @@
                     <tbody>
                         {% for findings in findings_per_org_critical %}
                             <tr>
-                                {% has_organization_perms "tools.view_organization" request.user findings.organization as can_view_organization %}
-                                {% if can_view_organization %}
-                                    <td>
-                                        <a href="{% url "organization_crisis_room" findings.organization.code %}">{{ findings.organization.name }}</a>
-                                    </td>
-                                {% else %}
-                                    <td>{{ findings.organization.name }}</td>
-                                {% endif %}
+                                <td>
+                                    <a href="{% url "organization_crisis_room" findings.organization.code %}">{{ findings.organization.name }}</a>
+                                </td>
                                 <td class="number">{{ findings|get_item:"meta"|get_item:"total_by_severity"|get_item:"critical" }}</td>
                                 <td>
                                     <button class="expando-button"
