@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
 from starlette.responses import JSONResponse
 
-from bytes.api.api_models import RawResponse
+from bytes.api.models import RawResponse
 from bytes.auth import authenticate_token
 from bytes.database.sql_meta_repository import MetaIntegrityError, ObjectNotFoundException, create_meta_data_repository
 from bytes.events.events import RawFileReceived
