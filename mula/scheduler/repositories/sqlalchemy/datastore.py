@@ -71,7 +71,7 @@ def retry(max_retries: int = 3, retry_delay: float = 5.0):
                     return func(*args, **kwargs)
                 except (
                     sqlalchemy.exc.OperationalError,
-                    sqlalchemy.exc.DBAPIError,
+                    sqlalchemy.exc.InternalError,
                 ) as e:
                     if i == max_retries - 1:
                         raise e
