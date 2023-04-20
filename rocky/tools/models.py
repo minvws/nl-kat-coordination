@@ -218,6 +218,7 @@ class OrganizationMember(models.Model):
             return True
         codenames = self.get_permissions_codenames(permissions)
         has_permissions = []
+
         for codename in codenames:
             for group in self.groups.all():
                 group_permissions_codenames = group.permissions.values_list("codename", flat=True)
@@ -226,7 +227,7 @@ class OrganizationMember(models.Model):
                     break
                 else:
                     has_permissions.append(False)
-        if all(has_permissions):
+        if has_permissions and all(has_permissions):
             return True
         return False
 

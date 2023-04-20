@@ -72,9 +72,9 @@
                     {% if member.trusted_clearance_level <= 0 %}
                         <p>
                             {% blocktranslate%}
-        You don't have any clearance to scan objects.<br>
-        Get in contact with the admin to give you the necessary clearance level.
-    {% endblocktranslate%}
+          You don't have any clearance to scan objects.<br>
+          Get in contact with the admin to give you the necessary clearance level.
+        {% endblocktranslate%}
                         </p>
                     {% else %}
                         <p>
@@ -89,8 +89,8 @@
                     {% if member.acknowledged_clearance_level < member.trusted_clearance_level %}
                         <p class="explanation">
                             {% blocktranslate trimmed with cl=member.trusted_clearance_level %}
-            You are granted clearance for {{ cl }} your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>
-        {% endblocktranslate %}
+              You are granted clearance for {{ cl }} your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>
+            {% endblocktranslate %}
                         </p>
                         {% include "partials/single_action_form.html" with btn_text="Accept level 4 clearance and responsibility" action="accept_clearance" key="member_id" value=member.id btn_class="ghost" %}
 
