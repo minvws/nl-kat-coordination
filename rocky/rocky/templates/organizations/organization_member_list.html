@@ -12,13 +12,13 @@
             <div>
                 <h1>{% translate "Organization" %}: {{ organization.name }}</h1>
                 {% blocktranslate with organization_name=organization.name %}
-            An overview of "{{ organization_name }}" its members.
-        {% endblocktranslate %}
+           An overview of "{{ organization_name }}" its members.
+{% endblocktranslate %}
                 <h2>{% translate "Members" %}</h2>
                 {% has_organization_perms "tools.add_organizationmember" request.user organization as can_add_member %}
                 {% if can_add_member %}
                     <div class="horizontal-view toolbar">
-                        <a href="{% url 'organization_member_add' organization.code %}"
+                        <a href="{% url "organization_member_add" organization.code %}"
                            class="button">{% translate "Add new member" %}</a>
                     </div>
                 {% endif %}
