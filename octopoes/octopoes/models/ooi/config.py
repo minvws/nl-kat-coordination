@@ -11,12 +11,10 @@ class Config(OOI):
     bit_id: str
     config: str
 
-    @property
-    def natural_key(self) -> str:
-        return str(self.ooi)
+    _natural_key_attrs = ["ooi", "bit_id"]
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         parts = reference.natural_key.split("|")
-        ooi_reference = Reference.from_str("|".join(parts))
-        return f"Config of {ooi_reference.human_readable}"
+        ooi_reference = Reference.from_str("|".join(parts[:-1]))
+        return f"Config of {parts[-1]} under {ooi_reference}"
