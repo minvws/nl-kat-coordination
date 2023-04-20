@@ -148,6 +148,7 @@ services:
       - "127.0.0.1:8002:8000"
     build:
       context: bytes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
