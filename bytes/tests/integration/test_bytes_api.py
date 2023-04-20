@@ -22,27 +22,15 @@ def test_metrics(bytes_api_client: BytesAPIClient) -> None:
     metrics = bytes_api_client.get_metrics()
 
     metrics = list(text_string_to_metric_families(metrics.decode()))
-    assert len(metrics) == 6
-    assert [(metric.name, len(metric.samples)) for metric in metrics] == [
-        ("bytes_data_organizations_total", 1),
-        ("bytes_data_raw_files_total", 0),
-        ("bytes_database_organizations_total", 1),
-        ("bytes_database_raw_files_total", 0),
-        ("bytes_filesystem_avail_bytes", 2),
-        ("bytes_filesystem_size_bytes", 2),
-    ]
-    data_organizations, data_files, database_organizations, database_files, filesystem_avail, filesystem_size = metrics
+    assert len(metrics) == 2
+    assert metrics[0].name == "bytes_database_organizations_total"
+    assert len(metrics[0].samples) == 1
+    assert metrics[1].name == "bytes_database_raw_files_total"
+    assert len(metrics[1].samples) == 0
 
-    assert data_organizations.samples[0].value == 0.0
+    database_organizations, database_files = metrics
+
     assert database_organizations.samples[0].value == 0.0
-
-    assert filesystem_avail.samples[0].labels == {"mountpoint": "/"}
-    assert filesystem_avail.samples[1].labels == {"mountpoint": "/data"}
-    assert filesystem_size.samples[0].labels == {"mountpoint": "/"}
-    assert filesystem_size.samples[1].labels == {"mountpoint": "/data"}
-
-    assert filesystem_avail.samples[0].value < filesystem_size.samples[0].value
-    assert filesystem_avail.samples[1].value < filesystem_size.samples[1].value
 
     boefje_meta = get_boefje_meta()
     bytes_api_client.save_boefje_meta(boefje_meta)
@@ -51,21 +39,11 @@ def test_metrics(bytes_api_client: BytesAPIClient) -> None:
 
     metrics = bytes_api_client.get_metrics()
     metrics = list(text_string_to_metric_families(metrics.decode()))
-    assert [(metric.name, len(metric.samples)) for metric in metrics] == [
-        ("bytes_data_organizations_total", 1),
-        ("bytes_data_raw_files_total", 1),
-        ("bytes_database_organizations_total", 1),
-        ("bytes_database_raw_files_total", 1),
-        ("bytes_filesystem_avail_bytes", 2),
-        ("bytes_filesystem_size_bytes", 2),
-    ]
-    data_organizations, data_files, database_organizations, database_files, filesystem_avail, filesystem_size = metrics
+    assert len(metrics[0].samples) == 1
+    assert len(metrics[1].samples) == 1
+    database_organizations, database_files = metrics
 
-    assert data_organizations.samples[0].value == 1.0
     assert database_organizations.samples[0].value == 1.0
-
-    assert data_files.samples[0].labels["organization_id"] == "test"
-    assert data_files.samples[0].value == 2.0
 
     assert database_files.samples[0].labels["organization_id"] == "test"
     assert database_files.samples[0].value == 2.0
@@ -78,24 +56,11 @@ def test_metrics(bytes_api_client: BytesAPIClient) -> None:
 
     metrics = bytes_api_client.get_metrics()
     metrics = list(text_string_to_metric_families(metrics.decode()))
-    assert [(metric.name, len(metric.samples)) for metric in metrics] == [
-        ("bytes_data_organizations_total", 1),
-        ("bytes_data_raw_files_total", 2),
-        ("bytes_database_organizations_total", 1),
-        ("bytes_database_raw_files_total", 2),
-        ("bytes_filesystem_avail_bytes", 2),
-        ("bytes_filesystem_size_bytes", 2),
-    ]
-    data_organizations, data_files, database_organizations, database_files, filesystem_avail, filesystem_size = metrics
+    assert len(metrics[0].samples) == 1
+    assert len(metrics[1].samples) == 2
+    database_organizations, database_files = metrics
 
-    assert data_organizations.samples[0].value == 2.0
     assert database_organizations.samples[0].value == 2.0
-    assert len(data_files.samples) == 2
-
-    assert data_files.samples[0].labels["organization_id"] == "test"
-    assert data_files.samples[0].value == 2.0
-    assert data_files.samples[1].labels["organization_id"] == "test2"
-    assert data_files.samples[1].value == 1.0
 
     assert len(database_files.samples) == 2
     assert database_files.samples[0].labels["organization_id"] == "test"

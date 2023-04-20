@@ -13,9 +13,7 @@ from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from bytes.api.metrics import get_registry
 from bytes.auth import TokenResponse, authenticate_token, get_access_token
-from bytes.config import Settings, get_settings
 from bytes.database.sql_meta_repository import create_meta_data_repository
-from bytes.raw.file_raw_repository import create_raw_repository
 from bytes.repositories.meta_repository import MetaDataRepository
 from bytes.version import __version__
 
@@ -53,11 +51,8 @@ def root() -> ServiceHealth:
 
 
 @router.get("/metrics", dependencies=[Depends(authenticate_token)])
-def metrics(
-    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
-    settings: Settings = Depends(get_settings),
-):
-    collector_registry = get_registry(meta_repository, create_raw_repository(settings))
+def metrics(meta_repository: MetaDataRepository = Depends(create_meta_data_repository)):
+    collector_registry = get_registry(meta_repository)
     data = prometheus_client.generate_latest(collector_registry)
 
     return Response(media_type="text/plain", content=data)

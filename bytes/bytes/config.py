@@ -1,6 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseSettings
 
@@ -35,7 +35,7 @@ class Settings(BaseSettings):
     kat_private_key_b64: str = ""
     vws_public_key_b64: str = ""
 
-    bytes_metrics_mountpoints: List[Path] = [Path("/")]
+    bytes_metrics_ttl_seconds: int = 0
 
 
 @lru_cache()

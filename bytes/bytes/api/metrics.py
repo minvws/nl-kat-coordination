@@ -1,25 +1,15 @@
-import shutil
+import logging
+from typing import Dict
 
+from cachetools import TTLCache, cached
 from prometheus_client import CollectorRegistry, Gauge
 
 from bytes.config import get_settings
 from bytes.repositories.meta_repository import MetaDataRepository
-from bytes.repositories.raw_repository import RawRepository
 
 collector_registry = CollectorRegistry()
 
 
-bytes_data_organizations_total = Gauge(
-    name="bytes_data_organizations_total",
-    documentation="Total amount of organizations in the bytes data directory.",
-    registry=collector_registry,
-)
-bytes_data_raw_files_total = Gauge(
-    name="bytes_data_raw_files_total",
-    documentation="Total amount of raw files in the bytes data directory.",
-    registry=collector_registry,
-    labelnames=["organization_id"],
-)
 bytes_database_organizations_total = Gauge(
     name="bytes_database_organizations_total",
     documentation="Total amount of organizations in the bytes database.",
@@ -31,38 +21,21 @@ bytes_database_raw_files_total = Gauge(
     registry=collector_registry,
     labelnames=["organization_id"],
 )
-bytes_filesystem_avail_bytes = Gauge(
-    name="bytes_filesystem_avail_bytes",
-    documentation="Total amount of available bytes of the file system at the mount point.",
-    registry=collector_registry,
-    labelnames=["mountpoint"],
-)
-bytes_filesystem_size_bytes = Gauge(
-    name="bytes_filesystem_size_bytes",
-    documentation="Total amount of bytes of the file system at the mount point.",
-    registry=collector_registry,
-    labelnames=["mountpoint"],
-)
+
+logger = logging.getLogger(__name__)
 
 
-def get_registry(meta_repository: MetaDataRepository, raw_repository: RawRepository) -> CollectorRegistry:
-    settings = get_settings()
-    organizations = raw_repository.get_organizations()
-    bytes_data_organizations_total.set(len(organizations))
+@cached(cache=TTLCache(maxsize=1, ttl=get_settings().bytes_metrics_ttl_seconds), key=lambda x: "")
+def cached_counts_per_organization(meta_repository: MetaDataRepository) -> Dict[str, int]:
+    logger.debug("Metrics cache miss, ttl set to %s seconds", get_settings().bytes_metrics_ttl_seconds)
+    return meta_repository.get_raw_file_count_per_organization()
 
-    for organization in organizations:
-        bytes_data_raw_files_total.labels(organization).set(raw_repository.get_raw_file_count(organization))
 
-    counts_per_organization = meta_repository.get_raw_file_count_per_organization()
+def get_registry(meta_repository: MetaDataRepository) -> CollectorRegistry:
+    counts_per_organization = cached_counts_per_organization(meta_repository)
     bytes_database_organizations_total.set(len(counts_per_organization))
 
     for organization_id, count in counts_per_organization.items():
         bytes_database_raw_files_total.labels(organization_id).set(count)
-
-    for mountpoint in settings.bytes_metrics_mountpoints:
-        total, used, free = shutil.disk_usage(mountpoint)
-
-        bytes_filesystem_avail_bytes.labels(mountpoint).set(free)
-        bytes_filesystem_size_bytes.labels(mountpoint).set(total)
 
     return collector_registry
