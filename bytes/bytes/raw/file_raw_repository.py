@@ -1,7 +1,5 @@
 import logging
-import os
 from pathlib import Path
-from typing import List
 
 from bytes.config import Settings
 from bytes.models import BoefjeMeta, RawData
@@ -56,20 +54,6 @@ class FileRawRepository(RawRepository):
 
         contents = file_path.read_bytes()
         return RawData(value=self.file_middleware.decode(contents), boefje_meta=boefje_meta)
-
-    def get_organizations(self) -> List[str]:
-        return os.listdir(str(self.base_path.absolute()))
-
-    def get_raw_file_count(self, organization_id: str) -> int:
-        count = 0
-
-        organization_path = str(self.base_path.joinpath(organization_id).absolute())
-
-        # The os.listdir approach seems to be the fastest python-native way to do this.
-        for index_path in os.listdir(organization_path):
-            count += len(os.listdir(Path(organization_path) / index_path))
-
-        return count
 
     def _raw_file_path(self, raw_id: str, boefje_meta: BoefjeMeta) -> Path:
         return self.base_path / boefje_meta.organization / self._index(raw_id) / raw_id
