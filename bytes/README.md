@@ -85,7 +85,7 @@ QUEUE_URI=
 # Optional environment variables
 BYTES_LOG_FILE=  # Optional file with Bytes logs.
 BYTES_DATA_DIR=  # Root for all the data. A change means that you no longer have access to old data unless you move it!
-BYTES_METRICS_MOUNTPOINTS=["/"]
+BYTES_METRICS_TTL_SECONDS=0  # The time to cache slow queries performed in the metrics endpoint.
 ```
 
 Most of these are self-explanatory, but a few sets of variables require more explanation.
@@ -131,6 +131,14 @@ KAT_PRIVATE_KEY_B64=""
 VWS_PUBLIC_KEY_B64=""
 ```
 
+### Observability
+
+Bytes exposes a `/metrics` endpoint for basic application level observability,
+such as the amount of organizations and the amount of raw files per organization.
+Another important component to monitor is the disk usage of Bytes.
+It is recommended to install [node exporter](https://prometheus.io/docs/guides/node-exporter/) to keep track of this.
+
+
 ## Design
 
 We now include two levels of design, according to the [C4 model](https://c4model.com/).
@@ -147,7 +155,6 @@ graph
     RabbitMQ[["RabbitMQ<br/><i>Message Broker"]]
     Scheduler["Scheduler<br/><i>Software System"]
     Boefjes["Boefjes<br/><i>Python App"]
-
 
     Boefjes -- GET/POST Raw/Meta --> Bytes
     User -- Interacts with --> Rocky
