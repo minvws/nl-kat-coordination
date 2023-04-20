@@ -1,6 +1,6 @@
-import enum
 import uuid
 from datetime import datetime, timezone
+from enum import Enum as _Enum
 from typing import ClassVar, List, Optional
 
 import mmh3
@@ -17,7 +17,7 @@ from .queue import PrioritizedItem
 from .raw_data import RawData
 
 
-class TaskStatus(str, enum.Enum):
+class TaskStatus(str, _Enum):
     """Status of a task."""
 
     PENDING = "pending"
