@@ -99,7 +99,12 @@
                                             {% if member.blocked %}
                                                 {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
                                             {% else %}
-                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="block" key="member_id" value=member.id %}
+                                            {% comment %} Disable the "block" checkbox for members that are super users or for the member of the user that's logged in so they can't lock themself out of the organisation by accident{% endcomment %}
+                                                {% if member.user.is_superuser or member.user.email == request.user.email %}
+                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled="disabled" action="block" key="member_id" value=member.id %}
+                                                  {% else %}
+                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked action="block" key="member_id" value=member.id %}
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
