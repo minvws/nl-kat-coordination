@@ -3,7 +3,8 @@ from json import JSONDecodeError
 from typing import Literal, Optional
 
 from jsonschema.exceptions import SchemaError, ValidationError
-from jsonschema.validators import Draft202012Validator, validate as schema_validate
+from jsonschema.validators import Draft202012Validator
+from jsonschema.validators import validate as schema_validate
 from pydantic.class_validators import validator
 
 from octopoes.models import OOI, Reference
@@ -42,4 +43,3 @@ class FormQuestionAnswer(OOI):
             raise ValueError("The json_schema field is not a valid JSON schema") from e
 
         return schema
-
