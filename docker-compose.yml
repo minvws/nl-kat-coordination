@@ -181,6 +181,7 @@ services:
     restart: unless-stopped
     build:
       context: mula/
+      target: dev
       args:
         ENVIRONMENT: dev
     ports:
