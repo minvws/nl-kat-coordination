@@ -18,7 +18,7 @@ from boefjes.katalogus.storage.interfaces import (
 from boefjes.sql.db import get_engine, SQL_BASE
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.repository_storage import SQLRepositoryStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage
+from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 
 
@@ -41,7 +41,7 @@ class TestRepositories(TestCase):
         session = sessionmaker(bind=self.engine)()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
         self.repository_storage = SQLRepositoryStorage(session, settings)
-        self.settings_storage = SQLSettingsStorage(session, IdentityMiddleware())
+        self.settings_storage = SQLSettingsStorage(session, create_encrypter())
         self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
 
     def tearDown(self) -> None:

@@ -25,13 +25,14 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
 
     def get_by_key(self, key: str, organisation_id: str, plugin_id: str) -> str:
         instance = self._db_instance_by_id(organisation_id, plugin_id)
+        values = json.loads(self.encryption.decode(instance.values))
 
-        if key not in instance.values:
+        if key not in values:
             raise SettingsNotFound(organisation_id, plugin_id) from ObjectNotFoundException(
                 SettingsInDB, organisation_id=organisation_id
             )
 
-        return json.loads(self.encryption.decode(instance.values))[key]
+        return values[key]
 
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         try:
@@ -39,7 +40,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
         except SettingsNotFound:
             return {}
 
-        return {key: value for key, value in json.loads(self.encryption.decode(instance.values)).items()}
+        return json.loads(self.encryption.decode(instance.values))
 
     def create(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
         logger.info("Saving settings: %s for organisation %s", settings, organisation_id)
