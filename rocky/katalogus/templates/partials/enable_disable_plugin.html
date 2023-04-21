@@ -8,7 +8,7 @@
         {% csrf_token %}
         <input type="hidden"
                name="current_url"
-               value="{{ request.path }}#enableform_{{ plugin.id|slugify }}">
+               value="{{ request.path }}#plugin_{{ plugin.id|slugify }}">
         <button type="submit"
                 class="{% if not plugin.enabled %}button{% else %}ghost{% endif %}">
             {% if not plugin.enabled %}

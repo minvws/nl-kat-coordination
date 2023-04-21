@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 
-<div role="group" id="enableform_{{ plugin.id|slugify }}">
+<div role="group" id="plugin_{{ plugin.id|slugify }}">
     <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
          alt="boefje placeholder image"/>
     <div class="horizontal-view scan-intensity">
