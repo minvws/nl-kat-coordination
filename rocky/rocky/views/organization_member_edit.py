@@ -6,7 +6,7 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django_otp.decorators import otp_required
-from tools.models import GROUP_ADMIN, GROUP_CLIENT, OrganizationMember
+from tools.models import GROUP_CLIENT, OrganizationMember
 from two_factor.views.utils import class_view_decorator
 
 
@@ -26,9 +26,12 @@ class OrganizationMemberEditView(PermissionRequiredMixin, UserPassesTestMixin, O
     def get_form(self):
         form = super().get_form()
         group = self.object.user.groups.all().values_list("name", flat=True)
-        if self.object.user.is_superuser or GROUP_ADMIN in group:
-            # There could be a case where you block yourself out of the system
+
+        # Make sure the logged in user can't block himself out of the organisation.
+        if self.object.user == self.request.user:
             form.fields["blocked"].disabled = True
+
+        # Since clients aren't allowed to scan and set clearance levels, disable the truste clearance level field.
         if GROUP_CLIENT in group:
             form.fields["trusted_clearance_level"].disabled = True
         return form
