@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from http import HTTPStatus
 from logging import getLogger
-from typing import List, Optional, Set, Type
+from typing import Dict, List, Optional, Set, Type
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from requests import HTTPError, RequestException
@@ -272,6 +272,14 @@ def get_scan_profile_inheritance(
     if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED:
         return [start]
     return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
+
+
+@router.get("/finding_types/count")
+def get_findingtype_count(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> Dict[str, int]:
+    return octopoes.ooi_repository.get_findingtype_count(valid_time)
 
 
 @router.post("/node")

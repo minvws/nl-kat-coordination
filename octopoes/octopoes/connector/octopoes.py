@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import List, Optional, Set, Type, Union
+from typing import Dict, List, Optional, Set, Type, Union
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -162,3 +162,8 @@ class OctopoesAPIConnector:
         params = {"reference": str(reference), "valid_time": valid_time}
         res = self.session.get(f"/{self.client}/scan_profiles/inheritance", params=params)
         return parse_obj_as(List[InheritanceSection], res.json())
+
+    def get_findingtype_count(self, valid_time: Optional[datetime] = None) -> Dict[str, int]:
+        params = {"valid_time": valid_time}
+        res = self.session.get(f"/{self.client}/finding_types/count", params=params)
+        return res.json()
