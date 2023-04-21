@@ -17,6 +17,7 @@ services:
   postgres:
     restart: unless-stopped
     image: postgres:15
+    shm_size: 256MB
     ports:
       - "127.0.0.1:5432:5432"
     healthcheck:
