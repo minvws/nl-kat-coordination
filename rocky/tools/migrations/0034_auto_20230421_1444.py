@@ -3,6 +3,7 @@
 from django.contrib.auth.management import create_permissions
 from django.db import migrations
 
+
 # https://stackoverflow.com/a/40092780/1336275
 def migrate_permissions(apps, schema_editor):
     for app_config in apps.get_app_configs():
@@ -25,7 +26,6 @@ def add_group_permissions(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0033_alter_organization_options"),
         ("contenttypes", "0002_remove_content_type_name"),
