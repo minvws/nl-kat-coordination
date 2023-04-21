@@ -3,14 +3,13 @@
 
 {% has_organization_perms "tools.can_enable_disable_boefje" request.user organization as can_enable_disable_boefje %}
 {% if can_enable_disable_boefje %}
-    <form id="enableform_{{ plugin.id|slugify }}"
-          action="{% url "plugin_enable_disable" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id plugin_state=plugin.enabled %}"
+    <form action="{% url "plugin_enable_disable" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id plugin_state=plugin.enabled %}"
           method="post"
           class="inline">
         {% csrf_token %}
         <input type="hidden"
                name="current_url"
-               value="{{ request.path }}#enableform_{{ plugin.id|slugify }}">
+               value="{{ request.path }}#plugin_{{ plugin.id|slugify }}">
         <button type="submit"
                 class="{% if not plugin.enabled %}button{% else %}ghost{% endif %}">
             {% if not plugin.enabled %}
