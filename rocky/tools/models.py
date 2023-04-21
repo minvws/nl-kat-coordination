@@ -1,10 +1,13 @@
 import logging
 import uuid
+from functools import cached_property
+from typing import List, Union
 
 import tagulous.models
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.signals import pre_save
@@ -182,38 +185,38 @@ class OrganizationMember(models.Model):
     def blocked(self):
         return self.status == OrganizationMember.STATUSES.BLOCKED
 
-    @property
-    def is_admin(self):
+    @cached_property
+    def is_admin(self) -> bool:
         return self.groups.filter(name=GROUP_ADMIN).exists()
 
-    @property
-    def is_redteam(self):
+    @cached_property
+    def is_redteam(self) -> bool:
         return self.groups.filter(name=GROUP_REDTEAM).exists()
 
-    @property
-    def is_client(self):
+    @cached_property
+    def is_client(self) -> bool:
         return self.groups.filter(name=GROUP_CLIENT).exists()
 
-    def get_permissions_codenames(self, permissions):
+    def get_permissions_codenames(self, permissions: Union[str, tuple] = None) -> List[str]:
         codenames = []
+
         if permissions is None:
-            raise ImproperlyConfigured("Permission(s) not defined")
+            raise ValueError("Permission(s) not defined")
         if isinstance(permissions, str):
             perms = (permissions,)
         else:
             perms = permissions
         for perm in perms:
-            try:
-                _, codename = perm.split(".", 1)
-            except IndexError:
-                raise AttributeError(
-                    "The format of identifier string permission (perm) is wrong. "
-                    "It should be in 'app_label.codename'."
-                )
-            codenames.append(codename)
+            if perm.count(".") == 1:
+                app_label, codename = perm.split(".")
+                if app_label and codename:
+                    if ContentType.objects.filter(app_label=app_label, model="organization").exists():
+                        codenames.append(codename)
+            else:
+                raise ValueError("Permissions should be defined as: 'app_label.codename'.")
         return codenames
 
-    def has_member_perms(self, permissions) -> bool:
+    def has_member_perms(self, permissions: Union[str, tuple] = None) -> bool:
         if self.user.is_superuser and self.user.is_active and self.status is not OrganizationMember.STATUSES.BLOCKED:
             return True
         codenames = self.get_permissions_codenames(permissions)

@@ -1,3 +1,4 @@
+import pytest
 from account.views import AccountView
 from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains, assertNotContains
@@ -31,6 +32,22 @@ def test_red_teamer_can_scan_organization(redteam_member):
     assert redteam_member.user.has_perm("tools.can_scan_organization") or redteam_member.has_member_perms(
         "tools.can_scan_organization"
     )
+
+
+def test_member_perms(redteam_member):
+    with pytest.raises(ValueError):
+        redteam_member.has_member_perms()
+    with pytest.raises(ValueError):
+        redteam_member.has_member_perms("tools")
+
+    # Not Authorized
+    assert not redteam_member.has_member_perms("wrong_app_label.can_scan_organization")
+    assert not redteam_member.has_member_perms("tools.")
+    assert not redteam_member.has_member_perms(".can_scan_organization")
+    assert not redteam_member.has_member_perms(".")
+
+    assert redteam_member.has_member_perms(("tools.can_scan_organization", "tools.can_enable_disable_boefje"))
+    assert redteam_member.has_member_perms(("tools.can_scan_organization", ".can_enable_disable_boefje"))
 
 
 def test_account_detail_perms(rf, superuser_member, admin_member, redteam_member, client_member):

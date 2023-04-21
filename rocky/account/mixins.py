@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from tools.models import Indemnification, Organization, OrganizationMember
@@ -127,15 +128,10 @@ class RockyPermissionRequiredMixin(PermissionRequiredMixin):
         user_perm = super().has_permission()
         if user_perm:
             return user_perm
-        if "organization_code" in self.kwargs:
-            organization_code = self.kwargs["organization_code"]
-            if organization_code:
-                try:
-                    organization = Organization.objects.get(code=organization_code)
-                    member = OrganizationMember.objects.get(user=self.request.user, organization=organization)
-                    return member.has_member_perms(self.permission_required)
-                except OrganizationMember.DoesNotExist:
-                    raise Http404()
+        organization_code = self.kwargs.get("organization_code")
+        if organization_code is not None:
+            organization = get_object_or_404(Organization, code=organization_code)
+            member = get_object_or_404(OrganizationMember, user=self.request.user, organization=organization)
         # if no organization is giving, check if permission exists in one of member's organzation
         members = OrganizationMember.objects.filter(user=self.request.user)
         if members:
