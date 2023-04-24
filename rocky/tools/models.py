@@ -27,6 +27,8 @@ logger = logging.getLogger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
 
+DENY_ORGANIZATION_CODES = ["admin"]
+
 
 class OrganizationTag(tagulous.models.TagTreeModel):
     COLOR_CHOICES = settings.TAG_COLORS
@@ -44,6 +46,12 @@ class OrganizationTag(tagulous.models.TagTreeModel):
         return f"tags-{self.color} {self.border_type}"
 
 
+def organization_code_validator(value: str) -> None:
+    if value in DENY_ORGANIZATION_CODES:
+        raise ValidationError("Use another organization code")
+    return value
+
+
 class Organization(models.Model):
     name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation"))
     code = LowerCaseSlugField(
@@ -54,6 +62,7 @@ class Organization(models.Model):
             "A slug containing only lower-case unicode letters, numbers, hyphens or underscores "
             "that will be used in URLs and paths"
         ),
+        validators=[organization_code_validator],
     )
     tags = tagulous.models.TagField(to=OrganizationTag, blank=True)
 
