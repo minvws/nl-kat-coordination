@@ -16,9 +16,12 @@ class Octopoes(HTTPService):
 
     @exception_handler
     def get_objects_by_object_types(
-        self, organisation_id: str, object_types: List[str], scan_level: List[int] = []
+        self, organisation_id: str, object_types: List[str], scan_level: List[int]
     ) -> List[OOI]:
         """Get all oois from octopoes"""
+        if scan_level is None:
+            scan_level = []
+
         url = f"{self.host}/{organisation_id}/objects"
 
         params = {
@@ -46,8 +49,11 @@ class Octopoes(HTTPService):
         return oois
 
     @exception_handler
-    def get_random_objects(self, organisation_id: str, n: int, scan_level: List[int] = []) -> List[OOI]:
+    def get_random_objects(self, organisation_id: str, n: int, scan_level: List[int]) -> List[OOI]:
         """Get `n` random oois from octopoes"""
+        if scan_level is None:
+            scan_level = []
+
         url = f"{self.host}/{organisation_id}/objects/random"
 
         params = {
