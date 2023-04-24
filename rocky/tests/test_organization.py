@@ -183,7 +183,7 @@ def test_organization_member_list(rf, admin_member):
     assertContains(response, admin_member.user.date_joined.strftime("%m/%d/%Y"))
     assertContains(response, "Assigned clearance level")
     assertContains(response, admin_member.trusted_clearance_level)
-    assertContains(response, "Agreed clearance level")
+    assertContains(response, "Accepted clearance level")
     assertContains(response, admin_member.acknowledged_clearance_level)
     assertContains(response, "Edit")
     assertContains(response, admin_member.id)
