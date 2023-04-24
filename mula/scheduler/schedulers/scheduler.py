@@ -76,7 +76,7 @@ class Scheduler(abc.ABC):
         self.stop_event: threading.Event = self.ctx.stop_event
 
     @abc.abstractmethod
-    def populate_queue(self) -> None:
+    def run(self) -> None:
         raise NotImplementedError
 
     def post_push(self, p_item: models.PrioritizedItem) -> None:
@@ -258,15 +258,6 @@ class Scheduler(abc.ABC):
             t.join(5)
 
         self.logger.info("Stopped scheduler: %s", self.scheduler_id)
-
-    def run(self) -> None:
-        # Populator
-        if self.populate_queue_enabled:
-            self.run_in_thread(
-                name="populator",
-                func=self.populate_queue,
-                interval=self.ctx.config.pq_populate_interval,
-            )
 
     def dict(self) -> Dict[str, Any]:
         return {

@@ -40,9 +40,11 @@ class NormalizerScheduler(Scheduler):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
 
-    def populate_queue(self) -> None:
-        """Populate the PriorityQueue"""
-        self.push_tasks_for_received_raw_file()
+    def run(self) -> None:
+        self.run_in_thread(
+            name="raw_file",
+            func=self.push_tasks_for_received_raw_file,
+        )
 
     def push_tasks_for_received_raw_file(self) -> None:
         while not self.queue.full():
