@@ -13,6 +13,7 @@ services:
     volumes:
       - .:/app/rocky
       - ./.ci/run_rocky.sh:/app/run_rocky.sh
+      - ../octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .ci/.env.test
 
