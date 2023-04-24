@@ -22,7 +22,7 @@ class PrioritizedItem(BaseModel):
     scheduler_id: Optional[str]
 
     # A unique generated identifier for the object contained in data
-    hash: Optional[str]
+    hash: Optional[str] = Field(None, max_length=32)
 
     priority: Optional[int]
 
