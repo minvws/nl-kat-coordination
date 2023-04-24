@@ -8,6 +8,7 @@ from tools.models import OrganizationMember
 
 User = get_user_model()
 
+
 # https://stackoverflow.com/a/40092780/1336275
 def migrate_permissions(apps, schema_editor):
     for app_config in apps.get_app_configs():
