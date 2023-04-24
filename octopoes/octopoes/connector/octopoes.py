@@ -163,7 +163,7 @@ class OctopoesAPIConnector:
         res = self.session.get(f"/{self.client}/scan_profiles/inheritance", params=params)
         return parse_obj_as(List[InheritanceSection], res.json())
 
-    def get_findingtype_count(self, valid_time: Optional[datetime] = None) -> Dict[str, int]:
+    def get_finding_type_count(self, valid_time: Optional[datetime] = None) -> Dict[str, int]:
         params = {"valid_time": valid_time}
         res = self.session.get(f"/{self.client}/finding_types/count", params=params)
         return res.json()
