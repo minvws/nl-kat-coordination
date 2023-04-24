@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
 from tools.enums import SCAN_LEVEL
-from tools.forms.base import BaseRockyForm
+from tools.forms.base import BaseRockyForm, BaseRockyModelForm
 from tools.models import (
     GROUP_ADMIN,
     GROUP_CLIENT,
@@ -135,7 +135,7 @@ class UserAddForm(forms.Form):
         )
 
 
-class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
+class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
     """
     Form to add a new member
     """
@@ -172,18 +172,28 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
         fields = ("account_type", "name", "email", "password")
 
 
-class OrganizationMemberEditForm(forms.ModelForm):
+class OrganizationMemberEditForm(BaseRockyModelForm):
     trusted_clearance_level = forms.ChoiceField(
         required=False,
-        label=_("Trusted clearance level"),
+        label=_("Assigned clearance level"),
         choices=[(-1, "")] + SCAN_LEVEL.choices,
         help_text=_("Select a clearance level you trust this member with."),
         widget=forms.RadioSelect(attrs={"radio_paws": True}),
     )
 
+    blocked = forms.BooleanField(
+        required=False,
+        label=_("Blocked"),
+        help_text=_("Set the members status to blocked, so they don't have access to the organization anymore."),
+        widget=forms.CheckboxInput(),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.fields["blocked"].widget.attrs["field_form_label"] = "Status"
+        if self.instance.user.is_superuser:
+            self.fields["trusted_clearance_level"].disabled = True
+        self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
         self.fields["acknowledged_clearance_level"].required = False
         self.fields["acknowledged_clearance_level"].widget.attrs[
             "fixed_paws"
@@ -202,10 +212,10 @@ class OrganizationMemberEditForm(forms.ModelForm):
 
     class Meta:
         model = OrganizationMember
-        fields = ["status", "trusted_clearance_level", "acknowledged_clearance_level"]
+        fields = ["blocked", "trusted_clearance_level", "acknowledged_clearance_level"]
 
 
-class OrganizationForm(forms.ModelForm):
+class OrganizationForm(BaseRockyModelForm):
     """
     Form to create a new organization.
     """
