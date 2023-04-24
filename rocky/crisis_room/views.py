@@ -1,21 +1,26 @@
-from datetime import timezone, datetime
+import logging
+from datetime import datetime, timezone
 from typing import List, Union
 
+from account.models import KATUser
 from django.conf import settings
+from django.contrib import messages
 from django.urls.base import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+from tools.forms.base import ObservedAtForm
+from tools.models import Organization
+from tools.view_helpers import BreadcrumbsMixin, convert_date_to_datetime
 from two_factor.views.utils import class_view_decorator
 
-from account.models import KATUser
-from octopoes.connector import RemoteException
+from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.findings import Finding
 from rocky.views.ooi_report import build_findings_list_from_store
 from rocky.views.ooi_view import ConnectorFormMixin
-from tools.forms.base import ObservedAtForm
-from tools.models import Organization
-from tools.view_helpers import BreadcrumbsMixin, convert_date_to_datetime
+
+logger = logging.getLogger(__name__)
 
 
 class CrisisRoomBreadcrumbsMixin(BreadcrumbsMixin):
@@ -46,7 +51,11 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
             api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
 
             return api_connector.list(self.ooi_types, valid_time=self.get_observed_at()).items
-        except RemoteException:
+        except ConnectorException:
+            messages.add_message(
+                self.request, messages.ERROR, _("Failed to get list of findings, check server logs for more details.")
+            )
+            logger.exception("Failed to get list of findings for organization %s", organization.code)
             return []
 
     def get_observed_at(self) -> datetime:

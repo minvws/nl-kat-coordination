@@ -5,14 +5,16 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
-from rocky.views.organization_settings import OrganizationSettingsView
+from requests import RequestException
+from tools.models import Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
+from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_list import OrganizationMemberListView
-from tests.conftest import setup_request, create_member
-from tools.models import Organization
+from rocky.views.organization_settings import OrganizationSettingsView
+from tests.conftest import create_member, setup_request
 
 AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
@@ -51,6 +53,97 @@ def test_edit_organization(rf, superuser_member):
     assertContains(response, superuser_member.organization.code)
     assertContains(response, superuser_member.organization.name)
     assertContains(response, "Save organization")
+
+
+def test_add_organization_page(rf, superuser_member):
+    request = setup_request(rf.get("organization_add"), superuser_member.user)
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+
+    assert response.status_code == 200
+    assertContains(response, "Name")
+    assertContains(response, "Code")
+    assertContains(response, superuser_member.organization.code)
+    assertContains(response, superuser_member.organization.name)
+    assertContains(response, "Organization setup")
+
+
+def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "neworg", "code": "norg"},
+        ),
+        superuser_member.user,
+    )
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+    assert "Organization added successfully" in messages[0].message
+
+
+def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests.Session().get.side_effect = RequestException
+
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "neworg", "code": "norg"},
+        ),
+        superuser_member.user,
+    )
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+    assert "An issue occurred in KATalogus while creating the organization" in messages[0].message
+
+
+def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker, mock_models_octopoes):
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_health_response = mocker.MagicMock()
+    mock_health_response.json.return_value = {"service": "test", "healthy": True}
+
+    mock_organization_exists_response = mocker.MagicMock()
+    mock_organization_exists_response.status_code = 404
+
+    mock_requests.Session().get.side_effect = [mock_health_response, mock_organization_exists_response]
+    mock_requests.Session().post.side_effect = RequestException
+
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "new", "code": "newcode"},
+        ),
+        superuser_member.user,
+    )
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+    assert "An issue occurred in KATalogus while creating the organization" in messages[0].message
+
+
+def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_response = mocker.MagicMock()
+    mock_requests.Session().get.return_value = mock_response
+    mock_response.json.return_value = {"service": "test", "healthy": False}
+
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "neworg", "code": "norg"},
+        ),
+        superuser_member.user,
+    )
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+    assert "An issue occurred in KATalogus while creating the organization" in messages[0].message
 
 
 def test_organization_list(rf, superuser_member, bulk_organizations, django_assert_max_num_queries):

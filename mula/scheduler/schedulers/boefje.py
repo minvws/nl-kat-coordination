@@ -213,8 +213,9 @@ class BoefjeScheduler(Scheduler):
 
                 while not self.is_space_on_queue():
                     self.logger.debug(
-                        "Waiting for queue to have enough space, not adding task to queue "
+                        "Waiting for queue to have enough space, not adding task to queue: %s "
                         "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
+                        task,
                         self.queue.qsize(),
                         self.queue.maxsize,
                         self.organisation.id,
@@ -225,7 +226,7 @@ class BoefjeScheduler(Scheduler):
                 self.logger.info(
                     "Created boefje task: %s for ooi: %s "
                     "[boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
-                    boefje.name,
+                    task,
                     ooi.primary_key,
                     boefje.id,
                     ooi.primary_key,
@@ -579,9 +580,8 @@ class BoefjeScheduler(Scheduler):
         """
         if boefje.enabled is False:
             self.logger.debug(
-                "Boefje: %s is disabled [organisation.id=%s, boefje.id=%s, organisation.id=%s, scheduler_id=%s]",
+                "Boefje: %s is disabled [boefje.id=%s, organisation.id=%s, scheduler_id=%s]",
                 boefje.name,
-                self.organisation.id,
                 boefje.id,
                 self.organisation.id,
                 self.scheduler_id,

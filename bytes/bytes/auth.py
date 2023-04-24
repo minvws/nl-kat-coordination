@@ -1,12 +1,10 @@
+import logging
+from datetime import datetime, timedelta, timezone
 from typing import Tuple
 
-import logging
-
-from datetime import datetime, timedelta, timezone
-
-from fastapi import HTTPException, Depends
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette import status

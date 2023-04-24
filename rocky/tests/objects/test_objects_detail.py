@@ -1,15 +1,14 @@
 from urllib.parse import urlencode
 
 from django.http import HttpResponseRedirect
-from pytest_django.asserts import assertContains
-
-from octopoes.models.tree import ReferenceTree
-
 from katalogus.client import Plugin
-from rocky.views.ooi_detail import OOIDetailView
-from tests.conftest import setup_request
+from pytest_django.asserts import assertContains
 from tools.enums import SCAN_LEVEL
 from tools.models import Indemnification
+
+from octopoes.models.tree import ReferenceTree
+from rocky.views.ooi_detail import OOIDetailView
+from tests.conftest import setup_request
 
 TREE_DATA = {
     "root": {
@@ -52,7 +51,7 @@ def test_ooi_detail(
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2
     assertContains(response, "Object")
-    assertContains(response, "Hostname|internet|mispo.es.")
+    assertContains(response, "Hostname|internet|mispo.es")
 
     assertContains(response, "Plugin")
     assertContains(response, "test-boefje")
@@ -77,7 +76,7 @@ def test_ooi_detail_start_scan(
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
-    mock_katalogus().get_boefje.return_value = Plugin(
+    mock_katalogus().get_plugin.return_value = Plugin(
         id="nmap",
         repository_id="",
         name="",

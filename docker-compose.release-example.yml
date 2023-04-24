@@ -16,6 +16,7 @@ services:
 
   postgres:
     image: postgres:15
+    shm_size: 256MB
     ports:
       - "0.0.0.0:5432:5432"
     volumes:
@@ -27,7 +28,7 @@ services:
       APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
 
   crux:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.0"
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.4"
     restart: on-failure
     ports:
       - "127.0.0.1:3000:3000"

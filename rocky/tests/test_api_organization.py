@@ -9,9 +9,9 @@ from pytest_drf import (
     Returns201,
     Returns204,
     Returns500,
-    UsesGetMethod,
     UsesDeleteMethod,
     UsesDetailEndpoint,
+    UsesGetMethod,
     UsesListEndpoint,
     UsesPatchMethod,
     UsesPostMethod,
@@ -20,7 +20,6 @@ from pytest_drf import (
 from pytest_drf.util import pluralized, url_for
 from pytest_lambda import lambda_fixture, static_fixture
 from requests import HTTPError
-
 from tools.models import Organization
 
 pytestmark = pytest.mark.django_db
@@ -123,7 +122,7 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Katalogus returned error creating organization: Test error",
+                        "detail": "Failed creating organization in the Katalogus",
                         "attr": None,
                     }
                 ],
@@ -152,7 +151,7 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Octopoes returned error creating organization: Test error",
+                        "detail": "Failed creating organization in Octopoes",
                         "attr": None,
                     }
                 ],
@@ -245,7 +244,7 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Katalogus returned error deleting organization: Test error",
+                        "detail": "Failed deleting organization in the Katalogus",
                         "attr": None,
                     }
                 ],
@@ -270,7 +269,7 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Octopoes returned error deleting organization: Test error",
+                        "detail": "Failed deleting organization in Octopoes",
                         "attr": None,
                     }
                 ],

@@ -1,11 +1,9 @@
-from importlib import import_module
-from inspect import signature, isfunction
-
 import json
-
 from enum import Enum
+from importlib import import_module
+from inspect import isfunction, signature
 from pathlib import Path
-from typing import Set, Union, Protocol
+from typing import Protocol, Set, Union
 
 from pydantic import BaseModel, StrictBytes
 

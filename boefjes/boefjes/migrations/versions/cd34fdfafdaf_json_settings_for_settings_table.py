@@ -7,8 +7,8 @@ Create Date: 2023-02-16 14:47:20.424959
 """
 import json
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.engine import Connection
 from sqlalchemy.orm import sessionmaker
 

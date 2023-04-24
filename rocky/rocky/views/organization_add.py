@@ -1,15 +1,19 @@
+import logging
+
+from account.forms import OrganizationForm
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
-from django.urls import reverse
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
 from django_otp.decorators import otp_required
+from tools.models import Organization, OrganizationMember
 from two_factor.views.utils import class_view_decorator
 
-from account.forms import OrganizationForm
-from tools.models import Organization, OrganizationMember
+from rocky.exceptions import ServiceException
+
+logger = logging.getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
@@ -33,13 +37,29 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        self.object = form.save()
-        member, _ = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
-        member.acknowledged_clearance_level = 4
-        member.trusted_clearance_level = 4
-        member.save()
+        try:
+            self.object = form.save()
+        except ServiceException as e:
+            message = f"An issue occurred in {e.service_name} while creating the organization"
+            logger.exception(message)
+            messages.add_message(self.request, messages.ERROR, _(message))
+
+            return redirect(self.success_url)  # get_success_url() assumes self.object is set, see ModelFormMixin
+
+        try:
+            member, created = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
+            member.acknowledged_clearance_level = 4
+            member.trusted_clearance_level = 4
+            member.save()
+        except Exception:
+            message = "An issue occurred while creating the organization"
+            logger.exception(message)
+            messages.add_message(self.request, messages.ERROR, _(message))
+
+            return redirect(self.success_url)
+
         self.add_success_notification()
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
 
     def add_success_notification(self):
         success_message = _("Organization added successfully.")

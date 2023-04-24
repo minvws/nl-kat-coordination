@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from pydantic.tools import parse_obj_as
 from requests import Session

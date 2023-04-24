@@ -1,7 +1,6 @@
 import re
-
+from ipaddress import IPv6Address, ip_address
 from os import getenv
-from ipaddress import ip_address, IPv6Address
 from typing import List, Tuple, Union
 
 import docker

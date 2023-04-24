@@ -1,8 +1,8 @@
-from typing import List, Iterator
+from typing import Iterator, List
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import NXDOMAIN
 
 

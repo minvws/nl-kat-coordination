@@ -1,7 +1,8 @@
-from typing import Tuple, Union, List
-import docker
-from boefjes.job_models import BoefjeMeta
+from typing import List, Tuple, Union
 
+import docker
+
+from boefjes.job_models import BoefjeMeta
 
 NUCLEI_IMAGE = "projectdiscovery/nuclei:latest"
 
@@ -24,7 +25,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     url = verify_hostname_meta(boefje_meta.arguments["input"])
     output = client.containers.run(
         NUCLEI_IMAGE,
-        ["-t", "/root/nuclei-templates/cves/", "-u", url, "-json"],
+        ["-t", "/root/nuclei-templates/cves/", "-u", url, "-jsonl"],
         remove=True,
     )
 

@@ -30,11 +30,12 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # dependencies
 ARG ENVIRONMENT
 
-COPY rocky/requirements.txt rocky/requirements-check.txt rocky/requirements-dev.txt .
+COPY rocky/requirements*.txt .
 RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
-    && pip install -r requirements.txt \
-    && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
+    && if [ "$ENVIRONMENT" = "dev" ]; \
+    then pip install -r requirements-dev.txt; \
+    else pip install -r requirements.txt; fi
 
 COPY octopoes/ /tmp/octopoes
 RUN cd /tmp/octopoes && python setup.py bdist_wheel

@@ -18,7 +18,6 @@ Login As User For The First Time
     Fill Text    css=#id_auth-username    ${email}
     Fill Text    css=#id_auth-password    ${password}
     Click    "Log in"
-    Click    "Setup two factor authentication"
     ${otp-raw}    Get Attribute    css=#totp-input    value
     Set Global Variable    ${otp-raw-global}    ${otp-raw}
     ${otp-code}    get otp    ${otp-raw-global}
@@ -43,7 +42,6 @@ Logout Normally
     Get Element Count    .login-meta    ==    0    error still logged in
 
 Generate First DNS Report
-    #Debug
     Click    "Let\'s get started"
     Click    css=#main-content > section > div > p:nth-child(10) > a:nth-child(2)
     Click    "Let\'s choose a report"
