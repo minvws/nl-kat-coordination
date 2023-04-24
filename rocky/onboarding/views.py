@@ -223,7 +223,7 @@ class OnboardingSetupScanOOIAddView(
         except KeyError:
             raise Http404("OOI not found")
 
-    def get_success_url(self, ooi: OOI) -> str:
+    def success_url(self, ooi: OOI) -> str:
         self.request.session["ooi_id"] = ooi.primary_key
         return get_ooi_url("step_set_clearance_level", ooi.primary_key, self.organization.code)
 

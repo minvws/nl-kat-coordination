@@ -136,7 +136,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         try:
             new_ooi = self.save_ooi(form.cleaned_data)
             sleep(1)
-            return redirect(get_ooi_url("ooi_detail", new_ooi.primary_key, self.organization.code))
+            return redirect(self.success_url(new_ooi))
         except ValidationError as exception:
             for error in exception.errors():
                 form.add_error(error["loc"][0], error["msg"])
@@ -144,6 +144,9 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         except Exception as exception:
             form.add_error("__all__", str(exception))
             return self.form_invalid(form)
+
+    def success_url(self, ooi: OOI) -> str:
+        return get_ooi_url("ooi_detail", ooi.primary_key, self.organization.code)
 
     def get_readonly_fields(self) -> List:
         if not hasattr(self, "ooi"):
