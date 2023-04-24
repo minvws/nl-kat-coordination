@@ -2,7 +2,7 @@ alembic==1.8.1
 anyio==3.6.2
 asgiref==3.5.2
 astroid==2.12.12
-attrs==22.1.0
+attrs==23.1.0
 bcrypt==4.0.1
 black==23.1.0
 certifi==2022.12.7
