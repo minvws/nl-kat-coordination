@@ -17,6 +17,7 @@ from tools.models import Indemnification, OrganizationMember
 from tools.ooi_helpers import format_display
 
 from octopoes.models import OOI, Reference
+from octopoes.models.ooi.question import Question
 from rocky import scheduler
 from rocky.views.mixins import OOIBreadcrumbsMixin
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
@@ -178,6 +179,7 @@ class OOIDetailView(
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.get_observed_at()
+        context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects()
         context["ooi_current"] = self.get_current_ooi()

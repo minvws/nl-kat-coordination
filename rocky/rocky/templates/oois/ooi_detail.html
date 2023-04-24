@@ -12,7 +12,6 @@
             <div>
                 {% if ooi_past_due %}
                     {% include "oois/ooi_past_due_warning.html" with ooi_current=ooi_current %}
-
                 {% endif %}
                 {% include "partials/ooi_head.html" with ooi=ooi view="ooi_detail" %}
                 {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
@@ -109,4 +108,8 @@
     {{ block.super }}
     <script src="{% static "/js/autoSubmit.js" %}"
             nonce="{{ request.csp_nonce }}"></script>
+{% if is_question %}
+    <script src="{% static "/js/forms.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+{% endif %}
 {% endblock html_at_end_body %}
