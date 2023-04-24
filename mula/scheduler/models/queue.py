@@ -46,7 +46,7 @@ class PrioritizedItemORM(Base):
 
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String)
-    hash = Column(String)
+    hash = Column(String(32))
 
     priority = Column(Integer)
     data = Column(JSON, nullable=False)
