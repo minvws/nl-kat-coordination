@@ -1,6 +1,6 @@
-## Rocky Design
+# Rocky Design
 
-### Running a boefje
+## Running a boefje
 
 The following diagram shows the triggered flows when running a Boefje from Rocky.
 ```{mermaid}
