@@ -28,8 +28,7 @@ from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
 # Quiet faker locale messages down in tests.
-logger = logging.getLogger("faker")
-logger.setLevel(logging.INFO)
+logging.getLogger("faker").setLevel(logging.INFO)
 
 
 def create_user(django_user_model, email, password, name, device_name, superuser=False):
