@@ -80,6 +80,7 @@ class Organization(models.Model):
             ("can_set_clearance_level", "Can set clearance level"),
             ("can_view_admin_onboarding", "Can view admin onboarding"),
             ("can_view_redteam_onboarding", "Can view redteam onboarding"),
+            ("add_indemnification", "Can add indemnification"),
         )
 
     def get_absolute_url(self):
