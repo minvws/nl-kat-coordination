@@ -104,10 +104,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         """
         if self.is_superuser:
             return self.all_organizations
-        return [
-            m.organization
-            for m in self.organization_members if not m.blocked
-        ]
+        return [m.organization for m in self.organization_members if not m.blocked]
 
     @cached_property
     def organizations_including_blocked(self) -> List[Organization]:
