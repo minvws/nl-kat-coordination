@@ -115,17 +115,3 @@ class AppContext:
             registry=self.metrics_registry,
             labelnames=["scheduler_id"],
         )
-
-        self.metrics_katalogus_cache_expiry = Gauge(
-            name="katalogus_cache_expiry",
-            documentation="Katalogus cache expiry",
-            registry=self.metrics_registry,
-            labelnames=["cache_type"],
-        )
-
-        self.metrics_katalogus_cache_start = Gauge(
-            name="katalogus_cache_start",
-            documentation="Katalogus cache start",
-            registry=self.metrics_registry,
-            labelnames=["cache_type"],
-        )
