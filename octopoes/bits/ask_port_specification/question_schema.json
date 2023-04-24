@@ -27,7 +27,9 @@
         },
         "tcp": {
           "type": "array",
-          "default": [25, 53,
+          "default": [
+            25,
+            53,
             110,
             143,
             993,
@@ -73,7 +75,8 @@
         },
         "tcp": {
           "type": "array",
-          "default": [21,
+          "default": [
+            21,
             22,
             23,
             3389,
@@ -102,7 +105,8 @@
       "properties": {
         "tcp": {
           "type": "array",
-          "default": [1433,
+          "default": [
+            1433,
             1434,
             3050,
             3306,
