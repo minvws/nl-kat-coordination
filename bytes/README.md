@@ -246,3 +246,13 @@ To export raw SQL from the SQLAlchemy migration files, run the following target
 ```shell
 $ make sql rev1=0003 rev2=0004 > sql_migrations/0004_change_x_to_y_add_column_z.sql
 ```
+
+
+## Production
+
+
+### Performance tuning
+
+Bytes caches some metrics for performance, but the default is not to cache these queries.
+It is recommended to tune the `BYTES_METRICS_TTL_SECONDS` variable to on the amount of calls to the `/metrics` endpoint.
+As a guideline, add at least 10 seconds to the cache for every million of raw files in the database.
