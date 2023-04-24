@@ -23,15 +23,6 @@ class NormalizerMetaFilter(BaseModel):
     offset: int = 0
     descending: bool = True
 
-    @root_validator(pre=False)
-    def either_organization_or_boefje_meta_id(  # pylint: disable=no-self-argument
-        cls, values: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        if values.get("organization") or values.get("raw_id"):
-            return values
-
-        raise ValueError("boefje_meta_id and organization cannot both be None.")
-
 
 class RawDataFilter(BaseModel):
     organization: Optional[str]
