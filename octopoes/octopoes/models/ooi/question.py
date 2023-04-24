@@ -19,6 +19,7 @@ class Question(OOI):
 
     _natural_key_attrs = ["schema_id", "ooi"]
     _traversable = False
+    _reverse_relation_names = {"ooi": "questions"}
 
     @validator("json_schema")
     def json_schema_valid(cls, schema: str) -> str:
