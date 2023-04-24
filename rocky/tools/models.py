@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
 
-DENY_ORGANIZATION_CODES = ["admin"]
+DENY_ORGANIZATION_CODES = ["admin", "api"]
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):
@@ -48,7 +48,7 @@ class OrganizationTag(tagulous.models.TagTreeModel):
 
 def organization_code_validator(value: str) -> None:
     if value in DENY_ORGANIZATION_CODES:
-        raise ValidationError("Use another organization code")
+        raise ValidationError("Choose another organization code")
     return value
 
 

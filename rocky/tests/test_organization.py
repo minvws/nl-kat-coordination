@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 from requests import RequestException
-from tools.models import Organization
+from tools.models import DENY_ORGANIZATION_CODES, Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.organization_add import OrganizationAddView
@@ -315,3 +315,22 @@ def test_admin_edits_organization(rf, admin_member, mocker):
     assertContains(resulted_response, "tags-color-1-light plain")  # default color
     assertContains(resulted_response, "tag1")
     assertContains(resulted_response, "tag2")
+
+
+def test_organization_code_validator(rf, superuser_member, mocker, mock_models_octopoes):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    if DENY_ORGANIZATION_CODES:
+        for organization_code in DENY_ORGANIZATION_CODES:
+            request = setup_request(
+                rf.post(
+                    "organization_add",
+                    {"name": "DENIED LIST CHECK", "code": organization_code},
+                ),
+                superuser_member.user,
+            )
+
+            response = OrganizationAddView.as_view()(request)
+
+            # Form validation returns 200 with invalid form
+            assert response.status_code == 200
+            assertContains(response, "Choose another organization code")
