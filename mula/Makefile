@@ -75,7 +75,7 @@ cov: ## Generate a test coverage report
 ##+------------------------------------------------------------------------+
 
 sql: ## Generate raw sql for the migrations.
-	docker-compose exec scheduler \
+	docker-compose run scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		upgrade $(rev1):$(rev2) --sql
 
