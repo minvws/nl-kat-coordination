@@ -13,7 +13,8 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: str) -> Iterator[O
         return
 
     one_year = datetime.timedelta(days=365).total_seconds()
-    max_age = json.loads(config).get("max-age", one_year)
+
+    max_age = json.loads(config).get("max-age", one_year) if config else one_year
     findings: [str] = []
 
     if "includeSubDomains" not in header.value:

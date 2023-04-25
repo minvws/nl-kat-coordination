@@ -171,7 +171,10 @@ class OctopoesService:
                                 config = config_ooi.config
 
                 try:
-                    resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
+                    if config_path is not None:
+                        resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
+                    else:
+                        resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
                 except Exception as e:
                     logger.exception("Error running inference", exc_info=e)
                     return
