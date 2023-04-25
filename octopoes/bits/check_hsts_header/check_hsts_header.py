@@ -1,4 +1,5 @@
 import datetime
+import json
 from typing import Iterator, List
 
 from octopoes.models import OOI, Reference
@@ -6,15 +7,13 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import HTTPHeader
 
 
-def run(
-    input_ooi: HTTPHeader,
-    additional_oois: List,
-) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: List, config: str) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "strict-transport-security":
         return
 
     one_year = datetime.timedelta(days=365).total_seconds()
+    max_age = json.loads(config).get("max-age", one_year)
     findings: [str] = []
 
     if "includeSubDomains" not in header.value:
@@ -23,7 +22,7 @@ def run(
     if "max-age" not in header.value:
         findings.append("The cache validity period of the HSTS should be defined and should be at least 1 year.")
 
-    if "max-age" in header.value and int(header.value.split("=")[1].split(";")[0]) < one_year:
+    if "max-age" in header.value and int(header.value.split("=")[1].split(";")[0]) < max_age:
         findings.append("The cache validity period of the HSTS should be at least 1 year.")
 
     if findings:
