@@ -4,7 +4,7 @@ import pytest
 from crisis_room.views import (
     CrisisRoomView,
     OrganizationFindingTypeCount,
-    load_findingtype_risks,
+    load_finding_type_risks,
 )
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
@@ -79,7 +79,7 @@ def test_load_finding_type_severities(
     retirejsfindingtype_information,
 ):
     with django_assert_num_queries(1):
-        assert load_findingtype_risks(
+        assert load_finding_type_risks(
             {
                 "KATFindingType|TestFindingType",
                 "CVEFindingType|CVE-2020-1234",
@@ -98,7 +98,7 @@ def test_crisis_room(rf, client_member, mock_crisis_room_octopoes):
     request = setup_request(rf.get("crisis_room"), client_member.user)
     request.resolver_match = resolve(reverse("crisis_room"))
 
-    mock_crisis_room_octopoes().get_findingtype_count.return_value = {
+    mock_crisis_room_octopoes().get_finding_type_count.return_value = {
         "KATFindingType|TestFindingType": 1,
     }
 
@@ -107,7 +107,7 @@ def test_crisis_room(rf, client_member, mock_crisis_room_octopoes):
     assert response.status_code == 200
     assertContains(response, "1")
 
-    assert mock_crisis_room_octopoes().get_findingtype_count.call_count == 1
+    assert mock_crisis_room_octopoes().get_finding_type_count.call_count == 1
 
 
 def test_crisis_room_observed_at(rf, client_member, mock_crisis_room_octopoes):
