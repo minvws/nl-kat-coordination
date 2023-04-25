@@ -20,8 +20,7 @@ class RabbitMQEventManager(EventManager):
         event_data = event.json()
         queue_name = self._queue_name(event)
 
-        logger.info("Publishing %s event to %s", event.event_id, queue_name)
-        logger.debug("Event: %s", event_data)
+        logger.debug("Publishing event: %s", event_data)
 
         channel = self.connection.channel()
         channel.queue_declare(queue_name)
@@ -40,6 +39,8 @@ class RabbitMQEventManager(EventManager):
                 queue_name,
                 event_data.encode(),
             )
+
+        logger.info("Published event [event_id=%s] to queue %s", event.event_id, queue_name)
 
     def connect(self) -> pika.BlockingConnection:
         connection = self.get_rabbitmq_connection
