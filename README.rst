@@ -37,7 +37,7 @@ Current release
 
 The current release of OpenKAT can be found via the `release page on this repository <https://github.com/minvws/nl-kat-coordination/releases>`_.
 
-Which licence applies to OpenKAT?
+Which license applies to OpenKAT?
 =================================
 
 OpenKAT is available under the `EU PL 1.2 license <https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12>`_. This license was chosen because it provides a reasonable degree of freedom while ensuring public character. The EU PL 1.2 license is retained upon further distribution of the software. Modifications and additions can be made under the EU PL 1.2 license or under compatible licenses, which are similar in nature.
