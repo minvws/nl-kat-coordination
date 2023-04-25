@@ -25,11 +25,6 @@ Teardown Test
     Stop Monitoring
     Cleanup
 
-Verify Object Present
-    [Arguments]    ${reference}
-    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${reference}
-    Should Be Equal As Integers    ${response.status_code}    200
-
 Verify Origin Present
     [Arguments]    ${reference}    ${origin_task_id}
     ${response}    Get    ${OCTOPOES_URI}/origins    params=reference=${reference}

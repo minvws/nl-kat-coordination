@@ -152,3 +152,12 @@ Recalculate Scan Profiles
     ...    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
     Await Sync
+
+Verify Object Present
+    [Arguments]    ${reference}
+    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${reference}
+    Should Be Equal As Integers    ${response.status_code}    200
+
+Verify Object Not Present
+    [Arguments]    ${reference}
+    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${reference}    expected_status=404
