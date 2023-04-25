@@ -101,11 +101,12 @@ class AppContext:
             registry=self.metrics_registry,
         ).info(
             {
-                "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
                 "pq_maxsize": str(self.config.pq_maxsize),
                 "pq_populate_interval": str(self.config.pq_populate_interval),
                 "pq_populate_grace_period": str(self.config.pq_populate_grace_period),
                 "pq_populate_max_random_objects": str(self.config.pq_populate_max_random_objects),
+                "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
+                "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
             }
         )
 
