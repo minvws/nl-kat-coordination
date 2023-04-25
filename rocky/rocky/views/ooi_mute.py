@@ -10,6 +10,7 @@ class MuteFindingView(PermissionRequiredMixin, BaseOOIDetailView, FormView):
     template_name = "oois/ooi_mute_finding.html"
     form_class = MuteFindingForm
     permission_required = "tools.can_scan_organization"
+    depth = 1
 
     def get_initial(self):
         initial = super().get_initial()
