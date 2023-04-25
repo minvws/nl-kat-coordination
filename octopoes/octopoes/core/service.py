@@ -149,23 +149,26 @@ class OctopoesService:
                 parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
                 parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
-                obj = source
-                path_oois = bit_definition.config_ooi_relation_path.split(".")
-                for ooi in path_oois:
-                    path = Path.parse(f"{obj.__class__.__name__}.{ooi}")
-                    obj = self.ooi_repository.list_neighbours(
-                        references={obj.reference}, paths={path}, valid_time=valid_time
-                    ).pop()
-
-                config_oois = self.get_ooi_tree(
-                    reference=obj.reference, valid_time=valid_time, search_types=to_concrete({Config})
-                )
-
                 config = ""
-                for config_ooi in config_oois.store.values():
-                    if isinstance(config_ooi, Config):
-                        if config_ooi.bit_id == bit_definition.id:
-                            config = config_ooi.config
+                config_path = bit_definition.config_ooi_relation_path
+                if config_path is not None:
+                    obj = source
+                    path_oois = config_path.split(".") if config_path else []
+
+                    for ooi in path_oois:
+                        path = Path.parse(f"{obj.__class__.__name__}.{ooi}")
+                        obj = self.ooi_repository.list_neighbours(
+                            references={obj.reference}, paths={path}, valid_time=valid_time
+                        ).pop()
+
+                    config_oois = self.get_ooi_tree(
+                        reference=obj.reference, valid_time=valid_time, search_types=to_concrete({Config})
+                    )
+
+                    for config_ooi in config_oois.store.values():
+                        if isinstance(config_ooi, Config):
+                            if config_ooi.bit_id == bit_definition.id:
+                                config = config_ooi.config
 
                 try:
                     resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)

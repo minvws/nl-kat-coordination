@@ -4,7 +4,7 @@ from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, List, Type
+from typing import Dict, List, Optional, Type
 
 from pydantic import BaseModel
 
@@ -27,7 +27,7 @@ class BitDefinition(BaseModel):
     module: str
     min_scan_level: int = 1
     default_enabled: bool = True
-    config_ooi_relation_path: str = ""
+    config_ooi_relation_path: Optional[str]
 
 
 @lru_cache(maxsize=32)
