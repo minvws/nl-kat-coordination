@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from pydantic import BaseModel, Field
 
-from bytes.models import NormalizerMeta, RawDataMeta
+from bytes.models import RawDataMeta
 
 
 def utc_now() -> datetime:
@@ -20,9 +20,3 @@ class RawFileReceived(Event):
     event_id: str = "raw_file_received"
 
     raw_data: RawDataMeta
-
-
-class NormalizerMetaReceived(Event):
-    event_id: str = "normalizer_meta_received"
-
-    normalizer_meta: NormalizerMeta

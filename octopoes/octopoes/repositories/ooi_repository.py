@@ -103,6 +103,9 @@ class OOIRepository:
     def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
         raise NotImplementedError
 
+    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
+        raise NotImplementedError
+
 
 class XTDBReferenceNode(BaseModel):
     __root__: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
@@ -553,3 +556,12 @@ class XTDBOOIRepository(OOIRepository):
         """
         response = self.session.client.query(query, valid_time=valid_time)
         return {Reference.from_str(row[0]) for row in response}
+
+    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
+        query = """
+                    {:query {
+                     :find [?finding_type (count ?finding)]
+                     :where [[?finding :Finding/finding_type ?finding_type]] }}
+                """
+        response = self.session.client.query(query, valid_time=valid_time)
+        return {finding_type: count for finding_type, count in response}
