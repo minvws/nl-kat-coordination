@@ -34,11 +34,11 @@ from rocky.keiko import (
 )
 from rocky.views.finding_list import FindingListView
 from rocky.views.mixins import SingleOOITreeMixin
-from rocky.views.ooi_view import OOIBreadcrumbsMixin
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
 @class_view_decorator(otp_required)
-class OOIReportView(OOIBreadcrumbsMixin):
+class OOIReportView(BaseOOIDetailView):
     template_name = "oois/ooi_report.html"
     connector_form_class = OOIReportSettingsForm
 

@@ -72,7 +72,7 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
 
 
 @class_view_decorator(otp_required)
-class BaseOOIDetailView(SingleOOITreeMixin, ConnectorFormMixin, TemplateView):
+class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         self.ooi = self.get_ooi()
         return super().get(request, *args, **kwargs)
@@ -85,6 +85,25 @@ class BaseOOIDetailView(SingleOOITreeMixin, ConnectorFormMixin, TemplateView):
         context["observed_at"] = self.get_observed_at()
 
         return context
+
+    def build_breadcrumbs(self) -> List[Breadcrumb]:
+        if isinstance(self.ooi, Finding):
+            start = {
+                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Findings"),
+            }
+        else:
+            start = {
+                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Objects"),
+            }
+        return [
+            start,
+            {
+                "url": get_ooi_url("ooi_detail", self.ooi.primary_key, self.organization.code),
+                "text": self.ooi.human_readable,
+            },
+        ]
 
 
 @class_view_decorator(otp_required)
@@ -136,7 +155,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         try:
             new_ooi = self.save_ooi(form.cleaned_data)
             sleep(1)
-            return redirect(self.success_url(new_ooi))
+            return redirect(self.get_ooi_success_url(new_ooi))
         except ValidationError as exception:
             for error in exception.errors():
                 form.add_error(error["loc"][0], error["msg"])
@@ -145,7 +164,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
             form.add_error("__all__", str(exception))
             return self.form_invalid(form)
 
-    def success_url(self, ooi: OOI) -> str:
+    def get_ooi_success_url(self, ooi: OOI) -> str:
         return get_ooi_url("ooi_detail", ooi.primary_key, self.organization.code)
 
     def get_readonly_fields(self) -> List:
@@ -153,24 +172,3 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
             return []
 
         return self.ooi._natural_key_attrs
-
-
-class OOIBreadcrumbsMixin(BreadcrumbsMixin, BaseOOIDetailView):
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
-        if isinstance(self.ooi, Finding):
-            start = {
-                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Findings"),
-            }
-        else:
-            start = {
-                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Objects"),
-            }
-        return [
-            start,
-            {
-                "url": get_ooi_url("ooi_detail", self.ooi.primary_key, self.organization.code),
-                "text": self.ooi.human_readable,
-            },
-        ]

@@ -52,7 +52,7 @@ from rocky.views.ooi_view import BaseOOIDetailView, BaseOOIFormView, SingleOOITr
 User = get_user_model()
 
 
-class OnboardingBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
+class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
     def build_breadcrumbs(self):
         return [
             {
@@ -223,7 +223,7 @@ class OnboardingSetupScanOOIAddView(
         except KeyError:
             raise Http404("OOI not found")
 
-    def success_url(self, ooi: OOI) -> str:
+    def get_ooi_success_url(self, ooi: OOI) -> str:
         self.request.session["ooi_id"] = ooi.primary_key
         return get_ooi_url("step_set_clearance_level", ooi.primary_key, self.organization.code)
 

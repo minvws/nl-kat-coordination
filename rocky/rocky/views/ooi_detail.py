@@ -19,7 +19,7 @@ from tools.ooi_helpers import format_display
 from octopoes.models import OOI, Reference
 from rocky import scheduler
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
-from rocky.views.ooi_view import OOIBreadcrumbsMixin
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
 class PageActions(Enum):
@@ -30,7 +30,7 @@ class OOIDetailView(
     BoefjeMixin,
     OOIRelatedObjectAddView,
     OOIFindingManager,
-    OOIBreadcrumbsMixin,
+    BaseOOIDetailView,
 ):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm

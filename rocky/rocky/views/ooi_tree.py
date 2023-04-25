@@ -10,10 +10,10 @@ from tools.ooi_helpers import (
 )
 from tools.view_helpers import Breadcrumb, get_ooi_url
 
-from rocky.views.ooi_view import OOIBreadcrumbsMixin
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
-class OOITreeView(OOIBreadcrumbsMixin):
+class OOITreeView(BaseOOIDetailView):
     template_name = "oois/ooi_tree.html"
     connector_form_class = OoiTreeSettingsForm
 
