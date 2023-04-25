@@ -139,8 +139,9 @@ def list_random_objects(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     amount: int = 1,
+    scan_level: Set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
 ) -> List[OOI]:
-    return octopoes.list_random_ooi(amount, valid_time)
+    return octopoes.list_random_ooi(valid_time, amount, scan_level)
 
 
 @router.delete("/")

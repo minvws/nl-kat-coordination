@@ -9,4 +9,6 @@ Contains files to be used in the ``.github`` folder.
 
    bug_report_template
    feature_request_template
-   pull_request_template
+   pull_request_template_author
+   pull_request_template_review_code
+   pull_request_template_review_qa
