@@ -3,6 +3,7 @@ from unittest.mock import patch
 import pytest
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 from requests import RequestException
@@ -324,20 +325,32 @@ def test_admin_edits_organization(rf, admin_member, mocker):
     assertContains(resulted_response, "tag2")
 
 
-def test_organization_code_validator(rf, superuser_member, mocker, mock_models_octopoes):
+def test_organization_code_validator_add_view(rf, superuser_member, mocker, mock_models_octopoes):
     mocker.patch("katalogus.client.KATalogusClientV1")
-    if DENY_ORGANIZATION_CODES:
-        for organization_code in DENY_ORGANIZATION_CODES:
-            request = setup_request(
-                rf.post(
-                    "organization_add",
-                    {"name": "DENIED LIST CHECK", "code": organization_code},
-                ),
-                superuser_member.user,
-            )
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]},
+        ),
+        superuser_member.user,
+    )
 
-            response = OrganizationAddView.as_view()(request)
+    response = OrganizationAddView.as_view()(request)
 
-            # Form validation returns 200 with invalid form
-            assert response.status_code == 200
-            assertContains(response, "Choose another organization code")
+    # Form validation returns 200 with invalid form
+    assert response.status_code == 200
+    assertContains(response, "Choose another organization code")
+
+
+@pytest.mark.django_db
+def test_organization_code_validator_on_model(mocker, mock_models_octopoes):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    with pytest.raises(ValidationError):
+        Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])
+
+    new_org = Organization.objects.create(name="Test", code="test_123")
+    assert new_org.code == "test_123"
+
+    new_org.code = DENY_ORGANIZATION_CODES[0]
+    with pytest.raises(ValidationError):
+        new_org.save()

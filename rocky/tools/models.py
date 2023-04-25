@@ -4,6 +4,7 @@ import uuid
 import tagulous.models
 from django.conf import settings
 from django.core.exceptions import ValidationError
+
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.signals import pre_save
@@ -18,6 +19,7 @@ from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesU
 from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
+from rocky.settings import DENY_ORGANIZATION_CODES
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
@@ -26,8 +28,6 @@ GROUP_CLIENT = "clients"
 logger = logging.getLogger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
-
-DENY_ORGANIZATION_CODES = ["admin", "api"]
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):
@@ -46,12 +46,6 @@ class OrganizationTag(tagulous.models.TagTreeModel):
         return f"tags-{self.color} {self.border_type}"
 
 
-def organization_code_validator(value: str) -> None:
-    if value in DENY_ORGANIZATION_CODES:
-        raise ValidationError("Choose another organization code")
-    return value
-
-
 class Organization(models.Model):
     name = models.CharField(max_length=126, unique=True, help_text=_("The name of the organisation"))
     code = LowerCaseSlugField(
@@ -62,7 +56,6 @@ class Organization(models.Model):
             "A slug containing only lower-case unicode letters, numbers, hyphens or underscores "
             "that will be used in URLs and paths"
         ),
-        validators=[organization_code_validator],
     )
     tags = tagulous.models.TagField(to=OrganizationTag, blank=True)
 
@@ -101,8 +94,13 @@ class Organization(models.Model):
 
         super().delete(*args, **kwargs)
 
+    def clean(self):
+        if self.code in DENY_ORGANIZATION_CODES:
+            raise ValidationError({"code": _("Choose another organization code")})
+
     @classmethod
     def pre_create(cls, sender, instance, *args, **kwargs):
+        instance.clean()
         katalogus_client = cls._get_healthy_katalogus(instance.code)
         octopoes_client = cls._get_healthy_octopoes(instance.code)
 
