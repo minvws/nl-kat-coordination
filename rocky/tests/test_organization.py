@@ -17,6 +17,7 @@ from rocky.views.organization_member_list import OrganizationMemberListView
 from rocky.views.organization_settings import OrganizationSettingsView
 from tests.conftest import create_member, setup_request
 
+
 AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
 
@@ -325,7 +326,7 @@ def test_admin_edits_organization(rf, admin_member, mocker):
     assertContains(resulted_response, "tag2")
 
 
-def test_organization_code_validator_add_view(rf, superuser_member, mocker, mock_models_octopoes):
+def test_organization_code_validator_from_view(rf, superuser_member, mocker, mock_models_octopoes):
     mocker.patch("katalogus.client.KATalogusClientV1")
     request = setup_request(
         rf.post(
@@ -339,11 +340,13 @@ def test_organization_code_validator_add_view(rf, superuser_member, mocker, mock
 
     # Form validation returns 200 with invalid form
     assert response.status_code == 200
-    assertContains(response, "Choose another organization code")
+    assertContains(
+        response, "This organization code is reserved by OpenKAT and cannot be used. Choose another organization code."
+    )
 
 
 @pytest.mark.django_db
-def test_organization_code_validator_on_model(mocker, mock_models_octopoes):
+def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
     mocker.patch("katalogus.client.KATalogusClientV1")
     with pytest.raises(ValidationError):
         Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])

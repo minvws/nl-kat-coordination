@@ -96,7 +96,13 @@ class Organization(models.Model):
 
     def clean(self):
         if self.code in DENY_ORGANIZATION_CODES:
-            raise ValidationError({"code": _("Choose another organization code")})
+            raise ValidationError(
+                {
+                    "code": _(
+                        "This organization code is reserved by OpenKAT and cannot be used. Choose another organization code."
+                    )
+                }
+            )
 
     @classmethod
     def pre_create(cls, sender, instance, *args, **kwargs):
