@@ -16,6 +16,7 @@ services:
 
   postgres:
     image: postgres:15
+    shm_size: 256MB
     ports:
       - "0.0.0.0:5432:5432"
     volumes:

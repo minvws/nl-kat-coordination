@@ -38,7 +38,7 @@ class BoefjeMeta(BaseModel):
 
 
 class RawData(BaseModel):
-    id: Optional[str]
+    id: str
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
     secure_hash: Optional[str]
@@ -55,7 +55,7 @@ class Normalizer(BaseModel):
 
 class NormalizerMeta(BaseModel):
     id: str
-    raw_file_id: str
+    raw_data: RawData
     normalizer: Normalizer
     started_at: datetime.datetime
     ended_at: datetime.datetime
