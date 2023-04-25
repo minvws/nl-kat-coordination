@@ -9,10 +9,10 @@ Test Teardown       Teardown Test
 Add Several Append Origins
     Insert Calvin Outputs
     Verify Object Present    Hostname|internet|calvinnormalizer.com
-    Verify Origin Present    Hostname|internet|calvinnormalizer.com.    4321
+    Verify Origin Present    Hostname|internet|calvinnormalizer.com    4321
 
     Verify Object Present    Hostname|internet|calvinnormalizer.org
-    Verify Origin Present    Hostname|internet|calvinnormalizer.org.    43210
+    Verify Origin Present    Hostname|internet|calvinnormalizer.org    43210
 
     Insert Regular Declarations
 

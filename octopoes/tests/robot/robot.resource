@@ -108,7 +108,7 @@ Await Sync
     Wait For XTDB Synced
 
 Get Objects
-    ${response}    Get   ${OCTOPOES_URI}/objects
+    ${response}    Get    ${OCTOPOES_URI}/objects
     Should Be Equal As Integers    ${response.status_code}    200
     Should Be Equal    ${response.headers["content-type"]}    application/json
     ${response_data}    Set Variable    ${response.json()}
@@ -144,3 +144,11 @@ Total Object Count Should Be
     [Arguments]    ${length}
     ${response_data}    Get Objects
     Should Be Equal As Integers    ${response_data["count"]}    ${length}    Object count should be ${length}
+
+Recalculate Scan Profiles
+    ${params}    Get Valid Time Params
+    ${response}    Get
+    ...    ${OCTOPOES_URI}/scan_profiles/recalculate
+    ...    params=${params}
+    Should Be Equal As Integers    ${response.status_code}    200
+    Await Sync
