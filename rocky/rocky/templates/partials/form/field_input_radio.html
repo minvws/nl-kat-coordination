@@ -1,7 +1,6 @@
-<fieldset>
-    <legend>
-        {{ field.label_tag }}
-    </legend>
+<div>
+    {{ field.label_tag }}
+
     {% for choice in field %}
         <div class="horizontal-view">
             <input type="{% if choice.data.value < 0 %}hidden{% else %}radio{% endif %}"
@@ -13,7 +12,6 @@
             <label>
                 {% if choice.data.attrs.radio_paws %}
                     {% include "partials/scan_level_indicator.html" with value=choice.data.value custom_class=choice.data.attrs.class %}
-
                 {% else %}
                     {{ choice.choice_label }}
                 {% endif %}
@@ -23,4 +21,4 @@
 
         </div>
     {% endfor %}
-</fieldset>
+</div>
