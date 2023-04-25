@@ -63,7 +63,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return to_boefje_meta(boefje_meta_in_db)
 
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
-        logger.info("Querying boefje meta: %s", query_filter.json())
+        logger.debug("Querying boefje meta: %s", query_filter.json())
 
         query = self.session.query(BoefjeMetaInDB).filter(BoefjeMetaInDB.organization == query_filter.organization)
 
@@ -93,7 +93,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return to_normalizer_meta(normalizer_meta_in_db)
 
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
-        logger.info("Querying normalizer meta: %s", query_filter.json())
+        logger.debug("Querying normalizer meta: %s", query_filter.json())
 
         if query_filter.raw_id is not None:
             query = self.session.query(NormalizerMetaInDB).filter(NormalizerMetaInDB.raw_file_id == query_filter.raw_id)
@@ -137,7 +137,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return str(raw_file_in_db.id)
 
     def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
-        logger.info("Querying raw data: %s", query_filter.json())
+        logger.debug("Querying raw data: %s", query_filter.json())
 
         if query_filter.boefje_meta_id:
             query = self.session.query(RawFileInDB).filter(RawFileInDB.boefje_meta_id == query_filter.boefje_meta_id)
