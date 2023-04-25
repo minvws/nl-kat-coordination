@@ -184,8 +184,8 @@ class SQLMetaDataRepository(MetaDataRepository):
 
     def get_raw_file_count_per_organization(self) -> Dict[str, int]:
         query = (
-            self.session.query(BoefjeMetaInDB.organization, func.count(RawFileInDB.id))
-            .join(BoefjeMetaInDB)
+            self.session.query(BoefjeMetaInDB.organization, func.count())
+            .join(RawFileInDB)
             .group_by(BoefjeMetaInDB.organization)
         )
 

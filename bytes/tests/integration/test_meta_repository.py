@@ -109,6 +109,7 @@ def test_save_raw(meta_repository: SQLMetaDataRepository) -> None:
 
     with meta_repository:
         raw_id = meta_repository.save_raw(raw)
+        meta_repository.save_raw(raw)
 
     query_filter = RawDataFilter(
         organization=raw.boefje_meta.organization, boefje_meta_id=raw.boefje_meta.id, normalized=False
@@ -146,7 +147,7 @@ def test_save_raw(meta_repository: SQLMetaDataRepository) -> None:
     non_empty_raws = meta_repository.get_raw(query_filter)
     assert len(non_empty_raws) == 1
 
-    assert meta_repository.get_raw_file_count_per_organization() == {"test": 1}
+    assert meta_repository.get_raw_file_count_per_organization() == {"test": 2}
 
 
 def test_filter_raw_on_organization(meta_repository: SQLMetaDataRepository) -> None:
