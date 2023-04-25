@@ -68,7 +68,7 @@ direction RL
 
 ### Exhaustive overview of OctopoesViews
 
-```{mermaid}
+```mermaid
 classDiagram
 direction RL
     class OrganizationView
@@ -89,20 +89,20 @@ direction RL
 
     BaseOOIDetailView <|-- SingleOOITreeMixin
     BaseOOIDetailView <|-- ConnectorFormMixin
-    OOIDetailView <|-- OOIBreadcrumbsMixin
-    MuteFindingView <|-- OOIBreadcrumbsMixin
-    OOIBreadcrumbsMixin <|-- BaseOOIDetailView
+    OOIDetailView <|-- BaseOOIDetailView
+    OOIFindingListView <|-- OOIFindingManager
+    OOIFindingListView <|-- BaseOOIDetailView
+    MuteFindingView <|-- BaseOOIDetailView
     BaseReportView <|-- BaseOOIDetailView
     DnsReportView <|-- BaseReportView
 
-    OOIReportView <|-- OOIBreadcrumbsMixin
-    OOITreeView <|-- OOIBreadcrumbsMixin
+    OOIReportView <|-- BaseOOIDetailView
+    OOITreeView <|-- BaseOOIDetailView
     OOISummaryView <|-- OOITreeView
     OOIGraphView <|-- OOITreeView
 
     OOIRelatedObjectManager <|-- SingleOOITreeMixin
     OOIFindingManager <|-- SingleOOITreeMixin
-    OOIFindingListView <|-- OOIFindingManager
     OOIRelatedObjectAddView <|-- OOIRelatedObjectManager
 
     OOIReportPDFView <|-- SingleOOITreeMixin
