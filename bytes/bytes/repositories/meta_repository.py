@@ -11,6 +11,16 @@ class BoefjeMetaFilter(BaseModel):
     boefje_id: Optional[str]
     input_ooi: Optional[str] = "*"
     limit: int = 1
+    offset: int = 0
+    descending: bool = True
+
+
+class NormalizerMetaFilter(BaseModel):
+    organization: Optional[str]
+    normalizer_id: Optional[str]
+    raw_id: Optional[str]
+    limit: int = 1
+    offset: int = 0
     descending: bool = True
 
 
@@ -20,16 +30,16 @@ class RawDataFilter(BaseModel):
     normalized: Optional[bool]
     mime_types: List[MimeType] = Field(default_factory=list)
     limit: int = 1
+    offset: int = 0
 
     @root_validator(pre=False)
     def either_organization_or_boefje_meta_id(  # pylint: disable=no-self-argument
         cls, values: Dict[str, Any]
     ) -> Dict[str, Any]:
-        assert values.get("organization") or values.get(
-            "boefje_meta_id"
-        ), "boefje_meta_id and organization cannot both be None."
+        if values.get("organization") or values.get("boefje_meta_id"):
+            return values
 
-        return values
+        raise ValueError("boefje_meta_id and organization cannot both be None.")
 
 
 class MetaDataRepository:
@@ -51,19 +61,22 @@ class MetaDataRepository:
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
         raise NotImplementedError()
 
-    def get_normalizer_meta(self, normalizer_meta_id: str) -> NormalizerMeta:
+    def get_normalizer_meta_by_id(self, normalizer_meta_id: str) -> NormalizerMeta:
+        raise NotImplementedError()
+
+    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
         raise NotImplementedError()
 
     def save_raw(self, raw: RawData) -> str:
         raise NotImplementedError()
 
-    def get_raws(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
+    def get_raw_by_id(self, raw_id: str) -> RawData:
+        raise NotImplementedError()
+
+    def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
         raise NotImplementedError()
 
     def has_raw(self, boefje_meta: BoefjeMeta, mime_types: List[MimeType]) -> bool:
-        raise NotImplementedError()
-
-    def get_raw(self, raw_id: str) -> RawData:
         raise NotImplementedError()
 
     def get_raw_file_count_per_organization(self) -> Dict[str, int]:
