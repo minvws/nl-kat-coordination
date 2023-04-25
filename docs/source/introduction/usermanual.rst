@@ -98,7 +98,7 @@ Users
 
 OpenKAT knows four types of users: the client, the red team user, the admin and the superuser. In OpenKAT, permissions utilise a stacked model. This means that a higher permission level includes all lower permissions of the lower levels. The client is a 'read only' type of user, the red teamer is a researcher who can start scans. The admin is an administrative user who can do usermanagement etc, the superuser can do all.
 
-Rights and functions per usertype
+Rights and functions per user type
 ---------------------------------
 
 +-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
