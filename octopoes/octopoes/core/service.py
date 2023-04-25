@@ -449,8 +449,10 @@ class OctopoesService:
     def _on_delete_scan_profile(self, event: ScanProfileDBEvent) -> None:
         self._run_inferences(event)
 
-    def list_random_ooi(self, amount: int, valid_time: datetime) -> List[OOI]:
-        oois = self.ooi_repository.list_random(amount, valid_time)
+    def list_random_ooi(
+        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> List[OOI]:
+        oois = self.ooi_repository.list_random(valid_time, amount, scan_levels)
         self._populate_scan_profiles(oois, valid_time)
         return oois
 
