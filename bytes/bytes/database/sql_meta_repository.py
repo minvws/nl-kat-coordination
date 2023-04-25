@@ -45,6 +45,8 @@ class SQLMetaDataRepository(MetaDataRepository):
         try:
             self.session.commit()
         except IntegrityError as e:
+            logger.exception(e)
+
             raise MetaIntegrityError(str(e)) from e
 
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
