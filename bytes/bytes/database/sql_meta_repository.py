@@ -40,20 +40,19 @@ class SQLMetaDataRepository(MetaDataRepository):
         pass
 
     def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
-        logger.info("Committing session")
-
         try:
             self.session.commit()
+            logger.debug("Committed session")
         except IntegrityError as e:
-            logger.exception(e)
+            logger.exception("An integrity error occurred while committing a session.")
 
             raise MetaIntegrityError(str(e)) from e
 
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        logger.info("Inserting meta: %s", boefje_meta.json())
-
         boefje_meta_in_db = to_boefje_meta_in_db(boefje_meta)
         self.session.add(boefje_meta_in_db)
+
+        logger.info("Added boefje meta [id=%s]", boefje_meta.id)
 
     def get_boefje_meta_by_id(self, boefje_meta_id: str) -> BoefjeMeta:
         boefje_meta_in_db = self.session.get(BoefjeMetaInDB, boefje_meta_id)
@@ -63,11 +62,8 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return to_boefje_meta(boefje_meta_in_db)
 
-    def get_boefje_meta(
-        self,
-        query_filter: BoefjeMetaFilter,
-    ) -> List[BoefjeMeta]:
-        logger.info("Querying boefje meta")
+    def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
+        logger.info("Querying boefje meta: %s", query_filter.json())
 
         query = self.session.query(BoefjeMetaInDB).filter(BoefjeMetaInDB.organization == query_filter.organization)
 
@@ -83,10 +79,10 @@ class SQLMetaDataRepository(MetaDataRepository):
         return [to_boefje_meta(boefje_meta) for boefje_meta in query]
 
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        logger.info("Saving normalizer meta")
-
         normalizer_meta_in_db = to_normalizer_meta_in_db(normalizer_meta)
         self.session.add(normalizer_meta_in_db)
+
+        logger.info("Added normalizer meta [id=%s]", normalizer_meta.id)
 
     def get_normalizer_meta_by_id(self, normalizer_meta_id: str) -> NormalizerMeta:
         normalizer_meta_in_db = self.session.get(NormalizerMetaInDB, normalizer_meta_id)
@@ -97,7 +93,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return to_normalizer_meta(normalizer_meta_in_db)
 
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
-        logger.info("Querying normalizer meta")
+        logger.info("Querying normalizer meta: %s", query_filter.json())
 
         if query_filter.raw_id is not None:
             query = self.session.query(NormalizerMetaInDB).filter(NormalizerMetaInDB.raw_file_id == query_filter.raw_id)
@@ -121,8 +117,6 @@ class SQLMetaDataRepository(MetaDataRepository):
         return [to_normalizer_meta(normalizer_meta) for normalizer_meta in query]
 
     def save_raw(self, raw: RawData) -> str:
-        logger.info("Saving raw")
-
         # Hash the data
         secure_hash = hash_data(raw, raw.boefje_meta.ended_at, self.app_settings.hashing_algorithm)
 
@@ -138,10 +132,13 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         self.session.add(raw_file_in_db)
         self.raw_repository.save_raw(raw_file_in_db.id, raw)
+        logger.info("Added raw data [id=%s]", raw_file_in_db.id)
 
         return str(raw_file_in_db.id)
 
     def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
+        logger.info("Querying raw data: %s", query_filter.json())
+
         if query_filter.boefje_meta_id:
             query = self.session.query(RawFileInDB).filter(RawFileInDB.boefje_meta_id == query_filter.boefje_meta_id)
         else:
@@ -201,12 +198,14 @@ def create_meta_data_repository() -> Iterator[MetaDataRepository]:
     try:
         yield repository
     except Exception as error:
-        logger.exception("An error occurred: %s. Rolling back session", error)
+        logger.exception("An error occurred during the session.")
         session.rollback()
+        logger.warning("Rolled back session.")
+
         raise error
     finally:
-        logger.info("Closing session")
         session.close()
+        logger.debug("Closed session")
 
 
 class ObjectNotFoundException(Exception):
