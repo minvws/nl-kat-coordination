@@ -68,7 +68,7 @@ direction RL
 
 ### Exhaustive overview of OctopoesViews
 
-```mermaid
+```{mermaid}
 classDiagram
 direction RL
     class OrganizationView
