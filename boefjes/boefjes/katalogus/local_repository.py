@@ -52,7 +52,7 @@ class LocalPluginRepository:
         path = boefjes[id_].path / "schema.json"
 
         if not path.exists():
-            logger.debug(f"Did not find schema for boefje {boefjes[id_]=}")
+            logger.debug("Did not find schema for boefje %s", boefjes[id_])
             return None
 
         return json.loads(path.read_text())
@@ -67,10 +67,10 @@ class LocalPluginRepository:
         path = boefje.path / "cover.jpg"
 
         if not path.exists():
-            logger.debug(f"Did not find cover for boefje {boefje=}")
+            logger.debug("Did not find cover for boefje %s", boefje)
             return self.default_cover_path()
 
-        logger.debug(f"Found cover for boefje {boefje=}")
+        logger.debug("Found cover for boefje %s", boefje)
 
         return path
 

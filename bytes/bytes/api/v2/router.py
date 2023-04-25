@@ -144,7 +144,7 @@ async def create_raw(
             )
             event_manager.publish(event)
         except Exception as error:
-            logger.error("Error saving raw data: %s", error, exc_info=True)
+            logger.exception("Error saving raw data: %s", error)
             raise HTTPException(status_code=500, detail="Could not save raw data") from error
 
     return RawResponse(status="success", message="Raw data saved", id=raw_id)

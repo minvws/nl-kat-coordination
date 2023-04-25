@@ -25,7 +25,7 @@ paths = ["."]
 [tool.ruff]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
 # To be extended with UP, DJ, PT, RUF, C90, D, PL
-select = ["E", "F", "ERA", "W", "TID", "I"]
+select = ["E", "F", "ERA", "W", "TID", "I", "G"]
 fix = true
 
 # Exclude a variety of commonly ignored directories.

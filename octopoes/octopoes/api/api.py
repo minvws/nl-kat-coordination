@@ -22,9 +22,9 @@ logger = logging.getLogger(__name__)
 try:
     with open(settings.log_cfg, "r") as log_config:
         config.dictConfig(yaml.safe_load(log_config))
-        logger.info(f"Configured loggers with config: {settings.log_cfg}")
+        logger.info("Configured loggers with config: %s", settings.log_cfg)
 except FileNotFoundError:
-    logger.warning(f"No log config found at: {settings.log_cfg}")
+    logger.warning("No log config found at: %s", settings.log_cfg)
 
 app = FastAPI()
 add_timing_middleware(app, record=logger.debug, prefix="app")
