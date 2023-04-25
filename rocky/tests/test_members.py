@@ -154,7 +154,7 @@ def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
     request = setup_request(
         rf.post(
             "organization_member_edit",
-            {"status": "blocked", "trusted_clearance_level": 4},
+            {"blocked": True, "trusted_clearance_level": 4},
         ),
         admin_member.user,
     )
@@ -163,4 +163,4 @@ def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
     )
 
     redteam_member.refresh_from_db()
-    assert redteam_member.status == "blocked"
+    assert redteam_member.blocked is True
