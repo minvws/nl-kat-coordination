@@ -77,7 +77,9 @@ class OOIRepository:
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
-    def list_random(self, amount: int, valid_time: datetime) -> List[OOI]:
+    def list_random(
+        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> List[OOI]:
         raise NotImplementedError
 
     def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
@@ -264,20 +266,29 @@ class XTDBOOIRepository(OOIRepository):
             items=oois,
         )
 
-    def list_random(self, amount: int, valid_time: datetime) -> List[OOI]:
+    def list_random(
+        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> List[OOI]:
         query = """
-        {{
-            :query {{
-                :find [(rand {amount} ?id)]
-                :where [
-                    [?e :crux.db/id ?id]
-                    [?e :object_type]
-                ]
+            {{
+                :query {{
+                    :find [(rand {amount} ?id)]
+                    :in [[_scan_level ...]]
+                    :where [
+                        [?e :crux.db/id ?id]
+                        [?e :object_type]
+                        [?scan_profile :type "ScanProfile"]
+                        [?scan_profile :reference ?e]
+                        [?scan_profile :level _scan_level]
+                    ]
+                }}
+                :in-args [[{scan_levels}]]
             }}
-        }}
-        """.format(
-            amount=amount
+            """.format(
+            amount=amount,
+            scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
         )
+
         res = self.session.client.query(query, valid_time)
         if not res:
             return []
