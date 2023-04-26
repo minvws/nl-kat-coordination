@@ -10,6 +10,7 @@ from onboarding.views import (
     OnboardingSetupScanSelectPluginsView,
 )
 from pytest_django.asserts import assertContains
+from tools.view_helpers import get_ooi_url
 
 from tests.conftest import setup_request
 
@@ -74,6 +75,25 @@ def test_onboarding_setup_scan_detail(rf, redteam_member, mock_organization_view
     assertContains(response, "Dependencies")
     assertContains(response, "Create object")
     assertContains(response, "Skip onboarding")
+
+
+def test_onboarding_setup_scan_detail_create_ooi(
+    rf, redteam_member, mock_organization_view_octopoes, network, mock_bytes_client
+):
+    mock_organization_view_octopoes().get.return_value = network
+
+    request = setup_request(
+        rf.post("step_setup_scan_ooi_add", {"network": "Network|internet", "raw": "http://example.org", "web_url": ""}),
+        redteam_member.user,
+    )
+    response = OnboardingSetupScanOOIAddView.as_view()(
+        request, ooi_type="URL", organization_code=redteam_member.organization.code
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == get_ooi_url(
+        "step_set_clearance_level", "URL|internet|http://example.org", redteam_member.organization.code
+    )
 
 
 def test_onboarding_set_clearance_level(rf, redteam_member, mock_organization_view_octopoes, network):

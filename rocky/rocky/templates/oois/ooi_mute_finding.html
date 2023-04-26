@@ -9,7 +9,7 @@
   <main id="main-content">
     <section>
       <div class="form-view">
-        <h1>{% translate "Mute finding" %}: {{ finding.human_readable }}</h1>
+        <h1>{% translate "Mute finding" %}: {{ ooi.human_readable }}</h1>
         <p>
           {% translate "Give a reason below why you want to mute this finding." %}
         </p>
@@ -24,7 +24,7 @@
           <div class="horizontal-view">
             <fieldset>
               <button type="submit">{% translate "Mute" %}</button>
-              <a href="{% ooi_url 'ooi_detail' finding.primary_key organization.code %}"
+              <a href="{% ooi_url 'ooi_detail' ooi.primary_key organization.code %}"
                  class="button ghost"
                  type="submit"
                  name="cancel">{% translate "Cancel" %}</a>

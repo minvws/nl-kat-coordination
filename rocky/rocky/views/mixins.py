@@ -17,8 +17,6 @@ from tools.ooi_helpers import (
     get_knowledge_base_data_for_ooi_store,
 )
 from tools.view_helpers import (
-    Breadcrumb,
-    BreadcrumbsMixin,
     convert_date_to_datetime,
     get_ooi_url,
 )
@@ -220,27 +218,6 @@ class MultipleOOIMixin(OctopoesView):
             return _("All")
 
         return ", ".join(self.filtered_ooi_types)
-
-
-class OOIBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
-        if isinstance(self.ooi, Finding):
-            start = {
-                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Findings"),
-            }
-        else:
-            start = {
-                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Objects"),
-            }
-        return [
-            start,
-            {
-                "url": get_ooi_url("ooi_detail", self.ooi.primary_key, self.organization.code),
-                "text": self.ooi.human_readable,
-            },
-        ]
 
 
 class ConnectorFormMixin:
