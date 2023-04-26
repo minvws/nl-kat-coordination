@@ -25,7 +25,7 @@ paths = ["."]
 [tool.ruff]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
 # To be extended with UP, DJ, PT, RUF, C90, D, PL, RET
-select = ["E", "F", "ERA", "W", "TID", "I", "G"]
+select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP"]
 fix = true
 
 # Exclude a variety of commonly ignored directories.
@@ -66,11 +66,16 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401","F403"]
-"whitelist.py" = ["F821"]
+"whitelist.py" = ["F821", "INP"]
 "rocky/*/migrations/*.py" = ["E501"]
 "octopoes/bits/check_csp_header/check_csp_header.py" = ["ERA001"]
 "boefjes/boefjes/plugins/kat_binaryedge/http_web/normalize.py" = ["ERA001"]
-
+"*/packaging/*" = ["INP"]
+"*/.ci/*" = ["INP"]
+"conf.py" = ["INP"]
+"conftest.py" = ["INP"]
+"setup.py" = ["INP"]
+"manage.py" = ["INP"]
 
 [tool.ruff.flake8-tidy-imports]
 [tool.ruff.flake8-tidy-imports.banned-api]

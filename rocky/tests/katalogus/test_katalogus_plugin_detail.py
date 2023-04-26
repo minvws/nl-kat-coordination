@@ -4,10 +4,10 @@ from django.http import Http404
 from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains
 from requests import HTTPError
-from tests.conftest import setup_request
 
 from octopoes.models.pagination import Paginated
 from octopoes.models.types import OOIType
+from tests.conftest import setup_request
 
 
 def test_plugin_detail(
