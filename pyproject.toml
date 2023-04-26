@@ -25,7 +25,7 @@ paths = ["."]
 [tool.ruff]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
 # To be extended with UP, DJ, PT, RUF, C90, D, PL, RET
-select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP"]
+select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20"]
 fix = true
 
 # Exclude a variety of commonly ignored directories.
@@ -76,6 +76,7 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 "conftest.py" = ["INP"]
 "setup.py" = ["INP"]
 "manage.py" = ["INP"]
+"*/tests/*" = ["T20"]
 
 [tool.ruff.flake8-tidy-imports]
 [tool.ruff.flake8-tidy-imports.banned-api]

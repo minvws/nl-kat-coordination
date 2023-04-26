@@ -145,11 +145,6 @@ record = version + Group(terms).setResultsName("terms") + ZeroOrMore(SP) + Strin
 
 
 def parse(spf_record):
-    try:
-        parsed = record.parseString(spf_record)
-    except ParseException:
-        parsed = None
-    except Exception as e:
-        print(f"{e.__class__.__name__}: {e}")
-        parsed = None
+    parsed = record.parseString(spf_record)
+
     return parsed
