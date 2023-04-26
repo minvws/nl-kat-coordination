@@ -72,26 +72,6 @@ ROCKY_DB_USER=
 ROCKY_DB_PASSWORD=
 ```
 
-## So... How does it flow?
-
-### Perform scan (run boefje)
-
-```mermaid
-sequenceDiagram
-    participant r as Rocky
-    participant c as Scheduler
-    participant q as RabbitMQ
-    participant b as Boefje
-    participant n as Normalizer
-    participant o as Octopoes
-    r->>+c: Start scan
-    c-->>r: task.status = busy
-    c->>q: Produce message
-    q->>b: Consume message
-    q->>n: Consume message
-    n->>o: Add object(s)
-    c->>-r: task.status = done
-```
 
 ## KATalogus View Structure
 
