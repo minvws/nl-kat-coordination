@@ -4,7 +4,6 @@ import uuid
 import tagulous.models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.signals import pre_save
@@ -16,10 +15,10 @@ from requests import RequestException
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
+from rocky.settings import DENY_ORGANIZATION_CODES
 from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
-from rocky.settings import DENY_ORGANIZATION_CODES
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"

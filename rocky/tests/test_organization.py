@@ -2,8 +2,7 @@ from unittest.mock import patch
 
 import pytest
 from django.contrib.auth.models import Permission
-from django.core.exceptions import PermissionDenied
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 from requests import RequestException
@@ -16,7 +15,6 @@ from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_list import OrganizationMemberListView
 from rocky.views.organization_settings import OrganizationSettingsView
 from tests.conftest import create_member, setup_request
-
 
 AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
