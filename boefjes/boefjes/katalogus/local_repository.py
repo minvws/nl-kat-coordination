@@ -91,7 +91,7 @@ class LocalPluginRepository:
 
         for path, package in paths_and_packages:
             try:
-                boefje_resources.append(BoefjeResource(path, package, RESERVED_LOCAL_ID))
+                boefje_resources.append(BoefjeResource(path, package))
             except ModuleException as exc:
                 logger.exception(exc)
 
@@ -105,7 +105,7 @@ class LocalPluginRepository:
 
         for path, package in paths_and_packages:
             try:
-                normalizer_resources.append(NormalizerResource(path, package, RESERVED_LOCAL_ID))
+                normalizer_resources.append(NormalizerResource(path, package))
             except ModuleException as exc:
                 logger.exception(exc)
 
