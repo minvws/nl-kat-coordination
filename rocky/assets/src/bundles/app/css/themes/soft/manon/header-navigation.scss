@@ -1,7 +1,16 @@
 /* Header Navigation - Variables */
 
 :root {
+	/* Header */
+	--header-min-height: 3rem;
+	--header-flex-direction: column;
+	--header-justify-content: space-between;
+
+	/* Header navigation */
+	--header-navigation-position: initial;
 	--header-navigation-background-color: transparent;
 	--header-navigation-padding-right: 3rem;
 	--header-navigation-padding-left: 3rem;
+	--header-navigation-border-width: 0;
+	--header-navigation-width: auto;
 }

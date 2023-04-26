@@ -13,7 +13,7 @@
 @use "@minvws/manon/application-base";
 
 /* Icon */
-@use "@minvws/manon/icon-base";
+@use "@minvws/manon/icon";
 
 /* Text */
 @use "@minvws/manon/headings";
@@ -55,13 +55,13 @@
 /* Header navigation */
 @use "@minvws/manon/header";
 @use "@minvws/manon/header-navigation";
+@use "@minvws/manon/navigation-collapsible-menu";
 
 /* Footer */
 @use "@minvws/manon/footer";
 
 /* Components */
 @use "@minvws/manon/breadcrumb-bar-content-block";
-@use "@minvws/manon/navigation-collapsible-menu";
 @use "@minvws/manon/accordion";
 @use "@minvws/manon/filter";
 @use "@minvws/manon/description-list";
@@ -87,7 +87,7 @@
 @use "@minvws/manon/tile-groups";
 
 /* Table */
-@use "@minvws/manon/table-base"; /* Needs to be first of the set */
+@use "@minvws/manon/table"; /* Needs to be first of the set */
 @use "@minvws/manon/table-expando-rows";
 @use "@minvws/manon/table-caption";
 @use "@minvws/manon/table-number";
