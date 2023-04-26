@@ -34,6 +34,13 @@ class Runnable(Protocol):
         raise NotImplementedError
 
 
+def _try_import(import_statement: str) -> Runnable:
+    try:
+        return import_module(import_statement)
+    except Exception as e:
+        raise ModuleException(f"Cannot import module {import_statement}") from e
+
+
 class BoefjeResource:
     def __init__(self, path: Path, package: str, repository_id: str):
         self.path = path
@@ -42,7 +49,7 @@ class BoefjeResource:
         self.boefje = Boefje(**item, repository_id=repository_id)
 
         import_statement = f"{package}.{ENTRYPOINT_BOEFJES.rstrip('.py')}"
-        module: Runnable = import_module(import_statement)
+        module = _try_import(import_statement)
 
         if not hasattr(module, "run") or not isfunction(module.run):
             raise ModuleException(f"Module {module} does not define a run function")
@@ -61,7 +68,7 @@ class NormalizerResource:
         self.normalizer = Normalizer(**item, repository_id=repository_id)
 
         import_statement = f"{package}.{ENTRYPOINT_NORMALIZERS.rstrip('.py')}"
-        module: Runnable = import_module(import_statement)
+        module = _try_import(import_statement)
 
         if not hasattr(module, "run") or not isfunction(module.run):
             raise ModuleException(f"Module {module} does not define a run function")
