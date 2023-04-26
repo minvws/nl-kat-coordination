@@ -177,10 +177,6 @@ class OrganizationMember(models.Model):
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
     )
 
-    @property
-    def blocked(self):
-        return self.status == OrganizationMember.STATUSES.BLOCKED
-
     @cached_property
     def is_admin(self) -> bool:
         return self.groups.filter(name=GROUP_ADMIN).exists()
