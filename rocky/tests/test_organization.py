@@ -252,7 +252,7 @@ def test_organization_active_member(rf, admin_member):
 
 
 def test_organization_blocked_member(rf, admin_member):
-    admin_member.status = "blocked"
+    admin_member.blocked = True
     admin_member.save()
     request = setup_request(rf.get("organization_settings"), admin_member.user)
     with pytest.raises(PermissionDenied):
