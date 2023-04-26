@@ -2,6 +2,7 @@ import uuid
 
 import pytest
 import requests
+from prometheus_client.parser import text_string_to_metric_families
 from requests import HTTPError
 from tests.client import BytesAPIClient
 from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
@@ -15,6 +16,57 @@ def test_login(bytes_api_client: BytesAPIClient) -> None:
     bytes_api_client.login()
     assert "Authorization" in bytes_api_client.headers
     assert "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" in bytes_api_client.headers["Authorization"]
+
+
+def test_metrics(bytes_api_client: BytesAPIClient) -> None:
+    metrics = bytes_api_client.get_metrics()
+
+    metrics = list(text_string_to_metric_families(metrics.decode()))
+    assert len(metrics) == 2
+    assert metrics[0].name == "bytes_database_organizations_total"
+    assert len(metrics[0].samples) == 1
+    assert metrics[1].name == "bytes_database_raw_files_total"
+    assert len(metrics[1].samples) == 0
+
+    database_organizations, database_files = metrics
+
+    assert database_organizations.samples[0].value == 0.0
+
+    boefje_meta = get_boefje_meta()
+    bytes_api_client.save_boefje_meta(boefje_meta)
+    bytes_api_client.save_raw(boefje_meta.id, b"test 123")
+    bytes_api_client.save_raw(boefje_meta.id, b"test 12334", ["text/boefje"])
+
+    metrics = bytes_api_client.get_metrics()
+    metrics = list(text_string_to_metric_families(metrics.decode()))
+    assert len(metrics[0].samples) == 1
+    assert len(metrics[1].samples) == 1
+    database_organizations, database_files = metrics
+
+    assert database_organizations.samples[0].value == 1.0
+
+    assert database_files.samples[0].labels["organization_id"] == "test"
+    assert database_files.samples[0].value == 2.0
+
+    boefje_meta = get_boefje_meta()
+    boefje_meta.id = str(uuid.uuid4())
+    boefje_meta.organization = "test2"
+    bytes_api_client.save_boefje_meta(boefje_meta)
+    bytes_api_client.save_raw(boefje_meta.id, b"test 123")
+
+    metrics = bytes_api_client.get_metrics()
+    metrics = list(text_string_to_metric_families(metrics.decode()))
+    assert len(metrics[0].samples) == 1
+    assert len(metrics[1].samples) == 2
+    database_organizations, database_files = metrics
+
+    assert database_organizations.samples[0].value == 2.0
+
+    assert len(database_files.samples) == 2
+    assert database_files.samples[0].labels["organization_id"] == "test"
+    assert database_files.samples[0].value == 2.0
+    assert database_files.samples[1].labels["organization_id"] == "test2"
+    assert database_files.samples[1].value == 1.0
 
 
 def test_boefje_meta(bytes_api_client: BytesAPIClient) -> None:
