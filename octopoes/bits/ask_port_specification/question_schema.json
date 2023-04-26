@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "/schema/port-specification",
+  "$id": "/bit/port-classification",
   "type": "object",
   "default": {},
   "Port Configuration": "Root Schema",
