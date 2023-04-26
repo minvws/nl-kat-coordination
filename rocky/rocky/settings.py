@@ -16,6 +16,8 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
+from rocky.otel import OpenTelemetryHelper
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -110,6 +112,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "rocky.middleware.onboarding.OnboardingMiddleware",
+    "rocky.middleware.otel.OTELInstrumentTemplateMiddleware",
 ]
 
 ROOT_URLCONF = "rocky.urls"
@@ -358,3 +361,6 @@ DENY_ORGANIZATION_CODES = [
     "rocky",
     "fmea",
 ]
+SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
+if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+    OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)

@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     queue_uri: str = "amqp://guest:guest@rabbitmq:5672/%2fkat"
     xtdb_uri: str = "http://crux:3000"
     xtdb_type: XTDBType = XTDBType.CRUX
+    span_export_grpc_endpoint: str = None
 
     katalogus_api: str = "http://localhost:8003"
 
