@@ -61,14 +61,15 @@
 @use "@minvws/manon/footer";
 
 /* Components */
-@use "@minvws/manon/breadcrumb-bar-content-block";
 @use "@minvws/manon/accordion";
-@use "@minvws/manon/filter";
+@use "@minvws/manon/breadcrumb-bar-content-block";
+@use "@minvws/manon/code-base";
 @use "@minvws/manon/description-list";
+@use "@minvws/manon/filter";
+@use "@minvws/manon/language-selector-list";
 @use "@minvws/manon/hero";
 @use "@minvws/manon/pagination";
 @use "@minvws/manon/tabs";
-@use "@minvws/manon/code-base";
 
 /* Button */
 @use "@minvws/manon/button-base";
