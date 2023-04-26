@@ -149,7 +149,6 @@ def parse(spf_record):
         parsed = record.parseString(spf_record)
     except ParseException:
         parsed = None
-    except Exception as e:
-        print(f"{e.__class__.__name__}: {e}")
+    except Exception:
         parsed = None
     return parsed
