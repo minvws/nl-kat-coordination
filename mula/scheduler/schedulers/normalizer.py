@@ -48,17 +48,6 @@ class NormalizerScheduler(Scheduler):
         )
 
     def push_tasks_for_received_raw_file(self) -> None:
-        if self.queue.full():
-            self.logger.warning(
-                "Normalizer queue is full, not populating with new tasks "
-                "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
-                self.queue.qsize(),
-                self.queue.maxsize,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
-
         latest_raw_data = None
         try:
             latest_raw_data = self.ctx.services.raw_data.get_latest_raw_data(

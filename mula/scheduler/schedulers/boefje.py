@@ -60,11 +60,13 @@ class BoefjeScheduler(Scheduler):
         self.run_in_thread(
             name="boefjes",
             func=self.push_tasks_for_new_boefjes,
+            interval=60.0,
         )
 
         self.run_in_thread(
             name="random",
             func=self.push_tasks_for_random_objects,
+            interval=60.0,
         )
 
     def push_tasks_for_scan_profile_mutations(self) -> None:
@@ -72,16 +74,6 @@ class BoefjeScheduler(Scheduler):
 
         We loop until we don't have any messages on the queue anymore.
         """
-        if self.queue.full():
-            self.logger.warning(
-                "Boefjes queue is full, not populating with new tasks "
-                "[queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
-                self.queue.qsize(),
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
-
         mutation = None
         try:
             mutation = self.ctx.services.scan_profile_mutation.get_scan_profile_mutation(
@@ -153,16 +145,6 @@ class BoefjeScheduler(Scheduler):
     def push_tasks_for_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
-        if self.queue.full():
-            self.logger.warning(
-                "Boefjes queue is full, not populating with new tasks "
-                "[queue.qsize=%d, organisation.id=%s, scheduler_id=%s]",
-                self.queue.qsize(),
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
-
         new_boefjes = None
         try:
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
@@ -219,6 +201,7 @@ class BoefjeScheduler(Scheduler):
 
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""
+        # TODO: is this what we want?
         if self.queue.full():
             self.logger.warning(
                 "Boefjes queue is full, not populating with new tasks "
@@ -252,7 +235,6 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        # TODO: probably can make this concurrent
         for ooi in random_oois:
             self.logger.debug(
                 "Checking random ooi %s for rescheduling of tasks [organisation.id=%s, scheduler_id=%s]",
@@ -356,8 +338,17 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def is_task_running(self, task: BoefjeTask) -> bool:
-        # Get the last tasks that have run or are running for the hash
-        # of this particular BoefjeTask.
+        """Get the last tasks that have run or are running for the hash
+        of this particular BoefjeTask.
+
+        Args:
+            task: The BoefjeTask to check.
+
+        Returns:
+            True if the task is still running, False otherwise.
+        """
+        # Is task still running according to the datastore?
+        task_db = None
         try:
             task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
@@ -370,6 +361,21 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
+        if (
+            task_db is not None
+            and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]
+        ):
+            self.logger.debug(
+                "Task is still running, according to the datastore "
+                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
+                task_db.id,
+                task.hash,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return True
+
+        # Is task running according to bytes?
         try:
             task_bytes = self.ctx.services.bytes.get_last_run_boefje(
                 boefje_id=task.boefje.id,
@@ -388,26 +394,13 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_bytes
 
-        # Is task still running according to the datastore?
-        if (
-            task_db is not None
-            and task_bytes is None
-            and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]
-        ):
-            self.logger.debug(
-                "Task is still running, according to the datastore "
-                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
-                task_db.id,
-                task.hash,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return True
-
         # Task has been finished (failed, or succeeded) according to
-        # the database, but we have no results of it in bytes, meaning
+        # the datastore, but we have no results of it in bytes, meaning
         # we have a problem.
-        if task_bytes is None and task_db is not None and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
+        if (
+            task_bytes is None and task_db is not None
+            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+        ):
             self.logger.error(
                 "Task has been finished, but no results found in bytes "
                 "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
@@ -418,8 +411,11 @@ class BoefjeScheduler(Scheduler):
             )
             raise RuntimeError("Task has been finished, but no results found in bytes")
 
-        # Is boefje still running according to bytes?
-        if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
+        if (
+            task_bytes is not None
+            and task_bytes.ended_at is None
+            and task_bytes.started_at is not None
+        ):
             self.logger.debug(
                 "Task is still running, according to bytes "
                 "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
