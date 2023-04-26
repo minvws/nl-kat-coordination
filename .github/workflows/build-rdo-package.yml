@@ -8,6 +8,7 @@ on:
   create:
     tags:
       - v*
+  push:
     branches:
       - "rdo-workflows"
 
