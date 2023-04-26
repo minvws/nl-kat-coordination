@@ -32,7 +32,7 @@ def clear_group_from_users(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [("tools", "0033_auto_20230424_1318")]
+    dependencies = [("tools", "0034_organizationmember_groups")]
 
     operations = [
         migrations.RunPython(add_group_permissions),
