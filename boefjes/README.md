@@ -122,7 +122,7 @@ The job file for a DNS scan might look like this:
     "id": "ssl-scan-job",
     "version": null
   },
-  "input_ooi": "Hostname|internet|www.example.nl."
+  "input_ooi": "Hostname|internet|www.example.nl"
 }
 ```
 

@@ -52,7 +52,7 @@ def test_ooi_detail(
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2
     assertContains(response, "Object")
-    assertContains(response, "Hostname|internet|mispo.es.")
+    assertContains(response, "Hostname|internet|mispo.es")
 
     assertContains(response, "Plugin")
     assertContains(response, "test-boefje")
