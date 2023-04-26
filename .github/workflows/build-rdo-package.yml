@@ -286,4 +286,3 @@ jobs:
       with:
         name: katkeiko_venv_${{ env.RELEASE_VERSION }}
         path: ../katkeiko_venv_${{ env.RELEASE_VERSION }}.tar.gz
-
