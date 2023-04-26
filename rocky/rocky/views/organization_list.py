@@ -1,7 +1,7 @@
 from typing import List
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from account.models import KATUser
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count
 from django.views.generic import ListView
 from django_otp.decorators import otp_required

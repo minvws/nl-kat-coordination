@@ -1,12 +1,10 @@
 import logging
 import uuid
 from functools import cached_property
-from typing import List, Union
 
 import tagulous.models
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models

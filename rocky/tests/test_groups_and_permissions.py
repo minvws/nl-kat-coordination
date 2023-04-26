@@ -1,6 +1,5 @@
-import pytest
-from account.views import AccountView
 from account.mixins import MemberPermissionMixin
+from account.views import AccountView
 from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains, assertNotContains
 

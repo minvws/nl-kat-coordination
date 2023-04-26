@@ -8,6 +8,7 @@ from account.mixins import (
 )
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.core.exceptions import BadRequest
 from django.http import Http404
@@ -17,7 +18,6 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm

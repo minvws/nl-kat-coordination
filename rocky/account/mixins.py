@@ -1,11 +1,11 @@
 from datetime import datetime, timezone
-
+from typing import List, Union
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.contrib.auth.models import Permission
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from tools.models import Indemnification, Organization, OrganizationMember
@@ -119,7 +119,7 @@ class OrganizationView(View):
 
 
 class MemberPermissionMixin:
-    def get_member_permissions(self, member):
+    def get_member_permissions(self, member: OrganizationMember) -> List[str]:
         return [
             "%s.%s" % (ct, name)
             for ct, name in Permission.objects.filter(group__organizationmember=member).values_list(
@@ -127,7 +127,7 @@ class MemberPermissionMixin:
             )
         ]
 
-    def has_member_perms(self, permission, member):
+    def has_member_perms(self, permission: Union[str, tuple], member) -> bool:
         if isinstance(permission, str):
             perms = (permission,)
         else:
