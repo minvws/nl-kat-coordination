@@ -8,9 +8,6 @@ on:
   create:
     tags:
       - v*
-  push:
-    branches:
-      - "rdo-workflows"
 
 env:
   PKGDIR: /home/runner/work/nl-kat-coordination
