@@ -5,8 +5,7 @@ on:
     tags:
       - v*
     branches:
-      - "rdopackage"
-      - "workflow-cleanup-rdo"
+      - "rdo-workflows"
 
 jobs:
   build:
