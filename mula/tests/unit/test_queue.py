@@ -10,6 +10,7 @@ from scheduler import models, queues
 from scheduler.models import Base
 from scheduler.repositories import sqlalchemy
 from sqlalchemy.orm import sessionmaker
+
 from tests.utils import functions
 
 

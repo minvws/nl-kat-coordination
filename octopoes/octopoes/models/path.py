@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Type, List, Set, Optional, Tuple
+from typing import List, Optional, Set, Tuple, Type
 
-from pyparsing import Word, alphas, ParseException
+from pyparsing import ParseException, Word, alphas
 
 from octopoes.models import OOI
-from octopoes.models.types import type_by_name, get_relation, get_concrete_types, to_concrete, get_relations
+from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
 
 incoming_step_grammar = "<" + Word(alphas + "_") + "[" + "is" + Word(alphas) + "]"
 

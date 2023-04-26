@@ -3,6 +3,7 @@ import unittest
 from unittest import mock
 
 from scheduler import config, models, queues, rankers, repositories, schedulers
+
 from tests.factories import (
     BoefjeMetaFactory,
     OOIFactory,
@@ -14,7 +15,7 @@ from tests.factories import (
 from tests.utils import functions
 
 
-class NormalizerSchedulerTestCase(unittest.TestCase):
+class NormalizerSchedulerBaseTestCase(unittest.TestCase):
     def setUp(self):
         cfg = config.settings.Settings()
 
@@ -54,17 +55,13 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
-    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
-    def test_push_tasks_for_received_raw_file(
-        self,
-        mock_get_latest_raw_data,
-        mock_get_normalizers_for_mime_type,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
+
+@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")  # index: 3
+@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")  # index: 2
+@mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")  # index: 1
+@mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")  # index: 0
+class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
+    def test_push_tasks_for_received_raw_file(self, *mocks):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -86,7 +83,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         )
 
         # Mocks
-        mock_get_latest_raw_data.side_effect = [
+        mocks[0].side_effect = [
             models.RawDataReceivedEvent(
                 raw_data=RawDataFactory(
                     boefje_meta=boefje_meta,
@@ -98,11 +95,11 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             None,
         ]
 
-        mock_get_normalizers_for_mime_type.return_value = [
+        mocks[1].return_value = [
             PluginFactory(type="normalizer"),
         ]
-        mock_is_task_allowed_to_run.return_value = True
-        mock_is_task_running.return_value = False
+        mocks[2].return_value = True
+        mocks[3].return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_file()
@@ -116,17 +113,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
-    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
-    def test_push_tasks_for_received_raw_file_no_normalizers_found(
-        self,
-        mock_get_latest_raw_data,
-        mock_get_normalizers_for_mime_type,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
+    def test_push_tasks_for_received_raw_file_no_normalizers_found(self, *mocks):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -148,7 +135,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         )
 
         # Mocks
-        mock_get_latest_raw_data.side_effect = [
+        mocks[0].side_effect = [
             models.RawDataReceivedEvent(
                 raw_data=RawDataFactory(
                     boefje_meta=boefje_meta,
@@ -160,9 +147,9 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             None,
         ]
 
-        mock_get_normalizers_for_mime_type.return_value = []
-        mock_is_task_allowed_to_run.return_value = True
-        mock_is_task_running.return_value = False
+        mocks[1].return_value = []
+        mocks[2].return_value = True
+        mocks[3].return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_file()
@@ -170,17 +157,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
-    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
-    def test_push_tasks_for_received_raw_file_not_allowed_to_run(
-        self,
-        mock_get_latest_raw_data,
-        mock_get_normalizers_for_mime_type,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
+    def test_push_tasks_for_received_raw_file_not_allowed_to_run(self, *mocks):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -202,7 +179,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         )
 
         # Mocks
-        mock_get_latest_raw_data.side_effect = [
+        mocks[0].side_effect = [
             models.RawDataReceivedEvent(
                 raw_data=RawDataFactory(
                     boefje_meta=boefje_meta,
@@ -214,9 +191,9 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             None,
         ]
 
-        mock_get_normalizers_for_mime_type.return_value = []
-        mock_is_task_allowed_to_run.return_value = False
-        mock_is_task_running.return_value = False
+        mocks[1].return_value = []
+        mocks[2].return_value = False
+        mocks[3].return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_file()
@@ -224,17 +201,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
-    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
-    def test_push_tasks_for_received_raw_file_still_running(
-        self,
-        mock_get_latest_raw_data,
-        mock_get_normalizers_for_mime_type,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
+    def test_push_tasks_for_received_raw_file_still_running(self, *mocks):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -256,7 +223,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         )
 
         # Mocks
-        mock_get_latest_raw_data.side_effect = [
+        mocks[0].side_effect = [
             models.RawDataReceivedEvent(
                 raw_data=RawDataFactory(
                     boefje_meta=boefje_meta,
@@ -268,9 +235,9 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             None,
         ]
 
-        mock_get_normalizers_for_mime_type.return_value = []
-        mock_is_task_allowed_to_run.return_value = True
-        mock_is_task_running.return_value = True
+        mocks[1].return_value = []
+        mocks[2].return_value = True
+        mocks[3].return_value = True
 
         # Act
         self.scheduler.push_tasks_for_received_raw_file()
@@ -278,13 +245,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    @mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")
-    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
-    def test_push_tasks_for_received_raw_file_item_on_queue(
-        self,
-        mock_get_latest_raw_data,
-        mock_get_normalizers_for_mime_type,
-    ):
+    def test_push_tasks_for_received_raw_file_item_on_queue(self, *mocks):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -306,7 +267,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         )
 
         # Mocks
-        mock_get_latest_raw_data.side_effect = [
+        mocks[0].side_effect = [
             models.RawDataReceivedEvent(
                 raw_data=RawDataFactory(
                     boefje_meta=boefje_meta,
@@ -326,9 +287,12 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
             None,
         ]
 
-        mock_get_normalizers_for_mime_type.return_value = [
+        mocks[1].return_value = [
             PluginFactory(type="normalizer"),
         ]
+
+        mocks[2].return_value = True
+        mocks[3].return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_file()
@@ -342,11 +306,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    @mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")
-    def test_push_tasks_for_received_raw_file_error_mimetype(
-        self,
-        mock_get_latest_raw_data,
-    ):
+    def test_push_tasks_for_received_raw_file_error_mimetype(self, *mocks):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -368,7 +328,7 @@ class NormalizerSchedulerTestCase(unittest.TestCase):
         )
 
         # Mocks
-        mock_get_latest_raw_data.side_effect = [
+        mocks[0].side_effect = [
             models.RawDataReceivedEvent(
                 raw_data=RawDataFactory(
                     boefje_meta=boefje_meta,

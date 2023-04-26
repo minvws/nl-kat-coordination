@@ -1,9 +1,10 @@
 import pytest
-from pytest_django.asserts import assertContains
-from django.http import Http404
 from django.core.exceptions import PermissionDenied
-from tests.conftest import setup_request
+from django.http import Http404
+from pytest_django.asserts import assertContains
+
 from rocky.views.organization_member_edit import OrganizationMemberEditView
+from tests.conftest import setup_request
 
 
 def test_admin_can_edit_itself(rf, admin_member):
@@ -153,7 +154,7 @@ def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
     request = setup_request(
         rf.post(
             "organization_member_edit",
-            {"status": "blocked", "trusted_clearance_level": 4},
+            {"blocked": True, "trusted_clearance_level": 4},
         ),
         admin_member.user,
     )
@@ -162,4 +163,4 @@ def test_admin_edits_redteamer_to_block(rf, admin_member, redteam_member):
     )
 
     redteam_member.refresh_from_db()
-    assert redteam_member.status == "blocked"
+    assert redteam_member.blocked is True

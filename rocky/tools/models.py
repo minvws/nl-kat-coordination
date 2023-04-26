@@ -9,14 +9,13 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from katalogus.client import KATalogusClientV1, get_katalogus
+from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 from requests import RequestException
 
-from katalogus.client import get_katalogus, KATalogusClientV1
 from octopoes.connector.octopoes import OctopoesAPIConnector
-
-from katalogus.exceptions import KATalogusDownException, KATalogusUnhealthyException, KATalogusException
-from rocky.exceptions import OctopoesDownException, OctopoesUnhealthyException, OctopoesException
-from tools.add_ooi_information import get_info, SEPARATOR
+from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
+from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
 
@@ -152,13 +151,13 @@ class OrganizationMember(models.Model):
     class STATUSES(models.TextChoices):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
-        BLOCKED = "blocked", _("blocked")
 
     scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
 
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
+    blocked = models.BooleanField(default=False)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
@@ -166,10 +165,6 @@ class OrganizationMember(models.Model):
     acknowledged_clearance_level = models.IntegerField(
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
     )
-
-    @property
-    def blocked(self):
-        return self.status == OrganizationMember.STATUSES.BLOCKED
 
     class Meta:
         unique_together = ["user", "organization"]

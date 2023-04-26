@@ -1,21 +1,34 @@
-import json
-from pathlib import Path
-from unittest.mock import MagicMock
-import pytest
 import binascii
+import json
+import logging
 from os import urandom
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
-from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
+from katalogus.client import parse_plugin
+from tools.models import (
+    GROUP_ADMIN,
+    GROUP_CLIENT,
+    GROUP_REDTEAM,
+    Indemnification,
+    OOIInformation,
+    Organization,
+    OrganizationMember,
+)
+
+from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
-from unittest.mock import patch
-from tools.models import OOIInformation, Organization, OrganizationMember, Indemnification
-from django.contrib.auth.models import Permission, Group
-from tools.models import GROUP_REDTEAM, GROUP_ADMIN, GROUP_CLIENT
+
+# Quiet faker locale messages down in tests.
+logging.getLogger("faker").setLevel(logging.INFO)
 
 
 def create_user(django_user_model, email, password, name, device_name, superuser=False):
@@ -46,6 +59,7 @@ def create_member(user, organization):
         user=user,
         organization=organization,
         status=OrganizationMember.STATUSES.ACTIVE,
+        blocked=False,
         trusted_clearance_level=4,
         acknowledged_clearance_level=4,
         onboarded=False,
@@ -219,7 +233,8 @@ def active_member(django_user_model, organization):
 def blocked_member(django_user_model, organization):
     user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
     member = create_member(user, organization)
-    member.status = OrganizationMember.STATUSES.BLOCKED
+    member.status = OrganizationMember.STATUSES.ACTIVE
+    member.blocked = True
     member.save()
     return member
 
@@ -337,17 +352,19 @@ def finding():
 
 @pytest.fixture
 def plugin_details():
-    return {
-        "id": "test-boefje",
-        "type": "boefje",
-        "name": "TestBoefje",
-        "description": "Meows to the moon",
-        "repository_id": "test-repository",
-        "scan_level": 1,
-        "consumes": ["Network"],
-        "produces": ["Network"],
-        "enabled": True,
-    }
+    return parse_plugin(
+        {
+            "id": "test-boefje",
+            "type": "boefje",
+            "name": "TestBoefje",
+            "description": "Meows to the moon",
+            "repository_id": "test-repository",
+            "scan_level": 1,
+            "consumes": ["Network"],
+            "produces": ["Network"],
+            "enabled": True,
+        }
+    )
 
 
 @pytest.fixture
@@ -361,7 +378,13 @@ def plugin_schema():
                 "maxLength": 128,
                 "type": "string",
                 "description": "Test description",
-            }
+            },
+            "TEST_PROPERTY2": {
+                "title": "TEST_PROPERTY2",
+                "maxLength": 128,
+                "type": "integer",
+                "description": "Test description2",
+            },
         },
         "required": ["TEST_PROPERTY"],
     }
@@ -392,3 +415,8 @@ def mock_scheduler(mocker):
 
 def get_boefjes_data():
     return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())
+
+
+@pytest.fixture()
+def mock_mixins_katalogus(mocker):
+    return mocker.patch("katalogus.views.mixins.get_katalogus")

@@ -1,10 +1,10 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union, Literal
+from typing import Literal, Optional, Union
 
 from pydantic import BaseModel
 
-from octopoes.models import ScanProfile, Reference
+from octopoes.models import Reference, ScanProfile
 from octopoes.models.origin import Origin, OriginParameter
 from octopoes.models.types import OOIType
 

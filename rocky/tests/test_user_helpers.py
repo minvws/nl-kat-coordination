@@ -1,9 +1,9 @@
 from tools.user_helpers import (
-    is_red_team,
-    is_admin,
-    indemnification_present,
     can_scan_organization,
     can_switch_organization,
+    indemnification_present,
+    is_admin,
+    is_red_team,
 )
 
 

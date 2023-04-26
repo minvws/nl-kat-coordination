@@ -1,7 +1,7 @@
 import abc
 import base64
 
-from nacl.public import PrivateKey, PublicKey, Box
+from nacl.public import Box, PrivateKey, PublicKey
 
 from boefjes.katalogus.models import Base64Str
 

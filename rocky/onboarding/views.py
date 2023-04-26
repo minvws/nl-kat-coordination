@@ -1,5 +1,7 @@
-from typing import Type, List, Dict, Any
+from typing import Any, Dict, List, Type
 
+from account.forms import OnboardingOrganizationUpdateForm, OrganizationForm
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -12,42 +14,40 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from django_otp.decorators import otp_required
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models.ooi.network import Network
-from octopoes.models.types import type_by_name
-from two_factor.views.utils import class_view_decorator
-
-from account.forms import OrganizationForm, OnboardingOrganizationUpdateForm
-from account.mixins import OrganizationView
 from katalogus.client import get_katalogus
-from onboarding.forms import (
-    OnboardingCreateUserAdminForm,
-    OnboardingCreateUserRedTeamerForm,
-    OnboardingCreateUserClientForm,
-    OnboardingSetClearanceLevelForm,
-)
-from onboarding.mixins import RedTeamUserRequiredMixin, SuperOrAdminUserRequiredMixin
-from onboarding.view_helpers import (
-    KatIntroductionStepsMixin,
-    KatIntroductionAdminStepsMixin,
-    KatIntroductionRegistrationStepsMixin,
-)
-from rocky.bytes_client import get_bytes_client
-from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException, RockyError
-from rocky.views.indemnification_add import IndemnificationAddView
-from rocky.views.ooi_report import Report, DNSReport, build_findings_list_from_store
-from rocky.views.ooi_view import BaseOOIFormView, SingleOOITreeMixin, BaseOOIDetailView
 from tools.forms.boefje import SelectBoefjeForm
 from tools.models import Organization, OrganizationMember
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
-    get_or_create_ooi,
     create_object_tree_item_from_ref,
     filter_ooi_tree,
+    get_or_create_ooi,
 )
 from tools.user_helpers import is_red_team
-from tools.view_helpers import get_ooi_url, BreadcrumbsMixin, Breadcrumb
+from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_ooi_url
+from two_factor.views.utils import class_view_decorator
+
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI
+from octopoes.models.ooi.network import Network
+from octopoes.models.types import type_by_name
+from onboarding.forms import (
+    OnboardingCreateUserAdminForm,
+    OnboardingCreateUserClientForm,
+    OnboardingCreateUserRedTeamerForm,
+    OnboardingSetClearanceLevelForm,
+)
+from onboarding.mixins import RedTeamUserRequiredMixin, SuperOrAdminUserRequiredMixin
+from onboarding.view_helpers import (
+    KatIntroductionAdminStepsMixin,
+    KatIntroductionRegistrationStepsMixin,
+    KatIntroductionStepsMixin,
+)
+from rocky.bytes_client import get_bytes_client
+from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException, RockyError
+from rocky.views.indemnification_add import IndemnificationAddView
+from rocky.views.ooi_report import DNSReport, Report, build_findings_list_from_store
+from rocky.views.ooi_view import BaseOOIDetailView, BaseOOIFormView, SingleOOITreeMixin
 
 User = get_user_model()
 
@@ -276,7 +276,7 @@ class OnboardingSetupScanOOIDetailView(
         if not self.request.session.get("selected_boefjes"):
             return
         for boefje_id in self.request.session["selected_boefjes"]:
-            get_katalogus(self.organization.code).enable_boefje(boefje_id)
+            get_katalogus(self.organization.code).enable_boefje_by_id(boefje_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -355,6 +355,7 @@ class OnboardingReportView(
     def set_member_onboarded(self):
         member = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
         member.onboarded = True
+        member.status = OrganizationMember.STATUSES.ACTIVE
         member.save()
 
 
@@ -648,5 +649,6 @@ class CompleteOnboarding(OrganizationView):
             redteam_group.user_set.add(self.request.user)
             return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
         member.onboarded = True
+        member.status = OrganizationMember.STATUSES.ACTIVE
         member.save()
         return redirect(reverse("crisis_room"))

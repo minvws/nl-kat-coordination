@@ -1,7 +1,8 @@
-from typing import List, Iterator, Union
+from typing import Iterator, List, Union
+
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import KATFindingType, Finding
-from octopoes.models.ooi.network import IPPort, IPAddress
+from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.network import IPAddress, IPPort
 from octopoes.models.ooi.web import Website
 
 

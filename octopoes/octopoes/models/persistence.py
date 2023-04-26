@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Type, Optional
+from typing import Optional, Type, Union
 
 from pydantic import Field
 from pydantic.fields import FieldInfo

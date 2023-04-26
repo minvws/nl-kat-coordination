@@ -6,16 +6,15 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 from requests import RequestException
-
-from rocky.views.organization_add import OrganizationAddView
-from rocky.views.organization_settings import OrganizationSettingsView
+from tools.models import Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
+from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_list import OrganizationMemberListView
-from tests.conftest import setup_request, create_member
-from tools.models import Organization
+from rocky.views.organization_settings import OrganizationSettingsView
+from tests.conftest import create_member, setup_request
 
 AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
@@ -86,7 +85,7 @@ def test_add_organization_submit_success(rf, superuser_member, mocker, mock_mode
 
 def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
-    mock_requests.get.side_effect = RequestException
+    mock_requests.Session().get.side_effect = RequestException
 
     request = setup_request(
         rf.post(
@@ -110,8 +109,8 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
     mock_organization_exists_response = mocker.MagicMock()
     mock_organization_exists_response.status_code = 404
 
-    mock_requests.get.side_effect = [mock_health_response, mock_organization_exists_response]
-    mock_requests.post.side_effect = RequestException
+    mock_requests.Session().get.side_effect = [mock_health_response, mock_organization_exists_response]
+    mock_requests.Session().post.side_effect = RequestException
 
     request = setup_request(
         rf.post(
@@ -130,7 +129,7 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
 def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
-    mock_requests.get.return_value = mock_response
+    mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = {"service": "test", "healthy": False}
 
     request = setup_request(
@@ -184,7 +183,7 @@ def test_organization_member_list(rf, admin_member):
     assertContains(response, admin_member.user.date_joined.strftime("%m/%d/%Y"))
     assertContains(response, "Assigned clearance level")
     assertContains(response, admin_member.trusted_clearance_level)
-    assertContains(response, "Agreed clearance level")
+    assertContains(response, "Accepted clearance level")
     assertContains(response, admin_member.acknowledged_clearance_level)
     assertContains(response, "Edit")
     assertContains(response, admin_member.id)
@@ -192,35 +191,42 @@ def test_organization_member_list(rf, admin_member):
 
 
 def test_organization_filtered_member_list(rf, superuser_member, new_member, blocked_member):
-    request = setup_request(rf.get("organization_member_list", {"client_status": "blocked"}), superuser_member.user)
+    # Test with only filter option blocked status "blocked"
+    request = setup_request(rf.get("organization_member_list", {"blocked_status": "blocked"}), superuser_member.user)
     response = OrganizationMemberListView.as_view()(request, organization_code=superuser_member.organization.code)
 
     assertNotContains(response, new_member.user.full_name)
     assertContains(response, blocked_member.user.full_name)
     assertContains(response, 'class="blocked"')
-    assertNotContains(response, "New")
-    assertNotContains(response, "Active")
+    assertNotContains(response, 'class="new"')
+    assertNotContains(response, 'class="active"')
 
+    # Test with only filter option status "new" checked
     request2 = setup_request(rf.get("organization_member_list", {"client_status": "new"}), superuser_member.user)
     response2 = OrganizationMemberListView.as_view()(request2, organization_code=superuser_member.organization.code)
 
     assertContains(response2, new_member.user.full_name)
     assertNotContains(response2, blocked_member.user.full_name)
-    assertContains(response2, "New")
+    assertContains(response2, 'class="new"')
     assertNotContains(response2, 'class="blocked"')
-    assertNotContains(response2, "Active")
+    assertNotContains(response2, 'class="active"')
 
+    # Test with every filter option checked (new, active, blocked and unblocked)
     request3 = setup_request(
-        rf.get("organization_member_list", {"client_status": ["new", "active", "blocked"]}), superuser_member.user
+        rf.get(
+            "organization_member_list",
+            {"client_status": ["new", "active"], "blocked_status": ["blocked", "unblocked"]},
+        ),
+        superuser_member.user,
     )
     response3 = OrganizationMemberListView.as_view()(request3, organization_code=superuser_member.organization.code)
 
     assertContains(response3, superuser_member.user.full_name)
     assertContains(response3, new_member.user.full_name)
     assertContains(response3, blocked_member.user.full_name)
-    assertContains(response3, "New")
+    assertContains(response3, 'class="new"')
     assertContains(response3, 'class="blocked"')
-    assertContains(response3, "Active")
+    assertContains(response3, 'class="active"')
 
 
 def test_organization_does_not_exist(client, client_member):

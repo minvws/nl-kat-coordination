@@ -1,11 +1,11 @@
 from typing import Dict, List
 
-from boefjes.katalogus.models import Organisation, Repository, RESERVED_LOCAL_ID
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationStorage,
+    PluginEnabledStorage,
     RepositoryStorage,
     SettingsStorage,
-    PluginEnabledStorage,
 )
 
 # key = organisation id; value = organisation

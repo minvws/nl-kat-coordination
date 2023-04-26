@@ -6,8 +6,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
-from tools.models import OrganizationMember, Organization
+from tools.models import Organization, OrganizationMember
 
 
 class KATUserManager(BaseUserManager):
@@ -105,10 +104,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         """
         if self.is_superuser:
             return self.all_organizations
-        return [
-            m.organization
-            for m in filter(lambda o: o.status is not OrganizationMember.STATUSES.BLOCKED, self.organization_members)
-        ]
+        return [m.organization for m in self.organization_members if not m.blocked]
 
     @cached_property
     def organizations_including_blocked(self) -> List[Organization]:

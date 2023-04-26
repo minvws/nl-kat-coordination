@@ -213,8 +213,9 @@ class BoefjeScheduler(Scheduler):
 
                 while not self.is_space_on_queue():
                     self.logger.debug(
-                        "Waiting for queue to have enough space, not adding task to queue "
+                        "Waiting for queue to have enough space, not adding task to queue: %s "
                         "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s]",
+                        task,
                         self.queue.qsize(),
                         self.queue.maxsize,
                         self.organisation.id,
@@ -225,7 +226,7 @@ class BoefjeScheduler(Scheduler):
                 self.logger.info(
                     "Created boefje task: %s for ooi: %s "
                     "[boefje.id=%s, ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
-                    boefje.name,
+                    task,
                     ooi.primary_key,
                     boefje.id,
                     ooi.primary_key,
@@ -424,6 +425,7 @@ class BoefjeScheduler(Scheduler):
             random_oois = self.ctx.services.octopoes.get_random_objects(
                 organisation_id=self.organisation.id,
                 n=self.ctx.config.pq_populate_max_random_objects,
+                scan_level=[1, 2, 3, 4],
             )
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(

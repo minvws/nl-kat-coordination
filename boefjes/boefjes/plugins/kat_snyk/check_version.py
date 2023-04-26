@@ -1,7 +1,7 @@
+import logging
 import re
 from enum import Enum
 from typing import List
-import logging
 
 logger = logging.getLogger(__name__)
 

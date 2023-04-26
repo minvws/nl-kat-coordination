@@ -96,12 +96,60 @@ Organizations own the systems for which KAT is deployed. From KAT, multiple orga
 Users
 -----
 
-The administrator is responsible for the system. Besides the administrator two usertypes have been defined: the red team user who can launch new scans and the regular user who has read access and can request reports.
+OpenKAT knows four types of users: the client, the red team user, the admin and the superuser. In OpenKAT, permissions utilise a stacked model. This means that a higher permission level includes all lower permissions of the lower levels. The client is a 'read only' type of user, the red teamer is a researcher who can start scans. The admin is an administrative user who can do user management etc, the superuser can do all.
+
+Rights and functions per user type
+----------------------------------
+
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Action                                                                                              | USER | RED TEAM | ADMIN | SUPERUSER |
++=====================================================================================================+======+==========+=======+===========+
+| Login                                                                                               | x    | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can start scans on objects with enough clearance                                                    | x    | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can view reports                                                                                    | x    | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can start scans on objects with not enough clearance, but the user has enough clearance             |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can edit settings of scan tools                                                                     |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can enable/disable scan tools                                                                       |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can add objects                                                                                     |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can give clearance to objects up to it’s own clearance level                                        |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can give clearance to users                                                                         |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can manage organisation members                                                                     |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can create new account(s) in OpenKAT                                                                |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can create new and add, or add existing accounts, to the organisation                               |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can view users of an organisation                                                                   |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can edit users of an organisation                                                                   |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can view organisation details                                                                       |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can edit organisation details and settings                                                          |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can add organisations                                                                               |      |          |       | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can start scans on objects with not enough clearance, and the user also hasn’t got enough clearance |      |          |       | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can access Django admin                                                                             |      |          |       | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+
 
 User management
 ---------------
 
 Users and organizations can be created in the on boarding flow, in the Web interface or automated. The administrator of the system can create organizations and do user management. The administrator of an organization in turn can create users within the organization. The django interface provides additional capabilities for user management via the command line, for use in an automated deployment and linkage to external user management.
+
+
 
 OpenKAT Objects
 ===============
@@ -209,6 +257,19 @@ L4: Intensive scan
 ******************
 
 The premise of the test profile is to verify whether an attacker can exploit vulnerabilities to give himself more extensive access to the tested environment. Thus, known exploit code is applied in this level.
+
+Bits
+====
+
+Bits are businessrules that assess objects. These can be disabled or enabled using environment variables. Almost all bits are enabled by default and be disabled by adding the bit to `BITS_DISABLED`. The disabled bits can be enabled using `BITS_ENABLED`. For example:
+
+.. code-block:: sh
+
+    BITS_ENABLED='["bit1","bit2"]'
+    BITS_DISABLED='["bit3"]'
+
+
+Note that if you enable a bit that was previously enabled the bit won't be automatically run for every OOIs it should have run on, but only when it is triggered again after a new scan or other bit that has run. When a bit that was previously enabled is disabled the resulting OOIs from that bit will also not be automatically removed. Only when the bit triggers instead of running the bit the resulting OOIs of the previous run will be deleted. This also means that if the bit isn't triggered the old OOIs will not be removed.
 
 Reports
 =======

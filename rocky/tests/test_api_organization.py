@@ -9,9 +9,9 @@ from pytest_drf import (
     Returns201,
     Returns204,
     Returns500,
-    UsesGetMethod,
     UsesDeleteMethod,
     UsesDetailEndpoint,
+    UsesGetMethod,
     UsesListEndpoint,
     UsesPatchMethod,
     UsesPostMethod,
@@ -20,7 +20,6 @@ from pytest_drf import (
 from pytest_drf.util import pluralized, url_for
 from pytest_lambda import lambda_fixture, static_fixture
 from requests import HTTPError
-
 from tools.models import Organization
 
 pytestmark = pytest.mark.django_db

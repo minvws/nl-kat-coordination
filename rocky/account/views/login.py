@@ -14,9 +14,9 @@ from two_factor.views.utils import class_view_decorator
 
 from account.forms import (
     LoginForm,
+    TwoFactorBackupTokenForm,
     TwoFactorSetupTokenForm,
     TwoFactorVerifyTokenForm,
-    TwoFactorBackupTokenForm,
 )
 
 User = get_user_model()

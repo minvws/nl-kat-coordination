@@ -1,16 +1,15 @@
 from datetime import datetime, timezone
 from ipaddress import IPv4Address
 from typing import Dict, List, Optional, Set
-
 from unittest.mock import Mock
 
 import pytest
 
+from octopoes.models import OOI, EmptyScanProfile, Reference, ScanProfileBase
+from octopoes.models.path import Direction, Path
+from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
-from octopoes.models import EmptyScanProfile, Reference, OOI, ScanProfileBase
-from octopoes.models.path import Path, Direction
-from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
 
 
 @pytest.fixture
