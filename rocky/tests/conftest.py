@@ -1,5 +1,6 @@
 import binascii
 import json
+import logging
 from os import urandom
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -25,6 +26,9 @@ from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
+
+# Quiet faker locale messages down in tests.
+logging.getLogger("faker").setLevel(logging.INFO)
 
 
 def create_user(django_user_model, email, password, name, device_name, superuser=False):
@@ -55,6 +59,7 @@ def create_member(user, organization):
         user=user,
         organization=organization,
         status=OrganizationMember.STATUSES.ACTIVE,
+        blocked=False,
         trusted_clearance_level=4,
         acknowledged_clearance_level=4,
         onboarded=False,
@@ -227,7 +232,8 @@ def active_member(django_user_model, organization):
 def blocked_member(django_user_model, organization):
     user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
     member = create_member(user, organization)
-    member.status = OrganizationMember.STATUSES.BLOCKED
+    member.status = OrganizationMember.STATUSES.ACTIVE
+    member.blocked = True
     member.save()
     return member
 

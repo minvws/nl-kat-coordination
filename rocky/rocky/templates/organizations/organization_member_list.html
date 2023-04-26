@@ -12,8 +12,8 @@
             <div>
                 <h1>{% translate "Organization" %}: {{ organization.name }}</h1>
                 {% blocktranslate with organization_name=organization.name %}
-          An overview of "{{ organization_name }}" its members.
-{% endblocktranslate %}
+                    An overview of "{{ organization_name }}" its members.
+                {% endblocktranslate %}
                 <h2>{% translate "Members" %}</h2>
                 {% has_organization_perms "tools.add_organizationmember" organization_member as can_add_member %}
                 {% if can_add_member %}
@@ -35,7 +35,7 @@
                                 <th>{% translate "Status" %}</th>
                                 <th>{% translate "Added" %}</th>
                                 <th>{% translate "Assigned clearance level" %}</th>
-                                <th>{% translate "Agreed clearance level" %}</th>
+                                <th>{% translate "Accepted clearance level" %}</th>
                                 <th>{% translate "Edit" %}</th>
                                 <th>{% translate "Blocked" %}</th>
                             </tr>
@@ -62,7 +62,8 @@
                                             {% if member.user.is_superuser %}
                                                 <span class="active"></span><span>&nbsp;{% translate "Active" %}</span>
                                             {% else %}
-                                                <span class="{{ member.status }}"></span><span>&nbsp;{{ member.status|title }}</span>
+                                                <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span>
+                                                <span>&nbsp;{% if member.blocked %}{% translate "Blocked" %}{% else %}{{ member.status|title }}{% endif %}</span>
                                             {% endif %}
                                             <br>
                                         </td>
@@ -90,17 +91,22 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="{% url "organization_member_edit" organization.code member.id %}">
-                                                <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
-                                            </a>
+                                            {% if member.user.is_superuser %}
+                                                <button class="icon ti-edit action-button disabled">{% translate "Edit" %}</button>
+                                            {% else %}
+                                                <a href="{% url "organization_member_edit" organization.code member.id %}"><button class="icon ti-edit action-button">{% translate "Edit" %}</button></a>
+                                            {% endif %}
                                         </td>
                                         <td>
-                                            {% if member.status == "blocked" %}
+                                            {% if member.blocked %}
                                                 {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
-
                                             {% else %}
-                                                {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="block" key="member_id" value=member.id %}
-
+                                            {% comment %} Disable the "block" checkbox for members that are super users or for the member of the user that's logged in so they can't lock themself out of the organisation by accident{% endcomment %}
+                                                {% if member.user.is_superuser or member.user.email == request.user.email %}
+                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled="disabled" action="block" key="member_id" value=member.id %}
+                                                  {% else %}
+                                                    {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked action="block" key="member_id" value=member.id %}
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>

@@ -1,34 +1,26 @@
-from datetime import datetime, timezone
-from typing import Type
-
 from account.mixins import RockyPermissionRequiredMixin
 from django.views.generic import FormView
 from tools.forms.ooi import MuteFindingForm
 
-from octopoes.models import OOI
 from octopoes.models.ooi.findings import MutedFinding
-from rocky.views.mixins import OctopoesView, OOIBreadcrumbsMixin
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
-class MuteFindingView(RockyPermissionRequiredMixin, OctopoesView, OOIBreadcrumbsMixin, FormView):
+class MuteFindingView(RockyPermissionRequiredMixin, BaseOOIDetailView, FormView):
     template_name = "oois/ooi_mute_finding.html"
-    ooi_class: Type[OOI] = MutedFinding
     form_class = MuteFindingForm
     permission_required = "tools.can_scan_organization"
-
-    def get(self, request, *args, **kwargs):
-        # ooi needed for breadcrumbs
-        self.ooi = self.get_single_ooi(self.request.GET.get("ooi_id", None), datetime.now(timezone.utc))
-        return super().get(request, *args, **kwargs)
+    depth = 1
 
     def get_initial(self):
         initial = super().get_initial()
-        initial["finding"] = self.request.GET.get("ooi_id", None)
-        initial["ooi_type"] = self.ooi_class.__name__
+        initial["finding"] = self.ooi.reference
+        initial["ooi_type"] = MutedFinding.get_object_type()
+
         return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ooi_type"] = self.ooi_class.__name__
-        context["finding"] = self.ooi
+        context["ooi_type"] = MutedFinding.get_object_type()
+
         return context

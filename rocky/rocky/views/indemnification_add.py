@@ -2,6 +2,7 @@ from account.forms import IndemnificationAddForm
 from account.mixins import OrganizationView, RockyPermissionRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
@@ -35,4 +36,18 @@ class IndemnificationAddView(RockyPermissionRequiredMixin, OrganizationView, For
         context["indemnification_present"] = Indemnification.objects.filter(
             user=self.request.user, organization=self.organization
         )
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
+                "text": "Settings",
+            },
+            {
+                "url": reverse(
+                    "indemnification_add",
+                    kwargs={"organization_code": self.organization.code},
+                ),
+                "text": _("Add indemnification"),
+            },
+        ]
+
         return context

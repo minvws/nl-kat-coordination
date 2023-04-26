@@ -96,12 +96,60 @@ Organizations own the systems for which KAT is deployed. From KAT, multiple orga
 Users
 -----
 
-The administrator is responsible for the system. Besides the administrator two usertypes have been defined: the red team user who can launch new scans and the regular user who has read access and can request reports.
+OpenKAT knows four types of users: the client, the red team user, the admin and the superuser. In OpenKAT, permissions utilise a stacked model. This means that a higher permission level includes all lower permissions of the lower levels. The client is a 'read only' type of user, the red teamer is a researcher who can start scans. The admin is an administrative user who can do user management etc, the superuser can do all.
+
+Rights and functions per user type
+----------------------------------
+
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Action                                                                                              | USER | RED TEAM | ADMIN | SUPERUSER |
++=====================================================================================================+======+==========+=======+===========+
+| Login                                                                                               | x    | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can start scans on objects with enough clearance                                                    | x    | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can view reports                                                                                    | x    | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can start scans on objects with not enough clearance, but the user has enough clearance             |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can edit settings of scan tools                                                                     |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can enable/disable scan tools                                                                       |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can add objects                                                                                     |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can give clearance to objects up to it’s own clearance level                                        |      | x        | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can give clearance to users                                                                         |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can manage organisation members                                                                     |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can create new account(s) in OpenKAT                                                                |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can create new and add, or add existing accounts, to the organisation                               |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can view users of an organisation                                                                   |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can edit users of an organisation                                                                   |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can view organisation details                                                                       |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can edit organisation details and settings                                                          |      |          | x     | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can add organisations                                                                               |      |          |       | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can start scans on objects with not enough clearance, and the user also hasn’t got enough clearance |      |          |       | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+| Can access Django admin                                                                             |      |          |       | x         |
++-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
+
 
 User management
 ---------------
 
 Users and organizations can be created in the on boarding flow, in the Web interface or automated. The administrator of the system can create organizations and do user management. The administrator of an organization in turn can create users within the organization. The django interface provides additional capabilities for user management via the command line, for use in an automated deployment and linkage to external user management.
+
+
 
 OpenKAT Objects
 ===============
