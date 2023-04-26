@@ -202,6 +202,17 @@ services:
       - ./keiko:/app/keiko
       - keiko-reports:/reports
 
+  jaeger:
+    profiles:
+    - jaeger
+    restart: unless-stopped
+    image: jaegertracing/all-in-one:1.44
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: 9411
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "127.0.0.1:16686:16686"
+
 volumes:
   postgres-data:
   bytes-data:
