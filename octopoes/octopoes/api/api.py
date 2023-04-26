@@ -7,6 +7,13 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi_utils.timing import add_timing_middleware
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from requests import RequestException
 
 from octopoes.api.models import ServiceHealth
@@ -26,8 +33,24 @@ try:
 except FileNotFoundError:
     logger.warning(f"No log config found at: {settings.log_cfg}")
 
+
 app = FastAPI()
-add_timing_middleware(app, record=logger.debug, prefix="app")
+
+# Set up OpenTelemetry instrumentation
+if settings.span_export_grpc_endpoint is not None:
+    logger.info("Setting up instrumentation with span exporter endpoint [%s]", settings.span_export_grpc_endpoint)
+
+    add_timing_middleware(app, record=logger.debug, prefix="app")
+    FastAPIInstrumentor.instrument_app(app)
+    RequestsInstrumentor().instrument()
+
+    resource = Resource(attributes={SERVICE_NAME: "octopoes"})
+    provider = TracerProvider(resource=resource)
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=settings.span_export_grpc_endpoint))
+    provider.add_span_processor(processor)
+    trace.set_tracer_provider(provider)
+
+    logger.debug("Finished setting up instrumentation")
 
 
 @app.exception_handler(RequestValidationError)

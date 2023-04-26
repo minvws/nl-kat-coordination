@@ -78,3 +78,6 @@ class MetaDataRepository:
 
     def has_raw(self, boefje_meta: BoefjeMeta, mime_types: List[MimeType]) -> bool:
         raise NotImplementedError()
+
+    def get_raw_file_count_per_organization(self) -> Dict[str, int]:
+        raise NotImplementedError()
