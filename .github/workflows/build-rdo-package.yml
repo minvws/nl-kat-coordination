@@ -1,5 +1,9 @@
 name: Build RDO packages
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   create:
     tags:
