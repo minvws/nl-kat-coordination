@@ -3,7 +3,7 @@ from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import requests
-from requests.models import HTTPError
+from requests.exceptions import HTTPError
 
 from bytes.models import BoefjeMeta, NormalizerMeta
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
@@ -69,6 +69,14 @@ class BytesAPIClient:
         )
 
         return str(response.json()["access_token"])
+
+    @retry_with_login
+    def get_metrics(self) -> bytes:
+        response = self._session.get("/metrics", headers=self.headers)
+
+        self._verify_response(response)
+
+        return response.content
 
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
