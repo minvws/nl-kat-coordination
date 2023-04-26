@@ -70,7 +70,6 @@ def add_admin_group_permissions(member):
         Permission.objects.get(codename="add_organizationmember").id,
         Permission.objects.get(codename="change_organization").id,
         Permission.objects.get(codename="change_organizationmember").id,
-        Permission.objects.get(codename="can_view_admin_onboarding").id,
         Permission.objects.get(codename="add_indemnification").id,
     ]
     group.permissions.set(admin_permissions)
@@ -83,7 +82,6 @@ def add_redteam_group_permissions(member):
         Permission.objects.get(codename="can_scan_organization").id,
         Permission.objects.get(codename="can_enable_disable_boefje").id,
         Permission.objects.get(codename="can_set_clearance_level").id,
-        Permission.objects.get(codename="can_view_redteam_onboarding").id,
     ]
     group.permissions.set(redteam_permissions)
 
@@ -140,6 +138,7 @@ def adminuser_b(django_user_model):
 @pytest.fixture
 def admin_member(adminuser, organization):
     member = create_member(adminuser, organization)
+    adminuser.user_permissions.add(Permission.objects.get(codename="view_organization"))
     add_admin_group_permissions(member)
     return member
 
@@ -147,6 +146,7 @@ def admin_member(adminuser, organization):
 @pytest.fixture
 def admin_member_b(adminuser_b, organization_b):
     member = create_member(adminuser_b, organization_b)
+    adminuser_b.user_permissions.add(Permission.objects.get(codename="view_organization"))
     add_admin_group_permissions(member)
     return member
 

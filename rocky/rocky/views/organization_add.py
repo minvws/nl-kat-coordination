@@ -1,7 +1,7 @@
 import logging
 
 from account.forms import OrganizationForm
-from account.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy

@@ -1,6 +1,6 @@
 from typing import List
 
-from account.mixins import RockyPermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from account.models import KATUser
 from django.db.models import Count
 from django.views.generic import ListView
@@ -12,7 +12,7 @@ from two_factor.views.utils import class_view_decorator
 
 @class_view_decorator(otp_required)
 class OrganizationListView(
-    RockyPermissionRequiredMixin,
+    PermissionRequiredMixin,
     OrganizationBreadcrumbsMixin,
     ListView,
 ):

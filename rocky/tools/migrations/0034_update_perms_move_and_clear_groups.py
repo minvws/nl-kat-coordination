@@ -9,22 +9,11 @@ from tools.models import OrganizationMember
 User = get_user_model()
 
 
-# https://stackoverflow.com/a/40092780/1336275
-def migrate_permissions(apps, schema_editor):
-    for app_config in apps.get_app_configs():
-        app_config.models_module = True
-        create_permissions(app_config, apps=apps, verbosity=0)
-        app_config.models_module = None
-
-
 def add_group_permissions(apps, schema_editor):
     Group = apps.get_model("auth", "Group")
     Permission = apps.get_model("auth", "Permission")
     try:
-        redteam = Group.objects.get(name="redteam")
         admin = Group.objects.get(name="admin")
-        redteam.permissions.add(Permission.objects.get(codename="can_view_redteam_onboarding"))
-        admin.permissions.add(Permission.objects.get(codename="can_view_admin_onboarding"))
         admin.permissions.add(Permission.objects.get(codename="add_indemnification"))
     except Group.DoesNotExist:
         pass
@@ -34,8 +23,7 @@ def migrate_user_groups_to_organizationmember(apps, schema_editor):
     members = OrganizationMember.objects.all()
     for member in members:
         user_groups = member.user.groups.all()
-        for group in user_groups:
-            member.groups.add(group)
+        member.groups.add(*user_groups)
 
 
 def clear_group_from_users(apps, schema_editor):
@@ -48,7 +36,6 @@ class Migration(migrations.Migration):
     dependencies = [("tools", "0033_auto_20230424_1318"), ("contenttypes", "0002_remove_content_type_name")]
 
     operations = [
-        migrations.RunPython(migrate_permissions),
         migrations.RunPython(add_group_permissions),
         migrations.RunPython(migrate_user_groups_to_organizationmember),
         migrations.RunPython(clear_group_from_users),

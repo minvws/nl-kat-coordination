@@ -36,7 +36,7 @@
                 </div>
             </div>
         </section>
-        {% has_organization_perms "tools.can_scan_organization" request.user organization as can_scan_organization %}
+        {% has_organization_perms "tools.can_scan_organization" organization_member as can_scan_organization %}
         {% if can_scan_organization %}
             {% include "plugin_settings_list.html" with object_list=object_list plugin=plugin %}
 
@@ -73,7 +73,7 @@
                 </p>
             </div>
         </section>
-        {% has_organization_perms "tools.can_scan_organization" request.user organization as can_scan_organization %}
+        {% has_organization_perms "tools.can_scan_organization" organization_member as can_scan_organization %}
         {% if can_scan_organization %}
             {% include "partials/objects_to_scan.html" with plugin=plugin %}
 

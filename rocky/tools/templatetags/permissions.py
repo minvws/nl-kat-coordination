@@ -1,20 +1,12 @@
-from account.models import KATUser
 from django import template
-
-from tools.models import Organization, OrganizationMember
+from account.mixins import MemberPermissionMixin
+from tools.models import OrganizationMember
 
 register = template.Library()
 
 
 @register.simple_tag()
-def has_organization_perms(perms: str, user: KATUser, organization: Organization = None) -> bool:
-    if user.has_perms(perms):
+def has_organization_perms(perm: str, organization_member: OrganizationMember) -> bool:
+    if organization_member.user.has_perms(perm):
         return True
-    if organization:
-        member = OrganizationMember.objects.get(user=user, organization=organization)
-        return member.has_member_perms(perms)
-    members = OrganizationMember.objects.filter(user=user)
-    for member in members:
-        if member.has_member_perms(perms):
-            return True
-    return False
+    return MemberPermissionMixin().has_member_perms(perm, organization_member)

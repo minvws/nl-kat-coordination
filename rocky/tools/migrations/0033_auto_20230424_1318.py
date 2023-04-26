@@ -10,22 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name="organization",
-            options={
-                "permissions": (
-                    ("can_switch_organization", "Can switch organization"),
-                    ("can_scan_organization", "Can scan organization"),
-                    ("can_enable_disable_boefje", "Can enable or disable boefje"),
-                    ("can_set_clearance_level", "Can set clearance level"),
-                    ("can_view_admin_onboarding", "Can view admin onboarding"),
-                    ("can_view_redteam_onboarding", "Can view redteam onboarding"),
-                )
-            },
-        ),
         migrations.AddField(
             model_name="organizationmember",
             name="groups",
-            field=models.ManyToManyField(blank=True, related_name="members", to="auth.Group"),
+            field=models.ManyToManyField(blank=True, to="auth.Group"),
         ),
     ]

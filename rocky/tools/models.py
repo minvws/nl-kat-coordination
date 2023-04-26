@@ -78,8 +78,6 @@ class Organization(models.Model):
             ("can_scan_organization", "Can scan organization"),
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
             ("can_set_clearance_level", "Can set clearance level"),
-            ("can_view_admin_onboarding", "Can view admin onboarding"),
-            ("can_view_redteam_onboarding", "Can view redteam onboarding"),
         )
 
     def get_absolute_url(self):
@@ -171,7 +169,7 @@ class OrganizationMember(models.Model):
 
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
-    groups = models.ManyToManyField(Group, related_name="members", blank=True)
+    groups = models.ManyToManyField(Group, blank=True)
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
@@ -196,43 +194,6 @@ class OrganizationMember(models.Model):
     @cached_property
     def is_client(self) -> bool:
         return self.groups.filter(name=GROUP_CLIENT).exists()
-
-    def get_permissions_codenames(self, permissions: Union[str, tuple] = None) -> List[str]:
-        codenames = []
-
-        if permissions is None:
-            raise ValueError("Permission(s) not defined")
-        if isinstance(permissions, str):
-            perms = (permissions,)
-        else:
-            perms = permissions
-        for perm in perms:
-            if perm.count(".") == 1:
-                app_label, codename = perm.split(".")
-                if app_label and codename:
-                    if ContentType.objects.filter(app_label=app_label, model="organization").exists():
-                        codenames.append(codename)
-            else:
-                raise ValueError("Permissions should be defined as: 'app_label.codename'.")
-        return codenames
-
-    def has_member_perms(self, permissions: Union[str, tuple] = None) -> bool:
-        if self.user.is_superuser and self.user.is_active and self.status is not OrganizationMember.STATUSES.BLOCKED:
-            return True
-        codenames = self.get_permissions_codenames(permissions)
-        has_permissions = []
-
-        for codename in codenames:
-            for group in self.groups.all():
-                group_permissions_codenames = group.permissions.values_list("codename", flat=True)
-                if codename in group_permissions_codenames:
-                    has_permissions.append(True)
-                    break
-                else:
-                    has_permissions.append(False)
-        if has_permissions and all(has_permissions):
-            return True
-        return False
 
     class Meta:
         unique_together = ["user", "organization"]

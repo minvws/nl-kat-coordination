@@ -11,8 +11,7 @@
         <section>
             <div>
                 <h1>{% translate "Organizations" %}</h1>
-                {% has_organization_perms "tools.add_organization" request.user as add_organization %}
-                {% if add_organization %}
+                {% if perms.tools.add_organization %}
                     <div class="horizontal-view toolbar">
                         <a href="{% url 'organization_add' %}" class="button">{% translate "Add new organization" %}</a>
                     </div>

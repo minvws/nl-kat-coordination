@@ -17,6 +17,7 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
@@ -77,50 +78,57 @@ class OnboardingStart(OrganizationView):
         return redirect("crisis_room")
 
 
+class RedteamRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if self.request.user.is_superuser:
+            return True
+        members = OrganizationMember.objects.filter(user=self.request.user)
+        for member in members:
+            if member.is_redteam:
+                return True
+        return False
+
+
 # REDTEAMER FLOW
 @class_view_decorator(otp_required)
 class OnboardingIntroductionView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
     template_name = "step_1_introduction.html"
     current_step = 1
-    permission_required = "tools.can_view_redteam_onboarding"
 
 
 @class_view_decorator(otp_required)
 class OnboardingChooseReportInfoView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
     template_name = "step_2a_choose_report_info.html"
     current_step = 2
-    permission_required = "tools.can_view_redteam_onboarding"
 
 
 @class_view_decorator(otp_required)
 class OnboardingChooseReportTypeView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
     template_name = "step_2b_choose_report_type.html"
     current_step = 2
-    permission_required = "tools.can_view_redteam_onboarding"
 
 
 @class_view_decorator(otp_required)
 class OnboardingSetupScanSelectPluginsView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
     template_name = "step_3e_setup_scan_select_plugins.html"
     current_step = 3
     report: Type[Report] = DNSReport
-    permission_required = "tools.can_view_redteam_onboarding"
 
     def get_form(self):
         boefjes = self.report.get_boefjes(self.organization)
@@ -161,13 +169,12 @@ class OnboardingSetupScanSelectPluginsView(
 
 @class_view_decorator(otp_required)
 class OnboardingSetupScanOOIInfoView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
     template_name = "step_3a_setup_scan_ooi_info.html"
     current_step = 3
-    permission_required = "tools.can_view_redteam_onboarding"
 
 
 class OnboardingOOIForm(OOIForm):
@@ -187,7 +194,7 @@ class OnboardingOOIForm(OOIForm):
 
 @class_view_decorator(otp_required)
 class OnboardingSetupScanOOIAddView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     BaseOOIFormView,
 ):
@@ -199,7 +206,6 @@ class OnboardingSetupScanOOIAddView(
             "ooi": Network(name="internet"),
         }
     }
-    permission_required = "tools.can_view_redteam_onboarding"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -255,7 +261,7 @@ class OnboardingSetupScanOOIAddView(
 
 @class_view_decorator(otp_required)
 class OnboardingSetupScanOOIDetailView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     SingleOOITreeMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
@@ -263,7 +269,6 @@ class OnboardingSetupScanOOIDetailView(
 ):
     template_name = "step_3c_setup_scan_ooi_detail.html"
     current_step = 3
-    permission_required = "tools.can_view_redteam_onboarding"
 
     def get_ooi_id(self) -> str:
         if "ooi_id" in self.request.session:
@@ -299,7 +304,7 @@ class OnboardingSetupScanOOIDetailView(
 
 @class_view_decorator(otp_required)
 class OnboardingSetClearanceLevelView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     FormView,
@@ -308,7 +313,6 @@ class OnboardingSetClearanceLevelView(
     form_class = OnboardingSetClearanceLevelForm
     current_step = 3
     initial = {"level": 2}
-    permission_required = "tools.can_view_redteam_onboarding"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -351,13 +355,12 @@ class OnboardingSetClearanceLevelView(
 
 @class_view_decorator(otp_required)
 class OnboardingReportView(
-    RockyPermissionRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
     template_name = "step_4_report.html"
     current_step = 4
-    permission_required = "tools.can_view_redteam_onboarding"
 
     def post(self, request, *args, **kwargs):
         if "ooi_id" not in request.GET:
@@ -373,10 +376,9 @@ class OnboardingReportView(
         member.save()
 
 
-class BaseReportView(RockyPermissionRequiredMixin, BaseOOIDetailView):
+class BaseReportView(RedteamRequiredMixin, BaseOOIDetailView):
     report: Type[Report]
     depth = 15
-    permission_required = "tools.can_view_redteam_onboarding"
 
     def get_tree_dict(self):
         return create_object_tree_item_from_ref(self.tree.root, self.tree.store)
@@ -422,18 +424,26 @@ class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):
     ]
 
 
+class AdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if self.request.user.is_superuser:
+            return True
+        members = OrganizationMember.objects.filter(user=self.request.user)
+        for member in members:
+            if member.is_admin:
+                return True
+        return False
+
+
 # account flow
 @class_view_decorator(otp_required)
-class OnboardingIntroductionRegistrationView(
-    RockyPermissionRequiredMixin, KatIntroductionRegistrationStepsMixin, TemplateView
-):
+class OnboardingIntroductionRegistrationView(AdminRequiredMixin, KatIntroductionRegistrationStepsMixin, TemplateView):
     """
     Step: 1 - Registration introduction
     """
 
     template_name = "account/step_1_registration_intro.html"
     current_step = 1
-    permission_required = "tools.can_view_admin_onboarding"
 
 
 @class_view_decorator(otp_required)
@@ -544,22 +554,17 @@ class OnboardingIndemnificationSetupView(
 
 
 @class_view_decorator(otp_required)
-class OnboardingAccountSetupIntroView(RockyPermissionRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
+class OnboardingAccountSetupIntroView(AdminRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
     """
     Step 4: Split flow to or continue with single account or continue to multiple account creation
     """
 
     template_name = "account/step_2c_account_setup_intro.html"
     current_step = 4
-    permission_required = "tools.can_view_admin_onboarding"
 
 
 @class_view_decorator(otp_required)
-class OnboardingAccountCreationMixin(RockyPermissionRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
-    """ """
-
-    permission_required = "tools.add_organizationmember"
-
+class OnboardingAccountCreationMixin(AdminRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["organization_code"] = self.organization.code

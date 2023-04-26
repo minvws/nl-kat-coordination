@@ -3,8 +3,7 @@
 
 <ul>
     {% if request.user.is_authenticated %}
-        {% has_organization_perms "tools.view_organization" request.user as view_organization %}
-        {% if view_organization %}
+        {% if perms.tools.view_organization %}
             <li>
                 <a href="{% url "organization_list" %}"
                    {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Organizations" %}</a>

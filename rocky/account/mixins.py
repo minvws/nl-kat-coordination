@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import Permission
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from tools.models import Indemnification, Organization, OrganizationMember
@@ -118,7 +118,28 @@ class OrganizationView(View):
         return True
 
 
-class RockyPermissionRequiredMixin(PermissionRequiredMixin):
+class MemberPermissionMixin:
+    def get_member_permissions(self, member):
+        return [
+            "%s.%s" % (ct, name)
+            for ct, name in Permission.objects.filter(group__organizationmember=member).values_list(
+                "content_type__app_label", "codename"
+            )
+        ]
+
+    def has_member_perms(self, permission, member):
+        if isinstance(permission, str):
+            perms = (permission,)
+        else:
+            perms = permission
+        member_permssions = self.get_member_permissions(member)
+        for perm in perms:
+            if perm in member_permssions:
+                return True
+        return False
+
+
+class RockyPermissionRequiredMixin(PermissionRequiredMixin, MemberPermissionMixin):
     """
     An organization member can have different roles and set of permissions based on which organization they belong to.
     We do not want to check permissions based solely on the user but also on the organization member.
@@ -128,14 +149,4 @@ class RockyPermissionRequiredMixin(PermissionRequiredMixin):
         user_perm = super().has_permission()
         if user_perm:
             return user_perm
-        organization_code = self.kwargs.get("organization_code")
-        if organization_code is not None:
-            organization = get_object_or_404(Organization, code=organization_code)
-            member = get_object_or_404(OrganizationMember, user=self.request.user, organization=organization)
-        # if no organization is giving, check if permission exists in one of member's organzation
-        members = OrganizationMember.objects.filter(user=self.request.user)
-        if members:
-            for member in members:
-                if member.has_member_perms(self.permission_required):
-                    return True
-        return False
+        return self.has_member_perms(self.permission_required, self.organization_member)

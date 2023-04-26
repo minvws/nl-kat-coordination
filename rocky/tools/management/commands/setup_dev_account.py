@@ -47,7 +47,6 @@ class Command(BaseCommand):
                 "add_organizationmember",
                 "change_organization",
                 "change_organizationmember",
-                "can_view_admin_onboarding",
                 "add_indemnification",
             ]
         )
@@ -58,7 +57,6 @@ class Command(BaseCommand):
                 "can_scan_organization",
                 "can_enable_disable_boefje",
                 "can_set_clearance_level",
-                "can_view_redteam_onboarding",
             ]
         )
         self.group_redteam.permissions.set(redteam_permissions)
