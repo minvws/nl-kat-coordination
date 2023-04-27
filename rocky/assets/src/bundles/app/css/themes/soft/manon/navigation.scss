@@ -1,7 +1,7 @@
 /* Navigation - Variables */
 
 :root {
-  --navigation-collapsible-menu-list-item-collapsed-hover-background-color: #14131a;
+  /* nav */
   --navigation-gap: 1rem;
   --navigation-align-content: flex-start;
   --navigation-list-gap: var(--navigation-gap);
@@ -9,4 +9,21 @@
   --navigation-link-hover-text-decoration: none;
   --navigation-background-color: var(--application-base-background-color);
   --navigation-text-color: var(--application-base-text-color);
+
+  /* Main navigation */
+  --header-navigation-min-height: 5rem;
+  --header-navigation-gap: 1rem;
+  --header-navigation-content-wrapper-flex-direction: row;
+  --header-navigation-content-wrapper-justify-content: space-between;
+  --header-navigation-content-wrapper-align-items: center;
+  --header-navigation-content-wrapper-background-color: pink;
+
+  /* Collapsing menu */
+  --navigation-collapsible-menu-collapsing-menu-width: 100%;
+  --navigation-collapsible-menu-list-item-collapsed-hover-background-color: #14131a;
+
+}
+
+body > header nav div {
+  gap: 1rem;
 }
