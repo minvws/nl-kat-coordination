@@ -1,6 +1,6 @@
 import ipaddress
 import json
-from typing import Iterator, Union
+from typing import Generator, Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
@@ -28,7 +28,7 @@ def get_name_from_cpe(cpe: str) -> str:
         return cpe
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]

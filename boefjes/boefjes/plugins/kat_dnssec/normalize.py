@@ -1,12 +1,12 @@
 import json
-from typing import Iterator, Union
+from typing import Generator, Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     result = json.loads(raw)
 
     boefje_meta = normalizer_meta.raw_data.boefje_meta

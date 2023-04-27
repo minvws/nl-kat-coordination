@@ -1,12 +1,12 @@
 import json
-from typing import Iterator, Union
+from typing import Generator, Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.web import HTTPHeader
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     # fetch a reference to the original resource where these headers where downloaded from
     resource = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 

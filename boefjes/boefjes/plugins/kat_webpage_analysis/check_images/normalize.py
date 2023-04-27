@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import Iterator, Union
+from typing import Generator, Union
 
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
@@ -10,7 +10,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import ImageMetadata
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     # fetch a reference to the original resource where these headers where downloaded from
     resource = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
     image = Image.open(BytesIO(raw))

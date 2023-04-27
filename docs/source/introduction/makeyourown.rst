@@ -215,7 +215,7 @@ The file normalize.py contains the actual normalizer: Its only job is to parse r
 .. code-block:: python
 
  import json
- from typing import Iterator, Union
+ from typing import Generator, Union
 
  from octopoes.models import OOI, Reference
  from octopoes.models.ooi.findings import CVEFindingType, Finding
@@ -223,7 +223,7 @@ The file normalize.py contains the actual normalizer: Its only job is to parse r
 
  from boefjes.job_models import NormalizerMeta
 
- def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     results = json.loads(raw)
     ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 

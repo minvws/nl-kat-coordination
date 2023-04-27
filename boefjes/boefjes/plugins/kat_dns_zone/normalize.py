@@ -1,4 +1,4 @@
-from typing import Iterator, Union
+from typing import Generator, Union
 
 from dns.message import Message, from_text
 from dns.rdata import Rdata
@@ -13,7 +13,7 @@ from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.network import Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     internet = Network(name="internet")
 
     # parse raw data into dns.message.Message

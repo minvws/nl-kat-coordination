@@ -1,6 +1,6 @@
 import json
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, Iterator, List, Union
+from typing import Dict, Generator, List, Union
 
 from dns.message import Message, from_text
 from dns.rdata import Rdata
@@ -30,7 +30,7 @@ from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     internet = Network(name="internet")
 
     if raw.decode() == "NXDOMAIN":

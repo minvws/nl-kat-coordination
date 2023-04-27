@@ -2,7 +2,7 @@ import ipaddress
 import json
 import re
 from collections.abc import Iterable
-from typing import Iterator, Union
+from typing import Generator, Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
@@ -22,7 +22,7 @@ from octopoes.models.ooi.network import (
 from octopoes.models.ooi.software import Software, SoftwareInstance
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     results = json.loads(raw)
 
     boefje_meta = normalizer_meta.raw_data.boefje_meta

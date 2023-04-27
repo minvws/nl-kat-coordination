@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator, Union
+from typing import Iterator, Union , Generator
 
 from libnmap.objects import NmapHost, NmapService
 from libnmap.parser import NmapParser
@@ -56,7 +56,7 @@ def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Referen
             yield ip_service
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     """Decouple and parse Nmap XMLs and yield relevant network."""
     # Multiple XMLs are concatenated through "\n\n". XMLs end with "\n"; we split on "\n\n\n".
     raw = raw.decode().split("\n\n\n")

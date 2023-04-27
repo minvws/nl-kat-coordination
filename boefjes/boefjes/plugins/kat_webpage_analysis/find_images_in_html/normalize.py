@@ -1,4 +1,4 @@
-from typing import Iterator, Union
+from typing import Generator, Union
 from urllib.parse import urljoin
 
 import validators
@@ -10,7 +10,7 @@ from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     soup = BeautifulSoup(raw, "html.parser")
     images = set([img["src"] for img in soup.find_all("img", src=True)])
 

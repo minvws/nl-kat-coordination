@@ -1,8 +1,8 @@
-from typing import Iterator, Union
+from typing import Generator, Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
     yield 3
