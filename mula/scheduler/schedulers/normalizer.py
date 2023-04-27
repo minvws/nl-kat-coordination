@@ -4,10 +4,9 @@ from concurrent import futures
 from types import SimpleNamespace
 from typing import List, Optional
 
-import pika
 import requests
 
-from scheduler import context, queues, rankers
+from scheduler import connectors, context, queues, rankers
 from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, RawData, TaskStatus
 
 from .scheduler import Scheduler
@@ -44,32 +43,18 @@ class NormalizerScheduler(Scheduler):
     def run(self) -> None:
         self.run_in_thread(
             name="raw_file",
-            func=self.push_tasks_for_received_raw_file,
+            func=self.listen_for_raw_data,
         )
 
-    def push_tasks_for_received_raw_file(self) -> None:
-        latest_raw_data = None
-        try:
-            latest_raw_data = self.ctx.services.raw_data.get_latest_raw_data(
-                queue=f"{self.organisation.id}__raw_file_received",
-            )
-        except (
-            pika.exceptions.ConnectionClosed,
-            pika.exceptions.ChannelClosed,
-            pika.exceptions.ChannelClosedByBroker,
-            pika.exceptions.AMQPConnectionError,
-        ) as e:
-            self.logger.debug(
-                "Could not connect to rabbitmq queue: %s [organisation.id=%s, scheduler_id=%s]",
-                f"{self.organisation.id}__raw_file_received",
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            if self.stop_event.is_set():
-                raise e
+    def listen_for_raw_data(self) -> None:
+        listener = connectors.listeners.RawData(
+            dsn=self.ctx.config.host_raw_data,
+            queue=f"{self.organisation.id}__raw_file_received",
+            func=self.push_tasks_for_received_raw_data,
+        )
+        listener.listen()
 
-        # Stop the loop when we've processed everything from the
-        # messaging queue, so we can continue to the next step.
+    def push_tasks_for_received_raw_data(self, latest_raw_data: RawData) -> None:
         if latest_raw_data is None:
             self.logger.debug(
                 "No new raw data on message queue [organisation.id=%s, scheduler_id=%s]",
@@ -121,7 +106,7 @@ class NormalizerScheduler(Scheduler):
                     self.push_task,
                     normalizer,
                     latest_raw_data.raw_data,
-                    self.push_tasks_for_received_raw_file.__name__,
+                    self.push_tasks_for_received_raw_data.__name__,
                 )
 
     # TODO: check Optional[str]

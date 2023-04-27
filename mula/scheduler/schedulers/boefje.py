@@ -5,11 +5,19 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from typing import List, Optional
 
-import pika
 import requests
 
-from scheduler import context, queues, rankers
-from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
+from scheduler import connectors, context, queues, rankers
+from scheduler.models import (
+    OOI,
+    Boefje,
+    BoefjeTask,
+    Organisation,
+    Plugin,
+    PrioritizedItem,
+    ScanProfileMutation,
+    TaskStatus,
+)
 
 from .scheduler import Scheduler
 
@@ -54,7 +62,7 @@ class BoefjeScheduler(Scheduler):
         """
         self.run_in_thread(
             name="mutations",
-            func=self.push_tasks_for_scan_profile_mutations,
+            func=self.listen_for_scan_profile_mutations,
         )
 
         self.run_in_thread(
@@ -69,31 +77,22 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
-    def push_tasks_for_scan_profile_mutations(self) -> None:
+    def listen_for_scan_profile_mutations(self) -> None:
+        """Create tasks for oois that have a scan level change.
+        """
+        listener = connectors.listeners.ScanProfileMutation(
+            dsn=self.ctx.config.host_raw_data,
+            queue=f"{self.organisation.id}__scan_profile_mutations",
+            func=self.push_tasks_for_scan_profile_mutations,
+        )
+        listener.listen()
+
+    def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
         """Create tasks for oois that have a scan level change.
 
         We loop until we don't have any messages on the queue anymore.
         """
-        mutation = None
-        try:
-            mutation = self.ctx.services.scan_profile_mutation.get_scan_profile_mutation(
-                queue=f"{self.organisation.id}__scan_profile_mutations",
-            )
-        except (
-            pika.exceptions.ConnectionClosed,
-            pika.exceptions.ChannelClosed,
-            pika.exceptions.ChannelClosedByBroker,
-            pika.exceptions.AMQPConnectionError,
-        ) as e:
-            self.logger.debug(
-                "Could not connect to rabbitmq queue: %s [organisation.id=%s, scheduler_id=%s]",
-                f"{self.organisation.id}__scan_profile_mutations",
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            if self.stop_event.is_set():
-                raise e
-
+        # FIXME: can be removed
         if mutation is None:
             self.logger.debug(
                 "No more mutation left on queue, processed everything [organisation.id=%s, scheduler_id=%s]",
@@ -124,14 +123,23 @@ class BoefjeScheduler(Scheduler):
 
         # What available boefjes do we have for this ooi?
         boefjes = self.get_boefjes_for_ooi(ooi)
-        if boefjes is None or len(boefjes) == 0:
-            self.logger.debug(
-                "No boefjes available for ooi %s, skipping [organisation.id=%s, scheduler_id=%s]",
-                mutation.value,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
+        if not boefjes:
+            # If was a scan level was updated and we have no boefjes available,
+            # it's likely that we haven't got the recent available boefjes yet,
+            # this is likely because the expiration of the cache hasn't been
+            # reached.
+            if mutation.operation == "update":
+                self.ctx.services.katalogus.flush_cache()
+                boefjes = self.get_boefjes_for_ooi(ooi)
+
+            if not boefjes:
+                self.logger.debug(
+                    "No boefjes available for %s [organisation.id=%s, scheduler_id=%s]",
+                    ooi.primary_key,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                return
 
         with futures.ThreadPoolExecutor() as executor:
             for boefje in boefjes:
