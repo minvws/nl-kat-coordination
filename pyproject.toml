@@ -26,6 +26,7 @@ paths = ["."]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
 # To be extended with DJ, PT, RUF, C90, D, PL, RET
 select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP"]
+ignore = ["UP007"] # non-pep604-annotation is not actually compatible with 3.8
 fix = true
 
 # Exclude a variety of commonly ignored directories.
