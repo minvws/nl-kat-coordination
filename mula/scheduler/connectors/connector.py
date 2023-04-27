@@ -19,7 +19,7 @@ class Connector:
         try:
             socket.create_connection((hostname, port))
             return True
-        except socket.error:
+        except OSError:
             return False
 
     def is_host_healthy(self, host: str, health_endpoint: str) -> bool:
