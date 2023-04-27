@@ -8,96 +8,100 @@
          data-close-label="Sluit menu"
          data-media="(min-width: 56rem)"
          aria-label="Hoofdnavigatie">
-        <a href="{% url "landing_page" %}"
-           class="logo"
-           title="OpenKAT"
-           aria-label="{% translate "OpenKAT logo, go to the homepage of OpenKAT" %}">
-            <img src="{% static 'img/kat_logo.png' %}" alt="{% translate "OpenKAT" %}"/>
-            Kwetsbaarheden Analyse Tool
-        </a>
-        <!-- Adjust breakpoint as needed -->
 
-        <!-- Collapsible menu -->
-        <div class="collapsing-menu">
-            <ul>
-                {% if request.user.is_authenticated %}
-                    {% if not view_type == "onboarding" %}
-                        {% include "partials/organizations_menu_dropdown.html" %}
+        <div> <!-- Content wrapper -->
+            <a href="{% url "landing_page" %}"
+            class="logo"
+            title="OpenKAT"
+            aria-label="{% translate "OpenKAT logo, go to the homepage of OpenKAT" %}">
+                <img src="{% static 'img/kat_logo.png' %}" alt="{% translate "OpenKAT" %}"/>
+                Kwetsbaarheden Analyse Tool
+            </a>
 
-                    {% endif %}
-                    {% if not organization.code %}
-                        <li>
-                            <a href="{% url "crisis_room" %}"
-                            {% if 'crisis-room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
-                        </li>
-                    {% else %}
-                        <li>
-                            <a href="{% url "organization_crisis_room" organization.code %}"
-                            {% if 'crisis_room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
-                        </li>
-                    {% endif %}
-                    {% if organization.code and not view_type == "onboarding" %}
-                        <li>
-                            <a href="{% url "katalogus" organization.code %}"
-                            {% if 'kat-alogus' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "KAT-alogus" %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url "finding_list" organization.code %}"
-                            {% if 'finding' in request.path|urlencode or 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate "Findings" %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url "ooi_list" organization.code %}"
-                            {% if 'objects' in request.path|urlencode and not 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate "Objects" %}</a>
-                        </li>
-                        <li>
-                            <a href="{% url "task_list" organization.code %}"
-                            {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
-                        </li>
-                        {% if request.user.is_superuser or perms.tools.view_organization %}
+            {% if request.user.is_authenticated %}
+                {% if not view_type == "onboarding" %}
+                    {% include "partials/organizations_menu_dropdown.html" %}
+
+                {% endif %}
+            {% endif %}
+
+            <div class="collapsing-menu"> <!-- Collapsible menu -->
+                <ul>
+                    {% if request.user.is_authenticated %}
+                        {% if not organization.code %}
                             <li>
-                                <a href="{% url "organization_member_list" organization.code %}"
-                                {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Members" %}</a>
+                                <a href="{% url "crisis_room" %}"
+                                {% if 'crisis-room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
                             </li>
+                        {% else %}
                             <li>
-                                <a href="{% url "organization_settings" organization.code %}"
-                                {% if 'settings' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Settings" %}</a>
+                                <a href="{% url "organization_crisis_room" organization.code %}"
+                                {% if 'crisis_room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
                             </li>
                         {% endif %}
+                        {% if organization.code and not view_type == "onboarding" %}
+                            <li>
+                                <a href="{% url "katalogus" organization.code %}"
+                                {% if 'kat-alogus' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "KAT-alogus" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url "finding_list" organization.code %}"
+                                {% if 'finding' in request.path|urlencode or 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate "Findings" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url "ooi_list" organization.code %}"
+                                {% if 'objects' in request.path|urlencode and not 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate "Objects" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url "task_list" organization.code %}"
+                                {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
+                            </li>
+                            {% if request.user.is_superuser or perms.tools.view_organization %}
+                                <li>
+                                    <a href="{% url "organization_member_list" organization.code %}"
+                                    {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Members" %}</a>
+                                </li>
+                                <li>
+                                    <a href="{% url "organization_settings" organization.code %}"
+                                    {% if 'settings' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Settings" %}</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-            </ul>
-
-            <div>
-                <div class="language-selector">
-                    <p>Kies een taal:</p>
-                    <p class="visually-hidden" id="language-selector-description">Select your language</p>
-                    <div class="language-selector-options" aria-describedby="language-selector-description" aria-expanded="false">
-                    <button aria-haspopup="listbox" aria-current="true" class="dropdown-button ghost">
-                        EN
-                    </button>
-                    <ul role="listbox">
-                        <li>
-                            <a hreflang="nl" href="#" role="option" data-value="Nederlands" lang="nl">Nederlands</a>
-                        </li>
-                        <li>
-                            <a hreflang="en" href="#" role="option" data-value="English" lang="en">English</a>
-                        </li>
-                        <li>
-                            <a hreflang="fy" href="#" role="option" data-value="Frysk" lang="fy">Frysk</a>
-                        </li>
-                        <li aria-current="true">
-                            <a hreflang="pap-CW" href="#" role="option" data-value="Papiamentu" lang="pap-CW">Papiamentu</a>
-                        </li>
-                        <li>
-                            <a hreflang="pap-AW" href="#" role="option" data-value="Papiamento" lang="pap-AW">Papiamento</a>
-                        </li>
-                    </ul>
-                    </div>
-                </div>
-
-                <ul>
-                    {% include "partials/secondary-menu.html" %}
                 </ul>
+
+                <div>
+                    <div class="language-selector">
+                        <p>Kies een taal:</p>
+                        <p class="visually-hidden" id="language-selector-description">Select your language</p>
+                        <div class="language-selector-options" aria-describedby="language-selector-description" aria-expanded="false">
+                        <button aria-haspopup="listbox" aria-current="true" class="dropdown-button ghost">
+                            EN
+                        </button>
+                        <ul role="listbox">
+                            <li>
+                                <a hreflang="nl" href="#" role="option" data-value="Nederlands" lang="nl">Nederlands</a>
+                            </li>
+                            <li>
+                                <a hreflang="en" href="#" role="option" data-value="English" lang="en">English</a>
+                            </li>
+                            <li>
+                                <a hreflang="fy" href="#" role="option" data-value="Frysk" lang="fy">Frysk</a>
+                            </li>
+                            <li aria-current="true">
+                                <a hreflang="pap-CW" href="#" role="option" data-value="Papiamentu" lang="pap-CW">Papiamentu</a>
+                            </li>
+                            <li>
+                                <a hreflang="pap-AW" href="#" role="option" data-value="Papiamento" lang="pap-AW">Papiamento</a>
+                            </li>
+                        </ul>
+                        </div>
+                    </div>
+
+                    <ul>
+                        {% include "partials/secondary-menu.html" %}
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
