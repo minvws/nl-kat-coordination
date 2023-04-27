@@ -2,7 +2,7 @@ import csv
 import io
 import logging
 from ipaddress import IPv4Network, ip_network
-from typing import Dict, Generator, List, Tuple, Union
+from typing import Dict, Iterable, List, Tuple, Union
 
 from pydantic import ValidationError
 
@@ -24,7 +24,7 @@ OOI_TYPES = {
 logger = logging.getLogger(__name__)
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Generator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     reference_cache = {"Network": {"internet": Network(name="internet")}}
 
     yield from process_csv(raw, reference_cache)
