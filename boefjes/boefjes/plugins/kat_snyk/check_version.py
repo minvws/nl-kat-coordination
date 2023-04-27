@@ -92,7 +92,9 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
         end_bracket = re.search("[])]$", upperbound)
         if not upperbound or not end_bracket:
             # Unexpected input: there is no closing-bracket
-            logger.warning(f"Unexpected input, missing closing bracket for {lowerbound},{upperbound}. Ignoring input.")
+            logger.warning(
+                "Unexpected input, missing closing bracket for %s,%s. Ignoring input.", lowerbound, upperbound
+            )
             return False, None
         if lowerbound[0] == "(":
             lowerbound_versioncheck = VersionCheck.GREATER
@@ -135,7 +137,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
 
     # Check if upperbound is >, >=, = or *
     if upperbound is None:
-        logger.warning(f"Unexpected upperbound in kat_snyk.normalize: {all_versions}")
+        logger.warning("Unexpected upperbound in kat_snyk.normalize: %s", all_versions)
         return False, None
 
     start_inequality = re.search(regex_ineq_upperbound, upperbound)
@@ -159,7 +161,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
     elif upperbound == "*":
         upperbound_versioncheck = VersionCheck.ALL
     else:
-        logger.warning(f"Unexpected input in kat_snyk.normalize: {all_versions}")
+        logger.warning("Unexpected input in kat_snyk.normalize: %s", all_versions)
         return False, None
 
     # Check upperbound

@@ -25,7 +25,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     software_version = input_["version"]
 
     if not results["table_versions"] and not results["table_vulnerabilities"] and not results["cve_vulnerabilities"]:
-        logger.warning(f"Couldn't find software {software_name} in the SNYK vulnerability database")
+        logger.warning("Couldn't find software %s in the SNYK vulnerability database", software_name)
         return
     elif not results["table_vulnerabilities"] and not results["cve_vulnerabilities"]:
         # no vulnerabilities found

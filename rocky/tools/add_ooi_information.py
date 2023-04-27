@@ -326,7 +326,7 @@ def capec_info(capec_id: str) -> dict:
 
 def get_info(ooi_type: str, natural_key: str) -> dict:
     """Adds OOI information to the OOI Information table"""
-    logger.info(f"Getting OOI information for {ooi_type} {natural_key}")
+    logger.info("Getting OOI information for %s %s", ooi_type, natural_key)
     if ooi_type == "IPPort":
         protocol, port = natural_key.split(SEPARATOR)
         description, source = port_info(port, protocol)
