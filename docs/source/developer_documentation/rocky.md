@@ -1,11 +1,10 @@
-## Rocky (nl-kat)
+## Rocky
 
 Rocky is part of the openKAT project, made with Django.
-See [nl-kat-coordination](https://github.com/minvws/nl-kat-coordination) for more details about openKAT.
 
 ## Stack
 
-As said, Django is the framework for this project.
+Django is the framework for this project.
 To comply to government standards, use [Manon](https://github.com/minvws/nl-rdo-manon) for style and accessibility.
 Yarn is used as package manager and ParcelJS is used as bundler to compile the frontend (CSS and Javascript).
 You can find the Manon repository here: [https://github.com/minvws/nl-rdo-manon](https://github.com/minvws/nl-rdo-manon)
