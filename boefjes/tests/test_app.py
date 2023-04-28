@@ -31,11 +31,11 @@ class MockSchedulerClient(SchedulerClientInterface):
             return parse_raw_as(QueuePrioritizedItem, self.normalizer_responses.pop(0))
 
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
-        with open(self.log_path, "a") as f:
+        with self.log_path.open("a") as f:
             f.write(f"{task_id},{status.value}\n")
 
     def get_all_patched_tasks(self) -> List[List[str]]:
-        with open(self.log_path) as f:
+        with self.log_path.open() as f:
             return [x.strip().split(",") for x in f]
 
 
@@ -59,13 +59,13 @@ class MockHandler(Handler):
 
         self.calls += 1
 
-        with open(self.log_path, "a") as f:
+        with self.log_path.open("a") as f:
             f.write(f"{item.json()}\n")
 
         time.sleep(self.sleep_time)
 
     def get_all(self) -> List[Union[BoefjeMeta, NormalizerMeta]]:
-        with open(self.log_path) as f:
+        with self.log_path.open() as f:
             f = [x for x in f]
             return [parse_raw_as(Union[BoefjeMeta, NormalizerMeta], x) for x in f]
 

@@ -12,7 +12,7 @@ def setup_loggers(settings: Settings) -> None:
     """Load logging configuration."""
     logger = getLogger(__name__)
     try:
-        with open(settings.log_cfg, encoding="utf-8") as log_config:
+        with settings.log_cfg.open("rt", encoding="utf-8") as log_config:
             config.dictConfig(json.load(log_config))
             logger.info("Logging configuration loaded. [log_cfg=%s]", settings.log_cfg)
     except FileNotFoundError:
