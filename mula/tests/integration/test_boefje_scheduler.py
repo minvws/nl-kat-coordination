@@ -597,11 +597,7 @@ class SchedulerTestCase(unittest.TestCase):
     @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
     @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
     def test_push_tasks_for_random_objects_not_allowed_to_run(
-        self,
-        mock_get_random_objects,
-        mock_get_boefjes_for_ooi,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
+        self, mock_get_random_objects, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running
     ):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)

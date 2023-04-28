@@ -61,10 +61,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         """When pushing an item that is not of the correct type, the item
         shouldn't be pushed.
         """
-        p_item = {
-            "priority": 1,
-            "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex),
-        }
+        p_item = {"priority": 1, "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)}
 
         with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
             self.pq.push(p_item=p_item)
