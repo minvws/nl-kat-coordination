@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     kat_private_key_b64: str = ""
     vws_public_key_b64: str = ""
 
+    span_export_grpc_endpoint: Optional[str]
     bytes_metrics_ttl_seconds: int = 300
 
 
