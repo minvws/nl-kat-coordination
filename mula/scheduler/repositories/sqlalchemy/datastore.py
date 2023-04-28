@@ -77,8 +77,12 @@ def retry(max_retries: int = 3, retry_delay: float = 5.0):
                         raise e
 
                     logger.warning(
-                        f"Retrying {func.__module__}.{func.__name__} in "
-                        "{retry_delay} seconds ({i+1}/{max_retries}): {e}"
+                        "Retrying %s.%s in %f seconds (%f): %s",
+                        func.__module__,
+                        func.__name__,
+                        retry_delay,
+                        i + 1 / max_retries,
+                        e,
                     )
                     time.sleep(retry_delay)
 

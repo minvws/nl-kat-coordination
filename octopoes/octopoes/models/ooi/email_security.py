@@ -52,7 +52,7 @@ class DNSSPFMechanismIP(DNSSPFMechanism):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return (
             f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.hostname.name}"
-            + f"{reference.tokenized.mechanism} {reference.tokenized.ip.address}"
+            f"{reference.tokenized.mechanism} {reference.tokenized.ip.address}"
         )
 
 
@@ -71,7 +71,7 @@ class DNSSPFMechanismHostname(DNSSPFMechanism):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return (
             f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.hostname.name} "
-            + f"{reference.tokenized.mechanism} {reference.tokenized.hostname.name}"
+            f"{reference.tokenized.mechanism} {reference.tokenized.hostname.name}"
         )
 
 
@@ -90,7 +90,7 @@ class DNSSPFMechanismNetBlock(DNSSPFMechanism):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return (
             f"SPF Record of {reference.tokenized.spf_record.dns_txt_record.hostname.name} "
-            + f" {reference.tokenized.mechanism} {reference.tokenized.netblock.start_ip}"
+            f" {reference.tokenized.mechanism} {reference.tokenized.netblock.start_ip}"
             f"/{reference.tokenized.netblock.mask}"
         )
 

@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import pkgutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -52,7 +51,7 @@ class LocalPluginRepository:
         path = boefjes[id_].path / "schema.json"
 
         if not path.exists():
-            logger.debug(f"Did not find schema for boefje {boefjes[id_]=}")
+            logger.debug("Did not find schema for boefje %s", boefjes[id_])
             return None
 
         return json.loads(path.read_text())
@@ -67,10 +66,10 @@ class LocalPluginRepository:
         path = boefje.path / "cover.jpg"
 
         if not path.exists():
-            logger.debug(f"Did not find cover for boefje {boefje=}")
+            logger.debug("Did not find cover for boefje %s", boefje)
             return self.default_cover_path()
 
-        logger.debug(f"Found cover for boefje {boefje=}")
+        logger.debug("Found cover for boefje %s", boefje)
 
         return path
 
@@ -129,7 +128,7 @@ class LocalPluginRepository:
 
     @staticmethod
     def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
-        relative_path = str(package_dir.absolute()).replace(os.getcwd(), "")  # e.g. "/boefjes/plugins"
+        relative_path = str(package_dir.absolute()).replace(str(Path.cwd()), "")  # e.g. "/boefjes/plugins"
 
         return f"{relative_path[1:].replace('/', '.')}."  # Turns into "boefjes.plugins."
 

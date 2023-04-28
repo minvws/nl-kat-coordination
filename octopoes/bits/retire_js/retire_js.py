@@ -1,6 +1,6 @@
 import hashlib
 import json
-from os import path
+from pathlib import Path
 from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
@@ -16,8 +16,8 @@ def run(
     software_name = input_ooi.name
     software_version = input_ooi.version if input_ooi.version else "999.9.9"
 
-    filename_path = path.join(path.dirname(__file__), "retirejs.json")
-    with open(filename_path, encoding="utf-8") as json_file:
+    filename_path = Path(__file__).parent / "retirejs.json"
+    with filename_path.open(encoding="utf-8") as json_file:
         known_vulnerabilities = json.load(json_file)
 
     vulnerabilities = _check_vulnerabilities(software_name, software_version, known_vulnerabilities)
