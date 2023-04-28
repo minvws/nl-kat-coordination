@@ -34,7 +34,7 @@ class AppContext:
             raise Exception("PostgreSQL is the only supported database backend")
 
         # Load logging configuration
-        with open(self.config.log_cfg, "rt", encoding="utf-8") as f:
+        with open(self.config.log_cfg, encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
         # Services

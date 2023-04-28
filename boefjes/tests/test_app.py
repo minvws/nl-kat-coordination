@@ -35,7 +35,7 @@ class MockSchedulerClient(SchedulerClientInterface):
             f.write(f"{task_id},{status.value}\n")
 
     def get_all_patched_tasks(self) -> List[List[str]]:
-        with open(self.log_path, "r") as f:
+        with open(self.log_path) as f:
             return [x.strip().split(",") for x in f]
 
 
@@ -65,7 +65,7 @@ class MockHandler(Handler):
         time.sleep(self.sleep_time)
 
     def get_all(self) -> List[Union[BoefjeMeta, NormalizerMeta]]:
-        with open(self.log_path, "r") as f:
+        with open(self.log_path) as f:
             f = [x for x in f]
             return [parse_raw_as(Union[BoefjeMeta, NormalizerMeta], x) for x in f]
 
