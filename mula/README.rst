@@ -2,7 +2,7 @@
 Mula
 ====
 
-Mula is the scheduler for OpenKAT. Read all about OpenKAT `in the official documentation <https://docs.openkat.nl>`_. Information on Mula can be found in `the extensive developer documentation <https://github.com/minvws/nl-kat-coordination/blob/ring-ring-ring-freshreadmes/docs/source/developer_documentation/mula.md>`_ and in the `docs folder for this module <https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs>`_.
+Mula is the scheduler for OpenKAT. Read all about OpenKAT `in the official documentation <https://docs.openkat.nl>`_. Information on Mula can be found in `the extensive developer documentation <https://docs.openkat.nl/developer_documentation/index.html>`_ and in the `docs folder for this module <https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs>`_.
 
 * `Documentation of OpenKAT <https://docs.openkat.nl>`_
 * `Developer documentation <https://docs.openkat.nl/developer_documentation/index.html>`_
