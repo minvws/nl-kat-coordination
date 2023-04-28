@@ -2,7 +2,7 @@
 Test or develop via GitPod
 ==========================
 
-Through Gitpod, anyone (with a github, gitlab account) can quickly start up and test an OpenKAT environment. Gitpod offers a basic test enviroment that allows you to build OpenKAT directly from the repository.
+Through Gitpod, anyone (with a github, gitlab account) can quickly start up and test an OpenKAT environment. Gitpod offers a basic test environment that allows you to build OpenKAT directly from the repository.
 
 Gitpod test environment
 =======================
