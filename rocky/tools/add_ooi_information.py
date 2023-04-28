@@ -2,7 +2,6 @@ import datetime
 import hashlib
 import json
 import logging
-import os
 import re
 from dataclasses import dataclass
 from itertools import product
@@ -81,8 +80,8 @@ def _snyk_search(snyk_id: str) -> Dict:
 
 def retirejs_info(retirejs_id: str) -> dict:
     """Uses the retirejs vulnerabilities list to find outdated javascript instances"""
-    filename_path = os.path.join(settings.BASE_DIR, "data/retirejs.json")
-    with open(filename_path, encoding="utf-8") as json_file:
+    filename_path = settings.BASE_DIR / "data/retirejs.json"
+    with filename_path.open(encoding="utf-8") as json_file:
         data = json.load(json_file)
 
     _, name, hashed_id = retirejs_id.split("-")
