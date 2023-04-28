@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     bytes_username: str = "test"
     bytes_password: str = "secret"
 
+    span_export_grpc_endpoint: Optional[str] = None
+
     remote_ns: str = "8.8.8.8"
 
     lxd_endpoint: str = ""
