@@ -12,7 +12,7 @@
 
   /* Help */
   --form-help-button-icon-content: "\ec9d";
-  --form-help-button-icon-font-family: var(--icon-base-font-family);
+  --form-help-button-icon-font-family: var(--icon-font-family);
 
   /* Textarea */
   --form-textarea-text-color: var(--form-base-input-text-color);
@@ -20,4 +20,7 @@
 
   /* Fieldset */
   --form-fieldset-legend-font-weight: 600;
+
+  /* Nota bene */
+  --form-horizontal-view-fieldset-nota-bene-required-margin-bottom: 0.5rem;
 }

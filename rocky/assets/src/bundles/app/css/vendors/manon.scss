@@ -13,7 +13,7 @@
 @use "@minvws/manon/application-base";
 
 /* Icon */
-@use "@minvws/manon/icon-base";
+@use "@minvws/manon/icon";
 
 /* Text */
 @use "@minvws/manon/headings";
@@ -33,48 +33,45 @@
 @use "@minvws/manon/visually-hidden";
 
 /* Layout */
-@use "@minvws/manon/layout-base-variables";
-@use "@minvws/manon/layout-header-content-block";
-@use "@minvws/manon/layout-main-content-block";
-@use "@minvws/manon/layout-footer-content-block";
-@use "@minvws/manon/layout-authentication";
-@use "@minvws/manon/layout-one-third-two-thirds";
-@use "@minvws/manon/layout-two-thirds-one-third";
-@use "@minvws/manon/layout-fifty-fifty";
-@use "@minvws/manon/layout-column-2";
-@use "@minvws/manon/layout-column-3";
-@use "@minvws/manon/layout-column-4";
-@use "@minvws/manon/layout-centered";
+	@use "@minvws/manon/layout-set";
 
-/* Header */
+	/* Main */
+	@use "@minvws/manon/main";
+
+	/* Section */
+	@use "@minvws/manon/section";
+	@use "@minvws/manon/section-content-wrapper";
+
+	/* Layout exceptions */
+	@use "@minvws/manon/layout-authentication";
+	@use "@minvws/manon/layout-one-third-two-thirds";
+	@use "@minvws/manon/layout-two-thirds-one-third";
+	@use "@minvws/manon/layout-fifty-fifty";
+	@use "@minvws/manon/layout-column-2";
+	@use "@minvws/manon/layout-column-3";
+	@use "@minvws/manon/layout-column-4";
+	@use "@minvws/manon/layout-centered";
+
+/* Header navigation */
 @use "@minvws/manon/header";
-@use "@minvws/manon/header-navigation-base";
-
-/* Main */
-@use "@minvws/manon/main";
-
-/* Navigation */
-@use "@minvws/manon/navigation";
-
-/* Article */
-/*@use "@minvws/manon/article-base";*/
-
-/* Section */
-@use "@minvws/manon/section";
+@use "@minvws/manon/header-navigation";
+@use "@minvws/manon/header-navigation-content-wrapper";
+@use "@minvws/manon/navigation-collapsible-menu";
 
 /* Footer */
 @use "@minvws/manon/footer";
 
 /* Components */
-@use "@minvws/manon/breadcrumb-bar-content-block";
-@use "@minvws/manon/navigation-collapsible-menu";
 @use "@minvws/manon/accordion";
-@use "@minvws/manon/filter";
+@use "@minvws/manon/breadcrumb-bar";
+@use "@minvws/manon/breadcrumb-bar-content-block";
+@use "@minvws/manon/code-base";
 @use "@minvws/manon/description-list";
+@use "@minvws/manon/filter";
+@use "@minvws/manon/language-selector-list";
 @use "@minvws/manon/hero";
 @use "@minvws/manon/pagination";
 @use "@minvws/manon/tabs";
-@use "@minvws/manon/code-base";
 
 /* Button */
 @use "@minvws/manon/button-base";
@@ -82,7 +79,7 @@
 @use "@minvws/manon/button-cta";
 @use "@minvws/manon/button-icon";
 @use "@minvws/manon/list-base";
-@use "@minvws/manon/skip-to-content-base";
+@use "@minvws/manon/skip-to-content";
 
 /* Images */
 @use "@minvws/manon/logo";
@@ -93,7 +90,7 @@
 @use "@minvws/manon/tile-groups";
 
 /* Table */
-@use "@minvws/manon/table-base"; /* Needs to be first of the set */
+@use "@minvws/manon/table"; /* Needs to be first of the set */
 @use "@minvws/manon/table-expando-rows";
 @use "@minvws/manon/table-caption";
 @use "@minvws/manon/table-number";

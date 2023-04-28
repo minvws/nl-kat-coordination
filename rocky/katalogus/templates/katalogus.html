@@ -50,7 +50,7 @@
                             </thead>
                             <tbody>
                                 {% for plugin in object_list %}
-                                    <tr>
+                                    <tr id="plugin_{{ plugin.id|slugify }}">
                                         <td scope="row">{{ plugin.name }}</td>
                                         <td>{{ plugin.description }}</td>
                                         <td>

@@ -50,7 +50,13 @@ class RetireJSFindingType(FindingTypeBase):
     information_updated: Optional[str] = Field(..., alias="information updated")
 
 
-FindingType = Union[KATFindingType, CVEFindingType, RetireJSFindingType]
+class CWEFindingType(FindingTypeBase):
+    ooi_type: Literal["CWEFindingType"]
+    risk: Optional[str]
+    source: Optional[str]
+
+
+FindingType = Union[KATFindingType, CVEFindingType, RetireJSFindingType, CWEFindingType]
 
 
 class FindingOccurrence(BaseModel):
