@@ -222,7 +222,7 @@ LANGUAGES = [
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "assets"),)
+STATICFILES_DIRS = (BASE_DIR / "assets",)
 
 LOGIN_URL = "two_factor:login"
 LOGIN_REDIRECT_URL = "crisis_room"

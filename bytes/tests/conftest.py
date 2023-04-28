@@ -26,7 +26,7 @@ def settings():
     try:
         return Settings()
     except ValidationError:  # test is probably being run outside the container setup
-        with open(Path(__file__).parent.parent / ".ci" / ".env.test") as f:
+        with (Path(__file__).parent.parent / ".ci" / ".env.test").open() as f:
             lines = [line.strip().split("=") for line in f.readlines() if line.strip() and line.strip()[-1] != "="]
 
             for key, val in lines:

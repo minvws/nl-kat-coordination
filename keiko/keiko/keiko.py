@@ -66,7 +66,7 @@ def generate_report(
 
     # read template and find used glossary entries
     found_entries: Set[str] = set()
-    with open(template.filename, encoding="utf-8") as template_file:
+    with Path(template.filename).open(encoding="utf-8") as template_file:
         for line in template_file:
             for word in line.split():
                 bare_word = baretext(word)
