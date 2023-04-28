@@ -10,5 +10,3 @@ Gitpod test environment
 Access the `Gitpod test environment through this link <https://gitpod.io/#github.com/minvws/nl-kat-coordination>`_
 
 The installation will be done from the repo, so you get a fresh install. Add your own account to OpenKAT during the installation process. Once started, the Rocky interface will be available on the service running on port 8000.
-
-
