@@ -10,6 +10,7 @@ _Please add some proof of your working change here, unless this is not required 
 ---
 
 ### Code Checklist
+- [ ] All the commits in this PR are properly PGP-signed and verified;
 - [ ] This PR only contains functionality relevant to the issue; tickets have been created for newly discovered issues.
 - [ ] I have written unit tests for the changes or fixes I made.
 - [ ] For any non-trivial functionality, I have added integration and/or end-to-end tests.
@@ -21,8 +22,8 @@ _Please add some proof of your working change here, unless this is not required 
 
 ---
 ## Checklist for code reviewers:
-Copy-paste the checklist from [the docs/source/templates folder](/docs/source/templates/pull_request_template_review_code.md).
+Copy-paste the checklist from [the docs/source/templates folder](https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/templates/pull_request_template_review_code.md) into your comment.
 
 ---
 ## Checklist for QA:
-Copy-paste the checklist from [the docs/source/templates folder](/docs/source/templates/pull_request_template_review_qa.md).
+Copy-paste the checklist from [the docs/source/templates folder](https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/templates/pull_request_template_review_qa.md) into your comment.
