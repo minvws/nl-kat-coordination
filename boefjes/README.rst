@@ -1,0 +1,12 @@
+=======
+Boefjes
+=======
+
+The purpose of the boefjes is to gather information for OpenKAT. Read all about OpenKAT `in the official documentation <https://docs.openkat.nl>`_.
+
+* `The documentation of OpenKAT <https://docs.openkat.nl>`_.
+* `Information on boefjes <https://docs.openkat.nl/introduction/howdoesitwork.html#collection-boefjes-and-whiskers>`_
+* `How to make your own boefje <https://docs.openkat.nl/introduction/makeyourown.html>`_
+* `Development documentation <https://docs.openkat.nl/developer_documentation/index.html>`_
+
+If you cannot find what you need, do `get in touch with the team <https://github.com/minvws/nl-kat-coordination/blob/main/README.rst#contact>`_!
