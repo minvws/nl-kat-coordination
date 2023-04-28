@@ -47,7 +47,7 @@ class Command(BaseCommand):
         for migration in migrations_to_export:
             migration: MigrationRecorder.Migration
 
-            logger.info(f"Exporting {migration.id}")
+            logger.info("Exporting %s", migration.id)
 
             # Generate SQL
             target = (migration.app, migration.name)
