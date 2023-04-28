@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 # Load log config
 try:
-    with open(settings.log_cfg, "r") as log_config:
+    with open(settings.log_cfg) as log_config:
         config.dictConfig(yaml.safe_load(log_config))
         logger.info("Configured loggers with config: %s", settings.log_cfg)
 except FileNotFoundError:
