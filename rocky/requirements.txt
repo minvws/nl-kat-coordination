@@ -40,5 +40,5 @@ reportlab==3.6.12
 opentelemetry-sdk==1.17.0
 opentelemetry-exporter-otlp-proto-grpc==1.17.0
 opentelemetry-instrumentation-django==0.38b0
-opentelemetry-instrumentation-psycopg2==0.38b
-opentelemetry-instrumentation-requests==0.38b
+opentelemetry-instrumentation-psycopg2==0.38b0
+opentelemetry-instrumentation-requests==0.38b0
