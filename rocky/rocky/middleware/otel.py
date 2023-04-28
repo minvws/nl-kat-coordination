@@ -3,7 +3,7 @@ from opentelemetry import trace
 tracer = trace.get_tracer(__name__)
 
 
-class OTELInstrumentTemplateMiddleware(object):
+class OTELInstrumentTemplateMiddleware:
     """
     Django middleware to instrument template rendering using OpenTelemetry
     """

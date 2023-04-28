@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8 AS dev
 
 EXPOSE 8000
 
@@ -22,8 +22,10 @@ COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
     && pip install -r requirements.txt
 
-COPY . .
-
 USER octopoes
+
+FROM dev
+
+COPY . .
 
 CMD ["uvicorn", "octopoes.api.api:app", "--host", "0.0.0.0", "--port", "8000"]
