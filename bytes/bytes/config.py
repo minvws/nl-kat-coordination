@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     bytes_metrics_ttl_seconds: int = 300
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     return Settings()
 

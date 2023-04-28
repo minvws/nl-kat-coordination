@@ -120,8 +120,8 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
                 except IndexError:
                     if required:
                         raise IndexError(
-                            "Required referenced primary-key field '%s' not set and no default present for Type '%s'."
-                            % (field, ooi_type_name)
+                            f"Required referenced primary-key field '{field}' not set "
+                            f"and no default present for Type '{ooi_type_name}'."
                         )
                     else:
                         kwargs[field] = None

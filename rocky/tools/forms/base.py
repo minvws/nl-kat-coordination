@@ -77,7 +77,7 @@ class LabeledCheckboxInput(forms.CheckboxInput):
         self.autosubmit = autosubmit
 
     def get_context(self, name, value, attrs):
-        context = super(LabeledCheckboxInput, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context["widget"]["wrap_label"] = True
         context["widget"]["label"] = self.label
         context["widget"]["attrs"]["class"] = "submit-on-click"
