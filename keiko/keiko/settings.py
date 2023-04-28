@@ -14,5 +14,7 @@ class Settings(BaseSettings):
     assets_folder: DirectoryPath = Field("assets", description="Folder containing the assets")
     reports_folder: Path = Field("/reports", description="Output folder containing the reports")
 
+    span_export_grpc_endpoint: str = Field(..., env="SPAN_EXPORT_GRPC_ENDPOINT")
+
     class Config:
         env_prefix = "KEIKO_"
