@@ -179,7 +179,7 @@ def iana_service_table(search_query: str) -> List[_Service]:
 def service_info(value) -> Tuple[str, str]:
     """Provides information about IP Services such as common assigned ports for certain protocols and descriptions"""
     services = iana_service_table(value)
-    source = "https://www.iana.org/assignments/service-names-port-numbers/" "service-names-port-numbers.xhtml"
+    source = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
     if not services:
         return f"No description found for {value}", "No source found"
 
