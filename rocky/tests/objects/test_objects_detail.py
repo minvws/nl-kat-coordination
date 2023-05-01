@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 
 from django.http import HttpResponseRedirect
 from katalogus.client import Plugin
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 from tools.enums import SCAN_LEVEL
 from tools.models import Indemnification
 
@@ -173,3 +173,50 @@ def test_ooi_detail_start_scan_no_action(
 
     assert mock_organization_view_octopoes().get_tree.call_count == 2
     assertContains(response, "Object details", status_code=404)
+
+
+def test_delete_perms_ooi_detail(
+    rf,
+    superuser_member,
+    admin_member,
+    redteam_member,
+    client_member,
+    mock_scheduler,
+    mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
+    mocker,
+):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+
+    response_superuser = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), superuser_member.user),
+        organization_code=superuser_member.organization.code,
+    )
+
+    response_admin = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), admin_member.user),
+        organization_code=admin_member.organization.code,
+    )
+
+    response_redteam = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+
+    response_client = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user),
+        organization_code=client_member.organization.code,
+    )
+
+    assert response_superuser.status_code == 200
+    assert response_admin.status_code == 200
+    assert response_redteam.status_code == 200
+    assert response_client.status_code == 200
+
+    assertContains(response_superuser, "Delete")
+    assertContains(response_admin, "Delete")
+    assertContains(response_redteam, "Delete")
+
+    assertNotContains(response_client, "Delete")

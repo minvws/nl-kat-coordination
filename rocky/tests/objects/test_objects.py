@@ -3,7 +3,7 @@ import io
 import json
 
 from django.urls import resolve, reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 from tools.models import Indemnification
 
 from octopoes.models import ScanLevel, ScanProfileType
@@ -424,3 +424,54 @@ def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes)
     assert len(exported_objects) == 152
     assert "observed_at" in exported_objects[0]
     assert "filters" in exported_objects[0]
+
+
+def test_delete_perms_object_list(
+    rf, superuser_member, redteam_member, admin_member, client_member, mock_organization_view_octopoes
+):
+    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+        count=200, items=[Network(name="testnetwork")] * 150
+    )
+
+    url = reverse("ooi_list", kwargs={"organization_code": superuser_member.organization.code})
+    request = rf.get(url)
+    request.resolver_match = resolve(url)
+    response_superuser = OOIListView.as_view()(
+        setup_request(request, superuser_member.user),
+        organization_code=superuser_member.organization.code,
+    )
+
+    url = reverse("ooi_list", kwargs={"organization_code": admin_member.organization.code})
+    request = rf.get(url)
+    request.resolver_match = resolve(url)
+    response_admin = OOIListView.as_view()(
+        setup_request(request, admin_member.user),
+        organization_code=admin_member.organization.code,
+    )
+
+    url = reverse("ooi_list", kwargs={"organization_code": redteam_member.organization.code})
+    request = rf.get(url)
+    request.resolver_match = resolve(url)
+    response_redteam = OOIListView.as_view()(
+        setup_request(request, redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+
+    url = reverse("ooi_list", kwargs={"organization_code": client_member.organization.code})
+    request = rf.get(url)
+    request.resolver_match = resolve(url)
+    response_client = OOIListView.as_view()(
+        setup_request(request, client_member.user),
+        organization_code=client_member.organization.code,
+    )
+
+    assert response_superuser.status_code == 200
+    assert response_admin.status_code == 200
+    assert response_redteam.status_code == 200
+    assert response_client.status_code == 200
+
+    assertContains(response_superuser, "Delete object(s)")
+    assertContains(response_admin, "Delete object(s)")
+    assertContains(response_redteam, "Delete object(s)")
+
+    assertNotContains(response_client, "Delete object(s)")
