@@ -35,8 +35,10 @@ class Settings(BaseSettings):
     kat_private_key_b64: str = ""
     vws_public_key_b64: str = ""
 
+    bytes_metrics_ttl_seconds: int = 300
 
-@lru_cache()
+
+@lru_cache
 def get_settings() -> Settings:
     return Settings()
 

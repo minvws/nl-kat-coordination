@@ -29,10 +29,6 @@ class OrganizationView(View):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        # authentication/otp flow happens before setup
-        if not request.user.is_authenticated:
-            return
-
         organization_code = kwargs["organization_code"]
         try:
             self.organization = Organization.objects.get(code=organization_code)
@@ -48,7 +44,7 @@ class OrganizationView(View):
         except OrganizationMember.DoesNotExist:
             raise Http404()
 
-        if self.organization_member.status == OrganizationMember.STATUSES.BLOCKED:
+        if self.organization_member.blocked:
             raise PermissionDenied()
 
         self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)

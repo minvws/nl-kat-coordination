@@ -390,7 +390,7 @@ def test_ooi_list_export_json(rf, client_member, mock_organization_view_octopoes
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "application/json"
-    assert mock_organization_view_octopoes().list.call_count == 3
+    assert mock_organization_view_octopoes().list.call_count == 1
 
     exported_objects = json.loads(response.content.decode())
     assert len(exported_objects) == 151
@@ -417,7 +417,7 @@ def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes)
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "text/csv"
-    assert mock_organization_view_octopoes().list.call_count == 3
+    assert mock_organization_view_octopoes().list.call_count == 1
 
     exported_objects = list(csv.DictReader(io.StringIO(response.content.decode()), delimiter=",", quotechar='"'))
 

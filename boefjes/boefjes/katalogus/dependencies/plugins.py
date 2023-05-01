@@ -97,7 +97,7 @@ class PluginService:
         try:
             self._assert_settings_match_schema(organisation_id, plugin_id)
         except SettingsNotConformingToSchema:
-            logger.warning(f"Removing setting disabled {plugin_id} for {organisation_id} (if it was enabled before)")
+            logger.warning("Removing setting disabled %s for %s (if it was enabled before)", plugin_id, organisation_id)
 
             plugin = self.by_plugin_id(plugin_id, organisation_id)
             self.update_by_id(plugin.repository_id, plugin_id, organisation_id, False)

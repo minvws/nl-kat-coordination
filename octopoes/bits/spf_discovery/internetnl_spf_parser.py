@@ -104,7 +104,7 @@ macro_string = Combine(ZeroOrMore(macro_expand | macro_literal))
 domain_spec = macro_string.setParseAction(_check_domain_end)
 
 ip4_network = Regex(
-    r"((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}" "(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])"
+    r"((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])"
 )
 
 ip6_cidr_length = CaselessLiteral("/") + Regex("(12[0-8]|1[01][0-9]|[1-9][0-9]|[0-9])")
@@ -149,7 +149,6 @@ def parse(spf_record):
         parsed = record.parseString(spf_record)
     except ParseException:
         parsed = None
-    except Exception as e:
-        print(f"{e.__class__.__name__}: {e}")
+    except Exception:
         parsed = None
     return parsed

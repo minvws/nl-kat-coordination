@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple
 from scheduler import models
 
 from ..stores import TaskStorer  # noqa: TID252
-from .datastore import SQLAlchemy
+from .datastore import SQLAlchemy, retry
 
 
 class TaskStore(TaskStorer):
@@ -19,6 +19,7 @@ class TaskStore(TaskStorer):
 
         self.datastore = datastore
 
+    @retry()
     def get_tasks(
         self,
         scheduler_id: Optional[str],
@@ -60,6 +61,7 @@ class TaskStore(TaskStorer):
 
             return tasks, count
 
+    @retry()
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = session.query(models.TaskORM).filter(models.TaskORM.id == task_id).first()
@@ -70,6 +72,7 @@ class TaskStore(TaskStorer):
 
             return task
 
+    @retry()
     def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
         with self.datastore.session.begin() as session:
             tasks_orm = (
@@ -86,6 +89,7 @@ class TaskStore(TaskStorer):
 
             return tasks
 
+    @retry()
     def get_latest_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = (
@@ -102,6 +106,7 @@ class TaskStore(TaskStorer):
 
             return task
 
+    @retry()
     def create_task(self, task: models.Task) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = models.TaskORM(**task.dict())
@@ -111,6 +116,7 @@ class TaskStore(TaskStorer):
 
             return created_task
 
+    @retry()
     def update_task(self, task: models.Task) -> None:
         with self.datastore.session.begin() as session:
             (session.query(models.TaskORM).filter(models.TaskORM.id == task.id).update(task.dict()))
