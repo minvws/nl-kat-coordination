@@ -87,8 +87,6 @@ class NormalizerScheduler(Scheduler):
         normalizers = []
         for mime_type in latest_raw_data.raw_data.mime_types:
             normalizers_by_mime_type = self.get_normalizers_for_mime_type(mime_type.get("value"))
-            if not normalizers_by_mime_type:
-                continue
 
             normalizers.extend(normalizers_by_mime_type)
 
