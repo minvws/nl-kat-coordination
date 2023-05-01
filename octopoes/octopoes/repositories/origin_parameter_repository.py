@@ -1,4 +1,3 @@
-import contextlib
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
@@ -97,9 +96,10 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
         return [self.deserialize(r[0]) for r in results]
 
     def save(self, origin_parameter: OriginParameter, valid_time: datetime) -> None:
-        old_origin_parameter = None
-        with contextlib.suppress(ObjectNotFoundException):
+        try:
             old_origin_parameter = self.get(origin_parameter.id, valid_time)
+        except ObjectNotFoundException:
+            old_origin_parameter = None
 
         if old_origin_parameter == origin_parameter:
             return

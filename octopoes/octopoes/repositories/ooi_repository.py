@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import json
 import logging
 from datetime import datetime
@@ -503,9 +502,10 @@ class XTDBOOIRepository(OOIRepository):
 
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
         # retrieve old ooi
-        old_ooi = None
-        with contextlib.suppress(ObjectNotFoundException):
+        try:
             old_ooi = self.get(ooi.reference, valid_time=valid_time)
+        except ObjectNotFoundException:
+            old_ooi = None
 
         new_ooi = ooi
         if old_ooi is not None:
