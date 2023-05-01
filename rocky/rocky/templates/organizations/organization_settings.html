@@ -2,7 +2,6 @@
 
 {% load i18n %}
 {% load static %}
-{% load permissions %}
 
 {% block content %}
     {% include "header.html" %}
@@ -42,8 +41,7 @@
                                 <td>{{ organization.name }}</td>
                                 <td>{{ organization.code }}</td>
                                 <td>
-                                    {% has_organization_perms "tools.change_organization" organization_member as can_change_organization %}
-                                    {% if can_change_organization %}
+                                    {% if perms.tools.can_change_organization %}
                                         {% spaceless %}
                                             <a href="{% url "organization_edit" organization.code %}">
                                                 <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
@@ -55,8 +53,7 @@
                         </tbody>
                     </table>
                 </div>
-                {% has_organization_perms "tools.add_indemnification" organization_member as can_add_indemnification %}
-                {% if can_add_indemnification %}
+                {% if perms.tools.add_indemnification %}
                     <a href="{% url "indemnification_add" organization.code %}"
                        class="button ghost">{% translate "Add indemnification" %}</a>
                 {% endif %}

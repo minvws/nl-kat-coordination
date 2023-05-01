@@ -1,10 +1,8 @@
 from datetime import datetime, timezone
-from typing import List, Union
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
@@ -19,6 +17,52 @@ from rocky.exceptions import (
     IndemnificationNotPresentException,
     TrustedClearanceLevelTooLowException,
 )
+
+
+# There are modified versions of PermLookupDict and PermWrapper from
+# django.contrib.auth.context_processor.
+class OrganizationPermLookupDict:
+    def __init__(self, organization_member, app_label):
+        self.organization_member, self.app_label = organization_member, app_label
+
+    def __repr__(self):
+        return str(self.organization_member.get_all_permissions)
+
+    def __getitem__(self, perm_name):
+        return self.organization_member.has_perm(f"{self.app_label}.{perm_name}")
+
+    def __iter__(self):
+        # To fix 'item in perms.someapp' and __getitem__ interaction we need to
+        # define __iter__. See #18979 for details.
+        raise TypeError("PermLookupDict is not iterable.")
+
+    def __bool__(self):
+        return False
+
+
+class OrganizationPermWrapper:
+    def __init__(self, organization_member):
+        self.organization_member = organization_member
+
+    def __repr__(self):
+        return f"{self.__class__.__qualname__}({self.organization_member!r})"
+
+    def __getitem__(self, app_label):
+        return OrganizationPermLookupDict(self.organization_member, app_label)
+
+    def __iter__(self):
+        # I am large, I contain multitudes.
+        raise TypeError("PermWrapper is not iterable.")
+
+    def __contains__(self, perm_name):
+        """
+        Lookup by "someapp" or "someapp.someperm" in perms.
+        """
+        if "." not in perm_name:
+            # The name refers to module.
+            return bool(self[perm_name])
+        app_label, perm_name = perm_name.split(".", 1)
+        return self[app_label][perm_name]
 
 
 class OrganizationView(View):
@@ -58,6 +102,7 @@ class OrganizationView(View):
         context["organization_member"] = self.organization_member
         context["may_update_clearance_level"] = self.may_update_clearance_level
         context["indemnification_present"] = self.indemnification_present
+        context["perms"] = OrganizationPermWrapper(self.organization_member)
         return context
 
     @property
@@ -119,35 +164,11 @@ class OrganizationView(View):
         return True
 
 
-class MemberPermissionMixin:
-    def get_member_permissions(self, member: OrganizationMember) -> List[str]:
-        return [
-            f"{ct}.{name}"
-            for ct, name in Permission.objects.filter(group__organizationmember=member).values_list(
-                "content_type__app_label", "codename"
-            )
-        ]
-
-    def has_member_perms(self, permission: Union[str, tuple], member) -> bool:
-        if isinstance(permission, str):
-            perms = (permission,)
-        else:
-            perms = permission
-        member_permssions = self.get_member_permissions(member)
-        for perm in perms:
-            if perm in member_permssions:
-                return True
-        return False
-
-
-class RockyPermissionRequiredMixin(PermissionRequiredMixin, MemberPermissionMixin):
+class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):
     """
-    An organization member can have different roles and set of permissions based on which organization they belong to.
-    We do not want to check permissions based solely on the user but also on the organization member.
+    This mixin will check the permission based on OrganizationMember instead of User.
     """
 
     def has_permission(self) -> bool:
-        user_perm = super().has_permission()
-        if user_perm:
-            return user_perm
-        return self.has_member_perms(self.permission_required, self.organization_member)
+        perms = self.get_permission_required()
+        return self.organization_member.has_perms(perms)

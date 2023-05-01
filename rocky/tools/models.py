@@ -1,10 +1,11 @@
 import logging
 import uuid
 from functools import cached_property
+from typing import Iterable, Set
 
 import tagulous.models
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -188,6 +189,32 @@ class OrganizationMember(models.Model):
     @cached_property
     def is_client(self) -> bool:
         return self.groups.filter(name=GROUP_CLIENT).exists()
+
+    @cached_property
+    def all_permissions(self) -> Set[str]:
+        if self.user.is_active and self.user.is_superuser:
+            # Superuser always has all permissions
+            return {
+                f"{ct}.{name}" for ct, name in Permission.objects.values_list("content_type__app_label", "codename")
+            }
+
+        if self.blocked or not self.user.is_active:
+            # A blocked or inactive user doesn't have any permissions specific to this organization
+            organization_member_perms = set()
+        else:
+            organization_member_perms = {
+                f"{ct}.{name}"
+                for ct, name in Permission.objects.filter(group__organizationmember=self).values_list(
+                    "content_type__app_label", "codename"
+                )
+            }
+        return organization_member_perms | self.user.get_all_permissions()
+
+    def has_perm(self, perm: str) -> bool:
+        return perm in self.all_permissions
+
+    def has_perms(self, perm_list: Iterable[str]) -> bool:
+        return all(self.has_perm(perm) for perm in perm_list)
 
     class Meta:
         unique_together = ["user", "organization"]

@@ -1,4 +1,4 @@
-from account.mixins import RockyPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -12,7 +12,7 @@ from katalogus.views.mixins import SingleSettingView
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsUpdateView(RockyPermissionRequiredMixin, SingleSettingView, FormView):
+class PluginSettingsUpdateView(OrganizationPermissionRequiredMixin, SingleSettingView, FormView):
     """View to update/edit a plugin setting for all plugins in KAT-alogus"""
 
     template_name = "plugin_settings_edit.html"

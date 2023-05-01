@@ -1,6 +1,6 @@
 from enum import Enum
 
-from account.mixins import RockyPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import models
@@ -27,7 +27,7 @@ class PageActions(Enum):
 
 @class_view_decorator(otp_required)
 class OrganizationMemberListView(
-    RockyPermissionRequiredMixin,
+    OrganizationPermissionRequiredMixin,
     OrganizationMemberBreadcrumbsMixin,
     ListView,
 ):
@@ -61,7 +61,7 @@ class OrganizationMemberListView(
         self.filters_active = self.get_filters_active()
 
     def post(self, request, *args, **kwargs):
-        if not self.has_member_perms("tools.change_organizationmember", self.organization_member):
+        if not self.organization_member.has_perm("tools.change_organizationmember"):
             raise PermissionDenied()
         if "action" not in self.request.POST:
             return self.get(request, *args, **kwargs)

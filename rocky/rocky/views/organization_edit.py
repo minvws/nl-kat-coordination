@@ -1,5 +1,5 @@
 from account.forms import OrganizationUpdateForm
-from account.mixins import OrganizationView, RockyPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -10,7 +10,7 @@ from two_factor.views.utils import class_view_decorator
 
 
 @class_view_decorator(otp_required)
-class OrganizationEditView(RockyPermissionRequiredMixin, OrganizationView, UpdateView):
+class OrganizationEditView(OrganizationPermissionRequiredMixin, OrganizationView, UpdateView):
     form_class = OrganizationUpdateForm
     model = Organization
     template_name = "organizations/organization_edit.html"

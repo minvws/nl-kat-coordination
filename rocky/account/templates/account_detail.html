@@ -2,7 +2,6 @@
 
 {% load static %}
 {% load i18n %}
-{% load permissions %}
 
 {% block content %}
     {% include "header.html" %}
@@ -64,8 +63,7 @@
                 </dl>
             </div>
         </section>
-        {% has_organization_perms "tools.can_scan_organization" organization_member as can_scan_organization %}
-        {% if can_scan_organization %}
+        {% if perms.tools.can_scan_organization %}
             <section>
                 <div>
                     <h2>{% translate "OOI clearance" %}</h2>

@@ -2,9 +2,9 @@ from typing import Any, Dict, List, Type
 
 from account.forms import OnboardingOrganizationUpdateForm, OrganizationForm
 from account.mixins import (
+    OrganizationPermissionRequiredMixin,
     OrganizationView,
     PermissionRequiredMixin,
-    RockyPermissionRequiredMixin,
 )
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -508,7 +508,7 @@ class OnboardingOrganizationSetupView(
 
 @class_view_decorator(otp_required)
 class OnboardingOrganizationUpdateView(
-    RockyPermissionRequiredMixin,
+    OrganizationPermissionRequiredMixin,
     KatIntroductionAdminStepsMixin,
     UpdateView,
 ):

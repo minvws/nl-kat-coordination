@@ -1,13 +1,11 @@
 {% load i18n %}
-{% load permissions %}
 
 {% translate props.ooi_type as display_type %}
 <div class="horizontal-view toolbar">
   <a href="{% ooi_url 'ooi_report' ooi_id organization.code query=mandatory_fields %}"
      class="button">{% translate "Generate report" %}</a>
   {% if not ooi_past_due %}
-    {% has_organization_perms "tools.can_scan_organization" organization_member as can_scan_organization %}
-    {% if ooi|is_finding and can_scan_organization %}
+    {% if ooi|is_finding and perms.tools.can_scan_organization %}
       <a href="{% ooi_url 'finding_mute' ooi_id organization.code %}"
          class="button">{% translate "Mute Finding" %}</a>
     {% endif %}

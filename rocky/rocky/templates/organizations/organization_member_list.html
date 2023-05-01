@@ -2,7 +2,6 @@
 
 {% load i18n %}
 {% load static %}
-{% load permissions %}
 
 {% block content %}
     {% include "header.html" %}
@@ -15,8 +14,7 @@
                     An overview of "{{ organization_name }}" its members.
                 {% endblocktranslate %}
                 <h2>{% translate "Members" %}</h2>
-                {% has_organization_perms "tools.add_organizationmember" organization_member as can_add_member %}
-                {% if can_add_member %}
+                {% if perms.tools.add_organizationmember %}
                     <div class="horizontal-view toolbar">
                         <a href="{% url "organization_member_add" organization.code %}"
                            class="button">{% translate "Add new member" %}</a>

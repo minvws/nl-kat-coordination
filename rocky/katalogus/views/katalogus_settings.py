@@ -1,5 +1,5 @@
 from account.forms.organization import OrganizationListForm
-from account.mixins import OrganizationView, RockyPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from account.models import KATUser
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -51,7 +51,7 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
 
 
 @class_view_decorator(otp_required)
-class KATalogusSettingsListView(RockyPermissionRequiredMixin, OrganizationView, FormView, ListView):
+class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, OrganizationView, FormView, ListView):
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"

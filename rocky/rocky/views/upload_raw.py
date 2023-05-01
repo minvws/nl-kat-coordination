@@ -1,4 +1,4 @@
-from account.mixins import OrganizationView, RockyPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -14,7 +14,7 @@ from rocky.bytes_client import get_bytes_client
 
 
 @class_view_decorator(otp_required)
-class UploadRaw(RockyPermissionRequiredMixin, OrganizationView, FormView):
+class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_raw.html"
     form_class = UploadRawForm
     permission_required = "tools.can_scan_organization"

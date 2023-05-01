@@ -1,4 +1,4 @@
-from account.mixins import RockyPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -12,7 +12,7 @@ from katalogus.views.mixins import SingleSettingView
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsDeleteView(RockyPermissionRequiredMixin, SingleSettingView, TemplateView):
+class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SingleSettingView, TemplateView):
     template_name = "plugin_settings_delete.html"
     permission_required = "tools.can_scan_organization"
 

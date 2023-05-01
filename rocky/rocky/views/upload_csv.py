@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import Any, ClassVar, Dict
 from uuid import uuid4
 
-from account.mixins import OrganizationView, RockyPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -41,7 +41,7 @@ CSV_CRITERIA = [
 
 
 @class_view_decorator(otp_required)
-class UploadCSV(RockyPermissionRequiredMixin, OrganizationView, FormView):
+class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
     form_class = UploadCSVForm
     permission_required = "tools.can_scan_organization"

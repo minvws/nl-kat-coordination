@@ -2,7 +2,6 @@
 
 {% load static %}
 {% load i18n %}
-{% load permissions %}
 
 {% block content %}
     {% include "header.html" %}
@@ -36,8 +35,7 @@
                 </div>
             </div>
         </section>
-        {% has_organization_perms "tools.can_scan_organization" organization_member as can_scan_organization %}
-        {% if can_scan_organization %}
+        {% if perms.tools.can_scan_organization %}
             {% include "plugin_settings_list.html" with object_list=object_list plugin=plugin %}
 
         {% endif %}
@@ -73,8 +71,7 @@
                 </p>
             </div>
         </section>
-        {% has_organization_perms "tools.can_scan_organization" organization_member as can_scan_organization %}
-        {% if can_scan_organization %}
+        {% if perms.tools.can_scan_organization %}
             {% include "partials/objects_to_scan.html" with plugin=plugin %}
 
         {% endif %}

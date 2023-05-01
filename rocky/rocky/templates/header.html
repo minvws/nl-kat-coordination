@@ -1,6 +1,5 @@
 {% load static %}
 {% load i18n %}
-{% load permissions %}
 
 <header>
     {% include "partials/skip-to-content.html" %}
@@ -52,8 +51,7 @@
                         <a href="{% url "task_list" organization.code %}"
                            {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
                     </li>
-                    {% has_organization_perms "tools.view_organization" organization_member as can_view_organization %}
-                    {% if can_view_organization %}
+                    {% if perms.tools.view_organization %}
                         <li>
                             <a href="{% url "organization_member_list" organization.code %}"
                                {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Members" %}</a>

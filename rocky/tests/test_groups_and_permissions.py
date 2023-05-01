@@ -1,4 +1,3 @@
-from account.mixins import MemberPermissionMixin
 from account.views import AccountView
 from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains, assertNotContains
@@ -26,28 +25,6 @@ def test_is_admin(admin_member):
 
 def test_indemnification_present(superuser_member):
     assert superuser_member.user.indemnification_set.exists()
-
-
-def test_red_teamer_can_scan_organization(redteam_member):
-    perms = MemberPermissionMixin()
-    assert redteam_member.user.has_perm("tools.can_scan_organization") or perms.has_member_perms(
-        "tools.can_scan_organization", redteam_member
-    )
-
-
-def test_member_perms(redteam_member):
-    perms = MemberPermissionMixin()
-
-    # Not Authorized
-    assert not perms.has_member_perms("", redteam_member)
-    assert not perms.has_member_perms("tools", redteam_member)
-    assert not perms.has_member_perms("wrong_app_label.can_scan_organization", redteam_member)
-    assert not perms.has_member_perms("tools.", redteam_member)
-    assert not perms.has_member_perms(".can_scan_organization", redteam_member)
-    assert not perms.has_member_perms(".", redteam_member)
-
-    assert perms.has_member_perms(("tools.can_scan_organization", "tools.can_enable_disable_boefje"), redteam_member)
-    assert perms.has_member_perms(("tools.can_scan_organization", ".can_enable_disable_boefje"), redteam_member)
 
 
 def test_account_detail_perms(rf, superuser_member, admin_member, redteam_member, client_member):

@@ -1,5 +1,5 @@
 from account.forms import OrganizationMemberEditForm
-from account.mixins import OrganizationView, RockyPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls.base import reverse
@@ -11,7 +11,9 @@ from two_factor.views.utils import class_view_decorator
 
 
 @class_view_decorator(otp_required)
-class OrganizationMemberEditView(RockyPermissionRequiredMixin, UserPassesTestMixin, OrganizationView, UpdateView):
+class OrganizationMemberEditView(
+    OrganizationPermissionRequiredMixin, UserPassesTestMixin, OrganizationView, UpdateView
+):
     form_class = OrganizationMemberEditForm
     model = OrganizationMember
     template_name = "organizations/organization_member_edit.html"
