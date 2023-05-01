@@ -48,6 +48,7 @@ services:
       - "127.0.0.1:8001:80"
     build:
       context: octopoes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
@@ -63,6 +64,7 @@ services:
       - rabbitmq
     build:
       context: octopoes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: worker-beat
@@ -79,6 +81,7 @@ services:
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     volumes:
@@ -99,6 +102,7 @@ services:
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     volumes:
@@ -126,6 +130,7 @@ services:
     build:
       context: .
       dockerfile: rocky/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     command: python3 manage.py runserver 0.0.0.0:80
@@ -143,6 +148,7 @@ services:
       - "127.0.0.1:8002:8000"
     build:
       context: bytes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
@@ -159,6 +165,7 @@ services:
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
@@ -174,6 +181,7 @@ services:
     restart: unless-stopped
     build:
       context: mula/
+      target: dev
       args:
         ENVIRONMENT: dev
     ports:
@@ -193,6 +201,7 @@ services:
     restart: unless-stopped
     build:
       context: keiko/
+      target: dev
     ports:
       - "127.0.0.1:8005:8000"
     command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko

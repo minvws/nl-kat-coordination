@@ -4,12 +4,12 @@ import pytest
 import requests
 from prometheus_client.parser import text_string_to_metric_families
 from requests import HTTPError
-from tests.client import BytesAPIClient
-from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 from bytes.models import MimeType
 from bytes.rabbitmq import RabbitMQEventManager
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
+from tests.client import BytesAPIClient
+from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 
 def test_login(bytes_api_client: BytesAPIClient) -> None:

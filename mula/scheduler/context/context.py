@@ -1,6 +1,7 @@
 import json
 import logging.config
 import threading
+from pathlib import Path
 from types import SimpleNamespace
 
 import scheduler
@@ -34,7 +35,7 @@ class AppContext:
             raise Exception("PostgreSQL is the only supported database backend")
 
         # Load logging configuration
-        with open(self.config.log_cfg, "rt", encoding="utf-8") as f:
+        with Path(self.config.log_cfg).open("rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
         # Services
