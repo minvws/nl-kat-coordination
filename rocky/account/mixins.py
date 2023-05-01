@@ -122,7 +122,7 @@ class OrganizationView(View):
 class MemberPermissionMixin:
     def get_member_permissions(self, member: OrganizationMember) -> List[str]:
         return [
-            "%s.%s" % (ct, name)
+            f"{ct}.{name}"
             for ct, name in Permission.objects.filter(group__organizationmember=member).values_list(
                 "content_type__app_label", "codename"
             )
