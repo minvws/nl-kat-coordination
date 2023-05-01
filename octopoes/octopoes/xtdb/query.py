@@ -11,6 +11,21 @@ class InvalidField(ValueError):
 
 @dataclass
 class Query:
+    """
+    Example of usage:
+
+    >>> query = Query(Network).where(Network, name="test")
+    >>> query = query.where(Finding, ooi=Network)
+    >>> query.format()
+    '
+    {:query {:find [(pull Network [*])] :where [
+        [ Network :Network/name "test" ]
+        [ Finding :Finding/ooi Network ]
+        [ Finding :Finding/ooi Network ]
+    ]}}
+    '
+    """
+
     result_ooi_type: Type[OOI]
 
     _where_clauses: List[str] = field(default_factory=list)

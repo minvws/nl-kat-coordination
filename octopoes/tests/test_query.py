@@ -51,7 +51,7 @@ def test_invalid_field_types():
 def test_allow_string_for_foreign_keys():
     assert (
         str(Query(Network).where(Finding, ooi="Network|internet"))
-        == "{:query {:find [(pull Network [*])] :where [ [ Finding :Finding/ooi \"Network|internet\" ]]}}"
+        == '{:query {:find [(pull Network [*])] :where [ [ Finding :Finding/ooi "Network|internet" ]]}}'
     )
 
 
