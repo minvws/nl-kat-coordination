@@ -18,9 +18,7 @@ class ScanProfileMutation(RabbitMQ):
 
     def dispatch(self, body: bytes) -> None:
         # Convert body into a ScanProfileMutationModel
-        body_str = body.decode("utf-8")
-        body_dict = json.loads(body_str)
-        model = ScanProfileMutationModel(**body_dict)
+        model = ScanProfileMutationModel.parse_raw(body)
 
         # Call the function
         self.func(model)
