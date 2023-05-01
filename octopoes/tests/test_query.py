@@ -60,7 +60,6 @@ def test_big_multiple_direction_query():
     query = (
         Query(Finding)
         .where(Finding, ooi=Network, finding_type="KATFindingType|KAT-500")
-        .where(Finding, ooi=Network)
         .where(IPAddress, network=Network)
         .where(IPPort, address=IPAddress)
         .where(IPPort, primary_key="IPPort|internet|xxx:xxx:x|tcp|23")
@@ -72,7 +71,6 @@ def test_big_multiple_direction_query():
 {:query {:find [(pull Finding [*])] :where [
     [ Finding :Finding/ooi Network ]
     [ Finding :Finding/finding_type "KATFindingType|KAT-500" ]
-    [ Finding :Finding/ooi Network ]
     (or [ IPAddress :IPAddressV4/network Network ] [ IPAddress :IPAddressV6/network Network ] )
     [ IPPort :IPPort/address IPAddress ]
     [ IPPort :IPPort/primary_key "IPPort|internet|xxx:xxx:x|tcp|23" ]]}}
