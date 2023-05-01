@@ -36,12 +36,12 @@ except FileNotFoundError:
 
 
 app = FastAPI()
+add_timing_middleware(app, record=logger.debug, prefix="app")
 
 # Set up OpenTelemetry instrumentation
 if settings.span_export_grpc_endpoint is not None:
     logger.info("Setting up instrumentation with span exporter endpoint [%s]", settings.span_export_grpc_endpoint)
 
-    add_timing_middleware(app, record=logger.debug, prefix="app")
     FastAPIInstrumentor.instrument_app(app)
     RequestsInstrumentor().instrument()
 
