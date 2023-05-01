@@ -3,29 +3,30 @@
 {% get_current_language as LANGUAGE_CODE %}
 
 <div class="language-selector">
-  <p>{% translate "Select your language" %}:</p>
   <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p>
-  <form action="{% url "set_language" %}" method="post">
-    {% csrf_token %}
-    <div class="language-selector-options" aria-describedby="language-selector-description" aria-expanded="false">
-      {% for language in languages %}
-        {% if LANGUAGE_CODE == language %}
-          <button type="button" aria-haspopup="listbox" aria-current="true">
-            {{ language }}
-          </button>
-        {% endif %}
-      {% endfor %}
-      <ul role="listbox">
-        {% for language in languages %}
-            <li>
-              <a hreflang="{{ language }}" href="#" role="option" data-value="{{ language }}" lang="{{ language }}">
-                <button type="submit" name="language" value={{ language }}>
-                  {{ language|upper }}
-                </button>
-              </a>
-            </li>
-        {% endfor %}
-      </ul>
+  <div class="language-selector-options" aria-describedby="language-selector-description" aria-expanded="false">
+    {% for language in languages %}
+      {% if LANGUAGE_CODE == language %}
+        {% get_language_info for LANGUAGE_CODE as lang %}
+        <button type="button" aria-haspopup="listbox" aria-current="true">
+          {{ lang.name_local }}
+        </button>
+      {% endif %}
+    {% endfor %}
+      <form action="{% url "set_language" %}" method="post">
+        {% csrf_token %}
+        <ul role="listbox">
+          {% for language in languages %}
+          {% get_language_info for language as lang %}
+          <li>
+            <a hreflang="{{ language }}" href="#" role="option" data-value="{{ language }}" lang="{{ language }}">
+              <button type="submit" name="language" value={{ language }}>
+                {{ lang.name_local }}
+              </button>
+            </a>
+          </li>
+            {% endfor %}
+        </ul>
+      </form>
     </div>
-  </form>
 </div>
