@@ -117,10 +117,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
         if "robot_result_enum" in vulns.get("robot", {}):
             robot = vulns["robot"]["robot_result_enum"]
             if robot in (
-                "VULNERABLE_WEAK_ORACLE",
-                "VULNERABLE_STRONG_ORACLE",
-                "NOT_VULNERABLE_NO_ORACLE",
-                "NOT_VULNERABLE_RSA_NOT_SUPPORTED",
-                "UNKNOWN_INCONSISTENT_RESULTS",
+                "VULNERABLE_WEAK_ORACLE",  # the server is vulnerable but the attack would take too long
+                "VULNERABLE_STRONG_ORACLE",  # the server is vulnerable and real attacks are feasible
+                "NOT_VULNERABLE_NO_ORACLE",  # the server supports RSA cipher suites but does not act as an oracle
+                "NOT_VULNERABLE_RSA_NOT_SUPPORTED",  # the server does not supports RSA cipher suites
+                "UNKNOWN_INCONSISTENT_RESULTS",  # could not determine whether the server is vulnerable or not
             ):
                 pass  # todo
