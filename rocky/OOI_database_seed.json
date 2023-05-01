@@ -466,7 +466,7 @@
       "data": {
         "description": "The encrypted connection provides no protection against downgrade attacks.",
         "recommendation": "Implement TLS_FALLBACK_SCSV.",
-        "source": "https://www.rfc-editor.org/rfc/rfc7507"
+        "source": "https://www.rfc-editor.org/rfc/rfc7507",
         "risk": "Low"
       },
       "consult_api": false
