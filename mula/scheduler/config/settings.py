@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from pydantic import BaseSettings, Field
 
@@ -31,6 +32,7 @@ class Settings(BaseSettings):
     host_mutation: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     host_raw_data: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     host_normalizer_meta: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
+    span_export_grpc_endpoint: Optional[str] = Field(None, env="SPAN_EXPORT_GRPC_ENDPOINT")
 
     # Queue settings (0 is infinite)
     pq_maxsize: int = Field(1000, env="SCHEDULER_PQ_MAXSIZE")
