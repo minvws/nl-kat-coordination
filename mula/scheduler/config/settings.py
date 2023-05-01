@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from pydantic import BaseSettings, Field
@@ -10,7 +9,7 @@ class Settings(BaseSettings):
     # Application settings
     debug: bool = Field(False, env="SCHEDULER_DEBUG")
     log_cfg: str = Field(
-        os.path.join(Path(__file__).parent.parent.parent, "logging.json"),
+        str(Path(__file__).parent.parent.parent / "logging.json"),
         env="SCHEDULER_LOG_CFG",
     )
 

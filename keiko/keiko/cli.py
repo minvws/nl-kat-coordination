@@ -34,7 +34,7 @@ def main(
         settings,
     )
 
-    print(f"Report generated with id {id_}")
+    click.echo(f"Report generated with id {id_}")
 
 
 if __name__ == "__main__":

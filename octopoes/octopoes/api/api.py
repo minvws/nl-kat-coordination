@@ -1,5 +1,6 @@
 import logging
 from logging import config
+from pathlib import Path
 
 import yaml
 from fastapi import FastAPI, status
@@ -27,11 +28,11 @@ logger = logging.getLogger(__name__)
 
 # Load log config
 try:
-    with open(settings.log_cfg, "r") as log_config:
+    with Path(settings.log_cfg).open() as log_config:
         config.dictConfig(yaml.safe_load(log_config))
-        logger.info(f"Configured loggers with config: {settings.log_cfg}")
+        logger.info("Configured loggers with config: %s", settings.log_cfg)
 except FileNotFoundError:
-    logger.warning(f"No log config found at: {settings.log_cfg}")
+    logger.warning("No log config found at: %s", settings.log_cfg)
 
 
 app = FastAPI()
