@@ -17,9 +17,7 @@ class RawData(RabbitMQ):
 
     def dispatch(self, body: bytes) -> None:
         # Convert body into a RawDataReceivedEvent
-        body_str = body.decode("utf-8")
-        body_dict = json.loads(body_str)
-        model = RawDataReceivedEvent(**body_dict)
+        model = RawDataReceivedEvent.parse_raw(body)
 
         # Call the function
         self.func(model)
