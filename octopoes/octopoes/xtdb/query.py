@@ -58,7 +58,10 @@ class Query:
         return query
 
     def query(self, ooi_type: Type[OOI]) -> "Query":
+        """Change the target object type of the Query after initialization, e.g. when using from_relation_path"""
+
         self.result_ooi_type = ooi_type
+
         return self
 
     def _where_field_is(self, ooi_type: Type[OOI], field_name: str, value: Union[Type[OOI], str]) -> None:
