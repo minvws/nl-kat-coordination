@@ -2,14 +2,12 @@
 
 :root {
   /* Breadcrumb bar nav */
-  --breadcrumb-bar-padding-right: 3%;
-  --breadcrumb-bar-padding-left: 3%;
+  --breadcrumb-bar-padding-right: 0;
+  --breadcrumb-bar-padding-left: 0;
   --breadcrumb-bar-background-color: var(--branding-color-1-background-color);
   --breadcrumb-bar-text-color: var(--branding-color-1-text-color);
 
   /* Content wrapper */
-  --breadcrumb-bar-content-block-padding-left: 0;
-  --breadcrumb-bar-content-block-padding-right: 0;
   --breadcrumb-bar-content-block-max-width: var(--header-navigation-max-width);
   --breadcrumb-bar-content-block-icon: "\ea61";
 

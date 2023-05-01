@@ -55,6 +55,7 @@
 /* Header navigation */
 @use "@minvws/manon/header";
 @use "@minvws/manon/header-navigation";
+@use "@minvws/manon/header-navigation-content-wrapper";
 @use "@minvws/manon/navigation-collapsible-menu";
 
 /* Footer */
@@ -62,6 +63,7 @@
 
 /* Components */
 @use "@minvws/manon/accordion";
+@use "@minvws/manon/breadcrumb-bar";
 @use "@minvws/manon/breadcrumb-bar-content-block";
 @use "@minvws/manon/code-base";
 @use "@minvws/manon/description-list";

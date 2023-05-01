@@ -29,6 +29,7 @@
 @import "manon/emphasized";
 @import "manon/filter";
 @import "manon/header-navigation";
+@import "manon/navigation-collapsible";
 @import "manon/layout-column-4.scss";
 @import "manon/description-list";
 @import "manon/filter";
@@ -36,9 +37,11 @@
 @import "manon/form-radio";
 @import "manon/layout";
 @import "manon/login-meta";
+@import "manon/logo";
 @import "manon/navigation";
 @import "manon/tabs";
 @import "manon/tile";
+@import "manon/language-selector-list";
 
 /* Needs sorting */
 @import "manon/manon-variables";

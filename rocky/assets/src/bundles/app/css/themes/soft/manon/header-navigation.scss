@@ -13,4 +13,12 @@
 	--header-navigation-padding-left: 3rem;
 	--header-navigation-border-width: 0;
 	--header-navigation-width: auto;
+	--header-navigation-min-height: 5rem;
+	--header-navigation-gap: 1rem;
+	--header-navigation-content-wrapper-flex-direction: row;
+	  
+	/* Header navigation content wrapper */
+	--header-navigation-content-wrapper-gap: 1rem;
+	--header-navigation-content-wrapper-justify-content: flex-start;
+	--header-navigation-content-wrapper-align-items: center;
 }

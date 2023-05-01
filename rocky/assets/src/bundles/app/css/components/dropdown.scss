@@ -1,9 +1,20 @@
 .dropdown {
+  max-width: 50%;
+  
   span {
     pointer-events: none;
   }
 
   position: relative;
+  
+  button,
+  a.button {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    min-width: 0;
+    display: block;
+  }
 
   > ul {
     padding: 0;

@@ -99,44 +99,62 @@ main section {
   }
 }
 
-body > main {
-	@media screen and (min-width: $grid-m) {
-		padding-bottom: var(--page-whitespace-bottom-grid-m);
-		padding-top: var(--page-whitespace-top-grid-m);
-		
-		section {
-			padding-right: var(--page-whitespace-right-grid-m);
-			padding-left: var(--page-whitespace-left-grid-m);
+body {
+
+	> header {
+		@media screen and (min-width: $grid-m) {
+			nav,
+			nav.breadcrumb-bar {
+				padding-bottom: 0;
+				padding-top: 0;
+				
+				> div {
+					padding-right: var(--page-whitespace-right-grid-m);
+					padding-left: var(--page-whitespace-left-grid-m);
+				}
+			}
 		}
 	}
 
-	@media screen and (min-width: $grid-l) {
-		padding-bottom: var(--page-whitespace-bottom-grid-l);
-		padding-top: var(--page-whitespace-top-grid-l);
-		
-		section {
-			padding-right: var(--page-whitespace-right-grid-l);
-			padding-left: var(--page-whitespace-left-grid-l);
+	> main {
+		@media screen and (min-width: $grid-m) {
+			padding-bottom: var(--page-whitespace-bottom-grid-m);
+			padding-top: var(--page-whitespace-top-grid-m);
+			
+			section {
+				padding-right: var(--page-whitespace-right-grid-m);
+				padding-left: var(--page-whitespace-left-grid-m);
+			}
 		}
-	}
-
-	@media screen and (min-width: $grid-xl) {
-		padding-bottom: var(--page-whitespace-bottom-grid-xl);
-		padding-top: var(--page-whitespace-top-grid-xl);
-
-		section {
-			padding-right: var(--page-whitespace-right-grid-xl);
-			padding-left: var(--page-whitespace-left-grid-xl);
+	
+		@media screen and (min-width: $grid-l) {
+			padding-bottom: var(--page-whitespace-bottom-grid-l);
+			padding-top: var(--page-whitespace-top-grid-l);
+			
+			section {
+				padding-right: var(--page-whitespace-right-grid-l);
+				padding-left: var(--page-whitespace-left-grid-l);
+			}
 		}
-	}
-
-	@media screen and (min-width: $grid-xxl) {
-		padding-bottom: var(--page-whitespace-bottom-grid-xxl);
-		padding-top: var(--page-whitespace-top-grid-xxl);
-		
-		section {
-			padding-right: var(--page-whitespace-right-grid-xxl);
-			padding-left: var(--page-whitespace-left-grid-xxl);
+	
+		@media screen and (min-width: $grid-xl) {
+			padding-bottom: var(--page-whitespace-bottom-grid-xl);
+			padding-top: var(--page-whitespace-top-grid-xl);
+	
+			section {
+				padding-right: var(--page-whitespace-right-grid-xl);
+				padding-left: var(--page-whitespace-left-grid-xl);
+			}
+		}
+	
+		@media screen and (min-width: $grid-xxl) {
+			padding-bottom: var(--page-whitespace-bottom-grid-xxl);
+			padding-top: var(--page-whitespace-top-grid-xxl);
+			
+			section {
+				padding-right: var(--page-whitespace-right-grid-xxl);
+				padding-left: var(--page-whitespace-left-grid-xxl);
+			}
 		}
 	}
 }
