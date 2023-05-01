@@ -6,6 +6,12 @@ from typing import List
 
 from fastapi import BackgroundTasks, Body, FastAPI
 from fastapi.staticfiles import StaticFiles
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from pydantic import BaseModel
 
 from keiko.base_models import ReportArgumentsBase
@@ -20,6 +26,21 @@ logger = logging.getLogger(__name__)
 def construct_api(settings: Settings) -> FastAPI:
     """Construct the FastAPI object, with prefilled examples from disk."""
     app = FastAPI()
+
+    # Set up OpenTelemetry instrumentation
+    if settings.span_export_grpc_endpoint is not None:
+        logger.info("Setting up instrumentation with span exporter endpoint [%s]", settings.span_export_grpc_endpoint)
+
+        FastAPIInstrumentor.instrument_app(app)
+
+        resource = Resource(attributes={SERVICE_NAME: "keiko"})
+        provider = TracerProvider(resource=resource)
+        processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=settings.span_export_grpc_endpoint))
+        provider.add_span_processor(processor)
+        trace.set_tracer_provider(provider)
+
+        logger.debug("Finished setting up instrumentation")
+
     examples = get_samples(settings)
 
     @app.get("/templates")
