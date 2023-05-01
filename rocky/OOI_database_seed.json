@@ -302,7 +302,7 @@
       "data": {
         "description": "The HTTP header X-DNS-Prefetch-Control is missing. The X-DNS-Prefetch-Control HTTP response header controls DNS prefetching, a feature by which browsers proactively perform domain name resolution on both links that the user may choose to follow as well as URLs for items referenced by the document.",
         "recommendation": "Set HTTP header X-DNS-Prefetch-Control: off in all HTTP answers.",
-        "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control"
+        "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control",
         "risk": "Very low"
       },
       "consult_api": false
