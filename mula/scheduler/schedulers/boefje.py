@@ -6,11 +6,14 @@ from typing import List
 
 import pika
 import requests
+from opentelemetry import trace
 
 from scheduler import context, queues, rankers
 from scheduler.models import OOI, Boefje, BoefjeTask, Organisation, Plugin, PrioritizedItem, TaskStatus
 
 from .scheduler import Scheduler
+
+tracer = trace.get_tracer(__name__)
 
 
 class BoefjeScheduler(Scheduler):
@@ -41,6 +44,7 @@ class BoefjeScheduler(Scheduler):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
 
+    @tracer.start_as_current_span("populate_queue")
     def populate_queue(self) -> None:
         """Populate the PriorityQueue.
 
@@ -57,6 +61,7 @@ class BoefjeScheduler(Scheduler):
 
         self.push_tasks_for_random_objects()
 
+    @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self) -> None:
         """Create tasks for oois that have a scan level change.
 
@@ -245,6 +250,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
+    @tracer.start_as_current_span("push_tasks_for_new_boefjes")
     def push_tasks_for_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
@@ -409,6 +415,7 @@ class BoefjeScheduler(Scheduler):
 
                 self.push_item_to_queue(p_item)
 
+    @tracer.start_as_current_span("push_tasks_for_random_objects")
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""
         if self.queue.full():
