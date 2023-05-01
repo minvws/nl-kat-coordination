@@ -149,7 +149,6 @@ def parse_plugin(plugin: Dict) -> Plugin:
         with contextlib.suppress(StopIteration):
             produces.add(type_by_name(ooi))
 
-
     return Plugin(
         id=plugin["id"],
         type=plugin["type"],

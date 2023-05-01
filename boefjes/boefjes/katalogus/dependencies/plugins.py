@@ -205,7 +205,6 @@ class PluginService:
         with contextlib.suppress(KeyError, NotFound):
             plugin.enabled = self.plugin_enabled_store.get_by_id(plugin.id, plugin.repository_id, organisation_id)
 
-
         return plugin
 
     @staticmethod

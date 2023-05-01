@@ -507,7 +507,6 @@ class XTDBOOIRepository(OOIRepository):
         with contextlib.suppress(ObjectNotFoundException):
             old_ooi = self.get(ooi.reference, valid_time=valid_time)
 
-
         new_ooi = ooi
         if old_ooi is not None:
             new_ooi, changed = merge_ooi(ooi, old_ooi)

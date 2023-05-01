@@ -227,7 +227,8 @@ def get_stripped_file_lines(filename):
     Return lines of a file with whitespace removed
     """
     try:
-        lines = open(filename).readlines()
+        with open(filename) as f:
+            lines = f.readlines()
     except FileNotFoundError:
         fatal(f"Could not open file: {filename!r}")
 
@@ -432,7 +433,6 @@ def main():
 
     with contextlib.suppress(KeyboardInterrupt):
         fierce(**vars(args))
-
 
 
 if __name__ == "__main__":

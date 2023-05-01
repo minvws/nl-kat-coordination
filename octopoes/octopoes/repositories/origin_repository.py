@@ -101,7 +101,6 @@ class XTDBOriginRepository(OriginRepository):
         with contextlib.suppress(ObjectNotFoundException):
             old_origin = self.get(origin.id, valid_time)
 
-
         if old_origin == origin:
             return
 

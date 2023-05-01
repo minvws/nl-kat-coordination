@@ -101,7 +101,6 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
         with contextlib.suppress(ObjectNotFoundException):
             old_origin_parameter = self.get(origin_parameter.id, valid_time)
 
-
         if old_origin_parameter == origin_parameter:
             return
 

@@ -13,16 +13,19 @@ def OnboardingMiddleware(get_response):
             # do not redirect itself, otherwise it will endup in endless loop
             # with too many redirects
             # exclude admin urls
-            if not (
-                "/onboarding/" in request.path
-                or "/admin/" in request.path
-                or "/login/" in request.path
-                or "/two_factor/" in request.path
-                or "/plugins" in request.path
-                or "/i18n/" in request.path
-                or "/introduction/" in request.path
-                or request.path.startswith("/api/")
-            ) and not member_onboarded:
+            if (
+                not (
+                    "/onboarding/" in request.path
+                    or "/admin/" in request.path
+                    or "/login/" in request.path
+                    or "/two_factor/" in request.path
+                    or "/plugins" in request.path
+                    or "/i18n/" in request.path
+                    or "/introduction/" in request.path
+                    or request.path.startswith("/api/")
+                )
+                and not member_onboarded
+            ):
                 member = OrganizationMember.objects.filter(user=request.user)
 
                 # There might be redteamers without an organization after an organization is deleted.

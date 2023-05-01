@@ -17,12 +17,11 @@ def run(
         not tldextract.extract(input_ooi.name).subdomain
         # don't report on findings on tlds
         and tldextract.extract(input_ooi.name).domain
-    ):
-        if not additional_oois:
-            ft = KATFindingType(id="KAT-NO-SPF")
-            yield ft
-            yield Finding(
-                ooi=input_ooi.reference,
-                finding_type=ft.reference,
-                description="This hostname does not have an SPF record",
-            )
+    ) and not additional_oois:
+        ft = KATFindingType(id="KAT-NO-SPF")
+        yield ft
+        yield Finding(
+            ooi=input_ooi.reference,
+            finding_type=ft.reference,
+            description="This hostname does not have an SPF record",
+        )
