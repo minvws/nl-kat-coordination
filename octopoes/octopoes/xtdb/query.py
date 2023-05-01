@@ -2,7 +2,8 @@ from dataclasses import dataclass, field
 from typing import List, Type, Union
 
 from octopoes.models import OOI
-from octopoes.models.types import get_abstract_types, get_relation, get_relations
+from octopoes.models.path import Direction, Path
+from octopoes.models.types import get_abstract_types, get_relations
 
 
 class InvalidField(ValueError):
@@ -43,17 +44,16 @@ class Query:
         return "\n" + self._compile(separator="\n    ") + "\n"
 
     @classmethod
-    def from_relation_path(cls, ooi_type: Type[OOI], path: str) -> "Query":
+    def from_path(cls, path: Path) -> "Query":
+        ooi_type = path.segments[-1].target_type
         query = Query(ooi_type)
 
-        for field_name in path.split("."):
-            try:
-                relation = get_relation(ooi_type, field_name)
-                query = query.where(ooi_type, **{field_name: relation})
-            except (InvalidField, KeyError) as e:
-                raise InvalidPath("Not a valid relation path") from e
+        for segment in path.segments:
+            if segment.direction is Direction.OUTGOING:
+                query = query.where(segment.source_type, **{segment.property_name: segment.target_type})
+                continue
 
-            ooi_type = relation
+            query = query.where(segment.target_type, **{segment.property_name: segment.source_type})
 
         return query
 

@@ -2,8 +2,8 @@ import pytest
 
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import IPAddress, IPPort, Network
-from octopoes.models.ooi.web import HTTPHeader
-from octopoes.xtdb.query import InvalidField, InvalidPath, Query
+from octopoes.models.path import Path
+from octopoes.xtdb.query import InvalidField, Query
 
 
 def test_basic_field_where_clause():
@@ -81,11 +81,7 @@ def test_big_multiple_direction_query():
 
 
 def test_create_query_from_relation_path():
-    query = (
-        Query.from_relation_path(HTTPHeader, "resource.website.hostname.network")
-        .query(Finding)
-        .where(Finding, ooi=Network)
-    )
+    query = Query.from_path(Path.parse("HTTPHeader.resource.website.hostname.network.<ooi [is Finding]"))
 
     assert (
         query.format()
@@ -99,11 +95,8 @@ def test_create_query_from_relation_path():
 """
     )
 
-    query = (
-        Query.from_relation_path(IPPort, "address.network")
-        .where(IPPort, primary_key="IPPort|internet|xxx:xxx:x|tcp|23")
-        .query(Finding)
-        .where(Finding, ooi=Network)
+    query = Query.from_path(Path.parse("IPPort.address.network.<ooi [is Finding]")).where(
+        IPPort, primary_key="IPPort|internet|xxx:xxx:x|tcp|23"
     )
 
     assert (
@@ -112,18 +105,7 @@ def test_create_query_from_relation_path():
 {:query {:find [(pull Finding [*])] :where [
     [ IPPort :IPPort/address IPAddress ]
     (or [ IPAddress :IPAddressV4/network Network ] [ IPAddress :IPAddressV6/network Network ] )
-    [ IPPort :IPPort/primary_key "IPPort|internet|xxx:xxx:x|tcp|23" ]
-    [ Finding :Finding/ooi Network ]]}}
+    [ Finding :Finding/ooi Network ]
+    [ IPPort :IPPort/primary_key "IPPort|internet|xxx:xxx:x|tcp|23" ]]}}
 """
     )
-
-
-def test_create_query_invalid_relation_path():
-    with pytest.raises(InvalidPath):
-        Query.from_relation_path(HTTPHeader, "website.hostname.network")
-
-    with pytest.raises(InvalidPath):
-        Query.from_relation_path(HTTPHeader, "resource.website.network")
-
-    with pytest.raises(InvalidPath):
-        Query.from_relation_path(IPPort, "address.network.finding")
