@@ -15,7 +15,6 @@ from requests import RequestException
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
-from rocky.settings import DENY_ORGANIZATION_CODES
 from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
@@ -94,11 +93,12 @@ class Organization(models.Model):
         super().delete(*args, **kwargs)
 
     def clean(self):
-        if self.code in DENY_ORGANIZATION_CODES:
+        if self.code in settings.DENY_ORGANIZATION_CODES:
             raise ValidationError(
                 {
                     "code": _(
-                        "This organization code is reserved by OpenKAT and cannot be used. Choose another organization code."
+                        "This organization code is reserved by OpenKAT and cannot be used."
+                        "Choose another organization code."
                     )
                 }
             )

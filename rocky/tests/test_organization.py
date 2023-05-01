@@ -1,12 +1,13 @@
 from unittest.mock import patch
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 from requests import RequestException
-from tools.models import DENY_ORGANIZATION_CODES, Organization
+from tools.models import Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.organization_add import OrganizationAddView
@@ -329,7 +330,7 @@ def test_organization_code_validator_from_view(rf, superuser_member, mocker, moc
     request = setup_request(
         rf.post(
             "organization_add",
-            {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]},
+            {"name": "DENIED LIST CHECK", "code": settings.DENY_ORGANIZATION_CODES[0]},
         ),
         superuser_member.user,
     )
@@ -347,11 +348,11 @@ def test_organization_code_validator_from_view(rf, superuser_member, mocker, moc
 def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
     mocker.patch("katalogus.client.KATalogusClientV1")
     with pytest.raises(ValidationError):
-        Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])
+        Organization.objects.create(name="Test", code=settings.DENY_ORGANIZATION_CODES[0])
 
     new_org = Organization.objects.create(name="Test", code="test_123")
     assert new_org.code == "test_123"
 
-    new_org.code = DENY_ORGANIZATION_CODES[0]
+    new_org.code = settings.DENY_ORGANIZATION_CODES[0]
     with pytest.raises(ValidationError):
         new_org.save()
