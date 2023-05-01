@@ -23,7 +23,7 @@
                     <div class="horizontal-view">
                         <button type="submit">{% translate "Save organization" %}</button>
                         <a class="button ghost"
-                           href="{% url 'organization_settings' object.id %}">{% translate "Cancel" %}</a>
+                           href="{% url 'organization_settings' organization.code %}">{% translate "Cancel" %}</a>
                     </div>
                 </form>
             </div>
@@ -32,6 +32,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}
