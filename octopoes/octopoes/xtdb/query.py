@@ -25,7 +25,6 @@ class Query:
     {:query {:find [(pull Network [*])] :where [
         [ Network :Network/name "test" ]
         [ Finding :Finding/ooi Network ]
-        [ Finding :Finding/ooi Network ]
     ]}}
     '
     """
