@@ -130,6 +130,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "tools.context_processors.languages",
                 "tools.context_processors.organizations_including_blocked",
+                "tools.context_processors.rocky_version",
             ],
             "builtins": ["tools.templatetags.ooi_extra"],
         },
