@@ -1,6 +1,5 @@
 import logging
 
-from colorama import Fore
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
@@ -60,4 +59,4 @@ class Command(BaseCommand):
             ]
         )
         self.group_redteam.permissions.set(redteam_permissions)
-        logging.info(Fore.GREEN + " ROCKY HAS BEEN SETUP SUCCESSFULLY")
+        logging.info("ROCKY HAS BEEN SETUP SUCCESSFULLY")
