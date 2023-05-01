@@ -2,7 +2,7 @@ import datetime
 import ipaddress
 import logging
 import re
-from typing import Iterator, List, Tuple, Union
+from typing import Iterable, List, Tuple, Union
 
 import cryptography
 from cryptography import x509
@@ -34,7 +34,7 @@ def find_between(s: str, first: str, last: str) -> str:
         return ""
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     # only get the first part of certificates
     contents = find_between(raw.decode(), "Certificate chain", "Certificate chain")
 

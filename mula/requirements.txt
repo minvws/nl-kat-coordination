@@ -9,3 +9,10 @@ python-dotenv==1.0.0
 requests==2.27.1
 sqlalchemy==1.4.31
 uvicorn==0.17.1
+
+# OpenTelemetry
+opentelemetry-sdk==1.17.0
+opentelemetry-exporter-otlp-proto-grpc==1.17.0
+opentelemetry-instrumentation-fastapi==0.38b0
+opentelemetry-instrumentation-psycopg2==0.38b0
+opentelemetry-instrumentation-requests==0.38b0

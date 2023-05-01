@@ -1,7 +1,6 @@
-import os
 from enum import Enum
 from pathlib import Path
-from typing import Set
+from typing import Optional, Set
 
 from pydantic import BaseSettings
 
@@ -16,14 +15,14 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    log_cfg: str = os.path.join(Path(__file__).parent.parent.parent, "logging.yml")
+    log_cfg: str = str(Path(__file__).parent.parent.parent / "logging.yml")  # todo: use Path type
     queue_name_octopoes: str = "octopoes"
 
     # External services settings
     queue_uri: str = "amqp://guest:guest@rabbitmq:5672/%2fkat"
     xtdb_uri: str = "http://crux:3000"
     xtdb_type: XTDBType = XTDBType.CRUX
-    span_export_grpc_endpoint: str = None
+    span_export_grpc_endpoint: Optional[str] = None
 
     katalogus_api: str = "http://localhost:8003"
 

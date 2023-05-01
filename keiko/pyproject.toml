@@ -37,6 +37,9 @@ Jinja2 = "^3.1.2"
 fastapi = "^0.85.2"
 uvicorn = "^0.19.0"
 vulture = "^2.5"
+opentelemetry-sdk = "^1.17.0"
+opentelemetry-exporter-otlp-proto-grpc = "1.17.0"
+opentelemetry-instrumentation-fastapi = "^0.38b0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.2"
