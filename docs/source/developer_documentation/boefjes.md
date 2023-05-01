@@ -62,8 +62,7 @@ although this would be more complicated.
 | OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                          |
 | BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                             |
 | KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                         |
-| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                     |
-| WP_SCAN_API                | "...DpfBZmnsq6..."           | A token needed by WP Scan boefje                  |
+| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                         |
 | ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings      |
 | KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string |
 | KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string  |
