@@ -140,12 +140,10 @@ class PriorityQueue(abc.ABC):
             item_on_queue = self.get_p_item_by_identifier(p_item)
 
             item_changed = (
-                False
-                if not item_on_queue or p_item.data == item_on_queue.data
-                else True  # FIXM: checking json/dicts here
+                not (not item_on_queue or p_item.data == item_on_queue.data)  # FIXM: checking json/dicts here
             )
 
-            priority_changed = False if not item_on_queue or p_item.priority == item_on_queue.priority else True
+            priority_changed = not (not item_on_queue or p_item.priority == item_on_queue.priority)
 
             allowed = False
             if item_on_queue and self.allow_replace:

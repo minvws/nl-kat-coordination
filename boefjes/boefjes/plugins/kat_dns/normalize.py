@@ -163,11 +163,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
     # DKIM
     dkim_results = results["dkim_response"]
-    if dkim_results not in ["NXDOMAIN", "Timeout"]:
-        if "rcode NOERROR" == dkim_results.split("\n")[2]:
-            yield DKIMExists(
-                hostname=input_hostname.reference,
-            )
+    if dkim_results not in ["NXDOMAIN", "Timeout"] and dkim_results.split("\n")[2] == "rcode NOERROR":
+        yield DKIMExists(
+            hostname=input_hostname.reference,
+        )
 
     # DMARC
     dmarc_results = results["dmarc_response"]

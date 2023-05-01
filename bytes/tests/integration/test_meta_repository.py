@@ -70,11 +70,10 @@ def test_boefje_id_length(meta_repository: SQLMetaDataRepository) -> None:
         boefje_meta.boefje.id = 64 * "a"
         meta_repository.save_boefje_meta(boefje_meta)
 
-    with pytest.raises(DataError):
-        with meta_repository:
-            boefje_meta.id = str(uuid.uuid4())
-            boefje_meta.boefje.id = 65 * "a"
-            meta_repository.save_boefje_meta(boefje_meta)
+    with pytest.raises(DataError), meta_repository:
+        boefje_meta.id = str(uuid.uuid4())
+        boefje_meta.boefje.id = 65 * "a"
+        meta_repository.save_boefje_meta(boefje_meta)
 
     meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
 
@@ -86,11 +85,10 @@ def test_boefje_organization_id_length(meta_repository: SQLMetaDataRepository) -
         boefje_meta.organization = 32 * "t"
         meta_repository.save_boefje_meta(boefje_meta)
 
-    with pytest.raises(DataError):
-        with meta_repository:
-            boefje_meta.id = str(uuid.uuid4())
-            boefje_meta.organization = 33 * "t"
-            meta_repository.save_boefje_meta(boefje_meta)
+    with pytest.raises(DataError), meta_repository:
+        boefje_meta.id = str(uuid.uuid4())
+        boefje_meta.organization = 33 * "t"
+        meta_repository.save_boefje_meta(boefje_meta)
 
     meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
 
@@ -262,11 +260,10 @@ def test_normalizer_id_length(meta_repository: SQLMetaDataRepository) -> None:
         normalizer_meta.normalizer.id = 64 * "a"
         meta_repository.save_normalizer_meta(normalizer_meta)
 
-    with pytest.raises(DataError):
-        with meta_repository:
-            normalizer_meta.id = str(uuid.uuid4())
-            normalizer_meta.normalizer.id = 65 * "a"
-            meta_repository.save_normalizer_meta(normalizer_meta)
+    with pytest.raises(DataError), meta_repository:
+        normalizer_meta.id = str(uuid.uuid4())
+        normalizer_meta.normalizer.id = 65 * "a"
+        meta_repository.save_normalizer_meta(normalizer_meta)
 
     meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
 

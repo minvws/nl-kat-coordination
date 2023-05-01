@@ -79,15 +79,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 software_version = scan["result"]["data"]["serverInfo"]["version"]
             # TODO: 'serverInfo.OpenSSLVersion, scan['result']['data']['serverInfo']['openssl']{running,compiled}
             # TODO: buildEnvironment.cc
-        elif module == "redis":
-            if "redis_version" in scan.get("result", {}).get("data", {}):
-                software_version = scan["result"]["data"]["redis_version"]
+        elif module == "redis" and "redis_version" in scan.get("result", {}).get("data", {}):
+            software_version = scan["result"]["data"]["redis_version"]
             # TODO: data.gccversion
 
-        if software_version:
-            software_ooi = Software(name=module, version=software_version)
-        else:
-            software_ooi = Software(name=module)
+        software_ooi = Software(name=module, version=software_version) if software_version else Software(name=module)
         yield software_ooi
         software_instance_ooi = SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         yield software_instance_ooi
