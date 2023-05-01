@@ -15,6 +15,7 @@ class RawData(RabbitMQ):
     def listen(self) -> None:
         self.basic_consume(self.queue, False)
 
+    # TODO: what kind of exception should be raised here?
     def dispatch(self, body: bytes) -> None:
         # Convert body into a RawDataReceivedEvent
         model = RawDataReceivedEvent.parse_raw(body)

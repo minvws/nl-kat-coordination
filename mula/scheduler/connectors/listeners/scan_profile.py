@@ -7,7 +7,6 @@ from .listeners import RabbitMQ
 
 
 class ScanProfileMutation(RabbitMQ):
-
     def __init__(self, dsn: str, queue: str, func: Callable):
         super().__init__(dsn)
         self.queue = queue
@@ -16,6 +15,7 @@ class ScanProfileMutation(RabbitMQ):
     def listen(self) -> None:
         self.basic_consume(self.queue, True)
 
+    # TODO: what kind of exception should be raised here?
     def dispatch(self, body: bytes) -> None:
         # Convert body into a ScanProfileMutationModel
         model = ScanProfileMutationModel.parse_raw(body)

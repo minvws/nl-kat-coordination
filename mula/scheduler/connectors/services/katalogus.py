@@ -15,20 +15,17 @@ class Katalogus(HTTPService):
 
         # For every organisation we cache its plugins, it references the
         # plugin-id as key and the plugin as value.
-        self.organisations_plugin_cache: dict_utils.ExpiringDict = \
-            dict_utils.ExpiringDict(lifetime=30)
+        self.organisations_plugin_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
 
         # For every organisation we cache on which type of object (consumes)
         # the boefjes consume, it references the object type (consumes)
         # as the key and a dict of boefjes as value.
-        self.organisations_boefje_type_cache: dict_utils.ExpiringDict = \
-            dict_utils.ExpiringDict(lifetime=30)
+        self.organisations_boefje_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
 
         # For every organisation we cache on which type of object (consumes)
         # the normalizers consume, it references the object type (consumes)
         # as the key and a dict of normalizers as value.
-        self.organisations_normalizer_type_cache: dict_utils.ExpiringDict = \
-            dict_utils.ExpiringDict(lifetime=30)
+        self.organisations_normalizer_type_cache: dict_utils.ExpiringDict = dict_utils.ExpiringDict(lifetime=30)
 
         # For every organisation we cache which new boefjes for an organisation
         # have been enabled.
