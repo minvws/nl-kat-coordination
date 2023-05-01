@@ -2,7 +2,8 @@ import pytest
 
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import IPAddress, IPPort, Network
-from octopoes.xtdb.query import InvalidField, Query
+from octopoes.models.ooi.web import HTTPHeader
+from octopoes.xtdb.query import InvalidField, InvalidPath, Query
 
 
 def test_basic_field_where_clause():
@@ -77,3 +78,52 @@ def test_big_multiple_direction_query():
     [ IPPort :IPPort/primary_key "IPPort|internet|2400:cb00:2049:1::a29f:1b48|tcp|23" ]]}}
 """
     )
+
+
+def test_create_query_from_relation_path():
+    query = (
+        Query.from_relation_path(HTTPHeader, "resource.website.hostname.network")
+        .query(Finding)
+        .where(Finding, ooi=Network)
+    )
+
+    assert (
+        query.format()
+        == """
+{:query {:find [(pull Finding [*])] :where [
+    [ HTTPHeader :HTTPHeader/resource HTTPResource ]
+    [ HTTPResource :HTTPResource/website Website ]
+    [ Website :Website/hostname Hostname ]
+    [ Hostname :Hostname/network Network ]
+    [ Finding :Finding/ooi Network ]]}}
+"""
+    )
+
+    query = (
+        Query.from_relation_path(IPPort, "address.network")
+        .where(IPPort, primary_key="IPPort|internet|2400:cb00:2049:1::a29f:1b48|tcp|23")
+        .query(Finding)
+        .where(Finding, ooi=Network)
+    )
+
+    assert (
+        query.format()
+        == """
+{:query {:find [(pull Finding [*])] :where [
+    [ IPPort :IPPort/address IPAddress ]
+    (or [ IPAddress :IPAddressV4/network Network ] [ IPAddress :IPAddressV6/network Network ] )
+    [ IPPort :IPPort/primary_key "IPPort|internet|2400:cb00:2049:1::a29f:1b48|tcp|23" ]
+    [ Finding :Finding/ooi Network ]]}}
+"""
+    )
+
+
+def test_create_query_invalid_relation_path():
+    with pytest.raises(InvalidPath):
+        Query.from_relation_path(HTTPHeader, "website.hostname.network")
+
+    with pytest.raises(InvalidPath):
+        Query.from_relation_path(HTTPHeader, "resource.website.network")
+
+    with pytest.raises(InvalidPath):
+        Query.from_relation_path(IPPort, "address.network.finding")

@@ -2,17 +2,21 @@ from dataclasses import dataclass, field
 from typing import List, Type, Union
 
 from octopoes.models import OOI
-from octopoes.models.types import get_abstract_types, get_relations
+from octopoes.models.types import get_abstract_types, get_relation, get_relations
 
 
 class InvalidField(ValueError):
     pass
 
 
+class InvalidPath(ValueError):
+    pass
+
+
 @dataclass
 class Query:
     """
-    Example of usage:
+    Example usage:
 
     >>> query = Query(Network).where(Network, name="test")
     >>> query = query.where(Finding, ooi=Network)
@@ -38,6 +42,25 @@ class Query:
 
     def format(self) -> str:
         return "\n" + self._compile(separator="\n    ") + "\n"
+
+    @classmethod
+    def from_relation_path(cls, ooi_type: Type[OOI], path: str) -> "Query":
+        query = Query(ooi_type)
+
+        for field_name in path.split("."):
+            try:
+                relation = get_relation(ooi_type, field_name)
+                query = query.where(ooi_type, **{field_name: relation})
+            except (InvalidField, KeyError) as e:
+                raise InvalidPath("Not a valid relation path") from e
+
+            ooi_type = relation
+
+        return query
+
+    def query(self, ooi_type: Type[OOI]) -> "Query":
+        self.result_ooi_type = ooi_type
+        return self
 
     def _where_field_is(self, ooi_type: Type[OOI], field_name: str, value: Union[Type[OOI], str]) -> None:
         abstract_types = get_abstract_types()
