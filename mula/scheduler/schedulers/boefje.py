@@ -1,9 +1,8 @@
 import logging
-import time
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import List, Optional
+from typing import List
 
 import requests
 
@@ -78,7 +77,8 @@ class BoefjeScheduler(Scheduler):
         )
 
     def listen_for_scan_profile_mutations(self) -> None:
-        """Create tasks for oois that have a scan level change.
+        """Listen for scan profile mutations and create tasks for oois that
+        have a scan level change.
         """
         listener = connectors.listeners.ScanProfileMutation(
             dsn=self.ctx.config.host_raw_data,
@@ -88,19 +88,7 @@ class BoefjeScheduler(Scheduler):
         listener.listen()
 
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
-        """Create tasks for oois that have a scan level change.
-
-        We loop until we don't have any messages on the queue anymore.
-        """
-        # FIXME: can be removed
-        if mutation is None:
-            self.logger.debug(
-                "No more mutation left on queue, processed everything [organisation.id=%s, scheduler_id=%s]",
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
-
+        """Create tasks for oois that have a scan level change."""
         self.logger.debug(
             "Received scan level mutation %s for: %s [ooi.primary_key=%s, organisation.id=%s, scheduler_id=%s]",
             mutation.operation,
@@ -369,10 +357,7 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
-        if (
-            task_db is not None
-            and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]
-        ):
+        if task_db is not None and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
                 "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
@@ -405,10 +390,7 @@ class BoefjeScheduler(Scheduler):
         # Task has been finished (failed, or succeeded) according to
         # the datastore, but we have no results of it in bytes, meaning
         # we have a problem.
-        if (
-            task_bytes is None and task_db is not None
-            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
-        ):
+        if task_bytes is None and task_db is not None and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
             self.logger.error(
                 "Task has been finished, but no results found in bytes "
                 "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
@@ -419,11 +401,7 @@ class BoefjeScheduler(Scheduler):
             )
             raise RuntimeError("Task has been finished, but no results found in bytes")
 
-        if (
-            task_bytes is not None
-            and task_bytes.ended_at is None
-            and task_bytes.started_at is not None
-        ):
+        if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
             self.logger.debug(
                 "Task is still running, according to bytes "
                 "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
@@ -436,15 +414,14 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    # TODO: check Optional[str]
-    def push_task(self, boefje: Boefje, ooi: OOI, caller: Optional[str] = "") -> None:
+    def push_task(self, boefje: Boefje, ooi: OOI, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
         Args:
-            boefje (Boefje): Boefje to run.
-            ooi (OOI): OOI to run Boefje on.
-            caller (str, optional): Caller of this function. Defaults to "".
+            boefje: Boefje to run.
+            ooi: OOI to run Boefje on.
+            caller: Caller of this function. Defaults to "".
 
         """
         task = BoefjeTask(
@@ -506,7 +483,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        if self.queue.is_item_on_queue_by_hash(task.hash):
+        if self.is_item_on_queue_by_hash(task.hash):
             self.logger.debug(
                 "Task is already on queue: %s [organisation.id=%s, scheduler_id=%s, caller=%s]",
                 task,
@@ -534,9 +511,11 @@ class BoefjeScheduler(Scheduler):
             hash=task.hash,
         )
 
-        while not self.is_space_on_queue():
-            self.logger.debug(
-                "Waiting for queue to have enough space, not adding task to queue: %s "
+        try:
+            self.push_item_to_queue_with_timeout(p_item)
+        except queues.QueueFullError:
+            self.logger.warning(
+                "Could not add task to queue, queue was full: %s "
                 "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.queue.qsize(),
@@ -545,7 +524,7 @@ class BoefjeScheduler(Scheduler):
                 self.scheduler_id,
                 caller,
             )
-            time.sleep(1)
+            return
 
         self.logger.info(
             "Created boefje task: %s for ooi: %s "
@@ -559,7 +538,6 @@ class BoefjeScheduler(Scheduler):
             caller,
         )
 
-        self.push_item_to_queue(p_item)
 
     def has_grace_period_passed(self, task: BoefjeTask) -> bool:
         """Check if the grace period has passed for a task in both the
@@ -628,16 +606,6 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            return False
-
-        return True
-
-    def is_space_on_queue(self) -> bool:
-        """Check if there is space on the queue.
-
-        NOTE: maxsize 0 means unlimited
-        """
-        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
             return False
 
         return True

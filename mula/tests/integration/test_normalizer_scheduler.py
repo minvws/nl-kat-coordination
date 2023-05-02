@@ -328,6 +328,3 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
-
-    def test_push_tasks_for_received_raw_file_queue_full(self, *mocks):
-        self.fail("Not implemented")

@@ -1,6 +1,7 @@
 import abc
 import logging
 import threading
+import time
 import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
@@ -229,6 +230,42 @@ class Scheduler(abc.ABC):
 
             count += 1
 
+    # TODO: not sure if we want to do this, should we keep retrying? What
+    # are the implications of missing tasks? What if there is an outage of
+    # workers. Do we retry the tasks? Is the messaging queue persistent,
+    # and do we have an offset?
+    def push_item_to_queue_with_timeout(
+        self,
+        p_item: models.PrioritizedItem,
+        timeout: int = 1,
+        max_tries: int = 5
+    ) -> None:
+        """Push an item to the queue, with a timeout.
+
+        Args:
+            p_item: The item to push to the queue.
+            timeout: The timeout in seconds.
+            max_tries: The maximum number of tries.
+
+        Raises:
+            QueueFullError: When the queue is full.
+        """
+        tries = 0
+        while not self.is_space_on_queue() and tries < max_tries:
+            self.logger.debug(
+                "Queue %s is full, waiting for space [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.pq_id,
+                self.queue.qsize(),
+            )
+            time.sleep(timeout)
+            tries += 1
+
+        if tries >= max_tries:
+            raise queues.errors.QueueFullError()
+
+        self.push_item_to_queue(p_item)
+
     def run_in_thread(
         self,
         name: str,
@@ -251,6 +288,19 @@ class Scheduler(abc.ABC):
             daemon=daemon,
         )
         self.threads[name].start()
+
+    def is_space_on_queue(self) -> bool:
+        """Check if there is space on the queue.
+
+        NOTE: maxsize 0 means unlimited
+        """
+        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
+            return False
+
+        return True
+
+    def is_item_on_queue_by_hash(self, hash: str) -> bool:
+        return self.queue.is_item_on_queue_by_hash(hash)
 
     def stop(self) -> None:
         """Stop the scheduler."""
