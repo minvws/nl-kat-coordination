@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Dict, List, Optional
 
-from account.mixins import OrganizationView
 from django.contrib import messages
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -57,7 +56,7 @@ def generate_findings_metadata(
     return sort_by_severity_desc(findings_meta)
 
 
-class FindingListView(BreadcrumbsMixin, BaseOOIListView, OrganizationView):
+class FindingListView(BreadcrumbsMixin, BaseOOIListView):
     template_name = "findings/finding_list.html"
     ooi_types = {Finding}
     paginate_by = 50

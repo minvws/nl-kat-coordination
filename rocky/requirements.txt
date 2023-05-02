@@ -16,7 +16,7 @@ psycopg2==2.9.6
 pydantic==1.10.7
 python-dotenv==1.0.0
 qrcode==7.3.1
-requests==2.28.1
+requests==2.28.2
 six==1.16.0
 soupsieve==2.3.2.post1
 sqlparse==0.4.4
@@ -35,3 +35,10 @@ drf-standardized-errors==0.12.5
 
 # temp fix to pass build, remove later when https://github.com/xhtml2pdf/xhtml2pdf/issues/589 is solved
 reportlab==3.6.12
+
+# OpenTelemetry
+opentelemetry-sdk==1.17.0
+opentelemetry-exporter-otlp-proto-grpc==1.17.0
+opentelemetry-instrumentation-django==0.38b0
+opentelemetry-instrumentation-psycopg2==0.38b0
+opentelemetry-instrumentation-requests==0.38b0
