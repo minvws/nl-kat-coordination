@@ -1,5 +1,5 @@
 import abc
-from enum import Enum, StrEnum
+from enum import Enum
 from typing import Literal, Optional
 
 from pydantic import AnyUrl
@@ -8,7 +8,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
 
-class RiskLevelSeverity(StrEnum):
+class RiskLevelSeverity(Enum):
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
