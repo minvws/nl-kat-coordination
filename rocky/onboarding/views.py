@@ -83,10 +83,7 @@ class RedteamRequiredMixin(UserPassesTestMixin):
         if self.request.user.is_superuser:
             return True
         members = OrganizationMember.objects.filter(user=self.request.user)
-        for member in members:
-            if member.is_redteam:
-                return True
-        return False
+        return any(member.is_redteam for member in members)
 
 
 # REDTEAMER FLOW
@@ -430,10 +427,7 @@ class AdminRequiredMixin(UserPassesTestMixin):
         if self.request.user.is_superuser:
             return True
         members = OrganizationMember.objects.filter(user=self.request.user)
-        for member in members:
-            if member.is_admin:
-                return True
-        return False
+        return any(member.is_admin for member in members)
 
 
 # account flow
