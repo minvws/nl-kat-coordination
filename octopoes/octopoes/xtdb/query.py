@@ -143,7 +143,7 @@ class Query:
         return f"[ {from_alias} :{field_type}/{field_name} {to_alias} ]"
 
     def _assert_type(self, object_type: Type[OOI]) -> str:
-        return f"[ {object_type.get_object_type()} :object_type \"{object_type.get_object_type()}\" ]"
+        return f'[ {object_type.get_object_type()} :object_type "{object_type.get_object_type()}" ]'
 
     def _compile_where_clauses(self, *, separator=" ") -> str:
         return separator + separator.join(sorted(set(self._where_clauses)))

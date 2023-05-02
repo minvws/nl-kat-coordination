@@ -8,34 +8,46 @@ from octopoes.xtdb.query import InvalidField, Query
 
 def test_basic_field_where_clause():
     query = Query(Network).where(Network, name="test")
-    assert query.format() == """
+    assert (
+        query.format()
+        == """
 {:query {:find [(pull Network [*])] :where [
     [ Network :Network/name "test" ]
     [ Network :object_type "Network" ]]}}
 """
+    )
 
     query = query.limit(4)
-    assert query.format() == """
+    assert (
+        query.format()
+        == """
 {:query {:find [(pull Network [*])] :where [
     [ Network :Network/name "test" ]
     [ Network :object_type "Network" ]] :limit 4}}
 """
+    )
     query = query.offset(0)
-    assert query.format() == """
+    assert (
+        query.format()
+        == """
 {:query {:find [(pull Network [*])] :where [
     [ Network :Network/name "test" ]
     [ Network :object_type "Network" ]] :limit 4 :offset 0}}
 """
+    )
 
 
 def test_reference_field_where_clause():
     query = Query(Network).where(Finding, ooi=Network)
-    assert query.format() == """
+    assert (
+        query.format()
+        == """
 {:query {:find [(pull Network [*])] :where [
     [ Finding :Finding/ooi Network ]
     [ Finding :object_type "Finding" ]
     [ Network :object_type "Network" ]]}}
 """
+    )
 
 
 def test_remove_duplicates():
@@ -57,13 +69,17 @@ def test_invalid_fields_name():
 
 def test_escaping_quotes():
     query = Query(Network).where(Finding, ooi=Network).where(Network, name='test " name')
-    assert query.format() == """
+    assert (
+        query.format()
+        == """
 {:query {:find [(pull Network [*])] :where [
     [ Finding :Finding/ooi Network ]
     [ Finding :object_type "Finding" ]
     [ Network :Network/name "test \\" name" ]
     [ Network :object_type "Network" ]]}}
 """
+    )
+
 
 def test_invalid_field_types():
     with pytest.raises(InvalidField) as ctx:
@@ -85,12 +101,15 @@ def test_invalid_field_types():
 def test_allow_string_for_foreign_keys():
     query = Query(Network).where(Finding, ooi="Network|internet")
 
-    assert query.format() == """
+    assert (
+        query.format()
+        == """
 {:query {:find [(pull Network [*])] :where [
     [ Finding :Finding/ooi "Network|internet" ]
     [ Finding :object_type "Finding" ]
     [ Network :object_type "Network" ]]}}
 """
+    )
 
 
 def test_big_multiple_direction_query():
