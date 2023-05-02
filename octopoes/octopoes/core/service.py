@@ -31,13 +31,11 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import (
-    Path,
     get_max_scan_level_inheritance,
     get_max_scan_level_issuance,
     get_paths_to_neighours,
 )
 from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import Config, to_concrete
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 from octopoes.repositories.origin_repository import OriginRepository
@@ -130,54 +128,49 @@ class OctopoesService:
             self.ooi_repository.save(ooi, valid_time=valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
 
-    def _run_inference(self, origin: Origin, valid_time: datetime):
+    def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
         bit_definition = get_bit_definitions()[origin.method]
 
-        resulting_oois = []
+        is_disabled = bit_definition.id in settings.bits_disabled or (
+            not bit_definition.default_enabled and bit_definition.id not in settings.bits_enabled
+        )
 
-        if bit_definition.id not in settings.bits_disabled and (
-            bit_definition.id in settings.bits_enabled or bit_definition.default_enabled
-        ):
+        if is_disabled:
+            self.save_origin(origin, [], valid_time)
+            return
+
+        try:
+            level = self.scan_profile_repository.get(origin.source, valid_time).level
+        except ObjectNotFoundException:
+            level = 0
+
+        if level < bit_definition.min_scan_level:
+            self.save_origin(origin, [], valid_time)
+            return
+
+        source = self.ooi_repository.get(origin.source, valid_time)
+
+        parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
+        parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
+
+        if bit_definition.config_ooi_relation_path is None:
             try:
-                level = self.scan_profile_repository.get(origin.source, valid_time).level
-            except ObjectNotFoundException:
-                level = 0
+                resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
+            except Exception as e:
+                logger.exception("Error running inference", exc_info=e)
+                return
 
-            if level >= bit_definition.min_scan_level:
-                source = self.ooi_repository.get(origin.source, valid_time)
+            self.save_origin(origin, resulting_oois, valid_time)
+            return
 
-                parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
-                parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
+        configs = self.ooi_repository.get_bit_configs(source, bit_definition, valid_time)
+        config = "" if len(configs) == 0 else configs[-1].config
 
-                config = ""
-                config_path = bit_definition.config_ooi_relation_path
-                if config_path is not None:
-                    obj = source
-                    path_oois = config_path.split(".") if config_path else []
-
-                    for ooi in path_oois:
-                        path = Path.parse(f"{obj.__class__.__name__}.{ooi}")
-                        obj = self.ooi_repository.list_neighbours(
-                            references={obj.reference}, paths={path}, valid_time=valid_time
-                        ).pop()
-
-                    config_oois = self.get_ooi_tree(
-                        reference=obj.reference, valid_time=valid_time, search_types=to_concrete({Config})
-                    )
-
-                    for config_ooi in config_oois.store.values():
-                        if isinstance(config_ooi, Config):
-                            if config_ooi.bit_id == bit_definition.id:
-                                config = config_ooi.config
-
-                try:
-                    if config_path is not None:
-                        resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
-                    else:
-                        resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
-                except Exception as e:
-                    logger.exception("Error running inference", exc_info=e)
-                    return
+        try:
+            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
+        except Exception as e:
+            logger.exception("Error running inference", exc_info=e)
+            return
 
         self.save_origin(origin, resulting_oois, valid_time)
 
