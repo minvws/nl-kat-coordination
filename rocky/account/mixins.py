@@ -118,6 +118,8 @@ class OrganizationView(View):
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
             raise IndemnificationNotPresentException()
+        if not self.organization_member.onboarded:
+            return True  # TO DO: refactor, create screen at onboarding to acknowledge clearance level.
         if self.organization_member.acknowledged_clearance_level < level:
             raise AcknowledgedClearanceLevelTooLowException()
         if self.organization_member.trusted_clearance_level < level:
