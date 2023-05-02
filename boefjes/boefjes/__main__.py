@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 )
 def cli(worker_type: str, log_level: str):
     logger.setLevel(log_level)
-    logger.info(f"Starting runtime for {worker_type}")
+    logger.info("Starting runtime for %s", worker_type)
 
     queue = RuntimeManager.Queue(worker_type)
     runtime = get_runtime_manager(settings, queue, log_level)
