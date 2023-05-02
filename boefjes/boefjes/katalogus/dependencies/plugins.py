@@ -1,3 +1,4 @@
+import contextlib
 import logging
 from pathlib import Path
 from typing import Dict, Iterable, Iterator, List, Optional
@@ -201,10 +202,8 @@ class PluginService:
                 raise SettingsNotConformingToSchema(organisation_id, plugin_id, e.message) from e
 
     def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
-        try:
+        with contextlib.suppress(KeyError, NotFound):
             plugin.enabled = self.plugin_enabled_store.get_by_id(plugin.id, plugin.repository_id, organisation_id)
-        except (KeyError, NotFound):
-            pass
 
         return plugin
 

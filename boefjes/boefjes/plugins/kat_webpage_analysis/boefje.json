@@ -8,6 +8,6 @@
         "produces": [
             "HTTPHeader"
         ],
-        "environment_keys": [],
+        "environment_keys": ["USERAGENT"],
         "scan_level": 2
     }

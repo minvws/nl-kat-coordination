@@ -149,10 +149,7 @@ async def create_raw(
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
 ) -> RawResponse:
-    if mime_types is None:
-        parsed_mime_types = []
-    else:
-        parsed_mime_types = [MimeType(value=mime_type) for mime_type in mime_types]
+    parsed_mime_types = [] if mime_types is None else [MimeType(value=mime_type) for mime_type in mime_types]
 
     try:
         meta = meta_repository.get_boefje_meta_by_id(boefje_meta_id)
@@ -206,10 +203,7 @@ def get_raws(
 ) -> List[RawDataMeta]:
     """Get a filtered list of RawDataMeta objects, which contains metadata of a RawData object without the contents"""
 
-    if mime_types is None:
-        parsed_mime_types = []
-    else:
-        parsed_mime_types = [MimeType(value=mime_type) for mime_type in mime_types]
+    parsed_mime_types = [] if mime_types is None else [MimeType(value=mime_type) for mime_type in mime_types]
 
     query_filter = RawDataFilter(
         organization=organization,

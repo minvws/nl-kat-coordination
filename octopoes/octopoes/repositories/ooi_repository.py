@@ -502,11 +502,10 @@ class XTDBOOIRepository(OOIRepository):
 
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
         # retrieve old ooi
-        old_ooi = None
         try:
             old_ooi = self.get(ooi.reference, valid_time=valid_time)
         except ObjectNotFoundException:
-            pass
+            old_ooi = None
 
         new_ooi = ooi
         if old_ooi is not None:
