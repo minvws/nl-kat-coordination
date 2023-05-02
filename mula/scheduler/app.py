@@ -4,10 +4,14 @@ import threading
 import time
 from typing import Any, Callable, Dict
 
+from opentelemetry import trace
+
 from scheduler import context, queues, rankers, schedulers, server
 from scheduler.connectors import listeners
 from scheduler.models import BoefjeTask, NormalizerTask, Organisation
 from scheduler.utils import thread
+
+tracer = trace.get_tracer(__name__)
 
 
 class App:
@@ -175,6 +179,7 @@ class App:
 
         return scheduler
 
+    @tracer.start_as_current_span("monitor_organisations")
     def monitor_organisations(self) -> None:
         """Monitor the organisations in the Katalogus service, and add/remove
         organisations from the schedulers.
