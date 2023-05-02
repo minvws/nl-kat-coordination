@@ -1,6 +1,6 @@
 import pytest
 
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.network import IPAddress, IPPort, Network
 from octopoes.models.path import Path
 from octopoes.xtdb.query import InvalidField, Query
@@ -126,10 +126,10 @@ def test_big_multiple_direction_query():
         == """
 {:query {:find [(pull Finding [*])] :where [
     (or [ IPAddress :IPAddressV4/network Network ] [ IPAddress :IPAddressV6/network Network ] )
+    (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )
     [ Finding :Finding/finding_type "KATFindingType|KAT-500" ]
     [ Finding :Finding/ooi Network ]
     [ Finding :object_type "Finding" ]
-    [ IPAddress :object_type "IPAddress" ]
     [ IPPort :IPPort/address IPAddress ]
     [ IPPort :IPPort/primary_key "IPPort|internet|xxx:xxx:x|tcp|23" ]
     [ IPPort :object_type "IPPort" ]]}}
@@ -165,11 +165,35 @@ def test_create_query_from_relation_path():
         == """
 {:query {:find [(pull Finding [*])] :where [
     (or [ IPAddress :IPAddressV4/network Network ] [ IPAddress :IPAddressV6/network Network ] )
+    (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )
     [ Finding :Finding/ooi Network ]
     [ Finding :object_type "Finding" ]
-    [ IPAddress :object_type "IPAddress" ]
     [ IPPort :IPPort/address IPAddress ]
     [ IPPort :IPPort/primary_key "IPPort|internet|xxx:xxx:x|tcp|23" ]
     [ IPPort :object_type "IPPort" ]]}}
+"""
+    )
+
+
+def test_finding_type_count_query():
+    query = Query(FindingType).where(Finding, finding_type=FindingType).group_by(FindingType).count(Finding)
+    object_type_options = [
+        '[ FindingType :object_type "ADRFindingType" ]',
+        '[ FindingType :object_type "CVEFindingType" ]',
+        '[ FindingType :object_type "CWEFindingType" ]',
+        '[ FindingType :object_type "CAPECFindingType" ]',
+        '[ FindingType :object_type "RetireJSFindingType" ]',
+        '[ FindingType :object_type "SnykFindingType" ]',
+        '[ FindingType :object_type "KATFindingType" ]',
+    ]
+    or_statement_list = " ".join(object_type_options)
+
+    assert (
+        query.format()
+        == f"""
+{{:query {{:find [FindingType (count Finding)] :where [
+    (or {or_statement_list} )
+    [ Finding :Finding/finding_type FindingType ]
+    [ Finding :object_type "Finding" ]]}}}}
 """
     )

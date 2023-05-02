@@ -36,6 +36,7 @@ class Query:
     result_type: Type[OOI]
 
     _where_clauses: List[str] = field(default_factory=list)
+    _find_clauses: List[str] = field(default_factory=list)
     _limit: Optional[int] = None
     _offset: Optional[int] = None
 
@@ -76,6 +77,16 @@ class Query:
 
         return self
 
+    def count(self, ooi_type: Type[OOI]) -> "Query":
+        self._find_clauses.append(f"(count {ooi_type.get_object_type()})")
+
+        return self
+
+    def group_by(self, ooi_type: Type[OOI]) -> "Query":
+        self._find_clauses.append(f"{ooi_type.get_object_type()}")
+
+        return self
+
     def limit(self, limit: int) -> "Query":
         self._limit = limit
 
@@ -87,8 +98,6 @@ class Query:
         return self
 
     def _where_field_is(self, ooi_type: Type[OOI], field_name: str, value: Union[Type[OOI], str]) -> None:
-        abstract_types = get_abstract_types()
-
         if field_name not in ooi_type.__fields__:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
@@ -105,6 +114,8 @@ class Query:
 
         if field_name not in get_relations(ooi_type):
             raise InvalidField(f'"{field_name}" is not a relation of {ooi_type.get_object_type()}')
+
+        abstract_types = get_abstract_types()
 
         if ooi_type in abstract_types:
             self._add_or_statement(ooi_type, field_name, value.get_object_type())
@@ -142,16 +153,32 @@ class Query:
     def _relationship(self, from_alias: str, field_type: str, field_name: str, to_alias: str) -> str:
         return f"[ {from_alias} :{field_type}/{field_name} {to_alias} ]"
 
-    def _assert_type(self, object_type: Type[OOI]) -> str:
-        return f'[ {object_type.get_object_type()} :object_type "{object_type.get_object_type()}" ]'
+    def _assert_type(self, ooi_type: Type[OOI]) -> str:
+        if ooi_type not in get_abstract_types():
+            return self._to_object_type_statement(ooi_type, ooi_type)
+
+        return f"(or {' '.join([self._to_object_type_statement(ooi_type, x) for x in ooi_type.__subclasses__()])} )"
+
+    def _to_object_type_statement(self, ooi_type: Type[OOI], other_type: Type[OOI]) -> str:
+        return f'[ {ooi_type.get_object_type()} :object_type "{other_type.get_object_type()}" ]'
 
     def _compile_where_clauses(self, *, separator=" ") -> str:
+        """Sorted and deduplicated where clauses, since they are both idempotent and commutative"""
+
         return separator + separator.join(sorted(set(self._where_clauses)))
+
+    def _compile_find_clauses(self) -> str:
+        return " ".join(self._find_clauses)
 
     def _compile(self, *, separator=" ") -> str:
         self._where_clauses.append(self._assert_type(self.result_type))
         where_clauses = self._compile_where_clauses(separator=separator)
-        compiled = f"{{:query {{:find [(pull {self.result_type.get_object_type()} [*])] :where [{where_clauses}]"
+
+        if not self._find_clauses:
+            self._find_clauses = [f"(pull {self.result_type.get_object_type()} [*])"]
+
+        find_clauses = self._compile_find_clauses()
+        compiled = f"{{:query {{:find [{find_clauses}] :where [{where_clauses}]"
 
         if self._limit is not None:
             compiled += f" :limit {self._limit}"
