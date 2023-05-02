@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Type, Union
+from typing import List, Optional, Type, Union
 
 from octopoes.models import OOI
 from octopoes.models.path import Direction, Path
@@ -30,9 +30,11 @@ class Query:
     '
     """
 
-    result_ooi_type: Type[OOI]
+    result_type: Type[OOI]
 
     _where_clauses: List[str] = field(default_factory=list)
+    _limit: Optional[int] = None
+    _offset: Optional[int] = None
 
     def where(self, ooi_type: Type[OOI], **kwargs) -> "Query":
         for field_name, value in kwargs.items():
@@ -60,7 +62,17 @@ class Query:
     def query(self, ooi_type: Type[OOI]) -> "Query":
         """Change the target object type of the Query after initialization, e.g. when using from_relation_path"""
 
-        self.result_ooi_type = ooi_type
+        self.result_type = ooi_type
+
+        return self
+
+    def limit(self, limit: int) -> "Query":
+        self._limit = limit
+
+        return self
+
+    def offset(self, offset: int) -> "Query":
+        self._offset = offset
 
         return self
 
@@ -120,8 +132,15 @@ class Query:
 
     def _compile(self, *, separator=" ") -> str:
         where_clauses = self._compile_where_clauses(separator=separator)
+        compiled = f"{{:query {{:find [(pull {self.result_type.get_object_type()} [*])] :where [{where_clauses}]"
 
-        return f"{{:query {{:find [(pull {self.result_ooi_type.get_object_type()} [*])] :where [{where_clauses}]}}}}"
+        if self._limit is not None:
+            compiled += f" :limit {self._limit}"
+
+        if self._offset is not None:
+            compiled += f" :offset {self._offset}"
+
+        return compiled + "}}"
 
     def __str__(self) -> str:
         return self._compile()

@@ -7,9 +7,16 @@ from octopoes.xtdb.query import InvalidField, Query
 
 
 def test_basic_field_where_clause():
+    query = Query(Network).where(Network, name="test")
+    assert str(query) == '{:query {:find [(pull Network [*])] :where [ [ Network :Network/name "test" ]]}}'
+
+    query = query.limit(4)
+    assert str(query) == '{:query {:find [(pull Network [*])] :where [ [ Network :Network/name "test" ]] :limit 4}}'
+
+    query = query.offset(0)
     assert (
-        str(Query(Network).where(Network, name="test"))
-        == '{:query {:find [(pull Network [*])] :where [ [ Network :Network/name "test" ]]}}'
+        str(query)
+        == '{:query {:find [(pull Network [*])] :where [ [ Network :Network/name "test" ]] :limit 4 :offset 0}}'
     )
 
 
