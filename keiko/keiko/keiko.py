@@ -5,7 +5,7 @@ import os
 import shutil
 import subprocess
 import tempfile
-from logging import getLogger
+from logging import DEBUG, ERROR, getLogger
 from pathlib import Path
 from typing import Dict, Set, Tuple
 
@@ -135,32 +135,41 @@ def generate_report(
 
         # run pdflatex
         cmd = [
-            "pdflatex",
+            "latexmk",
+            "-xelatex",
             "-synctex=1",
             "-interaction=nonstopmode",
             preprocessed_tex_path.as_posix(),
         ]
         env = {**os.environ, "TEXMFVAR": directory}
-        for i in (1, 2):
-            output = subprocess.run(cmd, cwd=directory, env=env, capture_output=True, check=False)
-            current_span.add_event(f"Completed pdflatex run {i}")
+
+        def log_output(level, output):
+            if not logger.isEnabledFor(level):
+                return
+            # prefix all lines in output
+            for line in output.decode("utf-8").splitlines():
+                logger.log(level, "latexmk output: %s", line)
+
+        try:
+            # capture all output to stdout, so that lines from stdout+stderr are in correct relative order
+            output = subprocess.run(
+                cmd, cwd=directory, env=env, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            )
+            current_span.add_event("Completed latexmk")
             logger.info(
-                "pdflatex [run=%d] [report_id=%s] [template=%s] [command=%s]",
-                i,
+                "latexmk [report_id=%s] [template=%s] [command=%s]",
                 report_id,
                 template_name,
                 " ".join(cmd),
             )
-            if output.returncode:
-                logger.error("stdout: %s", output.stdout.decode("utf-8"))
-                logger.error("stderr: %s", output.stderr.decode("utf-8"))
-                ex = Exception("Error in pdflatex run %d", i)
-                current_span.set_status(Status(StatusCode.ERROR))
-                current_span.record_exception(ex)
-                raise ex
-            else:
-                logger.debug(output.stdout.decode("utf-8"))
-                logger.debug(output.stderr.decode("utf-8"))
+            log_output(DEBUG, output.stdout)
+        except subprocess.CalledProcessError as ex:
+            log_output(ERROR, ex.stdout)
+            err = Exception("Error in latexmk")
+            err.__cause__ = ex
+            current_span.set_status(Status(StatusCode.ERROR))
+            current_span.record_exception(err)
+            raise err
 
         # copy result back to output folder
         shutil.copyfile(
