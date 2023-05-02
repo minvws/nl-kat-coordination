@@ -12,17 +12,16 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[DMARCTXTRecord],
 ) -> Iterator[OOI]:
+    # only report finding when there is no DMARC record
     if (
-        # don't report on findings on subdomains because it's not needed on subdomains
         not tldextract.extract(input_ooi.name).subdomain
-        # don't report on findings on tlds
         and tldextract.extract(input_ooi.name).domain
+        and not additional_oois
     ):
-        if not additional_oois:
-            ft = KATFindingType(id="KAT-NO-DMARC")
-            yield ft
-            yield Finding(
-                ooi=input_ooi.reference,
-                finding_type=ft.reference,
-                description="This hostname does not have a DMARC record",
-            )
+        ft = KATFindingType(id="KAT-NO-DMARC")
+        yield ft
+        yield Finding(
+            ooi=input_ooi.reference,
+            finding_type=ft.reference,
+            description="This hostname does not have a DMARC record",
+        )

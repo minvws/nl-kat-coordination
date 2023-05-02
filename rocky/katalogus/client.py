@@ -1,3 +1,4 @@
+import contextlib
 import json
 from io import BytesIO
 from typing import Dict, List, Optional, Set, Type
@@ -145,10 +146,8 @@ def parse_plugin(plugin: Dict) -> Plugin:
 
     produces = set()
     for ooi in plugin["produces"]:
-        try:
+        with contextlib.suppress(StopIteration):
             produces.add(type_by_name(ooi))
-        except StopIteration:
-            pass
 
     return Plugin(
         id=plugin["id"],
