@@ -1,23 +1,36 @@
 import json
+import logging
 from typing import Iterable, Union
 
 from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models import OOI
+from octopoes.models.ooi.findings import KATFindingType, RiskLevelSeverity
+
+logger = logging.getLogger(__name__)
+
+
+SEVERITY_SCORE_LOOKUP = {
+    RiskLevelSeverity.CRITICAL: 10.0,
+    RiskLevelSeverity.HIGH: 8.9,
+    RiskLevelSeverity.MEDIUM: 6.9,
+    RiskLevelSeverity.LOW: 3.9,
+    RiskLevelSeverity.RECOMMENDATION: 0.0,
+}
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
-    boefje_meta = normalizer_meta.raw_data.boefje_meta
-    data = json.loads(raw.decode())
+    id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
+    data = json.loads(raw)
 
-    pk = boefje_meta.input_ooi
-    website_reference = Reference.from_str(pk)
+    finding_type_information = data[id]
+    logger.info(finding_type_information["risk"].lower())
+    risk_severity = RiskLevelSeverity(finding_type_information["risk"].lower())
 
-    if not data["green"]:
-        ft = KATFindingType(id="KAT-NO-GREEN-HOSTING")
-        yield ft
-        yield Finding(
-            finding_type=ft.reference,
-            ooi=website_reference,
-            description="This server is not running in a 'green' datacenter according to the Green Web Foundation.",
-        )
+    risk_score = SEVERITY_SCORE_LOOKUP[risk_severity]
+
+    yield KATFindingType(
+        id=id,
+        description=finding_type_information["description"],
+        risk_severity=risk_severity,
+        risk_score=risk_score,
+    )
