@@ -16,7 +16,10 @@ class InvalidPath(ValueError):
 
 @dataclass
 class Query:
-    """
+    """Object representing an XTDB query.
+
+        result_type: The OOI Type being queried: executing the query should yield only this OOI Type.
+
     Example usage:
 
     >>> query = Query(Network).where(Network, name="test")
@@ -47,6 +50,13 @@ class Query:
 
     @classmethod
     def from_path(cls, path: Path) -> "Query":
+        """
+        Create a query from a Path.
+
+        The last segment in the path is assumed to be the queries OOI Type. You can change this by calling the
+        query() method after initialization for the required target OOI Type.
+        """
+
         ooi_type = path.segments[-1].target_type
         query = Query(ooi_type)
 
@@ -60,7 +70,7 @@ class Query:
         return query
 
     def query(self, ooi_type: Type[OOI]) -> "Query":
-        """Change the target object type of the Query after initialization, e.g. when using from_relation_path"""
+        """Change the target object type of the Query after initialization, e.g. when using from_relation_path()"""
 
         self.result_type = ooi_type
 
@@ -100,14 +110,18 @@ class Query:
             self._add_or_statement(ooi_type, field_name, value.get_object_type())
             return
 
+        self._assert_type(value)
         self._add_where_statement(ooi_type, field_name, value.get_object_type())
 
     def _add_where_statement(self, ooi_type: Type[OOI], field_name: str, to_alias: str) -> None:
         from_alias = ooi_type.get_object_type()
+        self._where_clauses.append(self._assert_type(ooi_type))
 
         self._where_clauses.append(self._relationship(from_alias, from_alias, field_name, to_alias))
 
     def _add_or_statement(self, ooi_type: Type[OOI], field_name: str, to_alias: str) -> None:
+        self._where_clauses.append(self._assert_type(ooi_type))
+
         self._where_clauses.append(
             self._or_statement(
                 ooi_type.get_object_type(),
@@ -128,10 +142,14 @@ class Query:
     def _relationship(self, from_alias: str, field_type: str, field_name: str, to_alias: str) -> str:
         return f"[ {from_alias} :{field_type}/{field_name} {to_alias} ]"
 
+    def _assert_type(self, object_type: Type[OOI]) -> str:
+        return f"[ {object_type.get_object_type()} :object_type \"{object_type.get_object_type()}\" ]"
+
     def _compile_where_clauses(self, *, separator=" ") -> str:
-        return separator + separator.join(self._where_clauses)
+        return separator + separator.join(sorted(set(self._where_clauses)))
 
     def _compile(self, *, separator=" ") -> str:
+        self._where_clauses.append(self._assert_type(self.result_type))
         where_clauses = self._compile_where_clauses(separator=separator)
         compiled = f"{{:query {{:find [(pull {self.result_type.get_object_type()} [*])] :where [{where_clauses}]"
 
@@ -145,3 +163,6 @@ class Query:
 
     def __str__(self) -> str:
         return self._compile()
+
+    def __eq__(self, other: "Query"):
+        return str(self) == str(other)
