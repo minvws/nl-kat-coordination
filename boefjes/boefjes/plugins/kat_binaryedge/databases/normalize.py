@@ -66,28 +66,24 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
         yield ip_port_ooi
 
         software_version = None
+        data = scan.get("result", {}).get("data", {})
         if module == "cassandra":
-            for cluster in scan.get("result", {}).get("data", {}).get("cluster", []):
+            for cluster in data.get("cluster", []):
                 if "cassandraVersion" in cluster:
                     software_version = cluster["cassandraVersion"]
-        elif module == "elasticsearch" or module == "memcached":
-            if "version" in scan.get("result", {}).get("data", {}):
-                software_version = scan["result"]["data"]["version"]
+                    break
+        elif module == "elasticsearch" or module == "memcached" and "version" in data:
+            software_version = data["version"]
             # TODO: jvm.version, jvm.vm_version, jvm.vm_vendor
-        elif module == "mongodb":
-            if "version" in scan.get("result", {}).get("data", {}).get("serverInfo"):
-                software_version = scan["result"]["data"]["serverInfo"]["version"]
+        elif module == "mongodb" and "version" in data.get("serverInfo", {}):
+            software_version = data["serverInfo"]["version"]
             # TODO: 'serverInfo.OpenSSLVersion, scan['result']['data']['serverInfo']['openssl']{running,compiled}
             # TODO: buildEnvironment.cc
-        elif module == "redis":
-            if "redis_version" in scan.get("result", {}).get("data", {}):
-                software_version = scan["result"]["data"]["redis_version"]
+        elif module == "redis" and "redis_version" in data:
+            software_version = data["redis_version"]
             # TODO: data.gccversion
 
-        if software_version:
-            software_ooi = Software(name=module, version=software_version)
-        else:
-            software_ooi = Software(name=module)
+        software_ooi = Software(name=module, version=software_version) if software_version else Software(name=module)
         yield software_ooi
         software_instance_ooi = SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
         yield software_instance_ooi

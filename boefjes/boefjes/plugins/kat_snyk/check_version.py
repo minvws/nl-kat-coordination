@@ -41,7 +41,7 @@ def check_version(version1: str, version2: str) -> VersionCheck:
         if pack1[0].isnumeric() and pack2[0].isnumeric():
             # Has a package-name, but it starts with version-numbers  # https://snyk.io/vuln/debian%3A12%3Awordpress
             first_part_check = check_version(pack1[0], pack2[0])
-            if not first_part_check == VersionCheck.EQUAL:
+            if first_part_check != VersionCheck.EQUAL:
                 return first_part_check
             else:
                 # Version is the same, but package different.. impossible to compare
@@ -96,10 +96,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
                 "Unexpected input, missing closing bracket for %s,%s. Ignoring input.", lowerbound, upperbound
             )
             return False, None
-        if lowerbound[0] == "(":
-            lowerbound_versioncheck = VersionCheck.GREATER
-        else:
-            lowerbound_versioncheck = VersionCheck.GREATER_EQUAL
+        lowerbound_versioncheck = VersionCheck.GREATER if lowerbound[0] == "(" else VersionCheck.GREATER_EQUAL
         lowerbound = lowerbound[1:].strip()
         if len(lowerbound) == 0:
             # Example: "(,1.2)"  # https://snyk.io/vuln/maven%3Aorg.apache.nifi%3Anifi-security-utils
@@ -144,10 +141,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
     upperbound_versioncheck = None
     if end_bracket:
         # Example: "(1.2,1.4]"
-        if upperbound[-1] == ")":
-            upperbound_versioncheck = VersionCheck.SMALLER
-        else:
-            upperbound_versioncheck = VersionCheck.SMALLER_EQUAL
+        upperbound_versioncheck = VersionCheck.SMALLER if upperbound[-1] == ")" else VersionCheck.SMALLER_EQUAL
         upperbound = upperbound[:-1].strip()
     elif start_inequality:
         # Example: "<=1.4"
