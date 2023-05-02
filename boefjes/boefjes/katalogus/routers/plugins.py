@@ -1,14 +1,13 @@
 from typing import Dict, List
 
-from fastapi import APIRouter, Depends, Body, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from requests import HTTPError
-from starlette.responses import FileResponse, Response, JSONResponse
+from starlette.responses import FileResponse, JSONResponse, Response
 from starlette.status import HTTP_404_NOT_FOUND
 
 from boefjes.katalogus.dependencies.plugins import PluginService, get_plugin_service
 from boefjes.katalogus.models import PluginType
 from boefjes.katalogus.routers.organisations import check_organisation_exists
-
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",

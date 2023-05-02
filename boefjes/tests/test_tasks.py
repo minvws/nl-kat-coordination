@@ -1,23 +1,23 @@
-from pathlib import Path
-
-import pytest
 import sys
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import List
 from unittest import TestCase, mock
 
+import pytest
+
+from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.job_models import (
     BoefjeMeta,
-    NormalizerMeta,
-    UnsupportedReturnTypeNormalizer,
     InvalidReturnValueNormalizer,
+    NormalizerMeta,
     NormalizerPlainOOI,
+    UnsupportedReturnTypeNormalizer,
 )
-from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.katalogus.models import Boefje, Normalizer, Bit, PluginType
-
-from tests.stubs import get_dummy_data
+from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from tests.stubs import get_dummy_data
 
 
 class TaskTest(TestCase):
@@ -94,6 +94,14 @@ class TaskTest(TestCase):
         plain_ooi = NormalizerPlainOOI(object_type="Network", name="internet")
 
         NormalizerHandler._parse_ooi(plain_ooi)
+
+    def test_parse_normalizer_meta_to_json(self):
+        meta = NormalizerMeta.parse_raw(get_dummy_data("snyk-normalizer.json"))
+        meta.started_at = datetime(10, 10, 10, 10, tzinfo=timezone.utc)
+        meta.ended_at = datetime(10, 10, 10, 12, tzinfo=timezone.utc)
+
+        assert "0010-10-10T10:00:00+00:00" in meta.json()
+        assert "0010-10-10T12:00:00+00:00" in meta.json()
 
     @mock.patch("boefjes.job_handler.get_environment_settings", return_value={})
     @mock.patch("boefjes.job_handler.bytes_api_client")

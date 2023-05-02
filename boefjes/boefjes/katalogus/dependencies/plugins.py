@@ -1,7 +1,6 @@
 import logging
-
 from pathlib import Path
-from typing import Dict, Iterable, List, Iterator, Optional
+from typing import Dict, Iterable, Iterator, List, Optional
 
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
@@ -16,11 +15,11 @@ from boefjes.katalogus.local_repository import (
     LocalPluginRepository,
     get_local_repository,
 )
-from boefjes.katalogus.models import Repository, PluginType, RESERVED_LOCAL_ID
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, PluginType, Repository
 from boefjes.katalogus.storage.interfaces import (
-    RepositoryStorage,
-    PluginEnabledStorage,
     NotFound,
+    PluginEnabledStorage,
+    RepositoryStorage,
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
@@ -98,7 +97,7 @@ class PluginService:
         try:
             self._assert_settings_match_schema(organisation_id, plugin_id)
         except SettingsNotConformingToSchema:
-            logger.warning(f"Removing setting disabled {plugin_id} for {organisation_id} (if it was enabled before)")
+            logger.warning("Removing setting disabled %s for %s (if it was enabled before)", plugin_id, organisation_id)
 
             plugin = self.by_plugin_id(plugin_id, organisation_id)
             self.update_by_id(plugin.repository_id, plugin_id, organisation_id, False)
@@ -234,7 +233,7 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
         return PluginService(
             create_plugin_enabled_storage(session),
             create_repository_storage(session),
-            create_setting_storage(organisation_id, session),
+            create_setting_storage(session),
             PluginRepositoryClient(),
             get_local_repository(),
         )

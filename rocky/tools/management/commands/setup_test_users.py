@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
@@ -6,9 +6,9 @@ from django.core.management import BaseCommand
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from tools.models import (
+    GROUP_ADMIN,
     GROUP_CLIENT,
     GROUP_REDTEAM,
-    GROUP_ADMIN,
     Organization,
     OrganizationMember,
 )
@@ -93,7 +93,5 @@ def add_user(user_kwargs: Dict[str, str], group_name: Optional[str] = None):
     )
 
     if created:
-        organizationmember.verified = True
-        organizationmember.authorized = True
         organizationmember.status = OrganizationMember.STATUSES.ACTIVE
         organizationmember.save()

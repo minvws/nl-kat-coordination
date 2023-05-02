@@ -1,9 +1,8 @@
 import json
 import logging
-
-from os import getenv
 from base64 import b64encode
-from typing import Tuple, Union, Optional, Dict, List
+from os import getenv
+from typing import Dict, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import requests
@@ -50,7 +49,7 @@ def check_with_header(url_input: str, header_name: str, payload: str, timeout: i
 
         return b64encode(response.content).decode()
     except requests.exceptions.ConnectionError as e:
-        logging.error(f"HTTP connection to {url_input} URL error: {e}")
+        logging.error("HTTP connection to %s URL error: %s", url_input, e)
 
 
 def check(url_input: str, payload: str, timeout: int) -> Optional[str]:
@@ -59,7 +58,7 @@ def check(url_input: str, payload: str, timeout: int) -> Optional[str]:
 
         return b64encode(response.content).decode()
     except requests.exceptions.ConnectionError as e:
-        logging.error(f"HTTP connection to {url_input} URL error: {e}")
+        logging.error("HTTP connection to %s URL error: %s", url_input, e)
 
 
 def get_payloads(url_input: str, reply_host: str, identifier: str) -> Dict[str, str]:

@@ -16,6 +16,8 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
+from rocky.otel import OpenTelemetryHelper
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -84,7 +86,6 @@ INSTALLED_APPS = [
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
-    "markdownify.apps.MarkdownifyConfig",
     "two_factor",
     "account",
     "tools",
@@ -107,9 +108,11 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django_otp.middleware.OTPMiddleware",
+    "rocky.middleware.auth_required.AuthRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "rocky.middleware.onboarding.OnboardingMiddleware",
+    "rocky.middleware.otel.OTELInstrumentTemplateMiddleware",
 ]
 
 ROOT_URLCONF = "rocky.urls"
@@ -126,6 +129,8 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "tools.context_processors.languages",
+                "tools.context_processors.organizations_including_blocked",
+                "tools.context_processors.rocky_version",
             ],
             "builtins": ["tools.templatetags.ooi_extra"],
         },
@@ -217,7 +222,7 @@ LANGUAGES = [
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "assets"),)
+STATICFILES_DIRS = (BASE_DIR / "assets",)
 
 LOGIN_URL = "two_factor:login"
 LOGIN_REDIRECT_URL = "crisis_room"
@@ -275,47 +280,6 @@ CSP_INCLUDE_NONCE_IN = ["script-src"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 
-# MarkDownify settings
-# see https://django-markdownify.readthedocs.io/en/latest/settings.html
-MARKDOWNIFY = {
-    "default": {
-        "WHITELIST_TAGS": [
-            "a",
-            "abbr",
-            "acronym",
-            "b",
-            "br",
-            "blockquote",
-            "em",
-            "h1",
-            "h2",
-            "h3",
-            "h4",
-            "h5",
-            "h6",
-            "i",
-            "li",
-            "ol",
-            "p",
-            "pre",
-            "strong",
-            "table",
-            "thead",
-            "tbody",
-            "th",
-            "tr",
-            "td",
-            "ul",
-        ],
-        "MARKDOWN_EXTENSIONS": [
-            "markdown.extensions.extra",
-        ],
-        "LINKIFY_TEXT": {
-            "PARSE_URLS": False,
-        },
-    }
-}
-
 DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
@@ -343,24 +307,24 @@ SERIALIZATION_MODULES = {
 TAGULOUS_SLUG_ALLOW_UNICODE = True
 
 TAG_COLORS = [
-    ("blue-light", _("Blue light")),
-    ("blue-medium", _("Blue medium")),
-    ("blue-dark", _("Blue dark")),
-    ("green-light", _("Green light")),
-    ("green-medium", _("Green medium")),
-    ("green-dark", _("Green dark")),
-    ("yellow-light", _("Yellow light")),
-    ("yellow-medium", _("Yellow medium")),
-    ("yellow-dark", _("Yellow dark")),
-    ("orange-light", _("Orange light")),
-    ("orange-medium", _("Orange medium")),
-    ("orange-dark", _("Orange dark")),
-    ("red-light", _("Red light")),
-    ("red-medium", _("Red medium")),
-    ("red-dark", _("Red dark")),
-    ("violet-light", _("Violet light")),
-    ("violet-medium", _("Violet medium")),
-    ("violet-dark", _("Violet dark")),
+    ("color-1-light", _("Blue light")),
+    ("color-1-medium", _("Blue medium")),
+    ("color-1-dark", _("Blue dark")),
+    ("color-2-light", _("Green light")),
+    ("color-2-medium", _("Green medium")),
+    ("color-2-dark", _("Green dark")),
+    ("color-3-light", _("Yellow light")),
+    ("color-3-medium", _("Yellow medium")),
+    ("color-3-dark", _("Yellow dark")),
+    ("color-4-light", _("Orange light")),
+    ("color-4-medium", _("Orange medium")),
+    ("color-4-dark", _("Orange dark")),
+    ("color-5-light", _("Red light")),
+    ("color-5-medium", _("Red medium")),
+    ("color-5-dark", _("Red dark")),
+    ("color-6-light", _("Violet light")),
+    ("color-6-medium", _("Violet medium")),
+    ("color-6-dark", _("Violet dark")),
 ]
 
 TAG_BORDER_TYPES = [
@@ -369,3 +333,7 @@ TAG_BORDER_TYPES = [
     ("dashed", _("Dashed")),
     ("dotted", _("Dotted")),
 ]
+
+SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
+if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+    OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)

@@ -6,20 +6,20 @@ import pydantic
 import yaml
 from fastapi import (
     APIRouter,
-    HTTPException,
     BackgroundTasks,
-    status,
-    File,
-    UploadFile,
     Depends,
+    File,
+    HTTPException,
+    UploadFile,
+    status,
 )
 
 from boefjes.plugin_repository.config import PLUGINS_DIR
 from boefjes.plugin_repository.models import (
-    Plugin,
-    PluginType,
     Index,
+    Plugin,
     PluginChoice,
+    PluginType,
 )
 from boefjes.plugin_repository.utils.index import get_or_create_index
 from boefjes.plugin_repository.utils.utils import parse_config

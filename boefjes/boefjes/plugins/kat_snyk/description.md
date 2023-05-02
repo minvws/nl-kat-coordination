@@ -14,4 +14,4 @@ Snyk currently outputs the following OOIs:
 
 |OOI type|Description|
 |---|---|
-|KATFinding|Known vulnerabilty of software|
+|KATFinding|Known vulnerability of software|

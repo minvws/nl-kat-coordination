@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from tools.models import Organization, OrganizationMember
 from tools.forms.settings import BLANK_CHOICE
+from tools.models import Organization, OrganizationMember
 
 
 class OrganizationListForm(forms.Form):

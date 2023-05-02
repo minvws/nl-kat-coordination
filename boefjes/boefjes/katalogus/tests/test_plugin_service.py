@@ -4,7 +4,7 @@ from boefjes.config import settings
 from boefjes.katalogus.clients import MockPluginRepositoryClient
 from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.katalogus.models import Boefje, Normalizer, Bit, Repository, RESERVED_LOCAL_ID
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, Bit, Boefje, Normalizer, Repository
 from boefjes.katalogus.storage.interfaces import SettingsNotConformingToSchema
 from boefjes.katalogus.storage.memory import (
     PluginStatesStorageMemory,
@@ -164,7 +164,7 @@ class TestPluginsService(TestCase):
         )
         self.assertEqual(ctx.exception.message, msg)
 
-        self.service.settings_storage.update_by_key("api_key", 128 * "a", self.organisation, plugin_id)
+        self.service.settings_storage.create("api_key", 128 * "a", self.organisation, plugin_id)
         self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         value = 129 * "a"
@@ -196,7 +196,7 @@ class TestPluginsService(TestCase):
     def test_removing_mandatory_setting_disables_plugin(self):
         plugin_id = "kat_test"
 
-        self.service.settings_storage.update_by_key("api_key", 128 * "a", self.organisation, plugin_id)
+        self.service.settings_storage.create("api_key", 128 * "a", self.organisation, plugin_id)
         self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
@@ -207,10 +207,10 @@ class TestPluginsService(TestCase):
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertFalse(plugin.enabled)
 
-    def test_adding_integer_settings_with_faulty_value_given_constraints(self):
+    def test_adding_integer_settings_within_given_constraints(self):
         plugin_id = "kat_test_2"
 
-        self.service.settings_storage.update_by_key("api_key", "24", self.organisation, plugin_id)
+        self.service.settings_storage.create("api_key", "24", self.organisation, plugin_id)
 
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
             self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
@@ -219,13 +219,11 @@ class TestPluginsService(TestCase):
 
         self.service.settings_storage.update_by_key("api_key", 24, self.organisation, plugin_id)  # Will become a string
 
-        with self.assertRaises(SettingsNotConformingToSchema) as ctx:
-            self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
-
-        self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
+        self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
-        self.assertFalse(plugin.enabled)
+        self.assertTrue(plugin.enabled)
+        self.service.update_by_id("test-repo-2", plugin_id, self.organisation, False)
 
     def test_clone_one_setting(self):
         new_org_id = "org2"

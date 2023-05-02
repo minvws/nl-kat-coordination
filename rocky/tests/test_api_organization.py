@@ -9,9 +9,9 @@ from pytest_drf import (
     Returns201,
     Returns204,
     Returns500,
-    UsesGetMethod,
     UsesDeleteMethod,
     UsesDetailEndpoint,
+    UsesGetMethod,
     UsesListEndpoint,
     UsesPatchMethod,
     UsesPostMethod,
@@ -20,7 +20,6 @@ from pytest_drf import (
 from pytest_drf.util import pluralized, url_for
 from pytest_lambda import lambda_fixture, static_fixture
 from requests import HTTPError
-
 from tools.models import Organization
 
 pytestmark = pytest.mark.django_db
@@ -41,9 +40,7 @@ express_organizations = pluralized(express_organization)
 class TestOrganizationViewSet(ViewSetTest):
     @pytest.fixture
     def organizations(self):
-        with patch("katalogus.client.KATalogusClientV1"), patch(
-            "octopoes.connector.octopoes.OctopoesAPIConnector.create_node"
-        ):
+        with patch("katalogus.client.KATalogusClientV1"), patch("tools.models.OctopoesAPIConnector"):
             return [
                 Organization.objects.create(name="Test Organization 1", code="test1", tags=["tag1", "tag2"]),
                 Organization.objects.create(name="Test Organization 2", code="test2"),
@@ -113,9 +110,11 @@ class TestOrganizationViewSet(ViewSetTest):
 
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("katalogus.client.KATalogusClientV1.organization_exists", return_value=False)
-            mocker.patch("katalogus.client.KATalogusClientV1.create_organization", side_effect=HTTPError("Test error"))
-            mocker.patch("octopoes.connector.octopoes.OctopoesAPIConnector.create_node")
+            mocker.patch("tools.models.KATalogusClientV1.organization_exists", return_value=False)
+            mocker.patch("tools.models.KATalogusClientV1.create_organization", side_effect=HTTPError("Test error"))
+            mocker.patch("tools.models.KATalogusClientV1.health")
+            mocker.patch("tools.models.OctopoesAPIConnector.root_health")
+            mocker.patch("tools.models.OctopoesAPIConnector.create_node")
 
         def test_it_returns_error(self, json):
             expected = {
@@ -123,7 +122,7 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Katalogus returned error creating organization: Test error",
+                        "detail": "Failed creating organization in the Katalogus",
                         "attr": None,
                     }
                 ],
@@ -139,11 +138,12 @@ class TestOrganizationViewSet(ViewSetTest):
 
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("katalogus.client.KATalogusClientV1.organization_exists", return_value=False)
-            mocker.patch("katalogus.client.KATalogusClientV1.create_organization")
-            mocker.patch(
-                "octopoes.connector.octopoes.OctopoesAPIConnector.create_node", side_effect=HTTPError("Test error")
-            )
+            mocker.patch("tools.models.KATalogusClientV1.health")
+            mocker.patch("tools.models.KATalogusClientV1.organization_exists", return_value=False)
+            mocker.patch("tools.models.KATalogusClientV1.create_organization")
+            mocker.patch("tools.models.KATalogusClientV1.delete_organization")  # Needed because of the "rollback"
+            mocker.patch("tools.models.OctopoesAPIConnector.root_health")
+            mocker.patch("tools.models.OctopoesAPIConnector.create_node", side_effect=HTTPError("Test error"))
 
         def test_it_returns_error(self, json):
             expected = {
@@ -151,7 +151,7 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Octopoes returned error creating organization: Test error",
+                        "detail": "Failed creating organization in Octopoes",
                         "attr": None,
                     }
                 ],
@@ -186,6 +186,14 @@ class TestOrganizationViewSet(ViewSetTest):
             "name": "Changed Organization",
             "code": "test1",
         }
+
+        @pytest.fixture(autouse=True)
+        def mock_services(self, mocker):
+            mocker.patch("tools.models.KATalogusClientV1.health")
+            mocker.patch("tools.models.KATalogusClientV1.organization_exists", return_value=False)
+            mocker.patch("tools.models.KATalogusClientV1.create_organization")
+            mocker.patch("tools.models.KATalogusClientV1.delete_organization")  # Needed because of the "rollback"
+            mocker.patch("tools.models.OctopoesAPIConnector")
 
         def test_it_sets_expected_attrs(self, organization):
             # We must tell Django to grab fresh data from the database, or we'll
@@ -226,8 +234,9 @@ class TestOrganizationViewSet(ViewSetTest):
     ):
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("katalogus.client.KATalogusClientV1.delete_organization", side_effect=HTTPError("Test error"))
-            mocker.patch("octopoes.connector.octopoes.OctopoesAPIConnector.delete_node")
+            mocker.patch("tools.models.KATalogusClientV1.health")
+            mocker.patch("tools.models.KATalogusClientV1.delete_organization", side_effect=HTTPError("Test error"))
+            mocker.patch("tools.models.OctopoesAPIConnector")
 
         def test_it_returns_error(self, json):
             expected = {
@@ -235,7 +244,7 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Katalogus returned error deleting organization: Test error",
+                        "detail": "Failed deleting organization in the Katalogus",
                         "attr": None,
                     }
                 ],
@@ -249,10 +258,10 @@ class TestOrganizationViewSet(ViewSetTest):
     ):
         @pytest.fixture(autouse=True)
         def mock_services(self, mocker):
-            mocker.patch("katalogus.client.KATalogusClientV1.delete_organization")
-            mocker.patch(
-                "octopoes.connector.octopoes.OctopoesAPIConnector.delete_node", side_effect=HTTPError("Test error")
-            )
+            mocker.patch("tools.models.KATalogusClientV1.health")
+            mocker.patch("tools.models.KATalogusClientV1.delete_organization")
+            mocker.patch("tools.models.OctopoesAPIConnector.root_health")
+            mocker.patch("tools.models.OctopoesAPIConnector.delete_node", side_effect=HTTPError("Test error"))
 
         def test_it_returns_error(self, json):
             expected = {
@@ -260,7 +269,7 @@ class TestOrganizationViewSet(ViewSetTest):
                 "errors": [
                     {
                         "code": "error",
-                        "detail": "Octopoes returned error deleting organization: Test error",
+                        "detail": "Failed deleting organization in Octopoes",
                         "attr": None,
                     }
                 ],

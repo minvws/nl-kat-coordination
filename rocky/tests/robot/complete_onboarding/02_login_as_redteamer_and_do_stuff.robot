@@ -13,6 +13,7 @@ I want generate my first report
 
 I am on the Crisis Room page
     Go to    ${ROOT_URL}
+    Click    "Skip onboarding"
     Get Title    equal    KAT - crisis_room
 
 I add an object
@@ -30,6 +31,3 @@ I should have created the object
 I want to logout
     Go to    ${ROOT_URL}/crisis-room
     Logout Normally
-
-I want to login again
-    Login As User Normally    redteamer@localhost    P@SSw00rdRedteam!123456789

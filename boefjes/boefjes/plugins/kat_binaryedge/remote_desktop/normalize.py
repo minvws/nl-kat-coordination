@@ -1,23 +1,22 @@
 import ipaddress
 import json
-from typing import Iterator, Union
-
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import KATFindingType, Finding
-from octopoes.models.ooi.network import (
-    IPPort,
-    Protocol,
-    PortState,
-    IPAddressV4,
-    IPAddressV6,
-    Network,
-)
-from octopoes.models.ooi.service import Service, IPService
+from typing import Iterable, Union
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.network import (
+    IPAddressV4,
+    IPAddressV6,
+    IPPort,
+    Network,
+    PortState,
+    Protocol,
+)
+from octopoes.models.ooi.service import IPService, Service
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]

@@ -1,18 +1,17 @@
 import datetime
 import hashlib
 import json
-import os
+import logging
 import re
 from dataclasses import dataclass
-from typing import Optional, Tuple, List, Dict, Union
+from itertools import product
+from typing import Dict, List, Optional, Tuple, Union
 
 import requests
 from ares import CVESearch
 from bs4 import BeautifulSoup
 from cwe import Database
 from django.conf import settings
-from itertools import product
-import logging
 
 RETIREJS_SOURCE = "https://github.com/RetireJS/retire.js/blob/master/repository/jsrepository.json"
 
@@ -81,8 +80,8 @@ def _snyk_search(snyk_id: str) -> Dict:
 
 def retirejs_info(retirejs_id: str) -> dict:
     """Uses the retirejs vulnerabilities list to find outdated javascript instances"""
-    filename_path = os.path.join(settings.BASE_DIR, "data/retirejs.json")
-    with open(filename_path, encoding="utf-8") as json_file:
+    filename_path = settings.BASE_DIR / "data/retirejs.json"
+    with filename_path.open(encoding="utf-8") as json_file:
         data = json.load(json_file)
 
     _, name, hashed_id = retirejs_id.split("-")
@@ -179,7 +178,7 @@ def iana_service_table(search_query: str) -> List[_Service]:
 def service_info(value) -> Tuple[str, str]:
     """Provides information about IP Services such as common assigned ports for certain protocols and descriptions"""
     services = iana_service_table(value)
-    source = "https://www.iana.org/assignments/service-names-port-numbers/" "service-names-port-numbers.xhtml"
+    source = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
     if not services:
         return f"No description found for {value}", "No source found"
 
@@ -326,7 +325,7 @@ def capec_info(capec_id: str) -> dict:
 
 def get_info(ooi_type: str, natural_key: str) -> dict:
     """Adds OOI information to the OOI Information table"""
-    logger.info(f"Getting OOI information for {ooi_type} {natural_key}")
+    logger.info("Getting OOI information for %s %s", ooi_type, natural_key)
     if ooi_type == "IPPort":
         protocol, port = natural_key.split(SEPARATOR)
         description, source = port_info(port, protocol)

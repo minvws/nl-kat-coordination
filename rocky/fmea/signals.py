@@ -1,4 +1,4 @@
-from django.db.models.signals import pre_delete, post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 from fmea.models import FailureMode, FailureModeEffect
@@ -33,7 +33,7 @@ def recalculate_risk_class(instance, delete=False):
 @receiver(pre_delete, sender=FailureModeEffect)
 def failure_mode_effect_pre_deleted(instance, **kwargs):
     """
-    This function gets triggered everytime FailureMode effects got
+    This function gets triggered every time FailureMode effects got
     deleted. It must check all failure modes that is connected to the deleted
     effect(s) and recalculate the risk class. pre_delete is used here,
     otherwise once deleted you don't know which failure modes to check.
@@ -46,7 +46,7 @@ def failure_mode_effect_pre_deleted(instance, **kwargs):
 @receiver(post_save, sender=FailureModeEffect)
 def failure_mode_effect_changed(instance, **kwargs):
     """
-    This function gets triggered everytime FailureMode effects got
+    This function gets triggered every time FailureMode effects got
     updated. It must check all failure modes that is connected to the updated
     effect(s) and recalculate the risk class.
     """

@@ -1,7 +1,7 @@
+import logging
 import re
 from enum import Enum
 from typing import List
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -23,12 +23,12 @@ def check_version(version1: str, version2: str) -> VersionCheck:
     """
 
     # Split the version until first dot
-    version1_splitted = version1.split(".", 1)
-    version2_splitted = version2.split(".", 1)
+    version1_split = version1.split(".", 1)
+    version2_split = version2.split(".", 1)
 
     # Check versions until first dot
-    v1 = version1_splitted[0]
-    v2 = version2_splitted[0]
+    v1 = version1_split[0]
+    v2 = version2_split[0]
     if v1 != v2 and v1.isnumeric() and v2.isnumeric():
         if int(v1) < int(v2):
             return VersionCheck.SMALLER
@@ -57,18 +57,18 @@ def check_version(version1: str, version2: str) -> VersionCheck:
                 return VersionCheck.GREATER
 
     # Check part after the first dot
-    if len(version1_splitted) == 1 and len(version2_splitted) == 1:
+    if len(version1_split) == 1 and len(version2_split) == 1:
         # This was the last part
         return VersionCheck.EQUAL
-    elif len(version1_splitted) == 1:
+    elif len(version1_split) == 1:
         # version 1 < version 1.1
         return VersionCheck.SMALLER
-    elif len(version2_splitted) == 1:
+    elif len(version2_split) == 1:
         # version 1 > version 1.1
         return VersionCheck.GREATER
     else:
         # Compare next part of version
-        return check_version(version1_splitted[1], version2_splitted[1])
+        return check_version(version1_split[1], version2_split[1])
 
 
 def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
@@ -92,7 +92,9 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
         end_bracket = re.search("[])]$", upperbound)
         if not upperbound or not end_bracket:
             # Unexpected input: there is no closing-bracket
-            logger.warning(f"Unexpected input, missing closing bracket for {lowerbound},{upperbound}. Ignoring input.")
+            logger.warning(
+                "Unexpected input, missing closing bracket for %s,%s. Ignoring input.", lowerbound, upperbound
+            )
             return False, None
         if lowerbound[0] == "(":
             lowerbound_versioncheck = VersionCheck.GREATER
@@ -135,7 +137,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
 
     # Check if upperbound is >, >=, = or *
     if upperbound is None:
-        logger.warning(f"Unexpected upperbound in kat_snyk.normalize: {all_versions}")
+        logger.warning("Unexpected upperbound in kat_snyk.normalize: %s", all_versions)
         return False, None
 
     start_inequality = re.search(regex_ineq_upperbound, upperbound)
@@ -159,7 +161,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
     elif upperbound == "*":
         upperbound_versioncheck = VersionCheck.ALL
     else:
-        logger.warning(f"Unexpected input in kat_snyk.normalize: {all_versions}")
+        logger.warning("Unexpected input in kat_snyk.normalize: %s", all_versions)
         return False, None
 
     # Check upperbound

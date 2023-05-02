@@ -1,24 +1,24 @@
 import logging
 import os
-from typing import List, Dict, Union, Tuple, Any
+from typing import Any, Dict, List, Tuple, Union
 
-from octopoes.models import OOI
 from pydantic import ValidationError
 
 from boefjes.job_models import (
     BoefjeMeta,
+    InvalidReturnValueNormalizer,
+    NormalizerDeclaration,
     NormalizerMeta,
+    NormalizerObservation,
     NormalizerOutput,
     NormalizerPlainOOI,
-    ObservationsWithoutInputOOI,
-    NormalizerObservation,
-    NormalizerDeclaration,
-    UnsupportedReturnTypeNormalizer,
-    InvalidReturnValueNormalizer,
     NormalizerResult,
+    ObservationsWithoutInputOOI,
+    UnsupportedReturnTypeNormalizer,
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.runtime_interfaces import BoefjeJobRunner, NormalizerJobRunner, JobRuntimeError
+from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
+from octopoes.models import OOI
 
 logger = logging.getLogger(__name__)
 

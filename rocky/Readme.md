@@ -72,26 +72,54 @@ ROCKY_DB_USER=
 ROCKY_DB_PASSWORD=
 ```
 
-## So... How does it flow?
 
-### Perform scan (run boefje)
+## KATalogus View Structure
+
+This diagram shows the current view structure and what properties are set in each class for the KATalogus.
 
 ```mermaid
-sequenceDiagram
-    participant r as Rocky
-    participant c as Scheduler
-    participant q as RabbitMQ
-    participant b as Boefje
-    participant n as Normalizer
-    participant o as Octopoes
-    r->>+c: Start scan
-    c-->>r: task.status = busy
-    c->>q: Produce message
-    q->>b: Consume message
-    q->>n: Consume message
-    n->>o: Add object(s)
-    c->>-r: task.status = done
+%%{ init : {"theme" : "base"}}%%
+
+classDiagram
+direction BT
+    class FormView
+    class OrganizationView
+    class SinglePluginView
+    class KATalogusView
+    class PluginSettingsAddView
+    class PluginEnableDisableView
+    class SingleSettingView
+    class PluginSettingsListView
+
+    OrganizationView : organization
+    OrganizationView : octopoes_api_connector
+    OrganizationView : organization_member
+    OrganizationView : indemnification_present
+
+    SinglePluginView : katalogus_client
+    SinglePluginView : plugin
+    SinglePluginView : plugin_schema
+
+    SingleSettingView : setting_name
+
+    class PluginSettingsUpdateView
+    class PluginSettingsDeleteView
+    class PluginDetailView
+
+    KATalogusView  <|--  OrganizationView
+    KATalogusView  <|--  FormView
+    SinglePluginView  <|--  OrganizationView
+    SingleSettingView  <|--  SinglePluginView
+    PluginDetailView  <|--  PluginSettingsListView
+    PluginEnableDisableView  <|--  SinglePluginView
+    PluginSettingsAddView  <|--  FormView
+    PluginSettingsAddView  <|--  SinglePluginView
+    PluginSettingsDeleteView  <|--  SingleSettingView
+    PluginSettingsUpdateView  <|--  FormView
+    PluginSettingsUpdateView  <|--  SingleSettingView
+    PluginSettingsListView  <|--  SinglePluginView
 ```
+
 
 ## Fonts license
 

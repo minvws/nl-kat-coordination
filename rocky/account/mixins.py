@@ -2,25 +2,25 @@ from datetime import datetime, timezone
 
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import DeclaredScanProfile, ScanLevel, Reference
-
+from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
 from rocky.exceptions import (
-    IndemnificationNotPresentException,
     AcknowledgedClearanceLevelTooLowException,
-    TrustedClearanceLevelTooLowException,
     ClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    TrustedClearanceLevelTooLowException,
 )
-from tools.models import Organization, OrganizationMember, Indemnification
 
 
 class OrganizationView(View):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.organization = None
         self.octopoes_api_connector = None
         self.organization_member = None
@@ -29,37 +29,32 @@ class OrganizationView(View):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        # authentication/otp flow happens before setup
-        if not request.user.is_authenticated:
-            return
-
         organization_code = kwargs["organization_code"]
         try:
             self.organization = Organization.objects.get(code=organization_code)
-            self.indemnification_present = Indemnification.objects.filter(organization=self.organization).exists()
         except Organization.DoesNotExist:
-            self.organization = None
+            raise Http404()
+
+        self.indemnification_present = Indemnification.objects.filter(organization=self.organization).exists()
+
         try:
             self.organization_member = OrganizationMember.objects.get(
                 user=self.request.user, organization=self.organization
             )
         except OrganizationMember.DoesNotExist:
-            self.organization_member = None
+            raise Http404()
+
+        if self.organization_member.blocked:
+            raise PermissionDenied()
 
         self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)
 
-    def dispatch(self, request, *args, **kwargs):
-        if self.organization is None or self.organization_member is None:
-            raise Http404()
-
-        return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.organization:
-            context["organization"] = self.organization
+        context["organization"] = self.organization
         context["organization_member"] = self.organization_member
         context["may_update_clearance_level"] = self.may_update_clearance_level
+        context["indemnification_present"] = self.indemnification_present
         return context
 
     @property

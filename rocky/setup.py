@@ -1,10 +1,11 @@
-from setuptools import setup, find_packages
-from rocky.version import __version__
+from setuptools import find_packages, setup
 
+from rocky.version import __version__
 
 setup(
     name="rocky",
     version=__version__,
+    author="MinVWS",
     url="https://openkat.nl/",
     packages=find_packages(exclude="tests"),
     scripts=["manage.py"],

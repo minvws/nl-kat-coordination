@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
 from pynetdicom import AE
 
@@ -14,7 +14,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     # it prints errors if the port is not open, ignore these errors as we expect them to happen a lot
     logging.getLogger("pynetdicom").setLevel(logging.CRITICAL)
 
-    # An AE is an Application Entitity, a DICOM specific thing
+    # An AE is an Application Entity, a DICOM specific thing
     ae = AE()
 
     # Context is a DICOM term used to define the content and encoding of data (like a DICOM dataset)

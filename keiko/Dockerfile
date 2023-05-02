@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8 AS dev
 
 EXPOSE 8000
 
@@ -14,7 +14,13 @@ ENV PATH=/home/keiko/.local/bin:${PATH}
 # LateX dependencies
 RUN apt update -y \
     && apt install -y --no-install-recommends \
-    texlive-latex-base texlive-latex-extra texlive-latex-recommended texlive-lang-european chktex
+        texlive-latex-base texlive-latex-extra texlive-latex-recommended \
+        texlive-lang-european texlive-fonts-recommended chktex \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV KEIKO_REPORTS_FOLDER=/reports
+RUN mkdir -p "$KEIKO_REPORTS_FOLDER" && chown -f -R keiko:keiko "$KEIKO_REPORTS_FOLDER"
+VOLUME /reports
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
 # dependencies
@@ -25,11 +31,10 @@ RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
     && pip install -r requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
 
-COPY . .
-
-RUN mkdir -p /app/keiko/reports
-RUN chown -f -R keiko:keiko /app/keiko/reports
-
 USER keiko
+
+FROM dev
+
+COPY . .
 
 CMD ["uvicorn", "keiko.app:api", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,19 +1,19 @@
-from typing import Iterator, Union
+from typing import Iterable, Union
 
-from dns.message import from_text, Message
+from dns.message import Message, from_text
 from dns.rdata import Rdata
 from dns.rdtypes.ANY.SOA import SOA
+
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSSOARecord,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.network import Network
 
-from boefjes.job_models import NormalizerMeta
 
-
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     internet = Network(name="internet")
 
     # parse raw data into dns.message.Message
@@ -33,13 +33,13 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             rr: Rdata
 
             if isinstance(rr, SOA):
-                parent_zone_hostname = Hostname(network=internet.reference, name=str(rrset.name))
+                parent_zone_hostname = Hostname(network=internet.reference, name=str(rrset.name).rstrip("."))
                 parent_zone = DNSZone(hostname=parent_zone_hostname.reference)
                 parent_zone_hostname.dns_zone = parent_zone.reference
 
                 input_zone.parent = parent_zone.reference
 
-                soa_hostname = Hostname(network=internet.reference, name=str(rr.mname))
+                soa_hostname = Hostname(network=internet.reference, name=str(rr.mname).rstrip("."))
 
                 yield DNSSOARecord(
                     hostname=parent_zone_hostname.reference,

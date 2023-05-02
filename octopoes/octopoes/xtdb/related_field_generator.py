@@ -1,4 +1,4 @@
-from typing import Tuple, Dict, Set, Optional
+from typing import Dict, Optional, Set, Tuple
 
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 
@@ -93,7 +93,7 @@ class RelatedFieldNode:
         for key, node in self.relations_out.items():
             cls, attr_name = key
             deeper_fields = node.generate_field(field_set, pk_prefix)
-            field_query = "{(:%s/%s {:as %s}) %s}" % (
+            field_query = "{{(:{}/{} {{:as {}}}) {}}}".format(
                 cls,
                 attr_name,
                 attr_name,
@@ -105,7 +105,7 @@ class RelatedFieldNode:
         for key, node in self.relations_in.items():
             foreign_cls, attr_name, reverse_name = key
             deeper_fields = node.generate_field(field_set, pk_prefix)
-            field_query = "{(:%s/_%s {:as %s}) %s}" % (
+            field_query = "{{(:{}/_{} {{:as {}}}) {}}}".format(
                 foreign_cls,
                 attr_name,
                 reverse_name,

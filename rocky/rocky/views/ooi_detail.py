@@ -1,25 +1,25 @@
+from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
 from django.contrib import messages
-from django.core.paginator import Paginator, Page
+from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
-from requests.exceptions import RequestException
-
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from octopoes.models import OOI
-from rocky import scheduler
-from rocky.views.mixins import OOIBreadcrumbsMixin
-from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
-from rocky.views.ooi_view import BaseOOIDetailView
+from requests.exceptions import RequestException
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification, OrganizationMember
 from tools.ooi_helpers import format_display
+
+from octopoes.models import OOI, Reference
+from rocky import scheduler
+from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
 class PageActions(Enum):
@@ -29,8 +29,8 @@ class PageActions(Enum):
 class OOIDetailView(
     BoefjeMixin,
     OOIRelatedObjectAddView,
+    OOIFindingManager,
     BaseOOIDetailView,
-    OOIBreadcrumbsMixin,
 ):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
@@ -39,7 +39,7 @@ class OOIDetailView(
     def post(self, request, *args, **kwargs):
         if not self.indemnification_present:
             messages.add_message(
-                request, messages.ERROR, "Indemnification not present at organization %s." % self.organization
+                request, messages.ERROR, f"Indemnification not present at organization {self.organization}."
             )
             return self.get(request, status_code=403, *args, **kwargs)
 
@@ -48,7 +48,8 @@ class OOIDetailView(
 
         self.ooi = self.get_ooi()
 
-        if not self.handle_page_action(request.POST.get("action")):
+        action = self.request.POST.get("action")
+        if not self.handle_page_action(action):
             return self.get(request, status_code=500, *args, **kwargs)
 
         success_message = (
@@ -66,7 +67,7 @@ class OOIDetailView(
                 boefje_id = self.request.POST.get("boefje_id")
                 ooi_id = self.request.GET.get("ooi_id")
 
-                boefje = get_katalogus(self.organization.code).get_boefje(boefje_id)
+                boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
                 ooi = self.get_single_ooi(pk=ooi_id)
                 self.run_boefje_for_oois(boefje, [ooi])
                 return True
@@ -157,6 +158,17 @@ class OOIDetailView(
         declarations, observations, inferences = self.get_origins(
             self.ooi.reference, self.get_observed_at(), self.organization
         )
+
+        inference_params = self.octopoes_api_connector.list_origin_parameters(
+            {inference.origin.id for inference in inferences}
+        )
+        inference_params_per_inference = defaultdict(list)
+        for inference_param in inference_params:
+            inference_params_per_inference[inference_param.origin_id].append(inference_param)
+
+        for inference in inferences:
+            inference.params = inference_params_per_inference.get(inference.origin.id, [])
+
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
@@ -180,5 +192,16 @@ class OOIDetailView(
             "scan_history_search",
             "scan_history_page",
         ]
-
+        if self.request.GET.get("show_clearance_level_inheritance"):
+            clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)
+            formatted_inheritance = [
+                {
+                    "object_type": Reference.from_str(section.reference).class_,
+                    "primary_key": section.reference,
+                    "human_readable": Reference.from_str(section.reference).human_readable,
+                    "level": section.level,
+                }
+                for section in clearance_level_inheritance
+            ]
+            context["clearance_level_inheritance"] = formatted_inheritance
         return context

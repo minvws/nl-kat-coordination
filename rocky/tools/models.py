@@ -3,22 +3,21 @@ import uuid
 
 import tagulous.models
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from katalogus.client import KATalogusClientV1, get_katalogus
+from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
+from requests import RequestException
 
-from katalogus.client import get_katalogus
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from rocky.exceptions import RockyError
-from tools.add_ooi_information import get_info, SEPARATOR
+from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
+from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
-
-User = get_user_model()
 
 GROUP_ADMIN = "admin"
 GROUP_REDTEAM = "redteam"
@@ -70,61 +69,95 @@ class Organization(models.Model):
         )
 
     def get_absolute_url(self):
-        return reverse("organization_detail", args=[self.pk])
+        return reverse("organization_settings", args=[self.pk])
 
     def delete(self, *args, **kwargs):
-        katalogus_client = get_katalogus(self.code)
-        try:
-            katalogus_client.delete_organization()
-        except Exception as e:
-            raise RockyError(f"Katalogus returned error deleting organization: {e}") from e
+        katalogus_client = self._get_healthy_katalogus(self.code)
+        octopoes_client = self._get_healthy_octopoes(self.code)
 
-        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=self.code)
         try:
             octopoes_client.delete_node()
         except Exception as e:
-            raise RockyError(f"Octopoes returned error deleting organization: {e}") from e
+            raise OctopoesException("Failed deleting organization in Octopoes") from e
+
+        try:
+            katalogus_client.delete_organization()
+        except Exception as e:
+            try:
+                octopoes_client.create_node()
+            except Exception as e:
+                raise OctopoesException("Failed creating organization in Octopoes") from e
+
+            raise KATalogusException("Failed deleting organization in the Katalogus") from e
 
         super().delete(*args, **kwargs)
 
     @classmethod
-    def post_create(cls, sender, instance, created, *args, **kwargs):
-        if not created:
-            return
-
-        katalogus_client = get_katalogus(instance.code)
+    def pre_create(cls, sender, instance, *args, **kwargs):
+        katalogus_client = cls._get_healthy_katalogus(instance.code)
+        octopoes_client = cls._get_healthy_octopoes(instance.code)
 
         try:
             if not katalogus_client.organization_exists():
                 katalogus_client.create_organization(instance.name)
         except Exception as e:
-            raise RockyError(f"Katalogus returned error creating organization: {e}") from e
-
-        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=instance.code)
+            raise KATalogusException("Failed creating organization in the Katalogus") from e
 
         try:
             octopoes_client.create_node()
         except Exception as e:
-            raise RockyError(f"Octopoes returned error creating organization: {e}") from e
+            try:
+                katalogus_client.delete_organization()
+            except Exception as e:
+                raise KATalogusException("Failed deleting organization in the Katalogus") from e
+
+            raise OctopoesException("Failed creating organization in Octopoes") from e
+
+    @staticmethod
+    def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
+        katalogus_client = get_katalogus(organization_code)
+
+        try:
+            health = katalogus_client.health()
+        except RequestException as e:
+            raise KATalogusDownException from e
+
+        if not health.healthy:
+            raise KATalogusUnhealthyException
+
+        return katalogus_client
+
+    @staticmethod
+    def _get_healthy_octopoes(organization_code: str) -> OctopoesAPIConnector:
+        octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
+        try:
+            health = octopoes_client.root_health()
+        except RequestException as e:
+            raise OctopoesDownException from e
+
+        if not health.healthy:
+            raise OctopoesUnhealthyException
+
+        return octopoes_client
 
 
-post_save.connect(Organization.post_create, sender=Organization)
+pre_save.connect(Organization.pre_create, sender=Organization)
 
 
 class OrganizationMember(models.Model):
+    # New is the status after an e-mail invite has been created for a member but the invite hasn't been accepted yet.
+    # Active is when the member has accepted the invited or the account was created directly without an invite.
+    # Blocked is when an organization admin has blocked the member.
     class STATUSES(models.TextChoices):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
-        BLOCKED = "blocked", _("blocked")
 
     scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
 
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, related_name="members")
-    verified = models.BooleanField(default=False)
-    authorized = models.BooleanField(default=False)
+    user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
-    member_name = models.CharField(max_length=126)
+    blocked = models.BooleanField(default=False)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
@@ -141,7 +174,7 @@ class OrganizationMember(models.Model):
 
 
 class Indemnification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey("account.KATUser", on_delete=models.SET_NULL, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
 
 
@@ -157,7 +190,7 @@ class OOIInformation(models.Model):
         if self.consult_api:
             self.consult_api = False
             self.get_internet_description()
-        super(OOIInformation, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def clean(self):
         if "description" not in self.data:

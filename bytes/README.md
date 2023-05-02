@@ -85,6 +85,7 @@ QUEUE_URI=
 # Optional environment variables
 BYTES_LOG_FILE=  # Optional file with Bytes logs.
 BYTES_DATA_DIR=  # Root for all the data. A change means that you no longer have access to old data unless you move it!
+BYTES_METRICS_TTL_SECONDS=0  # The time to cache slow queries performed in the metrics endpoint.
 ```
 
 Most of these are self-explanatory, but a few sets of variables require more explanation.
@@ -130,23 +131,77 @@ KAT_PRIVATE_KEY_B64=""
 VWS_PUBLIC_KEY_B64=""
 ```
 
+### Observability
+
+Bytes exposes a `/metrics` endpoint for basic application level observability,
+such as the amount of organizations and the amount of raw files per organization.
+Another important component to monitor is the disk usage of Bytes.
+It is recommended to install [node exporter](https://prometheus.io/docs/guides/node-exporter/) to keep track of this.
+
+
 ## Design
 
-The overall view of the application is as follows.
+We now include two levels of design, according to the [C4 model](https://c4model.com/).
+
+
+### Design: C2 Container level
+The overall view of the code is as follows.
+
+```mermaid
+graph
+    User((User))
+    Rocky["Rocky<br/><i>Django App</i>"]
+    Bytes{"Bytes<br/><i>FastAPI App"}
+    RabbitMQ[["RabbitMQ<br/><i>Message Broker"]]
+    Scheduler["Scheduler<br/><i>Software System"]
+    Boefjes["Boefjes<br/><i>Python App"]
+
+    Boefjes -- GET/POST Raw/Meta --> Bytes
+    User -- Interacts with --> Rocky
+    Rocky -- GET/POST Raw/Meta --> Bytes
+
+    Bytes -- "publish(RawFileReceived)" --> RabbitMQ
+    Scheduler --"subscribe(RawFileReceived)"--> RabbitMQ
+    Scheduler --"GET BoefjeMeta"--> Bytes
+```
+
+### Design: C3 Component level
+The overall view of the code is as follows.
 
 ```mermaid
 graph LR
-    U[User] -- BoefjeMeta --> A1[API] -- save BoefjeMeta --> B1[Meta Repository]
-    B1[Meta Repository] -- BoefjeMeta --> RDB
-    B[Meta Repository] -- hash RawFile --> HR[Hasher] -- Hash --> B[Meta Repository]
-    U[User] -- RawFile --> A2[API] -- save RawFile --> B[Meta Repository] -- save Hash --> H[Hash Repository]
-    H[Hash Repository] -- Hash --> T[Third Party]
-    B[Meta Repository] -- save RawFile --> R[Raw Repository] -- RawFile --> E[EnriptionMiddleware]
-    E[EnriptionMiddleware] -- Encrypted Data --> Disk -- Encrypted Data  --> E[EnriptionMiddleware]
+    User -- BoefjeMeta --> APIR1
+    User -- NormalizerMeta --> APIR2
+    User -- RawFile --> APIR3
+
+
+    User[User]
+
+    APIR1 -- save BoefjeMeta --> MR
+    APIR2 -- save NormalizerMeta --> MR
+    APIR3 -- save RawFile --> MR
+
+    subgraph API["Bytes API"]
+        APIR1[API Route]
+        APIR2[API Route]
+        APIR3[API Route]
+    end
+
+    subgraph Bytes["Bytes Domain"]
+        APIR3 -- "publish(RawFileReceived)" --> EM[EventManager]
+        MR[Meta Repository] -- Raw  --> H[Hasher] -- Hash --> MR[Meta Repository]
+        MR[Meta Repository] -- save Hash --> HR[Hash Repository]
+        MR[Meta Repository] -- save RawFile --> R[Raw Repository]
+        R[Raw Repository] -- RawFile --> F[FileMiddleware]
+    end
+
+    F[FileMiddleware] -- Encrypted Data --> Disk[[Disk]] -- Encrypted Data  --> F[FileMiddleware]
+    HR[Hash Repository] -- Hash --> T[[Third Party]]
+    MR[Meta Repository] -- BoefjeMeta/NormalizerMeta --> RDB[(Psql)]
+    EM[EventManager] -- "{'event_id': 123}" --> RabbitMQ[[RabbitMQ]]
 ```
 
-This flow does not show saving the `NormalizerMeta` object in the `MetaRepository`.
-A message is sent through RabbitMQ once a `RawFile` has been saved.
+This diagram roughly covers the C4 level as well, as this is a small service that can be regarded as one component.
 
 
 ## Development
@@ -191,3 +246,13 @@ To export raw SQL from the SQLAlchemy migration files, run the following target
 ```shell
 $ make sql rev1=0003 rev2=0004 > sql_migrations/0004_change_x_to_y_add_column_z.sql
 ```
+
+
+## Production
+
+
+### Performance tuning
+
+Bytes caches some metrics for performance, but the default is not to cache these queries.
+It is recommended to tune the `BYTES_METRICS_TTL_SECONDS` variable to on the amount of calls to the `/metrics` endpoint.
+As a guideline, add at least 10 seconds to the cache for every million of raw files in the database.

@@ -4,13 +4,12 @@ import django.contrib.auth.models
 import django.contrib.auth.validators
 import django.utils.timezone
 from django.db import migrations, models
-from django.utils.functional import cached_property
-
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.state import ProjectState, StateApps
+from django.utils.functional import cached_property
 
 import account.models
 
@@ -203,7 +202,7 @@ def fix_names(apps, schema_editor):
             "select conname from pg_constraint where conname = 'auth_user_groups_katuser_id_76ed1ca4_fk_auth_user_id'"
         )
         if not len(cursor.fetchall()):
-            # Not upraded so we don't have to fix up the constraint names
+            # Not upgraded so we don't have to fix up the constraint names
             return
 
     schema_editor.execute(

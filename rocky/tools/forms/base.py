@@ -1,15 +1,14 @@
 import datetime
-from typing import Dict, List, Union, Any, Optional
+from typing import Any, Dict, List, Optional, Union
 
-import pytz
 from django import forms
 from django.forms import Widget
 from django.utils.translation import gettext_lazy as _
 
 from tools.forms.settings import (
+    OBSERVED_AT_HELP_TEXT,
     Choices,
     ChoicesGroups,
-    OBSERVED_AT_HELP_TEXT,
 )
 
 
@@ -63,7 +62,7 @@ class ObservedAtForm(BaseRockyForm):
     observed_at = forms.DateField(
         label=_("Date"),
         widget=DateInput(format="%Y-%m-%d"),
-        initial=datetime.datetime.now(tz=pytz.UTC),
+        initial=lambda: datetime.datetime.now(tz=datetime.timezone.utc),
         required=True,
         help_text=OBSERVED_AT_HELP_TEXT,
     )
@@ -78,7 +77,7 @@ class LabeledCheckboxInput(forms.CheckboxInput):
         self.autosubmit = autosubmit
 
     def get_context(self, name, value, attrs):
-        context = super(LabeledCheckboxInput, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context["widget"]["wrap_label"] = True
         context["widget"]["label"] = self.label
         context["widget"]["attrs"]["class"] = "submit-on-click"

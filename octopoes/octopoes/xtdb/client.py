@@ -1,12 +1,12 @@
 import logging
-from datetime import timezone, datetime
+from datetime import datetime, timezone
 from enum import Enum
 from http import HTTPStatus
-from typing import Union, Optional, Tuple, List, Dict, Any, Type, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 import requests
 from pydantic import BaseModel, Field
-from requests import Response, HTTPError
+from requests import HTTPError, Response
 
 logger = logging.getLogger(__name__)
 

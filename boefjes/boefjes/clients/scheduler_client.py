@@ -1,17 +1,14 @@
+import datetime
 import logging
+import uuid
+from enum import Enum
 from typing import List, Optional, Union
 
 import requests
-import uuid
-
-from enum import Enum
-import datetime
-
+from pydantic import BaseModel, parse_obj_as
 from requests.adapters import HTTPAdapter, Retry
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-from pydantic import BaseModel, parse_obj_as
-
 
 logger = logging.getLogger(__name__)
 
@@ -104,4 +101,4 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response = self._session.patch(f"{self.base_url}/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
-        logger.info(f"Set task status to {status} in the scheduler for task[{task_id}]")
+        logger.info("Set task status to %s in the scheduler for task[%s]", status, task_id)

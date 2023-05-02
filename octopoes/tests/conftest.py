@@ -1,16 +1,15 @@
 from datetime import datetime, timezone
 from ipaddress import IPv4Address
 from typing import Dict, List, Optional, Set
-
 from unittest.mock import Mock
 
 import pytest
 
+from octopoes.models import OOI, EmptyScanProfile, Reference, ScanProfileBase
+from octopoes.models.path import Direction, Path
+from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
-from octopoes.models import EmptyScanProfile, Reference, OOI, ScanProfileBase
-from octopoes.models.path import Path, Direction
-from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
 
 
 @pytest.fixture
@@ -102,7 +101,7 @@ def network(ooi_repository, scan_profile_repository, valid_time):
 @pytest.fixture
 def dns_zone(network, ooi_repository, hostname, scan_profile_repository, valid_time):
     ooi = add_ooi(
-        DNSZone(name="example.com.", hostname=hostname.reference, network=network.reference),
+        DNSZone(name="example.com", hostname=hostname.reference, network=network.reference),
         ooi_repository,
         scan_profile_repository,
         valid_time,
@@ -114,7 +113,7 @@ def dns_zone(network, ooi_repository, hostname, scan_profile_repository, valid_t
 @pytest.fixture
 def hostname(network, ooi_repository, scan_profile_repository, valid_time):
     return add_ooi(
-        Hostname(name="example.com.", network=network.reference),
+        Hostname(name="example.com", network=network.reference),
         ooi_repository,
         scan_profile_repository,
         valid_time,

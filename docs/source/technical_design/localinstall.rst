@@ -89,7 +89,7 @@ Front end
 
 Find the frontend of your OpenKAT install at port 8000 (http) or 8443 (https) of your localhost depending on your  and follow the 'on boarding flow' to test your setup and start using your development setup of OpenKAT.
 
-Using http works only when connecting to localhost due to the security flags on the session and xsrf cookies. Localhost is whitelisted to allow secure cookies over an unsecure connection. Connecting to any other IP over http results in these cookies being disregarded, resulting in XSRF warnings when logging in.
+Using http works only when connecting to localhost due to the security flags on the session and xsrf cookies. Localhost is whitelisted to allow secure cookies over an insecure connection. Connecting to any other IP over http results in these cookies being disregarded, resulting in XSRF warnings when logging in.
 
 Specific builds
 ***************
@@ -138,3 +138,10 @@ Go to the directory containing openkat:
 	$ make update
 
 Create a new superuser for the new version. You can delete the old superuser after the update. This is not pretty, but has the advantage that your databases remain intact. Check that you are on the most recent version everywhere, especially Rocky sometimes hangs because of yarn.lock.
+
+OpenTelemetry
+=============
+
+OpenTelemetry is a way to trace requests through the system. It is used to find out where a request is going wrong and to instrument performance problems. OpenTelemetry is not enabled by default, but can be enabled by uncommenting the environment variable ``SPAN_EXPORT_GRPC_ENDPOINT`` in the ``.env`` file.
+
+The `Jaeger <https://www.jaegertracing.io>`_ tracing system is used to view the traces. It can be enabled by enabling the `Docker Compose profile <https://docs.docker.com/compose/profiles/#enable-profiles>`, for example by running ``docker-compose --profile jaeger up -d`` or using ``export COMPOSE_PROFILES=jaeger`` and then running Make as usual. The Jaeger UI can then be found at http://localhost:16686.

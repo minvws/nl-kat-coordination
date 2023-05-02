@@ -7,3 +7,12 @@ class SCAN_LEVEL(models.IntegerChoices):
     L2 = 2, "L2"
     L3 = 3, "L3"
     L4 = 4, "L4"
+
+
+class CUSTOM_SCAN_LEVEL(models.Choices):
+    INHERIT = "inherit"
+    L0 = 0
+    L1 = 1
+    L2 = 2
+    L3 = 3
+    L4 = 4

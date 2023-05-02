@@ -1,10 +1,13 @@
 # Python linters
-mypy==0.991
+mypy==1.0.1
 pylint==2.15.5
 vulture==2.6
 
+# djLint Django template and HTML linter/formatter
+djlint==1.19.17
+
 # Python formatter
-black==22.10.0
+black==23.1.0
 
 # Robot formatter
-robotframework-tidy==3.3.3
+robotframework-tidy==4.1.0

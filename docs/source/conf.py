@@ -30,6 +30,8 @@ extensions = [
     "sphinxcontrib.mermaid",
 ]
 
+myst_enable_extensions = ["tasklist"]
+
 templates_path = ["_templates"]
 exclude_patterns = []
 
@@ -57,4 +59,9 @@ html_context = {
 html_static_path = ["_static"]
 html_css_files = [
     "openkat.css",
+]
+
+mermaid_version = ""  # Do not fetch from the CDN
+html_js_files = [
+    "mermaid-9.4.3.min.js",
 ]

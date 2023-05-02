@@ -1,6 +1,6 @@
+import enum
 import uuid
 from datetime import datetime, timezone
-from enum import Enum as _Enum
 from typing import ClassVar, List, Optional
 
 import mmh3
@@ -17,7 +17,7 @@ from .queue import PrioritizedItem
 from .raw_data import RawData
 
 
-class TaskStatus(str, _Enum):
+class TaskStatus(str, enum.Enum):
     """Status of a task."""
 
     PENDING = "pending"
@@ -39,12 +39,15 @@ class Task(BaseModel):
 
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+    def __repr__(self):
+        return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
+
     class Config:
         orm_mode = True
 
 
 class TaskORM(Base):
-    """A SQLAlchemy datastore model respresentation of a Task"""
+    """A SQLAlchemy datastore model representation of a Task"""
 
     __tablename__ = "tasks"
 

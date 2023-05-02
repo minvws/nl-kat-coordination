@@ -1,7 +1,6 @@
 import re
-
+from ipaddress import IPv6Address, ip_address
 from os import getenv
-from ipaddress import ip_address, IPv6Address
 from typing import List, Tuple, Union
 
 import docker
@@ -40,7 +39,7 @@ def validate_ports(
     A valid port is:
     - a single port (set of digits) {22}
         - Regex: \\d+
-    - a port range (optional digits separated by hypen, optionally bracketed) {[80-]}
+    - a port range (optional digits separated by hyphen, optionally bracketed) {[80-]}
         - Regex: (\\[?\\d*-\\d*\\]?)
     - a valid Nmap protocol (alfanumeric wildcarded lowercase) {https*}
         - Regex: [a-z*?]+

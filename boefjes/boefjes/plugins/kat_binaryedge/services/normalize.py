@@ -1,35 +1,34 @@
 import ipaddress
 import json
-from typing import Iterator, Union
+from typing import Iterable, Union
 
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import (
-    IPPort,
-    Protocol,
-    PortState,
     IPAddressV4,
     IPAddressV6,
+    IPPort,
     Network,
+    PortState,
+    Protocol,
 )
 from octopoes.models.ooi.software import Software, SoftwareInstance
 
-from boefjes.job_models import NormalizerMeta
-
 
 def get_name_from_cpe(cpe: str) -> str:
-    splitted = []
+    split = []
     if cpe[0:5] == "cpe:/":
-        splitted = cpe[5:].split(":")
+        split = cpe[5:].split(":")
     elif cpe[0:8] == "cpe:2.3:":
-        splitted = cpe[8:].split(":")
+        split = cpe[8:].split(":")
 
-    if len(splitted) > 3:
-        return splitted[2]
+    if len(split) > 3:
+        return split[2]
     else:
         return cpe
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]

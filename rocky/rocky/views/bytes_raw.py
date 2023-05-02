@@ -2,15 +2,15 @@ import json
 import logging
 import zipfile
 from io import BytesIO
-from typing import List, Dict
+from typing import Dict, List
 
+from account.mixins import OrganizationView
 from django.contrib import messages
-from django.http import Http404, FileResponse
+from django.http import FileResponse, Http404
 from django.shortcuts import redirect
 from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
-from account.mixins import OrganizationView
 from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class BytesRawView(OrganizationView):
             boefje_meta_id = kwargs["boefje_meta_id"]
             raw_metas = client.get_raw_metas(boefje_meta_id)
 
-            raws = {raw_meta["id"]: client.get_raw(boefje_meta_id, raw_meta["id"]) for raw_meta in raw_metas}
+            raws = {raw_meta["id"]: client.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
 
             return FileResponse(
                 zip_data(raws, raw_metas),

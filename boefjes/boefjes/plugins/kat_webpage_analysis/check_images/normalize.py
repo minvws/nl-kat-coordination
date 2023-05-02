@@ -1,17 +1,16 @@
-from typing import Union, Iterator
-from octopoes.models import OOI, Reference
-
-from boefjes.job_models import NormalizerMeta
-from octopoes.models.ooi.findings import KATFindingType, Finding
-from octopoes.models.ooi.web import ImageMetadata
-
 from io import BytesIO
+from typing import Iterable, Union
 
 from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS
 
+from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.web import ImageMetadata
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     # fetch a reference to the original resource where these headers where downloaded from
     resource = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
     image = Image.open(BytesIO(raw))

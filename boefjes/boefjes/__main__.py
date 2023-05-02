@@ -4,10 +4,10 @@ import logging.config
 import click
 
 from boefjes.app import get_runtime_manager
-from boefjes.runtime_interfaces import RuntimeManager
 from boefjes.config import settings
+from boefjes.runtime_interfaces import RuntimeManager
 
-with open(settings.log_cfg) as f:
+with settings.log_cfg.open() as f:
     logging.config.dictConfig(json.load(f))
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 )
 def cli(worker_type: str, log_level: str):
     logger.setLevel(log_level)
-    logger.info(f"Starting runtime for {worker_type}")
+    logger.info("Starting runtime for %s", worker_type)
 
     queue = RuntimeManager.Queue(worker_type)
     runtime = get_runtime_manager(settings, queue, log_level)

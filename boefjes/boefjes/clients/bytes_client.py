@@ -1,8 +1,7 @@
-import json
 import logging
 import typing
 from functools import wraps
-from typing import Callable, Dict, Union, Any, Set
+from typing import Any, Callable, Dict, Set, Union
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -65,9 +64,11 @@ class BytesAPIClient:
 
     @staticmethod
     def _verify_response(response: requests.Response) -> None:
-        if response.status_code != 200:
+        try:
+            response.raise_for_status()
+        except HTTPError:
             logger.error(response.text)
-        response.raise_for_status()
+            raise
 
     def _get_authentication_headers(self) -> Dict[str, str]:
         return {"Authorization": f"bearer {self._get_token()}"}
@@ -97,23 +98,9 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        dehydrated_normalizer_meta = json.loads(normalizer_meta.json(exclude={"raw_data"}))
-        dehydrated_normalizer_meta["raw_file_id"] = normalizer_meta.raw_data.id
-        dehydrated_normalizer_meta["boefje_meta"] = json.loads(normalizer_meta.raw_data.boefje_meta.json())
-
-        response = self._session.post(
-            "/bytes/normalizer_meta", data=json.dumps(dehydrated_normalizer_meta), headers=self.headers
-        )
+        response = self._session.post("/bytes/normalizer_meta", data=normalizer_meta.json(), headers=self.headers)
 
         self._verify_response(response)
-
-    @retry_with_login
-    def get_normalizer_meta(self, normalizer_meta_id: str) -> NormalizerMeta:
-        response = self._session.get(f"/bytes/normalizer_meta/{normalizer_meta_id}", headers=self.headers)
-        self._verify_response(response)
-
-        normalizer_meta_json = response.json()
-        return NormalizerMeta.parse_obj(normalizer_meta_json)
 
     @retry_with_login
     def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Set[str] = None) -> None:
@@ -124,17 +111,17 @@ class BytesAPIClient:
         headers.update(self.headers)
 
         response = self._session.post(
-            f"/bytes/raw/{boefje_meta_id}",
+            "/bytes/raw",
             raw,
             headers=headers,
-            params={"mime_types": mime_types},
+            params={"mime_types": mime_types, "boefje_meta_id": boefje_meta_id},
         )
 
         self._verify_response(response)
 
     @retry_with_login
-    def get_raw(self, boefje_meta_id: str, raw_data_id: str) -> bytes:
-        response = self._session.get(f"/bytes/raw/{boefje_meta_id}/{raw_data_id}", headers=self.headers)
+    def get_raw(self, raw_data_id: str) -> bytes:
+        response = self._session.get(f"/bytes/raw/{raw_data_id}", headers=self.headers)
         self._verify_response(response)
 
         return response.content
