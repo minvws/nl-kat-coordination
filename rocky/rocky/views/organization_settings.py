@@ -1,4 +1,8 @@
+from datetime import datetime
+
+import time
 from enum import Enum
+from timeit import timeit
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -25,8 +29,11 @@ class OrganizationSettingsView(OrganizationDetailBreadcrumbsMixin, TemplateView)
             raise PermissionDenied()
         if action == PageActions.RECALCULATE.value:
             connector = self.octopoes_api_connector
+
+            start_time = datetime.now()
             number_of_bits = connector.recalculate_bits()
-            messages.add_message(request, messages.INFO, _(f"Racalculated {number_of_bits} bits."))
+            duration = datetime.now() - start_time
+            messages.add_message(request, messages.INFO, _(f"Recalculated {number_of_bits} bits. Duration: {duration}"))
             return self.get(request, *args, **kwargs)
         else:
             raise Http404()
