@@ -13,7 +13,7 @@ fastapi==0.88.0
 greenlet==2.0.1
 h11==0.13.0
 idna==3.4
-importlib-metadata==6.1.0
+importlib-metadata==6.0.0
 importlib-resources==5.7.1
 mako==1.2.4
 markupsafe==2.1.2
@@ -41,3 +41,10 @@ urllib3==1.26.15
 uvicorn==0.17.6
 zipp==3.8.1
 httpx==0.23.3
+
+# OpenTelemetry
+opentelemetry-sdk==1.17.0
+opentelemetry-exporter-otlp-proto-grpc==1.17.0
+opentelemetry-instrumentation-fastapi==0.38b0
+opentelemetry-instrumentation-psycopg2==0.38b0
+opentelemetry-instrumentation-requests==0.38b0

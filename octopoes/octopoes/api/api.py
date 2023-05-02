@@ -1,5 +1,6 @@
 import logging
 from logging import config
+from pathlib import Path
 
 import yaml
 from fastapi import FastAPI, status
@@ -27,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 # Load log config
 try:
-    with open(settings.log_cfg, "r") as log_config:
+    with Path(settings.log_cfg).open() as log_config:
         config.dictConfig(yaml.safe_load(log_config))
         logger.info("Configured loggers with config: %s", settings.log_cfg)
 except FileNotFoundError:
@@ -35,12 +36,12 @@ except FileNotFoundError:
 
 
 app = FastAPI()
+add_timing_middleware(app, record=logger.debug, prefix="app")
 
 # Set up OpenTelemetry instrumentation
 if settings.span_export_grpc_endpoint is not None:
     logger.info("Setting up instrumentation with span exporter endpoint [%s]", settings.span_export_grpc_endpoint)
 
-    add_timing_middleware(app, record=logger.debug, prefix="app")
     FastAPIInstrumentor.instrument_app(app)
     RequestsInstrumentor().instrument()
 

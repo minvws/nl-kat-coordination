@@ -89,7 +89,7 @@ def get_rocky_health(octopoes_api_connector: OctopoesAPIConnector) -> ServiceHea
         get_keiko_health(),
     ]
 
-    services_healthy = all((service.healthy for service in services))
+    services_healthy = all(service.healthy for service in services)
     additional = None
     if not services_healthy:
         additional = _("Rocky will not function properly. Not all services are healthy.")
