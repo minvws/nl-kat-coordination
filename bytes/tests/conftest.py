@@ -75,7 +75,7 @@ def meta_repository(
     session.commit()
 
     sessionmaker(bind=engine, autocommit=True)().execute(
-        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()])
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
 
 
@@ -91,7 +91,7 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
     )
 
     sessionmaker(bind=get_engine(settings.bytes_db_uri), autocommit=True)().execute(
-        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()])
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
 
 
