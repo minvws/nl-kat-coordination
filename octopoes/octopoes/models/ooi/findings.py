@@ -1,12 +1,29 @@
+import abc
+from enum import Enum, StrEnum
 from typing import Literal, Optional
+
+from pydantic import AnyUrl
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
 
-# todo: make abstract
-class FindingType(OOI):
+class RiskLevelSeverity(StrEnum):
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    RECOMMENDATION = "recommendation"
+
+
+class FindingType(OOI, abc.ABC):
     id: str
+
+    description: Optional[str]
+    source: Optional[AnyUrl]
+
+    risk_score: Optional[float]
+    risk_severity: Optional[RiskLevelSeverity]
 
     _natural_key_attrs = ["id"]
     _information_value = ["id"]
