@@ -16,7 +16,7 @@ ALLOWED_CONTENT_TYPES = mimetypes.types_map.values()
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
-    useragent = getenv("useragent", default="OpenKAT")
+    useragent = getenv("USERAGENT", default="OpenKAT")
 
     uri = get_uri(input_)
     ip = input_["website"]["ip_service"]["ip_port"]["address"]["address"]
