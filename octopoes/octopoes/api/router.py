@@ -308,3 +308,12 @@ def delete_node(
         if e.response.status_code == HTTPStatus.NOT_FOUND:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Node does not exist")
         raise
+
+
+@router.get("/bits/recalculate")
+def recalculate_bits(
+    xtdb_session_: XTDBSession = Depends(xtdb_session), octopoes: OctopoesService = Depends(octopoes_service)
+) -> int:
+    inference_count = octopoes.recalculate_bits()
+    xtdb_session_.commit()
+    return inference_count
