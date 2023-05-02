@@ -83,6 +83,7 @@ class Query:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
         if isinstance(value, str):
+            value = value.replace('"', r"\"")
             self._add_where_statement(ooi_type, field_name, f'"{value}"')
             return
 

@@ -39,6 +39,14 @@ def test_invalid_fields_name():
     assert ctx.exconly() == 'octopoes.xtdb.query.InvalidField: "abc" is not a field of Network'
 
 
+def test_escaping_quotes():
+    query = Query(Network).where(Finding, ooi=Network).where(Network, name='test " name')
+    assert (
+        str(query) == "{:query {:find [(pull Network [*])] :where [ [ Finding :Finding/ooi Network ] "
+        '[ Network :Network/name "test \\" name" ]]}}'
+    )
+
+
 def test_invalid_field_types():
     with pytest.raises(InvalidField) as ctx:
         Query(Network).where(Finding, ooi=3)
