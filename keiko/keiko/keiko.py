@@ -9,7 +9,7 @@ from logging import DEBUG, ERROR, getLogger
 from pathlib import Path
 from typing import Dict, Set, Tuple
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader
 from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
 
@@ -21,6 +21,35 @@ logger = getLogger(__name__)
 tracer = trace.get_tracer(__name__)
 
 DATA_SHAPE_CLASS_NAME = "DataShape"
+
+_latex_special_chars = {
+    "&": r"\&",
+    "%": r"\%",
+    "$": r"\$",
+    "#": r"\#",
+    "_": r"\_",
+    "{": r"\{",
+    "}": r"\}",
+    "~": r"\textasciitilde{}",
+    "^": r"\^{}",
+    "\\": r"\textbackslash{}",
+    "\n": "\\newline%\n",
+    "-": r"{-}",
+    "\xA0": "~",  # Non-breaking space
+    "[": r"{[}",
+    "]": r"{]}",
+}
+
+
+def latex_escape(s):
+    """Escape characters that are special in LaTeX.
+
+    References:
+    - https://github.com/JelteF/PyLaTeX/blob/ecc1e6e339a5a7be958c328403517cd547873d7e/pylatex/utils.py#L68-L100
+    - http://tex.stackexchange.com/a/34586/43228
+    - http://stackoverflow.com/a/16264094/2570866
+    """
+    return "".join(_latex_special_chars.get(c, c) for c in str(s))
 
 
 def baretext(input_: str) -> str:
@@ -58,10 +87,10 @@ def generate_report(
     # init jinja2 template
     env = Environment(
         loader=FileSystemLoader(settings.templates_folder),
-        autoescape=select_autoescape(),
         variable_start_string="@@{",
         variable_end_string="}@@",
     )
+    env.filters["latex_escape"] = latex_escape
     template = env.get_template(f"{template_name}/template.tex")
 
     if not template.filename:
