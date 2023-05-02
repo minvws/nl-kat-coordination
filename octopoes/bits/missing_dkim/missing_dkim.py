@@ -12,17 +12,16 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[DKIMExists],
 ) -> Iterator[OOI]:
+    # only report finding when there is no DKIM record
     if (
-        # don't report on findings on subdomains because it's not needed on subdomains
         not tldextract.extract(input_ooi.name).subdomain
-        # don't report on findings on tlds
         and tldextract.extract(input_ooi.name).domain
+        and not additional_oois
     ):
-        if not additional_oois:
-            ft = KATFindingType(id="KAT-NO-DKIM")
-            yield ft
-            yield Finding(
-                ooi=input_ooi.reference,
-                finding_type=ft.reference,
-                description="This hostname does not support DKIM records",
-            )
+        ft = KATFindingType(id="KAT-NO-DKIM")
+        yield ft
+        yield Finding(
+            ooi=input_ooi.reference,
+            finding_type=ft.reference,
+            description="This hostname does not support DKIM records",
+        )

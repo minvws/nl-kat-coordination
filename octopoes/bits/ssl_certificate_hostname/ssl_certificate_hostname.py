@@ -26,10 +26,7 @@ def subject_valid_for_hostname(subject: str, hostname: str) -> bool:
 
 
 def hostname_in_qualifiers(hostname: str, qualifiers: List[str]) -> bool:
-    for qualifier in qualifiers:
-        if is_part_of_wildcard(hostname, qualifier):
-            return True
-    return False
+    return any(is_part_of_wildcard(hostname, qualifier) for qualifier in qualifiers)
 
 
 def run(
