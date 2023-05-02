@@ -50,13 +50,13 @@ def run(
 
     policies = [policy.strip().split(" ") for policy in header.value.split(";")]
     for policy in policies:
-        if policy[0] in ["frame-src", "frame-ancestors"]:
-            if not _source_valid(policy[1:]):
-                findings.append(f"{policy[0]} has not been correctly defined.")
+        if policy[0] in ["frame-src", "frame-ancestors"] and not _source_valid(policy[1:]):
+            findings.append(f"{policy[0]} has not been correctly defined.")
 
-        if policy[0] == "default-src":
-            if ("'none'" not in policy and "'self'" not in policy) or not _source_valid(policy[2:]):
-                findings.append(f"{policy[0]} has not been correctly defined.")
+        if policy[0] == "default-src" and (
+            ("'none'" not in policy and "'self'" not in policy) or not _source_valid(policy[2:])
+        ):
+            findings.append(f"{policy[0]} has not been correctly defined.")
 
         if (policy[0] == "default-src" or policy[0] == "object-src" or policy[0] == "script-src") and "data:" in policy:
             findings.append(
