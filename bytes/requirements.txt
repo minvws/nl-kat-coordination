@@ -13,7 +13,7 @@ fastapi==0.88.0
 greenlet==2.0.1
 h11==0.13.0
 idna==3.4
-importlib-metadata==6.0.0
+importlib-metadata==6.0.1
 importlib-resources==5.7.1
 mako==1.2.4
 markupsafe==2.1.2

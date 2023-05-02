@@ -55,20 +55,21 @@ class RelatedFieldNode:
             # Loop all attributes
             for foreign_key in foreign_object_relations:
                 # Other object points to one of the types in this QueryNode (i.e. sets are NOT disjoint)
-                if not foreign_key.related_entities.isdisjoint(types):
-                    # Don't traverse the same relation back
-                    if not self.path or foreign_key != self.path[-1]:
-                        self.relations_in[
-                            (
-                                foreign_key.source_entity,
-                                foreign_key.attr_name,
-                                foreign_key.reverse_name,
-                            )
-                        ] = RelatedFieldNode(
-                            self.data_model,
-                            {foreign_object_type},
-                            self.path + (foreign_key,),
+                # Don't traverse the same relation back
+                if not foreign_key.related_entities.isdisjoint(types) and (
+                    not self.path or foreign_key != self.path[-1]
+                ):
+                    self.relations_in[
+                        (
+                            foreign_key.source_entity,
+                            foreign_key.attr_name,
+                            foreign_key.reverse_name,
                         )
+                    ] = RelatedFieldNode(
+                        self.data_model,
+                        {foreign_object_type},
+                        self.path + (foreign_key,),
+                    )
 
     def build_tree(self, depth: int):
         if depth > 0:

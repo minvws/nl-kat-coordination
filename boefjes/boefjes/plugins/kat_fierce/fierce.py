@@ -7,6 +7,7 @@ https://github.com/mschwager/fierce
 
 import argparse
 import concurrent.futures
+import contextlib
 import functools
 import http.client
 import ipaddress
@@ -226,7 +227,8 @@ def get_stripped_file_lines(filename):
     Return lines of a file with whitespace removed
     """
     try:
-        lines = open(filename).readlines()
+        with open(filename) as f:
+            lines = f.readlines()
     except FileNotFoundError:
         fatal(f"Could not open file: {filename!r}")
 
@@ -290,10 +292,7 @@ def fierce(**kwargs):
 
     ns = recursive_query(resolver, domain, "NS", tcp=kwargs["tcp"])
 
-    if ns:
-        domain_name_servers = [n.to_text() for n in ns]
-    else:
-        domain_name_servers = []
+    domain_name_servers = [n.to_text() for n in ns] if ns else []
 
     output["NS"] = domain_name_servers if ns else "failure"
 
@@ -432,10 +431,8 @@ def parse_args(args):
 def main():
     args = parse_args(sys.argv[1:])
 
-    try:
+    with contextlib.suppress(KeyboardInterrupt):
         fierce(**vars(args))
-    except KeyboardInterrupt:
-        pass
 
 
 if __name__ == "__main__":
