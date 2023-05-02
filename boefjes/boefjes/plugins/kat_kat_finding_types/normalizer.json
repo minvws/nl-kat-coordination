@@ -1,10 +1,9 @@
 {
-    "id": "kat_green_hosting_normalize",
+    "id": "kat_kat_finding_types_normalize",
     "consumes": [
-        "green-hosting"
+        "kat-finding-types"
     ],
     "produces": [
-        "KATFindingType",
-        "Finding"
+        "KATFindingType"
     ]
 }

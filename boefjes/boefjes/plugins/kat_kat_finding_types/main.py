@@ -4,13 +4,12 @@ import requests
 
 from boefjes.job_models import BoefjeMeta
 
-API_URL = "https://admin.thegreenwebfoundation.org"
+FINDING_TYPES_JSON_LOCATION = (
+    "https://raw.githubusercontent.com/minvws/nl-kat-coordination/finding-types-in-octopoes/kat_finding_types.json"
+)
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
-    input_ = boefje_meta.arguments["input"]
-    hostname = input_["hostname"]["name"]
-
-    response = requests.get(f"{API_URL}/greencheck/{hostname}")
+    response = requests.get(f"{FINDING_TYPES_JSON_LOCATION}")
 
     return [(set(), response.content)]

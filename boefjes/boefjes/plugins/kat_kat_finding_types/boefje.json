@@ -1,14 +1,13 @@
 {
-    "id": "green-hosting",
-    "name": "GreenHosting",
-    "description": "Use the Green Web Foundation Partner API to check whether the website is hosted on a green server. Meaning it runs on renewable energy and/or offsets its carbon footprint",
+    "id": "kat-finding-types",
+    "name": "KAT Finding Types",
+    "description": "Hydrate information of KAT finding types",
     "consumes": [
-        "Website"
+        "KATFindingType"
     ],
     "produces": [
-        "KATFindingType",
-        "Finding"
+        "KATFindingType"
     ],
     "environment_keys": [],
-    "scan_level": 1
+    "scan_level": 0
 }
