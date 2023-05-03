@@ -230,10 +230,6 @@ class Scheduler(abc.ABC):
 
             count += 1
 
-    # TODO: not sure if we want to do this, should we keep retrying? What
-    # are the implications of missing tasks? What if there is an outage of
-    # workers. Do we retry the tasks? Is the messaging queue persistent,
-    # and do we have an offset?
     def push_item_to_queue_with_timeout(
         self,
         p_item: models.PrioritizedItem,
@@ -245,13 +241,13 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The item to push to the queue.
             timeout: The timeout in seconds.
-            max_tries: The maximum number of tries.
+            max_tries: The maximum number of tries. Set to -1 for infinite tries.
 
         Raises:
             QueueFullError: When the queue is full.
         """
         tries = 0
-        while not self.is_space_on_queue() and tries < max_tries:
+        while not self.is_space_on_queue() and (tries < max_tries or max_tries == -1):
             self.logger.debug(
                 "Queue %s is full, waiting for space [queue_id=%s, qsize=%d]",
                 self.queue.pq_id,

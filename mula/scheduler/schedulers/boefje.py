@@ -512,7 +512,7 @@ class BoefjeScheduler(Scheduler):
         )
 
         try:
-            self.push_item_to_queue_with_timeout(p_item)
+            self.push_item_to_queue_with_timeout(p_item, -1)
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s "
