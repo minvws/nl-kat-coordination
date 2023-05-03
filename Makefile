@@ -66,9 +66,9 @@ endif
 # Build will prepare all services: migrate them, seed them, etc.
 build:
 ifeq ($(UNAME),Darwin)
-	docker-compose build --pull --build-arg USER_UID="$$(id -u)"
+	docker-compose build --pull --parallel --build-arg USER_UID="$$(id -u)"
 else
-	docker-compose build --pull --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
+	docker-compose build --pull --parallel --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
 endif
 	make -C rocky build
 	make -C boefjes build
