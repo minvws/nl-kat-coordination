@@ -1,5 +1,6 @@
 SHELL := bash
 .ONESHELL:
+.NOTPARALLEL:
 
 # use HIDE to run commands invisibly, unless VERBOSE defined
 HIDE:=$(if $(VERBOSE),,@)
