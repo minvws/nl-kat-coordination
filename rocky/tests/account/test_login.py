@@ -23,7 +23,7 @@ def test_login(superuser):
     client = Client()
 
     response = client.post(
-        "/login/",
+        "/en/login/",
         {
             "auth-username": "wrong@openkat.nl",
             "auth-password": "TestTest123!!",
@@ -36,7 +36,7 @@ def test_login(superuser):
     assertContains(response, "Please enter a correct email address and password.")
 
     response = client.post(
-        "/login/",
+        "/en/login/",
         {"auth-username": "admin@openkat.nl", "auth-password": "Test!!", "login_rocky_view-current_step": "auth"},
     )
 
@@ -46,7 +46,7 @@ def test_login(superuser):
     assertContains(response, "Please enter a correct email address and password.")
 
     response = client.post(
-        "/login/",
+        "/en/login/",
         {
             "auth-username": superuser.email,
             "auth-password": "SuperSuper123!!",
@@ -61,7 +61,7 @@ def test_login(superuser):
     assertContains(response, "Submit")
 
     response = client.post(
-        "/login/",
+        "/en/login/",
         {"token-otp_token": "123456", "login_rocky_view-current_step": "token"},
     )
 
