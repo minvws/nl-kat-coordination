@@ -9,7 +9,7 @@ from PIL import Image
 
 from boefjes.job_models import BoefjeMeta
 
-PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.32.0-jammy"
+PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.33.0-jammy"
 BROWSER = "chromium"
 
 
