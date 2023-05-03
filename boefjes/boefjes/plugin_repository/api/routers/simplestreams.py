@@ -23,7 +23,7 @@ def index_file():
                 "datatype": "image-downloads",
                 "path": "streams/v1/images.json",
                 "format": "products:1.0",
-                "products": [name for name in index.images.keys()],
+                "products": [name for name in index.images],
             }
         }
     }
@@ -63,9 +63,8 @@ def images_file():
                 "sha256": file.hash,
                 "path": f"{BASE_URL}/images/{file.location.relative_to(PLUGINS_DIR)}",
             }
-            if isinstance(file, CombinedFile):
-                if file.combined_squashfs_sha256 is not None:
-                    version["combined_squashfs_sha256"] = file.combined_squashfs_sha256
+            if isinstance(file, CombinedFile) and file.combined_squashfs_sha256 is not None:
+                version["combined_squashfs_sha256"] = file.combined_squashfs_sha256
             versions[created]["items"][file.location.name] = version
 
         content = {

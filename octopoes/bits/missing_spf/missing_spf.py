@@ -12,17 +12,16 @@ def run(
     input_ooi: Hostname,
     additional_oois: List[DNSSPFRecord],
 ) -> Iterator[OOI]:
+    # only report finding when there is no SPF record
     if (
-        # don't report on findings on subdomains because it would generate too much noise
         not tldextract.extract(input_ooi.name).subdomain
-        # don't report on findings on tlds
         and tldextract.extract(input_ooi.name).domain
+        and not additional_oois
     ):
-        if not additional_oois:
-            ft = KATFindingType(id="KAT-NO-SPF")
-            yield ft
-            yield Finding(
-                ooi=input_ooi.reference,
-                finding_type=ft.reference,
-                description="This hostname does not have an SPF record",
-            )
+        ft = KATFindingType(id="KAT-NO-SPF")
+        yield ft
+        yield Finding(
+            ooi=input_ooi.reference,
+            finding_type=ft.reference,
+            description="This hostname does not have an SPF record",
+        )

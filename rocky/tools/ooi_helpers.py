@@ -298,9 +298,8 @@ def get_ooi_types_from_tree(ooi, include_self=True):
         for child_type in get_ooi_types_from_tree(child):
             types.add(child_type)
 
-    if include_self:
-        if ooi["ooi_type"] not in types:
-            types.add(ooi["ooi_type"])
+    if include_self and ooi["ooi_type"] not in types:
+        types.add(ooi["ooi_type"])
 
     return sorted(types)
 

@@ -154,10 +154,7 @@ def _ooi_field_as_string(findings_grouped: Dict, store: Dict):
         list_of_findings = []
         for finding in finding_group["list"]:
             # Either take the human_readable or the primary key of the OOI from the Finding in the store
-            if finding["ooi"]:
-                ooi_field = str(finding["ooi"]["human_readable"])
-            else:
-                ooi_field = str(store[finding["id"]].ooi)
+            ooi_field = str(finding["ooi"]["human_readable"]) if finding["ooi"] else str(store[finding["id"]].ooi)
 
             list_of_findings.append({**finding, "ooi": ooi_field})
 
