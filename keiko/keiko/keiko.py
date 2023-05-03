@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 from logging import DEBUG, ERROR, getLogger
 from pathlib import Path
-from typing import Dict, Set, Tuple
+from typing import Any, Dict, Set, Tuple
 
 from jinja2 import Environment, FileSystemLoader
 from opentelemetry import trace
@@ -22,26 +22,28 @@ tracer = trace.get_tracer(__name__)
 
 DATA_SHAPE_CLASS_NAME = "DataShape"
 
-_latex_special_chars = {
-    "&": r"\&",
-    "%": r"\%",
-    "$": r"\$",
-    "#": r"\#",
-    "_": r"\_",
-    "{": r"\{",
-    "}": r"\}",
-    "~": r"\textasciitilde{}",
-    "^": r"\^{}",
-    "\\": r"\textbackslash{}",
-    "\n": "\\newline%\n",
-    "-": r"{-}",
-    "\xA0": "~",  # Non-breaking space
-    "[": r"{[}",
-    "]": r"{]}",
-}
+LATEX_SPECIAL_CHARS = str.maketrans(
+    {
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\^{}",
+        "\\": r"\textbackslash{}",
+        "\n": "\\newline%\n",
+        "-": r"{-}",
+        "\xA0": "~",  # Non-breaking space
+        "[": r"{[}",
+        "]": r"{]}",
+    }
+)
 
 
-def latex_escape(s):
+def latex_escape(input: Any) -> Any:
     """Escape characters that are special in LaTeX.
 
     References:
@@ -49,7 +51,9 @@ def latex_escape(s):
     - http://tex.stackexchange.com/a/34586/43228
     - http://stackoverflow.com/a/16264094/2570866
     """
-    return "".join(_latex_special_chars.get(c, c) for c in str(s))
+    if not isinstance(input, str):
+        return input
+    return input.translate(LATEX_SPECIAL_CHARS)
 
 
 def baretext(input_: str) -> str:
