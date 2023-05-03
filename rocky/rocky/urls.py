@@ -50,13 +50,13 @@ urlpatterns = [
     path("api/v1/", include(router.urls)),
     path("<organization_code>/health/", Health.as_view(), name="health"),
     path("", include(tf_urls)),
-    path("", include("account.urls"), name="account"),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
 ]
 urlpatterns += i18n_patterns(
+    path("", include("account.urls"), name="account"),
     path("admin/", admin.site.urls),
     path("", LandingPageView.as_view(), name="landing_page"),
     path("onboarding/", include("onboarding.urls"), name="onboarding"),
