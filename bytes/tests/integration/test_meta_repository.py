@@ -3,11 +3,11 @@ from datetime import timedelta
 
 import pytest
 from sqlalchemy.exc import DataError
-from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 from bytes.database.sql_meta_repository import SQLMetaDataRepository
 from bytes.models import MimeType, RetrievalLink, SecureHash
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
+from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 
 def test_save_boefje_meta(meta_repository: SQLMetaDataRepository) -> None:
@@ -70,11 +70,10 @@ def test_boefje_id_length(meta_repository: SQLMetaDataRepository) -> None:
         boefje_meta.boefje.id = 64 * "a"
         meta_repository.save_boefje_meta(boefje_meta)
 
-    with pytest.raises(DataError):
-        with meta_repository:
-            boefje_meta.id = str(uuid.uuid4())
-            boefje_meta.boefje.id = 65 * "a"
-            meta_repository.save_boefje_meta(boefje_meta)
+    with pytest.raises(DataError), meta_repository:
+        boefje_meta.id = str(uuid.uuid4())
+        boefje_meta.boefje.id = 65 * "a"
+        meta_repository.save_boefje_meta(boefje_meta)
 
     meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
 
@@ -86,11 +85,10 @@ def test_boefje_organization_id_length(meta_repository: SQLMetaDataRepository) -
         boefje_meta.organization = 32 * "t"
         meta_repository.save_boefje_meta(boefje_meta)
 
-    with pytest.raises(DataError):
-        with meta_repository:
-            boefje_meta.id = str(uuid.uuid4())
-            boefje_meta.organization = 33 * "t"
-            meta_repository.save_boefje_meta(boefje_meta)
+    with pytest.raises(DataError), meta_repository:
+        boefje_meta.id = str(uuid.uuid4())
+        boefje_meta.organization = 33 * "t"
+        meta_repository.save_boefje_meta(boefje_meta)
 
     meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
 
@@ -109,6 +107,7 @@ def test_save_raw(meta_repository: SQLMetaDataRepository) -> None:
 
     with meta_repository:
         raw_id = meta_repository.save_raw(raw)
+        meta_repository.save_raw(raw)
 
     query_filter = RawDataFilter(
         organization=raw.boefje_meta.organization, boefje_meta_id=raw.boefje_meta.id, normalized=False
@@ -145,6 +144,8 @@ def test_save_raw(meta_repository: SQLMetaDataRepository) -> None:
     # Now the raw data has been normalized
     non_empty_raws = meta_repository.get_raw(query_filter)
     assert len(non_empty_raws) == 1
+
+    assert meta_repository.get_raw_file_count_per_organization() == {"test": 2}
 
 
 def test_filter_raw_on_organization(meta_repository: SQLMetaDataRepository) -> None:
@@ -259,11 +260,10 @@ def test_normalizer_id_length(meta_repository: SQLMetaDataRepository) -> None:
         normalizer_meta.normalizer.id = 64 * "a"
         meta_repository.save_normalizer_meta(normalizer_meta)
 
-    with pytest.raises(DataError):
-        with meta_repository:
-            normalizer_meta.id = str(uuid.uuid4())
-            normalizer_meta.normalizer.id = 65 * "a"
-            meta_repository.save_normalizer_meta(normalizer_meta)
+    with pytest.raises(DataError), meta_repository:
+        normalizer_meta.id = str(uuid.uuid4())
+        normalizer_meta.normalizer.id = 65 * "a"
+        meta_repository.save_normalizer_meta(normalizer_meta)
 
     meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
 

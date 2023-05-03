@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.8
-FROM python:$PYTHON_VERSION
+FROM python:$PYTHON_VERSION AS dev
 
 EXPOSE 8000
 
@@ -27,8 +27,10 @@ RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
     && pip install -r requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
 
-COPY . .
-
 USER bytes
+
+FROM dev
+
+COPY . .
 
 CMD ["uvicorn", "bytes.api:app", "--host", "0.0.0.0", "--port", "8000"]

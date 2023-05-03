@@ -2,7 +2,8 @@ import ipaddress
 import json
 import re
 from collections.abc import Iterable
-from typing import Iterator, Union
+from typing import Iterable as Iterable_
+from typing import Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
@@ -22,7 +23,7 @@ from octopoes.models.ooi.network import (
 from octopoes.models.ooi.software import Software, SoftwareInstance
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OOI]:
     results = json.loads(raw)
 
     boefje_meta = normalizer_meta.raw_data.boefje_meta
@@ -47,10 +48,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         as_number = event["network"]["asn"]
         as_name = event["network"]["organization_name"]
         if as_number:
-            if as_name:
-                as_ooi = AutonomousSystem(number=as_number, name=as_name)
-            else:
-                as_ooi = AutonomousSystem(number=as_number)
+            as_ooi = AutonomousSystem(number=as_number, name=as_name) if as_name else AutonomousSystem(number=as_number)
             yield as_ooi
 
         if ip:
@@ -182,10 +180,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             for tag in event.get("tags", {}):
                 if re.match("cve-[0-9]{4}-[0-9]{4,6}", tag):
                     ft = CVEFindingType(id=tag)
-                    if software_ooi:
-                        cve_ooi = software_ooi
-                    else:
-                        cve_ooi = ip_port_ooi
+                    cve_ooi = software_ooi if software_ooi else ip_port_ooi
                     f = Finding(finding_type=ft.reference, ooi=cve_ooi.reference)
                     yield ft
                     yield f

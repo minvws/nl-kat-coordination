@@ -10,12 +10,15 @@ from pathlib import Path
 from typing import Dict, Set, Tuple
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from opentelemetry import trace
+from opentelemetry.trace import Status, StatusCode
 
 from keiko.base_models import DataShapeBase
 from keiko.settings import Settings
 from keiko.templates import get_data_shape
 
 logger = getLogger(__name__)
+tracer = trace.get_tracer(__name__)
 
 DATA_SHAPE_CLASS_NAME = "DataShape"
 
@@ -25,6 +28,7 @@ def baretext(input_: str) -> str:
     return "".join(filter(str.isalnum, input_)).lower()
 
 
+@tracer.start_as_current_span("generate_report")
 def generate_report(
     template_name: str,
     report_data: DataShapeBase,
@@ -34,9 +38,12 @@ def generate_report(
     settings: Settings,
 ) -> None:
     """Generate a preprocessed LateX file from a template, a JSON data file and a glossary CSV file."""
+    current_span = trace.get_current_span()
+
     # load data shape and validate
     data_shape_class = get_data_shape(template_name, settings)
     data = data_shape_class.parse_obj(report_data.dict())
+    current_span.add_event("Data shape validation successful")
     logger.info(
         "Data shape validation successful. [report_id=%s] [template=%s]",
         report_id,
@@ -45,6 +52,7 @@ def generate_report(
 
     # build glossary
     glossary_entries = read_glossary(glossary, settings)
+    current_span.add_event("Glossary loaded")
     logger.info("Glossary loaded. [report_id=%s] [glossary=%s]", report_id, glossary)
 
     # init jinja2 template
@@ -62,11 +70,14 @@ def generate_report(
             report_id,
             template_name,
         )
-        return
+        ex = Exception("Template file %s not found", template_name)
+        current_span.set_status(Status(StatusCode.ERROR))
+        current_span.record_exception(ex)
+        raise ex
 
     # read template and find used glossary entries
     found_entries: Set[str] = set()
-    with open(template.filename, encoding="utf-8") as template_file:
+    with Path(template.filename).open(encoding="utf-8") as template_file:
         for line in template_file:
             for word in line.split():
                 bare_word = baretext(word)
@@ -84,10 +95,12 @@ def generate_report(
 
     # render template
     out_document = template.render(**context)
+    current_span.add_event("Template rendered")
     logger.info("Template rendered. [report_id=%s] [template=%s]", report_id, template_name)
 
     # create temp folder
     with tempfile.TemporaryDirectory() as directory:
+        current_span.add_event("Temporary folder created")
         logger.info(
             "Temporary folder created. [report_id=%s] [template=%s] [directory=%s]",
             report_id,
@@ -97,6 +110,7 @@ def generate_report(
 
         # copy assets
         shutil.copytree(settings.assets_folder, directory, dirs_exist_ok=True)
+        current_span.add_event("Assets copied")
         logger.info("Assets copied. [report_id=%s] [template=%s]", report_id, template_name)
 
         output_file = settings.reports_folder / report_id
@@ -107,6 +121,7 @@ def generate_report(
 
         preprocessed_tex_path = Path(directory).joinpath(f"{report_id}.keiko.tex")
         preprocessed_tex_path.write_text(out_document)
+        current_span.add_event("TeX file written")
 
         # if debug is enabled copy preprocessed tex file and input data
         if debug or settings.debug:
@@ -128,6 +143,7 @@ def generate_report(
         env = {**os.environ, "TEXMFVAR": directory}
         for i in (1, 2):
             output = subprocess.run(cmd, cwd=directory, env=env, capture_output=True, check=False)
+            current_span.add_event(f"Completed pdflatex run {i}")
             logger.info(
                 "pdflatex [run=%d] [report_id=%s] [template=%s] [command=%s]",
                 i,
@@ -138,7 +154,10 @@ def generate_report(
             if output.returncode:
                 logger.error("stdout: %s", output.stdout.decode("utf-8"))
                 logger.error("stderr: %s", output.stderr.decode("utf-8"))
-                raise Exception("Error in pdflatex run %d", i)
+                ex = Exception("Error in pdflatex run %d", i)
+                current_span.set_status(Status(StatusCode.ERROR))
+                current_span.record_exception(ex)
+                raise ex
             else:
                 logger.debug(output.stdout.decode("utf-8"))
                 logger.debug(output.stderr.decode("utf-8"))
@@ -148,6 +167,7 @@ def generate_report(
             preprocessed_tex_path.with_suffix(".pdf"),
             pdf_output_file_path,
         )
+        current_span.add_event("Report copied to reports folder")
         logger.info(
             "Report copied to reports folder. [report_id=%s] [template=%s] [output_file=%s]",
             report_id,
