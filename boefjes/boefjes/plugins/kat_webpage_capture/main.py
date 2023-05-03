@@ -9,7 +9,7 @@ from PIL import Image
 
 from boefjes.job_models import BoefjeMeta
 
-PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.30.0-focal"
+PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.32.0-jammy"
 BROWSER = "chromium"
 
 
@@ -70,7 +70,7 @@ def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
     """Returns playwright command including webpage, browser and locations for image, har and storage."""
     return " ".join(
         [
-            "playwright screenshot",
+            "npx playwright screenshot",
             f"-b {browser}",
             "--full-page",
             f"--save-har={tmp_path}.har.zip",
