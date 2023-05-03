@@ -94,7 +94,6 @@ def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tu
         detach=True,
     )
     res.wait()
-    logging.warning("[Webpage Capture] HAR (.har.zip) and Storage (.json) files not working in 1.30.0.")
     image = Image.open(io.BytesIO(get_file_from_container(container=res, path=f"{tmp_path}.png")))
     har = get_file_from_container(container=res, path=f"{tmp_path}.har.zip")
     storage = get_file_from_container(container=res, path=f"{tmp_path}.json")
