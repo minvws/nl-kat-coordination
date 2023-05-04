@@ -10,30 +10,24 @@ def test_basic_field_where_clause():
     query = Query(Network).where(Network, name="test")
     assert (
         query.format()
-        == """
-{:query {:find [(pull Network [*])] :where [
+        == """{:query {:find [(pull Network [*])] :where [
     [ Network :Network/name "test" ]
-    [ Network :object_type "Network" ]]}}
-"""
+    [ Network :object_type "Network" ]]}}"""
     )
 
     query = query.limit(4)
     assert (
         query.format()
-        == """
-{:query {:find [(pull Network [*])] :where [
+        == """{:query {:find [(pull Network [*])] :where [
     [ Network :Network/name "test" ]
-    [ Network :object_type "Network" ]] :limit 4}}
-"""
+    [ Network :object_type "Network" ]] :limit 4}}"""
     )
     query = query.offset(0)
     assert (
         query.format()
-        == """
-{:query {:find [(pull Network [*])] :where [
+        == """{:query {:find [(pull Network [*])] :where [
     [ Network :Network/name "test" ]
-    [ Network :object_type "Network" ]] :limit 4 :offset 0}}
-"""
+    [ Network :object_type "Network" ]] :limit 4 :offset 0}}"""
     )
 
 
@@ -41,12 +35,10 @@ def test_reference_field_where_clause():
     query = Query(Network).where(Finding, ooi=Network)
     assert (
         query.format()
-        == """
-{:query {:find [(pull Network [*])] :where [
+        == """{:query {:find [(pull Network [*])] :where [
     [ Finding :Finding/ooi Network ]
     [ Finding :object_type "Finding" ]
-    [ Network :object_type "Network" ]]}}
-"""
+    [ Network :object_type "Network" ]]}}"""
     )
 
 
@@ -71,13 +63,11 @@ def test_escaping_quotes():
     query = Query(Network).where(Finding, ooi=Network).where(Network, name='test " name')
     assert (
         query.format()
-        == """
-{:query {:find [(pull Network [*])] :where [
+        == """{:query {:find [(pull Network [*])] :where [
     [ Finding :Finding/ooi Network ]
     [ Finding :object_type "Finding" ]
     [ Network :Network/name "test \\" name" ]
-    [ Network :object_type "Network" ]]}}
-"""
+    [ Network :object_type "Network" ]]}}"""
     )
 
 
@@ -103,12 +93,10 @@ def test_allow_string_for_foreign_keys():
 
     assert (
         query.format()
-        == """
-{:query {:find [(pull Network [*])] :where [
+        == """{:query {:find [(pull Network [*])] :where [
     [ Finding :Finding/ooi "Network|internet" ]
     [ Finding :object_type "Finding" ]
-    [ Network :object_type "Network" ]]}}
-"""
+    [ Network :object_type "Network" ]]}}"""
     )
 
 
@@ -123,8 +111,7 @@ def test_big_multiple_direction_query():
 
     assert (
         query.format()
-        == """
-{:query {:find [(pull Finding [*])] :where [
+        == """{:query {:find [(pull Finding [*])] :where [
     (or [ IPAddress :IPAddressV4/network Network ] [ IPAddress :IPAddressV6/network Network ] )
     (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )
     [ Finding :Finding/finding_type "KATFindingType|KAT-500" ]
@@ -132,18 +119,16 @@ def test_big_multiple_direction_query():
     [ Finding :object_type "Finding" ]
     [ IPPort :IPPort/address IPAddress ]
     [ IPPort :IPPort/primary_key "IPPort|internet|xxx:xxx:x|tcp|23" ]
-    [ IPPort :object_type "IPPort" ]]}}
-"""
+    [ IPPort :object_type "IPPort" ]]}}"""
     )
 
 
-def test_create_query_from_relation_path():
+def test_create_query_from_path():
     query = Query.from_path(Path.parse("HTTPHeader.resource.website.hostname.network.<ooi [is Finding]"))
 
     assert (
         query.format()
-        == """
-{:query {:find [(pull Finding [*])] :where [
+        == """{:query {:find [(pull Finding [*])] :where [
     [ Finding :Finding/ooi Network ]
     [ Finding :object_type "Finding" ]
     [ HTTPHeader :HTTPHeader/resource HTTPResource ]
@@ -153,8 +138,7 @@ def test_create_query_from_relation_path():
     [ Hostname :Hostname/network Network ]
     [ Hostname :object_type "Hostname" ]
     [ Website :Website/hostname Hostname ]
-    [ Website :object_type "Website" ]]}}
-"""
+    [ Website :object_type "Website" ]]}}"""
     )
 
     query = Query.from_path(Path.parse("IPPort.address.network.<ooi [is Finding]")).where(
@@ -162,16 +146,14 @@ def test_create_query_from_relation_path():
     )
     assert (
         query.format()
-        == """
-{:query {:find [(pull Finding [*])] :where [
+        == """{:query {:find [(pull Finding [*])] :where [
     (or [ IPAddress :IPAddressV4/network Network ] [ IPAddress :IPAddressV6/network Network ] )
     (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )
     [ Finding :Finding/ooi Network ]
     [ Finding :object_type "Finding" ]
     [ IPPort :IPPort/address IPAddress ]
     [ IPPort :IPPort/primary_key "IPPort|internet|xxx:xxx:x|tcp|23" ]
-    [ IPPort :object_type "IPPort" ]]}}
-"""
+    [ IPPort :object_type "IPPort" ]]}}"""
     )
 
 
@@ -190,10 +172,8 @@ def test_finding_type_count_query():
 
     assert (
         query.format()
-        == f"""
-{{:query {{:find [FindingType (count Finding)] :where [
+        == f"""{{:query {{:find [FindingType (count Finding)] :where [
     (or {or_statement_list} )
     [ Finding :Finding/finding_type FindingType ]
-    [ Finding :object_type "Finding" ]]}}}}
-"""
+    [ Finding :object_type "Finding" ]]}}}}"""
     )

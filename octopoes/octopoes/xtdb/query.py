@@ -47,35 +47,26 @@ class Query:
         return self
 
     def format(self) -> str:
-        return "\n" + self._compile(separator="\n    ") + "\n"
+        return self._compile(separator="\n    ")
 
     @classmethod
     def from_path(cls, path: Path) -> "Query":
         """
         Create a query from a Path.
 
-        The last segment in the path is assumed to be the queries OOI Type. You can change this by calling the
-        query() method after initialization for the required target OOI Type.
+        The last segment in the path is assumed to be the queries OOI Type.
         """
 
         ooi_type = path.segments[-1].target_type
-        query = Query(ooi_type)
+        query = cls(ooi_type)
 
         for segment in path.segments:
             if segment.direction is Direction.OUTGOING:
                 query = query.where(segment.source_type, **{segment.property_name: segment.target_type})
-                continue
-
-            query = query.where(segment.target_type, **{segment.property_name: segment.source_type})
+            else:
+                query = query.where(segment.target_type, **{segment.property_name: segment.source_type})
 
         return query
-
-    def query(self, ooi_type: Type[OOI]) -> "Query":
-        """Change the target object type of the Query after initialization, e.g. when using from_relation_path()"""
-
-        self.result_type = ooi_type
-
-        return self
 
     def count(self, ooi_type: Type[OOI]) -> "Query":
         self._find_clauses.append(f"(count {ooi_type.get_object_type()})")
