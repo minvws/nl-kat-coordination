@@ -1,4 +1,3 @@
-from pprint import pprint
 from unittest import TestCase
 
 from octopoes.config.settings import XTDBType
@@ -172,8 +171,6 @@ class QueryNodeTest(TestCase):
     def test_QueryNode_multiple_root_types_success(self):
         root = RelatedFieldNode(data_model=datamodel, object_types={"IpAddressV4", "IpAddressV6"})
         root.build_tree(1)
-
-        pprint(root)
 
         expected = {
             ("IpPort", "IpAddress", "IpPort/_IpAddress"): RelatedFieldNode(
