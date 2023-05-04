@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ==================================
 How do I customize LaTeX reports ?
 ==================================
@@ -134,6 +135,3 @@ You can change your current document font with the inclusion of this code to set
 .. code-block:: python
     \usepackage{helvet}
     \renewcommand{\familydefault}{\sfdefault}
-
-
->>>>>>> 7509bd9 (update code lang)
