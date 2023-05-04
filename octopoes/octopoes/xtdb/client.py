@@ -141,6 +141,9 @@ class XTDBSession:
     def add(self, operation: Operation):
         self._operations.append(operation)
 
+    def put(self, document: Union[str, Dict[str, Any]], valid_time: datetime):
+        self.add((OperationType.PUT, document, valid_time))
+
     def commit(self) -> None:
         if self._committed:
             raise RuntimeError("Session already committed")

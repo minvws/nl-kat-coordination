@@ -15,7 +15,7 @@ from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
 
 def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTPClient:
-    """ Base URL setup:
+    """Base URL setup:
             - Xtdb-multinode: "{base_uri}/_xtdb/{client}"
             - Old development setup: "{base_uri}/{_crux|_xtdb}"
             - Old production setup: client proxy & "{base_uri}/{client}/{_crux|_xtdb}"

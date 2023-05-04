@@ -29,7 +29,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
+from octopoes.xtdb.client import XTDBSession
 
 logger = getLogger(__name__)
 router = APIRouter(prefix="/{client}")

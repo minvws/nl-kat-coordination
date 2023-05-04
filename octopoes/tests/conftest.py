@@ -1,21 +1,20 @@
 from datetime import datetime, timezone
 from ipaddress import IPv4Address
-from typing import Dict, List, Optional, Set
+from typing import Dict, Iterator, List, Optional, Set
 from unittest.mock import Mock
 
 import pytest
-from octopoes.core.app import get_xtdb_client
 
 from octopoes.api.api import app
 from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
-
+from octopoes.core.app import get_xtdb_client
 from octopoes.models import OOI, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
-from octopoes.xtdb.client import XTDBHTTPClient
+from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
 
 @pytest.fixture
@@ -162,5 +161,14 @@ def app_settings():
 
 
 @pytest.fixture
-def xtdb_http_client(app_settings: Settings):
+def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
     return get_xtdb_client(app_settings.xtdb_uri, "test", app_settings.xtdb_type)
+
+
+@pytest.fixture
+def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
+    xtdb_http_client.create_node()
+
+    yield XTDBSession(xtdb_http_client)
+
+    xtdb_http_client.delete_node()
