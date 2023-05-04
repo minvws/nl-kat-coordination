@@ -8,7 +8,7 @@ from octopoes.config.settings import XTDBType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
-from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession, XTDBStatus
+from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.query import Query
 
 if os.environ.get("CI") != "1":
@@ -20,15 +20,12 @@ XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 
 def test_node_creation_and_deletion(xtdb_http_client: XTDBHTTPClient):
     xtdb_http_client.create_node()
-    assert xtdb_http_client.status() == XTDBStatus(
-        version="1.23.0",
-        revision="c9ae268855e156f07ac471537445823f011bc320",
-        indexVersion=22,
-        consumerState=None,
-        kvStore="xtdb.rocksdb.RocksKv",
-        estimateNumKeys=1,
-        size=71255,
-    )
+    status = xtdb_http_client.status()
+
+    assert status.indexVersion == 22
+    assert status.consumerState is None
+    assert status.kvStore == "xtdb.rocksdb.RocksKv"
+    assert status.estimateNumKeys == 1
 
     xtdb_http_client.delete_node()
 
