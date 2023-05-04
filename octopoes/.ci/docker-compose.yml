@@ -40,8 +40,6 @@ services:
       - xtdb_multinode
     env_file:
       - ".ci/ci-multinode.env"
-    volumes:
-      - .:/app/octopoes
 
   xtdb_multinode:
     image: "ghcr.io/dekkers/xtdb-http-multinode:main"
