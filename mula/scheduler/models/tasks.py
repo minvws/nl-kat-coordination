@@ -78,7 +78,7 @@ class TaskORM(Base):
 
     __table_args__ = (
         Index(
-            "idx_p_item_hash",
+            "ix_p_item_hash",
             text("(p_item->>'hash')"),
             created_at.desc(),
         ),
