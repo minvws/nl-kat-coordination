@@ -51,7 +51,9 @@ class XTDBStatus(BaseModel):
 
 
 class XTDBHTTPClient:
-    def __init__(self, base_url):
+    def __init__(self, base_url, client: str, multinode=False):
+        self._client = client
+        self._is_multinode = multinode
         self._session = XTDBHTTPSession(base_url)
 
     @staticmethod
@@ -65,15 +67,23 @@ class XTDBHTTPClient:
                 logger.error(response.text)
             raise e
 
+    def client_url(self) -> str:
+        if not self._is_multinode or self._client is None:
+            return ""
+
+        return f"/{self._client}"
+
     def status(self) -> XTDBStatus:
-        res = self._session.get("/status")
+        res = self._session.get(f"{self.client_url()}/status")
         self._verify_response(res)
         return XTDBStatus.parse_obj(res.json())
 
     def get_entity(self, entity_id: str, valid_time: Optional[datetime] = None) -> dict:
         if valid_time is None:
             valid_time = datetime.now(timezone.utc)
-        res = self._session.get("/entity", params={"eid": entity_id, "valid-time": valid_time.isoformat()})
+        res = self._session.get(
+            f"{self.client_url()}/entity", params={"eid": entity_id, "valid-time": valid_time.isoformat()}
+        )
         self._verify_response(res)
         return res.json()
 
@@ -81,7 +91,7 @@ class XTDBHTTPClient:
         if valid_time is None:
             valid_time = datetime.now(timezone.utc)
         res = self._session.post(
-            "/query",
+            f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
             data=query,
             headers={"Content-Type": "application/edn"},
@@ -90,12 +100,12 @@ class XTDBHTTPClient:
         return res.json()
 
     def await_transaction(self, transaction_id: int) -> None:
-        self._session.get("/await-tx", params={"txId": transaction_id})
+        self._session.get(f"{self._client}/await-tx", params={"txId": transaction_id})
         logger.info("Transaction completed [txId=%s]", transaction_id)
 
     def submit_transaction(self, operations: List[Operation]) -> None:
         res = self._session.post(
-            "/submit-tx",
+            f"{self.client_url()}/submit-tx",
             data=Transaction(operations=operations).json(by_alias=True),
             headers={"Content-Type": "application/json"},
         )
@@ -103,16 +113,13 @@ class XTDBHTTPClient:
         self._verify_response(res)
         self.await_transaction(res.json()["txId"])
 
-    def create_node(self, name: str) -> None:
-        res = self._session.post("/create-node", json={"node": name})
+    def create_node(self) -> None:
+        res = self._session.post("/create-node", json={"node": self._client})
 
         self._verify_response(res)
 
-    def delete_node(self, name: str) -> None:
-        res = self._session.post(
-            "/delete-node",
-            json={"node": name},
-        )
+    def delete_node(self) -> None:
+        res = self._session.post("/delete-node", json={"node": self._client})
 
         self._verify_response(res)
 

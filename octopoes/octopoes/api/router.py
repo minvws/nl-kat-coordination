@@ -284,26 +284,20 @@ def get_finding_type_count(
 
 
 @router.post("/node")
-def create_node(
-    client: str = Depends(extract_client),
-    settings: Settings = Depends(settings),
-) -> None:
+def create_node(xtdb_session_: XTDBSession = Depends(xtdb_session), settings: Settings = Depends(settings)) -> None:
     if settings.xtdb_type != XTDBType.XTDB_MULTINODE:
         raise Exception("Creating nodes requires XTDB_MULTINODE")
-    xtdb_client = XTDBHTTPClient(f"{settings.xtdb_uri}/_xtdb")
-    xtdb_client.create_node(client)
+
+    xtdb_session_.client.create_node()
 
 
 @router.delete("/node")
-def delete_node(
-    client: str = Depends(extract_client),
-    settings: Settings = Depends(settings),
-) -> None:
+def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session), settings: Settings = Depends(settings)) -> None:
     if settings.xtdb_type != XTDBType.XTDB_MULTINODE:
         raise Exception("Deleting nodes requires XTDB_MULTINODE")
-    xtdb_client = XTDBHTTPClient(f"{settings.xtdb_uri}/_xtdb")
+
     try:
-        xtdb_client.delete_node(client)
+        xtdb_session_.client.delete_node()
     except HTTPError as e:
         if e.response.status_code == HTTPStatus.NOT_FOUND:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Node does not exist")
