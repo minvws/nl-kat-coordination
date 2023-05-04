@@ -19,17 +19,17 @@ SEVERITY_SCORE_LOOKUP = {
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
-    id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
+    kat_finding_type_id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
     data = json.loads(raw)
 
-    finding_type_information = data[id]
+    finding_type_information = data[kat_finding_type_id]
     logger.info(finding_type_information["risk"].lower())
     risk_severity = RiskLevelSeverity(finding_type_information["risk"].lower())
 
     risk_score = SEVERITY_SCORE_LOOKUP[risk_severity]
 
     yield KATFindingType(
-        id=id,
+        id=kat_finding_type_id,
         description=finding_type_information["description"],
         risk_severity=risk_severity,
         risk_score=risk_score,
