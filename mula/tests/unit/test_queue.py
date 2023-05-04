@@ -16,7 +16,7 @@ from tests.utils import functions
 
 class MockPriorityQueue(queues.PriorityQueue):
     def create_hash(self, item: functions.TestModel):
-        return hash(item.id)
+        return item.id.hex
 
 
 class PriorityQueueTestCase(unittest.TestCase):
