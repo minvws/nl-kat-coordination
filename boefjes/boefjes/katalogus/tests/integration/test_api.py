@@ -57,7 +57,7 @@ class TestAPI(TestCase):
     def tearDown(self) -> None:
         session = sessionmaker(bind=get_engine())()
 
-        for table in SQL_BASE.metadata.tables.keys():
+        for table in SQL_BASE.metadata.tables:
             session.execute(f"DELETE FROM {table} CASCADE")
 
         session.commit()

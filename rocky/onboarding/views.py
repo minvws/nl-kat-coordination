@@ -52,7 +52,7 @@ from rocky.views.ooi_view import BaseOOIDetailView, BaseOOIFormView, SingleOOITr
 User = get_user_model()
 
 
-class OnboardingBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
+class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
     def build_breadcrumbs(self):
         return [
             {
@@ -223,7 +223,7 @@ class OnboardingSetupScanOOIAddView(
         except KeyError:
             raise Http404("OOI not found")
 
-    def get_success_url(self, ooi: OOI) -> str:
+    def get_ooi_success_url(self, ooi: OOI) -> str:
         self.request.session["ooi_id"] = ooi.primary_key
         return get_ooi_url("step_set_clearance_level", ooi.primary_key, self.organization.code)
 
@@ -355,6 +355,7 @@ class OnboardingReportView(
     def set_member_onboarded(self):
         member = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
         member.onboarded = True
+        member.status = OrganizationMember.STATUSES.ACTIVE
         member.save()
 
 
@@ -648,5 +649,6 @@ class CompleteOnboarding(OrganizationView):
             redteam_group.user_set.add(self.request.user)
             return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
         member.onboarded = True
+        member.status = OrganizationMember.STATUSES.ACTIVE
         member.save()
         return redirect(reverse("crisis_room"))

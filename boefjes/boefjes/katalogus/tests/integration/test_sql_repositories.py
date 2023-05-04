@@ -6,7 +6,6 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
-from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
 from boefjes.katalogus.models import Boefje, Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
@@ -19,7 +18,7 @@ from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 from boefjes.sql.repository_storage import SQLRepositoryStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage
+from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -41,13 +40,13 @@ class TestRepositories(TestCase):
         session = sessionmaker(bind=self.engine)()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
         self.repository_storage = SQLRepositoryStorage(session, settings)
-        self.settings_storage = SQLSettingsStorage(session, IdentityMiddleware())
+        self.settings_storage = SQLSettingsStorage(session, create_encrypter())
         self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
 
     def tearDown(self) -> None:
         session = sessionmaker(bind=get_engine())()
 
-        for table in SQL_BASE.metadata.tables.keys():
+        for table in SQL_BASE.metadata.tables:
             session.execute(f"DELETE FROM {table} CASCADE")
 
         session.commit()
@@ -167,9 +166,8 @@ class TestRepositories(TestCase):
 
         self.assertEqual(dict(), settings_storage.get_all(org.id, plugin_id))
 
-        with self.assertRaises(StorageError):
-            with self.settings_storage as settings_storage:
-                settings_storage.create("TEST_SETTING", "123.9", organisation_id, 65 * "a")
+        with self.assertRaises(StorageError), self.settings_storage as settings_storage:
+            settings_storage.create("TEST_SETTING", "123.9", organisation_id, 65 * "a")
 
     def test_settings_storage_values_field_limits(self):
         organisation_id = "test"

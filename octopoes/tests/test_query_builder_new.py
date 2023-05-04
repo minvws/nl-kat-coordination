@@ -1,4 +1,3 @@
-from pprint import pprint
 from unittest import TestCase
 
 from octopoes.config.settings import XTDBType
@@ -173,8 +172,6 @@ class QueryNodeTest(TestCase):
         root = RelatedFieldNode(data_model=datamodel, object_types={"IpAddressV4", "IpAddressV6"})
         root.build_tree(1)
 
-        pprint(root)
-
         expected = {
             ("IpPort", "IpAddress", "IpPort/_IpAddress"): RelatedFieldNode(
                 data_model=datamodel, object_types={"IpPort"}
@@ -207,9 +204,9 @@ class QueryNodeTest(TestCase):
 
         expected_query = (
             "{:query {:find [(pull ?e [* {(:DnsARecord/_IpAddressV4 {:as DnsARecord/_IpAddressV4}) [*]} "
-            + "{(:Finding/_OOI {:as Finding/_OOI}) [*]} {(:IpAddressV4/Network {:as Network}) [*]} "
-            + "{(:IpPort/_IpAddress {:as IpPort/_IpAddress}) [*]} {(:Job/_oois {:as Job/_oois}) [*]}])] "
-            + ':in [_db_crux_id] :where [[?e :db.crux/id _db_crux_id]]   } :in-args [ "IpAddressV4|internet|1.1.1.1" ]}'
+            "{(:Finding/_OOI {:as Finding/_OOI}) [*]} {(:IpAddressV4/Network {:as Network}) [*]} "
+            "{(:IpPort/_IpAddress {:as IpPort/_IpAddress}) [*]} {(:Job/_oois {:as Job/_oois}) [*]}])] "
+            ':in [_db_crux_id] :where [[?e :db.crux/id _db_crux_id]]   } :in-args [ "IpAddressV4|internet|1.1.1.1" ]}'
         )
         self.assertEqual(
             expected_query,
@@ -224,7 +221,7 @@ class QueryNodeTest(TestCase):
 
         expected_query = (
             "{:query {:find [(pull ?e [*])] :in [_attr_1] :where [[?e :attr_1 _attr_1]]   } "
-            + ':in-args [ "test_value_with_quotes\\" and injection" ]}'
+            ':in-args [ "test_value_with_quotes\\" and injection" ]}'
         )
         self.assertEqual(
             expected_query,

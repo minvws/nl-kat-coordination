@@ -40,7 +40,7 @@ class SinglePluginView(OrganizationView):
             self.plugin_schema = self.katalogus_client.get_plugin_schema(plugin_id)
         except HTTPError as e:
             if e.response.status_code == HTTP_404_NOT_FOUND:
-                raise Http404("Plugin {} not found.".format(plugin_id))
+                raise Http404(f"Plugin {plugin_id} not found.")
 
             raise
         except RequestException:
@@ -51,9 +51,6 @@ class SinglePluginView(OrganizationView):
             )
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_anonymous:
-            return redirect(reverse("login"))
-
         if not self.plugin:
             return redirect(reverse("katalogus", kwargs={"organization_code": self.organization.code}))
 

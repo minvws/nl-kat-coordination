@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -77,7 +78,7 @@ class LabeledCheckboxInput(forms.CheckboxInput):
         self.autosubmit = autosubmit
 
     def get_context(self, name, value, attrs):
-        context = super(LabeledCheckboxInput, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context["widget"]["wrap_label"] = True
         context["widget"]["label"] = self.label
         context["widget"]["attrs"]["class"] = "submit-on-click"
@@ -190,10 +191,9 @@ class CheckboxTable(Widget):
         del files
         getter = data.get
         if self.allow_multiple_selected:
-            try:
+            with contextlib.suppress(AttributeError):
                 getter = data.getlist
-            except AttributeError:
-                pass
+
         return getter(name)
 
     def format_value(self, value):
