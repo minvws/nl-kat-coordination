@@ -59,12 +59,13 @@ class OrganizationView(View):
 
     @property
     def may_update_clearance_level(self) -> bool:
-        return (
-            self.indemnification_present
-            and self.organization_member.acknowledged_clearance_level >= 0
-            and self.organization_member.trusted_clearance_level >= 0
-            and self.request.user.has_perm("tools.can_set_clearance_level")
-        )
+        if not self.indemnification_present:
+            return False
+        if self.organization_member.acknowledged_clearance_level < 0:
+            return False
+        if self.organization_member.trusted_clearance_level < 0:
+            return False
+        return True
 
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
