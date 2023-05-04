@@ -80,19 +80,23 @@ def start_working(
 
         logger.debug("Found queues: %s", [queue.id for queue in queues])
 
+        all_queues_empty = True
+
         for queue in queues:
             logger.info("Popping from queue %s", queue.id)
 
             try:
                 p_item = scheduler_client.pop_item(queue.id)
             except (HTTPError, ValidationError):
-                logger.exception("Popping task from scheduler failed")
-                time.sleep(10 * settings.poll_interval)
+                logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
+                time.sleep(10)
                 continue
 
             if not p_item:
-                logger.info("Queue %s empty", queue.id)
+                logger.debug("Queue %s empty", queue.id)
                 continue
+
+            all_queues_empty = False
 
             logger.info("Handling task[%s]", p_item.data.id)
             status = TaskStatus.FAILED
@@ -114,7 +118,9 @@ def start_working(
                 except HTTPError:
                     logger.exception("Could not patch scheduler task to %s", status.value)
 
-        time.sleep(settings.poll_interval)
+        if all_queues_empty:
+            logger.debug("All queues empty, sleeping %f seconds", settings.poll_interval)
+            time.sleep(settings.poll_interval)
 
 
 def get_runtime_manager(settings: Settings, queue: RuntimeManager.Queue, log_level: str) -> RuntimeManager:
