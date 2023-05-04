@@ -4,7 +4,7 @@ from functools import cached_property
 from typing import Dict, List, Optional, Set, Tuple, Type
 
 import requests.exceptions
-from account.mixins import OrganizationView
+from account.mixins import OrganizationView, ClearanceRequiredView
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -45,7 +45,7 @@ class OOIAttributeError(AttributeError):
     pass
 
 
-class OctopoesView(OrganizationView):
+class OctopoesView(OrganizationView, ClearanceRequiredView):
     def get_single_ooi(self, pk: str, observed_at: Optional[datetime] = None) -> OOI:
         try:
             ref = Reference.from_str(pk)
