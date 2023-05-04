@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:18-bullseye AS builder
+FROM node:18-bullseye AS node_builder
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY rocky/assets assets
 
 RUN yarn --ignore-engines && yarn build
 
-FROM python:3.8
+FROM python:3.8 AS dev
 
 ARG USER_UID=1000
 ARG USER_GID=1000
@@ -37,6 +37,8 @@ RUN --mount=type=cache,target=/root/.cache \
     then pip install -r requirements-dev.txt; \
     else pip install -r requirements.txt; fi
 
+FROM dev
+
 COPY octopoes/ /tmp/octopoes
 RUN cd /tmp/octopoes && python setup.py bdist_wheel
 RUN pip install /tmp/octopoes/dist/octopoes*.whl
@@ -44,7 +46,7 @@ RUN pip install /tmp/octopoes/dist/octopoes*.whl
 COPY rocky .
 
 # These files need to be available when we run collectstatic
-COPY --link --from=builder /app/assets/dist assets/dist
+COPY --link --from=node_builder /app/assets/dist assets/dist
 
 # The secret key isn't used by the commands, but Django won't work do anything
 # without it

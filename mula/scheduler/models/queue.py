@@ -22,7 +22,7 @@ class PrioritizedItem(BaseModel):
     scheduler_id: Optional[str]
 
     # A unique generated identifier for the object contained in data
-    hash: Optional[str]
+    hash: Optional[str] = Field(None, max_length=32)
 
     priority: Optional[int]
 
@@ -46,7 +46,7 @@ class PrioritizedItemORM(Base):
 
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String)
-    hash = Column(String)
+    hash = Column(String(32))
 
     priority = Column(Integer)
     data = Column(JSON, nullable=False)

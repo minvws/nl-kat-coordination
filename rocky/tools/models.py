@@ -190,7 +190,7 @@ class OOIInformation(models.Model):
         if self.consult_api:
             self.consult_api = False
             self.get_internet_description()
-        super(OOIInformation, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def clean(self):
         if "description" not in self.data:

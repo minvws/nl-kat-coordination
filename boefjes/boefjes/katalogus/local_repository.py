@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import pkgutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -133,7 +132,7 @@ class LocalPluginRepository:
 
     @staticmethod
     def create_relative_import_statement_from_cwd(package_dir: Path) -> str:
-        relative_path = str(package_dir.absolute()).replace(os.getcwd(), "")  # e.g. "/boefjes/plugins"
+        relative_path = str(package_dir.absolute()).replace(str(Path.cwd()), "")  # e.g. "/boefjes/plugins"
 
         return f"{relative_path[1:].replace('/', '.')}."  # Turns into "boefjes.plugins."
 

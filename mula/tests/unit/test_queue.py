@@ -38,7 +38,7 @@ class PriorityQueueTestCase(unittest.TestCase):
     def tearDown(self) -> None:
         session = sessionmaker(bind=self.datastore.engine)()
 
-        for table in Base.metadata.tables.keys():
+        for table in Base.metadata.tables:
             session.execute(f"DELETE FROM {table}")
 
         session.commit()
