@@ -4,5 +4,7 @@
     {% if key %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
     <button type="submit"
             class="{{ btn_class }}"
-            {% if btn_disabled %}disabled{% endif %}>{{ btn_text }}</button>
+            {% if btn_disabled %}disabled{% endif %}>
+        {{ btn_text }}{{ btn_var }}
+    </button>
 </form>

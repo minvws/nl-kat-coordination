@@ -67,6 +67,14 @@ class OrganizationView(View):
             return False
         return True
 
+    def verify_clearance_start_scan(self, clearance_levels) -> bool:
+        return any(
+            [
+                clearance_level <= self.organization_member.acknowledged_clearance_level
+                for clearance_level in clearance_levels
+            ]
+        )
+
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
             raise IndemnificationNotPresentException()
