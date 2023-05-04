@@ -28,27 +28,21 @@ def test_finding_delete(rf, redteam_member, mock_organization_view_octopoes, fin
     assertContains(response, "Are you sure?")
 
 
-def test_delete_ooi_perms(
-    rf, superuser_member, admin_member, redteam_member, client_member, mock_organization_view_octopoes, network
-):
+@pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])
+def test_delete_ooi_perms(request, member, rf, mock_organization_view_octopoes, network):
+    member = request.getfixturevalue(member)
     mock_organization_view_octopoes().get.return_value = network
 
-    response_superuser = OOIDeleteView.as_view()(
-        setup_request(rf.get("ooi_delete", {"ooi_id": "Network|testnetwork"}), superuser_member.user),
-        organization_code=superuser_member.organization.code,
-    )
-    response_admin = OOIDeleteView.as_view()(
-        setup_request(rf.get("ooi_delete", {"ooi_id": "Network|testnetwork"}), admin_member.user),
-        organization_code=admin_member.organization.code,
-    )
-    response_redteam = OOIDeleteView.as_view()(
-        setup_request(rf.get("ooi_delete", {"ooi_id": "Network|testnetwork"}), redteam_member.user),
-        organization_code=redteam_member.organization.code,
+    response = OOIDeleteView.as_view()(
+        setup_request(rf.get("ooi_delete", {"ooi_id": "Network|testnetwork"}), member.user),
+        organization_code=member.organization.code,
     )
 
-    assert response_superuser.status_code == 200
-    assert response_admin.status_code == 200
-    assert response_redteam.status_code == 200
+    assert response.status_code == 200
+
+
+def test_delete_ooi_perms_clients(rf, client_member, mock_organization_view_octopoes, network):
+    mock_organization_view_octopoes().get.return_value = network
 
     with pytest.raises(PermissionDenied):
         OOIDeleteView.as_view()(

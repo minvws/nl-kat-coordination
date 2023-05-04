@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+import pytest
 from django.http import HttpResponseRedirect
 from katalogus.client import Plugin
 from pytest_django.asserts import assertContains, assertNotContains
@@ -175,11 +176,32 @@ def test_ooi_detail_start_scan_no_action(
     assertContains(response, "Object details", status_code=404)
 
 
+@pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])
 def test_delete_perms_ooi_detail(
+    request,
+    member,
     rf,
-    superuser_member,
-    admin_member,
-    redteam_member,
+    mock_scheduler,
+    mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
+    mocker,
+):
+    member = request.getfixturevalue(member)
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+
+    response = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertContains(response, "Delete")
+
+
+def test_delete_perms_ooi_detail_clients(
+    rf,
     client_member,
     mock_scheduler,
     mock_organization_view_octopoes,
@@ -190,33 +212,9 @@ def test_delete_perms_ooi_detail(
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
-    response_superuser = OOIDetailView.as_view()(
-        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), superuser_member.user),
-        organization_code=superuser_member.organization.code,
-    )
-
-    response_admin = OOIDetailView.as_view()(
-        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), admin_member.user),
-        organization_code=admin_member.organization.code,
-    )
-
-    response_redteam = OOIDetailView.as_view()(
-        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user),
-        organization_code=redteam_member.organization.code,
-    )
-
-    response_client = OOIDetailView.as_view()(
+    response = OOIDetailView.as_view()(
         setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user),
         organization_code=client_member.organization.code,
     )
-
-    assert response_superuser.status_code == 200
-    assert response_admin.status_code == 200
-    assert response_redteam.status_code == 200
-    assert response_client.status_code == 200
-
-    assertContains(response_superuser, "Delete")
-    assertContains(response_admin, "Delete")
-    assertContains(response_redteam, "Delete")
-
-    assertNotContains(response_client, "Delete")
+    assert response.status_code == 200
+    assertNotContains(response, "Delete")
