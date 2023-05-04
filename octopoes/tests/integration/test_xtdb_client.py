@@ -11,7 +11,6 @@ from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession, XTDBStatus
 from octopoes.xtdb.query import Query
 
-
 if os.environ.get("CI") != "1":
     pytest.skip("Needs a CI database.", allow_module_level=True)
 
