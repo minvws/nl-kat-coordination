@@ -450,14 +450,18 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(2, len(response.json()["results"]))
 
         # Get tasks based on datetime, only min_created_at, should return 1 item
-        response = self.client.get(f"/tasks?min_created_at={urllib.parse.quote(self.second_item_api.get('created_at'))}")
+        response = self.client.get(
+            f"/tasks?min_created_at={urllib.parse.quote(self.second_item_api.get('created_at'))}"
+        )
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()["results"]))
         self.assertEqual(self.second_item_api.get("id"), response.json()["results"][0]["id"])
 
     def test_get_tasks_max_created_at(self):
         # Get tasks based on datetime, only max_created_at, should return 2 items
-        response = self.client.get(f"/tasks?max_created_at={urllib.parse.quote(self.second_item_api.get('created_at'))}")
+        response = self.client.get(
+            f"/tasks?max_created_at={urllib.parse.quote(self.second_item_api.get('created_at'))}"
+        )
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, len(response.json()["results"]))
 
