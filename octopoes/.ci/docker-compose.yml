@@ -11,7 +11,7 @@ services:
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s
-      retries: 10
+      retries: 4
     env_file:
       - ".ci/ci.env"
 
