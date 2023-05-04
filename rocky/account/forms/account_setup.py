@@ -158,12 +158,11 @@ class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
                 organization=self.organization,
                 status=OrganizationMember.STATUSES.ACTIVE,
             )
-            if selected_group.name == "admin" or self.user.is_superuser:
+            member.groups.add(selected_group.id)
+            if member.is_admin or self.user.is_superuser:
                 member.acknowledged_clearance_level = 4
                 member.trusted_clearance_level = 4
                 member.save()
-            selected_group.user_set.add(self.user)
-            self.user.save()
 
 
 class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):

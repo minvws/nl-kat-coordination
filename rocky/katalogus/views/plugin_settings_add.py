@@ -1,7 +1,7 @@
 import logging
 
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsAddView(PermissionRequiredMixin, SinglePluginView, FormView):
+class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginView, FormView):
     """View to add a general setting for all plugins in KAT-alogus"""
 
     template_name = "plugin_settings_add.html"
