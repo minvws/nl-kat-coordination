@@ -43,7 +43,7 @@ LATEX_SPECIAL_CHARS = str.maketrans(
 )
 
 
-def latex_escape(input: Any) -> Any:
+def latex_escape(input: Any) -> str:
     """Escape characters that are special in LaTeX.
 
     References:
@@ -52,7 +52,7 @@ def latex_escape(input: Any) -> Any:
     - http://stackoverflow.com/a/16264094/2570866
     """
     if not isinstance(input, str):
-        return input
+        input = str(input)
     return input.translate(LATEX_SPECIAL_CHARS)
 
 
