@@ -1,7 +1,6 @@
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from tools.models import OrganizationMember
-from tools.user_helpers import is_red_team
 
 
 def OnboardingMiddleware(get_response):
@@ -26,17 +25,18 @@ def OnboardingMiddleware(get_response):
                 )
                 and not member_onboarded
             ):
-                member = OrganizationMember.objects.filter(user=request.user)
-
-                # There might be redteamers without an organization after an organization is deleted.
-                if member.exists() and is_red_team(request.user):
-                    # a redteamer can be in many organizations, but we onboard the first one.
-                    return redirect(
-                        reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
-                    )
-
-                if request.user.is_superuser:
+                if request.user.is_superuser and not member_onboarded:
                     return redirect(reverse("step_introduction_registration"))
+
+                if not member_onboarded:
+                    member = OrganizationMember.objects.filter(user=request.user)
+
+                    # There might be redteamers without an organization after an organization is deleted.
+                    if member.exists() and member.first().is_redteam:
+                        # a redteamer can be in many organizations, but we onboard the first one.
+                        return redirect(
+                            reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
+                        )
 
         return response
 

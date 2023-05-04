@@ -244,17 +244,20 @@ def test_organization_no_member(client, clientuser, organization):
     assert response.status_code == 404
 
 
-def test_organization_active_member(rf, active_member):
-    request = setup_request(rf.get("organization_settings"), active_member.user)
-    response = OrganizationSettingsView.as_view()(request, organization_code=active_member.organization.code)
+def test_organization_active_member(rf, admin_member):
+    # Default is already active
+    request = setup_request(rf.get("organization_settings"), admin_member.user)
+    response = OrganizationSettingsView.as_view()(request, organization_code=admin_member.organization.code)
 
     assert response.status_code == 200
 
 
-def test_organization_blocked_member(rf, blocked_member):
-    request = setup_request(rf.get("organization_settings"), blocked_member.user)
+def test_organization_blocked_member(rf, admin_member):
+    admin_member.blocked = True
+    admin_member.save()
+    request = setup_request(rf.get("organization_settings"), admin_member.user)
     with pytest.raises(PermissionDenied):
-        OrganizationSettingsView.as_view()(request, organization_code=blocked_member.organization.code)
+        OrganizationSettingsView.as_view()(request, organization_code=admin_member.organization.code)
 
 
 def test_edit_organization_permissions(rf, redteam_member, client_member):
@@ -356,3 +359,93 @@ def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
     new_org.code = settings.DENY_ORGANIZATION_CODES[0]
     with pytest.raises(ValidationError):
         new_org.save()
+
+
+def test_organization_settings_perms(rf, superuser_member, admin_member, redteam_member, client_member):
+    response_superuser = OrganizationSettingsView.as_view()(
+        setup_request(rf.get("organization_settings"), superuser_member.user),
+        organization_code=superuser_member.organization.code,
+    )
+
+    response_admin = OrganizationSettingsView.as_view()(
+        setup_request(rf.get("organization_settings"), admin_member.user),
+        organization_code=admin_member.organization.code,
+    )
+
+    assert response_superuser.status_code == 200
+    assert response_admin.status_code == 200
+    assertContains(response_superuser, "Edit")
+    assertContains(response_admin, "Edit")
+    assertContains(response_superuser, "Add indemnification")
+    assertContains(response_admin, "Add indemnification")
+
+    with pytest.raises(PermissionDenied):
+        OrganizationSettingsView.as_view()(
+            setup_request(rf.get("organization_settings"), redteam_member.user),
+            organization_code=redteam_member.organization.code,
+        )
+
+    with pytest.raises(PermissionDenied):
+        OrganizationSettingsView.as_view()(
+            setup_request(rf.get("organization_settings"), client_member.user),
+            organization_code=client_member.organization.code,
+        )
+
+
+def test_organization_member_list_perms(rf, superuser_member, admin_member, redteam_member, client_member):
+    response_superuser = OrganizationMemberListView.as_view()(
+        setup_request(rf.get("organization_member_list"), superuser_member.user),
+        organization_code=superuser_member.organization.code,
+    )
+
+    response_admin = OrganizationMemberListView.as_view()(
+        setup_request(rf.get("organization_member_list"), admin_member.user),
+        organization_code=admin_member.organization.code,
+    )
+
+    assert response_superuser.status_code == 200
+    assert response_admin.status_code == 200
+
+    with pytest.raises(PermissionDenied):
+        OrganizationMemberListView.as_view()(
+            setup_request(rf.get("organization_member_list"), redteam_member.user),
+            organization_code=redteam_member.organization.code,
+        )
+
+    with pytest.raises(PermissionDenied):
+        OrganizationMemberListView.as_view()(
+            setup_request(rf.get("organization_member_list"), client_member.user),
+            organization_code=client_member.organization.code,
+        )
+
+
+def test_organization_list_perms(rf, superuser_member, admin_member, redteam_member, client_member):
+    response_superuser = OrganizationListView.as_view()(
+        setup_request(rf.get("organization_list"), superuser_member.user),
+        organization_code=superuser_member.organization.code,
+    )
+
+    response_admin = OrganizationListView.as_view()(
+        setup_request(rf.get("organization_list"), admin_member.user),
+        organization_code=admin_member.organization.code,
+    )
+
+    assert response_superuser.status_code == 200
+    assert response_admin.status_code == 200
+
+    assertContains(response_superuser, "Add new organization")
+
+    # Admins can not add organization
+    assertNotContains(response_admin, "Add new organization")
+
+    with pytest.raises(PermissionDenied):
+        OrganizationListView.as_view()(
+            setup_request(rf.get("organization_list"), redteam_member.user),
+            organization_code=redteam_member.organization.code,
+        )
+
+    with pytest.raises(PermissionDenied):
+        OrganizationListView.as_view()(
+            setup_request(rf.get("organization_list"), client_member.user),
+            organization_code=client_member.organization.code,
+        )

@@ -51,7 +51,7 @@
                                             {% if member.user.is_superuser %}
                                                 {% translate "Super user" %}
                                             {% endif %}
-                                            {% for group in member.user.groups.all %}
+                                            {% for group in member.groups.all %}
                                                 {{ group.name|title }}
                                                 <br>
                                             {% endfor %}
@@ -61,7 +61,13 @@
                                                 <span class="active"></span><span>&nbsp;{% translate "Active" %}</span>
                                             {% else %}
                                                 <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span>
-                                                <span>&nbsp;{% if member.blocked %}{% translate "Blocked" %}{% else %}{{ member.status|title }}{% endif %}</span>
+                                                <span>&nbsp;
+                                                    {% if member.blocked %}
+                                                        {% translate "Blocked" %}
+                                                    {% else %}
+                                                        {{ member.status|title }}
+                                                    {% endif %}
+                                                </span>
                                             {% endif %}
                                             <br>
                                         </td>
@@ -92,18 +98,23 @@
                                             {% if member.user.is_superuser %}
                                                 <button class="icon ti-edit action-button disabled">{% translate "Edit" %}</button>
                                             {% else %}
-                                                <a href="{% url "organization_member_edit" organization.code member.id %}"><button class="icon ti-edit action-button">{% translate "Edit" %}</button></a>
+                                                <a href="{% url "organization_member_edit" organization.code member.id %}">
+                                                    <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
+                                                </a>
                                             {% endif %}
                                         </td>
                                         <td>
                                             {% if member.blocked %}
                                                 {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled=member.user.is_superuser action="unblock" key="member_id" value=member.id %}
+
                                             {% else %}
-                                            {% comment %} Disable the "block" checkbox for members that are super users or for the member of the user that's logged in so they can't lock themself out of the organisation by accident{% endcomment %}
+                                                {% comment %} Disable the "block" checkbox for members that are super users or for the member of the user that's logged in so they can't lock themself out of the organisation by accident{% endcomment %}
                                                 {% if member.user.is_superuser or member.user.email == request.user.email %}
                                                     {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked input_disabled="disabled" action="block" key="member_id" value=member.id %}
-                                                  {% else %}
+
+                                                {% else %}
                                                     {% include "partials/single_action_checkbox_form.html" with input_checked=member.blocked action="block" key="member_id" value=member.id %}
+
                                                 {% endif %}
                                             {% endif %}
                                         </td>
@@ -119,6 +130,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}
