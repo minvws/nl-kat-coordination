@@ -181,7 +181,7 @@ def generate_report(
                 return
             # prefix all lines in output
             for line in output.decode("utf-8").splitlines():
-                logger.log(level, "latexmk output: %s", line)
+                logger.log(level, "latexmk [report_id=%s] output: %s", report_id, line)
 
         try:
             # capture all output to stdout, so that lines from stdout+stderr are in correct relative order
