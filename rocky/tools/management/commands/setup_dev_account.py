@@ -47,6 +47,7 @@ class Command(BaseCommand):
                 "change_organization",
                 "change_organizationmember",
                 "can_delete_oois",
+                "add_indemnification",
             ]
         )
         self.group_admin.permissions.set(admin_permissions)

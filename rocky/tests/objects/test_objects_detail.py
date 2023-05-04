@@ -218,3 +218,23 @@ def test_delete_perms_ooi_detail_clients(
     )
     assert response.status_code == 200
     assertNotContains(response, "Delete")
+
+
+def test_ooi_detail_start_scan_perms(
+    rf,
+    client_member,
+    mock_scheduler,
+    mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
+    mocker,
+):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
+
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+
+    response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assertNotContains(response, "Start Scan")

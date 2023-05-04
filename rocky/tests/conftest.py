@@ -66,9 +66,9 @@ def create_member(user, organization):
     )
 
 
-def add_admin_group_permissions(user):
+def add_admin_group_permissions(member):
     group, _ = Group.objects.get_or_create(name=GROUP_ADMIN)
-    group.user_set.add(user)
+    member.groups.add(group)
     admin_permissions = [
         Permission.objects.get(codename="view_organization").id,
         Permission.objects.get(codename="view_organizationmember").id,
@@ -76,13 +76,14 @@ def add_admin_group_permissions(user):
         Permission.objects.get(codename="change_organization").id,
         Permission.objects.get(codename="change_organizationmember").id,
         Permission.objects.get(codename="can_delete_oois").id,
+        Permission.objects.get(codename="add_indemnification").id,
     ]
     group.permissions.set(admin_permissions)
 
 
-def add_redteam_group_permissions(user):
+def add_redteam_group_permissions(member):
     group, _ = Group.objects.get_or_create(name=GROUP_REDTEAM)
-    group.user_set.add(user)
+    member.groups.add(group)
     redteam_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
         Permission.objects.get(codename="can_enable_disable_boefje").id,
@@ -92,9 +93,9 @@ def add_redteam_group_permissions(user):
     group.permissions.set(redteam_permissions)
 
 
-def add_client_group(user):
+def add_client_group(member):
     group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
-    group.user_set.add(user)
+    member.groups.add(group)
 
 
 @pytest.fixture
@@ -133,84 +134,82 @@ def superuser_member_b(superuser_b, organization_b):
 
 @pytest.fixture
 def adminuser(django_user_model):
-    admin_user = create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
-    add_admin_group_permissions(admin_user)
-    return admin_user
+    return create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
 
 
 @pytest.fixture
 def adminuser_b(django_user_model):
-    admin_user = create_user(
-        django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b"
-    )
-    add_admin_group_permissions(admin_user)
-    return admin_user
+    return create_user(django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b")
 
 
 @pytest.fixture
 def admin_member(adminuser, organization):
-    return create_member(adminuser, organization)
+    member = create_member(adminuser, organization)
+    adminuser.user_permissions.add(Permission.objects.get(codename="view_organization"))
+    add_admin_group_permissions(member)
+    return member
 
 
 @pytest.fixture
 def admin_member_b(adminuser_b, organization_b):
-    return create_member(adminuser_b, organization_b)
+    member = create_member(adminuser_b, organization_b)
+    adminuser_b.user_permissions.add(Permission.objects.get(codename="view_organization"))
+    add_admin_group_permissions(member)
+    return member
 
 
 @pytest.fixture
 def redteamuser(django_user_model):
-    redteam_user = create_user(
+    return create_user(
         django_user_model, "redteamer@openkat.nl", "RedteamRedteam123!!", "Redteam name", "default_redteam"
     )
-    add_redteam_group_permissions(redteam_user)
-    return redteam_user
 
 
 @pytest.fixture
 def redteamuser_b(django_user_model):
-    redteam_user = create_user(
+    return create_user(
         django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
     )
-    add_redteam_group_permissions(redteam_user)
-    return redteam_user
 
 
 @pytest.fixture
 def redteam_member(redteamuser, organization):
-    return create_member(redteamuser, organization)
+    member = create_member(redteamuser, organization)
+    add_redteam_group_permissions(member)
+    return member
 
 
 @pytest.fixture
 def redteam_member_b(redteamuser_b, organization_b):
-    return create_member(redteamuser_b, organization_b)
+    member = create_member(redteamuser_b, organization_b)
+    add_redteam_group_permissions(member)
+    return member
 
 
 @pytest.fixture
 def clientuser(django_user_model):
-    client_user = create_user(
-        django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client"
-    )
-    add_client_group(client_user)
-    return client_user
+    return create_user(django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client")
 
 
 @pytest.fixture
 def clientuser_b(django_user_model):
-    client_user_b = create_user(
+    return create_user(
         django_user_model, "clientB@openkat.nl", "ClientBClientB123!!", "Client B name", "default_client_b"
     )
-    add_client_group(client_user_b)
-    return client_user_b
 
 
 @pytest.fixture
 def client_member(clientuser, organization):
-    return create_member(clientuser, organization)
+    member = create_member(clientuser, organization)
+    add_client_group(member)
+    return member
 
 
 @pytest.fixture
 def client_member_b(clientuser_b, organization_b):
-    return create_member(clientuser_b, organization_b)
+    member = create_member(clientuser_b, organization_b)
+    add_client_group(member)
+    return member
 
 
 @pytest.fixture
