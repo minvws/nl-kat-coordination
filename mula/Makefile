@@ -21,7 +21,7 @@ export file
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
 
 ##
 ##+------------------------------------------------------------------------+
@@ -109,9 +109,9 @@ endif
 
 itest: ## Run the integration tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm mula python -m pytest tests/integration/${file} $(if $(function),-k $(function))
+	$(ci-docker-compose) run --rm mula sh -c "sleep 10; python -m pytest tests/integration/${file} $(if $(function),-k $(function))"
 else
-	$(ci-docker-compose) run --rm mula python -m pytest tests/integration
+	$(ci-docker-compose) run --rm mula sh -c "sleep 10; python -m pytest tests/integration"
 endif
 	$(ci-docker-compose) down --remove-orphans
 

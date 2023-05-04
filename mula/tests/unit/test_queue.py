@@ -6,7 +6,7 @@ import unittest
 import uuid
 from typing import Optional
 
-from scheduler import models, queues
+from scheduler import config, models, queues
 from scheduler.models import Base
 from scheduler.repositories import sqlalchemy
 from sqlalchemy.orm import sessionmaker
@@ -21,7 +21,8 @@ class MockPriorityQueue(queues.PriorityQueue):
 
 class PriorityQueueTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        self.datastore = sqlalchemy.SQLAlchemy("sqlite:///")
+        cfg = config.settings.Settings()
+        self.datastore = sqlalchemy.SQLAlchemy(cfg.database_dsn)
         Base.metadata.create_all(self.datastore.engine)
 
         self.pq_store = sqlalchemy.PriorityQueueStore(datastore=self.datastore)
