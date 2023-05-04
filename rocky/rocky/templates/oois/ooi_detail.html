@@ -60,7 +60,9 @@
                                     <th>{% translate "Boefje" %}</th>
                                     <th>{% translate "Description" %}</th>
                                     <th>{% translate "Scan profile" %}</th>
-                                    <th>{% translate "Scan" %}</th>
+                                    {% if perms.tools.can_scan_organization %}
+                                        <th>{% translate "Scan" %}</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -74,10 +76,12 @@
                                             {% include "partials/scan_level_indicator.html" with value=boefje.scan_level.value %}
 
                                         </td>
-                                        <td>
-                                            {% include "partials/single_action_form.html" with btn_text="Start Scan" action="start_scan" key="boefje_id" value=boefje.id %}
+                                        {% if perms.tools.can_scan_organization %}
+                                            <td>
+                                                {% include "partials/single_action_form.html" with btn_text="Start Scan" action="start_scan" key="boefje_id" value=boefje.id %}
 
-                                        </td>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -93,21 +97,21 @@
                             <p>
                                 {% translate "There are no boefjes available within the current clearance level of" %} "{{ ooi.human_readable }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
                             </p>
-                            <p>{% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".</p>
+                            <p>
+                                {% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".
+                            </p>
                         {% endif %}
                     </div>
                 {% endif %}
+                {% if ooi.scan_profile.scan_profile_type == 'inherited' %}
+                    {% include "partials/explanations.html" %}
 
-              {% if ooi.scan_profile.scan_profile_type == 'inherited' %}
-                {% include "partials/explanations.html" %}
-              {% endif %}
-
+                {% endif %}
             </div>
         </section>
     </main>
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/autoSubmit.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}
