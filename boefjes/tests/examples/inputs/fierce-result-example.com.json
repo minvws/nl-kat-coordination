@@ -1,0 +1,17 @@
+{
+  "NS": [
+    "ns.example.com.",
+    "ns.example.com."
+  ],
+  "SOA": "ns.example.com. (192.0.2.1)",
+  "subdomains": {
+    "www": {
+      "url": "www.example.com.",
+      "ip": "192.0.2.2"
+    },
+    "subdomain": {
+      "url": "subdomain.example.com.",
+      "ip": "192.0.2.3"
+    }
+  }
+}

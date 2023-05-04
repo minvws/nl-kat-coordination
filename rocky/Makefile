@@ -13,7 +13,7 @@ build-rocky:
 
 build-rocky-native:
 	python3 manage.py migrate
-	python3 manage.py createsuperuser
+	-python3 manage.py createsuperuser --no-input
 	python3 manage.py loaddata OOI_database_seed.json
 	python3 manage.py setup_dev_account
 	python3 manage.py compilemessages
