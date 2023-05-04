@@ -51,7 +51,7 @@ services:
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s
-      retries: 10
+      retries: 4
 
   ci_bytes-db:
     image: postgres:15
