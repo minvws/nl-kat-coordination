@@ -52,7 +52,7 @@ rtest:
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
 
 itest:
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml build --parallel
+	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml build --parallel $(build_args)
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml  run --rm octopoes_integration
 

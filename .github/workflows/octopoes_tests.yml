@@ -40,3 +40,7 @@ jobs:
         with:
           name: coverage
           path: octopoes/coverage.xml
+
+      - name: Run integration tests
+        run: SLEEP_TIME=5 make itest build_args='--build-arg PYTHON_VERSION=${{ matrix.version }}'
+        working-directory: ./octopoes
