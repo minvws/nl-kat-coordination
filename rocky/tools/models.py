@@ -97,7 +97,7 @@ class Organization(models.Model):
             raise ValidationError(
                 {
                     "code": _(
-                        "This organization code is reserved by OpenKAT and cannot be used."
+                        "This organization code is reserved by OpenKAT and cannot be used. "
                         "Choose another organization code."
                     )
                 }
