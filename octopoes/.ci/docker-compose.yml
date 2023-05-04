@@ -30,6 +30,22 @@ services:
     volumes:
       - ./.ci/health_check.py:/home/health_check.py
 
+  octopoes_integration:
+    build:
+      args:
+        ENVIRONMENT: dev
+      context: .
+    command: sh -c "sleep 4 && pytest tests/integration"
+    depends_on:
+      - xtdb_multinode
+    env_file:
+      - ".ci/ci-multinode.env"
+    volumes:
+      - .:/app/octopoes
+
+  xtdb_multinode:
+    image: "ghcr.io/dekkers/xtdb-http-multinode:main"
+
   octopoes_api:
     build:
       context: .

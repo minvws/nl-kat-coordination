@@ -3,22 +3,9 @@ import requests
 from fastapi.testclient import TestClient
 
 from octopoes.api.api import app
-from octopoes.api.router import settings
-from octopoes.config.settings import Settings, XTDBType
 from octopoes.version import __version__
 
 client = TestClient(app)
-
-
-def get_settings_override():
-    return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
-
-
-@pytest.fixture
-def xtdbtype_multinode():
-    app.dependency_overrides[settings] = get_settings_override
-    yield
-    app.dependency_overrides = {}
 
 
 @pytest.fixture
