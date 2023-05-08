@@ -3,6 +3,7 @@ import logging
 from typing import Any, Dict, List, Optional, Union
 
 import fastapi
+import prometheus_client
 import uvicorn
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -64,6 +65,13 @@ class Server:
             endpoint=self.health,
             methods=["GET"],
             response_model=models.ServiceHealth,
+            status_code=200,
+        )
+
+        self.api.add_api_route(
+            path="/metrics",
+            endpoint=self.metrics,
+            methods=["GET"],
             status_code=200,
         )
 
@@ -167,6 +175,11 @@ class Server:
         for service in self.ctx.services.__dict__.values():
             response.externals[service.name] = service.is_healthy()
 
+        return response
+
+    def metrics(self) -> Any:
+        data = prometheus_client.generate_latest(self.ctx.metrics_registry)
+        response = fastapi.Response(media_type="text/plain", content=data)
         return response
 
     def get_schedulers(self) -> Any:

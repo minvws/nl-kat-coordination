@@ -96,11 +96,10 @@ class XTDBOriginRepository(OriginRepository):
                 raise e
 
     def save(self, origin: Origin, valid_time: datetime) -> None:
-        old_origin = None
         try:
             old_origin = self.get(origin.id, valid_time)
         except ObjectNotFoundException:
-            pass
+            old_origin = None
 
         if old_origin == origin:
             return

@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.views.generic import FormView
 from tools.forms.ooi import MuteFindingForm
 
@@ -6,7 +6,7 @@ from octopoes.models.ooi.findings import MutedFinding
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
-class MuteFindingView(PermissionRequiredMixin, BaseOOIDetailView, FormView):
+class MuteFindingView(OrganizationPermissionRequiredMixin, BaseOOIDetailView, FormView):
     template_name = "oois/ooi_mute_finding.html"
     form_class = MuteFindingForm
     permission_required = "tools.can_scan_organization"

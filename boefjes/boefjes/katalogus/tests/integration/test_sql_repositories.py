@@ -46,7 +46,7 @@ class TestRepositories(TestCase):
     def tearDown(self) -> None:
         session = sessionmaker(bind=get_engine())()
 
-        for table in SQL_BASE.metadata.tables.keys():
+        for table in SQL_BASE.metadata.tables:
             session.execute(f"DELETE FROM {table} CASCADE")
 
         session.commit()
@@ -166,9 +166,8 @@ class TestRepositories(TestCase):
 
         self.assertEqual(dict(), settings_storage.get_all(org.id, plugin_id))
 
-        with self.assertRaises(StorageError):
-            with self.settings_storage as settings_storage:
-                settings_storage.create("TEST_SETTING", "123.9", organisation_id, 65 * "a")
+        with self.assertRaises(StorageError), self.settings_storage as settings_storage:
+            settings_storage.create("TEST_SETTING", "123.9", organisation_id, 65 * "a")
 
     def test_settings_storage_values_field_limits(self):
         organisation_id = "test"
