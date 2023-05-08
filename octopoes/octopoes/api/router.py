@@ -1,14 +1,13 @@
 import uuid
 from datetime import datetime, timezone
-from http import HTTPStatus
 from logging import getLogger
 from typing import Dict, List, Optional, Set, Type
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
-from requests import HTTPError, RequestException
+from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
-from octopoes.config.settings import Settings, XTDBType
+from octopoes.config.settings import Settings
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.models import (
@@ -30,6 +29,7 @@ from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
 from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.exceptions import NoMultinode, XTDBException
 
 logger = getLogger(__name__)
 router = APIRouter(prefix="/{client}")
@@ -284,21 +284,24 @@ def get_finding_type_count(
 
 
 @router.post("/node")
-def create_node(xtdb_session_: XTDBSession = Depends(xtdb_session), settings: Settings = Depends(settings)) -> None:
-    if settings.xtdb_type != XTDBType.XTDB_MULTINODE:
-        raise Exception("Creating nodes requires XTDB_MULTINODE")
-
-    xtdb_session_.client.create_node()
+def create_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
+    try:
+        xtdb_session_.client.create_node()
+    except NoMultinode:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
+        )
+    except XTDBException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Creating node failed") from e
 
 
 @router.delete("/node")
-def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session), settings: Settings = Depends(settings)) -> None:
-    if settings.xtdb_type != XTDBType.XTDB_MULTINODE:
-        raise Exception("Deleting nodes requires XTDB_MULTINODE")
-
+def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
     try:
         xtdb_session_.client.delete_node()
-    except HTTPError as e:
-        if e.response.status_code == HTTPStatus.NOT_FOUND:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Node does not exist")
-        raise
+    except NoMultinode:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
+        )
+    except XTDBException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deleting node failed") from e

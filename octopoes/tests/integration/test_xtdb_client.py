@@ -9,6 +9,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
+from octopoes.xtdb.exceptions import NodeNotFound
 from octopoes.xtdb.query import Query
 
 if os.environ.get("CI") != "1":
@@ -31,6 +32,11 @@ def test_node_creation_and_deletion(xtdb_http_client: XTDBHTTPClient):
 
     with pytest.raises(HTTPError):
         assert xtdb_http_client.status()
+
+
+def test_delete_non_existing_node(xtdb_http_client: XTDBHTTPClient):
+    with pytest.raises(NodeNotFound):
+        xtdb_http_client.delete_node()
 
 
 def test_query_no_results(xtdb_session: XTDBSession):

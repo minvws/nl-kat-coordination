@@ -8,6 +8,8 @@ import requests
 from pydantic import BaseModel, Field
 from requests import HTTPError, Response
 
+from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
+
 logger = logging.getLogger(__name__)
 
 
@@ -114,14 +116,30 @@ class XTDBHTTPClient:
         self.await_transaction(res.json()["txId"])
 
     def create_node(self) -> None:
-        res = self._session.post("/create-node", json={"node": self._client})
+        if not self._is_multinode:
+            raise NoMultinode("Creating nodes requires XTDB multinode")
 
-        self._verify_response(res)
+        try:
+            res = self._session.post("/create-node", json={"node": self._client})
+            self._verify_response(res)
+        except HTTPError as e:
+            logger.exception("Failed creating node")
+            raise XTDBException("Could not create node") from e
 
     def delete_node(self) -> None:
-        res = self._session.post("/delete-node", json={"node": self._client})
+        if not self._is_multinode:
+            raise NoMultinode("Deleting nodes requires XTDB multinode")
 
-        self._verify_response(res)
+        try:
+            res = self._session.post("/delete-node", json={"node": self._client})
+            self._verify_response(res)
+        except HTTPError as e:
+            if e.response.status_code == HTTPStatus.NOT_FOUND:
+                raise NodeNotFound from e
+
+            logger.exception("Failed deleting node")
+
+            raise XTDBException("Could not delete node") from e
 
 
 class XTDBSession:
