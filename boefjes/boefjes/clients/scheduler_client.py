@@ -101,4 +101,4 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response = self._session.patch(f"{self.base_url}/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
-        logger.info(f"Set task status to {status} in the scheduler for task[{task_id}]")
+        logger.info("Set task status to %s in the scheduler for task[%s]", status, task_id)

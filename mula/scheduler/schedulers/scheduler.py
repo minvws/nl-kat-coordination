@@ -311,6 +311,7 @@ class Scheduler(abc.ABC):
             "populate_queue_enabled": self.populate_queue_enabled,
             "priority_queue": {
                 "id": self.queue.pq_id,
+                "item_type": self.queue.item_type.type,
                 "maxsize": self.queue.maxsize,
                 "qsize": self.queue.qsize(),
                 "allow_replace": self.queue.allow_replace,

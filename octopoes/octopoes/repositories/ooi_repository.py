@@ -77,7 +77,9 @@ class OOIRepository:
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
-    def list_random(self, amount: int, valid_time: datetime) -> List[OOI]:
+    def list_random(
+        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> List[OOI]:
         raise NotImplementedError
 
     def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
@@ -99,6 +101,9 @@ class OOIRepository:
         raise NotImplementedError
 
     def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
+        raise NotImplementedError
+
+    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
         raise NotImplementedError
 
 
@@ -261,20 +266,29 @@ class XTDBOOIRepository(OOIRepository):
             items=oois,
         )
 
-    def list_random(self, amount: int, valid_time: datetime) -> List[OOI]:
+    def list_random(
+        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> List[OOI]:
         query = """
-        {{
-            :query {{
-                :find [(rand {amount} ?id)]
-                :where [
-                    [?e :crux.db/id ?id]
-                    [?e :object_type]
-                ]
+            {{
+                :query {{
+                    :find [(rand {amount} ?id)]
+                    :in [[_scan_level ...]]
+                    :where [
+                        [?e :crux.db/id ?id]
+                        [?e :object_type]
+                        [?scan_profile :type "ScanProfile"]
+                        [?scan_profile :reference ?e]
+                        [?scan_profile :level _scan_level]
+                    ]
+                }}
+                :in-args [[{scan_levels}]]
             }}
-        }}
-        """.format(
-            amount=amount
+            """.format(
+            amount=amount,
+            scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
         )
+
         res = self.session.client.query(query, valid_time)
         if not res:
             return []
@@ -488,11 +502,10 @@ class XTDBOOIRepository(OOIRepository):
 
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
         # retrieve old ooi
-        old_ooi = None
         try:
             old_ooi = self.get(ooi.reference, valid_time=valid_time)
         except ObjectNotFoundException:
-            pass
+            old_ooi = None
 
         new_ooi = ooi
         if old_ooi is not None:
@@ -542,3 +555,12 @@ class XTDBOOIRepository(OOIRepository):
         """
         response = self.session.client.query(query, valid_time=valid_time)
         return {Reference.from_str(row[0]) for row in response}
+
+    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
+        query = """
+                    {:query {
+                     :find [?finding_type (count ?finding)]
+                     :where [[?finding :Finding/finding_type ?finding_type]] }}
+                """
+        response = self.session.client.query(query, valid_time=valid_time)
+        return {finding_type: count for finding_type, count in response}

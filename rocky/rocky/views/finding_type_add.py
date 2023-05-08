@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
+from account.mixins import OrganizationView
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -14,11 +15,10 @@ from two_factor.views.utils import class_view_decorator
 from octopoes.api.models import Declaration
 from octopoes.models.ooi.findings import KATFindingType
 from rocky.bytes_client import BytesClient, get_bytes_client
-from rocky.views.mixins import OctopoesView
 
 
 @class_view_decorator(otp_required)
-class FindingTypeAddView(OctopoesView, FormView):
+class FindingTypeAddView(OrganizationView, FormView):
     template_name = "finding_type_add.html"
     form_class = FindingTypeAddForm
 

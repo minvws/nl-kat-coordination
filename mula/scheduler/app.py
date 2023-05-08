@@ -4,10 +4,14 @@ import threading
 import time
 from typing import Any, Callable, Dict
 
+from opentelemetry import trace
+
 from scheduler import context, queues, rankers, schedulers, server
 from scheduler.connectors import listeners
 from scheduler.models import BoefjeTask, NormalizerTask, Organisation
 from scheduler.utils import thread
+
+tracer = trace.get_tracer(__name__)
 
 
 class App:
@@ -175,6 +179,7 @@ class App:
 
         return scheduler
 
+    @tracer.start_as_current_span("monitor_organisations")
     def monitor_organisations(self) -> None:
         """Monitor the organisations in the Katalogus service, and add/remove
         organisations from the schedulers.
@@ -255,8 +260,28 @@ class App:
             interval=self.ctx.config.monitor_organisations_interval,
         )
 
+        # Start metrics collecting
+        self.run_in_thread(
+            name="metrics_collector",
+            func=self.collect_metrics,
+            interval=1,
+        )
+
         # Main thread
         while not self.stop_event.is_set():
             time.sleep(0.01)
 
         self.shutdown()
+
+    def collect_metrics(self) -> None:
+        """Collect application metrics
+
+        This method that allows to collect metrics throughout the application.
+        """
+        # Collect metrics from the schedulers
+        for s in self.schedulers.values():
+            self.ctx.metrics_qsize.labels(
+                scheduler_id=s.scheduler_id,
+            ).set(
+                s.queue.qsize(),
+            )

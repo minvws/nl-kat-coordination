@@ -1,19 +1,19 @@
 from account.forms import OrganizationMemberToGroupAddForm
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
+from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
 from django_otp.decorators import otp_required
-from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 from two_factor.views.utils import class_view_decorator
 
 User = get_user_model()
 
 
 @class_view_decorator(otp_required)
-class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, CreateView):
+class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, OrganizationView, CreateView):
     """
     View to create a new member for a specific organization.
     """
@@ -33,7 +33,21 @@ class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBread
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
+                "text": "Members",
+            },
+            {
+                "url": reverse(
+                    "organization_member_add",
+                    kwargs={"organization_code": self.organization.code},
+                ),
+                "text": _("Add member"),
+            },
+        ]
         context["organization"] = self.organization
+
         return context
 
     def form_valid(self, form):

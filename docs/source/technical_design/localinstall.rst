@@ -16,7 +16,6 @@ You need the following things to install OpenKAT:
 
 - A computer with a Linux installation. In this document we use Ubuntu, but on many other distributions it works in a similar way. Later we will also add instructions for macOS.
 - Docker. If you don't already have this, install it first.
-
 - OpenKAT's `GitHub repository <https://github.com/minvws/nl-kat-coordination/>`_.
 
 Before installing
@@ -71,9 +70,7 @@ Default installation
 
 	$ make kat
 
-Other options are "make clone" and "make pull" to either clone only or update the repositories. the above command performs this itself.
-
-Currently, the make cat instruction only works for the first user on a ``*nix`` system. This is a known problem which will be solved soon. The current user must be user 1000. You can check this by executing `id`.
+Currently, the ``make kat`` command only works for the first user on a ``*nix`` system. This is a known problem which will be solved soon. The current user must be user 1000. You can check this by executing `id`.
 
 In some cases this may not work because Docker does not yet know your user name. You solve this with the following commands, entering your user name instead of $USER:
 
@@ -87,48 +84,21 @@ Then OpenKAT is built, including all the parts such as Octopoes and Rocky.
 Front end
 *********
 
-Find the frontend of your OpenKAT install at port 8000 (http) or 8443 (https) of your localhost depending on your  and follow the 'on boarding flow' to test your setup and start using your development setup of OpenKAT.
+Find the frontend of your OpenKAT install at port 8000 (http) or 8443 (https) of your localhost and follow the 'onboarding flow' to test your setup and start using your development setup of OpenKAT.
+
+By default a superuser account is created with email address ``superuser@localhost``. The password can be found as ``DJANGO_SUPERUSER_PASSWORD`` in the .env file.
 
 Using http works only when connecting to localhost due to the security flags on the session and xsrf cookies. Localhost is whitelisted to allow secure cookies over an insecure connection. Connecting to any other IP over http results in these cookies being disregarded, resulting in XSRF warnings when logging in.
 
 Specific builds
 ***************
 
-If you want to create a specific build, you have a number of options. You can also look in the `Makefile <https://github.com/minvws/nl-kat-coordination/blob/main/Makefile>`_. Below are some examples.
-
-- Clone only relevant repositories
-
-.. code-block:: sh
-
-	$ make clone
-
-- Start a separate container
-
-.. code-block:: sh
-
-	$ docker-compose up --build -d {container_name}
-
- Set up a superuser with custom credentials (fill in the parameters as preferred for your installation)
-
-
-By default a user named 'admin', with the password 'admin' should be available.
-
-- Optional seed of the database with OOI information
-
-.. code-block:: sh
-
-	$ docker exec -it nl-kat-coordination_rocky_1 python3 /app/rocky/manage.py loaddata OOI_database_seed.json
-
-- install octopus-core in your local python environment with a symlink (after cloning)
-
-.. code-block:: sh
-
-	$ pip install -e nl-kat-coordination-octopoes-core
+If you want to create a specific build, you have a number of options. You can also look in the `Makefile <https://github.com/minvws/nl-kat-coordination/blob/main/Makefile>`_.
 
 Updates
 -------
 
-Updating an existing installation can be done with the new make update.
+Updating an existing installation can be done with the ``make update``.
 
 Go to the directory containing openkat:
 
@@ -137,4 +107,9 @@ Go to the directory containing openkat:
 	$ cd nl-kat-coordination
 	$ make update
 
-Create a new superuser for the new version. You can delete the old superuser after the update. This is not pretty, but has the advantage that your databases remain intact. Check that you are on the most recent version everywhere, especially Rocky sometimes hangs because of yarn.lock.
+OpenTelemetry
+=============
+
+OpenTelemetry is a way to trace requests through the system. It is used to find out where a request is going wrong and to instrument performance problems. OpenTelemetry is not enabled by default, but can be enabled by uncommenting the environment variable ``SPAN_EXPORT_GRPC_ENDPOINT`` in the ``.env`` file.
+
+The `Jaeger <https://www.jaegertracing.io>`_ tracing system is used to view the traces. It can be enabled by enabling the `Docker Compose profile <https://docs.docker.com/compose/profiles/#enable-profiles>`, for example by running ``docker-compose --profile jaeger up -d`` or using ``export COMPOSE_PROFILES=jaeger`` and then running Make as usual. The Jaeger UI can then be found at http://localhost:16686.

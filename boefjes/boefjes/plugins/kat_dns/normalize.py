@@ -1,6 +1,6 @@
 import json
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, Iterator, List, Union
+from typing import Dict, Iterable, List, Union
 
 from dns.message import Message, from_text
 from dns.rdata import Rdata
@@ -30,7 +30,7 @@ from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     internet = Network(name="internet")
 
     if raw.decode() == "NXDOMAIN":
@@ -163,11 +163,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
     # DKIM
     dkim_results = results["dkim_response"]
-    if dkim_results not in ["NXDOMAIN", "Timeout"]:
-        if "rcode NOERROR" == dkim_results.split("\n")[2]:
-            yield DKIMExists(
-                hostname=input_hostname.reference,
-            )
+    if dkim_results not in ["NXDOMAIN", "Timeout"] and dkim_results.split("\n")[2] == "rcode NOERROR":
+        yield DKIMExists(
+            hostname=input_hostname.reference,
+        )
 
     # DMARC
     dmarc_results = results["dmarc_response"]

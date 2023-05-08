@@ -1,8 +1,11 @@
 import logging
 import uuid
+from functools import cached_property
+from typing import Iterable, Set
 
 import tagulous.models
 from django.conf import settings
+from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -10,11 +13,19 @@ from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import KATalogusClientV1, get_katalogus
-from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
+from katalogus.exceptions import (
+    KATalogusDownException,
+    KATalogusException,
+    KATalogusUnhealthyException,
+)
 from requests import RequestException
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
+from rocky.exceptions import (
+    OctopoesDownException,
+    OctopoesException,
+    OctopoesUnhealthyException,
+)
 from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
@@ -66,6 +77,7 @@ class Organization(models.Model):
             ("can_scan_organization", "Can scan organization"),
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
             ("can_set_clearance_level", "Can set clearance level"),
+            ("can_delete_oois", "Can delete oois"),
         )
 
     def get_absolute_url(self):
@@ -151,13 +163,14 @@ class OrganizationMember(models.Model):
     class STATUSES(models.TextChoices):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
-        BLOCKED = "blocked", _("blocked")
 
     scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
 
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
+    groups = models.ManyToManyField(Group, blank=True)
     status = models.CharField(choices=STATUSES.choices, max_length=64, default=STATUSES.NEW)
+    blocked = models.BooleanField(default=False)
     onboarded = models.BooleanField(default=False)
     trusted_clearance_level = models.IntegerField(
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
@@ -166,9 +179,43 @@ class OrganizationMember(models.Model):
         default=-1, validators=[MinValueValidator(-1), MaxValueValidator(max(scan_levels))]
     )
 
-    @property
-    def blocked(self):
-        return self.status == OrganizationMember.STATUSES.BLOCKED
+    @cached_property
+    def is_admin(self) -> bool:
+        return self.groups.filter(name=GROUP_ADMIN).exists()
+
+    @cached_property
+    def is_redteam(self) -> bool:
+        return self.groups.filter(name=GROUP_REDTEAM).exists()
+
+    @cached_property
+    def is_client(self) -> bool:
+        return self.groups.filter(name=GROUP_CLIENT).exists()
+
+    @cached_property
+    def all_permissions(self) -> Set[str]:
+        if self.user.is_active and self.user.is_superuser:
+            # Superuser always has all permissions
+            return {
+                f"{ct}.{name}" for ct, name in Permission.objects.values_list("content_type__app_label", "codename")
+            }
+
+        if self.blocked or not self.user.is_active:
+            # A blocked or inactive user doesn't have any permissions specific to this organization
+            organization_member_perms = set()
+        else:
+            organization_member_perms = {
+                f"{ct}.{name}"
+                for ct, name in Permission.objects.filter(group__organizationmember=self).values_list(
+                    "content_type__app_label", "codename"
+                )
+            }
+        return organization_member_perms | self.user.get_all_permissions()
+
+    def has_perm(self, perm: str) -> bool:
+        return perm in self.all_permissions
+
+    def has_perms(self, perm_list: Iterable[str]) -> bool:
+        return all(self.has_perm(perm) for perm in perm_list)
 
     class Meta:
         unique_together = ["user", "organization"]
@@ -194,7 +241,7 @@ class OOIInformation(models.Model):
         if self.consult_api:
             self.consult_api = False
             self.get_internet_description()
-        super(OOIInformation, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def clean(self):
         if "description" not in self.data:

@@ -1,6 +1,5 @@
 import logging
 
-from colorama import Fore
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ObjectDoesNotExist
@@ -47,16 +46,14 @@ class Command(BaseCommand):
                 "add_organizationmember",
                 "change_organization",
                 "change_organizationmember",
+                "can_delete_oois",
+                "add_indemnification",
             ]
         )
         self.group_admin.permissions.set(admin_permissions)
 
         redteam_permissions = self.get_permissions(
-            [
-                "can_scan_organization",
-                "can_enable_disable_boefje",
-                "can_set_clearance_level",
-            ]
+            ["can_scan_organization", "can_enable_disable_boefje", "can_set_clearance_level", "can_delete_oois"]
         )
         self.group_redteam.permissions.set(redteam_permissions)
-        logging.info(Fore.GREEN + " ROCKY HAS BEEN SETUP SUCCESSFULLY")
+        logging.info("ROCKY HAS BEEN SETUP SUCCESSFULLY")

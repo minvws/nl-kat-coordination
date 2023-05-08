@@ -71,7 +71,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         _("active"),
         default=True,
         help_text=_(
-            "Designates whether this user should be treated as active. " "Unselect this instead of deleting accounts."
+            "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
         ),
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
@@ -104,10 +104,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         """
         if self.is_superuser:
             return self.all_organizations
-        return [
-            m.organization
-            for m in filter(lambda o: o.status is not OrganizationMember.STATUSES.BLOCKED, self.organization_members)
-        ]
+        return [m.organization for m in self.organization_members if not m.blocked]
 
     @cached_property
     def organizations_including_blocked(self) -> List[Organization]:

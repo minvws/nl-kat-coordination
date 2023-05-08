@@ -41,7 +41,7 @@
                                 <td>{{ organization.name }}</td>
                                 <td>{{ organization.code }}</td>
                                 <td>
-                                    {% if perms.tools.change_organization %}
+                                    {% if perms.tools.can_change_organization %}
                                         {% spaceless %}
                                             <a href="{% url "organization_edit" organization.code %}">
                                                 <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
@@ -53,7 +53,7 @@
                         </tbody>
                     </table>
                 </div>
-                {% if perms.tools.change_organization %}
+                {% if perms.tools.add_indemnification %}
                     <a href="{% url "indemnification_add" organization.code %}"
                        class="button ghost">{% translate "Add indemnification" %}</a>
                 {% endif %}

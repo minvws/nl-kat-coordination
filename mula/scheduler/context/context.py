@@ -1,7 +1,10 @@
 import json
 import logging.config
 import threading
+from pathlib import Path
 from types import SimpleNamespace
+
+from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
 from scheduler.config import settings
@@ -30,17 +33,15 @@ class AppContext:
         """Initializer of the AppContext class."""
         self.config: settings.Settings = settings.Settings()
 
-        if not self.config.database_dsn.startswith("postgresql"):
-            raise Exception("PostgreSQL is the only supported database backend")
-
         # Load logging configuration
-        with open(self.config.log_cfg, "rt", encoding="utf-8") as f:
+        with Path(self.config.log_cfg).open("rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
         # Services
         katalogus_service = services.Katalogus(
             host=self.config.host_katalogus,
             source=f"scheduler/{scheduler.__version__}",
+            cache_ttl=self.config.katalogus_cache_ttl,
         )
 
         bytes_service = services.Bytes(
@@ -69,6 +70,34 @@ class AppContext:
         self.stop_event: threading.Event = threading.Event()
 
         # Repositories
+        if not self.config.database_dsn.startswith("postgresql"):
+            raise Exception("PostgreSQL is the only supported database backend")
+
         datastore = sqlalchemy.SQLAlchemy(self.config.database_dsn)
         self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
         self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
+
+        # Metrics collector registry
+        self.metrics_registry: CollectorRegistry = CollectorRegistry()
+
+        Info(
+            name="app_settings",
+            documentation="Scheduler configuration settings",
+            registry=self.metrics_registry,
+        ).info(
+            {
+                "pq_maxsize": str(self.config.pq_maxsize),
+                "pq_populate_interval": str(self.config.pq_populate_interval),
+                "pq_populate_grace_period": str(self.config.pq_populate_grace_period),
+                "pq_populate_max_random_objects": str(self.config.pq_populate_max_random_objects),
+                "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
+                "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
+            }
+        )
+
+        self.metrics_qsize = Gauge(
+            name="scheduler_qsize",
+            documentation="Size of the scheduler queue",
+            registry=self.metrics_registry,
+            labelnames=["scheduler_id"],
+        )

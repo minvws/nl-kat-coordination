@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from typing import List
 
 import requests
+from opentelemetry import trace
 
 from scheduler import connectors, context, queues, rankers
 from scheduler.models import (
@@ -20,12 +21,15 @@ from scheduler.models import (
 
 from .scheduler import Scheduler
 
+tracer = trace.get_tracer(__name__)
+
 
 class BoefjeScheduler(Scheduler):
     """A KAT specific implementation of a Boefje scheduler. It extends
     the `Scheduler` class by adding a `organisation` attribute.
 
     Attributes:
+        logger: A logger instance.
         organisation: The organisation that this scheduler is for.
     """
 
@@ -38,6 +42,9 @@ class BoefjeScheduler(Scheduler):
         organisation: Organisation,
         populate_queue_enabled: bool = True,
     ):
+        self.logger = logging.getLogger(__name__)
+        self.organisation: Organisation = organisation
+
         super().__init__(
             ctx=ctx,
             scheduler_id=scheduler_id,
@@ -46,9 +53,7 @@ class BoefjeScheduler(Scheduler):
             populate_queue_enabled=populate_queue_enabled,
         )
 
-        self.logger = logging.getLogger(__name__)
-        self.organisation: Organisation = organisation
-
+    @tracer.start_as_current_span("run")
     def run(self) -> None:
         """Populate the PriorityQueue.
 
@@ -87,6 +92,7 @@ class BoefjeScheduler(Scheduler):
         )
         listener.listen()
 
+    @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
         """Create tasks for oois that have a scan level change."""
         self.logger.debug(
@@ -138,6 +144,7 @@ class BoefjeScheduler(Scheduler):
                     self.push_tasks_for_scan_profile_mutations.__name__,
                 )
 
+    @tracer.start_as_current_span("push_tasks_for_new_boefjes")
     def push_tasks_for_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
@@ -195,6 +202,7 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_new_boefjes.__name__,
                     )
 
+    @tracer.start_as_current_span("push_tasks_for_random_objects")
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""
         # TODO: is this what we want?
@@ -212,6 +220,7 @@ class BoefjeScheduler(Scheduler):
             random_oois = self.ctx.services.octopoes.get_random_objects(
                 organisation_id=self.organisation.id,
                 n=self.ctx.config.pq_populate_max_random_objects,
+                scan_level=[1, 2, 3, 4],
             )
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(

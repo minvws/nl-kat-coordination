@@ -3,9 +3,19 @@ import logging
 from typing import Any, Dict, List, Optional, Union
 
 import fastapi
+import prometheus_client
 import uvicorn
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from scheduler import context, models, queues, schedulers, version
+from scheduler.config import settings
 
 from .pagination import PaginatedResponse, paginate
 
@@ -21,8 +31,27 @@ class Server:
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.schedulers: Dict[str, schedulers.Scheduler] = s
+        self.config: settings.Settings = settings.Settings()
 
         self.api = fastapi.FastAPI()
+
+        # Set up OpenTelemetry instrumentation
+        if self.config.span_export_grpc_endpoint is not None:
+            self.logger.info(
+                "Setting up instrumentation with span exporter endpoint [%s]", self.config.span_export_grpc_endpoint
+            )
+
+            FastAPIInstrumentor.instrument_app(self.api)
+            Psycopg2Instrumentor().instrument()
+            RequestsInstrumentor().instrument()
+
+            resource = Resource(attributes={SERVICE_NAME: "mula"})
+            provider = TracerProvider(resource=resource)
+            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=self.config.span_export_grpc_endpoint))
+            provider.add_span_processor(processor)
+            trace.set_tracer_provider(provider)
+
+            self.logger.debug("Finished setting up instrumentation")
 
         self.api.add_api_route(
             path="/",
@@ -36,6 +65,13 @@ class Server:
             endpoint=self.health,
             methods=["GET"],
             response_model=models.ServiceHealth,
+            status_code=200,
+        )
+
+        self.api.add_api_route(
+            path="/metrics",
+            endpoint=self.metrics,
+            methods=["GET"],
             status_code=200,
         )
 
@@ -139,6 +175,11 @@ class Server:
         for service in self.ctx.services.__dict__.values():
             response.externals[service.name] = service.is_healthy()
 
+        return response
+
+    def metrics(self) -> Any:
+        data = prometheus_client.generate_latest(self.ctx.metrics_registry)
+        response = fastapi.Response(media_type="text/plain", content=data)
         return response
 
     def get_schedulers(self) -> Any:
