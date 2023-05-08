@@ -153,7 +153,6 @@ direction RL
 
     SingleSettingView : setting_name
 
-    class PluginSettingsUpdateView
     class PluginSettingsDeleteView
     class PluginDetailView
 
@@ -167,7 +166,5 @@ direction RL
     PluginSettingsAddView  <|--  FormView
     PluginSettingsAddView  <|--  SinglePluginView
     PluginSettingsDeleteView  <|--  SingleSettingView
-    PluginSettingsUpdateView  <|--  FormView
-    PluginSettingsUpdateView  <|--  SingleSettingView
     PluginSettingsListView  <|--  SinglePluginView
 ```
