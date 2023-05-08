@@ -9,7 +9,7 @@ from PIL import Image
 
 from boefjes.job_models import BoefjeMeta
 
-PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.30.0-focal"
+PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.33.0-jammy"
 BROWSER = "chromium"
 
 
@@ -70,7 +70,7 @@ def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
     """Returns playwright command including webpage, browser and locations for image, har and storage."""
     return " ".join(
         [
-            "playwright screenshot",
+            "npx playwright screenshot",
             f"-b {browser}",
             "--full-page",
             f"--save-har={tmp_path}.har.zip",
@@ -94,7 +94,6 @@ def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tu
         detach=True,
     )
     res.wait()
-    logging.warning("[Webpage Capture] HAR (.har.zip) and Storage (.json) files not working in 1.30.0.")
     image = Image.open(io.BytesIO(get_file_from_container(container=res, path=f"{tmp_path}.png")))
     har = get_file_from_container(container=res, path=f"{tmp_path}.har.zip")
     storage = get_file_from_container(container=res, path=f"{tmp_path}.json")

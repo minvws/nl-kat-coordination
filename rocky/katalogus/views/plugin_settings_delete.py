@@ -1,5 +1,5 @@
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -12,7 +12,7 @@ from katalogus.views.mixins import SingleSettingView
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsDeleteView(PermissionRequiredMixin, SingleSettingView, TemplateView):
+class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SingleSettingView, TemplateView):
     template_name = "plugin_settings_delete.html"
     permission_required = "tools.can_scan_organization"
 
