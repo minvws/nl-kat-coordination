@@ -109,9 +109,9 @@ endif
 
 itest: ## Run the integration tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm mula sh -c "sleep 10; python -m pytest tests/integration/${file} $(if $(function),-k $(function))"
+	$(ci-docker-compose) run --rm mula python -m pytest tests/integration/${file} $(if $(function),-k $(function))
 else
-	$(ci-docker-compose) run --rm mula sh -c "sleep 10; python -m pytest tests/integration"
+	$(ci-docker-compose) run --rm mula python -m pytest tests/integration
 endif
 	$(ci-docker-compose) down --remove-orphans
 
