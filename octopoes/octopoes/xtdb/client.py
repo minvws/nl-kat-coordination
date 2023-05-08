@@ -100,7 +100,7 @@ class XTDBHTTPClient:
         return res.json()
 
     def await_transaction(self, transaction_id: int) -> None:
-        self._session.get(f"{self._client}/await-tx", params={"txId": transaction_id})
+        self._session.get(f"{self.client_url()}/await-tx", params={"txId": transaction_id})
         logger.info("Transaction completed [txId=%s]", transaction_id)
 
     def submit_transaction(self, operations: List[Operation]) -> None:
