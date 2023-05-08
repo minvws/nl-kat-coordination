@@ -11,11 +11,12 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+
+from katalogus.views.plugin_settings_list import PluginSettingsListView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.client import get_katalogus
-from katalogus.views import PluginSettingsListView
 from katalogus.views.mixins import BoefjeMixin
 from rocky import scheduler
 
