@@ -86,8 +86,7 @@ class NormalizerScheduler(Scheduler):
         # Get all normalizers for the mime types of the raw data
         normalizers: Dict[str, Normalizer] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: List[Normalizer] = \
-                self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type: List[Normalizer] = self.get_normalizers_for_mime_type(mime_type.get("value"))
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -149,7 +148,7 @@ class NormalizerScheduler(Scheduler):
                 task,
                 self.organisation.id,
                 self.scheduler_id,
-                caller
+                caller,
             )
             return
 

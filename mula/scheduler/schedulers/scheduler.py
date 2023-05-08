@@ -231,10 +231,7 @@ class Scheduler(abc.ABC):
             count += 1
 
     def push_item_to_queue_with_timeout(
-        self,
-        p_item: models.PrioritizedItem,
-        timeout: int = 1,
-        max_tries: int = 5
+        self, p_item: models.PrioritizedItem, timeout: int = 1, max_tries: int = 5
     ) -> None:
         """Push an item to the queue, with a timeout.
 

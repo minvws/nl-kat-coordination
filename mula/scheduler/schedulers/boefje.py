@@ -547,7 +547,6 @@ class BoefjeScheduler(Scheduler):
             caller,
         )
 
-
     def has_grace_period_passed(self, task: BoefjeTask) -> bool:
         """Check if the grace period has passed for a task in both the
         datastore and bytes.
