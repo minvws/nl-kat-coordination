@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -12,8 +13,6 @@ from requests import HTTPError
 from two_factor.views.utils import class_view_decorator
 
 from rocky.scheduler import client
-
-from datetime import datetime
 
 TASK_LIMIT = 50
 
@@ -45,51 +44,31 @@ class DownloadTaskDetail(OrganizationView):
 class TaskListView(OrganizationView, ListView):
     paginate_by = 20
 
-    def get(self, request, *args, **kwargs):
-        self.scheduler_id = None
-        if self.organization:
-            self.scheduler_id = self.plugin_type + "-" + self.organization.code
-        else:
-            error_message = _("Organization could not be found")
-            messages.add_message(request, messages.ERROR, error_message)
-        return super().get(request, *args, **kwargs)
-
     def get_queryset(self):
-        if not self.scheduler_id:
-            return []
-
-        scheduler_id = self.request.GET.get("scheduler_id", self.scheduler_id)
+        scheduler_id = self.plugin_type + "-" + self.organization.code
         type_ = self.request.GET.get("type", self.plugin_type)
         status = self.request.GET.get("status", None)
-        filters = []
+        input_ooi = self.request.GET.get("scan_history_search")
+        status = self.request.GET.get("scan_history_status")
 
-        if self.request.GET.get("scan_history_search"):
-            filters.append(
-                {
-                    "field": "data__input_ooi",
-                    "operator": "eq",
-                    "value": self.request.GET.get("scan_history_search"),
-                }
-            )
-
-        min_created_at = None
         if self.request.GET.get("scan_history_from"):
             min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+        else:
+            min_created_at = None
 
-        max_created_at = None
         if self.request.GET.get("scan_history_to"):
             max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
-
-        status = self.request.GET.get("scan_history_status")
+        else:
+            max_created_at = None
 
         try:
             return client.get_lazy_task_list(
                 scheduler_id=scheduler_id,
-                object_type=type_,
+                type=type_,
                 status=status,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
-                filters=filters,
+                input_ooi=input_ooi,
             )
 
         except HTTPError:
