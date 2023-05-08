@@ -14,7 +14,6 @@ class ScanProfileMutation(RabbitMQ):
     def listen(self) -> None:
         self.basic_consume(self.queue, True)
 
-    # TODO: what kind of exception should be raised here?
     def dispatch(self, body: bytes) -> None:
         # Convert body into a ScanProfileMutationModel
         model = ScanProfileMutationModel.parse_raw(body)

@@ -118,22 +118,13 @@ class BoefjeScheduler(Scheduler):
         # What available boefjes do we have for this ooi?
         boefjes = self.get_boefjes_for_ooi(ooi)
         if not boefjes:
-            # If was a scan level was updated and we have no boefjes available,
-            # it's likely that we haven't got the recent available boefjes yet,
-            # this is likely because the expiration of the cache hasn't been
-            # reached.
-            if mutation.operation == "update":
-                self.ctx.services.katalogus.flush_cache()
-                boefjes = self.get_boefjes_for_ooi(ooi)
-
-            if not boefjes:
-                self.logger.debug(
-                    "No boefjes available for %s [organisation.id=%s, scheduler_id=%s]",
-                    ooi.primary_key,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                return
+            self.logger.debug(
+                "No boefjes available for %s [organisation.id=%s, scheduler_id=%s]",
+                ooi.primary_key,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return
 
         with futures.ThreadPoolExecutor() as executor:
             for boefje in boefjes:
