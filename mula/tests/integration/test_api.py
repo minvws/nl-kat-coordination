@@ -1,7 +1,6 @@
 import copy
 import json
 import unittest
-import urllib
 import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
@@ -430,58 +429,65 @@ class APITasksEndpointTestCase(APITemplateTestCase):
 
     def test_get_tasks_min_and_max_created_at(self):
         # Get tasks based on datetime, both min_created_at and max_created_at, should return 2 items
-        min_created_at = urllib.parse.quote(self.first_item_api.get("created_at"))
-        max_created_at = urllib.parse.quote(self.second_item_api.get("created_at"))
-        response = self.client.get(f"/tasks?min_created_at={min_created_at}&max_created_at={max_created_at}")
+        params = {
+            "min_created_at": self.first_item_api.get("created_at"),
+            "max_created_at": self.second_item_api.get("created_at"),
+        }
+
+        response = self.client.get("/tasks", params=params)
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, len(response.json()["results"]))
 
         # Get tasks based on datetime, both min_created_at and max_created_at, should return 1 item
-        min_created_at = urllib.parse.quote(self.first_item_api.get("created_at"))
-        max_created_at = urllib.parse.quote(self.first_item_api.get("created_at"))
-        response = self.client.get(f"/tasks?min_created_at={min_created_at}&max_created_at={max_created_at}")
+        params = {
+            "min_created_at": self.first_item_api.get("created_at"),
+            "max_created_at": self.first_item_api.get("created_at"),
+        }
+        response = self.client.get("/tasks", params=params)
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()["results"]))
 
     def test_get_tasks_min_created_at(self):
         # Get tasks based on datetime, only min_created_at, should return 2 items
-        response = self.client.get(f"/tasks?min_created_at={urllib.parse.quote(self.first_item_api.get('created_at'))}")
+        params = {"min_created_at": self.first_item_api.get("created_at")}
+        response = self.client.get("/tasks", params=params)
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, len(response.json()["results"]))
 
         # Get tasks based on datetime, only min_created_at, should return 1 item
-        response = self.client.get(
-            f"/tasks?min_created_at={urllib.parse.quote(self.second_item_api.get('created_at'))}"
-        )
+        params = {"min_created_at": self.second_item_api.get("created_at")}
+        response = self.client.get("/tasks", params=params)
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()["results"]))
         self.assertEqual(self.second_item_api.get("id"), response.json()["results"][0]["id"])
 
     def test_get_tasks_max_created_at(self):
         # Get tasks based on datetime, only max_created_at, should return 2 items
-        response = self.client.get(
-            f"/tasks?max_created_at={urllib.parse.quote(self.second_item_api.get('created_at'))}"
-        )
+        params = {"max_created_at": self.second_item_api.get("created_at")}
+        response = self.client.get("/tasks", params=params)
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, len(response.json()["results"]))
 
         # Get tasks based on datetime, only max_created_at, should return 1 item
-        response = self.client.get(f"/tasks?max_created_at={urllib.parse.quote(self.first_item_api.get('created_at'))}")
+        params = {"max_created_at": self.first_item_api.get("created_at")}
+        response = self.client.get("/tasks", params=params)
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()["results"]))
         self.assertEqual(self.first_item_api.get("id"), response.json()["results"][0]["id"])
 
     def test_get_tasks_min_greater_than_max_created_at(self):
         # Get tasks min_created_at greater than max_created_at, should return an error
-        min_created_at = urllib.parse.quote(self.second_item_api.get("created_at"))
-        max_created_at = urllib.parse.quote(self.first_item_api.get("created_at"))
-        response = self.client.get(f"/tasks?min_created_at={min_created_at}&max_created_at={max_created_at}")
+        params = {
+            "min_created_at": self.second_item_api.get("created_at"),
+            "max_created_at": self.first_item_api.get("created_at"),
+        }
+        response = self.client.get("/tasks", params=params)
         self.assertEqual(400, response.status_code)
 
     def test_get_tasks_min_created_at_future(self):
         # Get tasks based on datetime for something in the future, should return 0 items
-        min_created_at = urllib.parse.quote((datetime.now(timezone.utc) + timedelta(days=1)).isoformat())
-        response = self.client.get(f"/tasks?min_created_at={min_created_at}")
+        params = {"min_created_at": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()}
+        response = self.client.get("/tasks", params=params)
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, len(response.json()["results"]))
 
