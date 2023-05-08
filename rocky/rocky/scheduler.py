@@ -148,7 +148,7 @@ class LazyTaskList:
         if self._count is None:
             self._count = self.scheduler_client.list_tasks(
                 self.scheduler_id,
-                type=self.object_type,
+                type_=self.object_type,
                 limit=0,
                 status=self.status,
                 min_created_at=self.min_created_at,
@@ -172,7 +172,7 @@ class LazyTaskList:
 
         res = self.scheduler_client.list_tasks(
             self.scheduler_id,
-            type=self.object_type,
+            type_=self.object_type,
             limit=limit,
             offset=offset,
             status=self.status,
@@ -193,7 +193,7 @@ class SchedulerClient:
     def list_tasks(
         self,
         scheduler_id: str,
-        type: Optional[str] = None,
+        type_: Optional[str] = None,
         limit: Optional[int] = None,
         offset: Optional[int] = None,
         status: Optional[str] = None,
@@ -203,7 +203,7 @@ class SchedulerClient:
     ) -> PaginatedTasksResponse:
         params = {
             "scheduler_id": scheduler_id,
-            "type": type,
+            "type": type_,
             "limit": limit,
             "offset": offset,
             "status": status,
