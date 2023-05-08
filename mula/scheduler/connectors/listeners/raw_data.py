@@ -1,4 +1,3 @@
-import json
 from typing import Callable
 
 from scheduler.models import RawDataReceivedEvent
