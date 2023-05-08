@@ -6,7 +6,7 @@
       "object_type": "Config",
       "ooi": "Network|internet",
       "bit_id": "check-hsts-header",
-      "config": "{\"max-age\": 41536000}"
+      "config": {"max-age": "41536000"}
     }
   ],
   "valid_time": "2019-01-01T00:00:00+00:00",
