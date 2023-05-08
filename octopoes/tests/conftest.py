@@ -4,6 +4,7 @@ from typing import Dict, Iterator, List, Optional, Set
 from unittest.mock import Mock
 
 import pytest
+from requests.adapters import HTTPAdapter, Retry
 
 from octopoes.api.api import app
 from octopoes.api.router import settings
@@ -162,7 +163,10 @@ def app_settings():
 
 @pytest.fixture
 def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
-    return get_xtdb_client(app_settings.xtdb_uri, "test", app_settings.xtdb_type)
+    client = get_xtdb_client(app_settings.xtdb_uri, "test", app_settings.xtdb_type)
+    client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
+
+    return client
 
 
 @pytest.fixture

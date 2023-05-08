@@ -13,7 +13,7 @@ from octopoes.xtdb.exceptions import NodeNotFound
 from octopoes.xtdb.query import Query
 
 if os.environ.get("CI") != "1":
-    pytest.skip("Needs a CI database.", allow_module_level=True)
+    pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
 
 XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE

@@ -35,7 +35,7 @@ services:
       args:
         ENVIRONMENT: dev
       context: .
-    command: sh -c "sleep ${SLEEP_TIME:-1} && pytest tests/integration"
+    command: pytest -x tests/integration
     depends_on:
       - xtdb_multinode
     env_file:
