@@ -9,10 +9,7 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 from packaging import version
 
 
-def run(
-    input_ooi: Software,
-    additional_oois: List[SoftwareInstance],
-) -> Iterator[OOI]:
+def run(input_ooi: Software, additional_oois: List[SoftwareInstance], config: Dict[str, str]) -> Iterator[OOI]:
     software_name = input_ooi.name
     software_version = input_ooi.version if input_ooi.version else "999.9.9"
 

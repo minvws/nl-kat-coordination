@@ -1,20 +1,19 @@
 import datetime
-import json
-from typing import Iterator, List
+from typing import Dict, Iterator, List
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import HTTPHeader
 
 
-def run(input_ooi: HTTPHeader, additional_oois: List, config: str) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "strict-transport-security":
         return
 
     one_year = datetime.timedelta(days=365).total_seconds()
 
-    max_age = json.loads(config).get("max-age", one_year) if config else one_year
+    max_age = config.get("max-age", one_year) if config else one_year
     findings: [str] = []
 
     if "includeSubDomains" not in header.value:
