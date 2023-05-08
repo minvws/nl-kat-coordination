@@ -1,28 +1,30 @@
 from django.urls import path
 
-from katalogus import views
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
+from katalogus.views.katalogus import KATalogusView
+from katalogus.views.katalogus_settings import KATalogusSettingsListView, ConfirmCloneSettingsView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
+from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 from katalogus.views.plugin_settings_edit import PluginSettingsUpdateView
 
 urlpatterns = [
-    path("", views.KATalogusView.as_view(), name="katalogus"),
-    path("view/<view>/", views.KATalogusView.as_view(), name="katalogus"),
+    path("", KATalogusView.as_view(), name="katalogus"),
+    path("view/<view>/", KATalogusView.as_view(), name="katalogus"),
     path(
         "settings/",
-        views.KATalogusSettingsListView.as_view(),
+        KATalogusSettingsListView.as_view(),
         name="katalogus_settings",
     ),
     path(
         "settings/migrate/",
-        views.KATalogusSettingsListView.as_view(),
+        KATalogusSettingsListView.as_view(),
         name="katalogus_clone_settings",
     ),
     path(
         "settings/migrate/confirmation/<to_organization>/",
-        views.ConfirmCloneSettingsView.as_view(),
+        ConfirmCloneSettingsView.as_view(),
         name="confirm_clone_settings",
     ),
     path(
@@ -32,7 +34,7 @@ urlpatterns = [
     ),
     path(
         "plugins/<plugin_type>/<plugin_id>/<plugin_state>/",
-        views.PluginEnableDisableView.as_view(),
+        PluginEnableDisableView.as_view(),
         name="plugin_enable_disable",
     ),
     path(
