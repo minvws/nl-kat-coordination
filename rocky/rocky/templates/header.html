@@ -51,7 +51,7 @@
                         <a href="{% url "task_list" organization.code %}"
                            {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
                     </li>
-                    {% if request.user.is_superuser or perms.tools.view_organization %}
+                    {% if perms.tools.view_organization %}
                         <li>
                             <a href="{% url "organization_member_list" organization.code %}"
                                {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Members" %}</a>

@@ -1,7 +1,7 @@
 from enum import Enum
 
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.shortcuts import redirect
@@ -27,7 +27,7 @@ class PageActions(Enum):
 
 @class_view_decorator(otp_required)
 class OrganizationMemberListView(
-    PermissionRequiredMixin,
+    OrganizationPermissionRequiredMixin,
     OrganizationMemberBreadcrumbsMixin,
     ListView,
 ):
@@ -61,7 +61,7 @@ class OrganizationMemberListView(
         self.filters_active = self.get_filters_active()
 
     def post(self, request, *args, **kwargs):
-        if not self.request.user.has_perm("tools.change_organizationmember"):
+        if not self.organization_member.has_perm("tools.change_organizationmember"):
             raise PermissionDenied()
         if "action" not in self.request.POST:
             return self.get(request, *args, **kwargs)
