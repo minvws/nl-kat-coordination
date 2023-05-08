@@ -75,6 +75,7 @@ def add_admin_group_permissions(member):
         Permission.objects.get(codename="add_organizationmember").id,
         Permission.objects.get(codename="change_organization").id,
         Permission.objects.get(codename="change_organizationmember").id,
+        Permission.objects.get(codename="can_delete_oois").id,
         Permission.objects.get(codename="add_indemnification").id,
     ]
     group.permissions.set(admin_permissions)
@@ -87,6 +88,7 @@ def add_redteam_group_permissions(member):
         Permission.objects.get(codename="can_scan_organization").id,
         Permission.objects.get(codename="can_enable_disable_boefje").id,
         Permission.objects.get(codename="can_set_clearance_level").id,
+        Permission.objects.get(codename="can_delete_oois").id,
     ]
     group.permissions.set(redteam_permissions)
 
