@@ -231,6 +231,6 @@ def read_glossary(glossary: str, settings: Settings) -> Dict[str, Tuple[str, str
         for row in csvreader:
             # only allow words with baretext representation
             bare_word = baretext(row[0])
-            if bare_word != "":
+            if bare_word:
                 glossary_entries[baretext(row[0])] = row[0], row[1]
     return glossary_entries

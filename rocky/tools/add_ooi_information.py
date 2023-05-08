@@ -254,9 +254,9 @@ def table_to_2d(table_tag):
     return table
 
 
-def _map_usage_value(value: str):
+def _map_usage_value(value: str) -> bool:
     value = value.lower().strip()
-    return value is not None and value != "" and value != "no"
+    return value is not None and value and value != "no"
 
 
 def wiki_port_tables() -> List[_PortInfo]:
