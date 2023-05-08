@@ -64,6 +64,9 @@ class Scheduler(abc.ABC):
                 A rankers.Ranker instance.
             populate_queue:
                 A boolean whether to populate the queue.
+            max_tries:
+                The maximum number of retries for a task to be pushed to
+                the queue.
         """
 
         self.logger: logging.Logger = logging.getLogger(__name__)
@@ -71,7 +74,9 @@ class Scheduler(abc.ABC):
         self.scheduler_id = scheduler_id
         self.queue: queues.PriorityQueue = queue
         self.ranker: rankers.Ranker = ranker
-        self.populate_queue_enabled = populate_queue_enabled
+
+        self.populate_queue_enabled: bool = populate_queue_enabled
+        self.max_tries: int = -1
 
         self.threads: Dict[str, thread.ThreadRunner] = {}
         self.stop_event: threading.Event = self.ctx.stop_event
@@ -231,7 +236,7 @@ class Scheduler(abc.ABC):
             count += 1
 
     def push_item_to_queue_with_timeout(
-        self, p_item: models.PrioritizedItem, timeout: int = 1, max_tries: int = 5
+            self, p_item: models.PrioritizedItem, max_tries: int = 5, timeout: int =1,
     ) -> None:
         """Push an item to the queue, with a timeout.
 
@@ -254,7 +259,7 @@ class Scheduler(abc.ABC):
             time.sleep(timeout)
             tries += 1
 
-        if tries >= max_tries:
+        if tries >= max_tries and max_tries != -1:
             raise queues.errors.QueueFullError()
 
         self.push_item_to_queue(p_item)

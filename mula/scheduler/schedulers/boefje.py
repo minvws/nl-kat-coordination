@@ -205,7 +205,6 @@ class BoefjeScheduler(Scheduler):
     @tracer.start_as_current_span("push_tasks_for_random_objects")
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""
-        # TODO: is this what we want?
         if self.queue.full():
             self.logger.warning(
                 "Boefjes queue is full, not populating with new tasks "
@@ -521,7 +520,7 @@ class BoefjeScheduler(Scheduler):
         )
 
         try:
-            self.push_item_to_queue_with_timeout(p_item, -1)
+            self.push_item_to_queue_with_timeout(p_item, max_tries=self.max_tries)
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s "

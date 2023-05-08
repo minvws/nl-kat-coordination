@@ -570,6 +570,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         self.scheduler.queue.maxsize = 1
+        self.scheduler.max_tries = 1
 
         # Mocks
         mock_is_task_allowed_to_run.return_value = True
