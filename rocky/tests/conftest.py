@@ -382,7 +382,6 @@ def plugin_schema():
             },
             "TEST_PROPERTY2": {
                 "title": "TEST_PROPERTY2",
-                "maxLength": 128,
                 "type": "integer",
                 "description": "Test description2",
             },

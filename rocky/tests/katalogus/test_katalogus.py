@@ -1,8 +1,8 @@
 from katalogus.client import KATalogusClientV1, parse_plugin
+from katalogus.views.katalogus import KATalogusView
+from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsListView
 from pytest_django.asserts import assertContains, assertNotContains
 
-from katalogus.views.katalogus import KATalogusView
-from katalogus.views.katalogus_settings import KATalogusSettingsListView, ConfirmCloneSettingsView
 from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, setup_request
 

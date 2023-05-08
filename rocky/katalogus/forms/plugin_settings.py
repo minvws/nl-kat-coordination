@@ -1,3 +1,5 @@
+from typing import Dict
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -12,65 +14,34 @@ class PluginSchemaForm(forms.Form):
         "required": _("This field is required."),
     }
 
-    def __init__(self, plugin_schema, *args, **kwargs):
+    def __init__(self, plugin_schema: Dict, values: Dict, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.plugin_schema = plugin_schema
+        self.values = values
         self.populate_fields()
 
     def populate_fields(self):
-        fields = self.plugin_schema["properties"]
-        required_fields = self.plugin_schema["required"]
-        help_text = ""
-        for field_name, field_props in fields.items():
-            field_type = FIELD_TYPES[field_props["type"]]
-            if "description" in field_props:
-                help_text = field_props["description"]
+        if not self.plugin_schema:
+            return
+
+        for field_name, field_props in self.plugin_schema["properties"].items():
             kwargs = {
-                "required": field_name in required_fields,
+                "required": field_name in self.plugin_schema["required"],
                 "label": field_props.get("title", field_name),
-                "help_text": _(help_text),
+                "help_text": _(field_props.get("description", "")),
                 "error_messages": self.error_messages,
             }
             if field_props["type"] == "string":
                 kwargs["max_length"] = min(
                     MAX_SETTINGS_VALUE_LENGTH, field_props.get("maxLength", MAX_SETTINGS_VALUE_LENGTH)
                 )
+
+            if field_name in self.values:
+                kwargs["initial"] = self.values[field_name]
+
+            field_type = FIELD_TYPES[field_props["type"]]
             self.fields[field_name] = field_type(**kwargs)
 
-
-class PluginSettingAddEditForm(forms.Form):
-    """Form for adding a single setting or multiple settings, use setting name
-    to populate schema field propertis into form field."""
-
-    error_messages = {
-        "required": _("This field is required."),
-    }
-
-    def __init__(self, plugin_schema, setting_name, setting_value=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.plugin_schema = plugin_schema
-        self.setting_name = setting_name
-        self.setting_value = setting_value
-        self.populate_field()
-
-    def populate_field(self):
-        field = self.plugin_schema["properties"][self.setting_name]
-        help_text = ""
-        initial = ""
-        if "description" in field:
-            help_text = field["description"]
-        if self.setting_value:
-            initial = self.setting_value
-        if field:
-            field_type = FIELD_TYPES[field["type"]]
-            kwargs = {
-                "required": self.setting_name in self.plugin_schema["required"],
-                "label": field.get("title", field),
-                "help_text": _(help_text),
-                "error_messages": self.error_messages,
-                "initial": initial,
-            }
-            if field["type"] == "string":
-                kwargs["max_length"] = min(MAX_SETTINGS_VALUE_LENGTH, field.get("maxLength", MAX_SETTINGS_VALUE_LENGTH))
-
-            self.fields[self.setting_name] = field_type(**kwargs)
+    def clean(self):
+        # The form assigns null to all unfilled fields, but json-schema does not allow null for optional fields
+        return {key: value for key, value in self.cleaned_data.items() if value is not None}

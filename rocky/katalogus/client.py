@@ -73,18 +73,12 @@ class KATalogusClientV1:
         response.raise_for_status()
         return response.json()
 
-    def add_plugin_setting(self, plugin_id: str, name: str, value: str) -> None:
-        body = {"value": value}
-        response = self.session.post(f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body)
+    def upsert_plugin_settings(self, plugin_id: str, values: Dict) -> None:
+        response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
-    def update_plugin_setting(self, plugin_id: str, name: str, value: str) -> None:
-        body = {"value": value}
-        response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body)
-        response.raise_for_status()
-
-    def delete_plugin_setting(self, plugin_id: str, name: str):
-        response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings/{name}")
+    def delete_plugin_settings(self, plugin_id: str):
+        response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
         return response
 

@@ -2,12 +2,11 @@ from django.urls import path
 
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import KATalogusView
-from katalogus.views.katalogus_settings import KATalogusSettingsListView, ConfirmCloneSettingsView
+from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsListView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
-from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
+from katalogus.views.plugin_settings_add import PluginSettingsAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
-from katalogus.views.plugin_settings_edit import PluginSettingsUpdateView
 
 urlpatterns = [
     path("", KATalogusView.as_view(), name="katalogus"),
@@ -43,27 +42,17 @@ urlpatterns = [
         name="plugin_cover",
     ),
     path(
-        "plugins/<plugin_type>/<plugin_id>/settings/add/",
-        PluginSettingsAddView.as_view(),
-        name="plugin_settings_add",
-    ),
-    path(
         "plugins/<plugin_type>/<plugin_id>/change-clearance-level/<scan_level>/",
         ChangeClearanceLevel.as_view(),
         name="change_clearance_level",
     ),
     path(
-        "plugins/<plugin_type>/<plugin_id>/settings/add/<setting_name>/",
-        PluginSingleSettingAddView.as_view(),
-        name="plugin_settings_add_single",
+        "plugins/<plugin_type>/<plugin_id>/settings/add/",
+        PluginSettingsAddView.as_view(),
+        name="plugin_settings_add",
     ),
     path(
-        "plugins/<plugin_type>/<plugin_id>/settings/edit/<setting_name>/",
-        PluginSettingsUpdateView.as_view(),
-        name="plugin_settings_edit",
-    ),
-    path(
-        "plugins/<plugin_type>/<plugin_id>/settings/delete/<setting_name>/",
+        "plugins/<plugin_type>/<plugin_id>/settings/delete/",
         PluginSettingsDeleteView.as_view(),
         name="plugin_settings_delete",
     ),

@@ -72,12 +72,29 @@ class TestAPI(TestCase):
         self.assertEqual("dns-records", data["id"])
         self.assertEqual("LOCAL", data["repository_id"])
 
+    def test_basic_settings_api(self):
+        plug = "dns-records"
+
+        self.client.put(f"/v1/organisations/{self.org.id}/{plug}/settings", json={"new": "settings", "with integer": 5})
+        response = self.client.get(f"/v1/organisations/{self.org.id}/{plug}/settings")
+        assert response.json() == {"new": "settings", "with integer": 5}
+
+        self.client.put(f"/v1/organisations/{self.org.id}/{plug}/settings", json={"with integer": 8})
+        response = self.client.get(f"/v1/organisations/{self.org.id}/{plug}/settings")
+        assert response.json() == {"with integer": 8}
+
+        self.client.delete(f"/v1/organisations/{self.org.id}/{plug}/settings")
+        response = self.client.get(f"/v1/organisations/{self.org.id}/{plug}/settings")
+        assert response.json() == {}
+
     def test_clone_settings(self):
         plug = "dns-records"
 
         # Set a setting on the first organisation and enable dns-records
-        self.client.post(f"/v1/organisations/{self.org.id}/{plug}/settings/test_key", json={"value": "test value"})
-        self.client.post(f"/v1/organisations/{self.org.id}/{plug}/settings/test_key_2", json={"value": "test value 2"})
+        self.client.put(
+            f"/v1/organisations/{self.org.id}/{plug}/settings",
+            json={"test_key": "test value", "test_key_2": "test value 2"},
+        )
         self.client.patch(f"/v1/organisations/{self.org.id}/repositories/LOCAL/plugins/{plug}", json={"enabled": True})
 
         assert self.client.get(f"/v1/organisations/{self.org.id}/{plug}/settings").json() == {
@@ -90,7 +107,7 @@ class TestAPI(TestCase):
         new_org_id = "org2"
         org2 = Organisation(id=new_org_id, name="Second test Organisation")
         self.client.post("/v1/organisations/", org2.json())
-        self.client.post(f"/v1/organisations/{new_org_id}/{plug}/settings/test_key", json={"value": "second value"})
+        self.client.put(f"/v1/organisations/{new_org_id}/{plug}/settings", json={"test_key": "second value"})
 
         # Show that the second organisation has no settings and dns-records is not enabled
         assert self.client.get(f"/v1/organisations/{new_org_id}/{plug}/settings").json() == {"test_key": "second value"}

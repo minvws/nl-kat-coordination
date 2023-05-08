@@ -7,11 +7,12 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
+from jsonschema.validators import Draft202012Validator
 from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
-from katalogus.forms import PluginSchemaForm, PluginSettingAddEditForm
-from katalogus.views.mixins import SinglePluginView, SingleSettingView
+from katalogus.forms import PluginSchemaForm
+from katalogus.views.mixins import SinglePluginView
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +25,11 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
     permission_required = "tools.can_scan_organization"
 
     def get_form(self, **kwargs):
-        if self.plugin_schema is None:
-            return None
+        settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
 
-        return PluginSchemaForm(self.plugin_schema, **self.get_form_kwargs())
+        return PluginSchemaForm(self.plugin_schema, settings, **self.get_form_kwargs())
 
-    def form_valid(self, form):
+    def dispatch(self, request, *args, **kwargs):
         if self.plugin_schema is None:
             messages.add_message(
                 self.request,
@@ -38,27 +38,31 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
             )
             return redirect(self.get_success_url())
 
-        try:
-            settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
-        except RequestException:
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        if form.cleaned_data == {}:
             messages.add_message(
-                self.request, messages.ERROR, _("Failed getting settings for boefje {}").format(self.plugin.id)
+                self.request,
+                messages.WARNING,
+                _("No changes to the settings added: no form data present"),
             )
             return redirect(self.get_success_url())
 
-        for name, value in form.cleaned_data.items():
-            if name in settings:
-                self.add_error_notification(_("Setting {} already exists. Use the edit link.").format(name))
-                return redirect(self.get_success_url())
+        validator = Draft202012Validator(self.plugin_schema)
 
-            try:
-                self.katalogus_client.add_plugin_setting(self.plugin.id, name, value)
-                messages.add_message(
-                    self.request, messages.SUCCESS, _("Setting {} added for {} ").format(name, self.plugin.name)
-                )
-            except RequestException:
-                messages.add_message(self.request, messages.ERROR, _("Failed adding setting {}").format(name))
-                return redirect(self.get_success_url())
+        if not validator.is_valid(form.cleaned_data):
+            for error in validator.iter_errors(form.cleaned_data):
+                messages.add_message(self.request, messages.ERROR, error.message)
+
+            return self.form_invalid(form)
+
+        try:
+            self.katalogus_client.upsert_plugin_settings(self.plugin.id, form.cleaned_data)
+            messages.add_message(self.request, messages.SUCCESS, _("Added settings for '{}'").format(self.plugin.id))
+        except RequestException:
+            messages.add_message(self.request, messages.ERROR, _("Failed adding settings"))
+            return redirect(self.get_success_url())
 
         if "add-enable" in self.request.POST:
             try:
@@ -115,22 +119,3 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
                 "plugin_id": self.plugin.id,
             },
         )
-
-    def add_error_notification(self, message):
-        messages.add_message(self.request, messages.ERROR, message)
-
-
-@class_view_decorator(otp_required)
-class PluginSingleSettingAddView(PluginSettingsAddView, SingleSettingView):
-    """View to add one specific setting."""
-
-    template_name = "plugin_settings_add.html"
-    permission_required = "tools.can_scan_organization"
-
-    def get_form(self, **kwargs):
-        return PluginSettingAddEditForm(self.plugin_schema, self.setting_name, **self.get_form_kwargs())
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["setting_name"] = self.setting_name
-        return context

@@ -8,19 +8,19 @@ from django_otp.decorators import otp_required
 from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
-from katalogus.views.mixins import SingleSettingView
+from katalogus.views.mixins import SinglePluginView
 
 
 @class_view_decorator(otp_required)
-class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SingleSettingView, TemplateView):
+class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePluginView, TemplateView):
     template_name = "plugin_settings_delete.html"
     permission_required = "tools.can_scan_organization"
 
     def post(self, request, *args, **kwargs):
         return self.delete(request, *args, **kwargs)
 
-    def get_context_data(self, setting_name: str, **kwargs):
-        context = super().get_context_data(setting_name=setting_name, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
         context["breadcrumbs"] = [
             {
@@ -45,13 +45,11 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SingleSettin
                         "organization_code": self.organization.code,
                         "plugin_type": self.plugin.type,
                         "plugin_id": self.plugin.id,
-                        "setting_name": setting_name,
                     },
                 ),
                 "text": _("Delete"),
             },
         ]
-        context["setting_name"] = setting_name
         context["plugin_id"] = self.plugin.id
         context["plugin_type"] = self.plugin.type
         context["plugin_name"] = self.plugin.name
@@ -68,22 +66,29 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SingleSettin
             },
         )
 
-    def delete(self, request, setting_name: str, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         try:
-            self.katalogus_client.delete_plugin_setting(plugin_id=self.plugin.id, name=setting_name)
+            self.katalogus_client.delete_plugin_settings(self.plugin.id)
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                _("Setting {} for plugin {} successfully deleted.").format(setting_name, self.plugin.name),
+                _("Settings for plugin {} successfully deleted.").format(self.plugin.name),
             )
-        except RequestException:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("Failed deleting Setting {} for plugin {}. Check the Katalogus logs for more info.").format(
-                    setting_name, self.plugin.name
-                ),
-            )
+        except RequestException as e:
+            if e.response.status_code == 404:
+                messages.add_message(
+                    request,
+                    messages.WARNING,
+                    _("Plugin {} has no settings.").format(self.plugin.name),
+                )
+            else:
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    _("Failed deleting Settings for plugin {}. Check the Katalogus logs for more info.").format(
+                        self.plugin.name
+                    ),
+                )
             return HttpResponseRedirect(self.get_success_url())
 
         return HttpResponseRedirect(self.get_success_url())
