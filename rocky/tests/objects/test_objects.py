@@ -2,8 +2,9 @@ import csv
 import io
 import json
 
+import pytest
 from django.urls import resolve, reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNotContains
 from tools.models import Indemnification
 
 from octopoes.models import ScanLevel, ScanProfileType
@@ -424,3 +425,41 @@ def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes)
     assert len(exported_objects) == 152
     assert "observed_at" in exported_objects[0]
     assert "filters" in exported_objects[0]
+
+
+@pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])
+def test_delete_perms_object_list(request, member, rf, mock_organization_view_octopoes):
+    member = request.getfixturevalue(member)
+    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+        count=200, items=[Network(name="testnetwork")] * 150
+    )
+
+    url = reverse("ooi_list", kwargs={"organization_code": member.organization.code})
+    request = rf.get(url)
+    request.resolver_match = resolve(url)
+    response = OOIListView.as_view()(
+        setup_request(request, member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+
+    assertContains(response, "Delete object(s)")
+
+
+def test_delete_perms_object_list_clients(rf, client_member, mock_organization_view_octopoes):
+    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+        count=200, items=[Network(name="testnetwork")] * 150
+    )
+
+    url = reverse("ooi_list", kwargs={"organization_code": client_member.organization.code})
+    request = rf.get(url)
+    request.resolver_match = resolve(url)
+    response = OOIListView.as_view()(
+        setup_request(request, client_member.user),
+        organization_code=client_member.organization.code,
+    )
+
+    assert response.status_code == 200
+
+    assertNotContains(response, "Delete object(s)")
