@@ -21,6 +21,7 @@ class BoefjeScheduler(Scheduler):
     the `Scheduler` class by adding a `organisation` attribute.
 
     Attributes:
+        logger: A logger instance.
         organisation: The organisation that this scheduler is for.
     """
 
@@ -33,6 +34,9 @@ class BoefjeScheduler(Scheduler):
         organisation: Organisation,
         populate_queue_enabled: bool = True,
     ):
+        self.logger = logging.getLogger(__name__)
+        self.organisation: Organisation = organisation
+
         super().__init__(
             ctx=ctx,
             scheduler_id=scheduler_id,
@@ -40,9 +44,6 @@ class BoefjeScheduler(Scheduler):
             ranker=ranker,
             populate_queue_enabled=populate_queue_enabled,
         )
-
-        self.logger = logging.getLogger(__name__)
-        self.organisation: Organisation = organisation
 
     @tracer.start_as_current_span("populate_queue")
     def populate_queue(self) -> None:

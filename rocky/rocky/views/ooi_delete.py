@@ -1,3 +1,4 @@
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -10,8 +11,9 @@ from rocky.views.mixins import SingleOOIMixin
 
 
 @class_view_decorator(otp_required)
-class OOIDeleteView(SingleOOIMixin, TemplateView):
+class OOIDeleteView(OrganizationPermissionRequiredMixin, SingleOOIMixin, TemplateView):
     template_name = "oois/ooi_delete.html"
+    permission_required = "tools.can_delete_oois"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
