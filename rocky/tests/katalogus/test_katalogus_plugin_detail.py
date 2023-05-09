@@ -11,6 +11,7 @@ def test_plugin_detail_view(
     superuser_member,
     mock_mixins_katalogus,
     plugin_details,
+    mock_organization_view_octopoes,
     mocker,
 ):
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
