@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Dict
+from typing import Any, Dict, List
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -113,37 +113,46 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
         selected_oois = request.POST.getlist("ooi")
         plugin_id = request.POST["boefje_id"]
         if selected_oois and plugin_id:
+            oois = self.get_sorted_oois(selected_oois)
             boefje = self.katalogus_client.get_plugin(plugin_id)
-            oois_with_clearance_level = self.get_oois_with_clearance_level(selected_oois)
+
+            oois_with_clearance_level = oois["oois_with_clearance"]
+            oois_without_clearance_level = oois["oois_without_clearance"]
+
             if oois_with_clearance_level:
                 self.run_boefje_for_oois(
                     boefje=boefje,
                     oois=oois_with_clearance_level,
                 )
-            oois_without_clearance_level = self.get_oois_without_clearance_level(selected_oois)
-            if oois_without_clearance_level and self.organization_member.has_perm("tools.can_set_clearance_level"):
-                request.session["selected_oois"] = oois_without_clearance_level
-                return redirect(
-                    reverse(
-                        "change_clearance_level",
-                        kwargs={
-                            "organization_code": self.organization.code,
-                            "plugin_type": self.plugin.type,
-                            "plugin_id": plugin_id,
-                            "scan_level": self.plugin.scan_level.value,
-                        },
+                messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
+
+            if oois_without_clearance_level:
+                if not self.organization_member.has_perm("tools.can_set_clearance_level"):
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Some selected OOIs needs an increase of clearance level to perform scans."
+                            " You do not have the permission to change clearance level."
+                        ),
                     )
-                )
-            else:
-                messages.add_message(
-                    self.request, messages.ERROR, _("You do not have the permission to change clearance level.")
-                )
-                return self.get(request, *args, **kwargs)
-        else:
-            messages.add_message(self.request, messages.ERROR, _("Scanning has failed to start."))
-            return self.get(request, *args, **kwargs)
-        messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
-        return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
+                else:
+                    request.session["selected_oois"] = oois_without_clearance_level
+                    return redirect(
+                        reverse(
+                            "change_clearance_level",
+                            kwargs={
+                                "organization_code": self.organization.code,
+                                "plugin_type": self.plugin.type,
+                                "plugin_id": plugin_id,
+                                "scan_level": self.plugin.scan_level.value,
+                            },
+                        )
+                    )
+            return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
+
+        messages.add_message(self.request, messages.ERROR, _("Please select an OOI to start scan."))
+        return self.get(request, *args, **kwargs)
 
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
@@ -154,20 +163,16 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
         oois = self.get_form_consumable_oois()
         return [ooi for ooi in oois if ooi.scan_profile.level >= self.plugin.scan_level.value]
 
-    def get_oois_with_clearance_level(self, selected_oois):
-        """Return a list of selected oois that meets clearance level."""
-        oois_with_clearance_level = []
+    def get_sorted_oois(self, selected_oois: List[str]) -> Dict[str, Any]:
+        oois_with_clearance = []
+        oois_without_clearance = []
         for ooi in selected_oois:
             ooi_object = self.get_single_ooi(pk=ooi)
             if ooi_object.scan_profile.level >= self.plugin.scan_level.value:
-                oois_with_clearance_level.append(ooi_object)
-        return oois_with_clearance_level
-
-    def get_oois_without_clearance_level(self, selected_oois):
-        """Return a list from selected oois without clearance level for scanning"""
-        oois_without_clearance_level = []
-        for ooi in selected_oois:
-            ooi_object = self.get_single_ooi(pk=ooi)
-            if ooi_object.scan_profile.level < self.plugin.scan_level.value:
-                oois_without_clearance_level.append(ooi_object.primary_key)
-        return oois_without_clearance_level
+                oois_with_clearance.append(ooi_object)
+            else:
+                oois_without_clearance.append(ooi_object.primary_key)
+        return {
+            "oois_with_clearance": oois_with_clearance,
+            "oois_without_clearance": oois_without_clearance,
+        }
