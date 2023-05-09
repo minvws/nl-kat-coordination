@@ -43,7 +43,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
     def get_scan_history(self) -> Page:
         list_args: Dict[str, str] = {}
         list_args["scheduler_id"] = f"{self.plugin.type}-{self.organization.code}"
-        list_args["plugin_type"] = (self.plugin.type,)
+        list_args["type"] = (self.plugin.type,)
         list_args["plugin_id"] = (self.plugin.id,)
         list_args["input_ooi"] = self.request.GET.get("scan_history_search")
         list_args["status"] = self.request.GET.get("scan_history_status")
