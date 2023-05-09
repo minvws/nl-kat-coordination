@@ -1,6 +1,5 @@
 import pytest
-from django.core.exceptions import PermissionDenied
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains
 
 from octopoes.models.tree import ReferenceTree
 from rocky.views.ooi_add import OOIAddView

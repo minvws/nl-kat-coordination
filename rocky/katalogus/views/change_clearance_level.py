@@ -1,3 +1,4 @@
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -7,7 +8,6 @@ from django_otp.decorators import otp_required
 from two_factor.views.utils import class_view_decorator
 
 from katalogus.views.mixins import BoefjeMixin, SinglePluginView
-from account.mixins import OrganizationPermissionRequiredMixin
 
 
 @class_view_decorator(otp_required)
