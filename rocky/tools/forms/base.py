@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -190,10 +191,9 @@ class CheckboxTable(Widget):
         del files
         getter = data.get
         if self.allow_multiple_selected:
-            try:
+            with contextlib.suppress(AttributeError):
                 getter = data.getlist
-            except AttributeError:
-                pass
+
         return getter(name)
 
     def format_value(self, value):
