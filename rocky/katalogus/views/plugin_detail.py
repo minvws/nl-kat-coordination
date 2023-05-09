@@ -43,7 +43,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
     def get_scan_history(self) -> Page:
         list_args: Dict[str, str] = {}
         list_args["scheduler_id"] = f"{self.plugin.type}-{self.organization.code}"
-        list_args["plugin_type"] = (self.plugin.type,)
+        list_args["type"] = (self.plugin.type,)
         list_args["plugin_id"] = (self.plugin.id,)
         list_args["input_ooi"] = self.request.GET.get("scan_history_search")
         list_args["status"] = self.request.GET.get("scan_history_status")
@@ -121,7 +121,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
                     oois=oois_with_clearance_level,
                 )
             oois_without_clearance_level = self.get_oois_without_clearance_level(selected_oois)
-            if oois_without_clearance_level:
+            if oois_without_clearance_level and self.organization_member.has_perm("tools.can_set_clearance_level"):
                 request.session["selected_oois"] = oois_without_clearance_level
                 return redirect(
                     reverse(
@@ -134,6 +134,11 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
                         },
                     )
                 )
+            else:
+                messages.add_message(
+                    self.request, messages.ERROR, _("You do not have the permission to change clearance level.")
+                )
+                return self.get(request, *args, **kwargs)
         else:
             messages.add_message(self.request, messages.ERROR, _("Scanning has failed to start."))
             return self.get(request, *args, **kwargs)
