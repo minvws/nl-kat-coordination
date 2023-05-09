@@ -23,6 +23,7 @@ from tools.models import (
 )
 
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
+from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
@@ -336,6 +337,18 @@ def network():
     return Network(
         name="testnetwork",
         scan_profile=DeclaredScanProfile(reference=Reference.from_str("Network|testnetwork"), level=ScanLevel.L1),
+    )
+
+
+@pytest.fixture
+def hostname():
+    return Hostname(
+        scan_profile=DeclaredScanProfile(
+            reference=Reference.from_str("Hostname|testnetwork|openkat.nl"), level=ScanLevel.L1
+        ),
+        network=Reference.from_str("Network|testnetwork"),
+        name="testhostname",
+        dns_zone=Reference.from_str("Hostname|testnetwork|openkat.nl"),
     )
 
 

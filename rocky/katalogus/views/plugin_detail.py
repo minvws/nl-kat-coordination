@@ -1,5 +1,6 @@
 from datetime import datetime
 from logging import getLogger
+from typing import Any, Dict, List
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -154,7 +155,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
                         )
                     )
             else:
-                messages.add_message(self.request, messages.ERROR, _("You do not have clearanace to start scan"))
+                messages.add_message(self.request, messages.ERROR, _("You do not have clearanace to start scan."))
                 return self.get(request, *args, **kwargs)
         else:
             messages.add_message(self.request, messages.ERROR, _("Scanning has failed to start."))
@@ -171,7 +172,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
         oois = self.get_form_consumable_oois()
         return [ooi for ooi in oois if ooi.scan_profile.level >= self.plugin.scan_level.value]
 
-    def get_oois_clearance_info(self, selected_oois):
+    def get_oois_clearance_info(self, selected_oois: List[str]) -> Dict[str, Any]:
         oois_with_clearance = []
         oois_without_clearance = []
         clearance_level = []

@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
-from django.shortcuts import get_object_or_404
+from typing import List
+
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from tools.models import Indemnification, Organization, OrganizationMember
@@ -64,7 +65,7 @@ class ClearanceRequiredView(OrganizationSetupView):
             return False
         return True
 
-    def verify_clearance_start_scan(self, clearance_levels) -> bool:
+    def verify_clearance_start_scan(self, clearance_levels: List[int]) -> bool:
         return any(
             [
                 clearance_level <= self.organization_member.acknowledged_clearance_level
