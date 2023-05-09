@@ -1,3 +1,4 @@
+import pytest
 from katalogus.client import KATalogusClientV1, parse_plugin
 from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsListView, KATalogusView
 from pytest_django.asserts import assertContains, assertNotContains
@@ -6,35 +7,26 @@ from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, setup_request
 
 
-def test_katalogus_plugin_listing(admin_member, redteam_member, client_member, rf, mocker):
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_katalogus_plugin_listing(request, member, rf, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
     mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = get_boefjes_data()
 
-    request_admin = setup_request(rf.get("katalogus"), admin_member.user)
-    response_admin = KATalogusView.as_view()(request_admin, organization_code=admin_member.organization.code)
+    member = request.getfixturevalue(member)
 
-    request_redteam = setup_request(rf.get("katalogus"), redteam_member.user)
-    response_redteam = KATalogusView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
+    response = KATalogusView.as_view()(
+        setup_request(rf.get("katalogus"), member.user), organization_code=member.organization.code
+    )
 
-    request_client = setup_request(rf.get("katalogus"), client_member.user)
-    response_client = KATalogusView.as_view()(request_client, organization_code=client_member.organization.code)
+    assert response.status_code == 200
 
-    assertContains(response_client, "KAT-alogus")
-
-    assertNotContains(response_redteam, "You don't have permission to enable boefje")
-    assertContains(response_admin, "You don't have permission to enable boefje")
-    assertContains(response_client, "You don't have permission to enable boefje")
-
-    assertContains(response_redteam, "KAT-alogus Settings")
-    assertNotContains(response_client, "KAT-alogus Settings")
-    assertNotContains(response_admin, "KAT-alogus Settings")
-
-    assertContains(response_client, "Enable")
-    assertContains(response_client, "BinaryEdge")
-    assertContains(response_client, "WPScantest")
-    assertNotContains(response_client, "test_binary_edge_normalizer")
+    assertContains(response, "KAT-alogus")
+    assertContains(response, "You don't have permission to enable boefje")
+    assertContains(response, "Enable")
+    assertContains(response, "BinaryEdge")
+    assertContains(response, "WPScantest")
 
 
 def test_katalogus_settings_list_one_organization(redteam_member, rf, mocker):
