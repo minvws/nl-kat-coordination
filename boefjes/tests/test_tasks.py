@@ -122,10 +122,12 @@ class TaskTest(TestCase):
 
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
         mock_bytes_api_client.save_raw.assert_called_once()
-        assert mock_bytes_api_client.save_raw.call_args[0][0] == "some-random-job-id"
-        assert "Traceback (most recent call last)" in mock_bytes_api_client.save_raw.call_args[0][1]
-        assert "JobRuntimeError: Boefje failed" in mock_bytes_api_client.save_raw.call_args[0][1]
-        assert mock_bytes_api_client.save_raw.call_args[0][2] == {
+        raw_call_args = mock_bytes_api_client.save_raw.call_args
+
+        assert raw_call_args[0][0] == "some-random-job-id"
+        assert "Traceback (most recent call last)" in raw_call_args[0][1]
+        assert "JobRuntimeError: Boefje failed" in raw_call_args[0][1]
+        assert raw_call_args[0][2] == {
             "error/boefje",
             "dummy_boefje_runtime_exception",
             "boefje/dummy_boefje_runtime_exception",
