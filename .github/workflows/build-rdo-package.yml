@@ -5,7 +5,7 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  create:
+  push:
     tags:
       - v*
 

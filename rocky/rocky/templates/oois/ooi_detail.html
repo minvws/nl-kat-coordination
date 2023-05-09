@@ -60,7 +60,9 @@
                                     <th>{% translate "Boefje" %}</th>
                                     <th>{% translate "Description" %}</th>
                                     <th>{% translate "Scan profile" %}</th>
-                                    <th>{% translate "Scan" %}</th>
+                                    {% if perms.tools.can_scan_organization %}
+                                        <th>{% translate "Scan" %}</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>

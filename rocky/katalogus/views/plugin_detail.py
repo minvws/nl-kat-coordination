@@ -41,44 +41,22 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
     limit_ooi_list = 9999
 
     def get_scan_history(self) -> Page:
-        scheduler_id = f"{self.plugin.type}-{self.organization.code}"
+        list_args: Dict[str, str] = {}
+        list_args["scheduler_id"] = f"{self.plugin.type}-{self.organization.code}"
+        list_args["plugin_type"] = (self.plugin.type,)
+        list_args["plugin_id"] = (self.plugin.id,)
+        list_args["input_ooi"] = self.request.GET.get("scan_history_search")
+        list_args["status"] = self.request.GET.get("scan_history_status")
 
-        filters = [
-            {
-                "field": f"data__{self.plugin.type}__id",
-                "operator": "eq",
-                "value": self.plugin.id,
-            }
-        ]
+        if self.request.GET.get("scan_history_from"):
+            list_args["min_created_at"] = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
 
-        if self.request.GET.get("scan_history_search"):
-            filters.append(
-                {
-                    "field": "data__input_ooi",
-                    "operator": "eq",
-                    "value": self.request.GET.get("scan_history_search"),
-                }
-            )
+        if self.request.GET.get("scan_history_to"):
+            list_args["max_created_at"] = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
 
         page = int(self.request.GET.get("scan_history_page", 1))
 
-        status = self.request.GET.get("scan_history_status")
-
-        min_created_at = None
-        if self.request.GET.get("scan_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
-
-        max_created_at = None
-        if self.request.GET.get("scan_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
-
-        scan_history = scheduler.client.get_lazy_task_list(
-            scheduler_id=scheduler_id,
-            status=status,
-            min_created_at=min_created_at,
-            max_created_at=max_created_at,
-            filters=filters,
-        )
+        scan_history = scheduler.client.get_lazy_task_list(**list_args)
 
         return Paginator(scan_history, self.scan_history_limit).page(page)
 

@@ -1,8 +1,9 @@
 import datetime
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import fastapi
+import prometheus_client
 import uvicorn
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -64,6 +65,13 @@ class Server:
             endpoint=self.health,
             methods=["GET"],
             response_model=models.ServiceHealth,
+            status_code=200,
+        )
+
+        self.api.add_api_route(
+            path="/metrics",
+            endpoint=self.metrics,
+            methods=["GET"],
             status_code=200,
         )
 
@@ -169,6 +177,11 @@ class Server:
 
         return response
 
+    def metrics(self) -> Any:
+        data = prometheus_client.generate_latest(self.ctx.metrics_registry)
+        response = fastapi.Response(media_type="text/plain", content=data)
+        return response
+
     def get_schedulers(self) -> Any:
         return [models.Scheduler(**s.dict()) for s in self.schedulers.values()]
 
@@ -216,14 +229,15 @@ class Server:
     def list_tasks(
         self,
         request: fastapi.Request,
-        scheduler_id: Union[str, None] = None,
-        type: Union[str, None] = None,
-        status: Union[str, None] = None,
+        scheduler_id: Optional[str] = None,
+        type: Optional[str] = None,
+        status: Optional[str] = None,
         offset: int = 0,
         limit: int = 10,
-        min_created_at: Union[datetime.datetime, None] = None,
-        max_created_at: Union[datetime.datetime, None] = None,
-        filters: Optional[List[models.Filter]] = None,
+        min_created_at: Optional[datetime.datetime] = None,
+        max_created_at: Optional[datetime.datetime] = None,
+        input_ooi: Optional[str] = None,
+        plugin_id: Optional[str] = None,
     ) -> Any:
         try:
             if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
@@ -237,7 +251,8 @@ class Server:
                 limit=limit,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
-                filters=filters,
+                input_ooi=input_ooi,
+                plugin_id=plugin_id,
             )
         except ValueError as exc:
             raise fastapi.HTTPException(
