@@ -136,7 +136,7 @@ class LazyTaskList:
         if self._count is None:
             self._count = self.scheduler_client.list_tasks(
                 self.scheduler_id,
-                type_=self.object_type,
+                type=self.object_type,
                 limit=0,
                 **self.kwargs,
             ).count
@@ -157,7 +157,7 @@ class LazyTaskList:
 
         res = self.scheduler_client.list_tasks(
             self.scheduler_id,
-            type_=self.object_type,
+            type=self.object_type,
             limit=limit,
             offset=offset,
             **self.kwargs,
@@ -182,7 +182,7 @@ class SchedulerClient:
     def get_lazy_task_list(
         self,
         scheduler_id: str,
-        type: Optional[str] = None,
+        type_: Optional[str] = None,
         status: Optional[str] = None,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
@@ -193,7 +193,7 @@ class SchedulerClient:
         return LazyTaskList(
             self,
             scheduler_id=scheduler_id,
-            type_=type,
+            type=type_,
             status=status,
             min_created_at=min_created_at,
             max_created_at=max_created_at,
