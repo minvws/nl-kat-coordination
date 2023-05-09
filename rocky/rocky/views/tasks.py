@@ -65,7 +65,7 @@ class TaskListView(OrganizationView, ListView):
         try:
             return client.get_lazy_task_list(
                 scheduler_id=scheduler_id,
-                object_type=type_,
+                type=type_,
                 status=status,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,

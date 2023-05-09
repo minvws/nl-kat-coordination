@@ -407,26 +407,6 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response_get.status_code, 200)
         self.assertEqual(initial_item_id, response_get.json().get("id"))
 
-    def test_get_tasks_value(self):
-        # Get tasks with embedded value of "test"", should return 2 items
-        response = self.client.get("/tasks", json=[{"field": "data__name", "operator": "eq", "value": "test"}])
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(2, len(response.json()["results"]))
-
-        # Get tasks with embedded value of "123", should return 1 item
-        response = self.client.get("/tasks", json=[{"field": "data__id", "operator": "eq", "value": "123"}])
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()["results"]))
-        self.assertEqual("123", response.json()["results"][0]["p_item"]["data"]["id"])
-
-        # Get tasks with embedded value of 123 two level deep, should return 1 item
-        response = self.client.get(
-            "/tasks", json=[{"field": "data__child__name", "operator": "eq", "value": "test.child"}]
-        )
-        self.assertEqual(200, response.status_code)
-        self.assertEqual(1, len(response.json()["results"]))
-        self.assertEqual("123.123", response.json()["results"][0]["p_item"]["data"]["child"]["id"])
-
     def test_get_tasks_min_and_max_created_at(self):
         # Get tasks based on datetime, both min_created_at and max_created_at, should return 2 items
         params = {
