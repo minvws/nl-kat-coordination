@@ -4,7 +4,7 @@ from functools import cached_property
 from typing import Dict, List, Optional, Set, Tuple, Type
 
 import requests.exceptions
-from account.mixins import OrganizationView, ClearanceRequiredView
+from account.mixins import ClearanceRequiredView, OrganizationView
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
