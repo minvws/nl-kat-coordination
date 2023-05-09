@@ -334,7 +334,6 @@ TAG_BORDER_TYPES = [
     ("dotted", _("Dotted")),
 ]
 
-
 SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
 if SPAN_EXPORT_GRPC_ENDPOINT is not None:
     OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
