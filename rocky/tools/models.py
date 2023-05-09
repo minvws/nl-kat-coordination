@@ -37,6 +37,34 @@ GROUP_CLIENT = "clients"
 logger = logging.getLogger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
+DENY_ORGANIZATION_CODES = [
+    "admin",
+    "api",
+    "i18n",
+    "health",
+    "privacy-statement",
+    "account",
+    "crisis-room",
+    "onboarding",
+    "indemnifications",
+    "findings",
+    "objects",
+    "organizations",
+    "edit",
+    "members",
+    "settings",
+    "scans",
+    "upload",
+    "tasks",
+    "bytes",
+    "kat-alogus",
+    "boefjes",
+    "mula",
+    "keiko",
+    "octopoes",
+    "rocky",
+    "fmea",
+]
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):
@@ -105,7 +133,7 @@ class Organization(models.Model):
         super().delete(*args, **kwargs)
 
     def clean(self):
-        if self.code in settings.DENY_ORGANIZATION_CODES:
+        if self.code in DENY_ORGANIZATION_CODES:
             raise ValidationError(
                 {
                     "code": _(

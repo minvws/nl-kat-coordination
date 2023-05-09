@@ -334,34 +334,7 @@ TAG_BORDER_TYPES = [
     ("dotted", _("Dotted")),
 ]
 
-DENY_ORGANIZATION_CODES = [
-    "admin",
-    "api",
-    "i18n",
-    "health",
-    "privacy-statement",
-    "account",
-    "crisis-room",
-    "onboarding",
-    "indemnifications",
-    "findings",
-    "objects",
-    "organizations",
-    "edit",
-    "members",
-    "settings",
-    "scans",
-    "upload",
-    "tasks",
-    "bytes",
-    "kat-alogus",
-    "boefjes",
-    "mula",
-    "keiko",
-    "octopoes",
-    "rocky",
-    "fmea",
-]
+
 SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
 if SPAN_EXPORT_GRPC_ENDPOINT is not None:
     OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
