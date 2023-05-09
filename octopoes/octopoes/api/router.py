@@ -310,7 +310,7 @@ def delete_node(
         raise
 
 
-@router.get("/bits/recalculate")
+@router.post("/bits/recalculate")
 def recalculate_bits(
     xtdb_session_: XTDBSession = Depends(xtdb_session), octopoes: OctopoesService = Depends(octopoes_service)
 ) -> int:

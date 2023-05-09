@@ -48,7 +48,7 @@ class Command(BaseCommand):
                 "change_organizationmember",
                 "can_delete_oois",
                 "add_indemnification",
-                "recalculate_bits",
+                "can_recalculate_bits",
             ]
         )
         self.group_admin.permissions.set(admin_permissions)

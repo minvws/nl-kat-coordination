@@ -4,7 +4,7 @@ from enum import Enum
 from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
@@ -35,4 +35,4 @@ class OrganizationSettingsView(OrganizationPermissionRequiredMixin, Organization
             messages.add_message(request, messages.INFO, _(f"Recalculated {number_of_bits} bits. Duration: {duration}"))
             return self.get(request, *args, **kwargs)
         else:
-            raise Http404()
+            raise HttpResponseBadRequest("Unknown action")
