@@ -7,12 +7,10 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{longtable}
-\usepackage[utf8]{inputenc}
 \usepackage{lastpage}
 \usepackage{ragged2e}
 \usepackage{titlepic}
 \usepackage{xcolor}
-\usepackage{underscore}
 
 \hypersetup{
 	colorlinks=true,
@@ -36,7 +34,7 @@
 
 %KEIKO-specific variables
 \newcommand\application{KEIKO @@{keiko_version}@@}
-\newcommand\reporttitle{Bevindingenrapport voor @@{report_source_type}@@ @@{report_source_value}@@}
+\newcommand\reporttitle{Bevindingenrapport voor @@{report_source_type|latex_escape}@@ @@{report_source_value|latex_escape}@@}
 \newcommand\tlp{AMBER}
 \newcommand\tlpbox{\colorbox{black}{\color{orange}TLP:AMBER}}
 %END-KEIKO
@@ -63,10 +61,13 @@
 \author{ \application{} }
 \titlepic{\includegraphics[width=70mm]{keiko.png}}
 
+% To use a different font, uncomment the following lines.
+% Run `fc-list` in the container to see which fonts are available.
+%\usepackage{fontspec}
+%\setmainfont{DejaVu Sans}
+
 \begin{document}
 \maketitle
-
-
 
 \chapter{Over dit document}
 \section{Vertrouwelijkheid}
@@ -140,36 +141,36 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 
 \chapter{Bevindingen}
 {% for finding_type_id, occurrence in findings_grouped.items()|sort(attribute='1.finding_type.risk_level_score', reverse=True) %}
-	\section{@@{finding_type_id}@@}
+	\section{@@{finding_type_id|latex_escape}@@}
 	\subsection{Bevinding informatie}
 	\begin{longtable}{ p{.25\textwidth}  p{.75\textwidth} }
-		Bevinding & @@{occurrence.finding_type.id}@@ \\
-		Risico niveau & @@{occurrence.finding_type.risk_level_score}@@ / 10 \\
+		Bevinding & @@{occurrence.finding_type.id|latex_escape}@@ \\
+		Risico niveau & @@{occurrence.finding_type.risk_level_score|latex_escape}@@ / 10 \\
 		{% if occurrence.finding_type.cvss %}
-			CVSS & @@{occurrence.finding_type.cvss}@@ \\
+			CVSS & @@{occurrence.finding_type.cvss|latex_escape}@@ \\
 		{% endif %}
-		Ernst & @@{occurrence.finding_type.risk_level_severity|capitalize}@@ \\
+		Ernst & @@{occurrence.finding_type.risk_level_severity|latex_escape|capitalize}@@ \\
     {% if occurrence.finding_type.description %}
-		  Beschrijving & @@{occurrence.finding_type.description}@@ \\
+		  Beschrijving & @@{occurrence.finding_type.description|latex_escape}@@ \\
     {% endif %}
 		{% if occurrence.finding_type.Information %}
-			Informatie & @@{occurrence.finding_type.Information}@@ \\
+			Informatie & @@{occurrence.finding_type.Information|latex_escape}@@ \\
 		{% endif %}
 		{% if occurrence.finding_type.recommendation %}
-			Aanbeveling & @@{occurrence.finding_type.recommendation}@@ \\
+			Aanbeveling & @@{occurrence.finding_type.recommendation|latex_escape}@@ \\
 		{% endif %}
 		{% if occurrence.finding_type.source %}
-			Bron& \href{@@{occurrence.finding_type.source}@@}{@@{occurrence.finding_type.source}@@} \\
+			Bron& \href{@@{occurrence.finding_type.source|latex_escape}@@}{@@{occurrence.finding_type.source|latex_escape}@@} \\
 		{% endif %}
 		{% if occurrence.finding_type.information_updated %}
-			Informatie laatst bijgewerkt & @@{occurrence.finding_type.information_updated}@@ \\
+			Informatie laatst bijgewerkt & @@{occurrence.finding_type.information_updated|latex_escape}@@ \\
 		{% endif %}
 	\end{longtable}
 
 	\subsection{Voorvallen}
 	{% for finding in occurrence.list %}
-		\subsubsection{@@{finding.ooi}@@}
-		@@{finding.description}@@
+		\subsubsection{@@{finding.ooi|latex_escape}@@}
+		@@{finding.description|latex_escape}@@
 	{% endfor %}
 
 {% endfor %}
