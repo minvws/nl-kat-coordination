@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django_otp.decorators import otp_required
-from jsonschema.validators import Draft202012Validator
 from requests import RequestException
 from two_factor.views.utils import class_view_decorator
 
@@ -48,14 +47,6 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
                 _("No changes to the settings added: no form data present"),
             )
             return redirect(self.get_success_url())
-
-        validator = Draft202012Validator(self.plugin_schema)
-
-        if not validator.is_valid(form.cleaned_data):
-            for error in validator.iter_errors(form.cleaned_data):
-                messages.add_message(self.request, messages.ERROR, error.message)
-
-            return self.form_invalid(form)
 
         try:
             self.katalogus_client.upsert_plugin_settings(self.plugin.id, form.cleaned_data)

@@ -2,6 +2,7 @@ from typing import Dict
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from jsonschema.validators import Draft202012Validator
 
 FIELD_TYPES = {"string": forms.CharField, "integer": forms.IntegerField, "enum": forms.Select}
 MAX_SETTINGS_VALUE_LENGTH = 128
@@ -21,9 +22,6 @@ class PluginSchemaForm(forms.Form):
         self.populate_fields()
 
     def populate_fields(self):
-        if not self.plugin_schema:
-            return
-
         for field_name, field_props in self.plugin_schema["properties"].items():
             kwargs = {
                 "required": field_name in self.plugin_schema["required"],
@@ -43,5 +41,15 @@ class PluginSchemaForm(forms.Form):
             self.fields[field_name] = field_type(**kwargs)
 
     def clean(self):
-        # The form assigns null to all unfilled fields, but json-schema does not allow null for optional fields
-        return {key: value for key, value in self.cleaned_data.items() if value is not None}
+        cleaned_data = super().clean()
+
+        # The form assigns "" and in some scenario's null to all unfilled (optional) fields
+        cleaned_data = {key: value for key, value in cleaned_data.items() if value is not None and value != ""}
+
+        validator = Draft202012Validator(self.plugin_schema)
+
+        if not validator.is_valid(cleaned_data):
+            for error in validator.iter_errors(cleaned_data):
+                self.add_error(None, error.message)
+
+        return cleaned_data

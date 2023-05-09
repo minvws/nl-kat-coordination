@@ -383,6 +383,8 @@ def plugin_schema():
             "TEST_PROPERTY2": {
                 "title": "TEST_PROPERTY2",
                 "type": "integer",
+                "minimum": 2,
+                "maximum": 200,
                 "description": "Test description2",
             },
         },

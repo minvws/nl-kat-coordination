@@ -107,6 +107,48 @@ def test_plugin_settings_add_error_message_about_integer_for_string_type(
     assertContains(response, "Enter a whole number.")
 
 
+def test_plugin_settings_add_error_message_about_integer_too_small(
+    rf,
+    superuser_member,
+    mock_mixins_katalogus,
+    plugin_details,
+    plugin_schema,
+):
+    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
+
+    request = setup_request(
+        rf.post("plugin_settings_add", data={"TEST_PROPERTY": "abc", "TEST_PROPERTY2": 1}), superuser_member.user
+    )
+    response = PluginSettingsAddView.as_view()(
+        request, organization_code=superuser_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
+    )
+
+    assertContains(response, "Error")
+    assertContains(response, "1 is less than the minimum of 2")
+
+
+def test_plugin_settings_add_error_message_about_integer_too_big(
+    rf,
+    superuser_member,
+    mock_mixins_katalogus,
+    plugin_details,
+    plugin_schema,
+):
+    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
+
+    request = setup_request(
+        rf.post("plugin_settings_add", data={"TEST_PROPERTY": "abc", "TEST_PROPERTY2": 1000}), superuser_member.user
+    )
+    response = PluginSettingsAddView.as_view()(
+        request, organization_code=superuser_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
+    )
+
+    assertContains(response, "Error")
+    assertContains(response, "1000 is greater than the maximum of 200")
+
+
 def test_plugin_single_settings_add_view_no_schema(rf, superuser_member, mock_mixins_katalogus, plugin_details):
     mock_katalogus = mock_mixins_katalogus()
     mock_katalogus.get_plugin.return_value = plugin_details

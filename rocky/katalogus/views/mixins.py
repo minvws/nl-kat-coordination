@@ -8,6 +8,8 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from jsonschema.exceptions import SchemaError
+from jsonschema.validators import Draft202012Validator
 from requests import HTTPError, RequestException
 from rest_framework.status import HTTP_404_NOT_FOUND
 
@@ -37,7 +39,17 @@ class SinglePluginView(OrganizationView):
 
         try:
             self.plugin = self.katalogus_client.get_plugin(plugin_id)
-            self.plugin_schema = self.katalogus_client.get_plugin_schema(plugin_id)
+            plugin_schema = self.katalogus_client.get_plugin_schema(plugin_id)
+
+            if not plugin_schema:
+                return
+
+            try:
+                Draft202012Validator.check_schema(plugin_schema)
+                self.plugin_schema = plugin_schema
+            except SchemaError:
+                logger.warning("Invalid schema found for plugin %s", self.plugin.id)
+
         except HTTPError as e:
             if e.response.status_code == HTTP_404_NOT_FOUND:
                 raise Http404(f"Plugin {plugin_id} not found.")
