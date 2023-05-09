@@ -1,8 +1,7 @@
 {% load i18n %}
 
 {% if perms.tools.can_enable_disable_boefje %}
-    <form
-          action="{% url "plugin_enable_disable" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id plugin_state=plugin.enabled %}"
+    <form action="{% url "plugin_enable_disable" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id plugin_state=plugin.enabled %}"
           method="post"
           class="inline">
         {% csrf_token %}
@@ -19,5 +18,5 @@
         </button>
     </form>
 {% else %}
-    <span class="de-emphasized">{% translate "Redteam can enable " %}{{ plugin.type }}</span>
+    <span class="de-emphasized">{% translate "You don't have permission to enable " %}{{ plugin.type }}</span>
 {% endif %}

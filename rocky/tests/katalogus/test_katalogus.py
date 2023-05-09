@@ -22,8 +22,10 @@ def test_katalogus_plugin_listing(admin_member, redteam_member, client_member, r
     response_client = KATalogusView.as_view()(request_client, organization_code=client_member.organization.code)
 
     assertContains(response_client, "KAT-alogus")
-    assertContains(response_admin, "Redteam can enable boefje")
-    assertContains(response_client, "Redteam can enable boefje")
+
+    assertNotContains(response_redteam, "You don't have permission to enable boefje")
+    assertContains(response_admin, "You don't have permission to enable boefje")
+    assertContains(response_client, "You don't have permission to enable boefje")
 
     assertContains(response_redteam, "KAT-alogus Settings")
     assertNotContains(response_client, "KAT-alogus Settings")
