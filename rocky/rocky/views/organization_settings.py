@@ -24,7 +24,7 @@ class OrganizationSettingsView(OrganizationPermissionRequiredMixin, Organization
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """Perform actions based on action type"""
         action = request.POST.get("action")
-        if not self.request.user.has_perm("tools.recalculate_bits"):
+        if not self.request.user.has_perm("tools.can_recalculate_bits"):
             raise PermissionDenied()
         if action == PageActions.RECALCULATE.value:
             connector = self.octopoes_api_connector
