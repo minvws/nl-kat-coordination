@@ -1,9 +1,7 @@
 from datetime import datetime
-
-import time
 from enum import Enum
-from timeit import timeit
 
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpRequest, HttpResponse
@@ -19,8 +17,9 @@ class PageActions(Enum):
 
 
 @class_view_decorator(otp_required)
-class OrganizationSettingsView(OrganizationDetailBreadcrumbsMixin, TemplateView):
+class OrganizationSettingsView(OrganizationPermissionRequiredMixin, OrganizationDetailBreadcrumbsMixin, TemplateView):
     template_name = "organizations/organization_settings.html"
+    permission_required = "tools.view_organization"
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """Perform actions based on action type"""

@@ -41,7 +41,7 @@
               <td>{{ organization.name }}</td>
               <td>{{ organization.code }}</td>
               <td>
-                {% if perms.tools.change_organization %}
+                {% if perms.tools.can_change_organization %}
                   {% spaceless %}
                     <a href="{% url "organization_edit" organization.code %}">
                       <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
@@ -53,22 +53,22 @@
             </tbody>
           </table>
         </div>
-        {% if perms.tools.change_organization %}
+        {% if perms.tools.add_indemnification %}
           <a href="{% url "indemnification_add" organization.code %}"
              class="button ghost">{% translate "Add indemnification" %}</a>
         {% endif %}
-      {% if perms.tools.recalculate_bits %}
-      <form method="post" class="inline">
-        {% csrf_token %}
-        <button type="submit"
-                class="dropdown-button"
-                name="action"
-                value="recalculate">
-          {% translate "Rerun all bits" %}
-        </button>
-      </form>
+        {% if perms.tools.recalculate_bits %}
+          <form method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit"
+                    class="dropdown-button"
+                    name="action"
+                    value="recalculate">
+              {% translate "Rerun all bits" %}
+            </button>
+          </form>
+        {% endif %}
       </div>
-    {% endif %}
     </section>
     {% if organization.tags.all %}
       <section>
