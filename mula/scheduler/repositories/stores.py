@@ -23,7 +23,8 @@ class TaskStorer(abc.ABC):
         status: Optional[str],
         min_created_at: Optional[datetime.datetime],
         max_created_at: Optional[datetime.datetime],
-        filters: Optional[List[models.Filter]],
+        input_ooi: Optional[str],
+        plugin_id: Optional[str],
         offset: int = 0,
         limit: int = 100,
     ) -> Tuple[List[models.Task], int]:
