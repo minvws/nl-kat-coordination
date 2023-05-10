@@ -154,8 +154,6 @@ class LazyTaskList:
             raise TypeError("Invalid slice argument type.")
 
         res = self.scheduler_client.list_tasks(
-            self.scheduler_id,
-            type=self.object_type,
             limit=limit,
             offset=offset,
             **self.kwargs,
