@@ -10,17 +10,19 @@ services:
       - .ci/.env.test
     volumes:
       - .:/app/scheduler
+    depends_on:
+      mula_postgres:
+        condition: service_healthy
 
-  mula_integration:
-    build:
-      context: .
-      args:
-        ENVIRONMENT: dev
-    command: python -m unittest discover tests/integration
+  mula_postgres:
+    image: postgres:15
     env_file:
       - .ci/.env.test
-    volumes:
-      - .:/app/scheduler
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mula_simulation:
     build:
