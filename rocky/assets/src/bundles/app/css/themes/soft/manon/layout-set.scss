@@ -50,9 +50,9 @@ $grid-xxl: 215rem;
 	--content-justify-content: flex-start;
 	--content-align-items: flex-start;
 	--content-gap: 2.5rem;
-	--content-padding-top: 0;
+	--content-padding-top: var(--page-whitespace-top-grid-m);
 	--content-padding-right: var(--page-whitespace-right-grid-s);
-	--content-padding-bottom: 0;
+	--content-padding-bottom: var(--page-whitespace-bottom-grid-m);
 	--content-padding-left: var(--page-whitespace-left-grid-s);
 	--content-max-width: 215rem;
 
@@ -63,13 +63,6 @@ $grid-xxl: 215rem;
 	--content-nested-padding-left: 0;
 	--content-nested-max-width: 100%;
 	--content-nested-gap: var(--spacing-grid-normal);
-
-	/* Main */
-		--main-padding-top: var(--page-whitespace-top);
-  	--main-padding-right: var(--page-whitespace-right);
-  	--main-padding-bottom: var(--page-whitespace-bottom);
-  	--main-padding-left: var(--page-whitespace-left);
-  	--main-gap: var(--content-gap);
 
   	/* Section */
   	--section-padding-right: var(--content-padding-right);
@@ -112,48 +105,6 @@ body {
 					padding-right: var(--page-whitespace-right-grid-m);
 					padding-left: var(--page-whitespace-left-grid-m);
 				}
-			}
-		}
-	}
-
-	> main {
-		@media screen and (min-width: $grid-m) {
-			padding-bottom: var(--page-whitespace-bottom-grid-m);
-			padding-top: var(--page-whitespace-top-grid-m);
-			
-			section {
-				padding-right: var(--page-whitespace-right-grid-m);
-				padding-left: var(--page-whitespace-left-grid-m);
-			}
-		}
-	
-		@media screen and (min-width: $grid-l) {
-			padding-bottom: var(--page-whitespace-bottom-grid-l);
-			padding-top: var(--page-whitespace-top-grid-l);
-			
-			section {
-				padding-right: var(--page-whitespace-right-grid-l);
-				padding-left: var(--page-whitespace-left-grid-l);
-			}
-		}
-	
-		@media screen and (min-width: $grid-xl) {
-			padding-bottom: var(--page-whitespace-bottom-grid-xl);
-			padding-top: var(--page-whitespace-top-grid-xl);
-	
-			section {
-				padding-right: var(--page-whitespace-right-grid-xl);
-				padding-left: var(--page-whitespace-left-grid-xl);
-			}
-		}
-	
-		@media screen and (min-width: $grid-xxl) {
-			padding-bottom: var(--page-whitespace-bottom-grid-xxl);
-			padding-top: var(--page-whitespace-top-grid-xxl);
-			
-			section {
-				padding-right: var(--page-whitespace-right-grid-xxl);
-				padding-left: var(--page-whitespace-left-grid-xxl);
 			}
 		}
 	}
