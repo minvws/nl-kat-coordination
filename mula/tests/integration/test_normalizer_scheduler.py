@@ -56,10 +56,9 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
         )
 
 
-@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")  # index: 3
-@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")  # index: 2
-@mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")  # index: 1
-@mock.patch("scheduler.context.AppContext.services.raw_data.get_latest_raw_data")  # index: 0
+@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")  # index: 2
+@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")  # index: 1
+@mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")  # index: 0
 class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def test_push_tasks_for_received_raw_file(self, *mocks):
         # Arrange
@@ -82,27 +81,24 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             input_ooi=ooi.primary_key,
         )
 
-        # Mocks
-        mocks[0].side_effect = [
-            models.RawDataReceivedEvent(
-                raw_data=RawDataFactory(
-                    boefje_meta=boefje_meta,
-                    mime_types=[{"value": "text/plain"}],
-                ),
-                organization=self.organisation.name,
-                created_at=datetime.datetime.now(),
+        raw_data_event = models.RawDataReceivedEvent(
+            raw_data=RawDataFactory(
+                boefje_meta=boefje_meta,
+                mime_types=[{"value": "text/plain"}],
             ),
-            None,
-        ]
+            organization=self.organisation.name,
+            created_at=datetime.datetime.now(),
+        )
 
-        mocks[1].return_value = [
+        # Mocks
+        mocks[0].return_value = [
             PluginFactory(type="normalizer"),
         ]
-        mocks[2].return_value = True
-        mocks[3].return_value = False
+        mocks[1].return_value = True
+        mocks[2].return_value = False
 
         # Act
-        self.scheduler.push_tasks_for_received_raw_file()
+        self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
 
         # Task should be on priority queue
         task_pq = models.NormalizerTask(**self.scheduler.queue.peek(0).data)
@@ -134,25 +130,22 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             input_ooi=ooi.primary_key,
         )
 
-        # Mocks
-        mocks[0].side_effect = [
-            models.RawDataReceivedEvent(
-                raw_data=RawDataFactory(
-                    boefje_meta=boefje_meta,
-                    mime_types=[{"value": "text/plain"}],
-                ),
-                organization=self.organisation.name,
-                created_at=datetime.datetime.now(),
+        raw_data_event = models.RawDataReceivedEvent(
+            raw_data=RawDataFactory(
+                boefje_meta=boefje_meta,
+                mime_types=[{"value": "text/plain"}],
             ),
-            None,
-        ]
+            organization=self.organisation.name,
+            created_at=datetime.datetime.now(),
+        )
 
-        mocks[1].return_value = []
-        mocks[2].return_value = True
-        mocks[3].return_value = False
+        # Mocks
+        mocks[0].return_value = []
+        mocks[1].return_value = True
+        mocks[2].return_value = False
 
         # Act
-        self.scheduler.push_tasks_for_received_raw_file()
+        self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -179,24 +172,21 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         )
 
         # Mocks
-        mocks[0].side_effect = [
-            models.RawDataReceivedEvent(
-                raw_data=RawDataFactory(
-                    boefje_meta=boefje_meta,
-                    mime_types=[{"value": "text/plain"}],
-                ),
-                organization=self.organisation.name,
-                created_at=datetime.datetime.now(),
+        raw_data_event = models.RawDataReceivedEvent(
+            raw_data=RawDataFactory(
+                boefje_meta=boefje_meta,
+                mime_types=[{"value": "text/plain"}],
             ),
-            None,
-        ]
+            organization=self.organisation.name,
+            created_at=datetime.datetime.now(),
+        )
 
-        mocks[1].return_value = []
+        mocks[0].return_value = []
+        mocks[1].return_value = False
         mocks[2].return_value = False
-        mocks[3].return_value = False
 
         # Act
-        self.scheduler.push_tasks_for_received_raw_file()
+        self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -223,24 +213,21 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         )
 
         # Mocks
-        mocks[0].side_effect = [
-            models.RawDataReceivedEvent(
-                raw_data=RawDataFactory(
-                    boefje_meta=boefje_meta,
-                    mime_types=[{"value": "text/plain"}],
-                ),
-                organization=self.organisation.name,
-                created_at=datetime.datetime.now(),
+        raw_data_event = models.RawDataReceivedEvent(
+            raw_data=RawDataFactory(
+                boefje_meta=boefje_meta,
+                mime_types=[{"value": "text/plain"}],
             ),
-            None,
-        ]
+            organization=self.organisation.name,
+            created_at=datetime.datetime.now(),
+        )
 
-        mocks[1].return_value = []
+        mocks[0].return_value = []
+        mocks[1].return_value = True
         mocks[2].return_value = True
-        mocks[3].return_value = True
 
         # Act
-        self.scheduler.push_tasks_for_received_raw_file()
+        self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -267,35 +254,34 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         )
 
         # Mocks
-        mocks[0].side_effect = [
-            models.RawDataReceivedEvent(
-                raw_data=RawDataFactory(
-                    boefje_meta=boefje_meta,
-                    mime_types=[{"value": "text/plain"}],
-                ),
-                organization=self.organisation.name,
-                created_at=datetime.datetime.now(),
+        raw_data_event1 = models.RawDataReceivedEvent(
+            raw_data=RawDataFactory(
+                boefje_meta=boefje_meta,
+                mime_types=[{"value": "text/plain"}],
             ),
-            models.RawDataReceivedEvent(
-                raw_data=RawDataFactory(
-                    boefje_meta=boefje_meta,
-                    mime_types=[{"value": "text/plain"}],
-                ),
-                organization=self.organisation.name,
-                created_at=datetime.datetime.now(),
-            ),
-            None,
-        ]
+            organization=self.organisation.name,
+            created_at=datetime.datetime.now(),
+        )
 
-        mocks[1].return_value = [
+        raw_data_event2 = models.RawDataReceivedEvent(
+            raw_data=RawDataFactory(
+                boefje_meta=boefje_meta,
+                mime_types=[{"value": "text/plain"}],
+            ),
+            organization=self.organisation.name,
+            created_at=datetime.datetime.now(),
+        )
+
+        mocks[0].return_value = [
             PluginFactory(type="normalizer"),
         ]
 
-        mocks[2].return_value = True
-        mocks[3].return_value = False
+        mocks[1].return_value = True
+        mocks[2].return_value = False
 
         # Act
-        self.scheduler.push_tasks_for_received_raw_file()
+        self.scheduler.push_tasks_for_received_raw_data(raw_data_event1)
+        self.scheduler.push_tasks_for_received_raw_data(raw_data_event2)
 
         # Task should be on priority queue (only one)
         task_pq = models.NormalizerTask(**self.scheduler.queue.peek(0).data)
@@ -328,20 +314,17 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         )
 
         # Mocks
-        mocks[0].side_effect = [
-            models.RawDataReceivedEvent(
-                raw_data=RawDataFactory(
-                    boefje_meta=boefje_meta,
-                    mime_types=[{"value": "text/plain"}],
-                ),
-                organization=self.organisation.name,
-                created_at=datetime.datetime.now(),
+        raw_data_event = models.RawDataReceivedEvent(
+            raw_data=RawDataFactory(
+                boefje_meta=boefje_meta,
+                mime_types=[{"value": "text/plain"}],
             ),
-            None,
-        ]
+            organization=self.organisation.name,
+            created_at=datetime.datetime.now(),
+        )
 
         # Act
-        self.scheduler.push_tasks_for_received_raw_file()
+        self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
 
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())

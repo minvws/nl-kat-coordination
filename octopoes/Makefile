@@ -48,7 +48,7 @@ test:
 rtest:
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build
 	sleep 1
-	robot -d reports --variablefile tests/robot/variables.py:xtdb tests/robot || :
+	robot -d reports --variablefile tests/robot/variables.py:xtdb tests/robot
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
 
 itest:

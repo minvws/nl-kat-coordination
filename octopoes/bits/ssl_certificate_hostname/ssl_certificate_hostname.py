@@ -1,4 +1,4 @@
-from typing import Iterator, List, Union
+from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.certificate import (
@@ -32,6 +32,7 @@ def hostname_in_qualifiers(hostname: str, qualifiers: List[str]) -> bool:
 def run(
     input_ooi: X509Certificate,
     additional_oois: List[Union[Website, SubjectAlternativeNameHostname]],
+    config: Dict[str, str],
 ) -> Iterator[OOI]:
     subject = input_ooi.subject.rstrip(".")
 

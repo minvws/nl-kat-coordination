@@ -136,6 +136,7 @@ class Server:
             endpoint=self.get_queues,
             methods=["GET"],
             response_model=List[models.Queue],
+            response_model_exclude_unset=True,
             status_code=200,
         )
 
@@ -327,7 +328,7 @@ class Server:
         return updated_task
 
     def get_queues(self) -> Any:
-        return [models.Queue(**s.queue.dict()) for s in self.schedulers.values()]
+        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.values()]
 
     def get_queue(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
