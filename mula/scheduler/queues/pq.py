@@ -264,9 +264,9 @@ class PriorityQueue(abc.ABC):
 
         return True
 
-    def dict(self) -> Dict[str, Any]:
+    def dict(self, include_pq: bool = True) -> Dict[str, Any]:
         """Return a dictionary representation of the queue."""
-        return {
+        response = {
             "id": self.pq_id,
             "size": self.qsize(),
             "maxsize": self.maxsize,
@@ -274,8 +274,12 @@ class PriorityQueue(abc.ABC):
             "allow_replace": self.allow_replace,
             "allow_updates": self.allow_updates,
             "allow_priority_updates": self.allow_priority_updates,
-            "pq": self.pq_store.get_items_by_scheduler_id(self.pq_id),
         }
+
+        if include_pq:
+            response["pq"] = self.pq_store.get_items_by_scheduler_id(self.pq_id)
+
+        return response
 
     @abc.abstractmethod
     def create_hash(self, p_item: models.PrioritizedItem) -> str:

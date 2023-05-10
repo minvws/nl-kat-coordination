@@ -8,7 +8,7 @@ from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
 from scheduler.config import settings
-from scheduler.connectors import listeners, services
+from scheduler.connectors import services
 from scheduler.repositories import sqlalchemy, stores
 
 
@@ -57,19 +57,6 @@ class AppContext:
             orgs=katalogus_service.get_organisations(),
         )
 
-        # Listeners
-        mutations_listener = listeners.ScanProfileMutation(
-            dsn=self.config.host_mutation,
-        )
-
-        raw_data_listener = listeners.RawData(
-            dsn=self.config.host_raw_data,
-        )
-
-        normalizer_meta_listener = listeners.NormalizerMeta(
-            dsn=self.config.host_normalizer_meta,
-        )
-
         # Register external services, SimpleNamespace allows us to use dot
         # notation
         self.services: SimpleNamespace = SimpleNamespace(
@@ -77,9 +64,6 @@ class AppContext:
                 services.Katalogus.name: katalogus_service,
                 services.Octopoes.name: octopoes_service,
                 services.Bytes.name: bytes_service,
-                listeners.ScanProfileMutation.name: mutations_listener,
-                listeners.RawData.name: raw_data_listener,
-                listeners.NormalizerMeta.name: normalizer_meta_listener,
             }
         )
 

@@ -77,4 +77,4 @@ class Queue(BaseModel):
     allow_replace: bool
     allow_updates: bool
     allow_priority_updates: bool
-    pq: List[PrioritizedItem]
+    pq: Optional[List[PrioritizedItem]]
