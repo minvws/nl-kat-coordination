@@ -21,7 +21,7 @@ export file
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
 
 ##
 ##+------------------------------------------------------------------------+
@@ -83,7 +83,7 @@ ifeq ($(m),)
 else ifeq ($(revid),)
 	$(HIDE) (echo "ERROR: Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	$(ci-docker-compose) run scheduler \
+	docker-compose run scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		revision --autogenerate \
 		-m "$(m)" --rev-id "$(revid)"
