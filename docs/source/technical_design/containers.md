@@ -102,8 +102,7 @@ We have two container images that are used to run multiple containers. What the 
 | boefjes         | normalizer  | Normalizers runtime                                                               |
 | boefjes         | katalogus   | Katalogus API                                                                     |
 | octopoes        | web         | Octopoes API                                                                      |
-| octopoes        | worker-beat | Celery worker running beat. There must only be exactly one container of this type |
-| octopoes        | worker      | Celery worker. Use this if you need to more than one work container for scaling   |
+
 
 ## Env variables
 
