@@ -14,8 +14,15 @@ ENV PATH=/home/keiko/.local/bin:${PATH}
 # LateX dependencies
 RUN apt update -y \
     && apt install -y --no-install-recommends \
-        texlive-latex-base texlive-latex-extra texlive-latex-recommended \
-        texlive-lang-european texlive-fonts-recommended chktex \
+        chktex \
+        fonts-recommended \
+        latexmk \
+        texlive-fonts-recommended \
+        texlive-lang-european \
+        texlive-latex-base \
+        texlive-latex-extra \
+        texlive-latex-recommended \
+        texlive-xetex \
     && rm -rf /var/lib/apt/lists/*
 
 ENV KEIKO_REPORTS_FOLDER=/reports

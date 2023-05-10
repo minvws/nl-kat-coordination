@@ -1,8 +1,8 @@
 from account.forms.organization import OrganizationListForm
-from account.mixins import OrganizationView
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from account.models import KATUser
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
@@ -51,7 +51,7 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
 
 
 @class_view_decorator(otp_required)
-class KATalogusSettingsListView(PermissionRequiredMixin, OrganizationView, FormView, ListView):
+class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, OrganizationView, FormView, ListView):
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"
