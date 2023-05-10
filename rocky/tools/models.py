@@ -78,6 +78,9 @@ class Organization(models.Model):
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
             ("can_set_clearance_level", "Can set clearance level"),
             ("can_delete_oois", "Can delete oois"),
+            ("can_mute_findings", "Can mute findings"),
+            ("can_view_katalogus_settings", "Can view KAT-alogus settings"),
+            ("can_set_katalogus_settings", "Can set KAT-alogus settings"),
         )
 
     def get_absolute_url(self):

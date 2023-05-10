@@ -17,8 +17,11 @@ from katalogus.client import get_katalogus
 
 
 @class_view_decorator(otp_required)
-class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateView):
+class ConfirmCloneSettingsView(
+    OrganizationPermissionRequiredMixin, OrganizationView, UserPassesTestMixin, TemplateView
+):
     template_name = "confirmation_clone_settings.html"
+    permission_required = "tools.can_set_katalogus_settings"
 
     def test_func(self):
         user: KATUser = self.request.user
@@ -56,7 +59,7 @@ class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, Organizatio
 
     template_name = "katalogus_settings.html"
     paginate_by = 10
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.can_view_katalogus_settings"
     plugin_type = "boefjes"
 
     def get_context_data(self, **kwargs):

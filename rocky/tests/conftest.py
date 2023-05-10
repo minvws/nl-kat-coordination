@@ -89,6 +89,9 @@ def add_redteam_group_permissions(member):
         Permission.objects.get(codename="can_enable_disable_boefje").id,
         Permission.objects.get(codename="can_set_clearance_level").id,
         Permission.objects.get(codename="can_delete_oois").id,
+        Permission.objects.get(codename="can_mute_findings").id,
+        Permission.objects.get(codename="can_view_katalogus_settings").id,
+        Permission.objects.get(codename="can_set_katalogus_settings").id,
     ]
     group.permissions.set(redteam_permissions)
 
