@@ -7,15 +7,15 @@ from boefjes.job_models import BoefjeMeta
 NUCLEI_IMAGE = "projectdiscovery/nuclei:latest"
 
 
-def verify_hostname_meta(input_):
+def verify_hostname_meta(input_ooi):
     # if the input object is HostnameHTTPURL then the hostname is located in netloc
-    if "netloc" in input_ and "name" in input_["netloc"]:
-        netloc_name = input_["netloc"]["name"]
-        port = input_["port"]
+    if "netloc" in input_ooi and "name" in input_ooi["netloc"]:
+        netloc_name = input_ooi["netloc"]["name"]
+        port = input_ooi["port"]
         return f"{netloc_name}:{port}"
     else:
         # otherwise the Hostname input object is used
-        return input_["name"]
+        return input_ooi["name"]
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:

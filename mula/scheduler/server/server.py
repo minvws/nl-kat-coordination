@@ -229,9 +229,9 @@ class Server:
     def list_tasks(
         self,
         request: fastapi.Request,
-        scheduler_id: Union[str, None] = None,
-        type_: Union[str, None] = None,
-        status: Union[str, None] = None,
+        scheduler_id: Optional[str] = None,
+        task_type: Optional[str] = None,
+        status: Optional[str] = None,
         offset: int = 0,
         limit: int = 10,
         min_created_at: Optional[datetime.datetime] = None,
@@ -245,7 +245,7 @@ class Server:
 
             results, count = self.ctx.task_store.get_tasks(
                 scheduler_id=scheduler_id,
-                type_=type_,
+                task_type=task_type,
                 status=status,
                 offset=offset,
                 limit=limit,

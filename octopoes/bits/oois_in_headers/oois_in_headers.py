@@ -38,15 +38,15 @@ def run(
     if input_ooi.key.lower() == "content-security-policy":
         urls_and_hostname = re.findall(r"(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", input_ooi.value)
 
-        for object_ in urls_and_hostname:
+        for url_or_hostname in urls_and_hostname:
             try:
-                u = URL(raw=object_, network=network.reference)
+                u = URL(raw=url_or_hostname, network=network.reference)
                 yield u
                 http_header_url = HTTPHeaderURL(header=input_ooi.reference, url=u.reference)
                 yield http_header_url
             # some hostnames get classified as urls by the regex here, they need to be parsed by another bit
             except ValidationError:
-                name = object_ if object_[0] != "." else object_[1:]
+                name = url_or_hostname if url_or_hostname[0] != "." else url_or_hostname[1:]
                 h = Hostname(name=name, network=network.reference)
                 yield h
                 http_header_hostname = HTTPHeaderHostname(header=input_ooi.reference, hostname=h.reference)

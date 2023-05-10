@@ -43,7 +43,7 @@ LATEX_SPECIAL_CHARS = str.maketrans(
 )
 
 
-def latex_escape(input_: Any) -> str:
+def latex_escape(text: Any) -> str:
     """Escape characters that are special in LaTeX.
 
     References:
@@ -51,14 +51,14 @@ def latex_escape(input_: Any) -> str:
     - http://tex.stackexchange.com/a/34586/43228
     - http://stackoverflow.com/a/16264094/2570866
     """
-    if not isinstance(input_, str):
-        input_ = str(input_)
-    return input_.translate(LATEX_SPECIAL_CHARS)
+    if not isinstance(text, str):
+        text = str(text)
+    return text.translate(LATEX_SPECIAL_CHARS)
 
 
-def baretext(input_: str) -> str:
+def baretext(text: str) -> str:
     """Remove non-alphanumeric characters from a string."""
-    return "".join(filter(str.isalnum, input_)).lower()
+    return "".join(filter(str.isalnum, text)).lower()
 
 
 @tracer.start_as_current_span("generate_report")
