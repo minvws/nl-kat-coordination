@@ -7,8 +7,8 @@ def add_group_permissions(apps, schema_editor):
     Group = apps.get_model("auth", "Group")
     Permission = apps.get_model("auth", "Permission")
     try:
-        admin = Group.objects.get(name="clients")
-        admin.permissions.add(Permission.objects.get(codename="can_scan_organization"))
+        clients = Group.objects.get(name="clients")
+        clients.permissions.add(Permission.objects.get(codename="can_scan_organization"))
     except Group.DoesNotExist:
         pass
 

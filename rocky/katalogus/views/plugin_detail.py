@@ -124,7 +124,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
         selected_oois = request.POST.getlist("ooi")
         plugin_id = request.POST["boefje_id"]
         if selected_oois and plugin_id:
-            oois = self.get_sorted_oois(selected_oois)
+            oois = self.get_oois(selected_oois)
             boefje = self.katalogus_client.get_plugin(plugin_id)
 
             oois_with_clearance_level = oois["oois_with_clearance"]
@@ -174,7 +174,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
         oois = self.get_form_consumable_oois()
         return [ooi for ooi in oois if ooi.scan_profile.level >= self.plugin.scan_level.value]
 
-    def get_sorted_oois(self, selected_oois: List[str]) -> Dict[str, Any]:
+    def get_oois(self, selected_oois: List[str]) -> Dict[str, Any]:
         oois_with_clearance = []
         oois_without_clearance = []
         for ooi in selected_oois:
