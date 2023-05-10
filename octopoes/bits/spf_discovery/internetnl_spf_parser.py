@@ -131,9 +131,9 @@ a = Combine(
     + Optional(dual_cidr_length)
 )
 include = Combine(Optional(qualifier) + CaselessLiteral("include:") + domain_spec)
-all = Combine(Optional(qualifier) + CaselessLiteral("all"))
+all_ = Combine(Optional(qualifier) + CaselessLiteral("all"))
 
-mechanism = all | include | a | mx | ptr | ip4 | ip6 | exists
+mechanism = all_ | include | a | mx | ptr | ip4 | ip6 | exists
 directive = mechanism
 terms = ZeroOrMore(OneOrMore(SP) + (directive | modifier))
 

@@ -1,4 +1,4 @@
-from typing import Iterator, List
+from typing import Dict, Iterator, List
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -37,10 +37,7 @@ DB_TCP_PORTS = [
 ]
 
 
-def run(
-    input_ooi: IPPort,
-    additional_oois: List,
-) -> Iterator[OOI]:
+def run(input_ooi: IPPort, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     port = input_ooi.port
     protocol = input_ooi.protocol
     if protocol == Protocol.TCP and port in SA_TCP_PORTS:
