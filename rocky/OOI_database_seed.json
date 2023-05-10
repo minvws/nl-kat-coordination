@@ -569,7 +569,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "OpenKAT tests all IPv6 addressesreceived from your name servers. For this website there are not enough name servers accessible via IPv6.",
+        "description": "OpenKAT tests all IPv6 addresses received from your name servers. For this website there are not enough name servers accessible via IPv6.",
         "recommendation": "Add an IPv6 address for at least two name servers that have no IPv6 address yet.",
         "risk": "Middle"
       },
