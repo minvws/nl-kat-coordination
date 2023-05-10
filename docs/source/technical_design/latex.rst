@@ -545,7 +545,7 @@ Another option is to manually add your font ``.ttf`` or ``.otf`` file to the `ke
 How do I customize LaTeX reports ?
 ==================================
 
-The LaTeX reports can be customized in a number of ways. You can customize the current ``bevindingenrapport`` by locating it within the ``keiko`` directory and start making changes.
+The LaTeX reports can be customized in a number of ways. You can customize the current ``bevindingenrapport`` by locating it within the ``keiko`` directory and start making changes to the code.
 
 
 Styling changes
