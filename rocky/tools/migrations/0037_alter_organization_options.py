@@ -6,6 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
     dependencies = [
         ("tools", "0036_merge_20230504_1629"),
+        ("tools", "0033_alter_organization_options"),
     ]
 
     operations = [
