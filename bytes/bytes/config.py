@@ -47,10 +47,10 @@ def get_settings() -> Settings:
 def has_pastebin_key() -> bool:
     settings = get_settings()
 
-    return settings.pastebin_api_dev_key != ""
+    return bool(settings.pastebin_api_dev_key)
 
 
 def has_rfc3161_provider() -> bool:
     settings = get_settings()
 
-    return settings.rfc3161_provider != ""
+    return bool(settings.rfc3161_provider)

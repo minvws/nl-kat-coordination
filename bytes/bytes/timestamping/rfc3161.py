@@ -21,7 +21,7 @@ class RFC3161HashRepository(HashRepository):
     def verify(self, link: RetrievalLink, secure_hash: SecureHash) -> bool:
         # Note: "link" is an inconvenient name for this implementation since it is a token.
 
-        if link == "":
+        if not link:
             raise ValueError("Can't retrieve secure-hash from empty link.")
 
         time_stamp_token = base64.b64decode(str(link))
