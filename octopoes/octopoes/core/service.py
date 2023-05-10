@@ -128,30 +128,42 @@ class OctopoesService:
             self.ooi_repository.save(ooi, valid_time=valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
 
-    def _run_inference(self, origin: Origin, valid_time: datetime):
+    def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
         bit_definition = get_bit_definitions()[origin.method]
 
-        resulting_oois = []
+        is_disabled = bit_definition.id in settings.bits_disabled or (
+            not bit_definition.default_enabled and bit_definition.id not in settings.bits_enabled
+        )
 
-        if bit_definition.id not in settings.bits_disabled and (
-            bit_definition.id in settings.bits_enabled or bit_definition.default_enabled
-        ):
-            try:
-                level = self.scan_profile_repository.get(origin.source, valid_time).level
-            except ObjectNotFoundException:
-                level = 0
+        if is_disabled:
+            self.save_origin(origin, [], valid_time)
+            return
 
-            if level >= bit_definition.min_scan_level:
-                source = self.ooi_repository.get(origin.source, valid_time)
+        try:
+            level = self.scan_profile_repository.get(origin.source, valid_time).level
+        except ObjectNotFoundException:
+            level = 0
 
-                parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
-                parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
+        if level < bit_definition.min_scan_level:
+            self.save_origin(origin, [], valid_time)
+            return
 
-                try:
-                    resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
-                except Exception as e:
-                    logger.exception("Error running inference", exc_info=e)
-                    return
+        source = self.ooi_repository.get(origin.source, valid_time)
+
+        parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
+        parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
+
+        config = {}
+        if bit_definition.config_ooi_relation_path is not None:
+            configs = self.ooi_repository.get_bit_configs(source, bit_definition, valid_time)
+            if len(configs) != 0:
+                config = configs[-1].config
+
+        try:
+            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
+        except Exception as e:
+            logger.exception("Error running inference", exc_info=e)
+            return
 
         self.save_origin(origin, resulting_oois, valid_time)
 
