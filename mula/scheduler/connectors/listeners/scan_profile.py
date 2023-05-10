@@ -1,31 +1,22 @@
-from typing import List, Optional
+from typing import Callable
 
-from scheduler.connectors.errors import exception_handler
 from scheduler.models import ScanProfileMutation as ScanProfileMutationModel
 
 from .listeners import RabbitMQ
 
 
 class ScanProfileMutation(RabbitMQ):
-    name = "scan_profile_mutation"
+    def __init__(self, dsn: str, queue: str, func: Callable):
+        super().__init__(dsn)
+        self.queue = queue
+        self.func = func
 
-    @exception_handler
-    def get_scan_profile_mutation(self, queue: str) -> Optional[ScanProfileMutationModel]:
-        response = self.get(queue)
-        if response is None:
-            return None
+    def listen(self) -> None:
+        self.basic_consume(self.queue, True)
 
-        return ScanProfileMutationModel(**response)
+    def dispatch(self, body: bytes) -> None:
+        # Convert body into a ScanProfileMutationModel
+        model = ScanProfileMutationModel.parse_raw(body)
 
-    @exception_handler
-    def get_scan_profile_mutations(self, queue: str, n: int) -> Optional[List[ScanProfileMutationModel]]:
-        oois: List[ScanProfileMutationModel] = []
-
-        for _ in range(n):
-            ooi = self.get_scan_profile_mutation(queue=queue)
-            if ooi is None:
-                break
-
-            oois.append(ooi)
-
-        return oois
+        # Call the function
+        self.func(model)
