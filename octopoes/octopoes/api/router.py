@@ -305,3 +305,12 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
         )
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deleting node failed") from e
+
+
+@router.post("/bits/recalculate")
+def recalculate_bits(
+    xtdb_session_: XTDBSession = Depends(xtdb_session), octopoes: OctopoesService = Depends(octopoes_service)
+) -> int:
+    inference_count = octopoes.recalculate_bits()
+    xtdb_session_.commit()
+    return inference_count
