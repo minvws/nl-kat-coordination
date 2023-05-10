@@ -11,7 +11,7 @@ from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPHeader
 def test_url_extracted_by_oois_in_headers_url():
     header = HTTPHeader(resource="", key="Location", value="https://www.example.com")
 
-    results = list(run_oois_in_headers(header, []))
+    results = list(run_oois_in_headers(header, [], {}))
 
     url = results[0]
     assert isinstance(url, URL)
@@ -40,7 +40,7 @@ def test_url_extracted_by_oois_in_headers_relative_path():
 
     header = HTTPHeader(resource=resource.reference, key="Location", value="script.php")
 
-    results = list(run_oois_in_headers(header, []))
+    results = list(run_oois_in_headers(header, [], {}))
 
     url = results[0]
     assert isinstance(url, URL)
@@ -56,7 +56,7 @@ def test_url_extracted_by_oois_in_headers_relative_path():
 def test_finding_generated_when_443_not_open_and_80_is_open():
     port_80 = IPPort(address="fake", protocol="tcp", port=80)
     website = Website(ip_service="fake", hostname="fake")
-    results = list(run_https_availability(None, [port_80, website]))
+    results = list(run_https_availability(None, [port_80, website], {}))
     finding = results[0]
     assert isinstance(finding, Finding)
     assert finding.description == "HTTP port is open, but HTTPS port is not open"

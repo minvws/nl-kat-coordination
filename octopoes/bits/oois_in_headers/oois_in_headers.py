@@ -1,5 +1,5 @@
 import re
-from typing import Iterator, List
+from typing import Dict, Iterator, List
 from urllib.parse import urljoin, urlparse
 
 from pydantic import ValidationError
@@ -15,10 +15,7 @@ def is_url(input_str):
     return bool(result.scheme)
 
 
-def run(
-    input_ooi: HTTPHeader,
-    additional_oois: List,
-) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     network = Network(name="internet")
 
     if input_ooi.key.lower() == "location":
