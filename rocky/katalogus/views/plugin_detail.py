@@ -60,7 +60,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
 
         scan_history = scheduler.client.get_lazy_task_list(
             scheduler_id=scheduler_id,
-            type=plugin_type,
+            task_type=plugin_type,
             plugin_id=plugin_id,
             input_ooi=input_ooi,
             status=status,
