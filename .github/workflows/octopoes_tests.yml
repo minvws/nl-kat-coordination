@@ -40,3 +40,7 @@ jobs:
         with:
           name: coverage
           path: octopoes/coverage.xml
+
+      - name: Run integration tests
+        run: DOCKER_BUILDKIT=1 make itest build_args='--build-arg PYTHON_VERSION=${{ matrix.version }}'
+        working-directory: ./octopoes
