@@ -1,4 +1,5 @@
 import logging
+import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Dict, List, Set
@@ -136,9 +137,9 @@ class BoefjeHandler(Handler):
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, environment)
-        except Exception as e:
+        except Exception:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
-            boefje_results = [({"error/boefje"}, str(e))]
+            boefje_results = [({"error/boefje"}, traceback.format_exc())]
 
             raise
         finally:
