@@ -231,7 +231,7 @@ class Server:
         self,
         request: fastapi.Request,
         scheduler_id: Optional[str] = None,
-        type: Optional[str] = None,
+        task_type: Optional[str] = None,
         status: Optional[str] = None,
         offset: int = 0,
         limit: int = 10,
@@ -246,7 +246,7 @@ class Server:
 
             results, count = self.ctx.task_store.get_tasks(
                 scheduler_id=scheduler_id,
-                type=type,
+                task_type=task_type,
                 status=status,
                 offset=offset,
                 limit=limit,

@@ -1,0 +1,49 @@
+{
+  "method": "boefje_normalizer_x",
+  "source": "Hostname|internet|example.com",
+  "result": [
+    {
+      "object_type": "Network",
+      "name": "internet"
+    },
+    {
+      "object_type": "Hostname",
+      "network": "Network|internet",
+      "name": "example.com"
+    },
+    {
+      "object_type": "ResolvedHostname",
+      "hostname": "Hostname|internet|example.com",
+      "address": "IPAddressV4|internet|1.1.1.1"
+    },
+    {
+      "object_type": "IPAddressV4",
+      "network": "Network|internet",
+      "address": "1.1.1.1"
+    },
+    {
+        "object_type": "IPPort",
+        "address": "IPAddressV4|internet|1.1.1.1",
+        "protocol": "tcp",
+        "port": 80,
+        "state": "open"
+    },
+    {
+        "object_type": "Service",
+        "name": "http"
+    },
+    {
+        "object_type": "IPService",
+        "ip_port": "IPPort|internet|1.1.1.1|tcp|80",
+        "service": "Service|http"
+    },
+    {
+        "object_type": "HTTPHeader",
+        "resource": "HTTPResource|internet|1.1.1.1|tcp|80|http|internet|example.com|http|internet|example.com|80|/",
+        "key": "strict-transport-security",
+        "value": "max-age=31536000; includeSubDomains"
+    }
+  ],
+  "valid_time": "2019-01-01T00:00:00+00:00",
+  "task_id": "1234"
+}
