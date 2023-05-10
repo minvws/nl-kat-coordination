@@ -29,7 +29,7 @@ def test_katalogus_plugin_listing(request, member, rf, mocker):
 
 
 @pytest.mark.parametrize("member", ["admin_member", "client_member"])
-def test_katalogus_plugin_listing(request, member, rf, mocker):
+def test_katalogus_plugin_listing_no_perms(request, member, rf, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
     mock_requests.Session().get.return_value = mock_response
