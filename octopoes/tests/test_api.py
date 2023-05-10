@@ -3,22 +3,9 @@ import requests
 from fastapi.testclient import TestClient
 
 from octopoes.api.api import app
-from octopoes.api.router import settings
-from octopoes.config.settings import Settings, XTDBType
 from octopoes.version import __version__
 
 client = TestClient(app)
-
-
-def get_settings_override():
-    return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
-
-
-@pytest.fixture
-def xtdbtype_multinode():
-    app.dependency_overrides[settings] = get_settings_override
-    yield
-    app.dependency_overrides = {}
 
 
 @pytest.fixture
@@ -105,13 +92,15 @@ def test_get_scan_profiles(requests_mock, patch_pika):
 
 
 def test_create_node():
-    with pytest.raises(Exception, match="Creating nodes requires XTDB_MULTINODE"):
-        client.post("/_dev/node")
+    res = client.post("/_dev/node")
+    assert res.status_code == 501
+    assert res.json() == {"detail": "XTDB multinode is not set up for Octopoes."}
 
 
 def test_delete_node():
-    with pytest.raises(Exception, match="Deleting nodes requires XTDB_MULTINODE"):
-        client.delete("/_dev/node")
+    res = client.delete("/_dev/node")
+    assert res.status_code == 501
+    assert res.json() == {"detail": "XTDB multinode is not set up for Octopoes."}
 
 
 def test_create_node_multinode(requests_mock, xtdbtype_multinode):

@@ -15,7 +15,7 @@ def test_plugin_settings_edit_view(
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    request = setup_request(rf.post("step_organization_setup", data={"boefje_id": 123}), superuser_member.user)
+    request = setup_request(rf.post("plugin_settings_edit", data={"boefje_id": 123}), superuser_member.user)
     response = PluginSettingsUpdateView.as_view()(
         request,
         organization_code=superuser_member.organization.code,
