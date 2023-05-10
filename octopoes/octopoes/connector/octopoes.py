@@ -169,4 +169,4 @@ class OctopoesAPIConnector:
         return res.json()
 
     def recalculate_bits(self) -> int:
-        return self.session.get(f"/{self.client}/bits/recalculate").json()
+        return self.session.post(f"/{self.client}/bits/recalculate").json()
