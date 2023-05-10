@@ -257,7 +257,7 @@ class OOIInformation(models.Model):
 
     @property
     def description(self):
-        if self.data["description"] == "":
+        if not self.data["description"]:
             self.get_internet_description()
         return self.data["description"]
 

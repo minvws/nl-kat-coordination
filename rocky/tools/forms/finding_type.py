@@ -87,8 +87,8 @@ class FindingTypeAddForm(BaseRockyForm):
 
         return data
 
-    def check_finding_type_existence(self, id):
-        _, created = OOIInformation.objects.get_or_create(id=f"KATFindingType|{id}")
+    def check_finding_type_existence(self, finding_type_id):
+        _, created = OOIInformation.objects.get_or_create(id=f"KATFindingType|{finding_type_id}")
 
         if not created:
             raise ValidationError(_("Finding type already exists"))
