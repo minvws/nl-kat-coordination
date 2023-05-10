@@ -162,3 +162,6 @@ class OctopoesAPIConnector:
         params = {"reference": str(reference), "valid_time": valid_time}
         res = self.session.get(f"/{self.client}/scan_profiles/inheritance", params=params)
         return parse_obj_as(List[InheritanceSection], res.json())
+
+    def recalculate_bits(self) -> int:
+        return self.session.post(f"/{self.client}/bits/recalculate").json()

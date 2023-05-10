@@ -57,6 +57,17 @@
                     <a href="{% url "indemnification_add" organization.code %}"
                        class="button ghost">{% translate "Add indemnification" %}</a>
                 {% endif %}
+                {% if perms.tools.can_recalculate_bits %}
+                    <form method="post" class="inline">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="dropdown-button"
+                              name="action"
+                              value="recalculate">
+                        {% translate "Rerun all bits" %}
+                      </button>
+                    </form>
+                {% endif %}
             </div>
         </section>
         {% if organization.tags.all %}
