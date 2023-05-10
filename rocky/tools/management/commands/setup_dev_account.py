@@ -47,6 +47,7 @@ class Command(BaseCommand):
                 "add_organizationmember",
                 "change_organization",
                 "change_organizationmember",
+                "can_recalculate_bits",
             ]
         )
         self.group_admin.permissions.set(admin_permissions)

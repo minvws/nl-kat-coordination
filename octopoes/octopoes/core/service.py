@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from logging import getLogger
 from typing import Callable, Dict, List, Optional, Set, Type
 
@@ -495,3 +495,10 @@ class OctopoesService:
                 return expl
 
         return inheritance_chain
+
+    def recalculate_bits(self) -> int:
+        valid_time = datetime.now(timezone.utc)
+        origins = self.origin_repository.list(origin_type=OriginType.INFERENCE, valid_time=valid_time)
+        for origin in origins:
+            self._run_inference(origin, valid_time)
+        return len(origins)
