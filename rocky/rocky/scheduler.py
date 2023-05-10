@@ -135,7 +135,6 @@ class LazyTaskList:
     def count(self) -> int:
         if self._count is None:
             self._count = self.scheduler_client.list_tasks(
-                self.scheduler_id,
                 type=self.object_type,
                 limit=0,
                 **self.kwargs,
