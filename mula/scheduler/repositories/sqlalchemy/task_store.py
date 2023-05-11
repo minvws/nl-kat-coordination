@@ -23,7 +23,7 @@ class TaskStore(TaskStorer):
     def get_tasks(
         self,
         scheduler_id: Optional[str],
-        type: Optional[str],
+        task_type: Optional[str],
         status: Optional[str],
         min_created_at: Optional[datetime.datetime],
         max_created_at: Optional[datetime.datetime],
@@ -38,8 +38,8 @@ class TaskStore(TaskStorer):
             if scheduler_id is not None:
                 query = query.filter(models.TaskORM.scheduler_id == scheduler_id)
 
-            if type is not None:
-                query = query.filter(models.TaskORM.type == type)
+            if task_type is not None:
+                query = query.filter(models.TaskORM.type == task_type)
 
             if status is not None:
                 query = query.filter(models.TaskORM.status == models.TaskStatus(status).name)

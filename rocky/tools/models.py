@@ -106,6 +106,7 @@ class Organization(models.Model):
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
             ("can_set_clearance_level", "Can set clearance level"),
             ("can_delete_oois", "Can delete oois"),
+            ("can_recalculate_bits", "Can recalculate bits"),
         )
 
     def get_absolute_url(self):
@@ -297,7 +298,7 @@ class OOIInformation(models.Model):
 
     @property
     def description(self):
-        if self.data["description"] == "":
+        if not self.data["description"]:
             self.get_internet_description()
         return self.data["description"]
 
