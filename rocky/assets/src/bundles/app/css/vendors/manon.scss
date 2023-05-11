@@ -43,6 +43,10 @@
 	@use "@minvws/manon/section";
 	@use "@minvws/manon/section-content-wrapper";
 
+	/* Article */
+	@use "@minvws/manon/article";
+	@use "@minvws/manon/article-content-wrapper";
+
 	/* Layout exceptions */
 	@use "@minvws/manon/layout-authentication";
 	@use "@minvws/manon/layout-one-third-two-thirds";
@@ -64,6 +68,7 @@
 
 /* Components */
 @use "@minvws/manon/accordion";
+@use "@minvws/manon/background-color-offset";
 @use "@minvws/manon/breadcrumb-bar";
 @use "@minvws/manon/breadcrumb-bar-content-block";
 @use "@minvws/manon/code-base";
