@@ -37,6 +37,34 @@ GROUP_CLIENT = "clients"
 logger = logging.getLogger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
+DENY_ORGANIZATION_CODES = [
+    "admin",
+    "api",
+    "i18n",
+    "health",
+    "privacy-statement",
+    "account",
+    "crisis-room",
+    "onboarding",
+    "indemnifications",
+    "findings",
+    "objects",
+    "organizations",
+    "edit",
+    "members",
+    "settings",
+    "scans",
+    "upload",
+    "tasks",
+    "bytes",
+    "kat-alogus",
+    "boefjes",
+    "mula",
+    "keiko",
+    "octopoes",
+    "rocky",
+    "fmea",
+]
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):
@@ -105,8 +133,20 @@ class Organization(models.Model):
 
         super().delete(*args, **kwargs)
 
+    def clean(self):
+        if self.code in DENY_ORGANIZATION_CODES:
+            raise ValidationError(
+                {
+                    "code": _(
+                        "This organization code is reserved by OpenKAT and cannot be used. "
+                        "Choose another organization code."
+                    )
+                }
+            )
+
     @classmethod
     def pre_create(cls, sender, instance, *args, **kwargs):
+        instance.clean()
         katalogus_client = cls._get_healthy_katalogus(instance.code)
         octopoes_client = cls._get_healthy_octopoes(instance.code)
 
