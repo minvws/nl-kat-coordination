@@ -2,11 +2,11 @@ from unittest.mock import patch
 
 import pytest
 from django.contrib.auth.models import Permission
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
 from requests import RequestException
-from tools.models import Organization
+from tools.models import DENY_ORGANIZATION_CODES, Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.organization_add import OrganizationAddView
@@ -325,6 +325,39 @@ def test_admin_edits_organization(rf, admin_member, mocker):
     assertContains(resulted_response, "tags-color-1-light plain")  # default color
     assertContains(resulted_response, "tag1")
     assertContains(resulted_response, "tag2")
+
+
+def test_organization_code_validator_from_view(rf, superuser_member, mocker, mock_models_octopoes):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]},
+        ),
+        superuser_member.user,
+    )
+
+    response = OrganizationAddView.as_view()(request)
+
+    # Form validation returns 200 with invalid form
+    assert response.status_code == 200
+    assertContains(
+        response, "This organization code is reserved by OpenKAT and cannot be used. Choose another organization code."
+    )
+
+
+@pytest.mark.django_db
+def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    with pytest.raises(ValidationError):
+        Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])
+
+    new_org = Organization.objects.create(name="Test", code="test_123")
+    assert new_org.code == "test_123"
+
+    new_org.code = DENY_ORGANIZATION_CODES[0]
+    with pytest.raises(ValidationError):
+        new_org.save()
 
 
 def test_organization_settings_perms(rf, superuser_member, admin_member, redteam_member, client_member):
