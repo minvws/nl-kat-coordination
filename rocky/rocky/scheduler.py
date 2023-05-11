@@ -178,7 +178,7 @@ class SchedulerClient:
     def get_lazy_task_list(
         self,
         scheduler_id: str,
-        type: Optional[str] = None,
+        task_type: Optional[str] = None,
         status: Optional[str] = None,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
@@ -189,7 +189,7 @@ class SchedulerClient:
         return LazyTaskList(
             self,
             scheduler_id=scheduler_id,
-            type=type,
+            type=task_type,
             status=status,
             min_created_at=min_created_at,
             max_created_at=max_created_at,

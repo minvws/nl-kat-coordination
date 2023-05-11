@@ -19,7 +19,7 @@ class TaskStorer(abc.ABC):
     def get_tasks(
         self,
         scheduler_id: Optional[str],
-        type: Optional[str],
+        task_type: Optional[str],
         status: Optional[str],
         min_created_at: Optional[datetime.datetime],
         max_created_at: Optional[datetime.datetime],
