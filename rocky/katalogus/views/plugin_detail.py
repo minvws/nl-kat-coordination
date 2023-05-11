@@ -42,7 +42,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
 
     def get_scan_history(self) -> Page:
         scheduler_id = f"{self.plugin.type}-{self.organization.code}"
-        type = self.plugin.type
+        plugin_type = self.plugin.type
         plugin_id = self.plugin.id
         input_ooi = self.request.GET.get("scan_history_search")
         status = self.request.GET.get("scan_history_status")
@@ -61,7 +61,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
 
         scan_history = scheduler.client.get_lazy_task_list(
             scheduler_id=scheduler_id,
-            type=type,
+            task_type=plugin_type,
             plugin_id=plugin_id,
             input_ooi=input_ooi,
             status=status,

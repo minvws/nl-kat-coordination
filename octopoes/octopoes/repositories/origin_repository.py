@@ -10,7 +10,7 @@ from octopoes.events.events import OperationType, OriginDBEvent
 from octopoes.events.manager import EventManager
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.origin import Origin
+from octopoes.models.origin import Origin, OriginType
 from octopoes.xtdb import FieldSet
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
@@ -36,6 +36,9 @@ class OriginRepository:
         raise NotImplementedError
 
     def delete(self, origin: Origin, valid_time: datetime) -> None:
+        raise NotImplementedError
+
+    def list(self, origin_type: OriginType, valid_time: datetime) -> List[Origin]:
         raise NotImplementedError
 
 
@@ -123,3 +126,14 @@ class XTDBOriginRepository(OriginRepository):
             old_data=origin,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
+
+    def list(self, origin_type: OriginType, valid_time: datetime) -> List[Origin]:
+        query = generate_pull_query(
+            self.xtdb_type,
+            FieldSet.ALL_FIELDS,
+            {
+                "origin_type": origin_type.value,
+            },
+        )
+        results = self.session.client.query(query, valid_time=valid_time)
+        return [self.deserialize(r[0]) for r in results]
