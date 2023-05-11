@@ -300,8 +300,8 @@ class Scheduler(abc.ABC):
 
         return True
 
-    def is_item_on_queue_by_hash(self, hash: str) -> bool:
-        return self.queue.is_item_on_queue_by_hash(hash)
+    def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
+        return self.queue.is_item_on_queue_by_hash(item_hash)
 
     def stop(self) -> None:
         """Stop the scheduler."""

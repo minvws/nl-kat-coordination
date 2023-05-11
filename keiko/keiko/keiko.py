@@ -43,7 +43,7 @@ LATEX_SPECIAL_CHARS = str.maketrans(
 )
 
 
-def latex_escape(input: Any) -> str:
+def latex_escape(text: Any) -> str:
     """Escape characters that are special in LaTeX.
 
     References:
@@ -51,14 +51,14 @@ def latex_escape(input: Any) -> str:
     - http://tex.stackexchange.com/a/34586/43228
     - http://stackoverflow.com/a/16264094/2570866
     """
-    if not isinstance(input, str):
-        input = str(input)
-    return input.translate(LATEX_SPECIAL_CHARS)
+    if not isinstance(text, str):
+        text = str(text)
+    return text.translate(LATEX_SPECIAL_CHARS)
 
 
-def baretext(input_: str) -> str:
+def baretext(text: str) -> str:
     """Remove non-alphanumeric characters from a string."""
-    return "".join(filter(str.isalnum, input_)).lower()
+    return "".join(filter(str.isalnum, text)).lower()
 
 
 @tracer.start_as_current_span("generate_report")
@@ -231,6 +231,6 @@ def read_glossary(glossary: str, settings: Settings) -> Dict[str, Tuple[str, str
         for row in csvreader:
             # only allow words with baretext representation
             bare_word = baretext(row[0])
-            if bare_word != "":
+            if bare_word:
                 glossary_entries[baretext(row[0])] = row[0], row[1]
     return glossary_entries

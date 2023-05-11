@@ -167,3 +167,6 @@ class OctopoesAPIConnector:
         params = {"valid_time": valid_time}
         res = self.session.get(f"/{self.client}/finding_types/count", params=params)
         return res.json()
+
+    def recalculate_bits(self) -> int:
+        return self.session.post(f"/{self.client}/bits/recalculate").json()
