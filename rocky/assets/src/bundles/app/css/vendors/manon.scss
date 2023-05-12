@@ -61,7 +61,7 @@
 @use "@minvws/manon/header";
 @use "@minvws/manon/header-navigation";
 @use "@minvws/manon/header-navigation-content-wrapper";
-@use "@minvws/manon/navigation-collapsible-menu";
+@use "@minvws/manon/header-navigation-collapsible";
 
 /* Footer */
 @use "@minvws/manon/footer";
@@ -123,10 +123,11 @@
 @use "@minvws/manon/form-horizontal-view-fieldset";
 @use "@minvws/manon/form-fieldset-visually-hidden-horizontal-view";
 @use "@minvws/manon/form-fieldset-visually-hidden-help";
-@use "@minvws/manon/fieldset-radio";
+@use "@minvws/manon/form-fieldset-radio";
+@use "@minvws/manon/form-fieldset-checkbox";
 
 /* Notifications */
-@use "@minvws/manon/notification-base";
+@use "@minvws/manon/notification";
 @use "@minvws/manon/notification-block-element";
 @use "@minvws/manon/notification-paragraph";
 @use "@minvws/manon/notification-table";
