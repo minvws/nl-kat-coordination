@@ -121,16 +121,18 @@ class TaskTest(TestCase):
             BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository).handle(meta)
 
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
-        mock_bytes_api_client.save_raw.assert_called_once_with(
-            "some-random-job-id",
-            "Boefje failed",
-            {
-                "error/boefje",
-                "dummy_boefje_runtime_exception",
-                "boefje/dummy_boefje_runtime_exception",
-                f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
-            },
-        )
+        mock_bytes_api_client.save_raw.assert_called_once()
+        raw_call_args = mock_bytes_api_client.save_raw.call_args
+
+        assert raw_call_args[0][0] == "some-random-job-id"
+        assert "Traceback (most recent call last)" in raw_call_args[0][1]
+        assert "JobRuntimeError: Boefje failed" in raw_call_args[0][1]
+        assert raw_call_args[0][2] == {
+            "error/boefje",
+            "dummy_boefje_runtime_exception",
+            "boefje/dummy_boefje_runtime_exception",
+            f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
+        }
 
     def test_exception_raised_unsupported_return_type_normalizer(self):
         meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))

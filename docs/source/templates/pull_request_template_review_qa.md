@@ -2,7 +2,7 @@
 
 ```markdown
 ## Checklist for QA:
-- [ ] I have checked out this branch, and successfully ran a fresh `make kat`.
+- [ ] I have checked out this branch, and successfully ran a fresh `make reset`.
 - [ ] I confirmed that there are no unintended functional regressions in this branch:
     - [ ] I have managed to pass the onboarding flow
     - [ ] Objects and Findings are created properly

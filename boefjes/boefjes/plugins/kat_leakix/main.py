@@ -21,13 +21,13 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     else:
         raise NameError(f'Expected an IPAddress of Hostname, but got pk "{pk}"')
 
-    for type in ("leak", "service"):
+    for scope in ("leak", "service"):
         page_counter = 0
         want_next_result = True
         while want_next_result:
             want_next_result = False
             response = requests.get(
-                f"https://leakix.net/search?scope={type}&q={dork}&page={page_counter}",
+                f"https://leakix.net/search?scope={scope}&q={dork}&page={page_counter}",
                 headers={"Accept": "application/json", "api-key": getenv("LEAKIX_API")},
             )
             page_counter += 1

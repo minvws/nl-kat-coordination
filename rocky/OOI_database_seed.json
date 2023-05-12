@@ -225,7 +225,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "The website does not use HTTP Strict Transport Security (HSTS). Via HSTS the browser is configured to only connect via a proper secured HTTPS connection to the website.",
+        "description": "The website does not use HTTP Strict Transport Security (HSTS). HSTS tells the browser to connect via a proper secured HTTPS connection to the website.",
         "impact": "When a browser uses the HTTP protocol, the network connection is not encrypted, so computers in the chain between the web server and the browser can read the data traffic. This makes data and identity theft possible, as well as manipulating data traffic, allowing for all kinds of fraud scenarios. With HSTS, only HTTPS traffic to the website is accepted by the browser.",
         "recommendation": "Set the Strict-Transport-Security HTTP header in all HTTP answers.",
         "source": "https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security",
@@ -300,8 +300,9 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "The HTTP header X-DNS-Prefetch-Control is missing.",
+        "description": "The HTTP header X-DNS-Prefetch-Control is missing. The X-DNS-Prefetch-Control HTTP response header controls DNS prefetching, a feature by which browsers proactively perform domain name resolution on both links that the user may choose to follow as well as URLs for items referenced by the document.",
         "recommendation": "Set HTTP header X-DNS-Prefetch-Control: off in all HTTP answers.",
+        "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control",
         "risk": "Very low"
       },
       "consult_api": false
@@ -343,7 +344,7 @@
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
         "description": "The HTTP header Referrer-Policy is missing in HTTP responses.",
-        "impact": "When a website visitor clicks on a link to another website, the user's browser sends through the Referer HTTP header (a part of the URL) to the other website. The website that is linked to will know which website (and webpage, if HTTP was used) the visitor came from. This is a privacy leak for the website visitor. In some cases, sensitive information such as session tokens may leak to websites that are linked to.",
+        "impact": "When a website visitor clicks on a link to another website, the browser sends the Referer HTTP header (a part of the URL) to the other website. This is a privacy leak for the website visitor. In some cases, sensitive information such as session tokens may leak to websites that are linked to.",
         "recommendation": "Set the header Referrer-Policy: no- referrer in every HTTP answer.",
         "source": "https://scotthelme.co.uk/a-new-security-header-referrer-policy/",
         "risk": "Very low"
@@ -465,6 +466,7 @@
       "data": {
         "description": "The encrypted connection provides no protection against downgrade attacks.",
         "recommendation": "Implement TLS_FALLBACK_SCSV.",
+        "source": "https://www.rfc-editor.org/rfc/rfc7507",
         "risk": "Low"
       },
       "consult_api": false
@@ -541,7 +543,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if all name servers, that have an AAAA record with IPv6 address, are reachable over IPv6. One or more name servers is not reachable on an IPv6 address.",
+        "description": "One or more name servers is not reachable on an IPv6 address.",
         "recommendation": "Check IPv6 addresses for all name servers.",
         "risk": "Low"
       },
@@ -554,7 +556,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if all web servers, that have an AAAA record with IPv6 address, are reachable over IPv6. In this case the web server(s) is/are not reachable via IPv6.",
+        "description": "OpenKAT checks if all web server that have an AAAA record with IPv6 address are reachable over IPv6. In this case the web server(s) is/are not reachable via IPv6.",
         "recommendation": "Configure IPv6 addresses for the web servers",
         "risk": "Low"
       },
@@ -567,7 +569,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if we can connect to your name server(s) over IPv6 on any available ports (80 and/or 443). We test all IPv6 addresses that we receive from your name servers. For this website there are not enough name servers accessible via IPv6.",
+        "description": "OpenKAT tests all IPv6 addresses received from your name servers. For this website there are not enough name servers accessible via IPv6.",
         "recommendation": "Add an IPv6 address for at least two name servers that have no IPv6 address yet.",
         "risk": "Middle"
       },
@@ -580,7 +582,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if there is at least one AAAA record with IPv6 address for your web server. For this website there is no web server with an IPv6 address available.",
+        "description": "For this website there is no web server with an IPv6 address available.",
         "recommendation": "Add an IPv6 address for at least one web server that has no IPv6 address yet.",
         "risk": "Low"
       },
@@ -593,7 +595,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We compare the web content that we receive from the web server over both IPv6 and IPv4 on any available ports (80 and/or 443). In case there are multiple IPv6 and IPv4 addresses, we pick one IPv6 address and one IPv4 address. If the content difference is not higher than 10%, we expect the main web content to be the same. In this case the websites hosted on IPv4 and IPv6 for the given hostname are not the same.",
+        "description": "The websites hosted on IPv4 and IPv6 for the given hostname are not the same.",
         "recommendation": "Make sure both IPv6 and IPv4 addresses point to the same web content.",
         "risk": "Low"
       },
@@ -606,7 +608,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
+        "description": "The provided domain is not DNSSEC signed.",
         "recommendation": "Enable DNSSEC on your name servers.",
         "risk": "Middle"
       },
@@ -619,7 +621,7 @@
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is DNSSEC signed, but the DNSSEC is invalid.",
+        "description": "The provided domain is DNSSEC signed, but the DNSSEC config is invalid.",
         "recommendation": "Reconfigure DNSSEC on your name servers.",
         "risk": "Middle"
       },
@@ -669,7 +671,6 @@
       "last_updated": "2021-09-29T14:46:09.835Z",
       "data": {
         "description": "This software is known to be used as malware.",
-        "recommendation": "You probably want to remove this software.",
         "risk": "High"
       },
       "consult_api": false
@@ -682,7 +683,6 @@
       "last_updated": "2021-09-29T16:46:09.835Z",
       "data": {
         "description": "This software should not be exposed to the Internet.",
-        "recommendation": "You probably want to this port to be closed.",
         "risk": "Critical"
       },
       "consult_api": false
@@ -695,7 +695,6 @@
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
         "description": "A verified vulnerability is found.",
-        "recommendation": "You want to investigate this: maybe you could close this port or patch/remove the software.",
         "risk": "Critical"
       },
       "consult_api": false
@@ -708,6 +707,7 @@
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
         "description": "SPF record does not have valid syntax.",
+        "source": "http://www.open-spf.org/SPF_Record_Syntax/",
         "risk": "High"
       },
       "consult_api": false
@@ -1006,7 +1006,6 @@
       "last_updated": "2022-01-27T09:01:09.835Z",
       "data": {
         "description": "There is a newer version for this software.",
-        "recommendation": "Update your software to the newest version.",
         "risk": "Recommendation"
       },
       "consult_api": false
@@ -1043,7 +1042,7 @@
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
         "description": "The hostname in this header does not exist.",
-        "recommendation": "Check if the hostname in the header is correct, update the header as quickly as possible.",
+        "recommendation": "Check if the hostname in the header is correct and update accordingly.",
         "risk": "Critical"
       },
       "consult_api": false

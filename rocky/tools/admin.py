@@ -34,7 +34,7 @@ class OOIInformationAdmin(admin.ModelAdmin):
     # if pk is not readonly, it will create a new record upon editing
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:  # editing an existing object
-            if obj.value == "":
+            if not obj.value:
                 return self.readonly_fields + (
                     "id",
                     "consult_api",

@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "dev": "parcel watch assets/src/bundles/*.js --dist-dir assets/dist --public-url ./ --no-cache",
-    "build": "parcel build assets/src/bundles/*.js --dist-dir assets/dist --public-url ./ --no-cache --no-scope-hoist",
+    "dev": "parcel watch assets/src/bundles/*.js --dist-dir assets/dist --public-url ./",
+    "build": "parcel build assets/src/bundles/*.js --dist-dir assets/dist --public-url ./ --no-scope-hoist",
     "test": "yarn --cwd roeltje cypress open",
     "format": "prettier --write ."
   },

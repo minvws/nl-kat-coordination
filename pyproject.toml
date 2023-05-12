@@ -25,8 +25,9 @@ paths = ["."]
 [tool.ruff]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
 # To be extended with DJ, PT, RUF, C90, D, PL, RET
-select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM"]
-ignore = ["UP006", "UP007"] # non-pep585-annotation and non-pep604-annotation are not actually compatible with 3.8
+select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A"]
+# non-pep585-annotation and non-pep604-annotation are not actually compatible with 3.8
+ignore = ["UP006", "UP007", "A003"]
 fix = true
 
 # Exclude a variety of commonly ignored directories.
@@ -73,7 +74,7 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 "boefjes/boefjes/plugins/kat_binaryedge/http_web/normalize.py" = ["ERA001"]
 "*/packaging/*" = ["INP"]
 "*/.ci/*" = ["INP"]
-"conf.py" = ["INP", "PTH"]
+"conf.py" = ["INP", "PTH", "A"]
 "conftest.py" = ["INP"]
 "setup.py" = ["INP"]
 "manage.py" = ["INP"]
