@@ -117,7 +117,7 @@ class OOIDetailView(
             status=status,
             min_created_at=min_created_at,
             max_created_at=max_created_at,
-            type="boefje",
+            task_type="boefje",
             input_ooi=self.get_ooi_id(),
             plugin_id=plugin_id,
         )

@@ -55,9 +55,10 @@ class RabbitMQ(Listener):
         """Dispatch a message without a return value"""
         raise NotImplementedError
 
-    def basic_consume(self, queue: str) -> None:
+    def basic_consume(self, queue: str, durable: bool) -> None:
         connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
         channel = connection.channel()
+        channel.queue_declare(queue=queue, durable=durable)
         channel.basic_consume(queue, on_message_callback=self.callback)
         channel.start_consuming()
 
@@ -81,7 +82,10 @@ class RabbitMQ(Listener):
         properties: pika.spec.BasicProperties,
         body: bytes,
     ) -> None:
-        self.logger.debug(" [x] Received %r", body)
+        """Callback function that is called when a message is received on the
+        queue.
+        """
+        self.logger.debug("Received message on queue %s, message: %r", method.routing_key, body)
 
         self.dispatch(body)
 

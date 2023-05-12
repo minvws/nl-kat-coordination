@@ -37,6 +37,34 @@ GROUP_CLIENT = "clients"
 logger = logging.getLogger(__name__)
 
 ORGANIZATION_CODE_LENGTH = 32
+DENY_ORGANIZATION_CODES = [
+    "admin",
+    "api",
+    "i18n",
+    "health",
+    "privacy-statement",
+    "account",
+    "crisis-room",
+    "onboarding",
+    "indemnifications",
+    "findings",
+    "objects",
+    "organizations",
+    "edit",
+    "members",
+    "settings",
+    "scans",
+    "upload",
+    "tasks",
+    "bytes",
+    "kat-alogus",
+    "boefjes",
+    "mula",
+    "keiko",
+    "octopoes",
+    "rocky",
+    "fmea",
+]
 
 
 class OrganizationTag(tagulous.models.TagTreeModel):
@@ -78,6 +106,7 @@ class Organization(models.Model):
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
             ("can_set_clearance_level", "Can set clearance level"),
             ("can_delete_oois", "Can delete oois"),
+            ("can_recalculate_bits", "Can recalculate bits"),
         )
 
     def get_absolute_url(self):
@@ -104,8 +133,20 @@ class Organization(models.Model):
 
         super().delete(*args, **kwargs)
 
+    def clean(self):
+        if self.code in DENY_ORGANIZATION_CODES:
+            raise ValidationError(
+                {
+                    "code": _(
+                        "This organization code is reserved by OpenKAT and cannot be used. "
+                        "Choose another organization code."
+                    )
+                }
+            )
+
     @classmethod
     def pre_create(cls, sender, instance, *args, **kwargs):
+        instance.clean()
         katalogus_client = cls._get_healthy_katalogus(instance.code)
         octopoes_client = cls._get_healthy_octopoes(instance.code)
 
@@ -257,7 +298,7 @@ class OOIInformation(models.Model):
 
     @property
     def description(self):
-        if self.data["description"] == "":
+        if not self.data["description"]:
             self.get_internet_description()
         return self.data["description"]
 

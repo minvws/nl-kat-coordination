@@ -224,6 +224,9 @@ class App:
             scheduler_boefje.run()
 
         if additions:
+            # Flush katalogus caches when new organisations are added
+            self.ctx.services.katalogus.flush_caches()
+
             self.logger.info(
                 "Added %s organisations to scheduler [org_ids=%s]",
                 len(additions),

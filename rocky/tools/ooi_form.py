@@ -26,7 +26,7 @@ class OOIForm(BaseRockyForm):
             self.fields[name] = field
 
     def clean(self):
-        return {key: value for key, value in super().clean().items() if value != ""}
+        return {key: value for key, value in super().clean().items() if value}
 
     def get_fields(self) -> Dict[str, forms.fields.Field]:
         return self.generate_form_fields()
