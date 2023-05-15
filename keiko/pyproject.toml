@@ -4,8 +4,6 @@ version = "0.1.0"
 description = "KAT report engine using LateX to generate PDF"
 authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.2.2"
 
 
 [tool.vulture]
