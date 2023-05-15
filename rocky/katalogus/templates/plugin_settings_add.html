@@ -28,7 +28,7 @@
                         {% csrf_token %}
                         {% include "partials/form/fieldset.html" with legend=name fields=form %}
 
-                        <div class="horizontal-view">
+                        <div class="button-container">
                             <button type="submit" class="ghost" name="add">
                                 {% blocktrans count form.fields|length as count %}
                   Add setting

@@ -86,6 +86,7 @@
 @use "@minvws/manon/button-icon";
 @use "@minvws/manon/list-base";
 @use "@minvws/manon/skip-to-content";
+@use "@minvws/manon/button-container";
 
 /* Images */
 @use "@minvws/manon/logo";
@@ -132,10 +133,15 @@
 @use "@minvws/manon/notification-paragraph";
 @use "@minvws/manon/notification-table";
 @use "@minvws/manon/notification-error";
+@use "@minvws/manon/notification-error-page";
 @use "@minvws/manon/notification-warning";
+@use "@minvws/manon/notification-warning-page";
 @use "@minvws/manon/notification-explanation";
+@use "@minvws/manon/notification-explanation-page";
 @use "@minvws/manon/notification-confirmation";
+@use "@minvws/manon/notification-confirmation-page";
 @use "@minvws/manon/notification-system-message";
+@use "@minvws/manon/notification-system-page";
 
 /* Login meta */
 @use "@minvws/manon/login-meta";

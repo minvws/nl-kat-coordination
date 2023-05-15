@@ -21,7 +21,7 @@
           {% translate "Mute finding" as fieldset_legend %}
           {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-          <div class="horizontal-view">
+          <div class="button-container">
             <fieldset>
               <button type="submit">{% translate "Mute" %}</button>
               <a href="{% ooi_url 'ooi_detail' ooi.primary_key organization.code %}"
