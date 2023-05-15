@@ -36,6 +36,7 @@ from octopoes.models.path import (
     get_paths_to_neighours,
 )
 from octopoes.models.tree import ReferenceTree
+from octopoes.models.types import OOIType
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 from octopoes.repositories.origin_repository import OriginRepository
@@ -94,7 +95,7 @@ class OctopoesService:
         offset: int = 0,
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-    ) -> Paginated[OOI]:
+    ) -> Paginated[OOIType]:
         paginated = self.ooi_repository.list(types, valid_time, limit, offset, scan_levels, scan_profile_types)
         self._populate_scan_profiles(paginated.items, valid_time)
         return paginated

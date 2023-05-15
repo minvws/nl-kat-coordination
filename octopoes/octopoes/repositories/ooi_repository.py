@@ -26,7 +26,7 @@ from octopoes.models.ooi.config import Config
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.tree import ReferenceNode, ReferenceTree
-from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
+from octopoes.models.types import OOIType, get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
@@ -77,7 +77,7 @@ class OOIRepository:
         limit: int = 20,
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-    ) -> Paginated[OOI]:
+    ) -> Paginated[OOIType]:
         raise NotImplementedError
 
     def list_random(
@@ -217,7 +217,7 @@ class XTDBOOIRepository(OOIRepository):
         limit: int = 20,
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-    ) -> Paginated[OOI]:
+    ) -> Paginated[OOIType]:
         types = to_concrete(types)
 
         count_query = """
