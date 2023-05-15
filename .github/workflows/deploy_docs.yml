@@ -36,7 +36,7 @@ jobs:
           cache: 'pip' # caching pip dependencies
 
       - name: Install pip dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-docs.txt
 
       - name: Compile static HTML
         run: sphinx-build -b html docs/source docs/_build

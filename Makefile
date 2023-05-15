@@ -80,3 +80,18 @@ debian-build-image:
 # Build Ubuntu build image
 ubuntu-build-image:
 	docker build -t kat-ubuntu-build-image packaging/ubuntu
+
+poetry-dependencies:
+	poetry check -C ./
+	poetry lock -C ./
+	poetry export -C ./ --without=docs -f requirements.txt -o ./requirements.txt
+	poetry export -C ./ --only=dev -f requirements.txt -o ./requirements-dev.txt
+	poetry export -C ./ --only=docs -f requirements.txt -o ./requirements-docs.txt
+	for path in keiko octopoes
+	do
+		echo $$path
+		poetry check -C $$path
+		poetry lock -C $$path
+		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt
+		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt
+	done
