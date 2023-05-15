@@ -8,7 +8,7 @@
 
     <main id="main-content">
         <section>
-            <div class="form-view">
+            <div class="layout-form">
                 <h1>{% translate "FMEA effect and severity" %}</h1>
                 <form novalidate
                       action="{% if editing_view %}{{ object.get_update_url }}{% else %}{% url "fmea_failure_mode_effect_create" %}{% endif %}"
