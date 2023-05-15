@@ -22,4 +22,5 @@ def test_list_oois(xtdb_ooi_repository: XTDBOOIRepository, valid_time: datetime)
 
     xtdb_ooi_repository.session.commit()
 
-    assert xtdb_ooi_repository.list({Network}, valid_time) == Paginated(count=0, items=[Network(name="test")])
+    # list() does not return any OOI without a scan profile
+    assert xtdb_ooi_repository.list({Network}, valid_time) == Paginated(count=0, items=[])
