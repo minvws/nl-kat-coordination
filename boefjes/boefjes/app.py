@@ -83,7 +83,7 @@ def start_working(
         all_queues_empty = True
 
         for queue in queues:
-            logger.info("Popping from queue %s", queue.id)
+            logger.debug("Popping from queue %s", queue.id)
 
             try:
                 p_item = scheduler_client.pop_item(queue.id)
