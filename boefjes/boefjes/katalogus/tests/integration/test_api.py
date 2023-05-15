@@ -10,7 +10,7 @@ from boefjes.config import settings
 from boefjes.katalogus.api import app
 from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
 from boefjes.katalogus.models import Organisation, Repository
-from boefjes.sql.db import get_engine, SQL_BASE
+from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 from boefjes.sql.repository_storage import SQLRepositoryStorage
@@ -57,7 +57,7 @@ class TestAPI(TestCase):
     def tearDown(self) -> None:
         session = sessionmaker(bind=get_engine())()
 
-        for table in SQL_BASE.metadata.tables.keys():
+        for table in SQL_BASE.metadata.tables:
             session.execute(f"DELETE FROM {table} CASCADE")
 
         session.commit()

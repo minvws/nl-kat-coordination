@@ -1,34 +1,35 @@
 import uuid
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import List, Optional, Set, Type
-from http import HTTPStatus
+from typing import Dict, List, Optional, Set, Type
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, status
-from requests import RequestException, HTTPError
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from requests import RequestException
 
-from octopoes.api.models import ServiceHealth, ValidatedObservation, ValidatedDeclaration
-from octopoes.config.settings import Settings, XTDBType
+from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
+from octopoes.config.settings import Settings
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.models import (
-    OOI,
-    Reference,
-    ScanProfileBase,
-    ScanProfile,
-    ScanLevel,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    OOI,
+    Reference,
+    ScanLevel,
+    ScanProfile,
+    ScanProfileBase,
     ScanProfileType,
 )
 from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.origin import Origin, OriginType
+from octopoes.models.explanation import InheritanceSection
+from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import type_by_name, OOIType
+from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
+from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.exceptions import NoMultinode, XTDBException
 
 logger = getLogger(__name__)
 router = APIRouter(prefix="/{client}")
@@ -114,12 +115,12 @@ def health(
 def list_objects(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    types: Set[Type[OOIType]] = Depends(extract_types),
+    types: Set[Type[OOI]] = Depends(extract_types),
     scan_level: Set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
     scan_profile_type: Set[ScanProfileType] = Query(DEFAULT_SCAN_PROFILE_TYPE_FILTER),
     offset: int = 0,
     limit: int = 20,
-) -> Paginated[OOIType]:
+) -> Paginated[OOI]:
     objects = octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
     return objects
 
@@ -129,7 +130,7 @@ def get_object(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     reference: Reference = Depends(extract_reference),
-) -> OOIType:
+) -> OOI:
     return octopoes.get_ooi(reference, valid_time)
 
 
@@ -138,8 +139,9 @@ def list_random_objects(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     amount: int = 1,
-) -> List[OOIType]:
-    return octopoes.list_random_ooi(amount, valid_time)
+    scan_level: Set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
+) -> List[OOI]:
+    return octopoes.list_random_ooi(valid_time, amount, scan_level)
 
 
 @router.delete("/")
@@ -177,6 +179,15 @@ def list_origins(
     reference: Reference = Depends(extract_reference),
 ) -> List[Origin]:
     return octopoes.origin_repository.list_by_result(reference, valid_time)
+
+
+@router.get("/origin_parameters")
+def list_origin_parameters(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    origin_id: Set[str] = Query(default=set()),
+) -> List[OriginParameter]:
+    return octopoes.origin_parameter_repository.list_by_origin(origin_id, valid_time)
 
 
 @router.post("/observations")
@@ -249,28 +260,57 @@ def recalculate_scan_profiles(
     xtdb_session_.commit()
 
 
+@router.get("/scan_profiles/inheritance")
+def get_scan_profile_inheritance(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    reference: Reference = Depends(extract_reference),
+) -> List[InheritanceSection]:
+    ooi = octopoes.get_ooi(reference, valid_time)
+    start = InheritanceSection(
+        reference=ooi.reference, level=ooi.scan_profile.level, scan_profile_type=ooi.scan_profile.scan_profile_type
+    )
+    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED:
+        return [start]
+    return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
+
+
+@router.get("/finding_types/count")
+def get_finding_type_count(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> Dict[str, int]:
+    return octopoes.ooi_repository.get_finding_type_count(valid_time)
+
+
 @router.post("/node")
-def create_node(
-    client: str = Depends(extract_client),
-    settings: Settings = Depends(settings),
-) -> None:
-    if settings.xtdb_type != XTDBType.XTDB_MULTINODE:
-        raise Exception("Creating nodes requires XTDB_MULTINODE")
-    xtdb_client = XTDBHTTPClient(f"{settings.xtdb_uri}/_xtdb")
-    xtdb_client.create_node(client)
+def create_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
+    try:
+        xtdb_session_.client.create_node()
+    except NoMultinode:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
+        )
+    except XTDBException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Creating node failed") from e
 
 
 @router.delete("/node")
-def delete_node(
-    client: str = Depends(extract_client),
-    settings: Settings = Depends(settings),
-) -> None:
-    if settings.xtdb_type != XTDBType.XTDB_MULTINODE:
-        raise Exception("Deleting nodes requires XTDB_MULTINODE")
-    xtdb_client = XTDBHTTPClient(f"{settings.xtdb_uri}/_xtdb")
+def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
     try:
-        xtdb_client.delete_node(client)
-    except HTTPError as e:
-        if e.response.status_code == HTTPStatus.NOT_FOUND:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Node does not exist")
-        raise
+        xtdb_session_.client.delete_node()
+    except NoMultinode:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
+        )
+    except XTDBException as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deleting node failed") from e
+
+
+@router.post("/bits/recalculate")
+def recalculate_bits(
+    xtdb_session_: XTDBSession = Depends(xtdb_session), octopoes: OctopoesService = Depends(octopoes_service)
+) -> int:
+    inference_count = octopoes.recalculate_bits()
+    xtdb_session_.commit()
+    return inference_count

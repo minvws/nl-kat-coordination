@@ -1,25 +1,25 @@
+from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
 from django.contrib import messages
-from django.core.paginator import Paginator, Page
+from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
-from requests.exceptions import RequestException
-
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from octopoes.models import OOI
-from rocky import scheduler
-from rocky.views.mixins import OOIBreadcrumbsMixin
-from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
-from rocky.views.ooi_view import BaseOOIDetailView
+from requests.exceptions import RequestException
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification, OrganizationMember
 from tools.ooi_helpers import format_display
+
+from octopoes.models import OOI, Reference
+from rocky import scheduler
+from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
 class PageActions(Enum):
@@ -29,8 +29,8 @@ class PageActions(Enum):
 class OOIDetailView(
     BoefjeMixin,
     OOIRelatedObjectAddView,
+    OOIFindingManager,
     BaseOOIDetailView,
-    OOIBreadcrumbsMixin,
 ):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
@@ -48,7 +48,8 @@ class OOIDetailView(
 
         self.ooi = self.get_ooi()
 
-        if not self.handle_page_action(request.POST.get("action")):
+        action = self.request.POST.get("action")
+        if not self.handle_page_action(action):
             return self.get(request, status_code=500, *args, **kwargs)
 
         success_message = (
@@ -66,7 +67,7 @@ class OOIDetailView(
                 boefje_id = self.request.POST.get("boefje_id")
                 ooi_id = self.request.GET.get("ooi_id")
 
-                boefje = get_katalogus(self.organization.code).get_boefje(boefje_id)
+                boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
                 ooi = self.get_single_ooi(pk=ooi_id)
                 self.run_boefje_for_oois(boefje, [ooi])
                 return True
@@ -93,39 +94,32 @@ class OOIDetailView(
     def get_scan_history(self) -> Page:
         scheduler_id = f"boefje-{self.organization.code}"
 
-        filters = [
-            {"field": "data__input_ooi", "operator": "eq", "value": self.get_ooi_id()},
-        ]
-
         # FIXME: in context of ooi detail is doesn't make sense to search
-        # for an object name
-        if self.request.GET.get("scan_history_search"):
-            filters.append(
-                {
-                    "field": "data__boefje__name",
-                    "operator": "eq",
-                    "value": self.request.GET.get("scan_history_search"),
-                }
-            )
+        # for an object name, so we search on plugin id
+        plugin_id = self.request.GET.get("scan_history_search")
 
         page = int(self.request.GET.get("scan_history_page", 1))
 
         status = self.request.GET.get("scan_history_status")
 
-        min_created_at = None
         if self.request.GET.get("scan_history_from"):
             min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+        else:
+            min_created_at = None
 
-        max_created_at = None
         if self.request.GET.get("scan_history_to"):
             max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
+        else:
+            max_created_at = None
 
         scan_history = scheduler.client.get_lazy_task_list(
             scheduler_id=scheduler_id,
             status=status,
             min_created_at=min_created_at,
             max_created_at=max_created_at,
-            filters=filters,
+            task_type="boefje",
+            input_ooi=self.get_ooi_id(),
+            plugin_id=plugin_id,
         )
 
         return Paginator(scan_history, self.scan_history_limit).page(page)
@@ -157,6 +151,17 @@ class OOIDetailView(
         declarations, observations, inferences = self.get_origins(
             self.ooi.reference, self.get_observed_at(), self.organization
         )
+
+        inference_params = self.octopoes_api_connector.list_origin_parameters(
+            {inference.origin.id for inference in inferences}
+        )
+        inference_params_per_inference = defaultdict(list)
+        for inference_param in inference_params:
+            inference_params_per_inference[inference_param.origin_id].append(inference_param)
+
+        for inference in inferences:
+            inference.params = inference_params_per_inference.get(inference.origin.id, [])
+
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
@@ -180,5 +185,16 @@ class OOIDetailView(
             "scan_history_search",
             "scan_history_page",
         ]
-
+        if self.request.GET.get("show_clearance_level_inheritance"):
+            clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)
+            formatted_inheritance = [
+                {
+                    "object_type": Reference.from_str(section.reference).class_,
+                    "primary_key": section.reference,
+                    "human_readable": Reference.from_str(section.reference).human_readable,
+                    "level": section.level,
+                }
+                for section in clearance_level_inheritance
+            ]
+            context["clearance_level_inheritance"] = formatted_inheritance
         return context

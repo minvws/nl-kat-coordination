@@ -1,22 +1,12 @@
 import logging
-from datetime import datetime, timezone, timedelta
+import traceback
+from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, List, Dict, Set
+from typing import Any, Dict, List, Set
 
 import requests
-
-from octopoes.models.types import OOIType
 from pydantic.tools import parse_obj_as
-
-from boefjes.katalogus.local_repository import LocalPluginRepository
-from octopoes.api.models import Observation, Declaration
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
 from requests import RequestException
-
-from boefjes.runtime_interfaces import Handler, BoefjeJobRunner, NormalizerJobRunner
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
@@ -25,6 +15,13 @@ from boefjes.job_models import (
     NormalizerMeta,
     NormalizerPlainOOI,
 )
+from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
+from octopoes.api.models import Declaration, Observation
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI, Reference
+from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.types import OOIType
 
 logger = logging.getLogger(__name__)
 bytes_api_client = BytesAPIClient(
@@ -140,9 +137,9 @@ class BoefjeHandler(Handler):
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, environment)
-        except Exception as e:
+        except Exception:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
-            boefje_results = [({"error/boefje"}, str(e))]
+            boefje_results = [({"error/boefje"}, traceback.format_exc())]
 
             raise
         finally:
@@ -167,7 +164,7 @@ class NormalizerHandler(Handler):
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
         bytes_api_client.login()
-        raw = bytes_api_client.get_raw(normalizer_meta.raw_data.boefje_meta.id, normalizer_meta.raw_data.id)
+        raw = bytes_api_client.get_raw(normalizer_meta.raw_data.id)
 
         normalizer_meta.started_at = datetime.now(timezone.utc)
 

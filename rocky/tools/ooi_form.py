@@ -1,11 +1,11 @@
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Type, Dict, Union, List
+from typing import Dict, List, Type, Union
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from pydantic import AnyUrl
-from pydantic.fields import ModelField, SHAPE_LIST
+from pydantic.fields import SHAPE_LIST, ModelField
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -26,7 +26,7 @@ class OOIForm(BaseRockyForm):
             self.fields[name] = field
 
     def clean(self):
-        return {key: value for key, value in super().clean().items() if value != ""}
+        return {key: value for key, value in super().clean().items() if value}
 
     def get_fields(self) -> Dict[str, forms.fields.Field]:
         return self.generate_form_fields()
@@ -45,7 +45,7 @@ class OOIForm(BaseRockyForm):
             if not hasattr(field.type_, "mro"):  # Literals
                 continue
 
-            if hidden_ooi_fields and name in hidden_ooi_fields.keys():
+            if hidden_ooi_fields and name in hidden_ooi_fields:
                 # Hidden ooi fields will have the value of an OOI ID
                 fields[name] = forms.CharField(widget=forms.HiddenInput())
             elif field.name in get_relations(self.ooi_class):

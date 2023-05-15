@@ -7,7 +7,7 @@ import json
 import os
 from logging import getLogger
 from pathlib import Path
-from typing import Set, Any, Dict, cast
+from typing import Any, Dict, Set, cast
 
 from pydantic import BaseModel
 
@@ -71,7 +71,7 @@ def get_samples(settings: Settings) -> Dict[str, Dict[str, Any]]:
             continue
         sample_file = subfolder / "sample.json"
         if sample_file.exists():
-            with open(sample_file) as sample:
+            with sample_file.open() as sample:
                 try:
                     samples[subfolder_name] = {
                         "summary": subfolder_name,

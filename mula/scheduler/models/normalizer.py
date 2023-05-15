@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 class Normalizer(BaseModel):
     """Normalizer representation."""
 
-    id: Optional[str]
+    id: str
     name: Optional[str]
     version: Optional[str] = Field(default=None)
 

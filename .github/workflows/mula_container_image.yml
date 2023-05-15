@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - mula/**
+      - .github/workflows/mula_container_image.yml
   pull_request:
     paths:
       - mula/**
+      - .github/workflows/mula_container_image.yml
 
 jobs:
   create_container_image:
@@ -36,6 +38,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate version.py
+        run: |
+          pip install setuptools-scm==7.1.0
+          python -m setuptools_scm
+          cp _version.py mula/scheduler/version.py
 
       - name: Build container image
         uses: docker/build-push-action@v3

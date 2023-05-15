@@ -4,7 +4,7 @@ from typing import List, Optional, Tuple
 from scheduler import models
 
 from ..stores import TaskStorer  # noqa: TID252
-from .datastore import SQLAlchemy
+from .datastore import SQLAlchemy, retry
 
 
 class TaskStore(TaskStorer):
@@ -19,14 +19,16 @@ class TaskStore(TaskStorer):
 
         self.datastore = datastore
 
+    @retry()
     def get_tasks(
         self,
         scheduler_id: Optional[str],
-        type: Optional[str],
+        task_type: Optional[str],
         status: Optional[str],
         min_created_at: Optional[datetime.datetime],
         max_created_at: Optional[datetime.datetime],
-        filters: Optional[List[models.Filter]],
+        input_ooi: Optional[str],
+        plugin_id: Optional[str],
         offset: int = 0,
         limit: int = 100,
     ) -> Tuple[List[models.Task], int]:
@@ -36,8 +38,8 @@ class TaskStore(TaskStorer):
             if scheduler_id is not None:
                 query = query.filter(models.TaskORM.scheduler_id == scheduler_id)
 
-            if type is not None:
-                query = query.filter(models.TaskORM.type == type)
+            if task_type is not None:
+                query = query.filter(models.TaskORM.type == task_type)
 
             if status is not None:
                 query = query.filter(models.TaskORM.status == models.TaskStatus(status).name)
@@ -48,9 +50,32 @@ class TaskStore(TaskStorer):
             if max_created_at is not None:
                 query = query.filter(models.TaskORM.created_at <= max_created_at)
 
-            if filters is not None:
-                for f in filters:
-                    query = query.filter(models.TaskORM.p_item[f.get_field()].as_string() == f.value)
+            if input_ooi is not None:
+                if type == "boefje":
+                    query = query.filter(models.TaskORM.p_item[["data", "input_ooi"]].as_string() == input_ooi)
+                elif type == "normalizer":
+                    query = query.filter(
+                        models.TaskORM.p_item[["data", "raw_data", "boefje_meta", "input_ooi"]].as_string() == input_ooi
+                    )
+                else:
+                    query = query.filter(
+                        (models.TaskORM.p_item[["data", "input_ooi"]].as_string() == input_ooi)
+                        | (
+                            models.TaskORM.p_item[["data", "raw_data", "boefje_meta", "input_ooi"]].as_string()
+                            == input_ooi
+                        )
+                    )
+
+            if plugin_id is not None:
+                if type == "boefje":
+                    query = query.filter(models.TaskORM.p_item[["data", "boefje", "id"]].as_string() == plugin_id)
+                elif type == "normalizer":
+                    query = query.filter(models.TaskORM.p_item[["data", "normalizer", "id"]].as_string() == plugin_id)
+                else:
+                    query = query.filter(
+                        (models.TaskORM.p_item[["data", "boefje", "id"]].as_string() == plugin_id)
+                        | (models.TaskORM.p_item[["data", "normalizer", "id"]].as_string() == plugin_id)
+                    )
 
             count = query.count()
 
@@ -60,6 +85,7 @@ class TaskStore(TaskStorer):
 
             return tasks, count
 
+    @retry()
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = session.query(models.TaskORM).filter(models.TaskORM.id == task_id).first()
@@ -70,6 +96,7 @@ class TaskStore(TaskStorer):
 
             return task
 
+    @retry()
     def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
         with self.datastore.session.begin() as session:
             tasks_orm = (
@@ -86,6 +113,7 @@ class TaskStore(TaskStorer):
 
             return tasks
 
+    @retry()
     def get_latest_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = (
@@ -102,6 +130,7 @@ class TaskStore(TaskStorer):
 
             return task
 
+    @retry()
     def create_task(self, task: models.Task) -> Optional[models.Task]:
         with self.datastore.session.begin() as session:
             task_orm = models.TaskORM(**task.dict())
@@ -111,6 +140,7 @@ class TaskStore(TaskStorer):
 
             return created_task
 
+    @retry()
     def update_task(self, task: models.Task) -> None:
         with self.datastore.session.begin() as session:
             (session.query(models.TaskORM).filter(models.TaskORM.id == task.id).update(task.dict()))

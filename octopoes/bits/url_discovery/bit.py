@@ -1,6 +1,6 @@
-from bits.definitions import BitParameterDefinition, BitDefinition
+from bits.definitions import BitDefinition, BitParameterDefinition
 from octopoes.models.ooi.dns.zone import ResolvedHostname
-from octopoes.models.ooi.network import IPPort, IPAddress
+from octopoes.models.ooi.network import IPAddress, IPPort
 
 BIT = BitDefinition(
     id="url-discovery",
@@ -10,4 +10,5 @@ BIT = BitDefinition(
         BitParameterDefinition(ooi_type=ResolvedHostname, relation_path="address"),
     ],
     module="bits.url_discovery.url_discovery",
+    min_scan_level=0,
 )

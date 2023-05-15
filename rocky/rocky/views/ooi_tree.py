@@ -1,20 +1,19 @@
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
-
 from fmea.models import DEPARTMENTS
-from rocky.views.mixins import OOIBreadcrumbsMixin
-from rocky.views.ooi_view import BaseOOIDetailView
 from tools.forms.ooi import OoiTreeSettingsForm
 from tools.ooi_helpers import (
-    get_ooi_types_from_tree,
-    filter_ooi_tree,
     create_object_tree_item_from_ref,
+    filter_ooi_tree,
+    get_ooi_types_from_tree,
 )
-from tools.view_helpers import get_ooi_url, Breadcrumb
+from tools.view_helpers import Breadcrumb, get_ooi_url
+
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
-class OOITreeView(OOIBreadcrumbsMixin, BaseOOIDetailView):
+class OOITreeView(BaseOOIDetailView):
     template_name = "oois/ooi_tree.html"
     connector_form_class = OoiTreeSettingsForm
 

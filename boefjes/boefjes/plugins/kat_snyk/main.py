@@ -1,11 +1,11 @@
 import json
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
 import requests
 from bs4 import BeautifulSoup
 
-from boefjes.plugins.kat_snyk import check_version
 from boefjes.job_models import BoefjeMeta
+from boefjes.plugins.kat_snyk import check_version
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:

@@ -6,7 +6,7 @@ COPY boefjes/requirements.txt ./boefjes
 # The echo since cat does not add a newline
 RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
 
-FROM python:3.8
+FROM python:3.8 AS dev
 
 ARG USER_UID=1000
 ARG USER_GID=1000
@@ -30,10 +30,13 @@ RUN --mount=type=cache,target=/root/.cache \
     && rm /tmp/boefjes-requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
 
+FROM dev
+
 COPY octopoes/ /tmp/octopoes
 RUN cd /tmp/octopoes && python setup.py bdist_wheel
 RUN pip install /tmp/octopoes/dist/octopoes*.whl
 
+COPY boefjes/entrypoint.sh .
 COPY boefjes/boefjes ./boefjes
 
 # FIXME: We currently have to run as root to be able to start containers using

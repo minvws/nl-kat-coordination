@@ -4,12 +4,12 @@ from typing import Any, Dict, Optional
 
 from bytes.config import BASE_DIR
 from bytes.models import (
-    BoefjeMeta,
     Boefje,
-    NormalizerMeta,
-    Normalizer,
-    RawData,
+    BoefjeMeta,
     MimeType,
+    Normalizer,
+    NormalizerMeta,
+    RawData,
     RawDataMeta,
     TimezoneAwareDatetime,
 )
@@ -30,7 +30,7 @@ def load_stub_raw(relative_path: str) -> bytes:
 def get_boefje_meta(
     meta_id: str = "d63d755b-6c23-44ab-8de6-8d144c448a71",
     boefje_id: str = "kat_test.main",
-    input_ooi: Optional[str] = "Hostname|internet|test.org.",
+    input_ooi: Optional[str] = "Hostname|internet|test.org",
 ) -> BoefjeMeta:
     return BoefjeMeta(
         id=meta_id,
@@ -46,8 +46,7 @@ def get_boefje_meta(
 def get_normalizer_meta(raw_file_id: str = "2c9f47db-dfca-4928-b29f-368e64b3c779") -> NormalizerMeta:
     return NormalizerMeta(
         id="203eedee-a590-43e1-8f80-6d18ffe529f5",
-        raw_file_id=raw_file_id,
-        boefje_meta=get_boefje_meta(),
+        raw_data=get_raw_data_meta(raw_file_id),
         normalizer=Normalizer(id="kat_test.main"),
         started_at=TimezoneAwareDatetime(1001, 10, 10, 10, 10, 10, tzinfo=timezone.utc),
         ended_at=TimezoneAwareDatetime(1001, 10, 10, 10, 10, 12, tzinfo=timezone.utc),
@@ -62,11 +61,11 @@ def get_raw_data() -> RawData:
     )
 
 
-def get_raw_data_meta() -> RawDataMeta:
+def get_raw_data_meta(raw_file_id="2c9f47db-dfca-4928-b29f-368e64b3c779") -> RawDataMeta:
     raw_data = get_raw_data()
 
     return RawDataMeta(
-        id="2c9f47db-dfca-4928-b29f-368e64b3c779",
+        id=raw_file_id,
         boefje_meta=raw_data.boefje_meta,
         mime_types=raw_data.mime_types,
     )

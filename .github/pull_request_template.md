@@ -1,64 +1,29 @@
-## Changes
-_Please describe the essence of this PR in a few sentences._
+### Changes
+_Please describe the essence of this PR in a few sentences. Mention any breaking changes or required configuration steps._
 
-## Issue ticket number and link
-_Please paste a link to the issue on the project board here. Alternatively, if there was no submitted issue prior to this PR, you may add this PR to the project board directly._
+### Issue link
+_Please add a link to the issue. If there is no issue for this PR, please add it to the project board directly._
 
-## Proof
-_Please paste some screenshots or other proof of your (working) change here. If you feel that this is not required (e.g. this PR is trivial), note that here._
+### Proof
+_Please add some proof of your working change here, unless this is not required (e.g. this PR is trivial)._
 
-## Extra instructions for others
-_This section may be skipped or omitted. Uncomment and answer the below questions if relevant._
+---
 
-<!---
-- Does this PR introduce or depend on API-incompatible changes? If yes: what do other users/developers need to do or confirm before merging?
-- Does this PR depend on a specific version of a library?
-- Does this PR depend on any other pending PR's?
-- Does this PR require config, setup, or `.env` changes?
--->
-
-## Checklist for author(s):
+### Code Checklist
 - [ ] All the commits in this PR are properly PGP-signed and verified;
-- [ ] This PR comes from a `feature` or `hotfix` branch, in line with our git branching strategy;
-- [ ] This PR is "bite-sized" and only focuses on a single issue, problem, or feature;
-- [ ] I am not reinventing the wheel: there is no high-quality library that already has this feature;
-- [ ] I have changed the example `.env` files if I added, removed, or changed any config options, and I have informed others that they need to modify their `.env` files if required;
-- [ ] I have performed a self-review of my own code;
-- [ ] I have commented my code, particularly in hard-to-understand areas;
-- [ ] I have made corresponding changes to the documentation, if necessary;
-- [ ] I have written unit, integration, and end-to-end tests for the change that I made;
+- [ ] This PR only contains functionality relevant to the issue; tickets have been created for newly discovered issues.
+- [ ] I have written unit tests for the changes or fixes I made.
+- [ ] For any non-trivial functionality, I have added integration and/or end-to-end tests.
+- [ ] I have performed a self-review of my code and refactored it to the best of my abilities.
 
-If a non-trivial PR:
-- [ ] This PR is part of a milestone and has appropriate labels;
-- [ ] This PR is properly linked to the project board (either directly or via an issue);
-- [ ] I have added screenshots or some other proof that my code does what it is supposed to do;
+### Communication
+- [ ] I have informed others of any required `.env` changes files if required and changed the `.env-dist` accordingly.
+- [ ] I have made corresponding changes to the documentation, if necessary.
 
+---
+## Checklist for code reviewers:
+Copy-paste the checklist from [the docs/source/templates folder](https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/templates/pull_request_template_review_code.md) into your comment.
 
-```
-## Checklist for functional reviewer(s):
-- [ ] If a non-trivial PR: This PR is properly linked to an issue on the project board;
-- [ ] I have checked out this branch, and successfully ran `make kat`;
-- [ ] I have ran `make test-rf` and all end-to-end Robot Framework tests pass;
-- [ ] I confirmed that the PR's advertised `feature` or `hotfix` works as intended;
-- [ ] I confirmed that there are no unintended functional regressions in this branch;
-
-### What works:
-* _bullet point + screenshot (if useful) per tested functionality_
-
-### What doesn't work:
-* _bullet point + screenshot (if useful) per tested functionality_
-
-### Bug or feature?:
-* _bullet point + screenshot (if useful) if it is unclear whether something is a bug or an intended feature._
-```
-
-```
-## Checklist for code reviewer(s):
-- [ ] The code passes the CI tests and linters;
-- [ ] The code does not bypass authentication or security mechanisms;
-- [ ] The code does not introduce any dependency on a library that has not been properly vetted;
-- [ ] The code does not violate Model-View-Template and our other architectural principles;
-- [ ] The code contains docstrings, comments, and documentation where needed;
-- [ ] The code prioritizes readability over performance where appropriate;
-- [ ] The code conforms to our agreed coding standards.
-```
+---
+## Checklist for QA:
+Copy-paste the checklist from [the docs/source/templates folder](https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/templates/pull_request_template_review_qa.md) into your comment.

@@ -3,9 +3,9 @@ import logging
 
 from fastapi import APIRouter
 
-from boefjes.plugin_repository.config import PLUGINS_DIR, BASE_URL
-from boefjes.plugin_repository.utils.index import get_or_create_index
+from boefjes.plugin_repository.config import BASE_URL, PLUGINS_DIR
 from boefjes.plugin_repository.models import CombinedFile
+from boefjes.plugin_repository.utils.index import get_or_create_index
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def index_file():
                 "datatype": "image-downloads",
                 "path": "streams/v1/images.json",
                 "format": "products:1.0",
-                "products": [name for name in index.images.keys()],
+                "products": [name for name in index.images],
             }
         }
     }
@@ -63,9 +63,8 @@ def images_file():
                 "sha256": file.hash,
                 "path": f"{BASE_URL}/images/{file.location.relative_to(PLUGINS_DIR)}",
             }
-            if isinstance(file, CombinedFile):
-                if file.combined_squashfs_sha256 is not None:
-                    version["combined_squashfs_sha256"] = file.combined_squashfs_sha256
+            if isinstance(file, CombinedFile) and file.combined_squashfs_sha256 is not None:
+                version["combined_squashfs_sha256"] = file.combined_squashfs_sha256
             versions[created]["items"][file.location.name] = version
 
         content = {

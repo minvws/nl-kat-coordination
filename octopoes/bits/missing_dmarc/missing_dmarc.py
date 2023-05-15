@@ -1,31 +1,24 @@
-from typing import Iterator, List
+from typing import Dict, Iterator, List
+
+import tldextract
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.email_security import DMARCTXTRecord
-
-import tldextract
-
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(
-    input_ooi: Hostname,
-    additional_oois: List[DMARCTXTRecord],
-) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: List[DMARCTXTRecord], config: Dict[str, str]) -> Iterator[OOI]:
+    # only report finding when there is no DMARC record
     if (
-        # only report on findings on the fqdn because of double findings
-        input_ooi.name == input_ooi.fqdn.tokenized.name
-        # don't report on findings on subdomains because it's not needed on subdomains
-        and not tldextract.extract(input_ooi.name).subdomain
-        # don't report on findings on tlds
+        not tldextract.extract(input_ooi.name).subdomain
         and tldextract.extract(input_ooi.name).domain
+        and not additional_oois
     ):
-        if not additional_oois:
-            ft = KATFindingType(id="KAT-NO-DMARC")
-            yield ft
-            yield Finding(
-                ooi=input_ooi.reference,
-                finding_type=ft.reference,
-                description="This hostname does not have a DMARC record",
-            )
+        ft = KATFindingType(id="KAT-NO-DMARC")
+        yield ft
+        yield Finding(
+            ooi=input_ooi.reference,
+            finding_type=ft.reference,
+            description="This hostname does not have a DMARC record",
+        )

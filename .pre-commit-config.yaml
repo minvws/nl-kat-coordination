@@ -10,21 +10,22 @@ repos:
       - id: check-json
       - id: check-toml
       - id: debug-statements
+      - id: end-of-file-fixer
 
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.12.1
+    rev: v0.12.2
     hooks:
       - id: validate-pyproject
         files: pyproject.toml$
 
   - repo: https://github.com/rstcheck/rstcheck
-    rev: v6.1.1
+    rev: v6.1.2
     hooks:
       - id: rstcheck
         additional_dependencies: ["rstcheck[sphinx]"]
 
   - repo: https://github.com/MarketSquare/robotframework-tidy
-    rev: "3.3.3"
+    rev: "4.1.0"
     hooks:
       - id: robotidy
 
@@ -35,16 +36,21 @@ repos:
         exclude: |
           /tests/
 
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.263'
+    hooks:
+      - id: ruff
+
   - repo: https://github.com/psf/black
-    rev: "23.1.0"
+    rev: "23.3.0"
     hooks:
       - id: black
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.0.0
+    rev: v1.2.0
     hooks:
       - id: mypy
-        additional_dependencies: ['types-PyYAML', 'types-requests', 'pydantic', 'pynacl']
+        additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'pydantic', 'pynacl']
         exclude: |
           (?x)(
           ^boefjes/ |
@@ -56,11 +62,6 @@ repos:
           docs/source/conf\.py$ |
           setup\.py$
           )
-
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.247'
-    hooks:
-      - id: ruff
 
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.4
@@ -78,5 +79,12 @@ repos:
           ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |
           ^rocky/assets/src/bundles/app/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
-          ^rocky/tests/stubs
+          ^rocky/tests/stubs |
+          ^docs/source/_static
           )
+
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.19.16
+    hooks:
+      - id: djlint-django
+        files: '^rocky/.*/templates/.*$'

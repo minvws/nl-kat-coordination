@@ -1,5 +1,6 @@
 import json
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect
@@ -10,7 +11,6 @@ from django_otp.decorators import otp_required
 from requests import HTTPError
 from two_factor.views.utils import class_view_decorator
 
-from account.mixins import OrganizationView
 from rocky.scheduler import client
 
 TASK_LIMIT = 50
@@ -57,7 +57,7 @@ class TaskListView(OrganizationView, ListView):
             return []
 
         scheduler_id = self.request.GET.get("scheduler_id", self.scheduler_id)
-        type_ = self.request.GET.get("type", self.plugin_type)
+        task_type = self.request.GET.get("type", self.plugin_type)
         status = self.request.GET.get("status", None)
         min_created_at = self.request.GET.get("min_created_at", None)
         max_created_at = self.request.GET.get("max_created_at", None)
@@ -65,7 +65,7 @@ class TaskListView(OrganizationView, ListView):
         try:
             return client.get_lazy_task_list(
                 scheduler_id=scheduler_id,
-                object_type=type_,
+                task_type=task_type,
                 status=status,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,

@@ -5,7 +5,7 @@ from typing import List, Optional
 
 import diskcache
 
-from boefjes.plugin_repository.models import File, CombinedFile
+from boefjes.plugin_repository.models import CombinedFile, File
 
 logger = logging.getLogger(__name__)
 

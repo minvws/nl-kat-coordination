@@ -4,17 +4,18 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
-
-from account.validators import get_password_validators_help_texts
-from tools.forms.base import BaseRockyForm
+from tools.enums import SCAN_LEVEL
+from tools.forms.base import BaseRockyForm, BaseRockyModelForm
 from tools.models import (
-    GROUP_CLIENT,
     GROUP_ADMIN,
+    GROUP_CLIENT,
     GROUP_REDTEAM,
+    ORGANIZATION_CODE_LENGTH,
     Organization,
     OrganizationMember,
 )
-from tools.models import ORGANIZATION_CODE_LENGTH
+
+from account.validators import get_password_validators_help_texts
 
 User = get_user_model()
 
@@ -134,7 +135,7 @@ class UserAddForm(forms.Form):
         )
 
 
-class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
+class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
     """
     Form to add a new member
     """
@@ -152,14 +153,16 @@ class OrganizationMemberAddForm(UserAddForm, forms.ModelForm):
             selected_group = Group.objects.get(name=self.cleaned_data["account_type"])
         if self.organization and selected_group:
             self.set_user()
-            OrganizationMember.objects.get_or_create(
+            member, _ = OrganizationMember.objects.get_or_create(
                 user=self.user,
                 organization=self.organization,
                 status=OrganizationMember.STATUSES.ACTIVE,
             )
-
-            selected_group.user_set.add(self.user)
-            self.user.save()
+            member.groups.add(selected_group.id)
+            if member.is_admin or self.user.is_superuser:
+                member.acknowledged_clearance_level = 4
+                member.trusted_clearance_level = 4
+                member.save()
 
 
 class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
@@ -168,13 +171,50 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
         fields = ("account_type", "name", "email", "password")
 
 
-class OrganizationMemberForm(forms.ModelForm):
+class OrganizationMemberEditForm(BaseRockyModelForm):
+    trusted_clearance_level = forms.ChoiceField(
+        required=False,
+        label=_("Assigned clearance level"),
+        choices=[(-1, "")] + SCAN_LEVEL.choices,
+        help_text=_("Select a clearance level you trust this member with."),
+        widget=forms.RadioSelect(attrs={"radio_paws": True}),
+    )
+
+    blocked = forms.BooleanField(
+        required=False,
+        label=_("Blocked"),
+        help_text=_("Set the members status to blocked, so they don't have access to the organization anymore."),
+        widget=forms.CheckboxInput(),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["blocked"].widget.attrs["field_form_label"] = "Status"
+        if self.instance.user.is_superuser:
+            self.fields["trusted_clearance_level"].disabled = True
+        self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
+        self.fields["acknowledged_clearance_level"].required = False
+        self.fields["acknowledged_clearance_level"].widget.attrs[
+            "fixed_paws"
+        ] = self.instance.acknowledged_clearance_level
+        self.fields["acknowledged_clearance_level"].widget.attrs["class"] = "level-indicator-form"
+        if self.instance.user.is_superuser:
+            self.fields["trusted_clearance_level"].disabled = True
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if instance.trusted_clearance_level < instance.acknowledged_clearance_level:
+            instance.acknowledged_clearance_level = instance.trusted_clearance_level
+        if commit:
+            instance.save()
+        return instance
+
     class Meta:
         model = OrganizationMember
-        fields = ["status"]
+        fields = ["blocked", "trusted_clearance_level", "acknowledged_clearance_level"]
 
 
-class OrganizationForm(forms.ModelForm):
+class OrganizationForm(BaseRockyModelForm):
     """
     Form to create a new organization.
     """
@@ -213,10 +253,21 @@ class OrganizationForm(forms.ModelForm):
         }
 
 
+class OnboardingOrganizationUpdateForm(OrganizationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["code"].disabled = True
+
+
 class OrganizationUpdateForm(OrganizationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["code"].disabled = True
+        self.fields["tags"].widget.attrs["placeholder"] = _("Enter tags separated by comma.")
+
+    class Meta:
+        model = Organization
+        fields = ["name", "code", "tags"]
 
 
 class SetPasswordForm(auth_forms.SetPasswordForm):

@@ -1,5 +1,5 @@
 import json
-from typing import Tuple, Union, List
+from typing import List, Tuple, Union
 
 import requests
 
@@ -59,7 +59,6 @@ def request_certs(search_string, search_type="Identity", match="=", deduplicate=
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     fqdn = input_["hostname"]["name"]
-    domain = fqdn.rstrip(".")
-    results = request_certs(domain)
+    results = request_certs(fqdn)
 
     return [(set(), results)]

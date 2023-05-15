@@ -1,9 +1,9 @@
 import unittest
-import uuid
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
+
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -15,7 +15,7 @@ from tests.factories import (
 from tests.utils import functions
 
 
-class SchedulerTestCase(unittest.TestCase):
+class BoefjeSchedulerBaseTestCase(unittest.TestCase):
     def setUp(self):
         cfg = config.settings.Settings()
 
@@ -51,7 +51,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.services.bytes = self.mock_bytes
 
         # Datastore
-        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy("sqlite:///")
+        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy(cfg.database_dsn)
         models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
         self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
         self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
@@ -82,401 +82,8 @@ class SchedulerTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
-    def test_push_tasks_for_scan_profile_mutations(
-        self,
-        mock_get_scan_profile_mutation,
-        mock_get_boefjes_for_ooi,
-        mock_has_grace_period_passed,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
-        """Scan level change"""
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
-        # Mocks
-        mock_get_scan_profile_mutation.side_effect = [
-            models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi),
-            None,
-        ]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_running.return_value = False
-        mock_is_task_allowed_to_run.return_value = True
-        mock_has_grace_period_passed.return_value = True
-
-        # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
-    def test_push_tasks_for_scan_profile_mutations_no_boefjes_found(
-        self,
-        mock_get_scan_profile_mutation,
-        mock_get_boefjes_for_ooi,
-    ):
-        """When no plugins are found for boefjes, it should return no boefje tasks"""
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-
-        # Mocks
-        mock_get_scan_profile_mutation.side_effect = [
-            models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi),
-            None,
-        ]
-        mock_get_boefjes_for_ooi.return_value = []
-
-        # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
-    def test_push_tasks_for_scan_profile_mutations_not_allowed_to_run(
-        self,
-        mock_get_scan_profile_mutation,
-        mock_get_boefjes_for_ooi,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
-        """When a boefje is not allowed to run, it should not be added to the queue"""
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_scan_profile_mutation.side_effect = [
-            models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi),
-            None,
-        ]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_allowed_to_run.return_value = False
-        mock_is_task_running.return_value = False
-
-        # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
-    def test_push_tasks_for_scan_profile_mutations_still_running(
-        self,
-        mock_get_scan_profile_mutation,
-        mock_get_boefjes_for_ooi,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
-        """When a boefje is still running, it should not be added to the queue"""
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_scan_profile_mutation.side_effect = [
-            models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi),
-            None,
-        ]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_allowed_to_run.return_value = True
-        mock_is_task_running.return_value = True
-
-        # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
-    def test_push_tasks_for_scan_profile_mutations_item_on_queue(
-        self,
-        mock_get_scan_profile_mutation,
-        mock_get_boefjes_for_ooi,
-        mock_has_grace_period_passed,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
-        """When a boefje is already on the queue, it should not be added to the queue"""
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_scan_profile_mutation.side_effect = [
-            models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi),
-            models.ScanProfileMutation(operation="update", primary_key=ooi.primary_key, value=ooi),
-            None,
-        ]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_running.return_value = False
-        mock_is_task_allowed_to_run.return_value = True
-        mock_has_grace_period_passed.return_value = True
-
-        # Act
-        self.scheduler.push_tasks_for_scan_profile_mutations()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    def test_push_tasks_for_random_objects(
-        self,
-        mock_get_random_objects,
-        mock_get_boefjes_for_ooi,
-        mock_has_grace_period_passed,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_running.return_value = False
-        mock_is_task_allowed_to_run.return_value = True
-        mock_has_grace_period_passed.return_value = True
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.context.AppContext.task_store.get_tasks_by_hash")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    def test_push_tasks_for_random_objects_prior_tasks(
-        self,
-        mock_get_random_objects,
-        mock_get_boefjes_for_ooi,
-        mock_has_grace_period_passed,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-        mock_get_tasks_by_hash,
-    ):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        p_item = models.PrioritizedItem(
-            id=task.id,
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-            data=task,
-            hash=task.hash,
-        )
-
-        task_db = models.Task(
-            id=p_item.id,
-            scheduler_id=self.scheduler.scheduler_id,
-            type="boefje",
-            p_item=p_item,
-            status=models.TaskStatus.COMPLETED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
-
-        # Mocks
-        mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_running.return_value = False
-        mock_is_task_allowed_to_run.return_value = True
-        mock_has_grace_period_passed.return_value = True
-        mock_get_tasks_by_hash.return_value = [task_db]
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    def test_push_tasks_for_random_objects_no_boefjes_found(
-        self,
-        mock_get_random_objects,
-        mock_get_boefjes_for_ooi,
-    ):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-
-        # Mocks
-        mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        mock_get_boefjes_for_ooi.return_value = []
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    def test_push_tasks_for_random_objects_not_allowed_to_run(
-        self, mock_get_random_objects, mock_get_boefjes_for_ooi, mock_is_task_allowed_to_run, mock_is_task_running
-    ):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_allowed_to_run.return_value = False
-        mock_is_task_running.return_value = False
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    def test_push_tasks_for_random_objects_still_running(
-        self,
-        mock_get_random_objects,
-        mock_get_boefjes_for_ooi,
-        mock_has_grace_period_passed,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_allowed_to_run.return_value = True
-        mock_is_task_running.return_value = True
-        mock_has_grace_period_passed.return_value = True
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    def test_push_tasks_for_random_objects_item_on_queue(
-        self,
-        mock_get_random_objects,
-        mock_get_boefjes_for_ooi,
-        mock_has_grace_period_passed,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-    ):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_random_objects.side_effect = [[ooi], [ooi], [], []]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_allowed_to_run.return_value = True
-        mock_is_task_running.return_value = False
-        mock_has_grace_period_passed.return_value = True
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
+class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
     def test_is_allowed_to_run(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -938,130 +545,48 @@ class SchedulerTestCase(unittest.TestCase):
         # Assert
         self.assertFalse(has_passed)
 
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
-    @mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")
-    def test_populate_queue_random_objects(
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_item_on_queue_by_hash")
+    @mock.patch("scheduler.context.AppContext.task_store.get_tasks_by_hash")
+    def test_push_task_queue_full(
         self,
-        mock_get_random_objects,
-        mock_get_scan_profile_mutation,
-        mock_get_boefjes_for_ooi,
+        mock_get_tasks_by_hash,
+        mock_is_item_on_queue_by_hash,
+        mock_has_grace_period_passed,
         mock_is_task_allowed_to_run,
         mock_is_task_running,
-        mock_has_grace_period_passed,
     ):
-        """When no scan profile mutations are present, it should be filled up
-        with random oois"""
+        """When the task queue is full, the task should not be pushed"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        mock_get_scan_profile_mutation.return_value = None
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_running.return_value = False
-        mock_is_task_allowed_to_run.return_value = True
-        mock_has_grace_period_passed.return_value = True
-
-        # Act
-        self.scheduler.populate_queue()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.push_tasks_for_random_objects")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
-    @mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")
-    @mock.patch("scheduler.context.AppContext.services.scan_profile_mutation.get_scan_profile_mutation")
-    def test_populate_queue_scan_profile_mutations(
-        self,
-        mock_get_scan_profile_mutation,
-        mock_get_boefjes_for_ooi,
-        mock_is_task_allowed_to_run,
-        mock_is_task_running,
-        mock_has_grace_period_passed,
-        mock_push_tasks_for_random_objects,
-    ):
-        """Population of queue should start with scan profile mutations"""
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        mock_get_scan_profile_mutation.side_effect = [
-            models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi),
-            None,
-        ]
-        mock_get_boefjes_for_ooi.return_value = [boefje]
-        mock_is_task_running.return_value = False
-        mock_is_task_allowed_to_run.return_value = True
-        mock_has_grace_period_passed.return_value = True
-        mock_push_tasks_for_random_objects.return_value = None
-
-        # Act
-        self.scheduler.populate_queue()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.context.AppContext.services.katalogus.get_boefjes_by_type_and_org_id")
-    def test_populate_queue_queue_full(self, mock_get_boefjes_by_type_and_org_id):
-        """When the boefje queue is full, it should not return a boefje task"""
-        organisation = OrganisationFactory()
-
-        # Make a queue with only one open slot
-        queue = queues.BoefjePriorityQueue(
-            pq_id=organisation.id,
-            maxsize=1,
-            item_type=models.BoefjeTask,
-            allow_priority_updates=True,
-            pq_store=self.pq_store,
-        )
-
-        # Add a task to the queue to make it full
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        task = models.BoefjeTask(
-            id=uuid.uuid4().hex,
-            boefje=BoefjeFactory(),
+        models.BoefjeTask(
+            boefje=boefje,
             input_ooi=ooi.primary_key,
-            organization=organisation.id,
+            organization=self.organisation.id,
         )
-        queue.push(functions.create_p_item(scheduler_id=organisation.id, priority=0, data=task))
 
-        self.scheduler.queue = queue
+        self.scheduler.queue.maxsize = 1
+        self.scheduler.max_tries = 1
 
-        # Assert
+        # Mocks
+        mock_is_task_allowed_to_run.return_value = True
+        mock_is_task_running.return_value = False
+        mock_has_grace_period_passed.return_value = True
+        mock_is_item_on_queue_by_hash.return_value = False
+        mock_get_tasks_by_hash.return_value = None
+
+        # Act & Assert
+        self.scheduler.push_task(boefje, ooi)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
-        # Act
-        self.scheduler.populate_queue()
+        with self.assertLogs("scheduler.schedulers", level="DEBUG") as cm:
+            self.scheduler.push_task(boefje, ooi)
 
-        # Assert
+        self.assertIn("Could not add task to queue", cm.output[-1])
         self.assertEqual(1, self.scheduler.queue.qsize())
 
     def test_post_push(self):
@@ -1131,3 +656,432 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")  # index: 3
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")  # index: 2
+@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")  # index: 1
+@mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")  # index: 0
+class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
+    def test_push_tasks_for_scan_profile_mutations(self, *mocks):
+        """Scan level change"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi)
+
+        # Mocks
+        mocks[0].return_value = [boefje]
+        mocks[1].return_value = True
+        mocks[2].return_value = True
+        mocks[3].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+    def test_push_tasks_for_scan_profile_mutations_no_boefjes_found(self, *mocks):
+        """When no plugins are found for boefjes, it should return no boefje tasks"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi)
+
+        # Mocks
+        mocks[0].return_value = []
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_scan_profile_mutations_not_allowed_to_run(self, *mocks):
+        """When a boefje is not allowed to run, it should not be added to the queue"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi)
+
+        # Mocks
+        mocks[0].return_value = [boefje]
+        mocks[1].return_value = True
+        mocks[2].return_value = False
+        mocks[3].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_scan_profile_mutations_still_running(self, *mocks):
+        """When a boefje is still running, it should not be added to the queue"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi)
+
+        # Mocks
+        mocks[0].return_value = [boefje]
+        mocks[1].return_value = True
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_scan_profile_mutations_item_on_queue(self, *mocks):
+        """When a boefje is already on the queue, it should not be added to the queue"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        mutation1 = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi)
+        mutation2 = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi)
+
+        # Mocks
+        mocks[0].return_value = [boefje]
+        mocks[1].return_value = True
+        mocks[2].return_value = True
+        mocks[3].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation1)
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation2)
+
+        # Task should be on priority queue (only one)
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")  # index: 4
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")  # index: 3
+@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")  # index: 2
+@mock.patch("scheduler.context.AppContext.services.katalogus.get_new_boefjes_by_org_id")  # index: 1
+@mock.patch("scheduler.context.AppContext.services.octopoes.get_objects_by_object_types")  # index: 0
+class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
+    def test_push_tasks_for_new_boefjes(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].return_value = [ooi]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+    def test_push_tasks_for_new_boefjes_no_new_boefjes(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+
+        # Mocks
+        mocks[0].return_value = [ooi]
+        mocks[1].return_value = []
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_new_boefjes_no_oois_found(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].return_value = []
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_new_boefjes_not_allowed_to_run(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].return_value = [ooi]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = False
+        mocks[4].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_new_boefjes_still_running(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].return_value = [ooi]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = True
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_new_boefjes_item_on_queue(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].return_value = [ooi]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Should only be one task on queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")  # index: 4
+@mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")  # index: 3
+@mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")  # index: 2
+@mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi")  # index: 1
+@mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects")  # index: 0
+class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
+    def test_push_tasks_for_random_objects(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].side_effect = [[ooi], [], [], []]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_random_objects()
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+    @mock.patch("scheduler.context.AppContext.task_store.get_tasks_by_hash")
+    def test_push_tasks_for_random_objects_prior_tasks(self, mock_get_tasks_by_hash, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        task_db = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
+            p_item=p_item,
+            status=models.TaskStatus.COMPLETED,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        # Mocks
+        mocks[0].side_effect = [[ooi], [], [], []]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = False
+        mock_get_tasks_by_hash.return_value = [task_db]
+
+        # Act
+        self.scheduler.push_tasks_for_random_objects()
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+    def test_push_tasks_for_random_objects_no_boefjes_found(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+
+        # Mocks
+        mocks[0].side_effect = [[ooi], [], [], []]
+        mocks[1].return_value = []
+
+        # Act
+        self.scheduler.push_tasks_for_random_objects()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_random_objects_not_allowed_to_run(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].side_effect = [[ooi], [], [], []]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = False
+        mocks[3].return_value = False
+        mocks[4].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_random_objects()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_random_objects_still_running(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].side_effect = [[ooi], [], [], []]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = True
+
+        # Act
+        self.scheduler.push_tasks_for_random_objects()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_random_objects_item_on_queue(self, *mocks):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Mocks
+        mocks[0].side_effect = [[ooi], [ooi], [], []]
+        mocks[1].return_value = [boefje]
+        mocks[2].return_value = True
+        mocks[3].return_value = True
+        mocks[4].return_value = False
+
+        # Act
+        self.scheduler.push_tasks_for_random_objects()
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)

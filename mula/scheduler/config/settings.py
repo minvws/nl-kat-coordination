@@ -1,5 +1,5 @@
-import os
 from pathlib import Path
+from typing import Optional
 
 from pydantic import BaseSettings, Field
 
@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     # Application settings
     debug: bool = Field(False, env="SCHEDULER_DEBUG")
     log_cfg: str = Field(
-        os.path.join(Path(__file__).parent.parent.parent, "logging.json"),
+        str(Path(__file__).parent.parent.parent / "logging.json"),
         env="SCHEDULER_LOG_CFG",
     )
 
@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     # Application settings
     boefje_populate: bool = Field(False, env="SCHEDULER_BOEFJE_POPULATE")
     normalizer_populate: bool = Field(True, env="SCHEDULER_NORMALIZER_POPULATE")
+    katalogus_cache_ttl: int = Field(30, env="SCHEDULER_KATALOGUS_CACHE_TTL")
     monitor_organisations_interval: int = Field(60, env="SCHEDULER_MONITOR_ORGANISATIONS_INTERVAL")
 
     # External services settings
@@ -32,6 +33,7 @@ class Settings(BaseSettings):
     host_mutation: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     host_raw_data: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     host_normalizer_meta: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
+    span_export_grpc_endpoint: Optional[str] = Field(None, env="SPAN_EXPORT_GRPC_ENDPOINT")
 
     # Queue settings (0 is infinite)
     pq_maxsize: int = Field(1000, env="SCHEDULER_PQ_MAXSIZE")

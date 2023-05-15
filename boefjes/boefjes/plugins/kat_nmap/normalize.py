@@ -1,19 +1,20 @@
 import logging
-from typing import Iterator, Union
+from typing import Iterable, Iterator, Union
+
 from libnmap.objects import NmapHost, NmapService
 from libnmap.parser import NmapParser
+
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import (
+    IPAddressV4,
     IPAddressV6,
     IPPort,
     Network,
-    IPAddressV4,
-    Protocol,
     PortState,
+    Protocol,
 )
-from octopoes.models.ooi.service import Service, IPService
-
-from boefjes.job_models import NormalizerMeta
+from octopoes.models.ooi.service import IPService, Service
 
 
 def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Reference) -> Iterator[OOI]:
@@ -55,7 +56,7 @@ def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Referen
             yield ip_service
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     """Decouple and parse Nmap XMLs and yield relevant network."""
     # Multiple XMLs are concatenated through "\n\n". XMLs end with "\n"; we split on "\n\n\n".
     raw = raw.decode().split("\n\n\n")

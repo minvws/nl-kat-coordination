@@ -1,25 +1,26 @@
 import datetime
 import ipaddress
+import logging
 import re
-from typing import Union, Iterator, List, Tuple
+from typing import Iterable, List, Tuple, Union
 
 import cryptography
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from dateutil.parser import parse
-import logging
+
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
-    X509Certificate,
     AlgorithmType,
+    SubjectAlternativeName,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
-    SubjectAlternativeName,
+    X509Certificate,
 )
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6, IPPort, Protocol, PortState
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
 
@@ -33,7 +34,7 @@ def find_between(s: str, first: str, last: str) -> str:
         return ""
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     # only get the first part of certificates
     contents = find_between(raw.decode(), "Certificate chain", "Certificate chain")
 

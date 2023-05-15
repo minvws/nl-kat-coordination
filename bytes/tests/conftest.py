@@ -8,17 +8,17 @@ from pydantic import ValidationError
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
+from bytes.config import Settings
+from bytes.database.db import SQL_BASE, get_engine
+from bytes.database.sql_meta_repository import SQLMetaDataRepository
 from bytes.rabbitmq import RabbitMQEventManager
+from bytes.raw.file_raw_repository import FileRawRepository
+from bytes.raw.middleware import IdentityMiddleware, NaclBoxMiddleware
+from bytes.repositories.hash_repository import HashRepository
+from bytes.timestamping.in_memory import InMemoryHashRepository
+from bytes.timestamping.pastebin import PastebinHashRepository
 from bytes.timestamping.rfc3161 import RFC3161HashRepository
 from tests.client import BytesAPIClient
-from bytes.config import Settings
-from bytes.timestamping.pastebin import PastebinHashRepository
-from bytes.timestamping.in_memory import InMemoryHashRepository
-from bytes.raw.file_raw_repository import FileRawRepository
-from bytes.raw.middleware import NaclBoxMiddleware, IdentityMiddleware
-from bytes.repositories.hash_repository import HashRepository
-from bytes.database.db import get_engine, SQL_BASE
-from bytes.database.sql_meta_repository import SQLMetaDataRepository
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ def settings():
     try:
         return Settings()
     except ValidationError:  # test is probably being run outside the container setup
-        with open(Path(__file__).parent.parent / ".ci" / ".env.test") as f:
+        with (Path(__file__).parent.parent / ".ci" / ".env.test").open() as f:
             lines = [line.strip().split("=") for line in f.readlines() if line.strip() and line.strip()[-1] != "="]
 
             for key, val in lines:
@@ -48,23 +48,16 @@ def nacl_middleware(settings: Settings) -> NaclBoxMiddleware:
 
 
 @pytest.fixture
-def hash_repository(settings: Settings) -> HashRepository:
+def pastebin_hash_repository(settings: Settings) -> HashRepository:
     return PastebinHashRepository(api_dev_key=settings.pastebin_api_dev_key)
 
 
 @pytest.fixture
-def mock_hash_repository(rfc3616_repository: RFC3161HashRepository, settings: Settings) -> HashRepository:
-    if settings.rfc3161_provider:
-        return rfc3616_repository
+def mock_hash_repository(settings: Settings) -> HashRepository:
+    if settings.rfc3161_cert_file and settings.rfc3161_provider:
+        return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), settings.rfc3161_provider)
 
     return InMemoryHashRepository()
-
-
-@pytest.fixture
-def rfc3616_repository(settings: Settings) -> HashRepository:
-    assert settings.rfc3161_cert_file and settings.rfc3161_provider
-
-    return RFC3161HashRepository(settings.rfc3161_cert_file.read_bytes(), settings.rfc3161_provider)
 
 
 @pytest.fixture
@@ -82,7 +75,7 @@ def meta_repository(
     session.commit()
 
     sessionmaker(bind=engine, autocommit=True)().execute(
-        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()])
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
 
 
@@ -98,7 +91,7 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
     )
 
     sessionmaker(bind=get_engine(settings.bytes_db_uri), autocommit=True)().execute(
-        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()])
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
 
 

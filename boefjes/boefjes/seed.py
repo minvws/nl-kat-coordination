@@ -14,7 +14,6 @@ def main():
         session.commit()
     except IntegrityError:
         session.rollback()
-        print("Repository Present")
 
     session.close()
 

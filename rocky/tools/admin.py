@@ -7,7 +7,7 @@ from django.db.models import JSONField
 from django.forms import widgets
 
 from rocky.admin import AdminErrorMessageMixin
-from tools.models import Organization, OrganizationMember, Indemnification, OOIInformation, OrganizationTag
+from tools.models import Indemnification, OOIInformation, Organization, OrganizationMember, OrganizationTag
 
 
 class JSONInfoWidget(widgets.Textarea):
@@ -34,7 +34,7 @@ class OOIInformationAdmin(admin.ModelAdmin):
     # if pk is not readonly, it will create a new record upon editing
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:  # editing an existing object
-            if obj.value == "":
+            if not obj.value:
                 return self.readonly_fields + (
                     "id",
                     "consult_api",

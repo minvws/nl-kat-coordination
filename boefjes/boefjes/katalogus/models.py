@@ -1,9 +1,8 @@
 import datetime
 from enum import Enum
-from typing import Union, NewType, Optional, List, Literal, Set
+from typing import List, Literal, NewType, Optional, Set, Union
 
-from pydantic import BaseModel, AnyHttpUrl, Field
-
+from pydantic import AnyHttpUrl, BaseModel, Field
 
 RESERVED_LOCAL_ID = "LOCAL"
 

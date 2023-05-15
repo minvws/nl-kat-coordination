@@ -1,11 +1,11 @@
 import csv
 import io
 from datetime import datetime, timezone
-from typing import Dict, ClassVar, Any
+from typing import Any, ClassVar, Dict
 from uuid import uuid4
 
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
@@ -13,20 +13,15 @@ from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from django_otp.decorators import otp_required
 from pydantic import ValidationError
+from tools.forms.upload_csv import CSV_ERRORS, UploadCSVForm
 from two_factor.views.utils import class_view_decorator
 
-from account.mixins import OrganizationView
 from octopoes.api.models import Declaration
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from octopoes.models.ooi.web import URL
-
 from rocky.bytes_client import get_bytes_client
-from tools.forms.upload_csv import (
-    UploadCSVForm,
-    CSV_ERRORS,
-)
 
 CSV_CRITERIA = [
     _("Add column titles. Followed by each object on a new line."),
@@ -46,7 +41,7 @@ CSV_CRITERIA = [
 
 
 @class_view_decorator(otp_required)
-class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
+class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
     form_class = UploadCSVForm
     permission_required = "tools.can_scan_organization"
@@ -121,8 +116,8 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
                 except IndexError:
                     if required:
                         raise IndexError(
-                            "Required referenced primary-key field '%s' not set and no default present for Type '%s'."
-                            % (field, ooi_type_name)
+                            f"Required referenced primary-key field '{field}' not set "
+                            f"and no default present for Type '{ooi_type_name}'."
                         )
                     else:
                         kwargs[field] = None

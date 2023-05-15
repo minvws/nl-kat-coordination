@@ -215,7 +215,7 @@ The file normalize.py contains the actual normalizer: Its only job is to parse r
 .. code-block:: python
 
  import json
- from typing import Iterator, Union
+ from typing import Iterable, Union
 
  from octopoes.models import OOI, Reference
  from octopoes.models.ooi.findings import CVEFindingType, Finding
@@ -223,9 +223,9 @@ The file normalize.py contains the actual normalizer: Its only job is to parse r
 
  from boefjes.job_models import NormalizerMeta
 
- def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.boefje_meta.input_ooi)
+    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
     for scan in results["data"]:
         port_nr = scan["port"]
@@ -400,4 +400,3 @@ There are a number of ways to add your new boefje to OpenKAT.
 ``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the Github CI.
 
 The goal is to set up a separate Github repo with a complete CI to create artifacts based on a template boefje. You can clone this repo. Your OpenKAT installation points you to the artifacts so they are usable from your system. This is now being worked on by the OpenKAT community. Send an email to meedoen@openkat.nl if you want to help. (status: Dec. 2022)
-

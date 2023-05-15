@@ -1,19 +1,15 @@
-from typing import Iterator
+from typing import Dict, Iterator
 
+from bits.spf_discovery.internetnl_spf_parser import parse
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSTXTRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.email_security import DNSSPFRecord, DNSSPFMechanismIP, DNSSPFMechanismHostname
-from bits.spf_discovery.internetnl_spf_parser import parse
+from octopoes.models.ooi.email_security import DNSSPFMechanismHostname, DNSSPFMechanismIP, DNSSPFRecord
 from octopoes.models.ooi.findings import Finding, KATFindingType
-
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
-def run(
-    input_ooi: DNSTXTRecord,
-    additional_oois,
-) -> Iterator[OOI]:
+def run(input_ooi: DNSTXTRecord, additional_oois, config: Dict[str, str]) -> Iterator[OOI]:
     if input_ooi.value.startswith("v=spf1"):
         spf_value = input_ooi.value.replace("%(d)", input_ooi.hostname.tokenized.name)
         parsed = parse(spf_value)
@@ -107,6 +103,9 @@ def parse_ptr_exists_include_mechanism(
         yield DNSSPFMechanismHostname(spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism="ptr")
     else:
         mechanism_type, domain = mechanism.split(":", 1)
+        # currently, the model only supports hostnames and not domains
+        if domain.startswith("_"):
+            return
         hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
         yield hostname
         yield DNSSPFMechanismHostname(
@@ -116,6 +115,9 @@ def parse_ptr_exists_include_mechanism(
 
 def parse_redirect_mechanism(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[str]:
     mechanism_type, domain = mechanism.split("=", 1)
+    # currently, the model only supports hostnames and not domains
+    if domain.startswith("_"):
+        return
     hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
     yield hostname
     yield DNSSPFMechanismHostname(

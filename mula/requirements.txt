@@ -3,9 +3,17 @@ celery==5.2.7
 fastapi==0.93.0
 mmh3==3.0.0
 pika==1.2.0
-psycopg2-binary==2.9.5
-pydantic==1.10.4
-python-dotenv==0.19.0
+prometheus-client==0.16.0
+psycopg2==2.9.6
+pydantic==1.10.7
+python-dotenv==1.0.0
 requests==2.27.1
 sqlalchemy==1.4.31
 uvicorn==0.17.1
+
+# OpenTelemetry
+opentelemetry-sdk==1.17.0
+opentelemetry-exporter-otlp-proto-grpc==1.17.0
+opentelemetry-instrumentation-fastapi==0.38b0
+opentelemetry-instrumentation-psycopg2==0.38b0
+opentelemetry-instrumentation-requests==0.38b0

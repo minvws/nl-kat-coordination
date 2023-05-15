@@ -1,23 +1,20 @@
 import hashlib
 import json
-from os import path
-from typing import List, Iterator, Dict, Union
+from pathlib import Path
+from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import Finding, CVEFindingType, RetireJSFindingType
-from octopoes.models.ooi.software import SoftwareInstance, Software
+from octopoes.models.ooi.findings import CVEFindingType, Finding, RetireJSFindingType
+from octopoes.models.ooi.software import Software, SoftwareInstance
 from packaging import version
 
 
-def run(
-    input_ooi: Software,
-    additional_oois: List[SoftwareInstance],
-) -> Iterator[OOI]:
+def run(input_ooi: Software, additional_oois: List[SoftwareInstance], config: Dict[str, str]) -> Iterator[OOI]:
     software_name = input_ooi.name
     software_version = input_ooi.version if input_ooi.version else "999.9.9"
 
-    filename_path = path.join(path.dirname(__file__), "retirejs.json")
-    with open(filename_path, encoding="utf-8") as json_file:
+    filename_path = Path(__file__).parent / "retirejs.json"
+    with filename_path.open(encoding="utf-8") as json_file:
         known_vulnerabilities = json.load(json_file)
 
     vulnerabilities = _check_vulnerabilities(software_name, software_version, known_vulnerabilities)

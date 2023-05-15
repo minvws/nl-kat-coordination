@@ -1,72 +1,74 @@
 from __future__ import annotations
 
-from typing import Type, Dict, Set, Iterator, Union
+from typing import Dict, Iterator, Set, Type, Union
 
 from pydantic.fields import ModelField
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
-    X509Certificate,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
+    X509Certificate,
 )
+from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.records import (
-    DNSARecord,
+    NXDOMAIN,
     DNSAAAARecord,
+    DNSARecord,
+    DNSCNAMERecord,
     DNSMXRecord,
-    DNSTXTRecord,
     DNSNSRecord,
     DNSSOARecord,
-    DNSCNAMERecord,
-    NXDOMAIN,
+    DNSTXTRecord,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone, ResolvedHostname
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname, ResolvedHostname
 from octopoes.models.ooi.email_security import (
-    DNSSPFMechanismIP,
-    DNSSPFMechanismHostname,
-    DNSSPFMechanismNetBlock,
-    DNSSPFRecord,
-    DMARCTXTRecord,
     DKIMExists,
     DKIMKey,
     DKIMSelector,
+    DMARCTXTRecord,
+    DNSSPFMechanismHostname,
+    DNSSPFMechanismIP,
+    DNSSPFMechanismNetBlock,
+    DNSSPFRecord,
 )
 from octopoes.models.ooi.findings import (
-    Finding,
     ADRFindingType,
-    KATFindingType,
+    CAPECFindingType,
     CVEFindingType,
     CWEFindingType,
+    Finding,
+    KATFindingType,
+    MutedFinding,
     RetireJSFindingType,
     SnykFindingType,
-    CAPECFindingType,
 )
-from octopoes.models.ooi.monitoring import Incident, Application
+from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
-    Network,
+    AutonomousSystem,
     IPAddressV4,
     IPAddressV6,
     IPPort,
-    AutonomousSystem,
     IPV4NetBlock,
     IPV6NetBlock,
+    Network,
 )
-from octopoes.models.ooi.service import Service, IPService
+from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
-    Website,
-    HostnameHTTPURL,
-    IPAddressHTTPURL,
-    HTTPResource,
-    HTTPHeader,
-    URL,
-    HTTPHeaderURL,
-    HTTPHeaderHostname,
-    ImageMetadata,
     RESTAPI,
+    URL,
     APIDesignRule,
     APIDesignRuleResult,
+    HostnameHTTPURL,
+    HTTPHeader,
+    HTTPHeaderHostname,
+    HTTPHeaderURL,
+    HTTPResource,
+    ImageMetadata,
+    IPAddressHTTPURL,
+    Website,
 )
 
 CertificateType = Union[
@@ -132,6 +134,7 @@ EmailSecurityType = Union[
     DKIMKey,
 ]
 MonitoringType = Union[Application, Incident]
+ConfigType = Union[Config]
 
 OOIType = Union[
     CertificateType,
@@ -148,13 +151,15 @@ OOIType = Union[
     MonitoringType,
     EmailSecurityType,
     Finding,
+    MutedFinding,
     FindingTypeType,
+    ConfigType,
 ]
 
 
 def get_all_types(cls_: Type[OOI]) -> Iterator[Type[OOI]]:
     yield cls_
-    for subcls in filter(lambda x: x.__module__.startswith("octopoes."), cls_.__subclasses__()):
+    for subcls in cls_.__subclasses__():
         yield from get_all_types(subcls)
 
 
@@ -162,17 +167,11 @@ ALL_TYPES = set(get_all_types(OOI))
 
 
 def get_abstract_types() -> Set[Type[OOI]]:
-    return {
-        t for t in ALL_TYPES if any(filter(lambda x: not x.__module__.startswith("pydantic.main"), t.__subclasses__()))
-    }
+    return {t for t in ALL_TYPES if t.__subclasses__()}
 
 
 def get_concrete_types() -> Set[Type[OOI]]:
-    return {
-        t
-        for t in ALL_TYPES
-        if not any(filter(lambda x: not x.__module__.startswith("pydantic.main"), t.__subclasses__()))
-    }
+    return {t for t in ALL_TYPES if not t.__subclasses__()}
 
 
 def get_collapsed_types() -> Set[Type[OOI]]:

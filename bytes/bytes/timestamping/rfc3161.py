@@ -2,7 +2,7 @@ import base64
 
 import rfc3161ng
 
-from bytes.models import SecureHash, RetrievalLink
+from bytes.models import RetrievalLink, SecureHash
 from bytes.repositories.hash_repository import HashRepository
 
 
@@ -21,7 +21,7 @@ class RFC3161HashRepository(HashRepository):
     def verify(self, link: RetrievalLink, secure_hash: SecureHash) -> bool:
         # Note: "link" is an inconvenient name for this implementation since it is a token.
 
-        if link == "":
+        if not link:
             raise ValueError("Can't retrieve secure-hash from empty link.")
 
         time_stamp_token = base64.b64decode(str(link))

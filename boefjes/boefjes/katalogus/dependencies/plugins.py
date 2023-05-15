@@ -1,7 +1,7 @@
+import contextlib
 import logging
-
 from pathlib import Path
-from typing import Dict, Iterable, List, Iterator, Optional
+from typing import Dict, Iterable, Iterator, List, Optional
 
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
@@ -16,11 +16,11 @@ from boefjes.katalogus.local_repository import (
     LocalPluginRepository,
     get_local_repository,
 )
-from boefjes.katalogus.models import Repository, PluginType, RESERVED_LOCAL_ID
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, PluginType, Repository
 from boefjes.katalogus.storage.interfaces import (
-    RepositoryStorage,
-    PluginEnabledStorage,
     NotFound,
+    PluginEnabledStorage,
+    RepositoryStorage,
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
@@ -98,7 +98,7 @@ class PluginService:
         try:
             self._assert_settings_match_schema(organisation_id, plugin_id)
         except SettingsNotConformingToSchema:
-            logger.warning(f"Removing setting disabled {plugin_id} for {organisation_id} (if it was enabled before)")
+            logger.warning("Removing setting disabled %s for %s (if it was enabled before)", plugin_id, organisation_id)
 
             plugin = self.by_plugin_id(plugin_id, organisation_id)
             self.update_by_id(plugin.repository_id, plugin_id, organisation_id, False)
@@ -202,10 +202,8 @@ class PluginService:
                 raise SettingsNotConformingToSchema(organisation_id, plugin_id, e.message) from e
 
     def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
-        try:
+        with contextlib.suppress(KeyError, NotFound):
             plugin.enabled = self.plugin_enabled_store.get_by_id(plugin.id, plugin.repository_id, organisation_id)
-        except (KeyError, NotFound):
-            pass
 
         return plugin
 

@@ -1,11 +1,10 @@
 from pathlib import Path
 from unittest import TestCase
 
-from octopoes.models.ooi.monitoring import Application
-
 from boefjes.job_models import NormalizerMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from octopoes.models.ooi.monitoring import Application
 from tests.test_snyk import get_dummy_data
 
 

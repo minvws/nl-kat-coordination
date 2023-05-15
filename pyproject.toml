@@ -14,6 +14,7 @@ follow_imports = "skip"
 disallow_untyped_decorators = false # Needed for FastAPI decorators
 
 [tool.setuptools_scm]
+write_to = "_version.py"
 
 [tool.vulture]
 min_confidence = 90
@@ -23,8 +24,11 @@ paths = ["."]
 
 [tool.ruff]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
-# To be extended with I, UP, DJ, PT, RUF, C90, D, PL
-select = ["E", "F", "ERA", "W", "TID"]
+# To be extended with DJ, PT, RUF, C90, D, PL, RET
+select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A"]
+# non-pep585-annotation and non-pep604-annotation are not actually compatible with 3.8
+ignore = ["UP006", "UP007", "A003"]
+fix = true
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -64,11 +68,18 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401","F403"]
-"whitelist.py" = ["F821"]
+"whitelist.py" = ["F821", "INP"]
 "rocky/*/migrations/*.py" = ["E501"]
 "octopoes/bits/check_csp_header/check_csp_header.py" = ["ERA001"]
 "boefjes/boefjes/plugins/kat_binaryedge/http_web/normalize.py" = ["ERA001"]
-
+"*/packaging/*" = ["INP"]
+"*/.ci/*" = ["INP"]
+"conf.py" = ["INP", "PTH", "A"]
+"conftest.py" = ["INP"]
+"setup.py" = ["INP"]
+"manage.py" = ["INP"]
+"*/tests/*" = ["T20"]
+"boefjes/boefjes/plugins/*" = ["PTH"]
 
 [tool.ruff.flake8-tidy-imports]
 [tool.ruff.flake8-tidy-imports.banned-api]

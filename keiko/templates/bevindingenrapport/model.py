@@ -2,7 +2,7 @@
 DNS Report Datamodel
 """
 from datetime import datetime
-from typing import Dict, List, Optional, Union, Literal
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -20,7 +20,7 @@ class Finding(OOI):
     proof: Optional[str]
     description: Optional[str]
     reproduce: Optional[str]
-    ooi: OOI
+    ooi: str
 
 
 class FindingTypeBase(OOI):
@@ -50,7 +50,13 @@ class RetireJSFindingType(FindingTypeBase):
     information_updated: Optional[str] = Field(..., alias="information updated")
 
 
-FindingType = Union[KATFindingType, CVEFindingType, RetireJSFindingType]
+class CWEFindingType(FindingTypeBase):
+    ooi_type: Literal["CWEFindingType"]
+    risk: Optional[str]
+    source: Optional[str]
+
+
+FindingType = Union[KATFindingType, CVEFindingType, RetireJSFindingType, CWEFindingType]
 
 
 class FindingOccurrence(BaseModel):
@@ -70,4 +76,5 @@ class DataShape(DataShapeBase):
     meta: Meta
     findings_grouped: Dict[str, FindingOccurrence]
     valid_time: datetime
-    ooi: OOI
+    report_source_type: str
+    report_source_value: str

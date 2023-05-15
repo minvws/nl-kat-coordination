@@ -2,27 +2,29 @@
 {% load ooi_extra %}
 
 {% spaceless %}
-  {% if inferences %}
-    <div class="horizontal-scroll">
-      <h2>{% translate 'Inferred by' %}</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>{% translate 'Bit' %}</th>
-            <th>{% translate 'Source' %}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for inference in inferences %}
-            <tr>
-              <td>{{ inference.origin.method }}</td>
-              <td>
-                <a href="{% ooi_url 'ooi_detail' inference.origin.source organization.code %}">{{ inference.origin.source }}</a>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% endif %}
+    {% if inferences %}
+        <div class="horizontal-scroll">
+            <h2>{% translate "Inferred by" %}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% translate "Bit" %}</th>
+                        <th>{% translate "Source" %}</th>
+                        <th>{% translate "Parameters" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inference in inferences %}
+                        <tr>
+                            <td>{{ inference.origin.method }}</td>
+                            <td>
+                                <a href="{% ooi_url 'ooi_detail' inference.origin.source organization.code %}">{{ inference.origin.source }}</a>
+                            </td>
+                          <td>{% for param in inference.params %}<a href="{% ooi_url 'ooi_detail' param.reference organization.code %}">{{ param.reference }}</a><br>{% endfor %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 {% endspaceless %}

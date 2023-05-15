@@ -1,6 +1,6 @@
 """Boefje script for scanning wordpress sites using wpscan"""
 from os import getenv
-from typing import Union, Tuple, List
+from typing import List, Tuple, Union
 
 import docker
 
@@ -13,7 +13,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     client = docker.from_env()
     input_ = boefje_meta.arguments["input"]
 
-    if not input_["software"]["name"] == "WordPress" or (
+    if input_["software"]["name"] != "WordPress" or (
         "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"]
     ):
         return [(set(), "")]
@@ -22,7 +22,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     path = input_["ooi"]["path"]
     scheme = input_["ooi"]["scheme"]
 
-    if not scheme == "https":
+    if scheme != "https":
         return [(set(), "")]
 
     url = f"{scheme}://{hostname}{path}"

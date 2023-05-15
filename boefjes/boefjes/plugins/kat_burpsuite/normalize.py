@@ -1,22 +1,21 @@
-from xml.dom import minidom
-from bs4 import BeautifulSoup
-from urllib.parse import urlparse
-from ipaddress import ip_address, IPv4Address, IPv6Address
 import base64
+from ipaddress import IPv4Address, IPv6Address, ip_address
+from typing import Iterable, Union
+from urllib.parse import urlparse
+from xml.dom import minidom
 
-from typing import Iterator, Union
-
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import Finding, CWEFindingType, CAPECFindingType, CVEFindingType
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network, IPPort, Protocol
-from octopoes.models.ooi.web import WebScheme, Website, IPAddressHTTPURL, HostnameHTTPURL, URL, HTTPResource, HTTPHeader
-from octopoes.models.ooi.service import Service, IPService
+from bs4 import BeautifulSoup
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.findings import CAPECFindingType, CVEFindingType, CWEFindingType, Finding
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
+from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, IPAddressHTTPURL, WebScheme, Website
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     parser = minidom.parse(raw)
 
     # assume that input ooi is none or a HostnameHTTPURL

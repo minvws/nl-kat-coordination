@@ -1,20 +1,21 @@
 import datetime
 import json
-from typing import Iterator, Union
+from typing import Iterable, Union
+
 from dateutil.parser import parse
+
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 
-from boefjes.job_models import NormalizerMeta
 
-
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     results = json.loads(raw)
     input_ = normalizer_meta.raw_data.boefje_meta.arguments["input"]
     fqdn = input_["hostname"]["name"]
-    current = fqdn.lstrip(".").rstrip(".")
+    current = fqdn.lstrip(".")
 
     network = Network(name="internet")
     yield network
@@ -35,16 +36,19 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 yield Hostname(name=name, network=network_reference)
                 unique_domains.add(name)
 
-        # todo: yield only current certs?
-        yield X509Certificate(
-            subject=common_name,
-            issuer=certificate["issuer_name"],
-            valid_from=certificate["not_before"],
-            valid_until=certificate["not_after"],
-            serial_number=certificate["serial_number"].upper(),
-            expires_in=parse(certificate["not_after"]).astimezone(datetime.timezone.utc)
-            - datetime.datetime.now(datetime.timezone.utc),
+        # Yield only current certs.
+        expires_in = parse(certificate["not_after"]).astimezone(datetime.timezone.utc) - datetime.datetime.now(
+            datetime.timezone.utc
         )
+        if expires_in.total_seconds() > 0:
+            yield X509Certificate(
+                subject=common_name,
+                issuer=certificate["issuer_name"],
+                valid_from=certificate["not_before"],
+                valid_until=certificate["not_after"],
+                serial_number=certificate["serial_number"].upper(),
+                expires_in=expires_in,
+            )
         # walk over the common_name. which might be unrelated to the requested domain, or it might be a parent domain
         # which our dns Boefje should also have picked up.
         # wildcards also trigger here, and won't be visible from a DNS query

@@ -1,13 +1,13 @@
-from typing import List, Iterator
 import re
-from urllib.parse import urlparse, urljoin
+from typing import Dict, Iterator, List
+from urllib.parse import urljoin, urlparse
 
 from pydantic import ValidationError
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.web import HTTPHeaderHostname
-from octopoes.models.types import HTTPHeader, URL, Network, HTTPHeaderURL
+from octopoes.models.types import URL, HTTPHeader, HTTPHeaderURL, Network
 
 
 def is_url(input_str):
@@ -15,10 +15,7 @@ def is_url(input_str):
     return bool(result.scheme)
 
 
-def run(
-    input_ooi: HTTPHeader,
-    additional_oois: List,
-) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     network = Network(name="internet")
 
     if input_ooi.key.lower() == "location":
@@ -38,15 +35,15 @@ def run(
     if input_ooi.key.lower() == "content-security-policy":
         urls_and_hostname = re.findall(r"(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-&?=%.]+", input_ooi.value)
 
-        for object in urls_and_hostname:
+        for url_or_hostname in urls_and_hostname:
             try:
-                u = URL(raw=object, network=network.reference)
+                u = URL(raw=url_or_hostname, network=network.reference)
                 yield u
                 http_header_url = HTTPHeaderURL(header=input_ooi.reference, url=u.reference)
                 yield http_header_url
             # some hostnames get classified as urls by the regex here, they need to be parsed by another bit
             except ValidationError:
-                name = object if object[0] != "." else object[1:]
+                name = url_or_hostname if url_or_hostname[0] != "." else url_or_hostname[1:]
                 h = Hostname(name=name, network=network.reference)
                 yield h
                 http_header_hostname = HTTPHeaderHostname(header=input_ooi.reference, hostname=h.reference)

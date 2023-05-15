@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Dict, Optional, Any, Union, TypedDict, Tuple
+from functools import total_ordering
+from typing import Any, Dict, Optional, Tuple, TypedDict, Union
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -11,18 +12,17 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import (
+    CAPECFindingType,
+    CVEFindingType,
+    CWEFindingType,
     Finding,
     FindingType,
     KATFindingType,
-    CVEFindingType,
-    CWEFindingType,
     RetireJSFindingType,
     SnykFindingType,
-    CAPECFindingType,
 )
 from octopoes.models.tree import ReferenceNode
-from octopoes.models.types import get_relations, OOI_TYPES
-
+from octopoes.models.types import OOI_TYPES, get_relations
 from rocky.bytes_client import BytesClient
 from tools.models import OOIInformation
 
@@ -31,12 +31,21 @@ User = get_user_model()
 RISK_LEVEL_SCORE_DEFAULT = 10
 
 
+@total_ordering
 class RiskLevelSeverity(Enum):
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
     NONE = "recommendation"
+
+    def __gt__(self, other: "RiskLevelSeverity") -> bool:
+        severity_order = ["recommendation", "low", "medium", "high", "critical"]
+
+        return severity_order.index(self.value) > severity_order.index(other.value)
+
+    def __str__(self):
+        return self.value
 
 
 def format_attr_name(s: str) -> str:
@@ -289,9 +298,8 @@ def get_ooi_types_from_tree(ooi, include_self=True):
         for child_type in get_ooi_types_from_tree(child):
             types.add(child_type)
 
-    if include_self:
-        if ooi["ooi_type"] not in types:
-            types.add(ooi["ooi_type"])
+    if include_self and ooi["ooi_type"] not in types:
+        types.add(ooi["ooi_type"])
 
     return sorted(types)
 

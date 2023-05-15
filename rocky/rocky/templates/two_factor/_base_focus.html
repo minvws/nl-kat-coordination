@@ -1,12 +1,13 @@
 {% extends "two_factor/_base.html" %}
-{% block content_wrapper %}
-  {% include 'header.html' with breadcrumbList=breadcrumbList %}
-  <main id="main-content">
-    <article>
-      <div class="form-view">
-        {% block content %}{% endblock %}
 
-      </div>
-    </article>
-  </main>
-{% endblock %}
+{% block content_wrapper %}
+    {% include "header.html" with breadcrumbList=breadcrumbList %}
+
+    <main id="main-content">
+        <article>
+            <div class="form-view">
+                {% block content %}{% endblock content %}
+            </div>
+        </article>
+    </main>
+{% endblock content_wrapper %}

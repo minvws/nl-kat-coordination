@@ -1,14 +1,13 @@
-from typing import List, Iterator, Union
+from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def run(
-    hostname: Hostname,
-    additional_oois: List[Union[Finding, DNSNSRecord]],
+    hostname: Hostname, additional_oois: List[Union[Finding, DNSNSRecord]], config: Dict[str, str]
 ) -> Iterator[OOI]:
     no_ipv6_findings = [
         finding

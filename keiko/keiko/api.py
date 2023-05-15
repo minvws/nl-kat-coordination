@@ -4,15 +4,21 @@ import uuid
 from pathlib import Path
 from typing import List
 
-from fastapi import FastAPI, BackgroundTasks, Body
+from fastapi import BackgroundTasks, Body, FastAPI
 from fastapi.staticfiles import StaticFiles
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from pydantic import BaseModel
 
 from keiko.base_models import ReportArgumentsBase
-from keiko.health import get_health, ServiceHealth
+from keiko.health import ServiceHealth, get_health
 from keiko.keiko import generate_report
 from keiko.settings import Settings
-from keiko.templates import get_templates, get_samples
+from keiko.templates import get_samples, get_templates
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +26,21 @@ logger = logging.getLogger(__name__)
 def construct_api(settings: Settings) -> FastAPI:
     """Construct the FastAPI object, with prefilled examples from disk."""
     app = FastAPI()
+
+    # Set up OpenTelemetry instrumentation
+    if settings.span_export_grpc_endpoint is not None:
+        logger.info("Setting up instrumentation with span exporter endpoint [%s]", settings.span_export_grpc_endpoint)
+
+        FastAPIInstrumentor.instrument_app(app)
+
+        resource = Resource(attributes={SERVICE_NAME: "keiko"})
+        provider = TracerProvider(resource=resource)
+        processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=settings.span_export_grpc_endpoint))
+        provider.add_span_processor(processor)
+        trace.set_tracer_provider(provider)
+
+        logger.debug("Finished setting up instrumentation")
+
     examples = get_samples(settings)
 
     @app.get("/templates")
@@ -58,8 +79,7 @@ def construct_api(settings: Settings) -> FastAPI:
         return get_health()
 
     # mount reports as static files
-    if not Path(settings.reports_folder).exists():
-        Path(settings.reports_folder).mkdir(parents=True)
+    Path(settings.reports_folder).mkdir(parents=True, exist_ok=True)
     app.mount("/reports", StaticFiles(directory=settings.reports_folder), name="reports")
 
     return app

@@ -1,7 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set
 
 from requests import HTTPError
 
@@ -12,7 +12,8 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import OriginParameter
 from octopoes.xtdb import FieldSet
-from octopoes.xtdb.client import XTDBSession, OperationType as XTDBOperationType
+from octopoes.xtdb.client import OperationType as XTDBOperationType
+from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
 
 logger = getLogger(__name__)
@@ -31,7 +32,7 @@ class OriginParameterRepository:
     def delete(self, origin_parameter: OriginParameter, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def list_by_origin(self, origin_id: str, valid_time: datetime) -> List[OriginParameter]:
+    def list_by_origin(self, origin_id: Set[str], valid_time: datetime) -> List[OriginParameter]:
         raise NotImplementedError
 
     def list_by_reference(self, reference: Reference, valid_time: datetime) -> List[OriginParameter]:
@@ -70,12 +71,12 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             else:
                 raise e
 
-    def list_by_origin(self, origin_id: str, valid_time: datetime) -> List[OriginParameter]:
+    def list_by_origin(self, origin_id: Set[str], valid_time: datetime) -> List[OriginParameter]:
         query = generate_pull_query(
             self.xtdb_type,
             FieldSet.ALL_FIELDS,
             {
-                "origin_id": str(origin_id),
+                "origin_id": origin_id,
                 "type": OriginParameter.__name__,
             },
         )
@@ -95,11 +96,10 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
         return [self.deserialize(r[0]) for r in results]
 
     def save(self, origin_parameter: OriginParameter, valid_time: datetime) -> None:
-        old_origin_parameter = None
         try:
             old_origin_parameter = self.get(origin_parameter.id, valid_time)
         except ObjectNotFoundException:
-            pass
+            old_origin_parameter = None
 
         if old_origin_parameter == origin_parameter:
             return

@@ -6,12 +6,10 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 # Makefile Reference: https://tech.davis-hansson.com/p/make/
 
-.PHONY: help mypy check black done lint env debian ubuntu clean
+.PHONY: all help mypy check black done lint env debian ubuntu clean itest utest test migrations HIDE
 
 # use HIDE to run commands invisibly, unless VERBOSE defined
 HIDE:=$(if $(VERBOSE),,@)
-
-BYTES_VERSION= v0.6.0
 
 # Export cmd line args:
 export VERBOSE
@@ -75,8 +73,8 @@ cov: ## Generate a test coverage report
 ##+------------------------------------------------------------------------+
 
 sql: ## Generate raw sql for the migrations.
-	docker-compose exec scheduler \
-		alembic --config /app/scheduler/alembic.ini \
+	docker-compose run --rm scheduler \
+		alembic --config /app/scheduler/scheduler/alembic.ini \
 		upgrade $(rev1):$(rev2) --sql
 
 migrations: ## Create migration.
@@ -92,7 +90,7 @@ else
 endif
 
 migrate: ## Run migrations using alembic.
-	docker-compose run scheduler \
+	$(ci-docker-compose) run scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		upgrade head
 
@@ -103,7 +101,7 @@ migrate: ## Run migrations using alembic.
 
 utest: ## Run the unit tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm mula python -m pytest tests/unit/${file} ${function}
+	$(ci-docker-compose) run --rm mula python -m pytest tests/unit/${file} $(if $(function),-k $(function))
 else
 	$(ci-docker-compose) run --rm mula python -m pytest tests/unit
 endif
@@ -111,7 +109,7 @@ endif
 
 itest: ## Run the integration tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm mula python -m pytest tests/integration/${file} ${function}
+	$(ci-docker-compose) run --rm mula python -m pytest tests/integration/${file} $(if $(function),-k $(function))
 else
 	$(ci-docker-compose) run --rm mula python -m pytest tests/integration
 endif

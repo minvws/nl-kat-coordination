@@ -1,13 +1,13 @@
 import tempfile
 import time
 from pathlib import Path
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 from unittest import TestCase
 
 from pydantic import parse_raw_as
 
 from boefjes.app import SchedulerRuntimeManager
-from boefjes.clients.scheduler_client import SchedulerClientInterface, QueuePrioritizedItem, Queue, TaskStatus
+from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, RuntimeManager
@@ -31,11 +31,11 @@ class MockSchedulerClient(SchedulerClientInterface):
             return parse_raw_as(QueuePrioritizedItem, self.normalizer_responses.pop(0))
 
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
-        with open(self.log_path, "a") as f:
+        with self.log_path.open("a") as f:
             f.write(f"{task_id},{status.value}\n")
 
     def get_all_patched_tasks(self) -> List[List[str]]:
-        with open(self.log_path, "r") as f:
+        with self.log_path.open() as f:
             return [x.strip().split(",") for x in f]
 
 
@@ -59,13 +59,13 @@ class MockHandler(Handler):
 
         self.calls += 1
 
-        with open(self.log_path, "a") as f:
+        with self.log_path.open("a") as f:
             f.write(f"{item.json()}\n")
 
         time.sleep(self.sleep_time)
 
     def get_all(self) -> List[Union[BoefjeMeta, NormalizerMeta]]:
-        with open(self.log_path, "r") as f:
+        with self.log_path.open() as f:
             f = [x for x in f]
             return [parse_raw_as(Union[BoefjeMeta, NormalizerMeta], x) for x in f]
 

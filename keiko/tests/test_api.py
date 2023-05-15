@@ -1,9 +1,9 @@
 from pathlib import Path
+from tempfile import gettempdir
 from unittest import TestCase
 
 from fastapi.testclient import TestClient
 
-from tempfile import gettempdir
 from keiko.api import construct_api
 from keiko.settings import Settings
 
