@@ -100,6 +100,12 @@ class OOI(BaseModel, abc.ABC):
     def get_object_type(cls) -> str:
         return cls.__name__
 
+    @classmethod
+    def ooi_subclasses(cls) -> List[Type[OOI]]:
+        """FastAPI creates duplicate class instances when parsing return types."""
+
+        return [subclass for subclass in cls.__subclasses__() if subclass.__name__ != cls.__name__]
+
     # FIXME: Legacy usage in Rocky/Boefjes
     @classmethod
     def get_ooi_type(cls) -> str:
@@ -258,9 +264,9 @@ PrimaryKeyToken.update_forward_refs()
 
 
 def get_leaf_subclasses(cls: Type[OOI]) -> Set[Type[OOI]]:
-    if not cls.__subclasses__():
+    if not cls.ooi_subclasses():
         return {cls}
-    child_sets = [get_leaf_subclasses(child_cls) for child_cls in cls.__subclasses__()]
+    child_sets = [get_leaf_subclasses(child_cls) for child_cls in cls.ooi_subclasses()]
     return set().union(*child_sets)
 
 
