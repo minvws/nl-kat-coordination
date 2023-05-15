@@ -160,7 +160,7 @@ OOIType = Union[
 def get_all_types(cls_: Type[OOI]) -> Iterator[Type[OOI]]:
     yield cls_
 
-    for subclass in cls_.ooi_subclasses():
+    for subclass in cls_.strict_subclasses():
         yield from get_all_types(subclass)
 
 
@@ -168,11 +168,11 @@ ALL_TYPES = set(get_all_types(OOI))
 
 
 def get_abstract_types() -> Set[Type[OOI]]:
-    return {t for t in ALL_TYPES if t.ooi_subclasses()}
+    return {t for t in ALL_TYPES if t.strict_subclasses()}
 
 
 def get_concrete_types() -> Set[Type[OOI]]:
-    return {t for t in ALL_TYPES if not t.ooi_subclasses()}
+    return {t for t in ALL_TYPES if not t.strict_subclasses()}
 
 
 def get_collapsed_types() -> Set[Type[OOI]]:
