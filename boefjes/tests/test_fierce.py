@@ -1,11 +1,10 @@
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv6Address
 from unittest.mock import MagicMock
 
 from boefjes.plugins.kat_fierce.normalize import run
 from octopoes.models import Reference
-from octopoes.models.ooi.dns.records import DNSARecord
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, Network
+from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from tests.stubs import get_dummy_data
 
 
@@ -13,21 +12,23 @@ def test_fierce():
     oois = set(run(MagicMock(), get_dummy_data("inputs/fierce-result-example.com.json")))
 
     expected = {
-        DNSARecord(
-            object_type="DNSARecord",
-            primary_key="DNSARecord|internet|subdomain.example.com|192.0.2.3",
+        ResolvedHostname(
+            object_type="ResolvedHostname",
+            primary_key="ResolvedHostname|internet|www.example.com|192.0.2.2",
+            hostname=Reference("Hostname|internet|www.example.com"),
+            address=Reference("IPAddressV4|internet|192.0.2.2"),
+        ),
+        ResolvedHostname(
+            object_type="ResolvedHostname",
+            primary_key="ResolvedHostname|internet|subdomain.example.com|192.0.2.3",
             hostname=Reference("Hostname|internet|subdomain.example.com"),
-            dns_record_type="A",
-            value="192.0.2.3",
             address=Reference("IPAddressV4|internet|192.0.2.3"),
         ),
-        DNSARecord(
-            object_type="DNSARecord",
-            primary_key="DNSARecord|internet|www.example.com|192.0.2.2",
-            hostname=Reference("Hostname|internet|www.example.com"),
-            dns_record_type="A",
-            value="192.0.2.2",
-            address=Reference("IPAddressV4|internet|192.0.2.2"),
+        ResolvedHostname(
+            object_type="ResolvedHostname",
+            primary_key="ResolvedHostname|internet|ipv6.example.com|ff02::1",
+            hostname=Reference("Hostname|internet|ipv6.example.com"),
+            address=Reference("IPAddressV6|internet|ff02::1"),
         ),
         Hostname(
             object_type="Hostname",
@@ -41,6 +42,12 @@ def test_fierce():
             network=Reference("Network|internet"),
             name="subdomain.example.com",
         ),
+        Hostname(
+            object_type="Hostname",
+            primary_key="Hostname|internet|ipv6.example.com",
+            network=Reference("Network|internet"),
+            name="ipv6.example.com",
+        ),
         IPAddressV4(
             object_type="IPAddressV4",
             primary_key="IPAddressV4|internet|192.0.2.3",
@@ -51,6 +58,12 @@ def test_fierce():
             object_type="IPAddressV4",
             primary_key="IPAddressV4|internet|192.0.2.2",
             address=IPv4Address("192.0.2.2"),
+            network=Reference("Network|internet"),
+        ),
+        IPAddressV6(
+            object_type="IPAddressV6",
+            primary_key="IPAddressV6|internet|ff02::1",
+            address=IPv6Address("ff02::1"),
             network=Reference("Network|internet"),
         ),
         Network(object_type="Network", primary_key="Network|internet", name="internet"),
