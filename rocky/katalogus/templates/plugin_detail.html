@@ -8,11 +8,7 @@
 
     <main id="main-content">
         <section>
-            <div class="one-third-two-thirds">
-                <div>
-                    <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
-                         alt="boefje placeholder image"/>
-                </div>
+            <div class="two-thirds-one-third">
                 <div>
                     <div class="horizontal-view toolbar">
                         <div>
@@ -32,6 +28,13 @@
                     <p>
                         {{ plugin.description }}
                     </p>
+                </div>
+
+                <div class="image-square">
+                    <div class="image-container">
+                        <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
+                            alt="boefje placeholder image"/>
+                    </div>
                 </div>
             </div>
         </section>
