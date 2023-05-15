@@ -56,11 +56,20 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
         )
 
 
-@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running")  # index: 2
-@mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run")  # index: 1
-@mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type")  # index: 0
 class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
-    def test_push_tasks_for_received_raw_file(self, *mocks):
+    def setUp(self):
+        super().setUp()
+
+        self.mock_is_task_running = \
+            mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running").start()
+
+        self.mock_is_task_allowed_to_run = \
+            mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run").start()
+
+        self.mock_get_normalizers_for_mime_type = \
+            mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type").start()
+
+    def test_push_tasks_for_received_raw_file(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -91,11 +100,11 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         )
 
         # Mocks
-        mocks[0].return_value = [
+        self.mock_get_normalizers_for_mime_type.return_value = [
             PluginFactory(type="normalizer"),
         ]
-        mocks[1].return_value = True
-        mocks[2].return_value = False
+        self.mock_is_task_allowed_to_run.return_value = True
+        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -109,7 +118,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    def test_push_tasks_for_received_raw_file_no_normalizers_found(self, *mocks):
+    def test_push_tasks_for_received_raw_file_no_normalizers_found(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -140,9 +149,9 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         )
 
         # Mocks
-        mocks[0].return_value = []
-        mocks[1].return_value = True
-        mocks[2].return_value = False
+        self.mock_get_normalizers_for_mime_type.return_value = []
+        self.mock_is_task_allowed_to_run.return_value = True
+        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -150,7 +159,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_received_raw_file_not_allowed_to_run(self, *mocks):
+    def test_push_tasks_for_received_raw_file_not_allowed_to_run(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -181,9 +190,9 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             created_at=datetime.datetime.now(),
         )
 
-        mocks[0].return_value = []
-        mocks[1].return_value = False
-        mocks[2].return_value = False
+        self.mock_get_normalizers_for_mime_type.return_value = []
+        self.mock_is_task_allowed_to_run.return_value = False
+        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -222,9 +231,9 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             created_at=datetime.datetime.now(),
         )
 
-        mocks[0].return_value = []
-        mocks[1].return_value = True
-        mocks[2].return_value = True
+        self.mock_get_normalizers_for_mime_type.return_value = []
+        self.mock_is_task_allowed_to_run.return_value = False
+        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -232,7 +241,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_received_raw_file_item_on_queue(self, *mocks):
+    def test_push_tasks_for_received_raw_file_item_on_queue(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -272,12 +281,11 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             created_at=datetime.datetime.now(),
         )
 
-        mocks[0].return_value = [
+        self.mock_get_normalizers_for_mime_type.return_value = [
             PluginFactory(type="normalizer"),
         ]
-
-        mocks[1].return_value = True
-        mocks[2].return_value = False
+        self.mock_is_task_allowed_to_run.return_value = True
+        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event1)
@@ -292,7 +300,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    def test_push_tasks_for_received_raw_file_error_mimetype(self, *mocks):
+    def test_push_tasks_for_received_raw_file_error_mimetype(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -313,7 +321,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             input_ooi=ooi.primary_key,
         )
 
-        # Mocks
         raw_data_event = models.RawDataReceivedEvent(
             raw_data=RawDataFactory(
                 boefje_meta=boefje_meta,
