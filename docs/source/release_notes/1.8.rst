@@ -40,6 +40,8 @@ New Features
    page and a new generate_report management command to generate the report.
  * A new port-common bit that also makes findings for every open common port.
    This bit is disabled by default.
+ * The organization settings page has a new "Rerun all bits" button that can be
+   used after upgrading.
 
 Bug fixes
 =========
@@ -51,14 +53,18 @@ Bug fixes
  * The port classification bit differentiates between TCP and UDP ports.
  * In a lot of places the error handling has been improved resulting in error
    messages in the web interface.
+ * The scheduler DB was missing an index. This has been added and should fix some
+   performance issues.
 
 Upgrading
 =========
 
 The usual instructions for upgrading can be followed. For the changes that cause
 certain object to no longer be created it can take some time before they
-disappear because the boefjes, normalizers and bits need to run again for that
-to happen.
+disappear because the boefjes and normalizers need to run again for that to
+happen. Objects created by bits might not disappear automatically at all because
+the bit will not be triggered if the data doesn't change. You can use the "Rerun
+all bits" button on the organization settings page to trigger all bits.
 
 Development containers
 ----------------------
