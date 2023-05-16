@@ -60,14 +60,15 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = \
-            mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running").start()
+        self.mock_is_task_running = mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running").start()
 
-        self.mock_is_task_allowed_to_run = \
-            mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run").start()
+        self.mock_is_task_allowed_to_run = mock.patch(
+            "scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run"
+        ).start()
 
-        self.mock_get_normalizers_for_mime_type = \
-            mock.patch("scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type").start()
+        self.mock_get_normalizers_for_mime_type = mock.patch(
+            "scheduler.schedulers.NormalizerScheduler.get_normalizers_for_mime_type"
+        ).start()
 
     def test_push_tasks_for_received_raw_file(self):
         # Arrange

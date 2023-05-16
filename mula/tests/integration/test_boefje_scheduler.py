@@ -16,7 +16,6 @@ from tests.utils import functions
 
 
 class BoefjeSchedulerBaseTestCase(unittest.TestCase):
-
     def setUp(self):
         cfg = config.settings.Settings()
 
@@ -85,14 +84,15 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
 
 class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
-
     def setUp(self):
         super().setUp()
 
-        self.mock_get_latest_task_by_hash = \
-            mock.patch("scheduler.context.AppContext.task_store.get_latest_task_by_hash").start()
-        self.mock_get_last_run_boefje = \
-            mock.patch("scheduler.context.AppContext.services.bytes.get_last_run_boefje").start()
+        self.mock_get_latest_task_by_hash = mock.patch(
+            "scheduler.context.AppContext.task_store.get_latest_task_by_hash"
+        ).start()
+        self.mock_get_last_run_boefje = mock.patch(
+            "scheduler.context.AppContext.services.bytes.get_last_run_boefje"
+        ).start()
 
     def test_is_allowed_to_run(self):
         # Arrange
@@ -626,18 +626,17 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
 
 class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
-
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
-        self.mock_is_task_allowed_to_run = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run").start()
-        self.mock_has_grace_period_passed = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed").start()
-        self.mock_get_boefjes_for_ooi = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
+        self.mock_is_task_running = mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
+        self.mock_is_task_allowed_to_run = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run"
+        ).start()
+        self.mock_has_grace_period_passed = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed"
+        ).start()
+        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
 
     def test_push_tasks_for_scan_profile_mutations(self):
         """Scan level change"""
@@ -758,16 +757,19 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
-        self.mock_is_task_allowed_to_run = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run").start()
-        self.mock_has_grace_period_passed = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed").start()
-        self.mock_get_new_boefjes_by_org_id = \
-            mock.patch("scheduler.context.AppContext.services.katalogus.get_new_boefjes_by_org_id").start()
-        self.mock_get_objects_by_object_types = \
-            mock.patch("scheduler.context.AppContext.services.octopoes.get_objects_by_object_types").start()
+        self.mock_is_task_running = mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
+        self.mock_is_task_allowed_to_run = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run"
+        ).start()
+        self.mock_has_grace_period_passed = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed"
+        ).start()
+        self.mock_get_new_boefjes_by_org_id = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_new_boefjes_by_org_id"
+        ).start()
+        self.mock_get_objects_by_object_types = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_objects_by_object_types"
+        ).start()
 
     def test_push_tasks_for_new_boefjes(self):
         # Arrange
@@ -910,16 +912,17 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
-        self.mock_is_task_allowed_to_run = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run").start()
-        self.mock_has_grace_period_passed = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed").start()
-        self.mock_get_boefjes_for_ooi = \
-            mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
-        self.mock_get_random_objects = \
-            mock.patch("scheduler.context.AppContext.services.octopoes.get_random_objects").start()
+        self.mock_is_task_running = mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
+        self.mock_is_task_allowed_to_run = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run"
+        ).start()
+        self.mock_has_grace_period_passed = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed"
+        ).start()
+        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
+        self.mock_get_random_objects = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_random_objects"
+        ).start()
 
     def test_push_tasks_for_random_objects(self):
         # Arrange
