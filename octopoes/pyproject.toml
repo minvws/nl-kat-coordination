@@ -57,6 +57,7 @@ opentelemetry-exporter-otlp-proto-grpc = "1.17.0"
 opentelemetry-instrumentation-fastapi = "^0.38b0"
 opentelemetry-instrumentation-requests = "^0.38b0"
 certifi = "^2023.5.7"
+sqlalchemy = "1.4.48"
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"
