@@ -60,9 +60,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = mock.patch(
-            "scheduler.schedulers.NormalizerScheduler.is_task_running"
-        ).start()
+        self.mock_is_task_running = mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running").start()
 
         self.mock_is_task_allowed_to_run = mock.patch(
             "scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run"
