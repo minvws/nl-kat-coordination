@@ -47,15 +47,52 @@ body > header nav .language-selector ul li a,
     padding: 0.125rem 1rem;
 }
 
-body > header nav .language-selector div[aria-expanded="true"] ul li[aria-current="true"] a,
-.language-selector div[aria-expanded="true"] ul li[aria-current="true"] a {
-    &:before {
-        content: "\ea5e";
-        font-family: var(--language-selector-list-button-icon-font-family);
-        margin-left: var(--language-selector-list-button-icon-margin-left);
-        font-size: var(--language-selector-list-button-icon-font-size);
-        color: var(--language-selector-list-button-icon-text-color);
-        margin-right: 0.5rem;
+body > header nav .language-selector div[aria-expanded="true"] ul li[aria-current="true"] a:before,
+.language-selector div[aria-expanded="true"] ul li[aria-current="true"] a:before {
+    content: "\ea5e";
+    font-family: var(--language-selector-list-button-icon-font-family);
+    margin-left: var(--language-selector-list-button-icon-margin-left);
+    font-size: var(--language-selector-list-button-icon-font-size);
+    color: var(--language-selector-list-button-icon-text-color);
+    margin-right: 0.5rem;
+}
+
+body > header nav.collapsible .collapsible-toggle[aria-expanded="true"] + .collapsing-element .language-selector {
+    order: 1;
+
+    .language-selector-options {
+        > button {
+            display: none;
+        }
+    
+        ul {
+            display: flex;
+            flex-direction: row;
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            border: 0;
+            padding-left: var(--collapsing-element-list-item-link-padding-left, 2rem);
+            gap: 1rem;
+    
+            li {
+                width: auto;
+                border: 0;
+    
+                a {
+                    padding: 0;
+                    border: 0;
+    
+                    button {
+                        min-width: 0;
+                        color: #006FB3;
+                        text-decoration: underline;
+                        text-transform: uppercase;
+                    }
+                }
+            }
+        }
     }
 }
+
+
 

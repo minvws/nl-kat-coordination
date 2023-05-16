@@ -1,19 +1,16 @@
 {% load static %}
 {% load i18n %}
 
-<header>
+<header class="test">
     {% include "partials/skip-to-content.html" %}
 
     <nav data-open-label="Menu"
          data-close-label="Sluit menu"
-         data-media="(min-width: 56rem)"
-         aria-label="Hoofdnavigatie">
-
-        <div> <!-- Content wrapper -->
-            <a href="{% url "landing_page" %}"
-            class="logo"
-            title="OpenKAT"
-            aria-label="{% translate "OpenKAT logo, go to the homepage of OpenKAT" %}">
+         data-media="(min-width: 70rem)"
+         aria-label="Hoofdnavigatie"
+         class="collapsible">
+         <div>
+            <a href="{% url "landing_page" %}" class="logo" title="OpenKAT" aria-label="{% translate "OpenKAT logo, go to the homepage of OpenKAT" %}">
                 <img src="{% static 'img/kat_logo.png' %}" alt="{% translate "OpenKAT" %}"/>
                 Kwetsbaarheden Analyse Tool
             </a>
@@ -25,7 +22,7 @@
                 {% endif %}
             {% endif %}
 
-            <div class="collapsing-menu"> <!-- Collapsible menu -->
+            <div class="collapsing-element">
                 <ul>
                     {% if request.user.is_authenticated %}
                         {% if not organization.code %}
@@ -100,4 +97,5 @@
         </nav>
     {% endif %}
 </header>
+
 {% include "partials/notifications/confirmation.html" %}

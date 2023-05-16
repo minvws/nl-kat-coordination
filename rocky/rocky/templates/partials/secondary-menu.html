@@ -2,7 +2,7 @@
 
 {% if request.user.is_authenticated %}
     <li>
-        <a href="{% url 'logout' %}">{% translate "Logout" %}</a>
+        <a href="{% url 'logout' %}" class="user-icon">{% translate "Logout" %}</a>
     </li>
 {% else %}
     <li>

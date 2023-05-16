@@ -1,0 +1,13 @@
+/* Header Navigation collapsible - Variables */
+
+:root {
+    --header-navigation-collapsible-background-color: white;
+    --header-navigation-collapsible-top: 5rem;
+    --header-navigation-collapsible-list-item-border-width: 0;
+}
+
+.collapsing-element > div {
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}

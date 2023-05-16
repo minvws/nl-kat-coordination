@@ -1,5 +1,4 @@
 :root {
-
   /* Color sets */
   --link-text-color: #006FB3;
   --link-hover-text-color: #005C94;
@@ -11,7 +10,7 @@
   /* Main colors */
 
     /* Lavender */
-    --branding-color-1: #EEECF8;
+    --branding-color-1: var(--kat-purrple-2);
 
     /* Bright yellow */
     --branding-color-2: #FECF48;
@@ -47,7 +46,7 @@
   --branding-color-1-link-hover-text-color: var(--branding-color-1-text-color);
   --branding-color-1-link-visited-hover-text-color: var(--branding-color-1-text-color);
 
-  --branding-color-1-darker: #5B4F90;
+  --branding-color-1-darker: var(--kat-purrple-8);
 
   /* Branding color 2 */
   --branding-color-2-background-color: var(--branding-color-2);
