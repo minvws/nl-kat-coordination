@@ -97,12 +97,14 @@ def test_save_raw(meta_repository: SQLMetaDataRepository) -> None:
     raw = get_raw_data()
     link = RetrievalLink("abcd.com")
     sec_hash = SecureHash("123456")
+    signing_provider = "abc.org"
 
     with meta_repository:
         meta_repository.save_boefje_meta(raw.boefje_meta)
 
     raw.hash_retrieval_link = link
     raw.secure_hash = sec_hash
+    raw.signing_provider = signing_provider
     raw.mime_types = [MimeType(value="text/plain")]
 
     with meta_repository:
@@ -115,6 +117,7 @@ def test_save_raw(meta_repository: SQLMetaDataRepository) -> None:
     first_updated_raw = meta_repository.get_raw(query_filter).pop()
     assert "hash_retrieval_link" in first_updated_raw.json()
     assert "secure_hash" in first_updated_raw.json()
+    assert "signing_provider" in first_updated_raw.json()
 
     query_filter = RawDataFilter(
         organization=raw.boefje_meta.organization,
@@ -124,6 +127,7 @@ def test_save_raw(meta_repository: SQLMetaDataRepository) -> None:
     first_updated_raw = meta_repository.get_raw(query_filter).pop()
     assert "hash_retrieval_link" in first_updated_raw.json()
     assert "secure_hash" in first_updated_raw.json()
+    assert "signing_provider" in first_updated_raw.json()
 
     query_filter = RawDataFilter(
         organization=raw.boefje_meta.organization,
@@ -244,6 +248,7 @@ def test_save_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:
 
     normalizer_meta.raw_data.secure_hash = normalizer_meta_from_db.raw_data.secure_hash
     normalizer_meta.raw_data.hash_retrieval_link = normalizer_meta_from_db.raw_data.hash_retrieval_link
+    normalizer_meta.raw_data.signing_provider = normalizer_meta_from_db.raw_data.signing_provider
 
     assert normalizer_meta == normalizer_meta_from_db
 
@@ -285,5 +290,6 @@ def test_normalizer_meta_pointing_to_raw_id(meta_repository: SQLMetaDataReposito
 
     normalizer_meta.raw_data.secure_hash = normalizer_meta_from_db.raw_data.secure_hash
     normalizer_meta.raw_data.hash_retrieval_link = normalizer_meta_from_db.raw_data.hash_retrieval_link
+    normalizer_meta.raw_data.signing_provider = normalizer_meta_from_db.raw_data.signing_provider
 
     assert normalizer_meta == normalizer_meta_from_db

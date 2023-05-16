@@ -124,6 +124,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         # Send hash to a third party service.
         link = self.hash_repository.store(secure_hash=secure_hash)
 
+        raw.signing_provider = self.hash_repository.get_signing_provider()
         raw.secure_hash = secure_hash
         raw.hash_retrieval_link = link
 
@@ -283,6 +284,7 @@ def to_raw_file_in_db(raw_data: RawData) -> RawFileInDB:
         id=str(uuid.uuid4()),
         boefje_meta_id=raw_data.boefje_meta.id,
         secure_hash=raw_data.secure_hash,
+        signing_provider=raw_data.signing_provider,
         hash_retrieval_link=raw_data.hash_retrieval_link,
         mime_types=[mime_type.value for mime_type in raw_data.mime_types],
     )
@@ -293,6 +295,7 @@ def raw_meta_to_raw_file_in_db(raw_data_meta: RawDataMeta) -> RawFileInDB:
         id=raw_data_meta.id,
         boefje_meta_id=raw_data_meta.boefje_meta.id,
         secure_hash=raw_data_meta.secure_hash,
+        signing_provider=raw_data_meta.signing_provider,
         hash_retrieval_link=raw_data_meta.hash_retrieval_link,
         mime_types=[mime_type.value for mime_type in raw_data_meta.mime_types],
     )
@@ -303,18 +306,18 @@ def to_raw_data(raw_file_in_db: RawFileInDB, raw: bytes) -> RawData:
         value=raw,
         boefje_meta=to_boefje_meta(raw_file_in_db.boefje_meta),
         secure_hash=raw_file_in_db.secure_hash,
+        signing_provider=raw_file_in_db.signing_provider,
         hash_retrieval_link=raw_file_in_db.hash_retrieval_link,
         mime_types=[to_mime_type(mime_type) for mime_type in raw_file_in_db.mime_types],
     )
 
 
 def to_raw_meta(raw_file_in_db: RawFileInDB) -> RawDataMeta:
-    boefje_meta = to_boefje_meta(raw_file_in_db.boefje_meta)
-
     return RawDataMeta(
         id=raw_file_in_db.id,
-        boefje_meta=boefje_meta,
+        boefje_meta=to_boefje_meta(raw_file_in_db.boefje_meta),
         secure_hash=raw_file_in_db.secure_hash,
+        signing_provider=raw_file_in_db.signing_provider,
         hash_retrieval_link=raw_file_in_db.hash_retrieval_link,
         mime_types=[to_mime_type(mime_type) for mime_type in raw_file_in_db.mime_types],
     )

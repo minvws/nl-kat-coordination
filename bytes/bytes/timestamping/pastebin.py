@@ -8,10 +8,11 @@ class PastebinHashRepository(HashRepository):
     def __init__(self, api_dev_key: str):
         self.api_dev_key = api_dev_key
         self.session = requests.Session()
+        self.url = "https://pastebin.com"
 
     def store(self, secure_hash: SecureHash) -> RetrievalLink:
         response = self.session.post(
-            url="https://pastebin.com/api/api_post.php",
+            url=f"{self.url}/api/api_post.php",
             data={
                 "api_paste_code": secure_hash,
                 "api_option": "paste",
@@ -37,7 +38,7 @@ class PastebinHashRepository(HashRepository):
         paste_id = link.split("/").pop()
         assert len(paste_id) > 0
 
-        response = self.session.get(f"https://pastebin.com/raw/{paste_id}")
+        response = self.session.get(f"{self.url}/raw/{paste_id}")
         if response.status_code != 200:
             raise ValueError(
                 f"Error retrieving pastebin data for {link=}, {response.status_code=},"
@@ -48,3 +49,8 @@ class PastebinHashRepository(HashRepository):
 
     def verify(self, link: RetrievalLink, secure_hash: SecureHash) -> bool:
         return secure_hash == self.retrieve(link)
+
+    def get_signing_provider(self) -> str:
+        """Get the specific signing provider url"""
+
+        return self.url

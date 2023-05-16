@@ -26,8 +26,10 @@ class RawFileInDB(SQL_BASE):  # type: ignore
     __tablename__ = "raw_file"
 
     id = Column(UUID, primary_key=True)
+
     secure_hash = Column(String(length=256), nullable=True)
     hash_retrieval_link = Column(String(length=2048), nullable=True)
+    signing_provider = Column(String(length=256), nullable=True)
 
     boefje_meta_id = Column(UUID, ForeignKey("boefje_meta.id", ondelete="CASCADE"), nullable=False, index=True)
     boefje_meta = relationship("BoefjeMetaInDB")

@@ -22,3 +22,6 @@ class InMemoryHashRepository(HashRepository):
 
     def verify(self, link: RetrievalLink, secure_hash: SecureHash) -> bool:
         return secure_hash == self.retrieve(link)
+
+    def get_signing_provider(self) -> str:
+        return "memory://"
