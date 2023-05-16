@@ -629,17 +629,24 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
+        self.mock_is_task_running = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_running",
+            return_value=False,
+        ).start()
 
         self.mock_is_task_allowed_to_run = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run"
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run",
+            return_value=True,
         ).start()
 
         self.mock_has_grace_period_passed = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed"
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
+            return_value=True,
         ).start()
 
-        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
+        self.mock_get_boefjes_for_ooi = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi",
+        ).start()
 
     def test_push_tasks_for_scan_profile_mutations(self):
         """Scan level change"""
@@ -651,9 +658,6 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
@@ -695,9 +699,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
         self.mock_is_task_allowed_to_run.return_value = False
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
@@ -715,8 +717,6 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
         self.mock_is_task_running.return_value = True
 
         # Act
@@ -736,9 +736,6 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation1)
@@ -760,14 +757,19 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
+        self.mock_is_task_running = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_running",
+            return_value=False,
+        ).start()
 
         self.mock_is_task_allowed_to_run = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run"
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run",
+            return_value=True,
         ).start()
 
         self.mock_has_grace_period_passed = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed"
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
+            return_value=True,
         ).start()
 
         self.mock_get_new_boefjes_by_org_id = mock.patch(
@@ -787,9 +789,6 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_new_boefjes()
@@ -813,9 +812,6 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = []
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_new_boefjes()
@@ -832,9 +828,6 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_objects_by_object_types.return_value = []
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_new_boefjes()
@@ -851,9 +844,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
         self.mock_is_task_allowed_to_run.return_value = False
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_new_boefjes()
@@ -870,8 +861,6 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = False
         self.mock_is_task_running.return_value = True
 
         # Act
@@ -889,9 +878,6 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_new_boefjes()
@@ -919,14 +905,19 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running").start()
+        self.mock_is_task_running = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_running",
+            return_value=False,
+        ).start()
 
         self.mock_is_task_allowed_to_run = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run"
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run",
+            return_value=True,
         ).start()
 
         self.mock_has_grace_period_passed = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed"
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
+            return_value=True,
         ).start()
 
         self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
@@ -944,9 +935,6 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_random_objects()
@@ -995,9 +983,6 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         mock_get_tasks_by_hash.return_value = [task_db]
 
@@ -1039,9 +1024,7 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = False
         self.mock_is_task_allowed_to_run.return_value = False
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_random_objects()
@@ -1058,8 +1041,6 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
         self.mock_is_task_running.return_value = True
 
         # Act
@@ -1077,9 +1058,6 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_has_grace_period_passed.return_value = True
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_random_objects()

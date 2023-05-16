@@ -60,10 +60,14 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.mock_is_task_running = mock.patch("scheduler.schedulers.NormalizerScheduler.is_task_running").start()
+        self.mock_is_task_running = mock.patch(
+            "scheduler.schedulers.NormalizerScheduler.is_task_running",
+            return_value=False,
+        ).start()
 
         self.mock_is_task_allowed_to_run = mock.patch(
-            "scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run"
+            "scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run",
+            return_value=True,
         ).start()
 
         self.mock_get_normalizers_for_mime_type = mock.patch(
@@ -104,8 +108,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = [
             PluginFactory(type="normalizer"),
         ]
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -151,8 +153,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_normalizers_for_mime_type.return_value = []
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -193,7 +193,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         self.mock_get_normalizers_for_mime_type.return_value = []
         self.mock_is_task_allowed_to_run.return_value = False
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -201,7 +200,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         # Task should not be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-    def test_push_tasks_for_received_raw_file_still_running(self, *mocks):
+    def test_push_tasks_for_received_raw_file_still_running(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -233,7 +232,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         )
 
         self.mock_get_normalizers_for_mime_type.return_value = []
-        self.mock_is_task_allowed_to_run.return_value = False
         self.mock_is_task_running.return_value = False
 
         # Act
@@ -285,8 +283,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = [
             PluginFactory(type="normalizer"),
         ]
-        self.mock_is_task_allowed_to_run.return_value = True
-        self.mock_is_task_running.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event1)
