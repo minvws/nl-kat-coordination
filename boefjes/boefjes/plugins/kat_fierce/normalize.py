@@ -2,6 +2,8 @@ import json
 from ipaddress import IPv4Address, ip_address
 from typing import Iterable, Union
 
+from tldextract import tldextract
+
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
@@ -16,7 +18,13 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     for _, subdomain in results["subdomains"].items():
         hostname = subdomain["url"].rstrip(".")
-        hostname_ooi = Hostname(name=hostname, network=internet.reference)
+        registered_domain = tldextract.extract(hostname).registered_domain
+
+        registered_domain_ooi = Hostname(name=registered_domain, network=internet.reference)
+        yield registered_domain_ooi
+        hostname_ooi = Hostname(
+            name=hostname, network=internet.reference, registered_domain=registered_domain_ooi.reference
+        )
         yield hostname_ooi
 
         resolved_ip = subdomain["ip"]

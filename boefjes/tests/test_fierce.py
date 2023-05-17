@@ -32,19 +32,28 @@ def test_fierce():
         ),
         Hostname(
             object_type="Hostname",
+            primary_key="Hostname|internet|example.com",
+            network=Reference("Network|internet"),
+            name="example.com",
+        ),
+        Hostname(
+            object_type="Hostname",
             primary_key="Hostname|internet|www.example.com",
+            registered_domain=Reference("Hostname|internet|example.com"),
             network=Reference("Network|internet"),
             name="www.example.com",
         ),
         Hostname(
             object_type="Hostname",
             primary_key="Hostname|internet|subdomain.example.com",
+            registered_domain=Reference("Hostname|internet|example.com"),
             network=Reference("Network|internet"),
             name="subdomain.example.com",
         ),
         Hostname(
             object_type="Hostname",
             primary_key="Hostname|internet|ipv6.example.com",
+            registered_domain=Reference("Hostname|internet|example.com"),
             network=Reference("Network|internet"),
             name="ipv6.example.com",
         ),
