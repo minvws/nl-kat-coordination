@@ -76,7 +76,7 @@ ROCKY_DB_PASSWORD=
 
 This diagram shows the current view structure and what properties are set in each class for the KATalogus.
 
-```mermaid
+```{mermaid}
 %%{ init : {"theme" : "base"}}%%
 
 classDiagram
@@ -140,7 +140,7 @@ https://tabler-icons.io/
 ## Running a boefje
 
 The following diagram shows the triggered flows when running a Boefje from Rocky.
-```mermaid
+```{mermaid}
 sequenceDiagram
     participant Rocky
     participant Scheduler
@@ -172,7 +172,7 @@ We therefore made several diagrams to show the most coherent components.
 
 ### Overview of child Views of the OrganizationViews
 
-```mermaid
+```{mermaid}
 classDiagram
 direction RL
     class OrganizationView
@@ -205,7 +205,7 @@ direction RL
 
 ### Exhaustive overview of OctopoesViews
 
-```mermaid
+```{mermaid}
 classDiagram
 direction RL
     class OrganizationView
@@ -267,7 +267,7 @@ direction RL
 
 ### KATalogus Views
 
-```mermaid
+```{mermaid}
 classDiagram
 direction RL
     class FormView
