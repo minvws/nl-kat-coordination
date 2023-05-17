@@ -18,7 +18,7 @@ class Software(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         version = reference.tokenized.version
-        if version != "":
+        if version:
             version = f" {version}"
         return f"{reference.tokenized.name}{version}"
 

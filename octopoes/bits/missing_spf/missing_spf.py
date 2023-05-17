@@ -1,4 +1,4 @@
-from typing import Iterator, List
+from typing import Dict, Iterator, List
 
 import tldextract
 
@@ -8,10 +8,7 @@ from octopoes.models.ooi.email_security import DNSSPFRecord
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(
-    input_ooi: Hostname,
-    additional_oois: List[DNSSPFRecord],
-) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: List[DNSSPFRecord], config: Dict[str, str]) -> Iterator[OOI]:
     # only report finding when there is no SPF record
     if (
         not tldextract.extract(input_ooi.name).subdomain

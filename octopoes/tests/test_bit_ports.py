@@ -7,21 +7,21 @@ from octopoes.models.ooi.network import IPPort
 
 def test_port_classification_tcp_80():
     port = IPPort(address="fake", protocol="tcp", port=80)
-    results = list(run_port_classification(port, []))
+    results = list(run_port_classification(port, [], {}))
 
     assert not results
 
 
 def test_port_classification_udp_53():
     port = IPPort(address="fake", protocol="udp", port=53)
-    results = list(run_port_classification(port, []))
+    results = list(run_port_classification(port, [], {}))
 
     assert not results
 
 
 def test_port_classification_tcp_22():
     port = IPPort(address="fake", protocol="tcp", port=22)
-    results = list(run_port_classification(port, []))
+    results = list(run_port_classification(port, [], {}))
 
     assert len(results) == 2
     finding = results[-1]
@@ -31,7 +31,7 @@ def test_port_classification_tcp_22():
 
 def test_port_classification_tcp_5432():
     port = IPPort(address="fake", protocol="tcp", port=5432)
-    results = list(run_port_classification(port, []))
+    results = list(run_port_classification(port, [], {}))
 
     assert len(results) == 2
     finding = results[-1]
@@ -41,7 +41,7 @@ def test_port_classification_tcp_5432():
 
 def test_port_classification_tcp_12345():
     port = IPPort(address="fake", protocol="tcp", port=12345)
-    results = list(run_port_classification(port, []))
+    results = list(run_port_classification(port, [], {}))
 
     assert len(results) == 2
     finding = results[-1]
@@ -51,7 +51,7 @@ def test_port_classification_tcp_12345():
 
 def test_port_classification_udp_80():
     port = IPPort(address="fake", protocol="udp", port=80)
-    results = list(run_port_classification(port, []))
+    results = list(run_port_classification(port, [], {}))
 
     assert len(results) == 2
     finding = results[-1]
@@ -61,7 +61,7 @@ def test_port_classification_udp_80():
 
 def test_port_common_tcp_80():
     port = IPPort(address="fake", protocol="tcp", port=80)
-    results = list(run_port_common(port, []))
+    results = list(run_port_common(port, [], {}))
 
     assert len(results) == 2
     finding = results[-1]
@@ -71,21 +71,21 @@ def test_port_common_tcp_80():
 
 def test_port_common_tcp_22():
     port = IPPort(address="fake", protocol="tcp", port=22)
-    results = list(run_port_common(port, []))
+    results = list(run_port_common(port, [], {}))
 
     assert not results
 
 
 def test_port_common_udp_80():
     port = IPPort(address="fake", protocol="udp", port=80)
-    results = list(run_port_common(port, []))
+    results = list(run_port_common(port, [], {}))
 
     assert not results
 
 
 def test_port_common_udp_53():
     port = IPPort(address="fake", protocol="udp", port=53)
-    results = list(run_port_common(port, []))
+    results = list(run_port_common(port, [], {}))
 
     assert len(results) == 2
     finding = results[-1]
