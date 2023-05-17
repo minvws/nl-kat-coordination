@@ -1,5 +1,5 @@
 import uuid
-from typing import Dict
+from typing import Dict, Optional
 
 from bytes.models import RetrievalLink, SecureHash
 from bytes.repositories.hash_repository import HashRepository
@@ -23,5 +23,5 @@ class InMemoryHashRepository(HashRepository):
     def verify(self, link: RetrievalLink, secure_hash: SecureHash) -> bool:
         return secure_hash == self.retrieve(link)
 
-    def get_signing_provider(self) -> str:
-        return "memory://"
+    def get_signing_provider(self) -> Optional[str]:
+        return None

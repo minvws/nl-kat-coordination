@@ -1,3 +1,5 @@
+from typing import Optional
+
 import requests
 
 from bytes.models import RetrievalLink, SecureHash
@@ -50,7 +52,7 @@ class PastebinHashRepository(HashRepository):
     def verify(self, link: RetrievalLink, secure_hash: SecureHash) -> bool:
         return secure_hash == self.retrieve(link)
 
-    def get_signing_provider(self) -> str:
+    def get_signing_provider(self) -> Optional[str]:
         """Get the specific signing provider url"""
 
         return self.url

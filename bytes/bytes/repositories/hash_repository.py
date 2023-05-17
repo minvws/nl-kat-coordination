@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bytes.models import RetrievalLink, SecureHash
 
 
@@ -14,7 +16,7 @@ class HashRepository:
 
         raise NotImplementedError()
 
-    def get_signing_provider(self) -> str:
+    def get_signing_provider(self) -> Optional[str]:
         """Get the specific signing provider url"""
 
         raise NotImplementedError()
