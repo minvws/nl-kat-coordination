@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView, ListView, TemplateView
+from django.views.generic import FormView, TemplateView
 from django_otp.decorators import otp_required
 from requests import RequestException
 from tools.models import Organization
@@ -51,11 +51,10 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
 
 
 @class_view_decorator(otp_required)
-class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, OrganizationView, ListView, FormView):
+class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"
-    paginate_by = 10
     permission_required = "tools.can_scan_organization"
     plugin_type = "boefjes"
 
@@ -72,9 +71,11 @@ class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, Organizatio
             },
         ]
         context["plugin_type"] = self.plugin_type
+        context["settings"] = self.get_settings()
+
         return context
 
-    def get_queryset(self):
+    def get_settings(self):
         all_plugins_settings = []
         katalogus_client = get_katalogus(self.organization.code)
         boefjes = katalogus_client.get_boefjes()
@@ -105,11 +106,6 @@ class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, Organizatio
 
     def form_valid(self, form):
         return HttpResponseRedirect(self.get_success_url(to_organization=form.cleaned_data["organization"]))
-
-    def form_invalid(self, form):
-        self.object_list = self.get_queryset()
-
-        return super().form_invalid(form)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy(
