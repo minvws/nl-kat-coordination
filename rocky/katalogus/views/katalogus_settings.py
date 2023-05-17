@@ -51,7 +51,7 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
 
 
 @class_view_decorator(otp_required)
-class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, OrganizationView, FormView, ListView):
+class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, OrganizationView, ListView, FormView):
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"
@@ -105,6 +105,11 @@ class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, Organizatio
 
     def form_valid(self, form):
         return HttpResponseRedirect(self.get_success_url(to_organization=form.cleaned_data["organization"]))
+
+    def form_invalid(self, form):
+        self.object_list = self.get_queryset()
+
+        return super().form_invalid(form)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy(
