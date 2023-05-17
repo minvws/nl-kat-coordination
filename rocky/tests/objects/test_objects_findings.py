@@ -85,7 +85,7 @@ def test_mute_finding_button_is_visible(request, member, rf, mock_organization_v
 
 
 @pytest.mark.parametrize("member", ["admin_member", "client_member"])
-def test_mute_finding_button_is_visible_no_perms(
+def test_mute_finding_button_is_not_visible_without_perms(
     request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
@@ -125,6 +125,10 @@ def test_mute_finding_form_view_no_perms(request, member, rf, mock_organization_
         MuteFindingView.as_view()(
             setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
             organization_code=member.organization.code,
+        )
+    with pytest.raises(PermissionDenied):
+        MuteFindingView.as_view()(
+            setup_request(rf.post("finding_mute"), member.user), organization_code=member.organization.code
         )
 
 

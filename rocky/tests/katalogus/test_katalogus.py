@@ -1,4 +1,5 @@
 import pytest
+from django.core.exceptions import PermissionDenied
 from katalogus.client import KATalogusClientV1, parse_plugin
 from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsListView, KATalogusView
 from pytest_django.asserts import assertContains, assertNotContains
@@ -7,8 +8,7 @@ from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, setup_request
 
 
-@pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_katalogus_plugin_listing(request, member, rf, mocker):
+def katalogus_plugin_listing(request, member, rf, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
     mock_requests.Session().get.return_value = mock_response
@@ -16,11 +16,18 @@ def test_katalogus_plugin_listing(request, member, rf, mocker):
 
     member = request.getfixturevalue(member)
 
-    response = KATalogusView.as_view()(
+    return KATalogusView.as_view()(
         setup_request(rf.get("katalogus"), member.user), organization_code=member.organization.code
     )
 
+
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
+def test_katalogus_plugin_listing(request, member, rf, mocker):
+    response = katalogus_plugin_listing(request, member, rf, mocker)
+
     assert response.status_code == 200
+
+    assertNotContains(response, "You don't have permission to enable boefje")
 
     assertContains(response, "KAT-alogus")
     assertContains(response, "Enable")
@@ -30,16 +37,9 @@ def test_katalogus_plugin_listing(request, member, rf, mocker):
 
 @pytest.mark.parametrize("member", ["admin_member", "client_member"])
 def test_katalogus_plugin_listing_no_perms(request, member, rf, mocker):
-    mock_requests = mocker.patch("katalogus.client.requests")
-    mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
-    mock_response.json.return_value = get_boefjes_data()
+    response = katalogus_plugin_listing(request, member, rf, mocker)
 
-    member = request.getfixturevalue(member)
-
-    response = KATalogusView.as_view()(
-        setup_request(rf.get("katalogus"), member.user), organization_code=member.organization.code
-    )
+    assert response.status_code == 200
 
     assertContains(response, "You don't have permission to enable boefje")
 
@@ -126,6 +126,21 @@ def test_katalogus_clone_settings(redteam_member, organization_b, rf, mocker, mo
     assert response.status_code == 302
 
     mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(organization_b.code)
+
+
+def test_katalogus_clone_settings_not_accessible_without_perms(
+    client_member, organization_b, rf, mocker, mock_models_octopoes
+):
+    # Mock katalogus calls: return right boefjes and settings
+    mocker.patch("katalogus.client.KATalogusClientV1")
+
+    create_member(client_member.user, organization_b)
+
+    request = setup_request(rf.post("confirm_clone_settings"), client_member.user)
+    with pytest.raises(PermissionDenied):
+        ConfirmCloneSettingsView.as_view()(
+            request, organization_code=client_member.organization.code, to_organization=organization_b.code
+        )
 
 
 def test_katalogus_client_organization_not_exists(mocker):
