@@ -11,8 +11,8 @@ normalizer tasks.
 
 ## Architecture
 
-See [design](docs/design.md) document for the architecture and the
-[extending](docs/extending.md) document for the extending the scheduler with
+See [design](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/design.md) document for the architecture and the
+[extending](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/extending.md) document for the extending the scheduler with
 your own custom schedulers, and rankers.
 
 ### Stack, packages and libraries
@@ -29,11 +29,11 @@ The scheduler interfaces with the following services:
 
 | Service | Usage |
 |---------|-------|
-| [Octopoes](https://github.com/minvws/nl-kat-octopoes) | Retrieving random OOI's of organizations |
-| [Katalogus](https://github.com/minvws/nl-kat-boefjes/tree/develop/katalogus) | Used for referencing available plugins and organizations |
-| [Bytes](https://github.com/minvws/nl-kat-bytes) | Retrieve last run boefje for organization and OOI |
-| [Boefjes](https://github.com/minvws/nl-kat-boefjes) | Sending boefje, and normalizer tasks to Celery |
-| [RabbitMQ]() | Used for retrieving scan profile changes, and created raw data in bytes  |
+| [Octopoes] | Retrieving random OOI's of organizations |
+| [Katalogus] | Used for referencing available plugins and organizations |
+| [Bytes] | Retrieve last run boefje for organization and OOI |
+| [Boefjes] | Sending boefje, and normalizer tasks to Celery |
+| [RabbitMQ] | Used for retrieving scan profile changes, and created raw data in bytes  |
 
 ### Project structure
 
@@ -80,7 +80,7 @@ to use whatever you want.
 By the use of environment variables we load in the configuration of the
 scheduler. Look at the [.env-dist](.env-dist) file for the application
 configuration settings, to build a `.env` file. Refer to the
-[`configuration.md`](docs/configuration.md) file for more information on the
+[`configuration.md`](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/configuration.md) file for more information on the
 individual settings.
 
 ### Running
