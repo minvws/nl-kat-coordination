@@ -38,7 +38,7 @@ addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-requests = "^2.29.0"
+requests = "^2.30.0"
 pydantic = "1.10.7"
 fastapi = "^0.88.0"
 fastapi-utils = "^0.2.1"
@@ -57,6 +57,7 @@ opentelemetry-exporter-otlp-proto-grpc = "1.17.0"
 opentelemetry-instrumentation-fastapi = "^0.38b0"
 opentelemetry-instrumentation-requests = "^0.38b0"
 certifi = "^2023.5.7"
+sqlalchemy = "1.4.48"
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"
