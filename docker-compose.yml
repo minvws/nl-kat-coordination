@@ -3,7 +3,7 @@ version: "3.9"
 services:
   rabbitmq:
     restart: unless-stopped
-    image: "rabbitmq:3.9-management"
+    image: "rabbitmq:3.11-management"
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -48,6 +48,7 @@ services:
       - "127.0.0.1:8001:80"
     build:
       context: octopoes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
@@ -63,6 +64,7 @@ services:
       - rabbitmq
     build:
       context: octopoes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: worker-beat
@@ -79,6 +81,7 @@ services:
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     volumes:
@@ -99,6 +102,7 @@ services:
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     volumes:
@@ -113,19 +117,13 @@ services:
   rocky:
     restart: unless-stopped
     depends_on:
-      - octopoes_api_worker
-      - octopoes_api
       - postgres
-      - boefje
-      - normalizer
-      - katalogus
-      - scheduler
-      - keiko
     ports:
       - "127.0.0.1:8000:80"
     build:
       context: .
       dockerfile: rocky/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     command: python3 manage.py runserver 0.0.0.0:80
@@ -143,6 +141,7 @@ services:
       - "127.0.0.1:8002:8000"
     build:
       context: bytes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
@@ -159,6 +158,7 @@ services:
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
@@ -174,6 +174,7 @@ services:
     restart: unless-stopped
     build:
       context: mula/
+      target: dev
       args:
         ENVIRONMENT: dev
     ports:
@@ -193,6 +194,7 @@ services:
     restart: unless-stopped
     build:
       context: keiko/
+      target: dev
     ports:
       - "127.0.0.1:8005:8000"
     command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko
@@ -201,6 +203,17 @@ services:
     volumes:
       - ./keiko:/app/keiko
       - keiko-reports:/reports
+
+  jaeger:
+    profiles:
+    - jaeger
+    restart: unless-stopped
+    image: jaegertracing/all-in-one:1.44
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: 9411
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "127.0.0.1:16686:16686"
 
 volumes:
   postgres-data:

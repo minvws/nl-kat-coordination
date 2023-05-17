@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         ENVIRONMENT: dev
-    command: sh -c "sleep ${SLEEP_TIME:-1} && pytest tests/integration"
+    command: pytest tests/integration
     depends_on:
       - ci_bytes
     env_file:
@@ -35,17 +35,23 @@ services:
         ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0
     depends_on:
-      - ci_bytes-db
-      - ci_rabbitmq
+      ci_rabbitmq:
+        condition: service_healthy
+      ci_bytes-db:
+        condition: service_started
     volumes:
       - .:/app/bytes
     env_file:
       - .ci/.env.test
 
   ci_rabbitmq:
-    image: "rabbitmq:3-management"
+    image: "rabbitmq:3.11-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      retries: 4
 
   ci_bytes-db:
     image: postgres:15

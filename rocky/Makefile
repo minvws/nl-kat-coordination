@@ -9,11 +9,13 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 build: build-rocky build-rocky-frontend
 
 build-rocky:
-	docker-compose run --rm rocky make build-rocky-native
+# Set DATABASE_MIGRATION=false to prevent entrypoint from running migration
+	docker-compose run --rm -e DATABASE_MIGRATION=false rocky make build-rocky-native
 
 build-rocky-native:
+	while ! nc -vz $$ROCKY_DB_HOST $$ROCKY_DB_PORT; do sleep 0.1; done
 	python3 manage.py migrate
-	python3 manage.py createsuperuser
+	-python3 manage.py createsuperuser --no-input
 	python3 manage.py loaddata OOI_database_seed.json
 	python3 manage.py setup_dev_account
 	python3 manage.py compilemessages

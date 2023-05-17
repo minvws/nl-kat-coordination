@@ -1,8 +1,7 @@
 from account.forms import OrganizationMemberToGroupAddForm
-from account.mixins import OrganizationView
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -14,7 +13,7 @@ User = get_user_model()
 
 
 @class_view_decorator(otp_required)
-class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationView, CreateView):
+class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, OrganizationView, CreateView):
     """
     View to create a new member for a specific organization.
     """

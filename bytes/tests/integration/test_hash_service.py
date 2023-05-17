@@ -1,10 +1,10 @@
 import pytest
-from tests.loading import get_boefje_meta, get_raw_data
 
 from bytes.config import has_pastebin_key  # noqa: F401
 from bytes.database.sql_meta_repository import SQLMetaDataRepository
 from bytes.repositories.meta_repository import RawDataFilter
 from bytes.timestamping.pastebin import PastebinHashRepository
+from tests.loading import get_boefje_meta, get_raw_data
 
 
 @pytest.mark.skipif("not has_pastebin_key()")

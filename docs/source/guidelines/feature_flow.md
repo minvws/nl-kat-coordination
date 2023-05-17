@@ -41,7 +41,7 @@ Also, we need to assure that there is no regression between the different suppor
 
 ### Environments for the extended QA
 
-- [ ] Clone the source repository and run `make kat` [Linux and Darwin, perhaps different docker versions and installs]
+- [ ] Clone the source repository and run `make reset` [Linux and Darwin, perhaps different docker versions and installs]
 - [ ] Install the debian packages [On different distro's: ubuntu 20.04 + 22.04, debian 11 + 12]
 - [ ] Install the container images
 

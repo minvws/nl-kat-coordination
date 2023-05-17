@@ -2,7 +2,6 @@ import datetime
 import hashlib
 import json
 import logging
-import os
 import re
 from dataclasses import dataclass
 from itertools import product
@@ -81,8 +80,8 @@ def _snyk_search(snyk_id: str) -> Dict:
 
 def retirejs_info(retirejs_id: str) -> dict:
     """Uses the retirejs vulnerabilities list to find outdated javascript instances"""
-    filename_path = os.path.join(settings.BASE_DIR, "data/retirejs.json")
-    with open(filename_path, encoding="utf-8") as json_file:
+    filename_path = settings.BASE_DIR / "data/retirejs.json"
+    with filename_path.open(encoding="utf-8") as json_file:
         data = json.load(json_file)
 
     _, name, hashed_id = retirejs_id.split("-")
@@ -179,7 +178,7 @@ def iana_service_table(search_query: str) -> List[_Service]:
 def service_info(value) -> Tuple[str, str]:
     """Provides information about IP Services such as common assigned ports for certain protocols and descriptions"""
     services = iana_service_table(value)
-    source = "https://www.iana.org/assignments/service-names-port-numbers/" "service-names-port-numbers.xhtml"
+    source = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
     if not services:
         return f"No description found for {value}", "No source found"
 
@@ -255,9 +254,9 @@ def table_to_2d(table_tag):
     return table
 
 
-def _map_usage_value(value: str):
+def _map_usage_value(value: str) -> bool:
     value = value.lower().strip()
-    return value is not None and value != "" and value != "no"
+    return value is not None and value and value != "no"
 
 
 def wiki_port_tables() -> List[_PortInfo]:
@@ -326,7 +325,7 @@ def capec_info(capec_id: str) -> dict:
 
 def get_info(ooi_type: str, natural_key: str) -> dict:
     """Adds OOI information to the OOI Information table"""
-    logger.info(f"Getting OOI information for {ooi_type} {natural_key}")
+    logger.info("Getting OOI information for %s %s", ooi_type, natural_key)
     if ooi_type == "IPPort":
         protocol, port = natural_key.split(SEPARATOR)
         description, source = port_info(port, protocol)

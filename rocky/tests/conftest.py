@@ -66,33 +66,36 @@ def create_member(user, organization):
     )
 
 
-def add_admin_group_permissions(user):
+def add_admin_group_permissions(member):
     group, _ = Group.objects.get_or_create(name=GROUP_ADMIN)
-    group.user_set.add(user)
+    member.groups.add(group)
     admin_permissions = [
         Permission.objects.get(codename="view_organization").id,
         Permission.objects.get(codename="view_organizationmember").id,
         Permission.objects.get(codename="add_organizationmember").id,
         Permission.objects.get(codename="change_organization").id,
         Permission.objects.get(codename="change_organizationmember").id,
+        Permission.objects.get(codename="can_delete_oois").id,
+        Permission.objects.get(codename="add_indemnification").id,
     ]
     group.permissions.set(admin_permissions)
 
 
-def add_redteam_group_permissions(user):
+def add_redteam_group_permissions(member):
     group, _ = Group.objects.get_or_create(name=GROUP_REDTEAM)
-    group.user_set.add(user)
+    member.groups.add(group)
     redteam_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
         Permission.objects.get(codename="can_enable_disable_boefje").id,
         Permission.objects.get(codename="can_set_clearance_level").id,
+        Permission.objects.get(codename="can_delete_oois").id,
     ]
     group.permissions.set(redteam_permissions)
 
 
-def add_client_group(user):
+def add_client_group(member):
     group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
-    group.user_set.add(user)
+    member.groups.add(group)
 
 
 @pytest.fixture
@@ -131,84 +134,82 @@ def superuser_member_b(superuser_b, organization_b):
 
 @pytest.fixture
 def adminuser(django_user_model):
-    admin_user = create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
-    add_admin_group_permissions(admin_user)
-    return admin_user
+    return create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
 
 
 @pytest.fixture
 def adminuser_b(django_user_model):
-    admin_user = create_user(
-        django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b"
-    )
-    add_admin_group_permissions(admin_user)
-    return admin_user
+    return create_user(django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b")
 
 
 @pytest.fixture
 def admin_member(adminuser, organization):
-    return create_member(adminuser, organization)
+    member = create_member(adminuser, organization)
+    adminuser.user_permissions.add(Permission.objects.get(codename="view_organization"))
+    add_admin_group_permissions(member)
+    return member
 
 
 @pytest.fixture
 def admin_member_b(adminuser_b, organization_b):
-    return create_member(adminuser_b, organization_b)
+    member = create_member(adminuser_b, organization_b)
+    adminuser_b.user_permissions.add(Permission.objects.get(codename="view_organization"))
+    add_admin_group_permissions(member)
+    return member
 
 
 @pytest.fixture
 def redteamuser(django_user_model):
-    redteam_user = create_user(
+    return create_user(
         django_user_model, "redteamer@openkat.nl", "RedteamRedteam123!!", "Redteam name", "default_redteam"
     )
-    add_redteam_group_permissions(redteam_user)
-    return redteam_user
 
 
 @pytest.fixture
 def redteamuser_b(django_user_model):
-    redteam_user = create_user(
+    return create_user(
         django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
     )
-    add_redteam_group_permissions(redteam_user)
-    return redteam_user
 
 
 @pytest.fixture
 def redteam_member(redteamuser, organization):
-    return create_member(redteamuser, organization)
+    member = create_member(redteamuser, organization)
+    add_redteam_group_permissions(member)
+    return member
 
 
 @pytest.fixture
 def redteam_member_b(redteamuser_b, organization_b):
-    return create_member(redteamuser_b, organization_b)
+    member = create_member(redteamuser_b, organization_b)
+    add_redteam_group_permissions(member)
+    return member
 
 
 @pytest.fixture
 def clientuser(django_user_model):
-    client_user = create_user(
-        django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client"
-    )
-    add_client_group(client_user)
-    return client_user
+    return create_user(django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client")
 
 
 @pytest.fixture
 def clientuser_b(django_user_model):
-    client_user_b = create_user(
+    return create_user(
         django_user_model, "clientB@openkat.nl", "ClientBClientB123!!", "Client B name", "default_client_b"
     )
-    add_client_group(client_user_b)
-    return client_user_b
 
 
 @pytest.fixture
 def client_member(clientuser, organization):
-    return create_member(clientuser, organization)
+    member = create_member(clientuser, organization)
+    add_client_group(member)
+    return member
 
 
 @pytest.fixture
 def client_member_b(clientuser_b, organization_b):
-    return create_member(clientuser_b, organization_b)
+    member = create_member(clientuser_b, organization_b)
+    add_client_group(member)
+    return member
 
 
 @pytest.fixture
@@ -420,3 +421,45 @@ def get_boefjes_data():
 @pytest.fixture()
 def mock_mixins_katalogus(mocker):
     return mocker.patch("katalogus.views.mixins.get_katalogus")
+
+
+@pytest.fixture
+def mock_scheduler_client_task_list(mocker):
+    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client.session")
+    scheduler_return_value = mocker.MagicMock()
+    scheduler_return_value.text = json.dumps(
+        {
+            "count": 1,
+            "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
+            "previous": None,
+            "results": [
+                {
+                    "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                    "scheduler_id": "boefje-test",
+                    "type": "boefje",
+                    "p_item": {
+                        "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                        "scheduler_id": "boefje-test",
+                        "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
+                        "priority": 631,
+                        "data": {
+                            "id": "2e757dd366c746b899877cd18252cc6d",
+                            "boefje": {"id": "test-plugin", "version": None},
+                            "input_ooi": "Hostname|internet|example.com",
+                            "organization": "test",
+                            "dispatches": [],
+                        },
+                        "created_at": "2023-05-09T09:37:20.899668+00:00",
+                        "modified_at": "2023-05-09T09:37:20.899675+00:00",
+                    },
+                    "status": "completed",
+                    "created_at": "2023-05-09T09:37:20.909069+00:00",
+                    "modified_at": "2023-05-09T09:37:20.909071+00:00",
+                }
+            ],
+        }
+    )
+
+    mock_scheduler_client_session.get.return_value = scheduler_return_value
+
+    return mock_scheduler_client_session

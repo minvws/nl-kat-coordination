@@ -1,15 +1,12 @@
 import re
-from typing import Iterator, List
+from typing import Dict, Iterator, List
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import HTTPHeader
 
 
-def run(
-    input_ooi: HTTPHeader,
-    additional_oois: List,
-) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "content-security-policy":
         return
@@ -50,13 +47,13 @@ def run(
 
     policies = [policy.strip().split(" ") for policy in header.value.split(";")]
     for policy in policies:
-        if policy[0] in ["frame-src", "frame-ancestors"]:
-            if not _source_valid(policy[1:]):
-                findings.append(f"{policy[0]} has not been correctly defined.")
+        if policy[0] in ["frame-src", "frame-ancestors"] and not _source_valid(policy[1:]):
+            findings.append(f"{policy[0]} has not been correctly defined.")
 
-        if policy[0] == "default-src":
-            if ("'none'" not in policy and "'self'" not in policy) or not _source_valid(policy[2:]):
-                findings.append(f"{policy[0]} has not been correctly defined.")
+        if policy[0] == "default-src" and (
+            ("'none'" not in policy and "'self'" not in policy) or not _source_valid(policy[2:])
+        ):
+            findings.append(f"{policy[0]} has not been correctly defined.")
 
         if (policy[0] == "default-src" or policy[0] == "object-src" or policy[0] == "script-src") and "data:" in policy:
             findings.append(

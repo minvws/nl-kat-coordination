@@ -139,23 +139,18 @@ class PriorityQueue(abc.ABC):
             # and we might need to update that.
             item_on_queue = self.get_p_item_by_identifier(p_item)
 
-            item_changed = (
-                False
-                if not item_on_queue or p_item.data == item_on_queue.data
-                else True  # FIXM: checking json/dicts here
+            item_changed = item_on_queue and p_item.data != item_on_queue.data  # FIXM: checking json/dicts here
+
+            priority_changed = item_on_queue and p_item.priority != item_on_queue.priority
+
+            allowed = any(
+                (
+                    item_on_queue and self.allow_replace,
+                    self.allow_updates and item_changed and item_on_queue,
+                    self.allow_priority_updates and priority_changed and item_on_queue,
+                    not item_on_queue,
+                )
             )
-
-            priority_changed = False if not item_on_queue or p_item.priority == item_on_queue.priority else True
-
-            allowed = False
-            if item_on_queue and self.allow_replace:
-                allowed = True
-            elif self.allow_updates and item_changed and item_on_queue:
-                allowed = True
-            elif self.allow_priority_updates and priority_changed and item_on_queue:
-                allowed = True
-            elif not item_on_queue:
-                allowed = True
 
             if not allowed:
                 raise NotAllowedError(
@@ -228,16 +223,16 @@ class PriorityQueue(abc.ABC):
 
         return True
 
-    def is_item_on_queue_by_hash(self, hash: str) -> bool:
+    def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
         """Check if an item is on the queue by its hash.
 
         Args:
-            hash: The hash of the item to be checked.
+            item_hash: The hash of the item to be checked.
 
         Returns:
             True if the item is on the queue, False otherwise.
         """
-        item = self.pq_store.get_item_by_hash(self.pq_id, hash)
+        item = self.pq_store.get_item_by_hash(self.pq_id, item_hash)
         return item is not None
 
     def get_p_item_by_identifier(self, p_item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
@@ -269,9 +264,9 @@ class PriorityQueue(abc.ABC):
 
         return True
 
-    def dict(self) -> Dict[str, Any]:
+    def dict(self, include_pq: bool = True) -> Dict[str, Any]:
         """Return a dictionary representation of the queue."""
-        return {
+        response = {
             "id": self.pq_id,
             "size": self.qsize(),
             "maxsize": self.maxsize,
@@ -279,8 +274,12 @@ class PriorityQueue(abc.ABC):
             "allow_replace": self.allow_replace,
             "allow_updates": self.allow_updates,
             "allow_priority_updates": self.allow_priority_updates,
-            "pq": self.pq_store.get_items_by_scheduler_id(self.pq_id),
         }
+
+        if include_pq:
+            response["pq"] = self.pq_store.get_items_by_scheduler_id(self.pq_id)
+
+        return response
 
     @abc.abstractmethod
     def create_hash(self, p_item: models.PrioritizedItem) -> str:

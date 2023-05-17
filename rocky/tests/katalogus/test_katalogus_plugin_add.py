@@ -2,6 +2,7 @@ import pytest
 from django.http import Http404
 from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
 from pytest_django.asserts import assertContains, assertNotContains
+
 from tests.conftest import setup_request
 
 

@@ -20,7 +20,7 @@ class ClearanceLevelSelect(forms.Select):
 
     def create_option(self, *args, **kwargs):
         option = super().create_option(*args, **kwargs)
-        if not option.get("value") == 2:
+        if option.get("value") != 2:
             option["attrs"]["disabled"] = "disabled"
         return option
 

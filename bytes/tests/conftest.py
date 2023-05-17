@@ -26,7 +26,7 @@ def settings():
     try:
         return Settings()
     except ValidationError:  # test is probably being run outside the container setup
-        with open(Path(__file__).parent.parent / ".ci" / ".env.test") as f:
+        with (Path(__file__).parent.parent / ".ci" / ".env.test").open() as f:
             lines = [line.strip().split("=") for line in f.readlines() if line.strip() and line.strip()[-1] != "="]
 
             for key, val in lines:
@@ -75,7 +75,7 @@ def meta_repository(
     session.commit()
 
     sessionmaker(bind=engine, autocommit=True)().execute(
-        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()])
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
 
 
@@ -91,7 +91,7 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
     )
 
     sessionmaker(bind=get_engine(settings.bytes_db_uri), autocommit=True)().execute(
-        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables.keys()])
+        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
 
 

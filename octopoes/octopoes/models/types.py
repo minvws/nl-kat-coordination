@@ -11,6 +11,7 @@ from octopoes.models.ooi.certificate import (
     SubjectAlternativeNameQualifier,
     X509Certificate,
 )
+from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.records import (
     NXDOMAIN,
     DNSAAAARecord,
@@ -134,6 +135,7 @@ EmailSecurityType = Union[
     DKIMKey,
 ]
 MonitoringType = Union[Application, Incident]
+ConfigType = Union[Config]
 
 OOIType = Union[
     CertificateType,
@@ -152,6 +154,7 @@ OOIType = Union[
     Finding,
     MutedFinding,
     FindingTypeType,
+    ConfigType,
     Question,
 ]
 

@@ -48,12 +48,11 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if not options["output"]:
-            if self.stdout.isatty():
-                self.stderr.write(
-                    "Can't print PDF file directly to stdout. Set a destination path or pipe the output to a file"
-                )
-                sys.exit(1)
+        if not options["output"] and self.stdout.isatty():
+            self.stderr.write(
+                "Can't print PDF file directly to stdout. Set a destination path or pipe the output to a file"
+            )
+            sys.exit(1)
 
         organization = self.get_organization(**options)
 

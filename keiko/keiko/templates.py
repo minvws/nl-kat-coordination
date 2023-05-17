@@ -71,7 +71,7 @@ def get_samples(settings: Settings) -> Dict[str, Dict[str, Any]]:
             continue
         sample_file = subfolder / "sample.json"
         if sample_file.exists():
-            with open(sample_file) as sample:
+            with sample_file.open() as sample:
                 try:
                     samples[subfolder_name] = {
                         "summary": subfolder_name,

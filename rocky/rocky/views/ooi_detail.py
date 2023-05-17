@@ -19,8 +19,7 @@ from tools.ooi_helpers import format_display
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
 from rocky import scheduler
-from rocky.views.mixins import OOIBreadcrumbsMixin
-from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
+from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
@@ -31,8 +30,8 @@ class PageActions(Enum):
 class OOIDetailView(
     BoefjeMixin,
     OOIRelatedObjectAddView,
+    OOIFindingManager,
     BaseOOIDetailView,
-    OOIBreadcrumbsMixin,
 ):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
@@ -96,39 +95,32 @@ class OOIDetailView(
     def get_scan_history(self) -> Page:
         scheduler_id = f"boefje-{self.organization.code}"
 
-        filters = [
-            {"field": "data__input_ooi", "operator": "eq", "value": self.get_ooi_id()},
-        ]
-
         # FIXME: in context of ooi detail is doesn't make sense to search
-        # for an object name
-        if self.request.GET.get("scan_history_search"):
-            filters.append(
-                {
-                    "field": "data__boefje__name",
-                    "operator": "eq",
-                    "value": self.request.GET.get("scan_history_search"),
-                }
-            )
+        # for an object name, so we search on plugin id
+        plugin_id = self.request.GET.get("scan_history_search")
 
         page = int(self.request.GET.get("scan_history_page", 1))
 
         status = self.request.GET.get("scan_history_status")
 
-        min_created_at = None
         if self.request.GET.get("scan_history_from"):
             min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+        else:
+            min_created_at = None
 
-        max_created_at = None
         if self.request.GET.get("scan_history_to"):
             max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
+        else:
+            max_created_at = None
 
         scan_history = scheduler.client.get_lazy_task_list(
             scheduler_id=scheduler_id,
             status=status,
             min_created_at=min_created_at,
             max_created_at=max_created_at,
-            filters=filters,
+            task_type="boefje",
+            input_ooi=self.get_ooi_id(),
+            plugin_id=plugin_id,
         )
 
         return Paginator(scan_history, self.scan_history_limit).page(page)

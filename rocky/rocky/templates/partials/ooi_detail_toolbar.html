@@ -13,7 +13,7 @@
       <a href="{% ooi_url 'ooi_edit' ooi_id organization.code %}"
          class="button ghost">{% blocktranslate %}Edit {{ display_type }}{% endblocktranslate %}</a>
     {% endif %}
-    {% if not ooi|is_finding_type %}
+    {% if not ooi|is_finding_type and perms.tools.can_delete_oois %}
       <a href="{% ooi_url 'ooi_delete' ooi_id organization.code %}"
          class="button ghost">{% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}</a>
     {% endif %}

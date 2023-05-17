@@ -2,6 +2,7 @@ import timeit
 import uuid
 from datetime import datetime, timezone
 from logging import config, getLogger
+from pathlib import Path
 from typing import Dict
 
 import yaml
@@ -17,11 +18,11 @@ settings = Settings()
 logger = getLogger(__name__)
 
 try:
-    with open(settings.log_cfg, "r") as log_config:
+    with Path(settings.log_cfg).open() as log_config:
         config.dictConfig(yaml.safe_load(log_config))
-        logger.info(f"Configured loggers with config: {settings.log_cfg}")
+        logger.info("Configured loggers with config: %s", settings.log_cfg)
 except FileNotFoundError:
-    logger.warning(f"No log config found at: {settings.log_cfg}")
+    logger.warning("No log config found at: %s", settings.log_cfg)
 
 
 @app.task(queue=settings.queue_name_octopoes)
