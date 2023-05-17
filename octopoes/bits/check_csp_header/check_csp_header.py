@@ -1,15 +1,12 @@
 import re
-from typing import Iterator, List
+from typing import Dict, Iterator, List
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import HTTPHeader
 
 
-def run(
-    input_ooi: HTTPHeader,
-    additional_oois: List,
-) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "content-security-policy":
         return

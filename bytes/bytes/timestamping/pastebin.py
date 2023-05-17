@@ -31,7 +31,7 @@ class PastebinHashRepository(HashRepository):
         return RetrievalLink(link)
 
     def retrieve(self, link: RetrievalLink) -> SecureHash:
-        if link == "":
+        if not link:
             raise ValueError("Can't retrieve secure-hash from empty link.")
 
         paste_id = link.split("/").pop()

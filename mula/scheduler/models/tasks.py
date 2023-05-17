@@ -5,8 +5,11 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, Field
-from sqlalchemy import JSON, Column, DateTime, Enum, String
+from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
+from sqlalchemy.sql.expression import text
 
 from scheduler.utils import GUID
 
@@ -54,7 +57,7 @@ class TaskORM(Base):
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String)
     type = Column(String)
-    p_item = Column(JSON, nullable=False)
+    p_item = Column(JSONB, nullable=False)
     status = Column(
         Enum(TaskStatus),
         nullable=False,
@@ -71,6 +74,14 @@ class TaskORM(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
+    )
+
+    __table_args__ = (
+        Index(
+            "ix_p_item_hash",
+            text("(p_item->>'hash')"),
+            created_at.desc(),
+        ),
     )
 
 
