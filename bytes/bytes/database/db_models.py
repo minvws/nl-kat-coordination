@@ -46,6 +46,5 @@ class NormalizerMetaInDB(SQL_BASE):  # type: ignore
     started_at = Column(DateTime(timezone=True))
     ended_at = Column(DateTime(timezone=True))
 
-    # Nullable because of backward compatibility
     raw_file_id = Column(UUID, ForeignKey("raw_file.id", ondelete="CASCADE"), nullable=False, index=True)
     raw_file = relationship("RawFileInDB")
