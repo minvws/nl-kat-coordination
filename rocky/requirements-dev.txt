@@ -21,5 +21,5 @@ pytest-django
 pytest-drf
 pytest-mock
 git+https://github.com/dekkers/django-admin-auto-tests@fix-create-unique
-model-mommy
+model-bakery
 factory-boy
