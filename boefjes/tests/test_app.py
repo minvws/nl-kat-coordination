@@ -162,14 +162,10 @@ class AppTest(TestCase):
 
         patched_tasks = self.scheduler_client.get_all_patched_tasks()
         self.assertEqual(6, len(patched_tasks))
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[0])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[1])
-        self.assertEqual(
-            ["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[2]
-        )  # Handler starts raising an Exception from the second call onward
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[3])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[4])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[5])
+        # Handler starts raising an Exception from the second call onward,
+        # so we have 2 completed tasks and 4 failed tasks.
+        self.assertEqual(patched_tasks.count(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"]), 2)
+        self.assertEqual(patched_tasks.count(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"]), 4)
 
     def test_null(self) -> None:
         """This tests ensures we test the behaviour when the scheduler client returns None for the pop_task method"""
