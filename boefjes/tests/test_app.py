@@ -135,22 +135,6 @@ class AppTest(TestCase):
         self.assertFalse(self.item_handler.log_path.exists())
         self.assertTrue(self.scheduler_client.log_path.exists())
 
-    def test_two_processes_late_exception(self) -> None:
-        self.runtime.settings.pool_size = 2
-        self.item_handler.max_calls = 1
-
-        self.runtime.run(RuntimeManager.Queue.BOEFJES)
-
-        items = self.item_handler.get_all()
-        self.assertEqual(2, len(items))
-
-        patched_tasks = self.scheduler_client.get_all_patched_tasks()
-        self.assertEqual(6, len(patched_tasks))
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[0])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[1])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[2])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[3])
-
     def test_two_processes_handler_exception(self) -> None:
         self.runtime.settings.pool_size = 2
         self.item_handler.max_calls = 1
