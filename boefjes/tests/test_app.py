@@ -112,7 +112,7 @@ class AppTest(TestCase):
 
     def test_two_processes(self) -> None:
         self.runtime.settings.pool_size = 2
-        self.item_handler.sleep_time = 0.1
+        self.item_handler.sleep_time = 0.5
 
         self.runtime.run(RuntimeManager.Queue.BOEFJES)
 
