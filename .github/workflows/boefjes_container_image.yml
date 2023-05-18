@@ -47,7 +47,6 @@ jobs:
           python -m setuptools_scm
           cp _version.py boefjes/boefjes/version.py
           cp _version.py boefjes/boefjes/katalogus/version.py
-          cp _version.py boefjes/boefjes/plugin_repository/version.py
 
       - name: Build container image
         uses: docker/build-push-action@v3
