@@ -95,9 +95,7 @@ ubuntu-build-image:
 poetry-dependencies:
 	poetry check -C ./
 	poetry lock -C ./
-	poetry export -C ./ --without=docs -f requirements.txt -o ./requirements.txt
-	poetry export -C ./ --only=dev -f requirements.txt -o ./requirements-dev.txt
-	poetry export -C ./ --only=docs -f requirements.txt -o ./requirements-docs.txt
+	poetry export -C ./ -f requirements.txt -o ./requirements.txt
 	for path in keiko octopoes
 	do
 		echo $$path
