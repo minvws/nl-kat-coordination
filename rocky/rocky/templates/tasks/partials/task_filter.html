@@ -19,10 +19,11 @@
         <fieldset>
             <label for="scan_history_status">{% translate "Status" %}</label>
             <select name="scan_history_status" id="scan_history_status">
-                <option value="" disabled selected>{% translate "Select status" %}</option>
+                <option value="" selected>{% translate "all" %}</option>}
+                <option value="pending" {% if request.GET.scan_history_status == 'pending' %}selected{% endif %}>{% translate "Pending" %}</option>}
                 <option value="queued" {% if request.GET.scan_history_status == 'queued' %}selected{% endif %}>{% translate "Queued" %}</option>
                 <option value="dispatched" {% if request.GET.scan_history_status == 'dispatched' %}selected{% endif %}>{% translate "Dispatched" %}</option>
-                <option value="completed" {% if request.GET.scan_history_status == 'completed' %}selected{% endif %}>{% translate "Success" %}</option>
+                <option value="completed" {% if request.GET.scan_history_status == 'completed' %}selected{% endif %}>{% translate "Completed" %}</option>
                 <option value="failed" {% if request.GET.scan_history_status == 'failed' %}selected{% endif %}>{% translate "Failure" %}</option>
             </select>
         </fieldset>

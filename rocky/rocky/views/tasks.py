@@ -47,9 +47,10 @@ class TaskListView(OrganizationView, ListView):
     def get_queryset(self):
         scheduler_id = self.plugin_type + "-" + self.organization.code
         task_type = self.request.GET.get("type", self.plugin_type)
-        status = self.request.GET.get("status", None)
-        input_ooi = self.request.GET.get("scan_history_search")
-        status = self.request.GET.get("scan_history_status")
+
+        status = self.request.GET.get("scan_history_status") if self.request.GET.get("scan_history_status") else None
+
+        input_ooi = self.request.GET.get("scan_history_search") if self.request.GET.get("scan_history_search") else None
 
         if self.request.GET.get("scan_history_from"):
             min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
