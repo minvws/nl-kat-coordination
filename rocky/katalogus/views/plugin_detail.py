@@ -10,9 +10,7 @@ from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django_otp.decorators import otp_required
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.client import get_katalogus
 from katalogus.views import PluginSettingsListView
@@ -31,7 +29,6 @@ class PluginCoverImgView(OrganizationView):
         return file
 
 
-@class_view_decorator(otp_required)
 class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
     """Detail view for a specific plugin. Shows plugin settings and consumable oois for scanning."""
 

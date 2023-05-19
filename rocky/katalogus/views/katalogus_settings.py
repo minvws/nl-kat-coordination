@@ -8,15 +8,12 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, TemplateView
-from django_otp.decorators import otp_required
 from requests import RequestException
 from tools.models import Organization
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.client import get_katalogus
 
 
-@class_view_decorator(otp_required)
 class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateView):
     template_name = "confirmation_clone_settings.html"
 
@@ -50,7 +47,6 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
         )
 
 
-@class_view_decorator(otp_required)
 class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     """View that gives an overview of all plugins settings"""
 
