@@ -51,7 +51,7 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
 
 
 @class_view_decorator(otp_required)
-class KATalogusSettingsListView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"

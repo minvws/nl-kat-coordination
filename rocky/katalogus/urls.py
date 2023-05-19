@@ -12,7 +12,7 @@ urlpatterns = [
     path("view/<view>/", views.KATalogusView.as_view(), name="katalogus"),
     path(
         "settings/",
-        views.KATalogusSettingsListView.as_view(),
+        views.KATalogusSettingsView.as_view(),
         name="katalogus_settings",
     ),
     path(

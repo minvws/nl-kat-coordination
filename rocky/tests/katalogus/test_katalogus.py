@@ -1,5 +1,5 @@
 from katalogus.client import KATalogusClientV1, parse_plugin
-from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsListView, KATalogusView
+from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsView, KATalogusView
 from pytest_django.asserts import assertContains, assertNotContains
 
 from rocky.health import ServiceHealth
@@ -45,7 +45,7 @@ def test_katalogus_settings_list_one_organization(redteam_member, rf, mocker):
     mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test"}
 
     request = setup_request(rf.get("katalogus_settings"), redteam_member.user)
-    response = KATalogusSettingsListView.as_view()(request, organization_code=redteam_member.organization.code)
+    response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)
     assert response.status_code == 200
 
     assertContains(response, "KAT-alogus Settings")
@@ -68,7 +68,7 @@ def test_katalogus_settings_list_multiple_organization(redteam_member, organizat
     create_member(redteam_member.user, organization_b)
 
     request = setup_request(rf.get("katalogus_settings"), redteam_member.user)
-    response = KATalogusSettingsListView.as_view()(request, organization_code=redteam_member.organization.code)
+    response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)
     assert response.status_code == 200
 
     assertContains(response, "KAT-alogus Settings")
