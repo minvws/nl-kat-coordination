@@ -1,6 +1,17 @@
 name: Check Poetry dependencies
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - requirements**.txt
+      - pyproject.toml
+      - poetry.lock
+  pull_request:
+    paths:
+      - requirements**.txt
+      - pyproject.toml
+      - poetry.lock
+
 
 jobs:
   pre-commit:
