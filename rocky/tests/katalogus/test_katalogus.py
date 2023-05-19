@@ -37,12 +37,12 @@ def test_katalogus_plugin_listing(admin_member, redteam_member, client_member, r
     assertNotContains(response_client, "test_binary_edge_normalizer")
 
 
-def test_katalogus_settings_list_one_organization(redteam_member, rf, mocker):
+def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
     # Mock katalogus calls: return right boefjes and settings
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
     boefjes_data = get_boefjes_data()
     mock_katalogus().get_boefjes.return_value = [parse_plugin(b) for b in boefjes_data if b["type"] == "boefje"]
-    mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test"}
+    mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test", "Second": "value"}
 
     request = setup_request(rf.get("katalogus_settings"), redteam_member.user)
     response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)

@@ -78,10 +78,8 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
     def get_settings(self):
         all_plugins_settings = []
         katalogus_client = get_katalogus(self.organization.code)
-        boefjes = katalogus_client.get_boefjes()
-        for boefje in boefjes:
-            plugin_settings = {}
 
+        for boefje in katalogus_client.get_boefjes():
             try:
                 plugin_setting = katalogus_client.get_plugin_settings(boefje.id)
             except RequestException:
@@ -90,13 +88,19 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
                 )
                 continue
 
-            if plugin_setting:
-                plugin_settings["plugin_id"] = boefje.id
-                plugin_settings["plugin_name"] = boefje.name
-                for key, value in plugin_setting.items():
-                    plugin_settings["name"] = key
-                    plugin_settings["value"] = value
-                all_plugins_settings.append(plugin_settings)
+            if not plugin_setting:
+                continue
+
+            for key, value in plugin_setting.items():
+                all_plugins_settings.append(
+                    {
+                        "plugin_id": boefje.id,
+                        "plugin_name": boefje.name,
+                        "name": key,
+                        "value": value,
+                    }
+                )
+
         return all_plugins_settings
 
     def get_form(self, form_class=None):
