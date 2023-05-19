@@ -46,7 +46,7 @@ class TaskListView(OrganizationView, ListView):
 
     def get_queryset(self):
         scheduler_id = self.plugin_type + "-" + self.organization.code
-        type_ = self.request.GET.get("type", self.plugin_type)
+        task_type = self.request.GET.get("type", self.plugin_type)
         status = self.request.GET.get("status", None)
         input_ooi = self.request.GET.get("scan_history_search")
         status = self.request.GET.get("scan_history_status")
@@ -64,7 +64,7 @@ class TaskListView(OrganizationView, ListView):
         try:
             return client.get_lazy_task_list(
                 scheduler_id=scheduler_id,
-                type=type_,
+                task_type=task_type,
                 status=status,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,

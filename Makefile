@@ -14,22 +14,33 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 
 # Build and bring up all containers (default target)
 kat: env-if-empty build up
+	@echo
+	@echo "The KAT frontend is running at http://localhost:8000,"
+	@echo "credentials can be found as DJANGO_SUPERUSER_* in the .env file."
+	@echo
+	@echo "WARNING: This is a development environment, do not use in production!"
+	@echo "See https://docs.openkat.nl/technical_design/install.html for production"
+	@echo "installation instructions."
 
-# Update using git pull and bring up containers
-update: pull kat
+# Remove containers, update using git pull and bring up containers
+update: down pull kat
 
-# Bring down containers, remove all volumes, and bring them up again
+# Remove all containers and volumes, and bring containers up again (data loss!)
 reset: clean kat
 
 # Bring up containers
 up:
 	docker-compose up --detach
 
-# Bring down containers without data loss
+# Stop containers
+stop:
+	-docker-compose stop
+
+# Remove containers but not volumes (no data loss)
 down:
 	-docker-compose down
 
-# Bring down containers and remove all volumes
+# Remove containers and all volumes (data loss!)
 clean:
 	-docker-compose down --timeout 0 --volumes --remove-orphans
 
