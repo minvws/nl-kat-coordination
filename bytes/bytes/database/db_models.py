@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, Index, String
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, Index, Integer, String
 from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.orm import relationship
 
@@ -22,6 +22,14 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
 Index("ix_boefje_meta_organization_boefje_id", BoefjeMetaInDB.organization, BoefjeMetaInDB.boefje_id)
 
 
+class SigningProviderInDB(SQL_BASE):  # type: ignore
+    __tablename__ = "signing_provider"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+    url = Column(String(length=256), nullable=False, unique=True)
+
+
 class RawFileInDB(SQL_BASE):  # type: ignore
     __tablename__ = "raw_file"
 
@@ -29,7 +37,11 @@ class RawFileInDB(SQL_BASE):  # type: ignore
 
     secure_hash = Column(String(length=256), nullable=True)
     hash_retrieval_link = Column(String(length=2048), nullable=True)
-    signing_provider = Column(String(length=256), nullable=True)
+
+    signing_provider_id = Column(
+        Integer, ForeignKey("signing_provider.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    signing_provider = relationship("SigningProviderInDB")
 
     boefje_meta_id = Column(UUID, ForeignKey("boefje_meta.id", ondelete="CASCADE"), nullable=False, index=True)
     boefje_meta = relationship("BoefjeMetaInDB")

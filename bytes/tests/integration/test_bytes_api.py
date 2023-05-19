@@ -123,7 +123,7 @@ def test_normalizer_meta(bytes_api_client: BytesAPIClient, event_manager: Rabbit
 
     normalizer_meta.raw_data.secure_hash = retrieved_normalizer_meta.raw_data.secure_hash
     normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_meta.raw_data.hash_retrieval_link
-    normalizer_meta.raw_data.signing_provider = retrieved_normalizer_meta.raw_data.signing_provider
+    normalizer_meta.raw_data.signing_provider_url = retrieved_normalizer_meta.raw_data.signing_provider_url
 
     assert normalizer_meta.dict() == retrieved_normalizer_meta.dict()
 
@@ -146,7 +146,7 @@ def test_filtered_normalizer_meta(bytes_api_client: BytesAPIClient) -> None:
 
     normalizer_meta.raw_data.secure_hash = retrieved_normalizer_metas[0].raw_data.secure_hash
     normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_metas[0].raw_data.hash_retrieval_link
-    normalizer_meta.raw_data.signing_provider = retrieved_normalizer_metas[0].raw_data.signing_provider
+    normalizer_meta.raw_data.signing_provider_url = retrieved_normalizer_metas[0].raw_data.signing_provider_url
 
     assert normalizer_meta == retrieved_normalizer_metas[0]
 
@@ -169,7 +169,7 @@ def test_filtered_normalizer_meta(bytes_api_client: BytesAPIClient) -> None:
 
     second_normalizer_meta.raw_data.secure_hash = retrieved_normalizer_metas[0].raw_data.secure_hash
     second_normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_metas[0].raw_data.hash_retrieval_link
-    second_normalizer_meta.raw_data.signing_provider = retrieved_normalizer_metas[0].raw_data.signing_provider
+    second_normalizer_meta.raw_data.signing_provider_url = retrieved_normalizer_metas[0].raw_data.signing_provider_url
 
     assert second_normalizer_meta == retrieved_normalizer_metas[0]
 
@@ -187,7 +187,7 @@ def test_normalizer_meta_pointing_to_raw_id(bytes_api_client: BytesAPIClient) ->
 
     normalizer_meta.raw_data.secure_hash = retrieved_normalizer_meta.raw_data.secure_hash
     normalizer_meta.raw_data.hash_retrieval_link = retrieved_normalizer_meta.raw_data.hash_retrieval_link
-    normalizer_meta.raw_data.signing_provider = retrieved_normalizer_meta.raw_data.signing_provider
+    normalizer_meta.raw_data.signing_provider_url = retrieved_normalizer_meta.raw_data.signing_provider_url
 
     assert normalizer_meta == retrieved_normalizer_meta
 
