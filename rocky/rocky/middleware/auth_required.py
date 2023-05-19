@@ -5,28 +5,29 @@ from django.urls.base import reverse
 def AuthRequiredMiddleware(get_response):
     def middleware(request):
         login_path = reverse("login")
-        email_recovery_path = reverse("recover_email")
-        password_recovery_path = reverse("password_reset")
-        home_path = reverse("landing_page")
-        lang_path = reverse("set_language")
-        privacy_statement = reverse("privacy_statement")
-
-        if not request.user.is_authenticated and (
-            not request.path.startswith("/account/reset/")
+        excluded = [
+            "/",
+            login_path,
+            reverse("recover_email"),
+            reverse("password_reset"),
+            reverse("landing_page"),
+            reverse("set_language"),
+            reverse("privacy_statement"),
+        ]
+        excluded_prefix = [
             # There won't be a request.user if auth tokens are used, but
             # Django REST framework will make sure that there is an
-            # authenticated user with out DEFAULT_PERMISSION_CLASSES setting
-            and not request.path.startswith("/api/")
-            and request.path
-            not in (
-                "/",
-                home_path,
-                login_path,
-                lang_path,
-                email_recovery_path,
-                password_recovery_path,
-                privacy_statement,
-            )
+            # authenticated user without DEFAULT_PERMISSION_CLASSES setting
+            # in settings.py.
+            "/api/",
+            "/account/reset/",
+        ]
+
+        if not request.user.is_authenticated and (
+            # check if path is not in excluded list
+            request.path not in excluded
+            # check if path starts with anything in excluded_prefix
+            and not any([request.path.startswith(prefix) for prefix in excluded_prefix])
         ):
             return redirect(login_path)
 
