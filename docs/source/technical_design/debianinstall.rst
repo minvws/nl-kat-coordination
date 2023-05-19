@@ -21,8 +21,8 @@ Downloading and installing
 ==========================
 
 Download the packages for all the components of KAT from `GitHub
-<https://github.com/minvws/nl-kat-coordination/releases/latest>`__. XTDB
-multinode package also be downloaded from `GitHub
+<https://github.com/minvws/nl-kat-coordination/releases/latest>`__. Also download the XTDB
+multinode package from `GitHub
 <https://github.com/dekkers/xtdb-http-multinode/releases/latest>`__.
 
 After downloading they can be installed as follows:
