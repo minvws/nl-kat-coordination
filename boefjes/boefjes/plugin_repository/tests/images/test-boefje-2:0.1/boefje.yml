@@ -1,9 +1,0 @@
-id: test-boefje-2
-type: boefje
-name: Test Boefje 2
-version: 0.1
-image_name: test-boefje-2
-description: |-
-    Just a dummy boefje for demonstration purposes
-consumes: Hostname
-produces: [application/json]

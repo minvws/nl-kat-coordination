@@ -1,9 +1,0 @@
-id: kat-test-boefje
-type: boefje
-name: KAT Test
-version: 0.1-dev
-image_name: kat-test-boefje
-description: |-
-    Just a dummy boefje for demonstration purposes
-consumes: WebPage
-produces: ['text/html', 'application/json']
