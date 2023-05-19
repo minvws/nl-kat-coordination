@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.shortcuts import redirect
 from django.urls.base import reverse
+from django.utils import translation
 
 
 def AuthRequiredMiddleware(get_response):
@@ -23,7 +24,7 @@ def AuthRequiredMiddleware(get_response):
             # authenticated user without DEFAULT_PERMISSION_CLASSES setting
             # in settings.py.
             "/api/",
-            "/account/reset/",
+            f"/{translation.get_language()}/reset/",
         ]
         # URLs only excluded from 2fa
         excluded_2fa = [
