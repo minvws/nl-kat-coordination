@@ -21,6 +21,7 @@ certifi = "^2023.5.7"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.2"
+httpx = "^0.24.1"
 robotframework-tidy = "^3.2"
 robotframework = "^6.0.1"
 robotframework-debuglibrary = "^2.3.0"
