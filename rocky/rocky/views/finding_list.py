@@ -1,16 +1,17 @@
 import logging
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from django.contrib import messages
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from tools.ooi_helpers import RiskLevelSeverity, get_finding_type_from_finding, get_knowledge_base_data_for_ooi
+from tools.ooi_helpers import get_finding_type_from_finding, get_knowledge_base_data_for_ooi
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.connector import ConnectorException
-from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
-from octopoes.models.ooi.findings import Finding, MutedFinding
-from rocky.views.mixins import OOIList
+from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, OOI
+from octopoes.models.ooi.findings import Finding, MutedFinding, FindingType, RiskLevelSeverity
+from rocky.views.mixins import OOIList, FindingList
 from rocky.views.ooi_view import BaseOOIListView
 
 logger = logging.getLogger(__name__)
@@ -25,6 +26,14 @@ def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
     for index, finding in enumerate(sorted_findings, start=1):
         finding["finding_number"] = index
     return sorted_findings
+
+
+@dataclass
+class FindingEntry:
+    index: int
+    finding: Finding
+    finding_type: FindingType
+    ooi: OOI
 
 
 def generate_findings_metadata(
@@ -61,31 +70,25 @@ class FindingListView(BreadcrumbsMixin, BaseOOIListView):
     ooi_types = {Finding}
     paginate_by = 50
 
-    def get_queryset(self):
-        findings = super().get_queryset()
-        muted_findings = OOIList(
-            self.octopoes_api_connector,
-            {MutedFinding},
-            self.get_observed_at(),
-            scan_level=DEFAULT_SCAN_LEVEL_FILTER,
-            scan_profile_type=DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-        )
-        severity_filter = []
+    def get_queryset(self) -> FindingList:
 
+        severities = set()
         for severity in self.request.GET.getlist("severity"):
             try:
-                severity_filter.append(RiskLevelSeverity(severity))
+                severities.add(RiskLevelSeverity(severity))
             except ValueError as e:
                 messages.error(self.request, _(str(e)))
 
-        try:
-            return generate_findings_metadata(findings, muted_findings, severity_filter)
-        except ConnectorException:
-            messages.add_message(
-                self.request, messages.ERROR, _("Failed to get list of findings, check server logs for more details.")
-            )
-            logger.exception("Failed get list of findings")
-            return []
+        return FindingList(self.octopoes_api_connector, self.get_observed_at(), severities)
+
+        #         try:
+        #     return generate_findings_metadata(findings, muted_findings, severities)
+        # except ConnectorException:
+        #     messages.add_message(
+        #         self.request, messages.ERROR, _("Failed to get list of findings, check server logs for more details.")
+        #     )
+        #     logger.exception("Failed get list of findings")
+        #     return []
 
     def build_breadcrumbs(self):
         return [

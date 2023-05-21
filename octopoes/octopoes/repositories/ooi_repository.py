@@ -12,6 +12,7 @@ from requests import HTTPError
 
 from bits.definitions import BitDefinition
 from octopoes.config.settings import XTDBType
+from octopoes.connector.octopoes import DEFAULT_OFFSET, DEFAULT_LIMIT
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
 from octopoes.models import (
@@ -24,6 +25,7 @@ from octopoes.models import (
 )
 from octopoes.models.ooi.config import Config
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.finding import HydratedFinding
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
@@ -109,6 +111,16 @@ class OOIRepository:
         raise NotImplementedError
 
     def count_findings_by_severity(self, valid_time: datetime) -> Dict[str, int]:
+        raise NotImplementedError
+
+    def list_findings(
+        self,
+        severities,
+        exclude_muted,
+        offset,
+        limit,
+        valid_time,
+    ) -> Paginated[Finding]:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> List[Config]:
@@ -591,3 +603,64 @@ class XTDBOOIRepository(OOIRepository):
         configs = [self.deserialize(res[0]) for res in self.session.client.query(str(query), valid_time=valid_time)]
 
         return [config for config in configs if isinstance(config, Config)]
+
+    def list_findings(
+        self,
+        severities: Set[RiskLevelSeverity],
+        exclude_muted=False,
+        offset=DEFAULT_OFFSET,
+        limit=DEFAULT_LIMIT,
+        valid_time: Optional[datetime] = None,
+    ) -> Paginated[Finding]:
+        # query = """
+        #     {{:query {{
+        #     }}
+        # """.format()
+
+        # generate_pull_query()
+
+        query = f"""
+            {{
+                :query {{
+                    :find [(pull ?finding [* {{ (:Finding/ooi {{:as :ooi}} ) [*] }} ] )]
+                    :where [[?finding :object_type "Finding"]
+                            [?finding :Finding/finding_type ?finding_type]
+                    :limit {limit}
+                    :offset {offset}
+                }}
+            }}
+        """
+
+        q = Query(Finding).where(Finding, finding_type=FindingType).where(FindingType, risk_severity=severities).count(Finding)
+        print(q.format())
+
+        count_query = """
+            {:query {
+                :find [(count ?finding)]
+                :where [[?finding :object_type "Finding"]
+                        [?finding :Finding/finding_type ?finding_type]]
+                :limit 50
+                :offset 0
+            }}
+        """
+        count_results = self.session.client.query(count_query, valid_time)
+        print(count_results)
+        count = count_results[0][0]
+
+        query = """
+            {
+                :query {
+                    :find [(pull ?finding [*] )]
+                    :where [[?finding :object_type "Finding"]
+                            [?finding :Finding/finding_type ?finding_type]
+                            [?finding_type :FindingType/risk_severity ?severity]
+                            [(= ?severity "CRITICAL")]]
+                    :limit 50
+                    :offset 0
+                }
+            }
+        """
+
+        res = self.session.client.query(query, valid_time)
+
+        return Paginated(count=count, items=[self.deserialize(row[0]) for row in res])

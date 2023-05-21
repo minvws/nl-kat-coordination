@@ -10,11 +10,10 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_otp.decorators import otp_required
+
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from tools.forms.base import ObservedAtForm
 from tools.models import Organization
-from tools.ooi_helpers import (
-    RiskLevelSeverity,
-)
 from tools.view_helpers import BreadcrumbsMixin, convert_date_to_datetime
 from two_factor.views.utils import class_view_decorator
 

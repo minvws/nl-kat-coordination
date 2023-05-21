@@ -177,3 +177,8 @@ def test_finding_type_count_query():
     [ Finding :Finding/finding_type FindingType ]
     [ Finding :object_type "Finding" ]]}}}}"""
     )
+
+
+def test_finding_query():
+    query = Query(Finding, FindingType, OOI).where(Finding, finding_type=FindingType).group_by(FindingType).count(Finding)
+

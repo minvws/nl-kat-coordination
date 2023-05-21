@@ -19,10 +19,14 @@ from octopoes.models import (
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
+from octopoes.models.ooi.findings import RiskLevelSeverity, Finding
 from octopoes.models.origin import Origin, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
+
+DEFAULT_LIMIT = 5000
+DEFAULT_OFFSET = 0
 
 
 class OctopoesAPISession(requests.Session):
@@ -167,6 +171,32 @@ class OctopoesAPIConnector:
         params = {"valid_time": valid_time}
         res = self.session.get(f"/{self.client}/findings/count_by_severity", params=params)
         return res.json()
+
+    def list_findings(
+        self,
+        severities: Set[RiskLevelSeverity],
+        exclude_muted: bool = True,
+        valid_time: Optional[datetime] = None,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+    ) -> Paginated[Finding]:
+        params = {
+            "valid_time": valid_time,
+            "offset": offset,
+            "limit": limit,
+            "severities": {s.value for s in severities},
+            "exclude_muted": exclude_muted,
+        }
+        res = self.session.get(f"/{self.client}/findings", params=params)
+        return Paginated[Finding].parse_obj(res.json())
+
+    def get_objects_bulk(self, references: Set[Reference], valid_time):
+        params = {
+            "references": references,
+            "valid_time": valid_time,
+        }
+        res = self.session.get(f"/{self.client}/objects/bulk", params=params)
+        return parse_obj_as(Dict[Reference, OOIType], res.json())
 
     def recalculate_bits(self) -> int:
         return self.session.post(f"/{self.client}/bits/recalculate").json()

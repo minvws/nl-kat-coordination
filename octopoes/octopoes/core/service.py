@@ -28,6 +28,7 @@ from octopoes.models import (
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
+from octopoes.models.finding import HydratedFinding
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import (

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, Type, Union
+from typing import List, Optional, Type, Union, Set
 
 from octopoes.models import OOI
 from octopoes.models.path import Direction, Path
@@ -88,13 +88,18 @@ class Query:
 
         return self
 
-    def _where_field_is(self, ooi_type: Type[OOI], field_name: str, value: Union[Type[OOI], str]) -> None:
+    def _where_field_is(self, ooi_type: Type[OOI], field_name: str, value: Union[Type[OOI], str, Set[str]]) -> None:
         if field_name not in ooi_type.__fields__:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
         if isinstance(value, str):
             value = value.replace('"', r"\"")
             self._add_where_statement(ooi_type, field_name, f'"{value}"')
+            return
+
+        if isinstance(value, set):
+            values = {v.replace('"', r"\"") for v in value}
+            self._or_statement(ooi_type, field_name, f'"{values}"')
             return
 
         if not isinstance(value, type):
