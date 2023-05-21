@@ -275,12 +275,12 @@ def get_scan_profile_inheritance(
     return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
 
 
-@router.get("/finding_types/count")
+@router.get("/findings/count_by_severity")
 def get_finding_type_count(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
 ) -> Dict[str, int]:
-    return octopoes.ooi_repository.get_finding_type_count(valid_time)
+    return octopoes.ooi_repository.count_findings_by_severity(valid_time)
 
 
 @router.post("/node")

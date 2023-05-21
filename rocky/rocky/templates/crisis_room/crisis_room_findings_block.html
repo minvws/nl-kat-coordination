@@ -14,12 +14,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for org_finding_type_count in org_finding_type_counts %}
+                        {% for org_finding_count in org_finding_counts_per_severity %}
                             <tr>
                                 <td>
-                                    <a href="{% url "organization_crisis_room" org_finding_type_count.code %}">{{ org_finding_type_count.name }}</a>
+                                    <a href="{% url "organization_crisis_room" org_finding_count.code %}">{{ org_finding_count.name }}</a>
                                 </td>
-                                <td class="number">{{ org_finding_type_count.total }}</td>
+                                <td class="number">{{ org_finding_count.total }}</td>
                                 <td>
                                     <button class="expando-button"
                                             data-icon-open-class="icon ti-chevron-down"
@@ -31,25 +31,25 @@
                             </tr>
                             <tr class="expando-row">
                                 <td colspan="3">
-                                    <span class="sr-only">{{ org_finding_type_count.name }} {% translate " Finding Details" %}</span>
+                                    <span class="sr-only">{{ org_finding_count.name }} {% translate " Finding Details" %}</span>
                                     <table>
                                         <thead>
                                             <th>{% translate "Severity" %}</th>
                                             <th>{% translate "Occurrences" %}</th>
                                         </thead>
                                         <tbody>
-                                            {% for severity, count in org_finding_type_count.finding_count_per_severity.items %}
+                                            {% for severity, count in org_finding_count.finding_count_per_severity.items %}
                                                 <tr>
                                                     <td>
                                                         {% if count != 0 %}
-                                                            <a href="{% url "finding_list" organization_code=org_finding_type_count.code %}?severity={{ severity }}"><span class="{{ severity }}">{{ severity|title }}</span></a>
+                                                            <a href="{% url "finding_list" organization_code=org_finding_count.code %}?severity={{ severity }}"><span class="{{ severity }}">{{ severity|title }}</span></a>
                                                         {% else %}
                                                             <span class="{{ severity }}">{{ severity|title }}</span>
                                                         {% endif %}
                                                     </td>
                                                     <td class="number">
                                                         {% if count != 0 %}
-                                                            <a href="{% url "finding_list" organization_code=org_finding_type_count.code %}?severity={{ severity }}">{{ count }}</a>
+                                                            <a href="{% url "finding_list" organization_code=org_finding_count.code %}?severity={{ severity }}">{{ count }}</a>
                                                         {% else %}
                                                             {{ count }}
                                                         {% endif %}
@@ -83,12 +83,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for org_finding_type_count in org_finding_type_counts_critical %}
+                        {% for org_finding_count in org_finding_counts_per_severity_critical %}
                             <tr>
                                 <td>
-                                    <a href="{% url "organization_crisis_room" org_finding_type_count.code %}">{{ org_finding_type_count.name }}</a>
+                                    <a href="{% url "organization_crisis_room" org_finding_count.code %}">{{ org_finding_count.name }}</a>
                                 </td>
-                                <td class="number">{{ org_finding_type_count.total_critical }}</td>
+                                <td class="number">{{ org_finding_count.total_critical }}</td>
                                 <td>
                                     <button class="expando-button"
                                             data-icon-open-class="icon ti-chevron-down"
@@ -100,25 +100,25 @@
                             </tr>
                             <tr class="expando-row">
                                 <td colspan="3">
-                                    <span class="sr-only">{{ org_finding_type_count.name }} {% translate " Finding Details" %}</span>
+                                    <span class="sr-only">{{ org_finding_count.name }} {% translate " Finding Details" %}</span>
                                     <table>
                                         <thead>
                                             <th>{% translate "Severity" %}</th>
                                             <th>{% translate "Occurrences" %}</th>
                                         </thead>
                                         <tbody>
-                                            {% for severity, count in org_finding_type_count.finding_count_per_severity.items %}
+                                            {% for severity, count in org_finding_count.finding_count_per_severity.items %}
                                                 <tr>
                                                     <td>
                                                         {% if count != 0 %}
-                                                            <a href="{% url "finding_list" organization_code=org_finding_type_count.code %}?severity={{ severity }}"><span class="{{ severity }}">{{ severity|title }}</span></a>
+                                                            <a href="{% url "finding_list" organization_code=org_finding_count.code %}?severity={{ severity }}"><span class="{{ severity }}">{{ severity|title }}</span></a>
                                                         {% else %}
                                                             <span class="{{ severity }}">{{ severity|title }}</span>
                                                         {% endif %}
                                                     </td>
                                                     <td class="number">
                                                         {% if count != 0 %}
-                                                            <a href="{% url "finding_list" organization_code=org_finding_type_count.code %}?severity={{ severity }}">{{ count }}</a>
+                                                            <a href="{% url "finding_list" organization_code=org_finding_count.code %}?severity={{ severity }}">{{ count }}</a>
                                                         {% else %}
                                                             {{ count }}
                                                         {% endif %}

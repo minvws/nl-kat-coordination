@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import json
 import logging
+from collections import defaultdict
 from datetime import datetime
 from http import HTTPStatus
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
-from bits.definitions import BitDefinition
 from pydantic import BaseModel, parse_obj_as
 from requests import HTTPError
 
+from bits.definitions import BitDefinition
 from octopoes.config.settings import XTDBType
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
@@ -21,8 +22,9 @@ from octopoes.models import (
     ScanLevel,
     ScanProfileType,
 )
-from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
+from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.tree import ReferenceNode, ReferenceTree
@@ -106,7 +108,7 @@ class OOIRepository:
     def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
         raise NotImplementedError
 
-    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
+    def count_findings_by_severity(self, valid_time: datetime) -> Dict[str, int]:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> List[Config]:
@@ -562,14 +564,20 @@ class XTDBOOIRepository(OOIRepository):
         response = self.session.client.query(query, valid_time=valid_time)
         return {Reference.from_str(row[0]) for row in response}
 
-    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
-        query = """
-                    {:query {
-                     :find [?finding_type (count ?finding)]
-                     :where [[?finding :Finding/finding_type ?finding_type]] }}
-                """
-        response = self.session.client.query(query, valid_time=valid_time)
-        return {finding_type: count for finding_type, count in response}
+    def count_findings_by_severity(self, valid_time: datetime) -> Dict[str, int]:
+        severity_counts = defaultdict(int)
+        for level in RiskLevelSeverity:
+            severity_counts[level.value] = 0
+
+        query = Query(FindingType).where(Finding, finding_type=FindingType).group_by(FindingType).count(Finding)
+        for finding_type, finding_count in self.session.client.query(str(query), valid_time=valid_time):
+            ft = cast(FindingType, self.deserialize(finding_type))
+            if ft.risk_severity:
+                severity_counts[ft.risk_severity.value] += finding_count
+            else:
+                # TODO: Think of better way to handle unknown severities
+                severity_counts[RiskLevelSeverity.RECOMMENDATION.value] += finding_count
+        return severity_counts
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> List[Config]:
         path = Path.parse(f"{bit_definition.config_ooi_relation_path}.<ooi [is Config]")

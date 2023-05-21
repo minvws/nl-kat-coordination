@@ -74,7 +74,7 @@ class Query:
         return self
 
     def group_by(self, ooi_type: Type[OOI]) -> "Query":
-        self._find_clauses.append(f"{ooi_type.get_object_type()}")
+        self._find_clauses.append(f"(pull {ooi_type.get_object_type()} [*])")
 
         return self
 
