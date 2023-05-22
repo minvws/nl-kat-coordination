@@ -1,0 +1,13 @@
+{
+    "id": "retirejs-finding-types",
+    "name": "RetireJS Finding Types",
+    "description": "Hydrate information of RetireJS finding types",
+    "consumes": [
+        "RetireJSFindingType"
+    ],
+    "produces": [
+        "RetireJSFindingType"
+    ],
+    "environment_keys": [],
+    "scan_level": 0
+}
