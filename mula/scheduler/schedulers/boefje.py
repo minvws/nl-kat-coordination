@@ -206,8 +206,6 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        raise NotImplementedError("This method is not implemented yet")
-
         try:
             random_oois = self.ctx.services.octopoes.get_random_objects(
                 organisation_id=self.organisation.id,
