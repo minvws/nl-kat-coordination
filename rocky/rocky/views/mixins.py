@@ -216,13 +216,17 @@ class FindingList:
             ).items
             ooi_references = {finding.ooi for finding in findings}
             finding_type_references = {finding.finding_type for finding in findings}
-            objects = self.octopoes_connector.get_objects_bulk(ooi_references & finding_type_references, valid_time=self.valid_time)
+            objects = self.octopoes_connector.get_objects_bulk(
+                ooi_references | finding_type_references, valid_time=self.valid_time
+            )
 
             hydrated_findings = []
             for finding in findings:
                 if finding.ooi not in objects or finding.finding_type not in objects:
                     continue
-                hydrated_findings.append(HydratedFinding(finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]))
+                hydrated_findings.append(
+                    HydratedFinding(finding_type=objects[finding.finding_type], ooi=objects[finding.ooi])
+                )
             return hydrated_findings
 
         elif isinstance(key, int):

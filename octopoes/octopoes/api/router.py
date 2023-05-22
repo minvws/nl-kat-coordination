@@ -7,8 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
-from octopoes.config.settings import Settings, XTDBType
-from octopoes.connector.octopoes import DEFAULT_OFFSET, DEFAULT_LIMIT
+from octopoes.config.settings import Settings
+from octopoes.connector.octopoes import DEFAULT_OFFSET, DEFAULT_LIMIT, DEFAULT_SEVERITIES
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.models import (
@@ -296,7 +296,7 @@ def get_scan_profile_inheritance(
 
 @router.get("/findings")
 def list_findings(
-    severities: Set[RiskLevelSeverity] = set(),
+    severities: Set[RiskLevelSeverity] = DEFAULT_SEVERITIES,
     exclude_muted: bool = True,
     offset=DEFAULT_OFFSET,
     limit=DEFAULT_LIMIT,

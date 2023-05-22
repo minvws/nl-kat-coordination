@@ -5,6 +5,7 @@ import logging
 from collections import defaultdict
 from datetime import datetime
 from http import HTTPStatus
+from operator import attrgetter
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
 from pydantic import BaseModel, parse_obj_as
@@ -612,55 +613,57 @@ class XTDBOOIRepository(OOIRepository):
         limit=DEFAULT_LIMIT,
         valid_time: Optional[datetime] = None,
     ) -> Paginated[Finding]:
-        # query = """
-        #     {{:query {{
-        #     }}
-        # """.format()
+        concrete_finding_types = to_concrete({FindingType})
+        clauses = [
+            f"[?finding_type :{finding_type.get_object_type()}/risk_severity severities_]"
+            for finding_type in concrete_finding_types
+        ]
+        or_severities = f"(or {' '.join(clauses)})"
 
-        # generate_pull_query()
+        exclude_muted_clause = ""
+        if exclude_muted:
+            exclude_muted_clause = "(not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])"
 
-        query = f"""
+        severity_values = ", ".join([str_val(severity.value) for severity in severities])
+
+        count_query = f"""
             {{
                 :query {{
-                    :find [(pull ?finding [* {{ (:Finding/ooi {{:as :ooi}} ) [*] }} ] )]
+                    :find [(count ?finding)]
+                    :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
+                            {or_severities}
+                            {exclude_muted_clause}]
                     :limit {limit}
                     :offset {offset}
                 }}
+                :in-args [ [{severity_values}] ]
             }}
         """
 
-        q = Query(Finding).where(Finding, finding_type=FindingType).where(FindingType, risk_severity=severities).count(Finding)
-        print(q.format())
-
-        count_query = """
-            {:query {
-                :find [(count ?finding)]
-                :where [[?finding :object_type "Finding"]
-                        [?finding :Finding/finding_type ?finding_type]]
-                :limit 50
-                :offset 0
-            }}
-        """
         count_results = self.session.client.query(count_query, valid_time)
-        print(count_results)
         count = count_results[0][0]
 
-        query = """
-            {
-                :query {
-                    :find [(pull ?finding [*] )]
+        finding_query = f"""
+            {{
+                :query {{
+                    :find [(pull ?finding [*])]
+                    :in [[severities_ ...]]
                     :where [[?finding :object_type "Finding"]
                             [?finding :Finding/finding_type ?finding_type]
-                            [?finding_type :FindingType/risk_severity ?severity]
-                            [(= ?severity "CRITICAL")]]
-                    :limit 50
-                    :offset 0
-                }
-            }
+                            {or_severities}
+                            {exclude_muted_clause}]
+                    :limit {limit}
+                    :offset {offset}
+                }}
+                :in-args [ [{severity_values}] ]
+            }}
         """
 
-        res = self.session.client.query(query, valid_time)
-
-        return Paginated(count=count, items=[self.deserialize(row[0]) for row in res])
+        res = self.session.client.query(finding_query, valid_time)
+        findings = [self.deserialize(x[0]) for x in res]
+        return Paginated(
+            count=count,
+            items=findings,
+        )

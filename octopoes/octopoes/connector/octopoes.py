@@ -25,6 +25,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 
+DEFAULT_SEVERITIES = {severity for severity in RiskLevelSeverity}
 DEFAULT_LIMIT = 5000
 DEFAULT_OFFSET = 0
 
