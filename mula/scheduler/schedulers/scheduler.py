@@ -320,6 +320,10 @@ class Scheduler(abc.ABC):
     def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
         return self.queue.is_item_on_queue_by_hash(item_hash)
 
+    def is_alive(self) -> bool:
+        """Check if the scheduler is alive."""
+        return not self.stop_event.is_set()
+
     def dict(self) -> Dict[str, Any]:
         return {
             "id": self.scheduler_id,

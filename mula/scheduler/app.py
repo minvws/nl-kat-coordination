@@ -14,7 +14,6 @@ from scheduler.utils import thread
 tracer = trace.get_tracer(__name__)
 
 
-
 class App:
     """Main application definition for the scheduler implementation of KAT.
 
@@ -33,8 +32,6 @@ class App:
         server:
             A server.Server instance that handles the API server.
     """
-
-    organisation: Organisation
 
     def __init__(self, ctx: context.AppContext) -> None:
         """Initialize the application.

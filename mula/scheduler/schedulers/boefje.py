@@ -143,15 +143,14 @@ class BoefjeScheduler(Scheduler):
         new_boefjes = None
         try:
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError) as e:
+        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
-                "Could not connect to rabbitmq queue: %s [org_id=%s, scheduler_id=%s]",
-                f"{self.organisation.id}__scan_profile_increments",
+                "Failed to get new boefjes for organisation: %s [organisation.id=%s, scheduler_id=%s]",
+                self.organisation.name,
                 self.organisation.id,
                 self.scheduler_id,
             )
-            if self.stop_event.is_set():
-                raise e
+            return
 
         if new_boefjes is None or not new_boefjes:
             self.logger.debug(

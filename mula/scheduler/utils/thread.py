@@ -1,5 +1,6 @@
 import logging
 import threading
+import time
 from typing import Any, Callable, Optional
 
 
@@ -40,13 +41,8 @@ class ThreadRunner(threading.Thread):
 
     def run(self) -> None:
         while not self.stop_event.is_set():
-            try:
-                self._target()
-                self.stop_event.wait(self.interval)
-            except Exception as e:
-                self.exception = e
-                self.logger.exception(e)
-                self.stop()
+            self._target()
+            time.sleep(self.interval)
 
         self.logger.warning("Thread stopped: %s", self.name)
 
