@@ -1,5 +1,7 @@
+import os
 import tempfile
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Union
 from unittest import TestCase
@@ -48,14 +50,21 @@ class MockHandler(Handler):
         exception=Exception,
     ):
         self.log_path = log_path
+        self.log_path_debug = log_path.with_name("debug")
         self.sleep_time = sleep_time
         self.max_calls = max_calls
         self.calls = 0
         self.exception = exception
 
     def handle(self, item: Union[BoefjeMeta, NormalizerMeta]):
+        with self.log_path_debug.open("a") as f:
+            f.write(f"{os.getpid()} {datetime.now()} handle {self.calls}\n")
+
         if self.calls >= self.max_calls:
             raise self.exception()
+
+        with self.log_path_debug.open("a") as f:
+            f.write(f"{os.getpid()} {datetime.now()} No exception\n")
 
         self.calls += 1
 
@@ -68,6 +77,10 @@ class MockHandler(Handler):
         with self.log_path.open() as f:
             f = [x for x in f]
             return [parse_raw_as(Union[BoefjeMeta, NormalizerMeta], x) for x in f]
+
+    def get_debug(self) -> str:
+        with self.log_path_debug.open() as f:
+            return f.read()
 
 
 class AppTest(TestCase):
@@ -118,6 +131,9 @@ class AppTest(TestCase):
 
         items = self.item_handler.get_all()
         self.assertEqual(4, len(items))
+
+        debug = self.item_handler.get_debug()
+        assert debug == "debug"
 
         patched_tasks = self.scheduler_client.get_all_patched_tasks()
         self.assertEqual(6, len(patched_tasks))
