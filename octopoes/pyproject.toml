@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "octopoes"
-version = "0.1.0"
+version = "0.0.1.dev1"
 description = "KAT's knowledge graph engine"
-authors = ["KAT Developers"]
+authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
 [build-system]
