@@ -45,5 +45,5 @@ jobs:
         run: pip install wheel && cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
 
       - name: Run pytests
-        run: python3 -m pytest -vv
+        run: python3 -m pytest
         working-directory: ./boefjes
