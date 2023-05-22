@@ -65,19 +65,19 @@ class BoefjeScheduler(Scheduler):
         random items from octopoes and schedule them accordingly.
         """
         self.run_in_thread(
-            name="mutations",
-            func=self.listen_for_scan_profile_mutations,
+            name=f"scheduler-{self.scheduler_id}-mutations",
+            target=self.listen_for_scan_profile_mutations,
         )
 
         self.run_in_thread(
-            name="boefjes",
-            func=self.push_tasks_for_new_boefjes,
+            name=f"scheduler-{self.scheduler_id}-new_boefjes",
+            target=self.push_tasks_for_new_boefjes,
             interval=60.0,
         )
 
         self.run_in_thread(
-            name="random",
-            func=self.push_tasks_for_random_objects,
+            name=f"scheduler-{self.scheduler_id}-random",
+            target=self.push_tasks_for_random_objects,
             interval=60.0,
         )
 
@@ -90,6 +90,7 @@ class BoefjeScheduler(Scheduler):
             queue=f"{self.organisation.id}__scan_profile_mutations",
             func=self.push_tasks_for_scan_profile_mutations,
         )
+        self.listeners.append(listener)
         listener.listen()
 
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
@@ -205,6 +206,8 @@ class BoefjeScheduler(Scheduler):
                 self.scheduler_id,
             )
             return
+
+        raise NotImplementedError("This method is not implemented yet")
 
         try:
             random_oois = self.ctx.services.octopoes.get_random_objects(

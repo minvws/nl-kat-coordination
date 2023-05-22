@@ -2,7 +2,7 @@ import logging
 import os
 import threading
 import time
-from typing import Any, Callable, Dict
+from typing import Dict
 
 from opentelemetry import trace
 
@@ -14,6 +14,7 @@ from scheduler.utils import thread
 tracer = trace.get_tracer(__name__)
 
 
+
 class App:
     """Main application definition for the scheduler implementation of KAT.
 
@@ -23,9 +24,6 @@ class App:
         ctx:
             Application context of shared data (e.g. configuration, external
             services connections).
-        threads:
-            A dict of ThreadRunner instances, used for runner processes
-            concurrently.
         stop_event: A threading.Event object used for communicating a stop
             event across threads.
         schedulers:
@@ -48,8 +46,8 @@ class App:
         """
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
-        self.threads: Dict[str, thread.ThreadRunner] = {}
-        self.stop_event: threading.Event = self.ctx.stop_event
+        self.stop_event: threading.Event = threading.Event()
+        self.lock = threading.Lock()
 
         # Initialize schedulers
         self.schedulers: Dict[str, schedulers.Scheduler] = {}
@@ -67,10 +65,16 @@ class App:
         """Gracefully shutdown the scheduler, and all threads."""
         self.logger.info("Shutting down...")
 
-        for s in self.schedulers.values():
-            s.stop()
+        for t in threading.enumerate():
+            if t is threading.current_thread():
+                continue
 
-        for t in self.threads.values():
+            if t is threading.main_thread():
+                continue
+
+            if not t.is_alive():
+                continue
+
             t.join(5)
 
         self.logger.info("Shutdown complete")
@@ -79,29 +83,6 @@ class App:
         # within a thread, otherwise it will not exit a docker container.
         # Source: https://stackoverflow.com/a/1489838/1346257
         os._exit(1)
-
-    def run_in_thread(
-        self,
-        name: str,
-        func: Callable[[], Any],
-        interval: float = 0.01,
-        daemon: bool = False,
-    ) -> None:
-        """Make a function run in a thread, and add it to the dict of threads.
-
-        Args:
-            name: The name of the thread.
-            func: The function to run in the thread.
-            interval: The interval to run the function.
-            daemon: Whether the thread should be a daemon.
-        """
-        self.threads[name] = thread.ThreadRunner(
-            target=func,
-            stop_event=self.stop_event,
-            interval=interval,
-            daemon=daemon,
-        )
-        self.threads[name].start()
 
     def initialize_boefje_schedulers(self) -> None:
         """Initialize the schedulers for the Boefje tasks. We will create
@@ -184,7 +165,8 @@ class App:
         """Monitor the organisations in the Katalogus service, and add/remove
         organisations from the schedulers.
         """
-        scheduler_orgs = {s.organisation.id for s in self.schedulers.values()}
+        current_schedulers = self.schedulers.copy()
+        scheduler_orgs = {s.organisation.id for s in current_schedulers.values()}
         katalogus_orgs = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
@@ -195,14 +177,18 @@ class App:
 
         # Get scheduler ids for removals
         removal_scheduler_ids = []
-        for s in self.schedulers.values():
+        for s in current_schedulers.values():
             if s.organisation.id in removals:
                 removal_scheduler_ids.append(s.scheduler_id)
 
         # Remove schedulers for organisation
         for scheduler_id in removal_scheduler_ids:
-            self.schedulers[scheduler_id].stop()
-            self.schedulers.pop(scheduler_id)
+            with self.lock:
+                if scheduler_id not in self.schedulers:
+                    continue
+
+                self.schedulers[scheduler_id].stop()
+                self.schedulers.pop(scheduler_id)
 
         if removals:
             self.logger.info(
@@ -233,46 +219,6 @@ class App:
                 additions,
             )
 
-    def run(self) -> None:
-        """Start the main scheduler application, and run in threads the
-        following processes:
-
-            * api server
-            * listeners
-            * schedulers
-            * monitors
-        """
-        # API Server
-        self.run_in_thread(name="server", func=self.server.run, daemon=False)
-
-        # Start the listeners
-        for name, listener in self.listeners.items():
-            self.run_in_thread(name=f"listener_{name}", func=listener.listen)
-
-        # Start the schedulers
-        for scheduler in self.schedulers.values():
-            scheduler.run()
-
-        # Start monitors
-        self.run_in_thread(
-            name="monitor_organisations",
-            func=self.monitor_organisations,
-            interval=self.ctx.config.monitor_organisations_interval,
-        )
-
-        # Start metrics collecting
-        self.run_in_thread(
-            name="metrics_collector",
-            func=self.collect_metrics,
-            interval=1,
-        )
-
-        # Main thread
-        while not self.stop_event.is_set():
-            time.sleep(0.01)
-
-        self.shutdown()
-
     def collect_metrics(self) -> None:
         """Collect application metrics
 
@@ -285,3 +231,54 @@ class App:
             ).set(
                 s.queue.qsize(),
             )
+
+    def run(self) -> None:
+        """Start the main scheduler application, and run in threads the
+        following processes:
+
+            * api server
+            * listeners
+            * schedulers
+            * monitors
+            * metrics collecting
+        """
+        # API Server
+        thread.ThreadRunner(
+            name="server",
+            target=self.server.run,
+            stop_event=self.stop_event,
+        ).start()
+
+        # Start the listeners
+        for name, listener in self.listeners.items():
+            thread.ThreadRunner(
+                name=f"listener_{name}",
+                target=listener.listen,
+                stop_event=self.stop_event,
+            ).start()
+
+        # Start the schedulers
+        for scheduler in self.schedulers.values():
+            scheduler.run()
+
+        # Start monitors
+        thread.ThreadRunner(
+            name="monitor_organisations",
+            target=self.monitor_organisations,
+            stop_event=self.stop_event,
+            interval=self.ctx.config.monitor_organisations_interval,
+        ).start()
+
+        # Start metrics collecting
+        thread.ThreadRunner(
+            name="metrics_collector",
+            target=self.collect_metrics,
+            stop_event=self.stop_event,
+            interval=1,
+        ).start()
+
+        # Main thread
+        while not self.stop_event.is_set():
+            time.sleep(0.01)
+
+        self.shutdown()

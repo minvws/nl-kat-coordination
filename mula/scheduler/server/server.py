@@ -328,7 +328,7 @@ class Server:
         return updated_task
 
     def get_queues(self) -> Any:
-        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.values()]
+        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
     def get_queue(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)

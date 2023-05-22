@@ -87,3 +87,6 @@ class AppTestCase(unittest.TestCase):
         response = self.client.get("/queues")
         self.assertEqual(0, len(response.json()))
         self.assertEqual([], response.json())
+
+    def test_app(self):
+        pass

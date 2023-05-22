@@ -42,7 +42,7 @@ class NormalizerScheduler(Scheduler):
     def run(self) -> None:
         self.run_in_thread(
             name="raw_file",
-            func=self.listen_for_raw_data,
+            target=self.listen_for_raw_data,
         )
 
     def listen_for_raw_data(self) -> None:

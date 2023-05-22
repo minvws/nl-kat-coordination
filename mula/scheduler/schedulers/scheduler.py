@@ -6,7 +6,7 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from scheduler import context, models, queues, rankers, utils
+from scheduler import connectors, context, models, queues, rankers, utils
 from scheduler.utils import thread
 
 
@@ -78,8 +78,10 @@ class Scheduler(abc.ABC):
         self.populate_queue_enabled: bool = populate_queue_enabled
         self.max_tries: int = -1
 
-        self.threads: Dict[str, thread.ThreadRunner] = {}
-        self.stop_event: threading.Event = self.ctx.stop_event
+        self.threads: List[thread.ThreadRunner] = []
+        self.stop_event: threading.Event = threading.Event()
+
+        self.listeners: List[connectors.listeners.Listener] = []
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -270,7 +272,7 @@ class Scheduler(abc.ABC):
     def run_in_thread(
         self,
         name: str,
-        func: Callable[[], Any],
+        target: Callable[[], Any],
         interval: float = 0.01,
         daemon: bool = False,
     ) -> None:
@@ -282,13 +284,28 @@ class Scheduler(abc.ABC):
             interval: The interval to run the function.
             daemon: Whether the thread should be a daemon.
         """
-        self.threads[name] = utils.ThreadRunner(
-            target=func,
+        t = utils.ThreadRunner(
+            name=name,
+            target=target,
             stop_event=self.stop_event,
             interval=interval,
             daemon=daemon,
         )
-        self.threads[name].start()
+        t.start()
+
+        self.threads.append(t)
+
+    def stop(self) -> None:
+        """Stop the scheduler."""
+        self.logger.info("Stopping scheduler: %s", self.scheduler_id)
+
+        for t in self.threads:
+            t.join(5)
+
+        for lst in self.listeners:
+            lst.stop()
+
+        self.logger.info("Stopped scheduler: %s", self.scheduler_id)
 
     def is_space_on_queue(self) -> bool:
         """Check if there is space on the queue.
@@ -302,13 +319,6 @@ class Scheduler(abc.ABC):
 
     def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
         return self.queue.is_item_on_queue_by_hash(item_hash)
-
-    def stop(self) -> None:
-        """Stop the scheduler."""
-        for t in self.threads.values():
-            t.join(5)
-
-        self.logger.info("Stopped scheduler: %s", self.scheduler_id)
 
     def dict(self) -> Dict[str, Any]:
         return {
