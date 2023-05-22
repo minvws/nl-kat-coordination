@@ -23,7 +23,7 @@ WORKDIR /app/rocky
 RUN --mount=type=cache,target=/var/cache/apt \
   apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends gettext \
+  && apt-get install -y --no-install-recommends gettext netcat \
   && rm -rf /var/lib/apt/lists/*
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev

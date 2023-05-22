@@ -17,15 +17,17 @@ List Objects With Filter
     Await Sync
     Verify Object List With Filter
 
-
 List Random Objects With Filter
     Insert Normalizer Output
     Declare Scan Profile    ${REF_HOSTNAME}    ${1}
     Await Sync
-    Length Of Random Object List With Filter Should Be   ${1}   ${5}
-    Length Of Random Object List With Filter Should Be   ${0}   ${1}
-    Length Of Random Object List With Filter Should Be   ${{ [1,0] }}   ${6}
-    Length Of Random Object List With Filter Should Be   ${{ [2,3] }}   ${0}
+    Recalculate Scan Profiles
+    Await Sync
+    Length Of Random Object List With Filter Should Be    ${1}    ${5}
+    Length Of Random Object List With Filter Should Be    ${0}    ${7}
+    Length Of Random Object List With Filter Should Be    ${{ [1,0] }}    ${10}
+    Length Of Random Object List With Filter Should Be    ${{ [2,3] }}    ${0}
+
 
 *** Keywords ***
 Setup Test
@@ -46,7 +48,7 @@ Get Objects With ScanLevel 0
     RETURN    ${response_data}
 
 Length Of Random Object List With Filter Should Be
-    [Arguments]    ${scan_levels}     ${expected_length}
-    ${params} =    Create Dictionary    scan_level=${scan_levels}    amount=10
+    [Arguments]    ${scan_levels}    ${expected_length}
+    ${params}    Create Dictionary    scan_level=${scan_levels}    amount=10
     ${response}    Get    ${OCTOPOES_URI}/objects/random    params=${params}
     Length Should Be    ${response.json()}    ${expected_length}
