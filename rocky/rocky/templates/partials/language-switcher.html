@@ -17,15 +17,15 @@
         {% csrf_token %}
         <ul role="listbox">
           {% for language in languages %}
-          {% get_language_info for language as lang %}
-          <li>
-            <a hreflang="{{ language }}" href="#" role="option" data-value="{{ language }}" lang="{{ language }}">
-              <button type="submit" name="language" value={{ language }}>
-                {{ lang.name_local }}
-              </button>
-            </a>
-          </li>
-            {% endfor %}
+            {% get_language_info for language as lang %}
+            <li {% if LANGUAGE_CODE == language %}aria-current="true" {% endif %}>
+              <a hreflang="{{ language }}" href="#" role="option" data-value="{{ language }}" lang="{{ language }}">
+                <button type="submit" name="language" value={{ language }}>
+                  {{ lang.name_local }}
+                </button>
+              </a>
+            </li>
+          {% endfor %}
         </ul>
       </form>
     </div>
