@@ -19,6 +19,10 @@ class ThreadRunner(threading.Thread):
         exception:
             A python Exception that can be set in order to signify that
             an exception has occurred during the execution of the thread.
+        _target:
+            A callable that is executed when the thread is started.
+        loop:
+            A boolean describing whether the thread should run in a loop.
     """
 
     def __init__(
@@ -28,23 +32,62 @@ class ThreadRunner(threading.Thread):
         stop_event: threading.Event,
         interval: float = 0.01,
         daemon: bool = False,
+        loop: bool = True,
     ) -> None:
+        """Initialize the ThreadRunner
+
+        Args:
+            name: A string describing the name of the thread.
+            target: A callable that is executed when the thread is started.
+            stop_event: A threading.Event object used for signalling thread
+            interval: A float describing the time between loop iterations.
+            daemon: A boolean describing whether the thread should be a daemon
+            loop: A boolean describing whether the thread should run in a loop.
+        """
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.stop_event: threading.Event = stop_event
         self.interval: float = interval
         self.exception: Optional[Exception] = None
         self._target: Callable[[], Any] = target
+        self.loop: bool = loop
 
         super().__init__(target=self._target, daemon=daemon)
 
         self.name = f"{self.name}-{name}" if name else self.name
 
-    def run(self) -> None:
+    # TODO: exception, needs to be unhandled, test this
+    def run_forever(self) -> None:
+        """Run the target function in a loop until the stop event is set."""
         while not self.stop_event.is_set():
-            self._target()
+            try:
+                self._target()
+            except Exception as e:
+                self.exception = e
+                self.logger.error("Exception occurred in thread: %s", self.name)
+                self.logger.exception(e)
+                self.stop_event.set()
+
             time.sleep(self.interval)
 
-        self.logger.warning("Thread stopped: %s", self.name)
+    # TODO: exception, needs to be unhandled, test this
+    def run_once(self) -> None:
+        """Run the target function once."""
+        try:
+            self._target()
+        except Exception as e:
+            self.exception = e
+            self.logger.error("Exception occurred in thread: %s", self.name)
+            self.logger.exception(e)
+            self.stop_event.set()
+
+    def run(self) -> None:
+        self.logger.debug("Starting thread: %s", self.name)
+        if self.loop:
+            self.run_forever()
+        else:
+            self.run_once()
+
+        self.logger.debug("Thread stopped: %s", self.name)
 
     def join(self, timeout: Optional[float] = None) -> None:
         self.logger.warning("Stopping thread: %s", self.name)

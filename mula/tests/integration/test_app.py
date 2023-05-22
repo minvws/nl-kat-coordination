@@ -31,6 +31,9 @@ class AppTestCase(unittest.TestCase):
 
         self.client = TestClient(self.app.server.api)
 
+    def tearDowns(self):
+        self.app.stop_event.set()
+
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_organisations")
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_organisation")
     def test_monitor_orgs_add(self, mock_get_organisation, mock_get_organisations):
@@ -87,6 +90,3 @@ class AppTestCase(unittest.TestCase):
         response = self.client.get("/queues")
         self.assertEqual(0, len(response.json()))
         self.assertEqual([], response.json())
-
-    def test_app(self):
-        pass

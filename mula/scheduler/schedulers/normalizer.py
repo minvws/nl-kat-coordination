@@ -43,6 +43,7 @@ class NormalizerScheduler(Scheduler):
         self.run_in_thread(
             name="raw_file",
             target=self.listen_for_raw_data,
+            loop=False,
         )
 
     def listen_for_raw_data(self) -> None:
@@ -54,6 +55,7 @@ class NormalizerScheduler(Scheduler):
             queue=f"{self.organisation.id}__raw_file_received",
             func=self.push_tasks_for_received_raw_data,
         )
+        self.listeners.append(listener)
         listener.listen()
 
     def push_tasks_for_received_raw_data(self, latest_raw_data: RawData) -> None:

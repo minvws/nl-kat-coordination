@@ -12,6 +12,7 @@ from scheduler.models import BoefjeTask, NormalizerTask, Organisation
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
+logger = logging.getLogger(__name__)
 
 
 class App:
@@ -44,7 +45,7 @@ class App:
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.stop_event: threading.Event = threading.Event()
-        self.lock = threading.Lock()
+        self.lock: threading.Lock = threading.Lock()
 
         # Initialize schedulers
         self.schedulers: Dict[str, schedulers.Scheduler] = {}
@@ -57,29 +58,6 @@ class App:
 
         # Initialize API server
         self.server: server.Server = server.Server(self.ctx, self.schedulers)
-
-    def shutdown(self) -> None:
-        """Gracefully shutdown the scheduler, and all threads."""
-        self.logger.info("Shutting down...")
-
-        for t in threading.enumerate():
-            if t is threading.current_thread():
-                continue
-
-            if t is threading.main_thread():
-                continue
-
-            if not t.is_alive():
-                continue
-
-            t.join(5)
-
-        self.logger.info("Shutdown complete")
-
-        # We're calling this here, because we want to issue a shutdown from
-        # within a thread, otherwise it will not exit a docker container.
-        # Source: https://stackoverflow.com/a/1489838/1346257
-        os._exit(1)
 
     def initialize_boefje_schedulers(self) -> None:
         """Initialize the schedulers for the Boefje tasks. We will create
@@ -159,7 +137,7 @@ class App:
 
     @tracer.start_as_current_span("monitor_organisations")
     def monitor_organisations(self) -> None:
-        """Monitor the organisations in the Katalogus service, and add/remove
+        """Monitor the organisations from the Katalogus service, and add/remove
         organisations from the schedulers.
         """
         current_schedulers = self.schedulers.copy()
@@ -278,4 +256,30 @@ class App:
         while not self.stop_event.is_set():
             time.sleep(0.01)
 
-        self.shutdown()
+
+def shutdown(args) -> None:
+    """Gracefully shutdown the scheduler application, and all threads."""
+    logger.info("Shutting down...")
+
+    for t in threading.enumerate():
+        if t is threading.current_thread():
+            continue
+
+        if t is threading.main_thread():
+            continue
+
+        if not t.is_alive():
+            continue
+
+        t.join(5)
+
+    logger.info("Shutdown complete")
+
+    # We're calling this here, because we want to issue a shutdown from
+    # within a thread, otherwise it will not exit a docker container.
+    # Source: https://stackoverflow.com/a/1489838/1346257
+    os._exit(1)
+
+
+# When a unhanded exception occurs, we want to shutdown the application
+threading.excepthook = shutdown

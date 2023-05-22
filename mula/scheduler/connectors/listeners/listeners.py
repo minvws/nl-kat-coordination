@@ -70,6 +70,7 @@ class RabbitMQ(Listener):
         self.channel.basic_consume(queue, on_message_callback=self.callback)
         self.channel.start_consuming()
 
+
     def get(self, queue: str) -> Optional[Dict[str, object]]:
         method, properties, body = self.channel.basic_get(queue)
 
@@ -111,10 +112,13 @@ class RabbitMQ(Listener):
         return self.is_host_available(parsed_url.hostname, parsed_url.port)
 
     def stop(self) -> None:
-        """Stop the RabbitMQ connection"""
         self.logger.info("Stopping RabbitMQ connection")
 
-        self.channel.stop_consuming()
-        self.connection.close()
+        self.connection.add_callback_threadsafe(self._close_callback)
 
         self.logger.info("RabbitMQ connection closed")
+
+    def _close_callback(self):
+        self.channel.stop_consuming()
+        self.channel.close()
+        self.connection.close()

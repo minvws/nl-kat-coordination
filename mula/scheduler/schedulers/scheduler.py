@@ -275,6 +275,7 @@ class Scheduler(abc.ABC):
         target: Callable[[], Any],
         interval: float = 0.01,
         daemon: bool = False,
+        loop: bool = True,
     ) -> None:
         """Make a function run in a thread, and add it to the dict of threads.
 
@@ -290,6 +291,7 @@ class Scheduler(abc.ABC):
             stop_event=self.stop_event,
             interval=interval,
             daemon=daemon,
+            loop=loop,
         )
         t.start()
 
@@ -299,11 +301,14 @@ class Scheduler(abc.ABC):
         """Stop the scheduler."""
         self.logger.info("Stopping scheduler: %s", self.scheduler_id)
 
-        for t in self.threads:
-            t.join(5)
-
+        # First stop the listeners, when those are running in a thread and
+        # they're using rabbitmq, they will block. Setting the stop event
+        # will not stop the thread. We need to explicitly stop the listener.
         for lst in self.listeners:
             lst.stop()
+
+        for t in self.threads:
+            t.join(5)
 
         self.logger.info("Stopped scheduler: %s", self.scheduler_id)
 
