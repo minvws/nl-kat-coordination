@@ -1,0 +1,9 @@
+{
+    "id": "cve_cve_finding_types_normalize",
+    "consumes": [
+        "cve-finding-types"
+    ],
+    "produces": [
+        "CVEFindingType"
+    ]
+}

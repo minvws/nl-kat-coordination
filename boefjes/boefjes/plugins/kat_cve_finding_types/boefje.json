@@ -1,0 +1,13 @@
+{
+    "id": "cve-finding-types",
+    "name": "CVE Finding Types",
+    "description": "Hydrate information of CVE finding types from the CVE API",
+    "consumes": [
+        "CVEFindingType"
+    ],
+    "produces": [
+        "CVEFindingType"
+    ],
+    "environment_keys": [],
+    "scan_level": 0
+}
