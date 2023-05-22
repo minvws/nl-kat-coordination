@@ -1,5 +1,4 @@
 import logging
-import uuid
 from functools import cached_property
 from typing import Iterable, Set
 
@@ -309,12 +308,3 @@ class OOIInformation(models.Model):
 
     def __str__(self):
         return self.id
-
-
-class Job(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-    boefje_id = models.CharField(max_length=128)
-    input_ooi = models.TextField(null=True)
-    arguments = models.JSONField()
-    created = models.DateTimeField(auto_now_add=True)
