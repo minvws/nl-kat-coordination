@@ -38,7 +38,7 @@ addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-requests = "^2.30.0"
+requests = "^2.31.0"
 pydantic = "1.10.7"
 fastapi = "^0.88.0"
 fastapi-utils = "^0.2.1"

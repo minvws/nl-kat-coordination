@@ -42,8 +42,5 @@ class Settings(BaseSettings):
 
     remote_ns: str = "8.8.8.8"
 
-    lxd_endpoint: str = ""
-    lxd_password: Optional[str] = None
-
 
 settings = Settings()
