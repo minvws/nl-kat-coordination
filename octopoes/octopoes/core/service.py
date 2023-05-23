@@ -500,5 +500,8 @@ class OctopoesService:
         valid_time = datetime.now(timezone.utc)
         origins = self.origin_repository.list(origin_type=OriginType.INFERENCE, valid_time=valid_time)
         for origin in origins:
-            self._run_inference(origin, valid_time)
+            try:
+                self._run_inference(origin, valid_time)
+            except ObjectNotFoundException:
+                continue
         return len(origins)
