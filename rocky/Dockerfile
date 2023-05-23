@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+ARG PYTHON_VERSION=3.11
 FROM node:18-bullseye AS node_builder
 
 WORKDIR /app
@@ -8,7 +9,6 @@ COPY rocky/assets assets
 
 RUN yarn --ignore-engines && yarn build
 
-ARG PYTHON_VERSION=3.11
 FROM python:$PYTHON_VERSION AS dev
 
 ARG USER_UID=1000
