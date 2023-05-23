@@ -1,4 +1,5 @@
-FROM python:3.8 as boefjes-requirements
+ARG PYTHON_VERSION=3.11
+FROM python:$PYTHON_VERSION AS boefjes-requirements
 
 COPY boefjes/boefjes ./boefjes
 COPY boefjes/requirements.txt ./boefjes
@@ -6,7 +7,7 @@ COPY boefjes/requirements.txt ./boefjes
 # The echo since cat does not add a newline
 RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
 
-FROM python:3.8 AS dev
+FROM python:$PYTHON_VERSION AS dev
 
 ARG USER_UID=1000
 ARG USER_GID=1000
