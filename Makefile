@@ -94,7 +94,7 @@ ubuntu-build-image:
 
 PIP_COMPILE_PARAMS := -q --no-header --generate-hashes --resolver=backtracking pyproject.toml
 dependencies:
-	pip-compile --extra dev -o requirements.txt --allow-unsafe $(PIP_COMPILE_PARAMS)
+	pip-compile --extra dev -o requirements.txt $(PIP_COMPILE_PARAMS)
 	for path in keiko octopoes
 		do
 			echo $$path
