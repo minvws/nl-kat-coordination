@@ -1,5 +1,5 @@
 from katalogus.client import KATalogusClientV1, parse_plugin
-from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsListView, KATalogusView
+from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsView, KATalogusView
 from pytest_django.asserts import assertContains, assertNotContains
 
 from rocky.health import ServiceHealth
@@ -22,8 +22,10 @@ def test_katalogus_plugin_listing(admin_member, redteam_member, client_member, r
     response_client = KATalogusView.as_view()(request_client, organization_code=client_member.organization.code)
 
     assertContains(response_client, "KAT-alogus")
-    assertContains(response_admin, "Redteam can enable boefje")
-    assertContains(response_client, "Redteam can enable boefje")
+
+    assertNotContains(response_redteam, "You don't have permission to enable boefje")
+    assertContains(response_admin, "You don't have permission to enable boefje")
+    assertContains(response_client, "You don't have permission to enable boefje")
 
     assertContains(response_redteam, "KAT-alogus Settings")
     assertNotContains(response_client, "KAT-alogus Settings")
@@ -35,15 +37,15 @@ def test_katalogus_plugin_listing(admin_member, redteam_member, client_member, r
     assertNotContains(response_client, "test_binary_edge_normalizer")
 
 
-def test_katalogus_settings_list_one_organization(redteam_member, rf, mocker):
+def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
     # Mock katalogus calls: return right boefjes and settings
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
     boefjes_data = get_boefjes_data()
     mock_katalogus().get_boefjes.return_value = [parse_plugin(b) for b in boefjes_data if b["type"] == "boefje"]
-    mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test"}
+    mock_katalogus().get_plugin_settings.return_value = {"BINARYEDGE_API": "test", "Second": "value"}
 
     request = setup_request(rf.get("katalogus_settings"), redteam_member.user)
-    response = KATalogusSettingsListView.as_view()(request, organization_code=redteam_member.organization.code)
+    response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)
     assert response.status_code == 200
 
     assertContains(response, "KAT-alogus Settings")
@@ -66,7 +68,7 @@ def test_katalogus_settings_list_multiple_organization(redteam_member, organizat
     create_member(redteam_member.user, organization_b)
 
     request = setup_request(rf.get("katalogus_settings"), redteam_member.user)
-    response = KATalogusSettingsListView.as_view()(request, organization_code=redteam_member.organization.code)
+    response = KATalogusSettingsView.as_view()(request, organization_code=redteam_member.organization.code)
     assert response.status_code == 200
 
     assertContains(response, "KAT-alogus Settings")

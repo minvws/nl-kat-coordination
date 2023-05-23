@@ -29,7 +29,9 @@
                     <p>
                         <strong>{% translate "Description" %}</strong>
                     </p>
-                    <p>{{ plugin.description }}</p>
+                    <p>
+                        {{ plugin.description }}
+                    </p>
                 </div>
             </div>
         </section>
@@ -77,8 +79,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
-    <script src="{% static "/js/autoSubmit.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

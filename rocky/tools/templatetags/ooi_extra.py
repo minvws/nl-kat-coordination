@@ -6,7 +6,6 @@ from django import template
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType
-from tools.models import GROUP_ADMIN, GROUP_REDTEAM
 from tools.view_helpers import get_ooi_url
 
 register = template.Library()
@@ -58,24 +57,6 @@ def get_type_name(instance):
 
 
 @register.simple_tag(takes_context=True)
-def user_belongs_to(context, group: str):
-    user = context["request"].user
-    return user.groups.filter(name=group).exists()
-
-
-@register.simple_tag(takes_context=True)
-def is_user_redteam(context, group: str):
-    user = context["request"].user
-    return user.groups.filter(name=GROUP_REDTEAM).exists()
-
-
-@register.simple_tag(takes_context=True)
-def is_user_admin(context, group: str):
-    user = context["request"].user
-    return user.groups.filter(name=GROUP_ADMIN).exists()
-
-
-@register.simple_tag(takes_context=True)
 def url_replace(context, field, value):
     dict_ = context["request"].GET.copy()
     dict_[field] = value
@@ -85,11 +66,6 @@ def url_replace(context, field, value):
 @register.filter
 def index(indexable, i):
     return indexable[i]
-
-
-@register.filter
-def has_group(user, group: str):
-    return user.groups.filter(name=group).exists()
 
 
 @register.filter

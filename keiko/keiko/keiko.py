@@ -5,11 +5,11 @@ import os
 import shutil
 import subprocess
 import tempfile
-from logging import getLogger
+from logging import DEBUG, ERROR, getLogger
 from pathlib import Path
-from typing import Dict, Set, Tuple
+from typing import Any, Dict, Set, Tuple
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader
 from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
 
@@ -22,10 +22,43 @@ tracer = trace.get_tracer(__name__)
 
 DATA_SHAPE_CLASS_NAME = "DataShape"
 
+LATEX_SPECIAL_CHARS = str.maketrans(
+    {
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\^{}",
+        "\\": r"\textbackslash{}",
+        "\n": "\\newline%\n",
+        "-": r"{-}",
+        "\xA0": "~",  # Non-breaking space
+        "[": r"{[}",
+        "]": r"{]}",
+    }
+)
 
-def baretext(input_: str) -> str:
+
+def latex_escape(text: Any) -> str:
+    """Escape characters that are special in LaTeX.
+
+    References:
+    - https://github.com/JelteF/PyLaTeX/blob/ecc1e6e339a5a7be958c328403517cd547873d7e/pylatex/utils.py#L68-L100
+    - http://tex.stackexchange.com/a/34586/43228
+    - http://stackoverflow.com/a/16264094/2570866
+    """
+    if not isinstance(text, str):
+        text = str(text)
+    return text.translate(LATEX_SPECIAL_CHARS)
+
+
+def baretext(text: str) -> str:
     """Remove non-alphanumeric characters from a string."""
-    return "".join(filter(str.isalnum, input_)).lower()
+    return "".join(filter(str.isalnum, text)).lower()
 
 
 @tracer.start_as_current_span("generate_report")
@@ -58,10 +91,10 @@ def generate_report(
     # init jinja2 template
     env = Environment(
         loader=FileSystemLoader(settings.templates_folder),
-        autoescape=select_autoescape(),
         variable_start_string="@@{",
         variable_end_string="}@@",
     )
+    env.filters["latex_escape"] = latex_escape
     template = env.get_template(f"{template_name}/template.tex")
 
     if not template.filename:
@@ -135,32 +168,41 @@ def generate_report(
 
         # run pdflatex
         cmd = [
-            "pdflatex",
+            "latexmk",
+            "-xelatex",
             "-synctex=1",
             "-interaction=nonstopmode",
             preprocessed_tex_path.as_posix(),
         ]
         env = {**os.environ, "TEXMFVAR": directory}
-        for i in (1, 2):
-            output = subprocess.run(cmd, cwd=directory, env=env, capture_output=True, check=False)
-            current_span.add_event(f"Completed pdflatex run {i}")
+
+        def log_output(level, output):
+            if not logger.isEnabledFor(level):
+                return
+            # prefix all lines in output
+            for line in output.decode("utf-8").splitlines():
+                logger.log(level, "latexmk [report_id=%s] output: %s", report_id, line)
+
+        try:
+            # capture all output to stdout, so that lines from stdout+stderr are in correct relative order
+            output = subprocess.run(
+                cmd, cwd=directory, env=env, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            )
+            current_span.add_event("Completed latexmk")
             logger.info(
-                "pdflatex [run=%d] [report_id=%s] [template=%s] [command=%s]",
-                i,
+                "latexmk [report_id=%s] [template=%s] [command=%s]",
                 report_id,
                 template_name,
                 " ".join(cmd),
             )
-            if output.returncode:
-                logger.error("stdout: %s", output.stdout.decode("utf-8"))
-                logger.error("stderr: %s", output.stderr.decode("utf-8"))
-                ex = Exception("Error in pdflatex run %d", i)
-                current_span.set_status(Status(StatusCode.ERROR))
-                current_span.record_exception(ex)
-                raise ex
-            else:
-                logger.debug(output.stdout.decode("utf-8"))
-                logger.debug(output.stderr.decode("utf-8"))
+            log_output(DEBUG, output.stdout)
+        except subprocess.CalledProcessError as ex:
+            log_output(ERROR, ex.stdout)
+            err = Exception("Error in latexmk")
+            err.__cause__ = ex
+            current_span.set_status(Status(StatusCode.ERROR))
+            current_span.record_exception(err)
+            raise err
 
         # copy result back to output folder
         shutil.copyfile(
@@ -189,6 +231,6 @@ def read_glossary(glossary: str, settings: Settings) -> Dict[str, Tuple[str, str
         for row in csvreader:
             # only allow words with baretext representation
             bare_word = baretext(row[0])
-            if bare_word != "":
+            if bare_word:
                 glossary_entries[baretext(row[0])] = row[0], row[1]
     return glossary_entries

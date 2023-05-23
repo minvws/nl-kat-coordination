@@ -4,7 +4,7 @@ services:
 
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3.9-management"
+    image: "rabbitmq:3.11-management"
     ports:
       - "127.0.0.1:28003:15672"
       - "127.0.0.1:28004:5672"

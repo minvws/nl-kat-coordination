@@ -21,7 +21,7 @@ export file
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
 
 ##
 ##+------------------------------------------------------------------------+
@@ -83,7 +83,7 @@ ifeq ($(m),)
 else ifeq ($(revid),)
 	$(HIDE) (echo "ERROR: Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	$(ci-docker-compose) run scheduler \
+	docker-compose run scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		revision --autogenerate \
 		-m "$(m)" --rev-id "$(revid)"
@@ -101,17 +101,17 @@ migrate: ## Run migrations using alembic.
 
 utest: ## Run the unit tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm mula python -m pytest tests/unit/${file} $(if $(function),-k $(function))
+	$(ci-docker-compose) run --rm mula python -m pytest -v tests/unit/${file} $(if $(function),-k $(function))
 else
-	$(ci-docker-compose) run --rm mula python -m pytest tests/unit
+	$(ci-docker-compose) run --rm mula python -m pytest -v tests/unit
 endif
 	$(ci-docker-compose) down --remove-orphans
 
 itest: ## Run the integration tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm mula python -m pytest tests/integration/${file} $(if $(function),-k $(function))
+	$(ci-docker-compose) run --rm mula python -m pytest -v tests/integration/${file} $(if $(function),-k $(function))
 else
-	$(ci-docker-compose) run --rm mula python -m pytest tests/integration
+	$(ci-docker-compose) run --rm mula python -m pytest -v tests/integration
 endif
 	$(ci-docker-compose) down --remove-orphans
 

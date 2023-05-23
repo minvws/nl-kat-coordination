@@ -1,6 +1,7 @@
 import abc
 import logging
 import threading
+import time
 import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
@@ -63,6 +64,9 @@ class Scheduler(abc.ABC):
                 A rankers.Ranker instance.
             populate_queue:
                 A boolean whether to populate the queue.
+            max_tries:
+                The maximum number of retries for a task to be pushed to
+                the queue.
         """
 
         self.logger: logging.Logger = logging.getLogger(__name__)
@@ -70,13 +74,15 @@ class Scheduler(abc.ABC):
         self.scheduler_id = scheduler_id
         self.queue: queues.PriorityQueue = queue
         self.ranker: rankers.Ranker = ranker
-        self.populate_queue_enabled = populate_queue_enabled
+
+        self.populate_queue_enabled: bool = populate_queue_enabled
+        self.max_tries: int = -1
 
         self.threads: Dict[str, thread.ThreadRunner] = {}
         self.stop_event: threading.Event = self.ctx.stop_event
 
     @abc.abstractmethod
-    def populate_queue(self) -> None:
+    def run(self) -> None:
         raise NotImplementedError
 
     def post_push(self, p_item: models.PrioritizedItem) -> None:
@@ -229,6 +235,38 @@ class Scheduler(abc.ABC):
 
             count += 1
 
+    def push_item_to_queue_with_timeout(
+        self,
+        p_item: models.PrioritizedItem,
+        max_tries: int = 5,
+        timeout: int = 1,
+    ) -> None:
+        """Push an item to the queue, with a timeout.
+
+        Args:
+            p_item: The item to push to the queue.
+            timeout: The timeout in seconds.
+            max_tries: The maximum number of tries. Set to -1 for infinite tries.
+
+        Raises:
+            QueueFullError: When the queue is full.
+        """
+        tries = 0
+        while not self.is_space_on_queue() and (tries < max_tries or max_tries == -1):
+            self.logger.debug(
+                "Queue %s is full, waiting for space [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.pq_id,
+                self.queue.qsize(),
+            )
+            time.sleep(timeout)
+            tries += 1
+
+        if tries >= max_tries and max_tries != -1:
+            raise queues.errors.QueueFullError()
+
+        self.push_item_to_queue(p_item)
+
     def run_in_thread(
         self,
         name: str,
@@ -252,6 +290,19 @@ class Scheduler(abc.ABC):
         )
         self.threads[name].start()
 
+    def is_space_on_queue(self) -> bool:
+        """Check if there is space on the queue.
+
+        NOTE: maxsize 0 means unlimited
+        """
+        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
+            return False
+
+        return True
+
+    def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
+        return self.queue.is_item_on_queue_by_hash(item_hash)
+
     def stop(self) -> None:
         """Stop the scheduler."""
         for t in self.threads.values():
@@ -259,21 +310,13 @@ class Scheduler(abc.ABC):
 
         self.logger.info("Stopped scheduler: %s", self.scheduler_id)
 
-    def run(self) -> None:
-        # Populator
-        if self.populate_queue_enabled:
-            self.run_in_thread(
-                name="populator",
-                func=self.populate_queue,
-                interval=self.ctx.config.pq_populate_interval,
-            )
-
     def dict(self) -> Dict[str, Any]:
         return {
             "id": self.scheduler_id,
             "populate_queue_enabled": self.populate_queue_enabled,
             "priority_queue": {
                 "id": self.queue.pq_id,
+                "item_type": self.queue.item_type.type,
                 "maxsize": self.queue.maxsize,
                 "qsize": self.queue.qsize(),
                 "allow_replace": self.queue.allow_replace,
