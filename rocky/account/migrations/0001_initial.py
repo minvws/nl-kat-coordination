@@ -78,7 +78,7 @@ class SwitchToCustomUserModel(Operation):
     create_user_model_operation = migrations.CreateModel(
         name="User",
         fields=[
-            ("id", models.AutoField(primary_key=True, verbose_name="ID")),
+            ("id", models.AutoField(primary_key=True, serialize=False, verbose_name="ID")),
             ("password", models.CharField(max_length=128, verbose_name="password")),
             (
                 "last_login",

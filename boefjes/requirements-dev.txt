@@ -4,13 +4,13 @@ dnspython==2.1.0
 jsonschema==4.17.0
 pydantic==1.10.7
 docker==6.1.2
-requests==2.30.0
+requests==2.31.0
 fastapi==0.86.0
 uvicorn==0.19.0
 psycopg2==2.9.6
-pylxd==2.3.1
 pynacl==1.5.0
 sqlalchemy==1.4.48
+typing-extensions==4.5.0
 
 # Dev dependencies
 pre-commit==3.2.2
