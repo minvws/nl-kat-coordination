@@ -16,7 +16,7 @@ class RiskLevelSeverity(Enum):
     RECOMMENDATION = "recommendation"
 
 
-class FindingType(OOI, abc.ABC):
+class FindingType(OOI):
     id: str
 
     description: Optional[str]
