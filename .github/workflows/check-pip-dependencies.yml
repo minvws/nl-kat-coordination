@@ -1,0 +1,33 @@
+name: Check pip dependencies
+
+on:
+  push:
+    paths:
+      - requirements**.txt
+      - pyproject.toml
+  pull_request:
+    paths:
+      - requirements**.txt
+      - pyproject.toml
+
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: pip
+
+      - name: Install pip-tools
+        run: pip install pip-tools
+
+      - name: Check, resolve, and export all requirements.txt's
+        run: make dependencies
+
+      - name: Check if there are any changed files
+        run: git diff --exit-code
