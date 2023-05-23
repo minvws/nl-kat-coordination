@@ -2,10 +2,8 @@ from enum import Enum
 
 from django.contrib import messages
 from django.views.generic.detail import DetailView
-from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
 from tools.models import OrganizationMember
-from two_factor.views.utils import class_view_decorator
 
 from account.mixins import OrganizationView
 
@@ -15,7 +13,6 @@ class PageActions(Enum):
     WITHDRAW_ACCEPTANCE = "withdraw_acceptance"
 
 
-@class_view_decorator(otp_required)
 class AccountView(OrganizationView, DetailView):
     template_name = "account_detail.html"
     context_object_name = "member"
