@@ -16,7 +16,7 @@ psycopg2==2.9.6
 pydantic==1.10.7
 python-dotenv==1.0.0
 qrcode==7.3.1
-requests==2.30.0
+requests==2.31.0
 six==1.16.0
 soupsieve==2.3.2.post1
 sqlparse==0.4.4
