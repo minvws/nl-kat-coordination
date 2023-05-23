@@ -67,7 +67,7 @@ class LoginRockyView(LoginView):
 
     def get_success_url(self):
         url = self.get_redirect_url()
-        if default_device(self.request.user) is None:
+        if settings.TWOFACTOR_ENABLED and default_device(self.request.user) is None:
             url = resolve_url("setup")
         return url or resolve_url(settings.LOGIN_REDIRECT_URL)
 

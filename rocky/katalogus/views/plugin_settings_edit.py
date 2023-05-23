@@ -3,15 +3,12 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-from django_otp.decorators import otp_required
 from requests import RequestException
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.forms import PluginSettingAddEditForm
 from katalogus.views.mixins import SingleSettingView
 
 
-@class_view_decorator(otp_required)
 class PluginSettingsUpdateView(OrganizationPermissionRequiredMixin, SingleSettingView, FormView):
     """View to update/edit a plugin setting for all plugins in KAT-alogus"""
 
