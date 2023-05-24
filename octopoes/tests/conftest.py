@@ -13,7 +13,7 @@ from octopoes.core.app import get_xtdb_client
 from octopoes.models import OOI, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
-from octopoes.repositories.ooi_repository import OOIRepository
+from octopoes.repositories.ooi_repository import OOIRepository, XTDBOOIRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
@@ -177,3 +177,8 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
     yield XTDBSession(xtdb_http_client)
 
     xtdb_http_client.delete_node()
+
+
+@pytest.fixture
+def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOOIRepository(Mock(), xtdb_session, XTDBType.XTDB_MULTINODE)

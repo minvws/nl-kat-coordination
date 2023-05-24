@@ -1,6 +1,6 @@
 alembic==1.8.1
 celery==5.2.7
-fastapi==0.86.0
+fastapi==0.93.0
 mmh3==3.0.0
 pika==1.2.0
 prometheus-client==0.16.0

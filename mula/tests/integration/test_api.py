@@ -299,7 +299,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
-        response = self.client.get(f"/queues/{self.scheduler.scheduler_id}/pop")
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/pop")
         self.assertEqual(200, response.status_code)
         self.assertEqual(initial_item_id, response.json().get("id"))
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -318,7 +318,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(2, self.scheduler.queue.qsize())
 
         # Should get the first item
-        response = self.client.get(
+        response = self.client.post(
             f"/queues/{self.scheduler.scheduler_id}/pop", json=[{"field": "name", "operator": "eq", "value": "test"}]
         )
         self.assertEqual(200, response.status_code)
@@ -326,7 +326,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Should not return any items
-        response = self.client.get(
+        response = self.client.post(
             f"/queues/{self.scheduler.scheduler_id}/pop", json=[{"field": "id", "operator": "eq", "value": "123"}]
         )
         self.assertEqual(404, response.status_code)
@@ -334,7 +334,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Should get the second item
-        response = self.client.get(
+        response = self.client.post(
             f"/queues/{self.scheduler.scheduler_id}/pop", json=[{"field": "name", "operator": "eq", "value": "test"}]
         )
         self.assertEqual(200, response.status_code)
@@ -343,7 +343,7 @@ class APITestCase(APITemplateTestCase):
 
     def test_pop_empty(self):
         """When queue is empty it should return an empty response"""
-        response = self.client.get(f"/queues/{self.scheduler.scheduler_id}/pop")
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/pop")
         self.assertEqual(200, response.status_code)
 
 

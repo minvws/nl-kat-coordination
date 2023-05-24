@@ -18,7 +18,6 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
-from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
 from tools.models import GROUP_REDTEAM, Organization, OrganizationMember
@@ -29,7 +28,6 @@ from tools.ooi_helpers import (
     get_or_create_ooi,
 )
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_ooi_url
-from two_factor.views.utils import class_view_decorator
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -87,7 +85,8 @@ class RedteamRequiredMixin(UserPassesTestMixin):
 
 
 # REDTEAMER FLOW
-@class_view_decorator(otp_required)
+
+
 class OnboardingIntroductionView(
     RedteamRequiredMixin,
     KatIntroductionStepsMixin,
@@ -97,7 +96,6 @@ class OnboardingIntroductionView(
     current_step = 1
 
 
-@class_view_decorator(otp_required)
 class OnboardingChooseReportInfoView(
     RedteamRequiredMixin,
     KatIntroductionStepsMixin,
@@ -107,7 +105,6 @@ class OnboardingChooseReportInfoView(
     current_step = 2
 
 
-@class_view_decorator(otp_required)
 class OnboardingChooseReportTypeView(
     RedteamRequiredMixin,
     KatIntroductionStepsMixin,
@@ -117,7 +114,6 @@ class OnboardingChooseReportTypeView(
     current_step = 2
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetupScanSelectPluginsView(
     RedteamRequiredMixin,
     KatIntroductionStepsMixin,
@@ -164,7 +160,6 @@ class OnboardingSetupScanSelectPluginsView(
         return context
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetupScanOOIInfoView(
     RedteamRequiredMixin,
     KatIntroductionStepsMixin,
@@ -189,7 +184,6 @@ class OnboardingOOIForm(OOIForm):
         return self.generate_form_fields(self.hidden_ooi_fields)
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetupScanOOIAddView(
     RedteamRequiredMixin,
     KatIntroductionStepsMixin,
@@ -256,7 +250,6 @@ class OnboardingSetupScanOOIAddView(
         return context
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetupScanOOIDetailView(
     RedteamRequiredMixin,
     SingleOOITreeMixin,
@@ -299,7 +292,6 @@ class OnboardingSetupScanOOIDetailView(
         return context
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetClearanceLevelView(
     RedteamRequiredMixin,
     KatIntroductionStepsMixin,
@@ -350,7 +342,6 @@ class OnboardingSetClearanceLevelView(
         return tiles
 
 
-@class_view_decorator(otp_required)
 class OnboardingReportView(
     RedteamRequiredMixin,
     KatIntroductionStepsMixin,
@@ -394,7 +385,6 @@ class BaseReportView(RedteamRequiredMixin, BaseOOIDetailView):
         return context
 
 
-@class_view_decorator(otp_required)
 class DnsReportView(OnboardingBreadcrumbsMixin, BaseReportView):
     template_name = "dns_report.html"
     report = DNSReport
@@ -431,7 +421,8 @@ class AdminRequiredMixin(UserPassesTestMixin):
 
 
 # account flow
-@class_view_decorator(otp_required)
+
+
 class OnboardingIntroductionRegistrationView(AdminRequiredMixin, KatIntroductionRegistrationStepsMixin, TemplateView):
     """
     Step: 1 - Registration introduction
@@ -441,7 +432,6 @@ class OnboardingIntroductionRegistrationView(AdminRequiredMixin, KatIntroduction
     current_step = 1
 
 
-@class_view_decorator(otp_required)
 class OnboardingOrganizationSetupView(
     PermissionRequiredMixin,
     KatIntroductionRegistrationStepsMixin,
@@ -500,7 +490,6 @@ class OnboardingOrganizationSetupView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class OnboardingOrganizationUpdateView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionAdminStepsMixin,
@@ -532,7 +521,6 @@ class OnboardingOrganizationUpdateView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class OnboardingIndemnificationSetupView(
     KatIntroductionAdminStepsMixin,
     IndemnificationAddView,
@@ -548,7 +536,6 @@ class OnboardingIndemnificationSetupView(
         return reverse_lazy("step_account_setup_intro", kwargs={"organization_code": self.organization.code})
 
 
-@class_view_decorator(otp_required)
 class OnboardingAccountSetupIntroView(AdminRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
     """
     Step 4: Split flow to or continue with single account or continue to multiple account creation
@@ -558,7 +545,6 @@ class OnboardingAccountSetupIntroView(AdminRequiredMixin, KatIntroductionAdminSt
     current_step = 4
 
 
-@class_view_decorator(otp_required)
 class OnboardingAccountCreationMixin(AdminRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -567,7 +553,8 @@ class OnboardingAccountCreationMixin(AdminRequiredMixin, KatIntroductionAdminSte
 
 
 # Account setup for multiple user accounts: redteam, admins, clients
-@class_view_decorator(otp_required)
+
+
 class OnboardingChooseUserTypeView(KatIntroductionAdminStepsMixin, TemplateView):
     """
     Step 1: Introduction about how to create multiple user accounts
@@ -577,7 +564,6 @@ class OnboardingChooseUserTypeView(KatIntroductionAdminStepsMixin, TemplateView)
     template_name = "account/step_3_account_user_type.html"
 
 
-@class_view_decorator(otp_required)
 class OnboardingAccountSetupAdminView(
     RegistrationBreadcrumbsMixin,
     OnboardingAccountCreationMixin,
@@ -604,7 +590,6 @@ class OnboardingAccountSetupAdminView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class OnboardingAccountSetupRedTeamerView(
     RegistrationBreadcrumbsMixin,
     OnboardingAccountCreationMixin,
@@ -632,7 +617,6 @@ class OnboardingAccountSetupRedTeamerView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingAccountCreationMixin):
     """
     Step 3: Create a client account.
@@ -656,7 +640,6 @@ class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingA
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class CompleteOnboarding(OrganizationView):
     """
     Complete onboarding for redteamers and superusers.
