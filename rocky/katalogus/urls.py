@@ -12,13 +12,8 @@ urlpatterns = [
     path("view/<view>/", views.KATalogusView.as_view(), name="katalogus"),
     path(
         "settings/",
-        views.KATalogusSettingsListView.as_view(),
+        views.KATalogusSettingsView.as_view(),
         name="katalogus_settings",
-    ),
-    path(
-        "settings/migrate/",
-        views.KATalogusSettingsListView.as_view(),
-        name="katalogus_clone_settings",
     ),
     path(
         "settings/migrate/confirmation/<to_organization>/",

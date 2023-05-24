@@ -30,7 +30,6 @@ jobs:
           echo "RELEASE_VERSION=$(python -m setuptools_scm | sed s/rc/~rc/)" >> $GITHUB_ENV
           cp _version.py boefjes/boefjes/version.py
           cp _version.py boefjes/boefjes/katalogus/version.py
-          cp _version.py boefjes/boefjes/plugin_repository/version.py
 
       - name: Run debian package build
         uses: addnab/docker-run-action@v3
