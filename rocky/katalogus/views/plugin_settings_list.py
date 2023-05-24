@@ -1,5 +1,6 @@
 import logging
 
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -10,10 +11,12 @@ from katalogus.views.mixins import SinglePluginView
 logger = logging.getLogger(__name__)
 
 
-class PluginSettingsListView(SinglePluginView, ListView):
+class PluginSettingsListView(OrganizationPermissionRequiredMixin, SinglePluginView, ListView):
     """
     Shows all settings available for a specific plugin (plugin schema settings).
     """
+
+    permission_required = "tools.can_view_katalogus_settings"
 
     def get(self, request, *args, **kwargs):
         try:
