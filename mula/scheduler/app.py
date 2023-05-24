@@ -1,8 +1,6 @@
 import logging
-import os
 import threading
-import time
-from typing import Dict
+from typing import Dict, Optional
 
 from opentelemetry import trace
 
@@ -12,7 +10,6 @@ from scheduler.models import BoefjeTask, NormalizerTask, Organisation
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
-logger = logging.getLogger(__name__)
 
 
 class App:
@@ -30,8 +27,6 @@ class App:
             A dict of schedulers, keyed by scheduler id.
         listeners:
             A dict of connector.Listener instances.
-        server:
-            A server.Server instance that handles the API server.
     """
 
     def __init__(self, ctx: context.AppContext) -> None:
@@ -46,18 +41,9 @@ class App:
         self.ctx: context.AppContext = ctx
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
-
-        # Initialize schedulers
         self.schedulers: Dict[str, schedulers.Scheduler] = {}
-
-        self.initialize_boefje_schedulers()
-        self.initialize_normalizer_schedulers()
-
-        # Initialize listeners
         self.listeners: Dict[str, listeners.Listener] = {}
-
-        # Initialize API server
-        self.server: server.Server = server.Server(self.ctx, self.schedulers)
+        self.server: Optional[server.Server] = None
 
     def initialize_boefje_schedulers(self) -> None:
         """Initialize the schedulers for the Boefje tasks. We will create
@@ -217,12 +203,11 @@ class App:
             * monitors
             * metrics collecting
         """
-        # API Server
-        thread.ThreadRunner(
-            name="server",
-            target=self.server.run,
-            stop_event=self.stop_event,
-        ).start()
+        # Start the schedulers
+        self.initialize_boefje_schedulers()
+        self.initialize_normalizer_schedulers()
+        for scheduler in self.schedulers.values():
+            scheduler.run()
 
         # Start the listeners
         for name, listener in self.listeners.items():
@@ -231,10 +216,6 @@ class App:
                 target=listener.listen,
                 stop_event=self.stop_event,
             ).start()
-
-        # Start the schedulers
-        for scheduler in self.schedulers.values():
-            scheduler.run()
 
         # Start monitors
         thread.ThreadRunner(
@@ -252,34 +233,21 @@ class App:
             interval=1,
         ).start()
 
+        # API Server
+        self.server = server.Server(self.ctx, self.schedulers)
+        thread.ThreadRunner(
+            name="server",
+            target=server.Server(self.ctx, self.schedulers).run,
+            stop_event=self.stop_event,
+        ).start()
+
         # Main thread
         while not self.stop_event.is_set():
-            time.sleep(0.01)
+            self.stop_event.wait(0.01)
 
+    def shutdown(self) -> None:
+        """Shutdown the scheduler application, and all threads."""
+        for s in self.schedulers.values():
+            s.stop()
 
-def shutdown(args) -> None:
-    """Gracefully shutdown the scheduler application, and all threads."""
-    logger.info("Shutting down...")
-
-    for t in threading.enumerate():
-        if t is threading.current_thread():
-            continue
-
-        if t is threading.main_thread():
-            continue
-
-        if not t.is_alive():
-            continue
-
-        t.join(5)
-
-    logger.info("Shutdown complete")
-
-    # We're calling this here, because we want to issue a shutdown from
-    # within a thread, otherwise it will not exit a docker container.
-    # Source: https://stackoverflow.com/a/1489838/1346257
-    os._exit(1)
-
-
-# When a unhanded exception occurs, we want to shutdown the application
-threading.excepthook = shutdown
+        self.stop_event.set()

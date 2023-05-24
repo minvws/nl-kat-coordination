@@ -3,7 +3,7 @@ from unittest import mock
 
 import scheduler
 from fastapi.testclient import TestClient
-from scheduler import config, models, repositories
+from scheduler import config, models, repositories, server
 
 from tests.factories import OrganisationFactory
 
@@ -29,10 +29,9 @@ class AppTestCase(unittest.TestCase):
 
         self.app = scheduler.App(self.mock_ctx)
 
-        self.client = TestClient(self.app.server.api)
+        self.app.server = server.Server(self.mock_ctx, self.app.schedulers)
 
-    def tearDowns(self):
-        self.app.stop_event.set()
+        self.client = TestClient(self.app.server.api)
 
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_organisations")
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_organisation")
@@ -51,6 +50,8 @@ class AppTestCase(unittest.TestCase):
 
         response = self.client.get("/schedulers")
         self.assertEqual(2, len(response.json()))
+
+        self.app.shutdown()
 
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_organisations")
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_organisation")
@@ -90,3 +91,18 @@ class AppTestCase(unittest.TestCase):
         response = self.client.get("/queues")
         self.assertEqual(0, len(response.json()))
         self.assertEqual([], response.json())
+
+    # @unittest.skip("TODO: fix this test")
+    @mock.patch("scheduler.context.AppContext.services.katalogus.get_organisations")
+    @mock.patch("scheduler.context.AppContext.services.katalogus.get_organisation")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.push_tasks_for_new_boefjes")
+    def test_unhandled_exception(self, mock_run, mock_get_organisation, mock_get_organisations):
+        """Test that an unhandled exception results is logged and that the
+        application is being stopped"""
+        # Mocks
+        mock_get_organisations.return_value = [self.organisation]
+        mock_get_organisation.return_value = self.organisation
+        mock_run.side_effect = Exception("Test")
+
+        # Act
+        self.app.run()

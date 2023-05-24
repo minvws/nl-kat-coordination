@@ -86,19 +86,11 @@ class BoefjeScheduler(Scheduler):
         """Listen for scan profile mutations and create tasks for oois that
         have a scan level change.
         """
-        try:
-            listener = connectors.listeners.ScanProfileMutation(
-                dsn=self.ctx.config.host_raw_data,
-                queue=f"{self.organisation.id}__scan_profile_mutations",
-                func=self.push_tasks_for_scan_profile_mutations,
-            )
-        except Exception:
-            self.logger.exception(
-                "Failed to initialize listener for scan profile mutations [organisation_id=%s, scheduler_id=%s]",
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
+        listener = connectors.listeners.ScanProfileMutation(
+            dsn=self.ctx.config.host_raw_data,
+            queue=f"{self.organisation.id}__scan_profile_mutations",
+            func=self.push_tasks_for_scan_profile_mutations,
+        )
 
         self.listeners.append(listener)
         listener.listen()
@@ -106,7 +98,7 @@ class BoefjeScheduler(Scheduler):
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
         """Create tasks for oois that have a scan level change."""
-        self.logger.debug(
+        self.logger.info(
             "Received scan level mutation %s for: %s [ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
             mutation.operation,
             mutation.primary_key,

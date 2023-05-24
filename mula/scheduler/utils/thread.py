@@ -1,6 +1,5 @@
 import logging
 import threading
-import time
 from typing import Any, Callable, Optional
 
 
@@ -55,30 +54,27 @@ class ThreadRunner(threading.Thread):
 
         self.name = f"{self.name}-{name}" if name else self.name
 
-    # TODO: exception, needs to be unhandled, test this
     def run_forever(self) -> None:
         """Run the target function in a loop until the stop event is set."""
         while not self.stop_event.is_set():
             try:
                 self._target()
-            except Exception as e:
-                self.exception = e
-                self.logger.error("Exception occurred in thread: %s", self.name)
-                self.logger.exception(e)
+                self.stop_event.wait(self.interval)
+            except Exception as exc:
+                self.exception = exc
+                self.logger.exception("Exception in thread: %s", self.name)
                 self.stop_event.set()
+                raise exc
 
-            time.sleep(self.interval)
-
-    # TODO: exception, needs to be unhandled, test this
     def run_once(self) -> None:
         """Run the target function once."""
         try:
             self._target()
-        except Exception as e:
-            self.exception = e
-            self.logger.error("Exception occurred in thread: %s", self.name)
-            self.logger.exception(e)
+        except Exception as exc:
+            self.exception = exc
+            self.logger.exception("Exception in thread: %s", self.name)
             self.stop_event.set()
+            raise exc
 
     def run(self) -> None:
         self.logger.debug("Starting thread: %s", self.name)
