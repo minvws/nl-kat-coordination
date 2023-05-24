@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Iterator, List, Dict
+from typing import Dict, Iterator, List
 
 from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
