@@ -11,10 +11,8 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
-from django_otp.decorators import otp_required
 from pydantic import ValidationError
 from tools.forms.upload_csv import CSV_ERRORS, UploadCSVForm
-from two_factor.views.utils import class_view_decorator
 
 from octopoes.api.models import Declaration
 from octopoes.models import Reference
@@ -40,7 +38,6 @@ CSV_CRITERIA = [
 ]
 
 
-@class_view_decorator(otp_required)
 class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
     form_class = UploadCSVForm
