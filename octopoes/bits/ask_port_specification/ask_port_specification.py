@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Iterator, List
+from typing import Iterator, List, Dict
 
 from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
@@ -10,6 +10,7 @@ from octopoes.models.ooi.question import Question
 def run(
     input_ooi: Network,
     additional_oois: List,
+    config: Dict[str, str],
 ) -> Iterator[OOI]:
     network = input_ooi
 
