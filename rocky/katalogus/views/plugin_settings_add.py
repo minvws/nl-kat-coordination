@@ -18,7 +18,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
     """View to add a general setting for all plugins in KAT-alogus"""
 
     template_name = "plugin_settings_add.html"
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.can_set_katalogus_settings"
 
     def get_form(self, **kwargs):
         if self.plugin_schema is None:
@@ -121,7 +121,6 @@ class PluginSingleSettingAddView(PluginSettingsAddView, SingleSettingView):
     """View to add one specific setting."""
 
     template_name = "plugin_settings_add.html"
-    permission_required = "tools.can_scan_organization"
 
     def get_form(self, **kwargs):
         return PluginSettingAddEditForm(self.plugin_schema, self.setting_name, **self.get_form_kwargs())
