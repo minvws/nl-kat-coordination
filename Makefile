@@ -92,7 +92,7 @@ debian-build-image:
 ubuntu-build-image:
 	docker build -t kat-ubuntu-build-image packaging/ubuntu
 
-PIP_COMPILE_PARAMS := -q --no-header --generate-hashes --strip-extras --allow-unsafe --resolver=backtracking pyproject.toml
+PIP_COMPILE_PARAMS := -q --no-header --generate-hashes --allow-unsafe --resolver=backtracking pyproject.toml
 dependencies:
 	pip-compile --extra dev -o requirements.txt $(PIP_COMPILE_PARAMS)
 	for path in keiko octopoes
