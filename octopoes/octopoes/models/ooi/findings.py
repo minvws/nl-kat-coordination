@@ -13,6 +13,8 @@ class RiskLevelSeverity(Enum):
     MEDIUM = "medium"
     LOW = "low"
     RECOMMENDATION = "recommendation"
+    PENDING = 'pending'
+    UNKNOWN = 'unknown'
 
 
 class FindingType(OOI):
