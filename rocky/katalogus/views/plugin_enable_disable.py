@@ -6,16 +6,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django_otp.decorators import otp_required
 from requests import RequestException
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.views.mixins import SinglePluginView
 
 logger = getLogger(__name__)
 
 
-@class_view_decorator(otp_required)
 class PluginEnableDisableView(SinglePluginView):
     def check_required_settings(self, settings: Dict):
         if self.plugin_schema is None:
