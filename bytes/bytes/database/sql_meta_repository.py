@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from bytes.config import Settings, get_settings
 from bytes.database.db import SQL_BASE, get_engine
-from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
+from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB, SigningProviderInDB
 from bytes.models import (
     Boefje,
     BoefjeMeta,
@@ -124,12 +124,14 @@ class SQLMetaDataRepository(MetaDataRepository):
         # Send hash to a third party service.
         link = self.hash_repository.store(secure_hash=secure_hash)
 
+        raw.signing_provider_url = self.hash_repository.get_signing_provider_url()
         raw.secure_hash = secure_hash
         raw.hash_retrieval_link = link
 
         logger.info("Added hash %s and link %s to data", secure_hash, link)
 
-        raw_file_in_db = to_raw_file_in_db(raw)
+        signing_provider = self._get_or_create_signing_provider(raw.signing_provider_url)
+        raw_file_in_db = to_raw_file_in_db(raw, signing_provider if signing_provider else None)
 
         self.session.add(raw_file_in_db)
         self.raw_repository.save_raw(raw_file_in_db.id, raw)
@@ -195,6 +197,19 @@ class SQLMetaDataRepository(MetaDataRepository):
         data = self.raw_repository.get_raw(raw_file_in_db.id, boefje_meta)
 
         return to_raw_data(raw_file_in_db, data.value)
+
+    def _get_or_create_signing_provider(self, signing_provider_url: Optional[str]) -> Optional[SigningProviderInDB]:
+        if not signing_provider_url:
+            return None
+
+        query = self.session.query(SigningProviderInDB).filter(SigningProviderInDB.url == signing_provider_url)
+        signing_provider = query.first()
+
+        if not signing_provider:
+            signing_provider = SigningProviderInDB(url=signing_provider_url)
+            self.session.add(signing_provider)
+
+        return signing_provider
 
 
 def create_meta_data_repository() -> Iterator[MetaDataRepository]:
@@ -278,21 +293,23 @@ def to_normalizer_meta(normalizer_meta_in_db: NormalizerMetaInDB) -> NormalizerM
     )
 
 
-def to_raw_file_in_db(raw_data: RawData) -> RawFileInDB:
+def to_raw_file_in_db(raw_data: RawData, signing_provider: Optional[SigningProviderInDB]) -> RawFileInDB:
     return RawFileInDB(
         id=str(uuid.uuid4()),
         boefje_meta_id=raw_data.boefje_meta.id,
         secure_hash=raw_data.secure_hash,
+        signing_provider=signing_provider if signing_provider else None,
         hash_retrieval_link=raw_data.hash_retrieval_link,
         mime_types=[mime_type.value for mime_type in raw_data.mime_types],
     )
 
 
-def raw_meta_to_raw_file_in_db(raw_data_meta: RawDataMeta) -> RawFileInDB:
+def raw_meta_to_raw_file_in_db(raw_data_meta: RawDataMeta, signing_provider_id: Optional[int]) -> RawFileInDB:
     return RawFileInDB(
         id=raw_data_meta.id,
         boefje_meta_id=raw_data_meta.boefje_meta.id,
         secure_hash=raw_data_meta.secure_hash,
+        signing_provider_id=signing_provider_id if signing_provider_id else None,
         hash_retrieval_link=raw_data_meta.hash_retrieval_link,
         mime_types=[mime_type.value for mime_type in raw_data_meta.mime_types],
     )
@@ -303,18 +320,18 @@ def to_raw_data(raw_file_in_db: RawFileInDB, raw: bytes) -> RawData:
         value=raw,
         boefje_meta=to_boefje_meta(raw_file_in_db.boefje_meta),
         secure_hash=raw_file_in_db.secure_hash,
+        signing_provider_url=raw_file_in_db.signing_provider.url if raw_file_in_db.signing_provider else None,
         hash_retrieval_link=raw_file_in_db.hash_retrieval_link,
         mime_types=[to_mime_type(mime_type) for mime_type in raw_file_in_db.mime_types],
     )
 
 
 def to_raw_meta(raw_file_in_db: RawFileInDB) -> RawDataMeta:
-    boefje_meta = to_boefje_meta(raw_file_in_db.boefje_meta)
-
     return RawDataMeta(
         id=raw_file_in_db.id,
-        boefje_meta=boefje_meta,
+        boefje_meta=to_boefje_meta(raw_file_in_db.boefje_meta),
         secure_hash=raw_file_in_db.secure_hash,
+        signing_provider_url=raw_file_in_db.signing_provider.url if raw_file_in_db.signing_provider else None,
         hash_retrieval_link=raw_file_in_db.hash_retrieval_link,
         mime_types=[to_mime_type(mime_type) for mime_type in raw_file_in_db.mime_types],
     )

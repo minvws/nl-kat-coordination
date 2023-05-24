@@ -7,16 +7,13 @@ from django.views.generic import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from django_otp.decorators import otp_required
 from tools.view_helpers import Breadcrumb
-from two_factor.views.utils import class_view_decorator
 
 from fmea.forms import FailureModeEffectForm
 from fmea.models import FailureModeEffect
 from fmea.views.view_helpers import FailureModeEffectBreadcrumbsMixin
 
 
-@class_view_decorator(otp_required)
 class FailureModeEffectCreateView(FailureModeEffectBreadcrumbsMixin, CreateView):
     """
     View to create a failure mode effect.
@@ -49,7 +46,6 @@ class FailureModeEffectCreateView(FailureModeEffectBreadcrumbsMixin, CreateView)
         return breadcrumbs
 
 
-@class_view_decorator(otp_required)
 class FailureModeEffectUpdateView(FailureModeEffectBreadcrumbsMixin, UpdateView):
     """
     View for updating a failure mode effect.
@@ -89,7 +85,6 @@ class FailureModeEffectUpdateView(FailureModeEffectBreadcrumbsMixin, UpdateView)
         return breadcrumbs
 
 
-@class_view_decorator(otp_required)
 class FailureModeEffectDetailView(FailureModeEffectBreadcrumbsMixin, DetailView):
     """
     View for 1 failure mode effect. id in kwargs.
@@ -111,7 +106,6 @@ class FailureModeEffectDetailView(FailureModeEffectBreadcrumbsMixin, DetailView)
         return breadcrumbs
 
 
-@class_view_decorator(otp_required)
 class FailureModeEffectListView(FailureModeEffectBreadcrumbsMixin, ListView):
     """
     View of all failure modes effects.

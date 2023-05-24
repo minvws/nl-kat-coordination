@@ -4,7 +4,7 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
-NUCLEI_IMAGE = "projectdiscovery/nuclei:v2.9.1"
+NUCLEI_IMAGE = "projectdiscovery/nuclei:v2.9.4"
 
 
 def verify_hostname_meta(input_ooi):
@@ -25,7 +25,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     url = verify_hostname_meta(boefje_meta.arguments["input"])
     output = client.containers.run(
         NUCLEI_IMAGE,
-        ["-t", "/root/nuclei-templates/exposed-panels/", "-u", url, "-jsonl"],
+        ["-t", "/root/nuclei-templates/http/exposed-panels/", "-u", url, "-jsonl"],
         remove=True,
     )
 
