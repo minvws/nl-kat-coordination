@@ -5,12 +5,9 @@ from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-from django_otp.decorators import otp_required
 from tools.models import Indemnification
-from two_factor.views.utils import class_view_decorator
 
 
-@class_view_decorator(otp_required)
 class IndemnificationAddView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "indemnification_add.html"
     form_class = IndemnificationAddForm

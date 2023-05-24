@@ -7,16 +7,13 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
-from django_otp.decorators import otp_required
 from tools.models import Organization, OrganizationMember
-from two_factor.views.utils import class_view_decorator
 
 from rocky.exceptions import ServiceException
 
 logger = logging.getLogger(__name__)
 
 
-@class_view_decorator(otp_required)
 class OrganizationAddView(PermissionRequiredMixin, CreateView):
     """
     View to create a new organization
