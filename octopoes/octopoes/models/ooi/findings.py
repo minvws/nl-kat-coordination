@@ -17,7 +17,7 @@ class RiskLevelSeverity(Enum):
     # pending = KAT still has to run the boefje to determine the risk level
     PENDING = 'pending'
 
-    # unkown = the third party has not determined the risk level (yet)
+    # unkown = the third party has been contacted, but third party has not determined the risk level (yet)
     UNKNOWN = 'unknown'
 
 
