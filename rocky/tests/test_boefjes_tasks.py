@@ -20,7 +20,7 @@ def test_boefjes_tasks(rf, client_member, mocker, lazy_task_list_empty):
         [
             call(
                 scheduler_id="boefje-test",
-                task_type="boefje",
+                type="boefje",
                 status=None,
                 min_created_at=None,
                 max_created_at=None,
