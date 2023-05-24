@@ -1,5 +1,6 @@
 import pytest
 from account.views import AccountView
+from django.core.exceptions import PermissionDenied
 from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -60,11 +61,12 @@ def test_account_detail_perms(rf, superuser_member, admin_member, redteam_member
     assertNotContains(response_client, check_text)
 
 
-@pytest.mark.parametrize("member", ["superuser_member", "redteam_member", "client_member"])
 def test_plugin_settings_list_perms(
-    request,
-    member,
     rf,
+    superuser_member,
+    admin_member,
+    redteam_member,
+    client_member,
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
@@ -80,17 +82,45 @@ def test_plugin_settings_list_perms(
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
-    member = request.getfixturevalue(member)
-
-    response = PluginDetailView.as_view()(
-        setup_request(rf.get("plugin_detail"), member.user),
-        organization_code=member.organization.code,
+    response_superuser = PluginDetailView.as_view()(
+        setup_request(rf.get("plugin_detail"), superuser_member.user),
+        organization_code=superuser_member.organization.code,
         plugin_type="boefje",
         plugin_id="test-plugin",
     )
 
-    assert response.status_code == 200
+    response_redteam = PluginDetailView.as_view()(
+        setup_request(rf.get("plugin_detail"), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+        plugin_type="boefje",
+        plugin_id="test-plugin",
+    )
 
-    # TODO: add perms for clients to see and change plugin settings
-    assertContains(response, "Overview of settings:")
-    assertContains(response, "Object list")
+    assert response_superuser.status_code == 200
+    assert response_redteam.status_code == 200
+
+    with pytest.raises(PermissionDenied):
+        PluginDetailView.as_view()(
+            setup_request(rf.get("plugin_detail"), admin_member.user),
+            organization_code=admin_member.organization.code,
+            plugin_type="boefje",
+            plugin_id="test-plugin",
+        )
+
+    with pytest.raises(PermissionDenied):
+        PluginDetailView.as_view()(
+            setup_request(rf.get("plugin_detail"), client_member.user),
+            organization_code=client_member.organization.code,
+            plugin_type="boefje",
+            plugin_id="test-plugin",
+        )
+
+    check_text = "Overview of settings:"
+    check_text_object_list = "Object list"
+
+    # Superusers and admins can see plugin settings and object list to scan oois:
+    assertContains(response_superuser, check_text)
+    assertContains(response_superuser, check_text_object_list)
+
+    assertContains(response_redteam, check_text)
+    assertContains(response_redteam, check_text_object_list)

@@ -8,11 +8,9 @@ from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
-from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
 from tools.models import OrganizationMember
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
-from two_factor.views.utils import class_view_decorator
 
 
 class BLOCK_STATUSES(models.TextChoices):
@@ -25,7 +23,6 @@ class PageActions(Enum):
     UNBLOCK = "unblock"
 
 
-@class_view_decorator(otp_required)
 class OrganizationMemberListView(
     OrganizationPermissionRequiredMixin,
     OrganizationMemberBreadcrumbsMixin,

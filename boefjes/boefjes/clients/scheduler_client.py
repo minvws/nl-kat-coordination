@@ -92,7 +92,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return parse_obj_as(List[Queue], response.json())
 
     def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
-        response = self._session.get(f"{self.base_url}/queues/{queue}/pop")
+        response = self._session.post(f"{self.base_url}/queues/{queue}/pop")
         self._verify_response(response)
 
         return parse_obj_as(Optional[QueuePrioritizedItem], response.json())

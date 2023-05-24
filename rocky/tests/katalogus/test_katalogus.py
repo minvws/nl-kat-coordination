@@ -1,4 +1,5 @@
 import pytest
+from django.core.exceptions import PermissionDenied
 from katalogus.client import KATalogusClientV1, parse_plugin
 from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsView, KATalogusView
 from pytest_django.asserts import assertContains, assertNotContains
@@ -7,8 +8,7 @@ from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, setup_request
 
 
-@pytest.mark.parametrize("member", ["admin_member", "client_member"])
-def test_katalogus_plugin_listing(request, member, rf, mocker):
+def katalogus_plugin_listing(request, member, rf, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
     mock_response = mocker.MagicMock()
     mock_requests.Session().get.return_value = mock_response
@@ -16,17 +16,35 @@ def test_katalogus_plugin_listing(request, member, rf, mocker):
 
     member = request.getfixturevalue(member)
 
-    response = KATalogusView.as_view()(
+    return KATalogusView.as_view()(
         setup_request(rf.get("katalogus"), member.user), organization_code=member.organization.code
     )
 
+
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
+def test_katalogus_plugin_listing(request, member, rf, mocker):
+    response = katalogus_plugin_listing(request, member, rf, mocker)
+
     assert response.status_code == 200
 
+    assertNotContains(response, "You don't have permission to enable boefje")
+
     assertContains(response, "KAT-alogus")
-    assertContains(response, "You don't have permission to enable boefje")
     assertContains(response, "Enable")
     assertContains(response, "BinaryEdge")
     assertContains(response, "WPScantest")
+
+
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_katalogus_plugin_listing_no_perms(request, member, rf, mocker):
+    response = katalogus_plugin_listing(request, member, rf, mocker)
+
+    assert response.status_code == 200
+
+    assertContains(response, "You don't have permission to enable boefje")
+
+    assertNotContains(response, "KAT-alogus Settings")
+    assertNotContains(response, "test_binary_edge_normalizer")
 
 
 def test_katalogus_settings_one_organization(redteam_member, rf, mocker):
@@ -75,14 +93,14 @@ def test_katalogus_settings_list_multiple_organization(redteam_member, organizat
     assertContains(response, organization_b.name)
 
 
-def test_katalogus_confirm_clone_settings(client_member, organization_b, rf, mock_models_octopoes, mocker):
+def test_katalogus_confirm_clone_settings(redteam_member, organization_b, rf, mock_models_octopoes, mocker):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
-    create_member(client_member.user, organization_b)
+    create_member(redteam_member.user, organization_b)
 
-    request = setup_request(rf.get("confirm_clone_settings"), client_member.user)
+    request = setup_request(rf.get("confirm_clone_settings"), redteam_member.user)
     response = ConfirmCloneSettingsView.as_view()(
-        request, organization_code=client_member.organization.code, to_organization=organization_b.code
+        request, organization_code=redteam_member.organization.code, to_organization=organization_b.code
     )
     assert response.status_code == 200
 
@@ -91,23 +109,38 @@ def test_katalogus_confirm_clone_settings(client_member, organization_b, rf, moc
     assertContains(response, "Are you sure")
     assertContains(response, "Cancel")
     assertContains(response, "Clone")
-    assertContains(response, client_member.organization.name)
+    assertContains(response, redteam_member.organization.name)
     assertContains(response, organization_b.name)
 
 
-def test_katalogus_clone_settings(client_member, organization_b, rf, mocker, mock_models_octopoes):
+def test_katalogus_clone_settings(redteam_member, organization_b, rf, mocker, mock_models_octopoes):
     # Mock katalogus calls: return right boefjes and settings
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
 
-    create_member(client_member.user, organization_b)
+    create_member(redteam_member.user, organization_b)
 
-    request = setup_request(rf.post("confirm_clone_settings"), client_member.user)
+    request = setup_request(rf.post("confirm_clone_settings"), redteam_member.user)
     response = ConfirmCloneSettingsView.as_view()(
-        request, organization_code=client_member.organization.code, to_organization=organization_b.code
+        request, organization_code=redteam_member.organization.code, to_organization=organization_b.code
     )
     assert response.status_code == 302
 
     mock_katalogus().clone_all_configuration_to_organization.assert_called_once_with(organization_b.code)
+
+
+def test_katalogus_clone_settings_not_accessible_without_perms(
+    client_member, organization_b, rf, mocker, mock_models_octopoes
+):
+    # Mock katalogus calls: return right boefjes and settings
+    mocker.patch("katalogus.client.KATalogusClientV1")
+
+    create_member(client_member.user, organization_b)
+
+    request = setup_request(rf.post("confirm_clone_settings"), client_member.user)
+    with pytest.raises(PermissionDenied):
+        ConfirmCloneSettingsView.as_view()(
+            request, organization_code=client_member.organization.code, to_organization=organization_b.code
+        )
 
 
 def test_katalogus_client_organization_not_exists(mocker):

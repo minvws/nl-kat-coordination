@@ -1,5 +1,6 @@
 import pytest
-from pytest_django.asserts import assertContains
+from django.core.exceptions import PermissionDenied
+from pytest_django.asserts import assertContains, assertNotContains
 
 from octopoes.models.tree import ReferenceTree
 from rocky.views.ooi_add import OOIAddView
@@ -83,6 +84,24 @@ def test_mute_finding_button_is_visible(request, member, rf, mock_organization_v
     assertContains(response, "Mute Finding")
 
 
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_mute_finding_button_is_not_visible_without_perms(
+    request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker
+):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+
+    member = request.getfixturevalue(member)
+
+    response = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertNotContains(response, "Mute Finding")
+
+
 @pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
 def test_mute_finding_form_view(request, member, rf, mock_organization_view_octopoes):
     member = request.getfixturevalue(member)
@@ -97,6 +116,20 @@ def test_mute_finding_form_view(request, member, rf, mock_organization_view_octo
     assertContains(response, "Mute")
     assertContains(response, "Cancel")
     assertContains(response, "Mute finding: ")
+
+
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_mute_finding_form_view_no_perms(request, member, rf, mock_organization_view_octopoes):
+    member = request.getfixturevalue(member)
+    with pytest.raises(PermissionDenied):
+        MuteFindingView.as_view()(
+            setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
+            organization_code=member.organization.code,
+        )
+    with pytest.raises(PermissionDenied):
+        MuteFindingView.as_view()(
+            setup_request(rf.post("finding_mute"), member.user), organization_code=member.organization.code
+        )
 
 
 def test_mute_finding_post(

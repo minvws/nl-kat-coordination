@@ -54,7 +54,15 @@ class Command(BaseCommand):
         self.group_admin.permissions.set(admin_permissions)
 
         redteam_permissions = self.get_permissions(
-            ["can_scan_organization", "can_enable_disable_boefje", "can_set_clearance_level", "can_delete_oois"]
+            [
+                "can_scan_organization",
+                "can_enable_disable_boefje",
+                "can_set_clearance_level",
+                "can_delete_oois",
+                "can_mute_findings",
+                "can_view_katalogus_settings",
+                "can_set_katalogus_settings",
+            ]
         )
         self.group_redteam.permissions.set(redteam_permissions)
         client_permissions = self.get_permissions(["can_scan_organization"])
