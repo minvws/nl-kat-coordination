@@ -138,6 +138,7 @@ octopoes = [
     "opentelemetry-instrumentation-requests==0.38b0",
     "certifi==2023.5.7",
     "sqlalchemy==1.4.48",
+    "typing-extensions==4.5.0"
 ]
 
 octopoes-dev = [
@@ -160,7 +161,8 @@ keiko = [
     "opentelemetry-exporter-otlp-proto-grpc==1.17.0",
     "opentelemetry-instrumentation-fastapi==0.38b0",
     "requests==2.31.0",
-    "certifi==2023.5.7"
+    "certifi==2023.5.7",
+    "typing-extensions==4.5.0"
 ]
 
 keiko-dev = [
