@@ -6,9 +6,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-from django_otp.decorators import otp_required
 from requests import RequestException
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.forms import PluginSchemaForm, PluginSettingAddEditForm
 from katalogus.views.mixins import SinglePluginView, SingleSettingView
@@ -16,7 +14,6 @@ from katalogus.views.mixins import SinglePluginView, SingleSettingView
 logger = logging.getLogger(__name__)
 
 
-@class_view_decorator(otp_required)
 class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginView, FormView):
     """View to add a general setting for all plugins in KAT-alogus"""
 
@@ -120,7 +117,6 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
         messages.add_message(self.request, messages.ERROR, message)
 
 
-@class_view_decorator(otp_required)
 class PluginSingleSettingAddView(PluginSettingsAddView, SingleSettingView):
     """View to add one specific setting."""
 
