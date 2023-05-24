@@ -39,11 +39,16 @@ class Hostname(OOI):
         DNSZone, max_issue_scan_level=1, max_inherit_scan_level=2, default=None
     )
 
+    registered_domain: Optional[Reference] = ReferenceField(
+        "Hostname", max_issue_scan_level=1, max_inherit_scan_level=2, default=None
+    )
+
     _natural_key_attrs = ["network", "name"]
 
     _reverse_relation_names = {
         "network": "hostnames",
         "dns_zone": "hostnames",
+        "registered_domain": "subdomains",
     }
 
     @validator("name")
