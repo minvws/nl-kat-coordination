@@ -121,7 +121,6 @@ class PluginSingleSettingAddView(PluginSettingsAddView, SingleSettingView):
     """View to add one specific setting."""
 
     template_name = "plugin_settings_add.html"
-    permission_required = "tools.can_scan_organization"
 
     def get_form(self, **kwargs):
         return PluginSettingAddEditForm(self.plugin_schema, self.setting_name, **self.get_form_kwargs())
