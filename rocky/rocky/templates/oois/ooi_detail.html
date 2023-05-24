@@ -117,6 +117,6 @@
     {{ block.super }}
     <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% if is_question %}
-    <script src="{% static "/js/jsonSchemaToform.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/jsonSchemaToForm.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endif %}
 {% endblock html_at_end_body %}
