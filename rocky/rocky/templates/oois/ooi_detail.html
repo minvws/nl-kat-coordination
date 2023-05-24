@@ -16,7 +16,9 @@
                 {% endif %}
                 {% include "partials/ooi_head.html" with ooi=ooi view="ooi_detail" %}
                 {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
-
+                {% if is_question %}
+                  {% include "forms/json_schema_form.html" with json_schema=ooi.json_schema %}
+                {% endif%}
             </div>
             <div>
                 {% include "oois/ooi_detail_origins_declarations.html" %}

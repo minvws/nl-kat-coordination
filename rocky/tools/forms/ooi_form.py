@@ -9,6 +9,7 @@ from pydantic.fields import SHAPE_LIST, ModelField
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
+from octopoes.models.ooi.question import Question
 from octopoes.models.types import get_relations
 from tools.forms.base import BaseRockyForm, CheckboxGroup
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
@@ -60,6 +61,8 @@ class OOIForm(BaseRockyForm):
                 fields[name] = forms.IntegerField(**default_attrs)
             elif issubclass(field.type_, Enum):
                 fields[name] = generate_select_ooi_type(field)
+            elif self.ooi_class == Question and issubclass(field.type_, str) and name == "json_schema":
+                fields[name] = forms.CharField(**default_attrs)
             elif issubclass(field.type_, str):
                 fields[name] = forms.CharField(max_length=256, **default_attrs)
 

@@ -1,0 +1,12 @@
+{% load i18n %}
+{% load static %}
+
+<form method="post" class="inline">
+  {% csrf_token %}
+  <fieldset>
+    <textarea name="schema" class="JsonSchemaForm">
+      {{ json_schema }}
+    </textarea>
+  </fieldset>
+  <button type="submit">{% translate "Submit" %}</button>
+</form>
