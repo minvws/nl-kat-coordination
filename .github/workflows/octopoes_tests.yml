@@ -1,4 +1,4 @@
-name: Octopoes unit tests
+name: Octopoes tests
 
 on:
   push:
