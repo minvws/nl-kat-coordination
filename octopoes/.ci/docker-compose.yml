@@ -53,6 +53,8 @@ services:
         condition: service_healthy
       crux:
         condition: service_healthy
+      katalogus_mock:
+        condition: service_started
     ports:
         - "127.0.0.1:29000:80"
     env_file:
