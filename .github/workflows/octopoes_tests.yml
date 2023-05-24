@@ -27,7 +27,7 @@ jobs:
           cache: 'pip' # caching pip dependencies
 
       - name: Install requirements.txt
-        run: pip install --upgrade pip && pip install -r requirements-dev.txt
+        run: pip install -r requirements-dev.txt
         working-directory: ./octopoes
 
       - name: Run unit tests
