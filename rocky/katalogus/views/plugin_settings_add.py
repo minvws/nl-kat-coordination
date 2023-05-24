@@ -110,18 +110,3 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
 
     def add_error_notification(self, message):
         messages.add_message(self.request, messages.ERROR, message)
-
-
-class PluginSingleSettingAddView(PluginSettingsAddView, SingleSettingView):
-    """View to add one specific setting."""
-
-    template_name = "plugin_settings_add.html"
-    permission_required = "tools.can_scan_organization"
-
-    def get_form(self, **kwargs):
-        return PluginSettingAddEditForm(self.plugin_schema, self.setting_name, **self.get_form_kwargs())
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["setting_name"] = self.setting_name
-        return context
