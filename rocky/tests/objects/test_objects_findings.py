@@ -68,57 +68,68 @@ def test_ooi_finding_list(rf, client_member, mock_organization_view_octopoes):
     assertContains(response, "Add finding")
 
 
-def test_mute_finding_button_is_visible(
-    rf, admin_member, redteam_member, client_member, mock_organization_view_octopoes, mock_scheduler, mocker
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
+def test_mute_finding_button_is_visible(request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+
+    member = request.getfixturevalue(member)
+
+    response = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertContains(response, "Mute Finding")
+
+
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_mute_finding_button_is_not_visible_without_perms(
+    request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request_admin = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), admin_member.user)
-    response_admin = OOIDetailView.as_view()(request_admin, organization_code=admin_member.organization.code)
+    member = request.getfixturevalue(member)
 
-    request_redteam = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
-    response_redteam = OOIDetailView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
-
-    request_client = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
-    response_client = OOIDetailView.as_view()(request_client, organization_code=client_member.organization.code)
-
-    assert response_admin.status_code == 200
-    assert response_redteam.status_code == 200
-    assert response_client.status_code == 200
-
-    # No permissions to see mute findings button
-    assertNotContains(response_admin, "Mute Finding")
-    assertNotContains(response_client, "Mute Finding")
-
-    # Redteam permission to see mute finding button
-    assertContains(response_redteam, "Mute Finding")
-
-
-def test_mute_finding_form_view(rf, admin_member, redteam_member, client_member, mock_organization_view_octopoes):
-    request_admin = setup_request(
-        rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), admin_member.user
+    response = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), member.user),
+        organization_code=member.organization.code,
     )
+
+    assert response.status_code == 200
+    assertNotContains(response, "Mute Finding")
+
+
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
+def test_mute_finding_form_view(request, member, rf, mock_organization_view_octopoes):
+    member = request.getfixturevalue(member)
+    response = MuteFindingView.as_view()(
+        setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+
+    assertContains(response, "Reason:")
+    assertContains(response, "Mute")
+    assertContains(response, "Cancel")
+    assertContains(response, "Mute finding: ")
+
+
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_mute_finding_form_view_no_perms(request, member, rf, mock_organization_view_octopoes):
+    member = request.getfixturevalue(member)
     with pytest.raises(PermissionDenied):
-        MuteFindingView.as_view()(request_admin, organization_code=admin_member.organization.code)
-
-    request_client = setup_request(
-        rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
-    )
+        MuteFindingView.as_view()(
+            setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
+            organization_code=member.organization.code,
+        )
     with pytest.raises(PermissionDenied):
-        MuteFindingView.as_view()(request_client, organization_code=client_member.organization.code)
-
-    request_redteam = setup_request(
-        rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), redteam_member.user
-    )
-    response_redteam = MuteFindingView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
-
-    assert response_redteam.status_code == 200
-
-    assertContains(response_redteam, "Reason:")
-    assertContains(response_redteam, "Mute")
-    assertContains(response_redteam, "Cancel")
-    assertContains(response_redteam, "Mute finding: ")
+        MuteFindingView.as_view()(
+            setup_request(rf.post("finding_mute"), member.user), organization_code=member.organization.code
+        )
 
 
 def test_mute_finding_post(
