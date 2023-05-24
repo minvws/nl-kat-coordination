@@ -164,5 +164,16 @@ ALL_OOI_TYPES = {
     MockDNSCNAMERecord,
 }
 
+MockOOIType = Union[
+    MockNetwork,
+    MockIPAddressV4,
+    MockIPAddressV6,
+    MockIPPort,
+    MockHostname,
+    MockDNSZone,
+    MockResolvedHostname,
+    MockDNSCNAMERecord,
+]
+
 for ooi_type in ALL_OOI_TYPES:
     ooi_type.update_forward_refs()
