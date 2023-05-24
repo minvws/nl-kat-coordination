@@ -92,6 +92,7 @@ debian-build-image:
 ubuntu-build-image:
 	docker build -t kat-ubuntu-build-image packaging/ubuntu
 
+# Note about `pip-compile`: exported requirements.txt's target the Python version and platform used to run the command
 PIP_COMPILE_PARAMS := -q --no-header --generate-hashes --allow-unsafe --resolver=backtracking pyproject.toml
 dependencies:
 	pip-compile --extra dev -o requirements.txt $(PIP_COMPILE_PARAMS)
@@ -99,5 +100,5 @@ dependencies:
 		do
 			echo $$path
 			pip-compile --extra common,$$path -o $$path/requirements.txt $(PIP_COMPILE_PARAMS)
-			pip-compile --extra common,$$path,$$path-dev -o $$path/requirements-dev.txt $(PIP_COMPILE_PARAMS)
+			pip-compile --extra common,common-dev,$$path,$$path-dev -o $$path/requirements-dev.txt $(PIP_COMPILE_PARAMS)
 		done
