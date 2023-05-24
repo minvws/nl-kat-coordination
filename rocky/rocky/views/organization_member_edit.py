@@ -5,12 +5,9 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
-from django_otp.decorators import otp_required
 from tools.models import GROUP_CLIENT, OrganizationMember
-from two_factor.views.utils import class_view_decorator
 
 
-@class_view_decorator(otp_required)
 class OrganizationMemberEditView(
     OrganizationPermissionRequiredMixin, UserPassesTestMixin, OrganizationView, UpdateView
 ):

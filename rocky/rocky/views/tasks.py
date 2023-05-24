@@ -7,16 +7,13 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
-from django_otp.decorators import otp_required
 from requests import HTTPError
-from two_factor.views.utils import class_view_decorator
 
 from rocky.scheduler import client
 
 TASK_LIMIT = 50
 
 
-@class_view_decorator(otp_required)
 class DownloadTaskDetail(OrganizationView):
     def get(self, request, *args, **kwargs):
         task_id = kwargs["task_id"]
@@ -39,7 +36,6 @@ class DownloadTaskDetail(OrganizationView):
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
-@class_view_decorator(otp_required)
 class TaskListView(OrganizationView, ListView):
     paginate_by = 20
 
@@ -83,13 +79,11 @@ class TaskListView(OrganizationView, ListView):
         return context
 
 
-@class_view_decorator(otp_required)
 class BoefjesTaskListView(TaskListView):
     template_name = "tasks/boefjes.html"
     plugin_type = "boefje"
 
 
-@class_view_decorator(otp_required)
 class NormalizersTaskListView(TaskListView):
     template_name = "tasks/normalizers.html"
     plugin_type = "normalizer"
