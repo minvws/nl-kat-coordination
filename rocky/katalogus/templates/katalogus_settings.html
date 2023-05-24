@@ -10,7 +10,7 @@
         <section>
             <div>
                 <h1>{% translate "KAT-alogus Settings" %}</h1>
-                {% if not object_list %}
+                {% if not settings %}
                     <p class="emphasized">
                         {% translate "There are currently no settings defined. Add settings at plugin detail page." %}
                     </p>
@@ -28,7 +28,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for setting in object_list %}
+                                {% for setting in settings %}
                                     <tr>
                                         <td>
                                             <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin_type plugin_id=setting.plugin_id %}">{{ setting.plugin_name }}</a>

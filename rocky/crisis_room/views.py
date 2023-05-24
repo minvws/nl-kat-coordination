@@ -9,7 +9,6 @@ from django.contrib import messages
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django_otp.decorators import otp_required
 from tools.forms.base import ObservedAtForm
 from tools.models import OOIInformation, Organization
 from tools.ooi_helpers import (
@@ -20,7 +19,6 @@ from tools.ooi_helpers import (
     get_risk_level_score_for_snyk,
 )
 from tools.view_helpers import BreadcrumbsMixin, convert_date_to_datetime
-from two_factor.views.utils import class_view_decorator
 
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -77,7 +75,6 @@ class CrisisRoomBreadcrumbsMixin(BreadcrumbsMixin):
     ]
 
 
-@class_view_decorator(otp_required)
 class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateView):
     template_name = "crisis_room/crisis_room.html"
     connector_form_class = ObservedAtForm
