@@ -61,7 +61,3 @@ rtest-crux:
 	sleep 1
 	robot -d reports --variablefile tests/robot/variables.py:crux tests/robot || :
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose-crux.yml down --remove-orphans
-
-export-requirements: ## Export the requirements to requirements.txt
-	poetry export --output requirements.txt --without-hashes && \
-	poetry export --output requirements-dev.txt --with dev --without-hashes
