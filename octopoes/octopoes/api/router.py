@@ -24,7 +24,6 @@ from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.origin import Origin, OriginParameter, OriginType
-from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
@@ -120,9 +119,8 @@ def list_objects(
     scan_profile_type: Set[ScanProfileType] = Query(DEFAULT_SCAN_PROFILE_TYPE_FILTER),
     offset: int = 0,
     limit: int = 20,
-) -> Paginated[OOI]:
-    objects = octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
-    return objects
+):
+    return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
 
 
 @router.get("/object")
@@ -130,7 +128,7 @@ def get_object(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     reference: Reference = Depends(extract_reference),
-) -> OOI:
+):
     return octopoes.get_ooi(reference, valid_time)
 
 
@@ -140,7 +138,7 @@ def list_random_objects(
     valid_time: datetime = Depends(extract_valid_time),
     amount: int = 1,
     scan_level: Set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
-) -> List[OOI]:
+):
     return octopoes.list_random_ooi(valid_time, amount, scan_level)
 
 
