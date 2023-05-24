@@ -72,7 +72,7 @@ utest: ## Run the unit tests.
 itest: ## Run the integration tests.
 	$(ci-docker-compose) build $(build_args)
 	$(ci-docker-compose) down --remove-orphans
-	$(ci-docker-compose) run --rm bytes_integration || ($(ci-docker-compose) logs ci_bytes && return 1)
+	$(ci-docker-compose) run --rm bytes_integration
 
 
 ##

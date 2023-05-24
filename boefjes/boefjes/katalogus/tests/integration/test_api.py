@@ -51,7 +51,7 @@ class TestAPI(TestCase):
         self.org = Organisation(id="test", name="Test Organisation")
 
         self.client = TestClient(app)
-        response = self.client.post("/v1/organisations/", self.org.json())
+        response = self.client.post("/v1/organisations/", data=self.org.json())
         self.assertEqual(response.status_code, 201)
 
     def tearDown(self) -> None:
@@ -89,7 +89,7 @@ class TestAPI(TestCase):
         # Add the second organisation
         new_org_id = "org2"
         org2 = Organisation(id=new_org_id, name="Second test Organisation")
-        self.client.post("/v1/organisations/", org2.json())
+        self.client.post("/v1/organisations/", data=org2.json())
         self.client.post(f"/v1/organisations/{new_org_id}/{plug}/settings/test_key", json={"value": "second value"})
 
         # Show that the second organisation has no settings and dns-records is not enabled

@@ -1,4 +1,6 @@
+import pytest
 from account.views import AccountView
+from django.core.exceptions import PermissionDenied
 from katalogus.views.plugin_detail import PluginDetailView
 from pytest_django.asserts import assertContains, assertNotContains
 
@@ -87,13 +89,6 @@ def test_plugin_settings_list_perms(
         plugin_id="test-plugin",
     )
 
-    response_admin = PluginDetailView.as_view()(
-        setup_request(rf.get("plugin_detail"), admin_member.user),
-        organization_code=admin_member.organization.code,
-        plugin_type="boefje",
-        plugin_id="test-plugin",
-    )
-
     response_redteam = PluginDetailView.as_view()(
         setup_request(rf.get("plugin_detail"), redteam_member.user),
         organization_code=redteam_member.organization.code,
@@ -101,17 +96,24 @@ def test_plugin_settings_list_perms(
         plugin_id="test-plugin",
     )
 
-    response_client = PluginDetailView.as_view()(
-        setup_request(rf.get("plugin_detail"), client_member.user),
-        organization_code=client_member.organization.code,
-        plugin_type="boefje",
-        plugin_id="test-plugin",
-    )
-
     assert response_superuser.status_code == 200
-    assert response_admin.status_code == 200
     assert response_redteam.status_code == 200
-    assert response_client.status_code == 200
+
+    with pytest.raises(PermissionDenied):
+        PluginDetailView.as_view()(
+            setup_request(rf.get("plugin_detail"), admin_member.user),
+            organization_code=admin_member.organization.code,
+            plugin_type="boefje",
+            plugin_id="test-plugin",
+        )
+
+    with pytest.raises(PermissionDenied):
+        PluginDetailView.as_view()(
+            setup_request(rf.get("plugin_detail"), client_member.user),
+            organization_code=client_member.organization.code,
+            plugin_type="boefje",
+            plugin_id="test-plugin",
+        )
 
     check_text = "Overview of settings:"
     check_text_object_list = "Object list"
@@ -122,9 +124,3 @@ def test_plugin_settings_list_perms(
 
     assertContains(response_redteam, check_text)
     assertContains(response_redteam, check_text_object_list)
-
-    assertNotContains(response_admin, check_text)
-    assertNotContains(response_admin, check_text_object_list)
-
-    assertNotContains(response_client, check_text)
-    assertNotContains(response_client, check_text_object_list)
