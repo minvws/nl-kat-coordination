@@ -72,7 +72,8 @@ class MockOOIRepository(OOIRepository):
             if segment.direction == Direction.OUTGOING:
                 for ref in references:
                     neighbour_ref = getattr(self.oois[ref], segment.property_name)
-                    neighbours.add(self.oois[neighbour_ref])
+                    if neighbour_ref is not None:
+                        neighbours.add(self.oois[neighbour_ref])
             else:
                 for ooi in self.oois.values():
                     if not isinstance(ooi, segment.target_type):
