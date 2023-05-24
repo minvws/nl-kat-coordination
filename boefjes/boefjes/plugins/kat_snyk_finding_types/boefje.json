@@ -1,0 +1,13 @@
+{
+    "id": "snyk-finding-types",
+    "name": "SNYK Finding Types",
+    "description": "Hydrate information of SNYK finding types",
+    "consumes": [
+        "SnykFindingType"
+    ],
+    "produces": [
+        "SnykFindingType"
+    ],
+    "environment_keys": [],
+    "scan_level": 0
+}
