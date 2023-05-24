@@ -2,7 +2,7 @@ from django.urls import path
 
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import KATalogusView
-from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsListView
+from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from katalogus.views.plugin_settings_add import PluginSettingsAddView
@@ -13,12 +13,12 @@ urlpatterns = [
     path("view/<view>/", KATalogusView.as_view(), name="katalogus"),
     path(
         "settings/",
-        KATalogusSettingsListView.as_view(),
+        KATalogusSettingsView.as_view(),
         name="katalogus_settings",
     ),
     path(
         "settings/migrate/",
-        KATalogusSettingsListView.as_view(),
+        KATalogusSettingsView.as_view(),
         name="katalogus_clone_settings",
     ),
     path(

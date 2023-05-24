@@ -4,13 +4,10 @@ from account.models import KATUser
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count
 from django.views.generic import ListView
-from django_otp.decorators import otp_required
 from tools.models import Organization
 from tools.view_helpers import OrganizationBreadcrumbsMixin
-from two_factor.views.utils import class_view_decorator
 
 
-@class_view_decorator(otp_required)
 class OrganizationListView(
     PermissionRequiredMixin,
     OrganizationBreadcrumbsMixin,
