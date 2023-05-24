@@ -1,6 +1,6 @@
 
 window.addEventListener('load', (event) => {
-  loadform();
+  loadform("JsonSchemaForm");
 });
 
 var inputtypes = {
@@ -28,29 +28,29 @@ function loadform(className){
   schemafields.forEach(schemafield => {
     let schema = schemafield.value;
     let original = schemafield.dataset.original;
-    let identifier = schemafield.id || typefield.id;
+    let identifier = schemafield.id;
     let parent = schemafield.closest('fieldset') || schemafield.closest('form');
     schemafield.style.display = "none";
+    schema = JSON.parse(schema);
     settype(parent, schema, original, identifier);
     schemafield.addEventListener('change', (event) => {
       field = event.target;
       schema = field.value;
+      schema = JSON.parse(schema);
       original = field.dataset.original;
       parent = field.closest('fieldset') || field.closest('form');
       settype(parent, schema, original, identifier);
     });
     let form = schemafield.closest('form');
     form.addEventListener('submit', (event) => {
-      console.log('handle submit');
+      event.preventDefault();
+      let answer = form2json(form, schema, identifier);
+      console.log(answer);  // TODO: add to hidden schema field as value
     });
   });
-
 }
 
-
-
 function settype(parent, schema, original, identifier) {
-  schema = JSON.parse(schema);
   if (original) {
     try {
       original = JSON.parse(original);
@@ -79,6 +79,9 @@ function renderobject(original, path, schema){
   }
   let fieldset = document.createElement('fieldset');
   for (fieldname in schema['properties']) {
+    let legend = document.createElement('h3');
+    legend.innerText = fieldname;
+    fieldset.appendChild(legend);
     childoriginal = (original && original[fieldname]?original[fieldname]:false);
     childschema = schema['properties'][fieldname];
     subpath = path + '_' + fieldname;
@@ -92,6 +95,7 @@ function renderobject(original, path, schema){
         (schema['required'] && schema['required'].includes(fieldname)),
         childoriginal, subpath, fieldname, childschema));
     }
+    fieldset.appendChild(document.createElement("div"));
   }
   return fieldset;
 }
@@ -101,18 +105,18 @@ function renderarray(original, path, name, schema) {
     schema['required'] = [];
   }
   let fieldset = document.createElement('fieldset');
-  let header = document.createElement('h4');
-  let text = name.charAt(0).toUpperCase() + name.slice(1);
-  if (schema.minItems && schema.maxItems) {
-    text += ' (between '+schema.minItems+' and '+schema.maxItems+' items)';
-  } else if(schema.minItems) {
-    text += ' (at least '+schema.minItems+' items)';
-  } else if(schema.minItems) {
-    text += ' (at most '+schema.minItems+' items)';
-  }
-  let headertext = document.createTextNode(text);
-  header.appendChild(headertext);
-  fieldset.appendChild(header);
+  // let header = document.createElement('h4');
+  // let text = name.charAt(0).toUpperCase() + name.slice(1);
+  // if (schema.minItems && schema.maxItems) {
+  //   text += ' (between '+schema.minItems+' and '+schema.maxItems+' items)';
+  // } else if(schema.minItems) {
+  //   text += ' (at least '+schema.minItems+' items)';
+  // } else if(schema.minItems) {
+  //   text += ' (at most '+schema.minItems+' items)';
+  // }
+  // let headertext = document.createTextNode(text);
+  // header.appendChild(headertext);
+  // fieldset.appendChild(header);
   let minamount = 1;
   if (original && original.length) {
     minamount = original.length;
@@ -137,7 +141,7 @@ function renderarray(original, path, name, schema) {
       required = schema['required'] && count < (schema.minItems || 0);
       fieldset.appendChild(renderfield(required,
         (original && original[count]?original[count]:false),
-        subpath, name, schema['items'], true, count));
+        subpath, null, schema['items'], true, count));
     }
   }
 
@@ -162,7 +166,7 @@ function renderarray(original, path, name, schema) {
         subpath = path + '_' + fieldset.querySelectorAll('div').length;
         fieldset.insertBefore(renderfield(
             (schema['required'] && schema['required'].includes(name)),
-            false, subpath, name, schema['items']),
+            false, subpath, null, schema['items']),
           morebutton);
       }
     }
@@ -179,12 +183,6 @@ function renderarray(original, path, name, schema) {
 }
 
 function renderfield(required, originalvalue, path, name, field) {
-  let div = document.createElement('div');
-  let label = document.createElement('label');
-  let labeltext = document.createTextNode(name.charAt(0).toUpperCase() + name.slice(1));
-  label.appendChild(labeltext);
-  div.appendChild(label);
-
   let fieldformat = null;
   if (field['format']) {
     let format = field['format'];
@@ -198,7 +196,7 @@ function renderfield(required, originalvalue, path, name, field) {
     field['enum'].forEach(fieldvalue => {
       let value = document.createElement('option');
       value.value = fieldvalue;
-      if (originalvalue && originalvalue == fieldvalue) {
+      if (originalvalue && originalvalue === fieldvalue) {
         value.selected = true;
       }
       let valuetext = document.createTextNode(fieldvalue);
@@ -219,7 +217,6 @@ function renderfield(required, originalvalue, path, name, field) {
   }
   input.name = path;
   input.id = input.name;
-  label.htmlFor = input.id;
   input.required = required;
   if (field['pattern']) {
     input.pattern = field['pattern'];
@@ -230,11 +227,11 @@ function renderfield(required, originalvalue, path, name, field) {
       inputtypes[field['type']]:
       field['type']);
   }
-  if (field['type'] == 'number'){
+  if (field['type'] === 'number'){
     if (field['multipleOf']){
       input.step = field['multipleOf'];
     } else {
-      input.step = "0.01"; // default step size is one, thats what we have Integers for.
+      input.step = "0.01"; // default step size is one, that's what we have Integers for.
     }
     if (field['minimum']){
       input.min = field['minimum'];
@@ -258,6 +255,19 @@ function renderfield(required, originalvalue, path, name, field) {
   if (field['maxLength']) {
     input.maxlength = parseInt(field['maxLength']);
   }
+
+  let label = document.createElement('label');
+
+  if (name) {
+    let labeltext = document.createTextNode(name.charAt(0).toUpperCase() + name.slice(1));
+    label.appendChild(labeltext);
+  }
+
+  label.htmlFor = input.id;
+
+  let div = document.createElement('div');
+  div.appendChild(label);
+
   if (field['examples']){
     let datalist = document.createElement('datalist');
     for (let index = 0; index < field['examples'].length; ++index) {
@@ -276,6 +286,81 @@ function renderfield(required, originalvalue, path, name, field) {
   }
   div.appendChild(input);
   return div;
+}
+
+function form2json(wrapper, schema, identifier){
+  let content = null;
+  let fieldname = null;
+  //try:
+  if (schema['type'] == 'object'){
+    content = ContentFromPostObject(wrapper, identifier, '', schema);
+  } else if (schema['type'] == 'array'){
+    fieldname = schema['name'] || schema['description'] || schema['Content'];
+    content = ContentFromPostArray(wrapper, identifier, '', fieldname, schema);
+  }
+  if (content){
+    return content;
+  }
+  //except KeyError:
+  //pass
+  return false
+}
+
+
+function ContentFromPostObject(wrapper, identifier, path, schema){
+  let content = [];
+  let data = null;
+  let fieldname = null;
+  for (fieldname in schema['properties']){
+    subpath = path + '_' + fieldname;
+    childschema = schema['properties'][fieldname];
+    data = null;
+    if (schema['properties'][fieldname]['type'] == 'array'){
+      data = ContentFromPostArray(wrapper, identifier, subpath, fieldname, childschema);
+    } else if (schema['properties'][fieldname]['type'] == 'object'){
+      data = ContentFromPostObject(wrapper, identifier, subpath, childschema);
+    } else if (wrapper.elements[identifier+subpath]){
+      if (schema['properties'][fieldname]['type'] == 'number'){
+        data = parseFloat(wrapper.elements[identifier+subpath].value);
+      } else if (schema['properties'][fieldname]['type'] == 'int'){
+        data = parseInt(wrapper.elements[identifier+subpath].value);
+      } else {
+        data = wrapper.elements[identifier+subpath].value;
+      }
+    }
+    if (data){
+      content[fieldname] = data;
+    }
+  }
+  if (Object.keys(content).length){
+    return content;
+  }
+  return false;
+}
+
+function ContentFromPostArray(wrapper, identifier, path, fieldname, schema){
+  let maxcount = schema['maxItems'] || 9999;
+  let content =  [];
+  let data = null;
+  for (let count=0; count<maxcount; count++){
+    subpath = path + '_' + count;
+    data = null;
+    if (schema['items']['type'] == 'array'){
+      data = ContentFromPostArray(wrapper, identifier, subpath, fieldname, schema['items']);
+    } else if (schema['items']['type'] == 'object'){
+      data = ContentFromPostObject(wrapper, identifier, subpath, schema['items']);
+    } else if (wrapper.elements[identifier+subpath]){
+      data = wrapper.elements[identifier+subpath].value;
+    }
+    if (!data){
+      break;
+    }
+    content.push(data);
+  }
+  if (content){
+    return content;
+  }
+  return false;
 }
 
 function resetform(wrapper) {
