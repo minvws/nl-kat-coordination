@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bytes.models import RetrievalLink, SecureHash
 
 
@@ -11,5 +13,10 @@ class HashRepository:
 
     def verify(self, link: RetrievalLink, secure_hash: SecureHash) -> bool:
         """Verify that the external party has seen the hash"""
+
+        raise NotImplementedError()
+
+    def get_signing_provider_url(self) -> Optional[str]:
+        """Get the specific signing provider url"""
 
         raise NotImplementedError()
