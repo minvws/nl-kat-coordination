@@ -8,15 +8,12 @@ from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import FileResponse, Http404
 from django.shortcuts import redirect
-from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
 
 from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
 
 
-@class_view_decorator(otp_required)
 class BytesRawView(OrganizationView):
     def get(self, request, **kwargs):
         try:
