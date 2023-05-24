@@ -9,7 +9,7 @@ from rocky.views.ooi_view import BaseOOIDetailView
 class MuteFindingView(OrganizationPermissionRequiredMixin, BaseOOIDetailView, FormView):
     template_name = "oois/ooi_mute_finding.html"
     form_class = MuteFindingForm
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.can_mute_findings"
     depth = 1
 
     def get_initial(self):
