@@ -13,7 +13,11 @@ class RiskLevelSeverity(Enum):
     MEDIUM = "medium"
     LOW = "low"
     RECOMMENDATION = "recommendation"
+
+    # pending = KAT still has to run the boefje to determine the risk level
     PENDING = 'pending'
+
+    # unkown = the third party has not determined the risk level (yet)
     UNKNOWN = 'unknown'
 
 
