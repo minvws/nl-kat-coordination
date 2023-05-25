@@ -7,15 +7,12 @@ from django.views.generic import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
 
 from fmea.forms import FailureModeForm
 from fmea.models import FailureMode, FailureModeEffect
 from fmea.views.view_helpers import FailureModeBreadcrumbsMixin
 
 
-@class_view_decorator(otp_required)
 class FailureModeCreateView(FailureModeBreadcrumbsMixin, CreateView):
     """
     Create a new failure mode with the failure mode form of FMEA.
@@ -53,7 +50,6 @@ class FailureModeCreateView(FailureModeBreadcrumbsMixin, CreateView):
         return breadcrumbs
 
 
-@class_view_decorator(otp_required)
 class FailureModeListView(FailureModeBreadcrumbsMixin, ListView):
     """
     View of all failure modes.
@@ -64,7 +60,6 @@ class FailureModeListView(FailureModeBreadcrumbsMixin, ListView):
     paginate_by = 10
 
 
-@class_view_decorator(otp_required)
 class FailureModeUpdateView(FailureModeBreadcrumbsMixin, UpdateView):
     model = FailureMode
     form_class = FailureModeForm
@@ -101,7 +96,6 @@ class FailureModeUpdateView(FailureModeBreadcrumbsMixin, UpdateView):
         return context
 
 
-@class_view_decorator(otp_required)
 class FailureModeDetailView(FailureModeBreadcrumbsMixin, DetailView):
     """
     View for 1 failure mode. Get failure mode with ID # in URL

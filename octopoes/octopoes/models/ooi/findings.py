@@ -1,4 +1,3 @@
-import abc
 from enum import Enum
 from typing import Literal, Optional
 
@@ -15,8 +14,14 @@ class RiskLevelSeverity(Enum):
     LOW = "low"
     RECOMMENDATION = "recommendation"
 
+    # pending = KAT still has to run the boefje to determine the risk level
+    PENDING = "pending"
 
-class FindingType(OOI, abc.ABC):
+    # unknown = the third party has been contacted, but third party has not determined the risk level (yet)
+    UNKNOWN = "unknown"
+
+
+class FindingType(OOI):
     id: str
 
     description: Optional[str]

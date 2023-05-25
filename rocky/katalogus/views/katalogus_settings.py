@@ -8,17 +8,17 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, TemplateView
-from django_otp.decorators import otp_required
 from requests import RequestException
 from tools.models import Organization
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.client import get_katalogus
 
 
-@class_view_decorator(otp_required)
-class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateView):
+class ConfirmCloneSettingsView(
+    OrganizationPermissionRequiredMixin, OrganizationView, UserPassesTestMixin, TemplateView
+):
     template_name = "confirmation_clone_settings.html"
+    permission_required = "tools.can_set_katalogus_settings"
 
     def test_func(self):
         user: KATUser = self.request.user
@@ -50,12 +50,11 @@ class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateVi
         )
 
 
-@class_view_decorator(otp_required)
 class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.can_view_katalogus_settings"
     plugin_type = "boefjes"
 
     def get_context_data(self, **kwargs):

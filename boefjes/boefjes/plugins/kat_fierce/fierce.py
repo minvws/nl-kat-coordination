@@ -81,14 +81,12 @@ def head_request(url, timeout=2):
 
     try:
         conn.request("HEAD", "/")
-    except (ConnectionError, socket.gaierror, socket.timeout):
-        return []
-    else:
         resp = conn.getresponse()
+        return resp.getheaders()
+    except (ConnectionError, socket.gaierror, socket.timeout, OSError):
+        return []
     finally:
         conn.close()
-
-    return resp.getheaders()
 
 
 def concatenate_subdomains(domain, subdomains):
