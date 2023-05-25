@@ -1,0 +1,9 @@
+{
+    "id": "kat_rdns_normalize",
+    "consumes": [
+        "rdns"
+    ],
+    "produces": [
+        "DNSPTRRecord"
+    ]
+}

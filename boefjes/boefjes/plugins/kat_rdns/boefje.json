@@ -1,0 +1,13 @@
+{
+    "id": "rdns",
+    "name": "Reverse DNS",
+    "description": "Resolve IP-addreses to a hostname",
+    "consumes": [
+        "IPAddressV4",
+        "IPAddressV6"
+    ],
+    "produces": [
+        "DNSPTRRecord"
+    ],
+    "scan_level": 1
+}
