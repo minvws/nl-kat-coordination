@@ -58,7 +58,7 @@ class OctopoesAPISession(requests.Session):
         return response
 
 
-# todo: use request Session and set default headers (accept-content, etc.)
+# todo: set default headers (accept-content, etc.)
 class OctopoesAPIConnector:
 
     """
@@ -144,6 +144,10 @@ class OctopoesAPIConnector:
     def delete(self, reference: Reference, valid_time: Optional[datetime] = None) -> None:
         params = {"reference": str(reference), "valid_time": valid_time}
         self.session.delete(f"/{self.client}/", params=params)
+
+    def delete_many(self, references: List[Reference], valid_time: Optional[datetime] = None) -> None:
+        params = {"valid_time": valid_time}
+        self.session.post(f"/{self.client}/objects/delete_many", params=params, json=[str(ref) for ref in references])
 
     def list_origin_parameters(self, origin_id: Set[str], valid_time: Optional[datetime] = None) -> List[str]:
         params = {"origin_id": origin_id, "valid_time": valid_time}

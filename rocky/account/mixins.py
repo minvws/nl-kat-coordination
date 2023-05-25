@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Optional
 
 from django.conf import settings
 from django.contrib import messages
@@ -69,7 +70,7 @@ class OrganizationView(View):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = None
-        self.octopoes_api_connector = None
+        self.octopoes_api_connector: Optional[OctopoesAPIConnector] = None
         self.organization_member = None
         self.indemnification_present = False
 

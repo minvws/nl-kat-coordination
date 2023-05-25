@@ -170,6 +170,7 @@ class OOIListView(BaseOOIListView):
 
     def _delete_oois(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
         connector = self.octopoes_api_connector
+        connector.delete_many()
 
         for ooi in selected_oois:
             try:

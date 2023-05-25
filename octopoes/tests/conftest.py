@@ -9,6 +9,7 @@ from requests.adapters import HTTPAdapter, Retry
 from octopoes.api.api import app
 from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
+from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.app import get_xtdb_client
 from octopoes.models import OOI, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.path import Direction, Path
@@ -175,8 +176,16 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
     xtdb_http_client.create_node()
 
     yield XTDBSession(xtdb_http_client)
-
+    xtdb_http_client.sync()
     xtdb_http_client.delete_node()
+
+
+@pytest.fixture
+def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
+    connector = OctopoesAPIConnector("http://ci_octopoes:80", "test")
+    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
+
+    return connector
 
 
 @pytest.fixture
