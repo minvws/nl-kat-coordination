@@ -103,9 +103,9 @@ deprecated==1.2.13 \
     --hash=sha256:43ac5335da90c31c24ba028af536a91d41d53f9e6901ddb021bcc572ce44e38d \
     --hash=sha256:64756e3e14c8c5eea9795d93c524551432a0be75629f8f29e67ab8caf076c76d
     # via opentelemetry-api
-fastapi==0.85.2 \
-    --hash=sha256:3e10ea0992c700e0b17b6de8c2092d7b9cd763ce92c49ee8d4be10fee3b2f367 \
-    --hash=sha256:6292db0edd4a11f0d938d6033ccec5f706e9d476958bf33b119e8ddb4e524bde
+fastapi==0.93.0 \
+    --hash=sha256:c2944febec6da706f4c82cdfa0de48afda960c8fbde29dec88697d55a67d7718 \
+    --hash=sha256:d6e6db5f096d67b475e2a09e1124983554f634fad50297de85fc3de0583df13a
     # via openkat (pyproject.toml)
 googleapis-common-protos==1.59.0 \
     --hash=sha256:4168fcb568a826a52f23510412da405abd93f4d23ba544bb68d943b14ba3cb44 \
@@ -343,23 +343,24 @@ sniffio==1.3.0 \
     --hash=sha256:e60305c5e5d314f5389259b7f22aaa33d8f7dee49763119234af3755c55b9101 \
     --hash=sha256:eecefdce1e5bbfb7ad2eeaabf7c1eeb404d7757c379bd1f7e5cce9d8bf425384
     # via anyio
-starlette==0.20.4 \
-    --hash=sha256:42fcf3122f998fefce3e2c5ad7e5edbf0f02cf685d646a83a08d404726af5084 \
-    --hash=sha256:c0414d5a56297d37f3db96a84034d61ce29889b9eaccf65eb98a0b39441fcaa3
+starlette==0.25.0 \
+    --hash=sha256:774f1df1983fd594b9b6fb3ded39c2aa1979d10ac45caac0f4255cbe2acb8628 \
+    --hash=sha256:854c71e73736c429c2bdb07801f2c76c9cba497e7c3cf4988fde5e95fe4cdb3c
     # via fastapi
 typing-extensions==4.5.0 \
     --hash=sha256:5cb5f4a79139d699607b3ef622a1dedafa84e115ab0024e0d9c044a9479ca7cb \
     --hash=sha256:fb33085c39dd998ac16d1431ebc293a8b3eedd00fd4a32de0ff79002c19511b4
     # via
+    #   openkat (pyproject.toml)
     #   opentelemetry-sdk
     #   pydantic
 urllib3==2.0.2 \
     --hash=sha256:61717a1095d7e155cdb737ac7bb2f4324a858a1e2e6466f6d03ff630ca68d3cc \
     --hash=sha256:d055c2f9d38dc53c808f6fdc8eab7360b6fdbbde02340ed25cfbcd817c62469e
     # via requests
-uvicorn==0.19.0 \
-    --hash=sha256:cc277f7e73435748e69e075a721841f7c4a95dba06d12a72fe9874acced16f6f \
-    --hash=sha256:cf538f3018536edb1f4a826311137ab4944ed741d52aeb98846f52215de57f25
+uvicorn==0.20.0 \
+    --hash=sha256:a4e12017b940247f836bc90b72e725d7dfd0c8ed1c51eb365f5ba30d9f5127d8 \
+    --hash=sha256:c3ed1598a5668208723f2bb49336f4509424ad198d6ab2615b7783db58d919fd
     # via openkat (pyproject.toml)
 wrapt==1.15.0 \
     --hash=sha256:02fce1852f755f44f95af51f69d22e45080102e9d00258053b79367d07af39c0 \

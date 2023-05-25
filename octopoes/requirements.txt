@@ -134,9 +134,9 @@ dnspython==2.2.1 \
     --hash=sha256:0f7569a4a6ff151958b64304071d370daa3243d15941a7beedf0c9fe5105603e \
     --hash=sha256:a851e51367fb93e9e1361732c1d60dab63eff98712e503ea7d92e6eccb109b4f
     # via openkat (pyproject.toml)
-fastapi==0.88.0 \
-    --hash=sha256:263b718bb384422fe3d042ffc9a0c8dece5e034ab6586ff034f6b4b1667c3eee \
-    --hash=sha256:915bf304180a0e7c5605ec81097b7d4cd8826ff87a02bb198e336fb9f3b5ff02
+fastapi==0.93.0 \
+    --hash=sha256:c2944febec6da706f4c82cdfa0de48afda960c8fbde29dec88697d55a67d7718 \
+    --hash=sha256:d6e6db5f096d67b475e2a09e1124983554f634fad50297de85fc3de0583df13a
     # via
     #   fastapi-utils
     #   openkat (pyproject.toml)
@@ -526,9 +526,9 @@ sqlalchemy==1.4.48 \
     # via
     #   fastapi-utils
     #   openkat (pyproject.toml)
-starlette==0.22.0 \
-    --hash=sha256:b092cbc365bea34dd6840b42861bdabb2f507f8671e642e8272d2442e08ea4ff \
-    --hash=sha256:b5eda991ad5f0ee5d8ce4c4540202a573bb6691ecd0c712262d0bc85cf8f2c50
+starlette==0.25.0 \
+    --hash=sha256:774f1df1983fd594b9b6fb3ded39c2aa1979d10ac45caac0f4255cbe2acb8628 \
+    --hash=sha256:854c71e73736c429c2bdb07801f2c76c9cba497e7c3cf4988fde5e95fe4cdb3c
     # via fastapi
 tldextract==3.4.0 \
     --hash=sha256:47aa4d8f1a4da79a44529c9a2ddc518663b25d371b805194ec5ce2a5f615ccd2 \
@@ -538,6 +538,7 @@ typing-extensions==4.5.0 \
     --hash=sha256:5cb5f4a79139d699607b3ef622a1dedafa84e115ab0024e0d9c044a9479ca7cb \
     --hash=sha256:fb33085c39dd998ac16d1431ebc293a8b3eedd00fd4a32de0ff79002c19511b4
     # via
+    #   openkat (pyproject.toml)
     #   opentelemetry-sdk
     #   pydantic
 urllib3==2.0.2 \

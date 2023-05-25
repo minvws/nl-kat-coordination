@@ -1,7 +1,9 @@
 anyio==3.6.2 \
     --hash=sha256:25ea0d673ae30af41a0c442f81cf3b38c7e79fdc7b60335a4c14e05eb0947421 \
     --hash=sha256:fbbe32bd270d2a2ef3ed1c5d45041250284e31fc0a4df4a5a6071842051a51e3
-    # via starlette
+    # via
+    #   httpcore
+    #   starlette
 asgiref==3.7.1 \
     --hash=sha256:33958cb2e4b3cd8b1b06ef295bd8605cde65b11df51d3beab39e2e149a610ab3 \
     --hash=sha256:8de379fcc383bcfe4507e229fc31209ea23d4831c850f74063b2c11639474dd2
@@ -18,6 +20,8 @@ certifi==2023.5.7 \
     --hash=sha256:0f0d56dc5a6ad56fd4ba36484d6cc34451e1c6548c61daad8c320169f91eddc7 \
     --hash=sha256:c6c2e98f5c7869efca1f8916fed228dd91539f9f1b444c314c06eef02980c716
     # via
+    #   httpcore
+    #   httpx
     #   openkat (pyproject.toml)
     #   requests
 charset-normalizer==3.1.0 \
@@ -117,9 +121,9 @@ exceptiongroup==1.1.1 \
     --hash=sha256:232c37c63e4f682982c8b6459f33a8981039e5fb8756b2074364e5055c498c9e \
     --hash=sha256:d484c3090ba2889ae2928419117447a14daf3c1231d5e30d0aae34f354f01785
     # via openkat (pyproject.toml)
-fastapi==0.85.2 \
-    --hash=sha256:3e10ea0992c700e0b17b6de8c2092d7b9cd763ce92c49ee8d4be10fee3b2f367 \
-    --hash=sha256:6292db0edd4a11f0d938d6033ccec5f706e9d476958bf33b119e8ddb4e524bde
+fastapi==0.93.0 \
+    --hash=sha256:c2944febec6da706f4c82cdfa0de48afda960c8fbde29dec88697d55a67d7718 \
+    --hash=sha256:d6e6db5f096d67b475e2a09e1124983554f634fad50297de85fc3de0583df13a
     # via openkat (pyproject.toml)
 googleapis-common-protos==1.59.0 \
     --hash=sha256:4168fcb568a826a52f23510412da405abd93f4d23ba544bb68d943b14ba3cb44 \
@@ -175,13 +179,24 @@ grpcio==1.54.2 \
 h11==0.14.0 \
     --hash=sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d \
     --hash=sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761
-    # via uvicorn
+    # via
+    #   httpcore
+    #   uvicorn
+httpcore==0.16.3 \
+    --hash=sha256:c5d6f04e2fc530f39e0c077e6a30caa53f1451096120f1f38b954afd0b17c0cb \
+    --hash=sha256:da1fb708784a938aa084bde4feb8317056c55037247c787bd7e19eb2c2949dc0
+    # via httpx
+httpx==0.23.3 \
+    --hash=sha256:9818458eb565bb54898ccb9b8b251a28785dd4a55afbc23d0eb410754fe7d0f9 \
+    --hash=sha256:a211fcce9b1254ea24f0cd6af9869b3d29aba40154e947d2a07bb499b3e310d6
+    # via openkat (pyproject.toml)
 idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
     --hash=sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
     # via
     #   anyio
     #   requests
+    #   rfc3986
 importlib-metadata==6.0.1 \
     --hash=sha256:1543daade821c89b1c4a55986c326f36e54f2e6ca3bad96be4563d0acb74dcd4 \
     --hash=sha256:950127d57e35a806d520817d3e92eec3f19fdae9f0cd99da77a407c5aabefba3
@@ -394,6 +409,10 @@ requests==2.31.0 \
     # via
     #   openkat (pyproject.toml)
     #   robotframework-requests
+rfc3986[idna2008]==1.5.0 \
+    --hash=sha256:270aaf10d87d0d4e095063c65bf3ddbc6ee3d0b226328ce21e036f946e421835 \
+    --hash=sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97
+    # via httpx
 rich==13.3.5 \
     --hash=sha256:2d11b9b8dd03868f09b4fffadc84a6a8cda574e40dc90821bd845720ebb8e89c \
     --hash=sha256:69cdf53799e63f38b95b9bf9c875f8c90e78dd62b2f00c13a911c7a3b9fa4704
@@ -429,10 +448,13 @@ six==1.16.0 \
 sniffio==1.3.0 \
     --hash=sha256:e60305c5e5d314f5389259b7f22aaa33d8f7dee49763119234af3755c55b9101 \
     --hash=sha256:eecefdce1e5bbfb7ad2eeaabf7c1eeb404d7757c379bd1f7e5cce9d8bf425384
-    # via anyio
-starlette==0.20.4 \
-    --hash=sha256:42fcf3122f998fefce3e2c5ad7e5edbf0f02cf685d646a83a08d404726af5084 \
-    --hash=sha256:c0414d5a56297d37f3db96a84034d61ce29889b9eaccf65eb98a0b39441fcaa3
+    # via
+    #   anyio
+    #   httpcore
+    #   httpx
+starlette==0.25.0 \
+    --hash=sha256:774f1df1983fd594b9b6fb3ded39c2aa1979d10ac45caac0f4255cbe2acb8628 \
+    --hash=sha256:854c71e73736c429c2bdb07801f2c76c9cba497e7c3cf4988fde5e95fe4cdb3c
     # via fastapi
 tomli==2.0.1 \
     --hash=sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc \
@@ -442,15 +464,16 @@ typing-extensions==4.5.0 \
     --hash=sha256:5cb5f4a79139d699607b3ef622a1dedafa84e115ab0024e0d9c044a9479ca7cb \
     --hash=sha256:fb33085c39dd998ac16d1431ebc293a8b3eedd00fd4a32de0ff79002c19511b4
     # via
+    #   openkat (pyproject.toml)
     #   opentelemetry-sdk
     #   pydantic
 urllib3==2.0.2 \
     --hash=sha256:61717a1095d7e155cdb737ac7bb2f4324a858a1e2e6466f6d03ff630ca68d3cc \
     --hash=sha256:d055c2f9d38dc53c808f6fdc8eab7360b6fdbbde02340ed25cfbcd817c62469e
     # via requests
-uvicorn==0.19.0 \
-    --hash=sha256:cc277f7e73435748e69e075a721841f7c4a95dba06d12a72fe9874acced16f6f \
-    --hash=sha256:cf538f3018536edb1f4a826311137ab4944ed741d52aeb98846f52215de57f25
+uvicorn==0.20.0 \
+    --hash=sha256:a4e12017b940247f836bc90b72e725d7dfd0c8ed1c51eb365f5ba30d9f5127d8 \
+    --hash=sha256:c3ed1598a5668208723f2bb49336f4509424ad198d6ab2615b7783db58d919fd
     # via openkat (pyproject.toml)
 wcwidth==0.2.6 \
     --hash=sha256:795b138f6875577cd91bba52baf9e445cd5118fd32723b460e30a0af30ea230e \
