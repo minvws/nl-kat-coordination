@@ -34,7 +34,7 @@ jobs:
         run: pytest --cov-report=xml
         working-directory: ./octopoes
 
-      - if: ${{ matrix.version == '3.8' }}
+      - if: ${{ matrix.version == '3.11' }}
         name: Upload coverage as artifact
         uses: actions/upload-artifact@v3
         with:
