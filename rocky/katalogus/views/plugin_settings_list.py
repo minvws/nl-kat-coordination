@@ -1,22 +1,22 @@
 import logging
 
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
-from django_otp.decorators import otp_required
 from requests import RequestException
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.views import SinglePluginView
 
 logger = logging.getLogger(__name__)
 
 
-@class_view_decorator(otp_required)
-class PluginSettingsListView(SinglePluginView, ListView):
+class PluginSettingsListView(OrganizationPermissionRequiredMixin, SinglePluginView, ListView):
     """
     Shows all settings available for a specific plugin (plugin schema settings).
     """
+
+    permission_required = "tools.can_view_katalogus_settings"
 
     def get(self, request, *args, **kwargs):
         try:
