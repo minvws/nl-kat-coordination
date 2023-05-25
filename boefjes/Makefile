@@ -66,6 +66,7 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm katalogus_integration
+	$(ci-docker-compose) down
 
 debian:
 	docker run --rm \

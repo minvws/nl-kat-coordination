@@ -1,9 +1,0 @@
-id: test-normalizer-1
-type: normalizer
-name: Test Normalizer 1
-version: 0.1
-image_name: test-normalizer-1
-description: |-
-    Just a dummy normalizer for demonstration purposes
-consumes: [text/html]
-produces: [WebPage]

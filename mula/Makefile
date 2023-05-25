@@ -101,17 +101,17 @@ migrate: ## Run migrations using alembic.
 
 utest: ## Run the unit tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm ci_scheduler_unit python -m pytest tests/unit/${file} $(if $(function),-k $(function))
+	$(ci-docker-compose) run --rm ci_scheduler_unit python -m pytest -v tests/unit/${file} $(if $(function),-k $(function))
 else
-	$(ci-docker-compose) run --rm ci_scheduler_unit python -m pytest tests/unit
+	$(ci-docker-compose) run --rm ci_scheduler_unit python -m pytest -v tests/unit
 endif
 	$(ci-docker-compose) down --remove-orphans
 
 itest: ## Run the integration tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm ci_scheduler_integration python -m pytest tests/integration/${file} $(if $(function),-k $(function))
+	$(ci-docker-compose) run --rm ci_scheduler_integration python -m pytest -v tests/integration/${file} $(if $(function),-k $(function))
 else
-	$(ci-docker-compose) run --rm ci_scheduler_integration python -m pytest tests/integration
+	$(ci-docker-compose) run --rm ci_scheduler_integration python -m pytest -v tests/integration
 endif
 	$(ci-docker-compose) down --remove-orphans
 

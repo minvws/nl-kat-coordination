@@ -3,7 +3,11 @@ from __future__ import annotations
 from unittest import TestCase
 from unittest.mock import patch
 
+import pytest
+from pydantic import ValidationError
+
 from octopoes.models import OOI
+from octopoes.models.pagination import Paginated
 from octopoes.models.types import (
     get_abstract_types,
     get_collapsed_types,
@@ -22,6 +26,7 @@ from tests.mocks.mock_ooi_types import (
     MockIPAddressV6,
     MockIPPort,
     MockNetwork,
+    MockOOIType,
     MockResolvedHostname,
 )
 
@@ -92,3 +97,19 @@ class TypeSystemTest(TestCase):
 
     def test_get_relations_abstract_class(self):
         self.assertEqual({"address": MockIPAddress}, get_relations(MockIPPort))
+
+    def test_paginated(self):
+        with pytest.raises(ValidationError):
+            Paginated.parse_obj({"items": []})
+
+        with pytest.raises(ValidationError):
+            Paginated.parse_obj({"count": 0})
+
+        Paginated.parse_obj({"count": 0, "items": []})
+        Paginated.parse_obj({"count": 0, "items": ["a"]})
+        Paginated[MockOOIType].parse_obj({"count": 0, "items": []})
+
+        with pytest.raises(ValidationError):
+            Paginated[MockOOIType].parse_obj({"count": 0, "items": ["a"]})
+
+        Paginated[MockOOIType].parse_obj({"count": 0, "items": [MockNetwork(name="test").dict()]})

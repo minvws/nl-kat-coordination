@@ -127,7 +127,7 @@ class Query:
         self._where_clauses.append(
             self._or_statement(
                 ooi_type.get_object_type(),
-                ooi_type.__subclasses__(),
+                ooi_type.strict_subclasses(),
                 field_name,
                 to_alias,
             )
@@ -148,7 +148,7 @@ class Query:
         if ooi_type not in get_abstract_types():
             return self._to_object_type_statement(ooi_type, ooi_type)
 
-        return f"(or {' '.join([self._to_object_type_statement(ooi_type, x) for x in ooi_type.__subclasses__()])} )"
+        return f"(or {' '.join([self._to_object_type_statement(ooi_type, x) for x in ooi_type.strict_subclasses()])} )"
 
     def _to_object_type_statement(self, ooi_type: Type[OOI], other_type: Type[OOI]) -> str:
         return f'[ {ooi_type.get_object_type()} :object_type "{other_type.get_object_type()}" ]'

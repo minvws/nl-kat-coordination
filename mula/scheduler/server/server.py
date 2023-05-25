@@ -151,7 +151,7 @@ class Server:
         self.api.add_api_route(
             path="/queues/{queue_id}/pop",
             endpoint=self.pop_queue,
-            methods=["GET"],
+            methods=["POST"],
             response_model=Optional[models.PrioritizedItem],
             status_code=200,
         )

@@ -8,12 +8,10 @@ from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django_otp.decorators import otp_required
 from requests import RequestException
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
 from tools.models import Indemnification
-from two_factor.views.utils import class_view_decorator
 
 from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
@@ -28,7 +26,6 @@ class PageActions(Enum):
     UPDATE_SCAN_PROFILE = "update-scan-profile"
 
 
-@class_view_decorator(otp_required)
 class OOIListView(BaseOOIListView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
