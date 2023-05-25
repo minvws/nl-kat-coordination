@@ -70,7 +70,6 @@ class RabbitMQ(Listener):
         self.channel.basic_consume(queue, on_message_callback=self.callback)
         self.channel.start_consuming()
 
-
     def get(self, queue: str) -> Optional[Dict[str, object]]:
         method, properties, body = self.channel.basic_get(queue)
 

@@ -1,6 +1,6 @@
 import logging
 import threading
-from typing import Dict, Optional
+from typing import Dict, Optional, Set
 
 from opentelemetry import trace
 
@@ -127,8 +127,13 @@ class App:
         organisations from the schedulers.
         """
         current_schedulers = self.schedulers.copy()
-        scheduler_orgs = {s.organisation.id for s in current_schedulers.values()}
-        katalogus_orgs = {org.id for org in self.ctx.services.katalogus.get_organisations()}
+
+        # We make a difference between the organisation id's that are used
+        # by the schedulers, and the organisation id's that are in the
+        # Katalogus service. We will add/remove schedulers based on the
+        # difference between these two sets.
+        scheduler_orgs: Set[str] = {s.organisation.id for s in current_schedulers.values()}
+        katalogus_orgs: Set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
         self.logger.debug("Organisations to add: %s", len(additions))
@@ -136,13 +141,13 @@ class App:
         removals = scheduler_orgs.difference(katalogus_orgs)
         self.logger.debug("Organisations to remove: %s", len(removals))
 
-        # Get scheduler ids for removals
-        removal_scheduler_ids = []
-        for s in current_schedulers.values():
-            if s.organisation.id in removals:
-                removal_scheduler_ids.append(s.scheduler_id)
+        # We need to get scheduler ids of the schedulers that are associated
+        # with the removed organisations
+        removal_scheduler_ids: Set[str] = {
+            s.scheduler_id for s in current_schedulers.values() if s.organisation.id in removals
+        }
 
-        # Remove schedulers for organisation
+        # Remove schedulers for removed organisations
         for scheduler_id in removal_scheduler_ids:
             with self.lock:
                 if scheduler_id not in self.schedulers:

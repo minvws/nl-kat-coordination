@@ -41,7 +41,7 @@ class NormalizerScheduler(Scheduler):
 
     def run(self) -> None:
         self.run_in_thread(
-            name="raw_file",
+            name=f"scheduler-{self.scheduler_id}-raw_file",
             target=self.listen_for_raw_data,
             loop=False,
         )
@@ -50,19 +50,11 @@ class NormalizerScheduler(Scheduler):
         """Listen for new raw data from the message queue and create tasks for
         the received raw data.
         """
-        try:
-            listener = connectors.listeners.RawData(
-                dsn=self.ctx.config.host_raw_data,
-                queue=f"{self.organisation.id}__raw_file_received",
-                func=self.push_tasks_for_received_raw_data,
-            )
-        except Exception:
-            self.logger.exception(
-                "Failed to initialize listener for scan profile mutations [organisation_id=%s, scheduler_id=%s]",
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
+        listener = connectors.listeners.RawData(
+            dsn=self.ctx.config.host_raw_data,
+            queue=f"{self.organisation.id}__raw_file_received",
+            func=self.push_tasks_for_received_raw_data,
+        )
 
         self.listeners.append(listener)
         listener.listen()

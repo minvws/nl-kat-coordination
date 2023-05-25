@@ -8,7 +8,8 @@ from .version import version
 logger = logging.getLogger(__name__)
 __version__ = version
 
-def shutdown(args) -> None:
+
+def shutdown(args: threading.ExceptHookArgs) -> None:
     """Gracefully shutdown the scheduler application, and all threads."""
     logger.info("Shutting down...")
 
