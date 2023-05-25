@@ -41,19 +41,19 @@ check: ## Check the code style using black, mypy and pylint.
 	make pylint
 
 mypy: ## Check code style using mypy.
-	$(ci-docker-compose) run --rm scheduler \
+	docker-compose run --rm scheduler \
 		python -m mypy --cache-dir /home/scheduler/.mypy_cache /app/scheduler/scheduler
 
 black: ## Check code style with black.
-	$(ci-docker-compose) run --rm scheduler \
+	docker-compose run --rm scheduler \
 		black --check --diff .
 
 pylint: ## Rate the code with pylint.
-	$(ci-docker-compose) run --rm scheduler \
+	docker-compsoe run --rm scheduler \
 		pylint --rcfile pyproject.toml scheduler
 
 fmt: ## Format the code using black.
-	$(ci-docker-compose) run --rm scheduler \
+	docker-compose run --rm scheduler \
 		black .
 
 done: ## Prepare for a commit.
@@ -62,7 +62,7 @@ done: ## Prepare for a commit.
 	make test
 
 cov: ## Generate a test coverage report
-	$(ci-docker-compose) run --rm scheduler \
+	docker-compose run --rm scheduler \
 		python -m pytest \
 		--cov-report term-missing:skip-covered \
 		--cov=scheduler tests/

@@ -111,11 +111,11 @@ class RabbitMQ(Listener):
         return self.is_host_available(parsed_url.hostname, parsed_url.port)
 
     def stop(self) -> None:
-        self.logger.info("Stopping RabbitMQ connection")
+        self.logger.debug("Stopping RabbitMQ connection")
 
         self.connection.add_callback_threadsafe(self._close_callback)
 
-        self.logger.info("RabbitMQ connection closed")
+        self.logger.debug("RabbitMQ connection closed")
 
     def _close_callback(self):
         self.channel.stop_consuming()

@@ -44,11 +44,11 @@ class ThreadRunner(threading.Thread):
             loop: A boolean describing whether the thread should run in a loop.
         """
         self.logger: logging.Logger = logging.getLogger(__name__)
+        self._target: Callable[[], Any] = target
         self.stop_event: threading.Event = stop_event
         self.interval: float = interval
-        self.exception: Optional[Exception] = None
-        self._target: Callable[[], Any] = target
         self.loop: bool = loop
+        self.exception: Optional[Exception] = None
 
         super().__init__(target=self._target, daemon=daemon)
 
@@ -86,12 +86,12 @@ class ThreadRunner(threading.Thread):
         self.logger.debug("Thread stopped: %s", self.name)
 
     def join(self, timeout: Optional[float] = None) -> None:
-        self.logger.warning("Stopping thread: %s", self.name)
+        self.logger.debug("Stopping thread: %s", self.name)
 
         self.stop_event.set()
         super().join(timeout)
 
-        self.logger.warning("Thread stopped: %s", self.name)
+        self.logger.debug("Thread stopped: %s", self.name)
 
     def stop(self) -> None:
         self.stop_event.set()

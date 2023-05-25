@@ -38,6 +38,8 @@ class Scheduler(abc.ABC):
             concurrently.
         stop_event: A threading.Event object used for communicating a stop
             event across threads.
+        listeners:
+            A dict of connector.Listener instances.
     """
 
     organisation: models.Organisation
@@ -49,6 +51,7 @@ class Scheduler(abc.ABC):
         queue: queues.PriorityQueue,
         ranker: rankers.Ranker,
         populate_queue_enabled: bool = True,
+        max_tries: int = -1,
     ):
         """Initialize the Scheduler.
 
@@ -62,7 +65,7 @@ class Scheduler(abc.ABC):
                 A queues.PriorityQueue instance
             ranker:
                 A rankers.Ranker instance.
-            populate_queue:
+            populate_queue_enabled:
                 A boolean whether to populate the queue.
             max_tries:
                 The maximum number of retries for a task to be pushed to
@@ -76,7 +79,7 @@ class Scheduler(abc.ABC):
         self.ranker: rankers.Ranker = ranker
 
         self.populate_queue_enabled: bool = populate_queue_enabled
-        self.max_tries: int = -1
+        self.max_tries: int = max_tries
 
         self.threads: List[thread.ThreadRunner] = []
         self.stop_event: threading.Event = threading.Event()
