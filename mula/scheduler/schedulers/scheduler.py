@@ -81,7 +81,7 @@ class Scheduler(abc.ABC):
         self.threads: List[thread.ThreadRunner] = []
         self.stop_event: threading.Event = threading.Event()
 
-        self.listeners: List[connectors.listeners.Listener] = []
+        self.listeners: Dict[str, connectors.listeners.Listener] = {}
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -304,7 +304,7 @@ class Scheduler(abc.ABC):
         # First stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
         # will not stop the thread. We need to explicitly stop the listener.
-        for lst in self.listeners:
+        for lst in self.listeners.values():
             lst.stop()
 
         for t in self.threads:

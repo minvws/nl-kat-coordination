@@ -5,7 +5,8 @@ from typing import Dict, List
 
 import requests
 
-from scheduler import connectors, context, queues, rankers
+from scheduler import context, queues, rankers
+from scheduler.connectors import listeners
 from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, RawData, TaskStatus
 
 from .scheduler import Scheduler
@@ -28,6 +29,9 @@ class NormalizerScheduler(Scheduler):
         organisation: Organisation,
         populate_queue_enabled: bool = True,
     ):
+        self.logger = logging.getLogger(__name__)
+        self.organisation: Organisation = organisation
+
         super().__init__(
             ctx=ctx,
             scheduler_id=scheduler_id,
@@ -36,28 +40,23 @@ class NormalizerScheduler(Scheduler):
             populate_queue_enabled=populate_queue_enabled,
         )
 
-        self.logger = logging.getLogger(__name__)
-        self.organisation: Organisation = organisation
+        self.initialize_listeners()
 
     def run(self) -> None:
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-raw_file",
-            target=self.listen_for_raw_data,
+            target=self.listeners["raw_data"].listen,
             loop=False,
         )
 
-    def listen_for_raw_data(self) -> None:
-        """Listen for new raw data from the message queue and create tasks for
-        the received raw data.
-        """
-        listener = connectors.listeners.RawData(
+    def initialize_listeners(self) -> None:
+        listener = listeners.RawData(
             dsn=self.ctx.config.host_raw_data,
             queue=f"{self.organisation.id}__raw_file_received",
             func=self.push_tasks_for_received_raw_data,
         )
 
-        self.listeners.append(listener)
-        listener.listen()
+        self.listeners["raw_data"] = listener
 
     def push_tasks_for_received_raw_data(self, latest_raw_data: RawData) -> None:
         """Create tasks for the received raw data.

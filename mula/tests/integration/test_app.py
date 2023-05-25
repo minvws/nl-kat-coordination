@@ -1,5 +1,4 @@
 import unittest
-from typing import Dict, List
 from unittest import mock
 
 import scheduler
@@ -7,27 +6,7 @@ from fastapi.testclient import TestClient
 from scheduler import config, models, repositories, server
 
 from tests.factories import OrganisationFactory
-
-
-class MockKatalogusService:
-    def __init__(self):
-        self.organisations: Dict[str, models.Organisation] = {}
-
-    def get_organisation(self, org_id: str) -> models.Organisation:
-        """Get the organisation with the given id."""
-        return self.organisations[org_id]
-
-    def get_organisations(self) -> List[models.Organisation]:
-        """Get all organisations."""
-        return list(self.organisations.values())
-
-    def get_new_boefjes_by_org_id(self, org_id: str) -> List[models.Boefje]:
-        """Get all new Boefjes for the given organisation."""
-        return []
-
-    def flush_caches(self) -> None:
-        """Flush the cache."""
-        pass
+from tests.mocks import MockKatalogusService
 
 
 class AppTestCase(unittest.TestCase):
@@ -56,6 +35,9 @@ class AppTestCase(unittest.TestCase):
         # Test client
         self.client = TestClient(self.app.server.api)
 
+    def tearDown(self):
+        self.app.shutdown()
+
     def test_monitor_orgs_add(self):
         """Test that when a new organisation is added, a new scheduler is created"""
         # Arrange
@@ -73,10 +55,6 @@ class AppTestCase(unittest.TestCase):
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-2"}, scheduler_org_ids)
-
-        # Clean up
-        for s in self.app.schedulers.values():
-            s.stop()
 
     def test_monitor_orgs_remove(self):
         """Test that when an organisation is removed, the scheduler is removed"""
@@ -143,7 +121,3 @@ class AppTestCase(unittest.TestCase):
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-3"}, scheduler_org_ids)
-
-        # Clean up
-        for s in self.app.schedulers.values():
-            s.stop()

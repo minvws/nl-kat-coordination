@@ -7,7 +7,8 @@ from typing import List
 import requests
 from opentelemetry import trace
 
-from scheduler import connectors, context, queues, rankers
+from scheduler import context, queues, rankers
+from scheduler.connectors import listeners
 from scheduler.models import (
     OOI,
     Boefje,
@@ -53,6 +54,8 @@ class BoefjeScheduler(Scheduler):
             populate_queue_enabled=populate_queue_enabled,
         )
 
+        self.initialize_listeners()
+
     @tracer.start_as_current_span("run")
     def run(self) -> None:
         """Populate the PriorityQueue.
@@ -66,7 +69,7 @@ class BoefjeScheduler(Scheduler):
         """
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-mutations",
-            target=self.listen_for_scan_profile_mutations,
+            target=self.listeners["scan_profile_mutations"].listen,
             loop=False,
         )
 
@@ -82,18 +85,17 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
-    def listen_for_scan_profile_mutations(self) -> None:
+    def initialize_listeners(self) -> None:
         """Listen for scan profile mutations and create tasks for oois that
         have a scan level change.
         """
-        listener = connectors.listeners.ScanProfileMutation(
+        listener = listeners.ScanProfileMutation(
             dsn=self.ctx.config.host_raw_data,
             queue=f"{self.organisation.id}__scan_profile_mutations",
             func=self.push_tasks_for_scan_profile_mutations,
         )
 
-        self.listeners.append(listener)
-        listener.listen()
+        self.listeners["scan_profile_mutations"] = listener
 
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
