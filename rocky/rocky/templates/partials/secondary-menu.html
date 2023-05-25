@@ -1,12 +1,44 @@
 {% load i18n %}
 
 {% if request.user.is_authenticated %}
-    <li>
-        <a href="{% url 'logout' %}" class="user-icon">{% translate "Logout" %}</a>
-    </li>
+<div
+  data-open-label="{{ user.full_name|slice:"1" }}"
+  data-close-label="{{ user.full_name|slice:"1" }}"
+  data-media="(min-width: 100%)"
+  aria-label="Acties"
+  class="collapsible">
+
+  <div class="collapsing-element">
+      <ul>
+        <li>
+          <a href="">
+            My organisations
+          </a>
+        </li>
+        <li>
+          <a href="#" aria-selected="true">
+            Profile
+          </a>
+        </li>
+        <li>
+          <a href="">
+            Settings
+          </a>
+        </li>
+        <li>
+            <a href="{% url 'logout' %}" class="user-icon">{% translate "Logout" %}</a>
+        </li>
+      </ul>
+  </div>
+</div>
 {% else %}
-    <li>
-        <a href="{% url "two_factor:login" %}"
-            {% if 'login' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Login" %}</a>
-    </li>
+  <div>
+    <ul>
+      <li>
+        <a href="{% url "two_factor:login" %}" {% if 'login' in request.path|urlencode %} aria-current="page"{% endif %}>
+            {% translate "Login" %}
+        </a>
+      </li>
+    </ul>
+  </div>
 {% endif %}
