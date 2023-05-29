@@ -105,10 +105,10 @@
   resolved "https://registry.yarnpkg.com/@lmdb/lmdb-win32-x64/-/lmdb-win32-x64-2.5.2.tgz#28f643fbc0bec30b07fbe95b137879b6b4d1c9c5"
   integrity sha512-zrBczSbXKxEyK2ijtbRdICDygRqWSRPpZMN5dD1T8VMEW5RIhIbwFWw2phDRXuBQdVDpSjalCIUMWMV2h3JaZA==
 
-"@minvws/manon@10.1.0":
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/@minvws/manon/-/manon-10.1.0.tgz#51ab63e9a1e274f5d778a636c0812e41012da182"
-  integrity sha512-YUf77pfkd3g4OsYR/mMWOS35m+0bkIsN8iGZpGZ7E5ALk7037p4JzB92TmfqeWt+y0/7L4NeppOwAaVZmhhNNQ==
+"@minvws/manon@12.2.0":
+  version "12.2.0"
+  resolved "https://registry.yarnpkg.com/@minvws/manon/-/manon-12.2.0.tgz#1ba71678afa4e03fc54e084e95e7ff2473e7b8ea"
+  integrity sha512-LQTLpMfPXJ2aOwLaxeinHffb4xUZy4eDNXy/2EKSeImybz9zRVxCvRJNDCl0WylXsI8b5A88QY9khVeDAnh32g==
 
 "@mischnic/json-sourcemap@^0.1.0":
   version "0.1.0"

@@ -32,7 +32,7 @@ $levels: l1, l2, l3, l4;
     background-size: contain;
     display: inline-block;
     min-width: 1rem;
-    min-height: 1rem;
+    height: 1rem;
   }
 
   &-form {
@@ -45,5 +45,16 @@ $levels: l1, l2, l3, l4;
 
   .level-indicator.#{$level}>li:nth-child(-n + #{$i}) {
     @extend %level-indicator--is-active;
+  }
+}
+
+form fieldset .level-indicator {
+  box-sizing: border-box;
+  min-height: 1.75rem;
+  display: block;
+  padding: 0.25rem 0;
+
+  li {
+    margin-right: 0.25rem;
   }
 }

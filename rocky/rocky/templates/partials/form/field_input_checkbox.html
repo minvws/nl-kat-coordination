@@ -12,9 +12,11 @@
         <span class="nota-bene">{% translate "This field is required" %}</span>
     {% endif %}
 
-    {{ field }}
-    {{ field.label_tag }}
-
+    <div class="checkbox">
+      {{ field }}
+      {{ field.label_tag }}
+    </div>
+    
     {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
     {% include "partials/form/field_input_errors.html" %}
   </div>
