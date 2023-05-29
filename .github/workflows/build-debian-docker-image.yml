@@ -41,7 +41,7 @@ jobs:
             type=ref,event=branch
             type=ref,event=tag
             type=ref,event=pr
-            type=raw,value=latest,enable=1
+            type=raw,value=latest,enable=true
             type=sha
 
       - name: Build and push Docker image
