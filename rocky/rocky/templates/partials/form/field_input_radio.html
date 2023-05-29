@@ -17,9 +17,9 @@
                   {{ choice.choice_label }}
               {% endif %}
           </label>
-          {% include "partials/form/field_input_help_text.html" with help_text=choice.help_text %}
-          {% include "partials/form/field_input_errors.html" with field=field %}
-
       </div>
   {% endfor %}
+
+    {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+    {% include "partials/form/field_input_errors.html" with field=field %}
 </fieldset>
