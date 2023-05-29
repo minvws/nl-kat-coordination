@@ -69,10 +69,10 @@
                     <h2>{% translate "OOI clearance" %}</h2>
                     {% if member.trusted_clearance_level <= 0 %}
                         <p>
-                            {% blocktranslate%}
-              You don't have any clearance to scan objects.<br>
-              Get in contact with the admin to give you the necessary clearance level.
-            {% endblocktranslate%}
+                            {% blocktranslate %}
+                                You don't have any clearance to scan objects.<br>
+                                Get in contact with the admin to give you the necessary clearance level.
+                            {% endblocktranslate %}
                         </p>
                     {% else %}
                         <p>
@@ -84,21 +84,21 @@
                             {% endif %}
                         </strong>
                     </p>
-                    {% if member.acknowledged_clearance_level < member.trusted_clearance_level %}
-                        <p class="explanation">
-                            {% blocktranslate trimmed with cl=member.trusted_clearance_level %}
-                  You are granted clearance for {{ cl }} your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>
-                {% endblocktranslate %}
-                        </p>
-                        {% include "partials/single_action_form.html" with btn_text="Accept level 4 clearance and responsibility" action="accept_clearance" key="member_id" value=member.id btn_class="ghost" %}
-
-                    {% else %}
-                        <p class="explanation">
-                            {% translate "You can withdraw this at anytime you like, but know that you're not able to change clearance levels anymore when you do." %}
-                        </p>
-                        {% include "partials/single_action_form.html" with btn_text="Withdraw acceptance up to level 4 clearance and responsibility" action="withdraw_acceptance" key="member_id" value=member.id btn_class="ghost" %}
-
-                    {% endif %}
+                    {% with cl=member.trusted_clearance_level|stringformat:"s" %}
+                        {% if member.acknowledged_clearance_level < member.trusted_clearance_level %}
+                            <p class="explanation">
+                                {% blocktranslate trimmed %}
+                                    You are granted clearance for level L{{ cl }} by your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>
+                                {% endblocktranslate %}
+                            </p>
+                            {% include "partials/single_action_form.html" with btn_text="Accept level L"|add:cl|add:" clearance and responsibility" action="accept_clearance" key="member_id" value=member.id btn_class="ghost" %}
+                        {% else %}
+                            <p class="explanation">
+                                {% translate "You can withdraw this at anytime you like, but know that you won't be able to change clearance levels anymore when you do." %}
+                            </p>
+                            {% include "partials/single_action_form.html" with btn_text="Withdraw acceptance of level L"|add:cl|add:" clearance and responsibility" action="withdraw_acceptance" key="member_id" value=member.id btn_class="ghost" %}
+                        {% endif %}
+                    {% endwith %}
                 {% endif %}
             </div>
         </section>
