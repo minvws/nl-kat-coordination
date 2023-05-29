@@ -5,6 +5,7 @@
   data-open-label="{{ user.full_name|slice:"1" }}"
   data-close-label="{{ user.full_name|slice:"1" }}"
   data-media="(min-width: 100%)"
+  data-button-classes="user-icon"
   aria-label="Acties"
   class="collapsible">
 
@@ -26,7 +27,7 @@
           </a>
         </li>
         <li>
-            <a href="{% url 'logout' %}" class="user-icon">{% translate "Logout" %}</a>
+            <a href="{% url 'logout' %}">{% translate "Logout" %}</a>
         </li>
       </ul>
   </div>
