@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - "packaging"
+      - ".github/workflows/build-debian-docker-image.yml"
 
 env:
   REGISTRY: ghcr.io
