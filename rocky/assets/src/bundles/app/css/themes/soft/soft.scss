@@ -1,19 +1,24 @@
 /* theme: Soft */
 /* Fonts */
-@import "fonts/fonts"; /* Fonts */
+@import "fonts/fonts";
+/* Fonts */
 
 /* Styling sets. E.g color sets */
 @import "manon/kat-purrple.scss";
 @import "manon/body-text-set";
-@import "manon/spot-large"; /* Branding colors */
-@import "manon/headings-base-set"; /* Defining available heading styles */
+@import "manon/spot-large";
+/* Branding colors */
+@import "manon/headings-base-set";
+/* Defining available heading styles */
 @import "manon/spacing";
 
 /* Base - Top level styling */
-@import "manon/application-base"; /* Styling on the highest level */
+@import "manon/application-base";
+/* Styling on the highest level */
 
 /* Helpers */
-/*@import "manon/center-only-child.scss";*/ /* Can be added after v10.1.1 */
+/*@import "manon/center-only-child.scss";*/
+/* Can be added after v10.1.1 */
 
 /* Layout */
 @import "manon/layout-set";
@@ -35,10 +40,13 @@
 /* Components */
 @import "manon/accordion";
 @import "manon/breadcrumb-bar";
-@import "manon/button-ghost"; /* Ghost button */
-@import "manon/button-icon"; /* Icon button */
+@import "manon/button-ghost";
+/* Ghost button */
+@import "manon/button-icon";
+/* Icon button */
 @import "manon/collapsible";
 @import "manon/emphasized";
+@import "manon/expando-rows";
 @import "manon/filter";
 @import "manon/header-navigation";
 @import "manon/header-navigation-content-wrapper";
