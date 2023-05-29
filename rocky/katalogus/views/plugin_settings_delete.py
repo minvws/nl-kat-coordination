@@ -4,17 +4,14 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django_otp.decorators import otp_required
 from requests import RequestException
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.views.mixins import SingleSettingView
 
 
-@class_view_decorator(otp_required)
 class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SingleSettingView, TemplateView):
     template_name = "plugin_settings_delete.html"
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.can_set_katalogus_settings"
 
     def post(self, request, *args, **kwargs):
         return self.delete(request, *args, **kwargs)

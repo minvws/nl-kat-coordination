@@ -49,7 +49,8 @@ KEIKO_API = os.getenv("KEIKO_API", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
-TWOFACTOR_ENABLED = os.getenv("TWOFACTOR_ENABLED") == "True"
+# SECURITY WARNING: enable two factor authentication in production!
+TWOFACTOR_ENABLED = os.getenv("TWOFACTOR_ENABLED", "True").casefold() != "false"
 
 ALLOWED_HOSTS = ["*"]
 

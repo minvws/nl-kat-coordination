@@ -119,9 +119,9 @@ Get Valid Time Params
     RETURN    ${valid_time_params}
 
 Await Tasks Done
-    Wait Until Keyword Succeeds    1 min    100ms    Task Type Empty    SENT
-    Wait Until Keyword Succeeds    1 min    100ms    Task Type Empty    RECEIVED
-    Wait Until Keyword Succeeds    1 min    100ms    Task Type Empty    STARTED
+    Wait Until Keyword Succeeds    1 min    200ms    Task Type Empty    SENT
+    Wait Until Keyword Succeeds    1 min    200ms    Task Type Empty    RECEIVED
+    Wait Until Keyword Succeeds    1 min    200ms    Task Type Empty    STARTED
 
 Task Type Empty
     [Arguments]    ${task_type}

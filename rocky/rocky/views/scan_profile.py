@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-from django_otp.decorators import otp_required
 from tools.forms.ooi import SetClearanceLevelForm
 from tools.models import Indemnification, OrganizationMember
 from tools.view_helpers import (
@@ -13,14 +12,12 @@ from tools.view_helpers import (
     get_mandatory_fields,
     get_ooi_url,
 )
-from two_factor.views.utils import class_view_decorator
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile
 from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
 from rocky.views.ooi_detail import OOIDetailView
 
 
-@class_view_decorator(otp_required)
 class ScanProfileDetailView(OOIDetailView, FormView):
     template_name = "scan_profiles/scan_profile_detail.html"
     form_class = SetClearanceLevelForm
