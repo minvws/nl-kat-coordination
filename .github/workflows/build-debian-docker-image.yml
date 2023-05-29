@@ -1,14 +1,10 @@
-
 name: Create and publish Docker image for building Debian packages
 
 on:
   workflow_dispatch: {}
-  push:
-    paths:
-      - "packaging/debian/Dockerfile"
   pull_request:
     paths:
-      - "packaging/debian/Dockerfile"
+      - "packaging"
 
 env:
   REGISTRY: ghcr.io
@@ -16,6 +12,9 @@ env:
 
 jobs:
   build-debian-image:
+    strategy:
+      matrix:
+        dist: [debian11, debian12, ubuntu22.04]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,7 +36,7 @@ jobs:
         uses: docker/metadata-action@12cce9efe0d49980455aaaca9b071c0befcdd702
         with:
           images: |
-            ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+            ghcr.io/${{ github.repository_owner }}/nl-kat-${{ matrix.dist }}
           tags: |
             type=ref,event=branch
             type=ref,event=tag
@@ -48,7 +47,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: ./packaging/debian
+          context: ./packaging/${{ matrix.dist }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

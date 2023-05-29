@@ -3,9 +3,6 @@ name: Create and publish Docker image for building Ubuntu packages
 
 on:
   workflow_dispatch: {}
-  push:
-    paths:
-      - "packaging/ubuntu/Dockerfile"
   pull_request:
     paths:
       - "packaging/ubuntu/Dockerfile"
