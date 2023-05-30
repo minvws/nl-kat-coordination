@@ -180,7 +180,7 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
     # TODO: Remove this work-around when this has been fixed: https://github.com/dekkers/xtdb-http-multinode/issues/9
     import time
 
-    time.sleep(0.5)
+    time.sleep(1)
 
     xtdb_http_client.delete_node()
 
