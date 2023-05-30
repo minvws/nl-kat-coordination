@@ -1,4 +1,5 @@
 import uuid
+from collections import Counter
 from datetime import datetime, timezone
 from logging import getLogger
 from typing import Dict, List, Optional, Set, Type
@@ -8,6 +9,7 @@ from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
 from octopoes.config.settings import Settings
+from octopoes.connector.octopoes import DEFAULT_LIMIT, DEFAULT_OFFSET, DEFAULT_SEVERITIES
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.models import (
@@ -23,7 +25,9 @@ from octopoes.models import (
 from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
+from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginParameter, OriginType
+from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
@@ -47,6 +51,10 @@ def extract_valid_time(valid_time: Optional[TimezoneAwareDatetime] = Query(None)
 
 def extract_required_valid_time(valid_time: TimezoneAwareDatetime) -> datetime:
     return valid_time
+
+
+def extract_references(references: Set[Reference] = Query(set())) -> Set[Reference]:
+    return references
 
 
 def extract_types(types: List[str] = Query(["OOI"])) -> Set[Type[OOI]]:
@@ -123,6 +131,15 @@ def list_objects(
     return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
 
 
+@router.get("/objects/bulk")
+def get_objects_bulk(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    references: Set[Reference] = Depends(extract_references),
+) -> Dict[Reference, OOI]:
+    return octopoes.ooi_repository.get_bulk(references, valid_time)
+
+
 @router.get("/object")
 def get_object(
     octopoes: OctopoesService = Depends(octopoes_service),
@@ -170,6 +187,8 @@ def get_tree(
 
 
 # Origin-related endpoints
+
+
 @router.get("/origins")
 def list_origins(
     octopoes: OctopoesService = Depends(octopoes_service),
@@ -223,6 +242,8 @@ def save_declaration(
 
 
 # ScanProfile-related endpoints
+
+
 @router.get("/scan_profiles")
 def scan_profiles(
     octopoes: OctopoesService = Depends(octopoes_service),
@@ -273,12 +294,30 @@ def get_scan_profile_inheritance(
     return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
 
 
-@router.get("/finding_types/count")
+@router.get("/findings")
+def list_findings(
+    exclude_muted: bool = True,
+    offset=DEFAULT_OFFSET,
+    limit=DEFAULT_LIMIT,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    severities: Set[RiskLevelSeverity] = Query(DEFAULT_SEVERITIES),
+) -> Paginated[Finding]:
+    return octopoes.ooi_repository.list_findings(
+        severities,
+        exclude_muted,
+        offset,
+        limit,
+        valid_time,
+    )
+
+
+@router.get("/findings/count_by_severity")
 def get_finding_type_count(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-) -> Dict[str, int]:
-    return octopoes.ooi_repository.get_finding_type_count(valid_time)
+) -> Counter:
+    return octopoes.ooi_repository.count_findings_by_severity(valid_time)
 
 
 @router.post("/node")

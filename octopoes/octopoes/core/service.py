@@ -118,6 +118,7 @@ class OctopoesService:
     def save_origin(self, origin: Origin, oois: List[OOI], valid_time: datetime) -> None:
         origin.result = [ooi.reference for ooi in oois]
 
+        # When an Origin is saved while the source OOI does not exist, reject saving the results
         if origin.origin_type != OriginType.DECLARATION and origin.source not in origin.result:
             try:
                 self.ooi_repository.get(origin.source, valid_time)
