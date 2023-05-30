@@ -209,3 +209,20 @@ See also https://github.com/minvws/nl-kat-mula/blob/main/docs/configuration.md
 | `EMAIL_USE_TLS`          | no       |               |                                  | https://docs.djangoproject.com/en/4.1/ref/settings/#email-use-tls                                 |
 | `EMAIL_USE_SSL`          | no       |               |                                  | https://docs.djangoproject.com/en/4.1/ref/settings/#email-use-ssl                                 |
 | `DATABASE_MIGRATION`     | no       | false         |                                  | Container entrypoint will run database migrations if set to "true"                                |
+
+(Upgrading_Containers)=
+## Upgrading
+
+When deploying new container images the database migrations are automatically
+run in the entrypoint. The OOI_database_seed.json file needs to be loaded
+manually using the following command:
+
+```shell
+python3 manage.py loaddata OOI_database_seed.json
+```
+
+With docker-compose you would run this as:
+
+```shell
+docker-compose -f docker-compose.release-example.yml exec rocky python3 manage.py loaddata OOI_database_seed.json
+```
