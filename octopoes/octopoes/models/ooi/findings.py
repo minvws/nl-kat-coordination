@@ -1,12 +1,34 @@
+from enum import Enum
 from typing import Literal, Optional
+
+from pydantic import AnyUrl
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
 
-# todo: make abstract
+class RiskLevelSeverity(Enum):
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    RECOMMENDATION = "recommendation"
+
+    # pending = KAT still has to run the boefje to determine the risk level
+    PENDING = "pending"
+
+    # unknown = the third party has been contacted, but third party has not determined the risk level (yet)
+    UNKNOWN = "unknown"
+
+
 class FindingType(OOI):
     id: str
+
+    description: Optional[str]
+    source: Optional[AnyUrl]
+
+    risk_score: Optional[float]
+    risk_severity: Optional[RiskLevelSeverity]
 
     _natural_key_attrs = ["id"]
     _information_value = ["id"]
