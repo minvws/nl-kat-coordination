@@ -54,60 +54,61 @@ class EventManager:
             event.client,
         )
 
-        if isinstance(event, ScanProfileDBEvent):
-            incremented = (event.operation_type == OperationType.CREATE and event.new_data.level > 0) or (
-                event.operation_type == OperationType.UPDATE and event.new_data.level > event.old_data.level
+        if not isinstance(event, ScanProfileDBEvent):
+            return
+
+        if not event.new_data:
+            return
+
+        incremented = (event.operation_type == OperationType.CREATE and event.new_data.level > 0) or (
+            event.operation_type == OperationType.UPDATE
+            and event.old_data
+            and event.new_data.level > event.old_data.level
+        )
+
+        if incremented:
+            ooi = json.dumps(
+                {
+                    "primary_key": event.reference,
+                    "object_type": event.reference.class_,
+                    "scan_profile": event.new_data.dict(),
+                }
             )
-            if incremented:
-                ooi = json.dumps(
-                    {
-                        "primary_key": event.new_data.reference,
-                        "object_type": event.new_data.reference.class_,
-                        "scan_profile": event.new_data.dict(),
-                    }
-                )
-
-                self.channel.basic_publish(
-                    "",
-                    f"{event.client}__scan_profile_increments",
-                    ooi.encode(),
-                    properties=pika.BasicProperties(
-                        delivery_mode=pika.DeliveryMode.Persistent,
-                    ),
-                )
-
-                logger.info(
-                    "Published scan_profile_increment [primary_key=%s] [level=%s]",
-                    format_id_short(event.primary_key),
-                    event.new_data.level,
-                )
-
-            # publish mutations
-            mutation = ScanProfileMutation(
-                operation=event.operation_type,
-                primary_key=event.primary_key,
-            )
-
-            if event.operation_type != OperationType.DELETE:
-                mutation.value = AbstractOOI(
-                    primary_key=event.new_data.reference,
-                    object_type=event.new_data.reference.class_,
-                    scan_profile=event.new_data,
-                )
 
             self.channel.basic_publish(
                 "",
-                f"{event.client}__scan_profile_mutations",
-                mutation.json().encode(),
-                properties=pika.BasicProperties(
-                    delivery_mode=pika.DeliveryMode.Persistent,
-                ),
+                f"{event.client}__scan_profile_increments",
+                ooi.encode(),
+                properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
             )
 
-            level = mutation.value.scan_profile.level if mutation.value != OperationType.DELETE else None
             logger.info(
-                "Published scan profile mutation [operation_type=%s] [primary_key=%s] [level=%s]",
-                mutation.operation,
+                "Published scan_profile_increment [primary_key=%s] [level=%s]",
                 format_id_short(event.primary_key),
-                level,
+                event.new_data.level,
             )
+
+        # publish mutations
+        mutation = ScanProfileMutation(operation=event.operation_type, primary_key=event.primary_key)
+
+        if event.operation_type != OperationType.DELETE:
+            mutation.value = AbstractOOI(
+                primary_key=event.new_data.reference,
+                object_type=event.new_data.reference.class_,
+                scan_profile=event.new_data,
+            )
+
+        self.channel.basic_publish(
+            "",
+            f"{event.client}__scan_profile_mutations",
+            mutation.json().encode(),
+            properties=pika.BasicProperties(delivery_mode=pika.DeliveryMode.Persistent),
+        )
+
+        level = mutation.value.scan_profile.level if mutation.value is not None else None
+        logger.info(
+            "Published scan profile mutation [operation_type=%s] [primary_key=%s] [level=%s]",
+            mutation.operation,
+            format_id_short(event.primary_key),
+            level,
+        )
