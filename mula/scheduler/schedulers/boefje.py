@@ -147,8 +147,11 @@ class BoefjeScheduler(Scheduler):
             for item in items:
                 self.ctx.pq_store.remove(
                     scheduler_id=self.scheduler_id,
-                    item_id=item.id,
+                    item_id=item.id.hex,
                 )
+
+                if item.hash is None:
+                    continue
 
                 task = self.ctx.task_store.get_latest_task_by_hash(item.hash)
                 if task is None:

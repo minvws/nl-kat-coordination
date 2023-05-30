@@ -28,7 +28,7 @@ class TaskStore(TaskStorer):
 
             if filters is not None:
                 for f in filters:
-                    query.filter(models.TaskORM.p_item[f.get_field()].astext == f.get_value())
+                    query.filter(models.TaskORM.p_item[f.get_field()].astext == f.value)
 
             count = query.count()
             tasks_orm = query.all()
