@@ -177,7 +177,7 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
 
     yield XTDBSession(xtdb_http_client)
 
-    # Temporary work-around until the race condition in xtdb-multinode when deleting nodes that are working is fixed.
+    # TODO: Remove this work-around when this has been fixed: https://github.com/dekkers/xtdb-http-multinode/issues/9
     import time
 
     time.sleep(0.5)
