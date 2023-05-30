@@ -83,9 +83,6 @@ def get_knowledge_base_data_for_ooi(ooi: OOI) -> Dict:
         if info.description:
             knowledge_base_data.update(info.data)
 
-        if isinstance(ooi, FindingType):
-            knowledge_base_data.update(risk_level_calculate(ooi, info))
-
     try:
         info_on_type = OOIInformation.objects.get(id=ooi.get_ooi_type())
         knowledge_base_data["Information"] = info_on_type.description

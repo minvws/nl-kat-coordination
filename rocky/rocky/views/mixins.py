@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timezone
 from functools import cached_property
-from typing import Dict, List, Optional, Set, Tuple, Type
+from typing import Dict, List, Optional, Set, Tuple, Type, Union
 
 import requests.exceptions
 from account.mixins import OrganizationView
@@ -25,7 +25,8 @@ from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.explanation import InheritanceSection
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.finding import HydratedFinding
+from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_collapsed_types, get_relations, type_by_name
@@ -173,6 +174,65 @@ class OOIList:
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
             ).items
+
+
+class FindingList:
+    def __init__(
+        self,
+        octopoes_connector: OctopoesAPIConnector,
+        valid_time: datetime,
+        severities: Set[RiskLevelSeverity],
+        exclude_muted: bool = True,
+    ):
+        self.octopoes_connector = octopoes_connector
+        self.valid_time = valid_time
+        self.ordered = True
+        self._count = None
+        self.severities = severities
+        self.exclude_muted = exclude_muted
+
+    @cached_property
+    def count(self) -> int:
+        return self.octopoes_connector.list_findings(
+            severities=self.severities,
+            exclude_muted=self.exclude_muted,
+            valid_time=self.valid_time,
+            limit=0,
+        ).count
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, key: Union[int, slice]) -> List[HydratedFinding]:
+        if isinstance(key, slice):
+            offset = key.start or 0
+            limit = key.stop - offset
+            findings = self.octopoes_connector.list_findings(
+                severities=self.severities,
+                exclude_muted=self.exclude_muted,
+                valid_time=self.valid_time,
+                offset=offset,
+                limit=limit,
+            ).items
+            ooi_references = {finding.ooi for finding in findings}
+            finding_type_references = {finding.finding_type for finding in findings}
+            objects = self.octopoes_connector.get_objects_bulk(
+                ooi_references | finding_type_references, valid_time=self.valid_time
+            )
+
+            hydrated_findings = []
+            for finding in findings:
+                if finding.ooi not in objects or finding.finding_type not in objects:
+                    continue
+                hydrated_findings.append(
+                    HydratedFinding(
+                        finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]
+                    )
+                )
+            return hydrated_findings
+
+        elif isinstance(key, int):
+            raise NotImplementedError("FindingList only supports slicing")
 
 
 class MultipleOOIMixin(OctopoesView):
