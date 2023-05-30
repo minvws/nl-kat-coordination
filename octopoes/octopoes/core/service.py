@@ -130,7 +130,6 @@ class OctopoesService:
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
         bit_definition = get_bit_definitions()[origin.method]
-
         is_disabled = bit_definition.id in settings.bits_disabled or (
             not bit_definition.default_enabled and bit_definition.id not in settings.bits_enabled
         )

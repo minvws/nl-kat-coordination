@@ -4,12 +4,14 @@ from typing import Dict, Iterator, List, Optional, Set
 from unittest.mock import Mock
 
 import pytest
+from bits.runner import BitRunner
 from requests.adapters import HTTPAdapter, Retry
 
 from octopoes.api.api import app
 from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.core.app import get_xtdb_client
+from octopoes.core.service import OctopoesService
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
@@ -170,6 +172,16 @@ def xtdbtype_multinode():
 @pytest.fixture
 def app_settings():
     return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def octopoes_service() -> OctopoesService:
+    return OctopoesService(Mock(), Mock(), Mock(), Mock())
+
+
+@pytest.fixture
+def bit_runner(mocker) -> BitRunner:
+    return mocker.patch("octopoes.core.service.BitRunner")
 
 
 @pytest.fixture
