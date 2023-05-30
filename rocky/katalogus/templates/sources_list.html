@@ -1,0 +1,46 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        {% if sources %}
+            <section>
+                <div>
+                    <h1>{% translate "Sources" %}</h1>
+                    <p>
+                        {% translate "Showing a list of all source links" %}
+                    </p>
+                    <div class="horizontal-scroll">
+                        <table>
+                            <caption>{% translate "Overview of sources:" %}</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% translate "Name" %}</th>
+                                    <th scope="col">{% translate "Link" %}</th>
+                                    <th scope="col">{% translate "OOI-Type" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for source in sources %}
+                                    <tr>
+                                        <td>{{ source.name }}</td>
+                                        <td>
+                                            <a href="{{ source.link }}" target="_blank">{{ source.content }}</a>
+                                        </td>
+                                        <td>{{ source.ooi_type }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% include "partials/pagination.html" %}
+
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+    </main>
+{% endblock content %}

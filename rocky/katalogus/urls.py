@@ -6,6 +6,7 @@ from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 from katalogus.views.plugin_settings_edit import PluginSettingsUpdateView
+from katalogus.views.sources_list import SourceListView
 
 urlpatterns = [
     path("", views.KATalogusView.as_view(), name="katalogus"),
@@ -59,5 +60,10 @@ urlpatterns = [
         "plugins/<plugin_type>/<plugin_id>/settings/delete/<setting_name>/",
         PluginSettingsDeleteView.as_view(),
         name="plugin_settings_delete",
+    ),
+    path(
+        "plugins/sources/",
+        SourceListView.as_view(),
+        name="plugin_sources",
     ),
 ]
