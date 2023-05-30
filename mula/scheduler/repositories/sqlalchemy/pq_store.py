@@ -134,9 +134,10 @@ class PriorityQueueStore(PriorityQueueStorer):
                 for f in filters:
                     query = query.filter(models.PrioritizedItemORM.data[f.get_field()].astext == f.value)
 
+            count = query.count()
             items_orm = query.all()
 
-            return ([models.PrioritizedItem.from_orm(item_orm) for item_orm in items_orm], len(items_orm))
+            return ([models.PrioritizedItem.from_orm(item_orm) for item_orm in items_orm], count)
 
     @retry()
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> Optional[models.PrioritizedItem]:

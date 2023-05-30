@@ -775,7 +775,9 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
     def test_push_task_for_scan_profile_mutations_delete_on_queue(self):
-        """When an OOI is deleted it should not create tasks"""
+        """When an OOI is deleted, and tasks associated with that ooi
+        should be removed from the queue
+        """
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -787,11 +789,29 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
             value=ooi,
         )
 
+        mutation2 = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+        )
+
+        models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+        )
+
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation1)
+
+        # Assert
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Arrange
         ooi.scan_profile.level = 1
@@ -805,10 +825,13 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation2)
 
         # Assert
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertIsNone(self.scheduler.queue.peek(0))
+        self.assertEqual(0, self.scheduler.queue.qsize())
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.CANCELLED)
 
 
 class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
