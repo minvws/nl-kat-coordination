@@ -1,0 +1,9 @@
+{
+    "id": "kat_adr_finding_types_normalize",
+    "consumes": [
+        "adr-finding-types"
+    ],
+    "produces": [
+        "ADRFindingType"
+    ]
+}
