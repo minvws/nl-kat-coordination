@@ -28,6 +28,7 @@ from octopoes.models import (
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
+from octopoes.models.finding import HydratedFinding
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import (
@@ -118,6 +119,7 @@ class OctopoesService:
     def save_origin(self, origin: Origin, oois: List[OOI], valid_time: datetime) -> None:
         origin.result = [ooi.reference for ooi in oois]
 
+        # When an Origin is saved while the source OOI does not exist, reject saving the results
         if origin.origin_type != OriginType.DECLARATION and origin.source not in origin.result:
             try:
                 self.ooi_repository.get(origin.source, valid_time)

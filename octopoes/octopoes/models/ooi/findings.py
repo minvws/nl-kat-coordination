@@ -13,6 +13,8 @@ class RiskLevelSeverity(Enum):
     MEDIUM = "medium"
     LOW = "low"
     RECOMMENDATION = "recommendation"
+    PENDING = 'pending'
+    UNKNOWN = 'unknown'
 
     # pending = KAT still has to run the boefje to determine the risk level
     PENDING = "pending"
@@ -31,7 +33,6 @@ class FindingType(OOI):
     risk_severity: Optional[RiskLevelSeverity]
 
     _natural_key_attrs = ["id"]
-    _information_value = ["id"]
     _traversable = False
 
     @classmethod
