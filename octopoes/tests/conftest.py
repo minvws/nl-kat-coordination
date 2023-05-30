@@ -10,7 +10,7 @@ from octopoes.api.api import app
 from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.core.app import get_xtdb_client
-from octopoes.models import OOI, EmptyScanProfile, Reference, ScanProfileBase
+from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
 from octopoes.repositories.ooi_repository import OOIRepository, XTDBOOIRepository
@@ -145,6 +145,16 @@ def resolved_hostname(hostname, ipaddressv4, ooi_repository, scan_profile_reposi
         scan_profile_repository,
         valid_time,
     )
+
+
+@pytest.fixture
+def empty_scan_profile():
+    return EmptyScanProfile(reference="test_reference")
+
+
+@pytest.fixture
+def declared_scan_profile():
+    return DeclaredScanProfile(reference="test_reference", level=2)
 
 
 @pytest.fixture

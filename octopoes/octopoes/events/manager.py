@@ -57,9 +57,6 @@ class EventManager:
         if not isinstance(event, ScanProfileDBEvent):
             return
 
-        if not event.new_data:
-            return
-
         incremented = (event.operation_type == OperationType.CREATE and event.new_data.level > 0) or (
             event.operation_type == OperationType.UPDATE
             and event.old_data
