@@ -9,12 +9,10 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
 from tools.view_helpers import convert_date_to_datetime, get_ooi_url
-from two_factor.views.utils import class_view_decorator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
@@ -37,7 +35,6 @@ from rocky.views.mixins import SingleOOITreeMixin
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
-@class_view_decorator(otp_required)
 class OOIReportView(BaseOOIDetailView):
     template_name = "oois/ooi_report.html"
     connector_form_class = OOIReportSettingsForm
@@ -73,7 +70,6 @@ class OOIReportView(BaseOOIDetailView):
         return context
 
 
-@class_view_decorator(otp_required)
 class OOIReportPDFView(SingleOOITreeMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -107,7 +103,6 @@ class OOIReportPDFView(SingleOOITreeMixin):
         )
 
 
-@class_view_decorator(otp_required)
 class FindingReportPDFView(FindingListView):
     paginate_by = None
 
