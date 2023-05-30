@@ -1,9 +1,14 @@
 from typing import Any, Dict, List, Type
 
 from account.forms import OnboardingOrganizationUpdateForm, OrganizationForm
-from account.mixins import OrganizationView
+from account.mixins import (
+    OrganizationPermissionRequiredMixin,
+    OrganizationView,
+    PermissionRequiredMixin,
+)
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.core.exceptions import BadRequest
 from django.http import Http404
@@ -13,19 +18,16 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
-from django_otp.decorators import otp_required
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
-from tools.models import Organization, OrganizationMember
+from tools.models import GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
     filter_ooi_tree,
     get_or_create_ooi,
 )
-from tools.user_helpers import is_red_team
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_ooi_url
-from two_factor.views.utils import class_view_decorator
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
@@ -37,14 +39,17 @@ from onboarding.forms import (
     OnboardingCreateUserRedTeamerForm,
     OnboardingSetClearanceLevelForm,
 )
-from onboarding.mixins import RedTeamUserRequiredMixin, SuperOrAdminUserRequiredMixin
 from onboarding.view_helpers import (
     KatIntroductionAdminStepsMixin,
     KatIntroductionRegistrationStepsMixin,
     KatIntroductionStepsMixin,
 )
 from rocky.bytes_client import get_bytes_client
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException, RockyError
+from rocky.exceptions import (
+    ClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    RockyError,
+)
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_report import DNSReport, Report, build_findings_list_from_store
 from rocky.views.ooi_view import BaseOOIDetailView, BaseOOIFormView, SingleOOITreeMixin
@@ -66,15 +71,24 @@ class OnboardingStart(OrganizationView):
     def get(self, request, *args, **kwargs):
         if request.user.is_superuser:
             return redirect("step_introduction_registration")
-        if is_red_team(request.user):
+        if self.organization_member.is_redteam:
             return redirect("step_introduction", kwargs={"organization_code": self.organization.code})
         return redirect("crisis_room")
 
 
+class RedteamRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if self.request.user.is_superuser:
+            return True
+        members = OrganizationMember.objects.filter(user=self.request.user)
+        return any(member.is_redteam for member in members)
+
+
 # REDTEAMER FLOW
-@class_view_decorator(otp_required)
+
+
 class OnboardingIntroductionView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
@@ -82,9 +96,8 @@ class OnboardingIntroductionView(
     current_step = 1
 
 
-@class_view_decorator(otp_required)
 class OnboardingChooseReportInfoView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
@@ -92,9 +105,8 @@ class OnboardingChooseReportInfoView(
     current_step = 2
 
 
-@class_view_decorator(otp_required)
 class OnboardingChooseReportTypeView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
@@ -102,9 +114,8 @@ class OnboardingChooseReportTypeView(
     current_step = 2
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetupScanSelectPluginsView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
@@ -149,9 +160,8 @@ class OnboardingSetupScanSelectPluginsView(
         return context
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetupScanOOIInfoView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
@@ -174,9 +184,8 @@ class OnboardingOOIForm(OOIForm):
         return self.generate_form_fields(self.hidden_ooi_fields)
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetupScanOOIAddView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     BaseOOIFormView,
 ):
@@ -241,9 +250,8 @@ class OnboardingSetupScanOOIAddView(
         return context
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetupScanOOIDetailView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     SingleOOITreeMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
@@ -284,9 +292,8 @@ class OnboardingSetupScanOOIDetailView(
         return context
 
 
-@class_view_decorator(otp_required)
 class OnboardingSetClearanceLevelView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     FormView,
@@ -335,9 +342,8 @@ class OnboardingSetClearanceLevelView(
         return tiles
 
 
-@class_view_decorator(otp_required)
 class OnboardingReportView(
-    RedTeamUserRequiredMixin,
+    RedteamRequiredMixin,
     KatIntroductionStepsMixin,
     TemplateView,
 ):
@@ -359,7 +365,7 @@ class OnboardingReportView(
         member.save()
 
 
-class BaseReportView(RedTeamUserRequiredMixin, BaseOOIDetailView):
+class BaseReportView(RedteamRequiredMixin, BaseOOIDetailView):
     report: Type[Report]
     depth = 15
 
@@ -379,7 +385,6 @@ class BaseReportView(RedTeamUserRequiredMixin, BaseOOIDetailView):
         return context
 
 
-@class_view_decorator(otp_required)
 class DnsReportView(OnboardingBreadcrumbsMixin, BaseReportView):
     template_name = "dns_report.html"
     report = DNSReport
@@ -407,11 +412,18 @@ class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):
     ]
 
 
+class AdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if self.request.user.is_superuser:
+            return True
+        members = OrganizationMember.objects.filter(user=self.request.user)
+        return any(member.is_admin for member in members)
+
+
 # account flow
-@class_view_decorator(otp_required)
-class OnboardingIntroductionRegistrationView(
-    SuperOrAdminUserRequiredMixin, KatIntroductionRegistrationStepsMixin, TemplateView
-):
+
+
+class OnboardingIntroductionRegistrationView(AdminRequiredMixin, KatIntroductionRegistrationStepsMixin, TemplateView):
     """
     Step: 1 - Registration introduction
     """
@@ -420,9 +432,8 @@ class OnboardingIntroductionRegistrationView(
     current_step = 1
 
 
-@class_view_decorator(otp_required)
 class OnboardingOrganizationSetupView(
-    SuperOrAdminUserRequiredMixin,
+    PermissionRequiredMixin,
     KatIntroductionRegistrationStepsMixin,
     CreateView,
 ):
@@ -434,6 +445,7 @@ class OnboardingOrganizationSetupView(
     template_name = "account/step_2a_organization_setup.html"
     form_class = OrganizationForm
     current_step = 2
+    permission_required = "tools.add_organization"
 
     def get(self, request, *args, **kwargs):
         organization = Organization.objects.first()
@@ -478,9 +490,8 @@ class OnboardingOrganizationSetupView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class OnboardingOrganizationUpdateView(
-    SuperOrAdminUserRequiredMixin,
+    OrganizationPermissionRequiredMixin,
     KatIntroductionAdminStepsMixin,
     UpdateView,
 ):
@@ -492,6 +503,7 @@ class OnboardingOrganizationUpdateView(
     template_name = "account/step_2a_organization_update.html"
     form_class = OnboardingOrganizationUpdateForm
     current_step = 2
+    permission_required = "tools.change_organization"
 
     def get_object(self, queryset=None):
         return self.organization
@@ -509,9 +521,7 @@ class OnboardingOrganizationUpdateView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class OnboardingIndemnificationSetupView(
-    SuperOrAdminUserRequiredMixin,
     KatIntroductionAdminStepsMixin,
     IndemnificationAddView,
 ):
@@ -526,8 +536,7 @@ class OnboardingIndemnificationSetupView(
         return reverse_lazy("step_account_setup_intro", kwargs={"organization_code": self.organization.code})
 
 
-@class_view_decorator(otp_required)
-class OnboardingAccountSetupIntroView(SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
+class OnboardingAccountSetupIntroView(AdminRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
     """
     Step 4: Split flow to or continue with single account or continue to multiple account creation
     """
@@ -536,10 +545,7 @@ class OnboardingAccountSetupIntroView(SuperOrAdminUserRequiredMixin, KatIntroduc
     current_step = 4
 
 
-@class_view_decorator(otp_required)
-class OnboardingAccountCreationMixin(SuperOrAdminUserRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
-    """ """
-
+class OnboardingAccountCreationMixin(AdminRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["organization_code"] = self.organization.code
@@ -547,7 +553,8 @@ class OnboardingAccountCreationMixin(SuperOrAdminUserRequiredMixin, KatIntroduct
 
 
 # Account setup for multiple user accounts: redteam, admins, clients
-@class_view_decorator(otp_required)
+
+
 class OnboardingChooseUserTypeView(KatIntroductionAdminStepsMixin, TemplateView):
     """
     Step 1: Introduction about how to create multiple user accounts
@@ -557,7 +564,6 @@ class OnboardingChooseUserTypeView(KatIntroductionAdminStepsMixin, TemplateView)
     template_name = "account/step_3_account_user_type.html"
 
 
-@class_view_decorator(otp_required)
 class OnboardingAccountSetupAdminView(
     RegistrationBreadcrumbsMixin,
     OnboardingAccountCreationMixin,
@@ -584,7 +590,6 @@ class OnboardingAccountSetupAdminView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class OnboardingAccountSetupRedTeamerView(
     RegistrationBreadcrumbsMixin,
     OnboardingAccountCreationMixin,
@@ -612,7 +617,6 @@ class OnboardingAccountSetupRedTeamerView(
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingAccountCreationMixin):
     """
     Step 3: Create a client account.
@@ -636,19 +640,16 @@ class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingA
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
-@class_view_decorator(otp_required)
 class CompleteOnboarding(OrganizationView):
     """
     Complete onboarding for redteamers and superusers.
     """
 
     def get(self, request, *args, **kwargs):
-        member, _ = OrganizationMember.objects.get_or_create(user=request.user, organization=self.organization)
-        redteam_group = Group.objects.get(name="redteam")
-        if self.request.user.is_superuser and redteam_group not in self.request.user.groups.all():
-            redteam_group.user_set.add(self.request.user)
+        if self.request.user.is_superuser and not self.organization_member.is_redteam:
+            self.organization_member.groups.add(Group.objects.get(name=GROUP_REDTEAM))
             return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
-        member.onboarded = True
-        member.status = OrganizationMember.STATUSES.ACTIVE
-        member.save()
+        self.organization_member.onboarded = True
+        self.organization_member.status = OrganizationMember.STATUSES.ACTIVE
+        self.organization_member.save()
         return redirect(reverse("crisis_room"))

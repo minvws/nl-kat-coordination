@@ -1,18 +1,16 @@
 from enum import Enum
 
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
-from django_otp.decorators import otp_required
 from requests.exceptions import RequestException
 from tools.models import OrganizationMember
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
-from two_factor.views.utils import class_view_decorator
 
 
 class BLOCK_STATUSES(models.TextChoices):
@@ -25,9 +23,8 @@ class PageActions(Enum):
     UNBLOCK = "unblock"
 
 
-@class_view_decorator(otp_required)
 class OrganizationMemberListView(
-    PermissionRequiredMixin,
+    OrganizationPermissionRequiredMixin,
     OrganizationMemberBreadcrumbsMixin,
     ListView,
 ):
@@ -61,7 +58,7 @@ class OrganizationMemberListView(
         self.filters_active = self.get_filters_active()
 
     def post(self, request, *args, **kwargs):
-        if not self.request.user.has_perm("tools.change_organizationmember"):
+        if not self.organization_member.has_perm("tools.change_organizationmember"):
             raise PermissionDenied()
         if "action" not in self.request.POST:
             return self.get(request, *args, **kwargs)

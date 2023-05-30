@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-from django_otp.decorators import otp_required
 from tools.forms.ooi import SetClearanceLevelForm
 from tools.models import Indemnification, OrganizationMember
 from tools.view_helpers import (
@@ -13,14 +12,12 @@ from tools.view_helpers import (
     get_mandatory_fields,
     get_ooi_url,
 )
-from two_factor.views.utils import class_view_decorator
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile
 from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
 from rocky.views.ooi_detail import OOIDetailView
 
 
-@class_view_decorator(otp_required)
 class ScanProfileDetailView(OOIDetailView, FormView):
     template_name = "scan_profiles/scan_profile_detail.html"
     form_class = SetClearanceLevelForm
@@ -67,7 +64,7 @@ class ScanProfileResetView(OOIDetailView):
     template_name = "scan_profiles/scan_profile_reset.html"
 
     def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
+        result = super().get(request, *args, **kwargs)
         if self.ooi.scan_profile.scan_profile_type != "declared":
             messages.add_message(
                 self.request,
@@ -78,11 +75,11 @@ class ScanProfileResetView(OOIDetailView):
             )
             return redirect(get_ooi_url("scan_profile_detail", self.ooi.primary_key, self.organization.code))
 
-        return super().get(request, *args, **kwargs)
+        return result
 
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
-        self.api_connector.save_scan_profile(
+        self.octopoes_api_connector.save_scan_profile(
             EmptyScanProfile(reference=self.ooi.reference),
             valid_time=datetime.now(timezone.utc),
         )

@@ -19,11 +19,12 @@ class TaskStorer(abc.ABC):
     def get_tasks(
         self,
         scheduler_id: Optional[str],
-        type: Optional[str],
+        task_type: Optional[str],
         status: Optional[str],
         min_created_at: Optional[datetime.datetime],
         max_created_at: Optional[datetime.datetime],
-        filters: Optional[List[models.Filter]],
+        input_ooi: Optional[str],
+        plugin_id: Optional[str],
         offset: int = 0,
         limit: int = 100,
     ) -> Tuple[List[models.Task], int]:

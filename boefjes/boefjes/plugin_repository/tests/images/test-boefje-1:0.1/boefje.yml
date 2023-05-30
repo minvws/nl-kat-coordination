@@ -1,9 +1,0 @@
-id: test-boefje-1
-type: boefje
-name: Test Boefje 1
-version: 0.1
-image_name: test-boefje-1
-description: |-
-    Just a dummy boefje for demonstration purposes
-consumes: WebPage
-produces: [text/html]

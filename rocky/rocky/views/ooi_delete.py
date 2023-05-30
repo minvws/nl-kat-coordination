@@ -1,17 +1,16 @@
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django_otp.decorators import otp_required
 from tools.view_helpers import get_ooi_url
-from two_factor.views.utils import class_view_decorator
 
 from rocky.views.mixins import SingleOOIMixin
 
 
-@class_view_decorator(otp_required)
-class OOIDeleteView(SingleOOIMixin, TemplateView):
+class OOIDeleteView(OrganizationPermissionRequiredMixin, SingleOOIMixin, TemplateView):
     template_name = "oois/ooi_delete.html"
+    permission_required = "tools.can_delete_oois"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

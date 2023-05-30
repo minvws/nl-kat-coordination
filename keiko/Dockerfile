@@ -1,4 +1,5 @@
-FROM python:3.8 AS dev
+ARG PYTHON_VERSION=3.11
+FROM python:$PYTHON_VERSION AS dev
 
 EXPOSE 8000
 
@@ -14,8 +15,15 @@ ENV PATH=/home/keiko/.local/bin:${PATH}
 # LateX dependencies
 RUN apt update -y \
     && apt install -y --no-install-recommends \
-        texlive-latex-base texlive-latex-extra texlive-latex-recommended \
-        texlive-lang-european texlive-fonts-recommended chktex \
+        chktex \
+        fonts-recommended \
+        latexmk \
+        texlive-fonts-recommended \
+        texlive-lang-european \
+        texlive-latex-base \
+        texlive-latex-extra \
+        texlive-latex-recommended \
+        texlive-xetex \
     && rm -rf /var/lib/apt/lists/*
 
 ENV KEIKO_REPORTS_FOLDER=/reports

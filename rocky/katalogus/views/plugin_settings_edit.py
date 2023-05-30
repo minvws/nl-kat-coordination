@@ -1,22 +1,19 @@
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-from django_otp.decorators import otp_required
 from requests import RequestException
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.forms import PluginSettingAddEditForm
 from katalogus.views.mixins import SingleSettingView
 
 
-@class_view_decorator(otp_required)
-class PluginSettingsUpdateView(PermissionRequiredMixin, SingleSettingView, FormView):
+class PluginSettingsUpdateView(OrganizationPermissionRequiredMixin, SingleSettingView, FormView):
     """View to update/edit a plugin setting for all plugins in KAT-alogus"""
 
     template_name = "plugin_settings_edit.html"
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.can_set_katalogus_settings"
 
     def get_form(self, **kwargs):
         settings_value = self.katalogus_client.get_plugin_settings(self.plugin.id).get(self.setting_name)

@@ -1,0 +1,21 @@
+{
+  "NS": [
+    "ns1.example.com.",
+    "ns2.example.com."
+  ],
+  "SOA": "ns.example.com. (192.0.2.1)",
+  "subdomains": {
+    "www": {
+      "url": "www.example.com.",
+      "ip": "192.0.2.2"
+    },
+    "subdomain": {
+      "url": "subdomain.example.com.",
+      "ip": "192.0.2.3"
+    },
+    "ipv6": {
+      "url": "ipv6.example.com.",
+      "ip": "ff02::1"
+    }
+  }
+}

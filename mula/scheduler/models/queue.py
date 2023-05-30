@@ -3,7 +3,8 @@ from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
-from sqlalchemy import JSON, Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 
 from scheduler.utils import GUID
@@ -46,10 +47,9 @@ class PrioritizedItemORM(Base):
 
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String)
-    hash = Column(String(32))
-
+    hash = Column(String(32), index=True)
     priority = Column(Integer)
-    data = Column(JSON, nullable=False)
+    data = Column(JSONB, nullable=False)
 
     created_at = Column(
         DateTime(timezone=True),
@@ -77,4 +77,4 @@ class Queue(BaseModel):
     allow_replace: bool
     allow_updates: bool
     allow_priority_updates: bool
-    pq: List[PrioritizedItem]
+    pq: Optional[List[PrioritizedItem]]

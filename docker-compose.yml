@@ -3,7 +3,7 @@ version: "3.9"
 services:
   rabbitmq:
     restart: unless-stopped
-    image: "rabbitmq:3.9-management"
+    image: "rabbitmq:3.11-management"
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -117,14 +117,7 @@ services:
   rocky:
     restart: unless-stopped
     depends_on:
-      - octopoes_api_worker
-      - octopoes_api
       - postgres
-      - boefje
-      - normalizer
-      - katalogus
-      - scheduler
-      - keiko
     ports:
       - "127.0.0.1:8000:80"
     build:

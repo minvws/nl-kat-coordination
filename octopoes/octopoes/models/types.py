@@ -11,6 +11,7 @@ from octopoes.models.ooi.certificate import (
     SubjectAlternativeNameQualifier,
     X509Certificate,
 )
+from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.records import (
     NXDOMAIN,
     DNSAAAARecord,
@@ -133,6 +134,7 @@ EmailSecurityType = Union[
     DKIMKey,
 ]
 MonitoringType = Union[Application, Incident]
+ConfigType = Union[Config]
 
 OOIType = Union[
     CertificateType,
@@ -151,24 +153,26 @@ OOIType = Union[
     Finding,
     MutedFinding,
     FindingTypeType,
+    ConfigType,
 ]
 
 
 def get_all_types(cls_: Type[OOI]) -> Iterator[Type[OOI]]:
     yield cls_
-    for subcls in cls_.__subclasses__():
-        yield from get_all_types(subcls)
+
+    for subclass in cls_.strict_subclasses():
+        yield from get_all_types(subclass)
 
 
 ALL_TYPES = set(get_all_types(OOI))
 
 
 def get_abstract_types() -> Set[Type[OOI]]:
-    return {t for t in ALL_TYPES if t.__subclasses__()}
+    return {t for t in ALL_TYPES if t.strict_subclasses()}
 
 
 def get_concrete_types() -> Set[Type[OOI]]:
-    return {t for t in ALL_TYPES if not t.__subclasses__()}
+    return {t for t in ALL_TYPES if not t.strict_subclasses()}
 
 
 def get_collapsed_types() -> Set[Type[OOI]]:

@@ -7,12 +7,10 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{longtable}
-\usepackage[utf8]{inputenc}
 \usepackage{lastpage}
 \usepackage{ragged2e}
 \usepackage{titlepic}
 \usepackage{xcolor}
-\usepackage{underscore}
 
 \hypersetup{
 	colorlinks=true,
@@ -97,13 +95,13 @@ niet vertrouwelijk en kan openbaar worden gedeeld.
 \chapter{DNS Records}
 
 {% for hostname in hostnames %}
-@@{hostname.name}@@
+@@{hostname.name|latex_escape}@@
 \begin{center}
 \begin{tabular}{ lllll  }
 	Hostname & Type &  TTL & Value  \\\toprule
 	\toprule
 	{% for dns_record in hostname.dns_records %}
-		@@{ dns_record.hostname }@@ & @@{ dns_record.dns_record_type }@@ & @@{ dns_record.ttl }@@ & @@{ dns_record.value }@@ \\
+		@@{ dns_record.hostname|latex_escape }@@ & @@{ dns_record.dns_record_type|latex_escape }@@ & @@{ dns_record.ttl|latex_escape }@@ & @@{ dns_record.value|latex_escape }@@ \\
 	{% endfor %}
 	\bottomrule
 \end{tabular}

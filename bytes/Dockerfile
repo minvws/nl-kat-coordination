@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.8
+ARG PYTHON_VERSION=3.11
 FROM python:$PYTHON_VERSION AS dev
 
 EXPOSE 8000
@@ -22,7 +22,7 @@ VOLUME /data
 # dependencies
 ARG ENVIRONMENT
 
-COPY requirements.txt requirements-dev.txt .
+COPY requirements.txt requirements-dev.txt ./
 RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip \
     && pip install -r requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi

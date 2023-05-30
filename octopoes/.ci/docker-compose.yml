@@ -4,14 +4,14 @@ services:
 
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3.9-management"
+    image: "rabbitmq:3.11-management"
     ports:
       - "127.0.0.1:29003:15672"
       - "127.0.0.1:29004:5672"
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s
-      retries: 10
+      retries: 4
     env_file:
       - ".ci/ci.env"
 
@@ -30,6 +30,20 @@ services:
     volumes:
       - ./.ci/health_check.py:/home/health_check.py
 
+  octopoes_integration:
+    build:
+      args:
+        ENVIRONMENT: dev
+      context: .
+    command: pytest -x tests/integration
+    depends_on:
+      - xtdb_multinode
+    env_file:
+      - ".ci/ci-multinode.env"
+
+  xtdb_multinode:
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.4"
+
   octopoes_api:
     build:
       context: .
@@ -39,6 +53,8 @@ services:
         condition: service_healthy
       crux:
         condition: service_healthy
+      katalogus_mock:
+        condition: service_started
     ports:
         - "127.0.0.1:29000:80"
     env_file:

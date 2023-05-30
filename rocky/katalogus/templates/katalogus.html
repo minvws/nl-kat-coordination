@@ -20,7 +20,7 @@
               {% endblocktranslate %}
                         </p>
                     </div>
-                    {% if perms.tools.can_scan_organization %}
+                    {% if perms.tools.can_view_katalogus_settings %}
                         <div class="horizontal-view toolbar">
                             <a class="button ghost"
                                href="{% url 'katalogus_settings' organization.code %}">{% translate "KAT-alogus Settings" %}</a>
@@ -86,6 +86,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

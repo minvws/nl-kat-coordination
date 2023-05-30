@@ -1,4 +1,4 @@
-from typing import Iterator, List, Union
+from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSNSRecord
@@ -7,8 +7,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def run(
-    hostname: Hostname,
-    additional_oois: List[Union[DNSAAAARecord, DNSARecord, DNSNSRecord]],
+    hostname: Hostname, additional_oois: List[Union[DNSAAAARecord, DNSARecord, DNSNSRecord]], config: Dict[str, str]
 ) -> Iterator[OOI]:
     dns_a_records = [dns_a_record for dns_a_record in additional_oois if isinstance(dns_a_record, DNSARecord)]
     dns_aaaa_records = [
