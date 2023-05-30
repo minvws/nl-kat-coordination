@@ -141,6 +141,14 @@ class OctopoesAPIConnector:
         params = {"valid_time": str(valid_time)}
         self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.json())
 
+    def save_many_scan_profiles(self, scan_profiles: List[ScanProfile], valid_time: Optional[datetime] = None) -> None:
+        params = {"valid_time": valid_time}
+        self.session.post(
+            f"/{self.client}/scan_profiles/save_many",
+            params=params,
+            json=[json.loads(scan_profile.json()) for scan_profile in scan_profiles],
+        )
+
     def delete(self, reference: Reference, valid_time: Optional[datetime] = None) -> None:
         params = {"reference": str(reference), "valid_time": valid_time}
         self.session.delete(f"/{self.client}/", params=params)

@@ -158,7 +158,7 @@ def delete_object(
 
 
 @router.post("/objects/delete_many", tags=["Objects"])
-def delete_multiple_objects(
+def delete_many(
     xtdb_session_: XTDBSession = Depends(xtdb_session),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
@@ -241,7 +241,7 @@ def save_declaration(
 
 # ScanProfile-related endpoints
 @router.get("/scan_profiles", tags=["Scan Profiles"])
-def scan_profiles(
+def list_scan_profiles(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     scan_profile_type: Optional[str] = Query(None),
@@ -262,6 +262,24 @@ def save_scan_profile(
         old_scan_profile = None
 
     octopoes.scan_profile_repository.save(old_scan_profile, scan_profile, valid_time)
+    xtdb_session_.commit()
+
+
+@router.post("/scan_profiles/save_many", tags=["Scan Profiles"])
+def save_many(
+    scan_profiles: List[ScanProfile],
+    xtdb_session_: XTDBSession = Depends(xtdb_session),
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+) -> None:
+    for scan_profile in scan_profiles:
+        try:
+            old_scan_profile = octopoes.scan_profile_repository.get(scan_profile.reference, valid_time)
+        except ObjectNotFoundException:
+            old_scan_profile = None
+
+        octopoes.scan_profile_repository.save(old_scan_profile, scan_profile, valid_time)
+
     xtdb_session_.commit()
 
 
