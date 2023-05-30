@@ -752,6 +752,64 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
+    def test_push_task_for_scan_profile_mutations_delete(self):
+        """When an OOI is deleted it should not create tasks"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        mutation1 = models.ScanProfileMutation(
+            operation=models.MutationOperationType.DELETE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+        )
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation1)
+
+        # Assert
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_task_for_scan_profile_mutations_delete_on_queue(self):
+        """When an OOI is deleted it should not create tasks"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        mutation1 = models.ScanProfileMutation(
+            operation=models.MutationOperationType.CREATE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+        )
+
+        # Mocks
+        self.mock_get_boefjes_for_ooi.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation1)
+
+        # Arrange
+        ooi.scan_profile.level = 1
+        mutation2 = models.ScanProfileMutation(
+            operation=models.MutationOperationType.DELETE,
+            primary_key=ooi.primary_key,
+            value=ooi,
+        )
+
+        # Act
+        self.scheduler.push_tasks_for_scan_profile_mutations(mutation2)
+
+        # Assert
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
 
 class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):

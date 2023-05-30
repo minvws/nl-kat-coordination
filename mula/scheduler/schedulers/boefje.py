@@ -12,6 +12,7 @@ from scheduler.models import (
     OOI,
     Boefje,
     BoefjeTask,
+    MutationOperationType,
     Organisation,
     Plugin,
     PrioritizedItem,
@@ -113,6 +114,21 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
+            return
+
+        if mutation.operation == MutationOperationType.DELETE:
+            self.logger.debug(
+                "Mutation operation is delete, skipping %s [organisation_id=%s, scheduler_id=%s]",
+                mutation,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+
+            # When task of the ooi are on the queue, we need to remove them
+            # from the queue.
+
+            # Delete all tasks for this ooi
+
             return
 
         # What available boefjes do we have for this ooi?
