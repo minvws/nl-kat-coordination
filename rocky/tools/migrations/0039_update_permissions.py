@@ -1,12 +1,15 @@
 from django.db import migrations
 
-from tools.models import GROUP_CLIENT, GROUP_REDTEAM
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
 
 
 def add_group_permissions(apps, schema_editor):
     Group = apps.get_model("auth", "Group")
     Permission = apps.get_model("auth", "Permission")
     try:
+        admin = Group.objects.get(name=GROUP_ADMIN)
+        admin.permissions.add(Permission.objects.get(codename="can_recalculate_bits"))
+
         redteam = Group.objects.get(name=GROUP_REDTEAM)
         redteam.permissions.add(Permission.objects.get(codename="can_mute_findings"))
         redteam.permissions.add(Permission.objects.get(codename="can_view_katalogus_settings"))
