@@ -14,8 +14,11 @@ from tools.models import Organization
 from katalogus.client import get_katalogus
 
 
-class ConfirmCloneSettingsView(OrganizationView, UserPassesTestMixin, TemplateView):
+class ConfirmCloneSettingsView(
+    OrganizationPermissionRequiredMixin, OrganizationView, UserPassesTestMixin, TemplateView
+):
     template_name = "confirmation_clone_settings.html"
+    permission_required = "tools.can_set_katalogus_settings"
 
     def test_func(self):
         user: KATUser = self.request.user
@@ -51,7 +54,7 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.can_view_katalogus_settings"
     plugin_type = "boefjes"
 
     def get_context_data(self, **kwargs):
