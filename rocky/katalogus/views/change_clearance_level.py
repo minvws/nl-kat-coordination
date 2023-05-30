@@ -1,3 +1,4 @@
+from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -7,8 +8,9 @@ from django.views.generic import TemplateView
 from katalogus.views.mixins import BoefjeMixin, SinglePluginView
 
 
-class ChangeClearanceLevel(BoefjeMixin, SinglePluginView, TemplateView):
+class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, SinglePluginView, TemplateView):
     template_name = "change_clearance_level.html"
+    permission_required = "tools.can_set_clearance_level"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

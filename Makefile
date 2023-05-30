@@ -6,7 +6,7 @@ SHELL := bash
 HIDE:=$(if $(VERBOSE),,@)
 UNAME := $(shell uname)
 
-.PHONY: $(MAKECMDGOALS)
+.PHONY: kat update reset up stop down clean fetch pull upgrade env-if-empty env build debian-build-image ubuntu-build-image
 
 # Export Docker buildkit options
 export DOCKER_BUILDKIT=1
@@ -91,3 +91,6 @@ debian-build-image:
 # Build Ubuntu build image
 ubuntu-build-image:
 	docker build -t kat-ubuntu-build-image packaging/ubuntu
+
+docs:
+	sphinx-build -b html docs/source docs/_build
