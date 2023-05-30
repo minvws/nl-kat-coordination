@@ -96,9 +96,13 @@ def add_redteam_group_permissions(member):
     group.permissions.set(redteam_permissions)
 
 
-def add_client_group(member):
+def add_client_group_permissions(member):
     group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
     member.groups.add(group)
+    client_permissions = [
+        Permission.objects.get(codename="can_scan_organization").id,
+    ]
+    group.permissions.set(client_permissions)
 
 
 @pytest.fixture
@@ -204,14 +208,14 @@ def clientuser_b(django_user_model):
 @pytest.fixture
 def client_member(clientuser, organization):
     member = create_member(clientuser, organization)
-    add_client_group(member)
+    add_client_group_permissions(member)
     return member
 
 
 @pytest.fixture
 def client_member_b(clientuser_b, organization_b):
     member = create_member(clientuser_b, organization_b)
-    add_client_group(member)
+    add_client_group_permissions(member)
     return member
 
 

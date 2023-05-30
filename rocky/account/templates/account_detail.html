@@ -63,7 +63,7 @@
                 </dl>
             </div>
         </section>
-        {% if perms.tools.can_scan_organization %}
+        {% if perms.tools.can_set_clearance_level %}
             <section>
                 <div>
                     <h2>{% translate "OOI clearance" %}</h2>
@@ -92,11 +92,13 @@
                                 {% endblocktranslate %}
                             </p>
                             {% include "partials/single_action_form.html" with btn_text="Accept level L"|add:cl|add:" clearance and responsibility" action="accept_clearance" key="member_id" value=member.id btn_class="ghost" %}
+
                         {% else %}
                             <p class="explanation">
                                 {% translate "You can withdraw this at anytime you like, but know that you won't be able to change clearance levels anymore when you do." %}
                             </p>
                             {% include "partials/single_action_form.html" with btn_text="Withdraw acceptance of level L"|add:cl|add:" clearance and responsibility" action="withdraw_acceptance" key="member_id" value=member.id btn_class="ghost" %}
+
                         {% endif %}
                     {% endwith %}
                 {% endif %}
