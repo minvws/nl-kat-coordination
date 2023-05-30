@@ -91,3 +91,6 @@ debian-build-image:
 # Build Ubuntu build image
 ubuntu-build-image:
 	docker build -t kat-ubuntu-build-image packaging/ubuntu
+
+docs:
+	sphinx-build -b html docs/source docs/_build
