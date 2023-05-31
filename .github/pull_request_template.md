@@ -2,7 +2,9 @@
 _Please describe the essence of this PR in a few sentences. Mention any breaking changes or required configuration steps._
 
 ### Issue link
-_Please add a link to the issue. If there is no issue for this PR, please add it to the project board directly._
+_Please add a link to the issue after "Closes". If there is no issue for this PR, please add it to the project board directly._
+
+Closes ...
 
 ### Proof
 _Please add some proof of your working change here, unless this is not required (e.g. this PR is trivial)._
