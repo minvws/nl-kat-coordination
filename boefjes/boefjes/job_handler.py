@@ -1,4 +1,5 @@
 import logging
+import os
 import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -83,6 +84,20 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
             f"{settings.katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
         ).json()
 
+        # Add prefixed BOEFJE_* environment variables,
+        # if and only if they are defined in boefje.json
+        for key, value in os.environ.items():
+            if key.startswith("BOEFJE_"):
+                logger.info("starts with boefje: %s", key)
+                katalogus_key = key.split("BOEFJE_", 1)[1]
+                logger.info("key boefje: %s", katalogus_key)
+                if katalogus_key in environment_keys and katalogus_key not in environment:
+                    logger.info("key match and priority!: %s", katalogus_key)
+                    # Katalogus settings take priority
+                    environment[katalogus_key] = value
+
+        logger.info("PERZIK: %s", environment)
+
         return {k: v for k, v in environment.items() if k in environment_keys}
     except RequestException:
         logger.exception("Error getting environment settings")
@@ -118,6 +133,8 @@ class BoefjeHandler(Handler):
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
+        logger.info("PERZIK: %s", boefje_meta)
+
         if boefje_meta.input_ooi:
             boefje_meta.arguments["input"] = serialize_ooi(
                 _find_ooi_in_past(
@@ -134,6 +151,8 @@ class BoefjeHandler(Handler):
 
         boefje_meta.started_at = datetime.now(timezone.utc)
         boefje_results = None
+
+        logger.info("PERZIK: %s", environment)
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, environment)
