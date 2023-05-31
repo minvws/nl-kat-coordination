@@ -51,7 +51,9 @@ DEBUG = os.getenv("DEBUG") == "True"
 # SECURITY WARNING: enable two factor authentication in production!
 TWOFACTOR_ENABLED = os.getenv("TWOFACTOR_ENABLED", "True").casefold() != "false"
 
-ALLOWED_HOSTS = ["*"]
+# A list of strings representing the host/domain names that this Django site can serve.
+# https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split()
 
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
@@ -255,6 +257,10 @@ CSRF_COOKIE_SAMESITE = "Strict"
 
 # only allow http to read csrf cookies, not Javascript
 CSRF_COOKIE_HTTPONLY = True
+
+# A list of trusted origins for unsafe requests (e.g. POST)
+# https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
+CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
 
 # Setup sane security defaults for application
 # Deny x-framing, which is standard since Django 3.0
