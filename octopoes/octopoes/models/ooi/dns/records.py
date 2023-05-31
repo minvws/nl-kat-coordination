@@ -139,6 +139,7 @@ class NXDOMAIN(OOI):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"NXDOMAIN response on {reference.tokenized.hostname.name}"
 
+
 class DNSPTRRecord(DNSRecord):
     object_type: Literal["DNSPTRRecord"] = "DNSPTRRecord"
     dns_record_type: Literal["PTR"] = "PTR"
@@ -155,5 +156,3 @@ class DNSPTRRecord(DNSRecord):
     def format_reference_human_readable(cls, reference: Reference):
         tokenized = reference.tokenized
         return f"{tokenized.address.address}"
-
-
