@@ -284,6 +284,8 @@ Start using OpenKAT
 
 By default OpenKAT will be accessible in your browser through `https://<server IP>:8443` (http://<server IP>:8000 for docker based installs). There, Rocky will take you through the steps of setting up your account and running your first boefjes.
 
+.. _Upgrading Debian:
+
 Upgrading OpenKAT
 =================
 
