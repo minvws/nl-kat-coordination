@@ -14,7 +14,7 @@ jobs:
   build-package:
     strategy:
       matrix:
-        dist: [debian, ubuntu]
+        dist: [debian11, ubuntu22.04]
     runs-on: ubuntu-latest
     env:
       PKG_NAME: kat-octopoes
