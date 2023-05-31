@@ -32,8 +32,12 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     descriptions = data["cve"]["description"]["description_data"]
     english_description = [description for description in descriptions if description["lang"] == "en"][0]
 
-    risk_score = data["impact"]["baseMetricV3"]["cvssV3"]["baseScore"]
-    risk_severity = get_risk_level(risk_score)
+    if data["impact"] == {}:
+        risk_severity = RiskLevelSeverity.UNKNOWN
+        risk_score = None
+    else:
+        risk_score = data["impact"]["baseMetricV3"]["cvssV3"]["baseScore"]
+        risk_severity = get_risk_level(risk_score)
 
     yield CVEFindingType(
         id=cve_finding_type_id,
