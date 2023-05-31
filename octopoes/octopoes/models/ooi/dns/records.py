@@ -155,6 +155,5 @@ class DNSPTRRecord(DNSRecord):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference):
         ip_address = reference.tokenized.address.address
-        
-        reverse = '.'.join(reversed(ip_address.split('.')))
+        reverse = ".".join(reversed(ip_address.split(".")))
         return f"{reverse}.in-addr.arpa"
