@@ -421,7 +421,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-TLS-1.1-AND-1.2-SUPPORT",
+    "pk": "KATFindingType|KAT-TLS-1.0-AND-1.1-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
