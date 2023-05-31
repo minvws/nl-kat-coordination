@@ -2,11 +2,11 @@ from django.urls import path
 
 from katalogus import views
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
+from katalogus.views.plugin_deep_link_list import PluginDeepLinkListView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_settings_add import PluginSettingsAddView, PluginSingleSettingAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 from katalogus.views.plugin_settings_edit import PluginSettingsUpdateView
-from katalogus.views.sources_list import SourceListView
 
 urlpatterns = [
     path("", views.KATalogusView.as_view(), name="katalogus"),
@@ -62,8 +62,8 @@ urlpatterns = [
         name="plugin_settings_delete",
     ),
     path(
-        "plugins/sources/",
-        SourceListView.as_view(),
-        name="plugin_sources",
+        "plugins/deep-link/",
+        PluginDeepLinkListView.as_view(),
+        name="plugin_deep_link",
     ),
 ]

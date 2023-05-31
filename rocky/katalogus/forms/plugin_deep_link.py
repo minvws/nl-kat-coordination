@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from tools.forms.settings import BLANK_CHOICE
 
-from katalogus.models import Source
+from katalogus.models import PluginDeepLink
 from octopoes.models.types import ALL_TYPES
 
 SORTED_OOI_TYPES = [BLANK_CHOICE] + [
@@ -10,14 +10,14 @@ SORTED_OOI_TYPES = [BLANK_CHOICE] + [
 ]
 
 
-class SourceForm(forms.ModelForm):
+class PluginDeepLinkForm(forms.ModelForm):
     class Meta:
-        model = Source
+        model = PluginDeepLink
         fields = "__all__"
         widgets = {"ooi_type": forms.Select(choices=SORTED_OOI_TYPES)}
         help_texts = {
-            "ooi_type": _("Choose an OOI-type where the source link will be bounded to."),
-            "name": _("Name your plugin which can be found in the KAT-alogus."),
+            "ooi_type": _("Choose an OOI-type where this plugin will be bounded to."),
+            "name": _("Give your plugin an unique name."),
             "content": _("This is the link text."),
             "link": _(
                 "Insert your link including the link parameters. "

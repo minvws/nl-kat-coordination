@@ -7,16 +7,16 @@
     {% include "header.html" %}
 
     <main id="main-content">
-        {% if sources %}
+        {% if plugin_deep_link %}
             <section>
                 <div>
-                    <h1>{% translate "Sources" %}</h1>
+                    <h1>{% translate "Deep Links" %}</h1>
                     <p>
-                        {% translate "Showing a list of all source links" %}
+                        {% translate "Showing a list of all deep links" %}
                     </p>
                     <div class="horizontal-scroll">
                         <table>
-                            <caption>{% translate "Overview of sources:" %}</caption>
+                            <caption>{% translate "Overview of deep links:" %}</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">{% translate "Name" %}</th>
@@ -25,13 +25,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for source in sources %}
+                                {% for deep_link in plugin_deep_link %}
                                     <tr>
-                                        <td>{{ source.name }}</td>
+                                        <td>{{ deep_link.plugin.name }}</td>
                                         <td>
-                                            <a href="{{ source.link }}" target="_blank">{{ source.content }}</a>
+                                            <a href="{{ deep_link.plugin.link }}" target="_blank">{{ deep_link.plugin.content }}</a>
                                         </td>
-                                        <td>{{ source.ooi_type }}</td>
+                                        <td>{{ deep_link.plugin.ooi_type }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

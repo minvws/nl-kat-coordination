@@ -1,10 +1,16 @@
 from django.contrib import admin
-from katalogus.forms import SourceForm
-from katalogus.models import Source
+
+from katalogus.forms import PluginDeepLinkForm
+from katalogus.models import OrganizationPlugin, PluginDeepLink
 
 
-class SourceAdmin(admin.ModelAdmin):
-    form = SourceForm
+class PluginDeepLinkAdmin(admin.ModelAdmin):
+    form = PluginDeepLinkForm
 
 
-admin.site.register(Source, SourceAdmin)
+class OrganizationPluginAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(PluginDeepLink, PluginDeepLinkAdmin)
+admin.site.register(OrganizationPlugin, OrganizationPluginAdmin)
