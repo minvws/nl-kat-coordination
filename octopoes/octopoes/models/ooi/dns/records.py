@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPAddress
+from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
 from octopoes.models.persistence import ReferenceField
 
 
@@ -154,5 +154,6 @@ class DNSPTRRecord(DNSRecord):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference):
-        tokenized = reference.tokenized
-        return f"{tokenized.address.address}.in-addr.arpa"
+        ip_address = reference.tokenized.address.address
+        reverse = '.'.join(reversed(ip_address.split('.')))
+        return f"{reverse}.in-addr.arpa"

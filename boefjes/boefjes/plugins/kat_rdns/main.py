@@ -1,7 +1,8 @@
-from typing import List, Tuple, Union
-from boefjes.job_models import BoefjeMeta
-import socket
 import json
+import socket
+from typing import List, Tuple, Union
+
+from boefjes.job_models import BoefjeMeta
 
 
 def run_rdns(ip_address: List[str]) -> str:

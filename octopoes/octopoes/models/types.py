@@ -19,9 +19,9 @@ from octopoes.models.ooi.dns.records import (
     DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
+    DNSPTRRecord,
     DNSSOARecord,
     DNSTXTRecord,
-    DNSPTRRecord,
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname, ResolvedHostname
 from octopoes.models.ooi.email_security import (
@@ -85,11 +85,11 @@ DnsRecordType = Union[
     DNSTXTRecord,
     DNSMXRecord,
     DNSNSRecord,
+    DNSPTRRecord,
     DNSSOARecord,
     DNSCNAMERecord,
     ResolvedHostname,
     NXDOMAIN,
-    DNSPTRRecord,
 ]
 FindingTypeType = Union[
     ADRFindingType,
