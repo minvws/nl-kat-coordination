@@ -29,3 +29,14 @@
 	/* Actions */
 	--table-action-buttons-button-font-size: var(--icon-font-size);
 }
+
+table td {
+
+	&.confirmation,
+	&.explanation,
+	&.error,
+	&.system,
+	&.warning {
+		border-width: 0 0 1px 0;
+	}
+}
