@@ -3,4 +3,12 @@
 :root {
     --logo-background-color: #111416;
     --logo-border-radius: 50%;
+    --logo-margin: 0;
+}
+
+.logo,
+a.logo,
+a:visited.logo,
+a:hover.logo {
+    align-self: center;
 }

@@ -7,13 +7,17 @@
 @import "manon/kat-purrple.scss";
 @import "manon/body-text-set";
 @import "manon/spot-large";
+
 /* Branding colors */
 @import "manon/headings-base-set";
+@import "manon/text-colors.scss";
+
 /* Defining available heading styles */
 @import "manon/spacing";
 
 /* Base - Top level styling */
 @import "manon/application-base";
+
 /* Styling on the highest level */
 
 /* Helpers */
@@ -41,8 +45,10 @@
 @import "manon/accordion";
 @import "manon/breadcrumb-bar";
 @import "manon/button-ghost";
+
 /* Ghost button */
 @import "manon/button-icon";
+
 /* Icon button */
 @import "manon/collapsible";
 @import "manon/emphasized";
@@ -51,6 +57,8 @@
 @import "manon/header-navigation";
 @import "manon/header-navigation-content-wrapper";
 @import "manon/header-navigation-collapsible";
+@import "manon/header-navigation-link";
+@import "manon/header-navigation-link-active";
 @import "manon/notification-block";
 @import "manon/layout-column-4.scss";
 @import "manon/description-list";

@@ -2,23 +2,22 @@
 
 :root {
 	/* Header */
-	--header-min-height: 3rem;
+	--header-min-height: 0;
 	--header-flex-direction: column;
 	--header-justify-content: space-between;
 
 	/* Header navigation */
 	--header-navigation-position: initial;
+	--header-navigation-align-items: stretch;
 	--header-navigation-background-color: transparent;
 	--header-navigation-padding-right: 3rem;
 	--header-navigation-padding-left: 3rem;
 	--header-navigation-border-width: 0;
 	--header-navigation-width: auto;
-	--header-navigation-min-height: 5rem;
+	--header-navigation-min-height: 4rem;
 	--header-navigation-gap: 1rem;
 	--header-navigation-content-wrapper-flex-direction: row;
-	  
-	/* Header navigation content wrapper */
-	--header-navigation-content-wrapper-gap: 1rem;
-	--header-navigation-content-wrapper-justify-content: flex-start;
-	--header-navigation-content-wrapper-align-items: center;
+
+	/* List item */
+	--header-navigation-list-item-text-color: var(--text-color-dark);
 }
