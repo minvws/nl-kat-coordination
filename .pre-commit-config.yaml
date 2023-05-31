@@ -23,6 +23,8 @@ repos:
     rev: v6.1.2
     hooks:
       - id: rstcheck
+        # https://github.com/rstcheck/rstcheck-core/issues/4
+        args: ["--ignore-messages", "Hyperlink target .* is not referenced"]
         additional_dependencies: ["rstcheck[sphinx]"]
 
   - repo: https://github.com/MarketSquare/robotframework-tidy

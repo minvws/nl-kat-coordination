@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -39,24 +40,23 @@ class DownloadTaskDetail(OrganizationView):
 class TaskListView(OrganizationView, ListView):
     paginate_by = 20
 
-    def get(self, request, *args, **kwargs):
-        self.scheduler_id = None
-        if self.organization:
-            self.scheduler_id = self.plugin_type + "-" + self.organization.code
-        else:
-            error_message = _("Organization could not be found")
-            messages.add_message(request, messages.ERROR, error_message)
-        return super().get(request, *args, **kwargs)
-
     def get_queryset(self):
-        if not self.scheduler_id:
-            return []
-
-        scheduler_id = self.request.GET.get("scheduler_id", self.scheduler_id)
+        scheduler_id = self.plugin_type + "-" + self.organization.code
         task_type = self.request.GET.get("type", self.plugin_type)
-        status = self.request.GET.get("status", None)
-        min_created_at = self.request.GET.get("min_created_at", None)
-        max_created_at = self.request.GET.get("max_created_at", None)
+
+        status = self.request.GET.get("scan_history_status") if self.request.GET.get("scan_history_status") else None
+
+        input_ooi = self.request.GET.get("scan_history_search") if self.request.GET.get("scan_history_search") else None
+
+        if self.request.GET.get("scan_history_from"):
+            min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+        else:
+            min_created_at = None
+
+        if self.request.GET.get("scan_history_to"):
+            max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
+        else:
+            max_created_at = None
 
         try:
             return client.get_lazy_task_list(
@@ -65,7 +65,9 @@ class TaskListView(OrganizationView, ListView):
                 status=status,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
+                input_ooi=input_ooi,
             )
+
         except HTTPError:
             error_message = _("Fetching tasks failed: no connection with scheduler")
             messages.add_message(self.request, messages.ERROR, error_message)
