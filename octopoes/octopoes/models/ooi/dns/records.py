@@ -155,4 +155,4 @@ class DNSPTRRecord(DNSRecord):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference):
         tokenized = reference.tokenized
-        return f"{tokenized.address.address}"
+        return f"{tokenized.address.address}.in-addr.arpa"

@@ -12,7 +12,7 @@ def run_rdns(ip_address: List[str]) -> str:
     try:
         hostname = socket.gethostbyaddr(ip_address)[0]
     except socket.herror:
-        print(f"Could not resolve hostname for {ip_address}")
+        return None
     else:
         data = {"IP-Address": ip_address, "Hostname": hostname}
         return data
