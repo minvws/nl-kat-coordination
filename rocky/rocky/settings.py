@@ -262,6 +262,20 @@ CSRF_COOKIE_HTTPONLY = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
 CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
 
+# Configuration for Gitpod
+if os.getenv("GITPOD_WORKSPACE_URL"):
+    # example environment variable: GITPOD_WORKSPACE_URL=https://minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io
+    # public url on https://8000-minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io/
+    ALLOWED_HOSTS.append("8000-" + os.getenv("GITPOD_WORKSPACE_URL").split("//")[1])
+    CSRF_TRUSTED_ORIGINS.append(os.getenv("GITPOD_WORKSPACE_URL").replace("//", "//8000-"))
+
+# Configuration for GitHub Codespaces
+if os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"):
+    # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
+    # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
+    ALLOWED_HOSTS.append("." + os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"))
+    CSRF_TRUSTED_ORIGINS.append("https://*." + os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"))
+
 # Setup sane security defaults for application
 # Deny x-framing, which is standard since Django 3.0
 # There is no need to embed this in a frame anywhere, not desired.
