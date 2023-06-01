@@ -93,19 +93,13 @@ class SettingsStorage(ABC):
     def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
-    def get_by_key(self, key: str, organisation_id: str, plugin_id: str) -> str:
-        raise NotImplementedError
-
     def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
         raise NotImplementedError
 
-    def create(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
+    def upsert(self, values: Dict, organisation_id: str, plugin_id: str) -> None:
         raise NotImplementedError
 
-    def update_by_key(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
-        raise NotImplementedError
-
-    def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
+    def delete(self, organisation_id: str, plugin_id: str) -> None:
         raise NotImplementedError
 
 
