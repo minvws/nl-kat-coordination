@@ -58,12 +58,13 @@ class OriginParameterDBEvent(DBEvent):
 
 class ScanProfileDBEvent(DBEvent):
     entity_type: Literal["scan_profile"] = "scan_profile"
+    reference: Reference
     old_data: Optional[ScanProfile]
     new_data: Optional[ScanProfile]
 
     @property
     def primary_key(self) -> Reference:
-        return self.new_data.reference if self.new_data else self.old_data.reference
+        return self.reference
 
 
 EVENT_TYPE = Union[OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent]

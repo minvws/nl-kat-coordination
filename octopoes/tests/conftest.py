@@ -4,8 +4,13 @@ from typing import Dict, List, Optional, Set
 from unittest.mock import Mock
 
 import pytest
+from bits.runner import BitRunner
 
-from octopoes.models import OOI, EmptyScanProfile, Reference, ScanProfileBase
+from octopoes.api.api import app
+from octopoes.api.router import settings
+from octopoes.config.settings import Settings, XTDBType
+from octopoes.core.service import OctopoesService
+from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
 from octopoes.repositories.ooi_repository import OOIRepository
@@ -138,3 +143,38 @@ def resolved_hostname(hostname, ipaddressv4, ooi_repository, scan_profile_reposi
         scan_profile_repository,
         valid_time,
     )
+
+
+@pytest.fixture
+def empty_scan_profile():
+    return EmptyScanProfile(reference="test_reference")
+
+
+@pytest.fixture
+def declared_scan_profile():
+    return DeclaredScanProfile(reference="test_reference", level=2)
+
+
+@pytest.fixture
+def xtdbtype_multinode():
+    def get_settings_override():
+        return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
+
+    app.dependency_overrides[settings] = get_settings_override
+    yield
+    app.dependency_overrides = {}
+
+
+@pytest.fixture
+def app_settings():
+    return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def octopoes_service() -> OctopoesService:
+    return OctopoesService(Mock(), Mock(), Mock(), Mock())
+
+
+@pytest.fixture
+def bit_runner(mocker) -> BitRunner:
+    return mocker.patch("octopoes.core.service.BitRunner")
