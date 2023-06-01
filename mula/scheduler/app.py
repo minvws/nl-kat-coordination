@@ -86,6 +86,7 @@ class App:
             ranker=ranker,
             populate_queue_enabled=self.ctx.config.normalizer_populate,
             organisation=org,
+            callback=self.remove_scheduler,
         )
 
         return scheduler
@@ -117,6 +118,7 @@ class App:
             ranker=ranker,
             populate_queue_enabled=self.ctx.config.boefje_populate,
             organisation=org,
+            callback=self.remove_scheduler,
         )
 
         return scheduler
@@ -149,12 +151,10 @@ class App:
 
         # Remove schedulers for removed organisations
         for scheduler_id in removal_scheduler_ids:
-            with self.lock:
-                if scheduler_id not in self.schedulers:
-                    continue
+            if scheduler_id not in self.schedulers:
+                continue
 
-                self.schedulers[scheduler_id].stop()
-                self.schedulers.pop(scheduler_id)
+            self.schedulers[scheduler_id].stop()
 
         if removals:
             self.logger.info(
@@ -252,7 +252,19 @@ class App:
 
     def shutdown(self) -> None:
         """Shutdown the scheduler application, and all threads."""
-        for s in self.schedulers.values():
+        for s in self.schedulers.copy().values():
             s.stop()
 
         self.stop_event.set()
+
+    def remove_scheduler(self, scheduler_id: str) -> None:
+        """Remove a scheduler from the application.
+
+        Args:
+            scheduler_id: The id of the scheduler to remove.
+        """
+        with self.lock:
+            if scheduler_id not in self.schedulers:
+                return
+
+            self.schedulers.pop(scheduler_id)

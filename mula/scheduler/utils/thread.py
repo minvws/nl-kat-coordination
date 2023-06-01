@@ -29,6 +29,8 @@ class ThreadRunner(threading.Thread):
         name: str,
         target: Callable[[], Any],
         stop_event: threading.Event,
+        callback: Optional[Callable[[], Any]] = None,
+        callback_args: Optional[tuple] = None,
         interval: float = 0.01,
         daemon: bool = False,
         loop: bool = True,
@@ -49,6 +51,8 @@ class ThreadRunner(threading.Thread):
         self.interval: float = interval
         self.loop: bool = loop
         self.exception: Optional[Exception] = None
+        self.callback: Optional[Callable[[], Any]] = callback
+        self.callback_args: Optional[tuple] = callback_args
 
         super().__init__(target=self._target, daemon=daemon)
 
@@ -66,6 +70,9 @@ class ThreadRunner(threading.Thread):
                 self.stop_event.set()
                 raise exc
 
+        if self.callback:
+            self.callback(*self.callback_args)
+
     def run_once(self) -> None:
         """Run the target function once."""
         try:
@@ -75,6 +82,9 @@ class ThreadRunner(threading.Thread):
             self.logger.exception("Exception in thread: %s", self.name)
             self.stop_event.set()
             raise exc
+
+        if self.callback:
+            self.callback(*self.callback_args)
 
     def run(self) -> None:
         self.logger.debug("Starting thread: %s", self.name)

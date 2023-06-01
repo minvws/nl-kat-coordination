@@ -95,10 +95,7 @@ class NormalizerTask(BaseModel):
     raw_data: RawData
 
     @property
-    def hash(self):
-        return self.__hash__()
-
-    def __hash__(self):
+    def hash(self) -> str:
         """Make NormalizerTask hashable, so that we can de-duplicate it when
         used in the PriorityQueue. We hash the combination of the attributes
         normalizer.id since this combination is unique."""
@@ -120,10 +117,7 @@ class BoefjeTask(BaseModel):
     dispatches: List[Normalizer] = Field(default_factory=list)
 
     @property
-    def hash(self):
-        return self.__hash__()
-
-    def __hash__(self) -> int:
+    def hash(self) -> str:
         """Make BoefjeTask hashable, so that we can de-duplicate it when used
         in the PriorityQueue. We hash the combination of the attributes
         input_ooi and boefje.id since this combination is unique."""

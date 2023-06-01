@@ -1,7 +1,7 @@
 import logging
 from concurrent import futures
 from types import SimpleNamespace
-from typing import Dict, List
+from typing import Callable, Dict, List, Optional
 
 import requests
 
@@ -27,6 +27,7 @@ class NormalizerScheduler(Scheduler):
         queue: queues.PriorityQueue,
         ranker: rankers.Ranker,
         organisation: Organisation,
+        callback: Optional[Callable[..., None]] = None,
         populate_queue_enabled: bool = True,
     ):
         self.logger = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ class NormalizerScheduler(Scheduler):
             scheduler_id=scheduler_id,
             queue=queue,
             ranker=ranker,
+            callback=callback,
             populate_queue_enabled=populate_queue_enabled,
         )
 
