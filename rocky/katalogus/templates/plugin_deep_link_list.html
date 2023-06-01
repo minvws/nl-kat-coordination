@@ -7,13 +7,15 @@
     {% include "header.html" %}
 
     <main id="main-content">
-        {% if plugin_deep_link %}
-            <section>
-                <div>
-                    <h1>{% translate "Deep Links" %}</h1>
-                    <p>
-                        {% translate "Showing a list of all deep links" %}
-                    </p>
+        <section>
+            <div>
+                {% include "partials/ooi_head.html" with ooi=ooi view="deep_links" %}
+
+                <h2>{% translate "Deep Links" %}</h2>
+                <p class="emphasized">
+                    {% translate "Showing a list of all deep links" %}
+                </p>
+                {% if plugin_deep_link %}
                     <div class="horizontal-scroll">
                         <table>
                             <caption>{% translate "Overview of deep links:" %}</caption>
@@ -21,17 +23,15 @@
                                 <tr>
                                     <th scope="col">{% translate "Name" %}</th>
                                     <th scope="col">{% translate "Link" %}</th>
-                                    <th scope="col">{% translate "OOI-Type" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for deep_link in plugin_deep_link %}
                                     <tr>
-                                        <td>{{ deep_link.plugin.name }}</td>
+                                        <td>{{ deep_link.name }}</td>
                                         <td>
-                                            <a href="{{ deep_link.plugin.link }}" target="_blank">{{ deep_link.plugin.content }}</a>
+                                            <a href="{{ deep_link.link }}" target="_blank">{{ deep_link.link_text }}</a>
                                         </td>
-                                        <td>{{ deep_link.plugin.ooi_type }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -39,8 +39,12 @@
                         {% include "partials/pagination.html" %}
 
                     </div>
-                </div>
-            </section>
-        {% endif %}
+                {% else %}
+                    <p>
+                        {% translate "There are no deep links to show." %}
+                    </p>
+                {% endif %}
+            </div>
+        </section>
     </main>
 {% endblock content %}

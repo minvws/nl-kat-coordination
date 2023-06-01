@@ -68,20 +68,7 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         return context
 
 
-class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
-        self.ooi = self.get_ooi()
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["ooi"] = self.ooi
-        context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["observed_at"] = self.get_observed_at()
-
-        return context
-
+class BaseOOIBreadcrumbs(BreadcrumbsMixin):
     def build_breadcrumbs(self) -> List[Breadcrumb]:
         if isinstance(self.ooi, Finding):
             start = {
@@ -100,6 +87,21 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
                 "text": self.ooi.human_readable,
             },
         ]
+
+
+class BaseOOIDetailView(SingleOOITreeMixin, BaseOOIBreadcrumbs, ConnectorFormMixin, TemplateView):
+    def get(self, request, *args, **kwargs):
+        self.ooi = self.get_ooi()
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["ooi"] = self.ooi
+        context["mandatory_fields"] = get_mandatory_fields(self.request)
+        context["observed_at"] = self.get_observed_at()
+
+        return context
 
 
 class BaseOOIFormView(SingleOOIMixin, FormView):
