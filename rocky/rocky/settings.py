@@ -14,15 +14,11 @@ import os
 from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
-from dotenv import load_dotenv
 
 from rocky.otel import OpenTelemetryHelper
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Load variables from the .env file
-load_dotenv(dotenv_path=BASE_DIR / ".env", verbose=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
