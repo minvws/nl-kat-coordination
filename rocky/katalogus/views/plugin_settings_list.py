@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from requests import RequestException
 
-from katalogus.views import SinglePluginView
+from katalogus.views.mixins import SinglePluginView
 
 logger = logging.getLogger(__name__)
 

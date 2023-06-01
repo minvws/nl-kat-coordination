@@ -1,7 +1,8 @@
 import pytest
 from django.core.exceptions import PermissionDenied
 from katalogus.client import KATalogusClientV1, parse_plugin
-from katalogus.views import ConfirmCloneSettingsView, KATalogusSettingsView, KATalogusView
+from katalogus.views.katalogus import KATalogusView
+from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from pytest_django.asserts import assertContains, assertNotContains
 
 from rocky.health import ServiceHealth

@@ -14,8 +14,8 @@ from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
 from katalogus.client import get_katalogus
-from katalogus.views import PluginSettingsListView
 from katalogus.views.mixins import BoefjeMixin
+from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky import scheduler
 
 logger = getLogger(__name__)

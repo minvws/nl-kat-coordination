@@ -4,7 +4,9 @@
     "properties": {
         "TOP_PORTS": {
             "title": "TOP_PORTS",
-            "type": "string",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
             "description": "Scan TOP_PORTS most common ports. Defaults to 250."
         },
         "PROTOCOL": {
