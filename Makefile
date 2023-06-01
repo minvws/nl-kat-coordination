@@ -84,13 +84,17 @@ endif
 	make -C rocky build
 	make -C boefjes build
 
-# Build Debian build image
-debian-build-image:
-	docker build -t kat-debian-build-image packaging/debian
+# Build Debian 11 build image
+debian11-build-image:
+	docker build -t kat-debian11-build-image packaging/debian11
 
-# Build Ubuntu build image
-ubuntu-build-image:
-	docker build -t kat-ubuntu-build-image packaging/ubuntu
+# Build Debian 11 build image
+debian12-build-image:
+	docker build -t kat-debian12-build-image packaging/debian12
+
+# Build Ubuntu 22.04 build image
+ubuntu22.04-build-image:
+	docker build -t kat-ubuntu22.04-build-image packaging/ubuntu22.04
 
 docs:
 	sphinx-build -b html docs/source docs/_build

@@ -34,7 +34,7 @@ class Command(BaseCommand):
 
         self.group_redteam, self.group_redteam_created = Group.objects.get_or_create(name=GROUP_REDTEAM)
 
-        Group.objects.get_or_create(name=GROUP_CLIENT)
+        self.group_client, self.group_client_created = Group.objects.get_or_create(name=GROUP_CLIENT)
 
     def handle(self, *args, **options):
         self.setup_kat_groups()
@@ -65,4 +65,6 @@ class Command(BaseCommand):
             ]
         )
         self.group_redteam.permissions.set(redteam_permissions)
+        client_permissions = self.get_permissions(["can_scan_organization"])
+        self.group_client.permissions.set(client_permissions)
         logging.info("ROCKY HAS BEEN SETUP SUCCESSFULLY")
