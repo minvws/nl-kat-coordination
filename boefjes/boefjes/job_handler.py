@@ -83,9 +83,10 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
             f"{settings.katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
         ).json()
 
-        return {k: v for k, v in environment.items() if k in environment_keys}
+        return {k: str(v) for k, v in environment.items() if k in environment_keys}
     except RequestException:
         logger.exception("Error getting environment settings")
+        raise
 
     return {}
 
@@ -113,7 +114,7 @@ def _collect_default_mime_types(boefje_meta: BoefjeMeta) -> Set[str]:
 class BoefjeHandler(Handler):
     def __init__(self, job_runner, local_repository: LocalPluginRepository):
         self.job_runner: BoefjeJobRunner = job_runner
-        self.local_repository: LocalPluginRepository = local_repository  # TODO: abstract (e.g. LXD version)
+        self.local_repository: LocalPluginRepository = local_repository
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
@@ -127,7 +128,7 @@ class BoefjeHandler(Handler):
             )
 
         env_keys = self.local_repository.by_id(boefje_meta.boefje.id).environment_keys
-        environment = get_environment_settings(boefje_meta, env_keys)
+        environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
 
         mime_types = _collect_default_mime_types(boefje_meta)
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
