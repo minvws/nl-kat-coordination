@@ -7,7 +7,7 @@ from typing import List
 import requests
 from opentelemetry import trace
 
-from scheduler import connectors, context, queues, rankers
+from scheduler import connectors, context, models, queues, rankers
 from scheduler.models import (
     OOI,
     Boefje,
@@ -142,11 +142,8 @@ class BoefjeScheduler(Scheduler):
             for item in items:
                 self.ctx.pq_store.remove(
                     scheduler_id=self.scheduler_id,
-                    item_id=item.id.hex,
+                    item_id=item.id,
                 )
-
-                if item.hash is None:
-                    continue
 
                 task = self.ctx.task_store.get_latest_task_by_hash(item.hash)
                 if task is None:
