@@ -10,12 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-import os
+import environ
 from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
 
 from rocky.otel import OpenTelemetryHelper
+
+env = environ.Env(
+    DEBUG=(bool, False),
+    POSTGRES_SSL_ENABLED=(bool, False),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,51 +29,51 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_NAME_BOEFJES = os.getenv("QUEUE_NAME_BOEFJES")
-QUEUE_NAME_NORMALIZERS = os.getenv("QUEUE_NAME_NORMALIZERS")
-QUEUE_URI = os.getenv("QUEUE_URI")
+QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES")
+QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS")
+QUEUE_URI = env.url("QUEUE_URI").geturl()
 
-OCTOPOES_API = os.getenv("OCTOPOES_API")
+OCTOPOES_API = env.url("OCTOPOES_API").geturl()
 
-SCHEDULER_API = os.getenv("SCHEDULER_API", "")
+SCHEDULER_API = env.url("SCHEDULER_API", "").geturl()
 
-KATALOGUS_API = os.getenv("KATALOGUS_API", "")
+KATALOGUS_API = env.url("KATALOGUS_API", "").geturl()
 
-BYTES_API = os.getenv("BYTES_API", "")
-BYTES_USERNAME = os.getenv("BYTES_USERNAME", "")
-BYTES_PASSWORD = os.getenv("BYTES_PASSWORD", "")
+BYTES_API = env.url("BYTES_API", "").geturl()
+BYTES_USERNAME = env("BYTES_USERNAME", default="")
+BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
-KEIKO_API = os.getenv("KEIKO_API", "")
+KEIKO_API = env.url("KEIKO_API", "").geturl()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG") == "True"
+DEBUG = env("DEBUG")
 # SECURITY WARNING: enable two factor authentication in production!
-TWOFACTOR_ENABLED = os.getenv("TWOFACTOR_ENABLED", "True").casefold() != "false"
+TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", True)
 
 ALLOWED_HOSTS = ["*"]
 
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
 # -----------------------------
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
-EMAIL_FILE_PATH = os.getenv("EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs")  # directory to store output files
-EMAIL_HOST = os.getenv("EMAIL_HOST")  # localhost
-EMAIL_PORT = os.getenv("EMAIL_PORT", 25)  # 25
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
-SERVER_EMAIL = os.getenv("SERVER_EMAIL")
-EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX")  # "KAT - "
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", False)  # False
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", False)  # False
-EMAIL_SSL_CERTFILE = os.getenv("EMAIL_SSL_CERTFILE", None)  # None
-EMAIL_SSL_KEYFILE = os.getenv("EMAIL_SSL_KEYFILE", None)
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_FILE_PATH = env.path("EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs")  # directory to store output files
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")  # localhost
+EMAIL_PORT = env.int("EMAIL_PORT", default=25)  # 25
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="")
+SERVER_EMAIL = env("SERVER_EMAIL", default="")
+EMAIL_SUBJECT_PREFIX = env("EMAIL_SUBJECT_PREFIX", default="KAT - ")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+EMAIL_SSL_CERTFILE = env("EMAIL_SSL_CERTFILE", default=None)  # None
+EMAIL_SSL_KEYFILE = env("EMAIL_SSL_KEYFILE", default=None)
 EMAIL_TIMEOUT = 30  # 30 seconds
 # ----------------------------
 
-HELP_DESK_EMAIL = os.getenv("HELP_DESK_EMAIL", "")
+HELP_DESK_EMAIL = env("HELP_DESK_EMAIL", default="")
 
 # Application definition
 
@@ -142,29 +147,18 @@ AUTH_USER_MODEL = "account.KATUser"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-POSTGRES_USER = os.getenv("ROCKY_DB_USER")
-POSTGRES_PASSWORD = os.getenv("ROCKY_DB_PASSWORD")
-POSTGRES_DB = os.getenv("ROCKY_DB")
-POSTGRES_DB_HOST = os.getenv("ROCKY_DB_HOST")
-POSTGRES_DB_PORT = os.getenv("ROCKY_DB_PORT")
+POSTGRES_DB = env.db("ROCKY_DB_DSN")
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": POSTGRES_DB,
-        "USER": POSTGRES_USER,
-        "PASSWORD": POSTGRES_PASSWORD,
-        "HOST": POSTGRES_DB_HOST,
-        "PORT": POSTGRES_DB_PORT,
-    }
-}
+# todo: POSTGRES_DB["ENGINE"] = "django.db.backends.postgresql_psycopg2"?
+DATABASES = {"default": POSTGRES_DB}
 
-if os.getenv("POSTGRES_SSL_ENABLED"):
+
+if env("POSTGRES_SSL_ENABLED"):
     DATABASES["default"]["OPTIONS"] = {
-        "sslmode": os.getenv("POSTGRES_SSL_MODE"),
-        "sslrootcert": os.getenv("POSTGRES_SSL_ROOTCERT"),
-        "sslcert": os.getenv("POSTGRES_SSL_CERT"),
-        "sslkey": os.getenv("POSTGRES_SSL_KEY"),
+        "sslmode": env("POSTGRES_SSL_MODE"),
+        "sslrootcert": env("POSTGRES_SSL_ROOTCERT"),
+        "sslcert": env("POSTGRES_SSL_CERT"),
+        "sslkey": env("POSTGRES_SSL_KEY"),
     }
 
 # Password validation
@@ -175,18 +169,18 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {
-            "min_length": int(os.getenv("PASSWORD_MIN_LENGTH", 12)),
+            "min_length": env.int("PASSWORD_MIN_LENGTH", default=12),
         },
     },
     {
         "NAME": "django_password_validators.password_character_requirements"
         ".password_validation.PasswordCharacterValidator",
         "OPTIONS": {
-            "min_length_digit": int(os.getenv("PASSWORD_MIN_DIGIT", 2)),
-            "min_length_alpha": int(os.getenv("PASSWORD_MIN_ALPHA", 2)),
-            "min_length_special": int(os.getenv("PASSWORD_MIN_SPECIAL", 2)),
-            "min_length_lower": int(os.getenv("PASSWORD_MIN_LOWER", 2)),
-            "min_length_upper": int(os.getenv("PASSWORD_MIN_UPPER", 2)),
+            "min_length_digit": env.int("PASSWORD_MIN_DIGIT", default=2),
+            "min_length_alpha": env.int("PASSWORD_MIN_ALPHA", default=2),
+            "min_length_special": env.int("PASSWORD_MIN_SPECIAL", default=2),
+            "min_length_lower": env.int("PASSWORD_MIN_LOWER", default=2),
+            "min_length_upper": env.int("PASSWORD_MIN_UPPER", default=2),
             "special_characters": " ~!@#$%^&*()_+{}\":;'[]",
         },
     },
@@ -260,7 +254,7 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-CSP_HEADER = os.getenv("CSP_HEADER", "True") == "True"
+CSP_HEADER = env.bool("CSP_HEADER", default=True)
 
 if CSP_HEADER:
     MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
@@ -280,7 +274,7 @@ CSP_BLOCK_ALL_MIXED_CONTENT = True
 DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
-BROWSABLE_API = os.getenv("BROWSABLE_API", "True" if DEBUG else "False") == "True"
+BROWSABLE_API = env.bool("BROWSABLE_API", default=DEBUG)
 
 if BROWSABLE_API:
     DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
@@ -331,6 +325,6 @@ TAG_BORDER_TYPES = [
     ("dotted", _("Dotted")),
 ]
 
-SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
+SPAN_EXPORT_GRPC_ENDPOINT = env("SPAN_EXPORT_GRPC_ENDPOINT", default=None)
 if SPAN_EXPORT_GRPC_ENDPOINT is not None:
     OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
