@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-import environ
 from pathlib import Path
 
+import environ
 from django.utils.translation import gettext_lazy as _
 
 from rocky.otel import OpenTelemetryHelper
@@ -31,8 +31,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES")
-QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS")
+QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES", default="boefjes")
+QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS", default="normalizers")
 QUEUE_URI = env.url("QUEUE_URI").geturl()
 
 OCTOPOES_API = env.url("OCTOPOES_API").geturl()
