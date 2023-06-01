@@ -13,7 +13,7 @@ idna==3.4
 lxml==4.9.2
 phonenumbers==8.12.57
 psycopg2==2.9.6
-pydantic==1.10.7
+pydantic==1.10.8
 python-dotenv==1.0.0
 qrcode==7.3.1
 requests==2.31.0
