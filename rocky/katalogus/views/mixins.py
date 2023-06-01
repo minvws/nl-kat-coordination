@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from requests import HTTPError, RequestException
 from rest_framework.status import HTTP_404_NOT_FOUND
 
-from katalogus.client import Plugin, get_katalogus
+from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
 from octopoes.models import OOI
 from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
 from rocky.scheduler import Boefje, BoefjeTask, QueuePrioritizedItem, client
@@ -23,9 +23,9 @@ logger = getLogger(__name__)
 class SinglePluginView(OrganizationView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.katalogus_client = None
+        self.katalogus_client: Optional[KATalogusClientV1] = None
         self.plugin_schema = None
-        self.plugin = None
+        self.plugin: Optional[Plugin] = None
 
     def setup(self, request, *args, **kwargs):
         """
@@ -58,23 +58,6 @@ class SinglePluginView(OrganizationView):
 
     def is_required_field(self, field: str) -> bool:
         return self.plugin_schema and field in self.plugin_schema.get("required", [])
-
-    def is_valid_setting(self, setting_name: str) -> bool:
-        return self.plugin_schema and setting_name in self.plugin_schema.get("properties", [])
-
-
-class SingleSettingView(SinglePluginView):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setting_name = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        if not self.is_valid_setting(kwargs.get("setting_name")):
-            raise Http404("Setting {} is not valid for this plugin.".format(kwargs.get("setting_name")))
-
-        self.setting_name = kwargs.get("setting_name")
 
 
 class BoefjeMixin(OctopoesView):
