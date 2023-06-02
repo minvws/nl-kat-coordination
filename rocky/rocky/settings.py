@@ -48,12 +48,33 @@ KEIKO_API = os.getenv("KEIKO_API", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
+
+# Make sure this header can never be set by an attacker, see also the security
+# warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
+REMOTE_USER_HEADER = os.getenv("REMOTE_USER_HEADER")
+REMOTE_USER_FALLBACK = os.getenv("REMOTE_USER_FALLBACK", "False").casefold() != "false"
+
+if REMOTE_USER_HEADER:
+    AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.RemoteUserBackend",
+    ]
+    if REMOTE_USER_FALLBACK:
+        AUTHENTICATION_BACKENDS += [
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+
+
 # SECURITY WARNING: enable two factor authentication in production!
-TWOFACTOR_ENABLED = os.getenv("TWOFACTOR_ENABLED", "True").casefold() != "false"
+TWOFACTOR_ENABLED = os.getenv("TWOFACTOR_ENABLED", "False" if REMOTE_USER_HEADER else "True").casefold() != "false"
 
 # A list of strings representing the host/domain names that this Django site can serve.
 # https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split()
+
+
+SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
+if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+    OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
 
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
@@ -110,13 +131,22 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+]
+
+if REMOTE_USER_HEADER:
+    MIDDLEWARE += ["rocky.middleware.remote_user.RemoteUserMiddleware"]
+
+MIDDLEWARE += [
     "django_otp.middleware.OTPMiddleware",
     "rocky.middleware.auth_required.AuthRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "rocky.middleware.onboarding.OnboardingMiddleware",
-    "rocky.middleware.otel.OTELInstrumentTemplateMiddleware",
 ]
+
+if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+    MIDDLEWARE += ["rocky.middleware.otel.OTELInstrumentTemplateMiddleware"]
+
 
 ROOT_URLCONF = "rocky.urls"
 
@@ -354,7 +384,3 @@ TAG_BORDER_TYPES = [
     ("dashed", _("Dashed")),
     ("dotted", _("Dotted")),
 ]
-
-SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
-if SPAN_EXPORT_GRPC_ENDPOINT is not None:
-    OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
