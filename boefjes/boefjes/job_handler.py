@@ -88,15 +88,10 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
         # if and only if they are defined in boefje.json
         for key, value in os.environ.items():
             if key.startswith("BOEFJE_"):
-                logger.info("starts with boefje: %s", key)
                 katalogus_key = key.split("BOEFJE_", 1)[1]
-                logger.info("key boefje: %s", katalogus_key)
+                # Only pass the environment variable if it is not explicitly set through the katalogus
                 if katalogus_key in environment_keys and katalogus_key not in environment:
-                    logger.info("key match and priority!: %s", katalogus_key)
-                    # Katalogus settings take priority
                     environment[katalogus_key] = value
-
-        logger.info("PERZIK: %s", environment)
 
         return {k: str(v) for k, v in environment.items() if k in environment_keys}
     except RequestException:
