@@ -6,7 +6,13 @@ from typing import Callable, Dict, List, Optional, Set, Type
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
 
-from octopoes.config.settings import Settings
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    Settings,
+)
 from octopoes.events.events import (
     DBEvent,
     OOIDBEvent,
@@ -15,8 +21,6 @@ from octopoes.events.events import (
     ScanProfileDBEvent,
 )
 from octopoes.models import (
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     OOI,
     DeclaredScanProfile,
     EmptyScanProfile,
@@ -90,8 +94,8 @@ class OctopoesService:
         self,
         types: Set[Type[OOI]],
         valid_time: datetime,
-        limit: int = 1000,
-        offset: int = 0,
+        limit: int = DEFAULT_LIMIT,
+        offset: int = DEFAULT_OFFSET,
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOI]:

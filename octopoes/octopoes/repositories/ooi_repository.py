@@ -11,13 +11,16 @@ from bits.definitions import BitDefinition
 from pydantic import BaseModel, parse_obj_as
 from requests import HTTPError
 
-from octopoes.config.settings import XTDBType
-from octopoes.connector.octopoes import DEFAULT_LIMIT, DEFAULT_OFFSET
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    XTDBType,
+)
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
 from octopoes.models import (
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     OOI,
     Reference,
     ScanLevel,
