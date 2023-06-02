@@ -35,7 +35,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
         yield kft
         yield Finding(finding_type=kft.reference, ooi=website_reference)
     elif ("tls", "1.0", True) in protocols and ("tls", "1.1", True) in protocols:
-        kft = KATFindingType(id="KAT-TLS-1.1-AND-1.2-SUPPORT")
+        kft = KATFindingType(id="KAT-TLS-1.0-AND-1.1-SUPPORT")
         yield kft
         yield Finding(finding_type=kft.reference, ooi=website_reference)
     elif ("tls", "1.2", False) in protocols:
