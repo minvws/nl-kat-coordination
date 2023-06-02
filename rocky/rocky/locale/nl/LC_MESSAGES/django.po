@@ -1596,10 +1596,10 @@ msgstr "Instelling verwijderen"
 #: katalogus/templates/plugin_settings_delete.html:12
 #, python-format
 msgid ""
-"Are you sure you want to delete setting %(name)s for the plugin "
+"Are you sure you want to delete all settings for the plugin "
 "%(plugin_name)s?"
 msgstr ""
-"Ben je zeker dat je de instelling %(name)s voor de plugin %(plugin_name)s wilt "
+"Weet je zeker dat je de instellingen voor de plugin %(plugin_name)s wilt "
 "verwijderen?"
 
 #: katalogus/templates/plugin_settings_delete.html:18
