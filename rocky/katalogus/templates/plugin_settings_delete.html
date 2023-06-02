@@ -9,9 +9,9 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Delete setting" %} - {{ setting_name }}</h1>
+                <h1>{% translate "Delete settings" %}</h1>
                 <p>
-                    {% blocktranslate %}Are you sure you want to delete setting {{ setting_name }} for the plugin {{ plugin_name }}?{% endblocktranslate %}
+                    {% blocktranslate %}Are you sure you want to delete all settings for the plugin {{ plugin_name }}?{% endblocktranslate %}
                 </p>
                 <form class="inline" method="post">
                     {% csrf_token %}
