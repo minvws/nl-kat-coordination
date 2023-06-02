@@ -10,6 +10,10 @@ from rocky.views.mixins import OctopoesView
 from rocky.views.ooi_view import BaseOOIBreadcrumbs
 
 
+def replace_link_id_param(link: str, key: str) -> str:
+    return link.split("[")[0] + key
+
+
 class PluginDeepLinkListView(BaseOOIBreadcrumbs, OctopoesView, ListView):
     model = OrganizationPlugin
     template_name = "plugin_deep_link_list.html"
@@ -30,8 +34,8 @@ class PluginDeepLinkListView(BaseOOIBreadcrumbs, OctopoesView, ListView):
             queryset.append(
                 {
                     "name": plugin.plugin.name,
-                    "link_text": self.replace_link_id(plugin.plugin.content, self.ooi.natural_key),
-                    "link": self.replace_link_id(plugin.plugin.link, self.ooi.natural_key),
+                    "link_text": replace_link_id_param(plugin.plugin.content, self.ooi.natural_key),
+                    "link": replace_link_id_param(plugin.plugin.link, self.ooi.natural_key),
                 }
             )
         return queryset
@@ -50,6 +54,3 @@ class PluginDeepLinkListView(BaseOOIBreadcrumbs, OctopoesView, ListView):
             }
         )
         return breadcrumbs
-
-    def replace_link_id(self, link: str, key: str) -> str:
-        return link.split("[")[0] + key

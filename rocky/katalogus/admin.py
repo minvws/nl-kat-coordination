@@ -6,6 +6,7 @@ from katalogus.models import OrganizationPlugin, PluginDeepLink
 
 class PluginDeepLinkAdmin(admin.ModelAdmin):
     form = PluginDeepLinkForm
+    fields = ("ooi_type", "name", "content", "link")
 
 
 class OrganizationPluginAdmin(admin.ModelAdmin):

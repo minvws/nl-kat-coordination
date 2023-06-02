@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from tools.forms.base import BaseRockyModelForm
 from tools.forms.settings import BLANK_CHOICE
 
 from katalogus.models import PluginDeepLink
@@ -10,7 +11,9 @@ SORTED_OOI_TYPES = [BLANK_CHOICE] + [
 ]
 
 
-class PluginDeepLinkForm(forms.ModelForm):
+class PluginDeepLinkForm(BaseRockyModelForm):
+    enable = forms.BooleanField(required=False)
+
     class Meta:
         model = PluginDeepLink
         fields = "__all__"
@@ -23,4 +26,5 @@ class PluginDeepLinkForm(forms.ModelForm):
                 "Insert your link including the link parameters. "
                 "Example: https://cve.mitre.org/cgi-bin/cvename.cgi?name=[cvecode]"
             ),
+            "enable": _("To use and show this link you must first enable it."),
         }

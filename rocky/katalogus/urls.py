@@ -3,6 +3,7 @@ from django.urls import path
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import KATalogusView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
+from katalogus.views.plugin_deep_link_add import PluginDeepLinkCreateView
 from katalogus.views.plugin_deep_link_list import PluginDeepLinkListView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -26,6 +27,11 @@ urlpatterns = [
         "settings/migrate/confirmation/<to_organization>/",
         ConfirmCloneSettingsView.as_view(),
         name="confirm_clone_settings",
+    ),
+    path(
+        "plugins/deep-link/add/",
+        PluginDeepLinkCreateView.as_view(),
+        name="plugin_deep_link_add",
     ),
     path(
         "plugins/<plugin_type>/<plugin_id>/",

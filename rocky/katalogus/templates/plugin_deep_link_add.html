@@ -1,0 +1,27 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="form-view">
+                <h1>{% translate "Create a Deep Link" %}</h1>
+                <form novalidate  method="post" class="horizontal-view help">
+                    {% csrf_token %}
+                    {% translate "Deep Link" as fieldset_legend %}
+                    {% include "partials/form/fieldset.html" with fields=form %}
+
+                    {% if editing_view %}
+                        <button class="cta" type="submit">{% translate "Save" %}</button>
+                    {% else %}
+                        <button type="submit">{% translate "Submit" %}</button>
+                    {% endif %}
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
