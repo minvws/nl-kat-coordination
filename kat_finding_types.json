@@ -55,7 +55,7 @@
         "description": "The server supports TLS version 1.1. This is a protocol that encrypts data traffic through a deprecated and discouraged protocol which has security risks.",
         "risk": "recommendation"
     },
-    "KAT-TLS-1.1-AND-1.2-SUPPORT": {
+    "KAT-TLS-1.0-AND-1.1-SUPPORT": {
         "description": "The server supports TLS version 1.0 and 1,1. These are protocols that encrypts data traffic using deprecated and discouraged protocols that contain security risks.",
         "risk": "low"
     },
