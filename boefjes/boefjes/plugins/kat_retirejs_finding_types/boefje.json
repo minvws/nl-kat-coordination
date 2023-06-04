@@ -9,5 +9,6 @@
         "RetireJSFindingType"
     ],
     "environment_keys": [],
-    "scan_level": 0
+    "scan_level": 0,
+    "enabled": true
 }
