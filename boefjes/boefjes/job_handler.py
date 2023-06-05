@@ -147,6 +147,8 @@ class BoefjeHandler(Handler):
             boefje_meta.ended_at = datetime.now(timezone.utc)
             logger.info("Saving to Bytes for boefje boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
+            boefje_meta.environment = environment
+
             bytes_api_client.login()
             bytes_api_client.save_boefje_meta(boefje_meta)
 

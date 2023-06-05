@@ -84,6 +84,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
+        logger.error(boefje_meta.json())
         response = self._session.post("/bytes/boefje_meta", data=boefje_meta.json(), headers=self.headers)
 
         self._verify_response(response)
