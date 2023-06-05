@@ -146,14 +146,14 @@ class DNSPTRRecord(DNSRecord):
     address: Optional[Reference] = ReferenceField(IPAddress)
     hostname: Optional[Reference] = ReferenceField(Hostname)
     reverse: str
- 
-    _natural_key_attrs = ["reverse","value"]
+
+    _natural_key_attrs = ["reverse", "value"]
 
     _reverse_relation_names = {
         "hostname": "dns_ptr_records",
         "pointer_hostname": "ptr_record_targets",
         "address": "ptr_record_ip",
-        "reverse": "ptr_record_reverse"
+        "reverse": "ptr_record_reverse",
     }
 
     @classmethod

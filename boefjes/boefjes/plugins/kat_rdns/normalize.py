@@ -1,16 +1,19 @@
+import ipaddress
+import json
 from typing import Iterable, Union
+
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.records import DNSPTRRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddress, Network
-import ipaddress
-import json
+from octopoes.models.ooi.network import Network
+
 
 def reverse_ip(ip: str) -> str:
     ip_obj = ipaddress.ip_address(ip)
     reversed_ip = ip_obj.reverse_pointer
     return reversed_ip
+
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     address = normalizer_meta.raw_data.boefje_meta.input_ooi
@@ -29,6 +32,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
                 value=value,
                 hostname=Reference(hostname),
                 address=Reference(address),
-                reverse=reverse
+                reverse=reverse,
             )
             yield dnsptr_ooi
