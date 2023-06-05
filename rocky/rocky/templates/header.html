@@ -32,8 +32,9 @@
                             </li>
                         {% else %}
                             <li>
-                                <a href="{% url "organization_crisis_room" organization.code %}"
-                                {% if 'crisis_room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
+                                {% url "organization_crisis_room" organization.code as index_url %}
+                                <a href="{{ index_url }}"
+                                {% if request.path == index_url %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
                             </li>
                         {% endif %}
                         {% if organization.code and not view_type == "onboarding" %}
