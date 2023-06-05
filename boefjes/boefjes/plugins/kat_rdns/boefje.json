@@ -6,6 +6,7 @@
         "IPAddressV4",
         "IPAddressV6",
         "IPV4NetBlock",
+        "IPV6NetBlock"
     ],
     "produces": [
         "DNSPTRRecord"
