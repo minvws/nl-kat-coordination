@@ -25,4 +25,4 @@ OpenKAT as educational tool (dutch)
 
 Educating the next generation is a collective responsibility. OpenKAT is already in use for educational purposes. This document gives some ideas for future educational projects.
 
-`OpenKAT als educatietool <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/guidelines/ideas/KAT%20-%20OpenKAT%20als%20educatietool.pdf>`_
+`OpenKAT: Educatietool <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/guidelines/ideas/KAT%20-%20OpenKAT%20als%20educatietool.pdf>`_
