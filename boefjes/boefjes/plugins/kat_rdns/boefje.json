@@ -4,7 +4,9 @@
     "description": "Resolve IP-addreses to a hostname",
     "consumes": [
         "IPAddressV4",
-        "IPAddressV6"
+        "IPAddressV6",
+        "IPV4NetBlock",
+        "IPV6NetBlock"
     ],
     "produces": [
         "DNSPTRRecord"
