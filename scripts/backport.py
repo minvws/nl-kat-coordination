@@ -87,7 +87,11 @@ def main():
 
     g = Github(token)
 
-    repo = g.get_repo("minvws/nl-kat-coordination")
+    # Remote can be of the form https://github.com/user/repo.git or git@github.com:user/repo.git
+    github_repo = repo.remotes["origin"].url.replace("https://github.com/", "").replace("git@github.com:", "")
+    github_repo = github_repo.removesuffix(".git")
+
+    repo = g.get_repo(github_repo)
 
     orig_title = commit.message.split("\n")[0]
     title = orig_title.replace(f"#{pr}", args.release)
