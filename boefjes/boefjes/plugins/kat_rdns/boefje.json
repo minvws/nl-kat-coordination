@@ -5,8 +5,7 @@
     "consumes": [
         "IPAddressV4",
         "IPAddressV6",
-        "IPV4NetBlock",
-        "IPV6NetBlock"
+        "IPV4NetBlock"
     ],
     "produces": [
         "DNSPTRRecord"
