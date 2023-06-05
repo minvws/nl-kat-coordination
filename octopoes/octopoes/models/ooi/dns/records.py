@@ -143,17 +143,19 @@ class NXDOMAIN(OOI):
 class DNSPTRRecord(DNSRecord):
     object_type: Literal["DNSPTRRecord"] = "DNSPTRRecord"
     dns_record_type: Literal["PTR"] = "PTR"
-    address: Reference = ReferenceField(IPAddress)
+    address: Optional[Reference] = ReferenceField(IPAddress)
     hostname: Optional[Reference] = ReferenceField(Hostname)
+    reverse: str
+ 
+    _natural_key_attrs = ["reverse","value"]
 
-    _natural_key_attrs = ["address"]
     _reverse_relation_names = {
-        "address": "rdns_ipaddress",
-        "hostname": "rdns_hostname",
+        "hostname": "dns_ptr_records",
+        "pointer_hostname": "ptr_record_targets",
+        "address": "ptr_record_ip",
+        "reverse": "ptr_record_reverse"
     }
 
     @classmethod
-    def format_reference_human_readable(cls, reference: Reference):
-        ip_address = reference.tokenized.address.address
-        reverse = ".".join(reversed(ip_address.split(".")))
-        return f"{reverse}.in-addr.arpa"
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"{reference.tokenized.reverse} -> {reference.tokenized.value}"

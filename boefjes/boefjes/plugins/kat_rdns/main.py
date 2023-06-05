@@ -1,27 +1,37 @@
-import json
 import socket
+import json
 from typing import List, Tuple, Union
 
 from boefjes.job_models import BoefjeMeta
+from ipaddress import ip_network
 
+def run_rdns(cidr):
+    network = ip_network(cidr)
+    results = []
 
-def run_rdns(ip_address: List[str]) -> str:
-    """Reverse DNS Lookup"""
-    # Disable caching
-    socket.setdefaulttimeout(0)
-    # Perform a rDNS lookup for the IP address
+    for ip in network.hosts():
+        ptr_value = get_ptr_record(str(ip))
+        data = {"IP": f"{ip}", "PTR": f"{ptr_value}"}
+        results.append(data)
+    return results
+
+def get_ptr_record(ip_address):
     try:
-        hostname = socket.gethostbyaddr(ip_address)[0]
+        ptr_record = socket.gethostbyaddr(ip_address)[0]
     except socket.herror:
         return None
-    else:
-        data = {"IP-Address": ip_address, "Hostname": hostname}
-        return data
-
+    return ptr_record
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     """return results to normalizer."""
-    input_ = boefje_meta.arguments["input"]
-    ip_address = input_["address"]
-    results = run_rdns(ip_address)
-    return [(set(), json.dumps(results))]
+    try:
+        ip_range = f"{boefje_meta.arguments['input']['start_ip']['address']}/{str(boefje_meta.arguments['input']['mask'])}"
+        results = run_rdns(ip_range)
+    except KeyError:
+        try:
+            ip = boefje_meta.arguments['input']['address']
+            results = run_rdns(ip)
+        except KeyError:
+            return None
+    return [(set(), json.dumps(results, default=str))]
+
