@@ -6,15 +6,12 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, ListView
-from django_otp.decorators import otp_required
 from requests import RequestException
-from two_factor.views.utils import class_view_decorator
 
 from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 
 
-@class_view_decorator(otp_required)
 class KATalogusView(ListView, OrganizationView, FormView):
     """View of all plugins in KAT-alogus"""
 

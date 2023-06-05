@@ -1,4 +1,4 @@
-body > header nav ul li a.user-icon,
+body>header nav ul li a.user-icon,
 .user-icon {
     $border-radius: 50%;
     min-width: initial;
@@ -12,5 +12,5 @@ body > header nav ul li a.user-icon,
     padding: 0.5rem;
     box-sizing: border-box;
     border-radius: $border-radius;
+    border: 0;
 }
-

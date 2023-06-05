@@ -361,7 +361,7 @@ def get_finding_type_from_finding(finding: Finding) -> FindingType:
     )
 
 
-_EXCLUDED = [Finding] + FindingType.__subclasses__()
+_EXCLUDED = [Finding] + FindingType.strict_subclasses()
 OOI_TYPES_WITHOUT_FINDINGS = [name for name, cls_ in OOI_TYPES.items() if cls_ not in _EXCLUDED]
 
 

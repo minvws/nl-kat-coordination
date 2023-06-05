@@ -1,5 +1,4 @@
 import logging
-import uuid
 from functools import cached_property
 from typing import Iterable, Set
 
@@ -106,6 +105,9 @@ class Organization(models.Model):
             ("can_enable_disable_boefje", "Can enable or disable boefje"),
             ("can_set_clearance_level", "Can set clearance level"),
             ("can_delete_oois", "Can delete oois"),
+            ("can_mute_findings", "Can mute findings"),
+            ("can_view_katalogus_settings", "Can view KAT-alogus settings"),
+            ("can_set_katalogus_settings", "Can set KAT-alogus settings"),
             ("can_recalculate_bits", "Can recalculate bits"),
         )
 
@@ -309,12 +311,3 @@ class OOIInformation(models.Model):
 
     def __str__(self):
         return self.id
-
-
-class Job(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True)
-    boefje_id = models.CharField(max_length=128)
-    input_ooi = models.TextField(null=True)
-    arguments = models.JSONField()
-    created = models.DateTimeField(auto_now_add=True)

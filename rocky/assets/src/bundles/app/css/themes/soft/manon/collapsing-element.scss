@@ -1,0 +1,9 @@
+/* Collapsing element */
+
+:root {
+    --collapsing-element-list-item-last-item-border-width: 0;
+}
+
+body>header nav.collapsible.collapsed button.collapsible-toggle[aria-expanded="true"]+.collapsing-element>div {
+    border-top: 1px solid #ccc;
+}

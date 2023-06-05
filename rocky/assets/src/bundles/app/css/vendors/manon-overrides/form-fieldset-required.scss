@@ -1,16 +1,12 @@
 /* Form fieldset required */
 
-form.horizontal-view div.required  {
+form.horizontal-view div.required {
 
     label {
         margin-top: calc(var(--form-horizontal-view-fieldset-nota-bene-required-margin-bottom) + var(--form-input-min-height) /2);
     }
 
-    .help-button {
-        margin-top: calc(var(--form-horizontal-view-fieldset-nota-bene-required-margin-bottom) + var(--form-input-min-height) /2);
-    }
-
-    select + div + .help-button {
+    select+div+.help-button {
         margin-top: 2rem;
     }
 }

@@ -3,12 +3,14 @@
 :root {
     --navigation-collapsible-menu-collapsing-menu-list-item-link-hover-background-color: #ededed;
 }
-body > header nav.collapsible-menu .collapsing-menu, 
+
+body>header nav.collapsible-menu .collapsing-menu,
 .collapsible-menu .collapsing-menu {
+
     ul,
     ol {
         border: 1px solid #ededed;
-        background-color: #fff;;
+        background-color: #fff;
 
         a[aria-current] {
             background-color: #fff;
@@ -25,7 +27,7 @@ body > header nav.collapsible-menu .collapsing-menu,
         }
     }
 
-    > div {
+    >div {
         background-color: #fff;
         width: 100%;
         display: flex;
@@ -62,8 +64,7 @@ body > header nav.collapsible-menu .collapsing-menu,
         ol {
             border: 0;
 
-            li {
-            }
+            li {}
         }
     }
 }

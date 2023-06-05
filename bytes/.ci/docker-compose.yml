@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         ENVIRONMENT: dev
-    command: pytest tests/integration
+    command: pytest -vv tests/integration
     depends_on:
       - ci_bytes
     env_file:
@@ -45,7 +45,7 @@ services:
       - .ci/.env.test
 
   ci_rabbitmq:
-    image: "rabbitmq:3.9-management"
+    image: "rabbitmq:3.11-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:

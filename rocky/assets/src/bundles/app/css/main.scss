@@ -1,6 +1,6 @@
 /* Abstracts */
 @import "abstracts/mixins.scss";
-@import "abstracts/colors.scss";
+@import "abstracts/alert-colors.scss";
 
 /* Helpers */
 @import "helpers/align-right.scss";
@@ -8,7 +8,7 @@
 @import "helpers/uc-first.scss";
 
 /* Vendors */
-@import "vendors/manon.scss";
+@import "vendors/manon-components.scss";
 @import "vendors/graph-override.scss";
 @import "vendors/two-factor.scss";
 @import "vendors/manon-overrides/dl.scss";
@@ -30,6 +30,7 @@
 @import "components/cytoscape.scss";
 @import "components/dl.scss";
 @import "components/dropdown.scss";
+@import "components/dropdown-list.scss";
 @import "components/filter.scss";
 @import "components/fmea.scss";
 @import "components/footer-logo.scss";

@@ -18,3 +18,7 @@
   --breadcrumb-bar-icon-font-family: var(--icon-font-family);
   --breadcrumb-bar-icon: "\ea61";
 }
+
+body>header nav.breadcrumb-bar ul li a {
+  border: 0;
+}
