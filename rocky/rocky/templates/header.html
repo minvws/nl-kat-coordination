@@ -4,10 +4,10 @@
 <header class="test">
     {% include "partials/skip-to-content.html" %}
 
-    <nav data-open-label="Menu"
-         data-close-label="Sluit menu"
+    <nav data-open-label="{% translate "Menu" %}"
+         data-close-label="{% translate "Close menu" %}"
          data-media="(min-width: 70rem)"
-         aria-label="Hoofdnavigatie"
+         aria-label="{% translate "Main navigation" %}"
          class="collapsible">
          <div>
             <a href="{% url "landing_page" %}" class="logo" title="OpenKAT" aria-label="{% translate "OpenKAT logo, go to the homepage of OpenKAT" %}">

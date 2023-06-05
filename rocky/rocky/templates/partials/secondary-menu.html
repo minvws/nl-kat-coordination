@@ -1,33 +1,30 @@
+{% load static %}
 {% load i18n %}
 
 {% if request.user.is_authenticated %}
-<div
-  data-open-label="{{ user.full_name|slice:"1" }}"
-  data-close-label="{{ user.full_name|slice:"1" }}"
+<div data-open-label="{% translate "Menu" %}"
+  data-close-label="{% translate "Close menu" %}"
   data-media="(min-width: 100%)"
   data-button-classes="user-icon"
-  aria-label="Acties"
-  class="collapsible">
+  aria-label="{% translate "User navigation" %}"
+  class="collapsible user-nav">
 
   <div class="collapsing-element">
       <ul>
         <li>
-          <a href="">
-            My organisations
+          <a href="{% url "organization_list" %}" {% if "organizations" in request.path|urlencode %} aria-selected="true" {% endif %}>
+            {% translate "My organisations" %}
           </a>
         </li>
+        {% if organization.code %}
+          <li>
+            <a href="{% url "account_detail" organization.code %}" {% if "account" in request.path|urlencode %} aria-selected="true" {% endif %}>
+              {% translate "Profile" %}
+            </a>
+          </li>
+        {% endif %}
         <li>
-          <a href="#" aria-selected="true">
-            Profile
-          </a>
-        </li>
-        <li>
-          <a href="">
-            Settings
-          </a>
-        </li>
-        <li>
-            <a href="{% url 'logout' %}">{% translate "Logout" %}</a>
+            <a href="{% url "logout" %}">{% translate "Logout" %}</a>
         </li>
       </ul>
   </div>
@@ -36,7 +33,7 @@
   <div>
     <ul>
       <li>
-        <a href="{% url "two_factor:login" %}" {% if 'login' in request.path|urlencode %} aria-current="page"{% endif %}>
+        <a href="{% url "two_factor:login" %}" {% if "login" in request.path|urlencode %} aria-current="page"{% endif %}>
             {% translate "Login" %}
         </a>
       </li>
