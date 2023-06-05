@@ -13,17 +13,16 @@ environments that require to be tested, such as penetration testing. This docume
 
 `OpenKAT Indemity statements <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/guidelines/ideas/OpenKAT%20-%20Indemnity%20statements%20v0.2.pdf>`_
 
-Veilige weergave boefjes-data (dutch)
+Safe viewing of boefjes-data (dutch)
 =====================================
 
 If you collect possible malware, how do you safely store and display it? This document explains how this has been handled in OpenKAT. Sorry, Dutch only at the moment.
 
 `Veilige weergave boefjes-data <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/guidelines/ideas/Veilige%20weergave%20boefjes-data%20in%20KAT%20interface%20v1.0.pdf>`_
 
-OpenKAT als educatietool (dutch)
-================================
+OpenKAT as educational tool (dutch)
+===================================
 
 Educating the next generation is a collective responsibility. OpenKAT is already in use for educational purposes. This document gives some ideas for future educational projects.
 
 `OpenKAT als educatietool <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/guidelines/ideas/KAT%20-%20OpenKAT%20als%20educatietool.pdf>`_
-
