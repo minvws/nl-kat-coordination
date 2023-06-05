@@ -1,0 +1,58 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <div class="column-2">
+                    <div>
+                        <h1>{{ object.name }} {% translate "details" %}</h1>
+                    </div>
+                    <div class="horizontal-view toolbar">
+                        <a class="button"
+                           href="{% url 'plugin_deep_link_edit' organization.code object.id %}">{% translate "Edit" %}</a>
+                    </div>
+                </div>
+                <dl>
+                    <div>
+                        <dt>
+                            {% translate "Name" %}
+                        </dt>
+                        <dd>
+                            {{ object.name }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            {% translate "OOI-Type" %}
+                        </dt>
+                        <dd>
+                            {{ object.ooi_type }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            {% translate "Content" %}
+                        </dt>
+                        <dd>
+                            {{ object.content }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>
+                            {% translate "Link" %}
+                        </dt>
+                        <dd>
+                            {{ object.link }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

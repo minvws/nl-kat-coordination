@@ -4,7 +4,9 @@ from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import KATalogusView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_deep_link_add import PluginDeepLinkCreateView
-from katalogus.views.plugin_deep_link_list import PluginDeepLinkListView
+from katalogus.views.plugin_deep_link_detail import PluginDeepLinkDetailView
+from katalogus.views.plugin_deep_link_edit import PluginDeepLinkUpdateView
+from katalogus.views.plugin_deep_link_list import PluginDeepLinkDetailedListView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from katalogus.views.plugin_settings_add import PluginSettingsAddView
@@ -32,6 +34,16 @@ urlpatterns = [
         "plugins/deep-link/add/",
         PluginDeepLinkCreateView.as_view(),
         name="plugin_deep_link_add",
+    ),
+    path(
+        "plugins/deep-link/edit/<pk>/",
+        PluginDeepLinkUpdateView.as_view(),
+        name="plugin_deep_link_edit",
+    ),
+    path(
+        "plugins/deep-link/details/<pk>/",
+        PluginDeepLinkDetailView.as_view(),
+        name="plugin_deep_link_details",
     ),
     path(
         "plugins/<plugin_type>/<plugin_id>/",
@@ -65,7 +77,7 @@ urlpatterns = [
     ),
     path(
         "plugins/deep-link/",
-        PluginDeepLinkListView.as_view(),
+        PluginDeepLinkDetailedListView.as_view(),
         name="plugin_deep_link",
     ),
 ]

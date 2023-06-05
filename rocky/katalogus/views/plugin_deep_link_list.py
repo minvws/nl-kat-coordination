@@ -14,9 +14,9 @@ def replace_link_id_param(link: str, key: str) -> str:
     return link.split("[")[0] + key
 
 
-class PluginDeepLinkListView(BaseOOIBreadcrumbs, OctopoesView, ListView):
+class PluginDeepLinkDetailedListView(BaseOOIBreadcrumbs, OctopoesView, ListView):
     model = OrganizationPlugin
-    template_name = "plugin_deep_link_list.html"
+    template_name = "plugin_deep_link_detailed_list.html"
     context_object_name = "plugin_deep_link"
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:

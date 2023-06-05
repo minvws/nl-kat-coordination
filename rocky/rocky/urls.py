@@ -2,7 +2,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import TemplateView
-from katalogus.views.plugin_deep_link_list import PluginDeepLinkListView
+from katalogus.views.plugin_deep_link_list import PluginDeepLinkDetailedListView
 from rest_framework import routers
 from tools.viewsets import OrganizationViewSet
 from two_factor.urls import urlpatterns as tf_urls
@@ -78,7 +78,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
     path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
-    path("<organization_code>/objects/sources/", PluginDeepLinkListView.as_view(), name="ooi_sources"),
+    path("<organization_code>/objects/sources/", PluginDeepLinkDetailedListView.as_view(), name="ooi_sources"),
     path("<organization_code>/objects/report/", OOIReportView.as_view(), name="ooi_report"),
     path("<organization_code>/objects/report/pdf/", OOIReportPDFView.as_view(), name="ooi_pdf_report"),
     path("<organization_code>/objects/summary/", OOISummaryView.as_view(), name="ooi_summary"),

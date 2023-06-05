@@ -28,12 +28,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>{{ deep_link.name }}</td>
-                                    <td>
-                                        <a href="{{ deep_link.link }}" target="_blank">{{ deep_link.link_text }}</a>
-                                    </td>
-                                </tr>
+                                {% for deep_link in plugin_deep_link %}
+                                    <tr>
+                                        <td>{{ deep_link.name }}</td>
+                                        <td>
+                                            <a href="{{ deep_link.link }}" target="_blank">{{ deep_link.link_text }}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                         {% include "partials/pagination.html" %}
