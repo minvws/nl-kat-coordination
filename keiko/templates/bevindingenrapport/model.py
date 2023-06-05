@@ -46,7 +46,7 @@ class CVEFindingType(FindingTypeBase):
 
 class RetireJSFindingType(FindingTypeBase):
     ooi_type: Literal["RetireJSFindingType"]
-    source: str
+    source: Optional[str]
     information_updated: Optional[str] = Field(..., alias="information updated")
 
 
