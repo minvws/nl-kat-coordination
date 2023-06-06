@@ -94,21 +94,45 @@ class SnykTest(TestCase):
         boefje_meta = BoefjeMeta.parse_raw(get_dummy_data("snyk-job.json"))
 
         mock_get.return_value.content = get_dummy_data("snyk-vuln.html")
-        mime_types, result = run_boefje(
-            boefje_meta,
-        )[0]
+
+        # Mock the first GET request
+        mock_first_get = mock.Mock()
+        mock_first_get.content = get_dummy_data("snyk-vuln.html")
+
+        # Mock the next GET request
+        mock_second_get = mock.Mock()
+        mock_second_get.content = get_dummy_data("snyk-vuln2.html")
+
+        # Mock the next 7 GET requests
+        mock_third_get = mock.Mock()
+        mock_third_get.content = get_dummy_data("snyk-vuln3.html")
+
+        mock_get.side_effect = [mock_first_get] + [mock_second_get] + [mock_third_get] * 7
+
+        mime_types, result = run_boefje(boefje_meta)[0]
 
         output = json.loads(result)
 
         self.assertListEqual(output["table_versions"], [])
-        self.assertListEqual(output["table_vulnerabilities"], [])
         self.assertListEqual(
-            output["cve_vulnerabilities"],
+            output["table_vulnerabilities"],
             [
-                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
-                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
-                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
-                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
-                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
+                {
+                    "Vuln_href": "SNYK-JS-LODASH-1018905",
+                    "Vuln_text": "Regular Expression Denial of Service (ReDoS)",
+                    "Vuln_versions": "<4.17.21",
+                },
+                {"Vuln_href": "SNYK-JS-LODASH-608086", "Vuln_text": "Prototype Pollution", "Vuln_versions": "<4.17.17"},
+                {"Vuln_href": "SNYK-JS-LODASH-450202", "Vuln_text": "Prototype Pollution", "Vuln_versions": "<4.17.12"},
+                {
+                    "Vuln_href": "SNYK-JS-LODASH-73639",
+                    "Vuln_text": "Regular Expression Denial of Service (ReDoS)",
+                    "Vuln_versions": "<4.17.11",
+                },
+                {"Vuln_href": "SNYK-JS-LODASH-73638", "Vuln_text": "Prototype Pollution", "Vuln_versions": "<4.17.11"},
+                {"Vuln_href": "npm:lodash:20180130", "Vuln_text": "Prototype Pollution", "Vuln_versions": "<4.17.5"},
             ],
+        )
+        self.assertListEqual(
+            output["cve_vulnerabilities"], [{"cve_code": "CVE-2021-23337", "Vuln_text": "Command Injection"}]
         )
