@@ -57,7 +57,7 @@ languages:
 
 lang: languages
 
-debian:
+debian11:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-rocky \
@@ -67,10 +67,10 @@ debian:
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
 	--workdir /app \
-	kat-debian-build-image \
+	kat-debian11-build-image \
 	packaging/scripts/build-debian-package.sh
 
-ubuntu:
+debian12:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-rocky \
@@ -80,7 +80,20 @@ ubuntu:
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
 	--workdir /app \
-	kat-ubuntu-build-image \
+	kat-debian12-build-image \
+	packaging/scripts/build-debian-package.sh
+
+ubuntu22.04:
+	mkdir -p build
+	docker run --rm \
+	--env PKG_NAME=kat-rocky \
+	--env REPOSITORY=minvws/nl-kat-rocky \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
+	--workdir /app \
+	kat-ubuntu22.04-build-image \
 	packaging/scripts/build-debian-package.sh
 
 clean:
