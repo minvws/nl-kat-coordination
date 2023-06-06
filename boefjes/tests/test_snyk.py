@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase, mock
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
@@ -93,11 +94,21 @@ class SnykTest(TestCase):
         boefje_meta = BoefjeMeta.parse_raw(get_dummy_data("snyk-job.json"))
 
         mock_get.return_value.content = get_dummy_data("snyk-vuln.html")
+        mime_types, result = run_boefje(
+            boefje_meta,
+        )[0]
 
-        output = list(
-            run_boefje(
-                boefje_meta,
-            )
+        output = json.loads(result)
+
+        self.assertListEqual(output["table_versions"], [])
+        self.assertListEqual(output["table_vulnerabilities"], [])
+        self.assertListEqual(
+            output["cve_vulnerabilities"],
+            [
+                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
+                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
+                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
+                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
+                {"cve_code": "", "Vuln_text": "Cross-site Scripting (XSS)"},
+            ],
         )
-
-        print(output)
