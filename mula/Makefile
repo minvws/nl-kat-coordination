@@ -83,7 +83,7 @@ ifeq ($(m),)
 else ifeq ($(revid),)
 	$(HIDE) (echo "ERROR: Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run scheduler \
+	docker-compose run --rm scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		revision --autogenerate \
 		-m "$(m)" --rev-id "$(revid)"
