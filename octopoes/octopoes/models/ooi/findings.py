@@ -7,6 +7,8 @@ from pydantic import AnyUrl
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
+severity_order = ["unknown", "pending", "recommendation", "low", "medium", "high", "critical"]
+
 
 @total_ordering
 class RiskLevelSeverity(Enum):
@@ -22,10 +24,8 @@ class RiskLevelSeverity(Enum):
     # unknown = the third party has been contacted, but third party has not determined the risk level (yet)
     UNKNOWN = "unknown"
 
-    __severity_order = ["unknown", "pending", "recommendation", "low", "medium", "high", "critical"]
-
     def __gt__(self, other: "RiskLevelSeverity") -> bool:
-        return self.__severity_order.index(self.value) > self.__severity_order.index(other.value)
+        return severity_order.index(self.value) > severity_order.index(other.value)
 
     def __str__(self):
         return self.value
