@@ -10,9 +10,6 @@ from django.conf import settings
 from requests import HTTPError
 from tools.ooi_helpers import (
     RiskLevelSeverity,
-    get_finding_type_from_finding,
-    get_knowledge_base_data_for_ooi,
-    get_knowledge_base_data_for_ooi_store,
     get_ooi_dict,
 )
 
@@ -112,7 +109,10 @@ class ReportsService:
         findings_metadata: List[Dict[str, Any]],
     ) -> BinaryIO:
         findings = [item["finding"] for item in findings_metadata]
-        store = {finding.primary_key: finding for finding in findings}
+        store = {}
+        for finding in findings:
+            store[finding.finding.primary_key] = finding.finding
+            store[finding.finding_type.primary_key] = finding.finding_type
 
         return self.get_report(valid_time, "Organisatie", organization_name, store)
 
@@ -167,10 +167,8 @@ def _ooi_field_as_string(findings_grouped: Dict, store: Dict):
 
 
 def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[List[str]] = None) -> Dict:
-    knowledge_base = get_knowledge_base_data_for_ooi_store(ooi_store)
-
     findings = [
-        build_finding_dict(finding_ooi, ooi_store, knowledge_base)
+        build_finding_dict(finding_ooi, ooi_store)
         for finding_ooi in ooi_store.values()
         if isinstance(finding_ooi, Finding)
     ]
@@ -178,7 +176,7 @@ def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[Lis
     if finding_filter is not None:
         findings = [finding for finding in findings if finding["finding_type"]["id"] in finding_filter]
 
-    findings = sorted(findings, key=lambda k: k["finding_type"]["risk_level_score"], reverse=True)
+    findings = sorted(findings, key=lambda k: k["finding_type"]["risk_score"], reverse=True)
 
     findings_grouped = {}
     for finding in findings:
@@ -199,15 +197,12 @@ def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[Lis
 def build_finding_dict(
     finding_ooi: Finding,
     ooi_store: Dict[str, OOI],
-    knowledge_base: Dict,
 ) -> Dict:
     finding_dict = get_ooi_dict(finding_ooi)
 
-    finding_type_ooi = get_finding_type_from_finding(finding_ooi)
+    finding_type_ooi = ooi_store[finding_ooi.finding_type]
 
-    knowledge_base.update({finding_type_ooi.get_information_id(): get_knowledge_base_data_for_ooi(finding_type_ooi)})
-
-    finding_type_dict = build_finding_type_dict(finding_type_ooi, knowledge_base)
+    finding_type_dict = build_finding_type_dict(finding_type_ooi)
 
     finding_dict["ooi"] = get_ooi_dict(ooi_store[str(finding_ooi.ooi)]) if str(finding_ooi.ooi) in ooi_store else None
     finding_dict["finding_type"] = finding_type_dict
@@ -242,7 +237,7 @@ def build_meta(findings: List[Dict]) -> Dict:
     finding_type_ids = []
     for finding in findings:
         finding_type_id = finding["finding_type"]["id"]
-        severity = finding["finding_type"]["risk_level_severity"]
+        severity = finding["finding_type"]["risk_severity"]
 
         meta["total_by_severity"][severity] = meta["total_by_severity"].get(severity, 0) + 1
         meta["total_by_finding_type"][finding_type_id] = meta["total_by_finding_type"].get(finding_type_id, 0) + 1
@@ -258,12 +253,8 @@ def build_meta(findings: List[Dict]) -> Dict:
     return meta
 
 
-def build_finding_type_dict(finding_type_ooi: FindingType, knowledge_base: Dict) -> Dict:
+def build_finding_type_dict(finding_type_ooi: FindingType) -> Dict:
     finding_type_dict = get_ooi_dict(finding_type_ooi)
-
-    if knowledge_base[finding_type_ooi.get_information_id()]:
-        finding_type_dict.update(knowledge_base[finding_type_ooi.get_information_id()])
-
     finding_type_dict["findings"] = []
 
     return finding_type_dict

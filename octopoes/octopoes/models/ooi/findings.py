@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import total_ordering
 from typing import Literal, Optional
 
 from pydantic import AnyUrl
@@ -7,6 +8,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
 
+@total_ordering
 class RiskLevelSeverity(Enum):
     CRITICAL = "critical"
     HIGH = "high"
@@ -19,6 +21,14 @@ class RiskLevelSeverity(Enum):
 
     # unknown = the third party has been contacted, but third party has not determined the risk level (yet)
     UNKNOWN = "unknown"
+
+    __severity_order = ["unknown", "pending", "recommendation", "low", "medium", "high", "critical"]
+
+    def __gt__(self, other: "RiskLevelSeverity") -> bool:
+        return self.__severity_order.index(self.value) > self.__severity_order.index(other.value)
+
+    def __str__(self):
+        return self.value
 
 
 class FindingType(OOI):

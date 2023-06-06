@@ -31,6 +31,13 @@ TREE_DATA = {
             "ooi": "Network|testnetwork",
             "finding_type": "KATFindingType|KAT-000",
         },
+        "KATFindingType|KAT-000": {
+            "object_type": "KATFindingType",
+            "id": "KATFindingType|KAT-000",
+            "description": "Fake description...",
+            "risk_score": 3,
+            "risk_level": "low",
+        },
     },
 }
 

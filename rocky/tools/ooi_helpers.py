@@ -202,6 +202,8 @@ def risk_level_severity(score: float) -> str:
 def process_value(value: Any) -> Any:
     if isinstance(value, Enum):
         return value.value
+    if isinstance(value, (int, float)):
+        return value
     return str(value) if value else None
 
 

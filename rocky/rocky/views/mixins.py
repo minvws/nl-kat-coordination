@@ -184,6 +184,8 @@ class OOIList:
 
 
 class FindingList:
+    HARD_LIMIT = 99_999_999
+
     def __init__(
         self,
         octopoes_connector: OctopoesAPIConnector,

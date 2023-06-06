@@ -2,7 +2,7 @@ import uuid
 from collections import Counter
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import Dict, List, Optional, Set, Type
+from typing import List, Optional, Set, Type
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from requests import RequestException
@@ -140,7 +140,7 @@ def get_objects_bulk(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     references: Set[Reference] = Depends(extract_references),
-) -> Dict[Reference, OOI]:
+):
     return octopoes.ooi_repository.get_bulk(references, valid_time)
 
 

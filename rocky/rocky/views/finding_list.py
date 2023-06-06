@@ -6,12 +6,11 @@ from django.contrib import messages
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
-from tools.ooi_helpers import get_finding_type_from_finding, get_knowledge_base_data_for_ooi
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
-from rocky.views.mixins import FindingList, OctopoesView, OOIList
+from rocky.views.mixins import FindingList, OctopoesView
 
 logger = logging.getLogger(__name__)
 
@@ -36,28 +35,21 @@ class FindingEntry:
 
 
 def generate_findings_metadata(
-    findings: OOIList,
-    muted_findings: OOIList,
+    findings: FindingList,
     severity_filter: Optional[List[RiskLevelSeverity]] = None,
 ) -> List[Dict[str, Any]]:
     findings_meta = []
-    muted_findings_ids = {m.finding.natural_key for m in muted_findings[: OOIList.HARD_LIMIT]}
 
-    for finding in findings[: OOIList.HARD_LIMIT]:
-        if finding.natural_key in muted_findings_ids:
-            continue
-
-        finding_type = get_finding_type_from_finding(finding)
-        knowledge_base = get_knowledge_base_data_for_ooi(finding_type)
-        severity = RiskLevelSeverity(knowledge_base["risk_level_severity"])
-        if not severity_filter or severity in severity_filter:
+    for finding in findings[: FindingList.HARD_LIMIT]:
+        finding_type = finding.finding_type
+        if not severity_filter or finding_type.risk_severity in severity_filter:
             findings_meta.append(
                 {
                     "finding_number": 0,
                     "finding": finding,
                     "finding_type": finding_type,
-                    "severity": severity.value.capitalize(),
-                    "risk_level_score": knowledge_base["risk_level_score"],
+                    "severity": finding_type.risk_severity.name,
+                    "risk_level_score": finding_type.risk_score,
                 }
             )
 
