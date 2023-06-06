@@ -60,18 +60,23 @@ class Bytes(HTTPService):
 
     @retry_with_login
     @exception_handler
-    def get_last_run_boefje(self, boefje_id: str, input_ooi: str, organization_id: str) -> Optional[BoefjeMeta]:
+    def get_last_run_boefje(
+        self,
+        boefje_id: str,
+        input_ooi: str,
+        organization_id: str,
+        limit: int,
+    ) -> Optional[BoefjeMeta]:
         url = f"{self.host}/bytes/boefje_meta"
-        response = self.get(
-            url=url,
-            params={
-                "boefje_id": boefje_id,
-                "input_ooi": input_ooi,
-                "organization": organization_id,
-                "limit": 1,
-                "descending": "true",
-            },
-        )
+
+        params = {
+            "boefje_id": boefje_id,
+            "input_ooi": input_ooi,
+            "organization": organization_id,
+            "descending": "true",
+        }
+
+        response = self.get(url=url, params=params)
 
         self._verify_response(response)
 

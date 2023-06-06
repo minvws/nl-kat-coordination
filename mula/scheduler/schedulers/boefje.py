@@ -1,7 +1,6 @@
 import logging
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
 from typing import List
 
 import requests
@@ -492,13 +491,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
-        score = self.ranker.rank(
-            SimpleNamespace(
-                prior_tasks=prior_tasks,
-                task=task,
-            )
-        )
+        score = self.ranker.rank(task)
 
         # We need to create a PrioritizedItem for this task, to push
         # it to the priority queue.

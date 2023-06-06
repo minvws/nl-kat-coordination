@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import OOI, Organisation
@@ -51,6 +51,7 @@ class Octopoes(HTTPService):
     @exception_handler
     def get_random_objects(self, organisation_id: str, n: int, scan_level: List[int]) -> List[OOI]:
         """Get `n` random oois from octopoes"""
+
         if scan_level is None:
             scan_level = []
 
@@ -71,6 +72,42 @@ class Octopoes(HTTPService):
         url = f"{self.host}/{organisation_id}"
         response = self.get(url, params={"reference": reference})
         return OOI(**response.json())
+
+    @exception_handler
+    def get_findings_by_ooi(self, organisation_id: str, reference: str) -> List[Dict]:
+        url = f"{self.host}/{organisation_id}/tree"
+        response = self.get(url, params={"reference": reference, "depth": 2})
+
+        tree = response.json()
+
+        findings: List[Dict] = []
+        for _, children in tree.root.children.items():
+            for child in children:
+                if child.reference == tree.root.reference:
+                    continue
+
+                if child.reference.class_ != "Finding":
+                    continue
+
+                findings.append(tree.store[str(child.reference)])
+
+        return findings
+
+    def get_children_by_ooi(self, organisation_id: str, reference: str) -> List[Dict]:
+        url = f"{self.host}/{organisation_id}/tree"
+        response = self.get(url, params={"reference": reference, "depth": 2})
+
+        tree = response.json()
+
+        children: List[Dict] = []
+        for _, c in tree.root.children.items():
+            for child in c:
+                if child.reference == tree.root.reference:
+                    continue
+
+                children.append(tree.store[str(child.reference)])
+
+        return children
 
     def is_healthy(self) -> bool:
         healthy = True
