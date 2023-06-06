@@ -1,4 +1,5 @@
 import logging
+import os
 import threading
 from typing import Dict, Optional, Set
 
@@ -37,6 +38,8 @@ class App:
                 Application context of shared data (e.g. configuration,
                 external services connections).
         """
+        threading.excepthook = self.shutdown  # type: ignore
+
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.stop_event: threading.Event = threading.Event()
@@ -256,6 +259,31 @@ class App:
             s.stop()
 
         self.stop_event.set()
+
+    def unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
+        """Gracefully shutdown the scheduler application, and all threads
+        When a unhandled exception occurs.
+        """
+        self.logger.error("Unhandled exception occurred: %s", args.exc_value)
+
+        for t in threading.enumerate():
+            if t is threading.current_thread():
+                continue
+
+            if t is threading.main_thread():
+                continue
+
+            if not t.is_alive():
+                continue
+
+            t.join(5)
+
+        self.logger.info("Shutdown complete")
+
+        # We're calling this here, because we want to issue a shutdown from
+        # within a thread, otherwise it will not exit a docker container.
+        # Source: https://stackoverflow.com/a/1489838/1346257
+        os._exit(1)
 
     def remove_scheduler(self, scheduler_id: str) -> None:
         """Remove a scheduler from the application.
