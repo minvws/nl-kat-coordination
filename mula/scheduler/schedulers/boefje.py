@@ -109,21 +109,13 @@ class BoefjeScheduler(Scheduler):
         ooi = mutation.value
         if ooi is None:
             self.logger.debug(
-                "Mutation value is None, skipping %s [organisation.id=%s, scheduler_id=%s]",
-                mutation,
+                "Mutation value is None, skipping [organisation.id=%s, scheduler_id=%s]",
                 self.organisation.id,
                 self.scheduler_id,
             )
             return
 
         if mutation.operation == MutationOperationType.DELETE:
-            self.logger.debug(
-                "Mutation operation is delete, skipping %s [organisation_id=%s, scheduler_id=%s]",
-                mutation,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-
             # When there are tasks of the ooi are on the queue, we need to
             # remove them from the queue.
             items, _ = self.ctx.pq_store.get_items(
