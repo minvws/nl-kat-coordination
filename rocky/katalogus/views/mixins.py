@@ -67,29 +67,16 @@ class BoefjeMixin(OctopoesView):
     """
 
     def run_boefje(self, katalogus_boefje: Plugin, ooi: Optional[OOI]) -> None:
-        boefje_queue_name = f"boefje-{self.organization.code}"
-
-        boefje = Boefje(
-            id=katalogus_boefje.id,
-            name=katalogus_boefje.name,
-            description=katalogus_boefje.description,
-            repository_id=katalogus_boefje.repository_id,
-            version=None,
-            scan_level=katalogus_boefje.scan_level.value,
-            consumes={ooi_class.get_ooi_type() for ooi_class in katalogus_boefje.consumes},
-            produces={ooi_class.get_ooi_type() for ooi_class in katalogus_boefje.produces},
-        )
-
         boefje_task = BoefjeTask(
             id=uuid4().hex,
-            boefje=boefje,
+            boefje=Boefje(id=katalogus_boefje.id, version=None),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
 
         item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
         logger.info("Item: %s", item.json())
-        client.push_task(boefje_queue_name, item)
+        client.push_task(f"boefje-{self.organization.code}", item)
 
     def run_boefje_for_oois(
         self,
