@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
 from typing import Dict, List, Optional, Set, Tuple, Type, Union
@@ -25,14 +26,20 @@ from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.explanation import InheritanceSection
-from octopoes.models.finding import HydratedFinding
-from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
+from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_collapsed_types, get_relations, type_by_name
 from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class HydratedFinding:
+    finding: Finding
+    ooi: OOI
+    finding_type: FindingType
 
 
 class OriginData(BaseModel):
