@@ -1,16 +1,21 @@
 import contextlib
 import json
 from io import BytesIO
+from logging import getLogger
 from typing import Dict, List, Optional, Set, Type
 
 import requests
 from django.conf import settings
+from jsonschema.exceptions import SchemaError
+from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel
 from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
+
+logger = getLogger(__name__)
 
 
 class Plugin(BaseModel):
@@ -66,25 +71,26 @@ class KATalogusClientV1:
     def get_plugin_schema(self, plugin_id) -> Optional[Dict]:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/schema.json")
         response.raise_for_status()
-        return response.json()
+
+        schema = response.json()
+
+        try:
+            Draft202012Validator.check_schema(schema)
+            return schema
+        except SchemaError:
+            logger.warning("Invalid schema found for plugin %s", plugin_id)
 
     def get_plugin_settings(self, plugin_id: str) -> Dict:
         response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
         return response.json()
 
-    def add_plugin_setting(self, plugin_id: str, name: str, value: str) -> None:
-        body = {"value": value}
-        response = self.session.post(f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body)
+    def upsert_plugin_settings(self, plugin_id: str, values: Dict) -> None:
+        response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
-    def update_plugin_setting(self, plugin_id: str, name: str, value: str) -> None:
-        body = {"value": value}
-        response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings/{name}", json=body)
-        response.raise_for_status()
-
-    def delete_plugin_setting(self, plugin_id: str, name: str):
-        response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings/{name}")
+    def delete_plugin_settings(self, plugin_id: str):
+        response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
         return response
 
