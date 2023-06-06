@@ -8,13 +8,17 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
-from octopoes.config.settings import Settings
-from octopoes.connector.octopoes import DEFAULT_LIMIT, DEFAULT_OFFSET, DEFAULT_SEVERITIES
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    DEFAULT_SEVERITY_FILTER,
+    Settings,
+)
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.models import (
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     OOI,
     Reference,
     ScanLevel,
@@ -301,7 +305,7 @@ def list_findings(
     limit=DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    severities: Set[RiskLevelSeverity] = Query(DEFAULT_SEVERITIES),
+    severities: Set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
         severities,

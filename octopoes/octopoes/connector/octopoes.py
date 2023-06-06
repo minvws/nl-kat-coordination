@@ -7,10 +7,14 @@ from pydantic.tools import parse_obj_as
 from requests import HTTPError, Response
 
 from octopoes.api.models import Declaration, Observation, ServiceHealth
-from octopoes.connector import DecodeException, RemoteException
-from octopoes.models import (
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+)
+from octopoes.connector import DecodeException, RemoteException
+from octopoes.models import (
     OOI,
     Reference,
     ScanLevel,
@@ -24,10 +28,6 @@ from octopoes.models.origin import Origin, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
-
-DEFAULT_SEVERITIES = {severity for severity in RiskLevelSeverity}
-DEFAULT_LIMIT = 5000
-DEFAULT_OFFSET = 0
 
 
 class OctopoesAPISession(requests.Session):

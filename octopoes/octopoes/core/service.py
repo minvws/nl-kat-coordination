@@ -6,7 +6,13 @@ from typing import Callable, Dict, List, Optional, Set, Type
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
 
-from octopoes.config.settings import Settings
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    Settings,
+)
 from octopoes.events.events import (
     DBEvent,
     OOIDBEvent,
@@ -15,8 +21,6 @@ from octopoes.events.events import (
     ScanProfileDBEvent,
 )
 from octopoes.models import (
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     OOI,
     DeclaredScanProfile,
     EmptyScanProfile,
@@ -90,8 +94,8 @@ class OctopoesService:
         self,
         types: Set[Type[OOI]],
         valid_time: datetime,
-        limit: int = 1000,
-        offset: int = 0,
+        limit: int = DEFAULT_LIMIT,
+        offset: int = DEFAULT_OFFSET,
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOI]:
@@ -131,7 +135,6 @@ class OctopoesService:
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
         bit_definition = get_bit_definitions()[origin.method]
-
         is_disabled = bit_definition.id in settings.bits_disabled or (
             not bit_definition.default_enabled and bit_definition.id not in settings.bits_enabled
         )
@@ -424,7 +427,7 @@ class OctopoesService:
             return
 
     def _run_inferences(self, event: ScanProfileDBEvent) -> None:
-        inference_origins = self.origin_repository.list_by_source(event.new_data.reference, valid_time=event.valid_time)
+        inference_origins = self.origin_repository.list_by_source(event.reference, valid_time=event.valid_time)
         inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
