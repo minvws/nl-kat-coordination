@@ -1,6 +1,7 @@
-from unittest import TestCase
+from unittest import TestCase, mock
 
-from boefjes.job_models import NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.plugins.kat_snyk.main import run as run_boefje
 from boefjes.plugins.kat_snyk.normalize import run
 from octopoes.models.ooi.findings import SnykFindingType
 from octopoes.models.types import (
@@ -11,7 +12,7 @@ from octopoes.models.types import (
 from tests.stubs import get_dummy_data
 
 
-class DnsTest(TestCase):
+class SnykTest(TestCase):
     maxDiff = None
 
     def test_snyk_no_findings(self):
@@ -86,3 +87,17 @@ class DnsTest(TestCase):
         expected = snyk_findingtypes + snyk_findings + cve_findingtypes + cve_findings
 
         self.assertCountEqual(expected, oois)
+
+    @mock.patch("boefjes.plugins.kat_snyk.main.requests.get")
+    def test_snyk_html_parser(self, mock_get):
+        boefje_meta = BoefjeMeta.parse_raw(get_dummy_data("snyk-job.json"))
+
+        mock_get.return_value.content = get_dummy_data("snyk-vuln.html")
+
+        output = list(
+            run_boefje(
+                boefje_meta,
+            )
+        )
+
+        print(output)
