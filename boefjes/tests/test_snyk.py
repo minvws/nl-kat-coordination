@@ -93,8 +93,6 @@ class SnykTest(TestCase):
     def test_snyk_html_parser(self, mock_get):
         boefje_meta = BoefjeMeta.parse_raw(get_dummy_data("snyk-job.json"))
 
-        mock_get.return_value.content = get_dummy_data("snyk-vuln.html")
-
         # Mock the first GET request
         mock_first_get = mock.Mock()
         mock_first_get.content = get_dummy_data("snyk-vuln.html")
