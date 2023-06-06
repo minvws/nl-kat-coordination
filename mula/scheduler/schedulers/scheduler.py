@@ -50,6 +50,7 @@ class Scheduler(abc.ABC):
         scheduler_id: str,
         queue: queues.PriorityQueue,
         ranker: rankers.Ranker,
+        callback: Optional[Callable[..., None]] = None,
         populate_queue_enabled: bool = True,
         max_tries: int = -1,
     ):
@@ -81,6 +82,7 @@ class Scheduler(abc.ABC):
         self.populate_queue_enabled: bool = populate_queue_enabled
         self.max_tries: int = max_tries
 
+        self.callback: Optional[Callable[[], Any]] = callback
         self.threads: List[thread.ThreadRunner] = []
         self.stop_event: threading.Event = threading.Event()
 
@@ -312,6 +314,9 @@ class Scheduler(abc.ABC):
 
         for t in self.threads:
             t.join(5)
+
+        if self.callback:
+            self.callback(self.scheduler_id)  # type: ignore [call-arg]
 
         self.logger.info("Stopped scheduler: %s", self.scheduler_id)
 
