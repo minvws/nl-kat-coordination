@@ -93,6 +93,7 @@ class Octopoes(HTTPService):
 
         return findings
 
+    @exception_handler
     def get_children_by_ooi(self, organisation_id: str, reference: str) -> List[Dict]:
         url = f"{self.host}/{organisation_id}/tree"
         response = self.get(url, params={"reference": reference, "depth": 2})
