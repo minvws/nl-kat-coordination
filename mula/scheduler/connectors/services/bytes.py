@@ -65,7 +65,7 @@ class Bytes(HTTPService):
         boefje_id: str,
         input_ooi: str,
         organization_id: str,
-        limit: int,
+        limit: int = 1,
     ) -> Optional[BoefjeMeta]:
         url = f"{self.host}/bytes/boefje_meta"
 

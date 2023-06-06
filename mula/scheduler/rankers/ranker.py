@@ -1,8 +1,7 @@
 import abc
 import logging
-from typing import Any
 
-from scheduler import context
+from scheduler import context, models
 
 
 class Ranker(abc.ABC):
@@ -27,5 +26,5 @@ class Ranker(abc.ABC):
         self.ctx: context.AppContext = ctx
 
     @abc.abstractmethod
-    def rank(self, obj: Any) -> int:
+    def rank(self, task: models.Task) -> int:
         raise NotImplementedError

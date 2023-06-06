@@ -1,6 +1,9 @@
 import random
+import statistics
 from datetime import datetime, timedelta, timezone
 from typing import Any
+
+from scheduler import models
 
 from .ranker import Ranker
 
@@ -9,8 +12,7 @@ class BoefjeRanker(Ranker):
     MAX_PRIORITY = 1000
     MAX_DAYS = 7
 
-    # TODO: type Task
-    def rank(self, task: Any) -> int:
+    def rank(self, task: models.Task) -> int:
         """When a task hasn't run in a while it needs to be run sooner. We want
         a task to get a priority of 3 when `max_days` days are gone by, and
         thus it should have a lower bound of 3 for every task that has run past
@@ -41,10 +43,15 @@ class BoefjeRanker(Ranker):
         if time_since_grace_period >= max_days_in_seconds:
             return 3
 
-        # Iterate over the prior tasks (limit to 10)
+        freq_duration = []
+        freq_findings = []
+
+        # Iterate over the prior tasks, limit to the last 10
         for prior_task in prior_tasks:
             # How long did it take for the task to run?
             duration = (prior_task.finished_at - prior_task.started_at).seconds
+            freq_duration.append(duration)
+
             self.logger.info(duration)
 
             # How many objects where created by the task?
@@ -59,7 +66,15 @@ class BoefjeRanker(Ranker):
                 organisation_id=task.organisation_id,
                 reference=prior_task.input_ooi.reference,
             )
+            freq_findings.append(len(findings))
             self.logger.info(findings)
+
+        # Calculate the median duration and findings
+        median_duration = statistics.median(freq_duration)
+        self.logger.info(median_duration)
+
+        median_findings = statistics.median(freq_findings)
+        self.logger.info(median_findings)
 
         return int(3 + (max_priority - 3) * (1 - time_since_grace_period / max_days_in_seconds))
 
