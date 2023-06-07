@@ -15,20 +15,23 @@ class RemoteUserBackend(BaseRemoteUserBackend):
 
     def configure_user(self, request, user, created=True):
         if not user.is_superuser and settings.REMOTE_USER_DEFAULT_ORGANIZATIONS:
-            user_orgs = [o.name for o in user.organizations]
-            for item in settings.REMOTE_USER_DEFAULT_ORGANIZATIONS:
-                organization_name, group_name = item.split(":")
-                if organization_name not in user_orgs:
-                    logger.info("Adding user '%s' to organization '%s'", user, organization_name)
-                    organization = Organization.objects.get(name=organization_name)
-                    member = OrganizationMember.objects.create(
-                        user=user,
-                        organization=organization,
-                        status=OrganizationMember.STATUSES.ACTIVE,
-                        blocked=False,
-                        trusted_clearance_level=4,
-                        acknowledged_clearance_level=0,
-                        onboarded=False,
-                    )
-                    member.groups.set([Group.objects.get(name=group_name)])
+            try:
+                user_orgs = [o.name for o in user.organizations]
+                for item in settings.REMOTE_USER_DEFAULT_ORGANIZATIONS:
+                    organization_name, group_name = item.split(":")
+                    if organization_name not in user_orgs:
+                        logger.info("Adding user '%s' to organization '%s'", user, organization_name)
+                        organization = Organization.objects.get(name=organization_name)
+                        member = OrganizationMember.objects.create(
+                            user=user,
+                            organization=organization,
+                            status=OrganizationMember.STATUSES.ACTIVE,
+                            blocked=False,
+                            trusted_clearance_level=4,
+                            acknowledged_clearance_level=0,
+                            onboarded=False,
+                        )
+                        member.groups.set([Group.objects.get(name=group_name)])
+            except Exception:
+                logger.exception("An error occurred while configuring user '%s'", user)
         return user
