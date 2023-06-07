@@ -32,6 +32,7 @@ class RemoteUserBackend(BaseRemoteUserBackend):
                             onboarded=False,
                         )
                         member.groups.set([Group.objects.get(name=group_name)])
+                        del user.organizations
             except Exception:
                 logger.exception("An error occurred while configuring user '%s'", user)
         return user
