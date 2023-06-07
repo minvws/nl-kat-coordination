@@ -22,7 +22,7 @@ iniconfig==2.0.0
 isort==5.10.1
 lazy-object-proxy==1.7.1
 mako==1.2.4
-markupsafe==2.1.2
+markupsafe==2.1.3
 mccabe==0.7.0
 mypy-extensions==1.0.0
 mypy==1.0.1
