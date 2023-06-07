@@ -30,10 +30,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     yield KATFindingType(
         id=kat_finding_type_id,
-        description=finding_type_information["description"],
-        source=finding_type_information["source"],
-        impact=finding_type_information["impact"],
-        recommendation=finding_type_information["recommendation"],
+        description=finding_type_information.get("description", None),
+        source=finding_type_information.get("source", None),
+        impact=finding_type_information.get("impact", None),
+        recommendation=finding_type_information.get("recommendation", None),
         risk_severity=risk_severity,
         risk_score=risk_score,
     )
