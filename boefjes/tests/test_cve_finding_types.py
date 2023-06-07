@@ -28,6 +28,7 @@ class CVETest(TestCase):
                 id="CVE-2021-46882",
                 description="The video framework has memory overwriting caused by addition overflow. "
                 "Successful exploitation of this vulnerability may affect availability.",
+                source="https://cve.circl.lu/cve/CVE-2021-46882",
                 risk_severity=RiskLevelSeverity.MEDIUM,
                 risk_score=7.5,
             ),
@@ -53,6 +54,7 @@ class CVETest(TestCase):
                 "data due to a missing capability check on the 'reset' function in versions up to, and including, "
                 "3.2.3. This makes it possible for authenticated attackers, with editor-level permissions and above, "
                 "to reset plugin settings.",
+                source="https://cve.circl.lu/cve/CVE-2021-46882",
                 risk_severity=RiskLevelSeverity.UNKNOWN,
                 risk_score=None,
             ),
