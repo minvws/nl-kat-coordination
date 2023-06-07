@@ -261,6 +261,19 @@ This oneliner will do it for you, executed as root:
 
     sudo sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
 
+Configure hostname in Rocky
+===========================
+
+The `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` variables in
+`/etc/kat/rocky.conf` need to be configured with the hostname that will be used
+to access OpenKAT. If `openkat.example.org` is used to access OpenKAT the
+configuration should be:
+
+.. code-block:: sh
+
+    DJANGO_ALLOWED_HOSTS="openkat.example.org"
+    DJANGO_CSRF_TRUSTED_ORIGINS="https://openkat.example.org"
+
 Restart KAT
 ===========
 
