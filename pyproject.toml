@@ -80,6 +80,7 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 "manage.py" = ["INP"]
 "*/tests/*" = ["T20"]
 "boefjes/boefjes/plugins/*" = ["PTH"]
+"scripts/*.py" = ["INP001", "T201"]
 
 [tool.ruff.flake8-tidy-imports]
 [tool.ruff.flake8-tidy-imports.banned-api]
