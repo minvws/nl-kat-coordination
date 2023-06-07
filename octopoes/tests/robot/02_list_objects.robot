@@ -28,6 +28,12 @@ List Random Objects With Filter
     Length Of Random Object List With Filter Should Be    ${{ [1,0] }}    ${10}
     Length Of Random Object List With Filter Should Be    ${{ [2,3] }}    ${0}
 
+Load Bulk
+    Insert Normalizer Output
+    Await Sync
+    ${references}    Create List    ${REF_HOSTNAME}    ${REF_IPADDR}    ${REF_RESOLVEDHOSTNAME}
+    Verify Bulk Load    ${references}
+
 
 *** Keywords ***
 Setup Test
@@ -52,3 +58,13 @@ Length Of Random Object List With Filter Should Be
     ${params}    Create Dictionary    scan_level=${scan_levels}    amount=10
     ${response}    Get    ${OCTOPOES_URI}/objects/random    params=${params}
     Length Should Be    ${response.json()}    ${expected_length}
+
+Verify Bulk Load
+    [Arguments]    ${references}
+    ${params}    Create Dictionary    references=@{references}
+    ${response}    Get    ${OCTOPOES_URI}/objects/bulk    params=${params}
+    Log    ${response.json()}
+    Should Be Equal As Integers    ${response.status_code}    200
+    FOR    ${reference}    IN    @{references}
+        Dictionary Should Contain Key    ${response.json()}    ${reference}
+    END
