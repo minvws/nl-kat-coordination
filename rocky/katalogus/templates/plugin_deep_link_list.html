@@ -7,41 +7,59 @@
     {% include "header.html" %}
 
     <main id="main-content">
+        {% include "partials/katalogus_header.html" %}
+        {% include "partials/plugins_navigation.html" with plugin_type="deep_link" %}
+
         <section>
             <div>
-                {% include "partials/ooi_head.html" with ooi=ooi view="deep_links" %}
-
-                <h2>{% translate "Deep Links" %}</h2>
-                <p class="emphasized">
-                    {% translate "Showing a list of all deep links" %}
-                </p>
-                <a class="button"
-                   href="{% url 'plugin_deep_link_add' organization.code %}">{% translate "Create deep link" %}</a>
-                {% if plugin_deep_link %}
+                <div class="fifty-fifty">
+                    <div>
+                        <h2>{% translate "Deep Links" %}</h2>
+                        <p>
+                            {% blocktranslate %}
+                                Deep links are links from an external source giving more information about an object.
+                                It could be a wikipedia page, CVE score page or anything that can give extended information about a particular object.
+                            {% endblocktranslate %}
+                        </p>
+                    </div>
+                    <div class="horizontal-view toolbar">
+                        <a class="button"
+                           href="{% url 'plugin_deep_link_add' organization.code %}">{% translate "Create deep link" %}</a>
+                    </div>
+                </div>
+                {% if deep_links %}
                     <div class="horizontal-scroll">
                         <table>
                             <caption>{% translate "Overview of deep links:" %}</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">{% translate "Name" %}</th>
-                                    <th scope="col">{% translate "Link" %}</th>
+                                    <th scope="col">{% translate "OOI-Type" %}</th>
+                                    <th scope="col">{% translate "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>{{ deep_link.name }}</td>
-                                    <td>
-                                        <a href="{{ deep_link.link }}" target="_blank">{{ deep_link.link_text }}</a>
-                                    </td>
-                                </tr>
+                                {% for deep_link in deep_links %}
+                                    <tr>
+                                        <td>{{ deep_link.plugin.name }}</td>
+                                        <td>{{ deep_link.plugin.ooi_type }}</td>
+                                        <td>
+                                            {% if deep_link.enabled %}
+                                                <button type="submit" class="button">{% translate "Disable" %}</button>
+                                            {% else %}
+                                                <button type="submit" class="button">{% translate "Enable" %}</button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                         {% include "partials/pagination.html" %}
 
                     </div>
                 {% else %}
-                    <p>
-                        {% translate "There are no deep links to show." %}
+                    <p class="emphasized">
+                        {% translate "There are no deep links available." %}
                     </p>
                 {% endif %}
             </div>

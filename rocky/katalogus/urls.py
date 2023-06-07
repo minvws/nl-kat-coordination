@@ -6,7 +6,7 @@ from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalog
 from katalogus.views.plugin_deep_link_add import PluginDeepLinkCreateView
 from katalogus.views.plugin_deep_link_detail import PluginDeepLinkDetailView
 from katalogus.views.plugin_deep_link_edit import PluginDeepLinkUpdateView
-from katalogus.views.plugin_deep_link_list import PluginDeepLinkDetailedListView
+from katalogus.views.plugin_deep_link_list import PluginDeepLinkListView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from katalogus.views.plugin_settings_add import PluginSettingsAddView
@@ -77,7 +77,7 @@ urlpatterns = [
     ),
     path(
         "plugins/deep-link/",
-        PluginDeepLinkDetailedListView.as_view(),
-        name="plugin_deep_link",
+        PluginDeepLinkListView.as_view(),
+        name="plugins_deep_link",
     ),
 ]

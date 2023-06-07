@@ -1,5 +1,6 @@
 from typing import Any, List
 
+from account.mixins import OrganizationView
 from django.http import HttpRequest, HttpResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -11,10 +12,15 @@ from rocky.views.ooi_view import BaseOOIBreadcrumbs
 
 
 def replace_link_id_param(link: str, key: str) -> str:
-    return link.split("[")[0] + key
+    return link.replace("[id]", key)
 
 
 class PluginDeepLinkDetailedListView(BaseOOIBreadcrumbs, OctopoesView, ListView):
+    """
+    Listing deep links of a specific OOI related to an OOI-Type.
+    Each OOI has a specific key/id to build the link, for example CVE codes in link.
+    """
+
     model = OrganizationPlugin
     template_name = "plugin_deep_link_detailed_list.html"
     context_object_name = "plugin_deep_link"
@@ -54,3 +60,16 @@ class PluginDeepLinkDetailedListView(BaseOOIBreadcrumbs, OctopoesView, ListView)
             }
         )
         return breadcrumbs
+
+
+class PluginDeepLinkListView(OrganizationView, ListView):
+    """
+    Listing all enabled deep link plugins of an organization in KAT-alogus.
+    """
+
+    model = OrganizationPlugin
+    template_name = "plugin_deep_link_list.html"
+    context_object_name = "deep_links"
+
+    def get_queryset(self):
+        return OrganizationPlugin.objects.filter(organization=self.organization, enabled=True)

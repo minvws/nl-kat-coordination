@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block title %}
-    {{ total_plugins }} {% translate "Available plugins" %}
+    <strong>{{ object_list|length }}</strong> {{ plugin_type }} {% translate "available" %}
 {% endblock title %}
 {% block filter_form %}
     <form novalidate method="get" class="help">

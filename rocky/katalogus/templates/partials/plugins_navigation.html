@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<section>
+    <div>
+        <nav class="tabs" aria-label="{% translate "Plugins Navigation" %}">
+            <ul>
+                <li {% if plugin_type == "boefjes" %} aria-current="page"{% endif %}>
+                    <a href="{% url 'katalogus' organization.code %}">{% translate "Boefjes" %}</a>
+                </li>
+                <li {% if plugin_type == "deep_link" %} aria-current="page"{% endif %}>
+                    <a href="{% url 'plugins_deep_link' organization.code %}">{% translate "Deep Links" %}</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</section>
