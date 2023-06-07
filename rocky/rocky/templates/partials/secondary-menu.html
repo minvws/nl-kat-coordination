@@ -2,10 +2,13 @@
 {% load i18n %}
 
 {% if request.user.is_authenticated %}
-<div data-open-label="{% translate "Menu" %}"
-  data-close-label="{% translate "Close menu" %}"
+<div
+  data-button-open-label="{{ user.full_name|slice:"1" }}"
+  data-button-close-label="{{ user.full_name|slice:"1" }}"
+  data-open-label="{% translate "User navigation" %}"
+  data-close-label="{% translate "Close user navigation" %}"
   data-media="(min-width: 100%)"
-  data-button-classes="user-icon"
+  data-button-classes="icon user-icon"
   aria-label="{% translate "User navigation" %}"
   class="collapsible user-nav">
 
