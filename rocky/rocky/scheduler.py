@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
@@ -16,13 +16,7 @@ class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
-    name: Optional[str]
-    description: Optional[str]
-    repository_id: Optional[str]
     version: Optional[str] = Field(default=None)
-    scan_level: Optional[int] = Field(default=None)
-    consumes: Optional[Union[str, Set[str]]]
-    produces: Optional[Set[str]]
 
 
 class BoefjeMeta(BaseModel):
