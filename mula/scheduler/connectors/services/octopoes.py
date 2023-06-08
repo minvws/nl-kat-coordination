@@ -79,17 +79,10 @@ class Octopoes(HTTPService):
         response = self.get(url, params={"reference": reference, "depth": 2})
 
         tree = response.json()
-
         findings: List[Dict] = []
-        for _, children in tree.root.children.items():
-            for child in children:
-                if child.reference == tree.root.reference:
-                    continue
-
-                if child.reference.class_ != "Finding":
-                    continue
-
-                findings.append(tree.store[str(child.reference)])
+        for _, references in tree.root.children.finding.items():
+            for finding in references:
+                findings.append(tree.store[str(finding.reference)])
 
         return findings
 
@@ -101,12 +94,11 @@ class Octopoes(HTTPService):
         tree = response.json()
 
         children: List[Dict] = []
-        for _, c in tree.root.children.items():
-            for child in c:
-                if child.reference == tree.root.reference:
-                    continue
+        for k, v in tree.store.items():
+            if k == tree.root.reference:
+                continue
 
-                children.append(tree.store[str(child.reference)])
+            children.append(v)
 
         return children
 
