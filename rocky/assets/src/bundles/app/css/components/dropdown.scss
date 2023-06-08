@@ -2,13 +2,13 @@
   max-width: 50%;
   width: auto;
   padding: 0;
-  
+
   span {
     pointer-events: none;
   }
 
   position: relative;
-  
+
   button,
   a.button {
     white-space: nowrap;
@@ -18,7 +18,7 @@
     display: block;
   }
 
-  > ul {
+  >ul {
     padding: 0;
     display: none;
     background-color: #fff;
@@ -27,7 +27,7 @@
     margin-block-start: 0;
     padding-inline-start: 0;
     position: absolute;
-    top: 2.875rem;
+    top: 4rem;
     z-index: 1;
     width: max-content;
     gap: 0;
@@ -42,8 +42,8 @@
         border-top: 1px $offwhite solid;
         padding: 0;
         width: 100%;
-  
-        > a {
+
+        >a {
           align-items: center;
           color: black;
           display: flex;

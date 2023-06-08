@@ -15,17 +15,12 @@
     --header-navigation-collapsible-list-item-link-selected-font-weight: bold;
 }
 
-.collapsing-element>div {
-    flex-direction: column;
-    width: 100%;
-    box-sizing: border-box;
-}
-
 header nav form {
     padding: 0;
 }
 
 body>header nav.collapsible.collapsed button.collapsible-toggle[aria-expanded="true"]+.collapsing-element {
+
     ul li a[aria-current] {
         &:before {
             content: "\ea5e";
@@ -42,5 +37,13 @@ body>header nav.collapsible.collapsed button.collapsible-toggle[aria-expanded="t
         &:hover {
             background-color: transparent;
         }
+    }
+}
+
+.collapsible.collapsed .collapsing-element {
+    >div {
+        flex-direction: column;
+        width: 100%;
+        box-sizing: border-box;
     }
 }
