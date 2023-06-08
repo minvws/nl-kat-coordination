@@ -77,30 +77,13 @@ class Octopoes(HTTPService):
     def get_findings_by_ooi(self, organisation_id: str, reference: str) -> List[Dict]:
         url = f"{self.host}/{organisation_id}/tree"
         response = self.get(url, params={"reference": reference, "depth": 2})
-
-        tree = response.json()
-        findings: List[Dict] = []
-        for _, references in tree.root.children.finding.items():
-            for finding in references:
-                findings.append(tree.store[str(finding.reference)])
-
-        return findings
+        return self.findings_from_tree_response(response.json())
 
     @exception_handler
-    def get_children_by_ooi(self, organisation_id: str, reference: str) -> List[Dict]:
+    def get_objects_by_ooi(self, organisation_id: str, reference: str) -> List[Dict]:
         url = f"{self.host}/{organisation_id}/tree"
         response = self.get(url, params={"reference": reference, "depth": 2})
-
-        tree = response.json()
-
-        children: List[Dict] = []
-        for k, v in tree.store.items():
-            if k == tree.root.reference:
-                continue
-
-            children.append(v)
-
-        return children
+        return self.objects_from_tree_response(response.json())
 
     def is_healthy(self) -> bool:
         healthy = True
@@ -109,3 +92,22 @@ class Octopoes(HTTPService):
                 return False
 
         return healthy
+
+    @staticmethod
+    def findings_from_tree_response(tree_response: Dict) -> List[Dict]:
+        findings: List[Dict] = []
+        for _, obj in tree_response["store"].items():
+            if obj["object_type"] != "Finding":
+                continue
+
+            findings.append(obj)
+
+        return findings
+
+    @staticmethod
+    def objects_from_tree_response(tree_response: Dict) -> List[Dict]:
+        objects: List[Dict] = []
+        for _, obj in tree_response["store"].items():
+            objects.append(obj)
+
+        return objects
