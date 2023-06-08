@@ -1,6 +1,24 @@
 /* Description list - Variables */
 
 :root {
-	--description-list-item-padding: 0.75rem 0.75rem 0.75rem 0;
+    --description-list-width: 100%;
+
+    /* Item */
+    --description-list-item-padding: 0.75rem 0.75rem 0.75rem 0;
     --description-list-item-odd-background-color: transparent;
+}
+
+/* Can be removed after manon v14.0.1 */
+main div dl,
+main section dl,
+main article dl,
+dl {
+    >div {
+        width: 100%;
+
+        dt,
+        dd {
+            white-space: initial;
+        }
+    }
 }

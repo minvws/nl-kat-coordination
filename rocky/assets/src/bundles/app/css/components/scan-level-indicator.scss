@@ -34,19 +34,19 @@ Markup:
   }
 
   &.l1 li:first-child:before {
-    color: var(--kat-purrple-4);
-  }
-
-  &.l2 li:nth-child(-n+2):before {
-    color: var(--kat-purrple-5);
-  }
-
-  &.l3 li:nth-child(-n+3):before {
     color: var(--kat-purrple-6);
   }
 
-  &.l4 li:nth-child(-n+4):before {
+  &.l2 li:nth-child(-n+2):before {
     color: var(--kat-purrple-7);
+  }
+
+  &.l3 li:nth-child(-n+3):before {
+    color: var(--kat-purrple-8);
+  }
+
+  &.l4 li:nth-child(-n+4):before {
+    color: var(--kat-purrple-9);
   }
 
   &-form {

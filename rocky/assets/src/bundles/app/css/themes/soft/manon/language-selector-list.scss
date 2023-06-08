@@ -24,7 +24,7 @@
     --language-selector-list-border-color: #d4d4d4;
     --language-selector-list-border-radius: 0.25rem;
     --language-selector-list-margin-top: 0.25rem;
-    --language-selector-list-box-shadow: 0px 8px 16px 0px rgba(17,20,22,0.15);
+    --language-selector-list-box-shadow: 0px 8px 16px 0px rgba(17, 20, 22, 0.15);
     --language-selector-list-min-width: 8rem;
 
     /* List item */
@@ -42,12 +42,12 @@
     --language-selector-list-item-active-font-weight: bold;
 }
 
-body > header nav .language-selector ul li a,
+body>header nav .language-selector ul li a,
 .language-selector ul li a {
     padding: 0.125rem 1rem;
 }
 
-body > header nav .language-selector div[aria-expanded="true"] ul li[aria-current="true"] a:before,
+body>header nav .language-selector div[aria-expanded="true"] ul li[aria-current="true"] a:before,
 .language-selector div[aria-expanded="true"] ul li[aria-current="true"] a:before {
     content: "\ea5e";
     font-family: var(--language-selector-list-button-icon-font-family);
@@ -57,14 +57,14 @@ body > header nav .language-selector div[aria-expanded="true"] ul li[aria-curren
     margin-right: 0.5rem;
 }
 
-body > header nav.collapsible .collapsible-toggle[aria-expanded="true"] + .collapsing-element .language-selector {
+body>header nav.collapsible .collapsible-toggle[aria-expanded="true"]+.collapsing-element .language-selector {
     order: 1;
 
     .language-selector-options {
-        > button {
+        >button {
             display: none;
         }
-    
+
         ul {
             display: flex;
             flex-direction: row;
@@ -73,15 +73,15 @@ body > header nav.collapsible .collapsible-toggle[aria-expanded="true"] + .colla
             border: 0;
             padding-left: var(--collapsing-element-list-item-link-padding-left, 2rem);
             gap: 1rem;
-    
+
             li {
                 width: auto;
                 border: 0;
-    
+
                 a {
                     padding: 0;
                     border: 0;
-    
+
                     button {
                         min-width: 0;
                         color: #006FB3;
@@ -93,6 +93,3 @@ body > header nav.collapsible .collapsible-toggle[aria-expanded="true"] + .colla
         }
     }
 }
-
-
-

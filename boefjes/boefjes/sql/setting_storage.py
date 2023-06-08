@@ -23,18 +23,23 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
 
         super().__init__(session)
 
-    def get_by_key(self, key: str, organisation_id: str, plugin_id: str) -> str:
-        instance = self._db_instance_by_id(organisation_id, plugin_id)
-        values = json.loads(self.encryption.decode(instance.values))
+    def upsert(self, values: Dict, organisation_id: str, plugin_id: str) -> None:
+        encrypted_values = self.encryption.encode(json.dumps(values))
 
-        if key not in values:
-            raise SettingsNotFound(organisation_id, plugin_id) from ObjectNotFoundException(
-                SettingsInDB, organisation_id=organisation_id
+        try:
+            instance = self._db_instance_by_id(organisation_id, plugin_id)
+            instance.values = encrypted_values
+        except SettingsNotFound:
+            organisation = self.session.query(OrganisationInDB).filter(OrganisationInDB.id == organisation_id).first()
+
+            setting_in_db = SettingsInDB(
+                values=encrypted_values,
+                plugin_id=plugin_id,
+                organisation_pk=organisation.pk,
             )
+            self.session.add(setting_in_db)
 
-        return values[key]
-
-    def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
+    def get_all(self, organisation_id: str, plugin_id: str) -> Dict:
         try:
             instance = self._db_instance_by_id(organisation_id, plugin_id)
         except SettingsNotFound:
@@ -42,40 +47,10 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
 
         return json.loads(self.encryption.decode(instance.values))
 
-    def create(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
-        logger.info("Saving settings: %s for organisation %s", settings, organisation_id)
-
-        try:
-            instance = self._db_instance_by_id(organisation_id, plugin_id)
-            json_settings = json.dumps({**json.loads(self.encryption.decode(instance.values)), **{key: value}})
-            instance.values = self.encryption.encode(json_settings)
-        except SettingsNotFound:
-            organisation = self.session.query(OrganisationInDB).filter(OrganisationInDB.id == organisation_id).first()
-            all_settings = {key: value}
-
-            setting_in_db = SettingsInDB(
-                values=self.encryption.encode(json.dumps(all_settings)),
-                plugin_id=plugin_id,
-                organisation_pk=organisation.pk,
-            )
-            self.session.add(setting_in_db)
-
-    def update_by_key(self, key: str, value, organisation_id: str, plugin_id: str) -> None:
+    def delete(self, organisation_id: str, plugin_id: str) -> None:
         instance = self._db_instance_by_id(organisation_id, plugin_id)
 
-        instance.values = self.encryption.encode(
-            json.dumps({**json.loads(self.encryption.decode(instance.values)), **{key: value}})
-        )
-
-    def delete_by_key(self, key: str, organisation_id: str, plugin_id: str) -> None:
-        instance = self._db_instance_by_id(organisation_id, plugin_id)
-        filtered_values = {
-            instance_key: value
-            for instance_key, value in json.loads(self.encryption.decode(instance.values)).items()
-            if instance_key != key
-        }
-
-        instance.values = self.encryption.encode(json.dumps(filtered_values))
+        self.session.delete(instance)
 
     def _db_instance_by_id(self, organisation_id: str, plugin_id: str) -> SettingsInDB:
         instance = (

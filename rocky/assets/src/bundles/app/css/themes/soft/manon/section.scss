@@ -1,11 +1,11 @@
 /* Section content wrapper - Variables */
 
 :root {
-	--section-padding-top: var(--content-padding-top);
+    --section-padding-top: var(--content-padding-top);
     --section-padding-bottom: var(--content-padding-bottom);
 }
 
-body > main section {
+body>main>section {
     @media screen and (min-width: $grid-m) {
         padding-right: var(--page-whitespace-right-grid-m);
         padding-left: var(--page-whitespace-left-grid-m);

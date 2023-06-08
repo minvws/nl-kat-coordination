@@ -26,6 +26,7 @@
                 <div class="layout-form">
                     <form novalidate method="post" class="horizontal-view help">
                         {% csrf_token %}
+                        {% include "partials/form/form_errors.html" with form=form %}
                         {% include "partials/form/fieldset.html" with legend=name fields=form %}
 
                         <div class="button-container">
