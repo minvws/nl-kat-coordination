@@ -17,7 +17,13 @@
 	--header-navigation-min-height: 4rem;
 	--header-navigation-gap: 1rem;
 	--header-navigation-content-wrapper-flex-direction: row;
+	--header-navigation-button-text-color: var(--button-ghost-text-color);
 
 	/* List item */
 	--header-navigation-list-item-text-color: var(--text-color-dark);
+
+	/* Icon */
+	--header-navigation-button-icon-font-family: var(--icon-font-family);
+	--header-navigation-button-icon-font-size: var(--icon-font-size);
+	--header-navigation-button-icon-text-color: var(--header-navigation-button-text-color);
 }

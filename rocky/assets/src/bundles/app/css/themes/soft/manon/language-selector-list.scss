@@ -13,6 +13,7 @@
     --language-selector-list-button-text-color: var(--button-ghost-text-color);
     --language-selector-list-button-border-width: var(--button-ghost-border-width);
     --language-selector-list-button-width: auto;
+    // --language-selector-list-button-font-weight: bold;
 
     /* List opened button icon */
     --language-selector-list-open-button-icon: "\ea5f";
@@ -40,11 +41,28 @@
 
     /* List item link active */
     --language-selector-list-item-active-font-weight: bold;
+
+    /* Icon */
+    --language-selector-list-button-icon-font-family: var(--icon-font-family);
+    --language-selector-list-button-icon-font-size: var(--icon-font-size);
 }
 
-body>header nav .language-selector ul li a,
-.language-selector ul li a {
-    padding: 0.125rem 1rem;
+body>header nav .language-selector {
+    >div>button {
+        color: var(--language-selector-list-button-text-color);
+        font-weight: bold;
+
+        &:after {
+            color: var(--language-selector-list-button-text-color);
+        }
+    }
+
+    ul li a,
+    ul li button {
+        padding: 0.125rem 1rem;
+        color: black;
+        font-weight: normal;
+    }
 }
 
 body>header nav .language-selector div[aria-expanded="true"] ul li[aria-current="true"] a:before,
