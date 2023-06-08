@@ -39,6 +39,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
             "aggressive",
             "--api-token",
             getenv("WP_SCAN_API"),
+            "--clear-cache",
         ],
         detach=True,
     )
