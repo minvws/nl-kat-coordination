@@ -90,6 +90,32 @@ class BoefjeMixin(OctopoesView):
             if ooi.scan_profile.level < boefje.scan_level:
                 try:
                     self.raise_clearance_level(ooi.reference, boefje.scan_level)
-                except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
-                    continue
+                except IndemnificationNotPresentException:
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Could not raise clearance level of %s to L%s. \
+                            Indemnification not present at organization %s."
+                        )
+                        % (
+                            ooi.reference.human_readable,
+                            boefje.scan_level,
+                            self.organization.name,
+                        ),
+                    )
+                except ClearanceLevelTooLowException:
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Could not raise clearance level of %s to L%s. \
+                            You acknowledged a clearance level of %s."
+                        )
+                        % (
+                            ooi.reference.human_readable,
+                            boefje.scan_level,
+                            self.organization_member.acknowledged_clearance_level,
+                        ),
+                    )
             self.run_boefje(boefje, ooi)
