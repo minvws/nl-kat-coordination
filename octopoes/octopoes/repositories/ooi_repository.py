@@ -67,7 +67,7 @@ class OOIRepository:
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         raise NotImplementedError
 
-    def get_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
+    def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
         raise NotImplementedError
 
     def get_neighbours(
@@ -218,7 +218,7 @@ class XTDBOOIRepository(OOIRepository):
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
-    def get_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
+    def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
         ids = list(map(str, references))
         query = generate_pull_query(self.xtdb_type, FieldSet.ALL_FIELDS, {self.pk_prefix(): ids})
         res = self.session.client.query(query, valid_time)
@@ -315,7 +315,7 @@ class XTDBOOIRepository(OOIRepository):
         if not res:
             return []
         references = {Reference.from_str(reference) for reference in res[0][0]}
-        return list(self.get_bulk(references, valid_time).values())
+        return list(self.load_bulk(references, valid_time).values())
 
     def get_tree(
         self,
@@ -337,7 +337,7 @@ class XTDBOOIRepository(OOIRepository):
 
         reference_node.filter_children(lambda child_node: child_node.reference.class_type in search_types)
 
-        store = self.get_bulk(reference_node.collect_references(), valid_time)
+        store = self.load_bulk(reference_node.collect_references(), valid_time)
         return ReferenceTree(root=reference_node, store=store)
 
     def _get_related_objects(self, references: Set[Reference], valid_time: Optional[datetime]) -> List[ReferenceNode]:

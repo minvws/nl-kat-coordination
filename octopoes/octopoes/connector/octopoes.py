@@ -203,12 +203,13 @@ class OctopoesAPIConnector:
         res = self.session.get(f"/{self.client}/findings", params=params)
         return Paginated[Finding].parse_obj(res.json())
 
-    def get_objects_bulk(self, references: Set[Reference], valid_time):
+    def load_objects_bulk(self, references: Set[Reference], valid_time):
         params = {
-            "references": references,
             "valid_time": valid_time,
         }
-        res = self.session.get(f"/{self.client}/objects/bulk", params=params)
+        res = self.session.post(
+            f"/{self.client}/objects/load_bulk", params=params, json=[str(ref) for ref in references]
+        )
         return parse_obj_as(Dict[Reference, OOIType], res.json())
 
     def recalculate_bits(self) -> int:

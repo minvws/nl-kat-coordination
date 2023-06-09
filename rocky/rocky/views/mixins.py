@@ -225,7 +225,7 @@ class FindingList:
             ).items
             ooi_references = {finding.ooi for finding in findings}
             finding_type_references = {finding.finding_type for finding in findings}
-            objects = self.octopoes_connector.get_objects_bulk(
+            objects = self.octopoes_connector.load_objects_bulk(
                 ooi_references | finding_type_references, valid_time=self.valid_time
             )
 

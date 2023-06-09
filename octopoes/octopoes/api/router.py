@@ -57,10 +57,6 @@ def extract_required_valid_time(valid_time: TimezoneAwareDatetime) -> datetime:
     return valid_time
 
 
-def extract_references(references: Set[Reference] = Query(set())) -> Set[Reference]:
-    return references
-
-
 def extract_types(types: List[str] = Query(["OOI"])) -> Set[Type[OOI]]:
     try:
         return {type_by_name(t) for t in types}
@@ -139,13 +135,13 @@ def list_objects(
     return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
 
 
-@router.get("/objects/bulk", tags=["Objects"])
-def get_objects_bulk(
+@router.post("/objects/load_bulk", tags=["Objects"])
+def load_objects_bulk(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     references: Set[Reference] = Depends(extract_references),
 ):
-    return octopoes.ooi_repository.get_bulk(references, valid_time)
+    return octopoes.ooi_repository.load_bulk(references, valid_time)
 
 
 @router.get("/object", tags=["Objects"])

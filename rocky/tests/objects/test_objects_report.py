@@ -129,7 +129,7 @@ def test_organization_pdf_report(rf, client_member, mock_organization_view_octop
         * 150,
     )
 
-    mock_organization_view_octopoes().get_objects_bulk.return_value = {
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
         network.reference: network,
         finding_types[0].reference: finding_types[0],
     }
@@ -214,7 +214,7 @@ def test_pdf_report_command(tmp_path, client_member, network, finding_types, moc
         ],
     )
 
-    mock_organization_view_octopoes().get_objects_bulk.return_value = {
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
         network.reference: network,
         finding_types[0].reference: finding_types[0],
         finding_types[1].reference: finding_types[1],
