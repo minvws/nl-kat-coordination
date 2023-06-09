@@ -8,13 +8,10 @@ from typing import Any, BinaryIO, Dict, List, Optional
 import requests
 from django.conf import settings
 from requests import HTTPError
-from tools.ooi_helpers import (
-    RiskLevelSeverity,
-    get_ooi_dict,
-)
+from tools.ooi_helpers import get_ooi_dict
 
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import Finding, FindingType
+from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from rocky.exceptions import RockyError
 from rocky.health import ServiceHealth
 
@@ -108,11 +105,10 @@ class ReportsService:
         organization_name: str,
         findings_metadata: List[Dict[str, Any]],
     ) -> BinaryIO:
-        findings = [item["finding"] for item in findings_metadata]
         store = {}
-        for finding in findings:
-            store[finding.finding.primary_key] = finding.finding
-            store[finding.finding_type.primary_key] = finding.finding_type
+        for item in findings_metadata:
+            store[item.finding.primary_key] = item.finding
+            store[item.finding_type.primary_key] = item.finding_type
 
         return self.get_report(valid_time, "Organisatie", organization_name, store)
 
@@ -221,7 +217,9 @@ def build_meta(findings: List[Dict]) -> Dict:
             RiskLevelSeverity.HIGH.value: 0,
             RiskLevelSeverity.MEDIUM.value: 0,
             RiskLevelSeverity.LOW.value: 0,
-            RiskLevelSeverity.NONE.value: 0,
+            RiskLevelSeverity.RECOMMENDATION.value: 0,
+            RiskLevelSeverity.PENDING.value: 0,
+            RiskLevelSeverity.UNKNOWN.value: 0,
         },
         "total_by_finding_type": {},
         "total_finding_types": 0,
@@ -230,7 +228,9 @@ def build_meta(findings: List[Dict]) -> Dict:
             RiskLevelSeverity.HIGH.value: 0,
             RiskLevelSeverity.MEDIUM.value: 0,
             RiskLevelSeverity.LOW.value: 0,
-            RiskLevelSeverity.NONE.value: 0,
+            RiskLevelSeverity.RECOMMENDATION.value: 0,
+            RiskLevelSeverity.PENDING.value: 0,
+            RiskLevelSeverity.UNKNOWN.value: 0,
         },
     }
 
@@ -239,15 +239,13 @@ def build_meta(findings: List[Dict]) -> Dict:
         finding_type_id = finding["finding_type"]["id"]
         severity = finding["finding_type"]["risk_severity"]
 
-        meta["total_by_severity"][severity] = meta["total_by_severity"].get(severity, 0) + 1
+        meta["total_by_severity"][severity] += 1
         meta["total_by_finding_type"][finding_type_id] = meta["total_by_finding_type"].get(finding_type_id, 0) + 1
 
         # count and append finding type id if not already present
         if finding_type_id not in finding_type_ids:
             finding_type_ids.append(finding_type_id)
-            meta["total_by_severity_per_finding_type"][severity] = (
-                meta["total_by_severity_per_finding_type"].get(severity, 0) + 1
-            )
+            meta["total_by_severity_per_finding_type"][severity] += 1
             meta["total_finding_types"] += 1
 
     return meta

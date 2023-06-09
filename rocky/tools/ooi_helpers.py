@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from enum import Enum
-from functools import total_ordering
 from typing import Any, Dict, Optional, Tuple, Union
 from uuid import uuid4
 
@@ -29,23 +28,6 @@ from tools.models import OOIInformation
 User = get_user_model()
 
 RISK_LEVEL_SCORE_DEFAULT = 10
-
-
-@total_ordering
-class RiskLevelSeverity(Enum):
-    CRITICAL = "critical"
-    HIGH = "high"
-    MEDIUM = "medium"
-    LOW = "low"
-    NONE = "recommendation"
-
-    def __gt__(self, other: "RiskLevelSeverity") -> bool:
-        severity_order = ["recommendation", "low", "medium", "high", "critical"]
-
-        return severity_order.index(self.value) > severity_order.index(other.value)
-
-    def __str__(self):
-        return self.value
 
 
 def format_attr_name(s: str) -> str:

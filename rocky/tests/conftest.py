@@ -23,7 +23,7 @@ from tools.models import (
 )
 
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
@@ -356,6 +356,33 @@ def finding():
         description="description",
         reproduce="reproduce",
     )
+
+
+@pytest.fixture
+def finding_types():
+    return [
+        KATFindingType(
+            id="KAT-0001",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=9.5,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+        KATFindingType(
+            id="KAT-0002",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=9.5,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+        KATFindingType(
+            id="KAT-0003",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=3.9,
+            risk_severity=RiskLevelSeverity.LOW,
+        ),
+    ]
 
 
 @pytest.fixture

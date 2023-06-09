@@ -42,6 +42,7 @@ def generate_findings_metadata(
 
     for finding in findings[: FindingList.HARD_LIMIT]:
         finding_type = finding.finding_type
+
         if not severity_filter or finding_type.risk_severity in severity_filter:
             findings_meta.append(
                 {
@@ -69,7 +70,7 @@ class FindingListView(BreadcrumbsMixin, OctopoesView, ListView):
             except ValueError as e:
                 messages.error(self.request, _(str(e)))
 
-        return FindingList(self.octopoes_api_connector, self.get_observed_at(), severities)
+        return FindingList(self.octopoes_api_connector, self.get_observed_at(), severities)[: FindingList.HARD_LIMIT]
 
     def build_breadcrumbs(self):
         return [
