@@ -8,7 +8,7 @@ from katalogus.views.plugin_deep_link_detail import PluginDeepLinkDetailView
 from katalogus.views.plugin_deep_link_edit import PluginDeepLinkUpdateView
 from katalogus.views.plugin_deep_link_list import PluginDeepLinkListView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
-from katalogus.views.plugin_enable_disable import PluginEnableDisableView
+from katalogus.views.plugin_enable_disable import PluginDeepLinkEnableDisableView, PluginEnableDisableView
 from katalogus.views.plugin_settings_add import PluginSettingsAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 
@@ -29,6 +29,11 @@ urlpatterns = [
         "settings/migrate/confirmation/<to_organization>/",
         ConfirmCloneSettingsView.as_view(),
         name="confirm_clone_settings",
+    ),
+    path(
+        "plugins/deep-link/enable-disable/",
+        PluginDeepLinkEnableDisableView.as_view(),
+        name="plugin_deep_link_enable_disable",
     ),
     path(
         "plugins/deep-link/add/",

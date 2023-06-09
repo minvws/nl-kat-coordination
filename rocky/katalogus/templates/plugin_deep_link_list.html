@@ -28,14 +28,17 @@
                     </div>
                 </div>
                 {% if deep_links %}
+                    <p>
+                        <strong>{{ deep_links|length }}</strong> {% translate "Deep links available" %}
+                    </p>
                     <div class="horizontal-scroll">
                         <table>
                             <caption>{% translate "Overview of deep links:" %}</caption>
                             <thead>
                                 <tr>
-                                    <th scope="col">{% translate "Name" %}</th>
-                                    <th scope="col">{% translate "OOI-Type" %}</th>
-                                    <th scope="col">{% translate "Actions" %}</th>
+                                    <th>{% translate "Name" %}</th>
+                                    <th>{% translate "OOI-Type" %}</th>
+                                    <th>{% translate "Actions" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,11 +47,18 @@
                                         <td>{{ deep_link.plugin.name }}</td>
                                         <td>{{ deep_link.plugin.ooi_type }}</td>
                                         <td>
-                                            {% if deep_link.enabled %}
-                                                <button type="submit" class="button">{% translate "Disable" %}</button>
-                                            {% else %}
-                                                <button type="submit" class="button">{% translate "Enable" %}</button>
-                                            {% endif %}
+                                            <form method="post"
+                                                  action="{% url 'plugin_deep_link_enable_disable' organization.code %}">
+                                                {% csrf_token %}
+                                                <fieldset>
+                                                    <input type="hidden" name="plugin" value="{{ deep_link.plugin.name }}"/>
+                                                    {% if deep_link.enabled %}
+                                                        <button name="disable" type="submit" class="button ghost" value="disable">{% translate "Disable" %}</button>
+                                                    {% else %}
+                                                        <button name="enable" type="submit" class="button" value="enable">{% translate "Enable" %}</button>
+                                                    {% endif %}
+                                                </fieldset>
+                                            </form>
                                         </td>
                                     </tr>
                                 {% endfor %}

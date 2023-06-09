@@ -1,6 +1,7 @@
 from logging import getLogger
 from typing import Dict
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -8,6 +9,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from requests import RequestException
 
+from katalogus.models import OrganizationPlugin
 from katalogus.views.mixins import SinglePluginView
 
 logger = getLogger(__name__)
@@ -75,3 +77,13 @@ class PluginEnableDisableView(SinglePluginView):
         )
 
         return HttpResponseRedirect(request.POST.get("current_url"))
+
+
+class PluginDeepLinkEnableDisableView(OrganizationView):
+    def post(self, request, *args, **kwargs):
+        plugin = request.POST.get("plugin")
+        if request.POST.get("enable"):
+            OrganizationPlugin.objects.filter(organization=self.organization, plugin__name=plugin).update(enabled=True)
+        if request.POST.get("disable"):
+            OrganizationPlugin.objects.filter(organization=self.organization, plugin__name=plugin).update(enabled=False)
+        return redirect(reverse("plugins_deep_link", kwargs={"organization_code": self.organization.code}))

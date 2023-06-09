@@ -72,4 +72,4 @@ class PluginDeepLinkListView(OrganizationView, ListView):
     context_object_name = "deep_links"
 
     def get_queryset(self):
-        return OrganizationPlugin.objects.filter(organization=self.organization, enabled=True)
+        return OrganizationPlugin.objects.filter(organization=self.organization)
