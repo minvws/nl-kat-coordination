@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.view_helpers import BreadcrumbsMixin
 
-from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from rocky.views.mixins import FindingList, OctopoesView
 
 logger = logging.getLogger(__name__)
@@ -49,8 +49,7 @@ def generate_findings_metadata(
 
 class FindingListView(BreadcrumbsMixin, OctopoesView, ListView):
     template_name = "findings/finding_list.html"
-    ooi_types = {Finding}
-    paginate_by = 50
+    paginate_by = 20
 
     def get_queryset(self) -> FindingList:
         severities = set()
@@ -60,7 +59,7 @@ class FindingListView(BreadcrumbsMixin, OctopoesView, ListView):
             except ValueError as e:
                 messages.error(self.request, _(str(e)))
 
-        return FindingList(self.octopoes_api_connector, self.get_observed_at(), severities)[: FindingList.HARD_LIMIT]
+        return FindingList(self.octopoes_api_connector, self.get_observed_at(), severities)
 
     def build_breadcrumbs(self):
         return [
@@ -73,10 +72,7 @@ class FindingListView(BreadcrumbsMixin, OctopoesView, ListView):
 
 class Top10FindingListView(FindingListView):
     template_name = "findings/finding_list.html"
-    ooi_types = {Finding}
-
-    def get_queryset(self):
-        return super().get_queryset()[:10]
+    paginate_by = 10
 
     def build_breadcrumbs(self):
         return [

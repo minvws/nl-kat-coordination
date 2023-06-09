@@ -25,7 +25,7 @@
 
                 <div class="horizontal-scroll">
                     <table class="action-buttons nowrap">
-                        <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ total_oois }} {% translate "objects" %}</caption>
+                        <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "objects" %}</caption>
                         <thead>
                             <tr>
                                 <th>Nr</th>
