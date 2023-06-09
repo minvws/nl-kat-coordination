@@ -17,7 +17,6 @@ from tools.models import (
     GROUP_CLIENT,
     GROUP_REDTEAM,
     Indemnification,
-    OOIInformation,
     Organization,
     OrganizationMember,
 )
@@ -424,13 +423,6 @@ def plugin_schema():
         },
         "required": ["TEST_PROPERTY"],
     }
-
-
-@pytest.fixture
-def ooi_information() -> OOIInformation:
-    data = {"description": "Fake description...", "recommendation": "Fake recommendation...", "risk": "Low"}
-    ooi_information = OOIInformation.objects.create(id="KATFindingType|KAT-000", data=data, consult_api=False)
-    return ooi_information
 
 
 def setup_request(request, user):
