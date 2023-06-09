@@ -48,7 +48,8 @@
                                         <td>{{ deep_link.plugin.ooi_type }}</td>
                                         <td>
                                             <form method="post"
-                                                  action="{% url 'plugin_deep_link_enable_disable' organization.code %}">
+                                                  action="{% url 'plugin_deep_link_enable_disable' organization.code %}"
+                                                  class="inline">
                                                 {% csrf_token %}
                                                 <fieldset>
                                                     <input type="hidden" name="plugin" value="{{ deep_link.plugin.name }}"/>
