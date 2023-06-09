@@ -30,8 +30,8 @@ from rocky.keiko import (
     build_findings_list_from_store,
     keiko_client,
 )
-from rocky.views.finding_list import FindingListView, generate_findings_metadata
-from rocky.views.mixins import FindingList, SingleOOITreeMixin
+from rocky.views.finding_list import generate_findings_metadata
+from rocky.views.mixins import FindingList, OctopoesView, SeveritiesMixin, SingleOOITreeMixin
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
@@ -103,7 +103,7 @@ class OOIReportPDFView(SingleOOITreeMixin):
         )
 
 
-class FindingReportPDFView(FindingListView):
+class FindingReportPDFView(SeveritiesMixin, OctopoesView):
     paginate_by = None
 
     def get(self, request, *args, **kwargs):
@@ -136,17 +136,14 @@ class FindingReportPDFView(FindingListView):
         )
 
 
-"""
-The new report
-Generates report from a starting point OOI with a filtered set of it's sub OOI's
-and a filtered set of findings belonging to those OOIs.
+# Generates report from a starting point OOI with a filtered set of it's sub OOI's
+# and a filtered set of findings belonging to those OOIs.
 
-boefjes_required - Set of possible boefjes
-boefjes_optional - Set of possible boefjes
-start_ooi - OOI that is the starting point of the report
-allowed_oois - Set of OOIs that are interesting for this specific report
-allowed_finding_types - Set of finding types that are interesting for this report
-"""
+# boefjes_required - Set of possible boefjes
+# boefjes_optional - Set of possible boefjes
+# start_ooi - OOI that is the starting point of the report
+# allowed_oois - Set of OOIs that are interesting for this specific report
+# allowed_finding_types - Set of finding types that are interesting for this report
 
 
 class Report(OrganizationView):

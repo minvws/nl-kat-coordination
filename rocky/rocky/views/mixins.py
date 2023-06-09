@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Set, Tuple, Type, Union
 
 import requests.exceptions
 from account.mixins import OrganizationView
+from django.contrib import messages
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -375,3 +376,15 @@ class SingleOOITreeMixin(SingleOOIMixin):
         self.tree = self.get_ooi_tree(pk, self.depth, observed_at)
 
         return self.tree.store[str(self.tree.root.reference)]
+
+
+class SeveritiesMixin:
+    def get_severities(self) -> Set[RiskLevelSeverity]:
+        severities = set()
+        for severity in self.request.GET.getlist("severity"):
+            try:
+                severities.add(RiskLevelSeverity(severity))
+            except ValueError as e:
+                messages.error(self.request, _(str(e)))
+
+        return severities
