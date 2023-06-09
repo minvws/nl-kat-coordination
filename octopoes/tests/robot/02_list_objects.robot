@@ -61,8 +61,7 @@ Length Of Random Object List With Filter Should Be
 
 Verify Bulk Load
     [Arguments]    ${references}
-    ${params}    Create Dictionary    references=@{references}
-    ${response}    Get    ${OCTOPOES_URI}/objects/bulk    params=${params}
+    ${response}    Post    ${OCTOPOES_URI}/objects/load_bulk    json=@{references}
     Log    ${response.json()}
     Should Be Equal As Integers    ${response.status_code}    200
     FOR    ${reference}    IN    @{references}
