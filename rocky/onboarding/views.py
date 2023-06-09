@@ -274,7 +274,35 @@ class OnboardingSetupScanOOIDetailView(
         level = int(self.request.session["clearance_level"])
         try:
             self.raise_clearance_level(ooi.reference, level)
-        except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
+        except IndemnificationNotPresentException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. \
+                Indemnification not present at organization %s."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization.name,
+                ),
+            )
+            return self.get(request, *args, **kwargs)
+        except ClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. \
+                You acknowledged a clearance level of %s."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
             return self.get(request, *args, **kwargs)
 
         self.enable_selected_boefjes()

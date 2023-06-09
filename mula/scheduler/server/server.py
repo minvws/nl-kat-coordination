@@ -244,7 +244,7 @@ class Server:
             if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
                 raise ValueError("min_date must be less than max_date")
 
-            results, count = self.ctx.task_store.get_tasks(
+            results, count = self.ctx.task_store.api_list_tasks(
                 scheduler_id=scheduler_id,
                 task_type=task_type,
                 status=status,
