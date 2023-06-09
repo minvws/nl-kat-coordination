@@ -145,6 +145,7 @@ class DNSPTRRecord(DNSRecord):
     dns_record_type: Literal["PTR"] = "PTR"
     address: Optional[Reference] = ReferenceField(IPAddress)
     hostname: Optional[Reference] = ReferenceField(Hostname)
+    net_block: Optional[Reference] = ReferenceField("NetBlock")
     reverse: str
 
     _natural_key_attrs = ["reverse", "value"]
