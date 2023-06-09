@@ -25,12 +25,16 @@
 \definecolor{box-color-medium}{HTML}{C36100}
 \definecolor{box-color-low}{HTML}{00519C}
 \definecolor{box-color-recommendation}{HTML}{C3DDF6}
+\definecolor{box-color-unknown}{HTML}{FFFFFF}
+\definecolor{box-color-pending}{HTML}{FFFFFF}
 
 \definecolor{color-critical}{HTML}{FFFFFF}
 \definecolor{color-high}{HTML}{FFFFFF}
 \definecolor{color-medium}{HTML}{FFFFFF}
 \definecolor{color-low}{HTML}{FFFFFF}
 \definecolor{color-recommendation}{HTML}{000000}
+\definecolor{color-unknown}{HTML}{000000}
+\definecolor{color-pending}{HTML}{000000}
 
 %KEIKO-specific variables
 \newcommand\application{KEIKO @@{keiko_version}@@}
@@ -131,8 +135,8 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 \begin{tabular}{ llr }
 	Risico niveau & Bevindingstype & Voorvallen \\\toprule
 	\midrule
-	{% for finding_type_id, occurrence in findings_grouped.items()|sort(attribute='1.finding_type.risk_level_score', reverse=True) %}
-		\colorbox{box-color-@@{ occurrence.finding_type.risk_level_severity }@@}{ \color{color-@@{ occurrence.finding_type.risk_level_severity }@@} @@{ occurrence.finding_type.risk_level_severity }@@ } & @@{ occurrence.finding_type.id }@@ & @@{occurrence.list|length}@@ \\
+	{% for finding_type_id, occurrence in findings_grouped.items()|sort(attribute='1.finding_type.risk_score', reverse=True) %}
+		\colorbox{box-color-@@{ occurrence.finding_type.risk_severity }@@}{ \color{color-@@{ occurrence.finding_type.risk_severity }@@} @@{ occurrence.finding_type.risk_severity }@@ } & @@{ occurrence.finding_type.id }@@ & @@{occurrence.list|length}@@ \\
 	{% endfor %}
 	\bottomrule
 \end{tabular}
@@ -140,16 +144,16 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 
 
 \chapter{Bevindingen}
-{% for finding_type_id, occurrence in findings_grouped.items()|sort(attribute='1.finding_type.risk_level_score', reverse=True) %}
+{% for finding_type_id, occurrence in findings_grouped.items()|sort(attribute='1.finding_type.risk_score', reverse=True) %}
 	\section{@@{finding_type_id|latex_escape}@@}
 	\subsection{Bevinding informatie}
 	\begin{longtable}{ p{.25\textwidth}  p{.75\textwidth} }
 		Bevinding & @@{occurrence.finding_type.id|latex_escape}@@ \\
-		Risico niveau & @@{occurrence.finding_type.risk_level_score|latex_escape}@@ / 10 \\
+		Risico niveau & @@{occurrence.finding_type.risk_score|latex_escape}@@ / 10 \\
 		{% if occurrence.finding_type.cvss %}
 			CVSS & @@{occurrence.finding_type.cvss|latex_escape}@@ \\
 		{% endif %}
-		Ernst & @@{occurrence.finding_type.risk_level_severity|latex_escape|capitalize}@@ \\
+		Ernst & @@{occurrence.finding_type.risk_severity|latex_escape|capitalize}@@ \\
     {% if occurrence.finding_type.description %}
 		  Beschrijving & @@{occurrence.finding_type.description|latex_escape}@@ \\
     {% endif %}
