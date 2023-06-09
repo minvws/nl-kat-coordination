@@ -30,8 +30,8 @@ from rocky.keiko import (
     build_findings_list_from_store,
     keiko_client,
 )
-from rocky.views.finding_list import FindingListView
-from rocky.views.mixins import SingleOOITreeMixin
+from rocky.views.finding_list import FindingListView, generate_findings_metadata
+from rocky.views.mixins import FindingList, SingleOOITreeMixin
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
@@ -107,13 +107,20 @@ class FindingReportPDFView(FindingListView):
     paginate_by = None
 
     def get(self, request, *args, **kwargs):
+        severities = self.get_severities()
+        findings = FindingList(
+            self.octopoes_api_connector,
+            self.get_observed_at(),
+            severities,
+        )
+
         reports_service = ReportsService(keiko_client)
 
         try:
             report = reports_service.get_organization_finding_report(
                 self.get_observed_at(),
                 self.organization.name,
-                super().get_queryset(),
+                generate_findings_metadata(findings, severities),
             )
         except GeneratingReportFailed:
             messages.error(request, _("Generating report failed. See Keiko logs for more information."))

@@ -74,7 +74,7 @@ class Command(BaseCommand):
 
     @staticmethod
     def get_findings_metadata(organization, valid_time, options) -> List[Dict[str, Any]]:
-        severities = [item for item in RiskLevelSeverity if item >= options["min_severity"]]
+        severities = [severity for severity in RiskLevelSeverity if severity >= options["min_severity"]]
         findings = FindingList(
             OctopoesAPIConnector(settings.OCTOPOES_API, organization.code),
             valid_time,

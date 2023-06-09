@@ -107,8 +107,8 @@ class ReportsService:
     ) -> BinaryIO:
         store = {}
         for item in findings_metadata:
-            store[item.finding.primary_key] = item.finding
-            store[item.finding_type.primary_key] = item.finding_type
+            store[item["finding"].finding.primary_key] = item["finding"].finding
+            store[item["finding"].finding_type.primary_key] = item["finding"].finding_type
 
         return self.get_report(valid_time, "Organisatie", organization_name, store)
 

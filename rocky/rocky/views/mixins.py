@@ -240,8 +240,7 @@ class FindingList:
                 )
             return hydrated_findings
 
-        elif isinstance(key, int):
-            raise NotImplementedError("FindingList only supports slicing")
+        raise NotImplementedError("FindingList only supports slicing")
 
 
 class MultipleOOIMixin(OctopoesView):
