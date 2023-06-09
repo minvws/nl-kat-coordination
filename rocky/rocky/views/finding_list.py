@@ -1,5 +1,4 @@
 import logging
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 from django.contrib import messages
@@ -8,8 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.view_helpers import BreadcrumbsMixin
 
-from octopoes.models import OOI
-from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from rocky.views.mixins import FindingList, OctopoesView
 
 logger = logging.getLogger(__name__)
@@ -24,14 +22,6 @@ def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
     for index, finding in enumerate(sorted_findings, start=1):
         finding["finding_number"] = index
     return sorted_findings
-
-
-@dataclass
-class FindingEntry:
-    index: int
-    finding: Finding
-    finding_type: FindingType
-    ooi: OOI
 
 
 def generate_findings_metadata(
