@@ -29,6 +29,13 @@
         ]
     },
     "loggers": {
+        "uvicorn.access": {
+            "level": "WARNING",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        },
         "uvicorn.error": {
             "level": "WARNING",
             "handlers": [
