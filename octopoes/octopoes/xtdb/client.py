@@ -141,6 +141,17 @@ class XTDBHTTPClient:
 
             raise XTDBException("Could not delete node") from e
 
+    def sync(self, timeout: Optional[int] = None):
+        params = {}
+
+        if timeout is not None:
+            params["timeout"] = timeout
+
+        res = self._session.get(f"{self.client_url()}/sync", params=params)
+        self._verify_response(res)
+
+        return res.json()
+
 
 class XTDBSession:
     def __init__(self, client: XTDBHTTPClient):

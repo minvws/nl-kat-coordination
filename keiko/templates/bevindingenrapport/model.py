@@ -2,7 +2,7 @@
 DNS Report Datamodel
 """
 from datetime import datetime
-from typing import Dict, List, Literal, Optional, Union
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -23,40 +23,21 @@ class Finding(OOI):
     ooi: str
 
 
-class FindingTypeBase(OOI):
+class FindingType(OOI):
+    ooi_type: str
+
+    risk: Optional[str]
+    recommendation: Optional[str]
+
+    cvss: Optional[str]
+    source: Optional[str]
+    information_updated: Optional[str] = Field(None, alias="information updated")
+
     risk_level_source: Optional[str]
     risk_level_score: Optional[float]
     risk_level_severity: Optional[str]
     Information: Optional[str]
     description: Optional[str]
-
-
-class KATFindingType(FindingTypeBase):
-    ooi_type: Literal["KATFindingType"]
-    risk: Optional[str]
-    recommendation: Optional[str]
-
-
-class CVEFindingType(FindingTypeBase):
-    ooi_type: Literal["CVEFindingType"]
-    cvss: Optional[str]
-    source: Optional[str]
-    information_updated: Optional[str] = Field(..., alias="information updated")
-
-
-class RetireJSFindingType(FindingTypeBase):
-    ooi_type: Literal["RetireJSFindingType"]
-    source: str
-    information_updated: Optional[str] = Field(..., alias="information updated")
-
-
-class CWEFindingType(FindingTypeBase):
-    ooi_type: Literal["CWEFindingType"]
-    risk: Optional[str]
-    source: Optional[str]
-
-
-FindingType = Union[KATFindingType, CVEFindingType, RetireJSFindingType, CWEFindingType]
 
 
 class FindingOccurrence(BaseModel):
