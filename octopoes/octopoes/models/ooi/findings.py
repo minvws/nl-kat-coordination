@@ -17,10 +17,6 @@ class FindingType(OOI):
         return reference.tokenized.id
 
 
-class ADRFindingType(FindingType):
-    object_type: Literal["ADRFindingType"] = "ADRFindingType"
-
-
 class CVEFindingType(FindingType):
     object_type: Literal["CVEFindingType"] = "CVEFindingType"
 
