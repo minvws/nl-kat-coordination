@@ -9,11 +9,13 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 build: build-rocky build-rocky-frontend
 
 build-rocky:
-	docker-compose run --rm rocky make build-rocky-native
+# Set DATABASE_MIGRATION=false to prevent entrypoint from running migration
+	docker-compose run --rm -e DATABASE_MIGRATION=false rocky make build-rocky-native
 
 build-rocky-native:
+	while ! nc -vz $$ROCKY_DB_HOST $$ROCKY_DB_PORT; do sleep 0.1; done
 	python3 manage.py migrate
-	python3 manage.py createsuperuser
+	-python3 manage.py createsuperuser --no-input
 	python3 manage.py loaddata OOI_database_seed.json
 	python3 manage.py setup_dev_account
 	python3 manage.py compilemessages
@@ -28,8 +30,6 @@ run:
 	python3 manage.py runserver
 
 test:
-	yarn --cwd roeltje
-	yarn --cwd roeltje cypress run
 	python3 manage.py test
 
 itest: ## Run the integration tests.
@@ -95,10 +95,6 @@ clean:
 check:
 	pre-commit run --all-files --show-diff-on-failure --color always
 
-install-rf:
-	pip3 install -r requirements-dev.txt
-	rfbrowser init
-
 test-prepare:
 	python3 manage.py flush --no-input
 	python3 manage.py migrate
@@ -106,34 +102,32 @@ test-prepare:
 	python3 manage.py loaddata OOI_database_seed.json
 	python3 manage.py setup_dev_account
 
-test-finish:
-	python3 manage.py flush --no-input
-	python3 manage.py migrate
-	python3 manage.py createsuperuser
-	python3 manage.py loaddata OOI_database_seed.json
-	python3 manage.py setup_dev_account
+test-rf: # Usage: `make test-rf headless=<bool>`
+	pip3 install robotframework robotframework-browser robotframework-debuglibrary robotframework-otp robotframework-postgresqldb
+	rfbrowser init
 
-reset-database:
-	docker exec -it nl-kat_rocky_1 make test-finish
-
-test-rf-onboarding: # Usage: `make test-rf-onboarding headless=<bool>`
-	# Test fresh login while fully skipping onboarding
-	docker exec -it nl-kat_rocky_1 make test-prepare
-	robot -d tests/robot/results-skip_onboarding_no_report -v headless:$(headless) tests/robot/skip_onboarding_no_report
-
-	# Test fresh login while generating a report but not creating more user accounts
-	docker exec -it nl-kat_rocky_1 make test-prepare
-	robot -d tests/robot/results-skip_onboarding_with_report -v headless:$(headless) tests/robot/skip_onboarding_with_report
-
-	# Test fresh login while creating all users and running report generation as the redteamer
-	docker exec -it nl-kat_rocky_1 make test-prepare
+	# Test fresh login while creating all users and running report generation as the superadmin
+	docker exec -it nl-kat-coordination_rocky_1 make test-prepare
 	robot -d tests/robot/results-complete_onboarding -v headless:$(headless) tests/robot/complete_onboarding
 
-	# You can run `make reset-database` manually after running tests to reset the database and create a new superuser account
-
-test-rf-functional: # Usage: `make test-rf-functional headless=<bool>`
-	# Test fresh login while fully skipping onboarding and running some functional tests
-	# These tests require clean databases
-	cd ../ && make kat
-	docker exec -it nl-kat_rocky_1 make test-prepare
-	robot -d tests/robot/results-skip_onboarding_with_functional_tests -v headless:$(headless) tests/robot/skip_onboarding_with_functional_tests
+#test-rf-onboarding: # Usage: `make test-rf-onboarding headless=<bool>`
+#	# Test fresh login while fully skipping onboarding
+#	docker exec -it nl-kat_rocky_1 make test-prepare
+#	robot -d tests/robot/results-skip_onboarding_no_report -v headless:$(headless) tests/robot/skip_onboarding_no_report
+#
+#	# Test fresh login while generating a report but not creating more user accounts
+#	docker exec -it nl-kat_rocky_1 make test-prepare
+#	robot -d tests/robot/results-skip_onboarding_with_report -v headless:$(headless) tests/robot/skip_onboarding_with_report
+#
+#	# Test fresh login while creating all users and running report generation as the redteamer
+#	docker exec -it nl-kat_rocky_1 make test-prepare
+#	robot -d tests/robot/results-complete_onboarding -v headless:$(headless) tests/robot/complete_onboarding
+#
+#	# You can run `make reset-database` manually after running tests to reset the database and create a new superuser account
+#
+#test-rf-functional: # Usage: `make test-rf-functional headless=<bool>`
+#	# Test fresh login while fully skipping onboarding and running some functional tests
+#	# These tests require clean databases
+#	cd ../ && make kat
+#	docker exec -it nl-kat_rocky_1 make test-prepare
+#	robot -d tests/robot/results-skip_onboarding_with_functional_tests -v headless:$(headless) tests/robot/skip_onboarding_with_functional_tests

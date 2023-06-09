@@ -5,24 +5,20 @@ from enum import Enum
 from typing import List
 
 from django.contrib import messages
-from django.http import HttpResponse, Http404, HttpRequest
-from django.urls import reverse_lazy
+from django.http import Http404, HttpRequest, HttpResponse
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django_otp.decorators import otp_required
-from django.urls import reverse
 from requests import RequestException
-from two_factor.views.utils import class_view_decorator
-
-from octopoes.connector import RemoteException
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.types import get_collapsed_types, type_by_name
-from rocky.exceptions import IndemnificationNotPresentException, ClearanceLevelTooLowException
-from rocky.views.ooi_view import BaseOOIListView
+from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
 from tools.models import Indemnification
-from tools.models import SCAN_LEVEL
+
+from octopoes.connector import RemoteException
+from octopoes.models import EmptyScanProfile, Reference
+from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.types import type_by_name
+from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
+from rocky.views.ooi_view import BaseOOIListView
 
 
 class PageActions(Enum):
@@ -30,11 +26,9 @@ class PageActions(Enum):
     UPDATE_SCAN_PROFILE = "update-scan-profile"
 
 
-@class_view_decorator(otp_required)
 class OOIListView(BaseOOIListView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
-    ooi_types = get_collapsed_types().difference({Finding, FindingType})
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -49,7 +43,7 @@ class OOIListView(BaseOOIListView):
             context.get("ooi_list", []), organization_code=self.organization.code
         )
         context["member"] = self.organization_member
-        context["scan_levels"] = [alias for level, alias in SCAN_LEVEL.choices]
+        context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
         context["organization_indemnification"] = self.get_organization_indemnification
         context["breadcrumbs"] = [
             {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
@@ -77,27 +71,25 @@ class OOIListView(BaseOOIListView):
             return self._delete_oois(selected_oois, request, *args, **kwargs)
 
         if action == PageActions.UPDATE_SCAN_PROFILE.value:
-
-            return self._set_scan_profiles(selected_oois, request, *args, **kwargs)
+            scan_profile = request.POST.get("scan-profile")
+            level = CUSTOM_SCAN_LEVEL[str(scan_profile).upper()]
+            if level.value == "inherit":
+                return self._set_oois_to_inherit(selected_oois, request, *args, **kwargs)
+            return self._set_scan_profiles(selected_oois, level, request, *args, **kwargs)
 
         messages.add_message(request, messages.ERROR, _("Unknown action."))
         return self.get(request, status=404, *args, **kwargs)
 
-    def _set_scan_profiles(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        scan_profile = request.POST.get("scan-profile")
-
-        level = SCAN_LEVEL[scan_profile]
-
+    def _set_scan_profiles(
+        self, selected_oois: List[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
+    ) -> HttpResponse:
         try:
-            self.verify_raise_clearance_level(level.value)
+            self.raise_clearance_levels(selected_oois, level.value)
         except IndemnificationNotPresentException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _(
-                    "Could not raise clearance level to L%s. \
-                    Indemnification not present at organization %s."
-                )
+                _("Could not raise clearance levels to L%s. Indemnification not present at organization %s.")
                 % (
                     level,
                     self.organization.name,
@@ -108,33 +100,24 @@ class OOIListView(BaseOOIListView):
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _(
-                    "Could not raise clearance level to L%s. \
-                    You acknowledged a clearance level of %s."
-                )
+                _("Could not raise clearance level to L%s. You acknowledged a clearance level of %s.")
                 % (
                     level,
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
             return self.get(request, status=403, *args, **kwargs)
+        except (RequestException, RemoteException, ConnectionError):
+            messages.add_message(request, messages.ERROR, _("An error occurred while saving clearance levels."))
 
-        for ooi_reference in selected_oois:
-            try:
-                self.raise_clearance_level(Reference.from_str(ooi_reference), level.value)
-            except (RequestException, RemoteException, ConnectionError):
-                messages.add_message(
-                    request, messages.ERROR, _("An error occurred while saving clearance level for %s.") % ooi_reference
-                )
-                return self.get(request, status=500, *args, **kwargs)
-            except ObjectNotFoundException:
-                messages.add_message(
-                    request,
-                    messages.ERROR,
-                    _("An error occurred while saving clearance level for %s.") % ooi_reference
-                    + _("OOI doesn't exist"),
-                )
-                return self.get(request, status=404, *args, **kwargs)
+            return self.get(request, status=500, *args, **kwargs)
+        except ObjectNotFoundException:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("An error occurred while saving clearance levels.") + _("One of the OOI's doesn't exist"),
+            )
+            return self.get(request, status=404, *args, **kwargs)
 
         messages.add_message(
             request,
@@ -143,20 +126,49 @@ class OOIListView(BaseOOIListView):
         )
         return self.get(request, *args, **kwargs)
 
+    def _set_oois_to_inherit(
+        self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs
+    ) -> HttpResponse:
+        scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
+
+        try:
+            self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=datetime.now(timezone.utc))
+        except (RequestException, RemoteException, ConnectionError):
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("An error occurred while setting clearance levels to inherit."),
+            )
+            return self.get(request, status=500, *args, **kwargs)
+        except ObjectNotFoundException:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("An error occurred while setting clearance levels to inherit: one of the OOIs doesn't exist."),
+            )
+            return self.get(request, status=404, *args, **kwargs)
+
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois),
+        )
+        return self.get(request, *args, **kwargs)
+
     def _delete_oois(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
         connector = self.octopoes_api_connector
+        valid_time = datetime.now(timezone.utc)
 
-        for ooi in selected_oois:
-            try:
-                connector.delete(ooi, valid_time=datetime.now(timezone.utc))
-            except (RequestException, RemoteException, ConnectionError):
-                messages.add_message(request, messages.ERROR, _("An error occurred deleting %s.") % ooi)
-                return self.get(request, status=500, *args, **kwargs)
-            except ObjectNotFoundException:
-                messages.add_message(
-                    request, messages.ERROR, _("An error occurred deleting %s.") % ooi + _("OOI doesn't exist")
-                )
-                return self.get(request, status=404, *args, **kwargs)
+        try:
+            connector.delete_many(selected_oois, valid_time)
+        except (RequestException, RemoteException, ConnectionError):
+            messages.add_message(request, messages.ERROR, _("An error occurred while deleting oois."))
+            return self.get(request, status=500, *args, **kwargs)
+        except ObjectNotFoundException:
+            messages.add_message(
+                request, messages.ERROR, _("An error occurred while deleting oois: one of the OOIs doesn't exist.")
+            )
+            return self.get(request, status=404, *args, **kwargs)
 
         messages.add_message(
             request,
@@ -170,10 +182,8 @@ class OOIListView(BaseOOIListView):
         return Indemnification.objects.filter(organization=self.organization).exists()
 
 
-class OOIListExportView(OOIListView):
+class OOIListExportView(BaseOOIListView):
     def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
-
         file_type = request.GET.get("file_type")
         observed_at = self.get_observed_at()
         filters = self.get_ooi_types_display()
@@ -200,7 +210,6 @@ class OOIListExportView(OOIListView):
             )
 
         if file_type == "json":
-
             response = HttpResponse(
                 json.dumps(exports),
                 content_type="application/json",
@@ -210,7 +219,6 @@ class OOIListExportView(OOIListView):
             return response
 
         elif file_type == "csv":
-
             response = HttpResponse(
                 content_type="text/csv",
                 headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(observed_at) + ".csv"},
@@ -232,5 +240,4 @@ class OOIListExportView(OOIListView):
             return response
 
         else:
-
             raise Http404("Export type not found")

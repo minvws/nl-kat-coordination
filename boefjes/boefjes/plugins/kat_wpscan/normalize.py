@@ -1,14 +1,14 @@
 import json
-from typing import Iterator, Union
+from typing import Iterable, Union
 
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import Finding, CVEFindingType
 from wpscan_out_parse import WPScanJsonParser
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.findings import CVEFindingType, Finding
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     url_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
     if raw:

@@ -2,7 +2,7 @@
 DNS Report Datamodel
 """
 from datetime import datetime
-from typing import Dict, List, Optional, Union, Literal
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -10,47 +10,34 @@ from keiko.base_models import DataShapeBase
 
 
 class OOI(BaseModel):
-    id: str
-    ooi_type: str
-    human_readable: str
-    object_type: str
+    id: Optional[str]
+    ooi_type: Optional[str]
+    human_readable: Optional[str]
+    object_type: Optional[str]
 
 
 class Finding(OOI):
     proof: Optional[str]
-    description: str
-    reproduce: Optional[str]
-    ooi: OOI
-
-
-class FindingTypeBase(OOI):
-    risk_level_source: Optional[str]
-    risk_level_score: float
-    risk_level_severity: str
-    Information: Optional[str]
     description: Optional[str]
+    reproduce: Optional[str]
+    ooi: str
 
 
-class KATFindingType(FindingTypeBase):
-    ooi_type: Literal["KATFindingType"]
+class FindingType(OOI):
+    ooi_type: str
+
     risk: Optional[str]
     recommendation: Optional[str]
 
+    cvss: Optional[str]
+    source: Optional[str]
+    information_updated: Optional[str] = Field(None, alias="information updated")
 
-class CVEFindingType(FindingTypeBase):
-    ooi_type: Literal["CVEFindingType"]
-    cvss: str
-    source: str
-    information_updated: Optional[str] = Field(..., alias="information updated")
-
-
-class RetireJSFindingType(FindingTypeBase):
-    ooi_type: Literal["RetireJSFindingType"]
-    source: str
-    information_updated: Optional[str] = Field(..., alias="information updated")
-
-
-FindingType = Union[KATFindingType, CVEFindingType, RetireJSFindingType]
+    risk_level_source: Optional[str]
+    risk_level_score: Optional[float]
+    risk_level_severity: Optional[str]
+    Information: Optional[str]
+    description: Optional[str]
 
 
 class FindingOccurrence(BaseModel):
@@ -70,4 +57,5 @@ class DataShape(DataShapeBase):
     meta: Meta
     findings_grouped: Dict[str, FindingOccurrence]
     valid_time: datetime
-    ooi: OOI
+    report_source_type: str
+    report_source_value: str

@@ -1,35 +1,20 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
+
 {% load static %}
 {% load i18n %}
 
 {% block content %}
-  {% include 'header.html' %}
-  <main id="main-content" tabindex="-1">
-    <section>
-      <div>
-        <h1>{% translate 'Error code 404: Page not found' %}</h1>
-        <p>
-          {% translate 'The page you wanted to see or the file you wanted to view was not found.' %}
-        </p>
-        <p>
-          {% translate 'You may be able to find the information you are looking for through the following pages:' %}
-        </p>
-        <ul>
-          <li>
-            <a href="{% url 'crisis_room' %}">{% translate 'Crisis Room' %}</a>
-          </li>
-          <li>
-            <a href="{% url 'katalogus' views.kwargs.organization_code %}">{% translate 'KAT-alogus' %}</a>
-          </li>
-          <li>
-            <a href="{% url 'finding_list' organization.code %}">{% translate 'Findings' %}</a>
-          </li>
-        </ul>
-        <p>
-          {% translate 'Or go back to the main page' %}
-        </p>
-        <a href="../index.html" class="button"><span class=" icon ti-home"></span>{% translate 'Homepage' %}</a>
-      </div>
-    </section>
-  </main>
-{% endblock %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1">
+        <section>
+            <div>
+                <h1>{% translate "Error code 404: Page not found" %}</h1>
+                <p>{% translate "The page you wanted to see or the file you wanted to view was not found." %}</p>
+                <p>
+                    {% translate "You may want to go back to the" %} <a href="{% url 'crisis_room' %}">{% translate "Crisis Room" %}</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

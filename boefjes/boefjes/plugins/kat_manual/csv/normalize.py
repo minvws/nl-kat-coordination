@@ -1,17 +1,17 @@
 import csv
 import io
 import logging
-from ipaddress import ip_network, IPv4Network
-from typing import Union, Iterator, Dict, Tuple, List
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
-from octopoes.models.ooi.web import URL
-from octopoes.models.types import OOIType
+from ipaddress import IPv4Network, ip_network
+from typing import Dict, Iterable, List, Tuple, Union
+
 from pydantic import ValidationError
 
 from boefjes.job_models import NormalizerMeta
-
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
+from octopoes.models.ooi.web import URL
+from octopoes.models.types import OOIType
 
 OOI_TYPES = {
     "Hostname": {"type": Hostname},
@@ -24,7 +24,7 @@ OOI_TYPES = {
 logger = logging.getLogger(__name__)
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     reference_cache = {"Network": {"internet": Network(name="internet")}}
 
     yield from process_csv(raw, reference_cache)
@@ -100,8 +100,8 @@ def get_ooi_from_csv(ooi_type_name: str, values: Dict[str, str], reference_cache
             except IndexError:
                 if required:
                     raise IndexError(
-                        "Required referenced primary-key field '%s' not set and no default present for Type '%s'."
-                        % (field, ooi_type_name)
+                        f"Required referenced primary-key field '{field}' not set "
+                        f"and no default present for Type '{ooi_type_name}'."
                     )
                 else:
                     kwargs[field] = None

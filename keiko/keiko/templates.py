@@ -7,7 +7,7 @@ import json
 import os
 from logging import getLogger
 from pathlib import Path
-from typing import Set, Any, Dict, cast
+from typing import Any, Dict, Set, cast
 
 from pydantic import BaseModel
 
@@ -16,11 +16,10 @@ from keiko.settings import Settings
 DATA_STRUCTURE_MODULE_NAME = "model.py"
 DATA_STRUCTURE_CLASS_NAME = "DataShape"
 
-settings = Settings()
 logger = getLogger(__name__)
 
 
-def get_templates() -> Set[str]:
+def get_templates(settings: Settings) -> Set[str]:
     """Assembles all template definitions found in the templates directory."""
 
     templates = set()
@@ -28,9 +27,8 @@ def get_templates() -> Set[str]:
     for template_folder in [
         f for f in os.listdir(settings.templates_folder) if (Path(settings.templates_folder) / f).is_dir()
     ]:
-
         try:
-            get_data_shape(template_folder)
+            get_data_shape(template_folder, settings)
             templates.add(template_folder)
         except FileNotFoundError:
             logger.warning(
@@ -41,7 +39,7 @@ def get_templates() -> Set[str]:
     return templates
 
 
-def get_data_shape(template: str) -> BaseModel:
+def get_data_shape(template: str, settings: Settings) -> BaseModel:
     """Imports the data model for a template"""
 
     model_path = Path(settings.templates_folder) / template / DATA_STRUCTURE_MODULE_NAME
@@ -61,7 +59,7 @@ def get_data_shape(template: str) -> BaseModel:
     return cast(BaseModel, getattr(module, DATA_STRUCTURE_CLASS_NAME))
 
 
-def get_samples() -> Dict[str, Dict[str, Any]]:
+def get_samples(settings: Settings) -> Dict[str, Dict[str, Any]]:
     """Returns a dictionary of sample data for each template"""
     samples = {}
     template_folder = Path(settings.templates_folder)
@@ -73,7 +71,7 @@ def get_samples() -> Dict[str, Dict[str, Any]]:
             continue
         sample_file = subfolder / "sample.json"
         if sample_file.exists():
-            with open(sample_file) as sample:
+            with sample_file.open() as sample:
                 try:
                     samples[subfolder_name] = {
                         "summary": subfolder_name,

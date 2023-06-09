@@ -1,12 +1,12 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from octopoes.models import Reference, DeclaredScanProfile, InheritedScanProfile
+from octopoes.models import DeclaredScanProfile, InheritedScanProfile, Reference
 from octopoes.repositories.scan_profile_repository import XTDBScanProfileRepository
 from tests.mocks.mock_ooi_types import (
     ALL_OOI_TYPES,
-    MockNetwork,
     MockIPAddressV4,
+    MockNetwork,
 )
 
 

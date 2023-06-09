@@ -421,6 +421,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Swap files
+*.swp
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,macos,python,node,react,intellij,vscode
 
 /bytes/bytes-data
@@ -432,3 +435,4 @@ $RECYCLE.BIN/
 deployment/github_config.sh
 
 nl-kat-*
+/_version.py

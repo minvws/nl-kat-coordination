@@ -1,7 +1,6 @@
 import datetime
 from typing import Dict, List
 
-import pytz
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -9,15 +8,15 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
+from tools.forms.base import BaseRockyForm, DataListInput, DateTimeInput
 from tools.forms.settings import (
-    RISK_RATING_CHOICES,
+    FINDING_DATETIME_HELP_TEXT,
+    FINDING_TYPE_IDS_HELP_TEXT,
+    MANUAL_FINDING_ID_PREFIX,
     PIE_SCALE_CHOICES,
     PIE_SCALE_EFFORT_CHOICES,
-    MANUAL_FINDING_ID_PREFIX,
-    FINDING_TYPE_IDS_HELP_TEXT,
+    RISK_RATING_CHOICES,
 )
-from tools.forms.base import DateTimeInput, BaseRockyForm, DataListInput
-from tools.forms.settings import FINDING_DATETIME_HELP_TEXT
 from tools.models import OOIInformation
 
 
@@ -35,7 +34,7 @@ class FindingTypeAddForm(BaseRockyForm):
     )
     description = forms.CharField(
         label=_("Description"),
-        widget=forms.Textarea(attrs={"placeholder": _("Desribe the finding type"), "rows": 3}),
+        widget=forms.Textarea(attrs={"placeholder": _("Describe the finding type"), "rows": 3}),
     )
     risk = forms.CharField(
         label=_("Risk"),
@@ -88,8 +87,8 @@ class FindingTypeAddForm(BaseRockyForm):
 
         return data
 
-    def check_finding_type_existence(self, id):
-        _, created = OOIInformation.objects.get_or_create(id=f"KATFindingType|{id}")
+    def check_finding_type_existence(self, finding_type_id):
+        _, created = OOIInformation.objects.get_or_create(id=f"KATFindingType|{finding_type_id}")
 
         if not created:
             raise ValidationError(_("Finding type already exists"))
@@ -103,7 +102,7 @@ class FindingAddForm(BaseRockyForm):
     finding_type_ids = forms.CharField(
         label=_("Finding types"),
         widget=forms.Textarea(
-            # Multi line placeholder because this textarea askes the user for every finding type on a new line.
+            # Multi line placeholder because this textarea asks the user for every finding type on a new line.
             attrs={
                 "placeholder": """KAT-999
 KAT-998
@@ -135,7 +134,7 @@ CVE-2021-00000""",
     date = forms.DateTimeField(
         label=_("Date/Time (UTC)"),
         widget=DateTimeInput(format="%Y-%m-%dT%H:%M"),
-        initial=datetime.datetime.now(tz=pytz.UTC),
+        initial=lambda: datetime.datetime.now(tz=datetime.timezone.utc),
         help_text=FINDING_DATETIME_HELP_TEXT,
     )
 
@@ -157,7 +156,7 @@ CVE-2021-00000""",
         data = self.cleaned_data["date"]
 
         # date should not be in the future
-        if data > datetime.datetime.now(tz=pytz.UTC):
+        if data > datetime.datetime.now(tz=datetime.timezone.utc):
             raise ValidationError(_("Doc! I'm from the future, I'm here to take you back!"))
 
         return data

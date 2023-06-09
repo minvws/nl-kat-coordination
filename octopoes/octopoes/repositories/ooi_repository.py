@@ -4,8 +4,9 @@ import json
 import logging
 from datetime import datetime
 from http import HTTPStatus
-from typing import Type, List, Optional, Set, Dict, Union, Any, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
 
+from bits.definitions import BitDefinition
 from pydantic import BaseModel, parse_obj_as
 from requests import HTTPError
 
@@ -13,20 +14,23 @@ from octopoes.config.settings import XTDBType
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
 from octopoes.models import (
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     OOI,
     Reference,
     ScanLevel,
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ScanProfileType,
 )
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.config import Config
 from octopoes.models.pagination import Paginated
-from octopoes.models.path import Path, get_paths_to_neighours, Direction, Segment
-from octopoes.models.tree import ReferenceTree, ReferenceNode
-from octopoes.models.types import get_relations, type_by_name, to_concrete, get_concrete_types, get_relation
-from octopoes.xtdb import FieldSet, Datamodel, ForeignKey
-from octopoes.xtdb.client import XTDBSession, OperationType as XTDBOperationType
+from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
+from octopoes.models.tree import ReferenceNode, ReferenceTree
+from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
+from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
+from octopoes.xtdb.client import OperationType as XTDBOperationType
+from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.query import Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
@@ -76,7 +80,9 @@ class OOIRepository:
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
-    def list_random(self, amount: int, valid_time: datetime) -> List[OOI]:
+    def list_random(
+        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> List[OOI]:
         raise NotImplementedError
 
     def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
@@ -98,6 +104,12 @@ class OOIRepository:
         raise NotImplementedError
 
     def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
+        raise NotImplementedError
+
+    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
+        raise NotImplementedError
+
+    def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> List[Config]:
         raise NotImplementedError
 
 
@@ -144,7 +156,6 @@ datamodel = Datamodel(entities=entities)
 
 
 class XTDBOOIRepository(OOIRepository):
-
     xtdb_type: XTDBType = XTDBType.CRUX
 
     def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
@@ -158,7 +169,6 @@ class XTDBOOIRepository(OOIRepository):
 
     @classmethod
     def serialize(cls, ooi: OOI) -> Dict[str, Any]:
-
         # export model with pydantic serializers
         export = json.loads(ooi.json())
 
@@ -216,21 +226,10 @@ class XTDBOOIRepository(OOIRepository):
                         :find [(count ?e)]
                         :in [[_object_type ...] [_scan_level ...] [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
-                                (or-join [?e _scan_level _scan_profile_type]
-                                  (and
-                                    [?scan_profile :type "ScanProfile"]
-                                    [?scan_profile :reference ?e]
-                                    [?scan_profile :level _scan_level]
-                                    [?scan_profile :scan_profile_type _scan_profile_type]
-                                  )
-                                  (and
-                                      (not-join [?e]
-                                          [?scan_profile :type "ScanProfile"]
-                                          [?scan_profile :reference ?e])
-                                      [(= _scan_level 0)]
-                                      [(= _scan_profile_type "empty")]
-                                  )
-                          )]
+                                [?scan_profile :type "ScanProfile"]
+                                [?scan_profile :reference ?e]
+                                [?scan_profile :level _scan_level]
+                                [?scan_profile :scan_profile_type _scan_profile_type]]
                     }}
                     :in-args [[{object_types}], [{scan_levels}], [{scan_profile_types}]]
                 }}
@@ -249,21 +248,10 @@ class XTDBOOIRepository(OOIRepository):
                         :find [(pull ?e [*])]
                         :in [[_object_type ...] [_scan_level ...]  [_scan_profile_type ...]]
                         :where [[?e :object_type _object_type]
-                                (or-join [?e _scan_level _scan_profile_type]
-                                      (and
-                                        [?scan_profile :type "ScanProfile"]
-                                        [?scan_profile :reference ?e]
-                                        [?scan_profile :level _scan_level]
-                                        [?scan_profile :scan_profile_type _scan_profile_type]
-                                      )
-                                      (and
-                                          (not-join [?e]
-                                              [?scan_profile :type "ScanProfile"]
-                                              [?scan_profile :reference ?e])
-                                          [(= _scan_level 0)]
-                                          [(= _scan_profile_type "empty")]
-                                      )
-                              )]
+                                [?scan_profile :type "ScanProfile"]
+                                [?scan_profile :reference ?e]
+                                [?scan_profile :level _scan_level]
+                                [?scan_profile :scan_profile_type _scan_profile_type]]
                         :limit {limit}
                         :offset {offset}
                     }}
@@ -284,20 +272,29 @@ class XTDBOOIRepository(OOIRepository):
             items=oois,
         )
 
-    def list_random(self, amount: int, valid_time: datetime) -> List[OOI]:
+    def list_random(
+        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> List[OOI]:
         query = """
-        {{
-            :query {{
-                :find [(rand {amount} ?id)]
-                :where [
-                    [?e :crux.db/id ?id]
-                    [?e :object_type]
-                ]
+            {{
+                :query {{
+                    :find [(rand {amount} ?id)]
+                    :in [[_scan_level ...]]
+                    :where [
+                        [?e :crux.db/id ?id]
+                        [?e :object_type]
+                        [?scan_profile :type "ScanProfile"]
+                        [?scan_profile :reference ?e]
+                        [?scan_profile :level _scan_level]
+                    ]
+                }}
+                :in-args [[{scan_levels}]]
             }}
-        }}
-        """.format(
-            amount=amount
+            """.format(
+            amount=amount,
+            scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
         )
+
         res = self.session.client.query(query, valid_time)
         if not res:
             return []
@@ -311,7 +308,6 @@ class XTDBOOIRepository(OOIRepository):
         search_types: Optional[Set[Type[OOI]]] = None,
         depth: Optional[int] = 1,
     ) -> ReferenceTree:
-
         if search_types is None:
             search_types = {OOI}
         search_types = to_concrete(search_types)
@@ -354,7 +350,6 @@ class XTDBOOIRepository(OOIRepository):
         exclude: Optional[Set[Reference]] = None,
         valid_time: Optional[datetime] = None,
     ) -> List[ReferenceNode]:
-
         if depth == 0 or not references:
             return []
 
@@ -416,7 +411,6 @@ class XTDBOOIRepository(OOIRepository):
 
     @classmethod
     def construct_neighbour_query(cls, reference: Reference, paths: Optional[Set[Path]] = None) -> str:
-
         if paths is None:
             paths = get_paths_to_neighours(reference.class_type)
 
@@ -443,7 +437,6 @@ class XTDBOOIRepository(OOIRepository):
 
     @classmethod
     def construct_neighbour_query_multi(cls, references: Set[Reference], paths: Set[Path]) -> str:
-
         encoded_segments = [cls.encode_segment(path.segments[0]) for path in sorted(paths)]
         segment_query_sections = [f"{{:{s} [*]}}" for s in encoded_segments]
 
@@ -468,7 +461,6 @@ class XTDBOOIRepository(OOIRepository):
     def get_neighbours(
         self, reference: Reference, valid_time: datetime, paths: Set[Path] = None
     ) -> Dict[Path, List[OOI]]:
-
         query = self.construct_neighbour_query(reference, paths)
 
         response = self.session.client.query(query, valid_time=valid_time)
@@ -491,7 +483,6 @@ class XTDBOOIRepository(OOIRepository):
         return ret
 
     def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
-
         query = self.construct_neighbour_query_multi(references, paths)
 
         response = self.session.client.query(query, valid_time=valid_time)
@@ -516,13 +507,11 @@ class XTDBOOIRepository(OOIRepository):
         return neighbours
 
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
-
         # retrieve old ooi
-        old_ooi = None
         try:
             old_ooi = self.get(ooi.reference, valid_time=valid_time)
         except ObjectNotFoundException:
-            pass
+            old_ooi = None
 
         new_ooi = ooi
         if old_ooi is not None:
@@ -548,7 +537,6 @@ class XTDBOOIRepository(OOIRepository):
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
     def delete(self, reference: Reference, valid_time: datetime) -> None:
-
         # retrieve old ooi
         try:
             ooi = self.get(reference, valid_time=valid_time)
@@ -573,3 +561,25 @@ class XTDBOOIRepository(OOIRepository):
         """
         response = self.session.client.query(query, valid_time=valid_time)
         return {Reference.from_str(row[0]) for row in response}
+
+    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
+        query = """
+                    {:query {
+                     :find [?finding_type (count ?finding)]
+                     :where [[?finding :Finding/finding_type ?finding_type]] }}
+                """
+        response = self.session.client.query(query, valid_time=valid_time)
+        return {finding_type: count for finding_type, count in response}
+
+    def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> List[Config]:
+        path = Path.parse(f"{bit_definition.config_ooi_relation_path}.<ooi [is Config]")
+
+        query = (
+            Query.from_path(path)
+            .where(type(source), primary_key=source.primary_key)
+            .where(Config, bit_id=bit_definition.id)
+        )
+
+        configs = [self.deserialize(res[0]) for res in self.session.client.query(str(query), valid_time=valid_time)]
+
+        return [config for config in configs if isinstance(config, Config)]

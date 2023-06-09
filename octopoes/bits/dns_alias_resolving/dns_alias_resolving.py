@@ -1,16 +1,14 @@
-from typing import List, Iterator, Union
+from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSCNAMERecord
-from octopoes.models.ooi.dns.zone import ResolvedHostname, Hostname
+from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.network import Network
 
 
 def run(
-    hostname: Hostname,
-    additional_oois: List[Union[DNSCNAMERecord, ResolvedHostname]],
+    hostname: Hostname, additional_oois: List[Union[DNSCNAMERecord, ResolvedHostname]], config: Dict[str, str]
 ) -> Iterator[OOI]:
-
     cname_records = [ooi for ooi in additional_oois if isinstance(ooi, DNSCNAMERecord)]
     resolved_hostnames = [ooi for ooi in additional_oois if isinstance(ooi, ResolvedHostname)]
 
@@ -23,7 +21,7 @@ def run(
             # Also the non-fqdn variant
             yield ResolvedHostname(
                 hostname=Hostname(
-                    name=cname_record.hostname.tokenized.name.rstrip("."),
+                    name=cname_record.hostname.tokenized.name,
                     network=Network(name=cname_record.hostname.tokenized.network.name).reference,
                 ).reference,
                 address=resolved_hostname.address,

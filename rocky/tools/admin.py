@@ -7,12 +7,7 @@ from django.db.models import JSONField
 from django.forms import widgets
 
 from rocky.admin import AdminErrorMessageMixin
-from tools.models import (
-    Organization,
-    OrganizationMember,
-    Indemnification,
-    OOIInformation,
-)
+from tools.models import Indemnification, OOIInformation, Organization, OrganizationMember, OrganizationTag
 
 
 class JSONInfoWidget(widgets.Textarea):
@@ -30,7 +25,6 @@ class JSONInfoWidget(widgets.Textarea):
 
 
 class OOIInformationAdmin(admin.ModelAdmin):
-
     # makes sure that the order stays the same
     fields = ("id", "data", "consult_api")
 
@@ -40,7 +34,7 @@ class OOIInformationAdmin(admin.ModelAdmin):
     # if pk is not readonly, it will create a new record upon editing
     def get_readonly_fields(self, request, obj=None):
         if obj is not None:  # editing an existing object
-            if obj.value == "":
+            if not obj.value:
                 return self.readonly_fields + (
                     "id",
                     "consult_api",
@@ -86,7 +80,12 @@ class IndemnificationAdmin(admin.ModelAdmin):
         return request.user.is_superuser
 
 
+class OrganizationTagAdmin(admin.ModelAdmin):
+    pass
+
+
 tagulous.admin.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationMember, OrganizationMemberAdmin)
 admin.site.register(Indemnification, IndemnificationAdmin)
 admin.site.register(OOIInformation, OOIInformationAdmin)
+admin.site.register(OrganizationTag, OrganizationTagAdmin)

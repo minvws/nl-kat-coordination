@@ -1,20 +1,18 @@
 import logging
 from typing import Type
 
+from account.mixins import OrganizationView
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
+from tools.ooi_helpers import OOI_TYPES_WITHOUT_FINDINGS
+from tools.view_helpers import existing_ooi_type
 
-from account.mixins import OrganizationView
 from octopoes.models import OOI
 from octopoes.models.types import type_by_name
 from rocky.views.ooi_view import BaseOOIFormView
-from tools.ooi_helpers import OOI_TYPES_WITHOUT_FINDINGS
-from tools.view_helpers import existing_ooi_type
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +23,6 @@ def ooi_type_input_choices():
     return [{"value": ooi_type, "text": ooi_type} for ooi_type in ooi_types]
 
 
-@class_view_decorator(otp_required)
 class OOIAddTypeSelectView(OrganizationView, TemplateView):
     template_name = "oois/ooi_add_type_select.html"
 
@@ -55,7 +52,6 @@ class OOIAddTypeSelectView(OrganizationView, TemplateView):
         return context
 
 
-@class_view_decorator(otp_required)
 class OOIAddView(BaseOOIFormView):
     template_name = "oois/ooi_add.html"
 

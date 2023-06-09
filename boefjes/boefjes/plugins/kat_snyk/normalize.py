@@ -1,22 +1,21 @@
 import json
 import logging
-from typing import Iterator, Union
-
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import (
-    KATFindingType,
-    Finding,
-    SnykFindingType,
-    CVEFindingType,
-)
+from typing import Iterable, Union
 
 from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_snyk import check_version
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.findings import (
+    CVEFindingType,
+    Finding,
+    KATFindingType,
+    SnykFindingType,
+)
 
 logger = logging.getLogger(__name__)
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
 
@@ -26,7 +25,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     software_version = input_["version"]
 
     if not results["table_versions"] and not results["table_vulnerabilities"] and not results["cve_vulnerabilities"]:
-        logger.warning(f"Couldn't find software {software_name} in the SNYK vulnerability database")
+        logger.warning("Couldn't find software %s in the SNYK vulnerability database", software_name)
         return
     elif not results["table_vulnerabilities"] and not results["cve_vulnerabilities"]:
         # no vulnerabilities found
@@ -56,7 +55,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             latest_version = version.get("Version_text")
 
     if software_version and latest_version and check_version.check_version_in(software_version, f"<{latest_version}"):
-        kat_ooi = KATFindingType(id="KAT-654")
+        kat_ooi = KATFindingType(id="KAT-SOFTWARE-UPDATE-AVAILABLE")
         yield kat_ooi
         yield Finding(
             finding_type=kat_ooi.reference,

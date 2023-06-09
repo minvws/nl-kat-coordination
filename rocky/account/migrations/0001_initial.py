@@ -4,13 +4,12 @@ import django.contrib.auth.models
 import django.contrib.auth.validators
 import django.utils.timezone
 from django.db import migrations, models
-from django.utils.functional import cached_property
-
 from django.db.migrations.exceptions import InconsistentMigrationHistory
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.migrations.state import ProjectState, StateApps
+from django.utils.functional import cached_property
 
 import account.models
 
@@ -36,9 +35,8 @@ def check_consistent_history(self, connection):
             if parent not in applied:
                 # Skip unapplied squashed migrations that have all of their
                 # `replaces` applied.
-                if parent in self.replacements:
-                    if all(m in applied for m in self.replacements[parent].replaces):
-                        continue
+                if parent in self.replacements and all(m in applied for m in self.replacements[parent].replaces):
+                    continue
                 parent_migration = self.get_migration(parent[0], parent[1])
                 if hasattr(parent_migration.operations[0], "inconsistent_allowed"):
                     continue
@@ -80,7 +78,7 @@ class SwitchToCustomUserModel(Operation):
     create_user_model_operation = migrations.CreateModel(
         name="User",
         fields=[
-            ("id", models.AutoField(primary_key=True, verbose_name="ID")),
+            ("id", models.AutoField(primary_key=True, serialize=False, verbose_name="ID")),
             ("password", models.CharField(max_length=128, verbose_name="password")),
             (
                 "last_login",
@@ -203,7 +201,7 @@ def fix_names(apps, schema_editor):
             "select conname from pg_constraint where conname = 'auth_user_groups_katuser_id_76ed1ca4_fk_auth_user_id'"
         )
         if not len(cursor.fetchall()):
-            # Not upraded so we don't have to fix up the constraint names
+            # Not upgraded so we don't have to fix up the constraint names
             return
 
     schema_editor.execute(
@@ -348,7 +346,6 @@ def fix_contenttypes_and_permissions(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

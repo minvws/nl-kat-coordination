@@ -1,6 +1,6 @@
 """Boefje script for getting dns records"""
 import logging
-from typing import Union, Tuple, List
+from typing import List, Tuple, Union
 
 import dns.resolver
 from dns.name import Name
@@ -32,7 +32,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
 def get_parent_zone_soa(name: Name) -> Answer:
     while True:
-
         try:
             return dns.resolver.resolve(name, dns.rdatatype.SOA)
         except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):

@@ -4,12 +4,19 @@ on:
   push:
     paths:
       - boefjes/**
+      - octopoes/**
+      - .github/workflows/boefjes_debian_package.yml
+  pull_request:
+    paths:
+      - boefjes/**
+      - octopoes/**
+      - .github/workflows/boefjes_debian_package.yml
 
 jobs:
   build-package:
     strategy:
       matrix:
-        dist: [debian, ubuntu]
+        dist: [debian11, ubuntu22.04]
     runs-on: ubuntu-latest
     env:
       PKG_NAME: kat-boefjes
@@ -17,14 +24,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Get version from release tag or generate one
+      - name: Generate version.py and set RELEASE_VERSION
         run: |
-          if [ ${GITHUB_REF_TYPE} = "tag" ]; then
-            echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
-          else
-            pip install setuptools-scm==7.1.0
-            echo "RELEASE_VERSION=$(python -m setuptools_scm)" >> $GITHUB_ENV
-          fi
+          pip install setuptools-scm==7.1.0
+          echo "RELEASE_VERSION=$(python -m setuptools_scm | sed s/rc/~rc/)" >> $GITHUB_ENV
+          cp _version.py boefjes/boefjes/version.py
+          cp _version.py boefjes/boefjes/katalogus/version.py
 
       - name: Run debian package build
         uses: addnab/docker-run-action@v3

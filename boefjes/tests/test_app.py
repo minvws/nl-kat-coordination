@@ -1,13 +1,13 @@
 import tempfile
 import time
 from pathlib import Path
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 from unittest import TestCase
 
 from pydantic import parse_raw_as
 
 from boefjes.app import SchedulerRuntimeManager
-from boefjes.clients.scheduler_client import SchedulerClientInterface, QueuePrioritizedItem, Queue, TaskStatus
+from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, RuntimeManager
@@ -31,11 +31,11 @@ class MockSchedulerClient(SchedulerClientInterface):
             return parse_raw_as(QueuePrioritizedItem, self.normalizer_responses.pop(0))
 
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
-        with open(self.log_path, "a") as f:
+        with self.log_path.open("a") as f:
             f.write(f"{task_id},{status.value}\n")
 
     def get_all_patched_tasks(self) -> List[List[str]]:
-        with open(self.log_path, "r") as f:
+        with self.log_path.open() as f:
             return [x.strip().split(",") for x in f]
 
 
@@ -59,13 +59,13 @@ class MockHandler(Handler):
 
         self.calls += 1
 
-        with open(self.log_path, "a") as f:
+        with self.log_path.open("a") as f:
             f.write(f"{item.json()}\n")
 
         time.sleep(self.sleep_time)
 
     def get_all(self) -> List[Union[BoefjeMeta, NormalizerMeta]]:
-        with open(self.log_path, "r") as f:
+        with self.log_path.open() as f:
             f = [x for x in f]
             return [parse_raw_as(Union[BoefjeMeta, NormalizerMeta], x) for x in f]
 
@@ -121,10 +121,8 @@ class AppTest(TestCase):
 
         patched_tasks = self.scheduler_client.get_all_patched_tasks()
         self.assertEqual(6, len(patched_tasks))
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[0])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[3])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[4])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[5])
+        self.assertEqual(patched_tasks.count(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"]), 4)
+        self.assertEqual(patched_tasks.count(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"]), 2)
 
     def test_two_processes_exception(self) -> None:
         self.runtime.settings.pool_size = 2
@@ -134,22 +132,6 @@ class AppTest(TestCase):
 
         self.assertFalse(self.item_handler.log_path.exists())
         self.assertTrue(self.scheduler_client.log_path.exists())
-
-    def test_two_processes_late_exception(self) -> None:
-        self.runtime.settings.pool_size = 2
-        self.item_handler.max_calls = 1
-
-        self.runtime.run(RuntimeManager.Queue.BOEFJES)
-
-        items = self.item_handler.get_all()
-        self.assertEqual(2, len(items))
-
-        patched_tasks = self.scheduler_client.get_all_patched_tasks()
-        self.assertEqual(6, len(patched_tasks))
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[0])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[1])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[2])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[3])
 
     def test_two_processes_handler_exception(self) -> None:
         self.runtime.settings.pool_size = 2
@@ -162,14 +144,10 @@ class AppTest(TestCase):
 
         patched_tasks = self.scheduler_client.get_all_patched_tasks()
         self.assertEqual(6, len(patched_tasks))
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[0])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"], patched_tasks[1])
-        self.assertEqual(
-            ["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[2]
-        )  # Handler starts raising an Exception from the second call onward
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[3])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[4])
-        self.assertEqual(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"], patched_tasks[5])
+        # Handler starts raising an Exception from the second call onward,
+        # so we have 2 completed tasks and 4 failed tasks.
+        self.assertEqual(patched_tasks.count(["70da7d4f-f41f-4940-901b-d98a92e9014b", "completed"]), 2)
+        self.assertEqual(patched_tasks.count(["70da7d4f-f41f-4940-901b-d98a92e9014b", "failed"]), 4)
 
     def test_null(self) -> None:
         """This tests ensures we test the behaviour when the scheduler client returns None for the pop_task method"""

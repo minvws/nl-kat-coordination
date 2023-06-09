@@ -3,12 +3,12 @@ from pathlib import Path
 from typing import Tuple
 from unittest import TestCase
 
-from octopoes.models import Reference
 from pydantic import AnyUrl
 
 from boefjes.job_models import NormalizerMeta, NormalizerOutput
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from octopoes.models import Reference
 from tests.test_snyk import get_dummy_data
 
 
@@ -37,7 +37,7 @@ FE80:CD00:0000:0CDE:1257:0000:211E:729D,darknet""",
         b"""network,raw
 internet,https://example.com/
 darknet,https://openkat.nl/""",
-        # url withouth network
+        # url without network
         b"raw\nhttps://example.com/",
     ]
 
@@ -67,11 +67,11 @@ darknet,https://openkat.nl/""",
         self.assertEqual(
             {
                 "dns_zone": None,
-                "fqdn": Reference("Hostname|internet|example.com."),
                 "name": "example.com",
                 "network": Reference("Network|internet"),
                 "object_type": "Hostname",
                 "primary_key": "Hostname|internet|example.com",
+                "registered_domain": None,
                 "scan_profile": None,
             },
             output.declarations[1].ooi.dict(),
@@ -83,11 +83,11 @@ darknet,https://openkat.nl/""",
         self.assertEqual(
             {
                 "dns_zone": None,
-                "fqdn": Reference("Hostname|internet|example.net."),
                 "name": "example.net",
                 "network": Reference("Network|internet"),
                 "object_type": "Hostname",
                 "primary_key": "Hostname|internet|example.net",
+                "registered_domain": None,
                 "scan_profile": None,
             },
             output.declarations[1].ooi.dict(),

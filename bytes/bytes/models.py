@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Iterable, Callable, Union, Optional, Dict, Any, NewType, List
+from typing import Any, Callable, Dict, Iterable, List, NewType, Optional, Union
 
 from pydantic import BaseModel, Field
-from pydantic.datetime_parse import parse_datetime, StrBytesIntFloat
+from pydantic.datetime_parse import StrBytesIntFloat, parse_datetime
 
 RetrievalLink = NewType("RetrievalLink", str)
 SecureHash = NewType("SecureHash", str)
@@ -76,6 +76,7 @@ class RawDataMeta(BaseModel):
 
     # These are set once the raw is saved
     secure_hash: Optional[SecureHash]
+    signing_provider_url: Optional[str]
     hash_retrieval_link: Optional[RetrievalLink]
 
 
@@ -86,10 +87,10 @@ class RawData(BaseModel):
 
     # These are set once the raw is saved
     secure_hash: Optional[SecureHash]
+    signing_provider_url: Optional[str]
     hash_retrieval_link: Optional[RetrievalLink]
 
 
 class NormalizerMeta(Job):
-    raw_file_id: Optional[str]
-    boefje_meta: BoefjeMeta  # To be phased out?
+    raw_data: RawDataMeta
     normalizer: Normalizer

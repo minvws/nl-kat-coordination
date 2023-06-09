@@ -4,6 +4,13 @@ on:
   push:
     paths:
       - boefjes/**
+      - octopoes/**
+      - .github/workflows/boefjes_container_image.yml
+  pull_request:
+    paths:
+      - boefjes/**
+      - octopoes/**
+      - .github/workflows/boefjes_container_image.yml
 
 jobs:
   create_container_image:
@@ -34,6 +41,13 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate version.py
+        run: |
+          pip install setuptools-scm==7.1.0
+          python -m setuptools_scm
+          cp _version.py boefjes/boefjes/version.py
+          cp _version.py boefjes/boefjes/katalogus/version.py
+
       - name: Build container image
         uses: docker/build-push-action@v3
         with:
@@ -41,7 +55,7 @@ jobs:
           # https://github.com/docker/cli/issues/2827
           context: .
           file: boefjes/Dockerfile
-          push: true
+          push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

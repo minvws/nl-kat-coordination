@@ -1,0 +1,15 @@
+    {
+        "id": "nuclei-exposed-panels",
+        "name": "Nuclei Exposed panels",
+        "description": "Nuclei is used to send requests across targets based on a template, providing fast scanning. (Exposed panels)",
+        "consumes": [
+            "Hostname",
+            "HostnameHTTPURL"
+        ],
+        "produces": [
+            "Finding",
+            "KATFindingType"
+        ],
+        "environment_keys": [],
+        "scan_level": 3
+    }

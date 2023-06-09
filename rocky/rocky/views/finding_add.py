@@ -1,26 +1,37 @@
 from datetime import datetime, timezone
-from typing import List, Dict
+from typing import Dict, List
+from uuid import uuid4
 
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
+from tools.forms.finding_type import FindingAddForm
+from tools.view_helpers import get_ooi_url
 
 from octopoes.api.models import Declaration
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import (
+    CAPECFindingType,
     CVEFindingType,
-    KATFindingType,
+    CWEFindingType,
     Finding,
+    FindingType,
+    KATFindingType,
     RetireJSFindingType,
     SnykFindingType,
-    FindingType,
 )
 from octopoes.models.types import OOI_TYPES
-
-from rocky.bytes_client import get_bytes_client, BytesClient
+from rocky.bytes_client import BytesClient, get_bytes_client
 from rocky.views.ooi_view import BaseOOIFormView
-from tools.forms.finding_type import FindingAddForm
-from tools.view_helpers import get_ooi_url
+
+FINDING_TYPES_PREFIXES = {
+    "CVE": CVEFindingType,
+    "SNYK": SnykFindingType,
+    "CWE": CWEFindingType,
+    "CAPEC": CAPECFindingType,
+    "RetireJS": RetireJSFindingType,
+    "KAT": KATFindingType,
+}
 
 
 def get_finding_type_from_id(
@@ -28,19 +39,11 @@ def get_finding_type_from_id(
 ) -> FindingType:
     finding_type_id = finding_type_id.upper()
 
-    if finding_type_id.upper().startswith("CVE"):
-        # Fetch CVE info
-        finding_type = CVEFindingType(id=finding_type_id)
-    elif finding_type_id.upper().startswith("RetireJS"):
-        # Fetch RetireJS info
-        finding_type = RetireJSFindingType(id=finding_type_id)
-    elif finding_type_id.upper().startswith("SNYK"):
-        # Fetch RetireJS info
-        finding_type = SnykFindingType(id=finding_type_id)
+    prefix = finding_type_id.upper().split("-")[0]
+    if prefix in FINDING_TYPES_PREFIXES:
+        return FINDING_TYPES_PREFIXES[prefix](id=finding_type_id)
     else:
-        finding_type = KATFindingType(id=finding_type_id)
-
-    return finding_type
+        raise ValueError("Invalid finding type prefix")
 
 
 class FindingAddView(BaseOOIFormView):
@@ -89,7 +92,11 @@ class FindingAddView(BaseOOIFormView):
 
         s: str = form_data["finding_type_ids"]
         finding_type_ids = s.replace(",", "\n").splitlines()
-        finding_type_ids = [x.strip() for x in finding_type_ids if x.strip().startswith(("KAT-", "CVE-", "CWE-"))]
+        finding_type_ids = [
+            x.strip()
+            for x in finding_type_ids
+            if x.strip().startswith(("KAT-", "CVE-", "CWE-", "CAPEC-", "RetireJS-", "SNYK-"))
+        ]
 
         observed_at = datetime.combine(form_data.get("date"), datetime.min.time(), tzinfo=timezone.utc)
 
@@ -98,6 +105,7 @@ class FindingAddView(BaseOOIFormView):
 
         proof = []  # Collect as much data as possible in a single proof
 
+        task_id = uuid4()
         for f_id in finding_type_ids:
             finding_type = get_finding_type_from_id(f_id)
             finding = Finding(
@@ -107,10 +115,10 @@ class FindingAddView(BaseOOIFormView):
                 description=form_data.get("description"),
                 reproduce=form_data.get("reproduce"),
             )
-            proof.append(Declaration(ooi=finding, valid_time=observed_at))
-            proof.append(Declaration(ooi=finding_type, valid_time=observed_at))
+            proof.append(Declaration(ooi=finding, valid_time=observed_at, task_id=str(task_id)))
+            proof.append(Declaration(ooi=finding_type, valid_time=observed_at, task_id=str(task_id)))
 
-        get_bytes_client(self.organization.code).add_manual_proof(BytesClient.raw_from_declarations(proof))
+        get_bytes_client(self.organization.code).add_manual_proof(task_id, BytesClient.raw_from_declarations(proof))
 
         for declaration in proof:
             self.octopoes_api_connector.save_declaration(declaration)

@@ -30,13 +30,11 @@ help: ## Show this help.
 ##|------------------------------------------------------------------------|
 
 done: lint test ## Prepare for a commit.
-build:
-
 
 lint: ## Format the code using black.
 	pre-commit run --all-files --show-diff-on-failure --color always
 
-py-run := docker-compose run bytes python
+py-run := docker-compose --rm run bytes python
 
 
 export revid

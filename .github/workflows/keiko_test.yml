@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - keiko/**
+  pull_request:
+    paths:
+      - keiko/**
 
 jobs:
   test:
@@ -23,6 +26,19 @@ jobs:
         with:
           python-version: ${{ matrix.version }}
           cache: 'pip' # caching pip dependencies
+
+      - name: Install Latex
+        run: |
+          sudo apt-get install -y --no-install-recommends \
+            chktex \
+            fonts-recommended \
+            latexmk \
+            texlive-fonts-recommended \
+            texlive-lang-european \
+            texlive-latex-base \
+            texlive-latex-extra \
+            texlive-latex-recommended \
+            texlive-xetex
 
       - name: Install requirements-dev.txt
         run: pip install -r requirements-dev.txt

@@ -1,23 +1,22 @@
 import ipaddress
 import json
-from typing import Iterator, Union
-
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import KATFindingType, Finding
-from octopoes.models.ooi.network import (
-    IPPort,
-    Protocol,
-    PortState,
-    IPAddressV4,
-    IPAddressV6,
-    Network,
-)
-from octopoes.models.ooi.service import Service, IPService
+from typing import Iterable, Union
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.network import (
+    IPAddressV4,
+    IPAddressV6,
+    IPPort,
+    Network,
+    PortState,
+    Protocol,
+)
+from octopoes.models.ooi.service import IPService, Service
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
@@ -74,7 +73,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         ip_service_ooi = IPService(ip_port=ip_port_ooi.reference, service=service_ooi.reference)
         yield ip_service_ooi
 
-        kat_641_ooi = KATFindingType(id="KAT-641")
+        kat_641_ooi = KATFindingType(id="KAT-EXPOSED-SOFTWARE")
         yield kat_641_ooi
         yield Finding(
             finding_type=kat_641_ooi.reference,
@@ -83,7 +82,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         )
 
         if module == "bluekeep" and scan.get("result", {}).get("data", {}).get("status", "").lower() == "vulnerable":
-            kat_642_ooi = KATFindingType(id="KAT-642")
+            kat_642_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_642_ooi
             yield Finding(
                 finding_type=kat_642_ooi.reference,

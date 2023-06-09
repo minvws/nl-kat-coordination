@@ -1,22 +1,21 @@
 import ipaddress
 import json
-from typing import Iterator, Union
-
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import KATFindingType, Finding
-from octopoes.models.ooi.network import (
-    IPPort,
-    Protocol,
-    PortState,
-    IPAddressV4,
-    IPAddressV6,
-    Network,
-)
+from typing import Iterable, Union
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.network import (
+    IPAddressV4,
+    IPAddressV6,
+    IPPort,
+    Network,
+    PortState,
+    Protocol,
+)
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ = boefje_meta.arguments["input"]
@@ -67,7 +66,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
         vulns = scan.get("data", {}).get("vulnerabilities", {})
         if vulns.get("compression", {}).get("supports_compression"):
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -75,7 +74,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 description="SSL is set to support compression, but it is advised to disable this.",
             )
         if vulns.get("fallback", {}).get("supports_fallback_scsv"):
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -83,7 +82,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 description="SSL is set to support fallback scsv, but it is advised to disable this.",
             )
         if "heartbleed" in vulns and vulns["heartbleed"]["is_vulnerable_to_heartbleed"]:
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -92,7 +91,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 "the fix.",
             )
         if "openssl_ccs" in vulns and vulns["openssl_ccs"]["is_vulnerable_to_ccs_injection"]:
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -100,7 +99,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 description="It is verified this connection is vulnerable to the OpenSSL CSS Injection Vulnerability.",
             )
         if "renegotiation" in vulns and vulns["renegotiation"]["accepts_client_renegotiation"]:
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -108,7 +107,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
                 description="This SSL accepts client renegotiation, but i can be used in a DOS attack.",
             )
         if "renegotiation" in vulns and vulns["renegotiation"]["supports_secure_renegotiation"]:
-            kat_ooi = KATFindingType(id="KAT-642")
+            kat_ooi = KATFindingType(id="KAT-VERIFIED-VULNERABILITY")
             yield kat_ooi
             yield Finding(
                 finding_type=kat_ooi.reference,
@@ -117,16 +116,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
             )
         if "robot_result_enum" in vulns.get("robot", {}):
             robot = vulns["robot"]["robot_result_enum"]
-            if robot == "VULNERABLE_WEAK_ORACLE":
-                # FIXME: new KAT-Finding (low)?
-                pass  # The server is vulnerable but the attack would take too long
-            elif robot == "VULNERABLE_STRONG_ORACLE":
-                # FIXME: new KAT-Finding (high)?
-                pass  # The server is vulnerable and real attacks are feasible
-            elif robot == "NOT_VULNERABLE_NO_ORACLE":
-                pass  # The server supports RSA cipher suites but does not act as an oracle
-            elif robot == "NOT_VULNERABLE_RSA_NOT_SUPPORTED":
-                pass  # The server does not supports RSA cipher suites
-            elif robot == "UNKNOWN_INCONSISTENT_RESULTS":
-                # FIXME: KATFinding (low)?
-                pass  # Could not determine whether the server is vulnerable or not
+            if robot in (
+                "VULNERABLE_WEAK_ORACLE",  # the server is vulnerable but the attack would take too long
+                "VULNERABLE_STRONG_ORACLE",  # the server is vulnerable and real attacks are feasible
+                "NOT_VULNERABLE_NO_ORACLE",  # the server supports RSA cipher suites but does not act as an oracle
+                "NOT_VULNERABLE_RSA_NOT_SUPPORTED",  # the server does not supports RSA cipher suites
+                "UNKNOWN_INCONSISTENT_RESULTS",  # could not determine whether the server is vulnerable or not
+            ):
+                pass  # todo

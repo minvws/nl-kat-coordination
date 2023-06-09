@@ -15,7 +15,7 @@ from boefjes.clients.scheduler_client import (
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import get_local_repository
-from boefjes.local import LocalNormalizerJobRunner, LocalBoefjeJobRunner
+from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.runtime_interfaces import Handler, RuntimeManager
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class SchedulerRuntimeManager(RuntimeManager):
         logger.setLevel(log_level)
 
     def run(self, queue: RuntimeManager.Queue) -> None:
-        logger.info(f"Creating worker pool for queue '{queue.value}'")
+        logger.info("Creating worker pool for queue '%s'", queue.value)
         pool_size = self.settings.pool_size
 
         with Pool(processes=pool_size) as pool:
@@ -63,7 +63,7 @@ def start_working(
     Hence, it should catch most errors and give proper, granular feedback to the user.
     """
 
-    logger.info(f"Started worker process [pid={os.getpid()}]")
+    logger.info("Started worker process [pid=%d]", os.getpid())
 
     while True:
         try:
@@ -78,23 +78,27 @@ def start_working(
         # and queue ids contain the organisation_id
         queues = [q for q in queues if q.id.startswith(queue_to_handle.value)]
 
-        logger.debug(f"Found queues: {[queue.id for queue in queues]}")
+        logger.debug("Found queues: %s", [queue.id for queue in queues])
+
+        all_queues_empty = True
 
         for queue in queues:
-            logger.info(f"Popping from queue {queue.id}")
+            logger.debug("Popping from queue %s", queue.id)
 
             try:
                 p_item = scheduler_client.pop_item(queue.id)
             except (HTTPError, ValidationError):
-                logger.exception("Popping task from scheduler failed")
-                time.sleep(10 * settings.poll_interval)
+                logger.exception("Popping task from scheduler failed, sleeping 10 seconds")
+                time.sleep(10)
                 continue
 
             if not p_item:
-                logger.info(f"Queue {queue.id} empty")
+                logger.debug("Queue %s empty", queue.id)
                 continue
 
-            logger.info(f"Handling task[{p_item.data.id}]")
+            all_queues_empty = False
+
+            logger.info("Handling task[%s]", p_item.data.id)
             status = TaskStatus.FAILED
 
             try:
@@ -107,14 +111,16 @@ def start_working(
                 logger.exception("Exiting worker...")
                 return
             finally:
-                logger.info(f"Patching scheduler task task[{p_item.data.id}] to {status.value}")
+                logger.info("Patching scheduler task task[%s] to %s", p_item.data.id, status.value)
 
                 try:
                     scheduler_client.patch_task(str(p_item.id), status)
                 except HTTPError:
-                    logger.exception(f"Could not patch scheduler task to {status.value}")
+                    logger.exception("Could not patch scheduler task to %s", status.value)
 
-        time.sleep(settings.poll_interval)
+        if all_queues_empty:
+            logger.debug("All queues empty, sleeping %f seconds", settings.poll_interval)
+            time.sleep(settings.poll_interval)
 
 
 def get_runtime_manager(settings: Settings, queue: RuntimeManager.Queue, log_level: str) -> RuntimeManager:

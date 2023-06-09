@@ -16,6 +16,8 @@ from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
+from rocky.otel import OpenTelemetryHelper
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -46,9 +48,33 @@ KEIKO_API = os.getenv("KEIKO_API", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
-TWOFACTOR_ENABLED = os.getenv("TWOFACTOR_ENABLED") == "True"
 
-ALLOWED_HOSTS = ["*"]
+# Make sure this header can never be set by an attacker, see also the security
+# warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
+REMOTE_USER_HEADER = os.getenv("REMOTE_USER_HEADER")
+REMOTE_USER_FALLBACK = os.getenv("REMOTE_USER_FALLBACK", "False").casefold() != "false"
+
+if REMOTE_USER_HEADER:
+    AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.RemoteUserBackend",
+    ]
+    if REMOTE_USER_FALLBACK:
+        AUTHENTICATION_BACKENDS += [
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+
+
+# SECURITY WARNING: enable two factor authentication in production!
+TWOFACTOR_ENABLED = os.getenv("TWOFACTOR_ENABLED", "False" if REMOTE_USER_HEADER else "True").casefold() != "false"
+
+# A list of strings representing the host/domain names that this Django site can serve.
+# https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split()
+
+
+SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
+if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+    OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
 
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
@@ -84,7 +110,6 @@ INSTALLED_APPS = [
     "django_otp",
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
-    "markdownify.apps.MarkdownifyConfig",
     "two_factor",
     "account",
     "tools",
@@ -106,11 +131,22 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+]
+
+if REMOTE_USER_HEADER:
+    MIDDLEWARE += ["rocky.middleware.remote_user.RemoteUserMiddleware"]
+
+MIDDLEWARE += [
     "django_otp.middleware.OTPMiddleware",
+    "rocky.middleware.auth_required.AuthRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "rocky.middleware.onboarding.OnboardingMiddleware",
 ]
+
+if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+    MIDDLEWARE += ["rocky.middleware.otel.OTELInstrumentTemplateMiddleware"]
+
 
 ROOT_URLCONF = "rocky.urls"
 
@@ -126,6 +162,8 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "tools.context_processors.languages",
+                "tools.context_processors.organizations_including_blocked",
+                "tools.context_processors.rocky_version",
             ],
             "builtins": ["tools.templatetags.ooi_extra"],
         },
@@ -217,7 +255,7 @@ LANGUAGES = [
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "assets"),)
+STATICFILES_DIRS = (BASE_DIR / "assets",)
 
 LOGIN_URL = "two_factor:login"
 LOGIN_REDIRECT_URL = "crisis_room"
@@ -250,6 +288,24 @@ CSRF_COOKIE_SAMESITE = "Strict"
 # only allow http to read csrf cookies, not Javascript
 CSRF_COOKIE_HTTPONLY = True
 
+# A list of trusted origins for unsafe requests (e.g. POST)
+# https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
+CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
+
+# Configuration for Gitpod
+if GITPOD_WORKSPACE_URL := os.getenv("GITPOD_WORKSPACE_URL"):
+    # example environment variable: GITPOD_WORKSPACE_URL=https://minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io
+    # public url on https://8000-minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io/
+    ALLOWED_HOSTS.append("8000-" + GITPOD_WORKSPACE_URL.split("//")[1])
+    CSRF_TRUSTED_ORIGINS.append(GITPOD_WORKSPACE_URL.replace("//", "//8000-"))
+
+# Configuration for GitHub Codespaces
+if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"):
+    # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
+    # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
+    ALLOWED_HOSTS.append("." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
+    CSRF_TRUSTED_ORIGINS.append("https://*." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
+
 # Setup sane security defaults for application
 # Deny x-framing, which is standard since Django 3.0
 # There is no need to embed this in a frame anywhere, not desired.
@@ -274,47 +330,6 @@ CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
-
-# MarkDownify settings
-# see https://django-markdownify.readthedocs.io/en/latest/settings.html
-MARKDOWNIFY = {
-    "default": {
-        "WHITELIST_TAGS": [
-            "a",
-            "abbr",
-            "acronym",
-            "b",
-            "br",
-            "blockquote",
-            "em",
-            "h1",
-            "h2",
-            "h3",
-            "h4",
-            "h5",
-            "h6",
-            "i",
-            "li",
-            "ol",
-            "p",
-            "pre",
-            "strong",
-            "table",
-            "thead",
-            "tbody",
-            "th",
-            "tr",
-            "td",
-            "ul",
-        ],
-        "MARKDOWN_EXTENSIONS": [
-            "markdown.extensions.extra",
-        ],
-        "LINKIFY_TEXT": {
-            "PARSE_URLS": False,
-        },
-    }
-}
 
 DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
@@ -343,24 +358,24 @@ SERIALIZATION_MODULES = {
 TAGULOUS_SLUG_ALLOW_UNICODE = True
 
 TAG_COLORS = [
-    ("blue-light", _("Blue light")),
-    ("blue-medium", _("Blue medium")),
-    ("blue-dark", _("Blue dark")),
-    ("green-light", _("Green light")),
-    ("green-medium", _("Green medium")),
-    ("green-dark", _("Green dark")),
-    ("yellow-light", _("Yellow light")),
-    ("yellow-medium", _("Yellow medium")),
-    ("yellow-dark", _("Yellow dark")),
-    ("orange-light", _("Orange light")),
-    ("orange-medium", _("Orange medium")),
-    ("orange-dark", _("Orange dark")),
-    ("red-light", _("Red light")),
-    ("red-medium", _("Red medium")),
-    ("red-dark", _("Red dark")),
-    ("violet-light", _("Violet light")),
-    ("violet-medium", _("Violet medium")),
-    ("violet-dark", _("Violet dark")),
+    ("color-1-light", _("Blue light")),
+    ("color-1-medium", _("Blue medium")),
+    ("color-1-dark", _("Blue dark")),
+    ("color-2-light", _("Green light")),
+    ("color-2-medium", _("Green medium")),
+    ("color-2-dark", _("Green dark")),
+    ("color-3-light", _("Yellow light")),
+    ("color-3-medium", _("Yellow medium")),
+    ("color-3-dark", _("Yellow dark")),
+    ("color-4-light", _("Orange light")),
+    ("color-4-medium", _("Orange medium")),
+    ("color-4-dark", _("Orange dark")),
+    ("color-5-light", _("Red light")),
+    ("color-5-medium", _("Red medium")),
+    ("color-5-dark", _("Red dark")),
+    ("color-6-light", _("Violet light")),
+    ("color-6-medium", _("Violet medium")),
+    ("color-6-dark", _("Violet dark")),
 ]
 
 TAG_BORDER_TYPES = [

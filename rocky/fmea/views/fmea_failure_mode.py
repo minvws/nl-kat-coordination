@@ -1,21 +1,18 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from django.contrib import messages
-from django.urls.base import reverse_lazy, reverse
+from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
 
 from fmea.forms import FailureModeForm
 from fmea.models import FailureMode, FailureModeEffect
 from fmea.views.view_helpers import FailureModeBreadcrumbsMixin
 
 
-@class_view_decorator(otp_required)
 class FailureModeCreateView(FailureModeBreadcrumbsMixin, CreateView):
     """
     Create a new failure mode with the failure mode form of FMEA.
@@ -38,7 +35,7 @@ class FailureModeCreateView(FailureModeBreadcrumbsMixin, CreateView):
         return context
 
     def add_success_notification(self):
-        success_message = _("Failure mode succesfully created.")
+        success_message = _("Failure mode successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def build_breadcrumbs(self) -> List[Dict[str, str]]:
@@ -53,7 +50,6 @@ class FailureModeCreateView(FailureModeBreadcrumbsMixin, CreateView):
         return breadcrumbs
 
 
-@class_view_decorator(otp_required)
 class FailureModeListView(FailureModeBreadcrumbsMixin, ListView):
     """
     View of all failure modes.
@@ -64,7 +60,6 @@ class FailureModeListView(FailureModeBreadcrumbsMixin, ListView):
     paginate_by = 10
 
 
-@class_view_decorator(otp_required)
 class FailureModeUpdateView(FailureModeBreadcrumbsMixin, UpdateView):
     model = FailureMode
     form_class = FailureModeForm
@@ -101,7 +96,6 @@ class FailureModeUpdateView(FailureModeBreadcrumbsMixin, UpdateView):
         return context
 
 
-@class_view_decorator(otp_required)
 class FailureModeDetailView(FailureModeBreadcrumbsMixin, DetailView):
     """
     View for 1 failure mode. Get failure mode with ID # in URL

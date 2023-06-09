@@ -4,7 +4,7 @@ from typing import Optional
 
 from pydantic import BaseSettings
 
-from bytes.models import HashingAlgorithm, HashingRepositoryReference, EncryptionMiddleware
+from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
 BASE_DIR = Path(__file__).parent.parent
 
@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     log_cfg: Path = BASE_DIR / "dev.logging.conf"
 
     bytes_db_uri: str
-    bytes_data_dir: Optional[str]
+    bytes_data_dir: Path = Path("/data")
 
     bytes_log_file: str = "bytes.log"
     access_token_expire_minutes: float = 15.0
@@ -35,28 +35,22 @@ class Settings(BaseSettings):
     kat_private_key_b64: str = ""
     vws_public_key_b64: str = ""
 
+    span_export_grpc_endpoint: Optional[str]
+    bytes_metrics_ttl_seconds: int = 300
 
-@lru_cache()
+
+@lru_cache
 def get_settings() -> Settings:
     return Settings()
-
-
-def get_bytes_data_directory() -> Path:
-    settings = get_settings()
-
-    if settings.bytes_data_dir:
-        return Path(settings.bytes_data_dir)
-
-    return Path(BASE_DIR) / "bytes-data"
 
 
 def has_pastebin_key() -> bool:
     settings = get_settings()
 
-    return settings.pastebin_api_dev_key != ""
+    return bool(settings.pastebin_api_dev_key)
 
 
 def has_rfc3161_provider() -> bool:
     settings = get_settings()
 
-    return settings.rfc3161_provider != ""
+    return bool(settings.rfc3161_provider)

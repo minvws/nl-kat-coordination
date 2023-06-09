@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Union, Optional, Literal
+from typing import Literal, Optional, Union
 
 from pydantic.types import conint
 
@@ -163,6 +163,17 @@ ALL_OOI_TYPES = {
     MockResolvedHostname,
     MockDNSCNAMERecord,
 }
+
+MockOOIType = Union[
+    MockNetwork,
+    MockIPAddressV4,
+    MockIPAddressV6,
+    MockIPPort,
+    MockHostname,
+    MockDNSZone,
+    MockResolvedHostname,
+    MockDNSCNAMERecord,
+]
 
 for ooi_type in ALL_OOI_TYPES:
     ooi_type.update_forward_refs()

@@ -30,7 +30,7 @@ class SessionMixin:
 
     def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         if exc_type is not None:
-            logger.error("An error occured: %s. Rolling back session", exc_value, exc_info=True)
+            logger.error("An error occurred: %s. Rolling back session", exc_value, exc_info=True)
             self.session.rollback()
 
             return

@@ -1,33 +1,40 @@
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from logging import getLogger
-from typing import List, Optional, Callable, Set, Dict, Type
+from typing import Callable, Dict, List, Optional, Set, Type
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
+
+from octopoes.config.settings import Settings
 from octopoes.events.events import (
+    DBEvent,
     OOIDBEvent,
     OriginDBEvent,
     OriginParameterDBEvent,
     ScanProfileDBEvent,
-    DBEvent,
 )
 from octopoes.models import (
-    OOI,
-    Reference,
-    EmptyScanProfile,
-    DeclaredScanProfile,
-    InheritedScanProfile,
-    format_id_short,
-    ScanLevel,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    OOI,
+    DeclaredScanProfile,
+    EmptyScanProfile,
+    InheritedScanProfile,
+    Reference,
+    ScanLevel,
     ScanProfileType,
+    format_id_short,
 )
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.origin import Origin, OriginType, OriginParameter
+from octopoes.models.explanation import InheritanceSection
+from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
-from octopoes.models.path import get_max_scan_level_issuance, get_paths_to_neighours
+from octopoes.models.path import (
+    get_max_scan_level_inheritance,
+    get_max_scan_level_issuance,
+    get_paths_to_neighours,
+)
 from octopoes.models.tree import ReferenceTree
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
@@ -35,6 +42,7 @@ from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 logger = getLogger(__name__)
+settings = Settings()
 
 
 def find_relation_in_tree(relation: str, tree: ReferenceTree) -> List[OOI]:
@@ -108,7 +116,6 @@ class OctopoesService:
             self.ooi_repository.delete(reference, valid_time)
 
     def save_origin(self, origin: Origin, oois: List[OOI], valid_time: datetime) -> None:
-
         origin.result = [ooi.reference for ooi in oois]
 
         if origin.origin_type != OriginType.DECLARATION and origin.source not in origin.result:
@@ -121,20 +128,42 @@ class OctopoesService:
             self.ooi_repository.save(ooi, valid_time=valid_time)
         self.origin_repository.save(origin, valid_time=valid_time)
 
-    def _run_inference(self, origin: Origin, valid_time: datetime):
-
+    def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
         bit_definition = get_bit_definitions()[origin.method]
+        is_disabled = bit_definition.id in settings.bits_disabled or (
+            not bit_definition.default_enabled and bit_definition.id not in settings.bits_enabled
+        )
+
+        if is_disabled:
+            self.save_origin(origin, [], valid_time)
+            return
+
+        try:
+            level = self.scan_profile_repository.get(origin.source, valid_time).level
+        except ObjectNotFoundException:
+            level = 0
+
+        if level < bit_definition.min_scan_level:
+            self.save_origin(origin, [], valid_time)
+            return
 
         source = self.ooi_repository.get(origin.source, valid_time)
 
-        parameters_references = self.origin_parameter_repository.list_by_origin(origin.id, valid_time)
+        parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
         parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
+        config = {}
+        if bit_definition.config_ooi_relation_path is not None:
+            configs = self.ooi_repository.get_bit_configs(source, bit_definition, valid_time)
+            if len(configs) != 0:
+                config = configs[-1].config
+
         try:
-            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()))
+            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
             return
+
         self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
@@ -142,7 +171,6 @@ class OctopoesService:
         return path_level is not None and path_level >= current_level
 
     def recalculate_scan_profiles(self, valid_time: datetime) -> None:
-
         # fetch all scan profiles
         all_scan_profiles = self.scan_profile_repository.list(None, valid_time=valid_time)
 
@@ -163,7 +191,6 @@ class OctopoesService:
         }
 
         for current_level in range(4, 0, -1):
-
             # start point: all scan profiles with current level + all higher scan levels
             start_ooi_references = {
                 profile.reference for profile in all_declared_scan_profiles if profile.level == current_level
@@ -171,7 +198,6 @@ class OctopoesService:
             next_ooi_set = {ooi for ooi in self.ooi_repository.get_bulk(start_ooi_references, valid_time).values()}
 
             while next_ooi_set:
-
                 # prepare next iteration, group oois per type
                 ooi_types = {ooi.__class__ for ooi in next_ooi_set}
                 grouped_per_type: Dict[Type[OOI], Set[OOI]] = {
@@ -179,8 +205,7 @@ class OctopoesService:
                 }
 
                 temp_next_ooi_set = set()
-                for ooi_type_ in grouped_per_type.keys():
-
+                for ooi_type_ in grouped_per_type:
                     current_ooi_set = grouped_per_type[ooi_type_]
 
                     # find paths to neighbours higher or equal than current processing level
@@ -250,7 +275,7 @@ class OctopoesService:
         for reference in references_to_reset:
             old_scan_profile = inherited_scan_profiles[reference]
             self.scan_profile_repository.save(old_scan_profile, EmptyScanProfile(reference=reference), valid_time)
-        logger.info("Resetted scan profiles [len=%i]", len(references_to_reset))
+        logger.info("Reset scan profiles [len=%i]", len(references_to_reset))
 
         # Assign empty scan profiles to OOI's without scan profile
         unset_scan_profile_references = (
@@ -266,7 +291,6 @@ class OctopoesService:
         )
 
     def process_event(self, event: DBEvent):
-
         # handle event
         event_handler_name = f"_on_{event.operation_type.value}_{event.entity_type}"
         handler: Optional[Callable[[DBEvent], None]] = getattr(self, event_handler_name)
@@ -283,13 +307,21 @@ class OctopoesService:
     def _on_create_ooi(self, event: OOIDBEvent) -> None:
         ooi = event.new_data
 
+        # keep old scan profile, or create new scan profile
+        try:
+            self.scan_profile_repository.get(ooi.reference, event.valid_time)
+        except ObjectNotFoundException:
+            self.scan_profile_repository.save(
+                None,
+                EmptyScanProfile(reference=ooi.reference),
+                valid_time=event.valid_time,
+            )
+
         # analyze bit definitions
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
-
             # attach bit instances
             if isinstance(ooi, bit_definition.consumes):
-
                 bit_instance = Origin(
                     origin_type=OriginType.INFERENCE,
                     method=bit_id,
@@ -300,7 +332,6 @@ class OctopoesService:
             # attach bit parameters
             for additional_param in bit_definition.parameters:
                 if isinstance(ooi, additional_param.ooi_type):
-
                     path_parts = additional_param.relation_path.split(".")
                     try:
                         tree = self.ooi_repository.get_tree(
@@ -324,10 +355,18 @@ class OctopoesService:
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
-        ...
+        inference_origins = self.origin_repository.list_by_source(event.new_data.reference, valid_time=event.valid_time)
+        inference_params = self.origin_parameter_repository.list_by_reference(
+            event.new_data.reference, valid_time=event.valid_time
+        )
+        for inference_param in inference_params:
+            inference_origins.append(self.origin_repository.get(inference_param.origin_id, event.valid_time))
+
+        inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
+        for inference_origin in inference_origins:
+            self._run_inference(inference_origin, event.valid_time)
 
     def _on_delete_ooi(self, event: OOIDBEvent) -> None:
-
         reference = event.old_data.reference
 
         # delete related origins to which it is a source
@@ -382,17 +421,97 @@ class OctopoesService:
         except ObjectNotFoundException:
             return
 
+    def _run_inferences(self, event: ScanProfileDBEvent) -> None:
+        inference_origins = self.origin_repository.list_by_source(event.reference, valid_time=event.valid_time)
+        inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
+        for inference_origin in inference_origins:
+            self._run_inference(inference_origin, event.valid_time)
+
     # Scan profile events
     def _on_create_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
     def _on_update_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
     def _on_delete_scan_profile(self, event: ScanProfileDBEvent) -> None:
-        ...
+        self._run_inferences(event)
 
-    def list_random_ooi(self, amount: int, valid_time: datetime) -> List[OOI]:
-        oois = self.ooi_repository.list_random(amount, valid_time)
+    def list_random_ooi(
+        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> List[OOI]:
+        oois = self.ooi_repository.list_random(valid_time, amount, scan_levels)
         self._populate_scan_profiles(oois, valid_time)
         return oois
+
+    def get_scan_profile_inheritance(
+        self, reference: Reference, valid_time: datetime, inheritance_chain: List[InheritanceSection]
+    ) -> List[InheritanceSection]:
+        neighbour_cache = self.ooi_repository.get_neighbours(reference, valid_time)
+
+        last_inheritance_level = inheritance_chain[-1].level
+        visited = {inheritance.reference for inheritance in inheritance_chain}
+
+        # load scan profiles for all neighbours
+        neighbours_: List[OOI] = [
+            neighbour
+            for neighbours in neighbour_cache.values()
+            for neighbour in neighbours
+            if neighbour.reference not in visited
+        ]
+        self._populate_scan_profiles(neighbours_, valid_time)
+
+        # collect all inheritances
+        inheritances = []
+        for path, neighbours in neighbour_cache.items():
+            segment = path.segments[0]
+            for neighbour in neighbours:
+                segment_inheritance = get_max_scan_level_inheritance(segment)
+                if (
+                    segment_inheritance is None
+                    or neighbour.reference in visited
+                    or neighbour.scan_profile.level < last_inheritance_level
+                ):
+                    continue
+
+                inherited_level = min(get_max_scan_level_inheritance(segment), neighbour.scan_profile.level)
+                inheritances.append(
+                    InheritanceSection(
+                        segment=str(segment),
+                        reference=neighbour.reference,
+                        level=inherited_level,
+                        scan_profile_type=neighbour.scan_profile.scan_profile_type,
+                    )
+                )
+
+        # sort per ooi, per level, ascending
+        inheritances.sort(key=lambda x: x.level)
+
+        # if any declared, return highest straight away
+        declared_inheritances = [
+            inheritance for inheritance in inheritances if inheritance.scan_profile_type == ScanProfileType.DECLARED
+        ]
+        if declared_inheritances:
+            return inheritance_chain + [declared_inheritances[-1]]
+
+        # group by ooi, as the list is already sorted, it will contain the highest inheritance
+        highest_inheritance_per_neighbour = {
+            inheritance.reference: inheritance for inheritance in reversed(inheritances)
+        }
+
+        # traverse depth-first, highest levels first
+        for inheritance in sorted(highest_inheritance_per_neighbour.values(), key=lambda x: x.level, reverse=True):
+            expl = self.get_scan_profile_inheritance(
+                inheritance.reference, valid_time, inheritance_chain + [inheritance]
+            )
+            if expl[-1].scan_profile_type == ScanProfileType.DECLARED:
+                return expl
+
+        return inheritance_chain
+
+    def recalculate_bits(self) -> int:
+        valid_time = datetime.now(timezone.utc)
+        origins = self.origin_repository.list(origin_type=OriginType.INFERENCE, valid_time=valid_time)
+        for origin in origins:
+            self._run_inference(origin, valid_time)
+        return len(origins)

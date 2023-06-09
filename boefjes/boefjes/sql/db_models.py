@@ -1,16 +1,15 @@
 from sqlalchemy import (
+    Boolean,
     Column,
-    String,
     ForeignKey,
     Integer,
-    UniqueConstraint,
+    String,
     Table,
-    Boolean,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
 from boefjes.sql.db import SQL_BASE
-
 
 organisation_repo_association_table = Table(
     "organisation_repository",
@@ -39,20 +38,18 @@ class RepositoryInDB(SQL_BASE):
     base_url = Column(String(length=128), nullable=False)
 
 
-class SettingInDB(SQL_BASE):
-    __tablename__ = "setting"
+class SettingsInDB(SQL_BASE):
+    __tablename__ = "settings"
     __table_args__ = (
         UniqueConstraint(
-            "key",
             "organisation_pk",
             "plugin_id",
-            name="unique_keys_per_organisation_per_plugin",
+            name="unique_settings_per_organisation_per_plugin",
         ),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    key = Column(String(length=128), nullable=False)
-    value = Column(String(length=128), nullable=False)
+    values = Column(String(length=512), nullable=False)
     plugin_id = Column(String(length=64), nullable=False)
     organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
 

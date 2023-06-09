@@ -1,12 +1,36 @@
-from typing import Optional, Literal
+from enum import Enum
+from typing import Literal, Optional
+
+from pydantic import AnyUrl
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
 
 
-# todo: make abstract
+class RiskLevelSeverity(Enum):
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+    RECOMMENDATION = "recommendation"
+
+    # pending = KAT still has to run the boefje to determine the risk level
+    PENDING = "pending"
+
+    # unknown = the third party has been contacted, but third party has not determined the risk level (yet)
+    UNKNOWN = "unknown"
+
+
 class FindingType(OOI):
     id: str
+
+    description: Optional[str]
+    source: Optional[AnyUrl]
+    impact: Optional[str]
+    recommendation: Optional[str]
+
+    risk_score: Optional[float]
+    risk_severity: Optional[RiskLevelSeverity]
 
     _natural_key_attrs = ["id"]
     _information_value = ["id"]
@@ -15,6 +39,10 @@ class FindingType(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return reference.tokenized.id
+
+
+class ADRFindingType(FindingType):
+    object_type: Literal["ADRFindingType"] = "ADRFindingType"
 
 
 class CVEFindingType(FindingType):
@@ -62,3 +90,17 @@ class Finding(OOI):
         finding_type = parts.pop()
         ooi_reference = Reference.from_str("|".join(parts))
         return f"{finding_type} @ {ooi_reference.human_readable}"
+
+
+class MutedFinding(OOI):
+    object_type: Literal["MutedFinding"] = "MutedFinding"
+
+    finding: Reference = ReferenceField(Finding)
+    reason: Optional[str]
+
+    _natural_key_attrs = ["finding"]
+    _reverse_relation_names = {"finding": "mutes"}
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"Muted {reference.natural_key}"

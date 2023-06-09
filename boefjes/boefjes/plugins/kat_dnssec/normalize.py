@@ -1,13 +1,12 @@
 import json
-from typing import Union, Iterator
-
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from typing import Iterable, Union
 
 from boefjes.job_models import NormalizerMeta
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     result = json.loads(raw)
 
     boefje_meta = normalizer_meta.raw_data.boefje_meta
@@ -22,7 +21,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     ]
 
     if "No trusted keys found in tree" in result and "No DNSSEC public key(s)" in result:
-        ft = KATFindingType(id="KAT-600")
+        ft = KATFindingType(id="KAT-NO-DNSSEC")
         finding = Finding(
             finding_type=ft.reference,
             ooi=ooi_ref,
@@ -32,7 +31,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         yield finding
 
     if "No trusted keys found in tree" in result and [error for error in possible_errors if error in result]:
-        ft = KATFindingType(id="KAT-601")
+        ft = KATFindingType(id="KAT-INVALID-DNSSEC")
         finding = Finding(
             finding_type=ft.reference,
             ooi=ooi_ref,

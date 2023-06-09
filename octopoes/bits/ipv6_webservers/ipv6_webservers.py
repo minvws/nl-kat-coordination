@@ -1,16 +1,14 @@
-from typing import List, Iterator, Union
+from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import KATFindingType, Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def run(
-    hostname: Hostname,
-    additional_oois: List[Union[DNSAAAARecord, DNSARecord, DNSNSRecord]],
+    hostname: Hostname, additional_oois: List[Union[DNSAAAARecord, DNSARecord, DNSNSRecord]], config: Dict[str, str]
 ) -> Iterator[OOI]:
-
     dns_a_records = [dns_a_record for dns_a_record in additional_oois if isinstance(dns_a_record, DNSARecord)]
     dns_aaaa_records = [
         dns_aaaa_record for dns_aaaa_record in additional_oois if isinstance(dns_aaaa_record, DNSAAAARecord)
@@ -20,7 +18,7 @@ def run(
     is_nameserver = bool(dns_ns_records)
 
     if dns_a_records and not dns_aaaa_records and not is_nameserver:
-        finding_type = KATFindingType(id="KAT-581")
+        finding_type = KATFindingType(id="KAT-WEBSERVER-NO-IPV6")
         yield finding_type
         yield Finding(
             finding_type=finding_type.reference,

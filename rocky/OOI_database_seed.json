@@ -221,11 +221,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-500",
+    "pk": "KATFindingType|KAT-NO-HSTS",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "The website does not use HTTP Strict Transport Security (HSTS). Via HSTS the browser is configured to only connect via a proper secured HTTPS connection to the website.",
+        "description": "The website does not use HTTP Strict Transport Security (HSTS). HSTS tells the browser to connect via a proper secured HTTPS connection to the website.",
         "impact": "When a browser uses the HTTP protocol, the network connection is not encrypted, so computers in the chain between the web server and the browser can read the data traffic. This makes data and identity theft possible, as well as manipulating data traffic, allowing for all kinds of fraud scenarios. With HSTS, only HTTPS traffic to the website is accepted by the browser.",
         "recommendation": "Set the Strict-Transport-Security HTTP header in all HTTP answers.",
         "source": "https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security",
@@ -236,7 +236,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-501",
+    "pk": "KATFindingType|KAT-NO-CSP",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -251,7 +251,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-502",
+    "pk": "KATFindingType|KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -266,7 +266,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-503",
+    "pk": "KATFindingType|KAT-NO-EXPLICIT-XSS-PROTECTION",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -281,7 +281,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-504",
+    "pk": "KATFindingType|KAT-NO-X-FRAME-OPTIONS",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -296,12 +296,13 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-505",
+    "pk": "KATFindingType|KAT-NO-X-DNS-PREFETCH-CONTROL",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "The HTTP header X-DNS-Prefetch-Control is missing.",
+        "description": "The HTTP header X-DNS-Prefetch-Control is missing. The X-DNS-Prefetch-Control HTTP response header controls DNS prefetching, a feature by which browsers proactively perform domain name resolution on both links that the user may choose to follow as well as URLs for items referenced by the document.",
         "recommendation": "Set HTTP header X-DNS-Prefetch-Control: off in all HTTP answers.",
+        "source": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control",
         "risk": "Very low"
       },
       "consult_api": false
@@ -309,7 +310,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-506",
+    "pk": "KATFindingType|KAT-NO-EXCPECT-CT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -324,7 +325,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-507",
+    "pk": "KATFindingType|KAT-NO-PERMISSIONS-POLICY",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -338,12 +339,12 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-508",
+    "pk": "KATFindingType|KAT-NO-REFERRER-POLICY",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
         "description": "The HTTP header Referrer-Policy is missing in HTTP responses.",
-        "impact": "When a website visitor clicks on a link to another website, the user's browser sends through the Referer HTTP header (a part of the URL) to the other website. The website that is linked to will know which website (and webpage, if HTTP was used) the visitor came from. This is a privacy leak for the website visitor. In some cases, sensitive information such as session tokens may leak to websites that are linked to.",
+        "impact": "When a website visitor clicks on a link to another website, the browser sends the Referer HTTP header (a part of the URL) to the other website. This is a privacy leak for the website visitor. In some cases, sensitive information such as session tokens may leak to websites that are linked to.",
         "recommendation": "Set the header Referrer-Policy: no- referrer in every HTTP answer.",
         "source": "https://scotthelme.co.uk/a-new-security-header-referrer-policy/",
         "risk": "Very low"
@@ -353,7 +354,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-509",
+    "pk": "KATFindingType|KAT-NO-X-CONTENT-TYPE-OPTIONS",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -368,7 +369,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-540",
+    "pk": "KATFindingType|KAT-SSL-2-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -381,7 +382,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-541",
+    "pk": "KATFindingType|KAT-SSL-3-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -394,7 +395,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-542",
+    "pk": "KATFindingType|KAT-TLS-1.0-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -407,7 +408,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-543",
+    "pk": "KATFindingType|KAT-TLS-1.1-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -420,7 +421,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-544",
+    "pk": "KATFindingType|KAT-TLS-1.0-AND-1.1-SUPPORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -433,7 +434,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-545",
+    "pk": "KATFindingType|KAT-NO-TLS-1.2",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -446,7 +447,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-546",
+    "pk": "KATFindingType|KAT-NO-TLS-1.3",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -459,12 +460,13 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-547",
+    "pk": "KATFindingType|KAT-NO-TLS-FALLBACK-SCSV",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
         "description": "The encrypted connection provides no protection against downgrade attacks.",
         "recommendation": "Implement TLS_FALLBACK_SCSV.",
+        "source": "https://www.rfc-editor.org/rfc/rfc7507",
         "risk": "Low"
       },
       "consult_api": false
@@ -472,7 +474,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-560",
+    "pk": "KATFindingType|KAT-OPEN-SYSADMIN-PORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -485,7 +487,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-561",
+    "pk": "KATFindingType|KAT-OPEN-DATABASE-PORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -498,7 +500,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-562",
+    "pk": "KATFindingType|KAT-UNCOMMON-OPEN-PORT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -511,7 +513,20 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-581",
+    "pk": "KATFindingType|KAT-OPEN-COMMON-PORT",
+    "fields": {
+      "last_updated": "2021-08-09T14:50:09.835Z",
+      "data": {
+        "description": "A port commonly used was found to be open.",
+        "recommendation": "Manually validate whether this open port should be open.",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-WEBSERVER-NO-IPV6",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -524,11 +539,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-580",
+    "pk": "KATFindingType|KAT-NAMESERVER-IPV6-NOT-REACHABLE",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if all name servers, that have an AAAA record with IPv6 address, are reachable over IPv6. One or more name servers is not reachable on an IPv6 address.",
+        "description": "One or more name servers is not reachable on an IPv6 address.",
         "recommendation": "Check IPv6 addresses for all name servers.",
         "risk": "Low"
       },
@@ -537,11 +552,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-582",
+    "pk": "KATFindingType|KAT-WEBSERVER-IPV6-NOT-REACHABLE",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if all web servers, that have an AAAA record with IPv6 address, are reachable over IPv6. In this case the web server(s) is/are not reachable via IPv6.",
+        "description": "OpenKAT checks if all web server that have an AAAA record with IPv6 address are reachable over IPv6. In this case the web server(s) is/are not reachable via IPv6.",
         "recommendation": "Configure IPv6 addresses for the web servers",
         "risk": "Low"
       },
@@ -550,11 +565,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-583",
+    "pk": "KATFindingType|KAT-NOT-ENOUGH-IPV6-NAMESERVERS",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if we can connect to your name server(s) over IPv6 on any available ports (80 and/or 443). We test all IPv6 addresses that we receive from your name servers. For this website there are not enough name servers accessible via IPv6.",
+        "description": "OpenKAT tests all IPv6 addresses received from your name servers. For this website there are not enough name servers accessible via IPv6.",
         "recommendation": "Add an IPv6 address for at least two name servers that have no IPv6 address yet.",
         "risk": "Middle"
       },
@@ -563,11 +578,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-584",
+    "pk": "KATFindingType|KAT-WEBSERVER-NO-IPV6",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if there is at least one AAAA record with IPv6 address for your web server. For this website there is no web server with an IPv6 address available.",
+        "description": "For this website there is no web server with an IPv6 address available.",
         "recommendation": "Add an IPv6 address for at least one web server that has no IPv6 address yet.",
         "risk": "Low"
       },
@@ -576,11 +591,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-585",
+    "pk": "KATFindingType|KAT-IPV4-IPV6-INCONSISTENT",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We compare the web content that we receive from the web server over both IPv6 and IPv4 on any available ports (80 and/or 443). In case there are multiple IPv6 and IPv4 addresses, we pick one IPv6 address and one IPv4 address. If the content difference is not higher than 10%, we expect the main web content to be the same. In this case the websites hosted on IPv4 and IPv6 for the given hostname are not the same.",
+        "description": "The websites hosted on IPv4 and IPv6 for the given hostname are not the same.",
         "recommendation": "Make sure both IPv6 and IPv4 addresses point to the same web content.",
         "risk": "Low"
       },
@@ -589,11 +604,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-600",
+    "pk": "KATFindingType|KAT-NO-DNSSEC",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is not DNSSEC signed.",
+        "description": "The provided domain is not DNSSEC signed.",
         "recommendation": "Enable DNSSEC on your name servers.",
         "risk": "Middle"
       },
@@ -602,11 +617,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-601",
+    "pk": "KATFindingType|KAT-INVALID-DNSSEC",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
-        "description": "We check if your domain, more specifically its SOA record, is DNSSEC signed. The provided domain is DNSSEC signed, but the DNSSEC is invalid.",
+        "description": "The provided domain is DNSSEC signed, but the DNSSEC config is invalid.",
         "recommendation": "Reconfigure DNSSEC on your name servers.",
         "risk": "Middle"
       },
@@ -615,7 +630,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-606",
+    "pk": "KATFindingType|KAT-HSTS-VULNERABILITIES",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -627,7 +642,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-607",
+    "pk": "KATFindingType|KAT-CSP-VULNERABILITIES",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -639,7 +654,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-621",
+    "pk": "KATFindingType|KAT-JAVASCRIPT-VULNERABILITIES",
     "fields": {
       "last_updated": "2021-08-09T14:50:09.835Z",
       "data": {
@@ -651,12 +666,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-640",
+    "pk": "KATFindingType|KAT-POTENTIAL-MALWARE",
     "fields": {
       "last_updated": "2021-09-29T14:46:09.835Z",
       "data": {
         "description": "This software is known to be used as malware.",
-        "recommendation": "You probably want to remove this software.",
         "risk": "High"
       },
       "consult_api": false
@@ -664,12 +678,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-641",
+    "pk": "KATFindingType|KAT-EXPOSED-SOFTWARE",
     "fields": {
       "last_updated": "2021-09-29T16:46:09.835Z",
       "data": {
         "description": "This software should not be exposed to the Internet.",
-        "recommendation": "You probably want to this port to be closed.",
         "risk": "Critical"
       },
       "consult_api": false
@@ -677,12 +690,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-642",
+    "pk": "KATFindingType|KAT-VERIFIED-VULNERABILITY",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
         "description": "A verified vulnerability is found.",
-        "recommendation": "You want to investigate this: maybe you could close this port or patch/remove the software.",
         "risk": "Critical"
       },
       "consult_api": false
@@ -690,11 +702,12 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-611",
+    "pk": "KATFindingType|KAT-INVALID-SPF-SYNTAX",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
         "description": "SPF record does not have valid syntax.",
+        "source": "http://www.open-spf.org/SPF_Record_Syntax/",
         "risk": "High"
       },
       "consult_api": false
@@ -714,7 +727,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-613",
+    "pk": "KATFindingType|KAT-SPF-TOO-LONG",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -726,7 +739,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-614",
+    "pk": "KATFindingType|KAT-INVALID-IP-IN-SPF",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -738,7 +751,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-615",
+    "pk": "KATFindingType|KAT-SPF-REDIRECT-LOOP",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -774,7 +787,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-618",
+    "pk": "KATFindingType|KAT-SPF-INCLUDE-LOOP",
     "fields": {
       "last_updated": "2021-09-29T17:24:09.835Z",
       "data": {
@@ -798,7 +811,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-643",
+    "pk": "KATFindingType|KAT-DICOM-EXPOSED",
     "fields": {
       "last_updated": "2021-11-12T17:24:09.835Z",
       "data": {
@@ -811,7 +824,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-644",
+    "pk": "KATFindingType|KAT-10-OR-MORE-NEW-PORTS-OPEN",
     "fields": {
       "last_updated": "2021-11-12T17:24:09.835Z",
       "data": {
@@ -923,7 +936,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-645",
+    "pk": "KATFindingType|KAT-LEAKIX-CRITICAL",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -936,7 +949,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-646",
+    "pk": "KATFindingType|KAT-LEAKIX-HIGH",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -949,7 +962,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-647",
+    "pk": "KATFindingType|KAT-LEAKIX-MEDIUM",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -962,7 +975,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-648",
+    "pk": "KATFindingType|KAT-LEAKIX-LOW",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -975,7 +988,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-649",
+    "pk": "KATFindingType|KAT-LEAKIX-RECOMMENDATION",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -988,12 +1001,11 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-654",
+    "pk": "KATFindingType|KAT-SOFTWARE-UPDATE-AVAILABLE",
     "fields": {
       "last_updated": "2022-01-27T09:01:09.835Z",
       "data": {
         "description": "There is a newer version for this software.",
-        "recommendation": "Update your software to the newest version.",
         "risk": "Recommendation"
       },
       "consult_api": false
@@ -1001,7 +1013,7 @@
   },
   {
     "model": "tools.ooiinformation",
-    "pk": "KATFindingType|KAT-660",
+    "pk": "KATFindingType|KAT-NO-GREEN-HOSTING",
     "fields": {
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
@@ -1030,7 +1042,7 @@
       "last_updated": "2021-12-07T17:24:09.835Z",
       "data": {
         "description": "The hostname in this header does not exist.",
-        "recommendation": "Check if the hostname in the header is correct, update the header as quickly as possible.",
+        "recommendation": "Check if the hostname in the header is correct and update accordingly.",
         "risk": "Critical"
       },
       "consult_api": false
@@ -1093,6 +1105,19 @@
         "description": "The common name of the certificate does not match the netloc of the website",
         "recommendation": "Check if other names on the certificate do match (alternative names)",
         "risk": "High"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|KAT-NO-HTTPS-REDIRECT",
+    "fields": {
+      "last_updated": "2021-12-07T17:24:09.835Z",
+      "data": {
+        "description": "This HTTP URL may not redirect to HTTPS; 'location' was not found in HTTPHeader.",
+        "recommendation": "Check if redirection is setup properly.",
+        "risk": "Low"
       },
       "consult_api": false
     }
@@ -1170,6 +1195,116 @@
       "data": {
         "description": "This SPF record could not be parsed by the internet.nl SPF parser and is therefore deemed invalid.",
         "risk": "Low"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-NONSTANDARD-HTTP",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Only apply standard HTTP methods",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-NO-OPENAPI",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Use OpenAPI Specification for documentation",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-NO-MAJOR-VERSION-IN-URI",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Include the major version number in the URI",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-TRAILING-SLASHES",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Leave off trailing slashes from URIs",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-NO-OAS-JSON-STANDARD",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Publish OAS document at a standard location in JSON-format",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-NO-SEMANTIC-VERSIONING",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Adhere to the Semantic Versioning model when releasing API changes",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "ADRFindingType|API-NO-COMPLETE-VERSION-RESPONSE",
+    "fields": {
+      "last_updated": "2023-02-09T15:42:42.000Z",
+      "data": {
+        "description": "Return the full version number in a response header",
+        "risk": "Recommendation"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|SUB-DOMAIN-TAKEOVER",
+    "fields": {
+      "last_updated": "2023-04-05T15:42:42.000Z",
+      "data": {
+        "description": "Subdomain takeover is when an attacker takes control of an unused or improperly configured subdomain, potentially accessing sensitive information or conducting phishing attacks.",
+        "recommendation": "To prevent subdomain takeover, organizations should regularly monitor their DNS records to identify and remove any unused subdomains. Additionally, they should ensure that all subdomains are properly configured and point to valid services.",
+        "risk": "High"
+      },
+      "consult_api": false
+    }
+  },
+  {
+    "model": "tools.ooiinformation",
+    "pk": "KATFindingType|EXPOSED-PANELS",
+    "fields": {
+      "last_updated": "2023-04-05T15:42:42.000Z",
+      "data": {
+        "description": "Exposed login panels for services can pose security risks as they can be targeted by malicious actors for brute-force attacks, phishing attempts, and other forms of unauthorized access.",
+        "recommendation": "Ideally to minimize the attack surface as much as possible these panels should not be directly exposed to the internet",
+        "risk": "Recommendation"
       },
       "consult_api": false
     }

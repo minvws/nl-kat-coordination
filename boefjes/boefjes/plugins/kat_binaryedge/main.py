@@ -1,7 +1,7 @@
 import json
 import math
 from os import getenv
-from typing import Tuple, Union, Dict, List
+from typing import Dict, List, Tuple, Union
 
 from pybinaryedge import BinaryEdge
 
@@ -9,7 +9,6 @@ from boefjes.job_models import BoefjeMeta
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
-
     be = BinaryEdge(getenv("BINARYEDGE_API"))
     results: Dict[str, List] = {"results": []}
 

@@ -1,68 +1,74 @@
 from __future__ import annotations
 
-from typing import Type, Dict, Set, Iterator, Union
+from typing import Dict, Iterator, Set, Type, Union
 
 from pydantic.fields import ModelField
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
-    X509Certificate,
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
     SubjectAlternativeNameQualifier,
+    X509Certificate,
 )
+from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.dns.records import (
-    DNSARecord,
+    NXDOMAIN,
     DNSAAAARecord,
+    DNSARecord,
+    DNSCNAMERecord,
     DNSMXRecord,
-    DNSTXTRecord,
     DNSNSRecord,
     DNSSOARecord,
-    DNSCNAMERecord,
-    NXDOMAIN,
+    DNSTXTRecord,
 )
+from octopoes.models.ooi.dns.zone import DNSZone, Hostname, ResolvedHostname
 from octopoes.models.ooi.email_security import (
-    DNSSPFMechanismIP,
-    DNSSPFMechanismHostname,
-    DNSSPFMechanismNetBlock,
-    DNSSPFRecord,
-    DMARCTXTRecord,
     DKIMExists,
     DKIMKey,
     DKIMSelector,
+    DMARCTXTRecord,
+    DNSSPFMechanismHostname,
+    DNSSPFMechanismIP,
+    DNSSPFMechanismNetBlock,
+    DNSSPFRecord,
 )
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone, ResolvedHostname
 from octopoes.models.ooi.findings import (
-    Finding,
-    KATFindingType,
+    ADRFindingType,
+    CAPECFindingType,
     CVEFindingType,
     CWEFindingType,
+    Finding,
+    KATFindingType,
+    MutedFinding,
     RetireJSFindingType,
     SnykFindingType,
-    CAPECFindingType,
 )
-from octopoes.models.ooi.monitoring import Incident, Application
+from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
-    Network,
+    AutonomousSystem,
     IPAddressV4,
     IPAddressV6,
     IPPort,
-    AutonomousSystem,
     IPV4NetBlock,
     IPV6NetBlock,
+    Network,
 )
-from octopoes.models.ooi.service import Service, IPService
+from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
-    Website,
-    HostnameHTTPURL,
-    IPAddressHTTPURL,
-    HTTPResource,
-    HTTPHeader,
+    RESTAPI,
     URL,
-    HTTPHeaderURL,
+    APIDesignRule,
+    APIDesignRuleResult,
+    HostnameHTTPURL,
+    HTTPHeader,
     HTTPHeaderHostname,
+    HTTPHeaderURL,
+    HTTPResource,
     ImageMetadata,
+    IPAddressHTTPURL,
+    Website,
 )
 
 CertificateType = Union[
@@ -83,8 +89,8 @@ DnsRecordType = Union[
     ResolvedHostname,
     NXDOMAIN,
 ]
-FindingType = Union[
-    Finding,
+FindingTypeType = Union[
+    ADRFindingType,
     KATFindingType,
     CVEFindingType,
     RetireJSFindingType,
@@ -113,6 +119,9 @@ WebType = Union[
     HTTPHeaderURL,
     HTTPHeaderHostname,
     ImageMetadata,
+    RESTAPI,
+    APIDesignRule,
+    APIDesignRuleResult,
 ]
 EmailSecurityType = Union[
     DNSSPFRecord,
@@ -125,12 +134,12 @@ EmailSecurityType = Union[
     DKIMKey,
 ]
 MonitoringType = Union[Application, Incident]
+ConfigType = Union[Config]
 
 OOIType = Union[
     CertificateType,
     DnsType,
     DnsRecordType,
-    FindingType,
     NetworkType,
     ServiceType,
     SoftwareType,
@@ -141,24 +150,29 @@ OOIType = Union[
     DNSSPFRecord,
     MonitoringType,
     EmailSecurityType,
+    Finding,
+    MutedFinding,
+    FindingTypeType,
+    ConfigType,
 ]
 
 
 def get_all_types(cls_: Type[OOI]) -> Iterator[Type[OOI]]:
     yield cls_
-    for subcls in cls_.__subclasses__():
-        yield from get_all_types(subcls)
+
+    for subclass in cls_.strict_subclasses():
+        yield from get_all_types(subclass)
 
 
 ALL_TYPES = set(get_all_types(OOI))
 
 
 def get_abstract_types() -> Set[Type[OOI]]:
-    return {t for t in ALL_TYPES if t.__subclasses__()}
+    return {t for t in ALL_TYPES if t.strict_subclasses()}
 
 
 def get_concrete_types() -> Set[Type[OOI]]:
-    return {t for t in ALL_TYPES if not t.__subclasses__()}
+    return {t for t in ALL_TYPES if not t.strict_subclasses()}
 
 
 def get_collapsed_types() -> Set[Type[OOI]]:

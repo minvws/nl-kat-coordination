@@ -2,61 +2,60 @@
 {% load i18n %}
 
 {% if object_list %}
-  <section>
-    <div>
-      <h1>{{ plugin.type|title }}{% translate ' Details' %}</h1>
-      <p>
-        {% translate 'Settings' %}
-      </p>
-      <div class="horizontal-scroll">
-        <table>
-          <caption>{% translate 'Overview of settings:' %}</caption>
-          <thead>
-            <tr>
-              <th scope="col">{% translate 'Name' %}</th>
-              <th scope="col">{% translate 'Value' %}</th>
-              <th scope="col">{% translate 'Required' %}</th>
-              <th scope="col">{% translate 'Action' %}</th>
-              <th scope="col">{% translate 'Delete' %}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for setting in object_list %}
-              <tr>
-                <td>{{ setting.name }}</td>
-                <td>
-                  {% if not setting.value %}
-                    {% translate 'Unset' %}
-                  {% else %}
-                    {{ setting.value }}
-                  {% endif %}
-                </td>
-                <td>
-                  {% if setting.required %}
-                    {% translate 'Yes' %}
-                  {% else %}
-                    {% translate 'No' %}
-                  {% endif %}
-                </td>
-                {% if not setting.value %}
-                  <td>
-                    <a href="{% url 'plugin_settings_add_single' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate 'Add' %}</a>
-                  </td>
-                  <td></td>
-                {% else %}
-                  <td>
-                    <a href="{% url 'plugin_settings_edit' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id setting_name=setting.name %}">{% translate 'Edit' %}</a>
-                  </td>
-                  <td>
-                    <a href="{% url 'plugin_settings_delete' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id name=setting.name %}">{% translate 'Delete' %}</a>
-                  </td>
-                {% endif %}
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% include 'partials/pagination.html' %}
-      </div>
-    </div>
-  </section>
+    <section>
+        <div>
+            <h1>{{ plugin.type|title }}{% translate " Details" %}</h1>
+            <p>{% translate "Settings" %}</p>
+            <div class="horizontal-scroll">
+                <table>
+                    <caption>{% translate "Overview of settings:" %}</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">{% translate "Name" %}</th>
+                            <th scope="col">{% translate "Value" %}</th>
+                            <th scope="col">{% translate "Required" %}</th>
+                            <th scope="col">{% translate "Action" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for setting in object_list %}
+                            <tr>
+                                <td>{{ setting.name }}</td>
+                                <td>
+                                    {% if setting.value is None %}
+                                        {% translate "Unset" %}
+                                    {% else %}
+                                        {{ setting.value }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if setting.required %}
+                                        {% translate "Yes" %}
+                                    {% else %}
+                                        {% translate "No" %}
+                                    {% endif %}
+                                </td>
+                                {% if setting.value is None %}
+                                    <td>
+                                        <a href="{% url 'plugin_settings_add' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "Add" %}</a>
+                                    </td>
+                                    <td></td>
+                                {% else %}
+                                    <td>
+                                        <a href="{% url 'plugin_settings_add' organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "Edit" %}</a>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <form action="{% url "plugin_settings_delete" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}" method="get" class="inline">
+                  {% csrf_token %}
+                  <button type="submit">{% translate "Delete" %}</button>
+                </form>
+                {% include "partials/pagination.html" %}
+
+            </div>
+        </div>
+    </section>
 {% endif %}

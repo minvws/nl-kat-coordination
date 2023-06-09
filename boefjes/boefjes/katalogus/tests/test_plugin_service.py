@@ -4,7 +4,7 @@ from boefjes.config import settings
 from boefjes.katalogus.clients import MockPluginRepositoryClient
 from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.katalogus.models import Boefje, Normalizer, Bit, Repository, RESERVED_LOCAL_ID
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, Bit, Boefje, Normalizer, Repository
 from boefjes.katalogus.storage.interfaces import SettingsNotConformingToSchema
 from boefjes.katalogus.storage.memory import (
     PluginStatesStorageMemory,
@@ -87,7 +87,7 @@ def get_plugin_seed():
 
 def mock_plugin_service(organisation_id: str) -> PluginService:
     storage = SettingsStorageMemory()
-    storage.create("DUMMY_VAR", "123", "test", "test_plugin")
+    storage.upsert({"DUMMY_VAR": "123"}, "test", "test_plugin")
 
     repo_store = RepositoryStorageMemory(organisation_id)
     _mocked_repositories = {
@@ -129,7 +129,7 @@ class TestPluginsService(TestCase):
 
         kat_test_norm = list(filter(lambda x: x.id == "kat_test_normalize", plugins)).pop()
         self.assertIn("kat_test_normalize", kat_test_norm.id)
-        self.assertListEqual(["text/html"], kat_test_norm.consumes)
+        self.assertListEqual(["text/html", "normalizer/kat_test_normalize"], kat_test_norm.consumes)
         self.assertListEqual([], kat_test_norm.produces)
 
     def test_get_repository_plugins(self):
@@ -164,11 +164,11 @@ class TestPluginsService(TestCase):
         )
         self.assertEqual(ctx.exception.message, msg)
 
-        self.service.settings_storage.update_by_key("api_key", 128 * "a", self.organisation, plugin_id)
+        self.service.settings_storage.upsert({"api_key": 128 * "a"}, self.organisation, plugin_id)
         self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         value = 129 * "a"
-        self.service.settings_storage.update_by_key("api_key", value, self.organisation, plugin_id)
+        self.service.settings_storage.upsert({"api_key": 129 * "a"}, self.organisation, plugin_id)
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
             self.service.update_by_id("LOCAL", plugin_id, self.organisation, True)
 
@@ -196,51 +196,48 @@ class TestPluginsService(TestCase):
     def test_removing_mandatory_setting_disables_plugin(self):
         plugin_id = "kat_test"
 
-        self.service.settings_storage.update_by_key("api_key", 128 * "a", self.organisation, plugin_id)
+        self.service.settings_storage.upsert({"api_key": 128 * "a"}, self.organisation, plugin_id)
         self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertTrue(plugin.enabled)
 
-        self.service.delete_setting_by_key("api_key", self.organisation, plugin_id)
+        self.service.delete_settings(self.organisation, plugin_id)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertFalse(plugin.enabled)
 
-    def test_adding_integer_settings_with_faulty_value_given_constraints(self):
+    def test_adding_integer_settings_within_given_constraints(self):
         plugin_id = "kat_test_2"
 
-        self.service.settings_storage.update_by_key("api_key", "24", self.organisation, plugin_id)
+        self.service.settings_storage.upsert({"api_key": "24"}, self.organisation, plugin_id)
 
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
             self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
 
-        self.service.settings_storage.update_by_key("api_key", 24, self.organisation, plugin_id)  # Will become a string
+        self.service.settings_storage.upsert({"api_key": 24}, self.organisation, plugin_id)
 
-        with self.assertRaises(SettingsNotConformingToSchema) as ctx:
-            self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
-
-        self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
+        self.service.update_by_id("test-repo-2", plugin_id, self.organisation, True)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
-        self.assertFalse(plugin.enabled)
+        self.assertTrue(plugin.enabled)
+        self.service.update_by_id("test-repo-2", plugin_id, self.organisation, False)
 
     def test_clone_one_setting(self):
         new_org_id = "org2"
 
         plugin_id = "kat_test"
-        self.service.create_setting("api_key", "24", self.organisation, plugin_id)
-        assert self.service.get_setting_by_key("api_key", self.organisation, plugin_id) == "24"
+        self.service.settings_storage.upsert({"api_key": "24"}, self.organisation, plugin_id)
+        assert self.service.get_all_settings(self.organisation, plugin_id) == {"api_key": "24"}
 
         self.service.update_by_id(RESERVED_LOCAL_ID, plugin_id, self.organisation, True)
 
         self.service.update_by_id(RESERVED_LOCAL_ID, "test-boefje-1", new_org_id, True)
         self.service.update_by_id(RESERVED_LOCAL_ID, "test-boefje-2", new_org_id, True)
 
-        with self.assertRaises(KeyError):
-            self.service.get_setting_by_key("api_key", new_org_id, plugin_id)
+        assert "api_key" not in self.service.get_all_settings(new_org_id, plugin_id)
 
         new_org_plugins = self.service.get_all(new_org_id)
         assert len(new_org_plugins) == 8
@@ -250,8 +247,8 @@ class TestPluginsService(TestCase):
 
         self.service.clone_settings_to_organisation(self.organisation, new_org_id)
 
-        assert self.service.get_setting_by_key("api_key", self.organisation, plugin_id) == "24"
-        assert self.service.get_setting_by_key("api_key", new_org_id, plugin_id) == "24"
+        assert self.service.get_all_settings(self.organisation, plugin_id) == {"api_key": "24"}
+        assert self.service.get_all_settings(new_org_id, plugin_id) == {"api_key": "24"}
 
         new_org_plugins = self.service.get_all(new_org_id)
         assert len(new_org_plugins) == 8
@@ -260,11 +257,13 @@ class TestPluginsService(TestCase):
         assert "test-boefje-1" not in [x.id for x in new_org_plugins if x.enabled]
 
     def test_clone_many_settings(self):
-        plugin_ids = ["test-boefje-1", "test-boefje-2"] * 4
-        all_settings = {str(x): str(x + 1) for x in range(8)}
+        plugin_id_1 = "test-boefje-1"
+        plugin_id_2 = "test-boefje-2"
 
-        for plugin_id, (key, value) in zip(plugin_ids, all_settings.items()):
-            self.service.create_setting(key, value, self.organisation, plugin_id)
+        all_settings_1 = {str(x): str(x + 1) for x in range(0, 8, 2)}
+        all_settings_2 = {str(x): str(x + 1) for x in range(1, 9, 2)}
+        self.service.upsert_settings(all_settings_1, self.organisation, plugin_id_1)
+        self.service.upsert_settings(all_settings_2, self.organisation, plugin_id_2)
 
         self.service.clone_settings_to_organisation(self.organisation, "org2")
 

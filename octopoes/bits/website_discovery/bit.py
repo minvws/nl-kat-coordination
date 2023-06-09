@@ -1,4 +1,4 @@
-from bits.definitions import BitParameterDefinition, BitDefinition
+from bits.definitions import BitDefinition, BitParameterDefinition
 from octopoes.models.ooi.dns.zone import ResolvedHostname
 from octopoes.models.ooi.network import IPAddress
 from octopoes.models.ooi.service import IPService
@@ -11,4 +11,5 @@ BIT = BitDefinition(
         BitParameterDefinition(ooi_type=ResolvedHostname, relation_path="address"),
     ],
     module="bits.website_discovery.website_discovery",
+    min_scan_level=0,
 )

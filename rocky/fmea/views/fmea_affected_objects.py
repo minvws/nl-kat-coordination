@@ -1,24 +1,20 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-from django.urls.base import reverse_lazy, reverse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
-from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
 
 from fmea.forms import FailureModeAffectedObjectForm
 from fmea.models import FailureMode, FailureModeAffectedObject, FailureModeTreeObject
 from fmea.views.view_helpers import AffectedObjectBreadcrumbsMixin
 
 
-@class_view_decorator(otp_required)
 class FailureModeAffectedObjectCreateView(AffectedObjectBreadcrumbsMixin, CreateView):
     """
     View of failure modes with the affected departments.
@@ -41,7 +37,7 @@ class FailureModeAffectedObjectCreateView(AffectedObjectBreadcrumbsMixin, Create
         return context
 
     def add_success_notification(self):
-        success_message = _("Failure mode affected objects succesfully created.")
+        success_message = _("Failure mode affected objects successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def build_breadcrumbs(self) -> List[Dict[str, str]]:
@@ -56,7 +52,6 @@ class FailureModeAffectedObjectCreateView(AffectedObjectBreadcrumbsMixin, Create
         return breadcrumbs
 
 
-@class_view_decorator(otp_required)
 class FailureModeAffectedObjectUpdateView(AffectedObjectBreadcrumbsMixin, UpdateView):
     model = FailureModeAffectedObject
     form_class = FailureModeAffectedObjectForm
@@ -98,7 +93,6 @@ class FailureModeAffectedObjectUpdateView(AffectedObjectBreadcrumbsMixin, Update
         return breadcrumbs
 
 
-@class_view_decorator(otp_required)
 class FailureModeAffectedObjectListView(AffectedObjectBreadcrumbsMixin, ListView):
     """
     View of all failure modes affected objects.
@@ -109,7 +103,6 @@ class FailureModeAffectedObjectListView(AffectedObjectBreadcrumbsMixin, ListView
     paginate_by = 10
 
 
-@class_view_decorator(otp_required)
 class FailureModeAffectedObjectDetailView(AffectedObjectBreadcrumbsMixin, DetailView):
     """
     View for 1 failure mode affected objects.
@@ -119,7 +112,6 @@ class FailureModeAffectedObjectDetailView(AffectedObjectBreadcrumbsMixin, Detail
     model = FailureModeAffectedObject
 
 
-@class_view_decorator(otp_required)
 class FMEATreeObjectView(View):
     """
     Add tree nodes to affected departments
@@ -146,7 +138,7 @@ class FMEATreeObjectView(View):
             self.add_error_notification()
 
     def add_success_notification(self):
-        success_message = _("Treeobjects succesfully added.")
+        success_message = _("Treeobjects successfully added.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def add_error_notification(self):

@@ -2,7 +2,7 @@ import ipaddress
 from unittest import TestCase
 
 from octopoes.models import Reference
-from tests.mocks.mock_ooi_types import MockNetwork, MockIPAddressV4, MockLabel
+from tests.mocks.mock_ooi_types import MockIPAddressV4, MockLabel, MockNetwork
 
 
 class OOITest(TestCase):
@@ -13,6 +13,5 @@ class OOITest(TestCase):
         self.assertEqual("MockLabel|MockIPAddressV4|internet|1.1.1.1|LABEL-1000", str(label.reference))
 
     def test_reference_equality(self):
-
         internet = MockNetwork(name="internet")
         self.assertEqual(Reference.from_str("MockNetwork|internet"), internet.reference)

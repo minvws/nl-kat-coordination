@@ -1,33 +1,34 @@
-{% extends 'layouts/base.html' %}
+{% extends "layouts/base.html" %}
+
 {% load i18n %}
 {% load static %}
 
 {% block content %}
-  {% include 'header.html' %}
-  <main>
-    {% include 'partials/notifications/notifications_block.html' %}
-    <section>
-      <div>
-        <h1>{% translate 'Edit organization' %}</h1>
-        <form method="post" class="horizontal-view">
-          {% csrf_token %}
-          <fieldset>
-            {% for field in form %}
-              {% include "partials/form/field_input_wrapper.html" %}
-            {% endfor %}
-          </fieldset>
-          <div class="horizontal-view">
-            <button type="submit">{% translate 'Save organization' %}</button>
-            <a class="button ghost"
-               href="{% url 'organization_detail' object.id %}">{% translate 'Cancel' %}</a>
-          </div>
-        </form>
-      </div>
-    </section>
-  </main>
-{% endblock %}
+    {% include "header.html" %}
 
+    <main>
+        <section>
+            <div>
+                <h1>{% translate "Edit organization" %} {{ organization.name }}</h1>
+                <form method="post" class="horizontal-view help">
+                    {% csrf_token %}
+                    <fieldset>
+                        {% for field in form %}
+                            {% include "partials/form/field_input_wrapper.html" %}
+
+                        {% endfor %}
+                    </fieldset>
+                    <div class="horizontal-view">
+                        <button type="submit">{% translate "Save organization" %}</button>
+                        <a class="button ghost"
+                           href="{% url 'organization_settings' organization.code %}">{% translate "Cancel" %}</a>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
 {% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock %}
+    {{ block.super }}
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

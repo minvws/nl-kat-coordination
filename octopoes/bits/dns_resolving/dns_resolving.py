@@ -1,25 +1,15 @@
-from typing import List, Iterator, Union
+from typing import Dict, Iterator, List, Union
 
 from octopoes.models import OOI
-from octopoes.models.ooi.dns.records import DNSARecord, DNSAAAARecord
-from octopoes.models.ooi.dns.zone import ResolvedHostname, Hostname
+from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord
+from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 
 
 def run(
-    hostname: Hostname,
-    additional_oois: List[Union[DNSARecord, DNSAAAARecord]],
+    hostname: Hostname, additional_oois: List[Union[DNSARecord, DNSAAAARecord]], config: Dict[str, str]
 ) -> Iterator[OOI]:
-
-    # only run bit on fqdns
-    if not hostname.name.endswith("."):
-        return
-
-    non_fqdn_hostname = Hostname(network=hostname.network, name=hostname.name.rstrip("."))
-    yield non_fqdn_hostname
-
     for record in additional_oois:
-        for hostname_ in [hostname, non_fqdn_hostname]:
-            yield ResolvedHostname(
-                hostname=hostname_.reference,
-                address=record.address,
-            )
+        yield ResolvedHostname(
+            hostname=hostname.reference,
+            address=record.address,
+        )

@@ -1,29 +1,28 @@
 import json
 import urllib.parse
-from typing import Iterator, Union
+from typing import Iterable, Union
 
+from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import (
     IPPort,
-    Protocol,
-    PortState,
     Network,
+    PortState,
+    Protocol,
 )
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
     HTTPHeader,
     HTTPResource,
-    Website,
     IPAddressHTTPURL,
+    Website,
 )
 
-from boefjes.job_models import NormalizerMeta
 
-
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     results = json.loads(raw)
     ip_ooi_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 

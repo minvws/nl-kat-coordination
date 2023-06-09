@@ -4,6 +4,11 @@ on:
   push:
     paths:
       - octopoes/**
+      - .github/workflows/octopoes_container_image.yml
+  pull_request:
+    paths:
+      - octopoes/**
+      - .github/workflows/octopoes_container_image.yml
 
 jobs:
   create_container_image:
@@ -34,13 +39,19 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate version.py
+        run: |
+          pip install setuptools-scm==7.1.0
+          python -m setuptools_scm
+          cp _version.py octopoes/octopoes/version.py
+
       - name: Build container image
         uses: docker/build-push-action@v3
         with:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827
           context: octopoes
-          push: true
+          push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

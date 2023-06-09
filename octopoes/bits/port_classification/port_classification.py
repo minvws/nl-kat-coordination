@@ -1,43 +1,68 @@
-from typing import List, Iterator
+from typing import Dict, Iterator, List
 
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import KATFindingType, Finding
-from octopoes.models.ooi.network import IPPort
+from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.network import IPPort, Protocol
 
-COMMON_TCP_PORTS = [25, 53, 110, 143, 993, 995, 80, 443]
-SA_PORTS = [21, 22, 23, 3389, 5900]
-DB_PORTS = [1433, 1434, 3050, 3306, 5432]
+COMMON_TCP_PORTS = [
+    25,  # SMTP
+    53,  # DNS
+    80,  # HTTP
+    110,  # POP3
+    143,  # IMAP
+    443,  # HTTPS
+    465,  # SMTPS
+    587,  # SMTP (message submmission)
+    993,  # IMAPS
+    995,  # POP3S
+]
+
+COMMON_UDP_PORTS = [
+    53,  # DNS
+]
+
+SA_TCP_PORTS = [
+    21,  # FTP
+    22,  # SSH
+    23,  # Telnet
+    3389,  # Remote Desktop
+    5900,  # VNC
+]
+DB_TCP_PORTS = [
+    1433,  # MS SQL Server
+    1434,  # MS SQL Server
+    3050,  # Interbase/Firebase
+    3306,  # MySQL
+    5432,  # PostgreSQL
+]
 
 
-def run(
-    input_ooi: IPPort,
-    additional_oois: List,
-) -> Iterator[OOI]:
-
+def run(input_ooi: IPPort, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     port = input_ooi.port
-    if port in SA_PORTS:
-        open_sa_port = KATFindingType(id="KAT-560")
+    protocol = input_ooi.protocol
+    if protocol == Protocol.TCP and port in SA_TCP_PORTS:
+        open_sa_port = KATFindingType(id="KAT-OPEN-SYSADMIN-PORT")
         yield open_sa_port
         yield Finding(
             finding_type=open_sa_port.reference,
             ooi=input_ooi.reference,
-            description=f"Port {port} is a system administrator port and should not be open.",
+            description=f"Port {port}/{protocol.value} is a system administrator port and should not be open.",
         )
-
-    if port in DB_PORTS:
-        ft = KATFindingType(id="KAT-561")
+    elif protocol == Protocol.TCP and port in DB_TCP_PORTS:
+        ft = KATFindingType(id="KAT-OPEN-DATABASE-PORT")
         yield ft
         yield Finding(
             finding_type=ft.reference,
             ooi=input_ooi.reference,
-            description=f"Port {port} is a database port and should not be open.",
+            description=f"Port {port}/{protocol.value} is a database port and should not be open.",
         )
-
-    if port not in COMMON_TCP_PORTS and port not in SA_PORTS and port not in DB_PORTS:
-        kat = KATFindingType(id="KAT-562")
+    elif (protocol == Protocol.TCP and port not in COMMON_TCP_PORTS) or (
+        protocol == Protocol.UDP and port not in COMMON_UDP_PORTS
+    ):
+        kat = KATFindingType(id="KAT-UNCOMMON-OPEN-PORT")
         yield kat
         yield Finding(
             finding_type=kat.reference,
             ooi=input_ooi.reference,
-            description=f"Port {port} is not a common port and should possibly not be open.",
+            description=f"Port {port}/{protocol.value} is not a common port and should possibly not be open.",
         )

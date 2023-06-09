@@ -10,7 +10,7 @@ your own rules for the population, and prioritization of tasks.
 The *scheduler* implements a priority queue for prioritization of tasks to be
 performed by the worker(s). In the implementation of the scheduler within KAT
 the scheduler is tasked with populating the priority queue with 'boefje' and
-'normalizer' tasks. The scheduler is responsible for maintaining and updating
+'normalizer' jobs. The scheduler is responsible for maintaining and updating
 its internal priority queue.
 
 A priority queue is used, in as such, that it allows us to determine what jobs
@@ -34,8 +34,9 @@ scheduler system with their respective level of abstraction.
 
 #### C2 Container level:
 
-First we'll review how the `Scheduler` system interacts with its external
-services.
+First we'll review how the `Scheduler` system interacts and sits in between its
+external services. In this overview arrows from external services indicate how
+and why those services communicate with the scheduler.
 
 ```mermaid
 graph TB
@@ -62,157 +63,255 @@ graph TB
 ```
 
 * The `Scheduler` system combines data from the `Octopoes`, `Katalogus`,
-`Bytes` and `RabbitMQ` systems. With these data it determines what tasks should
-be created and run.
-
-* The `Scheduler` system implements multiple `schedulers` per organisation.
-
-#### C3 Component level:
-
-Following we review how different dataflows, from the `boefjes` and the
-`normalizers` are implemented within the `Scheduler` system. The following
-events within a KAT installation will trigger dataflows in the `Scheduler`:
-
-* When a plugin is enabled or disabled (`monitor_organisations`)
-
-* When an organisation is created or deleted (`monitor_organisations`)
-
-* When a scan level is increased (`get_latest_object`)
-
-* When a raw file is created (`get_latest_raw_data`)
-
-When any of these events occur, it will trigger a dataflow procedure to be
-executed in the `Scheduler`.
+`Bytes` and `RabbitMQ` systems.
 
 ```mermaid
 flowchart TB
+    subgraph Scheduler["SchedulerApp [system]"]
+        subgraph OrganizationA["Organization A"]
+            subgraph BoefjeSchedulerA["BoefjeScheduler [class]"]
+                BoefjePriorityQueueA(["PriorityQueue"])
+            end
+
+            subgraph NormalizerSchedulerA["NormalizerScheduler [class]"]
+                NormalizerPriorityQueueA(["PriorityQueue"])
+            end
+        end
+
+        subgraph OrganizationB["Organization B"]
+            subgraph BoefjeSchedulerB["BoefjeScheduler [class]"]
+                BoefjePriorityQueueB(["PriorityQueue"])
+            end
+
+            subgraph NormalizerSchedulerB["NormalizerScheduler [class]"]
+                NormalizerPriorityQueueB(["PriorityQueue"])
+            end
+        end
+
+
+        subgraph Server["API Server<br/>[REST API]"]
+        end
+    end
+
+    Datastore[("SQL database<br/> [datastore]")]
+```
+
+* The `Scheduler` system implements multiple `schedulers` per organisation.
+  Per organisation there is a `boefje` and `normalizer` scheduler. With their
+  respective priority queues. These queues are persisted in a SQL database.
+
+#### Dataflows
+
+Following we review how different dataflows, from the `boefjes` and the
+`normalizers` are implemented within the `Scheduler` system. The following
+events within a KAT installation will trigger dataflows in the `Scheduler`.
+With the current implementation of the scheduler we identify the creation of
+two different type of jobs, `boefje` and `normalizer` jobs.
+
+##### Creation of boefje jobs
+
+For a `boefje` job the following events will trigger a dataflow procedure to be
+executed and subsequently the creation of a `boefje` job.:
+
+1. When a scan level is increased on an OOI (`schedulers.boefje.push_tasks_for_scan_profile_mutations`),
+   this will get the priority of 2.
+
+    * When scan level mutation occurred, the `Scheduler` system will get the
+      scan profile mutation from the `RabbitMQ` system.
+
+    * For the associated OOI of this scan profile mutation, the `Scheduler`
+      system will get the enabled boefjes for this OOI. (`tasks = ooi * boefjes`)
+
+    * For each enabled boefje, a `BoefjeTask` will be created and added to the
+     `PriorityQueue` of the `BoefjeScheduler`. A `BoefjeTask` is an object
+     with the correct specification for the task runner to execute a boefje.
+
+    * Each task will be checked if it is:
+
+        * `is_allowed_to_run()`
+
+        * `is_task_running()`
+
+        * `has_grace_period_passed()`
+
+        * `is_item_on_queue_by_hash()`
+
+    * The `BoefjeScheduler` will then create a `PrioritizedItem` and push it to
+      the queue. The `PrioritizedItem` will contain the created `BoefjeTask`.
+      Additionally the `BoefjeTask` will be added to the database
+      (`post_push()`). And serves as a log of the tasks that have been
+      queued/executed, and can be queried through the API.
+
+    ```mermaid
+    flowchart TB
+
+        %% External services
+        RabbitMQ["RabbitMQ<br/>[message broker]"]
+
+        %% External services flow
+        RabbitMQ--"Get scan profile mutations<br/>(scan level increase)"-->get_scan_profile_mutation
+
+        %% Boefje flow
+        get_scan_profile_mutation-->get_boefjes_for_ooi-->create_boefje_task-->push_item_to_queue
+        push_item_to_queue-->post_push
+        push_item_to_queue-->push
+        push-->Datastore
+        post_push-->Datastore
+
+        subgraph Scheduler["SchedulerApp [system]"]
+
+            subgraph BoefjeScheduler["BoefjeScheduler [class]"]
+                subgraph BoefjePopulateQueue["populate_queue() [method]"]
+                    subgraph ScanProfileMutations["push_tasks_for_scan_profile_mutations() [method]"]
+                        get_scan_profile_mutation[["get_scan_profile_mutation()"]]
+                        get_boefjes_for_ooi[["get_boefjes_for_ooi()"]]
+                        create_boefje_task("Create BoefjeTasks for OOI and enabled Boefjes")
+                        push_item_to_queue[["push_item_to_queue()"]]
+                    end
+                end
+
+                push[["push()<br/><br/>Add PrioritizedItem to PriorityQueue"]]
+                post_push[["post_push()<br/><br/>Add BoefjeTask to database"]]
+            end
+
+            Datastore[("SQL database<br/>[datastore]<br/>")]
+
+        end
+    ```
+
+2. Rescheduling of oois (`schedulers.boefje.push_tasks_for_random_objects`). In
+   order to fill up the queue and to enforce that we reschedule tasks. We
+   continuously get a batch of random ooi's from octopoes
+   (`get_random_objects`). The tasks of from these ooi's (`tasks = ooi * boefjes`)
+   will get the priority that has been calculated by the ranker. At the moment
+   a task will get the priority of 3, when 7 days have gone by (e.g. how longer
+   it hasn't been running the higher the priority it will get). For everything
+   before those 7 days it will scale the priority appropriately.
+
+    * From Octopoes we get `n` random ooi's (`get_random_objects`)
+
+    * For each OOI, the `Scheduler` will get the enabled boefjes for this OOI.
+      (`tasks = ooi * boefjes`)
+
+    * For each enabled boefje, a `BoefjeTask` will be created and added to the
+     `PriorityQueue` of the `BoefjeScheduler`.
+
+    * Each task will be checked if it is:
+
+        * `is_allowed_to_run()`
+
+        * `is_task_running()`
+
+        * `has_grace_period_passed()`
+
+        * `is_item_on_queue_by_hash()`
+
+    * The `BoefjeScheduler` will then create a `PrioritizedItem` and push it to
+      the queue. The `PrioritizedItem` will contain the created `BoefjeTask`.
+      Additionally the `BoefjeTask` will be added to the database
+      (`post_push()`). And serves as a log of the tasks that have been
+      queued/executed, and can be queried through the API.
+
+    ```mermaid
+    flowchart TB
 
     %% External services
-    Rocky["Rocky<br/>[webapp]"]
     Octopoes["Octopoes<br/>[graph database]"]
-    %% Katalogus["Katalogus<br/>[software system]"]
-    %% Boefjes["Boefjes<br/>[software system]"]
-    %% Normalizers["Normalizers<br/>[software system]"]
-    %% Bytes["Bytes<br/>[software system]"]
-    RabbitMQ["RabbitMQ<br/>[message broker]"]
-
-    %% Rocky flow
-    Rocky--"Create object"-->Octopoes
-    Rocky--"Create scan job<br/>HTTP POST"--->push_queue
-    push_queue--"Push job with highest priority"-->BoefjePriorityQueue
-    push_queue--"Push job with highest priority"-->NormalizerPriorityQueue
 
     %% External services flow
-    %% Bytes--"Check last run of boefje and ooi<br/>HTTP GET"-->create_tasks_for_ooi
-    %% Katalogus--"Get available boefjes<br/>HTTP GET"--->create_tasks_for_ooi
-    %% Katalogus--"Get availalble normalizers<br/>HTTP GET"-->create_tasks_for_raw_data
-    Octopoes--"Get random ooi"--->get_random_objects
-    RabbitMQ--"Get latest created object<br/>(scan level increase)"-->get_latest_object
-    RabbitMQ--"Get latest raw data file<br/>(boefje finished)"-->get_latest_raw_data
+    Octopoes--"Get random OOI's"-->get_random_objects
 
     %% Boefje flow
-    get_latest_object-->get_random_objects-->create_tasks_for_ooi-->rank_boefje-->push_boefje
-    push_boefje-->post_push_boefje
-    push_boefje--> BoefjePriorityQueue
-    post_push_boefje-->Datastore
-
-    %% Normalizer flow
-    get_latest_raw_data-->create_tasks_for_raw_data-->rank_normalizer-->push_normalizer
-    push_normalizer-->post_push_normalizer
-    push_normalizer-->NormalizerPriorityQueue
-    post_push_normalizer-->Datastore
+    get_random_objects-->get_boefjes_for_ooi-->create_boefje_task-->push_item_to_queue
+    push_item_to_queue-->post_push
+    push_item_to_queue-->push
+    push-->Datastore
+    post_push-->Datastore
 
     subgraph Scheduler["SchedulerApp [system]"]
 
         subgraph BoefjeScheduler["BoefjeScheduler [class]"]
             subgraph BoefjePopulateQueue["populate_queue() [method]"]
-                get_latest_object[["get_latest_object()"]]
-                get_random_objects[["get_random_objects()"]]
-                create_tasks_for_ooi[["create_tasks_for_ooi()<br/><br/>* combine ooi with available <br/>boefjes to create tasks<br/>* check if those tasks are able<br/>to run"]]
-                rank_boefje[["rank()"]]
-                push_boefje[["push()"]]
+                subgraph RandomObjects["push_tasks_for_random_objects() [method]"]
+                    get_random_objects[["get_random_objects()"]]
+                    get_boefjes_for_ooi[["get_boefjes_for_ooi()"]]
+                    create_boefje_task("Create BoefjeTasks for OOI and enabled Boefjes")
+                    push_item_to_queue[["push_item_to_queue()"]]
+                end
             end
 
-            post_push_boefje[["post_push()<br/><br/>add tasks to database"]]
-
-            BoefjePriorityQueue(["PriorityQueue"])
-            BoefjePriorityQueue
-        end
-
-        subgraph NormalizerScheduler["NormalizerScheduler [class]"]
-            subgraph NormalizerPopulateQueue["populate_queue() [method]"]
-                get_latest_raw_data[["get_latest_raw_data()"]]
-                create_tasks_for_raw_data[["create_tasks_for_raw_data<br/><br/>* based on mime-types<br/>of the raw file, create<br/>normalizer tasks<br/>* check if normalizer is able to run<br/>* update status of boefje task to<br/>completed"]]
-                rank_normalizer[["rank()"]]
-                push_normalizer[["push()"]]
-            end
-
-            post_push_normalizer[["post_push()<br/><br/>add tasks to database"]]
-
-            NormalizerPriorityQueue(["PriorityQueue"])
-        end
-
-        subgraph Server
-            push_queue[["push_queue()<br/>[api endpoint]"]]
+            push[["push()<br/><br/>Add PrioritizedItem to PriorityQueue"]]
+            post_push[["post_push()<br/><br/>Add BoefjeTask to database"]]
         end
 
         Datastore[("SQL database<br/>[datastore]<br/>")]
 
     end
-```
+    ```
 
-* The `Scheduler` system implements multiple `schedulers`, one per
-  organisation.
+3. Scan jobs created by the user in Rocky (`server.push_queue`), these tasks
+   will get the highest priority of 1.
 
-* A `Scheduler` implements methods for popping items of the queue and pushing
-  off the queue. After the calls to the `pop` and `push` methods a `post_pop()`
-  and `post_push` method will be called. This will be used to update the tasks
-  in the database.
+   * Rocky will create a `BoefjeTask` that will be pushed directly to the
+     specified queue.
 
-* The `BoefjeScheduler` implementation of the `populate_queue()` method will:
+   ```mermaid
+   flowchart TB
 
-  - Continuously get the latest scan level changes of ooi's from a message
-    queue that was sent by octopoes (`get_latest_objects()`). The tasks
-    created from these ooi's (`tasks = ooi * boefjes`) from this queue will
-    get the priority of 2.
+    Rocky["Rocky<br/>[webapp]"]
 
-  - To fill up the queue, and to enforce that we reschedule tasks we get
-    random ooi's from octopoes (`get_random_objects`). The tasks of from these
-    ooi's (`tasks = ooi * boefjes`) will get the priority that has been
-    calculated by the ranker. At the moment a task will get the priority of 3,
-    when 7 days have gone by (e.g. how longer it hasn't been checked the
-    higher the priority it will get). For everything that hasn't been check
-    before the 7 days it will scale the priority appropriately.
+    Rocky--"Create scan job<br/>HTTP POST"-->push_item_to_queue
 
-  - In order for a  created tasks from `get_latest_objects()` and
-    `get_random_objects()` to be elligible for execution, the task adhere to
-    the following (`create_tasks_for_ooi()`):
+    push_item_to_queue-->post_push
+    push_item_to_queue-->push
+    push-->Datastore
+    post_push-->Datastore
 
-    * Should not have run within the 'grace period', meaning a task should not
-      be scheduled again within the last 24 hours (can be configured).
+    subgraph Scheduler["SchedulerApp [system]"]
 
-    * Should not schedule a task when the task is still being processed.
+        subgraph Server["Server [class]"]
+            push_item_to_queue[["push_item_to_queue()"]]
 
-    * Should schedule tasks with an enabled boefje.
+        end
 
-* The `NormalizerScheduler` implementation of the `populate_queue()` method
-  will:
+        subgraph BoefjeScheduler["BoefjeScheduler [class]"]
+            push[["push()<br/><br/>Add PrioritizedItem to PriorityQueue"]]
+            post_push[["post_push()<br/><br/>Add BoefjeTask to database"]]
+        end
 
-  - Continuously get the latest raw data files from the message
-    queue that was sent by the bytes (`get_latest_raw_data()`), for boefjes
-    that are done processing.
+        Datastore[("SQL database<br/>[datastore]<br/>")]
 
-  - When a raw file has been received the task from the `BoefjeScheduler` is
-    updated as `completed`.
+    end
+   ```
 
-  - For every mime-type of the raw file a task is created
-    (`create_tasks_for_raw_data()`) with its associated normalizers.
+4. When a plugin of type `boefje` is enabled or disabled in Rocky. This is
+   triggered when the plugin cache of an organisation is flushed.
 
-  - At the moment the tasks are given a unix time-stamp that is used as its
-    priority to simulate a FIFO queue.
+   * The cache of the organisation will be flushed at a specified interval.
 
-* The `Server` exposes REST API endpoints to interact and interface with the
-`Scheduler` system.
+   * Due to the flushing of the cache we get a new list of enabled boefjes for
+     an organisation.
+     (`connectors.services.katalogus._flush_organisations_boefje_type_cache()`)
+
+   * New tasks will be created for enabled boefjes, when the OOIs are being
+     rescheduled. This is then done when the `push_tasks_for_random_objects()`
+     method is called.
+
+##### Creation of normalizer jobs
+
+For a `normalizer` job the following events will trigger a dataflow procedure
+
+1. When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
+
+    * The `NormalizerScheduler` retrieves raw files that have been created in
+      Bytes from a message queue.
+
+    * For every mime type of the raw file, the `NormalizerScheduler` will
+      retrieve the enabled normalizers for this mime type.
+      (`create_tasks_for_raw_data()`)
+
+    * For every enabled normalizer, a `NormalizerTask` will be created and
+      added to the `PriorityQueue` of the `NormalizerScheduler`.
 
 #### C4 Code level (Condensed class diagram)
 

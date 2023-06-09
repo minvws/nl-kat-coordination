@@ -7,6 +7,7 @@ https://github.com/mschwager/fierce
 
 import argparse
 import concurrent.futures
+import contextlib
 import functools
 import http.client
 import ipaddress
@@ -80,14 +81,12 @@ def head_request(url, timeout=2):
 
     try:
         conn.request("HEAD", "/")
-    except (ConnectionError, socket.gaierror, socket.timeout):
-        return []
-    else:
         resp = conn.getresponse()
+        return resp.getheaders()
+    except (ConnectionError, socket.gaierror, socket.timeout, OSError):
+        return []
     finally:
         conn.close()
-
-    return resp.getheaders()
 
 
 def concatenate_subdomains(domain, subdomains):
@@ -111,7 +110,7 @@ def query(resolver, domain, record_type="A", tcp=False):
         # assume we received information on nameservers we can use and
         # perform the same query with those nameservers
         if resp.response.additional and resp.response.authority:
-            ns = [rdata.address for additionals in resp.response.additional for rdata in additionals.items]
+            ns = [rdata.address for additional in resp.response.additional for rdata in additional.items]
             resolver.nameservers = ns
             return query(resolver, domain, record_type, tcp=tcp)
 
@@ -226,7 +225,8 @@ def get_stripped_file_lines(filename):
     Return lines of a file with whitespace removed
     """
     try:
-        lines = open(filename).readlines()
+        with open(filename) as f:
+            lines = f.readlines()
     except FileNotFoundError:
         fatal(f"Could not open file: {filename!r}")
 
@@ -290,10 +290,7 @@ def fierce(**kwargs):
 
     ns = recursive_query(resolver, domain, "NS", tcp=kwargs["tcp"])
 
-    if ns:
-        domain_name_servers = [n.to_text() for n in ns]
-    else:
-        domain_name_servers = []
+    domain_name_servers = [n.to_text() for n in ns] if ns else []
 
     output["NS"] = domain_name_servers if ns else "failure"
 
@@ -432,10 +429,8 @@ def parse_args(args):
 def main():
     args = parse_args(sys.argv[1:])
 
-    try:
+    with contextlib.suppress(KeyboardInterrupt):
         fierce(**vars(args))
-    except KeyboardInterrupt:
-        pass
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from tools.add_ooi_information import retirejs_info, cve_info, snyk_info, port_info, service_info, cwe_info, get_info
+from tools.add_ooi_information import cve_info, cwe_info, get_info, port_info, retirejs_info, service_info, snyk_info
+from tools.ooi_helpers import RiskLevelSeverity
 
 
 def test_retirejs_info():
@@ -108,8 +109,27 @@ def test_cwe_info():
     assert output == {
         "description": "The product does not validate or incorrectly validates input "
         "that can affect the control flow or data flow of a program.",
-        "source": "https://cwe.mitre.org/index.html",
+        "source": "https://cwe.mitre.org/data/definitions/20.html",
+        "risk": "Very low",
     }
 
     output = cwe_info("CWE-223230")
-    assert output == {"description": "Not found"}
+    assert output == {
+        "description": "Not found",
+        "risk": "Very low",
+    }
+
+
+def test_risk_level_comparisons():
+    assert RiskLevelSeverity.CRITICAL >= RiskLevelSeverity.CRITICAL
+    assert RiskLevelSeverity.CRITICAL <= RiskLevelSeverity.CRITICAL
+    assert not RiskLevelSeverity.CRITICAL < RiskLevelSeverity.CRITICAL
+    assert not RiskLevelSeverity.CRITICAL > RiskLevelSeverity.CRITICAL
+
+    assert RiskLevelSeverity.CRITICAL >= RiskLevelSeverity.NONE
+    assert RiskLevelSeverity.CRITICAL > RiskLevelSeverity.NONE
+    assert RiskLevelSeverity.NONE <= RiskLevelSeverity.CRITICAL
+    assert RiskLevelSeverity.NONE < RiskLevelSeverity.CRITICAL
+
+    assert not RiskLevelSeverity.NONE >= RiskLevelSeverity.CRITICAL
+    assert not RiskLevelSeverity.NONE > RiskLevelSeverity.CRITICAL

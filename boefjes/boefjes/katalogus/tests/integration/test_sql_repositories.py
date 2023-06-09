@@ -2,24 +2,23 @@ import os
 import time
 from unittest import TestCase, skipIf
 
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
-from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
-from boefjes.katalogus.models import Organisation, Repository, Boefje
+from boefjes.katalogus.models import Boefje, Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
     PluginNotFound,
-    SettingNotFound,
     RepositoryNotFound,
+    SettingsNotFound,
     StorageError,
 )
-from boefjes.sql.db import get_engine, SQL_BASE
+from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.repository_storage import SQLRepositoryStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
+from boefjes.sql.repository_storage import SQLRepositoryStorage
+from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -41,13 +40,13 @@ class TestRepositories(TestCase):
         session = sessionmaker(bind=self.engine)()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
         self.repository_storage = SQLRepositoryStorage(session, settings)
-        self.settings_storage = SQLSettingsStorage(session, IdentityMiddleware())
+        self.settings_storage = SQLSettingsStorage(session, create_encrypter())
         self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
 
     def tearDown(self) -> None:
         session = sessionmaker(bind=get_engine())()
 
-        for table in SQL_BASE.metadata.tables.keys():
+        for table in SQL_BASE.metadata.tables:
             session.execute(f"DELETE FROM {table} CASCADE")
 
         session.commit()
@@ -139,29 +138,63 @@ class TestRepositories(TestCase):
             storage.create(org)
 
         with self.settings_storage as settings_storage:
-            settings_storage.create("TEST_SETTING", "123.9", organisation_id, plugin_id)
+            settings_storage.upsert({"TEST_SETTING": "123.9", "TEST_SETTING2": 12}, organisation_id, plugin_id)
 
-        returned_settings = settings_storage.get_by_key("TEST_SETTING", organisation_id, plugin_id)
-        self.assertEqual("123.9", returned_settings)
+        with self.settings_storage as settings_storage:
+            settings_storage.upsert({"TEST_SETTING": "123.9", "TEST_SETTING2": 13}, organisation_id, plugin_id)
 
-        with self.assertRaises(SettingNotFound):
-            settings_storage.get_by_key("no setting!", organisation_id, plugin_id)
+        returned_settings = settings_storage.get_all(organisation_id, plugin_id)
+        self.assertEqual("123.9", returned_settings["TEST_SETTING"])
+        self.assertEqual(13, returned_settings["TEST_SETTING2"])
 
-        with self.assertRaises(SettingNotFound):
-            settings_storage.get_by_key("TEST_SETTING", "no organisation!", plugin_id)
+        with self.assertRaises(SettingsNotFound):
+            settings_storage.delete("no organisation!", plugin_id)
 
-        self.assertEqual({"TEST_SETTING": "123.9"}, settings_storage.get_all(org.id, plugin_id))
+        self.assertEqual({"TEST_SETTING": "123.9", "TEST_SETTING2": 13}, settings_storage.get_all(org.id, plugin_id))
         self.assertEqual(dict(), settings_storage.get_all(org.id, "wrong"))
         self.assertEqual(dict(), settings_storage.get_all("wrong", plugin_id))
 
         with self.settings_storage as settings_storage:
-            settings_storage.delete_by_key("TEST_SETTING", org.id, plugin_id)
+            settings_storage.delete(org.id, plugin_id)
 
         self.assertEqual(dict(), settings_storage.get_all(org.id, plugin_id))
 
-        with self.assertRaises(StorageError):
-            with self.settings_storage as settings_storage:
-                settings_storage.create("TEST_SETTING", "123.9", organisation_id, 65 * "a")
+        with self.assertRaises(StorageError), self.settings_storage as settings_storage:
+            settings_storage.upsert({"TEST_SETTING": "123.9"}, organisation_id, 65 * "a")
+
+    def test_settings_storage_values_field_limits(self):
+        organisation_id = "test"
+        plugin_id = 64 * "a"
+
+        org = Organisation(id=organisation_id, name="Test")
+        with self.organisation_storage as storage:
+            storage.create(org)
+
+        with self.settings_storage as settings_storage:
+            settings_storage.upsert(
+                {
+                    "TEST_SETTING": 12 * "123.9",
+                    "TEST_SETTING2": 12000,
+                    "TEST_SETTING3": 30 * "b",
+                    "TEST_SETTING4": 30 * "b",
+                    "TEST_SETTING5": 10 * "b",
+                    "TEST_SETTING6": 123456789,
+                },
+                organisation_id,
+                plugin_id,
+            )
+
+        self.assertEqual(
+            {
+                "TEST_SETTING": 12 * "123.9",
+                "TEST_SETTING2": 12000,
+                "TEST_SETTING3": 30 * "b",
+                "TEST_SETTING4": 30 * "b",
+                "TEST_SETTING5": 10 * "b",
+                "TEST_SETTING6": 123456789,
+            },
+            settings_storage.get_all(org.id, plugin_id),
+        )
 
     def test_plugin_enabled_storage(self):
         with self.organisation_storage as storage:

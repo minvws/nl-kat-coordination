@@ -3,16 +3,16 @@ from __future__ import annotations
 import abc
 from enum import Enum, IntEnum
 from typing import (
-    List,
-    TypeVar,
-    Literal,
-    Dict,
     Any,
+    Dict,
+    List,
+    Literal,
     Optional,
-    Type,
     Set,
-    Union,
     Tuple,
+    Type,
+    TypeVar,
+    Union,
 )
 
 from pydantic import BaseModel, Field
@@ -99,6 +99,12 @@ class OOI(BaseModel, abc.ABC):
     @classmethod
     def get_object_type(cls) -> str:
         return cls.__name__
+
+    @classmethod
+    def strict_subclasses(cls) -> List[Type[OOI]]:
+        """FastAPI creates duplicate class instances when parsing return types."""
+
+        return [subclass for subclass in cls.__subclasses__() if subclass.__name__ != cls.__name__]
 
     # FIXME: Legacy usage in Rocky/Boefjes
     @classmethod
@@ -258,9 +264,9 @@ PrimaryKeyToken.update_forward_refs()
 
 
 def get_leaf_subclasses(cls: Type[OOI]) -> Set[Type[OOI]]:
-    if not cls.__subclasses__():
+    if not cls.strict_subclasses():
         return {cls}
-    child_sets = [get_leaf_subclasses(child_cls) for child_cls in cls.__subclasses__()]
+    child_sets = [get_leaf_subclasses(child_cls) for child_cls in cls.strict_subclasses()]
     return set().union(*child_sets)
 
 
@@ -287,3 +293,4 @@ def build_token_tree(ooi_class: Type[OOI]) -> Dict:
 DeclaredScanProfile.update_forward_refs()
 InheritedScanProfile.update_forward_refs()
 EmptyScanProfile.update_forward_refs()
+ScanProfileBase.update_forward_refs()

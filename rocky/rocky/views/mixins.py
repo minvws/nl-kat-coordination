@@ -1,36 +1,35 @@
 import logging
 from datetime import datetime, timezone
 from functools import cached_property
-from typing import Set, Type, List, Dict, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple, Type
 
 import requests.exceptions
+from account.mixins import OrganizationView
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from pydantic import BaseModel
-
-from account.mixins import OrganizationView
 from katalogus.client import Plugin, get_katalogus
-from octopoes.connector import ObjectNotFoundException
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
-from octopoes.models.ooi.findings import Finding
-from octopoes.models.origin import Origin, OriginType
-from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import get_relations, get_collapsed_types, type_by_name
-from rocky.bytes_client import get_bytes_client
+from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
-from tools.forms.settings import DEPTH_MAX, DEPTH_DEFAULT
+from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
 from tools.models import Organization
 from tools.ooi_helpers import (
     get_knowledge_base_data_for_ooi_store,
 )
 from tools.view_helpers import (
-    get_ooi_url,
     convert_date_to_datetime,
-    BreadcrumbsMixin,
-    Breadcrumb,
+    get_ooi_url,
 )
+
+from octopoes.connector import ObjectNotFoundException
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
+from octopoes.models.explanation import InheritanceSection
+from octopoes.models.ooi.findings import Finding
+from octopoes.models.origin import Origin, OriginType
+from octopoes.models.tree import ReferenceTree
+from octopoes.models.types import get_collapsed_types, get_relations, type_by_name
+from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +38,7 @@ class OriginData(BaseModel):
     origin: Origin
     normalizer: Optional[dict]
     boefje: Optional[Plugin]
+    params: Optional[Dict[str, str]]
 
 
 class OOIAttributeError(AttributeError):
@@ -72,7 +72,6 @@ class OctopoesView(OrganizationView):
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
-
                 if origin.origin.origin_type != OriginType.OBSERVATION:
                     continue
 
@@ -83,7 +82,7 @@ class OctopoesView(OrganizationView):
                     normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
                     boefje_id = normalizer_data["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
-                    origin.boefje = get_katalogus(organization.code).get_boefje(boefje_id)
+                    origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
                 except requests.exceptions.RequestException as e:
                     logger.error(e)
 
@@ -119,8 +118,13 @@ class OctopoesView(OrganizationView):
         except ValueError:
             return default_depth
 
+    def get_scan_profile_inheritance(self, ooi: OOI) -> List[InheritanceSection]:
+        return self.octopoes_api_connector.get_scan_profile_inheritance(ooi.reference)
+
 
 class OOIList:
+    HARD_LIMIT = 99_999_999
+
     def __init__(
         self,
         octopoes_connector: OctopoesAPIConnector,
@@ -216,27 +220,6 @@ class MultipleOOIMixin(OctopoesView):
         return ", ".join(self.filtered_ooi_types)
 
 
-class OOIBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
-        if isinstance(self.ooi, Finding):
-            start = {
-                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Findings"),
-            }
-        else:
-            start = {
-                "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Objects"),
-            }
-        return [
-            start,
-            {
-                "url": get_ooi_url("ooi_detail", self.ooi.primary_key, self.organization.code),
-                "text": self.ooi.human_readable,
-            },
-        ]
-
-
 class ConnectorFormMixin:
     connector_form_class: Type[ObservedAtForm] = None
     connector_form_initial = {}
@@ -256,6 +239,7 @@ class ConnectorFormMixin:
 
 class SingleOOIMixin(OctopoesView):
     ooi: OOI
+    tree: ReferenceTree
 
     def get_ooi_id(self) -> str:
         if "ooi_id" not in self.request.GET:
@@ -292,7 +276,7 @@ class SingleOOIMixin(OctopoesView):
         class_relations = get_relations(ooi.__class__)
         props = {field_name: value for field_name, value in ooi if field_name not in class_relations}
 
-        knowledge_base = get_knowledge_base_data_for_ooi_store(self.tree.store)
+        knowledge_base = get_knowledge_base_data_for_ooi_store({ooi.primary_key: ooi})
 
         if knowledge_base[ooi.get_information_id()]:
             props.update(knowledge_base[ooi.get_information_id()])

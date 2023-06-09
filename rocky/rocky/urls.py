@@ -1,8 +1,9 @@
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 from django.views.generic.base import TemplateView
 from rest_framework import routers
+from tools.viewsets import OrganizationViewSet
 from two_factor.urls import urlpatterns as tf_urls
 
 from rocky.views.bytes_raw import BytesRawView
@@ -18,23 +19,28 @@ from rocky.views.ooi_detail import OOIDetailView
 from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_edit import OOIEditView
 from rocky.views.ooi_findings import OOIFindingListView
-from rocky.views.ooi_list import OOIListView, OOIListExportView
-from rocky.views.ooi_report import OOIReportView, OOIReportPDFView
+from rocky.views.ooi_list import OOIListExportView, OOIListView
+from rocky.views.ooi_mute import MuteFindingView
+from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
 from rocky.views.organization_add import OrganizationAddView
-from rocky.views.organization_detail import OrganizationDetailView
+from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
 from rocky.views.organization_member_add import OrganizationMemberAddView
 from rocky.views.organization_member_edit import OrganizationMemberEditView
+from rocky.views.organization_member_list import OrganizationMemberListView
+from rocky.views.organization_settings import OrganizationSettingsView
 from rocky.views.privacy_statement import PrivacyStatementView
-from rocky.views.scan_profile import ScanProfileResetView, ScanProfileDetailView
+from rocky.views.scan_profile import ScanProfileDetailView, ScanProfileResetView
 from rocky.views.scans import ScanListView
-from rocky.views.tasks import BoefjesTaskListView, NormalizersTaskListView, DownloadTaskDetail
+from rocky.views.tasks import BoefjesTaskListView, DownloadTaskDetail, NormalizersTaskListView
 from rocky.views.upload_csv import UploadCSV
-from tools.viewsets import OrganizationViewSet
+from rocky.views.upload_raw import UploadRaw
 
 handler404 = "rocky.views.handler404.handler404"
+handler403 = "rocky.views.handler403.handler403"
+
 
 router = routers.SimpleRouter()
 router.register(r"organization", OrganizationViewSet)
@@ -44,13 +50,13 @@ urlpatterns = [
     path("api/v1/", include(router.urls)),
     path("<organization_code>/health/", Health.as_view(), name="health"),
     path("", include(tf_urls)),
-    path("", include("account.urls"), name="account"),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
 ]
 urlpatterns += i18n_patterns(
+    path("", include("account.urls"), name="account"),
     path("admin/", admin.site.urls),
     path("", LandingPageView.as_view(), name="landing_page"),
     path("onboarding/", include("onboarding.urls"), name="onboarding"),
@@ -67,7 +73,9 @@ urlpatterns += i18n_patterns(
     ),
     path("<organization_code>/findings/", FindingListView.as_view(), name="finding_list"),
     path("<organization_code>/findings/add/", FindingAddView.as_view(), name="finding_add"),
+    path("<organization_code>/findings/mute/", MuteFindingView.as_view(), name="finding_mute"),
     path("<organization_code>/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
+    path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
     path("<organization_code>/objects/report/", OOIReportView.as_view(), name="ooi_report"),
     path("<organization_code>/objects/report/pdf/", OOIReportPDFView.as_view(), name="ooi_pdf_report"),
@@ -81,7 +89,7 @@ urlpatterns += i18n_patterns(
         name="organization_add",
     ),
     path(
-        "organizations/<path:pk>/edit/",
+        "<organization_code>/edit/",
         OrganizationEditView.as_view(),
         name="organization_edit",
     ),
@@ -92,11 +100,21 @@ urlpatterns += i18n_patterns(
     ),
     path(
         "<organization_code>/",
-        OrganizationDetailView.as_view(),
-        name="organization_detail",
+        OrganizationCrisisRoomView.as_view(),
+        name="organization_crisis_room",
     ),
     path(
-        "organization_members/<path:pk>/edit/",
+        "<organization_code>/settings",
+        OrganizationSettingsView.as_view(),
+        name="organization_settings",
+    ),
+    path(
+        "<organization_code>/members",
+        OrganizationMemberListView.as_view(),
+        name="organization_member_list",
+    ),
+    path(
+        "<organization_code>/members/edit/<int:pk>/",
         OrganizationMemberEditView.as_view(),
         name="organization_member_edit",
     ),
@@ -128,11 +146,8 @@ urlpatterns += i18n_patterns(
         name="scan_profile_detail",
     ),
     path("<organization_code>/scans/", ScanListView.as_view(), name="scan_list"),
-    path(
-        "<organization_code>/upload/csv/",
-        UploadCSV.as_view(),
-        name="upload_csv",
-    ),
+    path("<organization_code>/upload/csv/", UploadCSV.as_view(), name="upload_csv"),
+    path("<organization_code>/upload/raw/", UploadRaw.as_view(), name="upload_raw"),
     path("<organization_code>/tasks/", BoefjesTaskListView.as_view(), name="task_list"),
     path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
     path(

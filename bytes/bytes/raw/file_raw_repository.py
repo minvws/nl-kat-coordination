@@ -1,18 +1,17 @@
 import logging
 from pathlib import Path
 
-from bytes.config import get_bytes_data_directory, Settings
-from bytes.raw.middleware import make_middleware, FileMiddleware
-from bytes.models import RawData, BoefjeMeta
-from bytes.repositories.raw_repository import RawRepository, BytesFileNotFoundException
-
+from bytes.config import Settings
+from bytes.models import BoefjeMeta, RawData
+from bytes.raw.middleware import FileMiddleware, make_middleware
+from bytes.repositories.raw_repository import BytesFileNotFoundException, RawRepository
 
 logger = logging.getLogger(__name__)
 
 
 def create_raw_repository(settings: Settings) -> RawRepository:
     return FileRawRepository(
-        get_bytes_data_directory(),
+        settings.bytes_data_dir,
         make_middleware(),
         folder_permissions=int(settings.bytes_folder_permission, 8),
         file_permissions=int(settings.bytes_file_permission, 8),
@@ -21,7 +20,6 @@ def create_raw_repository(settings: Settings) -> RawRepository:
 
 class FileRawRepository(RawRepository):
     UUID_INDEX = 3  # To reduce the number of subdirectories based on the uuid, see self._index()
-    _ENCODING = "utf-8"
 
     def __init__(
         self,

@@ -1,22 +1,22 @@
 from pathlib import Path
+from tempfile import gettempdir
 from unittest import TestCase
 
 from fastapi.testclient import TestClient
 
-import keiko.settings
-import keiko.templates
 from keiko.api import construct_api
+from keiko.settings import Settings
 
 
 class APITest(TestCase):
     maxDiff = None
 
     def setUp(self) -> None:
-        fixtures = Path(__file__).parent / "fixtures"
+        settings = Settings(
+            templates_folder=str(Path(__file__).parent / "fixtures" / "templates"), reports_folder=str(gettempdir())
+        )
 
-        keiko.templates.settings.templates_folder = str(fixtures / "templates")
-
-        self.api = construct_api()
+        self.api = construct_api(settings)
         self.client = TestClient(self.api)
 
     def test_health(self):

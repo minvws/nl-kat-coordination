@@ -1,7 +1,7 @@
+import contextlib
 import logging
-
 from pathlib import Path
-from typing import Dict, Iterable, List, Iterator, Optional
+from typing import Dict, Iterable, Iterator, List, Optional
 
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
@@ -16,11 +16,11 @@ from boefjes.katalogus.local_repository import (
     LocalPluginRepository,
     get_local_repository,
 )
-from boefjes.katalogus.models import Repository, PluginType, RESERVED_LOCAL_ID
+from boefjes.katalogus.models import RESERVED_LOCAL_ID, PluginType, Repository
 from boefjes.katalogus.storage.interfaces import (
-    RepositoryStorage,
-    PluginEnabledStorage,
     NotFound,
+    PluginEnabledStorage,
+    RepositoryStorage,
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
@@ -86,23 +86,6 @@ class PluginService:
     def get_all_settings(self, organisation_id: str, plugin_id: str):
         return self.settings_storage.get_all(organisation_id, plugin_id)
 
-    def get_setting_by_key(self, key: str, organisation_id: str, plugin_id: str):
-        return self.settings_storage.get_by_key(key, organisation_id, plugin_id)
-
-    def create_setting(self, key: str, value: str, organisation_id: str, plugin_id: str):
-        return self.settings_storage.create(key, value, organisation_id, plugin_id)
-
-    def delete_setting_by_key(self, key: str, organisation_id: str, plugin_id: str):
-        self.settings_storage.delete_by_key(key, organisation_id, plugin_id)
-
-        try:
-            self._assert_settings_match_schema(organisation_id, plugin_id)
-        except SettingsNotConformingToSchema:
-            logger.warning(f"Removing setting disabled {plugin_id} for {organisation_id} (if it was enabled before)")
-
-            plugin = self.by_plugin_id(plugin_id, organisation_id)
-            self.update_by_id(plugin.repository_id, plugin_id, organisation_id, False)
-
     def clone_settings_to_organisation(self, from_organisation: str, to_organisation: str):
         # One requirement is that we also do not keep previously enabled boefjes enabled of they are not copied.
         for repository_id, plugins in self.plugin_enabled_store.get_all_enabled(to_organisation).items():
@@ -110,21 +93,28 @@ class PluginService:
                 self.update_by_id(repository_id, plugin_id, to_organisation, enabled=False)
 
         for plugin in self.get_all(from_organisation):
-            old_settings = self.get_all_settings(to_organisation, plugin.id)
-
-            for key, value in self.get_all_settings(from_organisation, plugin.id).items():
-                if key in old_settings:
-                    self.update_setting_by_key(key, value, to_organisation, plugin.id)
-                    continue
-
-                self.create_setting(key, value, to_organisation, plugin.id)
+            if all_settings := self.get_all_settings(from_organisation, plugin.id):
+                self.upsert_settings(all_settings, to_organisation, plugin.id)
 
         for repository_id, plugins in self.plugin_enabled_store.get_all_enabled(from_organisation).items():
             for plugin_id in plugins:
                 self.update_by_id(repository_id, plugin_id, to_organisation, enabled=True)
 
-    def update_setting_by_key(self, key: str, value: str, organisation_id: str, plugin_id: str):
-        return self.settings_storage.update_by_key(key, value, organisation_id, plugin_id)
+    def upsert_settings(self, values: Dict, organisation_id: str, plugin_id: str):
+        self._assert_settings_match_schema(values, organisation_id, plugin_id)
+
+        return self.settings_storage.upsert(values, organisation_id, plugin_id)
+
+    def delete_settings(self, organisation_id: str, plugin_id: str):
+        self.settings_storage.delete(organisation_id, plugin_id)
+
+        try:
+            self._assert_settings_match_schema({}, organisation_id, plugin_id)
+        except SettingsNotConformingToSchema:
+            logger.warning("Making sure %s is disabled for %s because settings are deleted", plugin_id, organisation_id)
+
+            plugin = self.by_plugin_id(plugin_id, organisation_id)
+            self.update_by_id(plugin.repository_id, plugin_id, organisation_id, False)
 
     # These three methods should return this static info from remote repositories as well in the future
 
@@ -163,7 +153,8 @@ class PluginService:
 
     def update_by_id(self, repository_id: str, plugin_id: str, organisation_id: str, enabled: bool):
         if enabled:
-            self._assert_settings_match_schema(organisation_id, plugin_id)
+            all_settings = self.settings_storage.get_all(organisation_id, plugin_id)
+            self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)
 
         self.plugin_enabled_store.update_or_create_by_id(
             plugin_id,
@@ -191,8 +182,7 @@ class PluginService:
 
         return plugins
 
-    def _assert_settings_match_schema(self, organisation_id: str, plugin_id: str):
-        all_settings = self.settings_storage.get_all(organisation_id, plugin_id)
+    def _assert_settings_match_schema(self, all_settings: Dict, organisation_id: str, plugin_id: str):
         schema = self.schema(plugin_id)
 
         if schema:  # No schema means that there is nothing to assert
@@ -202,10 +192,8 @@ class PluginService:
                 raise SettingsNotConformingToSchema(organisation_id, plugin_id, e.message) from e
 
     def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
-        try:
+        with contextlib.suppress(KeyError, NotFound):
             plugin.enabled = self.plugin_enabled_store.get_by_id(plugin.id, plugin.repository_id, organisation_id)
-        except (KeyError, NotFound):
-            pass
 
         return plugin
 
@@ -234,7 +222,7 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
         return PluginService(
             create_plugin_enabled_storage(session),
             create_repository_storage(session),
-            create_setting_storage(organisation_id, session),
+            create_setting_storage(session),
             PluginRepositoryClient(),
             get_local_repository(),
         )

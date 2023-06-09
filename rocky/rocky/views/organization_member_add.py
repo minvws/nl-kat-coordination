@@ -1,20 +1,16 @@
+from account.forms import OrganizationMemberToGroupAddForm
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
+from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView
-from django_otp.decorators import otp_required
-from two_factor.views.utils import class_view_decorator
-
-from account.forms import OrganizationMemberToGroupAddForm
-from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
 User = get_user_model()
 
 
-@class_view_decorator(otp_required)
-class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, CreateView):
+class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, OrganizationView, CreateView):
     """
     View to create a new member for a specific organization.
     """
@@ -30,11 +26,25 @@ class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBread
         return kwargs
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("organization_detail", kwargs={"organization_code": self.organization.code})
+        return reverse_lazy("organization_member_list", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
+                "text": "Members",
+            },
+            {
+                "url": reverse(
+                    "organization_member_add",
+                    kwargs={"organization_code": self.organization.code},
+                ),
+                "text": _("Add member"),
+            },
+        ]
         context["organization"] = self.organization
+
         return context
 
     def form_valid(self, form):
@@ -42,5 +52,5 @@ class OrganizationMemberAddView(PermissionRequiredMixin, OrganizationMemberBread
         return super().form_valid(form)
 
     def add_success_notification(self):
-        success_message = _("Member added succesfully.")
+        success_message = _("Member added successfully.")
         messages.add_message(self.request, messages.SUCCESS, success_message)

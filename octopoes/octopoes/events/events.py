@@ -1,10 +1,10 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Union, Literal
+from typing import Literal, Optional, Union
 
 from pydantic import BaseModel
 
-from octopoes.models import ScanProfile, Reference
+from octopoes.models import Reference, ScanProfile
 from octopoes.models.origin import Origin, OriginParameter
 from octopoes.models.types import OOIType
 
@@ -58,12 +58,13 @@ class OriginParameterDBEvent(DBEvent):
 
 class ScanProfileDBEvent(DBEvent):
     entity_type: Literal["scan_profile"] = "scan_profile"
+    reference: Reference
     old_data: Optional[ScanProfile]
     new_data: Optional[ScanProfile]
 
     @property
     def primary_key(self) -> Reference:
-        return self.new_data.reference if self.new_data else self.old_data.reference
+        return self.reference
 
 
 EVENT_TYPE = Union[OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent]

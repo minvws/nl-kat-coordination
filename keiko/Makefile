@@ -31,10 +31,10 @@ check-latex:
 	done
 
 test:
-	python -m unittest discover -s tests -p "test_*.py"
+	pytest
 
 itest:
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build
+	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build && sleep 1
 	robot -d reports tests/robot
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
 
@@ -73,7 +73,7 @@ clean:
 	rm -f debian/*.debhelper.log
 	rm -f debian/changelog
 
-export-requirements: ## Export the requirements to requirements.txt
+export-requirements: ## Export the requirements to requirements.txt format
 	poetry export --output requirements.txt --without-hashes && \
-	poetry export --output requirements-dev.txt --with dev --without-hashes && \
+	poetry export --output requirements-dev.txt --with dev --without-hashes
 	poetry export --output requirements-check.txt --only dev --without-hashes

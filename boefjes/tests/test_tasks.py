@@ -1,23 +1,23 @@
-from pathlib import Path
-
-import pytest
 import sys
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import List
 from unittest import TestCase, mock
 
+import pytest
+
+from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.job_models import (
     BoefjeMeta,
-    NormalizerMeta,
-    UnsupportedReturnTypeNormalizer,
     InvalidReturnValueNormalizer,
+    NormalizerMeta,
     NormalizerPlainOOI,
+    UnsupportedReturnTypeNormalizer,
 )
-from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.katalogus.models import Boefje, Normalizer, Bit, PluginType
-
-from tests.stubs import get_dummy_data
+from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from tests.stubs import get_dummy_data
 
 
 class TaskTest(TestCase):
@@ -95,6 +95,14 @@ class TaskTest(TestCase):
 
         NormalizerHandler._parse_ooi(plain_ooi)
 
+    def test_parse_normalizer_meta_to_json(self):
+        meta = NormalizerMeta.parse_raw(get_dummy_data("snyk-normalizer.json"))
+        meta.started_at = datetime(10, 10, 10, 10, tzinfo=timezone.utc)
+        meta.ended_at = datetime(10, 10, 10, 12, tzinfo=timezone.utc)
+
+        assert "0010-10-10T10:00:00+00:00" in meta.json()
+        assert "0010-10-10T12:00:00+00:00" in meta.json()
+
     @mock.patch("boefjes.job_handler.get_environment_settings", return_value={})
     @mock.patch("boefjes.job_handler.bytes_api_client")
     @mock.patch("boefjes.job_handler._find_ooi_in_past")
@@ -113,16 +121,18 @@ class TaskTest(TestCase):
             BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository).handle(meta)
 
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
-        mock_bytes_api_client.save_raw.assert_called_once_with(
-            "some-random-job-id",
-            "Boefje failed",
-            {
-                "error/boefje",
-                "dummy_boefje_runtime_exception",
-                "boefje/dummy_boefje_runtime_exception",
-                f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
-            },
-        )
+        mock_bytes_api_client.save_raw.assert_called_once()
+        raw_call_args = mock_bytes_api_client.save_raw.call_args
+
+        assert raw_call_args[0][0] == "some-random-job-id"
+        assert "Traceback (most recent call last)" in raw_call_args[0][1]
+        assert "JobRuntimeError: Boefje failed" in raw_call_args[0][1]
+        assert raw_call_args[0][2] == {
+            "error/boefje",
+            "dummy_boefje_runtime_exception",
+            "boefje/dummy_boefje_runtime_exception",
+            f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
+        }
 
     def test_exception_raised_unsupported_return_type_normalizer(self):
         meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))

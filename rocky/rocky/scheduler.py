@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
@@ -16,13 +16,7 @@ class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
-    name: Optional[str]
-    description: Optional[str]
-    repository_id: Optional[str]
     version: Optional[str] = Field(default=None)
-    scan_level: Optional[int] = Field(default=None)
-    consumes: Optional[Union[str, Set[str]]]
-    produces: Optional[Set[str]]
 
 
 class BoefjeMeta(BaseModel):
@@ -38,7 +32,7 @@ class BoefjeMeta(BaseModel):
 
 
 class RawData(BaseModel):
-    id: Optional[str]
+    id: str
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
     secure_hash: Optional[str]
@@ -55,7 +49,7 @@ class Normalizer(BaseModel):
 
 class NormalizerMeta(BaseModel):
     id: str
-    raw_file_id: str
+    raw_data: RawData
     normalizer: Normalizer
     started_at: datetime.datetime
     ended_at: datetime.datetime
@@ -125,35 +119,18 @@ class LazyTaskList:
     def __init__(
         self,
         scheduler_client: SchedulerClient,
-        scheduler_id: str,
-        object_type: Optional[str] = None,
-        status: Optional[str] = None,
-        min_created_at: Optional[datetime.datetime] = None,
-        max_created_at: Optional[datetime.datetime] = None,
-        filters: Optional[List[Dict]] = None,
+        **kwargs,
     ):
         self.scheduler_client = scheduler_client
-
-        self.scheduler_id = scheduler_id
-        self.object_type = object_type
-        self.status = status
-        self.min_created_at = min_created_at
-        self.max_created_at = max_created_at
-        self.filters = filters
-
+        self.kwargs = kwargs
         self._count = None
 
     @property
     def count(self) -> int:
         if self._count is None:
             self._count = self.scheduler_client.list_tasks(
-                self.scheduler_id,
-                type=self.object_type,
                 limit=0,
-                status=self.status,
-                min_created_at=self.min_created_at,
-                max_created_at=self.max_created_at,
-                filters=self.filters,
+                **self.kwargs,
             ).count
         return self._count
 
@@ -171,14 +148,9 @@ class LazyTaskList:
             raise TypeError("Invalid slice argument type.")
 
         res = self.scheduler_client.list_tasks(
-            self.scheduler_id,
-            type=self.object_type,
             limit=limit,
             offset=offset,
-            status=self.status,
-            min_created_at=self.min_created_at,
-            max_created_at=self.max_created_at,
-            filters=self.filters,
+            **self.kwargs,
         )
 
         self._count = res.count
@@ -192,38 +164,33 @@ class SchedulerClient:
 
     def list_tasks(
         self,
-        scheduler_id: str,
-        type: Optional[str] = None,
-        limit: Optional[int] = None,
-        offset: Optional[int] = None,
-        status: Optional[str] = None,
-        min_created_at: Optional[datetime.datetime] = None,
-        max_created_at: Optional[datetime.datetime] = None,
-        filters: Optional[List[Dict]] = None,
+        **kwargs,
     ) -> PaginatedTasksResponse:
-        params = {
-            "scheduler_id": scheduler_id,
-            "type": type,
-            "limit": limit,
-            "offset": offset,
-            "status": status,
-            "min_created_at": min_created_at,
-            "max_created_at": max_created_at,
-        }
-
-        res = self.session.get(f"{self._base_uri}/tasks", params=params, json=filters)
+        res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
         return PaginatedTasksResponse.parse_raw(res.text)
 
     def get_lazy_task_list(
         self,
         scheduler_id: str,
-        object_type: Optional[str] = None,
+        task_type: Optional[str] = None,
         status: Optional[str] = None,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
-        filters: Optional[List[Dict]] = None,
+        input_ooi: Optional[str] = None,
+        plugin_id: Optional[str] = None,
+        boefje_name: Optional[str] = None,
     ) -> LazyTaskList:
-        return LazyTaskList(self, scheduler_id, object_type, status, min_created_at, max_created_at, filters)
+        return LazyTaskList(
+            self,
+            scheduler_id=scheduler_id,
+            type=task_type,
+            status=status,
+            min_created_at=min_created_at,
+            max_created_at=max_created_at,
+            input_ooi=input_ooi,
+            plugin_id=plugin_id,
+            boefje_name=boefje_name,
+        )
 
     def get_task_details(self, task_id):
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")

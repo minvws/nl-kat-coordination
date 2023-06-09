@@ -1,10 +1,10 @@
 from abc import ABC
 from enum import Enum
-from typing import Literal, Optional, Dict
+from typing import Dict, Literal, Optional
 
 from pydantic import AnyUrl
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI, PrimaryKeyToken, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, Network
@@ -12,12 +12,22 @@ from octopoes.models.ooi.service import IPService
 from octopoes.models.persistence import ReferenceField
 
 
+def format_web_url_token(token: PrimaryKeyToken) -> str:
+    port = f":{token.port}" if token.port else ""
+    try:
+        netloc = token.netloc.address
+    except KeyError:
+        netloc = token.netloc.name
+
+    return f"{token.scheme}://{netloc}{port}{token.path}"
+
+
 class Website(OOI):
     object_type: Literal["Website"] = "Website"
 
     ip_service: Reference = ReferenceField(IPService, max_issue_scan_level=0, max_inherit_scan_level=4)
     hostname: Reference = ReferenceField(Hostname, max_inherit_scan_level=4)
-    certificate: Optional[Reference] = ReferenceField(X509Certificate, default=None)
+    certificate: Optional[Reference] = ReferenceField(X509Certificate, default=None, max_issue_scan_level=1)
 
     _natural_key_attrs = ["ip_service", "hostname"]
 
@@ -27,9 +37,9 @@ class Website(OOI):
     def format_reference_human_readable(cls, reference: Reference) -> str:
         t = reference.tokenized
         service = t.ip_service.service.name
-        addres = t.ip_service.ip_port.address.address
+        address = t.ip_service.ip_port.address.address
         port = t.ip_service.ip_port.port
-        return f"{service}://{t.hostname.name}:{port} @ {addres}"
+        return f"{service}://{t.hostname.name}:{port} @ {address}"
 
 
 class WebScheme(Enum):
@@ -221,3 +231,56 @@ class ImageMetadata(OOI):
         address = t.resource.website.ip_service.ip_port.address.address
 
         return f"{web_url} @ {address}"
+
+
+class RESTAPI(OOI):
+    object_type: Literal["RESTAPI"] = "RESTAPI"
+
+    api_url: Reference = ReferenceField(WebURL)
+
+    _natural_key_attrs = ["api_url"]
+    _reverse_relation_names = {
+        "api_url": "api_url_of",
+    }
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return format_web_url_token(reference.tokenized.api_url)
+
+
+class APIDesignRule(OOI):
+    object_type: Literal["APIDesignRule"] = "APIDesignRule"
+
+    name: str
+
+    _natural_key_attrs = ["name"]
+    _reverse_relation_names = {}
+    _traversable = False
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return reference.tokenized.name
+
+
+class APIDesignRuleResult(OOI):
+    object_type: Literal["APIDesignRuleResult"] = "APIDesignRuleResult"
+
+    rest_api: Reference = ReferenceField(RESTAPI)
+    rule: Reference = ReferenceField(APIDesignRule)
+    passed: bool
+    message: str
+
+    _natural_key_attrs = ["rest_api", "rule"]
+    _reverse_relation_names = {
+        "rest_api": "api_design_rule_results",
+        "rule": "results",
+    }
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        t = reference.tokenized
+
+        rule = t.rule.name
+        api_url = format_web_url_token(t.rest_api.api_url)
+
+        return f"{rule} @ {api_url}"

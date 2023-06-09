@@ -13,10 +13,11 @@ services:
     volumes:
       - .:/app/rocky
       - ./.ci/run_rocky.sh:/app/run_rocky.sh
+      - ../octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .ci/.env.test
 
   ci_rocky-db:
-    image: postgres:12.8
+    image: postgres:15
     env_file:
       - .ci/.env.test

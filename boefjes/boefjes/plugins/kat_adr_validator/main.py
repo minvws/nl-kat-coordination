@@ -4,9 +4,8 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
-
-ADR_VALIDATOR_REPOSITORY = "registry.gitlab.com/commonground/don/adr-validator/tmp"
-ADR_VALIDATOR_VERSION = "main"
+ADR_VALIDATOR_REPOSITORY = "registry.gitlab.com/commonground/don/adr-validator"
+ADR_VALIDATOR_VERSION = "0.2.0"
 
 
 def run_adr_validator(url: str) -> str:
@@ -18,8 +17,8 @@ def run_adr_validator(url: str) -> str:
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
-    input = boefje_meta.arguments["input"]
-    api_url = input["api_url"]
+    input_ooi = boefje_meta.arguments["input"]
+    api_url = input_ooi["api_url"]
 
     hostname = api_url["netloc"]["name"]
     path = api_url["path"]

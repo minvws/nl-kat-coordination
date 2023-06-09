@@ -1,12 +1,13 @@
 import uuid
-from typing import Dict
+from typing import Dict, Optional
 
-from bytes.models import SecureHash, RetrievalLink
+from bytes.models import RetrievalLink, SecureHash
 from bytes.repositories.hash_repository import HashRepository
 
 
 class InMemoryHashRepository(HashRepository):
-    def __init__(self) -> None:
+    def __init__(self, signing_provider_url: Optional[str] = None) -> None:
+        self.signing_provider_url = signing_provider_url  # Being able to set this to a string is useful for testing
         self.memory: Dict[str, SecureHash] = {}
 
     def store(self, secure_hash: SecureHash) -> RetrievalLink:
@@ -22,3 +23,6 @@ class InMemoryHashRepository(HashRepository):
 
     def verify(self, link: RetrievalLink, secure_hash: SecureHash) -> bool:
         return secure_hash == self.retrieve(link)
+
+    def get_signing_provider_url(self) -> Optional[str]:
+        return self.signing_provider_url

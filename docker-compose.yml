@@ -2,8 +2,8 @@ version: "3.9"
 
 services:
   rabbitmq:
-    restart: on-failure
-    image: "rabbitmq:3.9-management"
+    restart: unless-stopped
+    image: "rabbitmq:3.11-management"
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -14,22 +14,41 @@ services:
     env_file:
       - .env
 
+  postgres:
+    restart: unless-stopped
+    image: postgres:15
+    shm_size: 256MB
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD", "gosu", "postgres", "pg_isready"]
+      interval: 10s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    env_file:
+      - .env
+    environment:
+      APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
+
   crux:
     image: "ghcr.io/dekkers/xtdb-http-multinode:main"
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "127.0.0.1:3000:3000"
     volumes:
       - xtdb-data:/var/lib/xtdb
 
   octopoes_api:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - crux
     ports:
       - "127.0.0.1:8001:80"
     build:
       context: octopoes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
@@ -39,12 +58,13 @@ services:
       - ./octopoes:/app/octopoes
 
   octopoes_api_worker:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - crux
       - rabbitmq
     build:
       context: octopoes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: worker-beat
@@ -54,17 +74,19 @@ services:
       - ./octopoes:/app/octopoes
 
   boefje:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - rabbitmq
       - bytes
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 1
@@ -73,127 +95,89 @@ services:
       - .env
 
   normalizer:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - rabbitmq
       - bytes
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
     deploy:
       replicas: 1
     command: normalizer
     env_file:
       - .env
 
-  rocky-db:
-    image: postgres:12.8
-    ports:
-      - "127.0.0.1:5432:5432"
-    volumes:
-      - rocky-db-data:/var/lib/postgresql/data
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env
-    environment:
-      - APP_DB=ROCKY_DB
-      - APP_DB_USER=ROCKY_DB_USER
-      - APP_DB_USER_CREATEDB=CREATEDB
-      - APP_DB_PASSWORD=ROCKY_DB_PASSWORD
-
-  bytes-db:
-    image: postgres:12.8
-    ports:
-      - "127.0.0.1:5433:5432"
-    volumes:
-      - bytes-db-data:/var/lib/postgresql/data
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env
-    environment:
-      - APP_DB=BYTES_DB
-      - APP_DB_USER=BYTES_DB_USER
-      - APP_DB_PASSWORD=BYTES_DB_PASSWORD
-
   rocky:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
-      - octopoes_api_worker
-      - octopoes_api
-      - rocky-db
-      - boefje
-      - normalizer
-      - katalogus
-      - scheduler
-      - keiko
+      - postgres
     ports:
       - "127.0.0.1:8000:80"
     build:
       context: .
       dockerfile: rocky/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     command: python3 manage.py runserver 0.0.0.0:80
     volumes:
       - ./rocky:/app/rocky
+      - ./octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .env
+    environment:
+      - GITPOD_WORKSPACE_URL=${GITPOD_WORKSPACE_URL:-}
+      - GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}
 
   bytes:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
-      - bytes-db
+      - postgres
     ports:
       - "127.0.0.1:8002:8000"
     build:
       context: bytes/
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
     volumes:
       - ./bytes:/app/bytes
+      - bytes-data:/data
     env_file:
       - .env
 
   katalogus:
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
-      - katalogus-db
+      - postgres
     build:
       context: .
       dockerfile: boefjes/Dockerfile
+      target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./boefjes:/app/boefjes
+      - ./octopoes/octopoes:/app/boefjes/octopoes
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
       - .env
 
-  katalogus-db:
-    image: postgres:12.8
-    ports:
-      - "127.0.0.1:5434:5432"
-    volumes:
-      - katalogus-db-data:/var/lib/postgresql/data
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env
-    environment:
-      - APP_DB=KATALOGUS_DB
-      - APP_DB_USER=KATALOGUS_DB_USER
-      - APP_DB_PASSWORD=KATALOGUS_DB_PASSWORD
-
   scheduler:
-    restart: on-failure
+    restart: unless-stopped
     build:
       context: mula/
+      target: dev
       args:
         ENVIRONMENT: dev
     ports:
@@ -203,30 +187,17 @@ services:
     volumes:
       - ./mula:/app/scheduler
     depends_on:
-      - scheduler-db
+      - postgres
       - boefje
       - normalizer
       - octopoes_api
       - katalogus
 
-  scheduler-db:
-    image: postgres:12.8
-    ports:
-      - "127.0.0.1:5435:5432"
-    volumes:
-      - scheduler-db-data:/var/lib/postgresql/data
-      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env
-    environment:
-      - APP_DB=SCHEDULER_DB
-      - APP_DB_USER=SCHEDULER_DB_USER
-      - APP_DB_PASSWORD=SCHEDULER_DB_PASSWORD
-
   keiko:
-    restart: on-failure
+    restart: unless-stopped
     build:
       context: keiko/
+      target: dev
     ports:
       - "127.0.0.1:8005:8000"
     command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko
@@ -234,10 +205,21 @@ services:
       - .env
     volumes:
       - ./keiko:/app/keiko
+      - keiko-reports:/reports
+
+  jaeger:
+    profiles:
+    - jaeger
+    restart: unless-stopped
+    image: jaegertracing/all-in-one:1.44
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: 9411
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "127.0.0.1:16686:16686"
 
 volumes:
-  rocky-db-data:
-  bytes-db-data:
-  katalogus-db-data:
-  scheduler-db-data:
+  postgres-data:
+  bytes-data:
+  keiko-reports:
   xtdb-data:

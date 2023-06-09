@@ -6,13 +6,14 @@ from typing import Any, Dict, List
 from requests import HTTPError
 
 from octopoes.config.settings import XTDBType
-from octopoes.events.events import OriginDBEvent, OperationType
+from octopoes.events.events import OperationType, OriginDBEvent
 from octopoes.events.manager import EventManager
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.origin import Origin
+from octopoes.models.origin import Origin, OriginType
 from octopoes.xtdb import FieldSet
-from octopoes.xtdb.client import XTDBSession, OperationType as XTDBOperationType
+from octopoes.xtdb.client import OperationType as XTDBOperationType
+from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query_builder import generate_pull_query
 
 logger = getLogger(__name__)
@@ -37,9 +38,11 @@ class OriginRepository:
     def delete(self, origin: Origin, valid_time: datetime) -> None:
         raise NotImplementedError
 
+    def list(self, origin_type: OriginType, valid_time: datetime) -> List[Origin]:
+        raise NotImplementedError
+
 
 class XTDBOriginRepository(OriginRepository):
-
     xtdb_type: XTDBType = XTDBType.CRUX
 
     def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
@@ -96,11 +99,10 @@ class XTDBOriginRepository(OriginRepository):
                 raise e
 
     def save(self, origin: Origin, valid_time: datetime) -> None:
-        old_origin = None
         try:
             old_origin = self.get(origin.id, valid_time)
         except ObjectNotFoundException:
-            pass
+            old_origin = None
 
         if old_origin == origin:
             return
@@ -124,3 +126,14 @@ class XTDBOriginRepository(OriginRepository):
             old_data=origin,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
+
+    def list(self, origin_type: OriginType, valid_time: datetime) -> List[Origin]:
+        query = generate_pull_query(
+            self.xtdb_type,
+            FieldSet.ALL_FIELDS,
+            {
+                "origin_type": origin_type.value,
+            },
+        )
+        results = self.session.client.query(query, valid_time=valid_time)
+        return [self.deserialize(r[0]) for r in results]

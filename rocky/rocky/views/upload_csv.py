@@ -1,33 +1,27 @@
 import csv
 import io
 from datetime import datetime, timezone
-from typing import Dict, ClassVar, Any
+from typing import Any, ClassVar, Dict
+from uuid import uuid4
 
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
-from django_otp.decorators import otp_required
 from pydantic import ValidationError
-from two_factor.views.utils import class_view_decorator
+from tools.forms.upload_csv import CSV_ERRORS, UploadCSVForm
 
-from account.mixins import OrganizationView
 from octopoes.api.models import Declaration
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network, IPAddressV4, IPAddressV6
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from octopoes.models.ooi.web import URL
-
 from rocky.bytes_client import get_bytes_client
-from tools.forms.upload_csv import (
-    UploadCSVForm,
-    CSV_ERRORS,
-)
 
-CSV_CRITERIAS = [
+CSV_CRITERIA = [
     _("Add column titles. Followed by each object on a new line."),
     _(
         "For URL object type, a column 'raw' with URL values is required, starting with http:// or https://, "
@@ -44,8 +38,7 @@ CSV_CRITERIAS = [
 ]
 
 
-@class_view_decorator(otp_required)
-class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
+class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
     form_class = UploadCSVForm
     permission_required = "tools.can_scan_organization"
@@ -76,7 +69,7 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
                 "text": _("Upload CSV"),
             },
         ]
-        context["criterias"] = CSV_CRITERIAS
+        context["criteria"] = CSV_CRITERIA
         return context
 
     def get_or_create_reference(self, ooi_type_name: str, value: str):
@@ -120,8 +113,8 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
                 except IndexError:
                     if required:
                         raise IndexError(
-                            "Required referenced primary-key field '%s' not set and no default present for Type '%s'."
-                            % (field, ooi_type_name)
+                            f"Required referenced primary-key field '{field}' not set "
+                            f"and no default present for Type '{ooi_type_name}'."
                         )
                     else:
                         kwargs[field] = None
@@ -148,7 +141,11 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
         csv_file = form.cleaned_data["csv_file"]
 
         csv_raw_data = csv_file.read()
-        get_bytes_client(self.organization.code).add_manual_proof(csv_raw_data, manual_mime_type="manual/csv")
+
+        task_id = uuid4()
+        get_bytes_client(self.organization.code).add_manual_proof(
+            task_id, csv_raw_data, manual_mime_types={"manual/csv"}
+        )
 
         csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
         rows_with_error = []
@@ -159,7 +156,7 @@ class UploadCSV(PermissionRequiredMixin, OrganizationView, FormView):
                 try:
                     ooi = self.get_ooi_from_csv(object_type, row)
                     self.octopoes_api_connector.save_declaration(
-                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc))
+                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
                     )
                 except ValidationError:
                     rows_with_error.append(row_number)

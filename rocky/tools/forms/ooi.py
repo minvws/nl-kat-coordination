@@ -1,21 +1,21 @@
-from typing import List, Tuple, Any
+from typing import Any, List, Tuple
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import OOI
+from tools.forms.base import (
+    BaseRockyForm,
+    CheckboxGroup,
+    CheckboxTable,
+    LabeledCheckboxInput,
+    ObservedAtForm,
+)
 from tools.forms.settings import (
     DEPTH_DEFAULT,
     DEPTH_HELP_TEXT,
     DEPTH_MAX,
     SCAN_LEVEL_CHOICES,
-)
-from tools.forms.base import (
-    BaseRockyForm,
-    ObservedAtForm,
-    CheckboxGroup,
-    CheckboxTable,
-    LabeledCheckboxInput,
 )
 
 
@@ -50,7 +50,6 @@ class OoiTreeSettingsForm(OOIReportSettingsForm):
 
 
 class SelectOOIForm(BaseRockyForm):
-
     ooi = forms.MultipleChoiceField(
         label=_("Objects"),
         widget=CheckboxTable(
@@ -104,7 +103,6 @@ class PossibleBoefjesFilterForm(BaseRockyForm):
 
 
 class SetClearanceLevelForm(forms.Form):
-
     level = forms.IntegerField(
         label=_("Clearance level"),
         help_text=_(
@@ -122,3 +120,9 @@ class SetClearanceLevelForm(forms.Form):
             },
         ),
     )
+
+
+class MuteFindingForm(forms.Form):
+    finding = forms.CharField(widget=forms.HiddenInput(), required=False)
+    ooi_type = forms.CharField(widget=forms.HiddenInput(), required=False)
+    reason = forms.CharField(widget=forms.Textarea(attrs={"name": "reason", "rows": "3", "cols": "5"}), required=False)

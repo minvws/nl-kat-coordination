@@ -1,4 +1,4 @@
-from typing import Tuple, Dict, Set, Optional
+from typing import Dict, Optional, Set, Tuple
 
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 
@@ -55,20 +55,21 @@ class RelatedFieldNode:
             # Loop all attributes
             for foreign_key in foreign_object_relations:
                 # Other object points to one of the types in this QueryNode (i.e. sets are NOT disjoint)
-                if not foreign_key.related_entities.isdisjoint(types):
-                    # Don't traverse the same relation back
-                    if not self.path or foreign_key != self.path[-1]:
-                        self.relations_in[
-                            (
-                                foreign_key.source_entity,
-                                foreign_key.attr_name,
-                                foreign_key.reverse_name,
-                            )
-                        ] = RelatedFieldNode(
-                            self.data_model,
-                            {foreign_object_type},
-                            self.path + (foreign_key,),
+                # Don't traverse the same relation back
+                if not foreign_key.related_entities.isdisjoint(types) and (
+                    not self.path or foreign_key != self.path[-1]
+                ):
+                    self.relations_in[
+                        (
+                            foreign_key.source_entity,
+                            foreign_key.attr_name,
+                            foreign_key.reverse_name,
                         )
+                    ] = RelatedFieldNode(
+                        self.data_model,
+                        {foreign_object_type},
+                        self.path + (foreign_key,),
+                    )
 
     def build_tree(self, depth: int):
         if depth > 0:
@@ -93,7 +94,7 @@ class RelatedFieldNode:
         for key, node in self.relations_out.items():
             cls, attr_name = key
             deeper_fields = node.generate_field(field_set, pk_prefix)
-            field_query = "{(:%s/%s {:as %s}) %s}" % (
+            field_query = "{{(:{}/{} {{:as {}}}) {}}}".format(
                 cls,
                 attr_name,
                 attr_name,
@@ -105,7 +106,7 @@ class RelatedFieldNode:
         for key, node in self.relations_in.items():
             foreign_cls, attr_name, reverse_name = key
             deeper_fields = node.generate_field(field_set, pk_prefix)
-            field_query = "{(:%s/_%s {:as %s}) %s}" % (
+            field_query = "{{(:{}/_{} {{:as {}}}) {}}}".format(
                 foreign_cls,
                 attr_name,
                 reverse_name,

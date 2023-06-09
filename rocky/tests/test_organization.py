@@ -1,133 +1,450 @@
+from unittest.mock import patch
+
 import pytest
 from django.contrib.auth.models import Permission
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
+from requests import RequestException
+from tools.models import DENY_ORGANIZATION_CODES, Organization
 
-from rocky.views.organization_detail import OrganizationDetailView
+from rocky.views.indemnification_add import IndemnificationAddView
+from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
-from tests.conftest import setup_request
-from tools.models import OrganizationMember
+from rocky.views.organization_member_list import OrganizationMemberListView
+from rocky.views.organization_settings import OrganizationSettingsView
+from tests.conftest import create_member, setup_request
+
+AMOUNT_OF_TEST_ORGANIZATIONS = 50
 
 
-def test_organization_list_non_superuser(rf, my_user, organization, mock_models_katalogus, mock_models_octopoes):
-    my_user.is_superuser = False
-    my_user.user_permissions.add(Permission.objects.get(codename="view_organization"))
+@pytest.fixture
+def bulk_organizations(active_member, blocked_member):
+    with patch("katalogus.client.KATalogusClientV1"), patch("tools.models.OctopoesAPIConnector"):
+        organizations = []
+        for i in range(1, AMOUNT_OF_TEST_ORGANIZATIONS):
+            org = Organization.objects.create(name=f"Test Organization {i}", code=f"test{i}", tags=f"test-tag{i}")
 
-    request = setup_request(rf.get("organization_list"), my_user)
+            for member in [active_member, blocked_member]:
+                create_member(member.user, org)
+            organizations.append(org)
+    return organizations
+
+
+def test_organization_list_non_superuser(rf, client_member):
+    client_member.user.user_permissions.add(Permission.objects.get(codename="view_organization"))
+
+    request = setup_request(rf.get("organization_list"), client_member.user)
     response = OrganizationListView.as_view()(request)
 
     assertContains(response, "Organizations")
     assertNotContains(response, "Add new organization")
-    assertContains(response, organization.name)
+    assertContains(response, client_member.organization.name)
 
 
-def test_edit_organization(rf, my_user, organization, mock_models_katalogus, mock_models_octopoes):
-    request = setup_request(rf.get("organization_edit"), my_user)
-    response = OrganizationEditView.as_view()(request, pk=organization.id)
+def test_edit_organization(rf, superuser_member):
+    request = setup_request(rf.get("organization_edit"), superuser_member.user)
+    response = OrganizationEditView.as_view()(request, organization_code=superuser_member.organization.code)
 
     assert response.status_code == 200
     assertContains(response, "Name")
     assertContains(response, "Code")
-    assertContains(response, organization.code)
-    assertContains(response, organization.name)
+    assertContains(response, superuser_member.organization.code)
+    assertContains(response, superuser_member.organization.name)
     assertContains(response, "Save organization")
 
 
-def test_organization_list(rf, my_user, organization, mock_models_katalogus, mock_models_octopoes):
-    request = setup_request(rf.get("organization_list"), my_user)
-    response = OrganizationListView.as_view()(request)
+def test_add_organization_page(rf, superuser_member):
+    request = setup_request(rf.get("organization_add"), superuser_member.user)
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
 
-    assertContains(response, "Organizations")
-    assertContains(response, "Add new organization")
-    assertContains(response, organization.name)
+    assert response.status_code == 200
+    assertContains(response, "Name")
+    assertContains(response, "Code")
+    assertContains(response, superuser_member.organization.code)
+    assertContains(response, superuser_member.organization.name)
+    assertContains(response, "Organization setup")
 
 
-def test_organization_member_list(rf, my_user, organization, mock_models_katalogus, mock_models_octopoes):
-    request = setup_request(rf.get("organization_detail"), my_user)
-    response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
+def test_add_organization_submit_success(rf, superuser_member, mocker, mock_models_octopoes):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "neworg", "code": "norg"},
+        ),
+        superuser_member.user,
+    )
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 302
 
-    assertContains(response, "Organization details")
-    assertContains(response, organization.name)
+    messages = list(request._messages)
+    assert "Organization added successfully" in messages[0].message
+
+
+def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests.Session().get.side_effect = RequestException
+
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "neworg", "code": "norg"},
+        ),
+        superuser_member.user,
+    )
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+    assert "An issue occurred in KATalogus while creating the organization" in messages[0].message
+
+
+def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker, mock_models_octopoes):
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_health_response = mocker.MagicMock()
+    mock_health_response.json.return_value = {"service": "test", "healthy": True}
+
+    mock_organization_exists_response = mocker.MagicMock()
+    mock_organization_exists_response.status_code = 404
+
+    mock_requests.Session().get.side_effect = [mock_health_response, mock_organization_exists_response]
+    mock_requests.Session().post.side_effect = RequestException
+
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "new", "code": "newcode"},
+        ),
+        superuser_member.user,
+    )
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+    assert "An issue occurred in KATalogus while creating the organization" in messages[0].message
+
+
+def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_response = mocker.MagicMock()
+    mock_requests.Session().get.return_value = mock_response
+    mock_response.json.return_value = {"service": "test", "healthy": False}
+
+    request = setup_request(
+        rf.post(
+            "organization_add",
+            {"name": "neworg", "code": "norg"},
+        ),
+        superuser_member.user,
+    )
+    response = OrganizationAddView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 302
+
+    messages = list(request._messages)
+    assert "An issue occurred in KATalogus while creating the organization" in messages[0].message
+
+
+def test_organization_list(rf, superuser_member, bulk_organizations, django_assert_max_num_queries):
+    """Verify that this view does not query the database for each organization."""
+
+    with django_assert_max_num_queries(
+        AMOUNT_OF_TEST_ORGANIZATIONS, info="Too many queries for organization list view"
+    ):
+        request = setup_request(rf.get("organization_list"), superuser_member.user)
+        response = OrganizationListView.as_view()(request)
+
+        assertContains(response, "Organizations")
+        assertContains(response, "Add new organization")
+        assertContains(response, superuser_member.organization.name)
+
+        for org in bulk_organizations:
+            assertContains(response, org.name)
+
+
+def test_organization_member_list(rf, admin_member):
+    request = setup_request(rf.get("organization_member_list"), admin_member.user)
+    response = OrganizationMemberListView.as_view()(request, organization_code=admin_member.organization.code)
+
+    assertContains(response, "Organization")
+    assertContains(response, admin_member.organization.name)
     assertContains(response, "Members")
     assertContains(response, "Add new member")
-    assertContains(response, my_user.email)
-    assertContains(response, "Grant")
-    assertContains(response, "active")
+    assertContains(response, "Name")
+    assertContains(response, admin_member.user.full_name)
+    assertContains(response, "E-mail")
+    assertContains(response, admin_member.user.email)
+    assertContains(response, "Role")
+    assertContains(response, "Admin")
+    assertContains(response, "Status")
+    assertContains(response, admin_member.status)
+    assertContains(response, "Added")
+    assertContains(response, admin_member.user.date_joined.strftime("%m/%d/%Y"))
+    assertContains(response, "Assigned clearance level")
+    assertContains(response, admin_member.trusted_clearance_level)
+    assertContains(response, "Accepted clearance level")
+    assertContains(response, admin_member.acknowledged_clearance_level)
+    assertContains(response, "Edit")
+    assertContains(response, admin_member.id)
+    assertContains(response, "Blocked")
 
 
-def test_organization_member_give_and_revoke_clearance(
-    rf, my_user, organization, mock_models_katalogus, mock_models_octopoes
-):
-    member = OrganizationMember.objects.get(user=my_user)
+def test_organization_filtered_member_list(rf, superuser_member, new_member, blocked_member):
+    # Test with only filter option blocked status "blocked"
+    request = setup_request(rf.get("organization_member_list", {"blocked_status": "blocked"}), superuser_member.user)
+    response = OrganizationMemberListView.as_view()(request, organization_code=superuser_member.organization.code)
 
+    assertNotContains(response, new_member.user.full_name)
+    assertContains(response, blocked_member.user.full_name)
+    assertContains(response, 'class="blocked"')
+    assertNotContains(response, 'class="new"')
+    assertNotContains(response, 'class="active"')
+
+    # Test with only filter option status "new" checked
+    request2 = setup_request(rf.get("organization_member_list", {"client_status": "new"}), superuser_member.user)
+    response2 = OrganizationMemberListView.as_view()(request2, organization_code=superuser_member.organization.code)
+
+    assertContains(response2, new_member.user.full_name)
+    assertNotContains(response2, blocked_member.user.full_name)
+    assertContains(response2, 'class="new"')
+    assertNotContains(response2, 'class="blocked"')
+    assertNotContains(response2, 'class="active"')
+
+    # Test with every filter option checked (new, active, blocked and unblocked)
+    request3 = setup_request(
+        rf.get(
+            "organization_member_list",
+            {"client_status": ["new", "active"], "blocked_status": ["blocked", "unblocked"]},
+        ),
+        superuser_member.user,
+    )
+    response3 = OrganizationMemberListView.as_view()(request3, organization_code=superuser_member.organization.code)
+
+    assertContains(response3, superuser_member.user.full_name)
+    assertContains(response3, new_member.user.full_name)
+    assertContains(response3, blocked_member.user.full_name)
+    assertContains(response3, 'class="new"')
+    assertContains(response3, 'class="blocked"')
+    assertContains(response3, 'class="active"')
+
+
+def test_organization_does_not_exist(client, client_member):
+    client.force_login(client_member.user)
+    response = client.get(reverse("organization_settings", kwargs={"organization_code": "nonexistent"}))
+
+    assert response.status_code == 404
+
+
+def test_organization_no_member(client, clientuser, organization):
+    client.force_login(clientuser)
+    response = client.get(reverse("organization_settings", kwargs={"organization_code": organization.code}))
+
+    assert response.status_code == 404
+
+
+def test_organization_active_member(rf, admin_member):
+    # Default is already active
+    request = setup_request(rf.get("organization_settings"), admin_member.user)
+    response = OrganizationSettingsView.as_view()(request, organization_code=admin_member.organization.code)
+
+    assert response.status_code == 200
+
+
+def test_organization_blocked_member(rf, admin_member):
+    admin_member.blocked = True
+    admin_member.save()
+    request = setup_request(rf.get("organization_settings"), admin_member.user)
+    with pytest.raises(PermissionDenied):
+        OrganizationSettingsView.as_view()(request, organization_code=admin_member.organization.code)
+
+
+def test_edit_organization_permissions(rf, redteam_member, client_member):
+    """Redteamers and clients cannot edit organization."""
+    request_redteam = setup_request(rf.get("organization_edit"), redteam_member.user)
+    request_client = setup_request(rf.get("organization_edit"), client_member.user)
+
+    with pytest.raises(PermissionDenied):
+        OrganizationEditView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
+
+    with pytest.raises(PermissionDenied):
+        OrganizationEditView.as_view()(
+            request_client, organization_code=client_member.organization.code, pk=client_member.organization.id
+        )
+
+
+def test_edit_organization_indemnification(rf, redteam_member, client_member):
+    """Redteamers and clients cannot add idemnification."""
+    request_redteam = setup_request(rf.get("indemnification_add"), redteam_member.user)
+    request_client = setup_request(rf.get("indemnification_add"), client_member.user)
+
+    with pytest.raises(PermissionDenied):
+        IndemnificationAddView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
+
+    with pytest.raises(PermissionDenied):
+        IndemnificationAddView.as_view()(
+            request_client, organization_code=client_member.organization.code, pk=client_member.organization.id
+        )
+
+
+def test_admin_rights_edits_organization(rf, admin_member):
+    """Can admin edit organization?"""
+    request = setup_request(rf.get("organization_edit"), admin_member.user)
+    response = OrganizationEditView.as_view()(
+        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
+    )
+
+    assert response.status_code == 200
+
+
+def test_admin_edits_organization(rf, admin_member, mocker):
+    """Admin editing organization values"""
     request = setup_request(
         rf.post(
-            "organization_detail",
-            {
-                "action": "give_clearance",
-                "member_id": member.id,
-            },
+            "organization_edit",
+            {"name": "This organization name has been edited", "tags": "tag1,tag2"},
         ),
-        my_user,
+        admin_member.user,
     )
-    response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mocker.patch("tools.models.OctopoesAPIConnector")
+    response = OrganizationEditView.as_view()(
+        request, organization_code=admin_member.organization.code, pk=admin_member.organization.id
+    )
 
+    # success post redirects to organization detail page
     assert response.status_code == 302
-    assert response.url == f"/en/{organization.code}/"
+    assert response.url == f"/en/{admin_member.organization.code}/settings"
+    resulted_request = setup_request(rf.get(response.url), admin_member.user)
+    resulted_response = OrganizationSettingsView.as_view()(
+        resulted_request, organization_code=admin_member.organization.code
+    )
+    assert resulted_response.status_code == 200
 
+    assertContains(resulted_response, "Tags")
+    assertContains(resulted_response, "tags-color-1-light plain")  # default color
+    assertContains(resulted_response, "tag1")
+    assertContains(resulted_response, "tag2")
+
+
+def test_organization_code_validator_from_view(rf, superuser_member, mocker, mock_models_octopoes):
+    mocker.patch("katalogus.client.KATalogusClientV1")
     request = setup_request(
         rf.post(
-            "organization_detail",
-            {
-                "action": "withdraw_clearance",
-                "member_id": member.id,
-            },
+            "organization_add",
+            {"name": "DENIED LIST CHECK", "code": DENY_ORGANIZATION_CODES[0]},
         ),
-        my_user,
-    )
-    response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
-
-    assert response.status_code == 302
-    assert response.url == f"/en/{organization.code}/"
-
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "action": "wrong_test",
-                "member_id": member.id,
-            },
-        ),
-        my_user,
+        superuser_member.user,
     )
 
-    with pytest.raises(Exception) as exc_info:
-        OrganizationDetailView.as_view()(request, organization_code=organization.code)
+    response = OrganizationAddView.as_view()(request)
 
-    assert exc_info.exconly() == "Exception: Unhandled allowed action: wrong_test"
-
-
-def test_organization_member_give_and_revoke_clearance_no_action_reloads_page(
-    rf, my_user, organization, mock_models_katalogus, mock_models_octopoes
-):
-    member = OrganizationMember.objects.get(user=my_user)
-
-    # No action in the POST means we simply reload the page
-    request = setup_request(
-        rf.post(
-            "organization_detail",
-            {
-                "wrong": "withdraw_clearance",
-                "member_id": member.id,
-            },
-        ),
-        my_user,
+    # Form validation returns 200 with invalid form
+    assert response.status_code == 200
+    assertContains(
+        response, "This organization code is reserved by OpenKAT and cannot be used. Choose another organization code."
     )
-    response = OrganizationDetailView.as_view()(request, organization_code=organization.code)
-    assertContains(response, "Organization details")
-    assertContains(response, organization.name)
-    assertContains(response, "Members")
-    assertContains(response, "Add new member")
-    assertContains(response, my_user.email)
-    assertContains(response, "Grant")
-    assertContains(response, "active")
+
+
+@pytest.mark.django_db
+def test_organization_code_validator_from_model(mocker, mock_models_octopoes):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    with pytest.raises(ValidationError):
+        Organization.objects.create(name="Test", code=DENY_ORGANIZATION_CODES[0])
+
+    new_org = Organization.objects.create(name="Test", code="test_123")
+    assert new_org.code == "test_123"
+
+    new_org.code = DENY_ORGANIZATION_CODES[0]
+    with pytest.raises(ValidationError):
+        new_org.save()
+
+
+def test_organization_settings_perms(rf, superuser_member, admin_member, redteam_member, client_member):
+    response_superuser = OrganizationSettingsView.as_view()(
+        setup_request(rf.get("organization_settings"), superuser_member.user),
+        organization_code=superuser_member.organization.code,
+    )
+
+    response_admin = OrganizationSettingsView.as_view()(
+        setup_request(rf.get("organization_settings"), admin_member.user),
+        organization_code=admin_member.organization.code,
+    )
+
+    assert response_superuser.status_code == 200
+    assert response_admin.status_code == 200
+    assertContains(response_superuser, "Edit")
+    assertContains(response_admin, "Edit")
+    assertContains(response_superuser, "Add indemnification")
+    assertContains(response_admin, "Add indemnification")
+
+    with pytest.raises(PermissionDenied):
+        OrganizationSettingsView.as_view()(
+            setup_request(rf.get("organization_settings"), redteam_member.user),
+            organization_code=redteam_member.organization.code,
+        )
+
+    with pytest.raises(PermissionDenied):
+        OrganizationSettingsView.as_view()(
+            setup_request(rf.get("organization_settings"), client_member.user),
+            organization_code=client_member.organization.code,
+        )
+
+
+def test_organization_member_list_perms(rf, superuser_member, admin_member, redteam_member, client_member):
+    response_superuser = OrganizationMemberListView.as_view()(
+        setup_request(rf.get("organization_member_list"), superuser_member.user),
+        organization_code=superuser_member.organization.code,
+    )
+
+    response_admin = OrganizationMemberListView.as_view()(
+        setup_request(rf.get("organization_member_list"), admin_member.user),
+        organization_code=admin_member.organization.code,
+    )
+
+    assert response_superuser.status_code == 200
+    assert response_admin.status_code == 200
+
+    with pytest.raises(PermissionDenied):
+        OrganizationMemberListView.as_view()(
+            setup_request(rf.get("organization_member_list"), redteam_member.user),
+            organization_code=redteam_member.organization.code,
+        )
+
+    with pytest.raises(PermissionDenied):
+        OrganizationMemberListView.as_view()(
+            setup_request(rf.get("organization_member_list"), client_member.user),
+            organization_code=client_member.organization.code,
+        )
+
+
+def test_organization_list_perms(rf, superuser_member, admin_member, redteam_member, client_member):
+    response_superuser = OrganizationListView.as_view()(
+        setup_request(rf.get("organization_list"), superuser_member.user),
+        organization_code=superuser_member.organization.code,
+    )
+
+    response_admin = OrganizationListView.as_view()(
+        setup_request(rf.get("organization_list"), admin_member.user),
+        organization_code=admin_member.organization.code,
+    )
+
+    assert response_superuser.status_code == 200
+    assert response_admin.status_code == 200
+
+    assertContains(response_superuser, "Add new organization")
+
+    # Admins can not add organization
+    assertNotContains(response_admin, "Add new organization")
+
+    with pytest.raises(PermissionDenied):
+        OrganizationListView.as_view()(
+            setup_request(rf.get("organization_list"), redteam_member.user),
+            organization_code=redteam_member.organization.code,
+        )
+
+    with pytest.raises(PermissionDenied):
+        OrganizationListView.as_view()(
+            setup_request(rf.get("organization_list"), client_member.user),
+            organization_code=client_member.organization.code,
+        )

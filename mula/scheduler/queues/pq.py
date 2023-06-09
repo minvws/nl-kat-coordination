@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import abc
 import logging
+import threading
 from typing import Any, Dict, List, Optional
 
 import pydantic
+
 from scheduler import models, repositories
 
 from .errors import (
@@ -23,7 +25,7 @@ class PriorityQueue(abc.ABC):
         logger:
             The logger for the class.
         pq_id:
-            A sting representing the identifier of the priority queue.
+            A string representing the identifier of the priority queue.
         maxsize:
             A integer representing the maximum size of the queue.
         item_type:
@@ -86,6 +88,7 @@ class PriorityQueue(abc.ABC):
         self.allow_updates: bool = allow_updates
         self.allow_priority_updates: bool = allow_priority_updates
         self.pq_store: repositories.stores.PriorityQueueStorer = pq_store
+        self.lock: threading.Lock = threading.Lock()
 
     def pop(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
         """Remove and return the highest priority item from the queue.
@@ -93,14 +96,15 @@ class PriorityQueue(abc.ABC):
         Raises:
             QueueEmptyError: If the queue is empty.
         """
-        if self.empty():
-            raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
+        with self.lock:
+            if self.empty():
+                raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
 
-        item = self.pq_store.pop(self.pq_id, filters)
-        if item is None:
-            return None
+            item = self.pq_store.pop(self.pq_id, filters)
+            if item is None:
+                return None
 
-        self.remove(item)
+            self.remove(item)
 
         return item
 
@@ -119,58 +123,57 @@ class PriorityQueue(abc.ABC):
 
             PrioritizedItemNotFoundError: If the item is not found on the queue.
         """
-        if not isinstance(p_item, models.PrioritizedItem):
-            raise InvalidPrioritizedItemError("The item is not a PrioritizedItem")
+        with self.lock:
+            if not isinstance(p_item, models.PrioritizedItem):
+                raise InvalidPrioritizedItemError("The item is not a PrioritizedItem")
 
-        if not self._is_valid_item(p_item.data):
-            raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
+            if not self._is_valid_item(p_item.data):
+                raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
 
-        if self.full():
-            raise QueueFullError(f"Queue {self.pq_id} is full.")
+            if self.full():
+                raise QueueFullError(f"Queue {self.pq_id} is full.")
 
-        # We try to get the item from the queue by a specified identifier of
-        # that item by the implementation of the queue. We don't do this by
-        # the item itself or its hash because this might have been changed
-        # and we might need to update that.
-        item_on_queue = self.get_p_item_by_identifier(p_item)
+            # We try to get the item from the queue by a specified identifier of
+            # that item by the implementation of the queue. We don't do this by
+            # the item itself or its hash because this might have been changed
+            # and we might need to update that.
+            item_on_queue = self.get_p_item_by_identifier(p_item)
 
-        item_changed = (
-            False if not item_on_queue or p_item.data == item_on_queue.data else True  # FIXM: checking json/dicts here
-        )
+            item_changed = item_on_queue and p_item.data != item_on_queue.data  # FIXM: checking json/dicts here
 
-        priority_changed = False if not item_on_queue or p_item.priority == item_on_queue.priority else True
+            priority_changed = item_on_queue and p_item.priority != item_on_queue.priority
 
-        allowed = False
-        if item_on_queue and self.allow_replace:
-            allowed = True
-        elif self.allow_updates and item_changed and item_on_queue:
-            allowed = True
-        elif self.allow_priority_updates and priority_changed and item_on_queue:
-            allowed = True
-        elif not item_on_queue:
-            allowed = True
-
-        if not allowed:
-            raise NotAllowedError(
-                f"[item_on_queue={item_on_queue}, item_changed={item_changed}, priority_changed={priority_changed}, "
-                f"allow_replace={self.allow_replace}, allow_updates={self.allow_updates}, "
-                f"allow_priority_updates={self.allow_priority_updates}]"
+            allowed = any(
+                (
+                    item_on_queue and self.allow_replace,
+                    self.allow_updates and item_changed and item_on_queue,
+                    self.allow_priority_updates and priority_changed and item_on_queue,
+                    not item_on_queue,
+                )
             )
 
-        # If already on queue update the item, else create a new one
-        item_db = None
-        if not item_on_queue:
-            identifier = self.create_hash(p_item)
-            p_item.hash = identifier
-            item_db = self.pq_store.push(self.pq_id, p_item)
-        else:
-            self.pq_store.update(self.pq_id, p_item)
-            item_db = self.get_p_item_by_identifier(p_item)
+            if not allowed:
+                raise NotAllowedError(
+                    f"[item_on_queue={item_on_queue}, item_changed={item_changed}, "
+                    f" priority_changed={priority_changed}, "
+                    f"allow_replace={self.allow_replace}, allow_updates={self.allow_updates}, "
+                    f"allow_priority_updates={self.allow_priority_updates}]"
+                )
 
-        if not item_db:
-            raise PrioritizedItemNotFoundError(f"Item {p_item} not found in datastore {self.pq_id}")
+            # If already on queue update the item, else create a new one
+            item_db = None
+            if not item_on_queue:
+                identifier = self.create_hash(p_item)
+                p_item.hash = identifier
+                item_db = self.pq_store.push(self.pq_id, p_item)
+            else:
+                self.pq_store.update(self.pq_id, p_item)
+                item_db = self.get_p_item_by_identifier(p_item)
 
-        return item_db
+            if not item_db:
+                raise PrioritizedItemNotFoundError(f"Item {p_item} not found in datastore {self.pq_id}")
+
+            return item_db
 
     def peek(self, index: int) -> Optional[models.PrioritizedItem]:
         """Return the item at index without removing it.
@@ -220,16 +223,16 @@ class PriorityQueue(abc.ABC):
 
         return True
 
-    def is_item_on_queue_by_hash(self, hash: str) -> bool:
+    def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
         """Check if an item is on the queue by its hash.
 
         Args:
-            hash: The hash of the item to be checked.
+            item_hash: The hash of the item to be checked.
 
         Returns:
             True if the item is on the queue, False otherwise.
         """
-        item = self.pq_store.get_item_by_hash(self.pq_id, hash)
+        item = self.pq_store.get_item_by_hash(self.pq_id, item_hash)
         return item is not None
 
     def get_p_item_by_identifier(self, p_item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
@@ -261,9 +264,9 @@ class PriorityQueue(abc.ABC):
 
         return True
 
-    def dict(self) -> Dict[str, Any]:
+    def dict(self, include_pq: bool = True) -> Dict[str, Any]:
         """Return a dictionary representation of the queue."""
-        return {
+        response = {
             "id": self.pq_id,
             "size": self.qsize(),
             "maxsize": self.maxsize,
@@ -271,8 +274,12 @@ class PriorityQueue(abc.ABC):
             "allow_replace": self.allow_replace,
             "allow_updates": self.allow_updates,
             "allow_priority_updates": self.allow_priority_updates,
-            "pq": self.pq_store.get_items_by_scheduler_id(self.pq_id),
         }
+
+        if include_pq:
+            response["pq"] = self.pq_store.get_items_by_scheduler_id(self.pq_id)
+
+        return response
 
     @abc.abstractmethod
     def create_hash(self, p_item: models.PrioritizedItem) -> str:
