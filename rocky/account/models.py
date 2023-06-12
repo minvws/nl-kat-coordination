@@ -60,7 +60,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
     # Because we migrated from using the standard Django User model, we need
     # explicitly use AutoField here instead of using BigAutoField by default
     id = models.AutoField(primary_key=True, verbose_name="ID")
-    full_name = models.CharField(_("full name"), max_length=150, blank=True)
+    full_name = models.CharField(_("full name"), max_length=150)
     email = LowercaseEmailField(_("email"), max_length=254, unique=True)
     is_staff = models.BooleanField(
         _("staff status"),
@@ -77,7 +77,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["full_name"]
 
     objects = KATUserManager()
 
