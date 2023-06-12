@@ -188,6 +188,7 @@ services:
       - ./mula:/app/scheduler
     depends_on:
       - postgres
+      - rabbitmq
       - boefje
       - normalizer
       - octopoes_api

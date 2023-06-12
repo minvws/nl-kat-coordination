@@ -26,6 +26,8 @@ class FindingType(OOI):
 
     description: Optional[str]
     source: Optional[AnyUrl]
+    impact: Optional[str]
+    recommendation: Optional[str]
 
     risk_score: Optional[float]
     risk_severity: Optional[RiskLevelSeverity]
