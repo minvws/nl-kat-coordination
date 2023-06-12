@@ -7,12 +7,13 @@ from typing import Callable, List, Optional
 import requests
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers
+from scheduler import context, models, queues, rankers
 from scheduler.connectors import listeners
 from scheduler.models import (
     OOI,
     Boefje,
     BoefjeTask,
+    MutationOperationType,
     Organisation,
     Plugin,
     PrioritizedItem,
@@ -115,11 +116,44 @@ class BoefjeScheduler(Scheduler):
         ooi = mutation.value
         if ooi is None:
             self.logger.debug(
-                "Mutation value is None, skipping %s [organisation_id=%s, scheduler_id=%s]",
-                mutation,
+                "Mutation value is None, skipping [organisation.id=%s, scheduler_id=%s]",
                 self.organisation.id,
                 self.scheduler_id,
             )
+            return
+
+        if mutation.operation == MutationOperationType.DELETE:
+            # When there are tasks of the ooi are on the queue, we need to
+            # remove them from the queue.
+            items, _ = self.ctx.pq_store.get_items(
+                scheduler_id=self.scheduler_id,
+                filters=[
+                    models.Filter(
+                        field="input_ooi",
+                        operator="eq",
+                        value=ooi.primary_key,
+                    ),
+                ],
+            )
+
+            # Delete all items for this ooi, update all tasks for this ooi
+            # to cancelled.
+            for item in items:
+                self.ctx.pq_store.remove(
+                    scheduler_id=self.scheduler_id,
+                    item_id=item.id.hex,
+                )
+
+                if item.hash is None:
+                    continue
+
+                task = self.ctx.task_store.get_latest_task_by_hash(item.hash)
+                if task is None:
+                    continue
+
+                task.status = TaskStatus.CANCELLED
+                self.ctx.task_store.update_task(task)
+
             return
 
         # What available boefjes do we have for this ooi?

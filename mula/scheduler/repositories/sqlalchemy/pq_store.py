@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from scheduler import models
 
@@ -118,6 +118,26 @@ class PriorityQueueStore(PriorityQueueStorer):
             )
 
             return count
+
+    @retry()
+    def get_items(
+        self,
+        scheduler_id: str,
+        filters: Optional[List[models.Filter]] = None,
+    ) -> Tuple[List[models.PrioritizedItem], int]:
+        with self.datastore.session.begin() as session:
+            query = session.query(models.PrioritizedItemORM).filter(
+                models.PrioritizedItemORM.scheduler_id == scheduler_id
+            )
+
+            if filters is not None:
+                for f in filters:
+                    query = query.filter(models.PrioritizedItemORM.data[f.get_field()].astext == f.value)
+
+            count = query.count()
+            items_orm = query.all()
+
+            return ([models.PrioritizedItem.from_orm(item_orm) for item_orm in items_orm], count)
 
     @retry()
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> Optional[models.PrioritizedItem]:
