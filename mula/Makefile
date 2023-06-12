@@ -90,7 +90,7 @@ else
 endif
 
 migrate: ## Run migrations using alembic.
-	$(ci-docker-compose) run scheduler \
+	docker-compose run scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		upgrade head
 
