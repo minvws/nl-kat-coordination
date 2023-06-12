@@ -3,8 +3,8 @@
 
 {% if request.user.is_authenticated %}
 <div
-  data-button-open-label="{{ user.full_name|slice:"1"|upper }}"
-  data-button-close-label="{{ user.full_name|slice:"1"|upper }}"
+  data-button-open-label="{% if user.full_name %}{{ user.full_name|slice:"1"|upper }}{% else %}{{ user.email|slice:"1"|upper }}{% endif %}"
+  data-button-close-label="{% if user.full_name %}{{ user.full_name|slice:"1"|upper }}{% else %}{{ user.email|slice:"1"|upper }}{% endif %}"
   data-open-label="{% translate "User navigation" %}"
   data-close-label="{% translate "Close user navigation" %}"
   data-media="(min-width: 100%)"
