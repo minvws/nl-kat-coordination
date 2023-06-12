@@ -6,7 +6,7 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from scheduler import context, models, queues, rankers, utils
+from scheduler import connectors, context, models, queues, rankers, utils
 from scheduler.utils import thread
 
 
@@ -38,6 +38,8 @@ class Scheduler(abc.ABC):
             concurrently.
         stop_event: A threading.Event object used for communicating a stop
             event across threads.
+        listeners:
+            A dict of connector.Listener instances.
     """
 
     organisation: models.Organisation
@@ -48,7 +50,9 @@ class Scheduler(abc.ABC):
         scheduler_id: str,
         queue: queues.PriorityQueue,
         ranker: rankers.Ranker,
+        callback: Optional[Callable[..., None]] = None,
         populate_queue_enabled: bool = True,
+        max_tries: int = -1,
     ):
         """Initialize the Scheduler.
 
@@ -62,7 +66,7 @@ class Scheduler(abc.ABC):
                 A queues.PriorityQueue instance
             ranker:
                 A rankers.Ranker instance.
-            populate_queue:
+            populate_queue_enabled:
                 A boolean whether to populate the queue.
             max_tries:
                 The maximum number of retries for a task to be pushed to
@@ -76,10 +80,13 @@ class Scheduler(abc.ABC):
         self.ranker: rankers.Ranker = ranker
 
         self.populate_queue_enabled: bool = populate_queue_enabled
-        self.max_tries: int = -1
+        self.max_tries: int = max_tries
 
-        self.threads: Dict[str, thread.ThreadRunner] = {}
-        self.stop_event: threading.Event = self.ctx.stop_event
+        self.callback: Optional[Callable[[], Any]] = callback
+        self.threads: List[thread.ThreadRunner] = []
+        self.stop_event: threading.Event = threading.Event()
+
+        self.listeners: Dict[str, connectors.listeners.Listener] = {}
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -270,9 +277,10 @@ class Scheduler(abc.ABC):
     def run_in_thread(
         self,
         name: str,
-        func: Callable[[], Any],
+        target: Callable[[], Any],
         interval: float = 0.01,
         daemon: bool = False,
+        loop: bool = True,
     ) -> None:
         """Make a function run in a thread, and add it to the dict of threads.
 
@@ -282,13 +290,35 @@ class Scheduler(abc.ABC):
             interval: The interval to run the function.
             daemon: Whether the thread should be a daemon.
         """
-        self.threads[name] = utils.ThreadRunner(
-            target=func,
+        t = utils.ThreadRunner(
+            name=name,
+            target=target,
             stop_event=self.stop_event,
             interval=interval,
             daemon=daemon,
+            loop=loop,
         )
-        self.threads[name].start()
+        t.start()
+
+        self.threads.append(t)
+
+    def stop(self) -> None:
+        """Stop the scheduler."""
+        self.logger.info("Stopping scheduler: %s", self.scheduler_id)
+
+        # First stop the listeners, when those are running in a thread and
+        # they're using rabbitmq, they will block. Setting the stop event
+        # will not stop the thread. We need to explicitly stop the listener.
+        for lst in self.listeners.values():
+            lst.stop()
+
+        for t in self.threads:
+            t.join(5)
+
+        if self.callback:
+            self.callback(self.scheduler_id)  # type: ignore [call-arg]
+
+        self.logger.info("Stopped scheduler: %s", self.scheduler_id)
 
     def is_space_on_queue(self) -> bool:
         """Check if there is space on the queue.
@@ -303,12 +333,9 @@ class Scheduler(abc.ABC):
     def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
         return self.queue.is_item_on_queue_by_hash(item_hash)
 
-    def stop(self) -> None:
-        """Stop the scheduler."""
-        for t in self.threads.values():
-            t.join(5)
-
-        self.logger.info("Stopped scheduler: %s", self.scheduler_id)
+    def is_alive(self) -> bool:
+        """Check if the scheduler is alive."""
+        return not self.stop_event.is_set()
 
     def dict(self) -> Dict[str, Any]:
         return {
