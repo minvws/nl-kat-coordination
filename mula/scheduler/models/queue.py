@@ -25,7 +25,7 @@ class PrioritizedItem(BaseModel):
     # A unique generated identifier for the object contained in data
     hash: Optional[str] = Field(None, max_length=32)
 
-    priority: Optional[int]
+    priority: int
 
     data: Dict
 
