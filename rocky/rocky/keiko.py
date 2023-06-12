@@ -255,4 +255,9 @@ def build_finding_type_dict(finding_type_ooi: FindingType) -> Dict:
     finding_type_dict = get_ooi_dict(finding_type_ooi)
     finding_type_dict["findings"] = []
 
+    if finding_type_dict["risk_score"] is None:
+        finding_type_dict["risk_score"] = 0
+    if finding_type_dict["risk_severity"] is None:
+        finding_type_dict["risk_severity"] = RiskLevelSeverity.PENDING.value
+
     return finding_type_dict
