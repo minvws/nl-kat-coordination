@@ -43,7 +43,6 @@ class FindingType(OOI):
     risk_severity: Optional[RiskLevelSeverity]
 
     _natural_key_attrs = ["id"]
-    _information_value = ["id"]
     _traversable = False
 
     @classmethod
