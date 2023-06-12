@@ -38,16 +38,16 @@ class BoefjeRankerTestCase(unittest.TestCase):
         ).start()
 
         self.tree_response = json.load(
-            Path.open("tests/fixtures/api_responses/octopoes_get_tree.json", encoding="utf-8"),
+            Path("tests/fixtures/api_responses/octopoes_get_tree.json").open(encoding="utf-8"),
         )
 
     def test_parse_findings(self):
         findings = services.Octopoes.findings_from_tree_response(self.tree_response)
-        self.assertEqual(len(findings), 2)
+        self.assertEqual(len(findings), 3)
 
     def test_parse_objects(self):
         objects = services.Octopoes.objects_from_tree_response(self.tree_response)
-        self.assertEqual(len(objects), 2)
+        self.assertEqual(len(objects), 10)
 
     def test_rank(self):
         # Arrange
