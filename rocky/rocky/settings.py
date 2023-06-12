@@ -37,23 +37,23 @@ QUEUE_URI = env.url("QUEUE_URI").geturl()
 
 OCTOPOES_API = env.url("OCTOPOES_API").geturl()
 
-SCHEDULER_API = env.url("SCHEDULER_API", "").geturl()
+SCHEDULER_API = env.url("SCHEDULER_API", default="").geturl()
 
-KATALOGUS_API = env.url("KATALOGUS_API", "").geturl()
+KATALOGUS_API = env.url("KATALOGUS_API", default="").geturl()
 
-BYTES_API = env.url("BYTES_API", "").geturl()
+BYTES_API = env.url("BYTES_API", default="").geturl()
 BYTES_USERNAME = env("BYTES_USERNAME", default="")
 BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
-KEIKO_API = env.url("KEIKO_API", "").geturl()
+KEIKO_API = env.url("KEIKO_API", default="").geturl()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
-REMOTE_USER_HEADER = os.getenv("REMOTE_USER_HEADER")
-REMOTE_USER_FALLBACK = os.getenv("REMOTE_USER_FALLBACK", "False").casefold() != "false"
+REMOTE_USER_HEADER = env("REMOTE_USER_HEADER")
+REMOTE_USER_FALLBACK = env("REMOTE_USER_FALLBACK", default=False)
 
 if REMOTE_USER_HEADER:
     AUTHENTICATION_BACKENDS = [
@@ -64,16 +64,14 @@ if REMOTE_USER_HEADER:
             "django.contrib.auth.backends.ModelBackend",
         ]
 
-
 # SECURITY WARNING: enable two factor authentication in production!
-TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", False if REMOTE_USER_HEADER else True)
+TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", default=not REMOTE_USER_HEADER)
 
 # A list of strings representing the host/domain names that this Django site can serve.
 # https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split()
+ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS", default="*").split()
 
-
-SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
+SPAN_EXPORT_GRPC_ENDPOINT = env("SPAN_EXPORT_GRPC_ENDPOINT")
 if SPAN_EXPORT_GRPC_ENDPOINT is not None:
     OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
 
@@ -148,7 +146,6 @@ MIDDLEWARE += [
 if SPAN_EXPORT_GRPC_ENDPOINT is not None:
     MIDDLEWARE += ["rocky.middleware.otel.OTELInstrumentTemplateMiddleware"]
 
-
 ROOT_URLCONF = "rocky.urls"
 
 TEMPLATES = [
@@ -184,7 +181,6 @@ POSTGRES_DB = env.db("ROCKY_DB_DSN")
 # todo: POSTGRES_DB["ENGINE"] = "django.db.backends.postgresql_psycopg2"?
 DATABASES = {"default": POSTGRES_DB}
 
-
 if env("POSTGRES_SSL_ENABLED"):
     DATABASES["default"]["OPTIONS"] = {
         "sslmode": env("POSTGRES_SSL_MODE"),
@@ -206,7 +202,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         "NAME": "django_password_validators.password_character_requirements"
-        ".password_validation.PasswordCharacterValidator",
+                ".password_validation.PasswordCharacterValidator",
         "OPTIONS": {
             "min_length_digit": env.int("PASSWORD_MIN_DIGIT", default=2),
             "min_length_alpha": env.int("PASSWORD_MIN_ALPHA", default=2),
@@ -280,17 +276,17 @@ CSRF_COOKIE_HTTPONLY = True
 
 # A list of trusted origins for unsafe requests (e.g. POST)
 # https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
-CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
+CSRF_TRUSTED_ORIGINS = env("DJANGO_CSRF_TRUSTED_ORIGINS", default="").split()
 
 # Configuration for Gitpod
-if GITPOD_WORKSPACE_URL := os.getenv("GITPOD_WORKSPACE_URL"):
+if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL"):
     # example environment variable: GITPOD_WORKSPACE_URL=https://minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io
     # public url on https://8000-minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io/
     ALLOWED_HOSTS.append("8000-" + GITPOD_WORKSPACE_URL.split("//")[1])
     CSRF_TRUSTED_ORIGINS.append(GITPOD_WORKSPACE_URL.replace("//", "//8000-"))
 
 # Configuration for GitHub Codespaces
-if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"):
+if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"):
     # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
     # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
     ALLOWED_HOSTS.append("." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
