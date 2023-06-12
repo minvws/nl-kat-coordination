@@ -1,0 +1,10 @@
+{
+    "id": "kat_cve_finding_types_normalize",
+    "consumes": [
+        "cve-finding-types"
+    ],
+    "produces": [
+        "CVEFindingType"
+    ],
+    "enabled": true
+}

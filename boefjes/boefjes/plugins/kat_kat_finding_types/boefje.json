@@ -1,0 +1,14 @@
+{
+    "id": "kat-finding-types",
+    "name": "KAT Finding Types",
+    "description": "Hydrate information of KAT finding types",
+    "consumes": [
+        "KATFindingType"
+    ],
+    "produces": [
+        "KATFindingType"
+    ],
+    "environment_keys": [],
+    "scan_level": 0,
+    "enabled": true
+}
