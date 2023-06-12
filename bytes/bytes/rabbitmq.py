@@ -22,7 +22,7 @@ class RabbitMQEventManager(EventManager):
         queue_name = self._queue_name(event)
 
         logger.debug("Publishing event: %s", event_data)
-        self.channel.queue_declare(queue_name)
+        self.channel.queue_declare(queue_name, durable=True)
 
         try:
             self.channel.basic_publish("", queue_name, event_data.encode())
