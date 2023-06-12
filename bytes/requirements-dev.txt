@@ -57,7 +57,7 @@ starlette==0.25.0
 toml==0.10.2
 tomli==2.0.1
 toolz==0.12.0
-urllib3==2.0.2
+urllib3==2.0.3
 uvicorn==0.17.6
 wrapt==1.14.1
 zipp==3.8.1
