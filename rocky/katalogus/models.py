@@ -15,8 +15,7 @@ class PluginDeepLink(models.Model):
     def unique_error_message(self, model_class, unique_check):
         if model_class == type(self) and unique_check == ("ooi_type", "name"):
             return _("This plugin already exists. Choose another name or OOI-Type.")
-        else:
-            return super().unique_error_message(model_class, unique_check)
+        return super().unique_error_message(model_class, unique_check)
 
     def __str__(self):
         return self.name
@@ -33,8 +32,7 @@ class OrganizationPlugin(models.Model):
     def unique_error_message(self, model_class, unique_check):
         if model_class == type(self) and unique_check == ("organization", "plugin"):
             return _("This plugin already exists. Choose another organization or plugin.")
-        else:
-            return super().unique_error_message(model_class, unique_check)
+        return super().unique_error_message(model_class, unique_check)
 
     def __str__(self):
         return str(self.plugin)

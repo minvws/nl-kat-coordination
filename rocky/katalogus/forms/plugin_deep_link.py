@@ -19,12 +19,12 @@ class PluginDeepLinkForm(BaseRockyModelForm):
         fields = "__all__"
         widgets = {"ooi_type": forms.Select(choices=SORTED_OOI_TYPES)}
         help_texts = {
-            "ooi_type": _("Choose an OOI-type where this plugin will be bounded to."),
-            "name": _("Give your plugin an unique name."),
+            "ooi_type": _("Choose an OOI-type where this plugin will be bound to."),
+            "name": _("Give your plugin a unique name."),
             "content": _("This is the link text."),
             "link": _(
                 "Insert your link including the link parameters. "
-                "Example: https://cve.mitre.org/cgi-bin/cvename.cgi?name=[cvecode]"
+                "Example: https://cve.mitre.org/cgi-bin/cvename.cgi?name=[id]"
             ),
             "enable": _("To use and show this link you must first enable it."),
         }

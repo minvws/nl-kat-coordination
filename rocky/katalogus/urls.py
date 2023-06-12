@@ -41,6 +41,11 @@ urlpatterns = [
         name="plugin_deep_link_add",
     ),
     path(
+        "plugins/deep-link/add/<ooi_type>/",
+        PluginDeepLinkCreateView.as_view(),
+        name="plugin_deep_link_add",
+    ),
+    path(
         "plugins/deep-link/edit/<pk>/",
         PluginDeepLinkUpdateView.as_view(),
         name="plugin_deep_link_edit",

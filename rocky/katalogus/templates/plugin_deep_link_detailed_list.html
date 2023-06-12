@@ -8,16 +8,15 @@
 
     <main id="main-content">
         <section>
-            {{ ooi }}
             <div>
                 {% include "partials/ooi_head.html" with ooi=ooi view="deep_links" %}
 
                 <h2>{% translate "Deep Links" %}</h2>
-                <p class="emphasized">
-                    {% translate "Showing a list of all deep links" %}
-                </p>
-                <a class="button"
-                   href="{% url 'plugin_deep_link_add' organization.code %}">{% translate "Create deep link" %}</a>
+                <p class="emphasized">{% translate "Showing a list of all deep links" %}</p>
+                {% if perms.katalogus.add_organizationplugin %}
+                    <a class="button"
+                       href="{% url 'plugin_deep_link_add' organization.code ooi.ooi_type %}">{% translate "Create deep link" %}</a>
+                {% endif %}
                 {% if plugin_deep_link %}
                     <div class="horizontal-scroll">
                         <table>
@@ -43,9 +42,7 @@
 
                     </div>
                 {% else %}
-                    <p>
-                        {% translate "There are no deep links to show." %}
-                    </p>
+                    <p>{% translate "There are no deep links to show." %}</p>
                 {% endif %}
             </div>
         </section>

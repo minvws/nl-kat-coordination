@@ -16,6 +16,7 @@ class PluginDeepLinkUpdateView(OrganizationView, UpdateView):
     form_class = PluginDeepLinkForm
     model = PluginDeepLink
     template_name = "plugin_deep_link_edit.html"
+    permission_required = "katalogus.change_organizationplugin"
 
     def get_initial(self) -> Dict[str, Any]:
         initial = super().get_initial()

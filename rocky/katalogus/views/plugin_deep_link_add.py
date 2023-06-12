@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.forms.models import BaseModelForm
@@ -13,6 +15,13 @@ from katalogus.models import OrganizationPlugin
 class PluginDeepLinkCreateView(OrganizationView, CreateView):
     form_class = PluginDeepLinkForm
     template_name = "plugin_deep_link_add.html"
+    permission_required = "katalogus.add_organizationplugin"
+
+    def get_initial(self) -> Dict[str, Any]:
+        initial = super().get_initial()
+        if "ooi_type" in self.kwargs:
+            initial["ooi_type"] = self.kwargs["ooi_type"]
+        return initial
 
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         response = super().form_valid(form)

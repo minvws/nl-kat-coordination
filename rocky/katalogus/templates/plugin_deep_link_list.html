@@ -38,7 +38,10 @@
                                 <tr>
                                     <th>{% translate "Name" %}</th>
                                     <th>{% translate "OOI-Type" %}</th>
-                                    <th>{% translate "Actions" %}</th>
+                                    {% if perms.katalogus.change_organizationplugin %}
+                                        <th>{% translate "Edit" %}</th>
+                                        <th>{% translate "Actions" %}</th>
+                                    {% endif %}
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,21 +49,28 @@
                                     <tr>
                                         <td>{{ deep_link.plugin.name }}</td>
                                         <td>{{ deep_link.plugin.ooi_type }}</td>
-                                        <td>
-                                            <form method="post"
-                                                  action="{% url 'plugin_deep_link_enable_disable' organization.code %}"
-                                                  class="inline">
-                                                {% csrf_token %}
-                                                <fieldset>
-                                                    <input type="hidden" name="plugin" value="{{ deep_link.plugin.name }}"/>
-                                                    {% if deep_link.enabled %}
-                                                        <button name="disable" type="submit" class="button ghost" value="disable">{% translate "Disable" %}</button>
-                                                    {% else %}
-                                                        <button name="enable" type="submit" class="button" value="enable">{% translate "Enable" %}</button>
-                                                    {% endif %}
-                                                </fieldset>
-                                            </form>
-                                        </td>
+                                        {% if perms.katalogus.change_organizationplugin %}
+                                            <td>
+                                                <a href="{% url "plugin_deep_link_edit" organization.code deep_link.plugin.id %}">
+                                                    <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <form method="post"
+                                                      action="{% url 'plugin_deep_link_enable_disable' organization.code %}"
+                                                      class="inline">
+                                                    {% csrf_token %}
+                                                    <fieldset>
+                                                        <input type="hidden" name="plugin" value="{{ deep_link.plugin.name }}"/>
+                                                        {% if deep_link.enabled %}
+                                                            <button name="disable" type="submit" class="button ghost" value="disable">{% translate "Disable" %}</button>
+                                                        {% else %}
+                                                            <button name="enable" type="submit" class="button" value="enable">{% translate "Enable" %}</button>
+                                                        {% endif %}
+                                                    </fieldset>
+                                                </form>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>
@@ -69,9 +79,7 @@
 
                     </div>
                 {% else %}
-                    <p class="emphasized">
-                        {% translate "There are no deep links available." %}
-                    </p>
+                    <p class="emphasized">{% translate "There are no deep links available." %}</p>
                 {% endif %}
             </div>
         </section>
