@@ -3,10 +3,10 @@ import random
 import unittest
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from unittest import mock
 
 import mmh3
-import path
 from factory import fuzzy
 from scheduler import config, models, rankers
 from scheduler.connectors import services
@@ -38,7 +38,7 @@ class BoefjeRankerTestCase(unittest.TestCase):
         ).start()
 
         self.tree_response = json.load(
-            path.open("tests/fixtures/api_responses/octopoes_get_tree.json", encoding="utf-8"),
+            Path.open("tests/fixtures/api_responses/octopoes_get_tree.json", encoding="utf-8"),
         )
 
     def test_parse_findings(self):
