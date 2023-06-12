@@ -30,26 +30,28 @@
         <div class="horizontal-scroll">
           <table>
             <thead>
-            <tr>
-              <th>{% translate "Name" %}</th>
-              <th>{% translate "Code" %}</th>
-              <th>{% translate "Edit" %}</th>
-            </tr>
+              <tr>
+                <th>{% translate "Name" %}</th>
+                <th>{% translate "Code" %}</th>
+                {% if perms.tools.change_organization %}
+                  <th>{% translate "Edit" %}</th>
+                {% endif %}
+              </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>{{ organization.name }}</td>
-              <td>{{ organization.code }}</td>
-              <td>
-                {% if perms.tools.can_change_organization %}
-                  {% spaceless %}
-                    <a href="{% url "organization_edit" organization.code %}">
-                      <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
-                    </a>
-                  {% endspaceless %}
+              <tr>
+                <td>{{ organization.name }}</td>
+                <td>{{ organization.code }}</td>
+                {% if perms.tools.change_organization %}
+                  <td>
+                    {% spaceless %}
+                      <a href="{% url "organization_edit" organization.code %}">
+                        <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
+                      </a>
+                    {% endspaceless %}
+                  </td>
                 {% endif %}
-              </td>
-            </tr>
+              </tr>
             </tbody>
           </table>
         </div>
