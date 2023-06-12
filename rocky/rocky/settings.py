@@ -49,10 +49,33 @@ KEIKO_API = env.url("KEIKO_API", "").geturl()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
-# SECURITY WARNING: enable two factor authentication in production!
-TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", True)
 
-ALLOWED_HOSTS = ["*"]
+# Make sure this header can never be set by an attacker, see also the security
+# warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
+REMOTE_USER_HEADER = os.getenv("REMOTE_USER_HEADER")
+REMOTE_USER_FALLBACK = os.getenv("REMOTE_USER_FALLBACK", "False").casefold() != "false"
+
+if REMOTE_USER_HEADER:
+    AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.RemoteUserBackend",
+    ]
+    if REMOTE_USER_FALLBACK:
+        AUTHENTICATION_BACKENDS += [
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+
+
+# SECURITY WARNING: enable two factor authentication in production!
+TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", False if REMOTE_USER_HEADER else True)
+
+# A list of strings representing the host/domain names that this Django site can serve.
+# https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split()
+
+
+SPAN_EXPORT_GRPC_ENDPOINT = os.getenv("SPAN_EXPORT_GRPC_ENDPOINT")
+if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+    OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
 
 # -----------------------------
 # EMAIL CONFIGURATION for SMTP
@@ -109,13 +132,22 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+]
+
+if REMOTE_USER_HEADER:
+    MIDDLEWARE += ["rocky.middleware.remote_user.RemoteUserMiddleware"]
+
+MIDDLEWARE += [
     "django_otp.middleware.OTPMiddleware",
     "rocky.middleware.auth_required.AuthRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "rocky.middleware.onboarding.OnboardingMiddleware",
-    "rocky.middleware.otel.OTELInstrumentTemplateMiddleware",
 ]
+
+if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+    MIDDLEWARE += ["rocky.middleware.otel.OTELInstrumentTemplateMiddleware"]
+
 
 ROOT_URLCONF = "rocky.urls"
 
@@ -246,6 +278,24 @@ CSRF_COOKIE_SAMESITE = "Strict"
 # only allow http to read csrf cookies, not Javascript
 CSRF_COOKIE_HTTPONLY = True
 
+# A list of trusted origins for unsafe requests (e.g. POST)
+# https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
+CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split()
+
+# Configuration for Gitpod
+if GITPOD_WORKSPACE_URL := os.getenv("GITPOD_WORKSPACE_URL"):
+    # example environment variable: GITPOD_WORKSPACE_URL=https://minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io
+    # public url on https://8000-minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io/
+    ALLOWED_HOSTS.append("8000-" + GITPOD_WORKSPACE_URL.split("//")[1])
+    CSRF_TRUSTED_ORIGINS.append(GITPOD_WORKSPACE_URL.replace("//", "//8000-"))
+
+# Configuration for GitHub Codespaces
+if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"):
+    # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
+    # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
+    ALLOWED_HOSTS.append("." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
+    CSRF_TRUSTED_ORIGINS.append("https://*." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
+
 # Setup sane security defaults for application
 # Deny x-framing, which is standard since Django 3.0
 # There is no need to embed this in a frame anywhere, not desired.
@@ -324,7 +374,3 @@ TAG_BORDER_TYPES = [
     ("dashed", _("Dashed")),
     ("dotted", _("Dotted")),
 ]
-
-SPAN_EXPORT_GRPC_ENDPOINT = env("SPAN_EXPORT_GRPC_ENDPOINT", default=None)
-if SPAN_EXPORT_GRPC_ENDPOINT is not None:
-    OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)

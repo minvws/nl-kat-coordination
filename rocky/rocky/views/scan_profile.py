@@ -41,7 +41,35 @@ class ScanProfileDetailView(OOIDetailView, FormView):
             level = form.cleaned_data["level"]
             try:
                 self.raise_clearance_level(self.ooi.reference, level)
-            except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
+            except IndemnificationNotPresentException:
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _(
+                        "Could not raise clearance level of %s to L%s. \
+                        Indemnification not present at organization %s."
+                    )
+                    % (
+                        self.ooi.reference.human_readable,
+                        level,
+                        self.organization.name,
+                    ),
+                )
+                return self.get(request, status=403, *args, **kwargs)
+            except ClearanceLevelTooLowException:
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _(
+                        "Could not raise clearance level of %s to L%s. \
+                        You acknowledged a clearance level of %s."
+                    )
+                    % (
+                        self.ooi.reference.human_readable,
+                        level,
+                        self.organization_member.acknowledged_clearance_level,
+                    ),
+                )
                 return self.get(request, status=403, *args, **kwargs)
         else:
             messages.add_message(

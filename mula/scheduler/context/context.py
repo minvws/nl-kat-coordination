@@ -1,6 +1,5 @@
 import json
 import logging.config
-import threading
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -22,8 +21,6 @@ class AppContext:
         services:
             A dict containing all the external services connectors that
             are used and need to be shared in the scheduler application.
-        stop_event: A threading.Event object used for communicating a stop
-            event across threads.
         datastore:
             A SQLAlchemy.SQLAlchemy object used for storing and retrieving
             tasks.
@@ -66,8 +63,6 @@ class AppContext:
                 services.Bytes.name: bytes_service,
             }
         )
-
-        self.stop_event: threading.Event = threading.Event()
 
         # Repositories
         if not self.config.database_dsn.startswith("postgresql"):

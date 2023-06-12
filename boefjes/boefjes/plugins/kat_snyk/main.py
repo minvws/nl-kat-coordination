@@ -32,14 +32,17 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
             for row in table.find("tbody").find_all("tr")
         ]
 
-        if table.find("thead") and table.find("thead").find("tr", {"class": "list-vulns__header"}):
+        if table.find("thead") and table.find("thead").find("tr", {"class": "vue--table__row"}):
             # Direct vulnerabilities table
             for info in temp_soup:
-                parsed_info = {
-                    "Vuln_href": info["Vulnerability"].find("a", href=True)["href"].split("/")[-1],
-                    "Vuln_text": info["Vulnerability"].text.strip()[2:].strip(),
-                    "Vuln_versions": info["Vulnerable versions"].text.strip(),
-                }
+                try:
+                    parsed_info = {
+                        "Vuln_href": info["Vulnerability"].find("a", href=True)["href"].split("/")[-1],
+                        "Vuln_text": info["Vulnerability"].text.strip()[2:].strip(),
+                        "Vuln_versions": info["Vulnerable Version"].text.strip(),
+                    }
+                except KeyError:
+                    continue
 
                 if check_version.check_version_in(software_version, parsed_info["Vuln_versions"]):
                     # Check if there is a CVE code available for this vulnerability
@@ -49,7 +52,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
                     cve_element = vuln_soup.select("[class='cve']")
                     cve_code = cve_element[0].text.split("\n")[0] if cve_element else ""
 
-                    if cve_code:
+                    if cve_code != " ":
                         result["cve_vulnerabilities"].append(
                             {
                                 "cve_code": cve_code,
