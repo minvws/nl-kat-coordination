@@ -34,7 +34,7 @@ class FindingType(OOI):
     information_updated: Optional[str] = Field(None, alias="information updated")
 
     risk_score: Optional[float]
-    risk_severity: Optional[str]
+    risk_severity: str = "pending"
     Information: Optional[str]
     description: Optional[str]
 
