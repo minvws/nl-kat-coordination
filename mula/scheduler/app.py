@@ -38,7 +38,7 @@ class App:
                 Application context of shared data (e.g. configuration,
                 external services connections).
         """
-        threading.excepthook = self.shutdown  # type: ignore
+        threading.excepthook = self.unhandled_exception  # type: ignore
 
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
