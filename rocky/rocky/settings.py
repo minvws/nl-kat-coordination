@@ -34,13 +34,13 @@ QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES", default="boefjes")
 QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS", default="normalizers")
 QUEUE_URI = env.url("QUEUE_URI", "").geturl()
 
-OCTOPOES_API = env.url("OCTOPOES_API").geturl()
+OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()
 
-SCHEDULER_API = env.url("SCHEDULER_API").geturl()
+SCHEDULER_API = env.url("SCHEDULER_API", "").geturl()
 
-KATALOGUS_API = env.url("KATALOGUS_API").geturl()
+KATALOGUS_API = env.url("KATALOGUS_API", "").geturl()
 
-BYTES_API = env.url("BYTES_API").geturl()
+BYTES_API = env.url("BYTES_API", "").geturl()
 BYTES_USERNAME = env("BYTES_USERNAME", default="")
 BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
