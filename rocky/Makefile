@@ -15,7 +15,7 @@ build-rocky:
 build-rocky-native:
 	while ! nc -vz $$ROCKY_DB_HOST $$ROCKY_DB_PORT; do sleep 0.1; done
 	python3 manage.py migrate
-	-python3 manage.py createsuperuser --no-input
+	-python3 manage.py createsuperuser --no-input --full_name "Super Admin"
 	python3 manage.py loaddata OOI_database_seed.json
 	python3 manage.py setup_dev_account
 	python3 manage.py compilemessages
