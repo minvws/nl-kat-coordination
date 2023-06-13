@@ -32,7 +32,7 @@ SECRET_KEY = env("SECRET_KEY")
 
 QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES", default="boefjes")
 QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS", default="normalizers")
-QUEUE_URI = env.url("QUEUE_URI").geturl()
+QUEUE_URI = env.url("QUEUE_URI", "").geturl()
 
 OCTOPOES_API = env.url("OCTOPOES_API").geturl()
 
