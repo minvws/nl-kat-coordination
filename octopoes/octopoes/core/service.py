@@ -6,7 +6,13 @@ from typing import Callable, Dict, List, Optional, Set, Type
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
 
-from octopoes.config.settings import Settings
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    Settings,
+)
 from octopoes.events.events import (
     DBEvent,
     OOIDBEvent,
@@ -15,8 +21,6 @@ from octopoes.events.events import (
     ScanProfileDBEvent,
 )
 from octopoes.models import (
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     OOI,
     DeclaredScanProfile,
     EmptyScanProfile,
@@ -90,8 +94,8 @@ class OctopoesService:
         self,
         types: Set[Type[OOI]],
         valid_time: datetime,
-        limit: int = 1000,
-        offset: int = 0,
+        limit: int = DEFAULT_LIMIT,
+        offset: int = DEFAULT_OFFSET,
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOI]:
@@ -118,6 +122,7 @@ class OctopoesService:
     def save_origin(self, origin: Origin, oois: List[OOI], valid_time: datetime) -> None:
         origin.result = [ooi.reference for ooi in oois]
 
+        # When an Origin is saved while the source OOI does not exist, reject saving the results
         if origin.origin_type != OriginType.DECLARATION and origin.source not in origin.result:
             try:
                 self.ooi_repository.get(origin.source, valid_time)
@@ -150,7 +155,7 @@ class OctopoesService:
         source = self.ooi_repository.get(origin.source, valid_time)
 
         parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
-        parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
+        parameters = self.ooi_repository.load_bulk({x.reference for x in parameters_references}, valid_time)
 
         config = {}
         if bit_definition.config_ooi_relation_path is not None:
@@ -195,7 +200,7 @@ class OctopoesService:
             start_ooi_references = {
                 profile.reference for profile in all_declared_scan_profiles if profile.level == current_level
             } | {reference for reference, level in assigned_scan_levels.items() if level > current_level}
-            next_ooi_set = {ooi for ooi in self.ooi_repository.get_bulk(start_ooi_references, valid_time).values()}
+            next_ooi_set = {ooi for ooi in self.ooi_repository.load_bulk(start_ooi_references, valid_time).values()}
 
             while next_ooi_set:
                 # prepare next iteration, group oois per type
