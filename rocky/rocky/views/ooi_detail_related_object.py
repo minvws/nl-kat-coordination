@@ -1,19 +1,17 @@
-from typing import Dict, List, Set, Tuple, Type, Union
+from collections import Counter
+from typing import Dict, List, Optional, Set, Tuple, Type
 
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.ooi_helpers import (
-    RiskLevelSeverity,
     format_attr_name,
-    get_finding_type_from_finding,
-    get_knowledge_base_data_for_ooi,
 )
 from tools.view_helpers import existing_ooi_type, url_with_querystring
 
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import Finding, FindingType
+from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.types import OOI_TYPES, get_relations, to_concrete
 from rocky.views.ooi_view import SingleOOITreeMixin
 
@@ -33,60 +31,31 @@ class OOIRelatedObjectManager(SingleOOITreeMixin):
 
 
 class OOIFindingManager(SingleOOITreeMixin):
-    def get_findings(self) -> List[Dict]:
-        findings: List[Dict] = []
-        for relation_name, children in self.tree.root.children.items():
-            for child in children:
-                if child.reference == self.tree.root.reference:
-                    continue
-                if child.reference.class_ == "Finding":
-                    findings.append(self.tree.store[str(child.reference)])
+    def get_findings(self) -> List[Finding]:
+        findings = []
+        for relation in self.tree.root.children.values():
+            for child in relation:
+                ooi = self.tree.store[str(child.reference)]
+                if isinstance(ooi, Finding) and ooi.reference != self.tree.root.reference:
+                    findings.append(ooi)
         return findings
 
-    def get_findings_severity_totals(self):
-        return {
-            "total_occurrences": self.total_occurrences,
-        }
-
-    def findings_severity_summary(self) -> List[Dict[str, Union[str, int]]]:
-        summary_table = []
-        self.total_occurrences = 0
-        finding_details = self.get_finding_details()
-        for risk_level in RiskLevelSeverity:
-            occurrence_count = len(
-                list(
-                    filter(
-                        lambda x: x["risk_level_severity"] == risk_level.value,
-                        finding_details,
-                    )
-                )
-            )
-            summary_table.append(
-                {
-                    "risk_level": risk_level.value,
-                    "occurrences": occurrence_count,
-                }
-            )
-            self.total_occurrences += occurrence_count
-        return summary_table
-
-    def get_finding_details_sorted_by_score_desc(self):
-        finding_details = self.get_finding_details()
-        sorted_finding_details = sorted(finding_details, key=lambda x: x["risk_level_score"], reverse=True)
-        return sorted_finding_details
-
-    def get_finding_details(self) -> List[Dict[str, Union[str, int]]]:
-        finding_details = []
-        risk_level_score = []
+    def count_findings_per_severity(self) -> Counter:
+        counter = Counter({severity: 0 for severity in RiskLevelSeverity})
         for finding in self.get_findings():
-            finding_type = get_finding_type_from_finding(finding)
-            finding_type_knowledge_base = get_knowledge_base_data_for_ooi(finding_type)
-            finding_type_knowledge_base["id"] = finding.primary_key
-            finding_type_knowledge_base["human_readable"] = finding.human_readable
-            finding_details.append(finding_type_knowledge_base)
-            risk_level_score.append(finding_type_knowledge_base["risk_level_score"])
-        self.risk_level_score_sorted = sorted(list(set(risk_level_score)), reverse=True)
-        return finding_details
+            finding_type: Optional[FindingType] = self.tree.store.get(str(finding.finding_type), None)
+            if finding_type is not None:
+                counter.update([finding_type.risk_severity])
+            else:
+                counter.update([RiskLevelSeverity.UNKNOWN])
+        return counter
+
+    def get_finding_details_sorted_by_score_desc(self) -> List[Tuple[Finding, FindingType]]:
+        finding_details = self.get_finding_details()
+        return list(sorted(finding_details, key=lambda x: x[1].risk_score, reverse=True))
+
+    def get_finding_details(self) -> List[Tuple[Finding, FindingType]]:
+        return [(finding, self.tree.store[str(finding.finding_type)]) for finding in self.get_findings()]
 
 
 class OOIRelatedObjectAddView(OOIRelatedObjectManager, TemplateView):
