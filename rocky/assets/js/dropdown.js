@@ -27,5 +27,4 @@ dropdowns.forEach((dropdown) => {
   };
 
   dropdownButton.addEventListener("click", () => toggle());
-
 });
