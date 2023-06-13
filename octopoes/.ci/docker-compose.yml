@@ -38,11 +38,40 @@ services:
     command: pytest -x tests/integration
     depends_on:
       - xtdb_multinode
+      - ci_octopoes
     env_file:
       - ".ci/ci-multinode.env"
 
   xtdb_multinode:
     image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.6"
+
+  ci_octopoes:
+    build:
+      context: .
+    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      xtdb_multinode:
+        condition: service_started
+      katalogus_mock:
+        condition: service_started
+      ci_octopoes_api_worker:
+        condition: service_started
+    env_file:
+      - ".ci/ci-multinode.env"
+
+  ci_octopoes_api_worker:
+    build:
+      context: .
+    command: celery -A octopoes.tasks.tasks worker -E -B -s /tmp/celerybeat-schedule --loglevel=INFO
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      xtdb_multinode:
+        condition: service_started
+    env_file:
+      - ".ci/ci-multinode.env"
 
   octopoes_api:
     build:
