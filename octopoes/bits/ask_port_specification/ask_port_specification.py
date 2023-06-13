@@ -14,7 +14,7 @@ def run(
 ) -> Iterator[OOI]:
     network = input_ooi
 
-    with (Path(__file__).parent / "question_schema.json").open() as f:
+    with (Path(__file__).parent / "tmp.json").open() as f: # TODO: set back
         schema = json.load(f)
 
     yield Question(ooi=network.reference, schema_id=schema["$id"], json_schema=json.dumps(schema))
