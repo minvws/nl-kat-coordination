@@ -19,7 +19,6 @@ from rocky.otel import OpenTelemetryHelper
 
 env = environ.Env(
     DEBUG=(bool, False),
-    POSTGRES_SSL_ENABLED=(bool, False),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -175,13 +174,13 @@ WSGI_APPLICATION = "rocky.wsgi.application"
 AUTH_USER_MODEL = "account.KATUser"
 
 # Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 POSTGRES_DB = env.db("ROCKY_DB_DSN")
 
 # todo: POSTGRES_DB["ENGINE"] = "django.db.backends.postgresql_psycopg2"?
 DATABASES = {"default": POSTGRES_DB}
 
-if env("POSTGRES_SSL_ENABLED"):
+if env.bool("POSTGRES_SSL_ENABLED", False):
     DATABASES["default"]["OPTIONS"] = {
         "sslmode": env("POSTGRES_SSL_MODE"),
         "sslrootcert": env("POSTGRES_SSL_ROOTCERT"),
@@ -215,7 +214,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
+# https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = "en"
 LANGUAGE_COOKIE_NAME = "language"
@@ -237,7 +236,7 @@ LANGUAGES = [
 ]
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
@@ -247,7 +246,7 @@ LOGIN_URL = "two_factor:login"
 LOGIN_REDIRECT_URL = "crisis_room"
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
