@@ -44,7 +44,7 @@ BYTES_API = env.url("BYTES_API", "").geturl()
 BYTES_USERNAME = env("BYTES_USERNAME", default="")
 BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
-KEIKO_API = env.url("KEIKO_API").geturl()
+KEIKO_API = env.url("KEIKO_API", "").geturl()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
