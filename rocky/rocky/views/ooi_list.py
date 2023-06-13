@@ -84,15 +84,12 @@ class OOIListView(BaseOOIListView):
         self, selected_oois: List[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
     ) -> HttpResponse:
         try:
-            self.verify_raise_clearance_level(level.value)
+            self.raise_clearance_levels(selected_oois, level.value)
         except IndemnificationNotPresentException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _(
-                    "Could not raise clearance level to L%s. \
-                    Indemnification not present at organization %s."
-                )
+                _("Could not raise clearance levels to L%s. Indemnification not present at organization %s.")
                 % (
                     level,
                     self.organization.name,
@@ -103,33 +100,24 @@ class OOIListView(BaseOOIListView):
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _(
-                    "Could not raise clearance level to L%s. \
-                    You acknowledged a clearance level of %s."
-                )
+                _("Could not raise clearance level to L%s. You acknowledged a clearance level of %s.")
                 % (
                     level,
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
             return self.get(request, status=403, *args, **kwargs)
+        except (RequestException, RemoteException, ConnectionError):
+            messages.add_message(request, messages.ERROR, _("An error occurred while saving clearance levels."))
 
-        for ooi_reference in selected_oois:
-            try:
-                self.raise_clearance_level(Reference.from_str(ooi_reference), level.value)
-            except (RequestException, RemoteException, ConnectionError):
-                messages.add_message(
-                    request, messages.ERROR, _("An error occurred while saving clearance level for %s.") % ooi_reference
-                )
-                return self.get(request, status=500, *args, **kwargs)
-            except ObjectNotFoundException:
-                messages.add_message(
-                    request,
-                    messages.ERROR,
-                    _("An error occurred while saving clearance level for %s.") % ooi_reference
-                    + _("OOI doesn't exist"),
-                )
-                return self.get(request, status=404, *args, **kwargs)
+            return self.get(request, status=500, *args, **kwargs)
+        except ObjectNotFoundException:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("An error occurred while saving clearance levels.") + _("One of the OOI's doesn't exist"),
+            )
+            return self.get(request, status=404, *args, **kwargs)
 
         messages.add_message(
             request,
@@ -141,26 +129,25 @@ class OOIListView(BaseOOIListView):
     def _set_oois_to_inherit(
         self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs
     ) -> HttpResponse:
-        for ooi in selected_oois:
-            try:
-                self.octopoes_api_connector.save_scan_profile(
-                    EmptyScanProfile(reference=Reference.from_str(ooi)),
-                    valid_time=datetime.now(timezone.utc),
-                )
-            except (RequestException, RemoteException, ConnectionError):
-                messages.add_message(
-                    request,
-                    messages.ERROR,
-                    _("An error occurred while setting clearance level to inherit for %s.") % ooi,
-                )
-                return self.get(request, status=500, *args, **kwargs)
-            except ObjectNotFoundException:
-                messages.add_message(
-                    request,
-                    messages.ERROR,
-                    _("An error occurred while setting clearance level to inherit for %s. OOI doesn't exist.") % ooi,
-                )
-                return self.get(request, status=404, *args, **kwargs)
+        scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
+
+        try:
+            self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=datetime.now(timezone.utc))
+        except (RequestException, RemoteException, ConnectionError):
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("An error occurred while setting clearance levels to inherit."),
+            )
+            return self.get(request, status=500, *args, **kwargs)
+        except ObjectNotFoundException:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("An error occurred while setting clearance levels to inherit: one of the OOIs doesn't exist."),
+            )
+            return self.get(request, status=404, *args, **kwargs)
+
         messages.add_message(
             request,
             messages.SUCCESS,
@@ -170,18 +157,18 @@ class OOIListView(BaseOOIListView):
 
     def _delete_oois(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
         connector = self.octopoes_api_connector
+        valid_time = datetime.now(timezone.utc)
 
-        for ooi in selected_oois:
-            try:
-                connector.delete(ooi, valid_time=datetime.now(timezone.utc))
-            except (RequestException, RemoteException, ConnectionError):
-                messages.add_message(request, messages.ERROR, _("An error occurred deleting %s.") % ooi)
-                return self.get(request, status=500, *args, **kwargs)
-            except ObjectNotFoundException:
-                messages.add_message(
-                    request, messages.ERROR, _("An error occurred deleting %s.") % ooi + _("OOI doesn't exist")
-                )
-                return self.get(request, status=404, *args, **kwargs)
+        try:
+            connector.delete_many(selected_oois, valid_time)
+        except (RequestException, RemoteException, ConnectionError):
+            messages.add_message(request, messages.ERROR, _("An error occurred while deleting oois."))
+            return self.get(request, status=500, *args, **kwargs)
+        except ObjectNotFoundException:
+            messages.add_message(
+                request, messages.ERROR, _("An error occurred while deleting oois: one of the OOIs doesn't exist.")
+            )
+            return self.get(request, status=404, *args, **kwargs)
 
         messages.add_message(
             request,

@@ -41,19 +41,19 @@ check: ## Check the code style using black, mypy and pylint.
 	make pylint
 
 mypy: ## Check code style using mypy.
-	$(ci-docker-compose) run --rm mula \
+	docker-compose run --rm scheduler \
 		python -m mypy --cache-dir /home/scheduler/.mypy_cache /app/scheduler/scheduler
 
 black: ## Check code style with black.
-	$(ci-docker-compose) run --rm mula \
+	docker-compose run --rm scheduler \
 		black --check --diff .
 
 pylint: ## Rate the code with pylint.
-	$(ci-docker-compose) run --rm mula \
+	docker-compsoe run --rm scheduler \
 		pylint --rcfile pyproject.toml scheduler
 
 fmt: ## Format the code using black.
-	$(ci-docker-compose) run --rm mula \
+	docker-compose run --rm scheduler \
 		black .
 
 done: ## Prepare for a commit.
@@ -62,7 +62,7 @@ done: ## Prepare for a commit.
 	make test
 
 cov: ## Generate a test coverage report
-	$(ci-docker-compose) run --rm mula \
+	docker-compose run --rm scheduler \
 		python -m pytest \
 		--cov-report term-missing:skip-covered \
 		--cov=scheduler tests/
@@ -83,14 +83,14 @@ ifeq ($(m),)
 else ifeq ($(revid),)
 	$(HIDE) (echo "ERROR: Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run scheduler \
+	docker-compose run --rm scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		revision --autogenerate \
 		-m "$(m)" --rev-id "$(revid)"
 endif
 
 migrate: ## Run migrations using alembic.
-	$(ci-docker-compose) run scheduler \
+	docker-compose run scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		upgrade head
 
@@ -101,22 +101,18 @@ migrate: ## Run migrations using alembic.
 
 utest: ## Run the unit tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm mula python -m pytest -v tests/unit/${file} $(if $(function),-k $(function))
+	$(ci-docker-compose) run --rm ci_scheduler_unit python -m pytest -v tests/unit/${file} $(if $(function),-k $(function))
 else
-	$(ci-docker-compose) run --rm mula python -m pytest -v tests/unit
+	$(ci-docker-compose) run --rm ci_scheduler_unit python -m pytest -v tests/unit
 endif
 	$(ci-docker-compose) down --remove-orphans
 
 itest: ## Run the integration tests.
 ifneq ($(file),)
-	$(ci-docker-compose) run --rm mula python -m pytest -v tests/integration/${file} $(if $(function),-k $(function))
+	$(ci-docker-compose) run --rm ci_scheduler_integration python -m pytest -v tests/integration/${file} $(if $(function),-k $(function))
 else
-	$(ci-docker-compose) run --rm mula python -m pytest -v tests/integration
+	$(ci-docker-compose) run --rm ci_scheduler_integration python -m pytest -v tests/integration
 endif
-	$(ci-docker-compose) down --remove-orphans
-
-stest: ## Run the simulation tests.
-	$(ci-docker-compose) run --rm mula python -m pytest tests/simulation
 	$(ci-docker-compose) down --remove-orphans
 
 test: ## Run all tests.

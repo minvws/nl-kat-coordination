@@ -39,7 +39,7 @@ addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
 [tool.poetry.dependencies]
 python = "^3.8"
 requests = "^2.31.0"
-pydantic = "^1.10.7"
+pydantic = "^1.10.9"
 fastapi = "^0.93.0"
 fastapi-utils = "^0.2.1"
 uvicorn = "^0.20.0"
@@ -58,7 +58,6 @@ opentelemetry-instrumentation-fastapi = "^0.38b0"
 opentelemetry-instrumentation-requests = "^0.38b0"
 certifi = "^2023.5.7"
 sqlalchemy = "1.4.48"
-typing-extensions = "<=4.5.0"
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"

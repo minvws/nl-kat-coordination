@@ -132,6 +132,9 @@ services:
       - ./octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .env
+    environment:
+      - GITPOD_WORKSPACE_URL=${GITPOD_WORKSPACE_URL:-}
+      - GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}
 
   bytes:
     restart: unless-stopped
@@ -185,6 +188,7 @@ services:
       - ./mula:/app/scheduler
     depends_on:
       - postgres
+      - rabbitmq
       - boefje
       - normalizer
       - octopoes_api
