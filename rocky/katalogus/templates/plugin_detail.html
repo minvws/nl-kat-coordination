@@ -10,12 +10,7 @@
         <section>
             <div class="two-thirds-one-third">
                 <div>
-                    <div class="horizontal-view toolbar">
-                        <div>
-                            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
-
-                        </div>
-                    </div>
+                    
                     <h1>{{ plugin.name }}</h1>
                     <div class="horizontal-view scan-intensity">
                         <span class="de-emphasized">{% translate "Scan level" %}</span>
@@ -28,6 +23,10 @@
                     <p>
                         {{ plugin.description }}
                     </p>
+
+                    <div class="horizontal-view">
+                        {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
+                    </div>
                 </div>
 
                 <div class="image-square">
