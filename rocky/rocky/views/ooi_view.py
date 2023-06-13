@@ -68,6 +68,23 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         return context
 
 
+class OOICreateView(SingleOOIMixin):
+    ooi_class: Type[OOI] = None
+
+    def save_ooi(self, data) -> OOI:
+        new_ooi = self.ooi_class.parse_obj(data)
+
+        task_id = uuid4()
+        declaration = Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
+
+        get_bytes_client(self.organization.code).add_manual_proof(
+            task_id, BytesClient.raw_from_declarations([declaration])
+        )
+
+        self.octopoes_api_connector.save_declaration(declaration)
+        return new_ooi
+
+
 class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         self.ooi = self.get_ooi()
@@ -102,8 +119,7 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
         ]
 
 
-class BaseOOIFormView(SingleOOIMixin, FormView):
-    ooi_class: Type[OOI] = None
+class BaseOOIFormView(OOICreateView, FormView):
     form_class = OOIForm
 
     def get_ooi_class(self):
@@ -131,19 +147,6 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         kwargs.update(super().get_form_kwargs())
 
         return kwargs
-
-    def save_ooi(self, data) -> OOI:
-        new_ooi = self.ooi_class.parse_obj(data)
-
-        task_id = uuid4()
-        declaration = Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
-
-        get_bytes_client(self.organization.code).add_manual_proof(
-            task_id, BytesClient.raw_from_declarations([declaration])
-        )
-
-        self.octopoes_api_connector.save_declaration(declaration)
-        return new_ooi
 
     def form_valid(self, form):
         # Transform into OOI

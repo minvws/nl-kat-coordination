@@ -1,9 +1,13 @@
 from account.mixins import OrganizationPermissionRequiredMixin
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from tools.forms.ooi import MuteFindingForm
 
 from octopoes.models.ooi.findings import MutedFinding
-from rocky.views.ooi_view import BaseOOIDetailView
+from rocky.views.ooi_view import BaseOOIDetailView, OOICreateView
 
 
 class MuteFindingView(OrganizationPermissionRequiredMixin, BaseOOIDetailView, FormView):
@@ -24,3 +28,17 @@ class MuteFindingView(OrganizationPermissionRequiredMixin, BaseOOIDetailView, Fo
         context["ooi_type"] = MutedFinding.get_object_type()
 
         return context
+
+
+class MuteFindingsBulkView(OOICreateView):
+    def post(self, request, *args, **kwargs):
+        self.ooi_class = MutedFinding
+        selected_findings = request.POST.getlist("finding", None)
+        reason = request.POST.get("reason", None)
+        mute_findings = request.POST.get("mute_findings", None)
+        if not selected_findings and mute_findings:
+            messages.add_message(self.request, messages.WARNING, _("Please select at least one finding."))
+        for finding in selected_findings:
+            data = {"finding": finding, "reason": reason}
+            self.save_ooi(data)
+        return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
