@@ -37,23 +37,23 @@ QUEUE_URI = env.url("QUEUE_URI").geturl()
 
 OCTOPOES_API = env.url("OCTOPOES_API").geturl()
 
-SCHEDULER_API = env.url("SCHEDULER_API", default="").geturl()
+SCHEDULER_API = env.url("SCHEDULER_API").geturl()
 
-KATALOGUS_API = env.url("KATALOGUS_API", default="").geturl()
+KATALOGUS_API = env.url("KATALOGUS_API").geturl()
 
-BYTES_API = env.url("BYTES_API", default="").geturl()
+BYTES_API = env.url("BYTES_API").geturl()
 BYTES_USERNAME = env("BYTES_USERNAME", default="")
 BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
-KEIKO_API = env.url("KEIKO_API", default="").geturl()
+KEIKO_API = env.url("KEIKO_API").geturl()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
-REMOTE_USER_HEADER = env("REMOTE_USER_HEADER")
-REMOTE_USER_FALLBACK = env("REMOTE_USER_FALLBACK", default=False)
+REMOTE_USER_HEADER = env("REMOTE_USER_HEADER", default=None)
+REMOTE_USER_FALLBACK = env.bool("REMOTE_USER_FALLBACK", False)
 
 if REMOTE_USER_HEADER:
     AUTHENTICATION_BACKENDS = [
@@ -65,13 +65,13 @@ if REMOTE_USER_HEADER:
         ]
 
 # SECURITY WARNING: enable two factor authentication in production!
-TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", default=not REMOTE_USER_HEADER)
+TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", not REMOTE_USER_HEADER)
 
 # A list of strings representing the host/domain names that this Django site can serve.
 # https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS", default="*").split()
 
-SPAN_EXPORT_GRPC_ENDPOINT = env("SPAN_EXPORT_GRPC_ENDPOINT")
+SPAN_EXPORT_GRPC_ENDPOINT = env("SPAN_EXPORT_GRPC_ENDPOINT", default=None)
 if SPAN_EXPORT_GRPC_ENDPOINT is not None:
     OpenTelemetryHelper.setup_instrumentation(SPAN_EXPORT_GRPC_ENDPOINT)
 
@@ -87,8 +87,8 @@ EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="")
 SERVER_EMAIL = env("SERVER_EMAIL", default="")
 EMAIL_SUBJECT_PREFIX = env("EMAIL_SUBJECT_PREFIX", default="KAT - ")
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
-EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", False)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", False)
 EMAIL_SSL_CERTFILE = env("EMAIL_SSL_CERTFILE", default=None)  # None
 EMAIL_SSL_KEYFILE = env("EMAIL_SSL_KEYFILE", default=None)
 EMAIL_TIMEOUT = 30  # 30 seconds
@@ -197,18 +197,18 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {
-            "min_length": env.int("PASSWORD_MIN_LENGTH", default=12),
+            "min_length": env.int("PASSWORD_MIN_LENGTH", 12),
         },
     },
     {
         "NAME": "django_password_validators.password_character_requirements"
-                ".password_validation.PasswordCharacterValidator",
+        ".password_validation.PasswordCharacterValidator",
         "OPTIONS": {
-            "min_length_digit": env.int("PASSWORD_MIN_DIGIT", default=2),
-            "min_length_alpha": env.int("PASSWORD_MIN_ALPHA", default=2),
-            "min_length_special": env.int("PASSWORD_MIN_SPECIAL", default=2),
-            "min_length_lower": env.int("PASSWORD_MIN_LOWER", default=2),
-            "min_length_upper": env.int("PASSWORD_MIN_UPPER", default=2),
+            "min_length_digit": env.int("PASSWORD_MIN_DIGIT", 2),
+            "min_length_alpha": env.int("PASSWORD_MIN_ALPHA", 2),
+            "min_length_special": env.int("PASSWORD_MIN_SPECIAL", 2),
+            "min_length_lower": env.int("PASSWORD_MIN_LOWER", 2),
+            "min_length_upper": env.int("PASSWORD_MIN_UPPER", 2),
             "special_characters": " ~!@#$%^&*()_+{}\":;'[]",
         },
     },
@@ -279,14 +279,17 @@ CSRF_COOKIE_HTTPONLY = True
 CSRF_TRUSTED_ORIGINS = env("DJANGO_CSRF_TRUSTED_ORIGINS", default="").split()
 
 # Configuration for Gitpod
-if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL"):
+if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL", default=None) is not None:
     # example environment variable: GITPOD_WORKSPACE_URL=https://minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io
     # public url on https://8000-minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io/
     ALLOWED_HOSTS.append("8000-" + GITPOD_WORKSPACE_URL.split("//")[1])
     CSRF_TRUSTED_ORIGINS.append(GITPOD_WORKSPACE_URL.replace("//", "//8000-"))
 
 # Configuration for GitHub Codespaces
-if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"):
+if (
+    GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", default=None)
+    is not None
+):
     # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
     # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
     ALLOWED_HOSTS.append("." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
@@ -300,7 +303,7 @@ X_FRAME_OPTIONS = "DENY"
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-CSP_HEADER = env.bool("CSP_HEADER", default=True)
+CSP_HEADER = env.bool("CSP_HEADER", True)
 
 if CSP_HEADER:
     MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
@@ -320,7 +323,7 @@ CSP_BLOCK_ALL_MIXED_CONTENT = True
 DEFAULT_RENDERER_CLASSES = ["rest_framework.renderers.JSONRenderer"]
 
 # Turn on the browsable API by default if DEBUG is True, but disable by default in production
-BROWSABLE_API = env.bool("BROWSABLE_API", default=DEBUG)
+BROWSABLE_API = env.bool("BROWSABLE_API", DEBUG)
 
 if BROWSABLE_API:
     DEFAULT_RENDERER_CLASSES = DEFAULT_RENDERER_CLASSES + ["rest_framework.renderers.BrowsableAPIRenderer"]
