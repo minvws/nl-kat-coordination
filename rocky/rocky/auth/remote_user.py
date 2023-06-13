@@ -14,7 +14,7 @@ class RemoteUserBackend(BaseRemoteUserBackend):
     """
 
     def configure_user(self, request, user, created=True):
-        if not user.is_superuser and settings.REMOTE_USER_DEFAULT_ORGANIZATIONS:
+        if settings.REMOTE_USER_DEFAULT_ORGANIZATIONS:
             try:
                 user_orgs = [o.name for o in user.organizations]
                 for item in settings.REMOTE_USER_DEFAULT_ORGANIZATIONS:
