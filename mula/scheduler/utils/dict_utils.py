@@ -25,7 +25,7 @@ class ExpiringDict:
         self.expiration_time: datetime = start_time + self.lifetime
         self.lock: threading.Lock = threading.Lock()
         self.cache: Dict[str, Any] = {}
-        self.dont_expire: bool = False
+        self.expiration_enabled: bool = True
 
     def get(self, key: str, default: Optional[Any] = None) -> Any:
         try:
@@ -38,16 +38,19 @@ class ExpiringDict:
             self.cache.clear()
             self.expiration_time = datetime.now(timezone.utc) + self.lifetime
 
-    def toggle_expire(self) -> None:
+    def set_expiration_enabled(self, value: bool) -> None:
+        """Enable or disable expiration. If disabled, the cache will never
+        expire.
+        """
         with self.lock:
-            self.dont_expire = not self.dont_expire
+            self.expiration_enabled = value
 
     def _is_expired(self) -> bool:
         return datetime.now(timezone.utc) > self.expiration_time
 
     def __getitem__(self, key: str) -> Any:
         with self.lock:
-            if self._is_expired() and not self.dont_expire:
+            if self._is_expired() and self.expiration_enabled:
                 # Using this instead of reset(), else we would lock
                 self.cache.clear()
                 self.expiration_time = datetime.now(timezone.utc) + self.lifetime

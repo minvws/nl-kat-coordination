@@ -23,11 +23,11 @@ class ExpiringDictTestCase(unittest.TestCase):
 
         ed.expiration_time = datetime.now(timezone.utc) - timedelta(seconds=2)
 
-        ed.toggle_expire()
+        ed.set_expiration_enabled(False)
 
         self.assertEqual(1, ed.get("a"))
 
-        ed.toggle_expire()
+        ed.set_expiration_enabled(True)
 
         with self.assertRaises(utils.ExpiredError):
             ed.get("a")
