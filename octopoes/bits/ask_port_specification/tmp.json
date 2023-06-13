@@ -1,0 +1,105 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "http://json-schema.org/draft-07/schema#",
+	"description": "Paragraph",
+	"type": "object",
+	"properties": {
+		"stringtest": {
+			"type": "string",
+			"description": "String.",
+			"minLength": 1
+		},
+		"numbertest": {
+			"type": "number",
+			"description": "Some number.",
+			"min": 1,
+			"max": 100
+		},
+		"arraytest": {
+			"type": "array",
+			"minItems": 1,
+			"maxItems": 5,
+			"items": {
+				"type": "string",
+				"format": "textarea",
+				"description": "The items content.",
+				"minLength": 1
+			}
+		},
+		"nestedtest": {
+			"type": "object",
+			"properties": {
+				"title": {
+					"type": "string",
+					"description": "The blocks title.",
+					"minLength": 1,
+					"maxLength": 255
+				},
+				"contents": {
+					"type": "array",
+					"minItems": 1,
+					"maxItems": 4,
+					"items": {
+						"type": "object",
+						"required": ["label", "url"],
+						"properties": {
+							"label": {
+								"type": "string",
+								"description": "The visible label.",
+								"minLength": 1,
+								"maxLength": 255
+							},
+							"url": {
+								"type": "string",
+								"description": "each label can optionally link somewhere."
+							}
+						}
+					}
+				},
+				"secondnested": {
+					"type": "object",
+					"properties": {
+						"title": {
+							"type": "string",
+							"description": "The blocks title.",
+							"minLength": 1,
+							"maxLength": 255
+						}
+					},
+					"thirdnested": {
+						"type": "object",
+						"properties": {
+							"fourthnested": {
+								"type": "object",
+								"properties": {
+									"fifthnested": {
+										"type": "object",
+										"properties": {
+											"sixthnested": {
+												"type": "object",
+												"properties": {
+													"seventhnested": {
+														"type": "object",
+														"properties": {
+															"title": {
+																"type": "string",
+																"description": "The blocks title.",
+																"minLength": 1,
+																"maxLength": 255
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"required": ["numbertest"]
+}
