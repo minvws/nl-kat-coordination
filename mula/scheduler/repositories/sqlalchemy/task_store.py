@@ -87,10 +87,9 @@ class TaskStore(TaskStorer):
         with self.datastore.session.begin() as session:
             task_orm = models.TaskORM(**task.dict())
             session.add(task_orm)
+            session.flush()
 
-            created_task = models.Task.from_orm(task_orm)
-
-            return created_task
+            return models.Task.from_orm(task_orm)
 
     @retry()
     def update_task(self, task: models.Task) -> None:

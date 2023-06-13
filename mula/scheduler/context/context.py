@@ -71,6 +71,7 @@ class AppContext:
         datastore = sqlalchemy.SQLAlchemy(self.config.database_dsn)
         self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
         self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
+        self.job_store: stores.JobStorer = sqlalchemy.JobStore(datastore)
 
         # Metrics collector registry
         self.metrics_registry: CollectorRegistry = CollectorRegistry()

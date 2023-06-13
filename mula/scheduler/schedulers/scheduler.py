@@ -116,7 +116,54 @@ class Scheduler(abc.ABC):
             self.ctx.task_store.update_task(task)
             return
 
-        self.ctx.task_store.create_task(task)
+        if p_item.hash is None:
+            self.logger.warning(
+                "Task %s has no hash, not creating job [task_id=%s, queue_id=%s]",
+                p_item.data.get("id"),
+                p_item.data.get("id"),
+                self.queue.pq_id,
+            )
+            return None
+
+        task_db = self.ctx.task_store.create_task(task)
+        if task_db is None:
+            self.logger.warning(
+                "Task %s could not be created, not creating job [task_id=%s, queue_id=%s]",
+                p_item.data.get("id"),
+                p_item.data.get("id"),
+                self.queue.pq_id,
+            )
+            return None
+
+        # TODO: enabled?
+        job = self.ctx.job_store.get_job_by_hash(p_item.hash)
+        if job is not None:
+            self.ctx.job_store.update_job(job)  # TODO: test this modified_at
+            return
+
+        job_db = self.ctx.job_store.create_job(
+            models.Job(
+                scheduler_id=self.scheduler_id,
+                hash=p_item.hash,
+                enabled=True,
+                p_item=p_item,
+                created_at=datetime.now(timezone.utc),
+                modified_at=datetime.now(timezone.utc),
+            )
+        )
+        if job_db is None:
+            self.logger.warning(
+                "Task %s could not be created, not creating job [task_id=%s, queue_id=%s]",
+                p_item.data.get("id"),
+                p_item.data.get("id"),
+                self.queue.pq_id,
+            )
+            return None
+
+        task_db.job_id = job_db.id
+        self.ctx.task_store.update_task(task_db)
+
+        return
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We

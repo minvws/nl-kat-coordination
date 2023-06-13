@@ -5,8 +5,9 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
@@ -39,8 +40,9 @@ class Task(BaseModel):
     p_item: PrioritizedItem
     status: TaskStatus
 
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    job_id: Optional[uuid.UUID] = None
 
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
@@ -59,11 +61,10 @@ class TaskORM(Base):
     scheduler_id = Column(String)
     type = Column(String)
     p_item = Column(JSONB, nullable=False)
-    status = Column(
-        Enum(TaskStatus),
-        nullable=False,
-        default=TaskStatus.PENDING,
-    )
+    status = Column(Enum(TaskStatus), nullable=False, default=TaskStatus.PENDING)
+
+    job_id = Column(GUID, ForeignKey("jobs.id"), nullable=True)
+    job = relationship("JobORM", back_populates="tasks")
 
     created_at = Column(
         DateTime(timezone=True),

@@ -233,6 +233,20 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_new_boefjes.__name__,
                     )
 
+    @tracer.start_as_current_span("push_tasks_for_rescheduling")
+    def push_tasks_for_rescheduling(self):
+        if self.queue.full():
+            self.logger.warning(
+                "Boefjes queue is full, not populating with new tasks "
+                "[queue.qsize=%d, organisation_id=%s, scheduler_id=%s]",
+                self.queue.qsize(),
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return
+
+        pass
+
     @tracer.start_as_current_span("push_tasks_for_random_objects")
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random objects from octopoes to the queue."""

@@ -106,3 +106,32 @@ class PriorityQueueStorer(abc.ABC):
     @abc.abstractmethod
     def get_items_by_scheduler_id(self, scheduler_id: str) -> List[models.PrioritizedItem]:
         raise NotImplementedError
+
+
+class JobStorer(abc.ABC):
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger(__name__)
+
+    @abc.abstractmethod
+    def get_jobs(
+        self,
+        scheduler_id,
+        filters: Optional[List[models.Filter]] = None,
+    ):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_job(self, job_id: str) -> Optional[models.Job]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def get_job_by_hash(self, job_hash: str) -> Optional[models.Job]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def create_job(self, job: models.Job) -> Optional[models.Job]:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def update_job(self, job: models.Job) -> None:
+        raise NotImplementedError
