@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 class RabbitMQEventManager(EventManager):
     def __init__(self, queue_uri: str):
         self.queue_uri = queue_uri
-        self.connection = get_connection(self.queue_uri)
+        self.connection = pika.BlockingConnection(pika.URLParameters(self.queue_uri))
         self.channel = self.connection.channel()
+        logger.info("Connected to RabbitMQ")
 
     def publish(self, event: Event) -> None:
         event_data = event.json()
@@ -29,8 +30,7 @@ class RabbitMQEventManager(EventManager):
         except pika.exceptions.ConnectionClosed:
             logger.exception("RabbitMQ connection was closed: retrying with a new connection.")
 
-            get_connection.cache_clear()
-            self.connection = get_connection(self.queue_uri)
+            self.connection = pika.BlockingConnection(pika.URLParameters(self.queue_uri))
             self.channel = self.connection.channel()
 
             self.channel.basic_publish("", queue_name, event_data.encode())
@@ -48,14 +48,6 @@ class NullManager(EventManager):
 
 
 @lru_cache(maxsize=1)
-def get_connection(queue_uri: str) -> pika.BlockingConnection:
-    logger.info("Connecting to RabbitMQ")
-    connection = pika.BlockingConnection(pika.URLParameters(queue_uri))
-    logger.info("Connected to RabbitMQ")
-
-    return connection
-
-
 def create_event_manager() -> EventManager:
     settings = get_settings()
 
