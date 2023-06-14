@@ -1,6 +1,6 @@
 """Boefje script for getting domaions and ipaddresses from dadb"""
 from os import getenv
-from typing import Union, Tuple, List
+from typing import List, Tuple, Union
 
 import requests
 

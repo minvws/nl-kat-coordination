@@ -4,7 +4,7 @@ To make the API call work, there are four environment variables:
 
 - `DB_URL`; the URL where the API for the database lives (without path, with port), for example `http://host.docker.internal:9000`.
 - `DB_ACCESS_TOKEN`; an API access token as `GET` parameter.
-- `DB_ORGANIZATION_IDENTIFIER`; by default uses the organisation ID in KAT. If this is not prefered it can be changed to something else. Otherwise, make sure that the organization code in kat matches the id of the organisation in the database.
+- `DB_ORGANIZATION_IDENTIFIER`; by default uses the organisation ID in KAT. If this is not preferred it can be changed to something else. Otherwise, make sure that the organization code in kat matches the id of the organisation in the database.
 - `DB_ENDPOINT_FORMAT`; a Python format string with all variables above (optionally empty) and any path specifics of the API. E.g. `{DB_URL}/api/v1/participants/assets/{DB_ORGANIZATION_IDENTIFIER}?access_token={DB_ACCESS_TOKEN}' (without quotes)`
 
 The response expected is JSON of the form
