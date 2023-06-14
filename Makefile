@@ -100,10 +100,7 @@ docs:
 	sphinx-build -b html docs/source docs/_build
 
 poetry-dependencies:
-	poetry check -C ./
-	poetry lock -C ./
-	poetry export -C ./ -f requirements.txt -o ./requirements.txt
-	for path in keiko octopoes
+	for path in . keiko octopoes
 	do
 		echo $$path
 		poetry check -C $$path
