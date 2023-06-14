@@ -15,8 +15,8 @@ python-dateutil==2.8.2
 tldextract==3.4.4
 
 # OpenTelemetry
-opentelemetry-sdk==1.17.0
-opentelemetry-exporter-otlp-proto-grpc==1.17.0
-opentelemetry-instrumentation-fastapi==0.38b0
-opentelemetry-instrumentation-psycopg2==0.38b0
-opentelemetry-instrumentation-requests==0.38b0
+opentelemetry-sdk==1.18.0
+opentelemetry-exporter-otlp-proto-grpc==1.18.0
+opentelemetry-instrumentation-fastapi==0.39b0
+opentelemetry-instrumentation-psycopg2==0.39b0
+opentelemetry-instrumentation-requests==0.39b0
