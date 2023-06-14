@@ -55,8 +55,11 @@ REMOTE_USER_HEADER = os.getenv("REMOTE_USER_HEADER")
 REMOTE_USER_FALLBACK = os.getenv("REMOTE_USER_FALLBACK", "False").casefold() != "false"
 
 if REMOTE_USER_HEADER:
+    # Optional list of default organizations to add remote users to,
+    # format: space separated list of ORGANIZATION_CODE:GROUP_NAME, e.g. `test:admin test2:redteam`
+    REMOTE_USER_DEFAULT_ORGANIZATIONS = os.getenv("REMOTE_USER_DEFAULT_ORGANIZATIONS", "").split()
     AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.RemoteUserBackend",
+        "rocky.auth.remote_user.RemoteUserBackend",
     ]
     if REMOTE_USER_FALLBACK:
         AUTHENTICATION_BACKENDS += [
