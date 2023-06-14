@@ -22,7 +22,7 @@ iniconfig==2.0.0
 isort==5.10.1
 lazy-object-proxy==1.7.1
 mako==1.2.4
-markupsafe==2.1.2
+markupsafe==2.1.3
 mccabe==0.7.0
 mypy-extensions==1.0.0
 mypy==1.0.1
@@ -38,7 +38,7 @@ psycopg2==2.9.6
 py==1.11.0
 pyasn1==0.4.8
 pycparser==2.21
-pydantic==1.10.8
+pydantic==1.10.9
 pylint==2.15.6
 pynacl==1.5.0
 pyparsing==3.0.9
@@ -57,7 +57,7 @@ starlette==0.25.0
 toml==0.10.2
 tomli==2.0.1
 toolz==0.12.0
-urllib3==2.0.2
+urllib3==2.0.3
 uvicorn==0.17.6
 wrapt==1.14.1
 zipp==3.8.1
