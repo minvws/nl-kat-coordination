@@ -123,7 +123,7 @@ def start_working(
                     ),
                 )
                 subp.start()
-                subp.join(timeout=settings.default_timeout)
+                subp.join(timeout=settings.max_plugin_runtime)
 
                 if subp.is_alive():
                     subp.terminate()

@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # Worker configuration
     pool_size: int = 2
     poll_interval: float = 1.0
-    default_timeout: Optional[float] = None
+    max_plugin_runtime: Optional[float] = None
 
     # Queue configuration
     queue_name_boefjes: str = "boefjes"
