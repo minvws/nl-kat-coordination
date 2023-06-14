@@ -38,7 +38,7 @@
                     {% if organization.code and not view_type == "onboarding" %}
                         <li>
                             <a href="{% url "katalogus" organization.code %}"
-                               {% if url_name == "katalogus" %}aria-current="page"{% endif %}>{% translate "KAT-alogus" %}</a>
+                               {% if url_name == "katalogus" or url_name == "plugin_detail" %}aria-current="page"{% endif %}>{% translate "KAT-alogus" %}</a>
                         </li>
                         <li>
                             <a href="{% url "finding_list" organization.code %}"
@@ -46,7 +46,7 @@
                         </li>
                         <li>
                             <a href="{% url "ooi_list" organization.code %}"
-                               {% if url_name == "ooi_list" %}aria-current="page"{% endif %}>{% translate "Objects" %}</a>
+                               {% if url_name == "ooi_list" or url_name == "ooi_detail" %}aria-current="page"{% endif %}>{% translate "Objects" %}</a>
                         </li>
                         <li>
                             <a href="{% url "task_list" organization.code %}"
