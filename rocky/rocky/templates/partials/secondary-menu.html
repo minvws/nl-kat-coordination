@@ -5,16 +5,17 @@
         {% if perms.tools.view_organization %}
             <li>
                 <a href="{% url "organization_list" %}"
-                   {% if 'organizations' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Organizations" %}</a>
+                   {% if url_name == "organization_list" %}aria-current="page"{% endif %}>{% translate "Organizations" %}</a>
             </li>
         {% endif %}
         <li>
-            <a href="{% url 'logout' %}">{% translate "Logout" %}</a>
+            <a href="{% url 'logout' %}"
+               {% if url_name == "logout" %}aria-current="page"{% endif %}>{% translate "Logout" %}</a>
         </li>
     {% else %}
         <li>
             <a href="{% url "two_factor:login" %}"
-               {% if 'login' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Login" %}</a>
+               {% if url_name == "login" %}aria-current="page"{% endif %}>{% translate "Login" %}</a>
         </li>
     {% endif %}
 </ul>

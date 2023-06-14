@@ -18,55 +18,57 @@
         </a>
         <!-- Adjust breakpoint as needed -->
         <ul>
-            {% if request.user.is_authenticated %}
-                {% if not view_type == "onboarding" %}
-                    {% include "partials/organizations_menu_dropdown.html" %}
+            {% with request.resolver_match.url_name as url_name %}
+                {% if request.user.is_authenticated %}
+                    {% if not view_type == "onboarding" %}
+                        {% include "partials/organizations_menu_dropdown.html" %}
 
-                {% endif %}
-                {% if not organization.code %}
-                    <li>
-                        <a href="{% url "crisis_room" %}"
-                           {% if 'crisis-room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
-                    </li>
-                {% else %}
-                    <li>
-                        <a href="{% url "organization_crisis_room" organization.code %}"
-                           {% if 'crisis_room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
-                    </li>
-                {% endif %}
-                {% if organization.code and not view_type == "onboarding" %}
-                    <li>
-                        <a href="{% url "katalogus" organization.code %}"
-                           {% if 'kat-alogus' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "KAT-alogus" %}</a>
-                    </li>
-                    <li>
-                        <a href="{% url "finding_list" organization.code %}"
-                           {% if 'finding' in request.path|urlencode or 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate "Findings" %}</a>
-                    </li>
-                    <li>
-                        <a href="{% url "ooi_list" organization.code %}"
-                           {% if 'objects' in request.path|urlencode and not 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate "Objects" %}</a>
-                    </li>
-                    <li>
-                        <a href="{% url "task_list" organization.code %}"
-                           {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
-                    </li>
-                    {% if perms.tools.view_organization %}
+                    {% endif %}
+                    {% if not organization.code %}
                         <li>
-                            <a href="{% url "organization_member_list" organization.code %}"
-                               {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Members" %}</a>
+                            <a href="{% url "crisis_room" %}"
+                               {% if url_name == "crisis_room" %}aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
                         </li>
+                    {% else %}
                         <li>
-                            <a href="{% url "organization_settings" organization.code %}"
-                               {% if 'settings' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Settings" %}</a>
+                            <a href="{% url "organization_crisis_room" organization.code %}"
+                               {% if url_name == "organization_crisis_room" %}aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
                         </li>
                     {% endif %}
+                    {% if organization.code and not view_type == "onboarding" %}
+                        <li>
+                            <a href="{% url "katalogus" organization.code %}"
+                               {% if url_name == "katalogus" %}aria-current="page"{% endif %}>{% translate "KAT-alogus" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url "finding_list" organization.code %}"
+                               {% if url_name == "finding_list" %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url "ooi_list" organization.code %}"
+                               {% if url_name == "ooi_list" %}aria-current="page"{% endif %}>{% translate "Objects" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url "task_list" organization.code %}"
+                               {% if url_name == "task_list" %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
+                        </li>
+                        {% if perms.tools.view_organization %}
+                            <li>
+                                <a href="{% url "organization_member_list" organization.code %}"
+                                   {% if url_name == "organization_member_list" %}aria-current="page"{% endif %}>{% translate "Members" %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url "organization_settings" organization.code %}"
+                                   {% if url_name == "organization_settings" %}aria-current="page"{% endif %}>{% translate "Settings" %}</a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-            <li class="secondary-menu">
-                {% include "partials/secondary-menu.html" %}
+                <li class="secondary-menu">
+                    {% include "partials/secondary-menu.html" %}
 
-            </li>
+                </li>
+            {% endwith %}
         </ul>
     </nav>
     {% if breadcrumbs %}
