@@ -29,6 +29,37 @@ TREE_DATA = {
     },
 }
 
+TREE_DATA_TWO_FINDINGS = {
+    "root": {
+        "reference": "Network|testnetwork",
+        "children": {
+            "ooi": [
+                {"reference": "Finding|Network|testnetwork|KAT-000", "children": {}},
+                {"reference": "Finding|Network|testnetwork|KAT-999", "children": {}},
+            ]
+        },
+    },
+    "store": {
+        "Network|testnetwork": {
+            "object_type": "Network",
+            "primary_key": "Network|testnetwork",
+            "name": "testnetwork",
+        },
+        "Finding|Network|testnetwork|KAT-000": {
+            "object_type": "Finding",
+            "primary_key": "Finding|Network|testnetwork|KAT-000",
+            "ooi": "Network|testnetwork",
+            "finding_type": "KATFindingType|KAT-000",
+        },
+        "Finding|Network|testnetwork|KAT-999": {
+            "object_type": "Finding",
+            "primary_key": "Finding|Network|testnetwork|KAT-999",
+            "ooi": "Network|testnetwork",
+            "finding_type": "KATFindingType|KAT-999",
+        },
+    },
+}
+
 
 MUTED_FINDING_TREE_DATA = {
     "root": {
@@ -176,3 +207,30 @@ def test_mute_finding_post(
     assertContains(resulted_response, "MutedFinding")
     assertContains(resulted_response, muted_finding["reason"])
     assertContains(resulted_response, "KAT-000 @ testnetwork")
+
+
+def test_muted_finding_button_presence(rf, client_member, mock_organization_view_octopoes):
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+
+    response = OOIFindingListView.as_view()(
+        setup_request(rf.get("finding_list", {"ooi_id": "Network|testnetwork"}), client_member.user),
+        organization_code=client_member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
+    # Does not show button with 1 Finding, see TREE DATA
+    assertNotContains(response, "Mute Findings")
+
+
+def test_muted_finding_button_presence_more_findings(rf, client_member, mock_organization_view_octopoes):
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA_TWO_FINDINGS)
+
+    response = OOIFindingListView.as_view()(
+        setup_request(rf.get("finding_list", {"ooi_id": "Network|testnetwork"}), client_member.user),
+        organization_code=client_member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
+    assertNotContains(response, "Mute Findings")
