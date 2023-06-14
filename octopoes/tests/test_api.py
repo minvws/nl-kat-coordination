@@ -123,3 +123,38 @@ def test_delete_node_multinode(requests_mock, xtdbtype_multinode):
     )
     response = client.delete("/_dev/node")
     assert response.status_code == 200
+
+
+def test_count_findings_by_severity(requests_mock, patch_pika):
+    requests_mock.real_http = True
+    xt_response = [
+        [
+            {
+                "object_type": "KATFindingType",
+                "KATFindingType/risk_severity": "medium",
+                "KATFindingType/id": "KAT-NO-DKIM",
+                "KATFindingType/description": "This hostname does not support a DKIM record.",
+                "KATFindingType/primary_key": "KATFindingType|KAT-NO-DKIM",
+                "KATFindingType/risk_score": 6.9,
+                "crux.db/id": "KATFindingType|KAT-NO-DKIM",
+            },
+            1,
+        ]
+    ]
+
+    requests_mock.post(
+        "http://crux:3000/_crux/query",
+        json=xt_response,
+        status_code=200,
+    )
+    response = client.get("/_dev/findings/count_by_severity")
+    assert response.status_code == 200
+    assert response.json() == {
+        "critical": 0,
+        "high": 0,
+        "medium": 1,
+        "low": 0,
+        "recommendation": 0,
+        "pending": 0,
+        "unknown": 0,
+    }
