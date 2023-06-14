@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from enum import Enum
-from functools import total_ordering
-from typing import Any, Dict, Optional, Tuple, TypedDict, Union
+from typing import Any, Dict, Optional, Tuple, Union
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -29,23 +28,6 @@ from tools.models import OOIInformation
 User = get_user_model()
 
 RISK_LEVEL_SCORE_DEFAULT = 10
-
-
-@total_ordering
-class RiskLevelSeverity(Enum):
-    CRITICAL = "critical"
-    HIGH = "high"
-    MEDIUM = "medium"
-    LOW = "low"
-    NONE = "recommendation"
-
-    def __gt__(self, other: "RiskLevelSeverity") -> bool:
-        severity_order = ["recommendation", "low", "medium", "high", "critical"]
-
-        return severity_order.index(self.value) > severity_order.index(other.value)
-
-    def __str__(self):
-        return self.value
 
 
 def format_attr_name(s: str) -> str:
@@ -83,9 +65,6 @@ def get_knowledge_base_data_for_ooi(ooi: OOI) -> Dict:
         if info.description:
             knowledge_base_data.update(info.data)
 
-        if isinstance(ooi, FindingType):
-            knowledge_base_data.update(risk_level_calculate(ooi, info))
-
     try:
         info_on_type = OOIInformation.objects.get(id=ooi.get_ooi_type())
         knowledge_base_data["Information"] = info_on_type.description
@@ -95,116 +74,11 @@ def get_knowledge_base_data_for_ooi(ooi: OOI) -> Dict:
     return knowledge_base_data
 
 
-class RiskLevelScore(TypedDict):
-    risk_level_source: Optional[Union[str, int, float]]
-    risk_level_score: Union[int, float]
-    risk_level_severity: str
-
-
-def risk_level_calculate(ooi: FindingType, ooi_info: OOIInformation) -> RiskLevelScore:
-    """
-    Returns risk source value, calculated score and severity for finding type
-    """
-
-    if isinstance(ooi, CVEFindingType):
-        return get_risk_level_score_for_cve(ooi_info.data)
-    if isinstance(ooi, RetireJSFindingType):
-        return get_risk_level_score_for_retirejs(ooi_info.data)
-    if isinstance(ooi, SnykFindingType):
-        return get_risk_level_score_for_snyk(ooi_info.data)
-
-    return get_risk_level_score(ooi_info.data)
-
-
-def get_risk_level_score_for_cve(data: Dict) -> RiskLevelScore:
-    source = data.get("source")
-    score = data.get("cvss", RISK_LEVEL_SCORE_DEFAULT) or RISK_LEVEL_SCORE_DEFAULT
-    return {
-        "risk_level_source": source,
-        "risk_level_score": score,
-        "risk_level_severity": risk_level_severity(score),
-    }
-
-
-def get_risk_level_score_for_retirejs(data: Dict) -> RiskLevelScore:
-    source = RiskLevelSeverity[data["severity"].upper()].value
-    score = risk_to_score(source or RISK_LEVEL_SCORE_DEFAULT)
-
-    return {
-        "risk_level_source": source,
-        "risk_level_score": score,
-        "risk_level_severity": risk_level_severity(score),
-    }
-
-
-def get_risk_level_score_for_snyk(data: Dict) -> RiskLevelScore:
-    score = risk_to_score(float(data["risk"]) or RISK_LEVEL_SCORE_DEFAULT)
-
-    return {
-        "risk_level_source": score,
-        "risk_level_score": score,
-        "risk_level_severity": risk_level_severity(score),
-    }
-
-
-def get_risk_level_score(data: Dict) -> RiskLevelScore:
-    source = data.get("risk")
-    score = risk_to_score(data.get("risk", RISK_LEVEL_SCORE_DEFAULT))
-
-    return {
-        "risk_level_source": source,
-        "risk_level_score": score,
-        "risk_level_severity": risk_level_severity(score),
-    }
-
-
-def risk_to_score(risk: Union[str, int, float]) -> Union[int, float]:
-    """
-    Returns risk score 0 - 10
-    Risk can be either string or number.
-    text to score mapping guideline: CVSS v3 https://nvd.nist.gov/vuln-metrics/cvss
-    """
-    text_to_score_dict = {
-        "critical": 10,
-        "high": 8.9,
-        "medium": 6.9,
-        "low": 3.9,
-        "very low": 0.0,
-        "recommendation": 0.0,
-        "middle": 6.9,
-    }
-
-    if isinstance(risk, (int, float)) and 0 <= risk <= 10:
-        return risk
-
-    if isinstance(risk, str) and risk.lower() in text_to_score_dict:
-        return text_to_score_dict[risk.lower()]
-
-    raise ValueError(f"Unknown risk level: {risk}")
-
-
-def risk_level_severity(score: float) -> str:
-    """
-    Returns severity string, based on 0 - 10 score
-    guideline: CVSS v3 https://nvd.nist.gov/vuln-metrics/cvss
-
-    If no score or score not in 0-10 scale, return severity: critical
-    """
-    if score == 0:
-        return RiskLevelSeverity.NONE.value
-    elif score < 4:
-        return RiskLevelSeverity.LOW.value
-    elif score < 7:
-        return RiskLevelSeverity.MEDIUM.value
-    elif score < 9:
-        return RiskLevelSeverity.HIGH.value
-    else:
-        return RiskLevelSeverity.CRITICAL.value
-
-
 def process_value(value: Any) -> Any:
     if isinstance(value, Enum):
         return value.value
+    if isinstance(value, (int, float)):
+        return value
     return str(value) if value else None
 
 
