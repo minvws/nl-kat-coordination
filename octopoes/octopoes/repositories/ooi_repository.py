@@ -585,7 +585,7 @@ class XTDBOOIRepository(OOIRepository):
             {:query {
                 :find [(pull ?finding_type [*]) (count ?finding)]
                 :where [
-                    [?finding :Finding/finding_type ?finding]
+                    [?finding :Finding/finding_type ?finding_type]
                     (not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])
                     ]}}
         """
