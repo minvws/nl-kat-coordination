@@ -29,4 +29,4 @@ For example:
 }
 ```
 
-The expected ip and domain (item) key lists can be configured in `normalize.py`. Ranges are expected as strings in CIDR notation.
+The expected ip and domain (item) key lists can be configured in `normalize.py`. Ranges are expected as strings in CIDR notation. Clearance level for fetched items is set to `L0`.

@@ -18,7 +18,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     get_request = api_format.format(
         DB_URL=getenv("DB_URL"),
         DB_ORGANIZATION_IDENTIFIER=getenv("DB_ORGANIZATION_IDENTIFIER", boefje_meta.organization),
-        DB_ACCESS_TOKEN=getenv("DB_ACCESS_TOKEN"),
+        DB_ACCESS_TOKEN=getenv("DB_ACCESS_TOKEN", ""),
     )
     response = requests.get(get_request, timeout=request_timeout)
     if not response.ok:
