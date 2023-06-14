@@ -17,13 +17,12 @@ from tools.models import (
     GROUP_CLIENT,
     GROUP_REDTEAM,
     Indemnification,
-    OOIInformation,
     Organization,
     OrganizationMember,
 )
 
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
@@ -359,6 +358,33 @@ def finding():
 
 
 @pytest.fixture
+def finding_types():
+    return [
+        KATFindingType(
+            id="KAT-0001",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=9.5,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+        KATFindingType(
+            id="KAT-0002",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=9.5,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+        KATFindingType(
+            id="KAT-0003",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=3.9,
+            risk_severity=RiskLevelSeverity.LOW,
+        ),
+    ]
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {
@@ -397,13 +423,6 @@ def plugin_schema():
         },
         "required": ["TEST_PROPERTY"],
     }
-
-
-@pytest.fixture
-def ooi_information() -> OOIInformation:
-    data = {"description": "Fake description...", "recommendation": "Fake recommendation...", "risk": "Low"}
-    ooi_information = OOIInformation.objects.create(id="KATFindingType|KAT-000", data=data, consult_api=False)
-    return ooi_information
 
 
 def setup_request(request, user):

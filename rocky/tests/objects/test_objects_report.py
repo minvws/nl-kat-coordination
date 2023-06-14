@@ -4,13 +4,10 @@ from django.core.management import call_command
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
 from requests import HTTPError
-from tools.ooi_helpers import RiskLevelSeverity
 
-from octopoes.models import Reference
-from octopoes.models.ooi.findings import Finding, MutedFinding
+from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import OOIType
 from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from tests.conftest import setup_request
 
@@ -31,11 +28,19 @@ TREE_DATA = {
             "ooi": "Network|testnetwork",
             "finding_type": "KATFindingType|KAT-000",
         },
+        "KATFindingType|KAT-000": {
+            "object_type": "KATFindingType",
+            "id": "KAT-000",
+            "description": "Fake description...",
+            "recommendation": "Fake recommendation...",
+            "risk_score": 3.9,
+            "risk_severity": "low",
+        },
     },
 }
 
 
-def test_ooi_report(rf, client_member, ooi_information, mock_organization_view_octopoes):
+def test_ooi_report(rf, client_member, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
     request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user)
@@ -50,7 +55,7 @@ def test_ooi_report(rf, client_member, ooi_information, mock_organization_view_o
     assertContains(response, "Fake recommendation...")
 
 
-def test_ooi_pdf_report(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
+def test_ooi_pdf_report(rf, client_member, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
     request = setup_request(
@@ -84,35 +89,50 @@ def test_ooi_pdf_report(rf, client_member, ooi_information, mock_organization_vi
     # Verify that the data is sent correctly to Keiko
     assert report_data_param["meta"] == {
         "total": 1,
-        "total_by_severity": {"critical": 0, "high": 0, "medium": 0, "low": 1, "recommendation": 0},
+        "total_by_severity": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 1,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0,
+        },
         "total_by_finding_type": {"KAT-000": 1},
         "total_finding_types": 1,
-        "total_by_severity_per_finding_type": {"critical": 0, "high": 0, "medium": 0, "low": 1, "recommendation": 0},
+        "total_by_severity_per_finding_type": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 1,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0,
+        },
     }
     assert report_data_param["findings_grouped"]["KAT-000"]["finding_type"]["id"] == "KAT-000"
     assert report_data_param["findings_grouped"]["KAT-000"]["list"][0]["description"] == "Fake description..."
 
 
-def test_organization_pdf_report(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
-    mock_organization_view_octopoes().list.side_effect = [
-        Paginated[OOIType](
-            count=0,
-            items=[],
-        ),
-        Paginated[OOIType](
-            count=150,
-            items=[
-                Finding(
-                    finding_type=Reference.from_str("KATFindingType|KAT-0001"),
-                    ooi=Reference.from_str("Network|testnetwork"),
-                    proof="proof",
-                    description="test description 123",
-                    reproduce="reproduce",
-                )
-            ]
-            * 150,
-        ),
-    ]
+def test_organization_pdf_report(rf, client_member, mock_organization_view_octopoes, network, finding_types, mocker):
+    mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
+        count=150,
+        items=[
+            Finding(
+                finding_type=finding_types[0].reference,
+                ooi=network.reference,
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            ),
+        ]
+        * 150,
+    )
+
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
+        network.reference: network,
+        finding_types[0].reference: finding_types[0],
+    }
 
     request = setup_request(
         rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
@@ -141,50 +161,65 @@ def test_organization_pdf_report(rf, client_member, ooi_information, mock_organi
     assert report_data_param["meta"] == {
         "total": 1,
         "total_by_finding_type": {"KAT-0001": 1},
-        "total_by_severity": {"critical": 1, "high": 0, "low": 0, "medium": 0, "recommendation": 0},
-        "total_by_severity_per_finding_type": {"critical": 1, "high": 0, "low": 0, "medium": 0, "recommendation": 0},
+        "total_by_severity": {
+            "critical": 1,
+            "high": 0,
+            "low": 0,
+            "medium": 0,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0,
+        },
+        "total_by_severity_per_finding_type": {
+            "critical": 1,
+            "high": 0,
+            "low": 0,
+            "medium": 0,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0,
+        },
         "total_finding_types": 1,
     }
     assert report_data_param["findings_grouped"]["KAT-0001"]["finding_type"]["id"] == "KAT-0001"
     assert report_data_param["findings_grouped"]["KAT-0001"]["list"][0]["description"] == "test description 123"
 
 
-def test_pdf_report_command(tmp_path, client_member, ooi_information, mocker):
+def test_pdf_report_command(tmp_path, client_member, network, finding_types, mocker):
     mock_organization_view_octopoes = mocker.patch("tools.management.commands.generate_report.OctopoesAPIConnector")
-    mock_organization_view_octopoes().list.side_effect = [
-        Paginated[OOIType](
-            count=1,
-            items=[
-                MutedFinding(finding=Reference.from_str("Finding|Network|testnetwork|KAT-0003")),
-            ],
-        ),
-        Paginated[OOIType](
-            count=3,
-            items=[
-                Finding(
-                    finding_type=Reference.from_str("KATFindingType|KAT-0001"),
-                    ooi=Reference.from_str("Network|testnetwork"),
-                    proof="proof",
-                    description="test description 123",
-                    reproduce="reproduce",
-                ),
-                Finding(
-                    finding_type=Reference.from_str("KATFindingType|KAT-0002"),
-                    ooi=Reference.from_str("Network|testnetwork"),
-                    proof="proof",
-                    description="test description 123",
-                    reproduce="reproduce",
-                ),
-                Finding(
-                    finding_type=Reference.from_str("KATFindingType|KAT-0003"),
-                    ooi=Reference.from_str("Network|testnetwork"),
-                    proof="proof",
-                    description="test description 123",
-                    reproduce="reproduce",
-                ),
-            ],
-        ),
-    ]
+    mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
+        count=3,
+        items=[
+            Finding(
+                finding_type=finding_types[0].reference,
+                ooi=network.reference,
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            ),
+            Finding(
+                finding_type=finding_types[1].reference,
+                ooi=network.reference,
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            ),
+            Finding(
+                finding_type=finding_types[2].reference,
+                ooi=network.reference,
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            ),
+        ],
+    )
+
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
+        network.reference: network,
+        finding_types[0].reference: finding_types[0],
+        finding_types[1].reference: finding_types[1],
+        finding_types[2].reference: finding_types[2],
+    }
 
     dt_in_filename = "2023_14_03T13_48_19_418402_+0000"
     mock_datetime = mocker.patch("rocky.keiko.datetime")
@@ -208,13 +243,29 @@ def test_pdf_report_command(tmp_path, client_member, ooi_information, mocker):
     assert report_data_param["meta"] == {
         "total": 2,
         "total_by_finding_type": {"KAT-0001": 1, "KAT-0002": 1},
-        "total_by_severity": {"critical": 2, "high": 0, "low": 0, "medium": 0, "recommendation": 0},
-        "total_by_severity_per_finding_type": {"critical": 2, "high": 0, "low": 0, "medium": 0, "recommendation": 0},
+        "total_by_severity": {
+            "critical": 2,
+            "high": 0,
+            "low": 0,
+            "medium": 0,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0,
+        },
+        "total_by_severity_per_finding_type": {
+            "critical": 2,
+            "high": 0,
+            "low": 0,
+            "medium": 0,
+            "recommendation": 0,
+            "pending": 0,
+            "unknown": 0,
+        },
         "total_finding_types": 2,
     }
 
 
-def test_ooi_pdf_report_timeout(rf, client_member, ooi_information, mock_organization_view_octopoes, mocker):
+def test_ooi_pdf_report_timeout(rf, client_member, mock_organization_view_octopoes, mocker):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
     request = setup_request(
