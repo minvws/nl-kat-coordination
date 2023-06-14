@@ -581,7 +581,15 @@ class XTDBOOIRepository(OOIRepository):
     def count_findings_by_severity(self, valid_time: datetime) -> Counter:
         severity_counts = Counter({severity: 0 for severity in RiskLevelSeverity})
 
-        query = Query(FindingType).where(Finding, finding_type=FindingType).group_by(FindingType).count(Finding)
+        query = """
+            {:query {
+                :find [(pull ?finding_type [*]) (count ?finding)]
+                :where [
+                    [?finding :Finding/finding_type ?finding]
+                    (not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])
+                    ]}}
+        """
+
         for finding_type, finding_count in self.session.client.query(str(query), valid_time=valid_time):
             ft = cast(FindingType, self.deserialize(finding_type))
             severity = ft.risk_severity or RiskLevelSeverity.PENDING
