@@ -5,3 +5,18 @@ ul.tiles > li > a,
 .tile > a {
   color: var(--link-text-color, initial);
 }
+
+.tile p,
+ul.tiles > li p,
+.tiles > div p {
+  font-size: var(--tile-font-size);
+}
+
+.tiles.images-cover {
+  > div,
+  li {
+    img {
+      border-radius: var(--tile-border-radius) var(--tile-border-radius) 0 0;
+    }
+  }
+}
