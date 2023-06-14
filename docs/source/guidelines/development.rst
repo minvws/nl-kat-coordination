@@ -147,7 +147,7 @@ Using docstrings and type hints everywhere improves the quality of the automatic
 Line ends
 =========
 
-We accept contributions from all sorts of development environments. Please set ``git config --global core.autocrlf true`` if you use a Windows environment. Check out `the documentation on issues related to line ends and white spaces <https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration#_formatting_and_whitespace>`_ if you need more information or run into issues. 
+We accept contributions from all sorts of development environments. Please set ``git config --global core.autocrlf true`` if you use a Windows environment. Check out `the documentation on issues related to line ends and white spaces <https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration#_formatting_and_whitespace>`_ if you need more information or run into issues.
 
 Technical diagrams
 ==================
