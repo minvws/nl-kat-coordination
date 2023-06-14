@@ -41,9 +41,16 @@ class ExpiringDict:
     def set_expiration_enabled(self, value: bool) -> None:
         """Enable or disable expiration. If disabled, the cache will never
         expire.
+
+        Args:
+            value (bool): Whether to enable or disable expiration.
         """
         with self.lock:
             self.expiration_enabled = value
+
+            # If we are enabling expiration, we need to reset the expiration
+            if value is True:
+                self.expiration_time = datetime.now(timezone.utc) + self.lifetime
 
     def _is_expired(self) -> bool:
         return datetime.now(timezone.utc) > self.expiration_time
