@@ -448,3 +448,41 @@ def test_organization_list_perms(rf, superuser_member, admin_member, redteam_mem
             setup_request(rf.get("organization_list"), client_member.user),
             organization_code=client_member.organization.code,
         )
+
+
+@pytest.mark.parametrize("member", ["superuser_member", "admin_member"])
+def test_organization_edit_perms(request, member, rf):
+    member = request.getfixturevalue(member)
+
+    response = OrganizationEditView.as_view()(
+        setup_request(rf.get("organization_edit"), member.user),
+        organization_code=member.organization.code,
+        pk=member.organization.id,
+    )
+
+    assert response.status_code == 200
+
+
+@pytest.mark.parametrize("member", ["superuser_member", "admin_member"])
+def test_organization_edit_view(request, member, rf):
+    member = request.getfixturevalue(member)
+
+    response = OrganizationSettingsView.as_view()(
+        setup_request(rf.get("organization_settings"), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertContains(response, "Edit")
+    assertContains(response, "icon ti-edit")
+
+
+@pytest.mark.parametrize("member", ["redteam_member", "client_member"])
+def test_organization_edit_perms_on_settings_view(request, member, rf):
+    member = request.getfixturevalue(member)
+
+    with pytest.raises(PermissionDenied):
+        OrganizationSettingsView.as_view()(
+            setup_request(rf.get("organization_settings"), member.user),
+            organization_code=member.organization.code,
+        )

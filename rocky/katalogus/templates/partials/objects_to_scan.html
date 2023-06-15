@@ -10,23 +10,19 @@
         or higher. There is no indemnification for this boefje to scan an OOI with a lower clearance level than <strong>L{{ scan_level }}</strong>. Use the filter to show OOI's with a lower clearance level.
       {% endblocktranslate %}
         </p>
-        <div class="horizontal-view toolbar">
-            <div>
-                <form method="get" class="inline">
-                    <div class="horizontal-view">
-                        {% include "partials/form/form_errors.html" with form=select_ooi_filter_form %}
+        <form method="get" class="inline">
+            <div class="horizontal-view">
+                {% include "partials/form/form_errors.html" with form=select_ooi_filter_form %}
 
-                        {% for field in select_ooi_filter_form %}
-                            <input type="{{ field.field.widget.input_type }}"
-                                   name="{{ field.name }}"
-                                   class="{{ field.field.widget.attrs.class }}"
-                                   {% if "show_all=on" in request.get_full_path %}checked{% endif %}/>
-                            <label>{{ field.label }}</label>
-                        {% endfor %}
-                    </div>
-                </form>
+                {% for field in select_ooi_filter_form %}
+                    <input type="{{ field.field.widget.input_type }}"
+                            name="{{ field.name }}"
+                            class="{{ field.field.widget.attrs.class }}"
+                            {% if "show_all=on" in request.get_full_path %}checked{% endif %}/>
+                    <label>{{ field.label }}</label>
+                {% endfor %}
             </div>
-        </div>
+        </form>
         {% if "show_all=on" in request.get_full_path and select_oois_form.fields.ooi.choices %}
             <p class="warning"
                role="group"
