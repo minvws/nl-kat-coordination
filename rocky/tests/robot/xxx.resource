@@ -18,13 +18,13 @@ Login As User For The First Time
     Fill Text    css=#id_auth-username    ${email}
     Fill Text    css=#id_auth-password    ${password}
     Click    "Log in"
-    ${otp-raw}    Get Attribute    css=#totp-input    value
-    Set Global Variable    ${otp-raw-global}    ${otp-raw}
-    ${otp-code}    get otp    ${otp-raw-global}
-    Fill Text    css=#id_generator-token    ${otp-code}
-    Click    "Authenticate"
-    Click    "Start using OpenKAT"
-    Get Text    .login-meta    contains    Logged in as:    error login failed
+#    ${otp-raw}    Get Attribute    css=#totp-input    value
+#    Set Global Variable    ${otp-raw-global}    ${otp-raw}
+#    ${otp-code}    get otp    ${otp-raw-global}
+#    Fill Text    css=#id_generator-token    ${otp-code}
+#    Click    "Authenticate"
+#    Click    "Start using OpenKAT"
+    Get Title    equal    OpenKAT - step_introduction_registration
 
 Login As User Normally
     [Arguments]    ${email}    ${password}
