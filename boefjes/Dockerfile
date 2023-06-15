@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION=3.11
-FROM python:$PYTHON_VERSION AS boefjes-requirements
+FROM python:$PYTHON_VERSION-bookworm AS boefjes-requirements
 
 COPY boefjes/boefjes ./boefjes
 COPY boefjes/requirements.txt ./boefjes
