@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ARG PYTHON_VERSION=3.11
-FROM node:18-bullseye AS node_builder
+FROM node:18-bookworm AS node_builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY rocky/assets assets
 
 RUN yarn --ignore-engines && yarn build
 
-FROM python:$PYTHON_VERSION AS dev
+FROM python:$PYTHON_VERSION-bookworm AS dev
 
 ARG USER_UID=1000
 ARG USER_GID=1000
@@ -24,7 +24,7 @@ WORKDIR /app/rocky
 RUN --mount=type=cache,target=/var/cache/apt \
   apt-get update \
   && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends gettext netcat \
+  && apt-get install -y --no-install-recommends gettext netcat-openbsd \
   && rm -rf /var/lib/apt/lists/*
 
 # Build with "docker build --build-arg ENVIRONMENT=dev" to install dev
