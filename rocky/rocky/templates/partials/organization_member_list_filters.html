@@ -13,7 +13,7 @@
             </legend>
             <div>
                 {% for option in status_filters %}
-                    <div class="horizontal-view">
+                    <div class="checkbox">
                         <input type="checkbox"
                                id="option-filter-{{ option.value }}"
                                name="client_status"
@@ -30,7 +30,7 @@
           </legend>
           <div>
               {% for option in blocked_filters %}
-                  <div class="horizontal-view">
+                  <div class="checkbox">
                       <input type="checkbox"
                              id="option-filter-{{ option.value }}"
                              name="blocked_status"

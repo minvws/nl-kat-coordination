@@ -55,10 +55,13 @@
             </tbody>
           </table>
         </div>
+        <h2>{% translate "Settings" %}</h2>
         {% if perms.tools.add_indemnification %}
           <a href="{% url "indemnification_add" organization.code %}"
              class="button ghost">{% translate "Add indemnification" %}</a>
         {% endif %}
+
+        <h2>{% translate "Actions" %}</h2>
         {% if perms.tools.can_recalculate_bits %}
           <form method="post" class="inline">
             {% csrf_token %}

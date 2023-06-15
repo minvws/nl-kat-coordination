@@ -1,24 +1,25 @@
-<div>
-    {{ field.label_tag }}
+<fieldset class="grouped-choice-list">
+  <legend>
+    {{ field.label }}
+  </legend>
+  {% for choice in field %}
+      <div class="radio">
+          <input type="{% if choice.data.value < 0 %}hidden{% else %}radio{% endif %}"
+                  name="{{ field.name }}"
+                  value="{{ choice.data.value }}"
+                  id="id_{{ field.name }}_{{ forloop.counter0 }}"
+                  {% if choice.data.attrs.disabled %} disabled{% endif %}
+                  {% if choice.data.attrs.checked %} checked{% endif %}/>
+          <label for="id_{{ field.name }}_{{ forloop.counter0 }}">
+              {% if choice.data.attrs.radio_paws %}
+                  {% include "partials/scan_level_indicator.html" with value=choice.data.value custom_class=choice.data.attrs.class %}
+              {% else %}
+                  {{ choice.choice_label }}
+              {% endif %}
+          </label>
+      </div>
+  {% endfor %}
 
-    {% for choice in field %}
-        <div class="horizontal-view">
-            <input type="{% if choice.data.value < 0 %}hidden{% else %}radio{% endif %}"
-                   name="{{ field.name }}"
-                   value="{{ choice.data.value }}"
-                   id="id_{{ field.name }}_{{ forloop.counter0 }}"
-                   {% if choice.data.attrs.disabled %} disabled{% endif %}
-                   {% if choice.data.attrs.checked %} checked{% endif %}/>
-            <label>
-                {% if choice.data.attrs.radio_paws %}
-                    {% include "partials/scan_level_indicator.html" with value=choice.data.value custom_class=choice.data.attrs.class %}
-                {% else %}
-                    {{ choice.choice_label }}
-                {% endif %}
-            </label>
-            {% include "partials/form/field_input_help_text.html" with help_text=choice.help_text %}
-            {% include "partials/form/field_input_errors.html" with field=field %}
-
-        </div>
-    {% endfor %}
-</div>
+    {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+    {% include "partials/form/field_input_errors.html" with field=field %}
+</fieldset>
