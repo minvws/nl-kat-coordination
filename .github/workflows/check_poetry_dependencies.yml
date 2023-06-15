@@ -3,12 +3,14 @@ name: Check Poetry dependencies
 on:
   push:
     paths:
-      - requirements*.txt
+      - requirements.txt
+      - requirements-dev.txt
       - pyproject.toml
       - poetry.lock
   pull_request:
     paths:
-      - requirements*.txt
+      - requirements.txt
+      - requirements-dev.txt
       - pyproject.toml
       - poetry.lock
 
