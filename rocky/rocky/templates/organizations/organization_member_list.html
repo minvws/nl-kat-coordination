@@ -58,18 +58,15 @@
                                         </td>
                                         <td class="nowrap">
                                             {% if member.user.is_superuser %}
-                                                <span class="active"></span><span>&nbsp;{% translate "Active" %}</span>
+                                                <span class="active"></span> {% translate "Active" %}
                                             {% else %}
                                                 <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span>
-                                                <span>&nbsp;
                                                     {% if member.blocked %}
                                                         {% translate "Blocked" %}
                                                     {% else %}
                                                         {{ member.status|title }}
                                                     {% endif %}
-                                                </span>
                                             {% endif %}
-                                            <br>
                                         </td>
                                         <td>{{ member.user.date_joined|date:"SHORT_DATE_FORMAT" }}</td>
                                         <td>
