@@ -179,6 +179,7 @@ AUTH_USER_MODEL = "account.KATUser"
 # try reading ROCKY_DB_DSN from environment, if not set fallback to old environment variables
 try:
     POSTGRES_DB = env.db("ROCKY_DB_DSN")
+    POSTGRES_DB["ENGINE"] = "django.db.backends.postgresql_psycopg2"
 except ImproperlyConfigured:
     POSTGRES_DB = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
@@ -189,7 +190,6 @@ except ImproperlyConfigured:
         "PORT": env.int("ROCKY_DB_PORT", default=5432),
     }
 
-# todo: POSTGRES_DB["ENGINE"] = "django.db.backends.postgresql_psycopg2"?
 DATABASES = {"default": POSTGRES_DB}
 
 if env.bool("POSTGRES_SSL_ENABLED", False):
