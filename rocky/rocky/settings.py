@@ -183,10 +183,10 @@ try:
 except ImproperlyConfigured:
     POSTGRES_DB = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": env("ROCKY_DB"),
-        "USER": env("ROCKY_DB_USER"),
-        "PASSWORD": env("ROCKY_DB_PASSWORD"),
-        "HOST": env("ROCKY_DB_HOST"),
+        "NAME": env("ROCKY_DB", default=None),
+        "USER": env("ROCKY_DB_USER", default=None),
+        "PASSWORD": env("ROCKY_DB_PASSWORD", default=None),
+        "HOST": env("ROCKY_DB_HOST", default=None),
         "PORT": env.int("ROCKY_DB_PORT", default=5432),
     }
 
