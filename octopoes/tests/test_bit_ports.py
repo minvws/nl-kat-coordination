@@ -56,7 +56,7 @@ def test_port_classification_tcp_12345():
 
 def test_port_classification_udp_80():
     address = IPAddressV4(address="8.8.8.8", network="fake")
-    port = IPPort(address=address.reference, protocol="tcp", port=80)
+    port = IPPort(address=address.reference, protocol="udp", port=80)
     results = list(run_port_classification(address, [port], {}))
 
     assert len(results) == 2
