@@ -1376,8 +1376,8 @@ msgid "See details"
 msgstr "Details openen"
 
 #: katalogus/templates/katalogus_settings.html:10
-msgid "KAT-alogus Settings"
-msgstr "KAT-alogus"
+msgid "KAT-alogus settings"
+msgstr "KAT-alogus instellingen"
 
 #: katalogus/templates/katalogus_settings.html:13
 msgid ""
