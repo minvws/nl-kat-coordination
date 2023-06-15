@@ -1,4 +1,5 @@
 import logging
+import os
 import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
@@ -82,6 +83,15 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
         environment = requests.get(
             f"{settings.katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
         ).json()
+
+        # Add prefixed BOEFJE_* global environment variables
+        for key, value in os.environ.items():
+            if key.startswith("BOEFJE_"):
+                katalogus_key = key.split("BOEFJE_", 1)[1]
+                # Only pass the environment variable if it is not explicitly set through the katalogus,
+                # if and only if they are defined in boefje.json
+                if katalogus_key in environment_keys and katalogus_key not in environment:
+                    environment[katalogus_key] = value
 
         return {k: str(v) for k, v in environment.items() if k in environment_keys}
     except RequestException:
