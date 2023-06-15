@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 
 import environ
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
 from rocky.otel import OpenTelemetryHelper
@@ -175,7 +176,18 @@ AUTH_USER_MODEL = "account.KATUser"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-POSTGRES_DB = env.db("ROCKY_DB_DSN")
+# try reading ROCKY_DB_DSN from environment, if not set fallback to old environment variables
+try:
+    POSTGRES_DB = env.db("ROCKY_DB_DSN")
+except ImproperlyConfigured:
+    POSTGRES_DB = {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": env("ROCKY_DB"),
+        "USER": env("ROCKY_DB_USER"),
+        "PASSWORD": env("ROCKY_DB_PASSWORD"),
+        "HOST": env("ROCKY_DB_HOST"),
+        "PORT": env.int("ROCKY_DB_PORT", default=5432),
+    }
 
 # todo: POSTGRES_DB["ENGINE"] = "django.db.backends.postgresql_psycopg2"?
 DATABASES = {"default": POSTGRES_DB}
