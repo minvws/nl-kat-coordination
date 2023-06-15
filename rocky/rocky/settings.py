@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 
 import environ
+from django.conf import locale
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
@@ -240,6 +241,14 @@ USE_L10N = True
 USE_TZ = True
 
 LOCALE_PATHS = (BASE_DIR / "rocky/locale",)
+
+# Add custom languages not provided by Django
+EXTRA_LANG_INFO = {
+    "pap": {"bidi": False, "code": "pap", "name": "Papiamentu", "name_local": "Papiamentu"},
+}
+LANG_INFO = locale.LANG_INFO.copy()
+LANG_INFO.update(EXTRA_LANG_INFO)
+locale.LANG_INFO = LANG_INFO
 
 LANGUAGES = [
     ("en", "en"),
