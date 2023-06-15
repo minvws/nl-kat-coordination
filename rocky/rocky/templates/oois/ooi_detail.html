@@ -15,9 +15,12 @@
 
                 {% endif %}
                 {% include "partials/ooi_head.html" with ooi=ooi view="ooi_detail" %}
-                {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
-
             </div>
+
+            <div>
+                {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
+            </div>
+
             <div>
                 {% include "oois/ooi_detail_origins_declarations.html" %}
                 {% include "oois/ooi_detail_origins_observations.html" %}

@@ -51,10 +51,10 @@
                     <button type="submit">{% translate "Create object" %}</button>
                 </form>
                 {% if organization %}
-                    <p>
+                    <div class="button-container">
                         <a href="{% url "complete_onboarding" organization.code %}"
                            class="button ghost">{% translate "Skip onboarding" %}</a>
-                    </p>
+                    </div>
                 {% endif %}
             </div>
         </section>

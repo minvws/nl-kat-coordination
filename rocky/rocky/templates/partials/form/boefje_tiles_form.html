@@ -1,13 +1,13 @@
 {% load i18n %}
 
-<form class="inline" method="post" class="help">
+<form class="inline column" method="post" class="help">
     {% csrf_token %}
     {% if checkbox_group_table_form %}
         {% include "partials/form/form_errors.html" with form=field %}
 
         {% for choices in checkbox_group_table_form %}{{ choices }}{% endfor %}
     {% endif %}
-    <div class="horizontal-view">
+    <div class="button-container">
         {% if skip_onboarding == "yes" and organization.code %}
             <a href="{% url "complete_onboarding" organization.code %}"
                class="button ghost">{% translate "Skip onboarding" %}</a>
