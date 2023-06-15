@@ -5,8 +5,8 @@ from logging import config, getLogger
 from pathlib import Path
 from typing import Dict
 
-from celery.signals import worker_process_shutdown, worker_process_init
 import yaml
+from celery.signals import worker_process_init, worker_process_shutdown
 from pydantic import parse_obj_as
 
 from octopoes.config.settings import Settings
@@ -29,14 +29,14 @@ except FileNotFoundError:
 
 @worker_process_shutdown.connect
 def shutdown_worker(**kwargs):
-    """ Close RabbitMQ connection on worker shutdown """
+    """Close RabbitMQ connection on worker shutdown"""
     rabbit_channel = get_rabbit_channel(settings.queue_uri)
     rabbit_channel.connection.close()
 
 
 @worker_process_init.connect
 def init_worker(**kwargs):
-    """ Set up one RabbitMQ connection and channel on worker startup """
+    """Set up one RabbitMQ connection and channel on worker startup"""
     get_rabbit_channel(settings.queue_uri)
 
 
