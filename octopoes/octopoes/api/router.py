@@ -2,7 +2,7 @@ import uuid
 from collections import Counter
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import List, Optional, Set, Type
+from typing import List, Optional, Set, Type, Generator
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from requests import RequestException
@@ -77,20 +77,18 @@ def settings() -> Settings:
 
 
 def xtdb_session(client: str = Depends(extract_client), settings_: Settings = Depends(settings)) -> XTDBSession:
-    xtdb_client_ = get_xtdb_client(settings_.xtdb_uri, client, settings_.xtdb_type)
-    return XTDBSession(xtdb_client_)
+    return XTDBSession(get_xtdb_client(settings_.xtdb_uri, client, settings_.xtdb_type))
 
 
 def octopoes_service(
     client: str = Depends(extract_client),
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
+    session: XTDBSession = Depends(xtdb_session),
     settings_: Settings = Depends(settings),
-):
-    octopoes, _, session, rabbit_connection = bootstrap_octopoes(settings_, client, xtdb_session_)
+) -> Generator[OctopoesService, None, None]:
     try:
-        yield octopoes
+        yield bootstrap_octopoes(settings_, client, session)
     finally:
-        rabbit_connection.close()
+        session.commit()
 
 
 # Endpoints
@@ -171,6 +169,8 @@ def delete_object(
     reference: Reference = Depends(extract_reference),
 ) -> None:
     octopoes.ooi_repository.delete(reference, valid_time)
+    octopoes.ooi_repository.session.commit()
+
     xtdb_session_.commit()
 
 

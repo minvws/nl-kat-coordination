@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime, timezone
 from enum import Enum
+from functools import lru_cache
 from http import HTTPStatus
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
@@ -52,11 +53,16 @@ class XTDBStatus(BaseModel):
     size: Optional[int]
 
 
+@lru_cache(maxsize=1)
+def get_xtdb_http_session(base_url):
+    return XTDBHTTPSession(base_url)
+
+
 class XTDBHTTPClient:
     def __init__(self, base_url, client: str, multinode=False):
         self._client = client
         self._is_multinode = multinode
-        self._session = XTDBHTTPSession(base_url)
+        self._session = get_xtdb_http_session(base_url)
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -70,7 +76,7 @@ class XTDBHTTPClient:
             raise e
 
     def client_url(self) -> str:
-        if not self._is_multinode or self._client is None:
+        if not self._is_multinode:
             return ""
 
         return f"/{self._client}"
