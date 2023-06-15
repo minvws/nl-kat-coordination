@@ -24,6 +24,7 @@
 
             <div class="collapsing-element">
                 <ul>
+                  {% with request.resolver_match.url_name as url_name %}
                     {% if request.user.is_authenticated %}
                         {% if not organization.code %}
                             <li>
@@ -66,6 +67,7 @@
                             {% endif %}
                         {% endif %}
                     {% endif %}
+                  {% endwith %}
                 </ul>
 
                 <div>

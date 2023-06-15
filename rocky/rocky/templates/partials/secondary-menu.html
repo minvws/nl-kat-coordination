@@ -14,21 +14,23 @@
 
   <div class="collapsing-element">
       <ul>
-        <li>
-          <a href="{% url "organization_list" %}" {% if url_name == "organization_list" %} aria-selected="true" {% endif %}>
-            {% translate "My organisations" %}
-          </a>
-        </li>
-        {% if organization.code %}
+        {% with request.resolver_match.url_name as url_name %}
           <li>
-            <a href="{% url "account_detail" organization.code %}" {% if url_name == "login" %} aria-selected="true" {% endif %}>
-              {% translate "Profile" %}
+            <a href="{% url "organization_list" %}" {% if url_name == "organization_list" %} aria-selected="true" {% endif %}>
+              {% translate "My organisations" %}
             </a>
           </li>
-        {% endif %}
-        <li>
-            <a href="{% url "logout" %}">{% translate "Logout" %}</a>
-        </li>
+          {% if organization.code %}
+            <li>
+              <a href="{% url "account_detail" organization.code %}" {% if url_name == "account_detail" %} aria-selected="true" {% endif %}>
+                {% translate "Profile" %}
+              </a>
+            </li>
+          {% endif %}
+          <li>
+              <a href="{% url "logout" %}">{% translate "Logout" %}</a>
+          </li>
+        {% endwith %}
       </ul>
   </div>
 </div>
