@@ -20,6 +20,7 @@ from requests import RequestException
 from octopoes.api.models import ServiceHealth
 from octopoes.api.router import router
 from octopoes.config.settings import Settings
+from octopoes.core.app import close_rabbit_channel, get_rabbit_channel
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.version import __version__
 
@@ -107,4 +108,15 @@ def root_health() -> ServiceHealth:
     )
 
 
+@app.on_event("shutdown")
+def close_rabbit_mq_connection():
+    close_rabbit_channel(settings.queue_uri)
+
+
+@app.on_event("startup")
+def create_rabbit_mq_connection():
+    get_rabbit_channel(settings.queue_uri)
+
+
 app.include_router(router)
+

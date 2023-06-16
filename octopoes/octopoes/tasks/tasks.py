@@ -11,7 +11,7 @@ from pydantic import parse_obj_as
 
 from octopoes.config.settings import Settings
 from octopoes.connector.katalogus import KATalogusClientV1
-from octopoes.core.app import bootstrap_octopoes, get_rabbit_channel, get_xtdb_client
+from octopoes.core.app import bootstrap_octopoes, close_rabbit_channel, get_rabbit_channel, get_xtdb_client
 from octopoes.events.events import EVENT_TYPE, DBEvent
 from octopoes.tasks.app import app
 from octopoes.xtdb.client import XTDBSession
@@ -29,9 +29,7 @@ except FileNotFoundError:
 
 @worker_process_shutdown.connect
 def shutdown_worker(**kwargs):
-    """Close RabbitMQ connection on worker shutdown"""
-    rabbit_channel = get_rabbit_channel(settings.queue_uri)
-    rabbit_channel.connection.close()
+    close_rabbit_channel(settings.queue_uri)
 
 
 @worker_process_init.connect
