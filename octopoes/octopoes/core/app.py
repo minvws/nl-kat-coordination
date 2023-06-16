@@ -47,6 +47,12 @@ def get_rabbit_channel(queue_uri: str) -> BlockingChannel:
     return channel
 
 
+def close_rabbit_channel(queue_uri: str):
+    rabbit_channel = get_rabbit_channel(queue_uri)
+    rabbit_channel.connection.close()
+    logger.info("Closed connection to RabbitMQ")
+
+
 def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSession) -> OctopoesService:
     event_manager = EventManager(
         client, celery_app, settings.queue_name_octopoes, get_rabbit_channel(settings.queue_uri)

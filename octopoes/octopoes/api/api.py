@@ -119,4 +119,3 @@ def create_rabbit_mq_connection():
 
 
 app.include_router(router)
-
