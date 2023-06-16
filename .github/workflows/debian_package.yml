@@ -44,8 +44,8 @@ jobs:
   build:
     needs: changes
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         dist: [debian11, debian12, ubuntu22.04]
         # On main, release branches and tags we always want to build all the packages
         package: ${{ github.event_name == 'push' && fromJSON('["boefjes", "bytes", "keiko", "mula", "octopoes", "rocky"]') || fromJSON(needs.changes.outputs.packages) }}
