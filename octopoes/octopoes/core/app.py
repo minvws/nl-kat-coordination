@@ -1,7 +1,8 @@
 import logging
-from functools import lru_cache
+import threading
 
 import pika
+from amqp import AMQPError
 from pika.adapters.blocking_connection import BlockingChannel
 
 from octopoes.config.settings import Settings, XTDBType
@@ -36,21 +37,31 @@ def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTP
     return XTDBHTTPClient(f"{base_uri}/_{xtdb_type.value}", client)
 
 
-@lru_cache(maxsize=1)
+thread_local = threading.local()
+
+
 def get_rabbit_channel(queue_uri: str) -> BlockingChannel:
-    connection = pika.BlockingConnection(pika.URLParameters(queue_uri))
-    logger.info("Connected to RabbitMQ")
+    try:
+        return thread_local.rabbit_channel
+    except AttributeError:
+        connection = pika.BlockingConnection(pika.URLParameters(queue_uri))
+        logger.info("Connected to RabbitMQ")
 
-    channel = connection.channel()
-    channel.queue_declare(queue="create_events", durable=True)
+        thread_local.rabbit_channel = connection.channel()
+        thread_local.rabbit_channel.queue_declare(queue="create_events", durable=True)
 
-    return channel
+        return thread_local.rabbit_channel
 
 
 def close_rabbit_channel(queue_uri: str):
     rabbit_channel = get_rabbit_channel(queue_uri)
-    rabbit_channel.connection.close()
-    logger.info("Closed connection to RabbitMQ")
+
+    try:
+        rabbit_channel.connection.close()
+        logger.info("Closed connection to RabbitMQ")
+    except AMQPError:
+        logger.exception("Unable to close rabbit")
+        pass
 
 
 def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSession) -> OctopoesService:

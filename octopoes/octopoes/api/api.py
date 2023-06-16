@@ -1,4 +1,5 @@
 import logging
+import socket
 from logging import config
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from pika.adapters.utils.connection_workflow import AMQPConnectionWorkflowFailed
 from requests import RequestException
 
 from octopoes.api.models import ServiceHealth
@@ -115,7 +117,10 @@ def close_rabbit_mq_connection():
 
 @app.on_event("startup")
 def create_rabbit_mq_connection():
-    get_rabbit_channel(settings.queue_uri)
+    try:
+        get_rabbit_channel(settings.queue_uri)
+    except (AMQPConnectionWorkflowFailed, socket.gaierror):
+        logger.exception("Unable to connect RabbitMQ on startup")
 
 
 app.include_router(router)
