@@ -144,6 +144,8 @@ class BoefjeHandler(Handler):
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
         boefje_meta.started_at = datetime.now(timezone.utc)
+        boefje_meta.runnable_hash = self.local_repository.by_id(boefje_meta.boefje.id).runnable_hash
+        print(boefje_meta.runnable_hash)  # noqa
         boefje_results = None
 
         try:
@@ -164,6 +166,8 @@ class BoefjeHandler(Handler):
 
             if boefje_results:
                 for boefje_added_mime_types, output in boefje_results:
+                    logger.error(boefje_added_mime_types)
+                    logger.error(output)
                     bytes_api_client.save_raw(boefje_meta.id, output, mime_types.union(boefje_added_mime_types))
 
             logger.info("Done with boefje for %s[%s]", boefje_meta.boefje.id, boefje_meta.id)

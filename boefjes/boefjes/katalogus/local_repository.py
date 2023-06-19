@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import pkgutil
@@ -141,6 +142,7 @@ class LocalPluginRepository:
         def_file = boefje.path / "boefje.json"
         def_obj = json.loads(def_file.read_text())
         def_obj["repository_id"] = RESERVED_LOCAL_ID
+        def_obj["runnable_hash"] = get_runnable_hash(boefje.path)
 
         return Boefje.parse_obj(def_obj)
 
@@ -158,3 +160,25 @@ class LocalPluginRepository:
 
 def get_local_repository():
     return LocalPluginRepository(BOEFJES_DIR)
+
+
+def get_runnable_hash(path: Path) -> str:
+    """Returns sha256(sha256(file1) + sha256(file2) + ...) of all files in the given path."""
+
+    file_hashes = []
+
+    for file in path.iterdir():
+        if file.is_file():
+            sha256 = hashlib.sha256()
+            with Path.open(file, "rb") as f:
+                while True:
+                    data = f.read(32768)
+                    if not data:
+                        break
+                    sha256.update(data)
+            file_hashes.append(sha256.hexdigest())
+
+    sha256 = hashlib.sha256()
+    sha256.update("".join(file_hashes).encode("utf-8"))
+
+    return sha256.hexdigest()

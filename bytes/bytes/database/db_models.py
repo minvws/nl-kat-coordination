@@ -15,6 +15,7 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
     input_ooi = Column(String(length=1024), nullable=True)
     arguments = Column(JSON, nullable=False, default=lambda: {})
     environment = Column(JSON, nullable=True, default=lambda: {})
+    runnable_hash = Column(String(length=64), nullable=True)
 
     started_at = Column(DateTime(timezone=True))
     ended_at = Column(DateTime(timezone=True))
