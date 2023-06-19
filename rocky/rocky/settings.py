@@ -93,8 +93,8 @@ SERVER_EMAIL = env("SERVER_EMAIL", default="")
 EMAIL_SUBJECT_PREFIX = env("EMAIL_SUBJECT_PREFIX", default="KAT - ")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", False)
 EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", False)
-EMAIL_SSL_CERTFILE = env.path("EMAIL_SSL_CERTFILE", default=None)
-EMAIL_SSL_KEYFILE = env.path("EMAIL_SSL_KEYFILE", default=None)
+EMAIL_SSL_CERTFILE = env.path("EMAIL_SSL_CERTFILE")
+EMAIL_SSL_KEYFILE = env.path("EMAIL_SSL_KEYFILE")
 EMAIL_TIMEOUT = 30  # 30 seconds
 # ----------------------------
 
