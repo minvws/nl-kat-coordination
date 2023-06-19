@@ -57,8 +57,11 @@ REMOTE_USER_HEADER = env("REMOTE_USER_HEADER", default=None)
 REMOTE_USER_FALLBACK = env.bool("REMOTE_USER_FALLBACK", False)
 
 if REMOTE_USER_HEADER:
+    # Optional list of default organizations to add remote users to,
+    # format: space separated list of ORGANIZATION_CODE:GROUP_NAME, e.g. `test:admin test2:redteam`
+    REMOTE_USER_DEFAULT_ORGANIZATIONS = env.list("REMOTE_USER_DEFAULT_ORGANIZATIONS", default=[])
     AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.RemoteUserBackend",
+        "rocky.auth.remote_user.RemoteUserBackend",
     ]
     if REMOTE_USER_FALLBACK:
         AUTHENTICATION_BACKENDS += [
@@ -90,8 +93,8 @@ SERVER_EMAIL = env("SERVER_EMAIL", default="")
 EMAIL_SUBJECT_PREFIX = env("EMAIL_SUBJECT_PREFIX", default="KAT - ")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", False)
 EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", False)
-EMAIL_SSL_CERTFILE = env("EMAIL_SSL_CERTFILE", default=None)  # None
-EMAIL_SSL_KEYFILE = env("EMAIL_SSL_KEYFILE", default=None)
+EMAIL_SSL_CERTFILE = env.path("EMAIL_SSL_CERTFILE", default=None)
+EMAIL_SSL_KEYFILE = env.path("EMAIL_SSL_KEYFILE", default=None)
 EMAIL_TIMEOUT = 30  # 30 seconds
 # ----------------------------
 
@@ -180,10 +183,9 @@ AUTH_USER_MODEL = "account.KATUser"
 # try reading ROCKY_DB_DSN from environment, if not set fallback to old environment variables
 try:
     POSTGRES_DB = env.db("ROCKY_DB_DSN")
-    POSTGRES_DB["ENGINE"] = "django.db.backends.postgresql_psycopg2"
 except ImproperlyConfigured:
     POSTGRES_DB = {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": env("ROCKY_DB", default=None),
         "USER": env("ROCKY_DB_USER", default=None),
         "PASSWORD": env("ROCKY_DB_PASSWORD", default=None),
@@ -196,9 +198,9 @@ DATABASES = {"default": POSTGRES_DB}
 if env.bool("POSTGRES_SSL_ENABLED", False):
     DATABASES["default"]["OPTIONS"] = {
         "sslmode": env("POSTGRES_SSL_MODE"),
-        "sslrootcert": env("POSTGRES_SSL_ROOTCERT"),
-        "sslcert": env("POSTGRES_SSL_CERT"),
-        "sslkey": env("POSTGRES_SSL_KEY"),
+        "sslrootcert": env.path("POSTGRES_SSL_ROOTCERT"),
+        "sslcert": env.path("POSTGRES_SSL_CERT"),
+        "sslkey": env.path("POSTGRES_SSL_KEY"),
     }
 
 # Password validation
@@ -296,10 +298,10 @@ CSRF_COOKIE_HTTPONLY = True
 
 # A list of trusted origins for unsafe requests (e.g. POST)
 # https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
-CSRF_TRUSTED_ORIGINS = env("DJANGO_CSRF_TRUSTED_ORIGINS", default="").split()
+CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])
 
 # Configuration for Gitpod
-if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL", default=None) is not None:
+if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL", default=None):
     # example environment variable: GITPOD_WORKSPACE_URL=https://minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io
     # public url on https://8000-minvws-nlkatcoordinatio-fykdue22b07.ws-eu98.gitpod.io/
     ALLOWED_HOSTS.append("8000-" + GITPOD_WORKSPACE_URL.split("//")[1])
