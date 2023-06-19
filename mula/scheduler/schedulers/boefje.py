@@ -83,8 +83,8 @@ class BoefjeScheduler(Scheduler):
         )
 
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-random",
-            target=self.push_tasks_for_random_objects,
+            name=f"scheduler-{self.scheduler_id}-reschedule",
+            target=self.push_tasks_for_rescheduling,
             interval=60.0,
         )
 
@@ -245,71 +245,119 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        pass
-
-    @tracer.start_as_current_span("push_tasks_for_random_objects")
-    def push_tasks_for_random_objects(self) -> None:
-        """Push tasks for random objects from octopoes to the queue."""
-        if self.queue.full():
-            self.logger.warning(
-                "Boefjes queue is full, not populating with new tasks "
-                "[queue.qsize=%d, organisation_id=%s, scheduler_id=%s]",
-                self.queue.qsize(),
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
-
+        # TODO: active jobs, where the deadline has passed
         try:
-            random_oois = self.ctx.services.octopoes.get_random_objects(
-                organisation_id=self.organisation.id,
-                n=self.ctx.config.pq_populate_max_random_objects,
-                scan_level=[1, 2, 3, 4],
+            jobs = self.ctx.job_store.get_jobs(
+                scheduler_id=self.scheduler_id,
+                enabled=True,
+                max_deadline=datetime.now(timezone.utc),
             )
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+        except Exception as exc_db:
             self.logger.warning(
-                "Could not get random oois for organisation: %s [organisation_id=%s, scheduler_id=%s]",
-                self.organisation.name,
+                "Failed to get jobs from database [organisation_id=%s, scheduler_id=%s]",
+                self.organisation.id,
+                self.scheduler_id,
+                exc_info=exc_db,
+            )
+            raise exc_db
+
+        if not jobs:
+            self.logger.debug(
+                "No jobs for rescheduling [organisation_id=%s, scheduler_id=%s]",
                 self.organisation.id,
                 self.scheduler_id,
             )
             return
 
-        if not random_oois:
-            self.logger.debug(
-                "No random oois for organisation: %s [organisation_id=%s, scheduler_id=%s]",
-                self.organisation.name,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return
+        self.logger.debug(
+            "Received jobs for rescheduling: %s [organisation_id=%s, scheduler_id=%s]",
+            jobs,
+            self.organisation.id,
+            self.scheduler_id,
+        )
 
-        for ooi in random_oois:
-            self.logger.debug(
-                "Checking random ooi %s for rescheduling of tasks [organisation_id=%s, scheduler_id=%s]",
-                ooi.primary_key,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-
-            boefjes = self.get_boefjes_for_ooi(ooi)
-            if boefjes is None or not boefjes:
-                self.logger.debug(
-                    "No boefjes available for ooi %s, skipping [organisation_id=%s, scheduler_id=%s]",
-                    ooi,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                continue
-
-            with futures.ThreadPoolExecutor() as executor:
-                for boefje in boefjes:
-                    executor.submit(
-                        self.push_task,
-                        boefje,
-                        ooi,
-                        self.push_tasks_for_random_objects.__name__,
+        with futures.ThreadPoolExecutor() as executor:
+            for job in jobs:
+                # Create a task from the prior task
+                try:
+                    task = BoefjeTask(**job.p_item.data)
+                except Exception as exc:
+                    self.logger.warning(
+                        "Failed to create task from job [organisation_id=%s, scheduler_id=%s]",
+                        self.organisation.id,
+                        self.scheduler_id,
+                        exc_info=exc,
                     )
+                    continue
+
+                # ooi still exists?
+                ooi = self.ctx.services.octopoes.get_object_by_id(self.organisation.id, task.ooi_id)
+                if not ooi:
+                    self.logger.warning(
+                        "OOI does not exist anymore [organisation_id=%s, scheduler_id=%s]",
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+
+                    job.enabled = False
+                    self.ctx.job_store.update_job(job)
+                    continue
+
+                # boefje still exists?
+                boefje = self.ctx.services.katalogus.get_boefje_by_id(self.organisation.id, task.boefje_id)
+                if not boefje:
+                    self.logger.warning(
+                        "Boefje does not exist anymore [organisation_id=%s, scheduler_id=%s]",
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+
+                    job.enabled = False
+                    self.ctx.job_store.update_job(job)
+                    continue
+
+                # boefje still enabled?
+                if not boefje.enabled:
+                    self.logger.warning(
+                        "Boefje is disabled [organisation_id=%s, scheduler_id=%s]",
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+
+                    job.enabled = False
+                    self.ctx.job_store.update_job(job)
+                    continue
+
+                # boefje still consumes ooi?
+                if ooi.object_type not in boefje.consumes:
+                    self.logger.warning(
+                        "Boefje does not consume ooi anymore [organisation_id=%s, scheduler_id=%s]",
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+
+                    job.enabled = False
+                    self.ctx.job_store.update_job(job)
+                    continue
+
+                # boefje allowed to scan ooi?
+                if not self.can_boefje_scan_ooi(boefje, ooi):
+                    self.logger.warning(
+                        "Boefje is not allowed to scan ooi [organisation_id=%s, scheduler_id=%s]",
+                        self.organisation.id,
+                        self.scheduler_id,
+                    )
+
+                    job.enabled = False
+                    self.ctx.job_store.update_job(job)
+                    continue
+
+                executor.submit(
+                    self.push_task,
+                    task.boefje,
+                    task.ooi,
+                    self.push_tasks_for_rescheduling.__name__,
+                )
 
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
@@ -343,6 +391,36 @@ class BoefjeScheduler(Scheduler):
             )
             return False
 
+        if not self.can_boefje_scan_ooi(boefje, ooi):
+            self.logger.debug(
+                "Boefje: %s is not allowed to scan ooi: %s "
+                "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
+                boefje.name,
+                ooi.primary_key,
+                boefje.id,
+                ooi,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return False
+
+        return True
+
+    def can_boefje_scan_ooi(self, boefje: Plugin, ooi: OOI) -> bool:
+        """Checks whether a boefje is allowed to run on an ooi.
+
+        Boefje intensity score ooi clearance level, range
+        from 0 to 4. 4 being the highest intensity, and 0 being
+        the lowest. OOI clearance level defines what boefje
+        intensity is allowed to run on.
+
+        Args:
+            boefje: The boefje to check.
+            ooi: The ooi to check.
+
+        Returns:
+            True if the boefje is allowed to run on the ooi, False otherwise.
+        """
         ooi_scan_level = ooi.scan_profile.level
         if ooi_scan_level is None:
             self.logger.warning(
@@ -365,23 +443,7 @@ class BoefjeScheduler(Scheduler):
             )
             return False
 
-        # Boefje intensity score ooi clearance level, range
-        # from 0 to 4. 4 being the highest intensity, and 0 being
-        # the lowest. OOI clearance level defines what boefje
-        # intensity is allowed to run on.
         if boefje_scan_level > ooi_scan_level:
-            self.logger.debug(
-                "Boefje: %s scan level %s is too intense for ooi: %s scan level %s "
-                "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
-                boefje.id,
-                boefje_scan_level,
-                ooi.primary_key,
-                ooi_scan_level,
-                boefje.id,
-                ooi.primary_key,
-                self.organisation.id,
-                self.scheduler_id,
-            )
             return False
 
         return True
