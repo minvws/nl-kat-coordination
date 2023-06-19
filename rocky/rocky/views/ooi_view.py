@@ -16,7 +16,8 @@ from tools.ooi_form import ClearanceFilterForm, OOIForm
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 
 from octopoes.api.models import Declaration
-from octopoes.models import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER, OOI, ScanLevel, ScanProfileType
+from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
+from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types
 from rocky.bytes_client import BytesClient, get_bytes_client

@@ -20,7 +20,7 @@
             {% for findings in findings_list.findings_grouped.values %}
                 <tr>
                     <td>
-                        <span class="{{ findings.finding_type.risk_level_severity }}">{{ findings.finding_type.risk_level_severity }}</span>
+                        <span class="{{ findings.finding_type.risk_severity }}">{{ findings.finding_type.risk_severity }}</span>
                     </td>
                     <td>{{ findings.finding_type.id }}</td>
                     <td class="number">{{ findings_list.meta.total_by_finding_type|get_item:findings.finding_type.id }}</td>

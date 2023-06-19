@@ -8,7 +8,7 @@
 
   <main id="main-content">
     <section>
-      <div class="form-view">
+      <div class="layout-form">
         <h1>{% translate "Mute finding" %}: {{ ooi.human_readable }}</h1>
         <p>
           {% translate "Give a reason below why you want to mute this finding." %}
@@ -21,7 +21,7 @@
           {% translate "Mute finding" as fieldset_legend %}
           {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-          <div class="horizontal-view">
+          <div class="button-container">
             <fieldset>
               <button type="submit">{% translate "Mute" %}</button>
               <a href="{% ooi_url 'ooi_detail' ooi.primary_key organization.code %}"

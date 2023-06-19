@@ -1,3 +1,5 @@
+import ast
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -155,3 +157,32 @@ class TaskTest(TestCase):
 
         with self.assertRaises(InvalidReturnValueNormalizer):
             runner.run(meta, b"123")
+
+    def test_cleared_boefje_env(self) -> None:
+        """This tests checks if un-containerized (local) boefjes can only access their explicitly set env vars"""
+
+        arguments = {"ARG1": "value1", "ARG2": "value2"}
+
+        meta = BoefjeMeta(
+            id="some-random-job-id",
+            boefje={"id": "dummy_boefje_environment"},
+            input_ooi="Network|internet",
+            arguments=arguments,
+            organization="_dev",
+        )
+
+        local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
+
+        runner = LocalBoefjeJobRunner(local_repository)
+
+        current_env = os.environ.copy()
+
+        output = runner.run(meta, arguments)
+
+        output_dict = ast.literal_eval(output[0][1].decode())
+
+        # Assert that there are no overlapping environment keys
+        assert not set(current_env.keys()) & set(output_dict.keys())
+
+        # Assert that the original environment has been restored correctly
+        assert current_env == os.environ
