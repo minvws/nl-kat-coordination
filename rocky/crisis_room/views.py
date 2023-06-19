@@ -34,7 +34,10 @@ class OrganizationFindingCountPerSeverity:
 
     @property
     def total_critical(self) -> int:
-        return self.finding_count_per_severity[RiskLevelSeverity.CRITICAL.value]
+        try:
+            return self.finding_count_per_severity[RiskLevelSeverity.CRITICAL.value]
+        except KeyError:
+            return 0
 
 
 class CrisisRoomBreadcrumbsMixin(BreadcrumbsMixin):
@@ -65,7 +68,11 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
             return api_connector.count_findings_by_severity(valid_time=self.get_observed_at())
         except ConnectorException:
             messages.add_message(
-                self.request, messages.ERROR, _("Failed to get list of findings, check server logs for more details.")
+                self.request,
+                messages.ERROR,
+                _("Failed to get list of findings for organization {}, check server logs for more details.").format(
+                    organization.code
+                ),
             )
             logger.exception("Failed to get list of findings for organization %s", organization.code)
             return {}
