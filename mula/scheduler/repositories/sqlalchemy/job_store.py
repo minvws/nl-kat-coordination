@@ -1,3 +1,4 @@
+import datetime
 from typing import List, Optional, Tuple
 
 from scheduler import models
@@ -16,17 +17,39 @@ class JobStore(JobStorer):
     def get_jobs(
         self,
         scheduler_id: str,
+        job_hash: Optional[str] = None,
+        enabled: Optional[bool] = None,
+        min_deadline: Optional[datetime.datetime] = None,
+        max_deadline: Optional[datetime.datetime] = None,
         filters: Optional[List[models.Filter]] = None,
+        offset: Optional[int] = 0,
+        limit: Optional[int] = 100,
     ) -> Tuple[List[models.Job], int]:
         with self.datastore.session.begin() as session:
-            query = session.query(models.PrioritizedItemORM).filter(models.JobORM.scheduler_id == scheduler_id)
+            query = session.query(models.PrioritizedItemORM)
+
+            if scheduler_id is not None:
+                query.filter(models.JobORM.scheduler_id == scheduler_id)
+
+            if job_hash is not None:
+                query.filter(models.JobORM.hash == job_hash)
+
+            if enabled is not None:
+                query.filter(models.JobORM.enabled == enabled)
+
+            if min_deadline is not None:
+                query.filter(models.JobORM.deadline >= min_deadline)
+
+            if max_deadline is not None:
+                query.filter(models.JobORM.deadline <= max_deadline)
 
             if filters is not None:
                 for f in filters:
                     query.filter(models.JobORM.data[f.get_field()].astext == f.value)
 
             count = query.count()
-            jobs_orm = query.all()
+
+            jobs_orm = query.offset(offset).limit(limit).all()
 
             return ([models.Job.from_orm(job_orm) for job_orm in jobs_orm], count)
 

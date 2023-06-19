@@ -39,7 +39,7 @@ class JobORM(Base):
 
     id = Column(GUID, primary_key=True, default=uuid.uuid4)
     scheduler_id = Column(String)
-    hash = Column(String(32), index=True)  # unique?
+    hash = Column(String(32), index=True)
     enabled = Column(Boolean, default=True)
     crontab = Column(String)
 
