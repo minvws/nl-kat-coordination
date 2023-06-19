@@ -172,7 +172,7 @@ def test_finding_type_count_query():
 
     assert (
         query.format()
-        == f"""{{:query {{:find [FindingType (count Finding)] :where [
+        == f"""{{:query {{:find [(pull FindingType [*]) (count Finding)] :where [
     (or {or_statement_list} )
     [ Finding :Finding/finding_type FindingType ]
     [ Finding :object_type "Finding" ]]}}}}"""

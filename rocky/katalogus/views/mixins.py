@@ -67,29 +67,16 @@ class BoefjeMixin(OctopoesView):
     """
 
     def run_boefje(self, katalogus_boefje: Plugin, ooi: Optional[OOI]) -> None:
-        boefje_queue_name = f"boefje-{self.organization.code}"
-
-        boefje = Boefje(
-            id=katalogus_boefje.id,
-            name=katalogus_boefje.name,
-            description=katalogus_boefje.description,
-            repository_id=katalogus_boefje.repository_id,
-            version=None,
-            scan_level=katalogus_boefje.scan_level.value,
-            consumes={ooi_class.get_ooi_type() for ooi_class in katalogus_boefje.consumes},
-            produces={ooi_class.get_ooi_type() for ooi_class in katalogus_boefje.produces},
-        )
-
         boefje_task = BoefjeTask(
             id=uuid4().hex,
-            boefje=boefje,
+            boefje=Boefje(id=katalogus_boefje.id, version=None),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
 
         item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
         logger.info("Item: %s", item.json())
-        client.push_task(boefje_queue_name, item)
+        client.push_task(f"boefje-{self.organization.code}", item)
 
     def run_boefje_for_oois(
         self,
@@ -103,6 +90,32 @@ class BoefjeMixin(OctopoesView):
             if ooi.scan_profile.level < boefje.scan_level:
                 try:
                     self.raise_clearance_level(ooi.reference, boefje.scan_level)
-                except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
-                    continue
+                except IndemnificationNotPresentException:
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Could not raise clearance level of %s to L%s. \
+                            Indemnification not present at organization %s."
+                        )
+                        % (
+                            ooi.reference.human_readable,
+                            boefje.scan_level,
+                            self.organization.name,
+                        ),
+                    )
+                except ClearanceLevelTooLowException:
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Could not raise clearance level of %s to L%s. \
+                            You acknowledged a clearance level of %s."
+                        )
+                        % (
+                            ooi.reference.human_readable,
+                            boefje.scan_level,
+                            self.organization_member.acknowledged_clearance_level,
+                        ),
+                    )
             self.run_boefje(boefje, ooi)

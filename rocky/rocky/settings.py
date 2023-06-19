@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.conf import locale
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
 
@@ -55,8 +56,11 @@ REMOTE_USER_HEADER = os.getenv("REMOTE_USER_HEADER")
 REMOTE_USER_FALLBACK = os.getenv("REMOTE_USER_FALLBACK", "False").casefold() != "false"
 
 if REMOTE_USER_HEADER:
+    # Optional list of default organizations to add remote users to,
+    # format: space separated list of ORGANIZATION_CODE:GROUP_NAME, e.g. `test:admin test2:redteam`
+    REMOTE_USER_DEFAULT_ORGANIZATIONS = os.getenv("REMOTE_USER_DEFAULT_ORGANIZATIONS", "").split()
     AUTHENTICATION_BACKENDS = [
-        "django.contrib.auth.backends.RemoteUserBackend",
+        "rocky.auth.remote_user.RemoteUserBackend",
     ]
     if REMOTE_USER_FALLBACK:
         AUTHENTICATION_BACKENDS += [
@@ -243,6 +247,14 @@ USE_L10N = True
 USE_TZ = True
 
 LOCALE_PATHS = (BASE_DIR / "rocky/locale",)
+
+# Add custom languages not provided by Django
+EXTRA_LANG_INFO = {
+    "pap": {"bidi": False, "code": "pap", "name": "Papiamentu", "name_local": "Papiamentu"},
+}
+LANG_INFO = locale.LANG_INFO.copy()
+LANG_INFO.update(EXTRA_LANG_INFO)
+locale.LANG_INFO = LANG_INFO
 
 LANGUAGES = [
     ("en", "en"),

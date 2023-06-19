@@ -34,7 +34,7 @@ done: lint test ## Prepare for a commit.
 lint: ## Format the code using black.
 	pre-commit run --all-files --show-diff-on-failure --color always
 
-py-run := docker-compose run bytes python
+py-run := docker-compose --rm run bytes python
 
 
 export revid
@@ -79,7 +79,7 @@ itest: ## Run the integration tests.
 ##|------------------------------------------------------------------------|
 ##			Building
 ##|------------------------------------------------------------------------|
-debian:
+debian11:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-bytes \
@@ -89,10 +89,10 @@ debian:
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--workdir /app \
-	kat-debian-build-image \
+	kat-debian11-build-image \
 	packaging/scripts/build-debian-package.sh
 
-ubuntu:
+debian12:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-bytes \
@@ -102,7 +102,20 @@ ubuntu:
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--workdir /app \
-	kat-ubuntu-build-image \
+	kat-debian12-build-image \
+	packaging/scripts/build-debian-package.sh
+
+ubuntu22.04:
+	mkdir -p build
+	docker run --rm \
+	--env PKG_NAME=kat-bytes \
+	--env BUILD_DIR=./build \
+	--env REPOSITORY=minvws/nl-kat-bytes \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--workdir /app \
+	kat-ubuntu22.04-build-image \
 	packaging/scripts/build-debian-package.sh
 
 clean:

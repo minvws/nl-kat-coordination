@@ -3,16 +3,17 @@ Steps within a flow can be displayed using this partial.
 */
 .stepper {
   border-top: 1px solid $grey;
+  width: 100%;
 
-  > ul {
+  >ul {
     padding: 1rem 0;
 
-    > li {
+    >li {
       font-weight: 400;
       list-style-type: none;
       opacity: 0.4;
 
-      > a {
+      >a {
         color: black;
         margin: 0;
         text-decoration: none;
@@ -28,19 +29,19 @@ Steps within a flow can be displayed using this partial.
       }
     }
 
-    > li:not(li[aria-label="current-step"] ~ li) {
+    >li:not(li[aria-label="current-step"] ~ li) {
       font-weight: 700;
       opacity: 1;
     }
   }
 
   @media (min-width: 56rem) {
-    > ul {
+    >ul {
       display: flex;
       flex-direction: row;
       padding: 2rem 0;
 
-      > li {
+      >li {
         &:before {
           content: "\ea61";
           display: inline-flex;

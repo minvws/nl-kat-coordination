@@ -7,10 +7,14 @@ from pydantic.tools import parse_obj_as
 from requests import HTTPError, Response
 
 from octopoes.api.models import Declaration, Observation, ServiceHealth
-from octopoes.connector import DecodeException, RemoteException
-from octopoes.models import (
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+)
+from octopoes.connector import DecodeException, RemoteException
+from octopoes.models import (
     OOI,
     Reference,
     ScanLevel,
@@ -19,6 +23,7 @@ from octopoes.models import (
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
+from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginParameter
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
@@ -58,7 +63,7 @@ class OctopoesAPISession(requests.Session):
         return response
 
 
-# todo: use request Session and set default headers (accept-content, etc.)
+# todo: set default headers (accept-content, etc.)
 class OctopoesAPIConnector:
 
     """
@@ -83,8 +88,8 @@ class OctopoesAPIConnector:
         self,
         types: Set[Type[OOI]],
         valid_time: Optional[datetime] = None,
-        offset: int = 0,
-        limit: int = 5000,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
         scan_level: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_type: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOIType]:
@@ -141,9 +146,21 @@ class OctopoesAPIConnector:
         params = {"valid_time": str(valid_time)}
         self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.json())
 
+    def save_many_scan_profiles(self, scan_profiles: List[ScanProfile], valid_time: Optional[datetime] = None) -> None:
+        params = {"valid_time": valid_time}
+        self.session.post(
+            f"/{self.client}/scan_profiles/save_many",
+            params=params,
+            json=[json.loads(scan_profile.json()) for scan_profile in scan_profiles],
+        )
+
     def delete(self, reference: Reference, valid_time: Optional[datetime] = None) -> None:
         params = {"reference": str(reference), "valid_time": valid_time}
         self.session.delete(f"/{self.client}/", params=params)
+
+    def delete_many(self, references: List[Reference], valid_time: Optional[datetime] = None) -> None:
+        params = {"valid_time": valid_time}
+        self.session.post(f"/{self.client}/objects/delete_many", params=params, json=[str(ref) for ref in references])
 
     def list_origin_parameters(self, origin_id: Set[str], valid_time: Optional[datetime] = None) -> List[str]:
         params = {"origin_id": origin_id, "valid_time": valid_time}
@@ -163,10 +180,37 @@ class OctopoesAPIConnector:
         res = self.session.get(f"/{self.client}/scan_profiles/inheritance", params=params)
         return parse_obj_as(List[InheritanceSection], res.json())
 
-    def get_finding_type_count(self, valid_time: Optional[datetime] = None) -> Dict[str, int]:
+    def count_findings_by_severity(self, valid_time: Optional[datetime] = None) -> Dict[str, int]:
         params = {"valid_time": valid_time}
-        res = self.session.get(f"/{self.client}/finding_types/count", params=params)
+        res = self.session.get(f"/{self.client}/findings/count_by_severity", params=params)
         return res.json()
+
+    def list_findings(
+        self,
+        severities: Set[RiskLevelSeverity],
+        exclude_muted: bool = True,
+        valid_time: Optional[datetime] = None,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+    ) -> Paginated[Finding]:
+        params = {
+            "valid_time": valid_time,
+            "offset": offset,
+            "limit": limit,
+            "severities": {s.value for s in severities},
+            "exclude_muted": exclude_muted,
+        }
+        res = self.session.get(f"/{self.client}/findings", params=params)
+        return Paginated[Finding].parse_obj(res.json())
+
+    def load_objects_bulk(self, references: Set[Reference], valid_time):
+        params = {
+            "valid_time": valid_time,
+        }
+        res = self.session.post(
+            f"/{self.client}/objects/load_bulk", params=params, json=[str(ref) for ref in references]
+        )
+        return parse_obj_as(Dict[Reference, OOIType], res.json())
 
     def recalculate_bits(self) -> int:
         return self.session.post(f"/{self.client}/bits/recalculate").json()

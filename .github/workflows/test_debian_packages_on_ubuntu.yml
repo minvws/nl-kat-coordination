@@ -217,11 +217,11 @@ jobs:
         run: sudo sed -i "s/XTDB_TYPE=\"xtdb\"/XTDB_TYPE=\"xtdb-multinode\"/g" /etc/kat/octopoes.conf
 
       - name: Restart KAT
-        run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker xtdb-http-multinode
+        run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
       - name: Setup accounts in Rocky
         run: |
-          DJANGO_SUPERUSER_PASSWORD=robotpassword sudo -E -u kat rocky-cli createsuperuser --noinput --email robot@localhost
+          DJANGO_SUPERUSER_PASSWORD=robotpassword sudo -E -u kat rocky-cli createsuperuser --noinput --email robot@localhost --full_name "Mr. Robot"
           sudo -u kat rocky-cli setup_dev_account
 
       - name: Check Keiko API health or print response and logs
@@ -246,7 +246,7 @@ jobs:
 
       - name: Check XTDB health or print response and logs
         run: |
-          for i in {1..15}; do curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status && s=0 && break || s=$? && sleep 1 ; done
+          for i in {1..30}; do curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status && s=0 && break || s=$? && sleep 1 ; done
           if [ $s != 0 ]; then echo $(curl -s -H "Accept: application/edn" http://localhost:3000/_dev/_xtdb/test/status) || true && journalctl --no-pager -u xtdb-http-multinode.service && exit $s ; fi
 
       - name: Create _dev node in Octopoes
