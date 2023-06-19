@@ -6,7 +6,6 @@
 
     <nav data-open-label="{% translate "Menu" %}"
          data-close-label="{% translate "Close menu" %}"
-         data-media="(min-width: 70rem)"
          aria-label="{% translate "Main navigation" %}"
          class="collapsible">
          <div>
@@ -97,3 +96,7 @@
 </header>
 
 {% include "partials/notifications_block.html" %}
+
+{% block html_at_end_body %}
+    <script src="{% static "/js/nav_width_calc.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}
