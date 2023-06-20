@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from pydantic import ValidationError
 
@@ -41,11 +41,15 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
     def __init__(self, local_repository: LocalPluginRepository):
         self.local_repository = local_repository
 
-    def run(self, boefje_meta: BoefjeMeta, environment: Dict[str, str]) -> List[Tuple[set, Union[bytes, str]]]:
+    def run(
+        self, boefje_meta: BoefjeMeta, environment: Optional[Dict[str, str]]
+    ) -> List[Tuple[set, Union[bytes, str]]]:
         logger.info("Running local boefje plugin")
 
         boefjes = self.local_repository.resolve_boefjes()
         boefje_resource = boefjes[boefje_meta.boefje.id]
+
+        environment = environment or {}
 
         with TemporaryEnvironment() as temporary_environment:
             temporary_environment.update(environment)
