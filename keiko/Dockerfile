@@ -1,4 +1,4 @@
-FROM python:3.8 AS dev
+FROM python:3.8-bullseye AS dev
 
 EXPOSE 8000
 

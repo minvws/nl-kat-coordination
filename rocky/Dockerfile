@@ -8,7 +8,7 @@ COPY rocky/assets assets
 
 RUN yarn --ignore-engines && yarn build
 
-FROM python:3.8 AS dev
+FROM python:3.8-bullseye AS dev
 
 ARG USER_UID=1000
 ARG USER_GID=1000
