@@ -85,6 +85,7 @@ def xtdb_session(
         yield session
     finally:
         session.commit()
+        logger.info("Committed XTDBSession")
 
 
 def octopoes_service(

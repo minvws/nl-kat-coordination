@@ -1,13 +1,10 @@
 import logging
-import threading
 
-import pika
 from amqp import AMQPError
-from pika.adapters.blocking_connection import BlockingChannel
 
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.core.service import OctopoesService
-from octopoes.events.manager import EventManager
+from octopoes.events.manager import EventManager, get_rabbit_channel
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.repositories.origin_parameter_repository import XTDBOriginParameterRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
@@ -37,22 +34,6 @@ def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTP
     return XTDBHTTPClient(f"{base_uri}/_{xtdb_type.value}", client)
 
 
-thread_local = threading.local()
-
-
-def get_rabbit_channel(queue_uri: str) -> BlockingChannel:
-    try:
-        return thread_local.rabbit_channel
-    except AttributeError:
-        connection = pika.BlockingConnection(pika.URLParameters(queue_uri))
-        logger.info("Connected to RabbitMQ")
-
-        thread_local.rabbit_channel = connection.channel()
-        thread_local.rabbit_channel.queue_declare(queue="create_events", durable=True)
-
-        return thread_local.rabbit_channel
-
-
 def close_rabbit_channel(queue_uri: str):
     rabbit_channel = get_rabbit_channel(queue_uri)
 
@@ -65,9 +46,7 @@ def close_rabbit_channel(queue_uri: str):
 
 
 def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSession) -> OctopoesService:
-    event_manager = EventManager(
-        client, celery_app, settings.queue_name_octopoes, get_rabbit_channel(settings.queue_uri)
-    )
+    event_manager = EventManager(client, settings.queue_uri, celery_app, settings.queue_name_octopoes)
 
     ooi_repository = XTDBOOIRepository(event_manager, xtdb_session, settings.xtdb_type)
     origin_repository = XTDBOriginRepository(event_manager, xtdb_session, settings.xtdb_type)

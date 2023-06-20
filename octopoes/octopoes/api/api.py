@@ -22,7 +22,8 @@ from requests import RequestException
 from octopoes.api.models import ServiceHealth
 from octopoes.api.router import router
 from octopoes.config.settings import Settings
-from octopoes.core.app import close_rabbit_channel, get_rabbit_channel
+from octopoes.core.app import close_rabbit_channel
+from octopoes.events.manager import get_rabbit_channel
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.version import __version__
 

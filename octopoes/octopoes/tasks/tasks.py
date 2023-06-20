@@ -11,8 +11,9 @@ from pydantic import parse_obj_as
 
 from octopoes.config.settings import Settings
 from octopoes.connector.katalogus import KATalogusClientV1
-from octopoes.core.app import bootstrap_octopoes, close_rabbit_channel, get_rabbit_channel, get_xtdb_client
+from octopoes.core.app import bootstrap_octopoes, close_rabbit_channel, get_xtdb_client
 from octopoes.events.events import EVENT_TYPE, DBEvent
+from octopoes.events.manager import get_rabbit_channel
 from octopoes.tasks.app import app
 from octopoes.xtdb.client import XTDBSession
 

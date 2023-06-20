@@ -189,8 +189,13 @@ class XTDBSession:
 
         self._committed = True
 
+        if not self.post_commit_callbacks:
+            return
+
         for callback in self.post_commit_callbacks:
             callback()
+
+        logger.info("Called %s callbacks after committing XTDBSession", len(self.post_commit_callbacks))
 
     def listen_post_commit(self, callback: Callable[[], None]):
         self.post_commit_callbacks.append(callback)
