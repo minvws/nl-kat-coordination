@@ -68,10 +68,10 @@ class AppContext:
         if not self.config.database_dsn.startswith("postgresql"):
             raise Exception("PostgreSQL is the only supported database backend")
 
-        datastore = sqlalchemy.SQLAlchemy(self.config.database_dsn)
-        self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
-        self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
-        self.job_store: stores.JobStorer = sqlalchemy.JobStore(datastore)
+        self.datastore = sqlalchemy.SQLAlchemy(self.config.database_dsn)
+        self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(self.datastore)
+        self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(self.datastore)
+        self.job_store: stores.JobStorer = sqlalchemy.JobStore(self.datastore)
 
         # Metrics collector registry
         self.metrics_registry: CollectorRegistry = CollectorRegistry()

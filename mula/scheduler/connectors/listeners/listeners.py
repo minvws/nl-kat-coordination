@@ -1,7 +1,7 @@
 import json
 import logging
 import urllib.parse
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 import pika
 
@@ -121,3 +121,20 @@ class RabbitMQ(Listener):
         self.channel.stop_consuming()
         self.channel.close()
         self.connection.close()
+
+
+class Psql(Listener):
+    def __init__(self, engine, channel, func: Callable):
+        super().__init__()
+
+        self.connection = engine.connect()
+        self.connection.execute(f"LISTEN {channel};")
+
+    def listen(self):
+        self.connection.connection.poll()
+        while self.connection.connection.notifies:
+            notify = self.connection.connection.notifies.pop(0)
+            self.logger.debug("Received message on channel %s, message: %r", notify.channel, notify.payload)
+
+    def stop(self):
+        pass

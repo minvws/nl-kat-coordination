@@ -29,6 +29,7 @@ def upgrade():
         sa.Column("crontab", sa.String(), nullable=True),
         sa.Column("p_item", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column("deadline", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
+        sa.Column("evaluated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("modified_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id"),

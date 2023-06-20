@@ -111,10 +111,14 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
+        # TODO: why are we looking for a task here, when we are creating one?
+        # What happens when we already found one and update it?
+        """
         task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
             self.ctx.task_store.update_task(task)
             return
+        """
 
         if p_item.hash is None:
             self.logger.warning(
@@ -123,9 +127,20 @@ class Scheduler(abc.ABC):
                 p_item.data.get("id"),
                 self.queue.pq_id,
             )
-            return None
+            return
 
-        task_db = self.ctx.task_store.create_task(task)
+        try:
+            task_db = self.ctx.task_store.create_task(task)
+        except Exception:  # FIXME
+            self.logger.warning(
+                "Task %s could not be created in datastore [task_id=%s, queue_id=%s]",
+                p_item.data.get("id"),
+                p_item.data.get("id"),
+                self.queue.pq_id,
+            )
+            self.logger.warning(traceback.format_exc())
+            return
+
         if task_db is None:
             self.logger.warning(
                 "Task %s could not be created, not creating job [task_id=%s, queue_id=%s]",
@@ -133,33 +148,57 @@ class Scheduler(abc.ABC):
                 p_item.data.get("id"),
                 self.queue.pq_id,
             )
-            return None
-
-        # TODO: enabled?
-        job = self.ctx.job_store.get_job_by_hash(p_item.hash)
-        if job is not None:
-            self.ctx.job_store.update_job(job)  # TODO: test this modified_at
             return
 
-        job_db = self.ctx.job_store.create_job(
-            models.Job(
-                scheduler_id=self.scheduler_id,
-                hash=p_item.hash,
-                enabled=True,
-                p_item=p_item,
-                created_at=datetime.now(timezone.utc),
-                modified_at=datetime.now(timezone.utc),
-            )
-        )
-        if job_db is None:
+        # TODO: enabled?
+        # When there is already a job with the same hash, we update the job
+        # so that it can be evaluated again.
+        try:
+            job = self.ctx.job_store.get_job_by_hash(p_item.hash)
+            if job is not None:
+                self.ctx.job_store.update_job(job)  # TODO: test this modified_at
+                return
+        except Exception:  # FIXME
             self.logger.warning(
-                "Task %s could not be created, not creating job [task_id=%s, queue_id=%s]",
+                "Job %s could not be created [task_id=%s, queue_id=%s]",
                 p_item.data.get("id"),
                 p_item.data.get("id"),
                 self.queue.pq_id,
             )
-            return None
+            self.logger.warning(traceback.format_exc())
+            return
 
+        try:
+            job_db = self.ctx.job_store.create_job(
+                models.Job(
+                    scheduler_id=self.scheduler_id,
+                    hash=p_item.hash,
+                    enabled=True,
+                    p_item=p_item,
+                    created_at=datetime.now(timezone.utc),
+                    modified_at=datetime.now(timezone.utc),
+                )
+            )
+        except Exception:  # FIXME
+            self.logger.warning(
+                "Job %s could not be created [task_id=%s, queue_id=%s]",
+                p_item.data.get("id"),
+                p_item.data.get("id"),
+                self.queue.pq_id,
+            )
+            self.logger.warning(traceback.format_exc())
+            return
+
+        if job_db is None:
+            self.logger.warning(
+                "Job %s could not be created [task_id=%s, queue_id=%s]",
+                p_item.data.get("id"),
+                p_item.data.get("id"),
+                self.queue.pq_id,
+            )
+            return
+
+        # For the task create the relationship with the associated job
         task_db.job_id = job_db.id
         self.ctx.task_store.update_task(task_db)
 

@@ -17,7 +17,7 @@ from .tasks import Task
 
 class Job(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    scheduler_id: uuid.UUID
+    scheduler_id: str
     hash: str
     enabled: bool = True
     crontab: Optional[str]
@@ -26,6 +26,7 @@ class Job(BaseModel):
     tasks: List[Task] = []
 
     deadline: Optional[datetime.datetime] = None
+    evaluated_at: Optional[datetime.datetime] = None
 
     created_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
     modified_at: datetime.datetime = Field(default_factory=datetime.datetime.utcnow)
@@ -47,6 +48,12 @@ class JobORM(Base):
     tasks = relationship("TaskORM", back_populates="job")
 
     deadline = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        server_default=func.now(),
+    )
+
+    evaluated_at = Column(
         DateTime(timezone=True),
         nullable=True,
         server_default=func.now(),

@@ -77,6 +77,12 @@ class BoefjeScheduler(Scheduler):
         )
 
         self.run_in_thread(
+            name=f"scheduler-{self.scheduler_id}-task_update",
+            target=self.listeners["task_update"].listen,
+            loop=True,
+        )
+
+        self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-new_boefjes",
             target=self.push_tasks_for_new_boefjes,
             interval=60.0,
@@ -92,13 +98,19 @@ class BoefjeScheduler(Scheduler):
         """Listen for scan profile mutations and create tasks for oois that
         have a scan level change.
         """
-        listener = listeners.ScanProfileMutation(
+        lst_scan_profile = listeners.ScanProfileMutation(
             dsn=self.ctx.config.host_raw_data,
             queue=f"{self.organisation.id}__scan_profile_mutations",
             func=self.push_tasks_for_scan_profile_mutations,
         )
 
-        self.listeners["scan_profile_mutations"] = listener
+        self.listeners["scan_profile_mutations"] = lst_scan_profile
+
+        lst_task_update = listeners.TaskUpdate(
+            engine=self.ctx.datastore.engine,
+            func=self.calculate_deadline,
+        )
+        self.listeners["task_update"] = lst_task_update
 
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
@@ -247,7 +259,7 @@ class BoefjeScheduler(Scheduler):
 
         # TODO: active jobs, where the deadline has passed
         try:
-            jobs = self.ctx.job_store.get_jobs(
+            jobs, _ = self.ctx.job_store.get_jobs(
                 scheduler_id=self.scheduler_id,
                 enabled=True,
                 max_deadline=datetime.now(timezone.utc),
@@ -769,3 +781,6 @@ class BoefjeScheduler(Scheduler):
         )
 
         return boefjes
+
+    def calculate_deadline(self):
+        self.logger.info("CALCULATE DEADLINE")
