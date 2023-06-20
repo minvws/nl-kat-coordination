@@ -137,15 +137,19 @@ class BoefjeHandler(Handler):
                 )
             )
 
-        env_keys = self.local_repository.by_id(boefje_meta.boefje.id).environment_keys
-        environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
+        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
 
+        env_keys = boefje_resource.environment_keys
+        boefje_meta.runnable_hash = boefje_resource.runnable_hash
+
+        environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
         mime_types = _collect_default_mime_types(boefje_meta)
+
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
         boefje_meta.started_at = datetime.now(timezone.utc)
         boefje_meta.environment = environment
-        boefje_meta.runnable_hash = self.local_repository.by_id(boefje_meta.boefje.id).runnable_hash
+
         boefje_results = None
 
         try:
