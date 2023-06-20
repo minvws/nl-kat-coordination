@@ -69,8 +69,10 @@ ROCKY_DB_PORT=
 ROCKY_DB=
 ROCKY_DB_USER=
 ROCKY_DB_PASSWORD=
+ROCKY_DB_DSN=
 ```
 
+The `ROCKY_DB_DSN` is optional (e.g. `postgresql://username:password@hostname:port/database_name`) and if unset the other DB variables will be used to setup the database connection.
 
 ### KATalogus View Structure
 
