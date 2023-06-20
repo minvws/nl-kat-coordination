@@ -163,22 +163,14 @@ def get_local_repository():
 
 
 def get_runnable_hash(path: Path) -> str:
-    """Returns sha256(sha256(file1) + sha256(file2) + ...) of all files in the given path."""
+    """Returns sha256(file1 + file2 + ...) of all files in the given path."""
 
-    file_hashes = []
+    folder_hash = hashlib.sha256()
 
-    for file in path.iterdir():
+    for file in sorted(path.iterdir()):
         if file.is_file():
-            sha256 = hashlib.sha256()
-            with Path.open(file, "rb") as f:
-                while True:
-                    data = f.read(32768)
-                    if not data:
-                        break
-                    sha256.update(data)
-            file_hashes.append(sha256.hexdigest())
+            with file.open("rb") as f:
+                while chunk := f.read(32768):
+                    folder_hash.update(chunk)
 
-    sha256 = hashlib.sha256()
-    sha256.update("".join(file_hashes).encode("utf-8"))
-
-    return sha256.hexdigest()
+    return folder_hash.hexdigest()
