@@ -25,7 +25,7 @@ class ExpiringDict:
         self.expiration_time: datetime = start_time + self.lifetime
         self.lock: threading.Lock = threading.Lock()
         self.cache: Dict[str, Any] = {}
-        self.expiration_enabled: bool = True
+        self._expiration_enabled: bool = True
 
     def get(self, key: str, default: Optional[Any] = None) -> Any:
         try:
@@ -38,7 +38,13 @@ class ExpiringDict:
             self.cache.clear()
             self.expiration_time = datetime.now(timezone.utc) + self.lifetime
 
-    def set_expiration_enabled(self, value: bool) -> None:
+    @property
+    def expiration_enabled(self) -> bool:
+        """Whether expiration is enabled or not."""
+        return self._expiration_enabled
+
+    @expiration_enabled.setter
+    def expiration_enabled(self, value: bool) -> None:
         """Enable or disable expiration. If disabled, the cache will never
         expire.
 
@@ -46,7 +52,7 @@ class ExpiringDict:
             value (bool): Whether to enable or disable expiration.
         """
         with self.lock:
-            self.expiration_enabled = value
+            self._expiration_enabled = value
 
             # If we are enabling expiration, we need to reset the expiration
             if value is True:

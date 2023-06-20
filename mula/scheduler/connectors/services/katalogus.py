@@ -43,7 +43,7 @@ class Katalogus(HTTPService):
         self.logger.debug("flushing plugin cache [cache=%s]", self.organisations_plugin_cache.cache)
 
         # First, we reset the cache, to make sure we won't get any ExpiredError
-        self.organisations_plugin_cache.set_expiration_enabled(False)
+        self.organisations_plugin_cache.expiration_enabled = False
         self.organisations_plugin_cache.reset()
 
         orgs = self.get_organisations()
@@ -55,7 +55,7 @@ class Katalogus(HTTPService):
             plugins = self.get_plugins_by_organisation(org.id)
             self.organisations_plugin_cache[org.id] = {plugin.id: plugin for plugin in plugins if plugin.enabled}
 
-        self.organisations_plugin_cache.set_expiration_enabled(True)
+        self.organisations_plugin_cache.expiration_enabled = True
         self.logger.debug("flushed plugins cache [cache=%s]", self.organisations_plugin_cache.cache)
 
     def flush_organisations_boefje_type_cache(self) -> None:
@@ -63,7 +63,7 @@ class Katalogus(HTTPService):
         self.logger.debug("flushing boefje cache [cache=%s]", self.organisations_boefje_type_cache.cache)
 
         # First, we reset the cache, to make sure we won't get any ExpiredError
-        self.organisations_boefje_type_cache.set_expiration_enabled(False)
+        self.organisations_boefje_type_cache.expiration_enabled = False
         self.organisations_boefje_type_cache.reset()
 
         orgs = self.get_organisations()
@@ -86,7 +86,7 @@ class Katalogus(HTTPService):
                 for type_ in plugin.consumes:
                     self.organisations_boefje_type_cache[org.id].setdefault(type_, []).append(plugin)
 
-        self.organisations_boefje_type_cache.set_expiration_enabled(True)
+        self.organisations_boefje_type_cache.expiration_enabled = True
         self.logger.debug("flushed boefje cache [cache=%s]", self.organisations_boefje_type_cache.cache)
 
     def flush_organisations_normalizer_type_cache(self) -> None:
@@ -94,7 +94,7 @@ class Katalogus(HTTPService):
         self.logger.debug("flushing normalizer cache [cache=%s]", self.organisations_normalizer_type_cache.cache)
 
         # First, we reset the cache, to make sure we won't get any ExpiredError
-        self.organisations_normalizer_type_cache.set_expiration_enabled(False)
+        self.organisations_normalizer_type_cache.expiration_enabled = False
         self.organisations_normalizer_type_cache.reset()
 
         orgs = self.get_organisations()
@@ -111,7 +111,7 @@ class Katalogus(HTTPService):
                 for type_ in plugin.consumes:
                     self.organisations_normalizer_type_cache[org.id].setdefault(type_, []).append(plugin)
 
-        self.organisations_normalizer_type_cache.set_expiration_enabled(True)
+        self.organisations_normalizer_type_cache.expiration_enabled = True
         self.logger.debug("flushed normalizer cache [cache=%s]", self.organisations_normalizer_type_cache.cache)
 
     @exception_handler
