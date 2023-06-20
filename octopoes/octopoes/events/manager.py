@@ -2,7 +2,7 @@ import json
 import logging
 import threading
 import uuid
-from typing import Optional
+from typing import Callable, Optional
 
 import pika
 from celery import Celery
@@ -28,12 +28,39 @@ class ScanProfileMutation(BaseModel):
     value: Optional[AbstractOOI]
 
 
+thread_local = threading.local()
+
+
+def get_rabbit_channel(queue_uri: str) -> BlockingChannel:
+    try:
+        if thread_local.rabbit_channel.is_closed or thread_local.rabbit_channel.connection.is_closed:
+            raise ConnectionError("RabbitMQ channel is closed, establishing a new connection...")
+
+        return thread_local.rabbit_channel
+    except (AttributeError, ConnectionError, StreamLostError):
+        connection = pika.BlockingConnection(pika.URLParameters(queue_uri))
+        logger.info("Connected to RabbitMQ")
+
+        thread_local.rabbit_channel = connection.channel()
+        thread_local.rabbit_channel.queue_declare(queue="create_events", durable=True)
+
+        return thread_local.rabbit_channel
+
+
 class EventManager:
-    def __init__(self, client: str, queue_uri: str, celery_app: Celery, celery_queue_name: str):
+    def __init__(
+        self,
+        client: str,
+        queue_uri: str,
+        celery_app: Celery,
+        celery_queue_name: str,
+        channel_factory: Callable[[str], BlockingChannel] = get_rabbit_channel,
+    ):
         self.client = client
         self.queue_uri = queue_uri
         self.celery_app = celery_app
         self.celery_queue_name = celery_queue_name
+        self.channel_factory = channel_factory
 
         self._try_connect()
 
@@ -137,25 +164,6 @@ class EventManager:
                 raise
 
     def _connect(self) -> None:
-        self.channel = get_rabbit_channel(self.queue_uri)
+        self.channel = self.channel_factory(self.queue_uri)
         self.channel.queue_declare(queue=f"{self.client}__scan_profile_increments", durable=True)
         self.channel.queue_declare(queue=f"{self.client}__scan_profile_mutations", durable=True)
-
-
-thread_local = threading.local()
-
-
-def get_rabbit_channel(queue_uri: str) -> BlockingChannel:
-    try:
-        if thread_local.rabbit_channel.is_closed or thread_local.rabbit_channel.connection.is_closed:
-            raise ConnectionError("RabbitMQ channel is closed, establishing a new connection...")
-
-        return thread_local.rabbit_channel
-    except (AttributeError, ConnectionError, StreamLostError):
-        connection = pika.BlockingConnection(pika.URLParameters(queue_uri))
-        logger.info("Connected to RabbitMQ")
-
-        thread_local.rabbit_channel = connection.channel()
-        thread_local.rabbit_channel.queue_declare(queue="create_events", durable=True)
-
-        return thread_local.rabbit_channel
