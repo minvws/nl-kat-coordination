@@ -265,7 +265,7 @@ Configure hostname in Rocky
 ===========================
 
 The `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` variables in
-`/etc/kat/rocky.conf` need to be configured with the hostname that will be used
+`/etc/kat/rocky.conf` need to be configured with the hostname (or hostnames separated by commas) that will be used
 to access OpenKAT. If `openkat.example.org` is used to access OpenKAT the
 configuration should be:
 
