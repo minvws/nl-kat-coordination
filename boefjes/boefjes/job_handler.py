@@ -142,7 +142,7 @@ class BoefjeHandler(Handler):
         env_keys = boefje_resource.environment_keys
 
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
-        boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else None
+        boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
 
         mime_types = _collect_default_mime_types(boefje_meta)
 

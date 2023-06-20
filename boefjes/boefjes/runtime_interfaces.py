@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Tuple, Union
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerOutput
 
@@ -10,9 +10,7 @@ class Handler:
 
 
 class BoefjeJobRunner:
-    def run(
-        self, boefje_meta: BoefjeMeta, environment: Optional[Dict[str, str]]
-    ) -> Tuple[BoefjeMeta, Union[str, bytes]]:
+    def run(self, boefje_meta: BoefjeMeta, environment: Dict[str, str]) -> Tuple[BoefjeMeta, Union[str, bytes]]:
         raise NotImplementedError()
 
 
