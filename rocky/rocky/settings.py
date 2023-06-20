@@ -308,10 +308,7 @@ if GITPOD_WORKSPACE_URL := env("GITPOD_WORKSPACE_URL", default=None):
     CSRF_TRUSTED_ORIGINS.append(GITPOD_WORKSPACE_URL.replace("//", "//8000-"))
 
 # Configuration for GitHub Codespaces
-if (
-    GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", default=None)
-    is not None
-):
+if GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN := env("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN", default=None):
     # example environment variable: GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=preview.app.github.dev
     # public url on https://praseodym-organic-engine-9j6465vx3xgx6-8000.preview.app.github.dev/
     ALLOWED_HOSTS.append("." + GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN)
