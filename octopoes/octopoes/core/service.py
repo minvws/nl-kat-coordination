@@ -530,26 +530,28 @@ class OctopoesService:
         for bit_id, bit_definition in bit_definitions.items():
             # loop over all oois that are consumed by the bit
             for ooi in self.ooi_repository.list({bit_definition.consumes}, limit=20000, valid_time=valid_time).items:
-                if isinstance(ooi, bit_definition.consumes):
-                    # check if exists
-                    bit_instance = Origin(
-                        origin_type=OriginType.INFERENCE,
-                        method=bit_id,
-                        source=ooi.reference,
-                    )
-                    try:
-                        self.origin_repository.get(bit_instance.id, valid_time)
-                    except ObjectNotFoundException:
-                        self.origin_repository.save(bit_instance, valid_time)
-                        bit_counter.update({bit_instance.method})
+                if not isinstance(ooi, bit_definition.consumes):
+                    logger.exception("Wut?")
 
-                    for param_def in bit_definition.parameters:
-                        path = Path.parse(f"{param_def.ooi_type.get_object_type()}.{param_def.relation_path}")
+                # insert, if not exists
+                bit_instance = Origin(
+                    origin_type=OriginType.INFERENCE,
+                    method=bit_id,
+                    source=ooi.reference,
+                )
+                try:
+                    self.origin_repository.get(bit_instance.id, valid_time)
+                except ObjectNotFoundException:
+                    self.origin_repository.save(bit_instance, valid_time)
+                    bit_counter.update({bit_instance.method})
 
-                        param_oois = self.ooi_repository.list_related(ooi, path.reverse(), valid_time=valid_time)
-                        for param_ooi in param_oois:
-                            param = OriginParameter(origin_id=bit_instance.id, reference=param_ooi.reference)
-                            self.origin_parameter_repository.save(param, valid_time)
+                for param_def in bit_definition.parameters:
+                    path = Path.parse(f"{param_def.ooi_type.get_object_type()}.{param_def.relation_path}").reverse()
+
+                    param_oois = self.ooi_repository.list_related(ooi, path, valid_time=valid_time)
+                    for param_ooi in param_oois:
+                        param = OriginParameter(origin_id=bit_instance.id, reference=param_ooi.reference)
+                        self.origin_parameter_repository.save(param, valid_time)
 
         # remove all Origins and Origin Parameters, which are no longer in use
 
