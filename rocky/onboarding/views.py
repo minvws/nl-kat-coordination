@@ -8,7 +8,6 @@ from account.mixins import (
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.auth.models import Group
 from django.core.exceptions import BadRequest
 from django.http import Http404
 from django.shortcuts import redirect
@@ -19,7 +18,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
-from tools.models import GROUP_REDTEAM, Organization, OrganizationMember
+from tools.models import Organization, OrganizationMember
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
@@ -70,7 +69,9 @@ class OnboardingStart(OrganizationView):
     def get(self, request, *args, **kwargs):
         if request.user.is_superuser:
             return redirect("step_introduction_registration")
-        if self.organization_member.is_redteam:
+        if self.organization_member.has_perms(
+            ["can_scan_organization", "can_set_clearance_level", "can_enable_disable_boefje"]
+        ):
             return redirect("step_introduction", kwargs={"organization_code": self.organization.code})
         return redirect("crisis_room")
 
@@ -676,8 +677,9 @@ class CompleteOnboarding(OrganizationView):
     """
 
     def get(self, request, *args, **kwargs):
-        if self.request.user.is_superuser and not self.organization_member.is_redteam:
-            self.organization_member.groups.add(Group.objects.get(name=GROUP_REDTEAM))
+        if self.request.user.is_superuser and not self.organization_member.has_perms(
+            ["can_scan_organization", "can_set_clearance_level", "can_enable_disable_boefje"]
+        ):
             return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
         self.organization_member.onboarded = True
         self.organization_member.status = OrganizationMember.STATUSES.ACTIVE

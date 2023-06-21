@@ -32,7 +32,9 @@ def OnboardingMiddleware(get_response):
                 member = OrganizationMember.objects.filter(user=request.user)
 
                 # Members with these permissions can run a full DNS-report onboarding.
-                if member.exists() and member.first().has_perms(["can_scan_organization", "can_set_clearance_level"]):
+                if member.exists() and member.first().has_perms(
+                    ["can_scan_organization", "can_set_clearance_level", "can_enable_disable_boefje"]
+                ):
                     # a redteamer can be in many organizations, but we onboard the first one.
                     return redirect(
                         reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})

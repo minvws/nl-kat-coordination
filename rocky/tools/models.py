@@ -223,18 +223,6 @@ class OrganizationMember(models.Model):
     )
 
     @cached_property
-    def is_admin(self) -> bool:
-        return self.groups.filter(name=GROUP_ADMIN).exists()
-
-    @cached_property
-    def is_redteam(self) -> bool:
-        return self.groups.filter(name=GROUP_REDTEAM).exists()
-
-    @cached_property
-    def is_client(self) -> bool:
-        return self.groups.filter(name=GROUP_CLIENT).exists()
-
-    @cached_property
     def all_permissions(self) -> Set[str]:
         if self.user.is_active and self.user.is_superuser:
             # Superuser always has all permissions
