@@ -13,7 +13,7 @@
 @use "@minvws/manon/application-base";
 
 /* Icon */
-@use "@minvws/manon/icon-base";
+@use "@minvws/manon/icon";
 
 /* Text */
 @use "@minvws/manon/headings";
@@ -24,6 +24,10 @@
 @use "@minvws/manon/link";
 @use "@minvws/manon/nota-bene";
 
+/* Fundamentals */
+@use "@minvws/manon/checkbox";
+@use "@minvws/manon/radio";
+
 /* Helpers */
 @use "@minvws/manon/horizontal-view";
 @use "@minvws/manon/horizontal-scroll";
@@ -31,12 +35,24 @@
 @use "@minvws/manon/focus-only";
 @use "@minvws/manon/nowrap";
 @use "@minvws/manon/visually-hidden";
+@use "@minvws/manon/hidden";
+@use "@minvws/manon/collapsible";
 
 /* Layout */
-@use "@minvws/manon/layout-base-variables";
-@use "@minvws/manon/layout-header-content-block";
-@use "@minvws/manon/layout-main-content-block";
-@use "@minvws/manon/layout-footer-content-block";
+@use "@minvws/manon/layout-set";
+
+/* Main */
+@use "@minvws/manon/main";
+
+/* Section */
+@use "@minvws/manon/section";
+@use "@minvws/manon/section-content-wrapper";
+
+/* Article */
+@use "@minvws/manon/article";
+@use "@minvws/manon/article-content-wrapper";
+
+/* Layout exceptions */
 @use "@minvws/manon/layout-authentication";
 @use "@minvws/manon/layout-one-third-two-thirds";
 @use "@minvws/manon/layout-two-thirds-one-third";
@@ -46,35 +62,30 @@
 @use "@minvws/manon/layout-column-4";
 @use "@minvws/manon/layout-centered";
 
-/* Header */
+/* Header navigation */
 @use "@minvws/manon/header";
-@use "@minvws/manon/header-navigation-base";
-
-/* Main */
-@use "@minvws/manon/main";
-
-/* Navigation */
-@use "@minvws/manon/navigation";
-
-/* Article */
-/*@use "@minvws/manon/article-base";*/
-
-/* Section */
-@use "@minvws/manon/section";
+@use "@minvws/manon/header-navigation";
+@use "@minvws/manon/header-navigation-content-wrapper";
+@use "@minvws/manon/header-navigation-collapsible";
+@use "@minvws/manon/header-navigation-link";
+@use "@minvws/manon/header-navigation-link-active";
+@use "@minvws/manon/header-navigation-button";
 
 /* Footer */
 @use "@minvws/manon/footer";
 
 /* Components */
-@use "@minvws/manon/breadcrumb-bar-content-block";
-@use "@minvws/manon/navigation-collapsible-menu";
 @use "@minvws/manon/accordion";
-@use "@minvws/manon/filter";
+@use "@minvws/manon/background-color-offset";
+@use "@minvws/manon/breadcrumb-bar";
+@use "@minvws/manon/breadcrumb-bar-content-block";
+@use "@minvws/manon/code-base";
 @use "@minvws/manon/description-list";
+@use "@minvws/manon/filter";
+@use "@minvws/manon/language-selector-list";
 @use "@minvws/manon/hero";
 @use "@minvws/manon/pagination";
 @use "@minvws/manon/tabs";
-@use "@minvws/manon/code-base";
 
 /* Button */
 @use "@minvws/manon/button-base";
@@ -82,7 +93,8 @@
 @use "@minvws/manon/button-cta";
 @use "@minvws/manon/button-icon";
 @use "@minvws/manon/list-base";
-@use "@minvws/manon/skip-to-content-base";
+@use "@minvws/manon/skip-to-content";
+@use "@minvws/manon/button-container";
 
 /* Images */
 @use "@minvws/manon/logo";
@@ -93,7 +105,8 @@
 @use "@minvws/manon/tile-groups";
 
 /* Table */
-@use "@minvws/manon/table-base"; /* Needs to be first of the set */
+@use "@minvws/manon/table";
+/* Needs to be first of the set */
 @use "@minvws/manon/table-expando-rows";
 @use "@minvws/manon/table-caption";
 @use "@minvws/manon/table-number";
@@ -119,18 +132,25 @@
 @use "@minvws/manon/form-fieldset-visually-hidden";
 @use "@minvws/manon/form-horizontal-view-fieldset";
 @use "@minvws/manon/form-fieldset-visually-hidden-horizontal-view";
-@use "@minvws/manon/form-fieldset-visually-hidden-help";
+@use "@minvws/manon/form-fieldset-radio";
+@use "@minvws/manon/form-fieldset-checkbox";
 
 /* Notifications */
-@use "@minvws/manon/notification-base";
+@use "@minvws/manon/notification";
 @use "@minvws/manon/notification-block-element";
 @use "@minvws/manon/notification-paragraph";
 @use "@minvws/manon/notification-table";
 @use "@minvws/manon/notification-error";
+@use "@minvws/manon/notification-error-page";
 @use "@minvws/manon/notification-warning";
+@use "@minvws/manon/notification-warning-page";
 @use "@minvws/manon/notification-explanation";
+@use "@minvws/manon/notification-explanation-page";
 @use "@minvws/manon/notification-confirmation";
+@use "@minvws/manon/notification-confirmation-page";
 @use "@minvws/manon/notification-system-message";
+@use "@minvws/manon/notification-system-page";
+@use "@minvws/manon/notification-form";
 
 /* Login meta */
 @use "@minvws/manon/login-meta";
@@ -139,3 +159,6 @@
 @use "@minvws/manon/tag";
 @use "@minvws/manon/tags";
 @use "@minvws/manon/tags-6-3";
+
+/* Images */
+@use "@minvws/manon/image-square";
