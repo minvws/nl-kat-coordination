@@ -36,7 +36,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
         risk_severity = RiskLevelSeverity.UNKNOWN
         risk_score = None
     else:
-        risk_score = data["impact"]["baseMetricV3"]["cvssV3"]["baseScore"]
+        try:
+            risk_score = data["impact"]["baseMetricV3"]["cvssV3"]["baseScore"]
+        except KeyError:
+            risk_score = data["impact"]["baseMetricV2"]["cvssV2"]["baseScore"]
         risk_severity = get_risk_level(risk_score)
 
     yield CVEFindingType(
