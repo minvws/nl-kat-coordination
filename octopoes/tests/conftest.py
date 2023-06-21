@@ -62,7 +62,7 @@ class MockOOIRepository(OOIRepository):
     def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
         self.oois[ooi.reference] = ooi
 
-    def get_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
+    def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
         return {ooi.primary_key: ooi for ooi in self.oois.values() if ooi.reference in references}
 
     def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
