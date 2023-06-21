@@ -302,8 +302,10 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
+                # FIXME: when tasks don't have an associated ooi
+
                 # ooi still exists?
-                ooi = self.ctx.services.octopoes.get_object_by_id(self.organisation.id, task.ooi_id)
+                ooi = self.ctx.services.octopoes.get_object(task.organization, task.input_ooi)
                 if not ooi:
                     self.logger.warning(
                         "OOI does not exist anymore [organisation_id=%s, scheduler_id=%s]",
@@ -316,7 +318,7 @@ class BoefjeScheduler(Scheduler):
                     continue
 
                 # boefje still exists?
-                boefje = self.ctx.services.katalogus.get_boefje_by_id(self.organisation.id, task.boefje_id)
+                boefje = self.ctx.services.katalogus.get_boefje(task.boefje.id)
                 if not boefje:
                     self.logger.warning(
                         "Boefje does not exist anymore [organisation_id=%s, scheduler_id=%s]",
@@ -366,8 +368,8 @@ class BoefjeScheduler(Scheduler):
 
                 executor.submit(
                     self.push_task,
-                    task.boefje,
-                    task.ooi,
+                    boefje,
+                    ooi,
                     self.push_tasks_for_rescheduling.__name__,
                 )
 

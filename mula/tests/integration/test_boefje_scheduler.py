@@ -55,9 +55,11 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
         models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
         self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
         self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
+        self.job_store = repositories.sqlalchemy.JobStore(self.mock_ctx.datastore)
 
         self.mock_ctx.pq_store = self.pq_store
         self.mock_ctx.task_store = self.task_store
+        self.mock_ctx.job_store = self.job_store
 
         # Scheduler
         self.organisation = OrganisationFactory()
@@ -586,6 +588,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
+        # Job should be in datastore
+        job = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
+        self.assertEqual(job.p_item.id, p_item.id)
+
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
         # Arrange
@@ -982,6 +988,58 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
 
+class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.mock_get_jobs = mock.patch(
+            "scheduler.context.AppContext.job_store.get_jobs",
+        ).start()
+
+        self.mock_get_object = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_object",
+        ).start()
+
+        self.mock_get_boefje = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_boefje",
+        ).start()
+
+    def test_push_tasks_for_rescheduling(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        job = models.Job(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        # Mocks
+        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_boefje.return_value = boefje
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert
+
+
 class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
@@ -1153,3 +1211,35 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+
+class TestCalculateDeadline(BoefjeSchedulerBaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+    def test_calculate_deadline(self):
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        task = models.BoefjeTask(
+            boefje=BoefjeFactory(),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        p_item = functions.create_p_item(
+            scheduler_id=self.organisation.id,
+            priority=0,
+            data=task,
+        )
+
+        # Mock
+        mock_calculate_deadline = mock.patch("scheduler.schedulers.BoefjeScheduler.calculate_deadline").start()
+
+        # Act
+        self.scheduler.push_item_to_queue(p_item)
+        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        task_db.status = models.TaskStatus.COMPLETED
+        self.mock_ctx.task_store.update_task(task_db)
+
+        # Assert
+        mock_calculate_deadline.assert_called()
+        self.assertEqual(1, mock_calculate_deadline.call_count)

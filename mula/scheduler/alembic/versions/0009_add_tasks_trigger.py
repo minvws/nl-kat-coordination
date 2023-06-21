@@ -24,10 +24,10 @@ def upgrade():
              END IF;
              RETURN NEW;
            END;
-           $$ LANGUAGE plpgsql;"""
+           $$ LANGUAGE plpgsql;
+           DROP TRIGGER IF EXISTS tasks_trigger ON tasks;
+           CREATE TRIGGER tasks_trigger AFTER UPDATE ON tasks FOR EACH ROW EXECUTE PROCEDURE tasks_trigger();"""
     )
-    op.execute("DROP TRIGGER IF EXISTS tasks_trigger ON tasks;")
-    op.execute("CREATE TRIGGER tasks_trigger AFTER UPDATE ON tasks FOR EACH ROW EXECUTE PROCEDURE tasks_trigger();")
     # ### end Alembic commands ###
 
 
