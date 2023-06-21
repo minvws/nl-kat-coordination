@@ -219,6 +219,15 @@ def client_member_b(clientuser_b, organization_b):
 
 
 @pytest.fixture
+def client_user_two_organizations(clientuser, organization, organization_b):
+    member = create_member(clientuser, organization)
+    add_client_group_permissions(member)
+    member = create_member(clientuser, organization_b)
+    add_client_group_permissions(member)
+    return clientuser
+
+
+@pytest.fixture
 def new_member(django_user_model, organization):
     user = create_user(django_user_model, "cl1@openkat.nl", "TestTest123!!", "New user", "default_new_user")
     member = create_member(user, organization)
