@@ -35,10 +35,10 @@ class MuteFindingsBulkView(OOICreateView):
         self.ooi_class = MutedFinding
         selected_findings = request.POST.getlist("finding", None)
         reason = request.POST.get("reason", None)
-        mute_findings = request.POST.get("mute_findings", None)
-        if not selected_findings and mute_findings:
+        if not selected_findings:
             messages.add_message(self.request, messages.WARNING, _("Please select at least one finding."))
         for finding in selected_findings:
             data = {"finding": finding, "reason": reason}
             self.save_ooi(data)
+        messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
         return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
