@@ -185,9 +185,9 @@ def test_create_query_from_path_abstract():
     query = Query.from_path(path).where(IPAddress, primary_key="test_pk")
 
     expected_query = """{:query {:find [(pull IPPort [*])] :where [
-     (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )
-     (or [ IPAddress :IPAddressV4/primary_key "test_pk" ] [ IPAddress :IPAddressV6/primary_key "test_pk" ] )
-     [ IPPort :IPPort/address IPAddress ]
-     [ IPPort :object_type "IPPort" ]]}})"""
+    (or [ IPAddress :IPAddressV4/primary_key "test_pk" ] [ IPAddress :IPAddressV6/primary_key "test_pk" ] )
+    (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )
+    [ IPPort :IPPort/address IPAddress ]
+    [ IPPort :object_type "IPPort" ]]}}"""
 
     assert query.format() == expected_query

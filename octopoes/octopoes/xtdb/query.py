@@ -92,6 +92,21 @@ class Query:
         if field_name not in ooi_type.__fields__:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
+        abstract_types = get_abstract_types()
+
+        if ooi_type in abstract_types:
+            if isinstance(value, str):
+                value = value.replace('"', r"\"")
+                self._add_or_statement(ooi_type, field_name, f'"{value}"')
+                return
+
+            if not isinstance(value, type):
+                raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
+
+            if issubclass(value, OOI):
+                self._add_or_statement(ooi_type, field_name, value.get_object_type())
+                return
+
         if isinstance(value, str):
             value = value.replace('"', r"\"")
             self._add_where_statement(ooi_type, field_name, f'"{value}"')
@@ -105,12 +120,6 @@ class Query:
 
         if field_name not in get_relations(ooi_type):
             raise InvalidField(f'"{field_name}" is not a relation of {ooi_type.get_object_type()}')
-
-        abstract_types = get_abstract_types()
-
-        if ooi_type in abstract_types:
-            self._add_or_statement(ooi_type, field_name, value.get_object_type())
-            return
 
         self._assert_type(value)
         self._add_where_statement(ooi_type, field_name, value.get_object_type())
