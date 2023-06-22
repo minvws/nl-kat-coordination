@@ -1,7 +1,5 @@
-from datetime import datetime, timezone
 from time import sleep
-from typing import List, Type
-from uuid import uuid4
+from typing import List
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -15,12 +13,10 @@ from tools.models import SCAN_LEVEL
 from tools.ooi_form import ClearanceFilterForm, OOIForm
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 
-from octopoes.api.models import Declaration
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types
-from rocky.bytes_client import BytesClient, get_bytes_client
 from rocky.views.mixins import (
     ConnectorFormMixin,
     MultipleOOIMixin,
@@ -69,23 +65,6 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         return context
 
 
-class OOICreateView(SingleOOIMixin):
-    ooi_class: Type[OOI] = None
-
-    def save_ooi(self, data) -> OOI:
-        new_ooi = self.ooi_class.parse_obj(data)
-
-        task_id = uuid4()
-        declaration = Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
-
-        get_bytes_client(self.organization.code).add_manual_proof(
-            task_id, BytesClient.raw_from_declarations([declaration])
-        )
-
-        self.octopoes_api_connector.save_declaration(declaration)
-        return new_ooi
-
-
 class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         self.ooi = self.get_ooi()
@@ -120,7 +99,7 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
         ]
 
 
-class BaseOOIFormView(OOICreateView, FormView):
+class BaseOOIFormView(SingleOOIMixin, FormView):
     form_class = OOIForm
 
     def get_ooi_class(self):

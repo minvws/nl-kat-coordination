@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Dict, List, Optional
 
-from django.urls import reverse
+from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 
@@ -56,7 +56,7 @@ class FindingListView(SeveritiesMixin, OctopoesView, ListView):
     def build_breadcrumbs(self):
         return [
             {
-                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
+                "url": reverse_lazy("finding_list", kwargs={"organization_code": self.organization.code}),
                 "text": _("Findings"),
             }
         ]
@@ -69,7 +69,7 @@ class Top10FindingListView(FindingListView):
     def build_breadcrumbs(self):
         return [
             {
-                "url": reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
+                "url": reverse_lazy("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
                 "text": _("Crisis room"),
             }
         ]

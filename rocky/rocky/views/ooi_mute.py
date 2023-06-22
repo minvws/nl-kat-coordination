@@ -7,7 +7,8 @@ from django.views.generic import FormView
 from tools.forms.ooi import MuteFindingForm
 
 from octopoes.models.ooi.findings import MutedFinding
-from rocky.views.ooi_view import BaseOOIDetailView, OOICreateView
+from rocky.views.mixins import SingleOOIMixin
+from rocky.views.ooi_view import BaseOOIDetailView
 
 
 class MuteFindingView(OrganizationPermissionRequiredMixin, BaseOOIDetailView, FormView):
@@ -30,7 +31,7 @@ class MuteFindingView(OrganizationPermissionRequiredMixin, BaseOOIDetailView, Fo
         return context
 
 
-class MuteFindingsBulkView(OOICreateView):
+class MuteFindingsBulkView(SingleOOIMixin):
     def post(self, request, *args, **kwargs):
         self.ooi_class = MutedFinding
         selected_findings = request.POST.getlist("finding", None)
