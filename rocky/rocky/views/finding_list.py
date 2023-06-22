@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from rocky.views.mixins import FindingList, OctopoesView, SeveritiesMixin
@@ -45,7 +46,7 @@ def generate_findings_metadata(
     return sort_by_severity_desc(findings_meta)
 
 
-class FindingListView(SeveritiesMixin, OctopoesView, ListView):
+class FindingListView(BreadcrumbsMixin, SeveritiesMixin, OctopoesView, ListView):
     template_name = "findings/finding_list.html"
     paginate_by = 20
 
