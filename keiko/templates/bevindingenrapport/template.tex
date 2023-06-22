@@ -132,6 +132,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 \bgroup{}
 \def\arraystretch{1.2}
 \section{Bevinding types}
+\resizebox{\columnwidth}{!}{
 \begin{tabular}{ llr }
 	Risico niveau & Bevindingstype & Voorvallen \\\toprule
 	\midrule
@@ -139,7 +140,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 		\colorbox{box-color-@@{ occurrence.finding_type.risk_severity }@@}{ \color{color-@@{ occurrence.finding_type.risk_severity }@@} @@{ occurrence.finding_type.risk_severity }@@ } & @@{ occurrence.finding_type.id }@@ & @@{occurrence.list|length}@@ \\
 	{% endfor %}
 	\bottomrule
-\end{tabular}
+\end{tabular}}
 \egroup{}
 
 
