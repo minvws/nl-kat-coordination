@@ -56,7 +56,7 @@ we assume that OpenKAT listens on the server to port 8000, you could check this 
 Logging
 =======
 
-We write the log files inthe directory /var/log/nginx/. If you rename the log files (in particular, give them an extension other than .log) or put them in a different place, you will have to reconfigure Logrotate for this as well, otherwise the log files will continue to grow indefinitely. For this, see the configuration in the file /etc/logrotate.d/nginx
+We write the log files in the directory /var/log/nginx/. If you rename the log files (in particular, give them an extension other than .log) or put them in a different place, you will have to reconfigure Logrotate for this as well, otherwise the log files will continue to grow indefinitely. For this, see the configuration in the file /etc/logrotate.d/nginx
 
 Activation
 ==========
