@@ -1232,13 +1232,14 @@ class TestCalculateDeadline(BoefjeSchedulerBaseTestCase):
         )
 
         # Mock
-        mock_calculate_deadline = mock.patch("scheduler.schedulers.BoefjeScheduler.calculate_deadline").start()
+        mock_calculate_deadline = mock.patch("scheduler.schedulers.BoefjeScheduler.handle_signal_task_updated").start()
 
         # Act
         self.scheduler.push_item_to_queue(p_item)
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
         task_db.status = models.TaskStatus.COMPLETED
         self.mock_ctx.task_store.update_task(task_db)
+        self.scheduler.handle_signal_task_updated(task_db)
 
         # Assert
         mock_calculate_deadline.assert_called()

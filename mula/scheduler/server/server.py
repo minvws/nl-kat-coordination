@@ -325,6 +325,9 @@ class Server:
                 detail="failed to update task",
             ) from exc
 
+        # TODO: background task
+        self._signal_task_updated(updated_task)
+
         return updated_task
 
     def get_queues(self) -> Any:
@@ -410,6 +413,17 @@ class Server:
             ) from exc_not_allowed
 
         return models.PrioritizedItem(**p_item.dict())
+
+    def _signal_task_updated(self, task: models.Task) -> None:
+        scheduler_id = task.scheduler_id
+        if scheduler_id is None:
+            raise ValueError("scheduler_id is None")
+
+        s = self.schedulers.get(scheduler_id)
+        if s is None:
+            raise ValueError("scheduler not found")
+
+        s.handle_signal_task_updated(task)
 
     def run(self) -> None:
         uvicorn.run(

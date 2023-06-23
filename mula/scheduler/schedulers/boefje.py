@@ -77,12 +77,6 @@ class BoefjeScheduler(Scheduler):
         )
 
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-task_update",
-            target=self.listeners["task_update"].listen,
-            loop=True,
-        )
-
-        self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-new_boefjes",
             target=self.push_tasks_for_new_boefjes,
             interval=60.0,
@@ -105,12 +99,6 @@ class BoefjeScheduler(Scheduler):
         )
 
         self.listeners["scan_profile_mutations"] = lst_scan_profile
-
-        lst_task_update = listeners.TaskUpdate(
-            engine=self.ctx.datastore.engine,
-            func=self.calculate_deadline,
-        )
-        self.listeners["task_update"] = lst_task_update
 
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
@@ -784,5 +772,25 @@ class BoefjeScheduler(Scheduler):
 
         return boefjes
 
-    def calculate_deadline(self):
-        self.logger.info("CALCULATE DEADLINE")
+    def handle_signal_task_updated(self, task: models.Task) -> None:
+        """Update a task when a signal is received.
+
+        Args:
+            task: The task to update.
+        """
+        if task.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
+            return
+
+        BoefjeTask.from_task(task)
+
+        job = self.ctx.job_store.get_job_by_hash(task.hash)
+        if job is None:
+            return
+
+        if job.deadline is not None:
+            return
+
+        # FIXME: this should be calculate based on prior tasks
+        job.deadline = datetime.now(timezone.utc) + timedelta(days=1)
+
+        self.ctx.job_store.update_job(job)

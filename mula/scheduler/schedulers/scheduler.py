@@ -92,6 +92,10 @@ class Scheduler(abc.ABC):
     def run(self) -> None:
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def handle_signal_task_updated(self, task: models.Task) -> None:
+        pass
+
     def post_push(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being added to the queue. We
         persist a task to the datastore with the status QUEUED
