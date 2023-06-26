@@ -51,7 +51,7 @@ Then put the following content in there, but insert the domain name openkat.exam
     }
 
 With this, we have set up minimal things for OpenKAT. Much more is possible, but this is the minimum we need to use OpenKAT properly.
-we assume that OpenKAT listens on the server to port 8000, you could check this by doing 'wget -O- localhost:8000' it should show you some html output.
+we assume that OpenKAT listens on the server to port 8000, you could check this by doing `wget -O- localhost:8000` it should show you some html output.
 
 Logging
 =======
