@@ -9,16 +9,6 @@ Install dependencies
 python3 -m pip install -r requirements.txt
 ```
 
-## Environment variables
-```bash
-export XTDB_URI="http://xtdb.local"
-export QUEUE_URI="amqp://guest:guest@localhost:5672/%2fkat"
-
-# Optional
-export LOG_CFG="logging.yml"
-export QUEUE_NAME_OCTOPOES="octopoes"
-```
-
 ### Run Octopoes API
 ```bash
 python3 -m uvicorn octopoes.api.api:app [--port 8000]

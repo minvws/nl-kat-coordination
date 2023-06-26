@@ -52,30 +52,6 @@ Currently, the settings are encrypted when stored, and returned decrypted.
 This could be changed in the future when the boefje-runner/plugin-code can decrypt the secrets itself,
 although this would be more complicated.
 
-## Environment variables
-By design, Boefjes do not have access to the host system's environment variables.
-If a Boefje requires access to a system-wide variable (e.g. `HTTP_PROXY` or `USER_AGENT`), it should note as such in its `boefje.json` manifest.
-These system-wide variables can be set in OpenKAT's global `.env`, by prefixing it with `BOEFJE_`.
-This is to prevent a Boefje from accessing variables it should not have access to, such as secrets.
-To illustrate: if `BOEFJE_HTTP_PROXY=HTTP_PROXY` is set in the global `.env`, the Boefje can access it as `HTTP_PROXY`.
-This feature can also be used to set default values for Katalogus settings. For example, configuring `BOEFJE_TOP_PORTS`
-in the global `.env` will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
-This default value can be overridden by setting any value for `TOP_PORTS` in the Katalogus.
-
-
-| Environment variable       | Value                        | Description                                       |
-|----------------------------|------------------------------|---------------------------------------------------|
-| QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                            |
-| QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                        |
-| QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                 |
-| OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                          |
-| BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                             |
-| KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                         |
-| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                         |
-| ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings      |
-| KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string |
-| KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string  |
-
 ## Design
 
 Boefjes will run as containerized workers pulling jobs from a centralized job queue:
