@@ -134,27 +134,36 @@ class SchedulerWorkerManager(WorkerManager):
             logger.warning(
                 "Worker[pid=%s, %s] not alive, creating new worker...", worker.pid, _format_exit_code(worker.exitcode)
             )
-            handling_task_id = self.handling_tasks[worker.pid]
 
-            try:
-                task = self.scheduler_client.get_task(handling_task_id)
-
-                if task.status is TaskStatus.DISPATCHED:
-                    try:
-                        self.scheduler_client.patch_task(str(task.id), TaskStatus.FAILED)
-                        logger.warning("Set status to failed in the scheduler for task[id=%s]", handling_task_id)
-                    except HTTPError:
-                        logger.exception("Could not patch scheduler task to failed")
-            except HTTPError:
-                logger.exception("Could not get scheduler task[id=%s]", handling_task_id)
-
+            self._cleanup_pending_worker_task(worker)
             worker.close()
+
             new_worker = mp.Process(target=_start_working, args=self.worker_args)
             new_worker.start()
-
             new_workers.append(new_worker)
 
         return new_workers
+
+    def _cleanup_pending_worker_task(self, worker: mp.Process) -> None:
+        if worker.pid not in self.handling_tasks:
+            logger.warning(
+                "No pending task found for Worker[pid=%s, %s]", worker.pid, _format_exit_code(worker.exitcode)
+            )
+            return
+
+        handling_task_id = self.handling_tasks[worker.pid]
+
+        try:
+            task = self.scheduler_client.get_task(handling_task_id)
+
+            if task.status is TaskStatus.DISPATCHED:
+                try:
+                    self.scheduler_client.patch_task(str(task.id), TaskStatus.FAILED)
+                    logger.warning("Set status to failed in the scheduler for task[id=%s]", handling_task_id)
+                except HTTPError:
+                    logger.exception("Could not patch scheduler task to failed")
+        except HTTPError:
+            logger.exception("Could not get scheduler task[id=%s]", handling_task_id)
 
 
 def _format_exit_code(exitcode: int) -> str:
