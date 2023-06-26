@@ -38,6 +38,7 @@ from onboarding.forms import (
     OnboardingSetClearanceLevelForm,
 )
 from onboarding.view_helpers import (
+    ONBOARIDNG_PERMS,
     KatIntroductionAdminStepsMixin,
     KatIntroductionRegistrationStepsMixin,
     KatIntroductionStepsMixin,
@@ -69,9 +70,7 @@ class OnboardingStart(OrganizationView):
     def get(self, request, *args, **kwargs):
         if request.user.is_superuser:
             return redirect("step_introduction_registration")
-        if self.organization_member.has_perms(
-            ["can_scan_organization", "can_set_clearance_level", "can_enable_disable_boefje"]
-        ):
+        if self.organization_member.has_perms(ONBOARIDNG_PERMS):
             return redirect("step_introduction", kwargs={"organization_code": self.organization.code})
         return redirect("crisis_room")
 
@@ -117,7 +116,7 @@ class OnboardingSetupScanSelectPluginsView(
     template_name = "step_3e_setup_scan_select_plugins.html"
     current_step = 3
     report: Type[Report] = DNSReport
-    permission_required = "tools.can_scan_organization"
+    permission_required = "tools.can_enable_disable_boefje"
 
     def get_form(self):
         boefjes = self.report.get_boefjes(self.organization)
@@ -677,9 +676,7 @@ class CompleteOnboarding(OrganizationView):
     """
 
     def get(self, request, *args, **kwargs):
-        if self.request.user.is_superuser and not self.organization_member.has_perms(
-            ["can_scan_organization", "can_set_clearance_level", "can_enable_disable_boefje"]
-        ):
+        if self.request.user.is_superuser and not self.organization_member.has_perms(ONBOARIDNG_PERMS):
             return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
         self.organization_member.onboarded = True
         self.organization_member.status = OrganizationMember.STATUSES.ACTIVE

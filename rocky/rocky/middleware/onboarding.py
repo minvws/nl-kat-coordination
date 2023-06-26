@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from django.urls.base import reverse
+from onboarding.view_helpers import ONBOARIDNG_PERMS
 from tools.models import OrganizationMember
 
 
@@ -32,9 +33,7 @@ def OnboardingMiddleware(get_response):
                 member = OrganizationMember.objects.filter(user=request.user)
 
                 # Members with these permissions can run a full DNS-report onboarding.
-                if member.exists() and member.first().has_perms(
-                    ["can_scan_organization", "can_set_clearance_level", "can_enable_disable_boefje"]
-                ):
+                if member.exists() and member.first().has_perms(ONBOARIDNG_PERMS):
                     # a redteamer can be in many organizations, but we onboard the first one.
                     return redirect(
                         reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
