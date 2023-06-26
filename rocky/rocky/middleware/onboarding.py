@@ -34,7 +34,6 @@ def OnboardingMiddleware(get_response):
 
                 # Members with these permissions can run a full DNS-report onboarding.
                 if member.exists() and member.first().has_perms(ONBOARIDNG_PERMS):
-                    # a redteamer can be in many organizations, but we onboard the first one.
                     return redirect(
                         reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
                     )
