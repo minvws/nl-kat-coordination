@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from tools.forms.findings import FindingSeveritiesForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -53,6 +54,11 @@ class FindingListView(BreadcrumbsMixin, SeveritiesMixin, OctopoesView, ListView)
     def get_queryset(self) -> FindingList:
         severities = self.get_severities()
         return FindingList(self.octopoes_api_connector, self.get_observed_at(), severities)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["severity_filter_form"] = FindingSeveritiesForm()
+        return context
 
     def build_breadcrumbs(self):
         return [

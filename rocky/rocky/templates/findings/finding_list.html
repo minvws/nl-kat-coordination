@@ -13,15 +13,15 @@
                 <h1>{% translate "Findings" %}</h1>
                 <p>
                     {% blocktranslate trimmed with observed_at|date as date %}
-        An overview of all findings OpenKAT found on {{ date }}. Each finding relates to an object.
-        Click a finding for additional information.
-      {% endblocktranslate %}
+                        An overview of all findings OpenKAT found on cookie. Each finding relates to an object.
+                        Click a finding for additional information.
+                    {% endblocktranslate %}
                 </p>
                 {{ object_type_filters }}
                 {% include "partials/findings_list_toolbar.html" %}
 
                 {% translate "Object list" as filter_title %}
-                {% include "partials/ooi_list_filters.html" with title=filter_title %}
+                {% include "findings/findings_filter.html" %}
 
                 <div class="horizontal-scroll">
                     <table class="action-buttons nowrap">
@@ -92,9 +92,7 @@
                                             </tr>
                                             <tr>
                                                 <td>{% translate "Risk score:" %}</td>
-                                                <td>
-                                                    {{ hydrated_finding.finding_type.risk_score }}
-                                                </td>
+                                                <td>{{ hydrated_finding.finding_type.risk_score }}</td>
                                             </tr>
                                         </table>
                                     </td>
@@ -111,5 +109,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

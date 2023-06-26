@@ -1,0 +1,22 @@
+{% extends "partials/list_filters.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load i18n %}
+
+{% block title %}
+    {% if count %}<span>{{ count }}</span>{% endif %}
+    {{ title }}
+{% endblock title %}
+{% block filter_form %}
+    <form method="get">
+        {% translate "Filter by Severity" as fieldset_legend %}
+        {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=severity_filter_form %}
+
+        <div class="button-container">
+            <input type="submit"
+                   value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}"/>
+            <input class="ghost" type="submit" value="{% translate "Clear filters" %}"/>
+        </div>
+    </form>
+{% endblock filter_form %}
