@@ -61,6 +61,9 @@ class SchedulerClientInterface:
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
         raise NotImplementedError()
 
+    def get_task(self, task_id: str) -> Task:
+        raise NotImplementedError()
+
 
 class LogRetry(Retry):
     """Add a log when retrying a request"""
@@ -100,3 +103,9 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
         response = self._session.patch(f"{self.base_url}/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
+
+    def get_task(self, task_id: str) -> Task:
+        response = self._session.get(f"{self.base_url}/tasks/{task_id}")
+        self._verify_response(response)
+
+        return parse_obj_as(Task, response.json())
