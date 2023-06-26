@@ -32,7 +32,7 @@ By default, on Ubuntu systems, nginx puts its configurations in the directory /e
 
     $ nano /etc/nginx/sites-available/openkat.example.com
 
-Then put the following content in there, but insert the domain name openkat.example.com into the domainname you are pointing to this Openkat install:
+Then put the following content in there, but insert the domain name openkat.example.com into the domain name you are pointing to this OpenKAT install:
 
 .. code-block:: sh
 
