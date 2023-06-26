@@ -85,7 +85,17 @@ if SPAN_EXPORT_GRPC_ENDPOINT is not None:
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 EMAIL_FILE_PATH = env.path("EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs")  # directory to store output files
 EMAIL_HOST = env("EMAIL_HOST", default="localhost")  # localhost
-EMAIL_PORT = env.int("EMAIL_PORT", default=25)  # 25
+try:
+    EMAIL_PORT = env.int("EMAIL_PORT", default=25)
+except ValueError:
+    # We have an empty EMAIL_PORT= to rocky.conf in the Debian package. We
+    # handle the empty string as default value here so we don't generate an
+    # exception for this
+    if env("EMAIL_PORT"):
+        raise
+
+    EMAIL_PORT = 25
+
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="")
