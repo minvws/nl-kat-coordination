@@ -2,11 +2,8 @@
 Environment variables
 =====================
 
-OpenKAT has Debian packages available. In the near future we will have an apt
-repository that will allow you to keep your installation up-to-date using apt.
-An installation of KAT can be done on a single machine or spread out on several
-machines for a high availability setup. This guide will take you through the
-steps for installing it on a single machine.
+We strive to keep ``.env-dist`` complete with all relevant environment variables and their default values.
+Not all services require all environment variables, but we use a unified file to keep things simple.
 
 
 
@@ -43,8 +40,6 @@ This default value can be overridden by setting any value for `TOP_PORTS` in the
 
 Keiko
 =====
-See available environment variables at [.env-dist](.env-dist)
-
 The `templates`, `glossaries` and `assets` folders should for now point to the corresponding folders in the repository.
 Example with environment variables, assuming that the keiko code lives in `/app/keiko`:
 ```bash
