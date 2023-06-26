@@ -11,6 +11,7 @@ Test Teardown       Teardown Test
 
 *** Test Cases ***
 Inheritance Of Two Declared Scan Profiles
+    Await Sync
     Declare Scan Profile    ${REF_HOSTNAME}    ${4}
     Declare Scan Profile    ${REF_IPADDR}    ${2}
     Await Sync
@@ -80,14 +81,6 @@ Set Scan Profile To Empty
     ...    json=${data}
     ...    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
-
-Recalculate Scan Profiles
-    ${params}    Get Valid Time Params
-    ${response}    Get
-    ...    ${OCTOPOES_URI}/scan_profiles/recalculate
-    ...    params=${params}
-    Should Be Equal As Integers    ${response.status_code}    200
-    Await Sync
 
 Verify Scan Level
     [Arguments]    ${reference}    ${scan_level}
