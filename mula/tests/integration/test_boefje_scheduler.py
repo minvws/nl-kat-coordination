@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
+from scheduler import config, connectors, models, repositories, schedulers
 
 from tests.factories import (
     BoefjeFactory,
@@ -64,23 +64,9 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
         # Scheduler
         self.organisation = OrganisationFactory()
 
-        queue = queues.BoefjePriorityQueue(
-            pq_id=self.organisation.id,
-            maxsize=cfg.pq_maxsize,
-            item_type=models.BoefjeTask,
-            allow_priority_updates=True,
-            pq_store=self.pq_store,
-        )
-
-        ranker = rankers.BoefjeRanker(
-            ctx=self.mock_ctx,
-        )
-
         self.scheduler = schedulers.BoefjeScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
-            queue=queue,
-            ranker=ranker,
             organisation=self.organisation,
         )
 
@@ -115,12 +101,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=4, consumes=[ooi.object_type])
 
         # Act
-        with self.assertLogs("scheduler.schedulers", level="DEBUG") as cm:
-            allowed_to_run = self.scheduler.is_task_allowed_to_run(ooi=ooi, boefje=boefje)
+        allowed_to_run = self.scheduler.is_task_allowed_to_run(ooi=ooi, boefje=boefje)
 
         # Assert
         self.assertFalse(allowed_to_run)
-        self.assertIn("is too intense", cm.output[-1])
 
     def test_is_task_not_running(self):
         """When both the task cannot be found in the datastore and bytes
@@ -1040,179 +1024,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert
 
 
-class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
-    def setUp(self):
-        super().setUp()
-
-        self.mock_is_task_running = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.is_task_running",
-            return_value=False,
-        ).start()
-
-        self.mock_is_task_allowed_to_run = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run",
-            return_value=True,
-        ).start()
-
-        self.mock_has_grace_period_passed = mock.patch(
-            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
-            return_value=True,
-        ).start()
-
-        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
-
-        self.mock_get_random_objects = mock.patch(
-            "scheduler.context.AppContext.services.octopoes.get_random_objects"
-        ).start()
-
-    def test_push_tasks_for_random_objects(self):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        self.mock_get_boefjes_for_ooi.return_value = [boefje]
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    @mock.patch("scheduler.context.AppContext.task_store.get_tasks_by_hash")
-    def test_push_tasks_for_random_objects_prior_tasks(self, mock_get_tasks_by_hash):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        p_item = models.PrioritizedItem(
-            id=task.id,
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-            data=task,
-            hash=task.hash,
-        )
-
-        task_db = models.Task(
-            id=p_item.id,
-            scheduler_id=self.scheduler.scheduler_id,
-            type="boefje",
-            p_item=p_item,
-            status=models.TaskStatus.COMPLETED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
-
-        # Mocks
-        self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        self.mock_get_boefjes_for_ooi.return_value = [boefje]
-
-        mock_get_tasks_by_hash.return_value = [task_db]
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-    def test_push_tasks_for_random_objects_no_boefjes_found(self):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-
-        # Mocks
-        self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        self.mock_get_boefjes_for_ooi.return_value = []
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    def test_push_tasks_for_random_objects_not_allowed_to_run(self):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_is_task_allowed_to_run.return_value = False
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    def test_push_tasks_for_random_objects_still_running(self):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        self.mock_get_boefjes_for_ooi.return_value = [boefje]
-        self.mock_is_task_running.return_value = True
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should not be on priority queue
-        self.assertEqual(0, self.scheduler.queue.qsize())
-
-    def test_push_tasks_for_random_objects_item_on_queue(self):
-        # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-
-        # Mocks
-        self.mock_get_random_objects.side_effect = [[ooi], [], [], []]
-        self.mock_get_boefjes_for_ooi.return_value = [boefje]
-
-        # Act
-        self.scheduler.push_tasks_for_random_objects()
-
-        # Task should be on priority queue
-        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
-        self.assertEqual(1, self.scheduler.queue.qsize())
-        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
-        self.assertEqual(boefje.id, task_pq.boefje.id)
-
-        # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
-
-
 class TestCalculateDeadline(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
@@ -1232,7 +1043,7 @@ class TestCalculateDeadline(BoefjeSchedulerBaseTestCase):
         )
 
         # Mock
-        mock_calculate_deadline = mock.patch("scheduler.schedulers.BoefjeScheduler.handle_signal_task_updated").start()
+        mock_handle_signal = mock.patch("scheduler.schedulers.BoefjeScheduler.handle_signal_task_updated").start()
 
         # Act
         self.scheduler.push_item_to_queue(p_item)
@@ -1242,5 +1053,5 @@ class TestCalculateDeadline(BoefjeSchedulerBaseTestCase):
         self.scheduler.handle_signal_task_updated(task_db)
 
         # Assert
-        mock_calculate_deadline.assert_called()
-        self.assertEqual(1, mock_calculate_deadline.call_count)
+        mock_handle_signal.assert_called()
+        self.assertEqual(1, mock_handle_signal.call_count)

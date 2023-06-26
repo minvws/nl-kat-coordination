@@ -24,9 +24,8 @@ class NormalizerScheduler(Scheduler):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue,
-        ranker: rankers.Ranker,
         organisation: Organisation,
+        queue: Optional[queues.PriorityQueue] = None,
         callback: Optional[Callable[..., None]] = None,
         populate_queue_enabled: bool = True,
     ):
@@ -36,10 +35,20 @@ class NormalizerScheduler(Scheduler):
         super().__init__(
             ctx=ctx,
             scheduler_id=scheduler_id,
-            queue=queue,
-            ranker=ranker,
             callback=callback,
             populate_queue_enabled=populate_queue_enabled,
+        )
+
+        self.queue = queue or queues.NormalizerPriorityQueue(
+            pq_id=self.scheduler_id,
+            maxsize=self.ctx.config.pq_maxsize,
+            item_type=NormalizerTask,
+            allow_priority_updates=True,
+            pq_store=self.ctx.pq_store,
+        )
+
+        self.ranker = rankers.NormalizerRanker(
+            ctx=self.ctx,
         )
 
         self.initialize_listeners()

@@ -39,9 +39,8 @@ class BoefjeScheduler(Scheduler):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue,
-        ranker: rankers.Ranker,
         organisation: Organisation,
+        queue: Optional[queues.PriorityQueue] = None,
         callback: Optional[Callable[..., None]] = None,
         populate_queue_enabled: bool = True,
     ):
@@ -51,10 +50,24 @@ class BoefjeScheduler(Scheduler):
         super().__init__(
             ctx=ctx,
             scheduler_id=scheduler_id,
-            queue=queue,
-            ranker=ranker,
             callback=callback,
             populate_queue_enabled=populate_queue_enabled,
+        )
+
+        self.queue = queue or queues.BoefjePriorityQueue(
+            pq_id=self.scheduler_id,
+            maxsize=self.ctx.config.pq_maxsize,
+            item_type=models.BoefjeTask,
+            allow_priority_updates=True,
+            pq_store=self.ctx.pq_store,
+        )
+
+        self.boefje_ranker = rankers.BoefjeRanker(
+            ctx=self.ctx,
+        )
+
+        self.job_ranker = rankers.JobDeadlineRanker(
+            ctx=self.ctx,
         )
 
         self.initialize_listeners()
@@ -611,7 +624,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
-        score = self.ranker.rank(
+        score = self.boefje_ranker.rank(
             SimpleNamespace(
                 prior_tasks=prior_tasks,
                 task=task,
@@ -781,16 +794,17 @@ class BoefjeScheduler(Scheduler):
         if task.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
             return
 
-        BoefjeTask.from_task(task)
+        boefje_task = BoefjeTask(**task.p_item.data)
 
-        job = self.ctx.job_store.get_job_by_hash(task.hash)
+        job = self.ctx.job_store.get_job_by_hash(boefje_task.hash)
         if job is None:
             return
 
         if job.deadline is not None:
             return
 
-        # FIXME: this should be calculate based on prior tasks
-        job.deadline = datetime.now(timezone.utc) + timedelta(days=1)
+        # FIXME: this should be calculated based on prior tasks
+        # FIXME: think about rankers
+        job.deadline = datetime.fromtimestamp(self.job_ranker.rank(job))
 
         self.ctx.job_store.update_job(job)

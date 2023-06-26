@@ -6,11 +6,23 @@ from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, queues, rankers, repositories, schedulers, server
+from scheduler import config, models, queues, repositories, schedulers, server
 
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 from tests.utils.functions import create_p_item
+
+
+class MockScheduler(schedulers.Scheduler):
+    def __init__(self, ctx, scheduler_id, queue, organisation):
+        super().__init__(ctx, scheduler_id, queue, organisation)
+        self._populate_queue_enabled = True
+
+    def populate_queue(self):
+        pass
+
+    def run(self):
+        pass
 
 
 class MockPriorityQueue(queues.PriorityQueue):
@@ -46,15 +58,10 @@ class APITemplateTestCase(unittest.TestCase):
             pq_store=self.pq_store,
         )
 
-        ranker = rankers.BoefjeRanker(
-            ctx=self.mock_ctx,
-        )
-
-        self.scheduler = schedulers.BoefjeScheduler(
+        self.scheduler = MockScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
             queue=queue,
-            ranker=ranker,
             organisation=self.organisation,
         )
 

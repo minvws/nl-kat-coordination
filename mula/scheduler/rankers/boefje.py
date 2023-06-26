@@ -56,4 +56,5 @@ class BoefjeRankerTimeBased(Ranker):
 
 class JobDeadlineRanker(Ranker):
     def rank(self, obj: Any) -> int:
-        return obj.deadline
+        # TODO: make more sophisticated calculation
+        return int((datetime.now(timezone.utc) + timedelta(days=1)).timestamp())

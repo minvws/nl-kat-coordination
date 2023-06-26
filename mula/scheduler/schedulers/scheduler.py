@@ -6,7 +6,7 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from scheduler import connectors, context, models, queues, rankers, utils
+from scheduler import connectors, context, models, queues, utils
 from scheduler.utils import thread
 
 
@@ -48,8 +48,7 @@ class Scheduler(abc.ABC):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue,
-        ranker: rankers.Ranker,
+        queue: queues.PriorityQueue = None,
         callback: Optional[Callable[..., None]] = None,
         populate_queue_enabled: bool = True,
         max_tries: int = -1,
@@ -76,8 +75,8 @@ class Scheduler(abc.ABC):
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.scheduler_id = scheduler_id
+
         self.queue: queues.PriorityQueue = queue
-        self.ranker: rankers.Ranker = ranker
 
         self.populate_queue_enabled: bool = populate_queue_enabled
         self.max_tries: int = max_tries
@@ -92,7 +91,6 @@ class Scheduler(abc.ABC):
     def run(self) -> None:
         raise NotImplementedError
 
-    @abc.abstractmethod
     def handle_signal_task_updated(self, task: models.Task) -> None:
         pass
 

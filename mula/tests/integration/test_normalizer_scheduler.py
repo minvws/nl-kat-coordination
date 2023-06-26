@@ -2,7 +2,7 @@ import datetime
 import unittest
 from unittest import mock
 
-from scheduler import config, models, queues, rankers, repositories, schedulers
+from scheduler import config, models, queues, repositories, schedulers
 
 from tests.factories import (
     BoefjeMetaFactory,
@@ -43,15 +43,10 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
             pq_store=self.pq_store,
         )
 
-        ranker = rankers.NormalizerRanker(
-            ctx=self.mock_ctx,
-        )
-
         self.scheduler = schedulers.NormalizerScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
             queue=queue,
-            ranker=ranker,
             organisation=self.organisation,
         )
 
