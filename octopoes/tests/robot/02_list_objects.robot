@@ -19,6 +19,7 @@ List Objects With Filter
 
 List Random Objects With Filter
     Insert Normalizer Output
+    Await Sync
     Declare Scan Profile    ${REF_HOSTNAME}    ${1}
     Await Sync
     Recalculate Scan Profiles
