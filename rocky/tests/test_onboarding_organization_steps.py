@@ -164,7 +164,7 @@ def test_onboarding_set_clearance_level(
         )
 
 
-@pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
 def test_onboarding_select_plugins(
     request,
     member,
@@ -191,6 +191,24 @@ def test_onboarding_select_plugins(
     assertContains(response, "Suggested plugins")
     assertContains(response, "Skip onboarding")
     assertContains(response, "Enable and start scan")
+
+
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_onboarding_select_plugins_perms(
+    request,
+    member,
+    rf,
+    mock_views_katalogus,
+    mock_organization_view_octopoes,
+    network,
+):
+    mock_organization_view_octopoes().get.return_value = network
+    member = request.getfixturevalue(member)
+    request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi_id": "Network|internet"}), member.user)
+
+    request.session["clearance_level"] = "2"
+    with pytest.raises(PermissionDenied):
+        OnboardingSetupScanSelectPluginsView.as_view()(request, organization_code=member.organization.code)
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
