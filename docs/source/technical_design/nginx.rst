@@ -85,7 +85,7 @@ SSL certificates
 ================
 
 With this basic configuration, we can then let Certbot arrange an SSL certificate; Certbot itself will also take care of setting this up in your web server configuration.
-Before we can setup a certificate, you need to make sure the domainname you used in the earlier config points to the external IP address for the host running nginx.
+Before we can setup a certificate, you need to make sure the domain name you used in the earlier config points to the external IP address for the host running nginx.
 
 This is very simple: you just need to start Certbot and answer the questions. Starting Certbot is done with the following command:
 
