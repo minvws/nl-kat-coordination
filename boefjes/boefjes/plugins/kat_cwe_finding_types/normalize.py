@@ -13,8 +13,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     cwe_finding_type_id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
     data = json.loads(raw)
 
-    data["description"]
-
     risk_severity = RiskLevelSeverity.UNKNOWN
     risk_score = None
 
