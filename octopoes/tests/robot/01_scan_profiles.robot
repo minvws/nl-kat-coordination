@@ -38,6 +38,7 @@ Inheritance Of Two Declared Scan Profiles
 Recalculate Inheritance After Modification
     Declare Scan Profile    ${REF_HOSTNAME}    ${4}
     Declare Scan Profile    ${REF_IPADDR}    ${2}
+    Await Sync
     Recalculate Scan Profiles
     Set Scan Profile To Empty    ${REF_HOSTNAME}
     Recalculate Scan Profiles
