@@ -81,11 +81,10 @@ def xtdb_session(
 ) -> Generator[XTDBSession, None, None]:
     session = XTDBSession(get_xtdb_client(settings_.xtdb_uri, client, settings_.xtdb_type))
 
-    try:
-        yield session
-    finally:
-        session.commit()
-        logger.info("Committed XTDBSession")
+    yield session
+    session.commit()
+
+    logger.info("Committed XTDBSession")
 
 
 def octopoes_service(
