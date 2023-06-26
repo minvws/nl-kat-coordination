@@ -12,6 +12,7 @@ ${REF_HSTS_FINDING}     Finding|HTTPHeader|internet|1.1.1.1|tcp|80|http|internet
 *** Test Cases ***
 HSTS Header With Config
     Insert Observation    tests/fixtures/normalizer_output_http.json
+    Await Sync
     Insert Observation    tests/fixtures/normalizer_output_config.json
     Await Sync
     Declare Scan Profile    ${REF_HOSTNAME}    ${4}
