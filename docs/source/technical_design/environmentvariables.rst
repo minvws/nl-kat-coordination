@@ -47,11 +47,11 @@ Bind your new implementation in ``bytes.timestamping.provider::create_hash_repos
 
 The secure-hashing-algorithm can be specified with an env var: ``HASHING_ALGORITHM="SHA512"``.
 
-```bash
-HASHING_ALGORITHM="SHA512"
-EXT_HASH_SERVICE="IN_MEMORY"
-PASTEBIN_API_DEV_KEY=""
-```
+.. code-block:: bash
+
+    HASHING_ALGORITHM="SHA512"
+    EXT_HASH_SERVICE="IN_MEMORY"
+    PASTEBIN_API_DEV_KEY=""
 
 Files in bytes can be saved encrypted to disk,
 the implementation can be set using an env-var, ``ENCRYPTION_MIDDLEWARE``. The options are:
@@ -59,13 +59,6 @@ the implementation can be set using an env-var, ``ENCRYPTION_MIDDLEWARE``. The o
 - ``"IDENTITY"``
 - ``"NACL_SEALBOX"``
 
-``IDENTITY`` means using no encryption.
-
+``"IDENTITY"`` means using no encryption.
 
 The ``"NACL_SEALBOX"`` option requires the ``KAT_PRIVATE_KEY_B64`` and ``VWS_PUBLIC_KEY_B64`` env vars.
-
-```bash
-ENCRYPTION_MIDDLEWARE="IDENTITY"
-KAT_PRIVATE_KEY_B64=""
-VWS_PUBLIC_KEY_B64=""
-```
