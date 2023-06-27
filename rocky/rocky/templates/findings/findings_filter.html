@@ -9,14 +9,16 @@
     {{ title }}
 {% endblock title %}
 {% block filter_form %}
-    <form method="get">
-        {% translate "Filter by Severity" as fieldset_legend %}
-        {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=severity_filter_form %}
+    <form method="get" class="help">
+        {% include "partials/form/fieldset.html" with fields=observed_at_form %}
+        {% include "partials/form/fieldset.html" with fields=muted_findings_filter_form %}
+        {% include "partials/form/fieldset.html" with fields=severity_filter_form %}
 
         <div class="button-container">
             <input type="submit"
                    value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}"/>
-            <input class="ghost" type="submit" value="{% translate "Clear filters" %}"/>
+            <a href="{% url 'finding_list' view.kwargs.organization_code %}"
+               class="button ghost">{% translate "Clear filters" %}</a>
         </div>
     </form>
 {% endblock filter_form %}
