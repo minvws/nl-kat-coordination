@@ -74,6 +74,7 @@ repos:
         exclude: |
           (?x)(
           \.po$ |
+          \.xml$ |
           poetry.lock$ |
           requirements-.*.txt$ |
           retirejs.json$ |
