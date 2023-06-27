@@ -85,8 +85,3 @@ clean:
 	rm -f debian/*.substvars
 	rm -f debian/*.debhelper.log
 	rm -f debian/changelog
-
-export-requirements: ## Export the requirements to requirements.txt format
-	poetry export --output requirements.txt --without-hashes && \
-	poetry export --output requirements-dev.txt --with dev --without-hashes
-	poetry export --output requirements-check.txt --only dev --without-hashes
