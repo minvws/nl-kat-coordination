@@ -576,6 +576,48 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         job = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
         self.assertEqual(job.p_item.id, p_item.id)
 
+    @unittest.skip
+    def test_post_push_job_update(self):
+        """If a task gets added to the queue, and a job already exists, the job should be updated"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        task = models.BoefjeTask(
+            boefje=BoefjeFactory(),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        p_item = functions.create_p_item(
+            scheduler_id=self.organisation.id,
+            priority=0,
+            data=task,
+        )
+
+        # Act
+        self.scheduler.push_item_to_queue(p_item)
+
+        # Disable job
+        job_db = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
+        job_db.enabled = False
+        try:
+            self.mock_ctx.job_store.update_job(job_db)
+        except Exception as e:
+            print(e)
+
+        job_db_disabled = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
+        self.assertFalse(job_db_disabled.enabled)
+
+        # Push task again
+        self.scheduler.push_item_to_queue(p_item)
+
+        # Assert
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Job should be in datastore and enabled
+        job_db = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
+        self.assertEqual(job_db.p_item.id, p_item.id)
+        self.assertTrue(job_db.enabled)
+
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
         # Arrange

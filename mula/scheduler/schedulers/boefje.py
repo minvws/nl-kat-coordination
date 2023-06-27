@@ -258,7 +258,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        # TODO: active jobs, where the deadline has passed
+        # Get all active jobs, where the deadline has passed
         try:
             jobs, _ = self.ctx.job_store.get_jobs(
                 scheduler_id=self.scheduler_id,
@@ -303,21 +303,6 @@ class BoefjeScheduler(Scheduler):
                     )
                     continue
 
-                # FIXME: when tasks don't have an associated ooi
-
-                # ooi still exists?
-                ooi = self.ctx.services.octopoes.get_object(task.organization, task.input_ooi)
-                if not ooi:
-                    self.logger.warning(
-                        "OOI does not exist anymore [organisation_id=%s, scheduler_id=%s]",
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
-
-                    job.enabled = False
-                    self.ctx.job_store.update_job(job)
-                    continue
-
                 # boefje still exists?
                 boefje = self.ctx.services.katalogus.get_boefje(task.boefje.id)
                 if not boefje:
@@ -343,29 +328,44 @@ class BoefjeScheduler(Scheduler):
                     self.ctx.job_store.update_job(job)
                     continue
 
-                # boefje still consumes ooi?
-                if ooi.object_type not in boefje.consumes:
-                    self.logger.warning(
-                        "Boefje does not consume ooi anymore [organisation_id=%s, scheduler_id=%s]",
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
+                # ooi still exists? We check if the task has an input ooi,
+                # since it is possible that task can have no ooi's
+                if task.input_ooi:
+                    ooi = self.ctx.services.octopoes.get_object(task.organization, task.input_ooi)
+                    if not ooi:
+                        self.logger.warning(
+                            "OOI does not exist anymore [organisation_id=%s, scheduler_id=%s]",
+                            self.organisation.id,
+                            self.scheduler_id,
+                        )
 
-                    job.enabled = False
-                    self.ctx.job_store.update_job(job)
-                    continue
+                        job.enabled = False
+                        self.ctx.job_store.update_job(job)
+                        continue
 
-                # boefje allowed to scan ooi?
-                if not self.can_boefje_scan_ooi(boefje, ooi):
-                    self.logger.warning(
-                        "Boefje is not allowed to scan ooi [organisation_id=%s, scheduler_id=%s]",
-                        self.organisation.id,
-                        self.scheduler_id,
-                    )
+                    # boefje still consumes ooi?
+                    if ooi.object_type not in boefje.consumes:
+                        self.logger.warning(
+                            "Boefje does not consume ooi anymore [organisation_id=%s, scheduler_id=%s]",
+                            self.organisation.id,
+                            self.scheduler_id,
+                        )
 
-                    job.enabled = False
-                    self.ctx.job_store.update_job(job)
-                    continue
+                        job.enabled = False
+                        self.ctx.job_store.update_job(job)
+                        continue
+
+                    # boefje allowed to scan ooi?
+                    if not self.can_boefje_scan_ooi(boefje, ooi):
+                        self.logger.warning(
+                            "Boefje is not allowed to scan ooi [organisation_id=%s, scheduler_id=%s]",
+                            self.organisation.id,
+                            self.scheduler_id,
+                        )
+
+                        job.enabled = False
+                        self.ctx.job_store.update_job(job)
+                        continue
 
                 executor.submit(
                     self.push_task,
@@ -374,7 +374,7 @@ class BoefjeScheduler(Scheduler):
                     self.push_tasks_for_rescheduling.__name__,
                 )
 
-    def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
+    def is_task_allowed_to_run(self, boefje: Plugin, ooi: Optional[OOI]) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
 
         Args:
@@ -394,30 +394,31 @@ class BoefjeScheduler(Scheduler):
             )
             return False
 
-        if ooi.scan_profile is None:
-            self.logger.debug(
-                "No scan_profile found for ooi: %s "
-                "[ooi.primary_key=%s, ooi.scan_profile=%s, organisation_id=%s, scheduler_id=%s]",
-                ooi.primary_key,
-                ooi,
-                ooi.scan_profile,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return False
+        if ooi:
+            if ooi.scan_profile is None:
+                self.logger.debug(
+                    "No scan_profile found for ooi: %s "
+                    "[ooi.primary_key=%s, ooi.scan_profile=%s, organisation_id=%s, scheduler_id=%s]",
+                    ooi.primary_key,
+                    ooi,
+                    ooi.scan_profile,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                return False
 
-        if not self.can_boefje_scan_ooi(boefje, ooi):
-            self.logger.debug(
-                "Boefje: %s is not allowed to scan ooi: %s "
-                "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
-                boefje.name,
-                ooi.primary_key,
-                boefje.id,
-                ooi,
-                self.organisation.id,
-                self.scheduler_id,
-            )
-            return False
+            if not self.can_boefje_scan_ooi(boefje, ooi):
+                self.logger.debug(
+                    "Boefje: %s is not allowed to scan ooi: %s "
+                    "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
+                    boefje.name,
+                    ooi.primary_key,
+                    boefje.id,
+                    ooi,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                return False
 
         return True
 
@@ -544,7 +545,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    def push_task(self, boefje: Boefje, ooi: OOI, caller: str = "") -> None:
+    def push_task(self, boefje: Boefje, ooi: Optional[OOI], caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -556,9 +557,11 @@ class BoefjeScheduler(Scheduler):
         """
         task = BoefjeTask(
             boefje=Boefje(id=boefje.id, version=boefje.version),
-            input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
+
+        if ooi:
+            task.input_ooi = ooi.primary_key
 
         if not self.is_task_allowed_to_run(boefje, ooi):
             self.logger.debug(
@@ -656,13 +659,23 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
+        if ooi:
+            self.logger.info(
+                "Created boefje task: %s for ooi: %s "
+                "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
+                task,
+                ooi.primary_key,
+                boefje.id,
+                ooi.primary_key,
+                self.organisation.id,
+                self.scheduler_id,
+                caller,
+            )
+
         self.logger.info(
-            "Created boefje task: %s for ooi: %s "
-            "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
+            "Created boefje task: %s [boefje.id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,
-            ooi.primary_key,
             boefje.id,
-            ooi.primary_key,
             self.organisation.id,
             self.scheduler_id,
             caller,
@@ -803,8 +816,7 @@ class BoefjeScheduler(Scheduler):
         if job.deadline is not None:
             return
 
-        # FIXME: this should be calculated based on prior tasks
-        # FIXME: think about rankers
+        # TODO: this should be calculated based on prior tasks
         job.deadline = datetime.fromtimestamp(self.job_ranker.rank(job))
 
         self.ctx.job_store.update_job(job)
