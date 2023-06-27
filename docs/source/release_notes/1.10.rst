@@ -32,6 +32,8 @@ New Features
  * The used signing provider is stored alongside rawfiles to make it possible to
    switch providers and still check older rawfiles.
  * The task list has better filters.
+ * Environment variables for boefjes aren't tutomatically inherited from the
+   runner process anymore and need to be set explicitly.
 
 Bug fixes
 =========
@@ -49,6 +51,13 @@ Django 4.2 requires that the trusted origins for CSRF protection is set. This
 can be done using the `DJANGO_CSRF_TRUSTED_ORIGINS` variable. It is a good idea
 to also set `DJANGO_ALLOWED_HOSTS` to the used hostnames, detailed instructions
 are written in the :ref:`Hardening<Production: Hardening OpenKAT>` section.
+
+If you configured system environment settings for boefjes or relied on existing
+system variables being inherited by boefjes you need to explicitly set those
+variables using either the boefje settings in the KAT-alogus or system
+environment variables provided to the boefje process prepended with `BOEFJE_`.
+See environment variables section of the :ref:`Boefjes` documentation for more
+information.
 
 The normal instructions for upgrading :ref:`Debian packages<Upgrading Debian>`
 or upgrading :ref:`containers <Upgrading_Containers>` should be followed.
