@@ -14,7 +14,7 @@
             </legend>
             <div class="column-4">
                 {% for checkbox in object_type_filters %}
-                    <div class="horizontal-view">
+                    <div class="checkbox">
                         <input type="checkbox"
                                id="type-{{ checkbox.value }}"
                                name="ooi_type"
@@ -26,7 +26,7 @@
             </div>
         </fieldset>
     {% endif %}
-    <fieldset>
+    <div class="button-container">
         {% if object_type_filters|length > 4 %}
             <button type="button"
                     class="toggle-all toggle-on ghost"
@@ -36,7 +36,7 @@
         {% endif %}
         <input type="submit"
                value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}"/>
-    </fieldset>
+    </div>
     {% for field in clearance_level_filter_form %}
         <fieldset>
             <legend>

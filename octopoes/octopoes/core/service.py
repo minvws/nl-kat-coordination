@@ -75,7 +75,7 @@ class OctopoesService:
         self.scan_profile_repository = scan_profile_repository
 
     def _populate_scan_profiles(self, oois: List[OOI], valid_time: datetime) -> List[OOI]:
-        logger.info("Populating scan profiles for %s oois", len(oois))
+        logger.debug("Populating scan profiles for %s oois", len(oois))
 
         ooi_cache: Dict[str, OOI] = {str(ooi.reference): ooi for ooi in oois}
         scan_profiles = self.scan_profile_repository.get_bulk({x.reference for x in oois}, valid_time)
@@ -235,7 +235,7 @@ class OctopoesService:
                             assigned_scan_levels[ooi.reference] = ScanLevel(current_level)
                             temp_next_ooi_set.add(ooi)
 
-                logger.info("Assigned scan levels [level=%i] [len=%i]", current_level, len(temp_next_ooi_set))
+                logger.debug("Assigned scan levels [level=%i] [len=%i]", current_level, len(temp_next_ooi_set))
                 next_ooi_set = temp_next_ooi_set
 
         scan_level_aggregates = {i: 0 for i in range(1, 5)}
@@ -243,8 +243,8 @@ class OctopoesService:
             scan_level_aggregates.setdefault(scan_level.value, 0)
             scan_level_aggregates[scan_level] += 1
 
-        logger.info("Assigned scan levels [len=%i]", len(assigned_scan_levels.keys()))
-        logger.info(json.dumps(scan_level_aggregates, indent=4))
+        logger.debug("Assigned scan levels [len=%i]", len(assigned_scan_levels.keys()))
+        logger.debug(json.dumps(scan_level_aggregates, indent=4))
 
         # Save all assigned scan levels
         update_count = 0
@@ -268,7 +268,7 @@ class OctopoesService:
                 self.scan_profile_repository.save(old_scan_profile, new_scan_profile, valid_time)
                 update_count += 1
 
-        logger.info("Updated inherited scan profiles [count=%i]", update_count)
+        logger.debug("Updated inherited scan profiles [count=%i]", update_count)
 
         # Reset previously assigned scan profiles to 0
         set_scan_profile_references = {
@@ -280,7 +280,7 @@ class OctopoesService:
         for reference in references_to_reset:
             old_scan_profile = inherited_scan_profiles[reference]
             self.scan_profile_repository.save(old_scan_profile, EmptyScanProfile(reference=reference), valid_time)
-        logger.info("Reset scan profiles [len=%i]", len(references_to_reset))
+        logger.debug("Reset scan profiles [len=%i]", len(references_to_reset))
 
         # Assign empty scan profiles to OOI's without scan profile
         unset_scan_profile_references = (
@@ -291,9 +291,10 @@ class OctopoesService:
         )
         for reference in unset_scan_profile_references:
             self.scan_profile_repository.save(None, EmptyScanProfile(reference=reference), valid_time)
-        logger.info(
+        logger.debug(
             "Assigned empty scan profiles to OOI's without scan profile [len=%i]", len(unset_scan_profile_references)
         )
+        logger.info("Recalculated scan profiles")
 
     def process_event(self, event: DBEvent):
         # handle event
@@ -302,7 +303,7 @@ class OctopoesService:
         if handler is not None:
             handler(event)
 
-        logger.info(
+        logger.debug(
             "Processed event [primary_key=%s] [operation_type=%s]",
             format_id_short(event.primary_key),
             event.operation_type,
