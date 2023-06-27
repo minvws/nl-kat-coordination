@@ -1,6 +1,16 @@
+from django.contrib.auth.management import create_permissions
 from django.db import migrations
 
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM
+
+
+# same as in 0026_auto_20221031_1344.py
+# https://stackoverflow.com/a/40092780/1336275
+def migrate_permissions(apps, schema_editor):
+    for app_config in apps.get_app_configs():
+        app_config.models_module = True
+        create_permissions(app_config, apps=apps, verbosity=0)
+        app_config.models_module = None
 
 
 def add_group_permissions(apps, schema_editor):
@@ -27,5 +37,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(migrate_permissions),
         migrations.RunPython(add_group_permissions),
     ]

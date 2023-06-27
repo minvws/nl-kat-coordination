@@ -8,6 +8,16 @@ An installation of KAT can be done on a single machine or spread out on several
 machines for a high availability setup. This guide will take you through the
 steps for installing it on a single machine.
 
+Supported distributions
+=======================
+
+We provide Debian packages for Debian and Ubuntu. We support only Debian stable
+and Ubuntu LTS releases and stop supporting the previous version 6 months after
+the release. Currently this means we support Debian 11 (bullseye) and 12
+(bookworm) and Ubuntu 22.04. Debian 12 has been released on 10th of June so we
+will stop providing packages for Debian 11 in December 2023. After Ubuntu 24.04
+is releases we will provide Ubuntu 22.02 packages until October 2024.
+
 Prerequisites
 =============
 
@@ -60,7 +70,7 @@ Create the database and user for Rocky in Postgres:
 
     sudo -u postgres createdb rocky_db
     sudo -u postgres createuser rocky -P
-    sudo -u postgres psql -c 'GRANT ALL ON DATABASE rocky_db TO rocky;'
+    sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO rocky;' rocky_db
 
 Now use rocky-cli to initialize the database:
 
@@ -88,7 +98,7 @@ Create a new database and user for KAT-alogus:
 
     sudo -u postgres createdb katalogus_db
     sudo -u postgres createuser katalogus -P
-    sudo -u postgres psql -c 'GRANT ALL ON DATABASE katalogus_db TO katalogus;'
+    sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO katalogus;' katalogus_db
 
 Initialize the database using the update-katalogus-db tool:
 
@@ -113,7 +123,7 @@ Create a new database and user for Bytes:
 
     sudo -u postgres createdb bytes_db
     sudo -u postgres createuser bytes -P
-    sudo -u postgres psql -c 'GRANT ALL ON DATABASE bytes_db TO bytes;'
+    sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO bytes;' bytes_db
 
 Initialize the Bytes database:
 
@@ -137,7 +147,7 @@ Create a new database and user for Mula:
 
     sudo -u postgres createdb mula_db
     sudo -u postgres createuser mula -P
-    sudo -u postgres psql -c 'GRANT ALL ON DATABASE mula_db TO mula;'
+    sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO mula;' mula_db
 
 Initialize the Mula database:
 
@@ -260,6 +270,19 @@ This oneliner will do it for you, executed as root:
 .. code-block:: sh
 
     sudo sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
+
+Configure hostname in Rocky
+===========================
+
+The `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` variables in
+`/etc/kat/rocky.conf` need to be configured with the hostname (or hostnames separated by commas) that will be used
+to access OpenKAT. If `openkat.example.org` is used to access OpenKAT the
+configuration should be:
+
+.. code-block:: sh
+
+    DJANGO_ALLOWED_HOSTS="openkat.example.org"
+    DJANGO_CSRF_TRUSTED_ORIGINS="https://openkat.example.org"
 
 Restart KAT
 ===========

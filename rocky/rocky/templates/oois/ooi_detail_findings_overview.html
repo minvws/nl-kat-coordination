@@ -21,18 +21,18 @@
                     <th>{% translate "Occurrences" %}</th>
                 </thead>
                 <tbody>
-                    {% for severity in severity_summary %}
+                    {% for severity, count in count_findings_per_severity.items %}
                         <tr>
                             <td>
-                                <span class="{{ severity.risk_level }}">{{ severity.risk_level }}</span>
+                                <span class="{{ severity.value }}">{{ severity.value|capfirst }}</span>
                             </td>
-                            <td>{{ severity.occurrences }}</td>
+                            <td>{{ count }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <th>{% translate "Total findings:" %}</th>
-                    <th>{{ severity_summary_totals.total_occurrences }}</th>
+                    <th>{{ severity_summary_totals }}</th>
                 </tfoot>
             </table>
         </div>

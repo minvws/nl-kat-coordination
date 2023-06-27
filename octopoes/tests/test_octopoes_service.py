@@ -115,7 +115,7 @@ def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner
     octopoes_service.scan_profile_repository.get.return_value = Mock(level=2)
     octopoes_service.ooi_repository.get.return_value = Mock()
     octopoes_service.origin_parameter_repository.list_by_origin.return_value = {}
-    octopoes_service.ooi_repository.get_bulk.return_value = {}
+    octopoes_service.ooi_repository.load_bulk.return_value = {}
 
     mock_oois = [Mock(reference="test1"), Mock(reference="test2")]
     bit_runner().run.return_value = mock_oois

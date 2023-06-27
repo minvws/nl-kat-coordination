@@ -244,7 +244,7 @@ class Server:
             if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
                 raise ValueError("min_date must be less than max_date")
 
-            results, count = self.ctx.task_store.get_tasks(
+            results, count = self.ctx.task_store.api_list_tasks(
                 scheduler_id=scheduler_id,
                 task_type=task_type,
                 status=status,
@@ -328,7 +328,7 @@ class Server:
         return updated_task
 
     def get_queues(self) -> Any:
-        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.values()]
+        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
     def get_queue(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
