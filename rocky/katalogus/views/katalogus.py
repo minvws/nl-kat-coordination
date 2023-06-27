@@ -73,7 +73,7 @@ class KATalogusView(ListView, OrganizationView, FormView):
         if sort_options == "a-z":
             return queryset
         if sort_options == "z-a":
-            return reversed(queryset)
+            return queryset[::-1]
         if sort_options == "enabled-disabled":
             return sorted(queryset, key=lambda item: not item["enabled"])
         if sort_options == "disabled-enabled":
