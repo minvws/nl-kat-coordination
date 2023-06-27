@@ -43,6 +43,7 @@ jobs:
 
   build:
     needs: changes
+    if: ${{ github.event_name == 'push' || (needs.changes.outputs.packages != '[]' && needs.changes.outputs.packages != '') }}
     strategy:
       fail-fast: false
       matrix:
