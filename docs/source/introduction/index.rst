@@ -9,5 +9,4 @@ Contains introduction into OpenKAT
 
    intro
    howdoesitwork
-   usermanual
    makeyourown
