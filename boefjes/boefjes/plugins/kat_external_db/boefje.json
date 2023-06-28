@@ -7,8 +7,10 @@
     ],
     "produces": [
         "Hostname",
-        "IPAddress",
-        "IPV4NetBlock"
+        "IPAddressV4",
+        "IPV4NetBlock",
+        "IPAddressV6",
+        "IPV6NetBlock"
     ],
     "environment_keys": [
         "DB_URL",

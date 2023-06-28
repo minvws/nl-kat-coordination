@@ -24,9 +24,9 @@ For example:
 
 ```json
 {
-    "ip_addresses": [{"ip_address": "1.1.1.1"}, {"ip_address": "1::1"}, {"ip_address": "8.8.4.0/28"}],
-    "domains": [{"domain": "mispo.es"}]
+    "ip_addresses": [{"ip_address": "198.51.100.2"}, {"ip_address": "2001:db8:ffff:ffff:ffff:ffff:ffff:ffff"}, {"ip_address": "192.0.2.0/24"}],
+    "domains": [{"domain": "example.com"}]
 }
 ```
 
-The expected ip and domain (item) key lists can be configured in `normalize.py`. Ranges are expected as strings in CIDR notation. Clearance level for fetched items is set to `L0`.
+The expected ip and domain (item) key lists can be configured in `normalize.py`. Ranges are expected as strings in CIDR notation. Clearance level for fetched items is set to `L0`. Reference implementation of the API server is in the works.
