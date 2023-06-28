@@ -28,7 +28,7 @@ Rerun bits
     Run    docker restart ${container_id_api}
 
     # wait until containers started up
-    Sleep    1s
+    Sleep    2s
 
     # make suer that new origin still does not exist
     Await Sync
