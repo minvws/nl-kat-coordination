@@ -1,5 +1,5 @@
-Introduction
-############
+How does it work?
+#################
 
 Contains introduction into OpenKAT
 
