@@ -2,43 +2,42 @@
 {% load i18n %}
 
 {% if request.user.is_authenticated %}
-<div
-  data-button-open-label="{% if user.full_name %}{{ user.full_name|slice:"1"|upper }}{% else %}{{ user.email|slice:"1"|upper }}{% endif %}"
-  data-button-close-label="{% if user.full_name %}{{ user.full_name|slice:"1"|upper }}{% else %}{{ user.email|slice:"1"|upper }}{% endif %}"
-  data-open-label="{% translate "User navigation" %}"
-  data-close-label="{% translate "Close user navigation" %}"
-  data-media="(min-width: 100%)"
-  data-button-classes="user-icon"
-  aria-label="{% translate "User navigation" %}"
-  class="collapsible user-nav">
-
-  <div class="collapsing-element">
+  <div data-button-open-label="{% if user.full_name %}{{ user.full_name|slice:"1"|upper }}{% else %}{{ user.email|slice:"1"|upper }}{% endif %}"
+       data-button-close-label="{% if user.full_name %}{{ user.full_name|slice:"1"|upper }}{% else %}{{ user.email|slice:"1"|upper }}{% endif %}"
+       data-open-label="{% translate "User navigation" %}"
+       data-close-label="{% translate "Close user navigation" %}"
+       data-media="(min-width: 100%)"
+       data-button-classes="user-icon"
+       aria-label="{% translate "User navigation" %}"
+       class="collapsible user-nav">
+    <div class="collapsing-element">
       <ul>
         <li>
-          <a href="{% url "organization_list" %}" {% if "organizations" in request.path|urlencode %} aria-selected="true" {% endif %}>
+          {% url "organization_list" as index_url %}
+          <a href="{{ index_url }}"
+             {% if index_url in request.path|urlencode %}aria-selected="true"{% endif %}>
             {% translate "My organisations" %}
           </a>
         </li>
         {% if organization.code %}
           <li>
-            <a href="{% url "account_detail" organization.code %}" {% if "account" in request.path|urlencode %} aria-selected="true" {% endif %}>
-              {% translate "Profile" %}
-            </a>
+            {% url "account_detail" organization.code as index_url %}
+            <a href="{{ index_url }}"
+               {% if index_url in request.path|urlencode %}aria-selected="true"{% endif %}>{% translate "Profile" %}</a>
           </li>
         {% endif %}
         <li>
-            <a href="{% url "logout" %}">{% translate "Logout" %}</a>
+          <a href="{% url "logout" %}">{% translate "Logout" %}</a>
         </li>
       </ul>
+    </div>
   </div>
-</div>
 {% else %}
   <div>
     <ul>
       <li>
-        <a href="{% url "two_factor:login" %}" {% if "login" in request.path|urlencode %} aria-current="page"{% endif %}>
-            {% translate "Login" %}
-        </a>
+        <a href="{% url "two_factor:login" %}"
+           {% if "login" in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Login" %}</a>
       </li>
     </ul>
   </div>

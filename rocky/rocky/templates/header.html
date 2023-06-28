@@ -9,68 +9,76 @@
          data-media="(min-width: 70rem)"
          aria-label="{% translate "Main navigation" %}"
          class="collapsible">
-         <div>
-            <a href="{% url "landing_page" %}" class="logo" title="OpenKAT" aria-label="{% translate "OpenKAT logo, go to the homepage of OpenKAT" %}">
+        <div>
+            <a href="{% url "landing_page" %}"
+               class="logo"
+               title="OpenKAT"
+               aria-label="{% translate "OpenKAT logo, go to the homepage of OpenKAT" %}">
                 <img src="{% static 'img/kat_logo.png' %}" alt="{% translate "OpenKAT" %}"/>
                 Kwetsbaarheden Analyse Tool
             </a>
-
             {% if request.user.is_authenticated %}
                 {% if not view_type == "onboarding" %}
                     {% include "partials/organizations_menu_dropdown.html" %}
 
                 {% endif %}
             {% endif %}
-
             <div class="collapsing-element">
                 <ul>
                     {% if request.user.is_authenticated %}
                         {% if not organization.code %}
+                            {% url "crisis_room" as index_url %}
                             <li>
-                                <a href="{% url "crisis_room" %}"
-                                {% if 'crisis-room' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
+                                <a href="{{ index_url }}"
+                                   {% if index_url == request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
                             </li>
                         {% else %}
                             <li>
                                 {% url "organization_crisis_room" organization.code as index_url %}
                                 <a href="{{ index_url }}"
-                                {% if request.path == index_url %} aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
+                                   {% if index_url == request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Crisis room" %}</a>
                             </li>
                         {% endif %}
                         {% if organization.code and not view_type == "onboarding" %}
+                            {% url "katalogus" organization.code as index_url %}
                             <li>
-                                <a href="{% url "katalogus" organization.code %}"
-                                {% if 'kat-alogus' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "KAT-alogus" %}</a>
+                                <a href="{{ index_url }}"
+                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "KAT-alogus" %}</a>
                             </li>
                             <li>
-                                <a href="{% url "finding_list" organization.code %}"
-                                {% if 'finding' in request.path|urlencode or 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate "Findings" %}</a>
+                                {% url "finding_list" organization.code as index_url %}
+                                <a href="{{ index_url }}"
+                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
                             </li>
                             <li>
-                                <a href="{% url "ooi_list" organization.code %}"
-                                {% if 'objects' in request.path|urlencode and not 'Finding' in request.get_full_path|urlencode %} aria-current="page"{% endif %}>{% translate "Objects" %}</a>
+                                {% url "ooi_list" organization.code as index_url %}
+                                <a href="{{ index_url }}"
+                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Objects" %}</a>
                             </li>
                             <li>
-                                <a href="{% url "task_list" organization.code %}"
-                                {% if 'tasks' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
+                                {% url "task_list" organization.code as index_url %}
+                                <a href="{{ index_url }}"
+                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Tasks" %}</a>
                             </li>
                             {% if request.user.is_superuser or perms.tools.view_organization %}
                                 <li>
-                                    <a href="{% url "organization_member_list" organization.code %}"
-                                    {% if 'members' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Members" %}</a>
+                                    {% url "organization_member_list" organization.code as index_url %}
+                                    <a href="{{ index_url }}"
+                                       {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Members" %}</a>
                                 </li>
                                 <li>
-                                    <a href="{% url "organization_settings" organization.code %}"
-                                    {% if 'settings' in request.path|urlencode %} aria-current="page"{% endif %}>{% translate "Settings" %}</a>
+                                    {% url "organization_settings" organization.code as index_url %}
+                                    <a href="{{ index_url }}"
+                                       {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Settings" %}</a>
                                 </li>
                             {% endif %}
                         {% endif %}
                     {% endif %}
                 </ul>
-
                 <div>
                     {% include "partials/language-switcher.html" %}
                     {% include "partials/secondary-menu.html" %}
+
                 </div>
             </div>
         </div>
@@ -95,5 +103,4 @@
         </nav>
     {% endif %}
 </header>
-
 {% include "partials/notifications_block.html" %}
