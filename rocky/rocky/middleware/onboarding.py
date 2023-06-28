@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from django.urls.base import reverse
-from onboarding.view_helpers import ONBOARIDNG_PERMS
+from onboarding.view_helpers import ONBOARDING_PERMISSIONS
 from tools.models import OrganizationMember
 
 
@@ -33,7 +33,7 @@ def OnboardingMiddleware(get_response):
                 member = OrganizationMember.objects.filter(user=request.user)
 
                 # Members with these permissions can run a full DNS-report onboarding.
-                if member.exists() and member.first().has_perms(ONBOARIDNG_PERMS):
+                if member.exists() and member.first().has_perms(ONBOARDING_PERMISSIONS):
                     return redirect(
                         reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
                     )

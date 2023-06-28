@@ -38,7 +38,7 @@ from onboarding.forms import (
     OnboardingSetClearanceLevelForm,
 )
 from onboarding.view_helpers import (
-    ONBOARIDNG_PERMS,
+    ONBOARDING_PERMISSIONS,
     KatIntroductionAdminStepsMixin,
     KatIntroductionRegistrationStepsMixin,
     KatIntroductionStepsMixin,
@@ -70,7 +70,7 @@ class OnboardingStart(OrganizationView):
     def get(self, request, *args, **kwargs):
         if request.user.is_superuser:
             return redirect("step_introduction_registration")
-        if self.organization_member.has_perms(ONBOARIDNG_PERMS):
+        if self.organization_member.has_perms(ONBOARDING_PERMISSIONS):
             return redirect("step_introduction", kwargs={"organization_code": self.organization.code})
         return redirect("crisis_room")
 
@@ -676,7 +676,7 @@ class CompleteOnboarding(OrganizationView):
     """
 
     def get(self, request, *args, **kwargs):
-        if self.request.user.is_superuser and not self.organization_member.has_perms(ONBOARIDNG_PERMS):
+        if self.request.user.is_superuser and not self.organization_member.has_perms(ONBOARDING_PERMISSIONS):
             return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
         self.organization_member.onboarded = True
         self.organization_member.status = OrganizationMember.STATUSES.ACTIVE

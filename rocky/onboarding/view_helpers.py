@@ -3,7 +3,11 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from tools.view_helpers import StepsMixin
 
-ONBOARIDNG_PERMS = ["tools.can_scan_organization", "tools.can_set_clearance_level", "tools.can_enable_disable_boefje"]
+ONBOARDING_PERMISSIONS = (
+    "tools.can_scan_organization",
+    "tools.can_set_clearance_level",
+    "tools.can_enable_disable_boefje",
+)
 
 
 class KatIntroductionStepsMixin(StepsMixin, OrganizationView):
