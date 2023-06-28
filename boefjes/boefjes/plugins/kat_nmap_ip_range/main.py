@@ -25,7 +25,7 @@ def build_nmap_arguments(ip_range: str, top_ports: int, protocol_str: str) -> Li
     if not TOP_PORTS_MIN <= top_ports <= TOP_PORTS_MAX:
         raise ValueError(f"{TOP_PORTS_MIN} <= TOP_PORTS: {top_ports} <= {TOP_PORTS_MAX} is invalid.")
 
-    args = ["nmap", "-T4", "-Pn", "-r", "-v10", f"-s{protocol_str}", "--top-ports", str(top_ports)]
+    args = ["nmap", "--open", "-T4", "-Pn", "-r", "-v10", f"-s{protocol_str}", "--top-ports", str(top_ports)]
     if isinstance(ip_network(ip_range), IPv6Network):
         args.append("-6")
     args.extend(["-oX", "-", ip_range])
