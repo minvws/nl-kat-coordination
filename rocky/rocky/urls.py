@@ -67,7 +67,7 @@ urlpatterns += i18n_patterns(
         name="privacy_statement",
     ),
     path(
-        "<organization_code>/indemnifications/",
+        "<organization_code>/settings/indemnifications/",
         IndemnificationAddView.as_view(),
         name="indemnification_add",
     ),
@@ -90,7 +90,7 @@ urlpatterns += i18n_patterns(
         name="organization_add",
     ),
     path(
-        "<organization_code>/edit/",
+        "<organization_code>/settings/edit/",
         OrganizationEditView.as_view(),
         name="organization_edit",
     ),
@@ -146,9 +146,9 @@ urlpatterns += i18n_patterns(
         ScanProfileDetailView.as_view(),
         name="scan_profile_detail",
     ),
-    path("<organization_code>/scans/", ScanListView.as_view(), name="scan_list"),
-    path("<organization_code>/upload/csv/", UploadCSV.as_view(), name="upload_csv"),
-    path("<organization_code>/upload/raw/", UploadRaw.as_view(), name="upload_raw"),
+    path("<organization_code>/objects/scans/", ScanListView.as_view(), name="scan_list"),
+    path("<organization_code>/objects/upload/csv/", UploadCSV.as_view(), name="upload_csv"),
+    path("<organization_code>/objects/upload/raw/", UploadRaw.as_view(), name="upload_raw"),
     path("<organization_code>/tasks/", BoefjesTaskListView.as_view(), name="task_list"),
     path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
     path(
