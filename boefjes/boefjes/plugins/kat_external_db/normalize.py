@@ -36,14 +36,12 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
     addresses_count, blocks_count, hostnames_count = 0, 0, 0
 
     for address_item in follow_path_in_dict(path=IP_ADDRESS_LIST_PATH, path_dict=results):
-        address = follow_path_in_dict(path=IP_ADDRESS_ITEM_PATH, path_dict=address_item)
-
-        mask = None
-        if "/" in address:
-            address, mask = address.split("/")
+        interface = ip_interface(follow_path_in_dict(path=IP_ADDRESS_ITEM_PATH, path_dict=address_item))
+        address, mask = interface.with_prefixlen.split("/")
+        mask = int(mask)
 
         # Decide whether we yield IPv4 or IPv6.
-        if isinstance(ip_interface(address), IPv4Interface):
+        if isinstance(interface, IPv4Interface):
             address_type = IPAddressV4
             block_type = IPV4NetBlock
         else:
@@ -54,10 +52,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
         yield ip_address
         addresses_count += 1
 
-        if mask is not None:
+        if mask < interface.ip.max_prefixlen:
             yield block_type(
                 start_ip=ip_address.reference,
-                mask=int(mask),
+                mask=mask,
                 network=network.reference,
             )
             blocks_count += 1
