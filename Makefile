@@ -100,7 +100,7 @@ docs:
 	sphinx-build -b html docs/source docs/_build
 
 poetry-dependencies:
-	for path in . keiko octopoes boefjes
+	for path in . keiko octopoes boefjes bytes
 	do
 		echo $$path
 		poetry check -C $$path
