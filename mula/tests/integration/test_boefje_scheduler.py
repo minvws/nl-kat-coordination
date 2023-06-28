@@ -576,7 +576,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         job = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
         self.assertEqual(job.p_item.id, p_item.id)
 
-    @unittest.skip
     def test_post_push_job_update(self):
         """If a task gets added to the queue, and a job already exists, the job should be updated"""
         # Arrange
@@ -598,14 +597,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Disable job
         job_db = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
-        job_db.enabled = False
-        try:
-            self.mock_ctx.job_store.update_job(job_db)
-        except Exception as e:
-            print(e)
-
+        self.mock_ctx.job_store.update_job_enabled(job_db.id, False)
         job_db_disabled = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
         self.assertFalse(job_db_disabled.enabled)
+
+        # Pop from queue
+        self.scheduler.pop_item_from_queue()
 
         # Push task again
         self.scheduler.push_item_to_queue(p_item)
@@ -614,9 +611,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Job should be in datastore and enabled
-        job_db = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
-        self.assertEqual(job_db.p_item.id, p_item.id)
-        self.assertTrue(job_db.enabled)
+        job_db_enabled = self.mock_ctx.job_store.get_job_by_hash(p_item.hash)
+        self.assertEqual(job_db_enabled.p_item.id, p_item.id)
+        self.assertTrue(job_db_enabled.enabled)
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
