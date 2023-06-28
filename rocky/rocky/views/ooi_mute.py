@@ -31,8 +31,9 @@ class MuteFindingView(OrganizationPermissionRequiredMixin, BaseOOIDetailView, Fo
         return context
 
 
-class MuteFindingsBulkView(SingleOOIMixin):
+class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
     ooi_class = MutedFinding
+    permission_required = "tools.can_mute_findings"
 
     def post(self, request, *args, **kwargs):
         selected_findings = request.POST.getlist("finding", None)
