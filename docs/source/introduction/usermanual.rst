@@ -4,7 +4,7 @@ User Guide
 
 This manual covers the day-to-day use of OpenKAT via the web interface. The concepts behind OpenKAT are explained in the "How does OpenKAT work" section. When using OpenKAT for the first time, the on-boarding flow is available, see the section in this chapter.
 
-.. image:: img/landingpage.png
+.. image:: ../img/landingpage.png
   :alt: landingpage
 
 Web interface
@@ -23,7 +23,7 @@ Crisis Room
 
 The Crisis Room provides the overview of all findings, which can be viewed for different times. The time of day can be selected with the option button after which the findings that were applicable at that time become visible.
 
-.. image:: img/crisisroom.png
+.. image:: /img/crisisroom.png
   :alt: crisisroom
 
 KAT catalog
@@ -35,12 +35,12 @@ Boefjes can be deployed automatically or manually. New boefjes can be added by t
 
 Automatic deployment of boefjes depends on the safeguard level, which can be set for each object. If no safeguard is set, it can be derived from a logically connected object for which it is.
 
-.. image:: img/katalogus.png
+.. image:: //img/katalogus.png
   :alt: KAT catalog
 
 Each boefje has an info page with information about the tools used, the associated objects and the safeguard level required to use the boefje.
 
-.. image:: img/boefjeinfopage.png
+.. image:: /img/boefjeinfopage.png
   :alt: Findings
 
 Findings
