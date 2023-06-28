@@ -553,7 +553,7 @@ class OctopoesService:
                         param = OriginParameter(origin_id=bit_instance.id, reference=param_ooi.reference)
                         self.origin_parameter_repository.save(param, valid_time)
 
-        # remove all Origins and Origin Parameters, which are no longer in use
+        # TODO: remove all Origins and Origin Parameters, which are no longer in use
 
         # rerun all existing bits
         origins = self.origin_repository.list(origin_type=OriginType.INFERENCE, valid_time=valid_time)
