@@ -12,7 +12,7 @@ class RawData(RabbitMQ):
         self.func = func
 
     def listen(self) -> None:
-        self.basic_consume(self.queue, False)
+        self.basic_consume(self.queue, True)
 
     def dispatch(self, body: bytes) -> None:
         # Convert body into a RawDataReceivedEvent
