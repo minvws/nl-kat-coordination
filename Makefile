@@ -98,3 +98,13 @@ ubuntu22.04-build-image:
 
 docs:
 	sphinx-build -b html docs/source docs/_build
+
+poetry-dependencies:
+	for path in . keiko octopoes
+	do
+		echo $$path
+		poetry check -C $$path
+		poetry lock --check -C $$path
+		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt
+		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt
+	done
