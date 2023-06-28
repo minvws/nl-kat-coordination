@@ -29,6 +29,7 @@ def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]
     ip = ip_address(host)
     args = [
         "nmap",
+        "--open",
         "-T4",
         "-Pn",
         "-r",
