@@ -123,11 +123,11 @@ class Scheduler(abc.ABC):
             return
 
         task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))
-        if task_db is not None:
+        if task_db is None:
+            task_db = self.ctx.task_store.create_task(task)
+        else:
             self.ctx.task_store.update_task(task)
-            return
 
-        task_db = self.ctx.task_store.create_task(task)
         if task_db is None:
             self.logger.warning(
                 "Task %s could not be created, not creating job [task_id=%s, queue_id=%s]",
@@ -162,35 +162,23 @@ class Scheduler(abc.ABC):
                 )
                 return
 
-        # Update job, if was already disabled, we enable it again.
-        if not job_db.enabled:
-            job_db.enabled = True
-
         try:
-            self.ctx.job_store.update_job(job_db)  # TODO: test this modified_at
+            # Update job, if was already disabled, we enable it again.
+            if not job_db.enabled:
+                self.ctx.job_store.update_job_enabled(job_db.id, True)
+
+            # Update task: For the task create the relationship with the associated job
+            task_db.job_id = job_db.id
+            self.ctx.task_store.update_task(task_db)
         except Exception as e:
             self.logger.warning(
-                "Job %s could not be updated [task_id=%s, queue_id=%s]: %s",
-                job_db.id,
+                "Task %s could not be updated [task_id=%s, queue_id=%s]: %s",
+                p_item.data.get("id"),
                 p_item.data.get("id"),
                 self.queue.pq_id,
                 e,
             )
             return
-
-        # Update task: For the task create the relationship with the associated job
-        task_db.job_id = job_db.id
-
-        try:
-            self.ctx.task_store.update_task(task_db)
-        except Exception as e:
-            self.logger.warning(
-                "Task %s could not be updated [task_id=%s, queue_id=%s]: %s",
-                task_db.id,
-                p_item.data.get("id"),
-                self.queue.pq_id,
-                e,
-            )
 
         return
 

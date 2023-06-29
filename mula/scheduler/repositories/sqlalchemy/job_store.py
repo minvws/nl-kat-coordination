@@ -88,3 +88,13 @@ class JobStore(JobStorer):
     def update_job(self, job: models.Job) -> None:
         with self.datastore.session.begin() as session:
             session.query(models.JobORM).filter(models.JobORM.id == job.id).update(job.dict())
+
+    @retry()
+    def update_job_deadline(self, job_id: str, deadline: datetime.datetime) -> None:
+        with self.datastore.session.begin() as session:
+            session.query(models.JobORM).filter(models.JobORM.id == job_id).update({"deadline": deadline})
+
+    @retry()
+    def update_job_enabled(self, job_id: str, enabled: bool) -> None:
+        with self.datastore.session.begin() as session:
+            session.query(models.JobORM).filter(models.JobORM.id == job_id).update({"enabled": enabled})
