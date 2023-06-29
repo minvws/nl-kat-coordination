@@ -315,7 +315,7 @@ deprecated==1.2.14 ; python_version >= "3.8" and python_version < "4.0" \
 dill==0.3.6 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:a07ffd2351b8c678dfc4a856a3005f8067aea51d6ba6c700796a4d9e280f39f0 \
     --hash=sha256:e5db55f3687856d8fbdab002ed78544e1c4559a130302693d839dfe8f93f2373
-django-admin-auto-tests @ git+https://github.com/dekkers/django-admin-auto-tests@fix-create-unique ; python_version >= "3.8" and python_version < "4.0"
+django-admin-auto-tests @ git+https://github.com/dekkers/django-admin-auto-tests@a2150fa ; python_version >= "3.8" and python_version < "4.0"
 django-csp==3.7 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
     --hash=sha256:01eda02ad3f10261c74131cdc0b5a6a62b7c7ad4fd017fbefb7a14776e0a9727

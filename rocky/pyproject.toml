@@ -79,7 +79,7 @@ pytest-cov = "^4.1.0"
 pytest-django = "^4.5.2"
 pytest-drf = "^1.1.3"
 pytest-mock = "^3.11.1"
-django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", branch = "fix-create-unique" }
+django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "a2150fa" }
 model-mommy = "^2.0.0"
 factory-boy = "^3.2.1"
 
