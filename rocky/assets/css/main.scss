@@ -8,16 +8,16 @@
 @import "helpers/uc-first.scss";
 
 /* Vendors */
-@import "vendors/manon-components.scss";
-@import "vendors/graph-override.scss";
-@import "vendors/two-factor.scss";
-@import "vendors/manon-overrides/dl.scss";
-@import "vendors/manon-overrides/layout-fifty-fifty.scss";
-@import "vendors/manon-overrides/nested-section.scss";
-@import "vendors/manon-overrides/form-radio.scss";
-@import "vendors/manon-overrides/form-fieldset-required.scss";
-@import "vendors/manon-overrides/link.scss";
-@import "vendors/manon-overrides/tile.scss";
+@import "manon-components.scss";
+@import "vendor_overrides/two-factor.scss";
+@import "vendor_overrides/graph-override.scss";
+@import "vendor_overrides/manon/dl.scss";
+@import "vendor_overrides/manon/layout-fifty-fifty.scss";
+@import "vendor_overrides/manon/nested-section.scss";
+@import "vendor_overrides/manon/form-radio.scss";
+@import "vendor_overrides/manon/form-fieldset-required.scss";
+@import "vendor_overrides/manon/link.scss";
+@import "vendor_overrides/manon/tile.scss";
 
 /* Theme */
 @import "themes/soft/soft.scss";

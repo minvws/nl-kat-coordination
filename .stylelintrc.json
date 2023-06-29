@@ -1,6 +1,7 @@
 {
   "extends": "stylelint-config-standard-scss",
   "rules": {
+    "ignoreFiles": ["**/graph/**"],
     "number-max-precision": 5,
     "color-hex-length": "long",
     "declaration-block-no-redundant-longhand-properties": null,

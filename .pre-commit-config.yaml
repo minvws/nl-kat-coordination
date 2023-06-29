@@ -81,8 +81,8 @@ repos:
           ^boefjes/boefjes/plugins/kat_fierce/lists |
           ^keiko/glossaries |
           ^keiko/templates/.*/template.tex$ |
-          ^rocky/assets/js/vendor |
-          ^rocky/assets/src/bundles/app/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
+          ^rocky/assets/vendors |
+          ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
           ^rocky/tests/stubs |
           ^docs/source/_static
           )
