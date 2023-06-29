@@ -11,6 +11,7 @@
 \usepackage{ragged2e}
 \usepackage{titlepic}
 \usepackage{xcolor}
+\usepackage{xstring}
 
 \hypersetup{
 	colorlinks=true,
@@ -41,6 +42,7 @@
 \newcommand\reporttitle{Bevindingenrapport voor @@{report_source_type|latex_escape}@@ @@{report_source_value|latex_escape}@@}
 \newcommand\tlp{AMBER}
 \newcommand\tlpbox{\colorbox{black}{\color{orange}TLP:AMBER}}
+\newcommand\humanreadable[1]{\protect\StrSubstitute{\empty#1}{|}{ | }}
 %END-KEIKO
 
 \pagestyle{fancy}
@@ -132,6 +134,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 \bgroup{}
 \def\arraystretch{1.2}
 \section{Bevinding types}
+\resizebox{\columnwidth}{!}{
 \begin{tabular}{ llr }
 	Risico niveau & Bevindingstype & Voorvallen \\\toprule
 	\midrule
@@ -139,7 +142,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 		\colorbox{box-color-@@{ occurrence.finding_type.risk_severity }@@}{ \color{color-@@{ occurrence.finding_type.risk_severity }@@} @@{ occurrence.finding_type.risk_severity }@@ } & @@{ occurrence.finding_type.id }@@ & @@{occurrence.list|length}@@ \\
 	{% endfor %}
 	\bottomrule
-\end{tabular}
+\end{tabular}}
 \egroup{}
 
 
@@ -173,7 +176,7 @@ Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().s
 
 	\subsection{Voorvallen}
 	{% for finding in occurrence.list %}
-		\subsubsection{@@{finding.ooi|latex_escape}@@}
+		\subsubsection{\humanreadable{@@{finding.ooi|latex_escape}@@}}
 		@@{finding.description|latex_escape}@@
 	{% endfor %}
 
