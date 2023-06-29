@@ -16,8 +16,8 @@ from tools.models import Indemnification
 from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.types import type_by_name
 from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
+from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -29,10 +29,6 @@ class PageActions(Enum):
 class OOIListView(BaseOOIListView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.filtered_ooi_types = self.get_filtered_ooi_types()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -188,11 +184,9 @@ class OOIListExportView(BaseOOIListView):
         observed_at = self.get_observed_at()
         filters = self.get_ooi_types_display()
 
-        ooi_types = self.ooi_types
-        if self.filtered_ooi_types:
-            ooi_types = {type_by_name(t) for t in self.filtered_ooi_types}
+        queryset = self.get_queryset()
+        ooi_list = queryset[: OOIList.HARD_LIMIT]
 
-        ooi_list = self.octopoes_api_connector.list(ooi_types, observed_at).items
         exports = [
             {
                 "observed_at": str(observed_at),
