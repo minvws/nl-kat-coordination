@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "mula"
 version = "0.0.1.dev1"
-description = "KAT intelligent job scheduler"
+description = "KAT's intelligent job scheduler"
 authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
