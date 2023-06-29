@@ -20,10 +20,51 @@ from account.validators import get_password_validators_help_texts
 User = get_user_model()
 
 
-class GroupAddForm(forms.Form):
-    """Add group dropdown field to form"""
+class OrganizationForm(BaseRockyModelForm):
+    """
+    Form to create a new organization.
+    """
 
-    GROUP_CHOICES = [
+    class Meta:
+        model = Organization
+        fields = ["name", "code"]
+
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "placeholder": _("The name of the organization."),
+                    "autocomplete": "off",
+                    "aria-describedby": _("explanation-organization-name"),
+                },
+            ),
+            "code": forms.TextInput(
+                attrs={
+                    "placeholder": _("A unique code of {code_length} characters.").format(
+                        code_length=ORGANIZATION_CODE_LENGTH
+                    ),
+                    "autocomplete": "off",
+                    "aria-describedby": _("explanation-organization-code"),
+                },
+            ),
+        }
+        error_messages = {
+            "name": {
+                "required": _("Organization name is required to proceed."),
+                "unique": _("Choose another organization."),
+            },
+            "code": {
+                "required": _("Organization code is required to proceed."),
+                "unique": _("Choose another code for your organization."),
+            },
+        }
+
+
+class AccountTypeSelectForm(forms.Form):
+    """
+    Shows a dropdown list of account types
+    """
+
+    ACCOUNT_TYPE_CHOICES = [
         ("", _("--- Please select one of the available options ----")),
         (GROUP_ADMIN, GROUP_ADMIN),
         (GROUP_REDTEAM, GROUP_REDTEAM),
@@ -32,14 +73,14 @@ class GroupAddForm(forms.Form):
 
     account_type = forms.CharField(
         label=_("Account Type"),
-        help_text=_("Every member of OpenKAT must be part of a group."),
+        help_text=_("Every member of OpenKAT must be part of an account type."),
         error_messages={
             "group": {
-                "required": _("Please select a group to proceed."),
+                "required": _("Please select an account type to proceed."),
             },
         },
         widget=forms.Select(
-            choices=GROUP_CHOICES,
+            choices=ACCOUNT_TYPE_CHOICES,
             attrs={
                 "aria-describedby": "explanation-account-type",
             },
@@ -66,6 +107,21 @@ class IndemnificationAddForm(BaseRockyForm):
     )
 
 
+class TrustedClearanceLevelRadioPawsForm(forms.Form):
+    trusted_clearance_level = forms.ChoiceField(
+        required=True,
+        label=_("Trusted clearance level"),
+        choices=SCAN_LEVEL.choices,
+        help_text=_("Select a clearance level you trust this member with."),
+        widget=forms.RadioSelect(attrs={"radio_paws": True}),
+        error_messages={
+            "trusted_clearance_level": {
+                "required": _("Please select a clearance level to proceed."),
+            },
+        },
+    )
+
+
 class AssignClearanceLevelForm(BaseRockyForm):
     assigned_level = forms.BooleanField(
         label=_("Trusted to change Clearance Levels."),
@@ -76,6 +132,70 @@ class AcknowledgeClearanceLevelForm(BaseRockyForm):
     acknowledged_level = forms.BooleanField(
         label=_("Acknowledged to change Clearance Levels."),
     )
+
+
+class UserRegistrationForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "off",
+                "placeholder": _("Choose your super secret password"),
+                "aria-describedby": "explanation-password",
+            },
+        ),
+        help_text=get_password_validators_help_texts(),
+        validators=[validate_password],
+        error_messages={"required": _("Please enter your password.")},
+    )
+
+    class Meta:
+        model = User
+
+        fields = [
+            "full_name",
+            "email",
+            "password",
+        ]
+        labels = {
+            "full_name": _("Name"),
+        }
+        help_texts = {
+            "full_name": _("This name we will use to communicate with you."),
+            "email": _("Enter your email address."),
+        }
+        error_messages = {
+            "full_name": {"required": _("Please enter your name.")},
+            "email": {"required": _("Please enter your email address."), "unique": _("Choose another email.")},
+        }
+        widgets = {
+            "full_name": forms.TextInput(
+                attrs={
+                    "autocomplete": "off",
+                    "placeholder": _("What do we call you?"),
+                    "aria-describedby": "explanation-name",
+                }
+            ),
+            "email": forms.EmailInput(
+                attrs={
+                    "autocomplete": "off",
+                    "placeholder": "name@example.com",
+                    "aria-describedby": "explanation-email",
+                }
+            ),
+        }
+
+
+class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPawsForm):
+    def __init__(self, *args, **kwargs):
+        self.organization = kwargs.pop("organization")
+        self.account_type = Group.objects.get(name=kwargs.pop("account_type"))
+        return super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+        return instance
 
 
 class UserAddForm(forms.Form):
@@ -165,7 +285,7 @@ class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
                 member.save()
 
 
-class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
+class OrganizationMemberToGroupAddForm(AccountTypeSelectForm, OrganizationMemberAddForm):
     class Meta:
         model = User
         fields = ("account_type", "name", "email", "password")
@@ -174,7 +294,7 @@ class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
 class OrganizationMemberEditForm(BaseRockyModelForm):
     trusted_clearance_level = forms.ChoiceField(
         required=False,
-        label=_("Assigned clearance level"),
+        label=_("Trusted clearance level"),
         choices=[(-1, "")] + SCAN_LEVEL.choices,
         help_text=_("Select a clearance level you trust this member with."),
         widget=forms.RadioSelect(attrs={"radio_paws": True}),
@@ -212,45 +332,6 @@ class OrganizationMemberEditForm(BaseRockyModelForm):
     class Meta:
         model = OrganizationMember
         fields = ["blocked", "trusted_clearance_level", "acknowledged_clearance_level"]
-
-
-class OrganizationForm(BaseRockyModelForm):
-    """
-    Form to create a new organization.
-    """
-
-    class Meta:
-        model = Organization
-        fields = ["name", "code"]
-
-        widgets = {
-            "name": forms.TextInput(
-                attrs={
-                    "placeholder": _("The name of the organization."),
-                    "autocomplete": "off",
-                    "aria-describedby": _("explanation-organization-name"),
-                },
-            ),
-            "code": forms.TextInput(
-                attrs={
-                    "placeholder": _("A unique code of {code_length} characters.").format(
-                        code_length=ORGANIZATION_CODE_LENGTH
-                    ),
-                    "autocomplete": "off",
-                    "aria-describedby": _("explanation-organization-code"),
-                },
-            ),
-        }
-        error_messages = {
-            "name": {
-                "required": _("Organization name is required to proceed."),
-                "unique": _("Choose another organization."),
-            },
-            "code": {
-                "required": _("Organization code is required to proceed."),
-                "unique": _("Choose another code for your organization."),
-            },
-        }
 
 
 class OnboardingOrganizationUpdateForm(OrganizationForm):
