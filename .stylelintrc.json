@@ -1,6 +1,5 @@
 {
   "extends": "stylelint-config-standard-scss",
-  "ignoreFiles": ["**/vendors/**"],
   "rules": {
     "number-max-precision": 5,
     "color-hex-length": "long",
