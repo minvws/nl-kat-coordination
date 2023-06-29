@@ -17,6 +17,7 @@ from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
+from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -28,10 +29,6 @@ class PageActions(Enum):
 class OOIListView(BaseOOIListView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.filtered_ooi_types = self.get_filtered_ooi_types()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -182,17 +179,13 @@ class OOIListView(BaseOOIListView):
 
 
 class OOIListExportView(BaseOOIListView):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.filtered_ooi_types = self.get_filtered_ooi_types()
-
     def get(self, request, *args, **kwargs):
         file_type = request.GET.get("file_type")
         observed_at = self.get_observed_at()
         filters = self.get_ooi_types_display()
 
         queryset = self.get_queryset()
-        ooi_list = queryset[: queryset.count]
+        ooi_list = queryset[: OOIList.HARD_LIMIT]
 
         exports = [
             {

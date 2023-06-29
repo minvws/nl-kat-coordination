@@ -445,7 +445,7 @@ def test_ooi_list_filtered_export_csv(rf, client_member, mock_organization_view_
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "text/csv"
-    assert mock_organization_view_octopoes().list.call_count == 2
+    assert mock_organization_view_octopoes().list.call_count == 1
 
     mock_calls = mock_organization_view_octopoes().list.mock_calls
     assert list(mock_calls[0].kwargs["scan_level"])[0].value == 3
