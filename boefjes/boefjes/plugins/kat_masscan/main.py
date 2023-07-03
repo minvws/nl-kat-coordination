@@ -8,6 +8,8 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
+IMAGE = "noamblitz/masscan:latest"
+
 
 ###############################################################################
 # Identical to Webpage Capture boefje.
@@ -49,7 +51,7 @@ class TarStream(io.RawIOBase):
         return outlen
 
 
-def get_file_from_container(container: docker.models.containers.Container, path: str) -> bytes:
+def get_file_from_container(container: docker.models.containers.Container, path: str) -> Union[bytes, None]:
     """Returns a file from a docker container."""
     try:
         stream, _ = container.get_archive(path)
@@ -71,29 +73,16 @@ def get_file_from_container(container: docker.models.containers.Container, path:
 ###############################################################################
 
 
-def build_image(client: docker.DockerClient, tag: str) -> str:
-    """Builds Docker container from Dockerfile in kat_masscan folder."""
-    output = client.images.build(path="boefjes/plugins/kat_masscan/", tag=tag, quiet=False)
-    logging.info("Build image: %s", output)
-    return tag
-
-
-def run_masscan(target_ip, tmp_path: str = "/tmp/output.json") -> Tuple[bytes]:
+def run_masscan(target_ip, tmp_path: str = "/tmp/output.json") -> bytes:
     """Run Playwright in Docker."""
     client = docker.from_env()
-
-    # Build image if it does not exist yet.
-    known_tags = [tag for tag_list in [c.tags for c in client.images.list()] for tag in tag_list]
-    image_tag = "nl-kat-masscan-0"
-    if image_tag + ":latest" not in known_tags:
-        image_tag = build_image(client, image_tag)
 
     # Scan according to arguments.
     port_range = os.getenv("PORTS", "53,80-82,443")
     max_rate = os.getenv("MAX_RATE", 100)
-    logging.info("Starting container %s to run masscan...", image_tag)
+    logging.info("Starting container %s to run masscan...", IMAGE)
     res = client.containers.run(
-        image=image_tag,
+        image=IMAGE,
         command=[f"-p{port_range}", "--max-rate", max_rate, "-oJ", tmp_path, target_ip],
         detach=True,
     )
