@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Dict, List, Optional
 
-from django.http import HttpRequest, HttpResponse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -52,11 +51,11 @@ def generate_findings_metadata(
 class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListView):
     connector_form_class = ObservedAtForm
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.severities = self.get_severities()
         self.valid_time = self.get_observed_at()
         self.exclude_muted = request.GET.get("exclude_muted", False)
-        return super().get(request, *args, **kwargs)
 
     def get_queryset(self) -> FindingList:
         return FindingList(

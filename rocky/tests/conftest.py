@@ -281,6 +281,11 @@ def mock_organization_view_octopoes(mocker):
 
 
 @pytest.fixture
+def mock_organization_new_octopoes(mocker):
+    return mocker.patch("rocky.views.mixins.OctopoesAPIConnector")
+
+
+@pytest.fixture
 def mock_crisis_room_octopoes(mocker):
     return mocker.patch("crisis_room.views.OctopoesAPIConnector")
 

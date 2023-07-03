@@ -2,7 +2,10 @@ import pytest
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
+from octopoes.models.ooi.findings import Finding
+from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
+from rocky.views.finding_list import FindingListView
 from rocky.views.ooi_add import OOIAddView
 from rocky.views.ooi_detail import OOIDetailView
 from rocky.views.ooi_findings import OOIFindingListView
@@ -176,3 +179,66 @@ def test_mute_finding_post(
     assertContains(resulted_response, "MutedFinding")
     assertContains(resulted_response, muted_finding["reason"])
     assertContains(resulted_response, "KAT-000 @ testnetwork")
+
+
+@pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
+def test_findings_list_filtering(
+    rf,
+    request,
+    member,
+    mock_organization_view_octopoes,
+    network,
+    finding_types,
+    mocker,
+    mock_bytes_client,
+    mock_scheduler,
+):
+    member = request.getfixturevalue(member)
+    finding_1 = Finding(
+        finding_type=finding_types[1].reference,
+        ooi=network.reference,
+        proof="proof",
+        description="test description 123",
+        reproduce="reproduce",
+    )
+    finding_2 = Finding(
+        finding_type=finding_types[2].reference,
+        ooi=network.reference,
+        proof="proof",
+        description="test description 123",
+        reproduce="reproduce",
+    )
+    mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
+        count=2,
+        items=[finding_1, finding_2],
+    )
+
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
+        network.reference: network,
+        finding_types[1].reference: finding_types[1],
+        finding_types[2].reference: finding_types[2],
+    }
+
+    response = FindingListView.as_view()(
+        setup_request(rf.get("finding_list"), member.user),
+        organization_code=member.organization.code,
+    )
+    assert len(response.context_data["object_list"]) == 2
+    assert response.status_code == 200
+
+    request_filtering = setup_request(
+        rf.get(
+            "finding_list",
+            {
+                "severity": "low",
+            },
+        ),
+        member.user,
+    )
+    response_filtering = FindingListView.as_view()(request_filtering, organization_code=member.organization.code)
+
+    assertContains(response_filtering, '<span class="low">Low</span>')
+    assertNotContains(response_filtering, '<span class="critical">Critical</span>')
+
+    assert len(response_filtering.context_data["object_list"]) == 1
+    assert response_filtering.status_code == 302
