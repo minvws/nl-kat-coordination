@@ -10,7 +10,25 @@ Install and update
 openKAT_install.sh
 ------------------
 
-`openKAT_install.sh </utilities/scripts/openKAT_install.sh>`_ installs OpenKAT on Debian 11 or 12, following the steps of the Debian install manual. Before running the script, edit it to specify the version of OpenKAT you want to run.
+`openKAT_install.sh </utilities/scripts/openKAT_install.sh>`_ installs OpenKAT on Debian 11 or 12, following the steps of the Debian install manual. Use the script as follows: 
+
+Change the permissions on the file to 750:
+wget <link to file
+chmod 750 openKAT_install.sh
+
+usage:
+./openKAT_install.sh [debian version] [openkat version] [no_super_user]
+
+Parameters:
+debian version: mandatory parameter, currently version 11 or 12 are supported
+openKAT version: mandatory parameter, e.g. 1.10.0
+no_super_user: optional parameter used for re-installs only
+
+Example for initial install of KAT version 1.10.0 on Debian 11 (create including the super user):
+./openKAT_install.sh 11 1.10.0
+
+and re-installing KAT version 1.10.0rc1 without super user account on Debian 12:
+./openKAT_install.sh 12 1.10.0rc1 no_super_user
 
 openKAT_update.sh
 -----------------
