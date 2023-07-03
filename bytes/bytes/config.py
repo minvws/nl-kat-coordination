@@ -14,13 +14,13 @@ class Settings(BaseSettings):
     bytes_username: str
     bytes_password: str
     queue_uri: Optional[str]
-    log_cfg: Path = BASE_DIR / "dev.logging.conf"
+    log_cfg: Path = BASE_DIR / "dev.logging.conf"  # Follow-up ticket to make logging the same for all modules?
 
     bytes_db_uri: str
     bytes_data_dir: Path = Path("/data")
 
     bytes_log_file: str = "bytes.log"
-    access_token_expire_minutes: float = 15.0
+    access_token_expire_minutes: float = 15.0  # Which value should be the default and why?
     bytes_folder_permission: str = "740"
     bytes_file_permission: str = "640"
 
@@ -31,12 +31,14 @@ class Settings(BaseSettings):
     rfc3161_provider: Optional[str]
     rfc3161_cert_file: Optional[Path]
 
-    encryption_middleware: EncryptionMiddleware = EncryptionMiddleware.NACL_SEALBOX
-    kat_private_key_b64: str = ""
-    vws_public_key_b64: str = ""
+    encryption_middleware: EncryptionMiddleware = (
+        EncryptionMiddleware.NACL_SEALBOX
+    )  # Should we default to no encryption? Does NACL_SEALBOX require keys?
+    kat_private_key_b64: str = ""  # Should this be renamed?
+    vws_public_key_b64: str = ""  # Should this be renamed?
 
     span_export_grpc_endpoint: Optional[str]
-    bytes_metrics_ttl_seconds: int = 300
+    bytes_metrics_ttl_seconds: int = 300  # Which value should be the default and why?
 
 
 @lru_cache

@@ -20,13 +20,15 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    log_cfg: str = str(Path(__file__).parent.parent.parent / "logging.yml")  # todo: use Path type
-    queue_name_octopoes: str = "octopoes"
+    log_cfg: str = str(
+        Path(__file__).parent.parent.parent / "logging.yml"
+    )  # Follow-up ticket to make logging the same for all modules?
+    queue_name_octopoes: str = "octopoes"  # Why would someone use another queue name?
 
     # External services settings
     queue_uri: str = "amqp://guest:guest@rabbitmq:5672/%2fkat"
     xtdb_uri: str = "http://crux:3000"
-    xtdb_type: XTDBType = XTDBType.CRUX
+    xtdb_type: XTDBType = XTDBType.CRUX  # We only support xtdb-multinode right?
     span_export_grpc_endpoint: Optional[str] = None
 
     katalogus_api: str = "http://localhost:8003"
