@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from tools.forms.ooi import MuteFindingForm
+from tools.ooi_helpers import create_ooi
 
 from octopoes.models.ooi.findings import MutedFinding
 from rocky.views.mixins import SingleOOIMixin
@@ -44,8 +45,8 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
 
         for finding in selected_findings:
-            data = {"finding": finding, "reason": reason}
-            self.save_ooi(data)
+            ooi = self.ooi_class.parse_obj({"finding": finding, "reason": reason})
+            create_ooi(self.octopoes_api_connector, self.bytes_client, ooi)
 
         messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
         return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
 from typing import Dict, List, Optional, Set, Tuple, Type, Union
-from uuid import uuid4
 
 import requests.exceptions
 from account.mixins import OrganizationView
@@ -24,7 +23,6 @@ from tools.view_helpers import (
     get_ooi_url,
 )
 
-from octopoes.api.models import Declaration
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
@@ -33,7 +31,7 @@ from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_collapsed_types, get_relations, type_by_name
-from rocky.bytes_client import BytesClient, get_bytes_client
+from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
 
@@ -324,19 +322,6 @@ class SingleOOIMixin(OctopoesView):
             pk = self.get_ooi_id()
 
         return self.get_single_ooi(pk, observed_at)
-
-    def save_ooi(self, data) -> OOI:
-        new_ooi = self.ooi_class.parse_obj(data)
-
-        task_id = uuid4()
-        declaration = Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
-
-        get_bytes_client(self.organization.code).add_manual_proof(
-            task_id, BytesClient.raw_from_declarations([declaration])
-        )
-
-        self.octopoes_api_connector.save_declaration(declaration)
-        return new_ooi
 
     def get_breadcrumb_list(self):
         start = {

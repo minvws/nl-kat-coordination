@@ -11,6 +11,7 @@ from tools.forms.base import BaseRockyForm, ObservedAtForm
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
 from tools.ooi_form import ClearanceFilterForm, OOIForm
+from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
@@ -131,7 +132,8 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
     def form_valid(self, form):
         # Transform into OOI
         try:
-            new_ooi = self.save_ooi(form.cleaned_data)
+            new_ooi = self.ooi_class.parse_obj(form.cleaned_data)
+            create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi)
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))
         except ValidationError as exception:
