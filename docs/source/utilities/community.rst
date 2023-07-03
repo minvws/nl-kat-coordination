@@ -35,6 +35,21 @@ openKAT_update.sh
 
 `openKAT_update.sh </utilities/scripts/openKAT_update.sh>`_ updates OpenKAT, removes old packages and restarts your instances.
 
+To update an existing KAT installation using the Debian packages download <link to openKAT_update.sh> and change the permissions to 750:
+
+wget <link to openKAT_update.sh>
+chmod 750 openKAT_update.sh
+
+Usage:
+./openKAT_update [Debian version] [openKAT version]
+
+Parameters:
+debian version: mandatory parameter, currently version 11 or 12 are supported
+openKAT version: mandatory parameter, e.g. 1.10.0
+
+Example to update a previous openKAT installation to version 1.10.0 on Debian 12:
+./openKAT_update.sh 12 1.10.0
+
 Status and logs
 ===============
 
