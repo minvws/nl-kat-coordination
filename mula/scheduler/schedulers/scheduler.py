@@ -64,7 +64,7 @@ class Scheduler(abc.ABC):
         """
 
         self.logger: logging.Logger = logging.getLogger(__name__)
-        self.enabled = True
+        self.is_enabled = True
         self.ctx: context.AppContext = ctx
         self.scheduler_id = scheduler_id
         self.queue: queues.PriorityQueue = queue
@@ -73,20 +73,28 @@ class Scheduler(abc.ABC):
         self.max_tries: int = max_tries
 
         self.callback: Optional[Callable[[], Any]] = callback
-        self.threads: List[thread.ThreadRunner] = []
-        self.stop_event: threading.Event = threading.Event()
 
+        # Listeners
         self.listeners: Dict[str, connectors.listeners.Listener] = {}
+
+        # Threads
+        self.stop_event_threads: threading.Event = threading.Event()
+        self.threads: List[thread.ThreadRunner] = []
+
+        # Checks
+        self.stop_event_checks: threading.Event = threading.Event()
+        self.checks: List[thread.ThreadRunner] = []
 
         t = utils.ThreadRunner(
             name=f"scheduler-{self.scheduler_id}-enabled",
             target=self.check_enabled,
-            stop_event=threading.Event(),
+            stop_event=self.stop_event_checks,
             interval=0.01,
             daemon=False,
             loop=True,
         )
         t.start()
+        self.checks.append(t)
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -278,6 +286,7 @@ class Scheduler(abc.ABC):
         self,
         name: str,
         target: Callable[[], Any],
+        stop_event: threading.Event,
         interval: float = 0.01,
         daemon: bool = False,
         loop: bool = True,
@@ -294,7 +303,7 @@ class Scheduler(abc.ABC):
         t = utils.ThreadRunner(
             name=name,
             target=target,
-            stop_event=self.stop_event,
+            stop_event=stop_event,
             interval=interval,
             daemon=daemon,
             loop=loop,
@@ -302,6 +311,74 @@ class Scheduler(abc.ABC):
         t.start()
 
         self.threads.append(t)
+
+    def is_space_on_queue(self) -> bool:
+        """Check if there is space on the queue.
+
+        NOTE: maxsize 0 means unlimited
+        """
+        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
+            return False
+
+        return True
+
+    def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
+        return self.queue.is_item_on_queue_by_hash(item_hash)
+
+    # FIXME: this is confusing, rename
+    def is_alive(self) -> bool:
+        """Check if the scheduler is alive."""
+        return not self.stop_event_threads.is_set()
+
+    # FIXME: necessary?
+    def check_enabled(self) -> None:
+        """Check if the scheduler is enabled."""
+        if self.is_enabled and not self.is_alive():
+            self.enable()
+        elif not self.is_enabled and self.is_alive():
+            self.disable()
+        elif self.is_enabled and self.is_alive():
+            self.logger.debug("Scheduler is already running")
+        elif not self.is_enabled and not self.is_alive():
+            self.logger.debug("Scheduler is already stopped")
+
+    def disable(self) -> None:
+        """Disable the scheduler.
+
+        NOTE: we keep the check_enabled thread running
+
+        """
+        self.logger.info("Disabling scheduler: %s", self.scheduler_id)
+
+        self.stop_listeners()
+        self.stop_threads()
+
+        self.queue.clear()
+
+        # Get all tasks that were on the queue and set them to CANCELLED
+        tasks, _ = self.ctx.task_store.get_tasks(
+            scheduler_id=self.scheduler_id,
+            status=models.TaskStatus.QUEUED,
+        )
+        task_ids = [task.id for task in tasks]
+        self.ctx.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
+
+        self.is_enabled = False
+
+        self.logger.info("Disabled scheduler: %s", self.scheduler_id)
+
+    def enable(self) -> None:
+        self.logger.info("Enabling scheduler: %s", self.scheduler_id)
+
+        self.stop_event_threads.clear()
+        for t in self.checks:
+            t.start()
+
+        self.run()
+
+        self.is_enabled = True
+
+        self.logger.info("Enabled scheduler: %s", self.scheduler_id)
 
     def stop(self, callback: bool = True) -> None:
         """Stop the scheduler."""
@@ -312,6 +389,7 @@ class Scheduler(abc.ABC):
         # will not stop the thread. We need to explicitly stop the listener.
         self.stop_listeners()
         self.stop_threads()
+        self.stop_checks()
 
         if self.callback and callback:
             self.callback(self.scheduler_id)  # type: ignore [call-arg]
@@ -330,52 +408,16 @@ class Scheduler(abc.ABC):
             t.join(5)
             self.threads.remove(t)
 
-    def is_space_on_queue(self) -> bool:
-        """Check if there is space on the queue.
-
-        NOTE: maxsize 0 means unlimited
-        """
-        if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
-            return False
-
-        return True
-
-    def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
-        return self.queue.is_item_on_queue_by_hash(item_hash)
-
-    def is_alive(self) -> bool:
-        """Check if the scheduler is alive."""
-        return not self.stop_event.is_set()
-
-    def check_enabled(self) -> None:
-        """Check if the scheduler is enabled."""
-        if self.enabled and not self.is_alive():
-            self.logger.debug("Scheduler is enabled, starting")
-            self.stop_event.clear()
-            self.run()
-        elif not self.enabled and self.is_alive():
-            self.logger.debug("Scheduler is disabled, not running")
-            self.stop(callback=False)
-
-            # Clear the queue
-            self.queue.clear()
-
-            # Get all tasks that were on the queue and set them to CANCELLED
-            tasks = self.ctx.task_store.get_tasks(
-                scheduler_id=self.scheduler_id,
-                status=models.TaskStatus.QUEUED,
-            )
-            task_ids = [task.task_id for task in tasks]
-            self.ctx.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
-        elif self.enabled and self.is_alive():
-            self.logger.debug("Scheduler is already running")
-        elif not self.enabled and not self.is_alive():
-            self.logger.debug("Scheduler is already stopped")
+    def stop_checks(self) -> None:
+        """Stop the checks."""
+        for t in self.checks:
+            t.join(5)
+            self.checks.remove(t)
 
     def dict(self) -> Dict[str, Any]:
         return {
             "id": self.scheduler_id,
-            "enabled": self.enabled,
+            "enabled": self.is_enabled,
             "priority_queue": {
                 "id": self.queue.pq_id,
                 "item_type": self.queue.item_type.type,

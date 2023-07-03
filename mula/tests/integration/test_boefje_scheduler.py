@@ -82,6 +82,9 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
+    def tearDown(self):
+        self.scheduler.stop_checks()
+
 
 class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
@@ -557,7 +560,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertIn("Could not add task to queue, queue was full", cm.output[-1])
         self.assertEqual(1, self.scheduler.queue.qsize())
 
-    # TODO: could be leveraged to test_scheduler.py
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
@@ -588,7 +590,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-    # TODO: could be leveraged to test_scheduler.py
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
         # Arrange

@@ -71,18 +71,21 @@ class BoefjeScheduler(Scheduler):
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-mutations",
             target=self.listeners["scan_profile_mutations"].listen,
+            stop_event=self.stop_event_threads,
             loop=False,
         )
 
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-new_boefjes",
             target=self.push_tasks_for_new_boefjes,
+            stop_event=self.stop_event_threads,
             interval=60.0,
         )
 
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-random",
             target=self.push_tasks_for_random_objects,
+            stop_event=self.stop_event_threads,
             interval=60.0,
         )
 
