@@ -49,9 +49,9 @@ restart_openkat.sh
 `restart_openkat.sh </utilities/scripts/restart_openkat.sh>`_ restarts all OpenKAT processes.
 
 Empty queue
------------
+===========
 
-`empty_job_queue_openkat.sh </utilities/scripts/empty_job_queue_openkat.sh>`_ stops your OpenKAT processes, empties the job queue and starts all processes. It also includes a 60 second sleep to make sure all processes have started completely.
+`empty job queue_openkat.sh </utilities/scripts/empty_job_queue_openkat.sh>`_ stops your OpenKAT processes, empties the job queue and starts all processes. It also includes a 60 second sleep to make sure all processes have started completely.
 
 
 
