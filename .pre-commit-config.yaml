@@ -94,11 +94,11 @@ repos:
         files: '^rocky/.*/templates/.*$'
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v15.4.0
+    rev: v15.9.0
     hooks:
       - id: stylelint
         args: [--fix]
         additional_dependencies:
-               - stylelint@15.4.0
-               - stylelint-config-standard-scss@8.0.0
-        files:  "^(rocky\/assets\/src\/|docs\/source\/).*.(css|scss|sass)$"
+               - stylelint@15.9.0
+               - stylelint-config-standard-scss@10.0.0
+        files:  "^(rocky\/assets\/|docs\/source\/).*.(css|scss|sass)$"
