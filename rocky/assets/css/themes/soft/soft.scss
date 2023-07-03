@@ -1,16 +1,18 @@
 /* theme: Soft */
+
 /* Fonts */
 @import "fonts/fonts";
+
 /* Fonts */
 
 /* Styling sets. E.g color sets */
-@import "manon/kat-purrple.scss";
+@import "manon/kat-purrple";
 @import "manon/body-text-set";
 @import "manon/spot-large";
 
 /* Branding colors */
 @import "manon/headings-base-set";
-@import "manon/text-colors.scss";
+@import "manon/text-colors";
 
 /* Defining available heading styles */
 @import "manon/spacing";
@@ -21,7 +23,9 @@
 /* Styling on the highest level */
 
 /* Helpers */
-/*@import "manon/center-only-child.scss";*/
+
+/* @import "manon/center-only-child.scss"; */
+
 /* Can be added after v10.1.1 */
 
 /* Layout */
@@ -63,7 +67,7 @@
 @import "manon/header-navigation-link-active";
 @import "manon/notification-block";
 @import "manon/icon";
-@import "manon/layout-column-4.scss";
+@import "manon/layout-column-4";
 @import "manon/description-list";
 @import "manon/form-fieldset";
 @import "manon/form-radio";
@@ -78,6 +82,3 @@
 @import "manon/tile";
 @import "manon/language-selector-list";
 @import "manon/image-square";
-
-/* Needs sorting */
-@import "manon/manon-variables";

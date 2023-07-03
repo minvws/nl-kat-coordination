@@ -1,6 +1,6 @@
 .affected-objects {
   span:not(:last-child) {
-    &:after {
+    &::after {
       content: "-";
       display: inline-block;
     }

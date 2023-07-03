@@ -20,9 +20,8 @@ header nav form {
 }
 
 body>header nav.collapsible.collapsed button.collapsible-toggle[aria-expanded="true"]+.collapsing-element {
-
     ul li a[aria-current] {
-        &:before {
+        &::before {
             content: "\ea5e";
             font-family: var(--language-selector-list-button-icon-font-family);
             margin-left: var(--language-selector-list-button-icon-margin-left);

@@ -1,25 +1,30 @@
-@keyframes fadeInOut {
+@keyframes fade-in-out {
   0% {
     opacity: 0;
   }
+
   2% {
     opacity: 1;
   }
+
   8% {
     opacity: 1;
   }
+
   10% {
     opacity: 0;
   }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   0% {
     opacity: 0;
   }
+
   2% {
     opacity: 1;
   }
+
   100% {
     opacity: 1;
   }
@@ -31,7 +36,7 @@
 }
 
 .wait-text span {
-  animation: fadeInOut linear 10s;
+  animation: fade-in-out linear 10s;
   height: 3.5rem;
   left: 0;
   margin-top: 2.5rem;
@@ -53,6 +58,6 @@
 }
 
 .wait-text span:nth-child(5) {
-  animation-name: fadeIn;
+  animation-name: fade-in;
   animation-delay: 8s;
 }

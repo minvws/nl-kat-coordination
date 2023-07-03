@@ -2,7 +2,7 @@
 $kat-font-path: "themes/soft/fonts/kat-icons" !default;
 
 @font-face {
-  font-family: "kat-icons";
+  font-family: kat-icons;
   font-weight: normal;
   font-style: normal;
   src: url("#{$kat-font-path}//kat-icons.eot");

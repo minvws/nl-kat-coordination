@@ -11,7 +11,7 @@ div {
       gap: var(--layout-fifty-fifty-breakpoint-gap);
 
       > * {
-        max-width: calc(50% - (var(--layout-fifty-fifty-gap)/2));
+        max-width: calc(50% - (var(--layout-fifty-fifty-gap) / 2));
       }
     }
   }

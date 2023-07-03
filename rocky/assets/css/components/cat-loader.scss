@@ -2,14 +2,17 @@
   0% {
     transform: rotate(-10deg);
   }
+
   100% {
     transform: rotate(10deg);
   }
 }
+
 @keyframes paw {
   0% {
     transform: rotate(20deg);
   }
+
   100% {
     transform: rotate(-40deg);
   }
@@ -20,6 +23,7 @@
   justify-content: center;
   margin: 3rem auto;
 }
+
 .cat-loader {
   height: 13rem;
   position: relative;
@@ -31,6 +35,7 @@
     position: absolute;
     top: 8rem;
   }
+
   .ball {
     animation: ball 1s alternate infinite ease-in-out;
     left: 1.5rem;
@@ -38,6 +43,7 @@
     top: 9.5rem;
     transform-origin: center bottom;
   }
+
   .head {
     position: absolute;
     top: 1rem;
@@ -50,20 +56,24 @@
     top: 8rem;
     transform-origin: center top;
   }
+
   .line {
     left: 2rem;
     position: absolute;
     top: 11.5rem;
   }
+
   .body {
     display: block;
     position: absolute;
     top: 4rem;
   }
+
   .ear-left {
     left: 0.5rem;
     position: absolute;
   }
+
   .ear-right {
     left: 3rem;
     position: absolute;

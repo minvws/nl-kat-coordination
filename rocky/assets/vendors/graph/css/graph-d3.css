@@ -8,21 +8,21 @@
 }
 
 #graph-selector {
-  border: 1px dotted #000;
+  border: 1px dotted #000000;
   position: fixed;
-  background: rgba(202, 32, 94, 0.5);
+  background: rgb(202 32 94 / 50%);
 }
 
 #nodes-selection {
   display: none;
   max-width: 600px;
   margin: auto;
-  box-shadow: 0px 5px 15px rgb(0 0 0 / 5%);
+  box-shadow: 0 5px 15px rgb(0 0 0 / 5%);
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background-color: #fff;
+  background-color: #ffffff;
   z-index: 1;
   max-height: 600px;
   overflow: auto;
@@ -66,7 +66,7 @@
 }
 
 .node circle {
-  fill: #fff;
+  fill: #ffffff;
   stroke: steelblue;
   stroke-width: 3px;
 }
@@ -77,6 +77,6 @@
 
 .link {
   fill: none;
-  stroke: #ccc;
+  stroke: #cccccc;
   stroke-width: 2px;
 }

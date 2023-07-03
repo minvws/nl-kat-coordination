@@ -36,8 +36,7 @@ body>header nav.collapsible-menu button.menu-toggle {
 }
 
 .collapsible-menu .collapsing-menu {
-  -webkit-box-shadow: 0px 8px 16px 0px rgba(17, 20, 22, 0.15);
-  box-shadow: 0px 8px 16px 0px rgba(17, 20, 22, 0.15);
+  box-shadow: 0 8px 16px 0 rgb(17 20 22 / 15%);
 
   ul {
     li {

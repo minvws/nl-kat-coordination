@@ -13,7 +13,7 @@ body > header {
             justify-content: space-between;
         }
 
-        @media screen and (min-width: 42rem) {
+        @media screen and (width >= 42rem) {
             > div {
                 gap: 2rem;
             }

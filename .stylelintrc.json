@@ -8,7 +8,9 @@
       true,
       {
         "ignoreFontFamilies": [
-          "RO Icons"
+          "RO Icons",
+          "tabler-icons",
+          "kat-icons"
         ]
       }
     ]

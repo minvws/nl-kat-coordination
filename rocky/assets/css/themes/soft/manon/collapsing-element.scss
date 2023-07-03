@@ -5,11 +5,9 @@
 }
 
 body header nav.collapsible {
-
     /* Collapsed state */
     &.collapsed.collapsed {
         .collapsing-element {
-
             .collapsible {
                 flex-direction: column;
 
@@ -26,7 +24,7 @@ body header nav.collapsible {
                         }
                     }
 
-                    &:before {
+                    &::before {
                         content: none;
                     }
                 }
@@ -61,7 +59,7 @@ body header nav.collapsible {
                 }
 
                 a[aria-selected="true"] {
-                    &:before {
+                    &::before {
                         content: var(--collapsible-list-selected-icon);
                     }
 
@@ -73,7 +71,6 @@ body header nav.collapsible {
 }
 
 body>header nav.collapsible.collapsed button.collapsible-toggle {
-
     &[aria-expanded="false"],
     &[aria-expanded="true"] {
         &.user-icon {

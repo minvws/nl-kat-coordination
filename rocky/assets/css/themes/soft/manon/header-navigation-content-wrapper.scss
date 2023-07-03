@@ -11,10 +11,8 @@
 
 body>header {
     >nav {
-
         /* Header navigation content wrapper */
         >div {
-
             /* Collapsing element above breakpoint */
             .collapsible-toggle[aria-expanded="false"]+div {
                 width: 100%;

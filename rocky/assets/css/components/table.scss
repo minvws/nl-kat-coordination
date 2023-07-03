@@ -23,11 +23,11 @@ tr {
   	border-style: var(--notification-confirmation-border-style);
   	border-color: var(--notification-confirmation-border-color);
 
-  	&:before {
+  	&::before {
 	    content: var(--notification-confirmation-icon-before-content);
 	  }
 
-	  &:after {
+	  &::after {
 	    content: var(--notification-confirmation-icon-after-content);
 	  }
 	}
@@ -38,11 +38,11 @@ tr {
   	border-style: var(--notification-error-border-style);
   	border-color: var(--notification-error-border-color);
 
-  	&:before {
+  	&::before {
 	    content: var(--notification-error-icon-before-content);
 	  }
 
-	  &:after {
+	  &::after {
 	    content: var(--notification-error-icon-after-content);
 	  }
 	}
@@ -53,11 +53,11 @@ tr {
   	border-style: var(--notification-warning-border-style);
   	border-color: var(--notification-warning-border-color);
 
-  	&:before {
+  	&::before {
 	    content: var(--notification-warning-icon-before-content);
 	  }
 
-	  &:after {
+	  &::after {
 	    content: var(--notification-warning-icon-after-content);
 	  }
 	}
@@ -68,11 +68,11 @@ tr {
   	border-style: var(--notification-explanation-border-style);
   	border-color: var(--notification-explanation-border-color);
 
-  	&:before {
+  	&::before {
 	    content: var(--notification-explanation-icon-before-content);
 	  }
 
-	  &:after {
+	  &::after {
 	    content: var(--notification-explanation-icon-after-content);
 	  }
 	}

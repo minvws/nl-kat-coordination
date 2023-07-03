@@ -25,27 +25,27 @@ Markup:
     line-height: 1rem;
     padding: 0;
 
-    &:before {
+    &::before {
       content: "\e900";
-      font-family: "kat-icons";
-      color: #ccc;
+      font-family: kat-icons;
+      color: #cccccc;
       font-size: 1rem;
     }
   }
 
-  &.l1 li:first-child:before {
+  &.l1 li:first-child::before {
     color: var(--kat-purrple-6);
   }
 
-  &.l2 li:nth-child(-n+2):before {
+  &.l2 li:nth-child(-n+2)::before {
     color: var(--kat-purrple-7);
   }
 
-  &.l3 li:nth-child(-n+3):before {
+  &.l3 li:nth-child(-n+3)::before {
     color: var(--kat-purrple-8);
   }
 
-  &.l4 li:nth-child(-n+4):before {
+  &.l4 li:nth-child(-n+4)::before {
     color: var(--kat-purrple-9);
   }
 

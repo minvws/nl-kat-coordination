@@ -35,24 +35,24 @@ Steps within a flow can be displayed using this partial.
     }
   }
 
-  @media (min-width: 56rem) {
+  @media (width >= 56rem) {
     >ul {
       display: flex;
       flex-direction: row;
       padding: 2rem 0;
 
       >li {
-        &:before {
+        &::before {
           content: "\ea61";
           display: inline-flex;
-          font-family: "tabler-icons";
+          font-family: tabler-icons;
           font-size: 1rem;
           font-weight: 400;
           margin: 0 2rem 0 1rem;
         }
 
         &:first-child {
-          &:before {
+          &::before {
             content: none;
           }
         }
