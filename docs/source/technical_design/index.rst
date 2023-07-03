@@ -17,4 +17,3 @@ Contains documentation for developers and contributors.
    debuggingtroubleshooting
    latex
    externalauthentication
-   configoois
