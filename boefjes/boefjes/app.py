@@ -8,7 +8,12 @@ from typing import Callable, Dict, List
 from pydantic import ValidationError
 from requests import HTTPError
 
-from boefjes.clients.scheduler_client import SchedulerAPIClient, SchedulerClientInterface, TaskStatus
+from boefjes.clients.scheduler_client import (
+    QueuePrioritizedItem,
+    SchedulerAPIClient,
+    SchedulerClientInterface,
+    TaskStatus,
+)
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler
 from boefjes.katalogus.local_repository import get_local_repository
@@ -30,42 +35,42 @@ class SchedulerWorkerManager(WorkerManager):
         self.client_factory = client_factory
         self.scheduler_client = client_factory()
         self.settings = settings
+
         self.task_queue = mp.Queue(maxsize=self.settings.pool_size)
-
-        manager = mp.Manager()
-        self.handling_tasks = manager.dict()
-
-        self.worker_args = (self.task_queue, self.item_handler, self.client_factory, self.handling_tasks)
+        self.handling_tasks = mp.Manager().dict()
 
         logger.setLevel(log_level)
 
     def run(self, queue_type: WorkerManager.Queue) -> None:
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
-        workers = [mp.Process(target=_start_working, args=self.worker_args) for _ in range(self.settings.pool_size)]
-
-        for worker in workers:
+        self.worker_args = (self.task_queue, self.item_handler, self.client_factory, self.handling_tasks)
+        self.workers = [
+            mp.Process(target=_start_working, args=self.worker_args) for _ in range(self.settings.pool_size)
+        ]
+        for worker in self.workers:
             worker.start()
+
+        signal.signal(signal.SIGINT, lambda x, y: self.exit(queue_type))
+        signal.signal(signal.SIGTERM, lambda x, y: self.exit(queue_type))
 
         while True:
             try:
-                workers = self._check_workers(workers)
+                self._check_workers()
                 self._fill_queue(self.task_queue, queue_type)
+                time.sleep(0.1)
             except Exception as e:  # noqa
                 logger.exception("Unhandled Exception:")
                 logger.info("Continuing worker...")
                 continue
-            except BaseException as e:  # noqa
+            except:  # noqa
                 logger.exception("Exiting worker...")
-                for worker in workers:
-                    worker.terminate()
-                    worker.join()
-                    worker.close()
+                self.exit(queue_type)
 
                 raise
 
     def _fill_queue(self, task_queue: mp.Queue, queue_type: WorkerManager.Queue):
-        if task_queue.full():
+        if task_queue.qsize() > self.settings.pool_size:
             time.sleep(self.settings.poll_interval)
             return
 
@@ -124,9 +129,10 @@ class SchedulerWorkerManager(WorkerManager):
             logger.debug("All queues empty, sleeping %f seconds", self.settings.poll_interval)
             time.sleep(self.settings.poll_interval)
 
-    def _check_workers(self, workers: List[mp.Process]) -> List[mp.Process]:
+    def _check_workers(self) -> None:
         new_workers = []
-        for worker in workers:
+
+        for worker in self.workers:
             if worker.is_alive():
                 new_workers.append(worker)
                 continue
@@ -142,7 +148,7 @@ class SchedulerWorkerManager(WorkerManager):
             new_worker.start()
             new_workers.append(new_worker)
 
-        return new_workers
+        self.workers = new_workers
 
     def _cleanup_pending_worker_task(self, worker: mp.Process) -> None:
         if worker.pid not in self.handling_tasks:
@@ -165,6 +171,25 @@ class SchedulerWorkerManager(WorkerManager):
         except HTTPError:
             logger.exception("Could not get scheduler task[id=%s]", handling_task_id)
 
+    def exit(self, queue_type: WorkerManager.Queue):
+        if not self.task_queue.empty():
+            items: List[QueuePrioritizedItem] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
+
+            for p_item in items:
+                self.scheduler_client.push_item(queue_type.value, p_item)
+
+        killed_workers = []
+
+        for worker in self.workers:  # Send all signals before joining, speeding up shutdowns
+            if not worker._closed and worker.is_alive():
+                worker.kill()
+                killed_workers.append(worker)
+
+        for worker in killed_workers:
+            worker.join()
+            self._cleanup_pending_worker_task(worker)
+            worker.close()
+
 
 def _format_exit_code(exitcode: int) -> str:
     if exitcode >= 0:
@@ -183,22 +208,22 @@ def _start_working(
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
     while True:
-        task = task_queue.get()
+        p_item = task_queue.get()
         status = TaskStatus.FAILED
-        handling_tasks[os.getpid()] = task.id
+        handling_tasks[os.getpid()] = str(p_item.id)
 
         try:
-            handler.handle(task.data)
+            handler.handle(p_item.data)
             status = TaskStatus.COMPLETED
         except Exception:  # noqa
-            logger.exception("An error occurred handling scheduler item[id=%s]", task.data.id)
+            logger.exception("An error occurred handling scheduler item[id=%s]", p_item.data.id)
         except:  # noqa
-            logger.exception("An unhandled error occurred handling scheduler item[id=%s]", task.data.id)
+            logger.exception("An unhandled error occurred handling scheduler item[id=%s]", p_item.data.id)
             raise
         finally:
             try:
-                scheduler_client.patch_task(str(task.id), status)
-                logger.info("Set status to %s in the scheduler for task[id=%s]", status, task.data.id)
+                scheduler_client.patch_task(str(p_item.id), status)  # Note: implicitly, we have p_item.id == task_id
+                logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value)
 
