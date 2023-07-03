@@ -3,7 +3,7 @@ from typing import List, Optional, Set, Type, Union
 
 from octopoes.models import OOI
 from octopoes.models.path import Direction, Path
-from octopoes.models.types import get_abstract_types, get_relations
+from octopoes.models.types import get_abstract_types, get_relations, to_concrete
 
 
 class InvalidField(ValueError):
@@ -92,6 +92,21 @@ class Query:
         if field_name not in ooi_type.__fields__:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
+        abstract_types = get_abstract_types()
+
+        if ooi_type in abstract_types:
+            if isinstance(value, str):
+                value = value.replace('"', r"\"")
+                self._add_or_statement(ooi_type, field_name, f'"{value}"')
+                return
+
+            if not isinstance(value, type):
+                raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
+
+            if issubclass(value, OOI):
+                self._add_or_statement(ooi_type, field_name, value.get_object_type())
+                return
+
         if isinstance(value, str):
             value = value.replace('"', r"\"")
             self._add_where_statement(ooi_type, field_name, f'"{value}"')
@@ -105,12 +120,6 @@ class Query:
 
         if field_name not in get_relations(ooi_type):
             raise InvalidField(f'"{field_name}" is not a relation of {ooi_type.get_object_type()}')
-
-        abstract_types = get_abstract_types()
-
-        if ooi_type in abstract_types:
-            self._add_or_statement(ooi_type, field_name, value.get_object_type())
-            return
 
         self._assert_type(value)
         self._add_where_statement(ooi_type, field_name, value.get_object_type())
@@ -148,7 +157,8 @@ class Query:
         if ooi_type not in get_abstract_types():
             return self._to_object_type_statement(ooi_type, ooi_type)
 
-        return f"(or {' '.join([self._to_object_type_statement(ooi_type, x) for x in ooi_type.strict_subclasses()])} )"
+        concrete = sorted(to_concrete({ooi_type}), key=lambda t: t.__name__)
+        return f"(or {' '.join([self._to_object_type_statement(ooi_type, x) for x in concrete])} )"
 
     def _to_object_type_statement(self, ooi_type: Type[OOI], other_type: Type[OOI]) -> str:
         return f'[ {ooi_type.get_object_type()} :object_type "{other_type.get_object_type()}" ]'
