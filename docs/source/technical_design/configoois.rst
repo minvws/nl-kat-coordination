@@ -5,11 +5,6 @@ What are Config OOI's?
 Config OOI's are, in principle, the same as regular objects, but serve to apply settings to the object that they to.
 Re-running all bits (through the Settings menu) will make sure they are applied.
 
-
-====================
-Current Config OOI's
-====================
-
 The below Config OOI's can be added by going to the ``Network|internet`` object detail page,
 clicking "Add" under "Related objects", selecting "Config" in the dropdown menu, and then clicking "Add object".
 
