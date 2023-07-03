@@ -7,7 +7,7 @@ BIT = BitDefinition(
     id="two-ipv6-nameservers",
     consumes=Hostname,
     parameters=[
-        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.hostname"),
+        BitParameterDefinition(ooi_type=Finding, relation_path="ooi [is DNSNSRecord].hostname"),
         BitParameterDefinition(ooi_type=DNSNSRecord, relation_path="hostname"),
     ],
     module="bits.two_ipv6_nameservers.two_ipv6_nameservers",
