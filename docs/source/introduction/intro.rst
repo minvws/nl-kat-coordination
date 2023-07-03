@@ -44,23 +44,7 @@ The easiest way to get to know the system is a local installation. If you don't 
 Where is the software located?
 ==============================
 
-OpenKAT consists of separate modules that each perform a specific task. These are included in a number of repositories.
-
-OpenKAT includes the following repositories:
-
-:Overview: `NL-KAT-Coordination <https://github.com/minvws/nl-kat-coordination>`_
-
-:Mula: `NL-KAT-mula <https://github.com/minvws/nl-kat-mula>`_
-
-:Octopoes: `NL-KAT-octopoes <https://github.com/minvws/nl-kat-octopoes>`_
-
-:Rocky: `NL-KAT-rocky <https://github.com/minvws/nl-kat-rocky>`_
-
-:Bytes: `NL-KAT-bytes <https://github.com/minvws/nl-kat-bytes>`_
-
-:Boefjes: `NL-KAT-boefjes <https://github.com/minvws/nl-kat-boefjes>`_
-
-The 'Modules of OpenKAT' section of the documentation goes into detail on each of these modules.
+OpenKAT consists of separate modules that each perform a specific task. All modules are located in the `NL-KAT-Coordination <https://github.com/minvws/nl-kat-coordination>`_ repository. The :ref:`Modules of OpenKAT<modules>` section of the documentation goes into detail on each of these modules.
 
 Responsible disclosure
 ======================
