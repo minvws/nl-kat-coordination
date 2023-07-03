@@ -90,6 +90,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_latest_task_by_hash = mock.patch(
             "scheduler.context.AppContext.task_store.get_latest_task_by_hash"
         ).start()
+
         self.mock_get_last_run_boefje = mock.patch(
             "scheduler.context.AppContext.services.bytes.get_last_run_boefje"
         ).start()
@@ -556,6 +557,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertIn("Could not add task to queue, queue was full", cm.output[-1])
         self.assertEqual(1, self.scheduler.queue.qsize())
 
+    # TODO: could be leveraged to test_scheduler.py
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
@@ -586,6 +588,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
+    # TODO: could be leveraged to test_scheduler.py
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
         # Arrange
@@ -623,6 +626,12 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+    def test_disable_scheduler(self):
+        pass
+
+    def test_enable_scheduler(self):
+        pass
 
 
 class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):

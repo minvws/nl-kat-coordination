@@ -191,6 +191,10 @@ class PriorityQueue(abc.ABC):
         """
         self.pq_store.remove(self.pq_id, str(p_item.id))
 
+    def clear(self) -> None:
+        """Clear the queue."""
+        self.pq_store.clear(self.pq_id)
+
     def empty(self) -> bool:
         """Return True if the queue is empty, False otherwise."""
         return self.pq_store.empty(self.pq_id)

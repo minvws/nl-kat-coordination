@@ -165,3 +165,12 @@ class PriorityQueueStore(PriorityQueueStorer):
             )
 
             return [models.PrioritizedItem.from_orm(item_orm) for item_orm in items_orm]
+
+    @retry()
+    def clear(self, scheduler_id: str) -> None:
+        with self.datastore.session.begin() as session:
+            (
+                session.query(models.PrioritizedItemORM)
+                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
+                .delete()
+            )
