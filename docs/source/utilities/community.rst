@@ -10,7 +10,7 @@ Install and update
 openKAT_install.sh
 ------------------
 
-`openKAT_install.sh </utilities/scripts/openKAT_install.sh>`_ installs OpenKAT on Debian 11 or 12, following the steps of the Debian install manual. After downloading, use the script as follows: 
+`openKAT_install.sh </utilities/scripts/openKAT_install.sh>`_ installs OpenKAT on Debian 11 or 12, following the steps of the Debian install manual. After downloading, use the script as follows:
 
 Change the permissions on the file to 750:
 wget <link to file
