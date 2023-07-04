@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# Installation for Debian 11 
+# Installation for Debian 11
 # echo (https://docs.openkat.nl/technical_design/debianinstall.html)
 
 # Check if version parameter was given
@@ -51,7 +51,7 @@ echo "Downloading nl-kat-coordination version ${1}..."
 sudo curl -LO "https://github.com/minvws/nl-kat-coordination/releases/download/v${2}/kat-debian${1}-${2}.tar.gz"
 
 echo "Step 5 - Install openKAT and xtdb"
-sudo tar zvxf kat-*.tar.gz 
+sudo tar zvxf kat-*.tar.gz
 sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb -y
 
 echo "Step 6 - Migrate databases (note: ignore two factor message in red)"
