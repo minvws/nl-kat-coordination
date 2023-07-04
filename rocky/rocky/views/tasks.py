@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from enum import Enum
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -8,11 +9,19 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
+from katalogus.client import get_katalogus
+from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 
+from rocky.bytes_client import get_bytes_client
 from rocky.scheduler import client
 
 TASK_LIMIT = 50
+
+
+class PageActions(Enum):
+    RESTART_BOEFJE = "restart_boefje"
+    RESTART_NORMALIZER = "restart_normalizer"
 
 
 class DownloadTaskDetail(OrganizationView):
@@ -81,11 +90,51 @@ class TaskListView(OrganizationView, ListView):
         return context
 
 
-class BoefjesTaskListView(TaskListView):
+class BoefjesTaskListView(BoefjeMixin, TaskListView):
     template_name = "tasks/boefjes.html"
     plugin_type = "boefje"
 
+    def post(self, request, *args, **kwargs):
+        if "action" in self.request.POST:
+            self.handle_page_action(request.POST["action"])
+        return self.get(request, *args, **kwargs)
 
-class NormalizersTaskListView(TaskListView):
+    def handle_page_action(self, action: str):
+        if action == PageActions.RESTART_BOEFJE.value:
+            task_id = self.request.POST.get("task_id")
+            task_details = client.get_task_details(task_id)
+
+            boefje_id = task_details["p_item"]["data"]["boefje"]["id"]
+            ooi_id = task_details["p_item"]["data"]["input_ooi"]
+
+            ooi = self.get_single_ooi(pk=ooi_id)
+            boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
+
+            self.run_boefje_for_oois(boefje, [ooi])
+            return True
+
+
+class NormalizersTaskListView(NormalizerMixin, TaskListView):
     template_name = "tasks/normalizers.html"
     plugin_type = "normalizer"
+
+    def post(self, request, *args, **kwargs):
+        if "action" in self.request.POST:
+            self.handle_page_action(request.POST["action"])
+        return self.get(request, *args, **kwargs)
+
+    def handle_page_action(self, action: str):
+        if action == PageActions.RESTART_NORMALIZER.value:
+            task_id = self.request.POST.get("task_id")
+            task_details = client.get_task_details(task_id)
+            normalizer_id = task_details["p_item"]["data"]["normalizer"]["id"]
+            normalizer = get_katalogus(self.organization.code).get_plugin(normalizer_id)
+
+            clt = get_bytes_client(self.organization.code)
+            clt.login()
+            raw_metas = client.get_raw_metas(task_id)
+
+            raws = {raw_meta["id"]: clt.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
+
+            self.run_normalizer(normalizer, raws)
+            return True

@@ -58,6 +58,9 @@
                                                 <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate "Download meta data" %}</a>
                                             {% endif %}
                                         </td>
+                                        <td>
+                                          {% include "partials/single_action_form.html" with btn_text="Restart" action="restart_boefje" key="task_id" value=task.id btn_class="ghost" %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
