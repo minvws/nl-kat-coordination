@@ -70,7 +70,7 @@ class SchedulerWorkerManager(WorkerManager):
 
     def _fill_queue(self, task_queue: mp.Queue, queue_type: WorkerManager.Queue):
         if task_queue.qsize() > self.settings.pool_size:
-            time.sleep(self.settings.poll_interval)
+            time.sleep(self.settings.worker_heartbeat)
             return
 
         try:
