@@ -21,8 +21,8 @@ sudo apt install curl -y
 sudo apt install sudo -y
 
 # ls -l
-rm -f kat-*
-rm -f xtdb-*
+rm -f kat-*.deb
+rm -f xtdb-*.deb
 
 echo "Step 1 - Get latest prerelease of openKAT"
 
