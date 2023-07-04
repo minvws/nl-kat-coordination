@@ -128,6 +128,9 @@ class OOIRepository:
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> List[Config]:
         raise NotImplementedError
 
+    def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> List[OOI]:
+        raise NotImplementedError
+
 
 class XTDBReferenceNode(BaseModel):
     __root__: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
@@ -608,6 +611,11 @@ class XTDBOOIRepository(OOIRepository):
         configs = [self.deserialize(res[0]) for res in self.session.client.query(str(query), valid_time=valid_time)]
 
         return [config for config in configs if isinstance(config, Config)]
+
+    def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> List[OOI]:
+        path_start_alias = path.segments[0].source_type
+        query = Query.from_path(path).where(path_start_alias, primary_key=ooi.primary_key)
+        return [self.deserialize(row[0]) for row in self.session.client.query(str(query), valid_time=valid_time)]
 
     def list_findings(
         self,
