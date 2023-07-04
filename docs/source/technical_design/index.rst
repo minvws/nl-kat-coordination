@@ -15,6 +15,6 @@ Contains documentation for developers and contributors.
    gitpod
    nginx
    debuggingtroubleshooting
-   community
    latex
    externalauthentication
+   community

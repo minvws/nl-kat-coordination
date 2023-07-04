@@ -1,6 +1,6 @@
-=================
-Tools and scripts
-=================
+===========================
+Community tools and scripts
+===========================
 
 Running OpenKAT requires regular updates and some basic debugging. Rob Musquetier contributed several scripts that make life with OpenKAT easier:
 
