@@ -309,7 +309,6 @@ class ConnectorFormMixin:
 class SingleOOIMixin(OctopoesView):
     ooi: OOI
     tree: ReferenceTree
-    ooi_class: Type[OOI] = None
 
     def get_ooi_id(self) -> str:
         if "ooi_id" not in self.request.GET:

@@ -1,5 +1,5 @@
 from time import sleep
-from typing import List
+from typing import List, Type
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -106,6 +106,7 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
 
 
 class BaseOOIFormView(SingleOOIMixin, FormView):
+    ooi_class: Type[OOI] = None
     form_class = OOIForm
 
     def get_ooi_class(self):
