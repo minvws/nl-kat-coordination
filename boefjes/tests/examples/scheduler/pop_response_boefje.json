@@ -12,6 +12,8 @@
         "organization": "_dev",
         "arguments": {},
         "started_at": null,
+        "runnable_hash": null,
+        "environment": null,
         "ended_at": null
     }
 }
