@@ -16,7 +16,7 @@ if [ ${1} != "11" ] && [ ${1} != "12" ]; then
 	exit
 fi
 
-echo "Step 0 - Preperations"
+echo "Step 0 - Preparations"
 
 echo "Step 0.1 - Removing old install/upgrade files, update system and install curl & sudo when needed..."
 rm -f kat-*
