@@ -25,6 +25,7 @@ from tests.mocks.mock_ooi_types import (
     MockIPAddressV4,
     MockIPAddressV6,
     MockIPPort,
+    MockLabel,
     MockNetwork,
     MockOOIType,
     MockResolvedHostname,
@@ -44,6 +45,7 @@ class TypeSystemTest(TestCase):
                 MockResolvedHostname,
                 MockDNSCNAMERecord,
                 MockDNSZone,
+                MockLabel,
             },
             get_concrete_types(),
         )
@@ -61,6 +63,7 @@ class TypeSystemTest(TestCase):
                 MockResolvedHostname,
                 MockDNSCNAMERecord,
                 MockDNSZone,
+                MockLabel,
             },
             get_collapsed_types(),
         )
@@ -79,6 +82,7 @@ class TypeSystemTest(TestCase):
                 MockResolvedHostname,
                 MockDNSCNAMERecord,
                 MockDNSZone,
+                MockLabel,
             },
             to_concrete({OOI}),
         )
