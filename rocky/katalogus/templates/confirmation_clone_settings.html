@@ -33,11 +33,11 @@
                 </p>
                 <form class="inline" method="post">
                     {% csrf_token %}
-                    <fieldset>
+                    <div class="button-container">
+                        <button type="submit">{% translate "Clone" %}</button>
                         <a href="{% url "katalogus_settings" organization.code %}"
                            class="button ghost">{% translate "Cancel" %}</a>
-                        <button type="submit">{% translate "Clone" %}</button>
-                    </fieldset>
+                    </div>
                 </form>
             </div>
         </section>
