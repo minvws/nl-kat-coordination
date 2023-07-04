@@ -167,10 +167,10 @@ def get_runnable_hash(path: Path) -> str:
 
     folder_hash = hashlib.sha256()
 
-    for file in sorted(path.iterdir()):
-        # Note that the hash does not include subdirectories, including __pycache__ and *.pyc files
+    for file in sorted(path.glob("**/*")):
+        # Note that the hash does not include *.pyc files
         # Thus there may be a desync between the source code and the cached, compiled bytecode
-        if file.is_file():
+        if file.is_file() and file.suffix != ".pyc":
             with file.open("rb") as f:
                 while chunk := f.read(32768):
                     folder_hash.update(chunk)
