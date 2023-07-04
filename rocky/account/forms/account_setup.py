@@ -20,6 +20,63 @@ from account.validators import get_password_validators_help_texts
 User = get_user_model()
 
 
+class UserRegistrationForm(forms.Form):
+    """
+    Basic User form fields, name, email and password.
+    With fields validation.
+    """
+
+    name = forms.CharField(
+        label=_("Name"),
+        max_length=254,
+        help_text=_("This name we will use to communicate with you."),
+        widget=forms.TextInput(
+            attrs={
+                "autocomplete": "off",
+                "placeholder": _("What do we call you?"),
+                "aria-describedby": "explanation-name",
+            }
+        ),
+    )
+    email = forms.EmailField(
+        label=_("Email"),
+        max_length=254,
+        help_text=_("Enter your email address."),
+        widget=forms.EmailInput(
+            attrs={
+                "autocomplete": "off",
+                "placeholder": "name@example.com",
+                "aria-describedby": "explanation-email",
+            }
+        ),
+    )
+    password = forms.CharField(
+        label=_("Password"),
+        widget=forms.PasswordInput(
+            attrs={
+                "autocomplete": "off",
+                "placeholder": _("Choose your super secret password"),
+                "aria-describedby": "explanation-password",
+            }
+        ),
+        help_text=get_password_validators_help_texts(),
+        validators=[validate_password],
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if User.objects.filter(email=email).exists():
+            self.add_error("email", _("Choose another email."))
+        return email
+
+    def set_user(self):
+        self.user = User.objects.create_user(
+            full_name=self.cleaned_data["name"],
+            email=self.cleaned_data["email"],
+            password=self.cleaned_data["password"],
+        )
+
+
 class OrganizationForm(BaseRockyModelForm):
     """
     Form to create a new organization.
@@ -134,128 +191,36 @@ class AcknowledgeClearanceLevelForm(BaseRockyForm):
     )
 
 
-class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "autocomplete": "off",
-                "placeholder": _("Choose your super secret password"),
-                "aria-describedby": "explanation-password",
-            },
-        ),
-        help_text=get_password_validators_help_texts(),
-        validators=[validate_password],
-        error_messages={"required": _("Please enter your password.")},
-    )
+class MemberRegistrationForm(UserRegistrationForm):
+    field_order = ["name", "email", "password"]
 
-    class Meta:
-        model = User
-
-        fields = [
-            "full_name",
-            "email",
-            "password",
-        ]
-        labels = {
-            "full_name": _("Name"),
-        }
-        help_texts = {
-            "full_name": _("This name we will use to communicate with you."),
-            "email": _("Enter your email address."),
-        }
-        error_messages = {
-            "full_name": {"required": _("Please enter your name.")},
-            "email": {"required": _("Please enter your email address."), "unique": _("Choose another email.")},
-        }
-        widgets = {
-            "full_name": forms.TextInput(
-                attrs={
-                    "autocomplete": "off",
-                    "placeholder": _("What do we call you?"),
-                    "aria-describedby": "explanation-name",
-                }
-            ),
-            "email": forms.EmailInput(
-                attrs={
-                    "autocomplete": "off",
-                    "placeholder": "name@example.com",
-                    "aria-describedby": "explanation-email",
-                }
-            ),
-        }
-
-
-class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPawsForm):
     def __init__(self, *args, **kwargs):
         self.organization = kwargs.pop("organization")
-        self.account_type = Group.objects.get(name=kwargs.pop("account_type"))
-        return super().__init__(*args, **kwargs)
+        self.group = Group.objects.get(name=kwargs.pop("account_type"))
+        super().__init__(*args, **kwargs)
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if commit:
-            instance.save()
-        return instance
-
-
-class UserAddForm(forms.Form):
-    """
-    Basic User form fields, name, email and password.
-    With fields validation.
-    """
-
-    name = forms.CharField(
-        label=_("Name"),
-        max_length=254,
-        help_text=_("This name we will use to communicate with you."),
-        widget=forms.TextInput(
-            attrs={
-                "autocomplete": "off",
-                "placeholder": _("What do we call you?"),
-                "aria-describedby": "explanation-name",
-            }
-        ),
-    )
-    email = forms.EmailField(
-        label=_("Email"),
-        max_length=254,
-        help_text=_("Enter your email address."),
-        widget=forms.EmailInput(
-            attrs={
-                "autocomplete": "off",
-                "placeholder": "name@example.com",
-                "aria-describedby": "explanation-email",
-            }
-        ),
-    )
-    password = forms.CharField(
-        label=_("Password"),
-        widget=forms.PasswordInput(
-            attrs={
-                "autocomplete": "off",
-                "placeholder": _("Choose your super secret password"),
-                "aria-describedby": "explanation-password",
-            }
-        ),
-        help_text=get_password_validators_help_texts(),
-        validators=[validate_password],
-    )
-
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            self.add_error("email", _("Choose another email."))
-        return email
-
-    def set_user(self):
-        self.user = User.objects.create_user(
-            full_name=self.cleaned_data["name"],
-            email=self.cleaned_data["email"],
-            password=self.cleaned_data["password"],
+    def full_clean(self) -> None:
+        super().full_clean()
+        user, _ = User.objects.get_or_create(
+            full_name=self.cleaned_data.get("name"),
+            email=self.cleaned_data.get("email"),
+            password=self.cleaned_data.get("password"),
         )
 
+        member, _ = OrganizationMember.objects.get_or_create(user=user, organization=self.organization)
+        member.groups.add(self.group)
 
-class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
+        trusted_clearance_level = self.cleaned_data.get("trusted_clearance_level")
+        if trusted_clearance_level:
+            member.trusted_clearance_level = trusted_clearance_level
+        member.save()
+
+
+class RedteamMemberRegistrationForm(MemberRegistrationForm, TrustedClearanceLevelRadioPawsForm):
+    pass
+
+
+class OrganizationMemberAddForm(UserRegistrationForm, BaseRockyModelForm):
     """
     Form to add a new member
     """
