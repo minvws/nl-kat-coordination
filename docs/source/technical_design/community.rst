@@ -1,6 +1,6 @@
-===========================
-Community contributed tools
-===========================
+=================
+Tools and scripts
+=================
 
 Running OpenKAT requires regular updates and some basic debugging. Rob Musquetier contributed several scripts that make life with OpenKAT easier:
 
@@ -10,7 +10,7 @@ Install and update
 Install
 -------
 
-`openKAT_install.sh </utilities/scripts/openKAT_install.sh>`_ installs OpenKAT on Debian 11 or 12, following the steps of the Debian install manual. After downloading, use the script as follows:
+:download:`openKAT_install.sh <utilities/scripts/openKAT_install.sh>` installs OpenKAT on Debian 11 or 12, following the steps of the Debian install manual. After downloading, use the script as follows:
 
 Change the permissions on the file to 750:
 
@@ -33,7 +33,7 @@ and re-installing KAT version 1.10.0rc1 without super user account on Debian 12:
 Update
 ------
 
-`openKAT_update.sh </utilities/scripts/openKAT_update.sh>`_ updates OpenKAT, removes old packages and restarts your instances.
+:download:`openKAT_update.sh <utilities/scripts/openKAT_update.sh>` updates OpenKAT, removes old packages and restarts your instances.
 
 To update an existing KAT installation using the Debian packages download the script and change the permissions to 750:
 
@@ -55,12 +55,12 @@ Status and logs
 Status
 ------
 
-`status_openkat.sh </utilities/scripts/status_openkat.sh>`_ shows you the status of all OpenKAT related processes from systemctl.
+:download:`status_openkat.sh <utilities/scripts/status_openkat.sh>` shows you the status of all OpenKAT related processes from systemctl.
 
 Show journal
 ------------
 
-`show_journal_openkat.sh </utilities/scripts/show_journal_openkat.sh>`_ shows the journalctl -n of all OpenKAT related processes.
+:download:`show_journal_openkat.sh <utilities/scripts/show_journal_openkat.sh>` shows the journalctl -n of all OpenKAT related processes.
 
 Starting, stopping, restarting
 ==============================
@@ -68,19 +68,19 @@ Starting, stopping, restarting
 Start
 -----
 
-`start_openkat.sh </utilities/scripts/start_openkat.sh>`_ starts all OpenKAT processes.
+:download:`start_openkat.sh <utilities/scripts/start_openkat.sh>` starts all OpenKAT processes.
 
 Stop
 ----
 
-`stop_openkat.sh </utilities/scripts/stop_openkat.sh>`_ stops all OpenKAT processes.
+:download:`stop_openkat.sh <utilities/scripts/stop_openkat.sh>` stops all OpenKAT processes.
 
 Restart
 -------
 
-`restart_openkat.sh </utilities/scripts/restart_openkat.sh>`_ restarts all OpenKAT processes.
+:download:`restart_openkat.sh <utilities/scripts/restart_openkat.sh>` restarts all OpenKAT processes.
 
 Empty queue
 ===========
 
-`empty job queue_openkat.sh </utilities/scripts/empty_job_queue_openkat.sh>`_ stops your OpenKAT processes, empties the job queue and starts all processes. It also includes a 60 second sleep to make sure all processes have started completely.
+:download:`empty job queue_openkat.sh <utilities/scripts/empty_job_queue_openkat.sh>` stops your OpenKAT processes, empties the job queue and starts all processes. It also includes a 60 second sleep to make sure all processes have started completely.
