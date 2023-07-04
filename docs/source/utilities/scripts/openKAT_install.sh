@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-# Installation for Debian 11 
+# Installation for Debian 11
 # echo (https://docs.openkat.nl/technical_design/debianinstall.html)
 
 # echo "number of arguments '$#'"
@@ -12,7 +12,7 @@ if [ $# -eq 0 ] || [ $# -gt 3 ]; then
 fi
 
 if [ ${1} != "11" ] && [ ${1} != "12" ]; then
-	echo "Debian version currently should be 11 or 12" 
+	echo "Debian version currently should be 11 or 12"
 	exit
 fi
 
@@ -56,7 +56,7 @@ echo "Step 2.3 - Downloading nl-kat-coordination version ${2} for Debian ${1}: h
 curl -LO "https://github.com/minvws/nl-kat-coordination/releases/download/v${2}/kat-debian${1}-${2}.tar.gz"
 
 echo "Step 3 - Install openKAT and xtdb"
-tar zvxf kat-*.tar.gz 
+tar zvxf kat-*.tar.gz
 sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb -y
 
 sudo systemctl start xtdb-http-multinode
@@ -186,14 +186,14 @@ sudo sed -i "/KATALOGUS_DB_URI=/s/.*/KATALOGUS_DB_URI=postgresql:\/\/katalogus:$
 echo "Step 4.6.5 - Update SCHEDULER_DSP_BROKER_URL in /etc/kat/mula.conf to ${RABBITMQ_PASSWORD}"
 sudo sed -i "/SCHEDULER_DSP_BROKER_URL=/s/.*/SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/mula.conf
 
-echo "Step 4.6.6 - Update SCHEDULER_RABBITMQ_DSN in /etc/kat/mula.conf to ${RABBITMQ_PASSWORD}" 
+echo "Step 4.6.6 - Update SCHEDULER_RABBITMQ_DSN in /etc/kat/mula.conf to ${RABBITMQ_PASSWORD}"
 sudo sed -i "/SCHEDULER_RABBITMQ_DSN=/s/.*/SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/mula.conf
 
-echo "Step 4.6.7 - Update SCHEDULER_DB_DSN in /etc/kat/mula.conf to ${MULADB_PASSWORD}" 
+echo "Step 4.6.7 - Update SCHEDULER_DB_DSN in /etc/kat/mula.conf to ${MULADB_PASSWORD}"
 sudo sed -i "/SCHEDULER_DB_DSN=/s/.*/SCHEDULER_DB_DSN=postgresql:\/\/mula:${MULADB_PASSWORD}@localhost\/mula_db/" /etc/kat/mula.conf
 
 echo "Step 4.6.8 - Update QUEUE_URI in rocky.conf, bytes.conf, boefjes.conf, octopoes.conf to ${RABBITMQ_PASSWORD}"
-sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/rocky.conf 
+sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/rocky.conf
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/bytes.conf
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/boefjes.conf
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/octopoes.conf
