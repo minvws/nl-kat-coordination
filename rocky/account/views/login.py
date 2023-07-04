@@ -51,7 +51,7 @@ class LoginRockyView(LoginView):
     def get_context_data(self, form, **kwargs):
         context = super().get_context_data(form, **kwargs)
         # if default device is set then the user has enabled two factor auth
-        context["two_factor_enabled"] = not settings.TWOFACTOR_ENABLED or default_device(self.request.user)
+        context["two_factor_enabled"] = settings.TWOFACTOR_ENABLED or default_device(self.request.user)
         context["form_name"] = "login"
         context["breadcrumbs"] = [
             {
