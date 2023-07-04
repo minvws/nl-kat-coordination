@@ -67,6 +67,7 @@ class RabbitMQ(Listener):
 
     def basic_consume(self, queue: str, durable: bool) -> None:
         self.channel.queue_declare(queue=queue, durable=durable)
+        self.channel.basic_qos(prefetch_count=10)
         self.channel.basic_consume(queue, on_message_callback=self.callback)
         self.channel.start_consuming()
 
