@@ -14,7 +14,7 @@
             {% blocktranslate trimmed with plugin_name=plugin.name scan_level=plugin.scan_level%}
         {{plugin_name}} will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
         or higher.
-      {% endblocktranslate %}
+            {% endblocktranslate %}
         </p>
         <section>
             <div>
@@ -22,7 +22,7 @@
                 <p class="emphasized">
                     {% blocktranslate trimmed with scan_level=plugin.scan_level%}
             The following objects are not yet cleared for level {{scan_level}}, please be advised that by continuing you will declare a level {{scan_level}} on these objects.
-          {% endblocktranslate %}
+                    {% endblocktranslate %}
                 </p>
                 <table>
                     <caption>{% translate "Selected OOIs:" %}</caption>
@@ -48,11 +48,11 @@
                 <p>{% translate "Are you sure you want to scan anyways?" %}</p>
                 <form class="inline" method="post">
                     {% csrf_token %}
-                    <fieldset>
+                    <div class="button-container">
+                        <button type="submit">{% translate "Scan" %}</button>
                         <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
                            class="button ghost">{% translate "Cancel" %}</a>
-                        <button type="submit">{% translate "Scan" %}</button>
-                    </fieldset>
+                    </div>
                 </form>
             </div>
         </section>
