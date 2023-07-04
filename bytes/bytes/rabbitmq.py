@@ -48,11 +48,11 @@ class RabbitMQEventManager(EventManager):
         if self.connection.is_closed:
             self.connection = pika.BlockingConnection(pika.URLParameters(self.queue_uri))
             self.channel = self.connection.channel()
-            logger.info("Reconnected to RabbitMQ")
+            logger.warning("Reconnected to RabbitMQ because connection was closed")
 
         if self.channel.is_closed:
             self.channel = self.connection.channel()
-            logger.info("Recreated RabbitMQ channel")
+            logger.warning("Recreated RabbitMQ channel because channel was closed")
 
     @staticmethod
     def _queue_name(event: Event) -> str:
