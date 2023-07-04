@@ -1,1 +1,1 @@
-pynetdicom
+pynetdicom==2.0.2
