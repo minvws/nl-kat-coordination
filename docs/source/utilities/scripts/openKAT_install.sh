@@ -121,7 +121,7 @@ U=`sudo -u postgres psql -c "SELECT 1 FROM pg_roles WHERE rolname='katalogus'"|a
 if [[ ${U} == "" ]]; then
 	echo "Create katalogus user with password ${KATALOGUSDB_PASSWORD}..."
 	sudo -u postgres psql -c "CREATE USER katalogus WITH PASSWORD '${KATALOGUSDB_PASSWORD}';"
-	
+
 	echo "Grant database katalogus_db to katalogus user..."
 	sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO katalogus;' katalogus_db
 else
