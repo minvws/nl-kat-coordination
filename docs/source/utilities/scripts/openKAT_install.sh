@@ -38,7 +38,7 @@ nl_kat_url='https://github.com/minvws/nl-kat-coordination/releases'
 echo "Step 2 - Download openKAT and xtdb"
 
 # Get the latest version of xtdb-http-multinode
-echo "Step 2.1 -  Determine lates xtdb version"
+echo "Step 2.1 -  Determine latest xtdb version"
 xtdb_content=$(curl -s ${xtdb_url})
 xtdb_version=$(echo ${xtdb_content} | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | sed 's/v//' | head -n 1)
 
