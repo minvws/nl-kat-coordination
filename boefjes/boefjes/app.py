@@ -58,7 +58,6 @@ class SchedulerWorkerManager(WorkerManager):
             try:
                 self._check_workers()
                 self._fill_queue(self.task_queue, queue_type)
-                time.sleep(0.1)
             except Exception as e:  # noqa
                 logger.exception("Unhandled Exception:")
                 logger.info("Continuing worker...")
