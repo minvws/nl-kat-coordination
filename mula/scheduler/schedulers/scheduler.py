@@ -392,12 +392,12 @@ class Scheduler(abc.ABC):
         """Stop the scheduler."""
         self.logger.info("Stopping scheduler: %s", self.scheduler_id)
 
-        # First stop the listeners, when those are running in a thread and
+        # Second, stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
         # will not stop the thread. We need to explicitly stop the listener.
+        self.stop_checks()
         self.stop_listeners()
         self.stop_threads()
-        self.stop_checks()
 
         if self.callback and callback:
             self.callback(self.scheduler_id)  # type: ignore [call-arg]
@@ -406,21 +406,21 @@ class Scheduler(abc.ABC):
 
     def stop_listeners(self) -> None:
         """Stop the listeners."""
-        for lst in self.listeners.values():
+        for lst in self.listeners.copy().values():
             lst.stop()
 
         self.listeners = {}
 
     def stop_threads(self) -> None:
         """Stop the threads."""
-        for t in self.threads:
+        for t in self.threads.copy():
             t.join(5)
 
         self.threads = []
 
     def stop_checks(self) -> None:
         """Stop the checks."""
-        for t in self.checks:
+        for t in self.checks.copy():
             t.join(5)
 
         self.checks = []

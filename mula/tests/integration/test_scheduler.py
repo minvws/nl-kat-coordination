@@ -149,7 +149,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertFalse(self.scheduler.is_running())
 
         # Scheduler should be disabled
-        self.assertFalse(self.scheduler.is_enabled)
+        self.assertFalse(self.scheduler.is_enabled())
 
     def test_enable_scheduler(self):
         """When a scheduler is re-enabled ..."""
