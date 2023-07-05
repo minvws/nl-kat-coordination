@@ -9,6 +9,7 @@ import docker
 from boefjes.job_models import BoefjeMeta
 
 IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:pr-1340"
+FILE_PATH = "/tmp/output.json"
 
 
 ###############################################################################
@@ -73,23 +74,23 @@ def get_file_from_container(container: docker.models.containers.Container, path:
 ###############################################################################
 
 
-def run_masscan(target_ip, tmp_path: str = "/tmp/output.json") -> bytes:
-    """Run Playwright in Docker."""
+def run_masscan(target_ip) -> bytes:
+    """Run Masscan in Docker."""
     client = docker.from_env()
 
     # Scan according to arguments.
-    port_range = os.getenv("PORTS", "53,80-82,443")
+    port_range = os.getenv("PORTS", "53,80,443")
     max_rate = os.getenv("MAX_RATE", 100)
     logging.info("Starting container %s to run masscan...", IMAGE)
     res = client.containers.run(
         image=IMAGE,
-        command=f"-p {port_range} --max-rate {max_rate} -oJ {tmp_path} {target_ip}",
+        command=f"-p {port_range} --max-rate {max_rate} -oJ {FILE_PATH} {target_ip}",
         detach=True,
     )
     res.wait()
     logging.debug(res.logs())
 
-    output = get_file_from_container(container=res, path=tmp_path)
+    output = get_file_from_container(container=res, path=FILE_PATH)
 
     # Do not crash the boefje if the output is known, instead log a warning.
     try:
