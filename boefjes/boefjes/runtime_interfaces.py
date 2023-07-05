@@ -19,7 +19,7 @@ class NormalizerJobRunner:
         raise NotImplementedError()
 
 
-class RuntimeManager:
+class WorkerManager:
     class Queue(Enum):
         BOEFJES = "boefje"
         NORMALIZERS = "normalizer"
