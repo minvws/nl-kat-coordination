@@ -50,6 +50,7 @@ class APITemplateTestCase(unittest.TestCase):
             ctx=self.mock_ctx,
         )
 
+        # TODO: refactor to MockScheduler
         self.scheduler = schedulers.BoefjeScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
@@ -65,6 +66,8 @@ class APITemplateTestCase(unittest.TestCase):
     def tearDown(self):
         models.Base.metadata.drop_all(self.mock_ctx.datastore.engine)
 
+        self.scheduler.stop()
+
 
 class APITestCase(APITemplateTestCase):
     def test_get_schedulers(self):
@@ -76,13 +79,14 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get("id"), self.scheduler.scheduler_id)
 
-    def test_patch_scheduler(self):
-        self.assertEqual(True, self.scheduler.populate_queue_enabled)
-        response = self.client.patch(
-            f"/schedulers/{self.scheduler.scheduler_id}", json={"populate_queue_enabled": False}
-        )
+    def test_patch_scheduler__(self):
+        self.assertTrue(self.scheduler.is_enabled())
+        response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"enabled": False})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(False, response.json().get("populate_queue_enabled"))
+        self.assertFalse(response.json().get("enabled"))
+
+        self.assertFalse(self.scheduler.is_enabled())
+        self.assertFalse(self.scheduler.is_running())
 
     def test_patch_scheduler_attr_not_found(self):
         response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"not_found": "not found"})

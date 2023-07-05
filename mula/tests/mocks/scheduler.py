@@ -1,3 +1,5 @@
+import time
+
 from scheduler import schedulers
 
 
@@ -10,5 +12,4 @@ class MockScheduler(schedulers.Scheduler):
         )
 
     def _run(self) -> None:
-        while True:
-            print("Hello world")
+        time.sleep(1)

@@ -64,7 +64,7 @@ class Scheduler(abc.ABC):
         """
 
         self.logger: logging.Logger = logging.getLogger(__name__)
-        self.is_enabled = True
+        self.enabled: bool = True
         self.ctx: context.AppContext = ctx
         self.scheduler_id = scheduler_id
         self.queue: queues.PriorityQueue = queue
@@ -286,7 +286,6 @@ class Scheduler(abc.ABC):
         self,
         name: str,
         target: Callable[[], Any],
-        stop_event: threading.Event,
         interval: float = 0.01,
         daemon: bool = False,
         loop: bool = True,
@@ -303,7 +302,7 @@ class Scheduler(abc.ABC):
         t = utils.ThreadRunner(
             name=name,
             target=target,
-            stop_event=stop_event,
+            stop_event=self.stop_event_threads,
             interval=interval,
             daemon=daemon,
             loop=loop,
@@ -325,28 +324,21 @@ class Scheduler(abc.ABC):
     def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
         return self.queue.is_item_on_queue_by_hash(item_hash)
 
-    # FIXME: this is confusing, rename
-    def is_alive(self) -> bool:
-        """Check if the scheduler is alive."""
-        return not self.stop_event_threads.is_set()
-
-    # FIXME: necessary?
     def check_enabled(self) -> None:
         """Check if the scheduler is enabled."""
-        if self.is_enabled and not self.is_alive():
+        if self.is_enabled() and not self.is_running():
             self.enable()
-        elif not self.is_enabled and self.is_alive():
+        elif not self.is_enabled() and self.is_running():
             self.disable()
-        elif self.is_enabled and self.is_alive():
+        elif self.is_enabled() and self.is_running():
             self.logger.debug("Scheduler is already running")
-        elif not self.is_enabled and not self.is_alive():
+        elif not self.is_enabled() and not self.is_running():
             self.logger.debug("Scheduler is already stopped")
 
     def disable(self) -> None:
         """Disable the scheduler.
 
         NOTE: we keep the check_enabled thread running
-
         """
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
 
@@ -363,7 +355,9 @@ class Scheduler(abc.ABC):
         task_ids = [task.id for task in tasks]
         self.ctx.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
 
-        self.is_enabled = False
+        # FIXME: this is probably already done, might be ok to leave in
+        # when the method is explicitly called elsewhere
+        self.enabled = False
 
         self.logger.info("Disabled scheduler: %s", self.scheduler_id)
 
@@ -371,14 +365,28 @@ class Scheduler(abc.ABC):
         self.logger.info("Enabling scheduler: %s", self.scheduler_id)
 
         self.stop_event_threads.clear()
+
         for t in self.checks:
             t.start()
 
         self.run()
 
-        self.is_enabled = True
+        # FIXME: this is probably already done, might be ok to leave in
+        # when the method is explicitly called elsewhere
+        self.enabled = True
 
         self.logger.info("Enabled scheduler: %s", self.scheduler_id)
+
+    def is_enabled(self) -> bool:
+        """Check if the scheduler is enabled."""
+        return self.enabled
+
+    def is_running(self) -> bool:
+        """Check if the scheduler is running.
+
+        Stop events are not set
+        """
+        return self.is_enabled() and not self.stop_event_threads.is_set() and not self.stop_event_checks.is_set()
 
     def stop(self, callback: bool = True) -> None:
         """Stop the scheduler."""
@@ -400,24 +408,27 @@ class Scheduler(abc.ABC):
         """Stop the listeners."""
         for lst in self.listeners.values():
             lst.stop()
-            self.listeners.pop(lst.listener_id, None)
+
+        self.listeners = {}
 
     def stop_threads(self) -> None:
         """Stop the threads."""
         for t in self.threads:
             t.join(5)
-            self.threads.remove(t)
+
+        self.threads = []
 
     def stop_checks(self) -> None:
         """Stop the checks."""
         for t in self.checks:
             t.join(5)
-            self.checks.remove(t)
+
+        self.checks = []
 
     def dict(self) -> Dict[str, Any]:
         return {
             "id": self.scheduler_id,
-            "enabled": self.is_enabled,
+            "enabled": self.enabled,
             "priority_queue": {
                 "id": self.queue.pq_id,
                 "item_type": self.queue.item_type.type,
