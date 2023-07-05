@@ -77,6 +77,7 @@ repos:
           \.po$ |
           \.xml$ |
           poetry.lock$ |
+          pyproject.toml$ |
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
