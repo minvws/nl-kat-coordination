@@ -62,8 +62,8 @@ class SinglePluginView(OrganizationView):
 
 class NormalizerMixin(OctopoesView):
     """
-    When a user wants to scan one or multiple OOI's,
-    this mixin provides the methods to construct the boefjes for the OOI's and run them.
+    When a user wants to run a normalizer on a given set of raw data,
+    this mixin provides the method to construct the normalizer task for that data and run it.
     """
 
     def run_normalizer(self, normalizer: Plugin, raw_data: RawData) -> None:
