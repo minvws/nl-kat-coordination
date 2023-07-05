@@ -3,7 +3,6 @@
     "name": "masscan",
     "description": "Quickly scan large amounts of IPs.",
     "consumes": [
-        "IPV6NetBlock",
         "IPV4NetBlock"
     ],
     "produces": [
