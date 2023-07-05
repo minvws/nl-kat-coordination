@@ -60,22 +60,16 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         super().setup(request, *args, **kwargs)
         self.severities = self.get_severities()
         self.valid_time = self.get_observed_at()
-        self.muted_findings = request.GET.get("muted_findings", "all")
+        self.muted_findings = request.GET.get("muted_findings")
         self.finding_types = request.GET.getlist("finding_types", [])
-        self.show_muted = False
-        self.exclude_muted = False
 
     def get_queryset(self) -> FindingList:
-        if self.muted_findings == "show":
-            self.show_muted = True
-        if self.muted_findings == "exclude":
-            self.exclude_muted = True
         return FindingList(
             self.octopoes_api_connector,
             self.valid_time,
             self.severities,
-            exclude_muted=self.exclude_muted,
-            show_muted=self.show_muted,
+            exclude_muted=self.muted_findings == "exclude",
+            show_muted=self.muted_findings == "show",
             finding_types=self.finding_types,
         )
 

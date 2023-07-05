@@ -31,7 +31,6 @@ FINDINGS_SEVERITIES_CHOICES = (
 )
 
 MUTED_FINDINGS_CHOICES = (
-    ("all", _("Show all Findings")),
     ("show", _("Show Muted Findings")),
     ("exclude", _("Exclude Muted Findings")),
 )
