@@ -248,16 +248,16 @@ class FindingList:
 
             ooi_references = set()
             finding_type_references = set()
-            filtered_findings = []
+            filtered_findings = findings
             for finding in findings:
                 ooi_references.add(finding.ooi)
                 finding_type_references.add(finding.finding_type)
-                for finding_type in self.finding_types:
-                    if finding_type in str(finding.finding_type):
-                        filtered_findings.append(finding)
+                if self.finding_types:
+                    filtered_findings = [
+                        finding for finding_type in self.finding_types if finding_type in str(finding.finding_type)
+                    ]
 
-            if filtered_findings:
-                findings = filtered_findings
+            findings = filtered_findings
 
             objects = self.octopoes_connector.load_objects_bulk(
                 ooi_references | finding_type_references, valid_time=self.valid_time
