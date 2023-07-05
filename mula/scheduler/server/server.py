@@ -225,6 +225,11 @@ class Server:
                     detail="attribute not found",
                 ) from exc
 
+        if stored_scheduler_model.enabled and not updated_scheduler.enabled:
+            s.disable()
+        elif not stored_scheduler_model.enabled and updated_scheduler.enabled:
+            s.enable()
+
         return updated_scheduler
 
     def list_tasks(

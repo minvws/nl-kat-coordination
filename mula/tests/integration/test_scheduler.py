@@ -48,9 +48,6 @@ class SchedulerTestCase(unittest.TestCase):
             ranker=ranker,
         )
 
-    def tearDown(self):
-        self.scheduler.stop_checks()
-
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
@@ -142,12 +139,6 @@ class SchedulerTestCase(unittest.TestCase):
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
-        # Check enabled should still be running
-        self.assertFalse(self.scheduler.stop_event_checks.is_set())
-
-        # Scheduler should not be running
-        self.assertFalse(self.scheduler.is_running())
-
         # Scheduler should be disabled
         self.assertFalse(self.scheduler.is_enabled())
 
@@ -171,20 +162,11 @@ class SchedulerTestCase(unittest.TestCase):
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
-        # Check enabled should still be running
-        self.assertFalse(self.scheduler.stop_event_checks.is_set())
-
-        # Stop checks to make testing this easier
-        self.scheduler.stop_checks()
-
         # Re-enable scheduler
         self.scheduler.enable()
 
         # Threads should be started
         self.assertGreater(len(self.scheduler.threads), 0)
-
-        # Scheduler should be running
-        self.assertFalse(self.scheduler.is_running())
 
         # Scheduler should be enabled
         self.assertTrue(self.scheduler.is_enabled())

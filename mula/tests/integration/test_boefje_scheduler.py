@@ -82,9 +82,6 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
-    def tearDown(self):
-        self.scheduler.stop_checks()
-
 
 class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):

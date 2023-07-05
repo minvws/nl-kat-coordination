@@ -81,21 +81,6 @@ class Scheduler(abc.ABC):
         self.stop_event_threads: threading.Event = threading.Event()
         self.threads: List[thread.ThreadRunner] = []
 
-        # Checks
-        self.stop_event_checks: threading.Event = threading.Event()
-        self.checks: List[thread.ThreadRunner] = []
-
-        t = utils.ThreadRunner(
-            name=f"scheduler-{self.scheduler_id}-enabled",
-            target=self.check_enabled,
-            stop_event=self.stop_event_checks,
-            interval=0.01,
-            daemon=False,
-            loop=True,
-        )
-        t.start()
-        self.checks.append(t)
-
     @abc.abstractmethod
     def run(self) -> None:
         raise NotImplementedError
@@ -324,23 +309,13 @@ class Scheduler(abc.ABC):
     def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
         return self.queue.is_item_on_queue_by_hash(item_hash)
 
-    def check_enabled(self) -> None:
-        """Check if the scheduler is enabled."""
-        if self.is_enabled() and not self.is_running():
-            self.enable()
-        elif not self.is_enabled() and self.is_running():
-            self.disable()
-        elif self.is_enabled() and self.is_running():
-            self.logger.debug("Scheduler is already running")
-        elif not self.is_enabled() and not self.is_running():
-            self.logger.debug("Scheduler is already stopped")
-
     def disable(self) -> None:
         """Disable the scheduler.
 
         NOTE: we keep the check_enabled thread running
         """
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
+        self.enabled = False
 
         self.stop_listeners()
         self.stop_threads()
@@ -355,38 +330,21 @@ class Scheduler(abc.ABC):
         task_ids = [task.id for task in tasks]
         self.ctx.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
 
-        # FIXME: this is probably already done, might be ok to leave in
-        # when the method is explicitly called elsewhere
-        self.enabled = False
-
         self.logger.info("Disabled scheduler: %s", self.scheduler_id)
 
     def enable(self) -> None:
         self.logger.info("Enabling scheduler: %s", self.scheduler_id)
+        self.enabled = True
 
         self.stop_event_threads.clear()
 
-        for t in self.checks:
-            t.start()
-
         self.run()
-
-        # FIXME: this is probably already done, might be ok to leave in
-        # when the method is explicitly called elsewhere
-        self.enabled = True
 
         self.logger.info("Enabled scheduler: %s", self.scheduler_id)
 
     def is_enabled(self) -> bool:
         """Check if the scheduler is enabled."""
         return self.enabled
-
-    def is_running(self) -> bool:
-        """Check if the scheduler is running.
-
-        Stop events are not set
-        """
-        return self.is_enabled() and not self.stop_event_threads.is_set() and not self.stop_event_checks.is_set()
 
     def stop(self, callback: bool = True) -> None:
         """Stop the scheduler."""
@@ -395,7 +353,6 @@ class Scheduler(abc.ABC):
         # Second, stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
         # will not stop the thread. We need to explicitly stop the listener.
-        self.stop_checks()
         self.stop_listeners()
         self.stop_threads()
 
@@ -417,13 +374,6 @@ class Scheduler(abc.ABC):
             t.join(5)
 
         self.threads = []
-
-    def stop_checks(self) -> None:
-        """Stop the checks."""
-        for t in self.checks.copy():
-            t.join(5)
-
-        self.checks = []
 
     def dict(self) -> Dict[str, Any]:
         return {

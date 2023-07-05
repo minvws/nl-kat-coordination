@@ -84,9 +84,7 @@ class APITestCase(APITemplateTestCase):
         response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"enabled": False})
         self.assertEqual(200, response.status_code)
         self.assertFalse(response.json().get("enabled"))
-
         self.assertFalse(self.scheduler.is_enabled())
-        self.assertFalse(self.scheduler.is_running())
 
     def test_patch_scheduler_attr_not_found(self):
         response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"not_found": "not found"})
