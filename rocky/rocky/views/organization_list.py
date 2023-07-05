@@ -1,7 +1,6 @@
 from typing import List
 
 from account.models import KATUser
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count
 from django.views.generic import ListView
 from tools.models import Organization
@@ -9,12 +8,10 @@ from tools.view_helpers import OrganizationBreadcrumbsMixin
 
 
 class OrganizationListView(
-    PermissionRequiredMixin,
     OrganizationBreadcrumbsMixin,
     ListView,
 ):
     template_name = "organizations/organization_list.html"
-    permission_required = "tools.view_organization"
 
     def get_queryset(self) -> List[Organization]:
         user: KATUser = self.request.user

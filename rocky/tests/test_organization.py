@@ -418,7 +418,7 @@ def test_organization_member_list_perms(rf, superuser_member, admin_member, redt
         )
 
 
-def test_organization_list_perms(rf, superuser_member, admin_member, redteam_member, client_member):
+def test_organization_list_perms(rf, superuser_member, admin_member, client_member):
     response_superuser = OrganizationListView.as_view()(
         setup_request(rf.get("organization_list"), superuser_member.user),
         organization_code=superuser_member.organization.code,
@@ -429,25 +429,16 @@ def test_organization_list_perms(rf, superuser_member, admin_member, redteam_mem
         organization_code=admin_member.organization.code,
     )
 
-    assert response_superuser.status_code == 200
-    assert response_admin.status_code == 200
+    response_client = OrganizationListView.as_view()(
+        setup_request(rf.get("organization_list"), client_member.user),
+        organization_code=client_member.organization.code,
+    )
 
     assertContains(response_superuser, "Add new organization")
 
-    # Admins can not add organization
+    # Non-superuser can not add organization
     assertNotContains(response_admin, "Add new organization")
-
-    with pytest.raises(PermissionDenied):
-        OrganizationListView.as_view()(
-            setup_request(rf.get("organization_list"), redteam_member.user),
-            organization_code=redteam_member.organization.code,
-        )
-
-    with pytest.raises(PermissionDenied):
-        OrganizationListView.as_view()(
-            setup_request(rf.get("organization_list"), client_member.user),
-            organization_code=client_member.organization.code,
-        )
+    assertNotContains(response_client, "Add new organization")
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member"])
