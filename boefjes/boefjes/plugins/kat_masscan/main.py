@@ -83,11 +83,12 @@ def run_masscan(target_ip, tmp_path: str = "/tmp/output.json") -> bytes:
     logging.info("Starting container %s to run masscan...", IMAGE)
     res = client.containers.run(
         image=IMAGE,
-        command=[f"-p{port_range}", "--max-rate", max_rate, "-oJ", tmp_path, target_ip],
+        command=f"-p {port_range} --max-rate {max_rate} -oJ {tmp_path} {target_ip}",
         detach=True,
     )
     res.wait()
     logging.debug(res.logs())
+
     output = get_file_from_container(container=res, path=tmp_path)
 
     # Do not crash the boefje if the output is known, instead log a warning.
