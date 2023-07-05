@@ -29,6 +29,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginType
+from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_collapsed_types, get_relations, type_by_name
 from rocky.bytes_client import get_bytes_client
@@ -192,7 +193,9 @@ class FindingList:
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
         severities: Set[RiskLevelSeverity],
-        exclude_muted: bool = True,
+        exclude_muted: bool = False,
+        show_muted: bool = False,
+        finding_types: List[str] = [],
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
@@ -200,6 +203,8 @@ class FindingList:
         self._count = None
         self.severities = severities
         self.exclude_muted = exclude_muted
+        self.show_muted = show_muted
+        self.finding_types = finding_types
 
     @cached_property
     def count(self) -> int:
@@ -213,6 +218,20 @@ class FindingList:
     def __len__(self):
         return self.count
 
+    def get_muted_findings(self, findings: Paginated[Finding], offset: int, limit: int) -> Paginated[Finding]:
+        return list(
+            set(findings)
+            - set(
+                self.octopoes_connector.list_findings(
+                    severities=self.severities,
+                    exclude_muted=True,
+                    valid_time=self.valid_time,
+                    offset=offset,
+                    limit=limit,
+                ).items
+            )
+        )
+
     def __getitem__(self, key: Union[int, slice]) -> List[HydratedFinding]:
         if isinstance(key, slice):
             offset = key.start or 0
@@ -224,8 +243,22 @@ class FindingList:
                 offset=offset,
                 limit=limit,
             ).items
-            ooi_references = {finding.ooi for finding in findings}
-            finding_type_references = {finding.finding_type for finding in findings}
+            if self.show_muted:
+                findings = self.get_muted_findings(findings, offset, limit)
+
+            ooi_references = set()
+            finding_type_references = set()
+            filtered_findings = []
+            for finding in findings:
+                ooi_references.add(finding.ooi)
+                finding_type_references.add(finding.finding_type)
+                for finding_type in self.finding_types:
+                    if finding_type in str(finding.finding_type):
+                        filtered_findings.append(finding)
+
+            if filtered_findings:
+                findings = filtered_findings
+
             objects = self.octopoes_connector.load_objects_bulk(
                 ooi_references | finding_type_references, valid_time=self.valid_time
             )

@@ -5,7 +5,12 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.forms.base import ObservedAtForm
-from tools.forms.findings import FindingMutedSelectionForm, FindingRiskScoreNumberForm, FindingSeverityMultiSelectForm
+from tools.forms.findings import (
+    FindingRiskScoreNumberForm,
+    FindingSeverityMultiSelectForm,
+    FindingTypesMultiSelectForm,
+    MutedFindingSelectionForm,
+)
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -55,11 +60,23 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         super().setup(request, *args, **kwargs)
         self.severities = self.get_severities()
         self.valid_time = self.get_observed_at()
-        self.exclude_muted = request.GET.get("exclude_muted", False)
+        self.muted_findings = request.GET.get("muted_findings", "all")
+        self.finding_types = request.GET.getlist("finding_types", [])
+        self.show_muted = False
+        self.exclude_muted = False
 
     def get_queryset(self) -> FindingList:
+        if self.muted_findings == "show":
+            self.show_muted = True
+        if self.muted_findings == "exclude":
+            self.exclude_muted = True
         return FindingList(
-            self.octopoes_api_connector, self.valid_time, self.severities, exclude_muted=self.exclude_muted
+            self.octopoes_api_connector,
+            self.valid_time,
+            self.severities,
+            exclude_muted=self.exclude_muted,
+            show_muted=self.show_muted,
+            finding_types=self.finding_types,
         )
 
     def get_context_data(self, **kwargs):
@@ -74,7 +91,8 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
                 "risk_score_smaller_than": self.request.GET.get("risk_score_smaller_than"),
             }
         )
-        context["muted_findings_filter_form"] = FindingMutedSelectionForm({"exclude_muted": self.exclude_muted})
+        context["muted_findings_filter_form"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
+        context["finding_types_filter_form"] = FindingTypesMultiSelectForm({"finding_types": self.finding_types})
 
         return context
 

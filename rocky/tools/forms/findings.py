@@ -1,11 +1,39 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models.ooi.findings import RiskLevelSeverity
+from octopoes.models.ooi.findings import (
+    ADRFindingType,
+    CAPECFindingType,
+    CVEFindingType,
+    CWEFindingType,
+    KATFindingType,
+    RetireJSFindingType,
+    RiskLevelSeverity,
+    SnykFindingType,
+)
 from tools.forms.base import BaseRockyForm
+
+FINDING_TYPES_LIST = [
+    ADRFindingType,
+    CVEFindingType,
+    CWEFindingType,
+    CAPECFindingType,
+    RetireJSFindingType,
+    SnykFindingType,
+    KATFindingType,
+]
+FINDING_TYPES_CHOICES = (
+    (str(finding_type.__name__), str(finding_type.__name__)) for finding_type in FINDING_TYPES_LIST
+)
 
 FINDINGS_SEVERITIES_CHOICES = (
     (str(severity.name).lower(), str(severity.value).lower()) for severity in RiskLevelSeverity
+)
+
+MUTED_FINDINGS_CHOICES = (
+    ("all", _("Show all Findings")),
+    ("show", _("Show Muted Findings")),
+    ("exclude", _("Exclude Muted Findings")),
 )
 
 
@@ -35,5 +63,16 @@ class FindingRiskScoreNumberForm(forms.Form):
     )
 
 
-class FindingMutedSelectionForm(BaseRockyForm):
-    exclude_muted = forms.BooleanField(label=_("Exclude Muted Findings"), required=False)
+class MutedFindingSelectionForm(BaseRockyForm):
+    muted_findings = forms.ChoiceField(
+        required=False, label=_("Filter by Muted Findings"), choices=MUTED_FINDINGS_CHOICES, widget=forms.RadioSelect()
+    )
+
+
+class FindingTypesMultiSelectForm(BaseRockyForm):
+    finding_types = forms.MultipleChoiceField(
+        label=_("Filter by FindingTypes"),
+        required=False,
+        choices=FINDING_TYPES_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+    )
