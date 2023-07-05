@@ -157,4 +157,10 @@ These are automatically rendered by GitHub and the online Sphinx docs.
 
 Mermaid has support for things like PlantUML and ERD's.
 
-.. require time estimate and timeframe for an issue
+Dependency management
+=====================
+
+Our module dependencies are managed using `Poetry <https://python-poetry.org>`_, through ``pyproject.toml`` and the ``make poetry-dependencies`` command.
+Poetry can create and manage per-module virtual environments for you automatically.
+The CI checks whether the ``pyproject.toml`` file is up-to-date with the ``poetry.lock`` and ``requirements.txt`` files.
+The automatically generated ``requirements.txt`` files are used by the Docker images, Debian packages, and the CI environment.
