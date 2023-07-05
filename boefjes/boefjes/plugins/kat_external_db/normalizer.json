@@ -1,0 +1,13 @@
+{
+    "id": "kat_external_db_normalize",
+    "consumes": [
+        "external_db"
+    ],
+    "produces": [
+        "Hostname",
+        "IPAddressV4",
+        "IPV4NetBlock",
+        "IPAddressV6",
+        "IPV6NetBlock"
+    ]
+}
