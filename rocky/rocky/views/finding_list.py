@@ -79,12 +79,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["severity_filter_form"] = FindingSeverityMultiSelectForm(
             {"severity": self.request.GET.getlist("severity")}
         )
-        context["risk_score_filter"] = FindingRiskScoreNumberForm(
-            {
-                "risk_score_greater_than": self.request.GET.get("risk_score_greater_than"),
-                "risk_score_smaller_than": self.request.GET.get("risk_score_smaller_than"),
-            }
-        )
+        context["risk_score_filter"] = FindingRiskScoreNumberForm(self.request.GET)
         context["muted_findings_filter_form"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["finding_types_filter_form"] = FindingTypesMultiSelectForm({"finding_types": self.finding_types})
 
