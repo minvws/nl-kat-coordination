@@ -8,7 +8,7 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
-IMAGE = "noamblitz/masscan:latest"
+IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:pr-1340"
 
 
 ###############################################################################

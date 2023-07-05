@@ -1,6 +1,7 @@
 name: Create and publish Masscan Docker image
 
 on:
+  workflow_dispatch: {}
   push:
     branches: [ main ]
     paths:
