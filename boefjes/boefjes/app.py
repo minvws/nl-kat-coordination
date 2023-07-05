@@ -36,7 +36,7 @@ class SchedulerWorkerManager(WorkerManager):
         self.scheduler_client = client_factory()
         self.settings = settings
 
-        self.task_queue = mp.Queue(maxsize=self.settings.pool_size)
+        self.task_queue = mp.Queue()
         self.handling_tasks = mp.Manager().dict()
 
         logger.setLevel(log_level)
