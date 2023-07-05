@@ -50,11 +50,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     # Relevant network object is received from the normalizer_meta.
     network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
-    yield network
 
-    netblock_ref = None
-    if "NetBlock" in normalizer_meta.raw_data.boefje_meta.arguments["input"]["object_type"]:
-        netblock_ref = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    netblock_ref = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 
     logging.info("Parsing %d Masscan IPs for %s.", len(raw), network)
     for ip_with_ports in raw:
