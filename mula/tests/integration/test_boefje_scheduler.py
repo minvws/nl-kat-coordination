@@ -626,10 +626,55 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
     def test_disable_scheduler(self):
-        pass
+        # Act
+        self.scheduler.disable()
+
+        # Listeners should be stopped
+        self.assertEqual(0, len(self.scheduler.listeners))
+
+        # Threads should be stopped
+        self.assertEqual(0, len(self.scheduler.threads))
+
+        # Queue should be empty
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # All tasks on queue should be set to CANCELLED
+        tasks, _ = self.mock_ctx.task_store.get_tasks(self.scheduler.scheduler_id)
+        for task in tasks:
+            self.assertEqual(task.status, models.TaskStatus.CANCELLED)
+
+        # Scheduler should be disabled
+        self.assertFalse(self.scheduler.is_enabled())
 
     def test_enable_scheduler(self):
-        pass
+        # Disable scheduler first
+        self.scheduler.disable()
+
+        # Listeners should be stopped
+        self.assertEqual(0, len(self.scheduler.listeners))
+
+        # Threads should be stopped
+        self.assertEqual(0, len(self.scheduler.threads))
+
+        # Queue should be empty
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # All tasks on queue should be set to CANCELLED
+        tasks, _ = self.mock_ctx.task_store.get_tasks(self.scheduler.scheduler_id)
+        for task in tasks:
+            self.assertEqual(task.status, models.TaskStatus.CANCELLED)
+
+        # Re-enable scheduler
+        self.scheduler.enable()
+
+        # Threads should be started
+        self.assertGreater(len(self.scheduler.threads), 0)
+
+        # Scheduler should be enabled
+        self.assertTrue(self.scheduler.is_enabled())
+
+        # Stop the scheduler
+        self.scheduler.stop()
 
 
 class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
