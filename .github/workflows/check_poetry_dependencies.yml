@@ -17,35 +17,13 @@ on:
 
 jobs:
   poetry-dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        id: py311
-        with:
-          python-version: 3.11
-          cache: pip
-
-      - name: Install pip dependencies
-        run: pip install poetry poetry-plugin-export
-
-      - name: Check, lock, and export Poetry dependencies
-        run: make poetry-dependencies
-
-      - name: Check if there are any changed files
-        run: git diff --exit-code
-
-  dependabot:
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    runs-on: ubuntu-latest
 
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
       contents: write
 
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -57,10 +35,14 @@ jobs:
           cache: pip
 
       - name: Install pip dependencies
-        run: pip install poetry poetry-plugin-export
+        run: pip install poetry
 
       - name: Check, lock, and export Poetry dependencies
         run: make poetry-dependencies
 
-      # Commit all changed files back to the repository
+      - name: Check if there are any changed files
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        run: git diff --exit-code
+
       - uses: stefanzweifel/git-auto-commit-action@v4
+        if: ${{ github.actor == 'dependabot[bot]' }}
