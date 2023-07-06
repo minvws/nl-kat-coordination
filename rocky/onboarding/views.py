@@ -417,22 +417,6 @@ class DnsReportView(OnboardingBreadcrumbsMixin, BaseReportView):
     template_name = "dns_report.html"
     report = DNSReport
 
-    def get_dns_zone_for_url(self):
-        """
-        Path to DNSZone: url > hostnamehttpurl > netloc > dns_zone
-        """
-        if self.ooi.ooi_type != "URL":
-            return self.ooi
-
-        try:
-            web_url = self.tree.store[str(self.ooi.web_url)]
-            netloc = self.tree.store[str(web_url.netloc)]
-            dns_zone = super().get_ooi(pk=str(netloc.dns_zone))
-            return dns_zone
-        except KeyError:
-            messages.add_message(self.request, messages.ERROR, _("No DNS zone found."))
-            return self.ooi
-
 
 class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):
     breadcrumbs = [

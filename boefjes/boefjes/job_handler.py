@@ -127,7 +127,7 @@ class BoefjeHandler(Handler):
         self.local_repository: LocalPluginRepository = local_repository
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
-        logger.info("Handling boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+        logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, boefje_meta.id)
 
         if boefje_meta.input_ooi:
             boefje_meta.arguments["input"] = serialize_ooi(
@@ -137,17 +137,23 @@ class BoefjeHandler(Handler):
                 )
             )
 
-        env_keys = self.local_repository.by_id(boefje_meta.boefje.id).environment_keys
-        environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
+        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
+
+        env_keys = boefje_resource.environment_keys
+
+        boefje_meta.runnable_hash = boefje_resource.runnable_hash
+        boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
 
         mime_types = _collect_default_mime_types(boefje_meta)
+
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
         boefje_meta.started_at = datetime.now(timezone.utc)
+
         boefje_results = None
 
         try:
-            boefje_results = self.job_runner.run(boefje_meta, environment)
+            boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
         except Exception:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
