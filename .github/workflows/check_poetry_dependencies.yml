@@ -44,5 +44,6 @@ jobs:
         if: ${{ github.actor != 'dependabot[bot]' }}
         run: git diff --exit-code
 
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Commit and push changes
         if: ${{ github.actor == 'dependabot[bot]' }}
+        run: git commit -a -S -m "Update requirements.txt" && git push
