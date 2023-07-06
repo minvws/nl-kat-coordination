@@ -2,7 +2,7 @@ import unittest
 import uuid
 from unittest import mock
 
-from scheduler import config, models, repositories
+from scheduler import config, models, queues, repositories
 
 from tests.mocks import queue as mock_queue
 from tests.mocks import ranker as mock_ranker
@@ -93,8 +93,6 @@ class SchedulerTestCase(unittest.TestCase):
         # Act
         self.scheduler.pop_item_from_queue()
 
-        # Assert
-
         # Assert: task should be in datastore, and dispatched
         self.assertEqual(0, self.scheduler.queue.qsize())
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
@@ -142,8 +140,18 @@ class SchedulerTestCase(unittest.TestCase):
         # Scheduler should be disabled
         self.assertFalse(self.scheduler.is_enabled())
 
+        with self.assertRaises(queues.errors.NotAllowedError):
+            self.scheduler.push_item_to_queue(p_item)
+
     def test_enable_scheduler(self):
         """When a scheduler is re-enabled ..."""
+        # Arrange
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=0,
+        )
+
+        self.scheduler.push_item_to_queue(p_item)
 
         # Disable scheduler first
         self.scheduler.disable()
@@ -170,6 +178,14 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Scheduler should be enabled
         self.assertTrue(self.scheduler.is_enabled())
+
+        # Push item to the queue
+        self.scheduler.push_item_to_queue(p_item)
+
+        # Assert: task should be on priority queue
+        pq_p_item = self.scheduler.queue.peek(0)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(pq_p_item.id, p_item.id)
 
         # Stop the scheduler
         self.scheduler.stop()

@@ -141,6 +141,14 @@ class Scheduler(abc.ABC):
         Returns:
             A PrioritizedItem instance.
         """
+        if not self.is_enabled():
+            self.logger.warning(
+                "Scheduler is disabled, not popping item from queue [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.qsize(),
+            )
+            raise queues.errors.NotAllowedError("Scheduler is disabled")
+
         try:
             p_item = self.queue.pop(filters)
         except queues.QueueEmptyError as exc:
@@ -157,6 +165,14 @@ class Scheduler(abc.ABC):
         Args:
             item: The item to push to the queue.
         """
+        if not self.is_enabled():
+            self.logger.warning(
+                "Scheduler is disabled, not pushing item to queue [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.qsize(),
+            )
+            raise queues.errors.NotAllowedError("Scheduler is disabled")
+
         try:
             self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
