@@ -192,9 +192,10 @@ class SchedulerClient:
             boefje_name=boefje_name,
         )
 
-    def get_task_details(self, task_id):
+    def get_task_details(self, task_id) -> Task:
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
-        return res.json()
+        res.raise_for_status()
+        return Task.parse_raw(res.content)
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
