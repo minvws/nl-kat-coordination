@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Any, List, Optional
 
@@ -17,6 +18,9 @@ from boefjes.config import settings
 from boefjes.katalogus.storage.interfaces import StorageError
 from boefjes.katalogus.v1 import router
 from boefjes.katalogus.version import __version__
+
+with settings.log_cfg.open() as f:
+    logging.config.dictConfig(json.load(f))
 
 logger = logging.getLogger(__name__)
 
