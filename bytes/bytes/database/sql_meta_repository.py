@@ -252,6 +252,8 @@ def to_boefje_meta_in_db(boefje_meta: BoefjeMeta) -> BoefjeMetaInDB:
         organization=boefje_meta.organization,
         started_at=boefje_meta.started_at,
         ended_at=boefje_meta.ended_at,
+        runnable_hash=boefje_meta.runnable_hash,
+        environment=boefje_meta.environment,
     )
 
 
@@ -264,6 +266,8 @@ def to_boefje_meta(boefje_meta_in_db: BoefjeMetaInDB) -> BoefjeMeta:
         organization=boefje_meta_in_db.organization,
         started_at=boefje_meta_in_db.started_at,
         ended_at=boefje_meta_in_db.ended_at,
+        runnable_hash=boefje_meta_in_db.runnable_hash,
+        environment=boefje_meta_in_db.environment,
     )
 
 
