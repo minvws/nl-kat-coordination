@@ -1,5 +1,4 @@
 from functools import partial
-
 from typing import Dict, List, Literal, Optional, Union
 
 from fastapi import APIRouter, Body, Depends, HTTPException
