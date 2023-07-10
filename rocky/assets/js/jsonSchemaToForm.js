@@ -28,8 +28,9 @@ function loadform(className){
   schemafields.forEach(schemafield => {
     let schema = schemafield.value;
     let original = schemafield.dataset.original;
-    let identifier = schemafield.id;
+    let identifier = (schemafield.id?schemafield.id:'new');
     let parent = schemafield.closest('fieldset') || schemafield.closest('form');
+    parent.className = "indented";
     schemafield.style.display = "none";
     schema = JSON.parse(schema);
     settype(parent, schema, original, identifier);
@@ -44,8 +45,8 @@ function loadform(className){
     let form = schemafield.closest('form');
     form.addEventListener('submit', (event) => {
       event.preventDefault();
-      let answer = form2json(form, schema, identifier);
-      console.log(answer);  // TODO: add to hidden schema field as value
+      schemafield.innerHTML = JSON.stringify(form2json(form, schema, identifier));
+      form.submit();
     });
   });
 }
@@ -59,7 +60,7 @@ function settype(parent, schema, original, identifier) {
       original = null;
     }
   }
-  identifier = (identifier?identifier:'new');
+
   resetform(parent);
   parent.appendChild(renderSchema(schema, original, identifier));
 }
@@ -79,7 +80,7 @@ function renderobject(original, path, schema){
   }
   let fieldset = document.createElement('fieldset');
   for (fieldname in schema['properties']) {
-    let legend = document.createElement('h3');
+    let legend = document.createElement('legend');
     legend.innerText = fieldname;
     fieldset.appendChild(legend);
     childoriginal = (original && original[fieldname]?original[fieldname]:false);
@@ -95,7 +96,6 @@ function renderobject(original, path, schema){
         (schema['required'] && schema['required'].includes(fieldname)),
         childoriginal, subpath, fieldname, childschema));
     }
-    fieldset.appendChild(document.createElement("div"));
   }
   return fieldset;
 }
@@ -148,8 +148,15 @@ function renderarray(original, path, name, schema) {
   let morebutton = document.createElement('button');
   let plussign = document.createTextNode('+');
   morebutton.appendChild(plussign);
-  morebutton.className = 'more';
+  morebutton.className = 'more align-right';
   fieldset.appendChild(morebutton);
+
+  let lessbutton = document.createElement('button');
+  let minussign = document.createTextNode('-');
+  lessbutton.appendChild(minussign);
+  lessbutton.className = 'less align-right';
+  fieldset.appendChild(lessbutton);
+
   morebutton.addEventListener('click', (event) => {
     event.preventDefault();
     if (!schema.maxItems ||
@@ -175,6 +182,18 @@ function renderarray(original, path, name, schema) {
       morebutton.disabled = true;
     }
   });
+
+  lessbutton.addEventListener('click', (event) => {
+    event.preventDefault();
+
+    let divset = fieldset.querySelectorAll(':scope > div, :scope > fieldset')
+    if (divset.length <= 1) {
+      return;
+    }
+
+    divset[divset.length - 1].remove()
+  });
+
   if (schema.maxItems &&
     fieldset.querySelectorAll(':scope > div, :scope > fieldset').length == schema.maxItems) {
     morebutton.disabled = true;
@@ -215,8 +234,7 @@ function renderfield(required, originalvalue, path, name, field) {
       input.pattern = fieldformat[2];
     }
   }
-  input.name = path;
-  input.id = input.name;
+  input.id = path;
   input.required = required;
   if (field['pattern']) {
     input.pattern = field['pattern'];
@@ -257,12 +275,6 @@ function renderfield(required, originalvalue, path, name, field) {
   }
 
   let label = document.createElement('label');
-
-  if (name) {
-    let labeltext = document.createTextNode(name.charAt(0).toUpperCase() + name.slice(1));
-    label.appendChild(labeltext);
-  }
-
   label.htmlFor = input.id;
 
   let div = document.createElement('div');
@@ -276,9 +288,9 @@ function renderfield(required, originalvalue, path, name, field) {
       option.value = element;
       datalist.appendChild(option);
     }
-    datalist.id = input.name + 'listoptions';
+    datalist.id = input.id + 'listoptions';
     div.appendChild(datalist);
-    input.list = input.name + 'listoptions';
+    input.list = input.id + 'listoptions';
   }
 
   if (originalvalue) {
@@ -291,7 +303,7 @@ function renderfield(required, originalvalue, path, name, field) {
 function form2json(wrapper, schema, identifier){
   let content = null;
   let fieldname = null;
-  //try:
+
   if (schema['type'] == 'object'){
     content = ContentFromPostObject(wrapper, identifier, '', schema);
   } else if (schema['type'] == 'array'){
@@ -301,14 +313,13 @@ function form2json(wrapper, schema, identifier){
   if (content){
     return content;
   }
-  //except KeyError:
-  //pass
+
   return false
 }
 
 
 function ContentFromPostObject(wrapper, identifier, path, schema){
-  let content = [];
+  let content = {};
   let data = null;
   let fieldname = null;
   for (fieldname in schema['properties']){

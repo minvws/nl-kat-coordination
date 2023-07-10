@@ -7,39 +7,20 @@
   "required": [],
   "properties": {
     "common": {
-      "type": "object",
-      "default": {},
-      "Common Ports": "Allowed ports",
-      "required": [],
-      "properties": {
-        "udp": {
-          "title": "Allowed UDP ports",
-          "type": "array",
-          "default": [
-            53
-          ],
-          "items": {
-            "type": "integer",
-            "examples": [
-              53
-            ]
-          }
-        },
-        "tcp": {
-          "type": "array",
-          "default": [
-            25,
-            53,
-            110,
-            143,
-            993,
-            995,
-            80,
-            443],
-          "title": "Allowed TCP ports",
-          "items": {
-            "type": "integer",
-            "examples": [
+        "type": "object",
+        "default": {},
+        "Common Ports": "Allowed ports",
+        "required": [],
+        "properties": {
+          "udp": {
+            "title": "Comma separated allowed UDP ports",
+            "type": "string",
+            "pattern": "^(\\s*(,*)[0-9]+,?\\s*)*$",
+            "default": "53"
+          },
+          "tcp": {
+            "type": "array",
+            "default": [
               25,
               53,
               110,
@@ -47,13 +28,24 @@
               993,
               995,
               80,
-              443
-            ]
+              443],
+            "title": "Allowed TCP ports",
+            "items": {
+              "type": "integer",
+              "examples": [
+                25,
+                53,
+                110,
+                143,
+                993,
+                995,
+                80,
+                443
+              ]
+            }
           }
         }
-      }
     },
-
     "admin": {
       "type": "object",
       "default": {},
