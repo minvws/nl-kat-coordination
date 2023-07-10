@@ -50,7 +50,6 @@ class APITemplateTestCase(unittest.TestCase):
             ctx=self.mock_ctx,
         )
 
-        # TODO: refactor to MockScheduler
         self.scheduler = schedulers.BoefjeScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,

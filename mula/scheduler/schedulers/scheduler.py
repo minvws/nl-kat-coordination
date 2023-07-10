@@ -328,7 +328,8 @@ class Scheduler(abc.ABC):
     def disable(self) -> None:
         """Disable the scheduler.
 
-        NOTE: we keep the check_enabled thread running
+        This will stop all listeners and threads, and clear the queue, and any
+        tasks that were on the queue will be set to CANCELLED.
         """
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
         self.enabled = False
@@ -349,6 +350,10 @@ class Scheduler(abc.ABC):
         self.logger.info("Disabled scheduler: %s", self.scheduler_id)
 
     def enable(self) -> None:
+        """Enable the scheduler.
+
+        This will start the scheduler, and start all listeners and threads.
+        """
         self.logger.info("Enabling scheduler: %s", self.scheduler_id)
         self.enabled = True
 
@@ -366,7 +371,7 @@ class Scheduler(abc.ABC):
         """Stop the scheduler."""
         self.logger.info("Stopping scheduler: %s", self.scheduler_id)
 
-        # Second, stop the listeners, when those are running in a thread and
+        # First, stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
         # will not stop the thread. We need to explicitly stop the listener.
         self.stop_listeners()
