@@ -65,6 +65,8 @@ class BoefjeMeta(Job):
     input_ooi: Optional[str]
     arguments: Dict[str, Any]
     organization: str
+    runnable_hash: Optional[str]
+    environment: Optional[Dict[str, str]]
 
 
 class RawDataMeta(BaseModel):
@@ -76,6 +78,7 @@ class RawDataMeta(BaseModel):
 
     # These are set once the raw is saved
     secure_hash: Optional[SecureHash]
+    signing_provider_url: Optional[str]
     hash_retrieval_link: Optional[RetrievalLink]
 
 
@@ -86,6 +89,7 @@ class RawData(BaseModel):
 
     # These are set once the raw is saved
     secure_hash: Optional[SecureHash]
+    signing_provider_url: Optional[str]
     hash_retrieval_link: Optional[RetrievalLink]
 
 

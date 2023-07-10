@@ -13,6 +13,7 @@
                 {% include "tasks/partials/tab_navigation.html" with view="normalizers_tasks" %}
 
                 <h1>{% translate "Normalizers" %}</h1>
+                {% include "tasks/partials/task_filter.html" %}
                 {% if not object_list %}
                     <p class="emphasized">{% translate "There are no tasks for normalizers" %}</p>
                 {% else %}
@@ -40,7 +41,9 @@
                                         {% else %}
                                             <td>{% translate "No input OOI" %}</td>
                                         {% endif %}
-                                        <td>{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</td>
+                                        <td>
+                                          <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                                        </td>
                                         <td>{{ task.p_item.data.normalizer.id }}</td>
                                         {% if task.status.value == "completed" %}
                                             <td class="confirmation">{{ task.status.value|capfirst }}</td>
@@ -69,3 +72,8 @@
         </section>
     </main>
 {% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock script %}

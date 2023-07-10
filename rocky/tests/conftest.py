@@ -17,13 +17,12 @@ from tools.models import (
     GROUP_CLIENT,
     GROUP_REDTEAM,
     Indemnification,
-    OOIInformation,
     Organization,
     OrganizationMember,
 )
 
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
@@ -89,13 +88,20 @@ def add_redteam_group_permissions(member):
         Permission.objects.get(codename="can_enable_disable_boefje").id,
         Permission.objects.get(codename="can_set_clearance_level").id,
         Permission.objects.get(codename="can_delete_oois").id,
+        Permission.objects.get(codename="can_mute_findings").id,
+        Permission.objects.get(codename="can_view_katalogus_settings").id,
+        Permission.objects.get(codename="can_set_katalogus_settings").id,
     ]
     group.permissions.set(redteam_permissions)
 
 
-def add_client_group(member):
+def add_client_group_permissions(member):
     group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
     member.groups.add(group)
+    client_permissions = [
+        Permission.objects.get(codename="can_scan_organization").id,
+    ]
+    group.permissions.set(client_permissions)
 
 
 @pytest.fixture
@@ -201,15 +207,24 @@ def clientuser_b(django_user_model):
 @pytest.fixture
 def client_member(clientuser, organization):
     member = create_member(clientuser, organization)
-    add_client_group(member)
+    add_client_group_permissions(member)
     return member
 
 
 @pytest.fixture
 def client_member_b(clientuser_b, organization_b):
     member = create_member(clientuser_b, organization_b)
-    add_client_group(member)
+    add_client_group_permissions(member)
     return member
+
+
+@pytest.fixture
+def client_user_two_organizations(clientuser, organization, organization_b):
+    member = create_member(clientuser, organization)
+    add_client_group_permissions(member)
+    member = create_member(clientuser, organization_b)
+    add_client_group_permissions(member)
+    return clientuser
 
 
 @pytest.fixture
@@ -352,6 +367,33 @@ def finding():
 
 
 @pytest.fixture
+def finding_types():
+    return [
+        KATFindingType(
+            id="KAT-0001",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=9.5,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+        KATFindingType(
+            id="KAT-0002",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=9.5,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+        KATFindingType(
+            id="KAT-0003",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=3.9,
+            risk_severity=RiskLevelSeverity.LOW,
+        ),
+    ]
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {
@@ -382,20 +424,14 @@ def plugin_schema():
             },
             "TEST_PROPERTY2": {
                 "title": "TEST_PROPERTY2",
-                "maxLength": 128,
                 "type": "integer",
+                "minimum": 2,
+                "maximum": 200,
                 "description": "Test description2",
             },
         },
         "required": ["TEST_PROPERTY"],
     }
-
-
-@pytest.fixture
-def ooi_information() -> OOIInformation:
-    data = {"description": "Fake description...", "recommendation": "Fake recommendation...", "risk": "Low"}
-    ooi_information = OOIInformation.objects.create(id="KATFindingType|KAT-000", data=data, consult_api=False)
-    return ooi_information
 
 
 def setup_request(request, user):

@@ -6,7 +6,7 @@ SHELL := bash
 HIDE:=$(if $(VERBOSE),,@)
 UNAME := $(shell uname)
 
-.PHONY: $(MAKECMDGOALS)
+.PHONY: kat update reset up stop down clean fetch pull upgrade env-if-empty env build debian-build-image ubuntu-build-image docs
 
 # Export Docker buildkit options
 export DOCKER_BUILDKIT=1
@@ -84,10 +84,31 @@ endif
 	make -C rocky build
 	make -C boefjes build
 
-# Build Debian build image
-debian-build-image:
-	docker build -t kat-debian-build-image packaging/debian
+# Build Debian 11 build image
+debian11-build-image:
+	docker build -t kat-debian11-build-image packaging/debian11
 
-# Build Ubuntu build image
-ubuntu-build-image:
-	docker build -t kat-ubuntu-build-image packaging/ubuntu
+# Build Debian 11 build image
+debian12-build-image:
+	docker build -t kat-debian12-build-image packaging/debian12
+
+# Build Ubuntu 22.04 build image
+ubuntu22.04-build-image:
+	docker build -t kat-ubuntu22.04-build-image packaging/ubuntu22.04
+
+docs:
+	sphinx-build -b html docs/source docs/_build
+
+poetry-dependencies:
+	for path in . keiko octopoes boefjes bytes mula rocky
+	do
+		echo $$path
+		poetry check -C $$path
+		poetry lock --check -C $$path
+		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt
+		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt
+	done
+
+	# NOTE: pip does not yet support hash verification for git dependencies;
+	# rocky's requirements-dev.txt unfortunately has no hashing until then
+	sed -i '/--hash/d; s/ \\$$//' rocky/requirements-dev.txt

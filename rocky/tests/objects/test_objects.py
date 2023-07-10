@@ -92,7 +92,7 @@ def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octo
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().list.call_count == 2
-    assert mock_organization_view_octopoes().delete.call_count == 2
+    assert mock_organization_view_octopoes().delete_many.call_count == 1
 
 
 def test_ooi_list_delete_none(rf, client_member, mock_organization_view_octopoes):
@@ -141,7 +141,7 @@ def test_update_scan_profile_multiple(rf, client_member, mock_organization_view_
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().save_scan_profile.call_count == 2
+    assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
 def test_update_scan_profile_single(rf, client_member, mock_organization_view_octopoes):
@@ -164,7 +164,7 @@ def test_update_scan_profile_single(rf, client_member, mock_organization_view_oc
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().save_scan_profile.call_count == 1
+    assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
 def test_update_scan_profile_to_inherit(rf, client_member, mock_organization_view_octopoes):
@@ -183,11 +183,11 @@ def test_update_scan_profile_to_inherit(rf, client_member, mock_organization_vie
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().save_scan_profile.call_count == 1
+    assert mock_organization_view_octopoes().save_many_scan_profiles.call_count == 1
 
 
 def test_update_scan_profile_to_inherit_connection_error(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().save_scan_profile.side_effect = ConnectionError
+    mock_organization_view_octopoes().save_many_scan_profiles.side_effect = ConnectionError
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -206,7 +206,7 @@ def test_update_scan_profile_to_inherit_connection_error(rf, client_member, mock
 
 
 def test_update_scan_profile_to_inherit_object_not_found(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().save_scan_profile.side_effect = ObjectNotFoundException("nothing found")
+    mock_organization_view_octopoes().save_many_scan_profiles.side_effect = ObjectNotFoundException("nothing found")
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("ooi_list", kwargs=kwargs)
 
@@ -293,7 +293,7 @@ def test_update_scan_profiles_no_indemnification(rf, redteam_member, mock_organi
 
 
 def test_update_scan_profiles_octopoes_down(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().save_scan_profile.side_effect = ConnectionError
+    mock_organization_view_octopoes().save_many_scan_profiles.side_effect = ConnectionError
     client_member.trusted_clearance_level = 2
     client_member.acknowledged_clearance_level = 2
     client_member.save()
@@ -314,7 +314,7 @@ def test_update_scan_profiles_octopoes_down(rf, client_member, mock_organization
 
 
 def test_update_scan_profiles_object_not_found(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().save_scan_profile.side_effect = ObjectNotFoundException("gone")
+    mock_organization_view_octopoes().save_many_scan_profiles.side_effect = ObjectNotFoundException("gone")
     client_member.trusted_clearance_level = 2
     client_member.acknowledged_clearance_level = 2
     client_member.save()
@@ -336,7 +336,7 @@ def test_update_scan_profiles_object_not_found(rf, client_member, mock_organizat
 
 
 def test_delete_octopoes_down(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().delete.side_effect = ConnectionError
+    mock_organization_view_octopoes().delete_many.side_effect = ConnectionError
 
     request = rf.post(
         "ooi_list",
@@ -357,7 +357,7 @@ def test_delete_octopoes_down(rf, client_member, mock_organization_view_octopoes
 
 
 def test_delete_object_not_found(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().delete.side_effect = ObjectNotFoundException("gone")
+    mock_organization_view_octopoes().delete_many.side_effect = ObjectNotFoundException("gone")
 
     request = rf.post(
         "ooi_list",
@@ -425,6 +425,32 @@ def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes)
     assert len(exported_objects) == 152
     assert "observed_at" in exported_objects[0]
     assert "filters" in exported_objects[0]
+
+
+def test_ooi_list_filtered_export_csv(rf, client_member, mock_organization_view_octopoes):
+    kwargs = {"organization_code": client_member.organization.code}
+    url = reverse("ooi_list_export", kwargs=kwargs)
+    request = rf.get(
+        url, {"file_type": "csv", "ooi_type": "Network", "clearance_type": "inherited", "clearance_level": 3}
+    )
+    request.resolver_match = resolve(url)
+
+    setup_request(request, client_member.user)
+
+    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+        count=200, items=[Network(name="testnetwork")] * 150
+    )
+
+    response = OOIListExportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "text/csv"
+    assert mock_organization_view_octopoes().list.call_count == 1
+
+    mock_calls = mock_organization_view_octopoes().list.mock_calls
+    assert list(mock_calls[0].kwargs["scan_level"])[0].value == 3
+    assert mock_calls[0].args[0].pop() == Network
+    assert list(mock_calls[0].kwargs["scan_profile_type"])[0].value == "inherited"
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])

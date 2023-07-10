@@ -53,6 +53,15 @@ This could be changed in the future when the boefje-runner/plugin-code can decry
 although this would be more complicated.
 
 ## Environment variables
+By design, Boefjes do not have access to the host system's environment variables.
+If a Boefje requires access to an environment variable (e.g. `HTTP_PROXY` or `USER_AGENT`), it should note as such in its `boefje.json` manifest.
+The system-wide variables can be set as environment variable to the boefjes runner by prefixing it with `BOEFJE_`.
+This is to prevent a Boefje from accessing variables it should not have access to, such as secrets.
+To illustrate: if `BOEFJE_HTTP_PROXY=https://proxy:8080` environment variable is configured, the Boefje can access it as `HTTP_PROXY`.
+This feature can also be used to set default values for KAT-alogus settings. For example, configuring the `BOEFJE_TOP_PORTS` environment variable
+will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
+This default value can be overridden by setting any value for `TOP_PORTS` in the KAT-alogus.
+
 
 | Environment variable       | Value                        | Description                                       |
 |----------------------------|------------------------------|---------------------------------------------------|

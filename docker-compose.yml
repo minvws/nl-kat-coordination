@@ -43,7 +43,10 @@ services:
   octopoes_api:
     restart: unless-stopped
     depends_on:
-      - crux
+      crux:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "127.0.0.1:8001:80"
     build:
@@ -60,8 +63,10 @@ services:
   octopoes_api_worker:
     restart: unless-stopped
     depends_on:
-      - crux
-      - rabbitmq
+      crux:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     build:
       context: octopoes/
       target: dev
@@ -132,6 +137,9 @@ services:
       - ./octopoes/octopoes:/app/rocky/octopoes
     env_file:
       - .env
+    environment:
+      - GITPOD_WORKSPACE_URL=${GITPOD_WORKSPACE_URL:-}
+      - GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN=${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN:-}
 
   bytes:
     restart: unless-stopped
@@ -185,6 +193,7 @@ services:
       - ./mula:/app/scheduler
     depends_on:
       - postgres
+      - rabbitmq
       - boefje
       - normalizer
       - octopoes_api

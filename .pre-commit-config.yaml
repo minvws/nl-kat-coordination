@@ -23,6 +23,8 @@ repos:
     rev: v6.1.2
     hooks:
       - id: rstcheck
+        # https://github.com/rstcheck/rstcheck-core/issues/4
+        args: ["--ignore-messages", "Hyperlink target .* is not referenced"]
         additional_dependencies: ["rstcheck[sphinx]"]
 
   - repo: https://github.com/MarketSquare/robotframework-tidy
@@ -72,7 +74,9 @@ repos:
         exclude: |
           (?x)(
           \.po$ |
+          \.xml$ |
           poetry.lock$ |
+          pyproject.toml$ |
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
@@ -89,3 +93,13 @@ repos:
     hooks:
       - id: djlint-django
         files: '^rocky/.*/templates/.*$'
+
+  # - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+  #   rev: v15.4.0
+  #   hooks:
+  #     - id: stylelint
+  #       args: [--fix]
+  #       additional_dependencies:
+  #              - stylelint@15.4.0
+  #              - stylelint-config-standard-scss@8.0.0
+  #       files:  "^(rocky\/assets\/src\/|docs\/source\/).*.(css|scss|sass)$"

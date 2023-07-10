@@ -1,11 +1,11 @@
 ARG PYTHON_VERSION=3.11
-FROM python:$PYTHON_VERSION AS boefjes-requirements
+FROM python:$PYTHON_VERSION-bookworm AS boefjes-requirements
 
 COPY boefjes/boefjes ./boefjes
 COPY boefjes/requirements.txt ./boefjes
 
 # The echo since cat does not add a newline
-RUN find ./boefjes -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
+RUN find ./boefjes/plugins -name 'requirements.txt' -execdir sh -c "cat {} && echo" \; | sort -u > /tmp/boefjes-requirements.txt
 
 FROM python:$PYTHON_VERSION AS dev
 
@@ -29,6 +29,7 @@ RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
     && pip install -r /tmp/boefjes-requirements.txt \
     && rm /tmp/boefjes-requirements.txt \
+    && pip install -r requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; then pip install -r requirements-dev.txt; fi
 
 FROM dev

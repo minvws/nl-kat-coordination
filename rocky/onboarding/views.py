@@ -274,7 +274,35 @@ class OnboardingSetupScanOOIDetailView(
         level = int(self.request.session["clearance_level"])
         try:
             self.raise_clearance_level(ooi.reference, level)
-        except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
+        except IndemnificationNotPresentException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. \
+                Indemnification not present at organization %s."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization.name,
+                ),
+            )
+            return self.get(request, *args, **kwargs)
+        except ClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. \
+                You acknowledged a clearance level of %s."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
             return self.get(request, *args, **kwargs)
 
         self.enable_selected_boefjes()
@@ -388,22 +416,6 @@ class BaseReportView(RedteamRequiredMixin, BaseOOIDetailView):
 class DnsReportView(OnboardingBreadcrumbsMixin, BaseReportView):
     template_name = "dns_report.html"
     report = DNSReport
-
-    def get_dns_zone_for_url(self):
-        """
-        Path to DNSZone: url > hostnamehttpurl > netloc > dns_zone
-        """
-        if self.ooi.ooi_type != "URL":
-            return self.ooi
-
-        try:
-            web_url = self.tree.store[str(self.ooi.web_url)]
-            netloc = self.tree.store[str(web_url.netloc)]
-            dns_zone = super().get_ooi(pk=str(netloc.dns_zone))
-            return dns_zone
-        except KeyError:
-            messages.add_message(self.request, messages.ERROR, _("No DNS zone found."))
-            return self.ooi
 
 
 class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):

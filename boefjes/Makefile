@@ -31,7 +31,7 @@ help: ## Show this help.
 build: seed
 
 seed:  # Seed the katalogus database
-	-docker-compose run katalogus python -m boefjes.seed
+	-docker-compose run --rm katalogus python -m boefjes.seed
 
 ##
 ##|------------------------------------------------------------------------|
@@ -42,12 +42,12 @@ migrations: ## Generate a migration using alembic
 ifeq ($(m),)
 	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)"
+	docker-compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)"
 endif
 
 
 sql: ## Generate raw sql for the migrations
-	docker-compose run katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade $(rev1):$(rev2) --sql
+	docker-compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade $(rev1):$(rev2) --sql
 
 check:
 	pre-commit run --all-files --color always
@@ -66,8 +66,9 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm katalogus_integration
+	$(ci-docker-compose) down
 
-debian:
+debian11:
 	docker run --rm \
 	--env PKG_NAME=kat-boefjes \
 	--env BUILD_DIR=./build \
@@ -77,10 +78,23 @@ debian:
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
 	--workdir /app \
-	kat-debian-build-image \
+	kat-debian11-build-image \
 	packaging/scripts/build-debian-package.sh
 
-ubuntu:
+debian12:
+	docker run --rm \
+	--env PKG_NAME=kat-boefjes \
+	--env BUILD_DIR=./build \
+	--env REPOSITORY=minvws/nl-kat-boefjes \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
+	--workdir /app \
+	kat-debian12-build-image \
+	packaging/scripts/build-debian-package.sh
+
+ubuntu22.04:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-boefjes \
@@ -91,7 +105,7 @@ ubuntu:
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
 	--workdir /app \
-	kat-ubuntu-build-image \
+	kat-ubuntu22.04-build-image \
 	packaging/scripts/build-debian-package.sh
 
 clean:

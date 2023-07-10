@@ -2,11 +2,14 @@ import pytest
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
+from octopoes.models.ooi.findings import Finding
+from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
+from rocky.views.finding_list import FindingListView
 from rocky.views.ooi_add import OOIAddView
 from rocky.views.ooi_detail import OOIDetailView
 from rocky.views.ooi_findings import OOIFindingListView
-from rocky.views.ooi_mute import MuteFindingView
+from rocky.views.ooi_mute import MuteFindingsBulkView, MuteFindingView
 from tests.conftest import setup_request
 
 TREE_DATA = {
@@ -60,7 +63,7 @@ MUTED_FINDING_TREE_DATA = {
 def test_ooi_finding_list(rf, client_member, mock_organization_view_octopoes):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request = setup_request(rf.get("finding_list", {"ooi_id": "Network|testnetwork"}), client_member.user)
+    request = setup_request(rf.get("ooi_findings", {"ooi_id": "Network|testnetwork"}), client_member.user)
     response = OOIFindingListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
@@ -68,57 +71,68 @@ def test_ooi_finding_list(rf, client_member, mock_organization_view_octopoes):
     assertContains(response, "Add finding")
 
 
-def test_mute_finding_button_is_visible(
-    rf, admin_member, redteam_member, client_member, mock_organization_view_octopoes, mock_scheduler, mocker
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
+def test_mute_finding_button_is_visible(request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+
+    member = request.getfixturevalue(member)
+
+    response = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertContains(response, "Mute Finding")
+
+
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_mute_finding_button_is_not_visible_without_perms(
+    request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
 
-    request_admin = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), admin_member.user)
-    response_admin = OOIDetailView.as_view()(request_admin, organization_code=admin_member.organization.code)
+    member = request.getfixturevalue(member)
 
-    request_redteam = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
-    response_redteam = OOIDetailView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
-
-    request_client = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
-    response_client = OOIDetailView.as_view()(request_client, organization_code=client_member.organization.code)
-
-    assert response_admin.status_code == 200
-    assert response_redteam.status_code == 200
-    assert response_client.status_code == 200
-
-    # No permissions to see mute findings button
-    assertNotContains(response_admin, "Mute Finding")
-    assertNotContains(response_client, "Mute Finding")
-
-    # Redteam permission to see mute finding button
-    assertContains(response_redteam, "Mute Finding")
-
-
-def test_mute_finding_form_view(rf, admin_member, redteam_member, client_member, mock_organization_view_octopoes):
-    request_admin = setup_request(
-        rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), admin_member.user
+    response = OOIDetailView.as_view()(
+        setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), member.user),
+        organization_code=member.organization.code,
     )
+
+    assert response.status_code == 200
+    assertNotContains(response, "Mute Finding")
+
+
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
+def test_mute_finding_form_view(request, member, rf, mock_organization_view_octopoes):
+    member = request.getfixturevalue(member)
+    response = MuteFindingView.as_view()(
+        setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+
+    assertContains(response, "Reason:")
+    assertContains(response, "Mute")
+    assertContains(response, "Cancel")
+    assertContains(response, "Mute finding: ")
+
+
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_mute_finding_form_view_no_perms(request, member, rf, mock_organization_view_octopoes):
+    member = request.getfixturevalue(member)
     with pytest.raises(PermissionDenied):
-        MuteFindingView.as_view()(request_admin, organization_code=admin_member.organization.code)
-
-    request_client = setup_request(
-        rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
-    )
+        MuteFindingView.as_view()(
+            setup_request(rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), member.user),
+            organization_code=member.organization.code,
+        )
     with pytest.raises(PermissionDenied):
-        MuteFindingView.as_view()(request_client, organization_code=client_member.organization.code)
-
-    request_redteam = setup_request(
-        rf.get("finding_mute", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), redteam_member.user
-    )
-    response_redteam = MuteFindingView.as_view()(request_redteam, organization_code=redteam_member.organization.code)
-
-    assert response_redteam.status_code == 200
-
-    assertContains(response_redteam, "Reason:")
-    assertContains(response_redteam, "Mute")
-    assertContains(response_redteam, "Cancel")
-    assertContains(response_redteam, "Mute finding: ")
+        MuteFindingView.as_view()(
+            setup_request(rf.post("finding_mute"), member.user), organization_code=member.organization.code
+        )
 
 
 def test_mute_finding_post(
@@ -165,3 +179,140 @@ def test_mute_finding_post(
     assertContains(resulted_response, "MutedFinding")
     assertContains(resulted_response, muted_finding["reason"])
     assertContains(resulted_response, "KAT-000 @ testnetwork")
+
+
+def test_muted_finding_button_not_presence(rf, mock_organization_view_octopoes, network, finding_types, redteam_member):
+    mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
+        count=1,
+        items=[
+            Finding(
+                finding_type=finding_types[0].reference,
+                ooi=network.reference,
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            ),
+        ],
+    )
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
+        network.reference: network,
+        finding_types[0].reference: finding_types[0],
+    }
+
+    response = FindingListView.as_view()(
+        setup_request(rf.get("finding_list"), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+
+    assert response.status_code == 200
+    # Does not show button with 1 Finding, multiselect for 2 or more findings
+    assertNotContains(response, '<button type="submit">Mute Findings</button>')
+
+
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
+def test_muted_finding_button_presence_more_findings_and_post(
+    rf,
+    request,
+    member,
+    mock_organization_view_octopoes,
+    network,
+    finding_types,
+    mocker,
+    mock_bytes_client,
+    mock_scheduler,
+):
+    member = request.getfixturevalue(member)
+    finding_1 = Finding(
+        finding_type=finding_types[0].reference,
+        ooi=network.reference,
+        proof="proof",
+        description="test description 123",
+        reproduce="reproduce",
+    )
+    finding_2 = Finding(
+        finding_type=finding_types[1].reference,
+        ooi=network.reference,
+        proof="proof",
+        description="test description 123",
+        reproduce="reproduce",
+    )
+    mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
+        count=2,
+        items=[finding_1, finding_2],
+    )
+
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
+        network.reference: network,
+        finding_types[0].reference: finding_types[0],
+        finding_types[1].reference: finding_types[1],
+    }
+
+    response = FindingListView.as_view()(
+        setup_request(rf.get("finding_list"), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertContains(response, '<input class="toggle-all" data-toggle-target="finding" type="checkbox">', html=True)
+    assertContains(response, '<input type="checkbox" name="finding" value="' + finding_1.primary_key + '">', html=True)
+    assertContains(response, '<button type="submit">Mute Findings</button>')
+
+    request = setup_request(
+        rf.post(
+            "finding_mute_bulk",
+            {
+                "finding": [finding_1, finding_2],
+                "reason": "testing",
+            },
+        ),
+        member.user,
+    )
+
+    response_post = MuteFindingsBulkView.as_view()(request, organization_code=member.organization.code)
+
+    assert response_post.status_code == 302
+
+
+@pytest.mark.parametrize("member", ["admin_member", "client_member"])
+def test_can_mute_findings_perms(
+    rf,
+    request,
+    member,
+    mock_organization_view_octopoes,
+    network,
+    finding_types,
+):
+    member = request.getfixturevalue(member)
+    mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
+        count=2,
+        items=[
+            Finding(
+                finding_type=finding_types[0].reference,
+                ooi=network.reference,
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            ),
+            Finding(
+                finding_type=finding_types[1].reference,
+                ooi=network.reference,
+                proof="proof",
+                description="test description 123",
+                reproduce="reproduce",
+            ),
+        ],
+    )
+
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
+        network.reference: network,
+        finding_types[0].reference: finding_types[0],
+        finding_types[1].reference: finding_types[1],
+    }
+
+    response = FindingListView.as_view()(
+        setup_request(rf.get("finding_list"), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertNotContains(response, '<button type="submit">Mute Findings</button>')

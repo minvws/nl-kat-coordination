@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from requests import HTTPError, RequestException
 from rest_framework.status import HTTP_404_NOT_FOUND
 
-from katalogus.client import Plugin, get_katalogus
+from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
 from octopoes.models import OOI
 from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
 from rocky.scheduler import Boefje, BoefjeTask, QueuePrioritizedItem, client
@@ -23,9 +23,9 @@ logger = getLogger(__name__)
 class SinglePluginView(OrganizationView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.katalogus_client = None
+        self.katalogus_client: Optional[KATalogusClientV1] = None
         self.plugin_schema = None
-        self.plugin = None
+        self.plugin: Optional[Plugin] = None
 
     def setup(self, request, *args, **kwargs):
         """
@@ -59,23 +59,6 @@ class SinglePluginView(OrganizationView):
     def is_required_field(self, field: str) -> bool:
         return self.plugin_schema and field in self.plugin_schema.get("required", [])
 
-    def is_valid_setting(self, setting_name: str) -> bool:
-        return self.plugin_schema and setting_name in self.plugin_schema.get("properties", [])
-
-
-class SingleSettingView(SinglePluginView):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.setting_name = None
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        if not self.is_valid_setting(kwargs.get("setting_name")):
-            raise Http404("Setting {} is not valid for this plugin.".format(kwargs.get("setting_name")))
-
-        self.setting_name = kwargs.get("setting_name")
-
 
 class BoefjeMixin(OctopoesView):
     """
@@ -84,29 +67,16 @@ class BoefjeMixin(OctopoesView):
     """
 
     def run_boefje(self, katalogus_boefje: Plugin, ooi: Optional[OOI]) -> None:
-        boefje_queue_name = f"boefje-{self.organization.code}"
-
-        boefje = Boefje(
-            id=katalogus_boefje.id,
-            name=katalogus_boefje.name,
-            description=katalogus_boefje.description,
-            repository_id=katalogus_boefje.repository_id,
-            version=None,
-            scan_level=katalogus_boefje.scan_level.value,
-            consumes={ooi_class.get_ooi_type() for ooi_class in katalogus_boefje.consumes},
-            produces={ooi_class.get_ooi_type() for ooi_class in katalogus_boefje.produces},
-        )
-
         boefje_task = BoefjeTask(
             id=uuid4().hex,
-            boefje=boefje,
+            boefje=Boefje(id=katalogus_boefje.id, version=None),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
 
         item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
         logger.info("Item: %s", item.json())
-        client.push_task(boefje_queue_name, item)
+        client.push_task(f"boefje-{self.organization.code}", item)
 
     def run_boefje_for_oois(
         self,
@@ -120,6 +90,32 @@ class BoefjeMixin(OctopoesView):
             if ooi.scan_profile.level < boefje.scan_level:
                 try:
                     self.raise_clearance_level(ooi.reference, boefje.scan_level)
-                except (IndemnificationNotPresentException, ClearanceLevelTooLowException):
-                    continue
+                except IndemnificationNotPresentException:
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Could not raise clearance level of %s to L%s. \
+                            Indemnification not present at organization %s."
+                        )
+                        % (
+                            ooi.reference.human_readable,
+                            boefje.scan_level,
+                            self.organization.name,
+                        ),
+                    )
+                except ClearanceLevelTooLowException:
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Could not raise clearance level of %s to L%s. \
+                            You acknowledged a clearance level of %s."
+                        )
+                        % (
+                            ooi.reference.human_readable,
+                            boefje.scan_level,
+                            self.organization_member.acknowledged_clearance_level,
+                        ),
+                    )
             self.run_boefje(boefje, ooi)

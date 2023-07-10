@@ -38,7 +38,7 @@ itest:
 	robot -d reports tests/robot
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
 
-debian:
+debian11:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-keiko \
@@ -48,10 +48,10 @@ debian:
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--workdir /app \
-	kat-debian-build-image \
+	kat-debian11-build-image \
 	packaging/scripts/build-debian-package.sh
 
-ubuntu:
+debian12:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-keiko \
@@ -61,7 +61,20 @@ ubuntu:
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--workdir /app \
-	kat-ubuntu-build-image \
+	kat-debian12-build-image \
+	packaging/scripts/build-debian-package.sh
+
+ubuntu22.04:
+	mkdir -p build
+	docker run --rm \
+	--env PKG_NAME=kat-keiko \
+	--env BUILD_DIR=./build \
+	--env REPOSITORY=minvws/nl-kat-keiko \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--workdir /app \
+	kat-ubuntu22.04-build-image \
 	packaging/scripts/build-debian-package.sh
 
 clean:
@@ -72,8 +85,3 @@ clean:
 	rm -f debian/*.substvars
 	rm -f debian/*.debhelper.log
 	rm -f debian/changelog
-
-export-requirements: ## Export the requirements to requirements.txt format
-	poetry export --output requirements.txt --without-hashes && \
-	poetry export --output requirements-dev.txt --with dev --without-hashes
-	poetry export --output requirements-check.txt --only dev --without-hashes

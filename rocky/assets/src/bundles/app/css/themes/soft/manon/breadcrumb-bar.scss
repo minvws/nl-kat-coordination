@@ -1,12 +1,24 @@
 /* Navigation - Variables */
 
 :root {
+  /* Breadcrumb bar nav */
+  --breadcrumb-bar-padding-right: 0;
+  --breadcrumb-bar-padding-left: 0;
   --breadcrumb-bar-background-color: var(--branding-color-1-background-color);
   --breadcrumb-bar-text-color: var(--branding-color-1-text-color);
+
+  /* Content wrapper */
+  --breadcrumb-bar-content-block-max-width: var(--header-navigation-max-width);
   --breadcrumb-bar-content-block-icon: "\ea61";
-  --breadcrumb-bar-padding-right: 3%;
-  --breadcrumb-bar-padding-left: 3%;
+
+  /* List */
   --breadcrumb-bar-list-vertical-align: center;
-  --breadcrumb-bar-icon-font-family: var(--icon-base-font-family);
+
+  /* Icon */
+  --breadcrumb-bar-icon-font-family: var(--icon-font-family);
   --breadcrumb-bar-icon: "\ea61";
+}
+
+body>header nav.breadcrumb-bar ul li a {
+  border: 0;
 }
