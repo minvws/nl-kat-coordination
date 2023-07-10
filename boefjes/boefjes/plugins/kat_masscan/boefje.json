@@ -7,7 +7,6 @@
     ],
     "produces": [
         "IPAddressV4",
-        "IPAddressV6",
         "IPPort"
     ],
     "environment_keys": [
