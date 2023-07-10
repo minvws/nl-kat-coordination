@@ -78,6 +78,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_latest_task_by_hash = mock.patch(
             "scheduler.context.AppContext.task_store.get_latest_task_by_hash"
         ).start()
+
         self.mock_get_last_run_boefje = mock.patch(
             "scheduler.context.AppContext.services.bytes.get_last_run_boefje"
         ).start()
@@ -1015,6 +1016,21 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
+        self.mock_is_task_running = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_running",
+            return_value=False,
+        ).start()
+
+        self.mock_is_task_allowed_to_run = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run",
+            return_value=True,
+        ).start()
+
+        self.mock_has_grace_period_passed = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
+            return_value=True,
+        ).start()
+
         self.mock_get_jobs = mock.patch(
             "scheduler.context.AppContext.job_store.get_jobs",
         ).start()
@@ -1061,6 +1077,97 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.push_tasks_for_rescheduling()
 
         # Assert
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_rescheduling_no_ooi(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=None,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        job = models.Job(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        # Mocks
+        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_boefje.return_value = boefje
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_rescheduling_boefje_not_found(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=None,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        job = models.Job(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        # Mocks
+        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_boefje.return_value = None
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert
+        self.assertEqual(0, self.scheduler.queue.qsize())
+        job_db = self.mock_ctx.job_store.get_job(job.id)
+        self.assertFalse(job_db.enabled)
+
+    def test_push_tasks_for_rescheduling_boefje_disabled(self):
+        # TODO: job should be disabled
+        pass
+
+    def test_push_tasks_for_rescheduling_ooi_not_found(self):
+        # TODO: job should be disabled
+        pass
+
+    def test_push_tasks_for_rescheduling_boefje_doesnt_consumes_ooi(self):
+        # TODO: job should be disabled
+        pass
+
+    def test_push_tasks_for_rescheduling_boefje_cannot_scan_ooi(self):
+        # TODO: job should be disabled
+        pass
 
 
 class TestCalculateDeadline(BoefjeSchedulerBaseTestCase):

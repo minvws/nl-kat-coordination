@@ -312,8 +312,7 @@ class BoefjeScheduler(Scheduler):
                         self.scheduler_id,
                     )
 
-                    job.enabled = False
-                    self.ctx.job_store.update_job(job)
+                    self.ctx.job_store.update_job_enabled(job.id, False)
                     continue
 
                 # boefje still enabled?
@@ -324,12 +323,12 @@ class BoefjeScheduler(Scheduler):
                         self.scheduler_id,
                     )
 
-                    job.enabled = False
-                    self.ctx.job_store.update_job(job)
+                    self.ctx.job_store.update_job_enabled(job.id, False)
                     continue
 
                 # ooi still exists? We check if the task has an input ooi,
                 # since it is possible that task can have no ooi's
+                ooi = None
                 if task.input_ooi:
                     ooi = self.ctx.services.octopoes.get_object(task.organization, task.input_ooi)
                     if not ooi:
@@ -339,8 +338,7 @@ class BoefjeScheduler(Scheduler):
                             self.scheduler_id,
                         )
 
-                        job.enabled = False
-                        self.ctx.job_store.update_job(job)
+                        self.ctx.job_store.update_job_enabled(job.id, False)
                         continue
 
                     # boefje still consumes ooi?
@@ -351,8 +349,7 @@ class BoefjeScheduler(Scheduler):
                             self.scheduler_id,
                         )
 
-                        job.enabled = False
-                        self.ctx.job_store.update_job(job)
+                        self.ctx.job_store.update_job_enabled(job.id, False)
                         continue
 
                     # boefje allowed to scan ooi?
@@ -363,8 +360,7 @@ class BoefjeScheduler(Scheduler):
                             self.scheduler_id,
                         )
 
-                        job.enabled = False
-                        self.ctx.job_store.update_job(job)
+                        self.ctx.job_store.update_job_enabled(job.id, False)
                         continue
 
                 executor.submit(
@@ -816,7 +812,6 @@ class BoefjeScheduler(Scheduler):
         if job.deadline is not None:
             return
 
-        # TODO: this should be calculated based on prior tasks
         job.deadline = datetime.fromtimestamp(self.job_ranker.rank(job))
 
         self.ctx.job_store.update_job(job)
