@@ -4,6 +4,7 @@
 <form method="post" class="indented-form">
   {% csrf_token %}
   <fieldset class="indented">
+    <input type="hidden" name="action" value="submit_answer">
     <textarea name="schema" class="JsonSchemaForm">
       {{ json_schema }}
     </textarea>

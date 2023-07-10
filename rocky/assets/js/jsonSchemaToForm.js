@@ -331,15 +331,15 @@ function ContentFromPostObject(wrapper, identifier, path, schema){
     } else if (schema['properties'][fieldname]['type'] == 'object'){
       data = ContentFromPostObject(wrapper, identifier, subpath, childschema);
     } else if (wrapper.elements[identifier+subpath]){
-      if (schema['properties'][fieldname]['type'] == 'number'){
-        data = parseFloat(wrapper.elements[identifier+subpath].value);
-      } else if (schema['properties'][fieldname]['type'] == 'int'){
-        data = parseInt(wrapper.elements[identifier+subpath].value);
-      } else {
-        data = wrapper.elements[identifier+subpath].value;
-      }
+      data = wrapper.elements[identifier+subpath].value;
     }
+
     if (data){
+      if (schema['properties'][fieldname]['type'] == 'number'){
+        data = parseFloat(data);
+      } else if (schema['properties'][fieldname]['type'] == 'integer'){
+        data = parseInt(data);
+      }
       content[fieldname] = data;
     }
   }
@@ -366,8 +366,16 @@ function ContentFromPostArray(wrapper, identifier, path, fieldname, schema){
     if (!data){
       break;
     }
+
+    if (schema['items']['type'] == 'number'){
+      data = parseFloat(data);
+    } else if (schema['items']['type'] == 'integer'){
+      data = parseInt(data);
+    }
+
     content.push(data);
   }
+
   if (content){
     return content;
   }
