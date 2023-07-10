@@ -32,7 +32,7 @@
                             </thead>
                             <tbody>
                                 {% for task in object_list %}
-                                    <tr>
+                                    <tr id="{{ task.id }}">
                                         {% if task.p_item.data.input_ooi %}
                                             <td>
                                                 <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code %}">{{ task.p_item.data.input_ooi }}</a>
