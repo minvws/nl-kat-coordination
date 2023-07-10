@@ -8,7 +8,7 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
-IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:pr-1340"
+IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:latest"
 FILE_PATH = "/tmp/output.json"
 
 
