@@ -27,19 +27,16 @@ class RabbitMQEventManager(EventManager):
 
         try:
             self.channel.queue_declare(queue_name, durable=True)
-        except pika.exceptions.AMQPChannelError as e:
+        except pika.exceptions.AMQPError as e:
             logger.info("Channel error %s, recreating channel", e)
-            self.channel = self.connection.channel()
+            self._check_connection()
             self.channel.queue_declare(queue_name, durable=True)
 
         try:
             self.channel.basic_publish("", queue_name, event_data.encode())
-        except pika.exceptions.ConnectionClosed:
-            logger.exception("RabbitMQ connection was closed: retrying with a new connection.")
-
-            self.connection = pika.BlockingConnection(pika.URLParameters(self.queue_uri))
-            self.channel = self.connection.channel()
-
+        except pika.exceptions.AMQPError:
+            logger.info("RabbitMQ connection was closed: retrying with a new connection.")
+            self._check_connection()
             self.channel.basic_publish("", queue_name, event_data.encode())
 
         logger.info("Published event [event_id=%s] to queue %s", event.event_id, queue_name)
