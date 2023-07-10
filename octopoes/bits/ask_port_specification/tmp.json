@@ -83,7 +83,7 @@
 														"properties": {
 															"title": {
 																"type": "string",
-																"description": "The blocks title.",
+																"description": "New blocks title.",
 																"minLength": 1,
 																"maxLength": 255
 															}
