@@ -5,7 +5,7 @@
         "PORTS": {
             "title": "PORTS",
             "type": "string",
-            "description": "Masscan ports argument, can use commas and hyphens, e.g. '80-82,433' (default)."
+            "description": "Masscan ports argument, can use commas and hyphens, e.g. '80-82,433' or '53,80,433' (default)."
         },
         "MAX_RATE": {
             "title": "MAX_RATE",
