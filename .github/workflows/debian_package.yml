@@ -27,6 +27,9 @@ jobs:
           bytes:
             - 'bytes/**'
             - '.github/workflows/debian_package.yml'
+          cveapi:
+            - 'cveapi/**'
+            - '.github/workflows/debian_package.yml'
           keiko:
             - 'keiko/**'
             - '.github/workflows/debian_package.yml'
@@ -49,7 +52,7 @@ jobs:
       matrix:
         dist: [debian11, debian12, ubuntu22.04]
         # On main, release branches and tags we always want to build all the packages
-        package: ${{ github.event_name == 'push' && fromJSON('["boefjes", "bytes", "keiko", "mula", "octopoes", "rocky"]') || fromJSON(needs.changes.outputs.packages) }}
+        package: ${{ github.event_name == 'push' && fromJSON('["boefjes", "bytes", "cveapi", "keiko", "mula", "octopoes", "rocky"]') || fromJSON(needs.changes.outputs.packages) }}
     runs-on: ubuntu-22.04
     env:
       PKG_NAME: kat-${{ matrix.package }}
