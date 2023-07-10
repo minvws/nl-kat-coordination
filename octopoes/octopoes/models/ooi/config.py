@@ -9,7 +9,7 @@ class Config(OOI):
 
     ooi: Reference = ReferenceField(OOI)
     bit_id: str
-    config: Dict[str, str]
+    config: Dict
 
     _natural_key_attrs = ["ooi", "bit_id"]
 
