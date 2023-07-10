@@ -18,12 +18,12 @@ class TaskStorer(abc.ABC):
     @abc.abstractmethod
     def get_tasks(
         self,
-        scheduler_id: Optional[str],
-        task_type: Optional[str],
-        status: Optional[str],
-        min_created_at: Optional[datetime.datetime],
-        max_created_at: Optional[datetime.datetime],
-        filters: Optional[List[models.Filter]],
+        scheduler_id: Optional[str] = None,
+        task_type: Optional[str] = None,
+        status: Optional[str] = None,
+        min_created_at: Optional[datetime.datetime] = None,
+        max_created_at: Optional[datetime.datetime] = None,
+        filters: Optional[List[models.Filter]] = None,
     ):
         raise NotImplementedError
 
