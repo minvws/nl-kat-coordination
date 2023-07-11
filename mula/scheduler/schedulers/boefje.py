@@ -43,6 +43,7 @@ class BoefjeScheduler(Scheduler):
         ranker: rankers.Ranker,
         organisation: Organisation,
         callback: Optional[Callable[..., None]] = None,
+        populate_queue_enabled: bool = True,
     ):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
@@ -53,8 +54,12 @@ class BoefjeScheduler(Scheduler):
             queue=queue,
             ranker=ranker,
             callback=callback,
+            populate_queue_enabled=populate_queue_enabled,
         )
 
+        self.initialize_listeners()
+
+    @tracer.start_as_current_span("run")
     def run(self) -> None:
         """Populate the PriorityQueue.
 
@@ -65,8 +70,28 @@ class BoefjeScheduler(Scheduler):
         When this is done we will try and fill the rest of the queue with
         random items from octopoes and schedule them accordingly.
         """
+        self.run_in_thread(
+            name=f"scheduler-{self.scheduler_id}-mutations",
+            target=self.listeners["scan_profile_mutations"].listen,
+            loop=False,
+        )
 
-        # Scan profile mutations
+        self.run_in_thread(
+            name=f"scheduler-{self.scheduler_id}-new_boefjes",
+            target=self.push_tasks_for_new_boefjes,
+            interval=60.0,
+        )
+
+        self.run_in_thread(
+            name=f"scheduler-{self.scheduler_id}-random",
+            target=self.push_tasks_for_random_objects,
+            interval=60.0,
+        )
+
+    def initialize_listeners(self) -> None:
+        """Listen for scan profile mutations and create tasks for oois that
+        have a scan level change.
+        """
         listener = listeners.ScanProfileMutation(
             dsn=self.ctx.config.host_raw_data,
             queue=f"{self.organisation.id}__scan_profile_mutations",
@@ -75,26 +100,6 @@ class BoefjeScheduler(Scheduler):
         )
 
         self.listeners["scan_profile_mutations"] = listener
-
-        self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-mutations",
-            target=self.listeners["scan_profile_mutations"].listen,
-            loop=False,
-        )
-
-        # New Boefjes
-        self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-new_boefjes",
-            target=self.push_tasks_for_new_boefjes,
-            interval=60.0,
-        )
-
-        # Random OOI's from Octopoes
-        self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-random",
-            target=self.push_tasks_for_random_objects,
-            interval=60.0,
-        )
 
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:

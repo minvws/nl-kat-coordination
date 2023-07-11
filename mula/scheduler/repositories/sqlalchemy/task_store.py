@@ -20,34 +20,11 @@ class TaskStore(TaskStorer):
         self.datastore = datastore
 
     @retry()
-    def get_tasks(
-        self,
-        scheduler_id: Optional[str] = None,
-        task_type: Optional[str] = None,
-        status: Optional[str] = None,
-        min_created_at: Optional[datetime.datetime] = None,
-        max_created_at: Optional[datetime.datetime] = None,
-        filters: Optional[List[models.Filter]] = None,
-    ) -> Tuple[List[models.Task], int]:
+    def get_tasks(self, scheduler_id: str, filters: Optional[List[models.Filter]]) -> Tuple[List[models.Task], int]:
         with self.datastore.session.begin() as session:
             query = session.query(models.TaskORM).filter(
                 models.TaskORM.scheduler_id == scheduler_id,
             )
-
-            if scheduler_id is not None:
-                query = query.filter(models.TaskORM.scheduler_id == scheduler_id)
-
-            if task_type is not None:
-                query = query.filter(models.TaskORM.type == task_type)
-
-            if status is not None:
-                query = query.filter(models.TaskORM.status == models.TaskStatus(status).name)
-
-            if min_created_at is not None:
-                query = query.filter(models.TaskORM.created_at >= min_created_at)
-
-            if max_created_at is not None:
-                query = query.filter(models.TaskORM.created_at <= max_created_at)
 
             if filters is not None:
                 for f in filters:
@@ -119,13 +96,6 @@ class TaskStore(TaskStorer):
     def update_task(self, task: models.Task) -> None:
         with self.datastore.session.begin() as session:
             (session.query(models.TaskORM).filter(models.TaskORM.id == task.id).update(task.dict()))
-
-    @retry()
-    def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
-        with self.datastore.session.begin() as session:
-            session.query(models.TaskORM).filter(
-                models.TaskORM.scheduler_id == scheduler_id, models.TaskORM.id.in_(task_ids)
-            ).update({"status": models.TaskStatus.CANCELLED.name})
 
     @retry()
     def api_list_tasks(
