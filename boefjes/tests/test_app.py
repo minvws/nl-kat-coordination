@@ -50,7 +50,6 @@ def test_two_processes_exception(manager: SchedulerWorkerManager, item_handler: 
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
     )
-    manager.client_factory = lambda: manager.scheduler_client
 
     manager.settings.pool_size = 2
     with pytest.raises(KeyboardInterrupt):
@@ -67,7 +66,6 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
     )
-    manager.client_factory = lambda: manager.scheduler_client
 
     manager.settings.pool_size = 2
     manager.task_queue = Queue(maxsize=2)
@@ -101,7 +99,6 @@ def test_two_processes_cleanup_unfinished_tasks(
         [],
         tmp_path / "patch_task_log",
     )
-    manager.client_factory = lambda: manager.scheduler_client
     manager.settings.pool_size = 2
     manager.task_queue = Queue(maxsize=2)
 
@@ -143,7 +140,6 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
         tmp_path / "patch_task_log",
         iterations_to_wait_for_exception=2,
     )
-    manager.client_factory = lambda: manager.scheduler_client
 
     with pytest.raises(KeyboardInterrupt):
         manager.run(WorkerManager.Queue.BOEFJES)

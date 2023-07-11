@@ -3,7 +3,7 @@ import multiprocessing as mp
 import os
 import signal
 import time
-from typing import Callable, Dict, List
+from typing import Dict, List
 
 from pydantic import ValidationError
 from requests import HTTPError
@@ -27,13 +27,12 @@ class SchedulerWorkerManager(WorkerManager):
     def __init__(
         self,
         item_handler: Handler,
-        client_factory: Callable[[], SchedulerClientInterface],
+        scheduler_client: SchedulerClientInterface,
         settings: Settings,
         log_level: str,  # TODO: (re)move?
     ):
         self.item_handler = item_handler
-        self.client_factory = client_factory
-        self.scheduler_client = client_factory()
+        self.scheduler_client = scheduler_client
         self.settings = settings
 
         self.task_queue = mp.Queue()
@@ -44,7 +43,7 @@ class SchedulerWorkerManager(WorkerManager):
     def run(self, queue_type: WorkerManager.Queue) -> None:
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
-        self.worker_args = (self.task_queue, self.item_handler, self.client_factory, self.handling_tasks)
+        self.worker_args = (self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks)
         self.workers = [
             mp.Process(target=_start_working, args=self.worker_args) for _ in range(self.settings.pool_size)
         ]
@@ -200,10 +199,9 @@ def _format_exit_code(exitcode: int) -> str:
 def _start_working(
     task_queue: mp.Queue,
     handler: Handler,
-    client_factory: Callable[[], SchedulerClientInterface],
+    scheduler_client: SchedulerClientInterface,
     handling_tasks: Dict[int, str],
 ):
-    scheduler_client = client_factory()
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
     while True:
@@ -228,10 +226,6 @@ def _start_working(
 
 
 def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
-    # Not a lambda since multiprocessing tries and fails to pickle lambda's
-    def client_factory():
-        return SchedulerAPIClient(settings.scheduler_api)
-
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(get_local_repository()), get_local_repository())
     else:
@@ -239,7 +233,7 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
 
     return SchedulerWorkerManager(
         item_handler,
-        client_factory,  # Do not share a session between workers
+        SchedulerAPIClient(settings.scheduler_api),  # Do not share a session between workers
         settings,
         log_level,
     )
