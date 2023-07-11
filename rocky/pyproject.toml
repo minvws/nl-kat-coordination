@@ -91,30 +91,6 @@ django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-
 requires = ["setuptools>=62.2", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
 
-[tool.black]
-target-version = ['py38']
-line-length = 120
-
-[tool.mypy]
-python_version = "3.8"
-exclude = [".git", "__pycache__", "old", "build", "dist", "venv"]
-strict = true
-ignore_missing_imports = true # Required as third-party modules may not come with type stubs
-follow_imports = "skip"
-
-[tool.vulture]
-exclude = [".git", "__pycache__", "old", "build", "dist", "venv"]
-paths = ["./"]
-min_confidence = 90
-ignore_names = ["mock_*"]
-
-[tool.pylint.format]
-max-line-length = 120
-
-[tool.pylint."MESSAGES CONTROL"]
-extension-pkg-whitelist = "pydantic" # Ignore pydantic import checks
-disable = ["E0203", "F0401", "R0914", "W1514", "R0903", "E0401"]
-
 [tool.pytest.ini_options]
 addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
 DJANGO_SETTINGS_MODULE = "rocky.settings"
