@@ -78,7 +78,7 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get("id"), self.scheduler.scheduler_id)
 
-    def test_patch_scheduler__(self):
+    def test_patch_scheduler(self):
         self.assertTrue(self.scheduler.is_enabled())
         response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"enabled": False})
         self.assertEqual(200, response.status_code)
