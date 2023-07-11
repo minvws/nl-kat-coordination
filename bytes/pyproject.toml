@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bytes"
 version = "0.0.1.dev1"
-description = "KAT forensic data store"
+description = "KAT's forensic data store"
 authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
@@ -81,28 +81,6 @@ setuptools = "^68.0.0"
 toml = "^0.10.2"
 tomli = "^2.0.1"
 wrapt = "^1.14.1"
-
-[tool.black]
-line-length = 120
-target-version = ['py38']
-
-[tool.mypy]
-python_version = 3.8
-plugins = ["pydantic.mypy"]
-exclude = "bytes-data"
-strict = true
-ignore_missing_imports = true
-disallow_untyped_decorators = false # Needed for FastAPI decorators
-
-
-[tool.vulture]
-min_confidence = 90
-paths = ["bytes"]
-
-[tool.pylint.master]
-disable = ["missing-module-docstring", "missing-class-docstring", "missing-function-docstring", "too-few-public-methods", "import-error", "too-many-arguments"]
-max-line-length = 120
-check-quote-consistency = true
 
 [build-system]
 requires = ["setuptools>=65", "wheel"]

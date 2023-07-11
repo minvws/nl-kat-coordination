@@ -44,6 +44,9 @@ jobs:
         if: ${{ github.actor != 'dependabot[bot]' }}
         run: git diff --exit-code
 
-      - name: Commit and push changes
+      - name: Commit, sign, and push changes
         if: ${{ github.actor == 'dependabot[bot]' }}
-        run: git commit -a -S -m "Update requirements.txt" && git push
+        run: sh .github/scripts/commit_sign_push.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DESTINATION_BRANCH: ${{ github.ref }}
