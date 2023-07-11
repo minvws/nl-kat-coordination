@@ -25,7 +25,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         log_path: Path,
         raise_on_empty_queue: Exception = KeyboardInterrupt,
         iterations_to_wait_for_exception: int = 0,
-        sleep_time: int = 0.05,
+        sleep_time: int = 0.1,
     ):
         self.queue_response = queue_response
         self.boefje_responses = boefje_responses
@@ -41,6 +41,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         self._pushed_items: Dict[str, Tuple[str, QueuePrioritizedItem]] = multiprocessing.Manager().dict()
 
     def get_queues(self) -> List[Queue]:
+        time.sleep(self.sleep_time)
         return parse_raw_as(List[Queue], self.queue_response)
 
     def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
