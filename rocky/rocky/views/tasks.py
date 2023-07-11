@@ -110,7 +110,7 @@ class TaskListView(OrganizationView, ListView):
             client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
 
             success_message = (
-                "Your task is running successfully in the background. \n "
+                "Your task is scheduled and will soon be started in the background. \n "
                 "Results will be added to the object list when they are in. "
                 "It may take some time, a refresh of the page may be needed to show the results."
             )
