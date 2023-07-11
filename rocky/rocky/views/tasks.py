@@ -19,7 +19,7 @@ TASK_LIMIT = 50
 
 
 class PageActions(Enum):
-    RESTART_TASK = "restart_task"
+    RESCHEDULE_TASK = "reschedule_task"
 
 
 class DownloadTaskDetail(OrganizationView):
@@ -83,7 +83,7 @@ class TaskListView(OrganizationView, ListView):
     def post(self, request, *args, **kwargs):
         if "action" in self.request.POST:
             self.handle_page_action(request.POST["action"])
-            if request.POST["action"] == PageActions.RESTART_TASK.value:
+            if request.POST["action"] == PageActions.RESCHEDULE_TASK.value:
                 task_id = self.request.POST.get("task_id")
                 task = client.get_task_details(task_id)
                 if task.type == "normalizer":
@@ -97,7 +97,7 @@ class TaskListView(OrganizationView, ListView):
         return self.get(request, *args, **kwargs)
 
     def handle_page_action(self, action: str):
-        if action == PageActions.RESTART_TASK.value:
+        if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
             task = client.get_task_details(task_id)
 
