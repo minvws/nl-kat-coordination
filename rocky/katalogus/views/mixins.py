@@ -14,7 +14,7 @@ from rest_framework.status import HTTP_404_NOT_FOUND
 from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
 from octopoes.models import OOI
 from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
-from rocky.scheduler import Boefje, BoefjeTask, QueuePrioritizedItem, client
+from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData, client
 from rocky.views.mixins import OctopoesView
 
 logger = getLogger(__name__)
@@ -58,6 +58,22 @@ class SinglePluginView(OrganizationView):
 
     def is_required_field(self, field: str) -> bool:
         return self.plugin_schema and field in self.plugin_schema.get("required", [])
+
+
+class NormalizerMixin(OctopoesView):
+    """
+    When a user wants to run a normalizer on a given set of raw data,
+    this mixin provides the method to construct the normalizer task for that data and run it.
+    """
+
+    def run_normalizer(self, normalizer: Plugin, raw_data: RawData) -> None:
+        normalizer_task = NormalizerTask(
+            id=uuid4().hex, normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
+        )
+
+        item = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
+        logger.info("Item: %s", item.json())
+        client.push_task(f"normalizer-{self.organization.code}", item)
 
 
 class BoefjeMixin(OctopoesView):
