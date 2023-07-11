@@ -60,7 +60,7 @@ class SinglePluginView(OrganizationView):
         return self.plugin_schema and field in self.plugin_schema.get("required", [])
 
 
-class NormalizerMixin(OctopoesView):
+class NormalizerMixin:
     """
     When a user wants to run a normalizer on a given set of raw data,
     this mixin provides the method to construct the normalizer task for that data and run it.
@@ -72,7 +72,6 @@ class NormalizerMixin(OctopoesView):
         )
 
         item = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
-        logger.info("Item: %s", item.json())
         client.push_task(f"normalizer-{self.organization.code}", item)
 
 
@@ -91,7 +90,6 @@ class BoefjeMixin(OctopoesView):
         )
 
         item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
-        logger.info("Item: %s", item.json())
         client.push_task(f"boefje-{self.organization.code}", item)
 
     def run_boefje_for_oois(
