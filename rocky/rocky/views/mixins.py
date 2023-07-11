@@ -193,6 +193,8 @@ class FindingList:
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
         severities: Set[RiskLevelSeverity],
+        risk_score_min: float,
+        risk_score_max: float,
         exclude_muted: bool = False,
         show_muted: bool = False,
         finding_types: List[str] = [],
@@ -205,6 +207,8 @@ class FindingList:
         self.exclude_muted = exclude_muted
         self.show_muted = show_muted
         self.finding_types = finding_types
+        self.risk_score_min = risk_score_min
+        self.risk_score_max = risk_score_max
 
     @cached_property
     def count(self) -> int:
@@ -232,6 +236,42 @@ class FindingList:
             )
         )
 
+    def hydrate_findings(self, findings: Paginated[Finding]) -> List[HydratedFinding]:
+        ooi_references = set()
+        finding_type_references = set()
+
+        for finding in findings:
+            ooi_references.add(finding.ooi)
+            finding_type_references.add(finding.finding_type)
+
+        objects = self.octopoes_connector.load_objects_bulk(
+            ooi_references | finding_type_references, valid_time=self.valid_time
+        )
+
+        hydrated_findings = []
+
+        for finding in findings:
+            if (finding.ooi not in objects or finding.finding_type not in objects) or not (
+                self.is_finding_in_risk_score_range(objects[finding.finding_type].risk_score)
+            ):
+                continue
+
+            hydrated_findings.append(
+                HydratedFinding(finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi])
+            )
+        return hydrated_findings
+
+    def is_finding_in_risk_score_range(self, finding_risk_score: float) -> bool:
+        return self.risk_score_min <= finding_risk_score <= self.risk_score_max
+
+    def filter_findings_by_type(self, findings: Paginated[Finding]) -> List[Finding]:
+        filtered_findings = []
+        for finding in findings:
+            for finding_type in self.finding_types:
+                if finding_type in str(finding.finding_type):
+                    filtered_findings.append(finding)
+        return filtered_findings
+
     def __getitem__(self, key: Union[int, slice]) -> List[HydratedFinding]:
         if isinstance(key, slice):
             offset = key.start or 0
@@ -243,36 +283,13 @@ class FindingList:
                 offset=offset,
                 limit=limit,
             ).items
+
             if self.show_muted:
                 findings = self.get_muted_findings(findings, offset, limit)
+            if self.finding_types:
+                findings = self.filter_findings_by_type(findings)
 
-            ooi_references = set()
-            finding_type_references = set()
-            filtered_findings = findings
-            for finding in findings:
-                ooi_references.add(finding.ooi)
-                finding_type_references.add(finding.finding_type)
-                if self.finding_types:
-                    filtered_findings = [
-                        finding for finding_type in self.finding_types if finding_type in str(finding.finding_type)
-                    ]
-
-            findings = filtered_findings
-
-            objects = self.octopoes_connector.load_objects_bulk(
-                ooi_references | finding_type_references, valid_time=self.valid_time
-            )
-
-            hydrated_findings = []
-            for finding in findings:
-                if finding.ooi not in objects or finding.finding_type not in objects:
-                    continue
-                hydrated_findings.append(
-                    HydratedFinding(
-                        finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]
-                    )
-                )
-            return hydrated_findings
+            return self.hydrate_findings(findings)
 
         raise NotImplementedError("FindingList only supports slicing")
 

@@ -1,6 +1,8 @@
 {# include template for input type, with fallback field_input.html #}
-{% if field.field.widget.input_type in "checkbox,radio,hidden" %}
+{% if field.field.widget.input_type in "checkbox,radio,hidden,number" %}
     {% include "partials/form/field_input_"|add:field.field.widget.input_type|add:".html" %}
+
 {% else %}
     {% include "partials/form/field_input.html" %}
+
 {% endif %}

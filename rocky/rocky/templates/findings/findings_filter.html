@@ -10,13 +10,21 @@
 {% block filter_form %}
     <form method="get" class="help">
         {% include "partials/form/fieldset.html" with fields=observed_at_form %}
-        {% include "partials/form/fieldset.html" with fields=muted_findings_filter_form %}
-        {% include "partials/form/fieldset.html" with fields=finding_types_filter_form %}
-        {% include "partials/form/fieldset.html" with fields=severity_filter_form %}
 
+        {% translate "Filter by severity risk score" as legend_risk_score %}
+        <div class="column-3 flex-direction row">
+            <div>
+                {% include "partials/form/fieldset.html" with fields=severity_filter fieldset_class="flex-direction column" %}
+                {% include "partials/form/fieldset.html" with fields=risk_score_filter legend=legend_risk_score %}
+
+            </div>
+            {% include "partials/form/fieldset.html" with fields=finding_types_filter fieldset_class="flex-direction column" %}
+            {% include "partials/form/fieldset.html" with fields=muted_findings_filter fieldset_class="flex-direction column" %}
+
+        </div>
         <div class="button-container">
             <input type="submit"
-                   value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}"/>
+                   value="{% if submit_text %}  {{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}"/>
             <a href="{% url 'finding_list' view.kwargs.organization_code %}"
                class="button ghost">{% translate "Clear filters" %}</a>
         </div>

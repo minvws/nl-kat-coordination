@@ -15,13 +15,14 @@ from tools.forms.base import BaseRockyForm
 
 FINDING_TYPES_LIST = [
     ADRFindingType,
+    CAPECFindingType,
     CVEFindingType,
     CWEFindingType,
-    CAPECFindingType,
+    KATFindingType,
     RetireJSFindingType,
     SnykFindingType,
-    KATFindingType,
 ]
+
 FINDING_TYPES_CHOICES = (
     (str(finding_type.__name__), str(finding_type.__name__)) for finding_type in FINDING_TYPES_LIST
 )
@@ -31,8 +32,8 @@ FINDINGS_SEVERITIES_CHOICES = (
 )
 
 MUTED_FINDINGS_CHOICES = (
-    ("show", _("Show Muted Findings")),
-    ("exclude", _("Exclude Muted Findings")),
+    ("show", _("Show muted findings")),
+    ("exclude", _("Exclude muted findings")),
 )
 
 
@@ -45,32 +46,32 @@ class FindingSeverityMultiSelectForm(forms.Form):
     )
 
 
-class FindingRiskScoreNumberForm(forms.Form):
-    risk_score_greater_than = forms.FloatField(
-        label=_("Filter risk scores greater than"),
-        required=False,
-        min_value=1,
+class FindingRiskScoreRangeForm(BaseRockyForm):
+    risk_score_min = forms.FloatField(
+        min_value=0,
         max_value=10,
-        widget=forms.NumberInput(attrs={"placeholder": "Enter a decimal number between 1 and 10"}),
+        required=False,
+        widget=forms.NumberInput(attrs={"step": "0.1"}),
+        label=_("Minimum risk score (one decimal place)"),
     )
-    risk_score_smaller_than = forms.FloatField(
-        label=_("Filter risk scores smaller than"),
-        required=False,
-        min_value=1,
+    risk_score_max = forms.FloatField(
+        min_value=0,
         max_value=10,
-        widget=forms.NumberInput(attrs={"placeholder": "Enter a decimal number between 1 and 10"}),
+        required=False,
+        widget=forms.NumberInput(attrs={"step": "0.1"}),
+        label=_("Maximum risk score (one decimal place)"),
     )
 
 
 class MutedFindingSelectionForm(BaseRockyForm):
     muted_findings = forms.ChoiceField(
-        required=False, label=_("Filter by Muted Findings"), choices=MUTED_FINDINGS_CHOICES, widget=forms.RadioSelect()
+        required=False, label=_("Filter by muted findings"), choices=MUTED_FINDINGS_CHOICES, widget=forms.RadioSelect()
     )
 
 
 class FindingTypesMultiSelectForm(BaseRockyForm):
     finding_types = forms.MultipleChoiceField(
-        label=_("Filter by FindingTypes"),
+        label=_("Filter by finding types"),
         required=False,
         choices=FINDING_TYPES_CHOICES,
         widget=forms.CheckboxSelectMultiple,

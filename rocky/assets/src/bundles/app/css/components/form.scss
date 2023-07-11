@@ -1,5 +1,9 @@
 /* Added min height for form buttons */
+
+$breakpoint: 300rem !default;
+
 form {
+
 	button,
 	a.button,
 	input[type="button"],
@@ -7,4 +11,19 @@ form {
 	input[type="reset"] {
 		min-height: 2.75rem;
 	}
+
+
+	.flex-direction {
+		display: flex;
+
+		&.row {
+			flex-direction: row;
+		}
+
+		&.column {
+			flex-direction: column;
+		}
+	}
+
+
 }

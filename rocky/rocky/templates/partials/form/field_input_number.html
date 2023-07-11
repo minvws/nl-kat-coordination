@@ -1,0 +1,14 @@
+<div class="{{ field_class }}">
+    <label for="id_{{ field.name }}_{{ forloop.counter0 }}">{{ field.label }}</label>
+    <input type="{{ field.field.widget.input_type }}"
+           name="{{ field.name }}"
+           value="{% if field.value %}{{ field.value }}{% elif field.initial == 0 %}0{% else %}{{ field.initial }}{% endif %}"
+           id="id_{{ field.name }}_{{ forloop.counter0 }}"
+           placeholder="{{ field.field.widget.attrs.placeholder }}"
+           {% if field.field.widget.attrs.step %}step="{{ field.field.widget.attrs.step }}"{% endif %}
+           {% if field.field.required %}required{% endif %}
+           {% if field.field.disabled %}disabled{% endif %}/>
+    {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+    {% include "partials/form/field_input_errors.html" with field=field %}
+
+</div>
