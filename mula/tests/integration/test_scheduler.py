@@ -100,14 +100,14 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
     def test_disable_scheduler(self):
-        """When a scheduler is disabled ..."""
+        # Arrange: start scheduler
+        self.scheduler.run()
 
-        # Arrange
+        # Arrange: add tasks
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
             priority=0,
         )
-
         self.scheduler.push_item_to_queue(p_item)
 
         # Assert: task should be on priority queue
@@ -119,6 +119,12 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: listeners should be running
+        self.assertGreater(len(self.scheduler.listeners), 0)
+
+        # Assert: threads should be running
+        self.assertGreater(len(self.scheduler.threads), 0)
 
         # Act
         self.scheduler.disable()
@@ -144,14 +150,21 @@ class SchedulerTestCase(unittest.TestCase):
             self.scheduler.push_item_to_queue(p_item)
 
     def test_enable_scheduler(self):
-        """When a scheduler is re-enabled ..."""
-        # Arrange
+        # Arrange: start scheduler
+        self.scheduler.run()
+
+        # Arrange: add tasks
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
             priority=0,
         )
-
         self.scheduler.push_item_to_queue(p_item)
+
+        # Assert: listeners should be running
+        self.assertGreater(len(self.scheduler.listeners), 0)
+
+        # Assert: threads should be running
+        self.assertGreater(len(self.scheduler.threads), 0)
 
         # Disable scheduler first
         self.scheduler.disable()
