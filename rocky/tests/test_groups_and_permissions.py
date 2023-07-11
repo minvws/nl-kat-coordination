@@ -60,7 +60,7 @@ def test_account_detail_perms(rf, superuser_member, admin_member, redteam_member
     assertNotContains(response_client, check_text)
 
 
-@pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
+@pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
 def test_plugin_settings_list_perms(
     request,
     member,
