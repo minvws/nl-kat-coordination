@@ -226,10 +226,10 @@ class Server:
                 ) from exc
 
         # Enable or disable the scheduler if needed.
-        if stored_scheduler_model.enabled and not updated_scheduler.enabled:
-            s.disable()
-        elif not stored_scheduler_model.enabled and updated_scheduler.enabled:
+        if updated_scheduler.enabled:
             s.enable()
+        elif not updated_scheduler.enabled:
+            s.disable()
 
         return updated_scheduler
 

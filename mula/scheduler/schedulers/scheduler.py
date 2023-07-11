@@ -331,6 +331,10 @@ class Scheduler(abc.ABC):
         This will stop all listeners and threads, and clear the queue, and any
         tasks that were on the queue will be set to CANCELLED.
         """
+        if not self.is_enabled():
+            self.logger.debug("Scheduler is already disabled")
+            return
+
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
         self.enabled = False
 
@@ -354,6 +358,10 @@ class Scheduler(abc.ABC):
 
         This will start the scheduler, and start all listeners and threads.
         """
+        if self.is_enabled():
+            self.logger.debug("Scheduler is already enabled")
+            return
+
         self.logger.info("Enabling scheduler: %s", self.scheduler_id)
         self.enabled = True
 
