@@ -37,7 +37,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         manager = mp.Manager()
 
-        self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on OSX, see mp.Queue.qsize()
+        self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
         self.handling_tasks = manager.dict()
         self.workers = []
 
