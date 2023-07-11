@@ -16,7 +16,7 @@
           {% url "organization_list" as index_url %}
           <a href="{{ index_url }}"
              {% if index_url in request.path|urlencode %}aria-selected="true"{% endif %}>
-            {% translate "My organisations" %}
+            {% translate "My organizations" %}
           </a>
         </li>
         {% if organization.code %}

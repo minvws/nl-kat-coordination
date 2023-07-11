@@ -127,7 +127,7 @@ class BoefjeHandler(Handler):
         self.local_repository: LocalPluginRepository = local_repository
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
-        logger.info("Handling boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+        logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, boefje_meta.id)
 
         if boefje_meta.input_ooi:
             boefje_meta.arguments["input"] = serialize_ooi(
