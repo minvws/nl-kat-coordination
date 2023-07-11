@@ -39,42 +39,6 @@ pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
 httpx = "^0.23.3"
 
-[tool.black]
-line-length = 120
-target-version = ['py38']
-
-[tool.mypy]
-python_version = 3.8
-strict = false
-install_types = true
-non_interactive = true
-ignore_missing_imports = true
-implicit_reexport = true
-exclude = "^(tests|whitelist.py)"
-
-[tool.pylint.master]
-fail-under=7.0
-max-line-length=120
-check-quote-consistency=true
-extension-pkg-whitelist = [
-    "pydantic",
-    "mmh3"
-]
-disable = [
-    "missing-module-docstring",
-    "missing-class-docstring",
-    "missing-function-docstring",
-    "too-few-public-methods",
-    "cyclic-import",
-    "fixme",
-    "invalid-name",
-]
-
-[tool.vulture]
-min_confidence = 90
-paths = ["./"]
-exclude = ["tests"]
-
 [build-system]
 requires = ["setuptools>=59", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
