@@ -5,14 +5,16 @@ import tarfile
 from typing import ByteString, Generator, List, Tuple, Union
 
 import docker
-from PIL import Image
 
 from boefjes.job_models import BoefjeMeta
 
-PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.33.0-jammy"
-BROWSER = "chromium"
+IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:latest"
+FILE_PATH = "/tmp/output.json"
 
 
+###############################################################################
+# Identical to Webpage Capture boefje.
+###############################################################################
 class TarStream(io.RawIOBase):
     """Wrapper around generator to feed tarfile.
 
@@ -50,13 +52,16 @@ class TarStream(io.RawIOBase):
         return outlen
 
 
-def get_file_from_container(container: docker.models.containers.Container, path: str) -> bytes:
+def get_file_from_container(container: docker.models.containers.Container, path: str) -> Union[bytes, None]:
     """Returns a file from a docker container."""
     try:
         stream, _ = container.get_archive(path)
     except docker.errors.NotFound:
         logging.warning(
-            "[Webpage Capture] %s not found in container %s %s", path, container.short_id, container.image.tags
+            "[Masscan] %s not found in container %s %s",
+            path,
+            container.short_id,
+            container.image.tags,
         )
         return None
 
@@ -66,53 +71,41 @@ def get_file_from_container(container: docker.models.containers.Container, path:
         return f.extractfile(tarobject).read()
 
 
-def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
-    """Returns playwright command including webpage, browser and locations for image, har and storage."""
-    return " ".join(
-        [
-            "npx playwright screenshot",
-            f"-b {browser}",
-            "--full-page",
-            f"--save-har={tmp_path}.har.zip",
-            f"--save-storage={tmp_path}.json",
-            webpage,
-            f"{tmp_path}.png",
-        ]
-    )
+###############################################################################
 
 
-def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tuple[bytes]:
-    """Run Playwright in Docker."""
+def run_masscan(target_ip) -> bytes:
+    """Run Masscan in Docker."""
     client = docker.from_env()
+
+    # Scan according to arguments.
+    port_range = os.getenv("PORTS", "53,80,443")
+    max_rate = os.getenv("MAX_RATE", 100)
+    logging.info("Starting container %s to run masscan...", IMAGE)
     res = client.containers.run(
-        image=PLAYWRIGHT_IMAGE,
-        command=[
-            "/bin/sh",
-            "-c",
-            f"npx -y {build_playwright_command(webpage=webpage, browser=browser, tmp_path=tmp_path)}",
-        ],
+        image=IMAGE,
+        command=f"-p {port_range} --max-rate {max_rate} -oJ {FILE_PATH} {target_ip}",
         detach=True,
     )
-    try:
-        res.wait()
-        image = Image.open(io.BytesIO(get_file_from_container(container=res, path=f"{tmp_path}.png")))
-        har = get_file_from_container(container=res, path=f"{tmp_path}.har.zip")
-        storage = get_file_from_container(container=res, path=f"{tmp_path}.json")
-    finally:
-        res.remove()
+    res.wait()
+    logging.debug(res.logs())
 
-    return image.tobytes(), har, storage
+    output = get_file_from_container(container=res, path=FILE_PATH)
+
+    # Do not crash the boefje if the output is known, instead log a warning.
+    try:
+        res.remove()
+    except Exception as e:
+        logging.warning(e)
+
+    return output
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     """Creates webpage and takes capture using Playwright container."""
     input_ = boefje_meta.arguments["input"]
-    webpage = f"{input_['scheme']}://{input_['netloc']['name']}{input_['path']}"
+    ip_range = f"{input_['start_ip']['address']}/{str(input_['mask'])}"
+    m_run = run_masscan(target_ip=ip_range)
+    logging.info("Received a response with length %d", len(m_run))
 
-    image_bytes, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)
-
-    return [
-        (set("image/png"), image_bytes),
-        (set("application/zip+json"), har_zip),
-        (set("application/json"), storage_json),
-    ]
+    return [(set(), m_run)]

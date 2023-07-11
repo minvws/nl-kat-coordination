@@ -71,6 +71,7 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: ['tomli']
+        args: [-L, lama]
         exclude: |
           (?x)(
           \.po$ |
