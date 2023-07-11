@@ -1,0 +1,19 @@
+{
+    "title": "Arguments",
+    "type": "object",
+    "properties": {
+        "PORTS": {
+            "title": "PORTS",
+            "type": "string",
+            "description": "Masscan ports argument, can use commas and hyphens, e.g. '80-82,433' or '53,80,433' (default)."
+        },
+        "MAX_RATE": {
+            "title": "MAX_RATE",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000,
+            "description": "Masscan scan rate, defaults to 100. A high rate will result in faster scans, but can DoS your own network connection or that of your target. Please check https://github.com/robertdavidgraham/masscan#transmit-rate-important before modification."
+        }
+    },
+    "required": []
+}
