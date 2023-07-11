@@ -61,6 +61,12 @@ class SchedulerClientInterface:
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
         raise NotImplementedError()
 
+    def get_task(self, task_id: str) -> Task:
+        raise NotImplementedError()
+
+    def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
+        raise NotImplementedError()
+
 
 class LogRetry(Retry):
     """Add a log when retrying a request"""
@@ -97,8 +103,16 @@ class SchedulerAPIClient(SchedulerClientInterface):
 
         return parse_obj_as(Optional[QueuePrioritizedItem], response.json())
 
+    def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
+        response = self._session.post(f"{self.base_url}/queues/{queue_id}/push", data=p_item.json())
+        self._verify_response(response)
+
     def patch_task(self, task_id: str, status: TaskStatus) -> None:
         response = self._session.patch(f"{self.base_url}/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
-        logger.info("Set task status to %s in the scheduler for task[%s]", status, task_id)
+    def get_task(self, task_id: str) -> Task:
+        response = self._session.get(f"{self.base_url}/tasks/{task_id}")
+        self._verify_response(response)
+
+        return parse_obj_as(Task, response.json())
