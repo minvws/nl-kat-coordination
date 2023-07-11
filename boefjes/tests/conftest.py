@@ -117,8 +117,7 @@ def item_handler(tmp_path: Path):
 def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager:
     scheduler_client = MockSchedulerClient(
         get_dummy_data("scheduler/queues_response.json"),
-        2 * [get_dummy_data("scheduler/pop_response_boefje.json")]
-        + [get_dummy_data("scheduler/should_crash.json")],
+        2 * [get_dummy_data("scheduler/pop_response_boefje.json")] + [get_dummy_data("scheduler/should_crash.json")],
         [get_dummy_data("scheduler/pop_response_normalizer.json")],
         tmp_path / "patch_task_log",
     )
