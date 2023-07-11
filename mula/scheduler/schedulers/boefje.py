@@ -71,6 +71,7 @@ class BoefjeScheduler(Scheduler):
             dsn=self.ctx.config.host_raw_data,
             queue=f"{self.organisation.id}__scan_profile_mutations",
             func=self.push_tasks_for_scan_profile_mutations,
+            prefetch_count=self.ctx.config.queue_prefetch_count,
         )
 
         self.listeners["scan_profile_mutations"] = listener
