@@ -3,7 +3,7 @@ import multiprocessing as mp
 import os
 import signal
 import time
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from pydantic import ValidationError
 from requests import HTTPError
@@ -35,17 +35,19 @@ class SchedulerWorkerManager(WorkerManager):
         self.scheduler_client = scheduler_client
         self.settings = settings
 
-        self.task_queue = mp.Queue()
-        self.handling_tasks = mp.Manager().dict()
+        manager = mp.Manager()
+
+        self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on OSX, see mp.Queue.qsize()
+        self.handling_tasks = manager.dict()
+        self.workers = []
 
         logger.setLevel(log_level)
 
     def run(self, queue_type: WorkerManager.Queue) -> None:
         logger.info("Created worker pool for queue '%s'", queue_type.value)
 
-        self.worker_args = (self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks)
         self.workers = [
-            mp.Process(target=_start_working, args=self.worker_args) for _ in range(self.settings.pool_size)
+            mp.Process(target=_start_working, args=self._worker_args()) for _ in range(self.settings.pool_size)
         ]
         for worker in self.workers:
             worker.start()
@@ -131,7 +133,7 @@ class SchedulerWorkerManager(WorkerManager):
         new_workers = []
 
         for worker in self.workers:
-            if worker.is_alive():
+            if not worker._closed and worker.is_alive():
                 new_workers.append(worker)
                 continue
 
@@ -139,10 +141,11 @@ class SchedulerWorkerManager(WorkerManager):
                 "Worker[pid=%s, %s] not alive, creating new worker...", worker.pid, _format_exit_code(worker.exitcode)
             )
 
-            self._cleanup_pending_worker_task(worker)
-            worker.close()
+            if not worker._closed:  # Closed workers do not have a pid, so cleaning up would fail
+                self._cleanup_pending_worker_task(worker)
+                worker.close()
 
-            new_worker = mp.Process(target=_start_working, args=self.worker_args)
+            new_worker = mp.Process(target=_start_working, args=self._worker_args())
             new_worker.start()
             new_workers.append(new_worker)
 
@@ -168,6 +171,9 @@ class SchedulerWorkerManager(WorkerManager):
                     logger.exception("Could not patch scheduler task to failed")
         except HTTPError:
             logger.exception("Could not get scheduler task[id=%s]", handling_task_id)
+
+    def _worker_args(self) -> Tuple:
+        return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
 
     def exit(self, queue_type: WorkerManager.Queue):
         if not self.task_queue.empty():

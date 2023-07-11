@@ -1,7 +1,7 @@
 import multiprocessing
 import time
 from datetime import datetime, timezone
-from multiprocessing import Queue as MultiprocessingQueue
+from multiprocessing import Manager
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -14,10 +14,6 @@ from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, WorkerManager
 from tests.stubs import get_dummy_data
-
-_tasks = multiprocessing.Manager().dict()
-_popped_items = multiprocessing.Manager().dict()
-_pushed_items = multiprocessing.Manager().dict()
 
 
 class MockSchedulerClient(SchedulerClientInterface):
@@ -40,9 +36,9 @@ class MockSchedulerClient(SchedulerClientInterface):
         self.sleep_time = sleep_time
 
         self._iterations = 0
-        self._tasks: Dict[str, Task] = _tasks
-        self._popped_items: Dict[str, QueuePrioritizedItem] = _popped_items
-        self._pushed_items: Dict[str, Tuple[str, QueuePrioritizedItem]] = _pushed_items
+        self._tasks: Dict[str, Task] = multiprocessing.Manager().dict()
+        self._popped_items: Dict[str, QueuePrioritizedItem] = multiprocessing.Manager().dict()
+        self._pushed_items: Dict[str, Tuple[str, QueuePrioritizedItem]] = multiprocessing.Manager().dict()
 
     def get_queues(self) -> List[Queue]:
         return parse_raw_as(List[Queue], self.queue_response)
@@ -97,7 +93,7 @@ class MockSchedulerClient(SchedulerClientInterface):
 class MockHandler(Handler):
     def __init__(self, exception=Exception):
         self.sleep_time = 0
-        self.queue = MultiprocessingQueue()
+        self.queue = Manager().Queue()
         self.exception = exception
 
     def handle(self, item: Union[BoefjeMeta, NormalizerMeta]):
