@@ -5,16 +5,30 @@
         "TOP_PORTS_TCP": {
             "title": "TOP_PORTS_TCP",
             "type": "integer",
-            "minimum": 1,
+            "minimum": 0,
             "maximum": 65535,
             "description": "Scan TOP_PORTS_TCP most common TCP ports. Defaults to 250."
         },
         "TOP_PORTS_UDP": {
             "title": "TOP_PORTS_UDP",
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 65535,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
             "description": "Scan TOP_PORTS_UDP most common UDP ports. Defaults to 10."
+        },
+        "MIN_VLSM_IPV4": {
+            "title": "MIN_VLSM_IPV4",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32,
+            "description": "Minimum variable-length subnet mask for IPv4-ranges. Defaults to 0. Use this value to prevent scanning large ranges."
+        },
+        "MIN_VLSM_IPV6": {
+            "title": "MIN_VLSM_IPV6",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 128,
+            "description": "Minimum variable-length subnet mask for IPv6-ranges. Defaults to 0. Use this value to prevent scanning large ranges."
         }
     },
     "required": []

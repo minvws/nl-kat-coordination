@@ -15,7 +15,9 @@
     ],
     "environment_keys": [
         "TOP_PORTS_TCP",
-        "TOP_PORTS_UDP"
+        "TOP_PORTS_UDP",
+        "MIN_VLSM_IPV4",
+        "MIN_VLSM_IPV6"
     ],
     "scan_level": 2
 }
