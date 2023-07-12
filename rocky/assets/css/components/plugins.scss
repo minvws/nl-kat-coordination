@@ -15,6 +15,11 @@ $normalizer-bg: #e17000;
   > div {
     position: relative;
 
+    /* interaction */
+    > .nota-bene {
+      display: none;
+    }
+
     /* States */
     &.required {
       .nota-bene {
@@ -23,11 +28,6 @@ $normalizer-bg: #e17000;
         top: -1.75rem;
         margin: 0;
       }
-    }
-
-    /* interaction */
-    > .nota-bene {
-      display: none;
     }
 
     /* Checkbox */

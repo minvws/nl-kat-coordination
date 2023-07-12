@@ -1,10 +1,4 @@
 /* DL - Variables */
-
-section dl div {
-  display: grid;
-}
-
-
 dl {
   /* Fix whitespace issue after linter adds spaces. */
   dt,
@@ -16,4 +10,8 @@ dl {
   > div {
     border-bottom: 1px solid #d4d4d4;
   }
+}
+
+section dl div {
+  display: grid;
 }

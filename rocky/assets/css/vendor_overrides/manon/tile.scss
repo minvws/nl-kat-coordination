@@ -1,15 +1,23 @@
 /* Tiles - Variables */
+%tile-style-overrides {
+  > a {
+    color: var(--link-text-color, initial);
+  }
 
-ul.tiles > li > a,
-.tiles > div > a,
-.tile > a {
-  color: var(--link-text-color, initial);
+  > p {
+    font-size: var(--tile-font-size);
+  }
 }
 
-.tile p,
-ul.tiles > li p,
-.tiles > div p {
-  font-size: var(--tile-font-size);
+.tile,
+.tiles,
+ul.tiles {
+  @extend %tile-style-overrides;
+
+  > div,
+  > li {
+    @extend %tile-style-overrides;
+  }
 }
 
 .tiles.images-cover {
