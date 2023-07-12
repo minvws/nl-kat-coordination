@@ -1,6 +1,6 @@
 /* Added min height for form buttons */
 
-$breakpoint: 300rem !default;
+$breakpoint-filter: 60rem !default;
 
 form {
 
@@ -12,18 +12,25 @@ form {
 		min-height: 2.75rem;
 	}
 
-
-	.flex-direction {
+	.filter-fields-direction {
 		display: flex;
-
-		&.row {
-			flex-direction: row;
-		}
 
 		&.column {
 			flex-direction: column;
 		}
 	}
+
+	@media (min-width:$breakpoint-filter) {
+		.filter-fields-direction {
+
+			&.row {
+				flex-direction: row;
+			}
+
+		}
+
+	}
+
 
 
 }
