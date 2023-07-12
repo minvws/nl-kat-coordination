@@ -32,7 +32,7 @@
                                     <th scope="col">{% translate "MimeType" %}</th>
                                     <th scope="col">{% translate "Output OOI's" %}</th>
                                     <th scope="col">{% translate "Download task details" %}</th>
-                                    <th scope="col">{% translate "Restart" %}</th>
+                                    <th scope="col">{% translate "Reschedule" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -68,7 +68,7 @@
                                         <td></td>
                                         <td></td>
                                         <td>
-                                          {% include "partials/single_action_form.html" with btn_text="Restart" action="restart_task" key="task_id" value=task.id btn_class="ghost" %}
+                                          {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id btn_class="ghost" %}
                                         </td>
                                     </tr>
                                 {% endfor %}

@@ -19,7 +19,7 @@ TASK_LIMIT = 50
 
 
 class PageActions(Enum):
-    RESTART_TASK = "restart_task"
+    RESCHEDULE_TASK = "reschedule_task"
 
 
 class DownloadTaskDetail(OrganizationView):
@@ -83,10 +83,21 @@ class TaskListView(OrganizationView, ListView):
     def post(self, request, *args, **kwargs):
         if "action" in self.request.POST:
             self.handle_page_action(request.POST["action"])
+            if request.POST["action"] == PageActions.RESCHEDULE_TASK.value:
+                task_id = self.request.POST.get("task_id")
+                task = client.get_task_details(task_id)
+                if task.type == "normalizer":
+                    return redirect(
+                        reverse("normalizers_task_list", kwargs={"organization_code": self.organization.code})
+                    )
+                if task.type == "boefje":
+                    return redirect(reverse("boefjes_task_list", kwargs={"organization_code": self.organization.code}))
+
+                return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
         return self.get(request, *args, **kwargs)
 
     def handle_page_action(self, action: str):
-        if action == PageActions.RESTART_TASK.value:
+        if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
             task = client.get_task_details(task_id)
 
@@ -99,11 +110,12 @@ class TaskListView(OrganizationView, ListView):
             client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
 
             success_message = (
-                "Your task is running successfully in the background. \n "
+                "Your task is scheduled and will soon be started in the background. \n "
                 "Results will be added to the object list when they are in. "
                 "It may take some time, a refresh of the page may be needed to show the results."
             )
             messages.add_message(self.request, messages.SUCCESS, success_message)
+            return
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

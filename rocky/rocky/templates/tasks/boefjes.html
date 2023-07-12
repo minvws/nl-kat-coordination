@@ -28,7 +28,7 @@
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
                                     <th scope="col">{% translate "Download task details" %}</th>
-                                    <th scope="col">{% translate "Restart" %}</th>
+                                    <th scope="col">{% translate "Reschedule" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -60,7 +60,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                          {% include "partials/single_action_form.html" with btn_text="Restart" action="restart_task" key="task_id" value=task.id btn_class="ghost" %}
+                                          {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id btn_class="ghost" %}
                                         </td>
                                     </tr>
                                 {% endfor %}
