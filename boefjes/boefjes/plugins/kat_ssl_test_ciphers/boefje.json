@@ -1,0 +1,12 @@
+    {
+        "id": "ssl-test-ciphers",
+        "name": "SSL Test Ciphers",
+        "description": "Run SSL Test Docker container and check ciphers",
+        "consumes": [
+            "IPService"
+        ],
+        "produces": [
+            "Finding"
+        ],
+        "scan_level": 2
+    }

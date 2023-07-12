@@ -1,0 +1,10 @@
+{
+    "id": "kat_ssl_test_ciphers_normalize",
+    "consumes": [
+        "ssl-test-ciphers"
+    ],
+    "produces": [
+        "KATFindingType",
+        "Finding"
+    ]
+}
