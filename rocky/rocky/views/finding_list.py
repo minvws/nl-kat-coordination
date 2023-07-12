@@ -14,7 +14,12 @@ from tools.forms.findings import (
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
+from rocky.views.mixins import (
+    ConnectorFormMixin,
+    FindingList,
+    OctopoesView,
+    SeveritiesMixin,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +29,9 @@ def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
     # order is preserved) so if we first sort by finding id the findings with
     # the same risk score will be sorted by finding id
     sorted_by_finding_id = sorted(findings, key=lambda x: x["finding_type"].id)
-    sorted_findings = sorted(sorted_by_finding_id, key=lambda x: x["risk_level_score"], reverse=True)
+    sorted_findings = sorted(
+        sorted_by_finding_id, key=lambda x: x["risk_level_score"], reverse=True
+    )
     for index, finding in enumerate(sorted_findings, start=1):
         finding["finding_number"] = index
     return sorted_findings
@@ -98,12 +105,14 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
 
 class FindingListView(BreadcrumbsMixin, FindingListFilter):
     template_name = "findings/finding_list.html"
-    paginate_by = 2
+    paginate_by = 50
 
     def build_breadcrumbs(self):
         return [
             {
-                "url": reverse_lazy("finding_list", kwargs={"organization_code": self.organization.code}),
+                "url": reverse_lazy(
+                    "finding_list", kwargs={"organization_code": self.organization.code}
+                ),
                 "text": _("Findings"),
             }
         ]
@@ -116,7 +125,10 @@ class Top10FindingListView(FindingListView):
     def build_breadcrumbs(self):
         return [
             {
-                "url": reverse_lazy("organization_crisis_room", kwargs={"organization_code": self.organization.code}),
+                "url": reverse_lazy(
+                    "organization_crisis_room",
+                    kwargs={"organization_code": self.organization.code},
+                ),
                 "text": _("Crisis room"),
             }
         ]
