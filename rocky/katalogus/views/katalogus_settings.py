@@ -15,31 +15,44 @@ from katalogus.client import get_katalogus
 
 
 class ConfirmCloneSettingsView(
-    OrganizationPermissionRequiredMixin, OrganizationView, UserPassesTestMixin, TemplateView
+    OrganizationPermissionRequiredMixin,
+    OrganizationView,
+    UserPassesTestMixin,
+    TemplateView,
 ):
     template_name = "confirmation_clone_settings.html"
     permission_required = "tools.can_set_katalogus_settings"
 
     def test_func(self):
         user: KATUser = self.request.user
-        return self.kwargs["to_organization"] in {org.code for org in user.organizations}
+        return self.kwargs["to_organization"] in {
+            org.code for org in user.organizations
+        }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["to_organization"] = Organization.objects.get(code=kwargs["to_organization"])
+        context["to_organization"] = Organization.objects.get(
+            code=kwargs["to_organization"]
+        )
 
         return context
 
     def post(self, request, *args, **kwargs):
         to_organization = Organization.objects.get(code=kwargs["to_organization"])
-        get_katalogus(self.organization.code).clone_all_configuration_to_organization(to_organization.code)
+        get_katalogus(self.organization.code).clone_all_configuration_to_organization(
+            to_organization.code
+        )
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            _("Settings from %s to %s successfully cloned.")
+            _(
+                "Settings from %(from_organization_name) to %(to_organization_name) successfully cloned."
+            )
             % (
-                self.organization.name,
-                to_organization.name,
+                {
+                    "from_organization_name": self.organization.name,
+                    "to_organization_name": to_organization.name,
+                }
             ),
         )
         return HttpResponseRedirect(
@@ -50,7 +63,9 @@ class ConfirmCloneSettingsView(
         )
 
 
-class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+class KATalogusSettingsView(
+    OrganizationPermissionRequiredMixin, OrganizationView, FormView
+):
     """View that gives an overview of all plugins settings"""
 
     template_name = "katalogus_settings.html"
@@ -61,11 +76,16 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {
-                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
+                "url": reverse(
+                    "katalogus", kwargs={"organization_code": self.organization.code}
+                ),
                 "text": _("KAT-alogus"),
             },
             {
-                "url": reverse("katalogus_settings", kwargs={"organization_code": self.organization.code}),
+                "url": reverse(
+                    "katalogus_settings",
+                    kwargs={"organization_code": self.organization.code},
+                ),
                 "text": _("Settings"),
             },
         ]
@@ -83,7 +103,9 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
                 plugin_setting = katalogus_client.get_plugin_settings(boefje.id)
             except RequestException:
                 messages.add_message(
-                    self.request, messages.ERROR, _("Failed getting settings for boefje {}").format(self.plugin.id)
+                    self.request,
+                    messages.ERROR,
+                    _("Failed getting settings for boefje {}").format(self.plugin.id),
                 )
                 continue
 
@@ -104,14 +126,21 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
 
     def get_form(self, form_class=None):
         return OrganizationListForm(
-            user=self.request.user, exclude_organization=self.organization, **self.get_form_kwargs()
+            user=self.request.user,
+            exclude_organization=self.organization,
+            **self.get_form_kwargs()
         )
 
     def form_valid(self, form):
-        return HttpResponseRedirect(self.get_success_url(to_organization=form.cleaned_data["organization"]))
+        return HttpResponseRedirect(
+            self.get_success_url(to_organization=form.cleaned_data["organization"])
+        )
 
     def get_success_url(self, **kwargs):
         return reverse_lazy(
             "confirm_clone_settings",
-            kwargs={"organization_code": self.organization.code, "to_organization": kwargs["to_organization"]},
+            kwargs={
+                "organization_code": self.organization.code,
+                "to_organization": kwargs["to_organization"],
+            },
         )
