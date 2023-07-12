@@ -10,8 +10,15 @@ class Octopoes(HTTPService):
     name = "octopoes"
     health_endpoint = None
 
-    def __init__(self, host: str, source: str, orgs: List[Organisation]):
+    def __init__(
+        self,
+        host: str,
+        source: str,
+        orgs: List[Organisation],
+        request_timeout: int = 10,
+    ):
         self.orgs: List[Organisation] = orgs
+        self.timeout = request_timeout
         super().__init__(host, source)
 
     @exception_handler
@@ -49,7 +56,9 @@ class Octopoes(HTTPService):
         return oois
 
     @exception_handler
-    def get_random_objects(self, organisation_id: str, n: int, scan_level: List[int]) -> List[OOI]:
+    def get_random_objects(
+        self, organisation_id: str, n: int, scan_level: List[int]
+    ) -> List[OOI]:
         """Get `n` random oois from octopoes"""
         if scan_level is None:
             scan_level = []
