@@ -96,8 +96,17 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
+        # Rate limited tasks
+        self.run_in_thread(
+            name=f"scheduler-{self.scheduler_id}-rate_limited",
+            target=self.push_tasks_for_rate_limited_objects,
+            interval=60.0,
+        )
+
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
-    def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
+    def push_tasks_for_scan_profile_mutations(
+        self, mutation: ScanProfileMutation
+    ) -> None:
         """Create tasks for oois that have a scan level change."""
         self.logger.info(
             "Received scan level mutation %s for: %s [ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
@@ -178,7 +187,9 @@ class BoefjeScheduler(Scheduler):
         boefjes can run on, and create tasks for it."""
         new_boefjes = None
         try:
-            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(
+                self.organisation.id
+            )
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
                 "Failed to get new boefjes for organisation: %s [organisation_id=%s, scheduler_id=%s]",
@@ -207,12 +218,17 @@ class BoefjeScheduler(Scheduler):
         for boefje in new_boefjes:
             oois_by_object_type: List[OOI] = []
             try:
-                oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-                    self.organisation.id,
-                    boefje.consumes,
-                    list(range(boefje.scan_level, 5)),
+                oois_by_object_type = (
+                    self.ctx.services.octopoes.get_objects_by_object_types(
+                        self.organisation.id,
+                        boefje.consumes,
+                        list(range(boefje.scan_level, 5)),
+                    )
                 )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            except (
+                requests.exceptions.RetryError,
+                requests.exceptions.ConnectionError,
+            ):
                 self.logger.warning(
                     "Could not get oois for organisation: %s [organisation_id=%s, scheduler_id=%s]",
                     self.organisation.name,
@@ -293,6 +309,11 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_random_objects.__name__,
                     )
 
+    def push_tasks_for_rate_limited_objects(self) -> None:
+        # TODO: check for tasks that are rate limited and push them to the queue
+        # when the rate limit is over.
+        pass
+
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
 
@@ -366,6 +387,16 @@ class BoefjeScheduler(Scheduler):
             )
             return False
 
+        # Is task rate limited?
+        if boefje.rate_limit is not None:
+            # TODO: Check if it is already on the list of rate limited tasks,
+            # if so disregard. It should be picked up.
+
+            # TODO: If it is not on the list and it is rate limited and the
+            # rate limit is hit, put it on the list and disregard. It should
+            # be picked up.
+            return False
+
         return True
 
     def is_task_running(self, task: BoefjeTask) -> bool:
@@ -392,7 +423,10 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
-        if task_db is not None and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]:
+        if task_db is not None and task_db.status not in [
+            TaskStatus.FAILED,
+            TaskStatus.COMPLETED,
+        ]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
                 "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
@@ -425,7 +459,11 @@ class BoefjeScheduler(Scheduler):
         # Task has been finished (failed, or succeeded) according to
         # the datastore, but we have no results of it in bytes, meaning
         # we have a problem.
-        if task_bytes is None and task_db is not None and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
+        if (
+            task_bytes is None
+            and task_db is not None
+            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+        ):
             self.logger.error(
                 "Task has been finished, but no results found in bytes "
                 "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
@@ -436,7 +474,11 @@ class BoefjeScheduler(Scheduler):
             )
             raise RuntimeError("Task has been finished, but no results found in bytes")
 
-        if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
+        if (
+            task_bytes is not None
+            and task_bytes.ended_at is None
+            and task_bytes.started_at is not None
+        ):
             self.logger.debug(
                 "Task is still running, according to bytes "
                 "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
@@ -594,7 +636,9 @@ class BoefjeScheduler(Scheduler):
             raise exc_db
 
         # Has grace period passed according to datastore?
-        if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timedelta(
+        if task_db is not None and datetime.now(
+            timezone.utc
+        ) - task_db.modified_at < timedelta(
             seconds=self.ctx.config.pq_populate_grace_period
         ):
             self.logger.debug(
