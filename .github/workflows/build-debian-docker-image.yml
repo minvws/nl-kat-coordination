@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}
   pull_request:
     paths:
-      - "packaging"
+      - "packaging/**"
       - ".github/workflows/build-debian-docker-image.yml"
 
 env:
