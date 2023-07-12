@@ -1,6 +1,8 @@
 {
   "extends": "stylelint-config-standard-scss",
+  "ignoreFiles": ["rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss"],
   "rules": {
+    "no-descending-specificity": null,
     "number-max-precision": 5,
     "color-hex-length": "long",
     "declaration-block-no-redundant-longhand-properties": null,

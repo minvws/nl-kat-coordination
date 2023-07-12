@@ -5,33 +5,6 @@
 }
 
 body header nav.collapsible {
-    /* Collapsed state */
-    &.collapsed.collapsed {
-        .collapsing-element {
-            .collapsible {
-                flex-direction: column;
-
-                button.collapsible-toggle {
-                    display: none;
-
-                    &[aria-expanded="false"],
-                    &[aria-expanded="true"] {
-                        +.collapsing-element {
-                            display: flex;
-                            position: static;
-                            width: 100%;
-                            box-shadow: none;
-                        }
-                    }
-
-                    &::before {
-                        content: none;
-                    }
-                }
-            }
-        }
-    }
-
     /* Uncollapsed state */
     .collapsing-element {
         position: relative;
@@ -64,6 +37,33 @@ body header nav.collapsible {
                     }
 
                     background-color: transparent;
+                }
+            }
+        }
+    }
+
+    /* Collapsed state */
+    &.collapsed {
+        .collapsing-element {
+            .collapsible {
+                flex-direction: column;
+
+                button.collapsible-toggle {
+                    display: none;
+
+                    &[aria-expanded="false"],
+                    &[aria-expanded="true"] {
+                        +.collapsing-element {
+                            display: flex;
+                            position: static;
+                            width: 100%;
+                            box-shadow: none;
+                        }
+                    }
+
+                    &::before {
+                        content: none;
+                    }
                 }
             }
         }
