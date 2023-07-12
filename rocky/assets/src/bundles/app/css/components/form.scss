@@ -22,15 +22,9 @@ form {
 
 	@media (min-width:$breakpoint-filter) {
 		.filter-fields-direction {
-
 			&.row {
 				flex-direction: row;
 			}
-
 		}
-
 	}
-
-
-
 }
