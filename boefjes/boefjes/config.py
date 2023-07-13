@@ -23,7 +23,6 @@ class Settings(BaseSettings):
     # Runtime configuration
     runtime: RuntimeConfiguration = RuntimeConfiguration.LOCAL
 
-    enable_db: bool = True  # Why would someone disable the database?
     katalogus_db_uri: PostgresDsn = "postgresql://xx:xx@host:5432/katalogus"
 
     scheduler_api: AnyHttpUrl = "http://localhost:8004"
