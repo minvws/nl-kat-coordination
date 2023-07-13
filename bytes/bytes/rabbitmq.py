@@ -19,28 +19,37 @@ class RabbitMQEventManager(EventManager):
         logger.info("Connected to RabbitMQ")
 
     def publish(self, event: Event) -> None:
+        self._check_connection()
+
         event_data = event.json()
+        logger.debug("Publishing event: %s", event_data)
         queue_name = self._queue_name(event)
 
-        logger.debug("Publishing event: %s", event_data)
         try:
             self.channel.queue_declare(queue_name, durable=True)
-        except pika.exceptions.AMQPChannelError as e:
+        except pika.exceptions.AMQPError as e:
             logger.info("Channel error %s, recreating channel", e)
-            self.channel = self.connection.channel()
+            self._check_connection()
             self.channel.queue_declare(queue_name, durable=True)
 
         try:
             self.channel.basic_publish("", queue_name, event_data.encode())
-        except pika.exceptions.ConnectionClosed:
-            logger.exception("RabbitMQ connection was closed: retrying with a new connection.")
-
-            self.connection = pika.BlockingConnection(pika.URLParameters(self.queue_uri))
-            self.channel = self.connection.channel()
-
+        except pika.exceptions.AMQPError:
+            logger.info("RabbitMQ connection was closed: retrying with a new connection.")
+            self._check_connection()
             self.channel.basic_publish("", queue_name, event_data.encode())
 
         logger.info("Published event [event_id=%s] to queue %s", event.event_id, queue_name)
+
+    def _check_connection(self):
+        if self.connection.is_closed:
+            self.connection = pika.BlockingConnection(pika.URLParameters(self.queue_uri))
+            self.channel = self.connection.channel()
+            logger.warning("Reconnected to RabbitMQ because connection was closed")
+
+        if self.channel.is_closed:
+            self.channel = self.connection.channel()
+            logger.warning("Recreated RabbitMQ channel because channel was closed")
 
     @staticmethod
     def _queue_name(event: Event) -> str:
