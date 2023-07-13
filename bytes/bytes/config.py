@@ -31,9 +31,7 @@ class Settings(BaseSettings):
     rfc3161_provider: Optional[str]
     rfc3161_cert_file: Optional[Path]
 
-    encryption_middleware: EncryptionMiddleware = (
-        EncryptionMiddleware.NACL_SEALBOX
-    )  # Should we default to no encryption? Does NACL_SEALBOX require keys?
+    encryption_middleware: EncryptionMiddleware = EncryptionMiddleware.IDENTITY
     kat_private_key_b64: str = ""  # Should this be renamed?
     vws_public_key_b64: str = ""  # Should this be renamed?
 
