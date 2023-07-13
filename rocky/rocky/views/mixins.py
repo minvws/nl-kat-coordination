@@ -64,14 +64,10 @@ class OctopoesView(OrganizationView):
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
             self.handle_connector_exception(e)
 
-    def get_ooi_tree(
-        self, pk: str, depth: int, observed_at: Optional[datetime] = None
-    ) -> ReferenceTree:
+    def get_ooi_tree(self, pk: str, depth: int, observed_at: Optional[datetime] = None) -> ReferenceTree:
         try:
             ref = Reference.from_str(pk)
-            return self.octopoes_api_connector.get_tree(
-                ref, depth=depth, valid_time=observed_at
-            )
+            return self.octopoes_api_connector.get_tree(ref, depth=depth, valid_time=observed_at)
         except Exception as e:
             self.handle_connector_exception(e)
 
@@ -96,28 +92,14 @@ class OctopoesView(OrganizationView):
                     normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
                     boefje_id = normalizer_data["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
-                    origin.boefje = get_katalogus(organization.code).get_plugin(
-                        boefje_id
-                    )
+                    origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
                 except requests.exceptions.RequestException as e:
                     logger.error(e)
 
             return (
-                [
-                    origin
-                    for origin in origin_data
-                    if origin.origin.origin_type == OriginType.DECLARATION
-                ],
-                [
-                    origin
-                    for origin in origin_data
-                    if origin.origin.origin_type == OriginType.OBSERVATION
-                ],
-                [
-                    origin
-                    for origin in origin_data
-                    if origin.origin.origin_type == OriginType.INFERENCE
-                ],
+                [origin for origin in origin_data if origin.origin.origin_type == OriginType.DECLARATION],
+                [origin for origin in origin_data if origin.origin.origin_type == OriginType.OBSERVATION],
+                [origin for origin in origin_data if origin.origin.origin_type == OriginType.INFERENCE],
             )
         except Exception as e:
             logger.error(e)
@@ -135,9 +117,7 @@ class OctopoesView(OrganizationView):
 
         try:
             datetime_format = "%Y-%m-%d"
-            return convert_date_to_datetime(
-                datetime.strptime(self.request.GET.get("observed_at"), datetime_format)
-            )
+            return convert_date_to_datetime(datetime.strptime(self.request.GET.get("observed_at"), datetime_format))
         except ValueError:
             return datetime.now(timezone.utc)
 
@@ -242,9 +222,7 @@ class FindingList:
     def __len__(self):
         return self.count
 
-    def get_muted_findings(
-        self, findings: Paginated[Finding], offset: int, limit: int
-    ) -> Paginated[Finding]:
+    def get_muted_findings(self, findings: Paginated[Finding], offset: int, limit: int) -> Paginated[Finding]:
         return list(
             set(findings)
             - set(
@@ -273,12 +251,8 @@ class FindingList:
         hydrated_findings = []
 
         for finding in findings:
-            if (
-                finding.ooi not in objects or finding.finding_type not in objects
-            ) or not (
-                self.is_finding_in_risk_score_range(
-                    objects[finding.finding_type].risk_score
-                )
+            if (finding.ooi not in objects or finding.finding_type not in objects) or not (
+                self.is_finding_in_risk_score_range(objects[finding.finding_type].risk_score)
             ):
                 continue
 
@@ -355,21 +329,16 @@ class MultipleOOIMixin(OctopoesView):
             {
                 "label": ooi_class.get_ooi_type(),
                 "value": ooi_class.get_ooi_type(),
-                "checked": not self.filtered_ooi_types
-                or ooi_class.get_ooi_type() in self.filtered_ooi_types,
+                "checked": not self.filtered_ooi_types or ooi_class.get_ooi_type() in self.filtered_ooi_types,
             }
             for ooi_class in get_collapsed_types()
         ]
 
-        ooi_type_filters = sorted(
-            ooi_type_filters, key=lambda filter_: filter_["label"]
-        )
+        ooi_type_filters = sorted(ooi_type_filters, key=lambda filter_: filter_["label"])
         return ooi_type_filters
 
     def get_ooi_types_display(self):
-        if not self.filtered_ooi_types or len(self.filtered_ooi_types) == len(
-            get_collapsed_types()
-        ):
+        if not self.filtered_ooi_types or len(self.filtered_ooi_types) == len(get_collapsed_types()):
             return _("All")
 
         return ", ".join(self.filtered_ooi_types)
@@ -402,9 +371,7 @@ class SingleOOIMixin(OctopoesView):
 
         return self.request.GET["ooi_id"]
 
-    def get_ooi(
-        self, pk: Optional[str] = None, observed_at: Optional[datetime] = None
-    ) -> OOI:
+    def get_ooi(self, pk: Optional[str] = None, observed_at: Optional[datetime] = None) -> OOI:
         if pk is None:
             pk = self.get_ooi_id()
 
@@ -412,36 +379,26 @@ class SingleOOIMixin(OctopoesView):
 
     def get_breadcrumb_list(self):
         start = {
-            "url": reverse(
-                "ooi_list", kwargs={"organization_code": self.organization.code}
-            ),
+            "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
             "text": "Objects",
         }
         if isinstance(self.ooi, Finding):
             start = {
-                "url": reverse(
-                    "finding_list", kwargs={"organization_code": self.organization.code}
-                ),
+                "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
                 "text": "Findings",
             }
 
         return [
             start,
             {
-                "url": get_ooi_url(
-                    "ooi_detail", self.ooi.primary_key, self.organization.code
-                ),
+                "url": get_ooi_url("ooi_detail", self.ooi.primary_key, self.organization.code),
                 "text": self.ooi.human_readable,
             },
         ]
 
     def get_ooi_properties(self, ooi: OOI):
         class_relations = get_relations(ooi.__class__)
-        props = {
-            field_name: value
-            for field_name, value in ooi
-            if field_name not in class_relations
-        }
+        props = {field_name: value for field_name, value in ooi if field_name not in class_relations}
 
         knowledge_base = get_knowledge_base_data_for_ooi_store({ooi.primary_key: ooi})
 
@@ -470,9 +427,7 @@ class SingleOOITreeMixin(SingleOOIMixin):
 
         return self.get_object_from_tree(pk, observed_at)
 
-    def get_object_from_tree(
-        self, pk: str, observed_at: Optional[datetime] = None
-    ) -> OOI:
+    def get_object_from_tree(self, pk: str, observed_at: Optional[datetime] = None) -> OOI:
         self.tree = self.get_ooi_tree(pk, self.depth, observed_at)
 
         return self.tree.store[str(self.tree.root.reference)]
