@@ -65,10 +65,19 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.severities = self.get_severities()
         self.valid_time = self.get_observed_at()
-        self.muted_findings = request.GET.get("muted_findings")
+        self.severities = self.get_severities()
         self.finding_types = request.GET.getlist("finding_types", [])
+        self.muted_findings = request.GET.getlist("muted_findings")
+
+        show_all_findings = (
+            "show" in self.muted_findings and "exclude" in self.muted_findings
+        )
+        self.exclude_muted = "exclude" in self.muted_findings and not (
+            show_all_findings
+        )
+        self.show_muted = "show" in self.muted_findings and not (show_all_findings)
+
         self.hydrate_risk_scores()
 
     def hydrate_risk_scores(self) -> None:
@@ -88,8 +97,8 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
             severities=self.severities,
             risk_score_min=self.risk_score_min,
             risk_score_max=self.risk_score_max,
-            exclude_muted=self.muted_findings == "exclude",
-            show_muted=self.muted_findings == "show",
+            exclude_muted=self.exclude_muted,
+            show_muted=self.show_muted,
             finding_types=self.finding_types,
         )
 

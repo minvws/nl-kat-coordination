@@ -24,16 +24,18 @@ FINDING_TYPES_LIST = [
 ]
 
 FINDING_TYPES_CHOICES = (
-    (str(finding_type.__name__), str(finding_type.__name__)) for finding_type in FINDING_TYPES_LIST
+    (str(finding_type.__name__), str(finding_type.__name__))
+    for finding_type in FINDING_TYPES_LIST
 )
 
 FINDINGS_SEVERITIES_CHOICES = (
-    (str(severity.name).lower(), str(severity.value).lower()) for severity in RiskLevelSeverity
+    (str(severity.name).lower(), str(severity.value).lower())
+    for severity in RiskLevelSeverity
 )
 
 MUTED_FINDINGS_CHOICES = (
     ("show", _("Show muted findings")),
-    ("exclude", _("Exclude muted findings")),
+    ("exclude", _("Show non-muted findings")),
 )
 
 
@@ -64,8 +66,11 @@ class FindingRiskScoreRangeForm(BaseRockyForm):
 
 
 class MutedFindingSelectionForm(BaseRockyForm):
-    muted_findings = forms.ChoiceField(
-        required=False, label=_("Filter by muted findings"), choices=MUTED_FINDINGS_CHOICES, widget=forms.RadioSelect()
+    muted_findings = forms.MultipleChoiceField(
+        required=False,
+        label=_("Filter by muted findings"),
+        choices=MUTED_FINDINGS_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
     )
 
 

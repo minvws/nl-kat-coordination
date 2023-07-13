@@ -316,6 +316,7 @@ class FindingList:
 
             if self.show_muted:
                 findings = self.get_muted_findings(findings, offset, limit)
+
             if self.finding_types:
                 findings = self.filter_findings_by_type(findings)
 
