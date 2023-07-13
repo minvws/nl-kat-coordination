@@ -11,12 +11,8 @@ from scheduler.models import Base
 from scheduler.repositories import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 
+from tests.mocks import queue as mock_queue
 from tests.utils import functions
-
-
-class MockPriorityQueue(queues.PriorityQueue):
-    def create_hash(self, item: functions.TestModel):
-        return item.id.hex
 
 
 class PriorityQueueTestCase(unittest.TestCase):
@@ -27,7 +23,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         self.pq_store = sqlalchemy.PriorityQueueStore(datastore=self.datastore)
 
-        self.pq = MockPriorityQueue(
+        self.pq = mock_queue.MockPriorityQueue(
             pq_id="test",
             maxsize=10,
             item_type=functions.TestModel,
