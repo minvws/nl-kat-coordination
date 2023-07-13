@@ -46,12 +46,6 @@ body header nav.collapsible {
 
   /* Collapsed state */
   &.collapsed {
-    .collapsing-element {
-      .collapsible {
-        flex-direction: column;
-      }
-    }
-
     button.collapsible-toggle {
       &[aria-expanded="false"],
       &[aria-expanded="true"] {
@@ -67,6 +61,10 @@ body header nav.collapsible {
           }
         }
       }
+    }
+
+    .collapsing-element .collapsible {
+      flex-direction: column;
     }
 
     .collapsing-element .collapsible button.collapsible-toggle {
