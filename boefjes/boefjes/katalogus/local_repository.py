@@ -117,14 +117,14 @@ class LocalPluginRepository:
 
         for package in pkgutil.walk_packages([str(self.path)], prefix):
             if not package.ispkg:
-                logging.warning("%s is not a package", package.name)
+                logging.debug("%s is not a package", package.name)
                 continue
 
             path = self.path / package.name.replace(prefix, "").replace(".", "/")
             not_present_files = [file for file in files if not (path / file).exists()]
 
             if not_present_files:
-                logging.warning("Files %s not found for %s", not_present_files, package.name)
+                logging.debug("Files %s not found for %s", not_present_files, package.name)
                 continue
 
             paths.append((path, package.name))
