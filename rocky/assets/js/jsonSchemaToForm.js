@@ -1,6 +1,6 @@
 
 window.addEventListener('load', (event) => {
-  loadform("JsonSchemaForm");
+ loadform("JsonSchemaForm");
 });
 
 var inputtypes = {
@@ -105,18 +105,6 @@ function renderarray(original, path, name, schema) {
     schema['required'] = [];
   }
   let fieldset = document.createElement('fieldset');
-  // let header = document.createElement('h4');
-  // let text = name.charAt(0).toUpperCase() + name.slice(1);
-  // if (schema.minItems && schema.maxItems) {
-  //   text += ' (between '+schema.minItems+' and '+schema.maxItems+' items)';
-  // } else if(schema.minItems) {
-  //   text += ' (at least '+schema.minItems+' items)';
-  // } else if(schema.minItems) {
-  //   text += ' (at most '+schema.minItems+' items)';
-  // }
-  // let headertext = document.createTextNode(text);
-  // header.appendChild(headertext);
-  // fieldset.appendChild(header);
   let minamount = 1;
   if (original && original.length) {
     minamount = original.length;
