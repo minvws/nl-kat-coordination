@@ -40,7 +40,7 @@ repos:
           /tests/
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: "v0.0.263"
+    rev: 'v0.0.263'
     hooks:
       - id: ruff
 
@@ -53,14 +53,7 @@ repos:
     rev: v1.2.0
     hooks:
       - id: mypy
-        additional_dependencies:
-          [
-            "types-PyYAML",
-            "types-requests",
-            "types-cachetools",
-            "pydantic",
-            "pynacl",
-          ]
+        additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'pydantic', 'pynacl']
         exclude: |
           (?x)(
           ^boefjes/ |
@@ -77,12 +70,14 @@ repos:
     rev: v2.2.4
     hooks:
       - id: codespell
-        additional_dependencies: ["tomli"]
+        additional_dependencies: ['tomli']
+        args: [-L, lama]
         exclude: |
           (?x)(
           \.po$ |
           \.xml$ |
           poetry.lock$ |
+          pyproject.toml$ |
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
@@ -98,7 +93,7 @@ repos:
     rev: v1.19.16
     hooks:
       - id: djlint-django
-        files: "^rocky/.*/templates/.*$"
+        files: '^rocky/.*/templates/.*$'
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
     rev: v15.9.0
