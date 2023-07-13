@@ -147,7 +147,7 @@ We now include two levels of design, according to the [C4 model](https://c4model
 ### Design: C2 Container level
 The overall view of the code is as follows.
 
-```mermaid
+```{mermaid}
 graph
     User((User))
     Rocky["Rocky<br/><i>Django App</i>"]
@@ -168,7 +168,7 @@ graph
 ### Design: C3 Component level
 The overall view of the code is as follows.
 
-```mermaid
+```{mermaid}
 graph LR
     User -- BoefjeMeta --> APIR1
     User -- NormalizerMeta --> APIR2

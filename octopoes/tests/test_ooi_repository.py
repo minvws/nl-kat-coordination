@@ -76,6 +76,7 @@ class OOIRepositoryTest(TestCase):
                                 :crux.db/id
                                 {:MockIPPort/_address [*]}
                                 {:MockResolvedHostname/_address [*]}
+                                {:MockLabel/_ooi [*]}
                                 {:MockIPAddressV4/network [*]}
                             ])
                         ]
