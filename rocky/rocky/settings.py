@@ -32,12 +32,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_NAME_BOEFJES = env(
-    "QUEUE_NAME_BOEFJES", default="boefjes"
-)  # Is there a use case for not using the default queue name?
-QUEUE_NAME_NORMALIZERS = env(
-    "QUEUE_NAME_NORMALIZERS", default="normalizers"
-)  # Is there a use case for not using the default queue name?
 QUEUE_URI = env.url("QUEUE_URI", "").geturl()
 
 OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()

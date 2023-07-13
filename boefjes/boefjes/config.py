@@ -14,12 +14,10 @@ class Settings(BaseSettings):
     log_cfg: Path = Path(__file__).parent / "logging.json"  # Follow-up ticket to make logging the same for all modules?
 
     # Worker configuration
-    pool_size: int = 2  # Which value should be the default and why?
-    poll_interval: float = 1.0  # Which value should be the default and why?
+    pool_size: int = 2
+    poll_interval: float = 10.0
 
     # Queue configuration
-    queue_name_boefjes: str = "boefjes"  # Why would someone use another queue name?
-    queue_name_normalizers: str = "normalizers"  # Why would someone use another queue name?
     queue_uri: str = "amqp://"
 
     # Runtime configuration
