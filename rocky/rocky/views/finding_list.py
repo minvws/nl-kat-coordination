@@ -29,9 +29,7 @@ def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
     # order is preserved) so if we first sort by finding id the findings with
     # the same risk score will be sorted by finding id
     sorted_by_finding_id = sorted(findings, key=lambda x: x["finding_type"].id)
-    sorted_findings = sorted(
-        sorted_by_finding_id, key=lambda x: x["risk_level_score"], reverse=True
-    )
+    sorted_findings = sorted(sorted_by_finding_id, key=lambda x: x["risk_level_score"], reverse=True)
     for index, finding in enumerate(sorted_findings, start=1):
         finding["finding_number"] = index
     return sorted_findings
@@ -70,12 +68,8 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         self.finding_types = request.GET.getlist("finding_types", [])
         self.muted_findings = request.GET.getlist("muted_findings")
 
-        show_all_findings = (
-            "show" in self.muted_findings and "exclude" in self.muted_findings
-        )
-        self.exclude_muted = "exclude" in self.muted_findings and not (
-            show_all_findings
-        )
+        show_all_findings = "show" in self.muted_findings and "exclude" in self.muted_findings
+        self.exclude_muted = "exclude" in self.muted_findings and not (show_all_findings)
         self.show_muted = "show" in self.muted_findings and not (show_all_findings)
 
         self.hydrate_risk_scores()
@@ -119,9 +113,7 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
     def build_breadcrumbs(self):
         return [
             {
-                "url": reverse_lazy(
-                    "finding_list", kwargs={"organization_code": self.organization.code}
-                ),
+                "url": reverse_lazy("finding_list", kwargs={"organization_code": self.organization.code}),
                 "text": _("Findings"),
             }
         ]
