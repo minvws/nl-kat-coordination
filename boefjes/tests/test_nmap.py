@@ -9,6 +9,7 @@ class NmapTest(TestCase):
         self.assertListEqual(
             [
                 "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -29,6 +30,7 @@ class NmapTest(TestCase):
         self.assertListEqual(
             [
                 "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -50,6 +52,7 @@ class NmapTest(TestCase):
         self.assertListEqual(
             [
                 "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -69,6 +72,7 @@ class NmapTest(TestCase):
         self.assertListEqual(
             [
                 "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -89,6 +93,7 @@ class NmapTest(TestCase):
         self.assertListEqual(
             [
                 "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -108,6 +113,7 @@ class NmapTest(TestCase):
         self.assertListEqual(
             [
                 "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -128,6 +134,7 @@ class NmapTest(TestCase):
         self.assertListEqual(
             [
                 "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -148,6 +155,7 @@ class NmapTest(TestCase):
         self.assertListEqual(
             [
                 "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",

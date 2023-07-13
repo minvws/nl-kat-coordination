@@ -10,6 +10,7 @@ from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
+from rocky.bytes_client import BytesClient, get_bytes_client
 from rocky.exceptions import (
     AcknowledgedClearanceLevelTooLowException,
     IndemnificationNotPresentException,
@@ -68,6 +69,7 @@ class OrganizationView(View):
         super().__init__(*args, **kwargs)
         self.organization = None
         self.octopoes_api_connector: Optional[OctopoesAPIConnector] = None
+        self.bytes_client: BytesClient = None
         self.organization_member = None
         self.indemnification_present = False
 
@@ -93,6 +95,7 @@ class OrganizationView(View):
             raise PermissionDenied()
 
         self.octopoes_api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization_code)
+        self.bytes_client = get_bytes_client(organization_code)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

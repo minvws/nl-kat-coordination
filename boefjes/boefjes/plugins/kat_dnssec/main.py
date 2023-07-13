@@ -37,10 +37,12 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         detach=True,
     )
 
-    # wait for container to exit, read its output in the logs and remove container
-    container.wait()
-    output = container.logs()
-    container.remove()
+    try:
+        # wait for container to exit, read its output in the logs and remove container
+        container.wait()
+        output = container.logs()
+    finally:
+        container.remove()
 
     results = json.dumps(output.decode())
     return [(set(), results)]

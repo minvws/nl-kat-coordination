@@ -1,7 +1,5 @@
-from datetime import datetime, timezone
 from time import sleep
 from typing import List, Type
-from uuid import uuid4
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -13,17 +11,17 @@ from tools.forms.base import BaseRockyForm, ObservedAtForm
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
 from tools.ooi_form import ClearanceFilterForm, OOIForm
+from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 
-from octopoes.api.models import Declaration
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types
-from rocky.bytes_client import BytesClient, get_bytes_client
 from rocky.views.mixins import (
     ConnectorFormMixin,
     MultipleOOIMixin,
+    OOIList,
     SingleOOIMixin,
     SingleOOITreeMixin,
 )
@@ -35,7 +33,11 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
     context_object_name = "ooi_list"
     ooi_types = get_collapsed_types().difference({Finding, FindingType})
 
-    def get_queryset(self):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.filtered_ooi_types = self.get_filtered_ooi_types()
+
+    def get_queryset(self) -> OOIList:
         scan_levels = DEFAULT_SCAN_LEVEL_FILTER
         selected_clearance_level = self.request.GET.getlist("clearance_level")
         if selected_clearance_level is not None:
@@ -133,23 +135,11 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
 
         return kwargs
 
-    def save_ooi(self, data) -> OOI:
-        new_ooi = self.ooi_class.parse_obj(data)
-
-        task_id = uuid4()
-        declaration = Declaration(ooi=new_ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
-
-        get_bytes_client(self.organization.code).add_manual_proof(
-            task_id, BytesClient.raw_from_declarations([declaration])
-        )
-
-        self.octopoes_api_connector.save_declaration(declaration)
-        return new_ooi
-
     def form_valid(self, form):
         # Transform into OOI
         try:
-            new_ooi = self.save_ooi(form.cleaned_data)
+            new_ooi = self.ooi_class.parse_obj(form.cleaned_data)
+            create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi)
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))
         except ValidationError as exception:
