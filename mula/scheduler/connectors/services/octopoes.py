@@ -15,11 +15,10 @@ class Octopoes(HTTPService):
         host: str,
         source: str,
         orgs: List[Organisation],
-        request_timeout: int = 10,
+        timeout: int = 10,
     ):
         self.orgs: List[Organisation] = orgs
-        self.timeout = request_timeout
-        super().__init__(host, source)
+        super().__init__(host, source, timeout)
 
     @exception_handler
     def get_objects_by_object_types(
@@ -56,7 +55,9 @@ class Octopoes(HTTPService):
         return oois
 
     @exception_handler
-    def get_random_objects(self, organisation_id: str, n: int, scan_level: List[int]) -> List[OOI]:
+    def get_random_objects(
+        self, organisation_id: str, n: int, scan_level: List[int]
+    ) -> List[OOI]:
         """Get `n` random oois from octopoes"""
         if scan_level is None:
             scan_level = []
