@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: mixed-line-ending
-        args: ["--fix=lf"]
+        args: [ "--fix=lf" ]
       - id: detect-private-key
       - id: check-case-conflict
       - id: check-yaml
@@ -24,8 +24,8 @@ repos:
     hooks:
       - id: rstcheck
         # https://github.com/rstcheck/rstcheck-core/issues/4
-        args: ["--ignore-messages", "Hyperlink target .* is not referenced"]
-        additional_dependencies: ["rstcheck[sphinx]"]
+        args: [ "--ignore-messages", "Hyperlink target .* is not referenced" ]
+        additional_dependencies: [ "rstcheck[sphinx]" ]
 
   - repo: https://github.com/MarketSquare/robotframework-tidy
     rev: "4.1.0"
@@ -40,7 +40,7 @@ repos:
           /tests/
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.263'
+    rev: "v0.0.263"
     hooks:
       - id: ruff
 
@@ -53,7 +53,7 @@ repos:
     rev: v1.2.0
     hooks:
       - id: mypy
-        additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'pydantic', 'pynacl']
+        additional_dependencies: [ "types-PyYAML", "types-requests", "types-cachetools", "pydantic", "pynacl" ]
         exclude: |
           (?x)(
           ^boefjes/ |
@@ -70,8 +70,8 @@ repos:
     rev: v2.2.4
     hooks:
       - id: codespell
-        additional_dependencies: ['tomli']
-        args: [-L, lama]
+        additional_dependencies: [ "tomli" ]
+        args: [ -L, lama ]
         exclude: |
           (?x)(
           \.po$ |
@@ -93,14 +93,14 @@ repos:
     rev: v1.19.16
     hooks:
       - id: djlint-django
-        files: '^rocky/.*/templates/.*$'
+        files: "^rocky/.*/templates/.*$"
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: v15.9.0
+    rev: v15.10.1
     hooks:
       - id: stylelint
-        args: [--fix]
+        args: [ --fix ]
         additional_dependencies:
-          - stylelint@15.9.0
+          - stylelint@15.10.1
           - stylelint-config-standard-scss@10.0.0
         files: "^(rocky\/assets\/css\/|docs\/source\/).*.(css|scss|sass)$"
