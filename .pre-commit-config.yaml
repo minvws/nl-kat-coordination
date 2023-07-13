@@ -13,6 +13,7 @@ repos:
       - id: debug-statements
       - id: end-of-file-fixer
 
+
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: v0.12.2
     hooks:
@@ -48,6 +49,7 @@ repos:
     rev: "23.3.0"
     hooks:
       - id: black
+        files: pyproject.toml$
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.2.0
