@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Literal, Optional
 
 from pydantic import BaseModel
 
@@ -16,6 +16,6 @@ class PaginationParameters(BaseModel):
 
 class FilterParameters(BaseModel):
     q: Optional[str] = None
-    type: Optional[Union[Literal["boefje"], Literal["normalizer"], Literal["bit"]]] = None
+    type: Optional[Literal["boefje", "normalizer", "bit"]] = None
     state: Optional[bool] = None
     scan_level: int = 0
