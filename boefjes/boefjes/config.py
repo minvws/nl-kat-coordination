@@ -37,7 +37,7 @@ class Settings(BaseSettings):
 
     span_export_grpc_endpoint: Optional[str] = None
 
-    remote_ns: str = "8.8.8.8"  # Why do we default to Google DNS?
+    remote_ns: str = "1.1.1.1"
 
 
 settings = Settings()
