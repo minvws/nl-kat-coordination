@@ -9,12 +9,13 @@ STATIC_DIR = KATALOGUS_DIR / "static"
 LIMIT = 100
 
 
-class PaginationParams(BaseModel):
+class PaginationParameters(BaseModel):
     offset: int = 0
     limit: Optional[int] = LIMIT
 
 
-class PluginsFilter(BaseModel):
+class FilterParameters(BaseModel):
     q: Optional[str] = None
     type: Optional[Union[Literal["boefje"], Literal["normalizer"], Literal["bit"]]] = None
     state: Optional[bool] = None
+    scan_level: int = 0

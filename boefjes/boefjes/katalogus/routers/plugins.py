@@ -1,33 +1,26 @@
 from functools import partial
-from typing import Dict, List, Literal, Optional, Union
+from typing import Dict, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 from requests import HTTPError
 from starlette.responses import FileResponse, JSONResponse, Response
 from starlette.status import HTTP_404_NOT_FOUND
 
-from boefjes.katalogus.dependencies.plugins import PluginService, get_plugin_service
+from boefjes.katalogus.dependencies.plugins import (
+    PluginService,
+    get_pagination_parameters,
+    get_plugin_service,
+    get_plugins_filter_parameters,
+)
 from boefjes.katalogus.models import PluginType
 from boefjes.katalogus.routers.organisations import check_organisation_exists
-from boefjes.katalogus.types import LIMIT, PaginationParams, PluginsFilter
+from boefjes.katalogus.types import FilterParameters, PaginationParameters
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",
     tags=["plugins"],
     dependencies=[Depends(check_organisation_exists)],
 )
-
-
-def get_pagination_parameters(offset: int = 0, limit: Optional[int] = LIMIT) -> PaginationParams:
-    return PaginationParams(offset=offset, limit=limit)
-
-
-def get_plugins_filter(
-    q: Optional[str] = None,
-    plugin_type: Optional[Union[Literal["boefje"], Literal["normalizer"], Literal["bit"]]] = None,
-    state: Optional[bool] = None,
-) -> PluginsFilter:
-    return PluginsFilter(q=q, type=plugin_type, state=state)
 
 
 # check if query matches plugin id, name or description
@@ -39,11 +32,12 @@ def _plugin_matches_query(plugin: PluginType, query: str) -> bool:
     )
 
 
+# todo: sorting?
 @router.get("/plugins", response_model=List[PluginType])
 def list_plugins(
     organisation_id: str,
-    filter_params: PluginsFilter = Depends(get_plugins_filter),
-    pagination_params: PaginationParams = Depends(get_pagination_parameters),
+    filter_params: FilterParameters = Depends(get_plugins_filter_parameters),
+    pagination_params: PaginationParameters = Depends(get_pagination_parameters),
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> List[PluginType]:
     with plugin_service as p:
@@ -62,7 +56,10 @@ def list_plugins(
 
     # filter plugins by state
     if filter_params.state is not None:
-        plugins = filter(lambda x: plugin.enabled is filter_params.state, plugins)
+        plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
+
+    # filter plugins by scan level
+    plugins = filter(lambda x: x.scan_level >= filter_params.scan_level, plugins)
 
     # paginate plugins
     plugins = list(plugins)[pagination_params.offset : pagination_params.offset + pagination_params.limit]
@@ -71,7 +68,7 @@ def list_plugins(
 
 
 @router.get("/plugins/{plugin_id}", response_model=PluginType)
-def plugin(
+def get_plugin(
     plugin_id: str,
     organisation_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),
