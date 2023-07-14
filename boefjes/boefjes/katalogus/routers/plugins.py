@@ -59,7 +59,7 @@ def list_plugins(
         plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
 
     # filter plugins by scan level for boefje plugins
-    plugins = filter(lambda x: x.type == "boefje" and x.scan_level >= filter_params.scan_level, plugins)
+    plugins = filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins)
 
     # paginate plugins
     plugins = list(plugins)[pagination_params.offset : pagination_params.offset + pagination_params.limit]
