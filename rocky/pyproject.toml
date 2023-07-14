@@ -103,3 +103,7 @@ max_line_length = 120
 blank_line_after_tag = "load,extends,include"
 # https://www.djlint.com/docs/linter/#rules
 ignore = "H006,H016,H017,H030,H031"
+
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311"]
+line-length = 120
