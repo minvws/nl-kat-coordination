@@ -23,12 +23,6 @@ class Settings(BaseSettings):
     )  # Why is this configurable for the scheduler and not for the other modules?
 
     # Application settings
-    boefje_populate: bool = Field(
-        False, env="SCHEDULER_BOEFJE_POPULATE"
-    )  # Is there a use case for not populating it? If not; let's remove it
-    normalizer_populate: bool = Field(
-        True, env="SCHEDULER_NORMALIZER_POPULATE"
-    )  # Is there a use case for not populating it? If not; let's remove it
     katalogus_cache_ttl: int = Field(
         30, env="SCHEDULER_KATALOGUS_CACHE_TTL"
     )  # Which value should be the default and why?

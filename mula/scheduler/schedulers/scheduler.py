@@ -31,8 +31,6 @@ class Scheduler(abc.ABC):
             A queues.PriorityQueue instance
         ranker:
             A rankers.Ranker instance.
-        populate_queue_enabled:
-            A boolean whether to populate the queue.
         threads:
             A dict of ThreadRunner instances, used for runner processes
             concurrently.
@@ -51,7 +49,6 @@ class Scheduler(abc.ABC):
         queue: queues.PriorityQueue,
         ranker: rankers.Ranker,
         callback: Optional[Callable[..., None]] = None,
-        populate_queue_enabled: bool = True,
         max_tries: int = -1,
     ):
         """Initialize the Scheduler.
@@ -66,8 +63,6 @@ class Scheduler(abc.ABC):
                 A queues.PriorityQueue instance
             ranker:
                 A rankers.Ranker instance.
-            populate_queue_enabled:
-                A boolean whether to populate the queue.
             max_tries:
                 The maximum number of retries for a task to be pushed to
                 the queue.
@@ -79,7 +74,6 @@ class Scheduler(abc.ABC):
         self.queue: queues.PriorityQueue = queue
         self.ranker: rankers.Ranker = ranker
 
-        self.populate_queue_enabled: bool = populate_queue_enabled
         self.max_tries: int = max_tries
 
         self.callback: Optional[Callable[[], Any]] = callback
@@ -340,7 +334,6 @@ class Scheduler(abc.ABC):
     def dict(self) -> Dict[str, Any]:
         return {
             "id": self.scheduler_id,
-            "populate_queue_enabled": self.populate_queue_enabled,
             "priority_queue": {
                 "id": self.queue.pq_id,
                 "item_type": self.queue.item_type.type,

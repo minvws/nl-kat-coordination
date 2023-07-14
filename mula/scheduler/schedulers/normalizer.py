@@ -28,7 +28,6 @@ class NormalizerScheduler(Scheduler):
         ranker: rankers.Ranker,
         organisation: Organisation,
         callback: Optional[Callable[..., None]] = None,
-        populate_queue_enabled: bool = True,
     ):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
@@ -39,7 +38,6 @@ class NormalizerScheduler(Scheduler):
             queue=queue,
             ranker=ranker,
             callback=callback,
-            populate_queue_enabled=populate_queue_enabled,
         )
 
         self.initialize_listeners()
