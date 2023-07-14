@@ -29,10 +29,14 @@ class OriginRepository:
     def save(self, origin: Origin, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def list_by_result(self, reference: Reference, valid_time: datetime) -> List[Origin]:
+    def list_by_result(
+        self, reference: Reference, valid_time: datetime
+    ) -> List[Origin]:
         raise NotImplementedError
 
-    def list_by_source(self, reference: Reference, valid_time: datetime) -> List[Origin]:
+    def list_by_source(
+        self, reference: Reference, valid_time: datetime
+    ) -> List[Origin]:
         raise NotImplementedError
 
     def delete(self, origin: Origin, valid_time: datetime) -> None:
@@ -43,9 +47,11 @@ class OriginRepository:
 
 
 class XTDBOriginRepository(OriginRepository):
-    xtdb_type: XTDBType = XTDBType.CRUX
+    xtdb_type: XTDBType = XTDBType.XTDB_MULTINODE
 
-    def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
+    def __init__(
+        self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType
+    ):
         super().__init__(event_manager)
         self.session = session
         self.__class__.xtdb_type = xtdb_type
@@ -65,7 +71,9 @@ class XTDBOriginRepository(OriginRepository):
     def deserialize(cls, data: Dict[str, Any]) -> Origin:
         return Origin.parse_obj(data)
 
-    def list_by_result(self, reference: Reference, valid_time: datetime) -> List[Origin]:
+    def list_by_result(
+        self, reference: Reference, valid_time: datetime
+    ) -> List[Origin]:
         query = generate_pull_query(
             self.xtdb_type,
             FieldSet.ALL_FIELDS,
@@ -110,7 +118,9 @@ class XTDBOriginRepository(OriginRepository):
         self.session.add((XTDBOperationType.PUT, self.serialize(origin), valid_time))
 
         event = OriginDBEvent(
-            operation_type=OperationType.CREATE if old_origin is None else OperationType.UPDATE,
+            operation_type=OperationType.CREATE
+            if old_origin is None
+            else OperationType.UPDATE,
             valid_time=valid_time,
             old_data=old_origin,
             new_data=origin,
