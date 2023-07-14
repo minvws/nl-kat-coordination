@@ -281,7 +281,7 @@ LOGIN_REDIRECT_URL = "crisis_room"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-SESSION_EXPIRE_SECONDS = 60 * 60 * 2  # Why 2 hours?
+SESSION_EXPIRE_SECONDS = env.int("SESSION_EXPIRE_SECONDS", 7200)
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 
 # Require session cookie to be secure, so only a https session can be started
