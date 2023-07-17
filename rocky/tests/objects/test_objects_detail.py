@@ -9,7 +9,7 @@ from tools.models import Indemnification
 
 from octopoes.models.tree import ReferenceTree
 from rocky.views.ooi_detail import OOIDetailView
-from tests.conftest import setup_request
+from tests.conftest import get_stub_path, setup_request
 
 TREE_DATA = {
     "root": {
@@ -27,6 +27,27 @@ TREE_DATA = {
             "primary_key": "Finding|Network|testnetwork|KAT-000",
             "ooi": "Network|testnetwork",
             "finding_type": "KATFindingType|KAT-000",
+        },
+    },
+}
+
+QUESTION_DATA = {
+    "root": {
+        "reference": "Question|/test|Network|testnetwork",
+        "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+    },
+    "store": {
+        "Network|testnetwork": {
+            "object_type": "Network",
+            "primary_key": "Network|testnetwork",
+            "name": "testnetwork",
+        },
+        "Question|/test|Network|testnetwork": {
+            "ooi": "Question|/test|Network|testnetwork",
+            "object_type": "Question",
+            "schema_id": "/test",
+            "json_schema": get_stub_path("question_schema.json").read_text(),
+            "primary_key": "Question|/test|Network|testnetwork",
         },
     },
 }
@@ -63,6 +84,33 @@ def test_ooi_detail(
     assertContains(response, "Completed")
     assertContains(response, "Created date")
     assertContains(response, "9, 2022, 11:53 a.m.")
+    assertNotContains(response, "Question")
+    assertNotContains(response, "Rendered Question Form")
+
+
+def test_question_detail(
+    rf,
+    client_member,
+    mock_scheduler,
+    mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
+    mocker,
+):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+
+    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}), client_member.user)
+
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(QUESTION_DATA)
+    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+
+    response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assert mock_organization_view_octopoes().get_tree.call_count == 2
+
+    assertContains(response, "Question")
+    assertContains(response, "Rendered Question Form")
+    assertContains(response, "Submit")
 
 
 def test_ooi_detail_start_scan(
