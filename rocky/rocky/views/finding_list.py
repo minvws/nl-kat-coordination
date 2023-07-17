@@ -5,7 +5,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.forms.base import ObservedAtForm
-from tools.forms.findings import FindingMutedSelectionForm, FindingRiskScoreNumberForm, FindingSeverityMultiSelectForm
+from tools.forms.findings import FindingMutedSelectionForm, FindingSeverityMultiSelectForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -65,17 +65,8 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
-        context["severity_filter_form"] = FindingSeverityMultiSelectForm(
-            {"severity": self.request.GET.getlist("severity")}
-        )
-        context["risk_score_filter"] = FindingRiskScoreNumberForm(
-            {
-                "risk_score_greater_than": self.request.GET.get("risk_score_greater_than"),
-                "risk_score_smaller_than": self.request.GET.get("risk_score_smaller_than"),
-            }
-        )
-        context["muted_findings_filter_form"] = FindingMutedSelectionForm({"exclude_muted": self.exclude_muted})
-
+        context["severity_filter_form"] = FindingSeverityMultiSelectForm(self.request.GET)
+        context["muted_findings_filter_form"] = FindingMutedSelectionForm(self.request.GET)
         return context
 
 
