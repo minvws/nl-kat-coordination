@@ -90,6 +90,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_latest_task_by_hash = mock.patch(
             "scheduler.context.AppContext.task_store.get_latest_task_by_hash"
         ).start()
+
         self.mock_get_last_run_boefje = mock.patch(
             "scheduler.context.AppContext.services.bytes.get_last_run_boefje"
         ).start()
@@ -623,6 +624,96 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+    def test_disable_scheduler(self):
+        # Arrange: start scheduler
+        self.scheduler.run()
+
+        # Arrange: add tasks
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        task = models.BoefjeTask(
+            boefje=BoefjeFactory(),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        p_item = functions.create_p_item(
+            scheduler_id=self.organisation.id,
+            priority=0,
+            data=task,
+        )
+        self.scheduler.push_item_to_queue(p_item)
+
+        # Assert: task should be on priority queue
+        pq_p_item = self.scheduler.queue.peek(0)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(pq_p_item.id, p_item.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: listeners should be running
+        self.assertGreater(len(self.scheduler.listeners), 0)
+
+        # Assert: threads should be running
+        self.assertGreater(len(self.scheduler.threads), 0)
+
+        # Act
+        self.scheduler.disable()
+
+        # Listeners should be stopped
+        self.assertEqual(0, len(self.scheduler.listeners))
+
+        # Threads should be stopped
+        self.assertEqual(0, len(self.scheduler.threads))
+
+        # Queue should be empty
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # All tasks on queue should be set to CANCELLED
+        tasks, _ = self.mock_ctx.task_store.get_tasks(self.scheduler.scheduler_id)
+        for task in tasks:
+            self.assertEqual(task.status, models.TaskStatus.CANCELLED)
+
+        # Scheduler should be disabled
+        self.assertFalse(self.scheduler.is_enabled())
+
+        self.scheduler.stop()
+
+    def test_enable_scheduler(self):
+        self.scheduler.run()
+
+        # Assert: listeners should be running
+        self.assertGreater(len(self.scheduler.listeners), 0)
+
+        # Assert: threads should be running
+        self.assertGreater(len(self.scheduler.threads), 0)
+
+        # Disable scheduler first
+        self.scheduler.disable()
+
+        # Listeners should be stopped
+        self.assertEqual(0, len(self.scheduler.listeners))
+
+        # Threads should be stopped
+        self.assertEqual(0, len(self.scheduler.threads))
+
+        # Queue should be empty
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Re-enable scheduler
+        self.scheduler.enable()
+
+        # Threads should be started
+        self.assertGreater(len(self.scheduler.threads), 0)
+
+        # Scheduler should be enabled
+        self.assertTrue(self.scheduler.is_enabled())
+
+        # Stop the scheduler
+        self.scheduler.stop()
 
 
 class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
