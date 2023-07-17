@@ -87,7 +87,6 @@ class App:
             scheduler_id=identifier,
             queue=queue,
             ranker=ranker,
-            populate_queue_enabled=self.ctx.config.normalizer_populate,
             organisation=org,
             callback=self.remove_scheduler,
         )
@@ -119,7 +118,6 @@ class App:
             scheduler_id=identifier,
             queue=queue,
             ranker=ranker,
-            populate_queue_enabled=self.ctx.config.boefje_populate,
             organisation=org,
             callback=self.remove_scheduler,
         )
