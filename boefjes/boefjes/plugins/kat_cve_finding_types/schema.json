@@ -6,7 +6,8 @@
             "title": "CVEAPI_URL",
             "maxLength": 2048,
             "type": "string",
-            "description": "URL of the CVE API, defaults to https://cve.openkat.dev/v1"
+            "description": "URL of the CVE API, defaults to https://cve.openkat.dev/v1",
+            "default": "https://cve.openkat.dev/v1"
         }
     }
 }
