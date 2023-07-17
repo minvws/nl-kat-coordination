@@ -37,15 +37,10 @@ black = "^23.1.0"
 requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
 
-[tool.black]
-line-length = 120
-target-version = ["py38"]
-
-[tool.vulture]
-paths = ["boefjes/"]
-min_confidence = 90
-sort_by_size = true
-
 [tool.flynt]
 line-length = 120
 transform-concats = true
+
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311"]
+line-length = 120
