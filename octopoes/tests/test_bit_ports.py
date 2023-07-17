@@ -1,27 +1,30 @@
-from bits.port_classification.port_classification import run as run_port_classification
+from bits.port_classification_ip.port_classification_ip import run as run_port_classification
 from bits.port_common.port_common import run as run_port_common
 
 from octopoes.models.ooi.findings import Finding
-from octopoes.models.ooi.network import IPPort
+from octopoes.models.ooi.network import IPAddressV4, IPPort
 
 
 def test_port_classification_tcp_80():
-    port = IPPort(address="fake", protocol="tcp", port=80)
-    results = list(run_port_classification(port, [], {}))
+    address = IPAddressV4(address="8.8.8.8", network="fake")
+    port = IPPort(address=address.reference, protocol="tcp", port=80)
+    results = list(run_port_classification(address, [port], {}))
 
     assert not results
 
 
 def test_port_classification_udp_53():
-    port = IPPort(address="fake", protocol="udp", port=53)
-    results = list(run_port_classification(port, [], {}))
+    address = IPAddressV4(address="8.8.8.8", network="fake")
+    port = IPPort(address=address.reference, protocol="tcp", port=53)
+    results = list(run_port_classification(address, [port], {}))
 
     assert not results
 
 
 def test_port_classification_tcp_22():
-    port = IPPort(address="fake", protocol="tcp", port=22)
-    results = list(run_port_classification(port, [], {}))
+    address = IPAddressV4(address="8.8.8.8", network="fake")
+    port = IPPort(address=address.reference, protocol="tcp", port=22)
+    results = list(run_port_classification(address, [port], {}))
 
     assert len(results) == 2
     finding = results[-1]
@@ -30,8 +33,9 @@ def test_port_classification_tcp_22():
 
 
 def test_port_classification_tcp_5432():
-    port = IPPort(address="fake", protocol="tcp", port=5432)
-    results = list(run_port_classification(port, [], {}))
+    address = IPAddressV4(address="8.8.8.8", network="fake")
+    port = IPPort(address=address.reference, protocol="tcp", port=5432)
+    results = list(run_port_classification(address, [port], {}))
 
     assert len(results) == 2
     finding = results[-1]
@@ -40,8 +44,9 @@ def test_port_classification_tcp_5432():
 
 
 def test_port_classification_tcp_12345():
-    port = IPPort(address="fake", protocol="tcp", port=12345)
-    results = list(run_port_classification(port, [], {}))
+    address = IPAddressV4(address="8.8.8.8", network="fake")
+    port = IPPort(address=address.reference, protocol="tcp", port=12345)
+    results = list(run_port_classification(address, [port], {}))
 
     assert len(results) == 2
     finding = results[-1]
@@ -50,8 +55,9 @@ def test_port_classification_tcp_12345():
 
 
 def test_port_classification_udp_80():
-    port = IPPort(address="fake", protocol="udp", port=80)
-    results = list(run_port_classification(port, [], {}))
+    address = IPAddressV4(address="8.8.8.8", network="fake")
+    port = IPPort(address=address.reference, protocol="udp", port=80)
+    results = list(run_port_classification(address, [port], {}))
 
     assert len(results) == 2
     finding = results[-1]
