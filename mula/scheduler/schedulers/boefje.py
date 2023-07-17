@@ -2,9 +2,10 @@ import logging
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import Callable, List, Optional
+from typing import Callable, Dict, List, Optional
 
 import requests
+from limits import parse, storage, strategies
 from opentelemetry import trace
 
 from scheduler import context, models, queues, rankers
@@ -45,7 +46,12 @@ class BoefjeScheduler(Scheduler):
         callback: Optional[Callable[..., None]] = None,
     ):
         self.logger = logging.getLogger(__name__)
+
         self.organisation: Organisation = organisation
+
+        self.rate_limiter = strategies.MovingWindowRateLimiter(
+            storage=storage.MemoryStorage())
+        self.rate_limited_tasks: Dict[str, BoefjeTask] = {}  # TODO: thread safety
 
         super().__init__(
             ctx=ctx,
@@ -176,9 +182,9 @@ class BoefjeScheduler(Scheduler):
             for boefje in boefjes:
                 executor.submit(
                     self.push_task,
-                    boefje,
-                    ooi,
-                    self.push_tasks_for_scan_profile_mutations.__name__,
+                    boefje=boefje,
+                    ooi=ooi,
+                    caller=self.push_tasks_for_scan_profile_mutations.__name__,
                 )
 
     @tracer.start_as_current_span("push_tasks_for_new_boefjes")
@@ -240,9 +246,9 @@ class BoefjeScheduler(Scheduler):
                 for ooi in oois_by_object_type:
                     executor.submit(
                         self.push_task,
-                        boefje,
-                        ooi,
-                        self.push_tasks_for_new_boefjes.__name__,
+                        boefje=boefje,
+                        ooi=ooi,
+                        caller=self.push_tasks_for_new_boefjes.__name__,
                     )
 
     @tracer.start_as_current_span("push_tasks_for_random_objects")
@@ -304,15 +310,21 @@ class BoefjeScheduler(Scheduler):
                 for boefje in boefjes:
                     executor.submit(
                         self.push_task,
-                        boefje,
-                        ooi,
-                        self.push_tasks_for_random_objects.__name__,
+                        boefje=boefje,
+                        ooi=ooi,
+                        caller=self.push_tasks_for_random_objects.__name__,
                     )
 
     def push_tasks_for_rate_limited_objects(self) -> None:
         # TODO: check for tasks that are rate limited and push them to the queue
         # when the rate limit is over.
-        pass
+        with futures.ThreadPoolExecutor() as executor:
+            for _, task in self.rate_limited_tasks.items():
+                executor.submit(
+                    self.push_task,
+                    task=task,
+                    caller=self.push_tasks_for_rate_limited_objects.__name__,
+                )
 
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
@@ -387,17 +399,53 @@ class BoefjeScheduler(Scheduler):
             )
             return False
 
-        # Is task rate limited?
-        if boefje.rate_limit is not None:
-            # TODO: Check if it is already on the list of rate limited tasks,
-            # if so disregard. It should be picked up.
+        return True
 
-            # TODO: If it is not on the list and it is rate limited and the
-            # rate limit is hit, put it on the list and disregard. It should
-            # be picked up.
+    def is_task_rate_limited(self, task: BoefjeTask) -> bool:
+        """Checks whether a task is rate limited.
+
+        Args:
+            task: The task to check.
+
+        Returns:
+            True if the task is rate limited, False otherwise.
+        """
+        breakpoint()
+        if task.boefje.rate_limit is not None:  # TODO: this needs to be returned by a boefje manifest
+
+            # Check if namespace is already in the tasks if not add it
+            rate_limited_task = self.rate_limited_tasks.get(task.hash)
+            if rate_limited_task is None:
+                self.rate_limited_tasks[task.hash] = task
+
+            parsed_rate_limit = parse(task.boefje.rate_limit)
+            if parsed_rate_limit is None:
+                self.logger.warning(
+                    "Could not parse rate limit for boefje: %s [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
+                    task.boefje.name,
+                    task.boefje.id,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                # TODO: raise?
+                return True
+
+            hit = self.rate_limiter.hit(parsed_rate_limit)  # TODO: parse rate limit
+            if hit:
+                self.logger.debug(
+                    "Boefje: %s is rate limited [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
+                    task.boefje.name,
+                    task.boefje.id,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                return True
+
+            # TODO: remove task from rate limited tasks
+            self.rate_limited_tasks.pop(task.hash)
             return False
 
-        return True
+        return False
 
     def is_task_running(self, task: BoefjeTask) -> bool:
         """Get the last tasks that have run or are running for the hash
@@ -491,7 +539,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    def push_task(self, boefje: Boefje, ooi: OOI, caller: str = "") -> None:
+    def push_task(self, task: BoefjeTask = None, boefje: Boefje = None, ooi: OOI = None, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -501,11 +549,12 @@ class BoefjeScheduler(Scheduler):
             caller: Caller of this function. Defaults to "".
 
         """
-        task = BoefjeTask(
-            boefje=Boefje(id=boefje.id, version=boefje.version),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
+        if task is None and (boefje is not None and ooi is not None):
+            task = BoefjeTask(
+                boefje=Boefje(id=boefje.id, version=boefje.version),
+                input_ooi=ooi.primary_key,
+                organization=self.organisation.id,
+            )
 
         if not self.is_task_allowed_to_run(boefje, ooi):
             self.logger.debug(

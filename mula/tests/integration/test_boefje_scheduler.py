@@ -516,8 +516,27 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert
         self.assertFalse(has_passed)
 
+    # TODO
+    def test_is_task_rate_limited(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(
+            scan_level=0, consumes=[ooi.object_type],
+            rate_limit="1/minute",  # TODO
+        )
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        # Act
+        self.scheduler.is_task_rate_limited(task=task)
+
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_rate_limited")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_item_on_queue_by_hash")
     @mock.patch("scheduler.context.AppContext.task_store.get_tasks_by_hash")
@@ -526,6 +545,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_get_tasks_by_hash,
         mock_is_item_on_queue_by_hash,
         mock_has_grace_period_passed,
+        mock_is_task_rate_limited,
         mock_is_task_allowed_to_run,
         mock_is_task_running,
     ):
@@ -543,16 +563,17 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_is_task_running.return_value = False
         mock_has_grace_period_passed.return_value = True
         mock_is_item_on_queue_by_hash.return_value = False
+        mock_is_task_rate_limited.return_value = False
         mock_get_tasks_by_hash.return_value = None
 
         # Act
-        self.scheduler.push_task(boefje, ooi)
+        self.scheduler.push_task(boefje=boefje, ooi=ooi)
 
         # Assert
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         with self.assertLogs("scheduler.schedulers", level="DEBUG") as cm:
-            self.scheduler.push_task(boefje, ooi)
+            self.scheduler.push_task(boefje=boefje, ooi=ooi)
 
         self.assertIn("Could not add task to queue, queue was full", cm.output[-1])
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -734,6 +755,11 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
             return_value=True,
         ).start()
+
+        self.mock_is_rate_limited = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_rate_limited",
+            return_value=False,
+        )
 
         self.mock_get_boefjes_for_ooi = mock.patch(
             "scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi",
@@ -944,6 +970,11 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
             return_value=True,
         ).start()
 
+        self.mock_is_rate_limited = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_rate_limited",
+            return_value=False,
+        )
+
         self.mock_get_new_boefjes_by_org_id = mock.patch(
             "scheduler.context.AppContext.services.katalogus.get_new_boefjes_by_org_id"
         ).start()
@@ -1092,7 +1123,14 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
             return_value=True,
         ).start()
 
-        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
+        self.mock_is_rate_limited = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_rate_limited",
+            return_value=False,
+        )
+
+        self.mock_get_boefjes_for_ooi = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi",
+        ).start()
 
         self.mock_get_random_objects = mock.patch(
             "scheduler.context.AppContext.services.octopoes.get_random_objects"
@@ -1244,3 +1282,13 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+
+# TODO
+class RateLimitTestCase(BoefjeSchedulerBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+
+    def test_push_tasks_for_rate_limited_objects(self):
+        pass

@@ -19,3 +19,4 @@ class Plugin(BaseModel):
     options: Optional[List[str]]
     produces: List[str]
     enabled: bool
+    rate_limit: Optional[str]  # TODO: update when this is implemented
