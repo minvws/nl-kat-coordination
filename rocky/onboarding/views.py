@@ -658,7 +658,7 @@ class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingA
     current_step = 4
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("crisis_room")
+        return reverse_lazy("complete_onboarding", kwargs={"organization_code": self.organization.code})
 
     def form_valid(self, form):
         name = form.cleaned_data["name"]
@@ -676,8 +676,6 @@ class CompleteOnboarding(OrganizationView):
     """
 
     def get(self, request, *args, **kwargs):
-        if self.request.user.is_superuser and not self.organization_member.has_perms(ONBOARDING_PERMISSIONS):
-            return redirect(reverse("step_introduction", kwargs={"organization_code": self.organization.code}))
         self.organization_member.onboarded = True
         self.organization_member.status = OrganizationMember.STATUSES.ACTIVE
         self.organization_member.save()
