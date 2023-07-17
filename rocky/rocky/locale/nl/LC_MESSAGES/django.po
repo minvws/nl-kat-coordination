@@ -3096,7 +3096,6 @@ msgstr "Introductie"
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:18
 #: onboarding/templates/step_3d_set_clearance_level.html:18
 #: rocky/templates/partials/form/indemnification_add_form.html:6
-#, fuzzy
 msgid ""
 "Some scans are lightweight while others might be a bit more aggressive with "
 "their scanning. OpenKAT requires you to set a clearance level for each "
@@ -3106,7 +3105,7 @@ msgid ""
 "people of companies."
 msgstr ""
 "Sommige scans zijn licht, terwijl andere wat agressiever scannen. OpenKAT "
-"vereist dat u een toestemmingsniveau instelt voor elk object om te voorkomen "
+"vereist dat u een vrijwaring niveau instelt voor elk object om te voorkomen "
 "dat u onbedoeld agressieve scans uitvoert. U kunt bijvoorbeeld het recht "
 "hebben om elk type scan op uw eigen server uit te voeren, maar u hebt "
 "waarschijnlijk niet het recht om dat te doen voor objecten die eigendom zijn "
@@ -4301,8 +4300,6 @@ msgid "Value %(value)r is not a valid choice."
 msgstr ""
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:101
-#, fuzzy
-#| msgid "This field is required."
 msgid "This field cannot be null."
 msgstr "Dit veld is verplicht."
 
@@ -4324,15 +4321,13 @@ msgid ""
 msgstr ""
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:126
-#, fuzzy, python-format
-#| msgid "Delete %(display_type)s"
 msgid "Field of type: %(field_type)s"
-msgstr "Verwijder %(display_type)s"
+msgstr Veld van type: %(field_type)s
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:958
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr ""
+msgstr "“%(value)s”-waarde moet Waar of Onwaar zijn."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:959
 #, python-format
@@ -4406,10 +4401,8 @@ msgid ""
 msgstr ""
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1588
-#, fuzzy
-#| msgid "Declarations"
 msgid "Duration"
-msgstr "Declaraties"
+msgstr "Duur"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1661
 msgid "File path"
@@ -4418,71 +4411,67 @@ msgstr ""
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1727
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr ""
+msgstr ""%(value)s" waarde moet een float zijn."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1729
 msgid "Floating point number"
-msgstr ""
+msgstr "Floating point number"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1767
 #, python-format
 msgid "“%(value)s” value must be an integer."
-msgstr ""
+msgstr "“%(value)s” waarde moet een geheel getal zijn."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1769
 msgid "Integer"
-msgstr ""
+msgstr "Geheel getal"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1852
 msgid "Big (8 byte) integer"
-msgstr ""
+msgstr "Groot (8 byte) geheel getal"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1867
 msgid "Small integer"
-msgstr ""
+msgstr "Klein geheel getal"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1875
-#, fuzzy
-#| msgid "Email address"
 msgid "IPv4 address"
-msgstr "E-mailadres"
+msgstr "IPv4 adres"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1906
-#, fuzzy
-#| msgid "Email address"
 msgid "IP address"
-msgstr "E-mailadres"
+msgstr "IP adres"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1986
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1987
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
-msgstr ""
+msgstr "“%(value)s” waarde moet Geen, Waar of Onwaar zijn."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1989
 msgid "Boolean (Either True, False or None)"
-msgstr ""
+msgstr "Booleaans (ofwel waar, onwaar of geen)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2043
 msgid "Positive big integer"
-msgstr ""
+msgstr "Positief groot geheel getal"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2056
 msgid "Positive integer"
-msgstr ""
+msgstr "Positief geheel getal"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2069
 msgid "Positive small integer"
-msgstr ""
+msgstr "Positief klein geheel getal"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2083
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr ""
+msgstr "Slug (tot %(max_length)s)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2115
 msgid "Text"
-msgstr ""
+msgstr "Tekst"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2181
 #, python-format
@@ -4490,6 +4479,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"“%(value)s” waarde heeft een ongeldig formaat. Het moet in UU:MM[:ss[.uuuuuu]] formaat zijn."
+
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2183
 #, python-format
@@ -4497,70 +4488,69 @@ msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"“%(value)s” waarde heeft de juiste notatie (UU:MM[:ss[.uuuuuu]]) maar het is een "
+"ongeldige tijd."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2186
 msgid "Time"
-msgstr ""
+msgstr "Tijd"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2334
 msgid "Raw binary data"
-msgstr ""
+msgstr "Ruwe binaire gegevens"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2399
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
-msgstr ""
+msgstr ""%(value)s" is geen geldige UUID."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2401
 msgid "Universally unique identifier"
-msgstr ""
+msgstr "Universeel unieke identificatiecode"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/files.py:226
 msgid "File"
-msgstr ""
+msgstr "Bestand"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/files.py:375
 msgid "Image"
-msgstr ""
+msgstr "Afbeelding"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/json.py:18
-#, fuzzy
-#| msgid "Add object"
+
 msgid "A JSON object"
-msgstr "Voeg object toe"
+msgstr "Een JSON object"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/json.py:20
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Waarde moet geldige JSON zijn."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:790
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(model)s instantie met %(field)s %(value)r bestaat niet."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:792
 msgid "Foreign Key (type determined by related field)"
-msgstr ""
+msgstr "Vreemde sleutel (type bepaald door gerelateerd veld)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1045
 msgid "One-to-one relationship"
-msgstr ""
+msgstr "Een-op-een relatie"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1099
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s relatie"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1100
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s relaties"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1142
-#, fuzzy
-#| msgid "Manual creation"
 msgid "Many-to-many relationship"
-msgstr "Handmatig toevoegen"
+msgstr "Veel-op-veel relatie"
 
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the label
@@ -4570,99 +4560,97 @@ msgstr ""
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:247
 msgid "Enter a whole number."
-msgstr ""
+msgstr "Voer een geheel getal in."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:402
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:1143
 msgid "Enter a valid date."
-msgstr ""
+msgstr "Voer een geldige datum in."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:426
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:1144
 msgid "Enter a valid time."
-msgstr ""
+msgstr "Voer een geldige tijd in."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:454
 msgid "Enter a valid date/time."
-msgstr ""
+msgstr "Voer een geldige datum/tijd in."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:488
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Voer een geldige duur in."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:489
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "Het aantal dagen moet tussen {min_days} en {max_days} liggen."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:549
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
+msgstr "Er is geen bestand ingediend. Controleer het coderingstype op het formulier."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:550
-#, fuzzy
-#| msgid "No file selected"
 msgid "No file was submitted."
-msgstr "Geen bestand geselecteerd"
+msgstr "Er is geen bestand ingediend."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:551
-#, fuzzy
-#| msgid "The uploaded file is empty."
 msgid "The submitted file is empty."
-msgstr "Het bestand is leeg"
+msgstr "Het ingediende bestand is leeg."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:553
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Zorg ervoor dat deze bestandsnaam maximaal %(max)d karakter heeft (het heeft %(length)d)."
+msgstr[1] "Zorg ervoor dat deze bestandsnaam maximaal %(max)d tekens bevat (deze heeft %(lengte)d)."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:556
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "Stuur alstublieft een bestand in of vink het selectievakje Wissen aan, niet beide."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:617
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
+"Upload een geldige afbeelding. Het bestand dat je hebt geüpload was geen afbeelding of een "
+"beschadigd beeld."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:779
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:869
 #: venv/lib/python3.9/site-packages/django/forms/models.py:1309
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr ""
+msgstr "Selecteer een geldige keuze. %(value)s is niet een van de beschikbare keuzes."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:870
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:985
 #: venv/lib/python3.9/site-packages/django/forms/models.py:1308
 msgid "Enter a list of values."
-msgstr ""
+msgstr "Voer een lijst met waarden in."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:986
 msgid "Enter a complete value."
-msgstr ""
+msgstr "Voer een volledige waarde in."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:1202
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Voer een geldige UUID in."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:1232
 msgid "Enter a valid JSON."
-msgstr ""
+msgstr "Voer een geldige JSON in."
 
 #. Translators: This is the default suffix added to form field labels
 #: venv/lib/python3.9/site-packages/django/forms/forms.py:76
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #: venv/lib/python3.9/site-packages/django/forms/forms.py:203
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(Verborgen veld %(naam)s) %(error)s"
 
 #: venv/lib/python3.9/site-packages/django/forms/formsets.py:61
 #, python-format
@@ -4670,35 +4658,37 @@ msgid ""
 "ManagementForm data is missing or has been tampered with. Missing fields: "
 "%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
+"ManagementForm-gegevens ontbreken of er is mee geknoeid. Ontbrekende velden: "
+"%(field_names)s. Mogelijk moet u een bugrapport indienen als het probleem zich blijft voordoen."
 
 #: venv/lib/python3.9/site-packages/django/forms/formsets.py:370
 #, python-format
 msgid "Please submit at most %d form."
 msgid_plural "Please submit at most %d forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Stuur maximaal %d formulier in."
+msgstr[1] "Dien maximaal %d formulieren in."
 
 #: venv/lib/python3.9/site-packages/django/forms/formsets.py:377
 #, python-format
 msgid "Please submit at least %d form."
 msgid_plural "Please submit at least %d forms."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Stuur maximaal %d formulier in."
+msgstr[1] "Dien maximaal %d formulieren in."
 
 #: venv/lib/python3.9/site-packages/django/forms/formsets.py:405
 #: venv/lib/python3.9/site-packages/django/forms/formsets.py:412
 msgid "Order"
-msgstr ""
+msgstr "Volgorde"
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:763
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
-msgstr ""
+msgstr "Corrigeer de dubbele gegevens voor %(field)s."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:767
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
-msgstr ""
+msgstr "Corrigeer de dubbele gegevens voor %(field)s, die uniek moeten zijn."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:773
 #, python-format
@@ -4706,14 +4696,16 @@ msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
+"Corrigeer de dubbele gegevens voor %(field_name)s die uniek moeten zijn "
+"voor de %(lookup)s in %(date_field)s."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:782
 msgid "Please correct the duplicate values below."
-msgstr ""
+msgstr "Corrigeer de dubbele waarden hieronder."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:1109
 msgid "The inline value did not match the parent instance."
-msgstr ""
+msgstr "De inline waarde komt niet overeen met de bovenliggende instantie."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:1193
 msgid "Select a valid choice. That choice is not one of the available choices."
@@ -4737,22 +4729,20 @@ msgstr ""
 
 #: venv/lib/python3.9/site-packages/django/forms/widgets.py:404
 msgid "Currently"
-msgstr ""
+msgstr "Momenteel"
 
 #: venv/lib/python3.9/site-packages/django/forms/widgets.py:405
 msgid "Change"
-msgstr ""
+msgstr "Wijzigen"
 
 #: venv/lib/python3.9/site-packages/django/forms/widgets.py:714
-#, fuzzy
-#| msgid "Unknown action."
 msgid "Unknown"
-msgstr "Ongeldige actie."
+msgstr "Onbekend"
 
 #. Translators: Please do not add spaces around commas.
 #: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:817
 msgid "yes,no,maybe"
-msgstr ""
+msgstr "ja,nee,misschien"
 
 #: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:846
 #: venv/lib/python3.9/site-packages/django/template/defaultfilters.py:863
@@ -4805,379 +4795,353 @@ msgstr ""
 
 #: venv/lib/python3.9/site-packages/django/utils/dateformat.py:146
 msgid "midnight"
-msgstr ""
+msgstr "middernacht"
 
 #: venv/lib/python3.9/site-packages/django/utils/dateformat.py:148
 msgid "noon"
-msgstr ""
+msgstr "middag"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Monday"
-msgstr ""
+msgstr "Maandag"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Tuesday"
-msgstr ""
+msgstr "Dinsdag"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Wednesday"
-msgstr ""
+msgstr "Woensdag"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Thursday"
-msgstr ""
+msgstr "Donderdag"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:6
 msgid "Friday"
-msgstr ""
+msgstr "Vrijdag"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:7
 msgid "Saturday"
-msgstr ""
+msgstr "Zaterdag"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:7
 msgid "Sunday"
-msgstr ""
+msgstr "Zondag"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Mon"
-msgstr ""
+msgstr "Ma."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Tue"
-msgstr ""
+msgstr "Di."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Wed"
-msgstr ""
+msgstr "Wo."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Thu"
-msgstr ""
+msgstr "Do."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:10
 msgid "Fri"
-msgstr ""
+msgstr "Vr."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:11
-#, fuzzy
-#| msgid "Status"
 msgid "Sat"
-msgstr "Status"
+msgstr "Za."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:11
 msgid "Sun"
-msgstr ""
+msgstr "Zo."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "January"
-msgstr ""
+msgstr "Januari"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "February"
-msgstr ""
+msgstr "Februari"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:14
-#, fuzzy
-#| msgid "Search"
 msgid "March"
-msgstr "Zoeken"
+msgstr "Maart"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "April"
-msgstr ""
+msgstr "April"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "May"
-msgstr ""
+msgstr "Mei"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:14
 msgid "June"
-msgstr ""
+msgstr "Juni"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:15
 msgid "July"
-msgstr ""
+msgstr "Juli"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:15
 msgid "August"
-msgstr ""
+msgstr "Augustus"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:15
-#, fuzzy
-#| msgid "Save member"
 msgid "September"
-msgstr "Sla leden op"
+msgstr "September"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:15
 msgid "October"
-msgstr ""
+msgstr "Oktober"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:15
-#, fuzzy
-#| msgid "Members"
 msgid "November"
-msgstr "Leden"
+msgstr "November"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:16
-#, fuzzy
-#| msgid "Members"
 msgid "December"
-msgstr "Leden"
+msgstr "December"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "jan"
-msgstr ""
+msgstr "jan"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "feb"
-msgstr ""
+msgstr "feb"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:19
-#, fuzzy
-#| msgid "Summary"
 msgid "mar"
-msgstr "Samenvatting"
+msgstr "mrt"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "apr"
-msgstr ""
+msgstr "apr"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:19
-#, fuzzy
-#| msgid "Summary"
 msgid "may"
-msgstr "Samenvatting"
+msgstr "mei"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:19
 msgid "jun"
-msgstr ""
+msgstr "jun"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "jul"
-msgstr ""
+msgstr "jul"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "aug"
-msgstr ""
+msgstr "aug"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "sep"
-msgstr ""
+msgstr "sep"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:20
-#, fuzzy
-#| msgid "objects"
 msgid "oct"
-msgstr "Objecten"
+msgstr "oct"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "nov"
-msgstr ""
+msgstr "nov"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:20
 msgid "dec"
-msgstr ""
+msgstr "dec"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:23
 msgctxt "abbrev. month"
 msgid "Jan."
-msgstr ""
+msgstr "Jan."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:24
 msgctxt "abbrev. month"
 msgid "Feb."
-msgstr ""
+msgstr "Feb."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:25
-#, fuzzy
-#| msgid "Search"
 msgctxt "abbrev. month"
 msgid "March"
-msgstr "Zoeken"
+msgstr "Maart"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:26
 msgctxt "abbrev. month"
 msgid "April"
-msgstr ""
+msgstr "April"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:27
 msgctxt "abbrev. month"
 msgid "May"
-msgstr ""
+msgstr "Mei"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:28
 msgctxt "abbrev. month"
 msgid "June"
-msgstr ""
+msgstr "Juni"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:29
 msgctxt "abbrev. month"
 msgid "July"
-msgstr ""
+msgstr "Juli"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:30
 msgctxt "abbrev. month"
 msgid "Aug."
-msgstr ""
+msgstr "Aug."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr ""
+msgstr "Sept."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Oct."
-msgstr ""
+msgstr "Oct."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "Nov."
-msgstr ""
+msgstr "Nov."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "Dec."
-msgstr ""
+msgstr "Dec."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:37
 msgctxt "alt. month"
 msgid "January"
-msgstr ""
+msgstr "Januari"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:38
 msgctxt "alt. month"
 msgid "February"
-msgstr ""
+msgstr "Februari"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:39
-#, fuzzy
-#| msgid "Search"
 msgctxt "alt. month"
 msgid "March"
-msgstr "Zoeken"
+msgstr "Maart"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:40
 msgctxt "alt. month"
 msgid "April"
-msgstr ""
+msgstr "April"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:41
 msgctxt "alt. month"
 msgid "May"
-msgstr ""
+msgstr "Mei"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:42
 msgctxt "alt. month"
 msgid "June"
-msgstr ""
+msgstr "Juni"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:43
 msgctxt "alt. month"
 msgid "July"
-msgstr ""
+msgstr "Juli"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:44
 msgctxt "alt. month"
 msgid "August"
-msgstr ""
+msgstr "Augustus"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:45
-#, fuzzy
-#| msgid "Save member"
 msgctxt "alt. month"
 msgid "September"
-msgstr "Sla leden op"
+msgstr "September"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:46
 msgctxt "alt. month"
 msgid "October"
-msgstr ""
+msgstr "Oktober"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:47
-#, fuzzy
-#| msgid "Members"
 msgctxt "alt. month"
 msgid "November"
-msgstr "Leden"
+msgstr "November"
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:48
-#, fuzzy
-#| msgid "Members"
 msgctxt "alt. month"
 msgid "December"
-msgstr "Leden"
+msgstr "December"
 
 #: venv/lib/python3.9/site-packages/django/utils/ipv6.py:8
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "Dit is geen geldig IPv6-adres."
 
 #: venv/lib/python3.9/site-packages/django/utils/text.py:71
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr ""
+msgstr "%(truncated_text)s…"
 
 #: venv/lib/python3.9/site-packages/django/utils/text.py:240
 msgid "or"
-msgstr ""
+msgstr "of"
 
 #. Translators: This string is used as a separator between list elements
 #: venv/lib/python3.9/site-packages/django/utils/text.py:259
 #: venv/lib/python3.9/site-packages/django/utils/timesince.py:94
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: venv/lib/python3.9/site-packages/django/utils/timesince.py:9
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d jaar"
+msgstr[1] "%d jaren"
 
 #: venv/lib/python3.9/site-packages/django/utils/timesince.py:10
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d maand"
+msgstr[1] "%d maanden"
 
 #: venv/lib/python3.9/site-packages/django/utils/timesince.py:11
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d week"
+msgstr[1] "%d weken"
 
 #: venv/lib/python3.9/site-packages/django/utils/timesince.py:12
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d dag"
+msgstr[1] "%d dagen"
 
 #: venv/lib/python3.9/site-packages/django/utils/timesince.py:13
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d uur"
+msgstr[1] "%d uren"
 
 #: venv/lib/python3.9/site-packages/django/utils/timesince.py:14
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minuut"
+msgstr[1] "%d minuten"
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:110
 msgid "Forbidden"
-msgstr ""
+msgstr "Verboden"
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:111
 msgid "CSRF verification failed. Request aborted."
-msgstr ""
+msgstr "CSFR verificatie gefaald. Aanvraag afgebroken."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:115
 msgid ""
@@ -5186,6 +5150,10 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"U ziet dit bericht omdat deze HTTPS-site een "Referer" vereist
+"header" die door uw webbrowser moet worden verzonden, maar er is geen verzonden. Deze header is "
+"noodzakelijk om veiligheidsredenen, om ervoor te zorgen dat uw browser niet wordt "
+"gekaapt door derden."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:120
 msgid ""
@@ -5193,6 +5161,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
+"Als u uw browser heeft geconfigureerd om “Referer” headers uit te schakelen, gelieve ze opnieuw "
+"in te schakelen, in ieder geval voor deze site, of voor HTTPS-verbindingen, of voor “same-"
+"origin” verzoeken."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:124
 msgid ""
@@ -5202,6 +5173,11 @@ msgid ""
 "If you’re concerned about privacy, use alternatives like <a "
 "rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
+"Als u de tag <meta name=\"referrer\" content=\"no-referrer\"> of "
+"inclusief de kop “Referrer-Policy: no-referrer”, verwijder deze alstublieft. De "
+"CSRF-bescherming vereist de kop “Referer” om strikte verwijzingscontrole uit te voeren. "
+"Als je je zorgen maakt over privacy, gebruik dan alternatieven zoals <a "
+"rel=\"noreferrer\" …> voor links naar sites van derden."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:132
 msgid ""
@@ -5209,44 +5185,49 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
+"U ziet dit bericht omdat deze site een CSRF-cookie vereist wanneer "
+"formulieren worden verzonden. Deze cookie is om veiligheidsredenen nodig om ervoor te zorgen dat "
+"dat uw browser niet wordt gekaapt door derden."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:137
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
+"Als u uw browser hebt geconfigureerd om cookies uit te schakelen, schakel deze dan opnieuw in"
+"in ieder geval voor deze site, of voor verzoeken van dezelfde oorsprong."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:142
 msgid "More information is available with DEBUG=True."
-msgstr ""
+msgstr "Meer informatie is beschikbaar met DEBUG=True."
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:41
 msgid "No year specified"
-msgstr ""
+msgstr "Geen jaar gespecificeerd"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:61
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:111
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:208
 msgid "Date out of range"
-msgstr ""
+msgstr "Datum buiten bereik"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:90
 msgid "No month specified"
-msgstr ""
+msgstr "Geen maand gespecificeerd"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:142
 msgid "No day specified"
-msgstr ""
+msgstr "Geen dag gespecificeerd"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:188
 msgid "No week specified"
-msgstr ""
+msgstr "Geen week gespecificeerd"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:338
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:367
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr ""
+msgstr ""Geen %(verbose_name_plural)s beschikbaar""
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:594
 #, python-format
@@ -5254,49 +5235,51 @@ msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
 msgstr ""
+"Toekomstige %(verbose_name_plural)s niet beschikbaar omdat %(class_name)s."
+"allow_future is niet waar."
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:628
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
-msgstr ""
+msgstr "Ongeldige datumstring “%(datestr)s” gegeven formaat “%(format)s””
 
 #: venv/lib/python3.9/site-packages/django/views/generic/detail.py:54
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
-msgstr ""
+msgstr "Geen %(verbose_name)s gevonden die overeenkomen met de zoekopdracht"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/list.py:67
 msgid "Page is not “last”, nor can it be converted to an int."
-msgstr ""
+msgstr "Pagina is niet ”laatste” en kan ook niet worden geconverteerd naar een geheel getal."
 
 #: venv/lib/python3.9/site-packages/django/views/generic/list.py:72
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
-msgstr ""
+msgstr "Ongeldige pagina (%(page_number)s): %(message)s"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/list.py:154
 #, python-format
 msgid "Empty list and “%(class_name)s.allow_empty” is False."
-msgstr ""
+msgstr "Lege lijst en “%(class_name)s.allow_empty” is False."
 
 #: venv/lib/python3.9/site-packages/django/views/static.py:40
 msgid "Directory indexes are not allowed here."
-msgstr ""
+msgstr "Directory-indexen zijn hier niet toegestaan."
 
 #: venv/lib/python3.9/site-packages/django/views/static.py:42
 #, python-format
 msgid "“%(path)s” does not exist"
-msgstr ""
+msgstr "“%(path)s” bestaat niet"
 
 #: venv/lib/python3.9/site-packages/django/views/static.py:80
 #, python-format
 msgid "Index of %(directory)s"
-msgstr ""
+msgstr "Index van %(directory)s"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:7
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:221
 msgid "The install worked successfully! Congratulations!"
-msgstr ""
+msgstr "De installatie is gelukt! Gefeliciteerd!"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:207
 #, python-format
@@ -5304,6 +5287,8 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
+"Bekijk <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">releaseopmerkingen</a> voor Django %(version)s"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:222
 #, python-format
@@ -5313,30 +5298,34 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
+"Je ziet deze pagina omdat <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> staat in je instellingenbestand en je hebt niet "
+"alle URL's geconfigureerd."
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:230
 msgid "Django Documentation"
-msgstr ""
+msgstr "Django-documentatie"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:231
 msgid "Topics, references, &amp; how-to’s"
-msgstr ""
+msgstr "Onderwerpen, referenties en how-to's"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:239
 msgid "Tutorial: A Polling App"
-msgstr ""
+msgstr "Zelfstudie: een peiling-app"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:240
 msgid "Get started with Django"
-msgstr ""
+msgstr "Aan de slag met Django"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:248
 msgid "Django Community"
-msgstr ""
+msgstr "Django-gemeenschap"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:249
 msgid "Connect, get help, or contribute"
-msgstr ""
+msgstr "Verbinden, hulp krijgen of bijdragen"
 
 #: rocky/settings.py:379
 msgid "Blue light"
@@ -5427,26 +5416,20 @@ msgid "Dotted"
 msgstr "Gestippeld"
 
 #: rocky/templates/403.html:12
-#, fuzzy
-#| msgid "Error code 404: Page not found"
 msgid "Error code 403: Unauthorized"
-msgstr "Foutcode 404: Pagina niet gevonden"
+msgstr "Foutcode 403: Ongeautoriseerd"
 
 #: rocky/templates/403.html:14
-#, fuzzy
-#| msgid "You are not allowed to change organizations."
 msgid "Your account is not authorized to access this page or organization."
-msgstr "U mag geen organisaties veranderen."
+msgstr "Uw account is niet geautoriseerd om toegang te krijgen tot deze pagina of organisatie."
 
 #: rocky/templates/403.html:16
-#, fuzzy
-#| msgid "Please contact the system administrator."
 msgid "Please contact your system administrator."
-msgstr "Neem contact op met de systeembeheerder."
+msgstr "Neem contact op met uw systeembeheerder."
 
 #: rocky/templates/403.html:19 rocky/templates/404.html:15
 msgid "You may want to go back to the"
-msgstr ""
+msgstr "Misschien wil je terug naar de"
 
 #: rocky/templates/403.html:19 rocky/templates/404.html:15
 #: rocky/templates/crisis_room/crisis_room.html:12
@@ -5511,10 +5494,8 @@ msgstr "Voorvallen"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html:67
 #: rocky/templates/crisis_room/crisis_room_findings_block.html:136
 #: rocky/templates/organizations/organization_list.html:49
-#, fuzzy
-#| msgid "Two factor authentication is enabled for your account."
 msgid "There were no organizations found for your user account"
-msgstr "Tweetrapsverificatie is ingeschakeld voor uw account."
+msgstr "Er zijn geen organisaties gevonden voor uw gebruikersaccount"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html:72
 msgid "Top critical organizations"
@@ -5686,30 +5667,24 @@ msgid "Source OOI:"
 msgstr "Bron:"
 
 #: rocky/templates/findings/finding_list.html:106
-#, fuzzy, python-format
-#| msgid "Show details for %(name)s"
 msgid "Show details for %(ooi)s"
-msgstr "Bekijk details van %(name)s"
+msgstr "Bekijk details van %(ooi)s"
 
 #: rocky/templates/findings/finding_list.html:110
 msgid "Risk score:"
-msgstr ""
+msgstr "Risicoscore:"
 
 #: rocky/templates/findings/finding_list.html:122
-#, fuzzy
-#| msgid "Total findings"
 msgid "Mute findings"
-msgstr "Totaal aantal bevindingen"
+msgstr "Bevindingen Dempen"
 
 #: rocky/templates/findings/finding_list.html:124
 msgid "Reason"
-msgstr ""
+msgstr "Reden"
 
 #: rocky/templates/findings/finding_list.html:131
-#, fuzzy
-#| msgid "Findings"
 msgid "Mute Findings"
-msgstr "Bevindingen"
+msgstr "Bevindingen dempen"
 
 #: rocky/templates/footer.html:16 rocky/views/privacy_statement.py:13
 msgid "Privacy Statement"
@@ -6052,18 +6027,14 @@ msgid "and their severity."
 msgstr "en het niveau"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html:12
-#, fuzzy
-#| msgid ""
-#| "Findings can occur multiple times. To give better insight the following "
-#| "table shows the number of unique findings found as well as the number of "
-#| "occurences."
 msgid ""
 "Findings can occur multiple times. To give better insight the following "
 "table shows the number of unique findings found as well as the number of "
 "occurrences."
 msgstr ""
-"Bevindingen kunnen vaker voorkomen. De tabel geeft de unieke en herhaalde "
-"bevindingen."
+"Bevindingen kunnen meerdere keren voorkomen. Om beter inzicht te geven het volgende "
+"tabel toont het aantal gevonden unieke vondsten en het aantal"
+"gebeurtenissen."
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html:15
 msgid "See finding details"
@@ -6092,10 +6063,8 @@ msgid "Source"
 msgstr "Bron"
 
 #: rocky/templates/oois/ooi_detail_origins_inference.html:13
-#, fuzzy
-#| msgid " characters"
 msgid "Parameters"
-msgstr " karakters"
+msgstr "Parameters"
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html:7
 msgid "Observed by"
@@ -6160,18 +6129,16 @@ msgstr "Verwijder object(en)"
 
 #: rocky/templates/oois/ooi_mute_finding.html:12
 #: rocky/templates/oois/ooi_mute_finding.html:19
-#, fuzzy
-#| msgid "Add finding"
 msgid "Mute finding"
-msgstr "Bevinding toevoegen"
+msgstr "Bevinding dempen"
 
 #: rocky/templates/oois/ooi_mute_finding.html:13
 msgid "Give a reason below why you want to mute this finding."
-msgstr ""
+msgstr "Geef hieronder een reden waarom je deze bevinding wilt dempen."
 
 #: rocky/templates/oois/ooi_mute_finding.html:23
 msgid "Mute"
-msgstr ""
+msgstr "Dempen"
 
 #: rocky/templates/oois/ooi_page_tabs.html:4
 msgid "List of views for OOI"
@@ -6286,10 +6253,8 @@ msgstr "Objectenlijst"
 
 #: rocky/templates/organizations/organization_crisis_room.html:16
 #: rocky/templates/organizations/organization_settings.html:21
-#, fuzzy
-#| msgid "Indemnification"
 msgid "indemnification warning"
-msgstr "Vrijwaring"
+msgstr "Vrijwaring waarschuwing"
 
 #: rocky/templates/organizations/organization_crisis_room.html:18
 #, python-format
@@ -6305,21 +6270,16 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html:26
-#, fuzzy
-#| msgid ""
-#| "An overview of all (critical) findings OpenKAT found. Check the detail "
-#| "section for additional severity information."
 msgid ""
 "An overview of the top 10 most severe findings OpenKAT found. Check the "
 "detail section for additional severity information."
 msgstr ""
-"Een overzicht van alle (kritieke) bevindingen die OpenKAT heeft gevonden. "
-"Bekijk de detailsectie voor aanvullende informatie over de ernst van de "
-"bevindingen."
+"Een overzicht van de top 10 meest ernstige bevindingen die OpenKAT heeft gevonden. Bekijk de "
+"detailsectie voor aanvullende informatie over de ernst."
 
 #: rocky/templates/organizations/organization_crisis_room.html:28
 msgid "Top 10 most severe Findings"
-msgstr ""
+msgstr "Top 10 meest ernstige bevindingen"
 
 #: rocky/templates/organizations/organization_crisis_room.html:65
 #: rocky/templates/partials/ooi_report_findings_block_table.html:14
@@ -6327,16 +6287,12 @@ msgid "Finding type"
 msgstr "Bevindingstype"
 
 #: rocky/templates/organizations/organization_crisis_room.html:72
-#, fuzzy
-#| msgid "OOI type:"
 msgid "OOI type"
-msgstr "Objecttype:"
+msgstr "OOI type"
 
 #: rocky/templates/organizations/organization_crisis_room.html:79
-#, fuzzy
-#| msgid "Source OOI:"
 msgid "Source OOI"
-msgstr "Bron:"
+msgstr "Bron OOI"
 
 #: rocky/templates/organizations/organization_edit.html:12
 msgid "Edit organization"
@@ -6382,22 +6338,13 @@ msgid "Save member"
 msgstr "Sla leden op"
 
 #: rocky/templates/organizations/organization_member_list.html:13
-#, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "                        Effect and severity level\n"
-#| "                        "
-#| msgid_plural ""
-#| "\n"
-#| "                        Effects and severity levels\n"
-#| "                      "
 msgid ""
 "\n"
 "                    An overview of \"%(organization_name)s\" its members.\n"
 "                "
 msgstr ""
 "\n"
-"                        Niveau van gevolg en ernstigheid\n"
+"                        Een overzicht van \"%(organization_name)s\" haar leden.\n"
 "                        "
 
 #: rocky/templates/organizations/organization_member_list.html:20
@@ -6409,14 +6356,12 @@ msgid "Member overview:"
 msgstr "Gebruikersoverzicht:"
 
 #: rocky/templates/organizations/organization_member_list.html:31
-#, fuzzy
-#| msgid "Email"
 msgid "E-mail"
 msgstr "E-mail"
 
 #: rocky/templates/organizations/organization_member_list.html:32
 msgid "Role"
-msgstr ""
+msgstr "Rol"
 
 #: rocky/templates/organizations/organization_member_list.html:33
 #: rocky/templates/partials/scan_history.html:29
@@ -6428,20 +6373,16 @@ msgid "Status"
 msgstr "Status"
 
 #: rocky/templates/organizations/organization_member_list.html:34
-#, fuzzy
-#| msgid "Added on"
 msgid "Added"
 msgstr "Toegevoegd op"
 
 #: rocky/templates/organizations/organization_member_list.html:52
 msgid "Super user"
-msgstr ""
+msgstr "Super gebruiker"
 
 #: rocky/templates/organizations/organization_member_list.html:61
-#, fuzzy
-#| msgid "active"
 msgid "Active"
-msgstr "actief"
+msgstr "Actief"
 
 #: rocky/templates/organizations/organization_settings.html:14
 #, python-format
@@ -6545,24 +6486,20 @@ msgid "graph"
 msgstr "graaf"
 
 #: rocky/templates/partials/explanations.html:6
-#, fuzzy
-#| msgid "Set clearance level to inherit"
 msgid "Clearance level inheritance"
-msgstr "Zet vrijwaringsniveau op overerving"
+msgstr "Overerving op vrijwaring niveau"
 
 #: rocky/templates/partials/explanations.html:24
 msgid "Origin"
-msgstr ""
+msgstr "Bron"
 
 #: rocky/templates/partials/explanations.html:39
-#, fuzzy
-#| msgid "Set clearance level to inherit"
 msgid "Show clearance level inheritance"
-msgstr "Zet vrijwaringsniveau op overerving"
+msgstr "Overerving op vrijwaring niveau weergeven"
 
 #: rocky/templates/partials/finding_occurrence_definition_list.html:12
 msgid "Reproduction"
-msgstr "Reproduceer bevinding"
+msgstr "Reproductie"
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html:18
 msgid "Please enable plugin to start scanning"
@@ -6575,10 +6512,8 @@ msgid "This field is required"
 msgstr "Dit veld is verplicht"
 
 #: rocky/templates/partials/form/field_input.html:16
-#, fuzzy
-#| msgid "Account setup"
 msgid "Not set"
-msgstr "Account opzetten"
+msgstr "Niet ingesteld"
 
 #: rocky/templates/partials/form/field_input.html:27
 msgid "Forgot email"
@@ -6632,10 +6567,8 @@ msgid "Only show objects of type %(type)s"
 msgstr "Toon alleen objecten van type %(type)s"
 
 #: rocky/templates/partials/language-switcher.html:6
-#, fuzzy
-#| msgid "Select organization"
 msgid "Select your language"
-msgstr "Selecteer organisatie"
+msgstr "Selecteer je taal"
 
 #: rocky/templates/partials/list_filters.html:10
 msgid "Hide filter options"
@@ -6704,10 +6637,8 @@ msgid "Generate report"
 msgstr "Rapport Genereren"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html:10
-#, fuzzy
-#| msgid "Finding"
 msgid "Mute Finding"
-msgstr "Bevinding"
+msgstr "Bevinding dempen"
 
 #: rocky/templates/partials/ooi_head.html:7
 msgid "An overview of"
@@ -6718,16 +6649,12 @@ msgid "object type"
 msgstr "Objecttype"
 
 #: rocky/templates/partials/ooi_head.html:7
-#, fuzzy
-#| msgid ""
-#| "This shows general information and its related objects. It also gives the "
-#| "possibility to add additonal related objects, or to scan for them."
 msgid ""
 "This shows general information and its related objects. It also gives the "
 "possibility to add additional related objects, or to scan for them."
 msgstr ""
 "Dit toont algemene informatie en gerelateerde objecten. Het geeft ook de "
-"mogelijkheid om verwante objecten toe te voegen, of ernaar te scannen."
+"mogelijkheid om aanvullende gerelateerde objecten toe te voegen of om ze te scannen."
 
 #: rocky/templates/partials/ooi_list_toolbar.html:15
 msgid "Scan for objects"
@@ -6819,10 +6746,8 @@ msgid "Shown status types"
 msgstr "Getoonde typen"
 
 #: rocky/templates/partials/organization_member_list_filters.html:29
-#, fuzzy
-#| msgid "Select status"
 msgid "Blocked status"
-msgstr "Selecteer status"
+msgstr "Geblokkeerde status"
 
 #: rocky/templates/partials/organization_properties_table.html:6
 msgid "Organization name"
@@ -6837,10 +6762,8 @@ msgid "Select organization"
 msgstr "Selecteer organisatie"
 
 #: rocky/templates/partials/organizations_menu_dropdown.html:15
-#, fuzzy
-#| msgid "Organizations"
 msgid "All organizations"
-msgstr "Organisaties"
+msgstr "Alle organisaties"
 
 #: rocky/templates/partials/page-meta.html:8
 msgid "Logged in as"
@@ -6925,28 +6848,20 @@ msgstr "Datum toegevoegd"
 
 #: rocky/templates/partials/secondary-menu.html:7
 #: rocky/templates/partials/secondary-menu.html:11
-#, fuzzy
-#| msgid "Main navigation"
 msgid "User navigation"
-msgstr "Hoofdnavigatie"
+msgstr "Gebruikersnavigatie"
 
 #: rocky/templates/partials/secondary-menu.html:8
-#, fuzzy
-#| msgid "Close explanation"
 msgid "Close user navigation"
-msgstr "Sluit toelichting"
+msgstr "Sluit gebruikersnavigatie"
 
 #: rocky/templates/partials/secondary-menu.html:19
-#, fuzzy
-#| msgid "Organizations"
 msgid "My organizations"
-msgstr "Organisaties"
+msgstr "Mijn organisaties"
 
 #: rocky/templates/partials/secondary-menu.html:26
-#, fuzzy
-#| msgid "Scan profile"
 msgid "Profile"
-msgstr "Scanprofiel"
+msgstr "Profiel"
 
 #: rocky/templates/partials/skip-to-content.html:3
 msgid "Go to content"
@@ -7014,19 +6929,13 @@ msgid "Set clearance level for:"
 msgstr "Zet vrijwaringsniveau voor:"
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html:16
-#, fuzzy
-#| msgid "Set clearance level for:"
 msgid "Setting the scan level from \\"
-msgstr "Zet vrijwaringsniveau voor:"
+msgstr "Het vrijwaring niveau in te stellen van \\"
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html:24
-#, fuzzy
-#| msgid ""
-#| "You are about to set the clearance level from \"declared\" to \"inherit\"."
 msgid "You are about to set the clearance level from \\"
-msgstr ""
-"Weet u zeker dat u het scan niveau wilt aanpassen van \"declared\" naar "
-"\"inherit\"?"
+msgstr "U staat op het punt het vrijwaring niveau in te stellen van \\"
+
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html:28
 msgid "Yes, set to inherit"
@@ -7082,28 +6991,24 @@ msgid "List of tasks"
 msgstr "Lijst van taken"
 
 #: rocky/templates/tasks/partials/task_filter.html:22
-#, fuzzy
-#| msgid "All"
 msgid "all"
-msgstr "Alle"
+msgstr "alle"
 
 #: rocky/templates/tasks/partials/task_filter.html:23
-#, fuzzy
-#| msgid "Finding"
 msgid "Pending"
-msgstr "Bevinding"
+msgstr "In behandeling"
 
 #: rocky/templates/tasks/partials/task_filter.html:24
 msgid "Queued"
-msgstr ""
+msgstr "In de wachtrij"
 
 #: rocky/templates/tasks/partials/task_filter.html:25
 msgid "Dispatched"
-msgstr ""
+msgstr "Afgeleverd"
 
 #: rocky/templates/tasks/partials/task_filter.html:26
 msgid "Completed"
-msgstr ""
+msgstr "Voltooid"
 
 #: rocky/templates/two_factor/_wizard_actions.html:8
 msgid "Log in"
@@ -7216,20 +7121,16 @@ msgid "Setup key"
 msgstr "Setup key"
 
 #: rocky/templates/two_factor/core/setup.html:32
-#, fuzzy
-#| msgid ""
-#| "The secret key is a 32 characters represenation of the QR code. There are "
-#| "2 options to setup the two factor authtentication. You can scan the QR "
-#| "code above or you can insert this key using the secret key option of the "
-#| "authenticator app."
 msgid ""
 "The secret key is a 32 characters representation of the QR code. There are 2 "
 "options to setup the two factor authtentication. You can scan the QR code "
 "above or you can insert this key using the secret key option of the "
 "authenticator app."
 msgstr ""
-"De sleutel hoort bij de QR code. Deze kunt u invoeren in uw authenticator "
-"app."
+"De geheime sleutel is een weergave van 32 tekens van de QR-code. Er zijn er 2 "
+"opties om de tweefactorauthenticatie in te stellen. U kunt de QR-code scannen"
+"hierboven of u kunt deze sleutel invoegen met behulp van de geheime sleuteloptie van de "
+"authenticatie-app."
 
 #: rocky/templates/two_factor/core/setup_complete.html:11
 msgid "Congratulations, you've successfully enabled two-factor authentication."
@@ -7342,24 +7243,16 @@ msgstr ""
 "uploaden."
 
 #: rocky/templates/upload_csv.html:14
-#, fuzzy
-#| msgid "These are the criterias for CSV upload:"
 msgid "These are the criteria for CSV upload:"
 msgstr "Dit zijn de criteria voor CSV-upload:"
 
 #: rocky/templates/upload_raw.html:13
-#, fuzzy
-#| msgid "Automate the creation of multiple objects by uploading a CSV file."
 msgid "Automate the creation of multiple objects by uploading a raw file."
-msgstr ""
-"Automatiseer het maken van meerdere objecten door een CSV-bestand te "
-"uploaden."
+msgstr "Automatiseer het maken van meerdere objecten door een raw-bestand te uploaden."
 
 #: rocky/templates/upload_raw.html:24 rocky/views/upload_raw.py:33
-#, fuzzy
-#| msgid "Upload CSV"
 msgid "Upload raw"
-msgstr "Upload CSV"
+msgstr "Upload raw-bestand"
 
 #: rocky/views/finding_add.py:64
 msgid "Add Finding"
@@ -7419,39 +7312,29 @@ msgid "Unknown action."
 msgstr "Ongeldige actie."
 
 #: rocky/views/ooi_list.py:88
-#, fuzzy, python-format
-#| msgid "No indemnification present for organization."
 msgid ""
 "Could not raise clearance levels to L%s. Indemnification not present at "
 "organization %s."
-msgstr "Geen vrijwaring aanwezig voor organisatie."
+msgstr ""
+"Kon vrijwaring niveau niet verhogen naar L%s. Vrijwaring niet aanwezig bij "
+"organisatie %s."
 
 #: rocky/views/ooi_list.py:99
-#, fuzzy, python-format
-#| msgid ""
-#| "You do not have clearance for level %s.                         You are "
-#| "trusted with clearance level %s and you acknowledged a clearance level of "
-#| "%s."
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of %s."
 msgstr ""
-"U hebt geen machtiging voor niveau %s.                         U wordt "
-"vertrouwd met machtigingsniveau %s en u hebt een machtigingsniveau van %s "
-"erkend."
+"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau bevestigd "
+"van %s."
 
 #: rocky/views/ooi_list.py:107 rocky/views/ooi_list.py:114
-#, fuzzy
-#| msgid "An error occurred while saving clearance level for %s."
 msgid "An error occurred while saving clearance levels."
-msgstr ""
-"Er is een fout opgetreden bij het opslaan van het vrijwaringsniveau voor %s."
+msgstr "Er is een fout opgetreden bij het opslaan van vrijwaring niveaus."
+
 
 #: rocky/views/ooi_list.py:114
-#, fuzzy
-#| msgid "OOI doesn't exist"
 msgid "One of the OOI's doesn't exist"
-msgstr "Object bestaat niet"
+msgstr "Een van de OOI's bestaat niet"
 
 #: rocky/views/ooi_list.py:121
 #, python-format
@@ -7459,39 +7342,29 @@ msgid "Successfully set scan profile to %s for %d oois."
 msgstr "Vrijwaringsniveau succesvol gezet op %s voor %d objecten."
 
 #: rocky/views/ooi_list.py:136
-#, fuzzy
-#| msgid "An error occurred while saving clearance level for %s."
 msgid "An error occurred while setting clearance levels to inherit."
-msgstr ""
-"Er is een fout opgetreden bij het opslaan van het vrijwaringsniveau voor %s."
+msgstr "Er is een fout opgetreden bij het instellen van vrijwaring niveaus naar overerven."
 
 #: rocky/views/ooi_list.py:143
-#, fuzzy
-#| msgid "An error occurred while saving clearance level for %s."
 msgid ""
 "An error occurred while setting clearance levels to inherit: one of the OOIs "
 "doesn't exist."
 msgstr ""
-"Er is een fout opgetreden bij het opslaan van het vrijwaringsniveau voor %s."
+"Er is een fout opgetreden bij het instellen van vrijwaring niveaus naar overerven: een van de OOI's"
+"bestaat niet."
 
 #: rocky/views/ooi_list.py:150
-#, fuzzy, python-format
-#| msgid "Set clearance level to inherit"
 msgid "Successfully set %d ooi(s) clearance level to inherit."
-msgstr "Zet vrijwaringsniveau op overerving"
+msgstr "Succesvol ingesteld %d ooi(s) vrijwaring niveau naar overerven."
 
 #: rocky/views/ooi_list.py:161
-#, fuzzy
-#| msgid "An error occurred deleting %s."
 msgid "An error occurred while deleting oois."
-msgstr "Er is een fout opgetreden bij het verwijderen van %s."
+msgstr "Er is een fout opgetreden bij het verwijderen van oois."
 
 #: rocky/views/ooi_list.py:165
-#, fuzzy
-#| msgid "An error occurred while saving clearance level for %s."
 msgid "An error occurred while deleting oois: one of the OOIs doesn't exist."
 msgstr ""
-"Er is een fout opgetreden bij het opslaan van het vrijwaringsniveau voor %s."
+"Er is een fout opgetreden bij het verwijderen van oois: een van de OOI's bestaat niet."
 
 #: rocky/views/ooi_list.py:172
 #, python-format
@@ -7503,16 +7376,12 @@ msgstr ""
 "weer toevoegen."
 
 #: rocky/views/ooi_mute.py:44
-#, fuzzy
-#| msgid "Please select a department or ooi."
 msgid "Please select at least one finding."
-msgstr "Selecteer een afdeling of ooi/object."
+msgstr "Selecteer ten minste één bevinding."
 
 #: rocky/views/ooi_mute.py:51
-#, fuzzy
-#| msgid "Setting succesfully updated."
 msgid "Finding(s) successfully muted."
-msgstr "Instelling wijzigen gelukt."
+msgstr "Bevinding(en) succesvol gedempt."
 
 #: rocky/views/ooi_report.py:50
 msgid "You can't generate a report for an OOI on a date in the future."
@@ -7523,24 +7392,12 @@ msgid "Findings report"
 msgstr "Bevindingen rapport"
 
 #: rocky/views/ooi_report.py:93 rocky/views/ooi_report.py:126
-#, fuzzy
-#| msgid ""
-#| "Error generating report: Timeout reached. See Keiko logs for more "
-#| "information."
 msgid "Generating report failed. See Keiko logs for more information."
-msgstr ""
-"Fout bij het genereren van het rapport: Time-out bereikt. Zie Keiko logs "
-"voor meer informatie."
+msgstr "Het genereren van het rapport is mislukt. Zie de Keiko-logboeken voor meer informatie."
 
 #: rocky/views/ooi_report.py:96 rocky/views/ooi_report.py:129
-#, fuzzy
-#| msgid ""
-#| "Error generating report: Timeout reached. See Keiko logs for more "
-#| "information."
 msgid "Timeout reached generating report. See Keiko logs for more information."
-msgstr ""
-"Fout bij het genereren van het rapport: Time-out bereikt. Zie Keiko logs "
-"voor meer informatie."
+msgstr "Time-out bereikt bij genereren van rapport. Zie Keiko-logboeken voor meer informatie."
 
 #: rocky/views/ooi_tree.py:48
 msgid "Tree Visualisation"
@@ -7555,8 +7412,6 @@ msgid "Setup"
 msgstr "Instellingen"
 
 #: rocky/views/organization_add.py:62
-#, fuzzy
-#| msgid "Organization added succesfully."
 msgid "Organization added successfully."
 msgstr "Organisatie succesvol toegoevoegd."
 
@@ -7565,28 +7420,20 @@ msgid "You are not allowed to add organizations."
 msgstr "Uw mag geen organisaties toevoegen."
 
 #: rocky/views/organization_edit.py:23
-#, fuzzy, python-format
-#| msgid "Organization added succesfully."
 msgid "Organization %s successfully updated."
-msgstr "Organisatie succesvol toegoevoegd."
+msgstr "Organisatie %s succesvol bijgewerkt."
 
 #: rocky/views/organization_member_add.py:43
-#, fuzzy
-#| msgid "Add new member"
 msgid "Add member"
-msgstr "Nieuw lid toevoegen"
+msgstr "Lid toevoegen"
 
 #: rocky/views/organization_member_add.py:55
-#, fuzzy
-#| msgid "Member added succesfully."
 msgid "Member added successfully."
-msgstr "Gebruiker toegevoegd."
+msgstr "Lid succesvol toegevoegd."
 
 #: rocky/views/organization_member_edit.py:42
-#, fuzzy, python-format
-#| msgid "Setting succesfully updated."
 msgid "Member %s successfully updated."
-msgstr "Instelling wijzigen gelukt."
+msgstr "Lid %s succesvol gewijzigd."
 
 #: rocky/views/organization_member_edit.py:78
 #, python-format
@@ -7596,35 +7443,35 @@ msgid ""
 "level L%s. For this reason the acknowledged clearance level has been set at "
 "the same level as trusted clearance level."
 msgstr ""
+"Het bijgewerkte vertrouwde vrijwaring niveau van L%s is lager dan dat van het lid "
+"erkend vrijwaring niveau van L%s. Dit lid heeft alleen toestemming voor "
+"niveau L%s. Om deze reden is het erkende vrijwaring niveau ingesteld op "
+"hetzelfde niveau als vertrouwd vrijwaring niveau."
 
 #: rocky/views/organization_member_edit.py:90
 msgid ""
 "You have trusted this member with a higher trusted level than member "
 "acknowledged. Member must first accept this level to use it."
 msgstr ""
+"Je hebt dit lid vertrouwd met een hoger vrijwaring niveau dan dit lid "
+"erkend heeft. Het lid moet dit niveau eerst accepteren om het te gebruiken."
 
 #: rocky/views/organization_member_list.py:18
-#, fuzzy
-#| msgid "blocked"
 msgid "Not blocked"
-msgstr "geblokkeerd"
+msgstr "Niet geblokkeerd"
 
 #: rocky/views/organization_member_list.py:77
-#, fuzzy, python-format
-#| msgid "Member added succesfully."
 msgid "Blocked member %s successfully."
-msgstr "Gebruiker toegevoegd."
+msgstr "Geblokkeerd lid %s succesvol."
 
 #: rocky/views/organization_member_list.py:84
-#, fuzzy, python-format
-#| msgid "Member added succesfully."
 msgid "Unblocked member %s successfully."
-msgstr "Gebruiker toegevoegd."
+msgstr "Deblokkeer lid %s succesvol."
 
 #: rocky/views/organization_settings.py:32
 #, python-brace-format
 msgid "Recalculated {number_of_bits} bits. Duration: {duration}"
-msgstr ""
+msgstr "Herberekend {number_of_bits} bits. Duur: {duration}"
 
 #: rocky/views/scan_profile.py:49
 #, python-format
@@ -7632,20 +7479,16 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                         "
 "Indemnification not present at organization %s."
 msgstr ""
+"Kon vrijwaring niveau van %s niet verhogen naar L%s."
+"Vrijwaring niet aanwezig bij organisatie %s."
 
 #: rocky/views/scan_profile.py:64
-#, fuzzy, python-format
-#| msgid ""
-#| "You do not have clearance for level %s.                         You are "
-#| "trusted with clearance level %s and you acknowledged a clearance level of "
-#| "%s."
 msgid ""
 "Could not raise clearance level of %s to L%s.                         You "
 "acknowledged a clearance level of %s."
 msgstr ""
-"U hebt geen machtiging voor niveau %s.                         U wordt "
-"vertrouwd met machtigingsniveau %s en u hebt een machtigingsniveau van %s "
-"erkend."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s. Jij "
+"erkende een vrijwaring niveau van %s."
 
 #: rocky/views/scan_profile.py:78
 msgid "Choose a valid level"
