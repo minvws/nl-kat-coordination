@@ -14,4 +14,5 @@ EOF
 
 dpkg-buildpackage -us -uc -b
 
+mkdir -p /app/build
 mv /${PKG_NAME}_${RELEASE_VERSION}_*.deb /app/build/
