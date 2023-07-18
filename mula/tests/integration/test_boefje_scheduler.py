@@ -533,7 +533,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
 
         # Act
-        self.scheduler.is_task_rate_limited(task=task)
+        is_rate_limited = self.scheduler.is_task_rate_limited(task=task)
+
+        # Assert
+        self.assertTrue(is_rate_limited)
+        self.assertIsNotNone(self.scheduler.rate_limiter_tasks[task.hash])
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")

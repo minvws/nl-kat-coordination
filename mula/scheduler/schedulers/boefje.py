@@ -1,4 +1,5 @@
 import logging
+import threading
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
@@ -50,7 +51,8 @@ class BoefjeScheduler(Scheduler):
         self.organisation: Organisation = organisation
 
         self.rate_limiter = strategies.MovingWindowRateLimiter(storage=storage.MemoryStorage())
-        self.rate_limited_tasks: Dict[str, BoefjeTask] = {}  # TODO: thread safety
+        self.rate_limiter_lock = threading.Lock()
+        self.rate_limiter_tasks: Dict[str, BoefjeTask] = {}  # TODO: thread safety
 
         super().__init__(
             ctx=ctx,
@@ -403,41 +405,42 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the task is rate limited, False otherwise.
         """
-        breakpoint()
-        if task.boefje.rate_limit is not None:  # TODO: this needs to be returned by a boefje manifest
-            # Check if namespace is already in the tasks if not add it
-            rate_limited_task = self.rate_limited_tasks.get(task.hash)
-            if rate_limited_task is None:
-                self.rate_limited_tasks[task.hash] = task
-
-            parsed_rate_limit = parse(task.boefje.rate_limit)
-            if parsed_rate_limit is None:
-                self.logger.warning(
-                    "Could not parse rate limit for boefje: %s [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
-                    task.boefje.name,
-                    task.boefje.id,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                # TODO: raise?
-                return True
-
-            hit = self.rate_limiter.hit(parsed_rate_limit)  # TODO: parse rate limit
-            if hit:
-                self.logger.debug(
-                    "Boefje: %s is rate limited [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
-                    task.boefje.name,
-                    task.boefje.id,
-                    self.organisation.id,
-                    self.scheduler_id,
-                )
-                return True
-
-            # TODO: remove task from rate limited tasks
-            self.rate_limited_tasks.pop(task.hash)
+        if task.boefje.rate_limit is None:  # TODO: this needs to be returned by a boefje manifest
             return False
 
+        # Check if namespace is already in the tasks if not add it
+        if self.rate_limiter_tasks.get(task.hash) is None:
+            self.rate_limiter_tasks[task.hash] = task
+
+        parsed_rate_limit = parse(task.boefje.rate_limit)
+        if parsed_rate_limit is None:
+            self.logger.warning(
+                "Could not parse rate limit for boefje: %s [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
+                task.boefje.name,
+                task.boefje.id,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            # TODO: raise?
+            return True
+
+        hit = self.rate_limiter.hit(parsed_rate_limit)  # TODO: parse rate limit
+        if hit:
+            self.logger.debug(
+                "Boefje: %s is rate limited [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
+                task.boefje.id,
+                task.boefje.id,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            return True
+
+        # TODO: remove task from rate limited tasks
+        with self.rate_limiter_lock:
+            self.rate_limiter_tasks.pop(task.hash)
+
         return False
+
 
     def is_task_running(self, task: BoefjeTask) -> bool:
         """Get the last tasks that have run or are running for the hash
@@ -543,6 +546,16 @@ class BoefjeScheduler(Scheduler):
         if not self.is_task_allowed_to_run(boefje, ooi):
             self.logger.debug(
                 "Task is not allowed to run: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                task,
+                self.organisation.id,
+                self.scheduler_id,
+                caller,
+            )
+            return
+
+        if self.is_task_rate_limited(task):
+            self.logger.debug(
+                "Task is rate limited: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.organisation.id,
                 self.scheduler_id,
