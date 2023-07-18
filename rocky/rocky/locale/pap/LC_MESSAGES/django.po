@@ -2083,7 +2083,13 @@ msgid_plural ""
 "            Add settings\n"
 "          "
 msgstr[0] ""
+"\n"
+"            Añadi configurashon\n"
+"          "
 msgstr[1] ""
+"\n"
+"            Añadi configurashonnan\n"
+"          "
 
 #: build/lib/katalogus/templates/plugin_settings_add.html:20
 #: katalogus/templates/plugin_settings_add.html:20
@@ -2096,7 +2102,13 @@ msgid_plural ""
 "            Settings\n"
 "          "
 msgstr[0] ""
+"\n"
+"            Configurashon\n"
+"          "
 msgstr[1] ""
+"\n"
+"            Configurashonnan\n"
+"          "
 
 #: build/lib/katalogus/templates/plugin_settings_add.html:33
 #: katalogus/templates/plugin_settings_add.html:34
@@ -4037,118 +4049,112 @@ msgid "(Deprecated) {text}"
 msgstr ""
 
 #: venv/lib/python3.9/site-packages/click/core.py:1357
-#, fuzzy
-#| msgid "option"
 msgid "Options"
-msgstr "opshon"
+msgstr "opshonnan"
 
 #: venv/lib/python3.9/site-packages/click/core.py:1383
 #, python-brace-format
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A enkontra èxtra argumento inesperado ({args})"
+msgstr[1] "A enkontra èxtra argumentonan inesperado ({args})"
 
 #: venv/lib/python3.9/site-packages/click/core.py:1399
 msgid "DeprecationWarning: The command {name!r} is deprecated."
-msgstr ""
+msgstr "Advertensia di desuzo: e komando {name!r} ta den desuzo".
 
 #: venv/lib/python3.9/site-packages/click/core.py:1605
 msgid "Commands"
-msgstr ""
+msgstr "Komandonan"
 
 #: venv/lib/python3.9/site-packages/click/core.py:1637
 msgid "Missing command."
-msgstr ""
+msgstr "Falta komando"
 
 #: venv/lib/python3.9/site-packages/click/core.py:1715
 msgid "No such command {name!r}."
-msgstr ""
+msgstr "No tin komando {name!r}."
 
 #: venv/lib/python3.9/site-packages/click/core.py:2271
 msgid "Value must be an iterable."
-msgstr ""
+msgstr "Balor mester ta un iterabel."
 
 #: venv/lib/python3.9/site-packages/click/core.py:2291
 #, python-brace-format
 msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ta tuma {nargs} balornan pero 1 a wordu duna."
+msgstr[1] "Ta tuma {nargs} balornan perot {len} a wordu duna."
 
 #: venv/lib/python3.9/site-packages/click/core.py:2734
 #, python-brace-format
 msgid "env var: {var}"
-msgstr ""
+msgstr "env var: {var}"
 
 #: venv/lib/python3.9/site-packages/click/core.py:2764
 msgid "(dynamic)"
-msgstr ""
+msgstr "(dynamic)"
 
 #: venv/lib/python3.9/site-packages/click/core.py:2777
 #, python-brace-format
 msgid "default: {default}"
-msgstr ""
+msgstr "defòlt: {default}"
 
 #: venv/lib/python3.9/site-packages/click/core.py:2790
-#, fuzzy
-#| msgid "Required"
 msgid "required"
-msgstr "Requerido"
+msgstr "Nesesario"
 
 #: venv/lib/python3.9/site-packages/click/decorators.py:400
 #, python-format
 msgid "%(prog)s, version %(version)s"
-msgstr ""
+msgstr "%(prog)s, version %(version)s"
 
 #: venv/lib/python3.9/site-packages/click/decorators.py:464
 msgid "Show the version and exit."
-msgstr ""
+msgstr "Mustra e version i sali."
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:43
 #: venv/lib/python3.9/site-packages/click/exceptions.py:79
 #, python-brace-format
 msgid "Error: {message}"
-msgstr ""
+msgstr "Error: {message}"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:71
 #, python-brace-format
 msgid "Try '{command} {option}' for help."
-msgstr ""
+msgstr "Purba '{command} {option}' pa ajudo."
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:120
 #, python-brace-format
 msgid "Invalid value: {message}"
-msgstr ""
+msgstr "Balor no ta balido: {message}"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:122
 #, python-brace-format
 msgid "Invalid value for {param_hint}: {message}"
-msgstr ""
+msgstr "Balor no ta balido pa {param_hint}: {message}"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:178
 msgid "Missing argument"
-msgstr ""
+msgstr "Falta argumento"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:180
-#, fuzzy
-#| msgid "Sorting options"
 msgid "Missing option"
-msgstr "Opshonnan súrtí"
+msgstr "Falta opshon"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:182
 msgid "Missing parameter"
-msgstr ""
+msgstr "Falta parametro"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:184
 #, python-brace-format
 msgid "Missing {param_type}"
-msgstr ""
+msgstr "Falta {param_type}""
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:191
 #, python-brace-format
 msgid "Missing parameter: {param_name}"
-msgstr ""
+msgstr "Falta parametro: {param_name}"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:211
 #, python-brace-format
@@ -4159,65 +4165,63 @@ msgstr ""
 #, python-brace-format
 msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bo kemen {possibility}?"
+msgstr[1] "(Opshonan posibel: {possibilities})"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:261
 msgid "unknown error"
-msgstr ""
+msgstr "error deskonosi"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:268
 msgid "Could not open file {filename!r}: {message}"
-msgstr ""
+msgstr "No por habri arkivo {filename!r}: {message}"
 
 #: venv/lib/python3.9/site-packages/click/parser.py:231
 msgid "Argument {name!r} takes {nargs} values."
-msgstr ""
+msgstr "Argumento {name!r} ta tuma {nargs} balornan."
 
 #: venv/lib/python3.9/site-packages/click/parser.py:413
 msgid "Option {name!r} does not take a value."
-msgstr ""
+msgstr "Opshon {name!r} no ta tuma un balor."
 
 #: venv/lib/python3.9/site-packages/click/parser.py:474
 msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Opshon {name!r} mester di un argumto."
+msgstr[1] "Opshon {name!r} mester {nargs} argumentonan."
 
 #: venv/lib/python3.9/site-packages/click/shell_completion.py:316
 msgid "Shell completion is not supported for Bash versions older than 4.4."
-msgstr ""
+msgstr "Shell completion no ta sostenibel pa Bash versionnan mas biew ku 4.4."
 
 #: venv/lib/python3.9/site-packages/click/shell_completion.py:322
 msgid "Couldn't detect Bash version, shell completion is not supported."
-msgstr ""
+msgstr "No por detekta Bash version, shell completion no ta aportá."
 
 #: venv/lib/python3.9/site-packages/click/termui.py:160
-#, fuzzy
-#| msgid "New password confirmation"
 msgid "Repeat for confirmation"
-msgstr "Konfirmashon password nobo"
+msgstr "Ripiti pa konfirmashon"
 
 #: venv/lib/python3.9/site-packages/click/termui.py:176
 msgid "Error: The value you entered was invalid."
-msgstr ""
+msgstr "Error: e balor ku ba pone no ta balido"
 
 #: venv/lib/python3.9/site-packages/click/termui.py:178
 #, python-brace-format
 msgid "Error: {e.message}"
-msgstr ""
+msgstr "Error: {e.message}"
 
 #: venv/lib/python3.9/site-packages/click/termui.py:189
 msgid "Error: The two entered values do not match."
-msgstr ""
+msgstr "Error: E dos balornan pone no ta kwadra."
 
 #: venv/lib/python3.9/site-packages/click/termui.py:245
 msgid "Error: invalid input"
-msgstr ""
+msgstr "Error: input no ta balido"
 
 #: venv/lib/python3.9/site-packages/click/termui.py:776
 msgid "Press any key to continue..."
-msgstr ""
+msgstr "Primi kwalke boton pa continua..."
 
 #: venv/lib/python3.9/site-packages/click/types.py:265
 #, python-brace-format
@@ -4225,142 +4229,139 @@ msgid ""
 "Choose from:\n"
 "\t{choices}"
 msgstr ""
+"Skohe for di:\n"
+"\t{choices}"
 
 #: venv/lib/python3.9/site-packages/click/types.py:297
 msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{value!r} no ta {choice}."
+msgstr[1] "{value!r} no ta un di e {choices}."
 
 #: venv/lib/python3.9/site-packages/click/types.py:387
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{value!r} no ta kwadra e format {format}."
+msgstr[1] "{value!r} no ta kwadra formatnan {formats}."
 
 #: venv/lib/python3.9/site-packages/click/types.py:409
 msgid "{value!r} is not a valid {number_type}."
-msgstr ""
+msgstr "{value!r} no ta un balido {number_type}."
 
 #: venv/lib/python3.9/site-packages/click/types.py:465
 #, python-brace-format
 msgid "{value} is not in the range {range}."
-msgstr ""
+msgstr "{value} no ta den rango {range}."
 
 #: venv/lib/python3.9/site-packages/click/types.py:606
 msgid "{value!r} is not a valid boolean."
-msgstr ""
+msgstr "{value!r} no ta un boolean balido."
 
 #: venv/lib/python3.9/site-packages/click/types.py:630
 msgid "{value!r} is not a valid UUID."
-msgstr ""
+msgstr "{value!r} no ta un UUID balido."
 
 #: venv/lib/python3.9/site-packages/click/types.py:811
 msgid "file"
-msgstr ""
+msgstr "arkivo"
 
 #: venv/lib/python3.9/site-packages/click/types.py:813
 msgid "directory"
-msgstr ""
+msgstr "katálogo"
 
 #: venv/lib/python3.9/site-packages/click/types.py:815
 msgid "path"
-msgstr ""
+msgstr "ruta"
 
 #: venv/lib/python3.9/site-packages/click/types.py:861
 msgid "{name} {filename!r} does not exist."
-msgstr ""
+msgstr "{name} {filename!r} no ta èksisti."
 
 #: venv/lib/python3.9/site-packages/click/types.py:870
 msgid "{name} {filename!r} is a file."
-msgstr ""
+msgstr "{name} {filename!r} ta un arkivo."
 
 #: venv/lib/python3.9/site-packages/click/types.py:878
 #, python-brace-format
 msgid "{name} '{filename}' is a directory."
-msgstr ""
+msgstr "{name} '{filename}' ta un katólogo."
 
 #: venv/lib/python3.9/site-packages/click/types.py:887
 msgid "{name} {filename!r} is not readable."
-msgstr ""
+msgstr "{name} {filename!r} no por lesé."
 
 #: venv/lib/python3.9/site-packages/click/types.py:896
 msgid "{name} {filename!r} is not writable."
-msgstr ""
+msgstr "{name} {filename!r} no ta skribibel."
 
 #: venv/lib/python3.9/site-packages/click/types.py:905
 msgid "{name} {filename!r} is not executable."
-msgstr ""
+msgstr "{name} {filename!r} no ta eksekutabel."
 
 #: venv/lib/python3.9/site-packages/click/types.py:972
 #, python-brace-format
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{len_type} balornan ta nesesario, pero {len_value} a wordu pone."
+msgstr[1] "{len_type} balornan ta nesesario, pero {len_value} a wordu pone."
 
 #: venv/lib/python3.9/site-packages/django/contrib/messages/apps.py:7
 msgid "Messages"
-msgstr ""
+msgstr "Mensahenan"
 
 #: venv/lib/python3.9/site-packages/django/contrib/sitemaps/apps.py:8
 msgid "Site Maps"
-msgstr ""
+msgstr "Mapanan di sitio"
 
 #: venv/lib/python3.9/site-packages/django/contrib/staticfiles/apps.py:9
 msgid "Static Files"
-msgstr ""
+msgstr "Arkivo statiko"
 
 #: venv/lib/python3.9/site-packages/django/contrib/syndication/apps.py:7
-#, fuzzy
-#| msgid "Indemnification"
 msgid "Syndication"
-msgstr "Indemnizashon"
+msgstr "Sindikashon"
 
 #. Translators: String used to replace omitted page numbers in elided page
 #. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
 #: venv/lib/python3.9/site-packages/django/core/paginator.py:30
 msgid "…"
-msgstr ""
+msgstr "…"
 
 #: venv/lib/python3.9/site-packages/django/core/paginator.py:51
 msgid "That page number is not an integer"
-msgstr ""
+msgstr "E number di pagina no ta un nùmero entero"
 
 #: venv/lib/python3.9/site-packages/django/core/paginator.py:53
 msgid "That page number is less than 1"
-msgstr ""
+msgstr "E number di pagina ta menos ku 1"
 
 #: venv/lib/python3.9/site-packages/django/core/paginator.py:58
 msgid "That page contains no results"
-msgstr ""
+msgstr "E pagina ta kontene ningun resultado"
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:22
-#, fuzzy
-#| msgid "Choose a valid level"
 msgid "Enter a valid value."
-msgstr "Skohé un nivél balido"
+msgstr "Pone un balor balido"
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:93
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:675
 msgid "Enter a valid URL."
-msgstr ""
+msgstr "Pone un URL balido."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:150
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Pone un nùmero entero balido."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:161
-#, fuzzy
-#| msgid "Enter your email address."
 msgid "Enter a valid email address."
-msgstr "Yena bo email adres"
+msgstr "Yena un email adres balido."
 
 #. Translators: "letters" means latin letters: a-z and A-Z.
 #: venv/lib/python3.9/site-packages/django/core/validators.py:262
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
+"Pone un “slug” balido konsistiendo di òf letternan, numbernan, underscores òf hyphens."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:269
 msgid ""
@@ -4371,43 +4372,37 @@ msgstr ""
 #: venv/lib/python3.9/site-packages/django/core/validators.py:278
 #: venv/lib/python3.9/site-packages/django/core/validators.py:288
 #: venv/lib/python3.9/site-packages/django/core/validators.py:311
-#, fuzzy
-#| msgid "Enter your email address."
 msgid "Enter a valid IPv4 address."
-msgstr "Yena bo email adres"
+msgstr "Pone un IPv4 adres balido."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:296
 #: venv/lib/python3.9/site-packages/django/core/validators.py:312
-#, fuzzy
-#| msgid "Enter your email address."
 msgid "Enter a valid IPv6 address."
-msgstr "Yena bo email adres"
+msgstr "Pone un IPv6 adres balido."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:306
 #: venv/lib/python3.9/site-packages/django/core/validators.py:310
-#, fuzzy
-#| msgid "Enter your email address."
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Yena bo email adres"
+msgstr "Yena un IPv4 òf IPv6 adres balido."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:340
 msgid "Enter only digits separated by commas."
-msgstr ""
+msgstr "Yena solamente cifranan separa dor di kòma."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:346
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr ""
+msgstr "E balor aki mester ta %(limit_value)s (pero e ta %(show_value)s)."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:379
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr ""
+msgstr "E balor aki mester ta menos of parew ku %(limit_value)s."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:388
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr ""
+msgstr "E balor aki mester ta mas grandi òf igual ku %(limit_value)s."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:398
 #, python-format
@@ -4418,7 +4413,11 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"E balor aki mester tin por lo menos %(limit_value)d karakternan (e tin "
+"%(show_value)d)."
 msgstr[1] ""
+"E balor aki mester tin por lo menos %(limit_value)d karakternan (e tin "
+"%(show_value)d)."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:413
 #, python-format
@@ -4429,26 +4428,30 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
+"E balor aki mester tin por lo menos %(limit_value)d karakternan (e tin "
+"%(show_value)d)."
 msgstr[1] ""
+"E balor aki mester tin por lo menos %(limit_value)d karakternan (e tin "
+"%(show_value)d)."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:432
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:292
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:327
 msgid "Enter a number."
-msgstr ""
+msgstr "Yena un nùmber numerico."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:434
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Chèk si no tin mas ku %(max)s number den totalidat."
+msgstr[1] "Chèk si no tin mas ku %(max)s numbernan den totalidat."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:439
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
+msgstr[0] "Chèk si no tin mas ku %(max)s luga decimal."
 msgstr[1] ""
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:444
@@ -4474,12 +4477,12 @@ msgstr ""
 #: venv/lib/python3.9/site-packages/django/db/models/base.py:1210
 #: venv/lib/python3.9/site-packages/django/forms/models.py:768
 msgid "and"
-msgstr ""
+msgstr "i"
 
 #: venv/lib/python3.9/site-packages/django/db/models/base.py:1212
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s ku nomber %(field_labels)s ta èksisti kaba."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:100
 #, python-format
@@ -4487,14 +4490,12 @@ msgid "Value %(value)r is not a valid choice."
 msgstr ""
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:101
-#, fuzzy
-#| msgid "This field is required."
 msgid "This field cannot be null."
-msgstr "E vèld aki ta obligatorio"
+msgstr "E vèld aki no por ta bashi."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:102
 msgid "This field cannot be blank."
-msgstr ""
+msgstr "E vèld aki no por ta bashi."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:103
 #, python-format
