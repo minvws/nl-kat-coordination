@@ -1,1 +1,1 @@
-sectxt==0.8
+sectxt==0.8.3
