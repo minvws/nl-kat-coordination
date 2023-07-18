@@ -427,10 +427,14 @@ class BoefjeScheduler(Scheduler):
         # we have a problem. However when the grace period has been reached we
         # should not raise an error.
         if (
-            task_bytes is None and
-            task_db is not None and
-            task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED] and
-            (task_db.modified_at is not None and task_db.modified_at > datetime.now(timezone.utc) - timedelta(seconds=self.ctx.config.pq_populate_grace_period))
+            task_bytes is None
+            and task_db is not None
+            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+            and (
+                task_db.modified_at is not None
+                and task_db.modified_at
+                > datetime.now(timezone.utc) - timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+            )
         ):
             self.logger.error(
                 "Task has been finished, but no results found in bytes, "
