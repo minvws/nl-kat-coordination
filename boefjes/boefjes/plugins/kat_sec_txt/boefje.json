@@ -1,0 +1,14 @@
+{
+    "id": "securtiy_txt",
+    "name": "Security.txt",
+    "description": "check",
+    "consumes": [
+        "Hostname"
+    ],
+    "produces": [
+        "KATFindingType",
+        "Finding"
+    ],
+    "environment_keys": [],
+    "scan_level": 0
+}

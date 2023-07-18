@@ -454,6 +454,27 @@
         "impact": null,
         "recommendation": "Set a DKIM record to protect your domain."
     },
+    "KAT-NO-SECURITY-TXT": {
+        "description": "This hostname does not have a Security.txt file.",
+        "source": null,
+        "risk": "high",
+        "impact": null,
+        "recommendation": "Make sure there is a security.txt available."
+    },
+    "KAT-INVALID-TXT": {
+        "description": "Required elements of the security.txt are missing.",
+        "source": null,
+        "risk": "medium",
+        "impact": null,
+        "recommendation": "Make sure the security.txt is in line with the requirements."
+    },
+    "KAT-BAD-FORMAT-TXT": {
+        "description": "There are flaws in the format of the security.txt.",
+        "source": null,
+        "risk": "low",
+        "impact": null,
+        "recommendation": "Make sure the security.txt is correctly formatted."
+    },
     "KAT-NO-SPF": {
         "description": "This hostname does not have an SPF record.",
         "source": null,
