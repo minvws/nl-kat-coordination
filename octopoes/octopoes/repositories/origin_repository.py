@@ -1,7 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from requests import HTTPError
 
@@ -29,19 +29,18 @@ class OriginRepository:
     def save(self, origin: Origin, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def list_by_result(self, reference: Reference, valid_time: datetime) -> List[Origin]:
-        raise NotImplementedError
-
-    def list_by_source(self, reference: Reference, valid_time: datetime) -> List[Origin]:
-        raise NotImplementedError
-
-    def list_by_task_id(self, task_id: str, valid_time: datetime) -> List[Origin]:
+    def list(
+        self,
+        valid_time: datetime,
+        *,
+        task_id: Optional[str] = None,
+        source: Optional[Reference] = None,
+        result: Optional[Reference] = None,
+        origin_type: Optional[OriginType] = None,
+    ) -> List[Origin]:
         raise NotImplementedError
 
     def delete(self, origin: Origin, valid_time: datetime) -> None:
-        raise NotImplementedError
-
-    def list(self, origin_type: OriginType, valid_time: datetime) -> List[Origin]:
         raise NotImplementedError
 
 
@@ -68,40 +67,35 @@ class XTDBOriginRepository(OriginRepository):
     def deserialize(cls, data: Dict[str, Any]) -> Origin:
         return Origin.parse_obj(data)
 
-    def list_by_result(self, reference: Reference, valid_time: datetime) -> List[Origin]:
-        query = generate_pull_query(
-            self.xtdb_type,
-            FieldSet.ALL_FIELDS,
-            {
-                "result": str(reference),
-                "type": Origin.__name__,
-            },
-        )
-        results = self.session.client.query(query, valid_time=valid_time)
-        return [self.deserialize(r[0]) for r in results]
+    def list(
+        self,
+        valid_time: datetime,
+        *,
+        task_id: Optional[str] = None,
+        source: Optional[Reference] = None,
+        result: Optional[Reference] = None,
+        origin_type: Optional[OriginType] = None,
+    ) -> List[Origin]:
+        where_parameters = {"type": Origin.__name__}
 
-    def list_by_source(self, reference, valid_time) -> List[Origin]:
-        query = generate_pull_query(
-            self.xtdb_type,
-            FieldSet.ALL_FIELDS,
-            {
-                "source": str(reference),
-                "type": Origin.__name__,
-            },
-        )
-        results = self.session.client.query(query, valid_time=valid_time)
-        return [self.deserialize(r[0]) for r in results]
+        if task_id:
+            where_parameters["task_id"] = task_id
 
-    def list_by_task_id(self, task_id: str, valid_time: datetime) -> List[Origin]:
+        if source:
+            where_parameters["source"] = str(source)
+
+        if result:
+            where_parameters["result"] = str(result)
+
+        if origin_type:
+            where_parameters["origin_type"] = origin_type.value
+
         query = generate_pull_query(
             self.xtdb_type,
             FieldSet.ALL_FIELDS,
-            {
-                "task_id": task_id,
-                "type": Origin.__name__,
-            },
+            where_parameters,
         )
-        logger.info(query)
+
         results = self.session.client.query(query, valid_time=valid_time)
         return [self.deserialize(r[0]) for r in results]
 
@@ -142,14 +136,3 @@ class XTDBOriginRepository(OriginRepository):
             old_data=origin,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
-
-    def list(self, origin_type: OriginType, valid_time: datetime) -> List[Origin]:
-        query = generate_pull_query(
-            self.xtdb_type,
-            FieldSet.ALL_FIELDS,
-            {
-                "origin_type": origin_type.value,
-            },
-        )
-        results = self.session.client.query(query, valid_time=valid_time)
-        return [self.deserialize(r[0]) for r in results]

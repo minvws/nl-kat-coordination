@@ -61,7 +61,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         "task_id": task_id,
     }
 
-    assert len(octopoes_api_connector.list_origins(reference=hostnames[0].reference)) == 1
+    assert len(octopoes_api_connector.list_origins(result=hostnames[0].reference)) == 1
 
     # Delete even-numbered test hostnames
     octopoes_api_connector.delete_many([Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)])

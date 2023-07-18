@@ -24,7 +24,7 @@ from octopoes.models import (
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
-from octopoes.models.origin import Origin, OriginParameter
+from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
@@ -133,14 +133,22 @@ class OctopoesAPIConnector:
 
     def list_origins(
         self,
-        reference: Optional[Reference] = None,
         valid_time: Optional[datetime] = None,
+        source: Optional[Reference] = None,
+        result: Optional[Reference] = None,
         task_id: Optional[str] = None,
+        origin_type: Optional[OriginType] = None,
     ) -> List[Origin]:
-        """Note: reference takes precedence over task_id"""
-
-        params = {"reference": reference, "valid_time": valid_time, "task_id": task_id}
-        res = self.session.get(f"/{self.client}/origins", params=params)
+        res = self.session.get(
+            f"/{self.client}/origins",
+            params={
+                "valid_time": valid_time,
+                "source": source,
+                "result": result,
+                "task_id": task_id,
+                "origin_type": origin_type,
+            },
+        )
         return parse_obj_as(List[Origin], res.json())
 
     def save_observation(self, observation: Observation) -> None:
