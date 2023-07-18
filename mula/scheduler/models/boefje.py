@@ -9,7 +9,7 @@ class Boefje(BaseModel):
 
     id: str
     version: Optional[str] = Field(default=None)
-    rate_limit: Optional[str] = Field(default=None) # TODO: update when this is implemented
+    rate_limit: Optional[str] = Field(default=None)  # TODO: update when this is implemented
 
 
 class BoefjeMeta(BaseModel):

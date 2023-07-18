@@ -522,7 +522,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(
-            scan_level=0, consumes=[ooi.object_type],
+            scan_level=0,
+            consumes=[ooi.object_type],
             rate_limit="1/minute",  # TODO
         )
         task = models.BoefjeTask(
@@ -1286,7 +1287,6 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
 
 # TODO
 class RateLimitTestCase(BoefjeSchedulerBaseTestCase):
-
     def setUp(self):
         super().setUp()
 

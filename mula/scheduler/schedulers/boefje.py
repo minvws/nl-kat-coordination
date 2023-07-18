@@ -49,8 +49,7 @@ class BoefjeScheduler(Scheduler):
 
         self.organisation: Organisation = organisation
 
-        self.rate_limiter = strategies.MovingWindowRateLimiter(
-            storage=storage.MemoryStorage())
+        self.rate_limiter = strategies.MovingWindowRateLimiter(storage=storage.MemoryStorage())
         self.rate_limited_tasks: Dict[str, BoefjeTask] = {}  # TODO: thread safety
 
         super().__init__(
@@ -110,9 +109,7 @@ class BoefjeScheduler(Scheduler):
         )
 
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
-    def push_tasks_for_scan_profile_mutations(
-        self, mutation: ScanProfileMutation
-    ) -> None:
+    def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
         """Create tasks for oois that have a scan level change."""
         self.logger.info(
             "Received scan level mutation %s for: %s [ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
@@ -193,9 +190,7 @@ class BoefjeScheduler(Scheduler):
         boefjes can run on, and create tasks for it."""
         new_boefjes = None
         try:
-            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(
-                self.organisation.id
-            )
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
                 "Failed to get new boefjes for organisation: %s [organisation_id=%s, scheduler_id=%s]",
@@ -224,12 +219,10 @@ class BoefjeScheduler(Scheduler):
         for boefje in new_boefjes:
             oois_by_object_type: List[OOI] = []
             try:
-                oois_by_object_type = (
-                    self.ctx.services.octopoes.get_objects_by_object_types(
-                        self.organisation.id,
-                        boefje.consumes,
-                        list(range(boefje.scan_level, 5)),
-                    )
+                oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
+                    self.organisation.id,
+                    boefje.consumes,
+                    list(range(boefje.scan_level, 5)),
                 )
             except (
                 requests.exceptions.RetryError,
@@ -412,7 +405,6 @@ class BoefjeScheduler(Scheduler):
         """
         breakpoint()
         if task.boefje.rate_limit is not None:  # TODO: this needs to be returned by a boefje manifest
-
             # Check if namespace is already in the tasks if not add it
             rate_limited_task = self.rate_limited_tasks.get(task.hash)
             if rate_limited_task is None:
@@ -507,11 +499,7 @@ class BoefjeScheduler(Scheduler):
         # Task has been finished (failed, or succeeded) according to
         # the datastore, but we have no results of it in bytes, meaning
         # we have a problem.
-        if (
-            task_bytes is None
-            and task_db is not None
-            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
-        ):
+        if task_bytes is None and task_db is not None and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
             self.logger.error(
                 "Task has been finished, but no results found in bytes "
                 "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
@@ -522,11 +510,7 @@ class BoefjeScheduler(Scheduler):
             )
             raise RuntimeError("Task has been finished, but no results found in bytes")
 
-        if (
-            task_bytes is not None
-            and task_bytes.ended_at is None
-            and task_bytes.started_at is not None
-        ):
+        if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
             self.logger.debug(
                 "Task is still running, according to bytes "
                 "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
@@ -685,9 +669,7 @@ class BoefjeScheduler(Scheduler):
             raise exc_db
 
         # Has grace period passed according to datastore?
-        if task_db is not None and datetime.now(
-            timezone.utc
-        ) - task_db.modified_at < timedelta(
+        if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timedelta(
             seconds=self.ctx.config.pq_populate_grace_period
         ):
             self.logger.debug(
