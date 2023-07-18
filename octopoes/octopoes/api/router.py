@@ -204,9 +204,22 @@ def get_tree(
 def list_origins(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    reference: Reference = Depends(extract_reference),
+    reference: Optional[str] = Query(None),
+    task_id: Optional[str] = Query(None),
 ) -> List[Origin]:
-    return octopoes.origin_repository.list_by_result(reference, valid_time)
+    """Note: reference takes precedence over task_id"""
+
+    # TODO: https://github.com/minvws/nl-kat-coordination/issues/1411
+
+    if reference:
+        return octopoes.origin_repository.list_by_result(Reference.from_str(reference), valid_time)
+
+    if task_id:
+        return octopoes.origin_repository.list_by_task_id(task_id, valid_time)
+
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, detail="Missing either a reference or task_id as a query parameter."
+    )
 
 
 @router.get("/origin_parameters", tags=["Origins"])

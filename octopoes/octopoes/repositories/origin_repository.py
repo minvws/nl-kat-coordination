@@ -35,6 +35,9 @@ class OriginRepository:
     def list_by_source(self, reference: Reference, valid_time: datetime) -> List[Origin]:
         raise NotImplementedError
 
+    def list_by_task_id(self, task_id: str, valid_time: datetime) -> List[Origin]:
+        raise NotImplementedError
+
     def delete(self, origin: Origin, valid_time: datetime) -> None:
         raise NotImplementedError
 
@@ -86,6 +89,19 @@ class XTDBOriginRepository(OriginRepository):
                 "type": Origin.__name__,
             },
         )
+        results = self.session.client.query(query, valid_time=valid_time)
+        return [self.deserialize(r[0]) for r in results]
+
+    def list_by_task_id(self, task_id: str, valid_time: datetime) -> List[Origin]:
+        query = generate_pull_query(
+            self.xtdb_type,
+            FieldSet.ALL_FIELDS,
+            {
+                "task_id": task_id,
+                "type": Origin.__name__,
+            },
+        )
+        logger.info(query)
         results = self.session.client.query(query, valid_time=valid_time)
         return [self.deserialize(r[0]) for r in results]
 

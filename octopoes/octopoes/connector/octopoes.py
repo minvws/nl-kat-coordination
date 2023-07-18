@@ -131,8 +131,15 @@ class OctopoesAPIConnector:
         )
         return ReferenceTree.parse_obj(res.json())
 
-    def list_origins(self, reference: Reference, valid_time: Optional[datetime] = None) -> List[Origin]:
-        params = {"reference": str(reference), "valid_time": valid_time}
+    def list_origins(
+        self,
+        reference: Optional[Reference] = None,
+        valid_time: Optional[datetime] = None,
+        task_id: Optional[str] = None,
+    ) -> List[Origin]:
+        """Note: reference takes precedence over task_id"""
+
+        params = {"reference": reference, "valid_time": valid_time, "task_id": task_id}
         res = self.session.get(f"/{self.client}/origins", params=params)
         return parse_obj_as(List[Origin], res.json())
 
