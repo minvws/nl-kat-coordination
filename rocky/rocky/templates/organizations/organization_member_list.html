@@ -16,8 +16,22 @@
                 <h2>{% translate "Members" %}</h2>
                 {% if perms.tools.add_organizationmember %}
                     <div class="horizontal-view toolbar">
-                        <a href="{% url "organization_member_add" organization.code %}"
-                           class="button">{% translate "Add new member" %}</a>
+                      <div class="dropdown">
+                        <button aria-controls="export-add" class="dropdown-button ghost">
+                          {% translate "Add" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+                        </button>
+                        <ul id="export-add" aria-expanded="false" class="dropdown-list">
+                          <li>
+                            <a href="{% url "organization_member_add" organization.code %}"
+                            class="button">{% translate "Add members manually" %}</a>
+                          </li>
+                          <li>
+                            <a href="{% url "organization_member_upload" organization.code %}"
+                            class="button">{% translate "Upload CSV" %}</a>
+                          </li>
+                        </ul>
+                      </div>
+
                     </div>
                 {% endif %}
                 {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}

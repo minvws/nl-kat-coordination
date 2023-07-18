@@ -23,7 +23,7 @@ from rocky.views.ooi_list import OOIListExportView, OOIListView
 from rocky.views.ooi_mute import MuteFindingsBulkView, MuteFindingView
 from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
-from rocky.views.organization_add import OrganizationAddView
+from rocky.views.organization_add import OrganizationAddView, MemberUpload
 from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
@@ -98,6 +98,11 @@ urlpatterns += i18n_patterns(
         "<organization_code>/members/add/",
         OrganizationMemberAddView.as_view(),
         name="organization_member_add",
+    ),
+    path(
+        "<organization_code>/members/upload/",
+        MemberUpload.as_view(),
+        name="organization_member_upload",
     ),
     path(
         "<organization_code>/",

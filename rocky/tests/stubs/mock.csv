@@ -1,0 +1,5 @@
+full_name,email,account_type,trusted_clearance_level,acknowledged_clearance_level
+test user,c@c.nl,clients,2,2
+test user,c@c.nl,redteam,1,4
+test userr,a@a.nl,redteam,1,4
+userr,a@b.nl,admin,0,0
