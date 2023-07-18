@@ -2,6 +2,12 @@ name: Create and publish Docker image for building Debian packages
 
 on:
   workflow_dispatch: {}
+  push:
+    branches:
+      - 'main'
+    paths:
+      - "packaging"
+      - ".github/workflows/build-debian-docker-image.yml"
   pull_request:
     paths:
       - "packaging/**"
