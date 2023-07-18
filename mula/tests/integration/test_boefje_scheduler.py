@@ -516,7 +516,6 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert
         self.assertFalse(has_passed)
 
-    # TODO
     def test_is_task_rate_limited(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -524,7 +523,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(
             scan_level=0,
             consumes=[ooi.object_type],
-            rate_limit="1/minute",  # TODO
+            rate_limit="1/hour",
         )
         task = models.BoefjeTask(
             boefje=boefje,
@@ -535,9 +534,17 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Act
         is_rate_limited = self.scheduler.is_task_rate_limited(task=task)
 
-        # Assert
+        # Assert: First time should not be rate limited, and not be delayed
+        self.assertFalse(is_rate_limited)
+        self.assertIsNone(self.scheduler.delayed_tasks.get(task.hash))
+
+        # Act
+        is_rate_limited = self.scheduler.is_task_rate_limited(task=task)
+
+        # Assert: Second time should be rate limited, and task should be
+        # delayed
         self.assertTrue(is_rate_limited)
-        self.assertIsNotNone(self.scheduler.rate_limiter_tasks[task.hash])
+        self.assertIsNotNone(self.scheduler.delayed_tasks.get(task.hash))
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
@@ -1289,10 +1296,61 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
 
-# TODO
-class RateLimitTestCase(BoefjeSchedulerBaseTestCase):
+class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
+        self.mock_is_task_running = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_running",
+            return_value=False,
+        ).start()
+
+        self.mock_is_task_allowed_to_run = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run",
+            return_value=True,
+        ).start()
+
+        self.mock_has_grace_period_passed = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
+            return_value=True,
+        ).start()
+
+    @unittest.skip
     def test_push_tasks_for_rate_limited_objects(self):
-        pass
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+            rate_limit="1/hour",
+        )
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        is_rate_limited = self.scheduler.is_task_rate_limited(task)
+
+        # Assert: First time should not be rate limited, and not be delayed
+        self.assertTrue(is_rate_limited)
+        self.assertIsNone(self.scheduler.delayed_tasks.get(task.hash))
+
+        # Task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: Second time should be rate limited, and task should be
+        # delayed
+        self.scheduler.push_tasks_for_delayed_tasks()
+
+    # TODO: when tasks are rate limited they should be delayed, when rate limit
+    # passed they should be put on the queue tasks should be put on queue

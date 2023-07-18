@@ -52,7 +52,7 @@ class BoefjeScheduler(Scheduler):
 
         self.rate_limiter = strategies.MovingWindowRateLimiter(storage=storage.MemoryStorage())
         self.rate_limiter_lock = threading.Lock()
-        self.rate_limiter_tasks: Dict[str, BoefjeTask] = {}  # TODO: thread safety
+        self.delayed_tasks: Dict[str, BoefjeTask] = {}  # TODO: thread safety
 
         super().__init__(
             ctx=ctx,
@@ -103,10 +103,10 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
-        # Rate limited tasks
+        # Delayed task thread
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-rate_limited",
-            target=self.push_tasks_for_rate_limited_objects,
+            name=f"scheduler-{self.scheduler_id}-delayed",
+            target=self.push_tasks_for_delayed_tasks,
             interval=60.0,
         )
 
@@ -310,15 +310,23 @@ class BoefjeScheduler(Scheduler):
                         caller=self.push_tasks_for_random_objects.__name__,
                     )
 
-    def push_tasks_for_rate_limited_objects(self) -> None:
-        # TODO: check for tasks that are rate limited and push them to the queue
-        # when the rate limit is over.
+    def push_tasks_for_delayed_tasks(self) -> None:
+        """Check for tasks that are delayed and push them to the queue
+        when the rate limit is over.
+        """
+        tasks_to_push = []
+        for _, task in self.delayed_tasks.items():
+            if not self.is_task_rate_limited(task):
+                with self.rate_limiter_lock:
+                    self.delayed_tasks.pop(task.hash)
+                tasks_to_push.append(task)
+
         with futures.ThreadPoolExecutor() as executor:
-            for _, task in self.rate_limited_tasks.items():
+            for task in tasks_to_push:
                 executor.submit(
                     self.push_task,
                     task=task,
-                    caller=self.push_tasks_for_rate_limited_objects.__name__,
+                    caller=self.push_tasks_for_delayed_tasks.__name__,
                 )
 
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
@@ -409,8 +417,8 @@ class BoefjeScheduler(Scheduler):
             return False
 
         # Check if namespace is already in the tasks if not add it
-        if self.rate_limiter_tasks.get(task.hash) is None:
-            self.rate_limiter_tasks[task.hash] = task
+        if self.delayed_tasks.get(task.hash) is None:
+            self.delayed_tasks[task.hash] = task
 
         parsed_rate_limit = parse(task.boefje.rate_limit)
         if parsed_rate_limit is None:
@@ -424,23 +432,11 @@ class BoefjeScheduler(Scheduler):
             # TODO: raise?
             return True
 
-        hit = self.rate_limiter.hit(parsed_rate_limit)  # TODO: parse rate limit
-        if hit:
-            self.logger.debug(
-                "Boefje: %s is rate limited [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
-                task.boefje.id,
-                task.boefje.id,
-                self.organisation.id,
-                self.scheduler_id,
-            )
+        allowed = self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
+        if not allowed:
             return True
 
-        # TODO: remove task from rate limited tasks
-        with self.rate_limiter_lock:
-            self.rate_limiter_tasks.pop(task.hash)
-
         return False
-
 
     def is_task_running(self, task: BoefjeTask) -> bool:
         """Get the last tasks that have run or are running for the hash
