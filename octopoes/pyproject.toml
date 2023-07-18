@@ -51,3 +51,7 @@ pytest-mock = "^3.10.0"
 pre-commit = "^2.20.0"
 httpx = "^0.23.3"
 pytest-timeout = "^2.1.0"
+
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311"]
+line-length = 120
