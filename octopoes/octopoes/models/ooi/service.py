@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import IPPort
@@ -34,3 +34,24 @@ class IPService(OOI):
         t = reference.tokenized
         ip_address = t.ip_port.address.address
         return f"{t.service.name}://{ip_address}:{t.ip_port.port}/{t.ip_port.protocol}"
+
+
+class SSLCipher(OOI):
+    object_type: Literal["SSLCipher"] = "SSLCipher"
+
+    ip_service: Reference = ReferenceField(IPService, max_issue_scan_level=0, max_inherit_scan_level=4)
+    protocol: str
+    suite: str
+
+    bits: int
+    key_size: Optional[int]
+
+    _natural_key_attrs = ["ip_service", "protocol", "suite"]
+
+    _reverse_relation_names = {"ip_service": "ciphers"}
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        t = reference.tokenized
+        ip_address = t.ip_service.ip_port.address.address
+        return f"{t.protocol} {t.suite} {str(ip_address)}:{t.ip_service.ip_port.port}"
