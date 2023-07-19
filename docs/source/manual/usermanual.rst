@@ -420,10 +420,10 @@ You can currently configure the ``max-age`` before HSTS headers will be consider
         "config": {"max-age": "4153600"}
     }
 
-Aggregate findings
-------------------
+Port classification
+-------------------
 
-Setting this to ``True`` will aggregate all findings of the same type into one finding,
+Setting aggregate_findings to ``True`` will aggregate all findings of the same type into one finding,
 resulting in cleaner finding reports (both in the web UI and in PDF's). For example, ``KAT-UNCOMMON-OPEN-PORT``
 will be aggregated into one finding, instead of one separate finding per port.
 
@@ -434,4 +434,16 @@ will be aggregated into one finding, instead of one separate finding per port.
         "ooi": "Network|internet",
         "bit-id": "port-classification-ip",
         "config": {"aggregate_findings": "True"}
+    }
+
+Also you can configure which open ports should create findings and which ports should not. This is done by settings
+common_tcp_ports, common_udp_ports, sa_tcp_ports and/or db_tcp_ports. As an example:
+
+.. code-block:: json
+
+    {
+        "object_type": "Config",
+        "ooi": "Network|internet",
+        "bit-id": "port-classification-ip",
+        "config": {"common_tcp_ports": "1,2,3", "sa_tcp_ports": "4,5,6"}
     }
