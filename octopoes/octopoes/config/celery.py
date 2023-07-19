@@ -13,4 +13,4 @@ event_serializer = "json"
 accept_content = ["application/json", "application/x-python-serialize"]
 result_accept_content = ["application/json", "application/x-python-serialize"]
 
-task_queues = (Queue(settings.queue_name_octopoes),)
+task_queues = (Queue(settings.QUEUE_NAME_OCTOPOES),)

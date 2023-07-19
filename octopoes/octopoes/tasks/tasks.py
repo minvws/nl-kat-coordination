@@ -39,7 +39,7 @@ def init_worker(**kwargs):
     get_rabbit_channel(settings.queue_uri)
 
 
-@app.task(queue=settings.queue_name_octopoes)
+@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
 def handle_event(event: Dict):
     parsed_event: DBEvent = parse_obj_as(EVENT_TYPE, event)
 
@@ -48,7 +48,7 @@ def handle_event(event: Dict):
     session.commit()
 
 
-@app.task(queue=settings.queue_name_octopoes)
+@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
 def schedule_scan_profile_recalculations():
     orgs = KATalogusClientV1(settings.katalogus_api).get_organisations()
 
@@ -56,13 +56,13 @@ def schedule_scan_profile_recalculations():
         app.send_task(
             "octopoes.tasks.tasks.recalculate_scan_profiles",
             (org,),
-            queue=settings.queue_name_octopoes,
+            queue=settings.QUEUE_NAME_OCTOPOES,
             task_id=str(uuid.uuid4()),
         )
         logger.info("Scheduled scan profile recalculation [org=%s]", org)
 
 
-@app.task(queue=settings.queue_name_octopoes)
+@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
 def recalculate_scan_profiles(org: str, *args, **kwargs):
     session = XTDBSession(get_xtdb_client(settings.xtdb_uri, org, settings.xtdb_type))
     octopoes = bootstrap_octopoes(settings, org, session)
@@ -71,4 +71,8 @@ def recalculate_scan_profiles(org: str, *args, **kwargs):
     octopoes.recalculate_scan_profiles(datetime.now(timezone.utc))
     session.commit()
 
-    logger.info("Finished scan profile recalculation [org=%s] [dur=%.2fs]", org, timeit.default_timer() - timer)
+    logger.info(
+        "Finished scan profile recalculation [org=%s] [dur=%.2fs]",
+        org,
+        timeit.default_timer() - timer,
+    )

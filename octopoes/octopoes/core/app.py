@@ -6,7 +6,9 @@ from octopoes.config.settings import Settings, XTDBType
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager, get_rabbit_channel
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
-from octopoes.repositories.origin_parameter_repository import XTDBOriginParameterRepository
+from octopoes.repositories.origin_parameter_repository import (
+    XTDBOriginParameterRepository,
+)
 from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.repositories.scan_profile_repository import XTDBScanProfileRepository
 from octopoes.tasks.app import app as celery_app
@@ -46,13 +48,18 @@ def close_rabbit_channel(queue_uri: str):
 
 
 def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSession) -> OctopoesService:
-    event_manager = EventManager(client, settings.queue_uri, celery_app, settings.queue_name_octopoes)
+    event_manager = EventManager(client, settings.queue_uri, celery_app, settings.QUEUE_NAME_OCTOPOES)
 
     ooi_repository = XTDBOOIRepository(event_manager, xtdb_session, settings.xtdb_type)
     origin_repository = XTDBOriginRepository(event_manager, xtdb_session, settings.xtdb_type)
     origin_param_repository = XTDBOriginParameterRepository(event_manager, xtdb_session, settings.xtdb_type)
     scan_profile_repository = XTDBScanProfileRepository(event_manager, xtdb_session, settings.xtdb_type)
 
-    octopoes = OctopoesService(ooi_repository, origin_repository, origin_param_repository, scan_profile_repository)
+    octopoes = OctopoesService(
+        ooi_repository,
+        origin_repository,
+        origin_param_repository,
+        scan_profile_repository,
+    )
 
     return octopoes

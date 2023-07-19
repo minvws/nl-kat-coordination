@@ -21,7 +21,6 @@ class Settings(BaseSettings):
     log_cfg: str = str(
         Path(__file__).parent.parent.parent / "logging.yml"
     )  # Follow-up ticket to make logging the same for all modules?
-    queue_name_octopoes: str = "octopoes"  # Why would someone use another queue name?
 
     # External services settings
     queue_uri: str = "amqp://guest:guest@rabbitmq:5672/%2fkat"
@@ -41,3 +40,4 @@ DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in S
 DEFAULT_SEVERITY_FILTER = {severity for severity in RiskLevelSeverity}
 DEFAULT_LIMIT = 50
 DEFAULT_OFFSET = 0
+QUEUE_NAME_OCTOPOES: str = "octopoes"
