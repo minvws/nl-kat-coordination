@@ -77,7 +77,7 @@ class OctopoesView(OrganizationView):
         organization: Organization,
     ) -> Tuple[List[OriginData], List[OriginData], List[OriginData]]:
         try:
-            origins = self.octopoes_api_connector.list_origins(reference, valid_time)
+            origins = self.octopoes_api_connector.list_origins(valid_time, result=reference)
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
