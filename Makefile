@@ -112,3 +112,9 @@ poetry-dependencies:
 	# NOTE: pip does not yet support hash verification for git dependencies;
 	# rocky's requirements-dev.txt unfortunately has no hashing until then
 	sed -i '/--hash/d; s/ \\$$//' rocky/requirements-dev.txt
+
+
+local-ci-robot:
+	make reset
+	docker exec -it nl-kat-coordination-rocky-1 /bin/bash -c 'export DJANGO_SUPERUSER_PASSWORD=robotpassword && python manage.py createsuperuser --full_name robot --email robot@localhost --noinput'
+	cd rocky && robot -d tests/robot/results-ci -v headless:false tests/robot/ci
