@@ -124,7 +124,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         return ooi_type(**kwargs)
 
     def form_valid(self, form):
-        if not self.proccess_csv(form):
+        if not self.process_csv(form):
             return redirect("upload_csv", organization_code=self.organization.code)
         return super().form_valid(form)
 
@@ -136,7 +136,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         messages.add_message(self.request, messages.SUCCESS, success_message)
         return True
 
-    def proccess_csv(self, form):
+    def process_csv(self, form):
         object_type = form.cleaned_data["object_type"]
         csv_file = form.cleaned_data["csv_file"]
 

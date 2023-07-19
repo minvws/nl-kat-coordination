@@ -27,7 +27,7 @@ from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
-from rocky.views.organization_member_add import OrganizationMemberAddView
+from rocky.views.organization_member_add import OrganizationMemberAddView, MembersUploadView
 from rocky.views.organization_member_edit import OrganizationMemberEditView
 from rocky.views.organization_member_list import OrganizationMemberListView
 from rocky.views.organization_settings import OrganizationSettingsView
@@ -98,6 +98,11 @@ urlpatterns += i18n_patterns(
         "<organization_code>/members/add/",
         OrganizationMemberAddView.as_view(),
         name="organization_member_add",
+    ),
+    path(
+        "<organization_code>/members/upload/",
+        MembersUploadView.as_view(),
+        name="organization_member_upload",
     ),
     path(
         "<organization_code>/",

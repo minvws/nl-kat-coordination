@@ -1,14 +1,31 @@
+import csv
+import io
+import logging
+
+from django.core.exceptions import ObjectDoesNotExist
+
 from account.forms import OrganizationMemberToGroupAddForm
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
+from tools.forms.upload_csv import UploadCSVForm
+from tools.models import OrganizationMember
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, FormView
+
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
+CSV_CRITERIA = [
+    _("Add column titles. Followed by each object on a new line."),
+    _("The columns are: full_name, email, account_type, trusted_clearance_level and acknowledged_clearance_level"),
+]
 
 class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, OrganizationView, CreateView):
     """
@@ -54,3 +71,75 @@ class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, Organizatio
     def add_success_notification(self):
         success_message = _("Member added successfully.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
+
+
+class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+    template_name = "organizations/organization_member_upload.html"
+    form_class = UploadCSVForm
+    permission_required = "tools.add_organizationmember"
+
+    def get_success_url(self):
+        return reverse_lazy("organization_member_list", kwargs={"organization_code": self.organization.code})
+
+    def form_valid(self, form):
+        self.process_csv(form)
+        return super().form_valid(form)
+
+    def process_csv(self, form) -> None:
+        csv_raw_data = form.cleaned_data["csv_file"].read()
+        csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
+
+        try:
+            for row_number, row in enumerate(csv.DictReader(csv_data, delimiter=",", quotechar='"'), start=1):
+                if not row:
+                    continue  # skip empty lines
+                try:
+                    full_name, email, account_type, trusted_clearance_level, acknowledged_clearance_level = (
+                        row["full_name"],
+                        row["email"],
+                        row["account_type"],
+                        row.get("trusted_clearance_level", 0),
+                        row.get("acknowledged_clearance_level", 0)
+                    )
+                except KeyError:
+                    logger.exception("Failed creating user")
+                    continue
+
+                try:
+                    user, user_created = User.objects.get_or_create(email=email, defaults={"full_name": full_name})
+                except Exception:
+                    logger.exception("Failed creating user")
+                    continue
+
+                try:
+                    member, member_created = OrganizationMember.objects.get_or_create(
+                        user=user,
+                        defaults={"organization": self.organization},
+                    )
+                except Exception:
+                    logger.exception("Failed creating organization member")
+                    if user_created:
+                        user.delete()
+
+                    continue
+
+                if member_created:
+                    member.organization = self.organization
+                    member.trusted_clearance_level = trusted_clearance_level
+                    member.acknowledged_clearance_level = acknowledged_clearance_level
+
+                try:
+                    member.groups.add(Group.objects.get(name=account_type))
+                except ObjectDoesNotExist:
+                    logger.exception("Failed adding organization member to group")
+                    continue
+
+            messages.add_message(self.request, messages.SUCCESS, _("Successfully added csv."))
+        except (csv.Error, IndexError):
+            logger.exception("Failed handling csv file")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["criteria"] = CSV_CRITERIA
+
+        return context
