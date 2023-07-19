@@ -136,7 +136,7 @@ def test_count_findings_by_severity(requests_mock, patch_pika):
                 "KATFindingType/description": "This hostname does not support a DKIM record.",
                 "KATFindingType/primary_key": "KATFindingType|KAT-NO-DKIM",
                 "KATFindingType/risk_score": 6.9,
-                "crux.db/id": "KATFindingType|KAT-NO-DKIM",
+                "xt/id": "KATFindingType|KAT-NO-DKIM",
             },
             1,
         ]

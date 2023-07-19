@@ -54,7 +54,7 @@ class XTDBOriginRepository(OriginRepository):
 
     @classmethod
     def pk_prefix(cls):
-        return "crux.db/id" if cls.xtdb_type == XTDBType.CRUX else "xt/id"
+        return "xt/id"
 
     @classmethod
     def serialize(cls, origin: Origin) -> Dict[str, Any]:

@@ -46,7 +46,7 @@ class ScanProfileRepository:
 
 
 class XTDBScanProfileRepository(ScanProfileRepository):
-    xtdb_type: XTDBType = XTDBType.CRUX
+    xtdb_type: XTDBType = XTDBType.XTDB_MULTINODE
 
     def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
         super().__init__(event_manager)
@@ -55,7 +55,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
 
     @classmethod
     def pk_prefix(cls):
-        return "crux.db/id" if cls.xtdb_type == XTDBType.CRUX else "xt/id"
+        return "xt/id"
 
     @classmethod
     def object_type(cls):

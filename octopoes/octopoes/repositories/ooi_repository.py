@@ -175,7 +175,7 @@ datamodel = Datamodel(entities=entities)
 
 
 class XTDBOOIRepository(OOIRepository):
-    xtdb_type: XTDBType = XTDBType.CRUX
+    xtdb_type: XTDBType = XTDBType.XTDB_MULTINODE
 
     def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
         super().__init__(event_manager)
@@ -184,7 +184,7 @@ class XTDBOOIRepository(OOIRepository):
 
     @classmethod
     def pk_prefix(cls):
-        return "crux.db/id" if cls.xtdb_type == XTDBType.CRUX else "xt/id"
+        return "xt/id"
 
     @classmethod
     def serialize(cls, ooi: OOI) -> Dict[str, Any]:
@@ -300,7 +300,7 @@ class XTDBOOIRepository(OOIRepository):
                     :find [(rand {amount} ?id)]
                     :in [[_scan_level ...]]
                     :where [
-                        [?e :crux.db/id ?id]
+                        [?e :xt/id ?id]
                         [?e :object_type]
                         [?scan_profile :type "ScanProfile"]
                         [?scan_profile :reference ?e]
@@ -440,12 +440,12 @@ class XTDBOOIRepository(OOIRepository):
                     :query {{
                         :find [
                             (pull ?e [
-                                :crux.db/id
+                                :xt/id
                                 {related_fields}
                             ])
                         ]
                         :in [[ _crux_db_id ... ]]
-                        :where [[?e :crux.db/id _crux_db_id]]
+                        :where [[?e :xt/id _crux_db_id]]
                     }}
                     :in-args [["{reference}"]]
                 }}""".format(
@@ -463,12 +463,12 @@ class XTDBOOIRepository(OOIRepository):
                         :query {{
                             :find [
                                 (pull ?e [
-                                    :crux.db/id
+                                    :xt/id
                                     {related_fields}
                                 ])
                             ]
                             :in [[ _crux_db_id ... ]]
-                            :where [[?e :crux.db/id _crux_db_id]]
+                            :where [[?e :xt/id _crux_db_id]]
                         }}
                         :in-args [[{reference}]]
                     }}""".format(
@@ -491,7 +491,7 @@ class XTDBOOIRepository(OOIRepository):
 
         ret = {}
         for key, value in response_data.items():
-            if key == "crux.db/id" or value == {}:
+            if key == "xt/id" or value == {}:
                 continue
             path = Path([self.decode_segment(key)])
             if isinstance(value, list):

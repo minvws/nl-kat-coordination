@@ -197,7 +197,7 @@ class QueryNodeTest(TestCase):
         field_node.build_tree(1)
 
         query = generate_pull_query(
-            XTDBType.CRUX,
+            XTDBType.XTDB_MULTINODE,
             FieldSet.ALL_FIELDS,
             {"db.crux/id": "IpAddressV4|internet|1.1.1.1"},
             field_node=field_node,
@@ -216,7 +216,7 @@ class QueryNodeTest(TestCase):
 
     def test_escape_injection_success(self):
         query = generate_pull_query(
-            XTDBType.CRUX,
+            XTDBType.XTDB_MULTINODE,
             FieldSet.ALL_FIELDS,
             where={"attr_1": 'test_value_with_quotes" and injection'},
         )
@@ -232,7 +232,7 @@ class QueryNodeTest(TestCase):
 
     def test_get_origin_by_task_id(self):
         query = generate_pull_query(
-            XTDBType.CRUX,
+            XTDBType.XTDB_MULTINODE,
             FieldSet.ALL_FIELDS,
             {
                 "task_id": "5c864d45a4364a81a5fecfd8b359cf9d",

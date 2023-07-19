@@ -40,7 +40,7 @@ class OriginParameterRepository:
 
 
 class XTDBOriginParameterRepository(OriginParameterRepository):
-    xtdb_type: XTDBType = XTDBType.CRUX
+    xtdb_type: XTDBType = XTDBType.XTDB_MULTINODE
 
     def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
         super().__init__(event_manager)
@@ -49,7 +49,7 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
 
     @classmethod
     def pk_prefix(cls):
-        return "crux.db/id" if cls.xtdb_type == XTDBType.CRUX else "xt/id"
+        return "xt/id"
 
     @classmethod
     def serialize(cls, origin_parameter: OriginParameter) -> Dict[str, Any]:
