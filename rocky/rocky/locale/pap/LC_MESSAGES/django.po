@@ -4723,12 +4723,12 @@ msgstr "Un JSON opheto"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/json.py:20
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Balor mester ta un JSON balido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:790
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
-msgstr ""
+msgstr "%(model)s instance with %(field)s %(value)r does not exist."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:792
 msgid "Foreign Key (type determined by related field)"
