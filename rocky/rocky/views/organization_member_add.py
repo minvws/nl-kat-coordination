@@ -88,7 +88,7 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
         csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
 
         try:
-            for row_number, row in enumerate(csv.DictReader(csv_data, delimiter=",", quotechar='"'), start=1):
+            for row in csv.DictReader(csv_data, delimiter=",", quotechar='"'):
                 if not row:
                     continue  # skip empty lines
                 try:
