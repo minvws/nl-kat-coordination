@@ -1,5 +1,6 @@
 from django.shortcuts import redirect
 from django.urls.base import reverse
+from onboarding.view_helpers import ONBOARDING_PERMISSIONS
 from tools.models import OrganizationMember
 
 
@@ -25,18 +26,17 @@ def OnboardingMiddleware(get_response):
                 )
                 and not member_onboarded
             ):
-                if request.user.is_superuser and not member_onboarded:
+                # Not onboarded superusers goes to registration of the their first organization + adding members to it.
+                if request.user.is_superuser:
                     return redirect(reverse("step_introduction_registration"))
 
-                if not member_onboarded:
-                    member = OrganizationMember.objects.filter(user=request.user)
+                member = OrganizationMember.objects.filter(user=request.user)
 
-                    # There might be redteamers without an organization after an organization is deleted.
-                    if member.exists() and member.first().is_redteam:
-                        # a redteamer can be in many organizations, but we onboard the first one.
-                        return redirect(
-                            reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
-                        )
+                # Members with these permissions can run a full DNS-report onboarding.
+                if member.exists() and member.first().has_perms(ONBOARDING_PERMISSIONS):
+                    return redirect(
+                        reverse("step_introduction", kwargs={"organization_code": member.first().organization.code})
+                    )
 
         return response
 
