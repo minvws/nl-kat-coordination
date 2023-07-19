@@ -4500,7 +4500,7 @@ msgstr "E vèld aki no por ta bashi."
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:103
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
-msgstr ""
+msgstr "%(model_name)s ku e %(field_label)s no ta èksisti."
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
 #. Eg: "Title must be unique for pub_date year"
@@ -4509,6 +4509,7 @@ msgstr ""
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s mester ta uniko pa %(date_field_label)s %(lookup_type)s."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:126
 #, fuzzy, python-format
@@ -4519,25 +4520,25 @@ msgstr "Kita %(display_type)s"
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:958
 #, python-format
 msgid "“%(value)s” value must be either True or False."
-msgstr ""
+msgstr "“%(value)s” balor mester ta òf True òf False."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:959
 #, python-format
 msgid "“%(value)s” value must be either True, False, or None."
-msgstr ""
+msgstr "“%(value)s” balor mester ta un di nan True, False, òf None."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:961
 msgid "Boolean (Either True or False)"
-msgstr ""
+msgstr "Boolean (un di nan True òf False)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1002
 #, python-format
 msgid "String (up to %(max_length)s)"
-msgstr ""
+msgstr "String (te na %(max_length)s)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1096
 msgid "Comma-separated integers"
-msgstr ""
+msgstr "Nùmero numerico separa pa kòma"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1145
 #, python-format
@@ -4545,6 +4546,8 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"“%(value)s” balor tin un formato di fecha robes. E mester ta den e formato YYYY-MM-DD."
+
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1147
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1290
@@ -4553,10 +4556,11 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"“%(value)s” balor tin e formato na drechi (YYYY-MM-DD) pero e ta un fecha inbalido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1150
 msgid "Date (without time)"
-msgstr ""
+msgstr "Fecha (sin tempu)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1288
 #, python-format
@@ -4564,6 +4568,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
+"“%(value)s” balor tin un formato inbalido. E mester ta den e formato YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ]."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1292
 #, python-format
@@ -4571,19 +4577,21 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
+"“%(value)s” balor tin e formato korekto (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) pero e tempu fecha/tempu ta inbalido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1296
 msgid "Date (with time)"
-msgstr ""
+msgstr "Fecha (ku tempu)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1444
 #, python-format
 msgid "“%(value)s” value must be a decimal number."
-msgstr ""
+msgstr "“%(value)s” balor mester ta un nùmero decimal."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1446
 msgid "Decimal number"
-msgstr ""
+msgstr "Nùmero decimal"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1585
 #, python-format
@@ -4591,85 +4599,81 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
+"“%(value)s” balor tin un formato inbalido. E mester ta den e formato [DD] [[HH:]MM:]ss[."
+"uuuuuu]."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1588
-#, fuzzy
-#| msgid "Declarations"
 msgid "Duration"
-msgstr "Deklarashon"
+msgstr "Durashon"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1661
 msgid "File path"
-msgstr ""
+msgstr "Ruta arkivo"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1727
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr ""
+msgstr "“%(value)s” balor mester ta un float."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1729
 msgid "Floating point number"
-msgstr ""
+msgstr "Floating punto nùmero"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1767
 #, python-format
 msgid "“%(value)s” value must be an integer."
-msgstr ""
+msgstr "“%(value)s” balor mester ta un nùmero numerico."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1769
 msgid "Integer"
-msgstr ""
+msgstr "Numerico"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1852
 msgid "Big (8 byte) integer"
-msgstr ""
+msgstr "Big (8 byte) numerico"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1867
 msgid "Small integer"
-msgstr ""
+msgstr "Numerico chiki"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1875
-#, fuzzy
-#| msgid "Email address"
 msgid "IPv4 address"
-msgstr "Email adrès"
+msgstr "IPv4 adrès"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1906
-#, fuzzy
-#| msgid "Email address"
 msgid "IP address"
-msgstr "Email adrès"
+msgstr "IP adrès"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1986
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1987
 #, python-format
 msgid "“%(value)s” value must be either None, True or False."
-msgstr ""
+msgstr "“%(value)s” balor mester ta un di nan: None, True òf False."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1989
 msgid "Boolean (Either True, False or None)"
-msgstr ""
+msgstr "Boolean (un di nan True, False òf None)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2043
 msgid "Positive big integer"
-msgstr ""
+msgstr "Nùmero numerico positivo grandi"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2056
 msgid "Positive integer"
-msgstr ""
+msgstr "Nùmero numerico positivo"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2069
 msgid "Positive small integer"
-msgstr ""
+msgstr "Nùmero numerico positivo chiki"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2083
 #, python-format
 msgid "Slug (up to %(max_length)s)"
-msgstr ""
+msgstr "Slug (te na %(max_length)s)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2115
 msgid "Text"
-msgstr ""
+msgstr "Teksto"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2181
 #, python-format
@@ -4677,6 +4681,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
+"“%(value)s” balor tin un formato inbalido. E formato mester ta HH:MM[:ss[.uuuuuu]]."
+
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2183
 #, python-format
@@ -4684,37 +4690,36 @@ msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
+"“%(value)s” balor tin e formato korekto (HH:MM[:ss[.uuuuuu]]) pero e tempu ta inbalido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2186
 msgid "Time"
-msgstr ""
+msgstr "Tempu"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2334
 msgid "Raw binary data"
-msgstr ""
+msgstr "Data binario crudo"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2399
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
-msgstr ""
+msgstr "“%(value)s” no ta un UUID balido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2401
 msgid "Universally unique identifier"
-msgstr ""
+msgstr "Identifikadó universal uniko"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/files.py:226
 msgid "File"
-msgstr ""
+msgstr "Arkivo"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/files.py:375
 msgid "Image"
-msgstr ""
+msgstr "Imágen"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/json.py:18
-#, fuzzy
-#| msgid "Add object"
 msgid "A JSON object"
-msgstr "Añadí opheto"
+msgstr "Un JSON opheto"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/json.py:20
 msgid "Value must be valid JSON."
