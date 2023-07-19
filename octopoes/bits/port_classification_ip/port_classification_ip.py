@@ -37,13 +37,24 @@ DB_TCP_PORTS = [
 ]
 
 
+def get_ports_from_config(config, config_key, default):
+    ports = config.get(config_key, "")
+    return list(map(int, ports.split(","))) if ports else default
+
+
 def run(input_ooi: IPPort, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     aggregate_findings = config.get("aggregate_findings", "False").lower() == "true" if config else False
     open_ports = []
+
+    common_tcp_ports = get_ports_from_config(config, "common_tcp_ports", COMMON_TCP_PORTS)
+    common_udp_ports = get_ports_from_config(config, "common_udp_ports", COMMON_UDP_PORTS)
+    sa_tcp_ports = get_ports_from_config(config, "sa_tcp_ports", SA_TCP_PORTS)
+    db_tcp_ports = get_ports_from_config(config, "db_tcp_ports", DB_TCP_PORTS)
+
     for ip_port in additional_oois:
         port = ip_port.port
         protocol = ip_port.protocol
-        if protocol == Protocol.TCP and port in SA_TCP_PORTS:
+        if protocol == Protocol.TCP and port in sa_tcp_ports:
             open_sa_port = KATFindingType(id="KAT-OPEN-SYSADMIN-PORT")
             if aggregate_findings:
                 open_ports.append(ip_port.port)
@@ -54,7 +65,7 @@ def run(input_ooi: IPPort, additional_oois: List, config: Dict[str, str]) -> Ite
                     ooi=ip_port.reference,
                     description=f"Port {port}/{protocol.value} is a system administrator port and should not be open.",
                 )
-        elif protocol == Protocol.TCP and port in DB_TCP_PORTS:
+        elif protocol == Protocol.TCP and port in db_tcp_ports:
             ft = KATFindingType(id="KAT-OPEN-DATABASE-PORT")
             if aggregate_findings:
                 open_ports.append(ip_port.port)
@@ -65,8 +76,8 @@ def run(input_ooi: IPPort, additional_oois: List, config: Dict[str, str]) -> Ite
                     ooi=ip_port.reference,
                     description=f"Port {port}/{protocol.value} is a database port and should not be open.",
                 )
-        elif (protocol == Protocol.TCP and port not in COMMON_TCP_PORTS) or (
-            protocol == Protocol.UDP and port not in COMMON_UDP_PORTS
+        elif (protocol == Protocol.TCP and port not in common_tcp_ports) or (
+            protocol == Protocol.UDP and port not in common_udp_ports
         ):
             kat = KATFindingType(id="KAT-UNCOMMON-OPEN-PORT")
             if aggregate_findings:
