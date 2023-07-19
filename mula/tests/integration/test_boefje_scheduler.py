@@ -1313,7 +1313,8 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             return_value=True,
         ).start()
 
-    def test_push_tasks_for_delayed_tasks(self):
+    def test_push_tasks_for_delayed_tasks_rate_limited(self):
+        """When a task is rate limited, it should not be pushed to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1330,16 +1331,16 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
 
         self.scheduler.push_task(first_task)
 
-        # TODO: should be first task
-
         # Task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(first_task.id, task_pq.id)
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, first_task.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -1347,7 +1348,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.pop_item_from_queue()
 
         # Assert: task should be in datastore, and dispatched
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
         # Arrange: create the same task
@@ -1366,6 +1367,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
 
         # Task should be in datastore, and delayed
         task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
 
         # Act: push tasks for delayed tasks
@@ -1376,6 +1378,8 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
     def test_push_tasks_for_delayed_tasks_rate_limit_passed(self):
+        """When a task is rate limited, and the rate limit passed it should be
+        pushed to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1401,16 +1405,19 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(first_task.id, task_pq.id)
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Assert: task should be in datastore, and queued
         task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
+        self.assertEqual(task_db.id.hex, first_task.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Assert: second task should be in datastore and delayed
         task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
 
         # Act: pop first task from queue
@@ -1420,7 +1427,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # Assert: first task should be in datastore, and dispatched
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
         time.sleep(1)
@@ -1428,14 +1435,15 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         # Act: push tasks for delayed tasks
         self.scheduler.push_tasks_for_delayed_tasks()
 
-        # TODO: should be the second task
         # Assert: task should be on priority queue, rate limit has passed
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(second_task.id, task_pq.id)
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Assert: task should be in datastore, and queued
         task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
