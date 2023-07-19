@@ -26,9 +26,7 @@ class Settings(BaseSettings):
     # External services settings
     queue_uri: str = "amqp://guest:guest@rabbitmq:5672/%2fkat"
     xtdb_uri: str = "http://crux:3000"
-    xtdb_type: XTDBType = (
-        XTDBType.XTDB_MULTINODE
-    )  # TODO remove all legacy CRUX/XTDB support
+    xtdb_type: XTDBType = XTDBType.XTDB_MULTINODE  # TODO remove all legacy CRUX/XTDB support
     span_export_grpc_endpoint: Optional[str] = None
 
     katalogus_api: str = "http://localhost:8003"
@@ -39,9 +37,7 @@ class Settings(BaseSettings):
 
 
 DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
-DEFAULT_SCAN_PROFILE_TYPE_FILTER = {
-    scan_profile_type for scan_profile_type in ScanProfileType
-}
+DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in ScanProfileType}
 DEFAULT_SEVERITY_FILTER = {severity for severity in RiskLevelSeverity}
 DEFAULT_LIMIT = 50
 DEFAULT_OFFSET = 0

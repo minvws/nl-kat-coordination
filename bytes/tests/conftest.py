@@ -44,7 +44,7 @@ def test_client(settings: Settings) -> TestClient:
 
 @pytest.fixture
 def nacl_middleware(settings: Settings) -> NaclBoxMiddleware:
-    return NaclBoxMiddleware(kat_private=settings.kat_private_key_b64, vws_public=settings.vws_public_key_b64)
+    return NaclBoxMiddleware(kat_private=settings.private_key_b64, vws_public=settings.public_key_b64)
 
 
 @pytest.fixture

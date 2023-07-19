@@ -32,8 +32,8 @@ class Settings(BaseSettings):
     rfc3161_cert_file: Optional[Path]
 
     encryption_middleware: EncryptionMiddleware = EncryptionMiddleware.IDENTITY
-    kat_private_key_b64: str = ""  # Should this be renamed?
-    vws_public_key_b64: str = ""  # Should this be renamed?
+    private_key_b64: str = ""
+    public_key_b64: str = ""
 
     span_export_grpc_endpoint: Optional[str]
     bytes_metrics_ttl_seconds: int = 300  # Which value should be the default and why?
