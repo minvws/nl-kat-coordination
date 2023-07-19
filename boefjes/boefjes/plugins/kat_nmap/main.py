@@ -28,7 +28,6 @@ def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]
     """Returns Nmap arguments to use based on protocol and top_ports for host."""
     ip = ip_address(host)
     args = [
-        "nmap",
         "-T4",
         "-Pn",
         "-r",
