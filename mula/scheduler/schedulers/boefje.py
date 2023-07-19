@@ -1,9 +1,8 @@
 import logging
-import threading
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import Callable, Dict, List, Optional
+from typing import Callable, List, Optional
 
 import requests
 from limits import parse, storage, strategies
@@ -47,12 +46,8 @@ class BoefjeScheduler(Scheduler):
         callback: Optional[Callable[..., None]] = None,
     ):
         self.logger = logging.getLogger(__name__)
-
         self.organisation: Organisation = organisation
-
         self.rate_limiter = strategies.MovingWindowRateLimiter(storage=storage.MemoryStorage())
-        self.rate_limiter_lock = threading.Lock()
-        self.delayed_tasks: Dict[str, BoefjeTask] = {}  # TODO: thread safety
 
         super().__init__(
             ctx=ctx,
@@ -314,11 +309,17 @@ class BoefjeScheduler(Scheduler):
         """Check for tasks that are delayed and push them to the queue
         when the rate limit is over.
         """
-        tasks_to_push = []
-        for _, task in self.delayed_tasks.items():
+        tasks_to_push: List[BoefjeTask] = []
+        delayed_tasks, _ = self.ctx.task_store.get_tasks(
+            scheduler_id=self.scheduler_id,
+            status=TaskStatus.DELAYED,
+        )
+
+        for delayed_task in delayed_tasks:
+            task = BoefjeTask(**delayed_task.p_item.data)
+            breakpoint()
+            # TODO: need to test, not hit it will consume
             if not self.is_task_rate_limited(task):
-                with self.rate_limiter_lock:
-                    self.delayed_tasks.pop(task.hash)
                 tasks_to_push.append(task)
 
         with futures.ThreadPoolExecutor() as executor:
@@ -416,10 +417,6 @@ class BoefjeScheduler(Scheduler):
         if task.boefje.rate_limit is None:  # TODO: this needs to be returned by a boefje manifest
             return False
 
-        # Check if namespace is already in the tasks if not add it
-        if self.delayed_tasks.get(task.hash) is None:
-            self.delayed_tasks[task.hash] = task
-
         parsed_rate_limit = parse(task.boefje.rate_limit)
         if parsed_rate_limit is None:
             self.logger.warning(
@@ -429,8 +426,7 @@ class BoefjeScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-            # TODO: raise?
-            return True
+            raise ValueError("Could not parse rate limit")  # TODO: what happens when this is raised?
 
         allowed = self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
         if not allowed:
@@ -539,19 +535,29 @@ class BoefjeScheduler(Scheduler):
                 organization=self.organisation.id,
             )
 
-        if not self.is_task_allowed_to_run(boefje, ooi):
+        # We need to create a PrioritizedItem for this task, to push
+        # it to the priority queue.
+        p_item = PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler_id,
+            data=task,
+            hash=task.hash,
+        )
+
+        if self.is_task_rate_limited(task):
             self.logger.debug(
-                "Task is not allowed to run: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                "Task is rate limited: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.organisation.id,
                 self.scheduler_id,
                 caller,
             )
+            self.post_push(p_item, models.TaskStatus.DELAYED)
             return
 
-        if self.is_task_rate_limited(task):
+        if not self.is_task_allowed_to_run(boefje, ooi):
             self.logger.debug(
-                "Task is rate limited: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                "Task is not allowed to run: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.organisation.id,
                 self.scheduler_id,
@@ -613,21 +619,11 @@ class BoefjeScheduler(Scheduler):
             return
 
         prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
-        score = self.ranker.rank(
+        p_item.priority = self.ranker.rank(
             SimpleNamespace(
                 prior_tasks=prior_tasks,
                 task=task,
             )
-        )
-
-        # We need to create a PrioritizedItem for this task, to push
-        # it to the priority queue.
-        p_item = PrioritizedItem(
-            id=task.id,
-            scheduler_id=self.scheduler_id,
-            priority=score,
-            data=task,
-            hash=task.hash,
         )
 
         try:
@@ -646,12 +642,10 @@ class BoefjeScheduler(Scheduler):
             return
 
         self.logger.info(
-            "Created boefje task: %s for ooi: %s "
-            "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
+            "Created boefje task: %s "
+            "[task_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,
-            ooi.primary_key,
-            boefje.id,
-            ooi.primary_key,
+            task.id,
             self.organisation.id,
             self.scheduler_id,
             caller,
