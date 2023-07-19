@@ -45,6 +45,7 @@ class Command(BaseCommand):
                 "view_organizationmember",
                 "add_organizationmember",
                 "change_organization",
+                "can_scan_organization",
                 "change_organizationmember",
                 "can_delete_oois",
                 "add_indemnification",

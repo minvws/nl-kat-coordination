@@ -3,6 +3,12 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from tools.view_helpers import StepsMixin
 
+ONBOARDING_PERMISSIONS = (
+    "tools.can_scan_organization",
+    "tools.can_set_clearance_level",
+    "tools.can_enable_disable_boefje",
+)
+
 
 class KatIntroductionStepsMixin(StepsMixin, OrganizationView):
     def build_steps(self):
