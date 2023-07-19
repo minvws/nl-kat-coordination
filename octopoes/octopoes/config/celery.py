@@ -1,6 +1,6 @@
 from kombu import Queue
 
-from octopoes.config.settings import Settings
+from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
 
 settings = Settings()
 
@@ -13,4 +13,4 @@ event_serializer = "json"
 accept_content = ["application/json", "application/x-python-serialize"]
 result_accept_content = ["application/json", "application/x-python-serialize"]
 
-task_queues = (Queue(settings.QUEUE_NAME_OCTOPOES),)
+task_queues = (Queue(QUEUE_NAME_OCTOPOES),)

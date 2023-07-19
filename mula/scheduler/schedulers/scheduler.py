@@ -407,6 +407,7 @@ class Scheduler(abc.ABC):
     def dict(self) -> Dict[str, Any]:
         return {
             "id": self.scheduler_id,
+            "enabled": self.enabled,
             "priority_queue": {
                 "id": self.queue.pq_id,
                 "item_type": self.queue.item_type.type,

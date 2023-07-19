@@ -8,4 +8,5 @@ class Scheduler(BaseModel):
     unmarshalling of schedulers to a JSON representation."""
 
     id: Optional[str]
+    enabled: Optional[bool]
     priority_queue: Optional[Dict[str, Any]]

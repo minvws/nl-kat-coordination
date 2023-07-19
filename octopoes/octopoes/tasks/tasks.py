@@ -9,7 +9,7 @@ import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
 from pydantic import parse_obj_as
 
-from octopoes.config.settings import Settings
+from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
 from octopoes.connector.katalogus import KATalogusClientV1
 from octopoes.core.app import bootstrap_octopoes, close_rabbit_channel, get_xtdb_client
 from octopoes.events.events import EVENT_TYPE, DBEvent
@@ -39,7 +39,7 @@ def init_worker(**kwargs):
     get_rabbit_channel(settings.queue_uri)
 
 
-@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
+@app.task(queue=QUEUE_NAME_OCTOPOES)
 def handle_event(event: Dict):
     parsed_event: DBEvent = parse_obj_as(EVENT_TYPE, event)
 
@@ -48,7 +48,7 @@ def handle_event(event: Dict):
     session.commit()
 
 
-@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
+@app.task(queue=QUEUE_NAME_OCTOPOES)
 def schedule_scan_profile_recalculations():
     orgs = KATalogusClientV1(settings.katalogus_api).get_organisations()
 
@@ -56,13 +56,13 @@ def schedule_scan_profile_recalculations():
         app.send_task(
             "octopoes.tasks.tasks.recalculate_scan_profiles",
             (org,),
-            queue=settings.QUEUE_NAME_OCTOPOES,
+            queue=QUEUE_NAME_OCTOPOES,
             task_id=str(uuid.uuid4()),
         )
         logger.info("Scheduled scan profile recalculation [org=%s]", org)
 
 
-@app.task(queue=settings.QUEUE_NAME_OCTOPOES)
+@app.task(queue=QUEUE_NAME_OCTOPOES)
 def recalculate_scan_profiles(org: str, *args, **kwargs):
     session = XTDBSession(get_xtdb_client(settings.xtdb_uri, org, settings.xtdb_type))
     octopoes = bootstrap_octopoes(settings, org, session)
