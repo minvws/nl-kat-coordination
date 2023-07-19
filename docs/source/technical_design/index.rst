@@ -16,3 +16,4 @@ Contains documentation for developers and contributors.
    nginx
    debuggingtroubleshooting
    latex
+   cveapi
