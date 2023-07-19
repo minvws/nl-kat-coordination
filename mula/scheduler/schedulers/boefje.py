@@ -317,8 +317,6 @@ class BoefjeScheduler(Scheduler):
 
         for delayed_task in delayed_tasks:
             task = BoefjeTask(**delayed_task.p_item.data)
-            breakpoint()
-            # TODO: need to test, not hit it will consume
             if not self.is_task_rate_limited(task):
                 tasks_to_push.append(task)
 
@@ -428,10 +426,12 @@ class BoefjeScheduler(Scheduler):
             )
             raise ValueError("Could not parse rate limit")  # TODO: what happens when this is raised?
 
-        allowed = self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
-        if not allowed:
+        can_consume = self.rate_limiter.test(parsed_rate_limit, task.boefje.id)
+        if not can_consume:
             return True
 
+        # When we can consume, we hit the rate limiter
+        self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
         return False
 
     def is_task_running(self, task: BoefjeTask) -> bool:
