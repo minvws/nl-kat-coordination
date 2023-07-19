@@ -2,21 +2,18 @@ import csv
 import io
 import logging
 
-from django.core.exceptions import ObjectDoesNotExist
-
 from account.forms import OrganizationMemberToGroupAddForm
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
-from tools.forms.upload_csv import UploadCSVForm
-from tools.models import OrganizationMember
-
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView, FormView
-
+from tools.forms.upload_csv import UploadCSVForm
+from tools.models import OrganizationMember
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +23,7 @@ CSV_CRITERIA = [
     _("Add column titles. Followed by each object on a new line."),
     _("The columns are: full_name, email, account_type, trusted_clearance_level and acknowledged_clearance_level"),
 ]
+
 
 class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, OrganizationView, CreateView):
     """
@@ -99,7 +97,7 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                         row["email"],
                         row["account_type"],
                         row.get("trusted_clearance_level", 0),
-                        row.get("acknowledged_clearance_level", 0)
+                        row.get("acknowledged_clearance_level", 0),
                     )
                 except KeyError:
                     logger.exception("Failed creating user")

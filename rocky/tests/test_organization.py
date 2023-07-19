@@ -170,7 +170,7 @@ def test_organization_member_list(rf, admin_member):
     assertContains(response, "Organization")
     assertContains(response, admin_member.organization.name)
     assertContains(response, "Members")
-    assertContains(response, "Add new member")
+    assertContains(response, "Add member(s)")
     assertContains(response, "Name")
     assertContains(response, admin_member.user.full_name)
     assertContains(response, "E-mail")

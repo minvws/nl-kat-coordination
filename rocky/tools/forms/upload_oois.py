@@ -20,4 +20,3 @@ class UploadOOICSVForm(UploadCSVForm):
         help_text=_("Choose a type of which objects are added."),
         required=True,
     )
-
