@@ -427,6 +427,32 @@ def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes)
     assert "filters" in exported_objects[0]
 
 
+def test_ooi_list_filtered_export_csv(rf, client_member, mock_organization_view_octopoes):
+    kwargs = {"organization_code": client_member.organization.code}
+    url = reverse("ooi_list_export", kwargs=kwargs)
+    request = rf.get(
+        url, {"file_type": "csv", "ooi_type": "Network", "clearance_type": "inherited", "clearance_level": 3}
+    )
+    request.resolver_match = resolve(url)
+
+    setup_request(request, client_member.user)
+
+    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+        count=200, items=[Network(name="testnetwork")] * 150
+    )
+
+    response = OOIListExportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "text/csv"
+    assert mock_organization_view_octopoes().list.call_count == 1
+
+    mock_calls = mock_organization_view_octopoes().list.mock_calls
+    assert list(mock_calls[0].kwargs["scan_level"])[0].value == 3
+    assert mock_calls[0].args[0].pop() == Network
+    assert list(mock_calls[0].kwargs["scan_profile_type"])[0].value == "inherited"
+
+
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])
 def test_delete_perms_object_list(request, member, rf, mock_organization_view_octopoes):
     member = request.getfixturevalue(member)
