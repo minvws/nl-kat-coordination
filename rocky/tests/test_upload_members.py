@@ -45,7 +45,7 @@ def test_upload_members(rf, superuser_member):
 
 
 def test_upload_bad_columns(rf, superuser_member):
-    example_file = BytesIO(b"name,network\n\xa0\xa1,internet")
+    example_file = BytesIO(b"name,network\nabc,internet")
     example_file.name = "bad.cvs"
     assert OrganizationMember.objects.filter(organization=superuser_member.organization).count() == 1
 
