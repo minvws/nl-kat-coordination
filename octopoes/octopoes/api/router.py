@@ -204,9 +204,18 @@ def get_tree(
 def list_origins(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    reference: Reference = Depends(extract_reference),
+    source: Optional[Reference] = Query(None),
+    result: Optional[Reference] = Query(None),
+    task_id: Optional[str] = Query(None),
+    origin_type: Optional[OriginType] = Query(None),
 ) -> List[Origin]:
-    return octopoes.origin_repository.list_by_result(reference, valid_time)
+    return octopoes.origin_repository.list(
+        valid_time,
+        task_id=task_id,
+        source=source,
+        result=result,
+        origin_type=origin_type,
+    )
 
 
 @router.get("/origin_parameters", tags=["Origins"])
