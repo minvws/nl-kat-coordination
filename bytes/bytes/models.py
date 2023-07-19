@@ -65,6 +65,8 @@ class BoefjeMeta(Job):
     input_ooi: Optional[str]
     arguments: Dict[str, Any]
     organization: str
+    runnable_hash: Optional[str]
+    environment: Optional[Dict[str, str]]
 
 
 class RawDataMeta(BaseModel):

@@ -55,9 +55,6 @@ class BoefjeScheduler(Scheduler):
             callback=callback,
         )
 
-        self.initialize_listeners()
-
-    @tracer.start_as_current_span("run")
     def run(self) -> None:
         """Populate the PriorityQueue.
 
@@ -68,35 +65,36 @@ class BoefjeScheduler(Scheduler):
         When this is done we will try and fill the rest of the queue with
         random items from octopoes and schedule them accordingly.
         """
+
+        # Scan profile mutations
+        listener = listeners.ScanProfileMutation(
+            dsn=self.ctx.config.host_raw_data,
+            queue=f"{self.organisation.id}__scan_profile_mutations",
+            func=self.push_tasks_for_scan_profile_mutations,
+            prefetch_count=self.ctx.config.queue_prefetch_count,
+        )
+
+        self.listeners["scan_profile_mutations"] = listener
+
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-mutations",
             target=self.listeners["scan_profile_mutations"].listen,
             loop=False,
         )
 
+        # New Boefjes
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-new_boefjes",
             target=self.push_tasks_for_new_boefjes,
             interval=60.0,
         )
 
+        # Random OOI's from Octopoes
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-random",
             target=self.push_tasks_for_random_objects,
             interval=60.0,
         )
-
-    def initialize_listeners(self) -> None:
-        """Listen for scan profile mutations and create tasks for oois that
-        have a scan level change.
-        """
-        listener = listeners.ScanProfileMutation(
-            dsn=self.ctx.config.host_raw_data,
-            queue=f"{self.organisation.id}__scan_profile_mutations",
-            func=self.push_tasks_for_scan_profile_mutations,
-        )
-
-        self.listeners["scan_profile_mutations"] = listener
 
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
@@ -426,10 +424,22 @@ class BoefjeScheduler(Scheduler):
 
         # Task has been finished (failed, or succeeded) according to
         # the datastore, but we have no results of it in bytes, meaning
-        # we have a problem.
-        if task_bytes is None and task_db is not None and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
+        # we have a problem. However when the grace period has been reached we
+        # should not raise an error.
+        if (
+            task_bytes is None
+            and task_db is not None
+            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+            and (
+                task_db.modified_at is not None
+                and task_db.modified_at
+                > datetime.now(timezone.utc) - timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+            )
+        ):
             self.logger.error(
-                "Task has been finished, but no results found in bytes "
+                "Task has been finished, but no results found in bytes, "
+                "please review the bytes logs for more information regarding "
+                "this error. "
                 "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,

@@ -96,7 +96,7 @@ class SelectOOIFilterForm(BaseRockyForm):
 class PossibleBoefjesFilterForm(BaseRockyForm):
     show_all = forms.NullBooleanField(
         widget=LabeledCheckboxInput(
-            label=_("Show Boefjes that exceed the OOI's scan level"),
+            label=_("Show Boefjes that exceed the objects clearance level"),
             autosubmit=True,
         ),
     )

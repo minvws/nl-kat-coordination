@@ -23,12 +23,9 @@ class Settings(BaseSettings):
     )  # Why is this configurable for the scheduler and not for the other modules?
 
     # Application settings
-    katalogus_cache_ttl: int = Field(
-        30, env="SCHEDULER_KATALOGUS_CACHE_TTL"
-    )  # Which value should be the default and why?
-    monitor_organisations_interval: int = Field(
-        60, env="SCHEDULER_MONITOR_ORGANISATIONS_INTERVAL"
-    )  # Which value should be the default and why?
+    katalogus_cache_ttl: int = Field(30, env="SCHEDULER_KATALOGUS_CACHE_TTL")
+    monitor_organisations_interval: int = Field(60, env="SCHEDULER_MONITOR_ORGANISATIONS_INTERVAL")
+    octopoes_request_timeout: int = Field(10, env="SCHEDULER_OCTOPOES_REQUEST_TIMEOUT")
 
     # External services settings
     host_katalogus: str = Field(..., env="KATALOGUS_API")
@@ -38,6 +35,7 @@ class Settings(BaseSettings):
     host_octopoes: str = Field(..., env="OCTOPOES_API")
     host_mutation: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     host_raw_data: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
+    queue_prefetch_count: int = Field(100, env="SCHEDULER_QUEUE_PREFETCH_COUNT")
     host_normalizer_meta: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     span_export_grpc_endpoint: Optional[str] = Field(None, env="SPAN_EXPORT_GRPC_ENDPOINT")
 

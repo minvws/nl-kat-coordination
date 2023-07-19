@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     # Worker configuration
     pool_size: int = 2
     poll_interval: float = 10.0
+    worker_heartbeat: float = 1.0
 
     # Queue configuration
     queue_uri: str = "amqp://"

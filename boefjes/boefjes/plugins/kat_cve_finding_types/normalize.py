@@ -29,17 +29,27 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     cve_finding_type_id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
     data = json.loads(raw)
 
-    descriptions = data["cve"]["description"]["description_data"]
+    descriptions = data["cve"]["descriptions"]
     english_description = [description for description in descriptions if description["lang"] == "en"][0]
 
-    if data["impact"] == {}:
+    if not data["cve"]["metrics"]:
         risk_severity = RiskLevelSeverity.UNKNOWN
         risk_score = None
     else:
-        try:
-            risk_score = data["impact"]["baseMetricV3"]["cvssV3"]["baseScore"]
-        except KeyError:
-            risk_score = data["impact"]["baseMetricV2"]["cvssV2"]["baseScore"]
+        metrics = data["cve"]["metrics"]
+        if "cvssMetricV31" in metrics:
+            cvss = metrics["cvssMetricV31"]
+        elif "cvssMetricV30" in metrics:
+            cvss = metrics["cvssMetricV30"]
+        else:
+            cvss = metrics["cvssMetricV20"]
+
+        for item in cvss:
+            if item["type"] == "Primary":
+                risk_score = item["cvssData"]["baseScore"]
+                break
+        else:
+            risk_score = cvss[0]["cvssData"]["baseScore"]
         risk_severity = get_risk_level(risk_score)
 
     yield CVEFindingType(
