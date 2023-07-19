@@ -1428,7 +1428,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         # Act: push tasks for delayed tasks
         self.scheduler.push_tasks_for_delayed_tasks()
 
-        # TODO: should be second task
+        # TODO: should be the second task
         # Assert: task should be on priority queue, rate limit has passed
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())

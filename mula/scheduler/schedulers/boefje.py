@@ -317,7 +317,7 @@ class BoefjeScheduler(Scheduler):
 
         for delayed_task in delayed_tasks:
             task = BoefjeTask(**delayed_task.p_item.data)
-            if not self.is_task_rate_limited(task):
+            if not self.is_task_rate_limited(task, hit=False):
                 tasks_to_push.append(task)
 
         with futures.ThreadPoolExecutor() as executor:
@@ -403,11 +403,12 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
-    def is_task_rate_limited(self, task: BoefjeTask) -> bool:
+    def is_task_rate_limited(self, task: BoefjeTask, hit: bool = True) -> bool:
         """Checks whether a task is rate limited.
 
         Args:
             task: The task to check.
+            hit: Whether to hit the rate limiter or not.
 
         Returns:
             True if the task is rate limited, False otherwise.
@@ -431,7 +432,9 @@ class BoefjeScheduler(Scheduler):
             return True
 
         # When we can consume, we hit the rate limiter
-        self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
+        if hit:
+            self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
+
         return False
 
     def is_task_running(self, task: BoefjeTask) -> bool:
