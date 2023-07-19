@@ -2,7 +2,7 @@
     "title": "Arguments",
     "type": "object",
     "properties": {
-        "PORTS": {
+        "CVEAPI_URL": {
             "title": "CVEAPI_URL",
             "maxLength": 2048,
             "type": "string",
