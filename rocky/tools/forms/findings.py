@@ -18,22 +18,5 @@ class FindingSeverityMultiSelectForm(forms.Form):
     )
 
 
-class FindingRiskScoreNumberForm(forms.Form):
-    risk_score_greater_than = forms.FloatField(
-        label=_("Filter risk scores greater than"),
-        required=False,
-        min_value=1,
-        max_value=10,
-        widget=forms.NumberInput(attrs={"placeholder": "Enter a decimal number between 1 and 10"}),
-    )
-    risk_score_smaller_than = forms.FloatField(
-        label=_("Filter risk scores smaller than"),
-        required=False,
-        min_value=1,
-        max_value=10,
-        widget=forms.NumberInput(attrs={"placeholder": "Enter a decimal number between 1 and 10"}),
-    )
-
-
 class FindingMutedSelectionForm(BaseRockyForm):
     exclude_muted = forms.BooleanField(label=_("Exclude Muted Findings"), required=False)
