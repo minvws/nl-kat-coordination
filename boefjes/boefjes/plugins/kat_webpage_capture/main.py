@@ -5,12 +5,25 @@ import tarfile
 from typing import ByteString, Generator, List, Tuple, Union
 
 import docker
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 from boefjes.job_models import BoefjeMeta
 
-PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.33.0-jammy"
+PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:latest"
 BROWSER = "chromium"
+
+
+class WebpageCaptureException(Exception):
+    """Exception raised when webpage capture fails."""
+
+    def __init__(self, message, container_log=None):
+        self.message = message
+        self.container_log = container_log
+
+    def __str__(self):
+        return str(self.message) + "\n\nContainer log:\n" + self.container_log
+
+    pass
 
 
 class TarStream(io.RawIOBase):
@@ -54,11 +67,11 @@ def get_file_from_container(container: docker.models.containers.Container, path:
     """Returns a file from a docker container."""
     try:
         stream, _ = container.get_archive(path)
-    except docker.errors.NotFound:
-        logging.warning(
+    except docker.errors.NotFound as e:
+        logging.error(
             "[Webpage Capture] %s not found in container %s %s", path, container.short_id, container.image.tags
         )
-        return None
+        raise e
 
     f = tarfile.open(mode="r|", fileobj=TarStream(stream).reader())
     tarobject = f.next()
@@ -68,7 +81,7 @@ def get_file_from_container(container: docker.models.containers.Container, path:
 
 def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
     """Returns playwright command including webpage, browser and locations for image, har and storage."""
-    return " ".join(
+    x = " ".join(
         [
             "npx playwright screenshot",
             f"-b {browser}",
@@ -79,12 +92,15 @@ def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
             f"{tmp_path}.png",
         ]
     )
+    logging.info("command: %s", x)
+    return x
 
 
 def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tuple[bytes]:
     """Run Playwright in Docker."""
     client = docker.from_env()
-    res = client.containers.run(
+    client.images.pull(PLAYWRIGHT_IMAGE)
+    container = client.containers.run(
         image=PLAYWRIGHT_IMAGE,
         command=[
             "/bin/sh",
@@ -94,14 +110,18 @@ def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tu
         detach=True,
     )
     try:
-        res.wait()
-        image = Image.open(io.BytesIO(get_file_from_container(container=res, path=f"{tmp_path}.png")))
-        har = get_file_from_container(container=res, path=f"{tmp_path}.har.zip")
-        storage = get_file_from_container(container=res, path=f"{tmp_path}.json")
+        container.wait()
+        image = Image.open(io.BytesIO(get_file_from_container(container=container, path=f"{tmp_path}.png")))
+        har = get_file_from_container(container=container, path=f"{tmp_path}.har.zip")
+        storage = get_file_from_container(container=container, path=f"{tmp_path}.json")
+        return image.tobytes(), har, storage
+    except (docker.errors.NotFound, UnidentifiedImageError):
+        raise WebpageCaptureException(
+            "Error while running Playwright container",
+            container.logs(stdout=True, stderr=True, timestamps=True).decode(),
+        )
     finally:
-        res.remove()
-
-    return image.tobytes(), har, storage
+        container.remove()
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
