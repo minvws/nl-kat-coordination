@@ -2,7 +2,7 @@ import csv
 import io
 import logging
 
-from account.forms import OrganizationMemberToGroupAddForm
+from account.forms import OrganizationMemberToGroupAddForm, PasswordResetForm
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -108,6 +108,20 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                 except Exception:
                     logger.exception("Failed creating user")
                     continue
+                if user_created:
+                    form = PasswordResetForm({"email": email})
+
+                    if not form.is_valid():
+                        logger.warning("Email not valid: %s", email)
+                        continue
+
+                    form.save(
+                        email_template_name="registration_email.html",
+                        subject_template_name="registration_subject.txt",
+                        extra_email_context={"organization": self.organization.name},
+                        use_https=self.request.is_secure(),
+                        request=self.request,
+                    )
 
                 try:
                     member, member_created = OrganizationMember.objects.get_or_create(
