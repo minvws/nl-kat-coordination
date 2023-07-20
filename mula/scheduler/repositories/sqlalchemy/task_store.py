@@ -19,6 +19,7 @@ class TaskStore(TaskStorer):
 
         self.datastore = datastore
 
+    # TODO: add ascending descending
     @retry()
     def get_tasks(
         self,
@@ -54,7 +55,7 @@ class TaskStore(TaskStorer):
                     query.filter(models.TaskORM.p_item[f.get_field()].astext == f.value)
 
             count = query.count()
-            tasks_orm = query.all()
+            tasks_orm = query.order_by(models.TaskORM.created_at.desc()).all()
 
             tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
 
@@ -187,7 +188,7 @@ class TaskStore(TaskStorer):
 
             count = query.count()
 
-            tasks_orm = query.order_by(models.TaskORM.created_at.desc()).offset(offset).limit(limit).all()
+            tasks_orm = query.order_by(models.TaskORM.created_at.asc()).offset(offset).limit(limit).all()
 
             tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
 

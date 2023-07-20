@@ -98,9 +98,9 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
-        # Delayed task thread
+        # Delayed tasks
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-delayed",
+            name=f"scheduler-{self.scheduler_id}-delayed_tasks",
             target=self.push_tasks_for_delayed_tasks,
             interval=60.0,
         )
@@ -322,9 +322,15 @@ class BoefjeScheduler(Scheduler):
 
         with futures.ThreadPoolExecutor() as executor:
             for task in tasks_to_push:
+                ooi = self.ctx.services.octopoes.get_object(
+                    organisation_id=self.organisation.id,
+                    reference=task.input_ooi,
+                )
                 executor.submit(
                     self.push_task,
                     task=task,
+                    boefje=task.boefje,
+                    ooi=ooi,
                     caller=self.push_tasks_for_delayed_tasks.__name__,
                 )
 
@@ -523,9 +529,9 @@ class BoefjeScheduler(Scheduler):
 
     def push_task(
         self,
+        boefje: Boefje,
+        ooi: OOI,
         task: Optional[BoefjeTask] = None,
-        boefje: Optional[Boefje] = None,
-        ooi: Optional[OOI] = None,
         caller: str = "",
     ) -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
@@ -537,14 +543,12 @@ class BoefjeScheduler(Scheduler):
             caller: Caller of this function. Defaults to "".
 
         """
-        if task is None and (boefje is not None and ooi is not None):
+        if task is None:
             task = BoefjeTask(
                 boefje=Boefje(id=boefje.id, version=boefje.version),
                 input_ooi=ooi.primary_key,
                 organization=self.organisation.id,
             )
-        else:
-            raise ValueError("Either task or boefje and ooi must be set")
 
         # We need to create a PrioritizedItem for this task, to push
         # it to the priority queue.
@@ -653,7 +657,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         self.logger.info(
-            "Created boefje task: %s " "[task_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
+            "Created boefje task: %s [task_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,
             task.id,
             self.organisation.id,

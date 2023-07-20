@@ -1313,6 +1313,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             return_value=True,
         ).start()
 
+        self.mock_get_object_by_primary_key = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_object"
+        ).start()
+
     def test_push_tasks_for_delayed_tasks_rate_limited(self):
         """When a task is rate limited, it should not be pushed to the queue"""
         # Arrange
@@ -1329,7 +1333,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        self.scheduler.push_task(first_task)
+        self.scheduler.push_task(boefje, ooi, first_task)
+
+        # Mocks
+        self.mock_get_object_by_primary_key.return_value = ooi
 
         # Task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
@@ -1360,7 +1367,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
 
         # Assert: Second time should be rate limited, and task should be
         # delayed
-        self.scheduler.push_task(second_task)
+        self.scheduler.push_task(boefje, ooi, second_task)
 
         # Task should NOT be on priority queue
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -1399,8 +1406,11 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        self.scheduler.push_task(first_task)
-        self.scheduler.push_task(second_task)
+        # Mocks
+        self.mock_get_object_by_primary_key.return_value = ooi
+
+        self.scheduler.push_task(boefje, ooi, first_task)
+        self.scheduler.push_task(boefje, ooi, second_task)
 
         # Assert: task should be on priority queue
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
@@ -1447,3 +1457,207 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id.hex, second_task.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+    def test_push_tasks_for_delayed_tasks_multiple(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+            rate_limit="1/hour",
+        )
+        first_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        second_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        third_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        # Mocks
+        self.mock_get_object_by_primary_key.return_value = ooi
+
+        # Act
+        self.scheduler.push_task(boefje, ooi, first_task)
+
+        # Assert: first task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(first_task.id, task_pq.id)
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: first task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
+        self.assertEqual(task_db.id.hex, first_task.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Act: push second task
+        self.scheduler.push_task(boefje, ooi, second_task)
+
+        # Assert: first task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(first_task.id, task_pq.id)
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: second task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
+
+        # Act: push tasks for delayed tasks
+        self.scheduler.push_tasks_for_delayed_tasks()
+
+        # Act: push third task
+        self.scheduler.push_task(boefje, ooi, third_task)
+
+        # Assert: first task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(first_task.id, task_pq.id)
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: second task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
+
+        # Assert: third task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(third_task.id)
+        self.assertEqual(task_db.id.hex, third_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
+
+    def test_push_tasks_for_delayed_tasks_multiple_clear(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+            rate_limit="1/second",
+        )
+        first_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        second_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        third_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        # Mocks
+        self.mock_get_object_by_primary_key.return_value = ooi
+
+        # Act
+        self.scheduler.push_task(boefje, ooi, first_task)
+        self.scheduler.push_task(boefje, ooi, second_task)
+        self.scheduler.push_task(boefje, ooi, third_task)
+
+        # Assert: first task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(first_task.id, task_pq.id)
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: first task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
+        self.assertEqual(task_db.id.hex, first_task.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: second task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
+
+        # Assert: third task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(third_task.id)
+        self.assertEqual(task_db.id.hex, third_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
+
+        time.sleep(1)
+
+        # Act: pop task from queue, push tasks for delayed tasks
+        self.scheduler.pop_item_from_queue()
+        self.scheduler.push_tasks_for_delayed_tasks()
+
+        # Assert: first task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
+        self.assertEqual(task_db.id.hex, first_task.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        # Assert: second task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: third task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(third_task.id)
+        self.assertEqual(task_db.id.hex, third_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
+
+        time.sleep(1)
+
+        # Act: pop task from queue, push tasks for delayed tasks
+        self.scheduler.pop_item_from_queue()
+        self.scheduler.push_tasks_for_delayed_tasks()
+
+        # Assert: first task should be in datastore, and dispatched
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
+        self.assertEqual(task_db.id.hex, first_task.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        # Assert: second task should be in datastore and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        # Assert: third task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(third_task.id)
+        self.assertEqual(task_db.id.hex, third_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        time.sleep(1)
+
+        # Act: pop task from queue, push tasks for delayed tasks
+        self.scheduler.pop_item_from_queue()
+        self.scheduler.push_tasks_for_delayed_tasks()
+
+        # Assert: first task should be in datastore, and dispatched
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
+        self.assertEqual(task_db.id.hex, first_task.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        # Assert: second task should be in datastore and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        # Assert: third task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(third_task.id)
+        self.assertEqual(task_db.id.hex, third_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
