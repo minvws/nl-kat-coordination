@@ -7,7 +7,6 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 from sqlalchemy.orm import Session
 
-from boefjes.config import settings
 from boefjes.katalogus.clients import (
     PluginRepositoryClient,
     PluginRepositoryClientInterface,
@@ -23,11 +22,6 @@ from boefjes.katalogus.storage.interfaces import (
     RepositoryStorage,
     SettingsNotConformingToSchema,
     SettingsStorage,
-)
-from boefjes.katalogus.storage.memory import (
-    PluginStatesStorageMemory,
-    RepositoryStorageMemory,
-    SettingsStorageMemory,
 )
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
@@ -203,21 +197,6 @@ class PluginService:
 
 
 def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
-    if not settings.enable_db:
-        store = PluginStatesStorageMemory(organisation_id)
-        repository_storage = RepositoryStorageMemory(organisation_id)
-        client = PluginRepositoryClient()
-        local_repo = get_local_repository()
-
-        yield PluginService(
-            store,
-            repository_storage,
-            SettingsStorageMemory(),
-            client,
-            local_repo,
-        )
-        return
-
     def closure(session: Session):
         return PluginService(
             create_plugin_enabled_storage(session),

@@ -24,7 +24,6 @@ class Settings(BaseSettings):
     # Runtime configuration
     runtime: RuntimeConfiguration = RuntimeConfiguration.LOCAL
 
-    enable_db: bool = True
     katalogus_db_uri: PostgresDsn = "postgresql://xx:xx@host:5432/katalogus"
 
     scheduler_api: AnyHttpUrl = "http://localhost:8004"
