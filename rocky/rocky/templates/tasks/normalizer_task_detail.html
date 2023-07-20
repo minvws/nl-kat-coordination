@@ -1,0 +1,32 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Task detail page" %}</h1>
+            </div>
+
+            <div>
+              <h2>{% translate "Input object" %}</h2>
+              {{ task.p_item.data.raw_data.boefje_meta.input_ooi }}
+            </div>
+
+            <div>
+              <h2>{% translate "Yielded objects" %}</h2>
+              {% for object in output_oois %}
+                <a href="{% ooi_url 'ooi_detail' object organization.code %}">{{ object }}</a>
+              {% endfor %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}
+
+{% block script %}
+    {{ block.super }}
+{% endblock script %}

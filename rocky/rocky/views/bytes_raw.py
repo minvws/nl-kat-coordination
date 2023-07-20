@@ -37,6 +37,15 @@ class BytesRawView(OrganizationView):
             return redirect(request.META["HTTP_REFERER"])
 
 
+# class NormalizerOriginRawView(OrganizationView):
+#     def get(self, request, **kwargs):
+
+
+#             for origin in connector.list_origins(valid_time, task_id=normalizer_meta.id):
+
+#             return FileResponse(
+
+
 def zip_data(raws: Dict[str, bytes], raw_metas: List[Dict]) -> BytesIO:
     zf_buffer = BytesIO()
 

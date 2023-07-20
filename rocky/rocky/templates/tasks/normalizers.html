@@ -24,14 +24,13 @@
                             <thead>
                                 <tr>
                                     <th scope="col">{% translate "OOI" %}</th>
-                                    <th scope="col">{% translate "Produced by Boefje" %}</th>
                                     <th scope="col">{% translate "Normalizer" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
+                                    <th scope="col">{% translate "Produced by Boefje" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
                                     <th scope="col">{% translate "Consumed Raw File" %}</th>
                                     <th scope="col">{% translate "MimeType" %}</th>
                                     <th scope="col">{% translate "Output OOI's" %}</th>
-                                    <th scope="col">{% translate "Download task details" %}</th>
                                     <th scope="col">{% translate "Reschedule" %}</th>
                                 </tr>
                             </thead>
@@ -46,9 +45,10 @@
                                             <td>{% translate "No input OOI" %}</td>
                                         {% endif %}
                                         <td>
-                                          <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                                          <a href="{% url 'normalizers_task_view' organization_code=organization.code task_id=task.id %}">
+                                            {{ task.p_item.data.normalizer.id }}
+                                          </a>
                                         </td>
-                                        <td>{{ task.p_item.data.normalizer.id }}</td>
                                         {% if task.status.value == "completed" %}
                                             <td class="confirmation">{{ task.status.value|capfirst }}</td>
                                         {% elif task.status.value == "failed" %}
@@ -56,19 +56,30 @@
                                         {% else %}
                                             <td>{{ task.status.value|capfirst }}</td>
                                         {% endif %}
-                                        <td><a href="{% url 'boefjes_task_list' organization_code=organization.code %}#{{ task.id|slugify }}"> {{ task.created_at }}</a></td>
                                         <td>
-                                            {% if task.status.value in "completed,failed" %}
-                                                <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}">{% translate "Download meta and raw data" %}</a>
+                                            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                                        </td>
+                                        <td>
+                                            {{ task.created_at }}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}">{% translate "Download meta and raw data" %}</a>
+                                        </td>
+                                        <td>
+                                            {% if task.status.value in "completed" %}
+                                                {% for type in task.p_item.data.raw_data.mime_types %}
+                                                    {{ type.value }}<br>
+                                                {% endfor %}
                                             {% else %}
-                                                <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate "Download meta data" %}</a>
                                             {% endif %}
                                         </td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
                                         <td>
-                                          {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id btn_class="ghost" %}
+                                            {% if task.status.value in "completed,failed" %}
+                                            {% else %}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id btn_class="ghost" %}
                                         </td>
                                     </tr>
                                 {% endfor %}

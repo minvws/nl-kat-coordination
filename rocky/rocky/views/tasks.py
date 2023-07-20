@@ -86,6 +86,7 @@ class TaskListView(OrganizationView, ListView):
             if request.POST["action"] == PageActions.RESCHEDULE_TASK.value:
                 task_id = self.request.POST.get("task_id")
                 task = client.get_task_details(task_id)
+
                 if task.type == "normalizer":
                     return redirect(
                         reverse("normalizers_task_list", kwargs={"organization_code": self.organization.code})
