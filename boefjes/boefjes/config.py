@@ -15,12 +15,10 @@ class Settings(BaseSettings):
 
     # Worker configuration
     pool_size: int = 2
-    poll_interval: float = 1.0
+    poll_interval: float = 10.0
     worker_heartbeat: float = 1.0
 
     # Queue configuration
-    queue_name_boefjes: str = "boefjes"
-    queue_name_normalizers: str = "normalizers"
     queue_uri: str = "amqp://"
 
     # Runtime configuration
@@ -41,7 +39,7 @@ class Settings(BaseSettings):
 
     span_export_grpc_endpoint: Optional[str] = None
 
-    remote_ns: str = "8.8.8.8"
+    remote_ns: str = "1.1.1.1"
 
 
 settings = Settings()
