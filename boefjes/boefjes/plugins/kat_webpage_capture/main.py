@@ -100,6 +100,7 @@ def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tu
     """Run Playwright in Docker."""
     client = docker.from_env()
     client.images.pull(PLAYWRIGHT_IMAGE)
+    # https://playwright.dev/docs/docker#crawling-and-scraping
     container = client.containers.run(
         image=PLAYWRIGHT_IMAGE,
         command=[
@@ -108,6 +109,14 @@ def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tu
             f"npx -y {build_playwright_command(webpage=webpage, browser=browser, tmp_path=tmp_path)}",
         ],
         detach=True,
+        ipc_mode="host",
+        user="pwuser",
+        security_opt=[
+            (
+                'seccomp={"comment": "Allow create user namespaces", "names": ["clone", "setns", "unshare"], '
+                '"action": "SCMP_ACT_ALLOW", "args": [], "includes": {}, "excludes": {}}'
+            )
+        ],
     )
     try:
         container.wait()
