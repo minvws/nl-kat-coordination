@@ -171,6 +171,11 @@ def xtdbtype_crux():
 
 
 @pytest.fixture
+def app_settings():
+    return Settings()
+
+
+@pytest.fixture
 def octopoes_service() -> OctopoesService:
     return OctopoesService(Mock(), Mock(), Mock(), Mock())
 
