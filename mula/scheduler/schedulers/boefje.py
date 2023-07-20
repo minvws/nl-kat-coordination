@@ -521,7 +521,13 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    def push_task(self, task: BoefjeTask = None, boefje: Boefje = None, ooi: OOI = None, caller: str = "") -> None:
+    def push_task(
+        self,
+        task: Optional[BoefjeTask] = None,
+        boefje: Optional[Boefje] = None,
+        ooi: Optional[OOI] = None,
+        caller: str = "",
+    ) -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -537,6 +543,8 @@ class BoefjeScheduler(Scheduler):
                 input_ooi=ooi.primary_key,
                 organization=self.organisation.id,
             )
+        else:
+            raise ValueError("Either task or boefje and ooi must be set")
 
         # We need to create a PrioritizedItem for this task, to push
         # it to the priority queue.
@@ -645,8 +653,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         self.logger.info(
-            "Created boefje task: %s "
-            "[task_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
+            "Created boefje task: %s " "[task_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,
             task.id,
             self.organisation.id,
