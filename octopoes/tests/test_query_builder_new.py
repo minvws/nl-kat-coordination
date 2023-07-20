@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from octopoes.config.settings import XTDBType
+from octopoes.models.origin import Origin
 from octopoes.xtdb import (
     Datamodel,
     FieldSet,
@@ -215,6 +216,7 @@ class QueryNodeTest(TestCase):
 
     def test_escape_injection_success(self):
         query = generate_pull_query(
+            XTDBType.CRUX,
             FieldSet.ALL_FIELDS,
             where={"attr_1": 'test_value_with_quotes" and injection'},
         )
@@ -227,3 +229,19 @@ class QueryNodeTest(TestCase):
             expected_query,
             query,
         )
+
+    def test_get_origin_by_task_id(self):
+        query = generate_pull_query(
+            XTDBType.CRUX,
+            FieldSet.ALL_FIELDS,
+            {
+                "task_id": "5c864d45a4364a81a5fecfd8b359cf9d",
+                "type": Origin.__name__,
+            },
+        )
+
+        expected_query = (
+            "{:query {:find [(pull ?e [*])] :in [_task_id _type] :where [[?e :task_id _task_id] "
+            '[?e :type _type]]   } :in-args [ "5c864d45a4364a81a5fecfd8b359cf9d" "Origin" ]}'
+        )
+        self.assertEqual(expected_query, query)

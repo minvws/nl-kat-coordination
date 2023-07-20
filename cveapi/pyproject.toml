@@ -1,0 +1,21 @@
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311"]
+line-length = 120
+
+[tool.poetry]
+name = "cveapi"
+version = "0.0.1.dev1"
+description = "CVE API"
+license = "EUPL"
+authors = ["MinVWS <maintainer@openkat.nl>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+
+[tool.poetry.scripts]
+cveapi = 'cveapi:run'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

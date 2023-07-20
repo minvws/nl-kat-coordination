@@ -50,7 +50,7 @@ Teardown Test
 
 Verify Origin Present
     [Arguments]    ${reference}    ${expected_amout_of_origins}
-    ${response}    Get    ${OCTOPOES_URI}/origins    params=reference=${reference}
+    ${response}    Get    ${OCTOPOES_URI}/origins    params=result=${reference}
     Should Be Equal As Integers    ${response.status_code}    200
     ${length}    Get Length    ${response.json()}
     Should Be Equal As Integers    ${length}    ${expected_amout_of_origins}
