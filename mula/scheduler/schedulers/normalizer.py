@@ -70,11 +70,11 @@ class NormalizerScheduler(Scheduler):
             self.scheduler_id,
         )
 
-        # Check if the raw data doesn't contain an error mime-type,
+        # Check if the raw data doesn't contain an error/warning/info/debug mime-type,
         # we don't need to create normalizers when the raw data returned
-        # an error.
+        # an error or logging info.
         for mime_type in latest_raw_data.raw_data.mime_types:
-            if mime_type.get("value", "").startswith("error/"):
+            if mime_type.get("value", "").startswith(("error/", "warning/", "info/", "debug/")):
                 self.logger.warning(
                     "Skipping raw data with error mime type [raw_data.id=%s ,organisation.id=%s, scheduler_id=%s]",
                     latest_raw_data.raw_data.id,
