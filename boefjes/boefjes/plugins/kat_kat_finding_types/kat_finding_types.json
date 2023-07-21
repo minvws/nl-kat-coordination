@@ -489,22 +489,29 @@
         "impact": null,
         "recommendation": "Ideally to minimize the attack surface as much as possible these panels should not be directly exposed to the internet"
     },
-    "KAT-SUFFICIENT-CIPHERS": {
-        "description": "Ciphers are used that are labeled as sufficient. These should only be used for legacy systems.",
-        "source": null,
-        "risk": "recommendation",
-        "impact": null,
-        "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
-    },
-    "KAT-BAD_CIPHERS": {
-        "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
-        "source": null,
-        "risk": "medium",
-        "impact": null,
-        "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
-    },
     "KAT-UNKNOWN_CIPHERS": {
           "description": "Ciphers are used that are not found in our list of ciphers. Manually verify that these ciphers are labelled as 'good'",
+          "source": null,
+          "risk": "recommendation",
+          "impact": null,
+          "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
+    },
+    "KAT-CRITICAL-BAD-CIPHER": {
+          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
+          "source": null,
+          "risk": "critical",
+          "impact": null,
+          "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
+    },
+    "KAT-MEDIUM-BAD-CIPHER": {
+          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
+          "source": null,
+          "risk": "medium",
+          "impact": null,
+          "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
+    },
+    "KAT-RECOMMENDATION-BAD-CIPHER": {
+          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
           "source": null,
           "risk": "recommendation",
           "impact": null,
