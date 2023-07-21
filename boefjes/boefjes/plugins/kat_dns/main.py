@@ -9,8 +9,11 @@ from dns.resolver import Answer
 
 from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
+from boefjes.utils import BoefjeOutput, Channel
 
 logger = logging.getLogger(__name__)
+
+boefje_output = BoefjeOutput()
 
 
 class ZoneNotFoundException(Exception):
@@ -37,7 +40,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         except dns.resolver.NoAnswer:
             pass
         except dns.resolver.NXDOMAIN:
-            return [(set(), "NXDOMAIN")]
+            return boefje_output.format(set(), "NXDOMAIN")
         except dns.resolver.Timeout:
             pass
 
@@ -48,7 +51,12 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         "dmarc_response": get_email_security_records(hostname, "_dmarc"),
         "dkim_response": get_email_security_records(hostname, "_domainkey"),
     }
-    return [(set(), json.dumps(results))]
+
+    boefje_output.writeln(Channel.DEBUG, "This is a debug message.")
+    boefje_output.writeln(Channel.DEBUG, "This is another debug message.")
+    boefje_output.writeln(Channel.INFO, "This is some info! :O !")
+
+    return boefje_output.format(set(), json.dumps(results))
 
 
 def get_parent_zone_soa(name: Name) -> Answer:
