@@ -15,7 +15,7 @@ def convert_date_to_datetime(d: date) -> datetime:
     return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
 
 
-def get_mandatory_fields(request, params: list[str] = []):
+def get_mandatory_fields(request, params: List[str] = []):
     mandatory_fields = []
 
     if not params:
