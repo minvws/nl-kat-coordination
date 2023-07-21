@@ -17,3 +17,4 @@ Contains documentation for developers and contributors.
    debuggingtroubleshooting
    latex
    externalauthentication
+   cveapi
