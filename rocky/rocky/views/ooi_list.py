@@ -12,6 +12,7 @@ from requests import RequestException
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
 from tools.models import Indemnification
+from tools.view_helpers import get_mandatory_fields
 
 from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
@@ -35,8 +36,11 @@ class OOIListView(BaseOOIListView):
 
         context["types_display"] = self.get_ooi_types_display()
         context["object_type_filters"] = self.get_ooi_type_filters()
+        context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["select_oois_form"] = SelectOOIForm(
-            context.get("ooi_list", []), organization_code=self.organization.code
+            context.get("ooi_list", []),
+            organization_code=self.organization.code,
+            mandatory_fields=context["mandatory_fields"],
         )
         context["member"] = self.organization_member
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
