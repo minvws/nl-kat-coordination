@@ -23,8 +23,6 @@ class WebpageCaptureException(Exception):
     def __str__(self):
         return str(self.message) + "\n\nContainer log:\n" + self.container_log
 
-    pass
-
 
 class TarStream(io.RawIOBase):
     """Wrapper around generator to feed tarfile.
@@ -81,19 +79,18 @@ def get_file_from_container(container: docker.models.containers.Container, path:
 
 def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
     """Returns playwright command including webpage, browser and locations for image, har and storage."""
-    x = " ".join(
-        [
-            "npx playwright screenshot",
-            f"-b {browser}",
-            "--full-page",
-            f"--save-har={tmp_path}.har.zip",
-            f"--save-storage={tmp_path}.json",
-            webpage,
-            f"{tmp_path}.png",
-        ]
-    )
-    logging.info("command: %s", x)
-    return x
+    return [
+        "/usr/bin/npx",
+        "playwright",
+        "screenshot",
+        "-b",
+        browser,
+        "--full-page",
+        f"--save-har={tmp_path}.har.zip",
+        f"--save-storage={tmp_path}.json",
+        webpage,
+        f"{tmp_path}.png",
+    ]
 
 
 def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tuple[bytes]:
@@ -101,13 +98,10 @@ def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tu
     client = docker.from_env()
     client.images.pull(PLAYWRIGHT_IMAGE)
     # https://playwright.dev/docs/docker#crawling-and-scraping
+    command = build_playwright_command(webpage=webpage, browser=browser, tmp_path=tmp_path)
     container = client.containers.run(
         image=PLAYWRIGHT_IMAGE,
-        command=[
-            "/bin/sh",
-            "-c",
-            f"npx -y {build_playwright_command(webpage=webpage, browser=browser, tmp_path=tmp_path)}",
-        ],
+        command=command,
         detach=True,
         ipc_mode="host",
         user="pwuser",
@@ -126,7 +120,7 @@ def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tu
         return image.tobytes(), har, storage
     except (docker.errors.NotFound, UnidentifiedImageError):
         raise WebpageCaptureException(
-            "Error while running Playwright container",
+            "Error while running Playwright container, command was: " + " ".join(command),
             container.logs(stdout=True, stderr=True, timestamps=True).decode(),
         )
     finally:
