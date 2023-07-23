@@ -28,7 +28,6 @@ class NormalizerScheduler(Scheduler):
         ranker: rankers.Ranker,
         organisation: Organisation,
         callback: Optional[Callable[..., None]] = None,
-        populate_queue_enabled: bool = True,
     ):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
@@ -39,26 +38,23 @@ class NormalizerScheduler(Scheduler):
             queue=queue,
             ranker=ranker,
             callback=callback,
-            populate_queue_enabled=populate_queue_enabled,
         )
 
-        self.initialize_listeners()
-
     def run(self) -> None:
+        listener = listeners.RawData(
+            dsn=self.ctx.config.host_raw_data,
+            queue=f"{self.organisation.id}__raw_file_received",
+            func=self.push_tasks_for_received_raw_data,
+            prefetch_count=self.ctx.config.queue_prefetch_count,
+        )
+
+        self.listeners["raw_data"] = listener
+
         self.run_in_thread(
             name=f"scheduler-{self.scheduler_id}-raw_file",
             target=self.listeners["raw_data"].listen,
             loop=False,
         )
-
-    def initialize_listeners(self) -> None:
-        listener = listeners.RawData(
-            dsn=self.ctx.config.host_raw_data,
-            queue=f"{self.organisation.id}__raw_file_received",
-            func=self.push_tasks_for_received_raw_data,
-        )
-
-        self.listeners["raw_data"] = listener
 
     def push_tasks_for_received_raw_data(self, latest_raw_data: RawData) -> None:
         """Create tasks for the received raw data.

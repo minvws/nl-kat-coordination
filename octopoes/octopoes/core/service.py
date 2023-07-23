@@ -117,7 +117,7 @@ class OctopoesService:
         return tree
 
     def _delete_ooi(self, reference: Reference, valid_time: datetime) -> None:
-        referencing_origins = self.origin_repository.list_by_result(reference, valid_time)
+        referencing_origins = self.origin_repository.list(valid_time, result=reference)
         if not referencing_origins:
             self.ooi_repository.delete(reference, valid_time)
 
@@ -368,7 +368,7 @@ class OctopoesService:
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
-        inference_origins = self.origin_repository.list_by_source(event.new_data.reference, valid_time=event.valid_time)
+        inference_origins = self.origin_repository.list(event.valid_time, source=event.new_data.reference)
         inference_params = self.origin_parameter_repository.list_by_reference(
             event.new_data.reference, valid_time=event.valid_time
         )
@@ -383,7 +383,7 @@ class OctopoesService:
         reference = event.old_data.reference
 
         # delete related origins to which it is a source
-        origins = self.origin_repository.list_by_source(reference, event.valid_time)
+        origins = self.origin_repository.list(event.valid_time, source=reference)
         for origin in origins:
             self.origin_repository.delete(origin, event.valid_time)
 
@@ -435,7 +435,7 @@ class OctopoesService:
             return
 
     def _run_inferences(self, event: ScanProfileDBEvent) -> None:
-        inference_origins = self.origin_repository.list_by_source(event.reference, valid_time=event.valid_time)
+        inference_origins = self.origin_repository.list(event.valid_time, source=event.reference)
         inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
@@ -557,7 +557,7 @@ class OctopoesService:
         # TODO: remove all Origins and Origin Parameters, which are no longer in use
 
         # rerun all existing bits
-        origins = self.origin_repository.list(origin_type=OriginType.INFERENCE, valid_time=valid_time)
+        origins = self.origin_repository.list(valid_time, origin_type=OriginType.INFERENCE)
         for origin in origins:
             self._run_inference(origin, valid_time)
             bit_counter.update({origin.method})

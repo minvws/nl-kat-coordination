@@ -76,6 +76,7 @@ def add_admin_group_permissions(member):
         Permission.objects.get(codename="change_organizationmember").id,
         Permission.objects.get(codename="can_delete_oois").id,
         Permission.objects.get(codename="add_indemnification").id,
+        Permission.objects.get(codename="can_scan_organization").id,
     ]
     group.permissions.set(admin_permissions)
 

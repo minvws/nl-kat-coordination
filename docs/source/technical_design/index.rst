@@ -13,8 +13,9 @@ Contains documentation for developers and contributors.
    hardening
    localinstall
    gitpod
+   community
    nginx
    debuggingtroubleshooting
    latex
    externalauthentication
-   community
+   cveapi
