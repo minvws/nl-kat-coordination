@@ -503,10 +503,22 @@ class BoefjeScheduler(Scheduler):
 
         # Task has been finished (failed, or succeeded) according to
         # the datastore, but we have no results of it in bytes, meaning
-        # we have a problem.
-        if task_bytes is None and task_db is not None and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
+        # we have a problem. However when the grace period has been reached we
+        # should not raise an error.
+        if (
+            task_bytes is None
+            and task_db is not None
+            and task_db.status in [TaskStatus.COMPLETED, TaskStatus.FAILED]
+            and (
+                task_db.modified_at is not None
+                and task_db.modified_at
+                > datetime.now(timezone.utc) - timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+            )
+        ):
             self.logger.error(
-                "Task has been finished, but no results found in bytes "
+                "Task has been finished, but no results found in bytes, "
+                "please review the bytes logs for more information regarding "
+                "this error. "
                 "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,
