@@ -77,7 +77,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if member.trusted_clearance_level < 0 %}
+                                            {% if member.acknowledged_clearance_level < 0 %}
                                                 None
                                             {% else %}
                                                 L{{ member.acknowledged_clearance_level }}
