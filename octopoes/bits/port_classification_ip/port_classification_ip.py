@@ -38,8 +38,10 @@ DB_TCP_PORTS = [
 
 
 def get_ports_from_config(config, config_key, default):
-    ports = config.get(config_key, "")
-    return list(map(int, ports.split(","))) if ports else default
+    ports = config.get(config_key, None)
+    if ports is None:
+        return default
+    return list(map(int, ports.split(","))) if ports else []
 
 
 def run(input_ooi: IPPort, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:

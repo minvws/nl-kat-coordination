@@ -448,3 +448,41 @@ SA (system administrator) ports will trigger a medium finding that a system admi
         "bit-id": "port-classification-ip",
         "config": {"common_tcp_ports": "1,2,3", "sa_tcp_ports": "4,5,6"}
     }
+
+Defaults are:
+
+.. code-block:: python
+
+    COMMON_TCP_PORTS = [
+        25,  # SMTP
+        53,  # DNS
+        80,  # HTTP
+        110,  # POP3
+        143,  # IMAP
+        443,  # HTTPS
+        465,  # SMTPS
+        587,  # SMTP (message submmission)
+        993,  # IMAPS
+        995,  # POP3S
+    ]
+
+    COMMON_UDP_PORTS = [
+        53,  # DNS
+    ]
+
+    SA_TCP_PORTS = [
+        21,  # FTP
+        22,  # SSH
+        23,  # Telnet
+        3389,  # Remote Desktop
+        5900,  # VNC
+    ]
+    DB_TCP_PORTS = [
+        1433,  # MS SQL Server
+        1434,  # MS SQL Server
+        3050,  # Interbase/Firebase
+        3306,  # MySQL
+        5432,  # PostgreSQL
+    ]
+
+You can set the ports to an empty string to disable the check.
