@@ -6,6 +6,12 @@ from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.service import SSLCipher
 
+SEVERITY_TO_ID = {
+    "Critical": "KAT-CRITICAL-BAD-CIPHER",
+    "Medium": "KAT-MEDIUM-BAD-CIPHER",
+    "Recommendation": "KAT-RECOMMENDATION-BAD-CIPHER",
+}
+
 
 def get_severity_and_reasons(cipher_suite) -> List[Tuple[str, str]]:
     with Path.open(Path(__file__).parent / "List-ciphers-openssl-with-finding-type.csv", newline="") as csvfile:
@@ -73,34 +79,9 @@ def run(input_ooi: SSLCipher, additional_oois, config) -> Iterator[OOI]:
     if not highest_severity:
         return
 
-    # If the highest severity is critical, return a finding
-    if highest_severity == "Critical":
+    if highest_severity in SEVERITY_TO_ID:
         ft = KATFindingType(
-            id="KAT-CRITICAL-BAD-CIPHER",
-        )
-        yield ft
-        yield Finding(
-            finding_type=ft.reference,
-            ooi=input_ooi.reference,
-            description=f"This cipher suite should not be used because:\n{all_reasons}",
-        )
-
-    # If the highest severity is medium, return a finding
-    if highest_severity == "Medium":
-        ft = KATFindingType(
-            id="KAT-MEDIUM-BAD-CIPHER",
-        )
-        yield ft
-        yield Finding(
-            finding_type=ft.reference,
-            ooi=input_ooi.reference,
-            description=f"This cipher suite should not be used because:\n{all_reasons}",
-        )
-
-    # If the highest severity is recommendation, return a finding
-    if highest_severity == "Recommendation":
-        ft = KATFindingType(
-            id="KAT-RECOMMENDATION-BAD-CIPHER",
+            id=SEVERITY_TO_ID[highest_severity],
         )
         yield ft
         yield Finding(
