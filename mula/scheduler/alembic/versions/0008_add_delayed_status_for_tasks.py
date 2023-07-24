@@ -1,7 +1,7 @@
 """Add DELAYED status for tasks
 
 Revision ID: 0008
-Revises: 0007_cancelled_status_for_tasks
+Revises: 0007_add_cancelled_status_for_tasks
 Create Date: 2023-07-24 12:22:42.329666
 
 """
@@ -9,7 +9,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "0008"
-down_revision = "0007_add_cancelled_status_for_tasks"
+down_revision = "0007"
 branch_labels = None
 depends_on = None
 
