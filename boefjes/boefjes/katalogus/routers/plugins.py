@@ -1,10 +1,9 @@
 from functools import partial
 from typing import Dict, List
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi.responses import FileResponse, JSONResponse, Response
 from requests import HTTPError
-from starlette.responses import FileResponse, JSONResponse, Response
-from starlette.status import HTTP_404_NOT_FOUND
 
 from boefjes.katalogus.dependencies.plugins import (
     PluginService,
@@ -77,7 +76,7 @@ def get_plugin(
         with plugin_service as p:
             return p.by_plugin_id(plugin_id, organisation_id)
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -106,7 +105,7 @@ def get_repository_plugin(
         with plugin_service as p:
             return p.repository_plugin(repository_id, plugin_id, organisation_id)
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -123,7 +122,7 @@ def update_plugin_state(
         with plugin_service as p:
             p.update_by_id(repository_id, plugin_id, organisation_id, enabled)
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -137,7 +136,7 @@ def get_plugin_schema(
         with plugin_service as p:
             return JSONResponse(p.schema(plugin_id))
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -151,7 +150,7 @@ def get_plugin_cover(
         with plugin_service as p:
             return FileResponse(p.cover(plugin_id))
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -166,7 +165,7 @@ def get_plugin_description(
         with plugin_service as p:
             return Response(p.description(plugin_id, organisation_id))
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
