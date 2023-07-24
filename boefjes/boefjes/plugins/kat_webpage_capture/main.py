@@ -85,6 +85,7 @@ def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
         "-b",
         browser,
         "--full-page",
+        "--ignore-https-errors",
         f"--save-har={tmp_path}.har.zip",
         f"--save-storage={tmp_path}.json",
         webpage,
