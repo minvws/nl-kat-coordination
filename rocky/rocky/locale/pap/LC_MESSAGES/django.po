@@ -201,7 +201,7 @@ msgstr "Skohé un otro codigo pa bo organisashon."
 #: account/forms/account_setup.py:266
 #: build/lib/account/forms/account_setup.py:267
 msgid "Enter tags separated by comma."
-msgstr ""
+msgstr "Drenta etikètanan separá pa komo."
 
 #: account/forms/account_setup.py:280
 #: build/lib/account/forms/account_setup.py:281
@@ -259,7 +259,7 @@ msgstr "Organisashonnan"
 
 #: account/forms/organization.py:36 build/lib/account/forms/organization.py:36
 msgid "The organization from which to clone settings."
-msgstr ""
+msgstr "E organisashon for di unda kopia e konfigurashon."
 
 #: account/forms/password_reset.py:8
 #: build/lib/account/forms/password_reset.py:8
@@ -688,6 +688,7 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                     "
 "Indemnification not present at organization %s."
 msgstr ""
+"No por a aumenta e nivel di autorisashon di %s pa L%s. Indemnifikashon no presente pa organisashon %s."
 
 #: build/lib/account/mixins.py:105
 msgid ""
@@ -729,7 +730,7 @@ msgstr ""
 
 #: build/lib/crisis_room/views.py:103
 msgid "Failed to get list of findings, check server logs for more details."
-msgstr ""
+msgstr "No por a optené lista di diskubrimentu, kontrolá registro di servidor pa detayenan mas."
 
 #: build/lib/fmea/forms.py:31 build/lib/fmea/forms.py:123
 #: build/lib/fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:19
@@ -1693,11 +1694,15 @@ msgid ""
 "disabled plugins.\n"
 "      "
 msgstr ""
+"\n"
+" Uza e formulario abou pa kopia e konfigurashon di "
+"<i>%(current_organization)s</i> pa e organisashon selektá.\n"
+" Esaki ta inkluí tanto e konfigurashonnan di KAT-alogus manera tambe e plug-innan aktivá i desaktivá.\n"
 
 #: build/lib/katalogus/templates/confirmation_clone_settings.html:39
 #: katalogus/templates/confirmation_clone_settings.html:37
 msgid "Clone"
-msgstr ""
+msgstr "Kopia"
 
 #: build/lib/katalogus/templates/katalogus.html:14
 #: build/lib/katalogus/views/change_clearance_level.py:57
@@ -2164,7 +2169,7 @@ msgstr "Kambia nivél di autorisashon"
 
 #: build/lib/katalogus/views/katalogus.py:39 katalogus/views/katalogus.py:36
 msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-msgstr ""
+msgstr "Carga di plug-in den KATalogus a falla. Fabor kontrolá e registro di KATalogus."
 
 #: build/lib/katalogus/views/katalogus_settings.py:39
 msgid "Settings from %s to %s successfully cloned."
@@ -3712,10 +3717,11 @@ msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
 "more details."
 msgstr ""
+"No por a optené lista di diskubrimentu pa e organisashon {}, kontrolá registro di servidor pa detayenan mas."
 
 #: katalogus/templates/partials/enable_disable_plugin.html:21
 msgid "You don't have permission to enable "
-msgstr ""
+msgstr "Bo no tin permiso pa aktivá "
 
 #: katalogus/templates/plugin_detail.html:56
 msgid "%(plugin_name)s does not need any input objects."
@@ -3807,7 +3813,7 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                 You "
 "acknowledged a clearance level of %s."
 msgstr ""
-"No por a subi e nivel di klarensia di %s pa L%s. Bo a rekonosé un nivel di autorisashon di %s."
+"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di %s."
 
 #: tools/forms/ooi.py:99
 msgid "Show Boefjes that exceed the objects clearance level"
@@ -3956,7 +3962,7 @@ msgstr "Falta parametro: {param_name}"
 #: venv/lib/python3.9/site-packages/click/exceptions.py:211
 #, python-brace-format
 msgid "No such option: {name}"
-msgstr ""
+msgstr "No tin e opcion aki: {name}"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:223
 #, python-brace-format
@@ -4267,11 +4273,11 @@ msgstr[1] ""
 msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
-msgstr ""
+msgstr "Extension di archivonan “%(extension)s” no ta permití. Extension permití ta: %(allowed_extensions)s."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:559
 msgid "Null characters are not allowed."
-msgstr ""
+msgstr "Karakternan nul no ta permití."
 
 #: venv/lib/python3.9/site-packages/django/db/models/base.py:1210
 #: venv/lib/python3.9/site-packages/django/forms/models.py:768
@@ -4286,7 +4292,7 @@ msgstr "%(model_name)s ku nomber %(field_labels)s ta èksisti kaba."
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:100
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "E balor %(value)r no ta un selekshon balido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:101
 msgid "This field cannot be null."
@@ -4529,21 +4535,21 @@ msgstr "%(model)s instance with %(field)s %(value)r does not exist."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:792
 msgid "Foreign Key (type determined by related field)"
-msgstr ""
+msgstr "Foreign Key (tipo determina pa e vèld relata)"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1045
 msgid "One-to-one relationship"
-msgstr ""
+msgstr "One-to-one relashon"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1099
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "%(from)s-%(to)s relashon"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1100
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "%(from)s-%(to)s relashonnan"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/related.py:1142
 msgid "Many-to-many relationship"
@@ -4553,38 +4559,38 @@ msgstr "Relashon many-to-many"
 #. characters will prevent the default label_suffix to be appended to the label
 #: venv/lib/python3.9/site-packages/django/forms/boundfield.py:150
 msgid ":?.!"
-msgstr ""
+msgstr ":?.!"
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:247
 msgid "Enter a whole number."
-msgstr ""
+msgstr "Yena un nùmero henter."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:402
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:1143
 msgid "Enter a valid date."
-msgstr ""
+msgstr "Yena un fecha balido."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:426
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:1144
 msgid "Enter a valid time."
-msgstr ""
+msgstr "Yena un tempu balido."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:454
 msgid "Enter a valid date/time."
-msgstr ""
+msgstr Yena un fecha/tempu balido."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:488
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Yena un durashon balido."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:489
 #, python-brace-format
 msgid "The number of days must be between {min_days} and {max_days}."
-msgstr ""
+msgstr "E kantidad di dia mester ta entre {min_days} y {max_days}."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:549
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr ""
+msgstr "Ningun archiv a ser entrega. Chèk e tipo di enkodamentu riba e formulario."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:550
 msgid "No file was submitted."
@@ -4604,7 +4610,7 @@ msgstr[1] "Sigurá e nòmber di arkivo tin por lo menos %(max)d karakternan (e t
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:556
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr ""
+msgstr "Fabor entrega un archiv òf marka e checkbox, pero no ambos."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:617
 msgid ""
@@ -4994,7 +5000,7 @@ msgstr "Aug."
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Sept."
-msgstr ""
+msgstr "Sept."
 
 #: venv/lib/python3.9/site-packages/django/utils/dates.py:32
 msgctxt "abbrev. month"
@@ -5707,7 +5713,7 @@ msgstr "Mapa di Grafa"
 
 #: rocky/templates/header.html:7
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: rocky/templates/header.html:16
 msgid "OpenKAT logo, go to the homepage of OpenKAT"
@@ -6719,6 +6725,8 @@ msgid ""
 "The severity of this findingtype has not (yet) been determined by the data "
 "source. This situation requires manual investigation of the severity."
 msgstr ""
+"Gravedat di e tìpo di diskubrimentu aki ainda no a ser determiná pa e fuente di dato. "
+"E situashon aki ta requeri investigashon manual di e gravedat."
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:67
 #: rocky/templates/partials/ooi_report_severity_totals_table.html:9
@@ -6974,7 +6982,7 @@ msgstr "Download detayes di tarea"
 #: rocky/templates/tasks/boefjes.html:41
 #: rocky/templates/tasks/normalizers.html:42
 msgid "No input OOI"
-msgstr ""
+msgstr "No tin entrada OOI"
 
 #: rocky/templates/tasks/boefjes.html:56
 #: rocky/templates/tasks/normalizers.html:58
