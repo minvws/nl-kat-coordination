@@ -1,0 +1,8 @@
+#! /usr/bin/make -f
+
+%:
+	dh $@ --buildsystem=pybuild
+
+execute_after_dh_install:
+# When we switch to debhelper compat lever 14 this will be done automatically.
+	dh_installsysusers

@@ -1,0 +1,18 @@
+Source: kat-cveapi
+Section: python
+Priority: optional
+Maintainer: OpenKAT <maintainer@openkat.nl>
+Build-Depends: debhelper-compat (= 13),
+               dh-sequence-python3,
+               python3,
+               pybuild-plugin-pyproject,
+               python3-poetry,
+Standards-Version: 4.6.2
+Homepage: https://github.com/minvws/nl-kat-coordination
+Rules-Requires-Root: no
+
+Package: kat-cveapi
+Architecture: all
+Depends: ${misc:Depends}, ${python3:Depends},
+Description: OpenKAT - Download CVE data from NVD API
+ Download CVE data from NVD API to make it available for OpenKAT to fetch.
