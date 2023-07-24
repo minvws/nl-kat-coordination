@@ -437,7 +437,7 @@ will be aggregated into one finding, instead of one separate finding per port.
     }
 
 Also you can configure which open ports should create findings and which ports should not. This is done by settings
-common_tcp_ports, common_udp_ports, sa_tcp_ports and/or db_tcp_ports. Common TCP ports are ports that will never trigger a finding. A good example is 443. Same counts for common udp ports. 
+common_tcp_ports, common_udp_ports, sa_tcp_ports and/or db_tcp_ports. Common TCP ports are ports that will never trigger a finding. A good example is 443. Same counts for common udp ports.
 SA (system administrator) ports will trigger a medium finding that a system administrator port is open, for example, port 22 is usually is SA port. Lastly, DB (database) ports trigger a more severe finding when a database port is open. As an of the configuration example:
 
 .. code-block:: json
