@@ -1,4 +1,5 @@
 import logging
+import threading
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
@@ -48,6 +49,7 @@ class BoefjeScheduler(Scheduler):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
         self.rate_limiter = strategies.MovingWindowRateLimiter(storage=storage.MemoryStorage())
+        self.rate_limiter_lock = threading.Lock()
 
         super().__init__(
             ctx=ctx,
@@ -436,15 +438,16 @@ class BoefjeScheduler(Scheduler):
 
         # TODO: is this thread safe?
 
-        can_consume = self.rate_limiter.test(parsed_rate_limit, task.boefje.id)
-        if not can_consume:
-            return True
+        with self.rate_limiter_lock:
+            can_consume = self.rate_limiter.test(parsed_rate_limit, task.boefje.id)
+            if not can_consume:
+                return True
 
-        # When we can consume, we hit the rate limiter
-        if hit:
-            self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
+            # When we can consume, we hit the rate limiter
+            if hit:
+                self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
 
-        return False
+            return False
 
     def is_task_running(self, task: BoefjeTask) -> bool:
         """Get the last tasks that have run or are running for the hash
