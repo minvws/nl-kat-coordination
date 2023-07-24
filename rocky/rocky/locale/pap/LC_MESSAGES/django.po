@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-24 13:19+0000\n"
+"POT-Creation-Date: 2023-07-24 15:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -356,22 +356,22 @@ msgstr "Habri detayes"
 msgid "Reset password"
 msgstr "Resèt password"
 
-#: account/templates/account_detail.html:23
+#: account/templates/account_detail.html:22
 #: build/lib/account/templates/account_detail.html:23
 msgid "Full name"
 msgstr "Nòmber Kompletu"
 
-#: account/templates/account_detail.html:31
+#: account/templates/account_detail.html:28
 #: build/lib/account/templates/account_detail.html:31
 msgid "E-mail address"
 msgstr "Email adrès"
 
-#: account/templates/account_detail.html:39
+#: account/templates/account_detail.html:34
 #: build/lib/account/templates/account_detail.html:39
 msgid "Member type"
 msgstr "Tipo di miembro"
 
-#: account/templates/account_detail.html:47
+#: account/templates/account_detail.html:40
 #: build/lib/account/templates/account_detail.html:47
 #: build/lib/onboarding/templates/account/step_2a_organization_setup.html:16
 #: build/lib/onboarding/templates/account/step_2a_organization_update.html:16
@@ -384,24 +384,24 @@ msgstr "Tipo di miembro"
 msgid "Organization"
 msgstr "Organisashon"
 
-#: account/templates/account_detail.html:56
+#: account/templates/account_detail.html:47
 #: build/lib/account/templates/account_detail.html:56
 msgid "Permission to set OOI clearance levels "
 msgstr "Pèrmit pa pone nivél di autorisashonnan pa OOI "
 
-#: account/templates/account_detail.html:70
+#: account/templates/account_detail.html:60
 #: build/lib/account/templates/account_detail.html:69
 msgid "OOI clearance"
 msgstr "OOI autorisá"
 
-#: account/templates/account_detail.html:73
+#: account/templates/account_detail.html:63
 msgid ""
 "\n"
 "                                You don't have any clearance to scan objects."
 "<br>\n"
 "                                Get in contact with the admin to give you "
 "the necessary clearance level.\n"
-"                            "
+"                                "
 msgstr ""
 "\n"
 "              Bo no tin autorisashon pa skan ophetonan.<br>\n"
@@ -409,29 +409,30 @@ msgstr ""
 "autorisashon.\n"
 "            "
 
-#: account/templates/account_detail.html:80
+#: account/templates/account_detail.html:70
 #: build/lib/account/templates/account_detail.html:79
 msgid "You have currently accepted clearance up to level"
 msgstr "Bo a acceptá nivél di autorisashon te na nivel"
 
-#: account/templates/account_detail.html:90
+#: account/templates/account_detail.html:80
+#, python-format
 msgid ""
 "You are granted clearance for level L%(tcl)s by your admin. Before you can "
 "change OOI clearance levels up to this level, you need to accept this "
 "permission. Remember: <strong>with great power comes great responsibility.</"
 "strong>"
 msgstr ""
-"Bo a haña nivel di autorisashon di L%(tcl)s for di bo administrador. Promé ku "
-"bo por kambia nivelnan di autorisashon di e OOI te na e nivel aki, bo mester "
-"prome aseptá e permiso aki. No lubidá: <strong>ku gran poder ta bini gran "
-"responsabilidat.</strong>"
+"Bo a haña nivel di autorisashon di L%(tcl)s for di bo administrador. Promé "
+"ku bo por kambia nivelnan di autorisashon di e OOI te na e nivel aki, bo "
+"mester prome aseptá e permiso aki. No lubidá: <strong>ku gran poder ta bini "
+"gran responsabilidat.</strong>"
 
-#: account/templates/account_detail.html:94
+#: account/templates/account_detail.html:84
 #, python-format
 msgid "\"Accept level L%(tcl)s clearance and responsibility\""
 msgstr "\"Aseptá autorisashon di nivel L%(tcl)s i responsabilidat\""
 
-#: account/templates/account_detail.html:99
+#: account/templates/account_detail.html:89
 msgid ""
 "You can withdraw this at anytime you like, but know that you won't be able "
 "to change clearance levels anymore when you do."
@@ -439,10 +440,11 @@ msgstr ""
 "Bo por retirá esaki n'e momento ku bo ke, pero sa ku bo no por kambia nivél "
 "di autorisashon mas ora bo hasi esaki."
 
-#: account/templates/account_detail.html:101
+#: account/templates/account_detail.html:91
 #, python-format
 msgid "\"Withdraw acceptance of level L%(tcl)s clearance and responsibility\""
-msgstr "\"Retirá akseptashon di autorisashon di nivel L%(tcl)s i responsabilidat\""
+msgstr ""
+"\"Retirá akseptashon di autorisashon di nivel L%(tcl)s i responsabilidat\""
 
 #: account/templates/login.html:10 build/lib/account/templates/login.html:8
 #: rocky/templates/two_factor/core/login.html:8
@@ -1087,8 +1089,8 @@ msgstr "Ophetonan afektá"
 #: fmea/views/fmea_failure_mode_effect.py:77
 #: katalogus/templates/plugin_settings_list.html:45
 #: rocky/templates/organizations/organization_member_list.html:37
-#: rocky/templates/organizations/organization_member_list.html:96
-#: rocky/templates/organizations/organization_member_list.html:99
+#: rocky/templates/organizations/organization_member_list.html:88
+#: rocky/templates/organizations/organization_member_list.html:91
 #: rocky/templates/organizations/organization_settings.html:37
 #: rocky/templates/organizations/organization_settings.html:49
 #: rocky/views/ooi_edit.py:37 rocky/views/organization_edit.py:38
@@ -1738,7 +1740,7 @@ msgstr "Kopia"
 #: build/lib/katalogus/views/plugin_settings_edit.py:44
 #: katalogus/templates/katalogus.html:14
 #: katalogus/views/change_clearance_level.py:56 katalogus/views/katalogus.py:87
-#: katalogus/views/katalogus_settings.py:82 katalogus/views/plugin_detail.py:87
+#: katalogus/views/katalogus_settings.py:64 katalogus/views/plugin_detail.py:87
 #: katalogus/views/plugin_settings_add.py:71
 #: katalogus/views/plugin_settings_delete.py:25
 #: rocky/templates/dashboard_client.html:31
@@ -2130,7 +2132,7 @@ msgstr "Kambia setting"
 #: build/lib/katalogus/templates/plugin_settings_list.html:8
 #: build/lib/katalogus/views/katalogus_settings.py:71
 #: katalogus/templates/plugin_settings_list.html:8
-#: katalogus/views/katalogus_settings.py:89 rocky/templates/header.html:72
+#: katalogus/views/katalogus_settings.py:71 rocky/templates/header.html:72
 #: rocky/templates/organizations/organization_settings.html:58
 msgid "Settings"
 msgstr "Settings"
@@ -2207,7 +2209,7 @@ msgstr "Ajustenan di %s pa %s a wordu di kloon ku éksito."
 #: build/lib/katalogus/views/katalogus_settings.py:88
 #: build/lib/katalogus/views/plugin_settings_add.py:45
 #: build/lib/katalogus/views/plugin_settings_list.py:26
-#: katalogus/views/katalogus_settings.py:108
+#: katalogus/views/katalogus_settings.py:90
 #: katalogus/views/plugin_settings_list.py:23
 msgid "Failed getting settings for boefje {}"
 msgstr "Faya den haña ajustenan pa boefje {}"
@@ -2682,7 +2684,7 @@ msgstr "Finalisá setup organisashon"
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html:12
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html:12
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html:12
-#: onboarding/templates/step_4_report.html:12 onboarding/views.py:65
+#: onboarding/templates/step_4_report.html:12 onboarding/views.py:64
 msgid "OpenKAT introduction"
 msgstr "OpenKAT introdukshon"
 
@@ -2715,7 +2717,6 @@ msgid "Welcome to OpenKAT"
 msgstr "Bon Biní na OpenKAT"
 
 #: build/lib/onboarding/templates/step_1_introduction.html:14
-#: onboarding/templates/step_1_introduction.html:14
 msgid ""
 "OpenKAT is the \"Kwetsbaarheden Analyse Tool\" (Vulnerabilities Analysis "
 "Tool). An Open-Source-project developed by the Ministry of Public Health, "
@@ -2996,7 +2997,7 @@ msgstr "Añadi URL"
 #: build/lib/onboarding/views.py:234
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html:16
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html:16
-#: onboarding/views.py:243
+#: onboarding/views.py:240
 msgid "Creating an object"
 msgstr "Kreando un opheto"
 
@@ -3343,42 +3344,42 @@ msgstr "Habri mi DNS-rapòrt"
 
 #: build/lib/onboarding/view_helpers.py:11
 #: build/lib/onboarding/view_helpers.py:34
-#: build/lib/onboarding/view_helpers.py:51 onboarding/view_helpers.py:11
-#: onboarding/view_helpers.py:34 onboarding/view_helpers.py:51
+#: build/lib/onboarding/view_helpers.py:51 onboarding/view_helpers.py:17
+#: onboarding/view_helpers.py:40 onboarding/view_helpers.py:57
 msgid "1: Introduction"
 msgstr "Introdukshon"
 
-#: build/lib/onboarding/view_helpers.py:15 onboarding/view_helpers.py:15
+#: build/lib/onboarding/view_helpers.py:15 onboarding/view_helpers.py:21
 msgid "2: Choose a report"
 msgstr "Skohé un rapòrt"
 
-#: build/lib/onboarding/view_helpers.py:19 onboarding/view_helpers.py:19
+#: build/lib/onboarding/view_helpers.py:19 onboarding/view_helpers.py:25
 msgid "3: Setup scan"
 msgstr "Setup scan"
 
-#: build/lib/onboarding/view_helpers.py:23 onboarding/view_helpers.py:23
+#: build/lib/onboarding/view_helpers.py:23 onboarding/view_helpers.py:29
 msgid "4: Open report"
 msgstr "Habri rapòrt"
 
 #: build/lib/onboarding/view_helpers.py:38
-#: build/lib/onboarding/view_helpers.py:55 onboarding/view_helpers.py:38
-#: onboarding/view_helpers.py:55
+#: build/lib/onboarding/view_helpers.py:55 onboarding/view_helpers.py:44
+#: onboarding/view_helpers.py:61
 msgid "2: Organization setup"
 msgstr "Konfiguráß organisashon"
 
 #: build/lib/onboarding/view_helpers.py:41
-#: build/lib/onboarding/view_helpers.py:59 onboarding/view_helpers.py:41
-#: onboarding/view_helpers.py:59
+#: build/lib/onboarding/view_helpers.py:59 onboarding/view_helpers.py:47
+#: onboarding/view_helpers.py:65
 msgid "3: Indemnification"
 msgstr "3: Indemnizashon"
 
 #: build/lib/onboarding/view_helpers.py:42
-#: build/lib/onboarding/view_helpers.py:63 onboarding/view_helpers.py:42
-#: onboarding/view_helpers.py:63
+#: build/lib/onboarding/view_helpers.py:63 onboarding/view_helpers.py:48
+#: onboarding/view_helpers.py:69
 msgid "4: Account setup"
 msgstr "4: Account setup"
 
-#: build/lib/onboarding/views.py:208 onboarding/views.py:217
+#: build/lib/onboarding/views.py:208 onboarding/views.py:214
 msgid ""
 "OpenKAT added the following required object to your object list to complete "
 "your request: {}"
@@ -3386,7 +3387,7 @@ msgstr ""
 "OpenKAT a añadi e siguinte opheton na bo lista di ophetonan pa kompleta bo "
 "petishon: {}"
 
-#: build/lib/onboarding/views.py:314 onboarding/views.py:349
+#: build/lib/onboarding/views.py:314 onboarding/views.py:348
 msgid "Clearance level has been set"
 msgstr "Clearance nivél a wòrdu poné"
 
@@ -3394,23 +3395,23 @@ msgstr "Clearance nivél a wòrdu poné"
 msgid "No DNS zone found."
 msgstr "Zona di DNS no por a wòrdu enkontrá."
 
-#: build/lib/onboarding/views.py:406 onboarding/views.py:423
+#: build/lib/onboarding/views.py:406 onboarding/views.py:424
 msgid "OpenKAT Setup"
 msgstr "OpenKAT Setup"
 
-#: build/lib/onboarding/views.py:477 onboarding/views.py:501
+#: build/lib/onboarding/views.py:477 onboarding/views.py:497
 #, python-brace-format
 msgid "{org_name} successfully created."
 msgstr "{org_name} a wòrdu krea ku èksito."
 
-#: build/lib/onboarding/views.py:508 onboarding/views.py:532
+#: build/lib/onboarding/views.py:508 onboarding/views.py:528
 #, python-brace-format
 msgid "{org_name} successfully updated."
 msgstr "{org_name} a wòrdu kambia ku èksito."
 
 #: build/lib/onboarding/views.py:583 build/lib/onboarding/views.py:611
-#: build/lib/onboarding/views.py:635 onboarding/views.py:601
-#: onboarding/views.py:628 onboarding/views.py:651
+#: build/lib/onboarding/views.py:635 onboarding/views.py:603
+#: onboarding/views.py:630 onboarding/views.py:653
 #, python-brace-format
 msgid "{name} successfully created."
 msgstr "{name} a wòrdu krea ku èksito."
@@ -3779,15 +3780,11 @@ msgid ""
 "Are you sure you want to delete all settings for the plugin %(plugin_name)s?"
 msgstr "Segur bo ke bo ke eliminá tur ajuste pa e plug-in %(plugin_name)s?"
 
-#: katalogus/views/katalogus_settings.py:49
-msgid ""
-"Settings from %(from_organization_name) to %(to_organization_name) "
-"successfully cloned."
-msgstr ""
-"Ajustenan for di %(from_organization_name) pa %(to_organization_name) a "
-"wordu di kloon ku éksito."
+#: katalogus/views/katalogus_settings.py:42
+msgid "Settings from {} to {} successfully cloned."
+msgstr "Ajustenan di {} pa {} a wordu di kloon ku éksito."
 
-#: katalogus/views/mixins.py:98
+#: katalogus/views/mixins.py:112
 #, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                             "
@@ -3796,7 +3793,7 @@ msgstr ""
 "No por subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
 "presente na organisashon %s."
 
-#: katalogus/views/mixins.py:112
+#: katalogus/views/mixins.py:126
 #, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                             "
@@ -3847,7 +3844,17 @@ msgstr ""
 "Faya den eliminashon di Ajustenan pa e plug-in {}. Kontrolá e lognan di "
 "Katalogus pa mas informashon."
 
-#: onboarding/views.py:282
+#: onboarding/templates/step_1_introduction.html:14
+msgid ""
+"OpenKAT is the \"Kwetsbaarheden Analyse Tool\" (Vulnerabilities Analysis "
+"Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
+"and Sport to make your and our world a safer place."
+msgstr ""
+"OpenKAT ta e \"Kwetsbaarheden Analyse Tool\" (tool pa hasi análisis di "
+"bulerabilidat). Un proyekto Open Source desaroyá pa Ministerio di Salú "
+"Públiko, Salú i Deporte pa hasi nos mundu un lugar mas sigur pa bo i nos."
+
+#: onboarding/views.py:280
 #, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                 "
@@ -3856,7 +3863,7 @@ msgstr ""
 "No por a subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
 "presente pa organisashon %s."
 
-#: onboarding/views.py:297
+#: onboarding/views.py:295
 #, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                 You "
@@ -5794,7 +5801,7 @@ msgstr "KAT logo, bai na e homepage di OpenKAT"
 msgid "Crisis room"
 msgstr "Sala di krísis"
 
-#: rocky/templates/header.html:61 rocky/views/tasks.py:79
+#: rocky/templates/header.html:61 rocky/views/tasks.py:123
 msgid "Tasks"
 msgstr "Enkargonan"
 
@@ -7047,18 +7054,23 @@ msgstr "Lista di tareanan pa "
 msgid "Download task details"
 msgstr "Download detayes di tarea"
 
-#: rocky/templates/tasks/boefjes.html:41
-#: rocky/templates/tasks/normalizers.html:42
+#: rocky/templates/tasks/boefjes.html:31
+#: rocky/templates/tasks/normalizers.html:32
+msgid "Reschedule"
+msgstr "Reagenda"
+
+#: rocky/templates/tasks/boefjes.html:42
+#: rocky/templates/tasks/normalizers.html:43
 msgid "No input OOI"
 msgstr "No tin entrada OOI"
 
-#: rocky/templates/tasks/boefjes.html:56
-#: rocky/templates/tasks/normalizers.html:58
+#: rocky/templates/tasks/boefjes.html:57
+#: rocky/templates/tasks/normalizers.html:59
 msgid "Download meta and raw data"
 msgstr "Download meta data i data krudo"
 
-#: rocky/templates/tasks/boefjes.html:58
-#: rocky/templates/tasks/normalizers.html:60
+#: rocky/templates/tasks/boefjes.html:59
+#: rocky/templates/tasks/normalizers.html:61
 msgid "Download meta data"
 msgstr "Download meta data"
 
@@ -7526,6 +7538,7 @@ msgid "Member added successfully."
 msgstr "Miembro a wòrdu agregá ku èksito."
 
 #: rocky/views/organization_member_edit.py:42
+#, python-format
 msgid "Member %s successfully updated."
 msgstr "Miembro %s a wòrdu kambia ku èksito."
 
@@ -7601,11 +7614,11 @@ msgstr "No por resèt nivél di skan. Nivél di skan òf {ooi_name} no ta deklar
 msgid "Reset"
 msgstr "Resèt"
 
-#: rocky/views/tasks.py:35
+#: rocky/views/tasks.py:42
 msgid "Task details not found."
 msgstr "Detayes di tarea no por wordu haña."
 
-#: rocky/views/tasks.py:72
+#: rocky/views/tasks.py:79
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "No por haña tarea: no tin konekshon ku scheduler"
 

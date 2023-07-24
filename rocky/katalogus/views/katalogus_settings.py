@@ -39,13 +39,7 @@ class ConfirmCloneSettingsView(
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            _("Settings from %(from_organization_name) to %(to_organization_name) successfully cloned.")
-            % (
-                {
-                    "from_organization_name": self.organization.name,
-                    "to_organization_name": to_organization.name,
-                }
-            ),
+            _("Settings from {} to {} successfully cloned.").format(self.organization.name, to_organization.name),
         )
         return HttpResponseRedirect(
             reverse(
