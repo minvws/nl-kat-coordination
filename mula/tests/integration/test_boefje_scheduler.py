@@ -1650,7 +1650,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(first_task_db1.status, models.TaskStatus.DISPATCHED)
 
         # Act: push tasks for delayed tasks
-        time.sleep(1)
+        time.sleep(2)
         self.scheduler.push_tasks_for_delayed_tasks()
         self.assertEqual(1, self.scheduler.queue.qsize())
 
@@ -1677,7 +1677,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(first_task_db2.status, models.TaskStatus.DISPATCHED)
 
         # Act: push tasks for delayed tasks
-        time.sleep(1)
+        time.sleep(2)
         self.scheduler.push_tasks_for_delayed_tasks()
         self.assertEqual(1, self.scheduler.queue.qsize())
 
@@ -1704,7 +1704,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(first_task_db3.status, models.TaskStatus.DISPATCHED)
 
         # Act: push tasks for delayed tasks
-        time.sleep(1)
+        time.sleep(2)
         self.scheduler.push_tasks_for_delayed_tasks()
         self.assertEqual(0, self.scheduler.queue.qsize())
 
