@@ -796,4 +796,3 @@ class BoefjeScheduler(Scheduler):
         )
 
         return boefjes
-
