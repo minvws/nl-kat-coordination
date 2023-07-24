@@ -1637,10 +1637,9 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id.hex, third_task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
 
-        time.sleep(3)
-
         # Act: pop task from queue, push tasks for delayed tasks
         self.scheduler.pop_item_from_queue()
+        time.sleep(5)
         self.scheduler.push_tasks_for_delayed_tasks()
 
         # Assert: first task should be in datastore, and queued
@@ -1659,10 +1658,9 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id.hex, third_task.id)
         self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
 
-        time.sleep(3)
-
         # Act: pop task from queue, push tasks for delayed tasks
         self.scheduler.pop_item_from_queue()
+        time.sleep(5)
         self.scheduler.push_tasks_for_delayed_tasks()
 
         # Assert: first task should be in datastore, and dispatched
@@ -1681,10 +1679,9 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id.hex, third_task.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-        time.sleep(3)
-
         # Act: pop task from queue, push tasks for delayed tasks
         self.scheduler.pop_item_from_queue()
+        time.sleep(5)
         self.scheduler.push_tasks_for_delayed_tasks()
 
         # Assert: first task should be in datastore, and dispatched
