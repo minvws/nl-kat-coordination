@@ -485,4 +485,4 @@ Defaults are:
         5432,  # PostgreSQL
     ]
 
-You can set the ports to an empty string to disable the check.
+You can set the ports of SA and DB to an empty string to disable the check.
