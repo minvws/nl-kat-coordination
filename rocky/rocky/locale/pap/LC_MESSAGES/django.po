@@ -2037,7 +2037,6 @@ msgstr[1] ""
 
 #: build/lib/katalogus/templates/plugin_settings_add.html:33
 #: katalogus/templates/plugin_settings_add.html:34
-#| "                      "
 msgid ""
 "\n"
 "                  Add setting\n"
@@ -2688,7 +2687,7 @@ msgid ""
 "Tool). An Open-Source-project developed by the Ministry of Public Health, "
 "Wellbeing and Sports to make your and our world a safer place."
 msgstr ""
-"OpenKAT ta e "Kwetsbaarheden Analyse Tool" (tool pa hasi análisis di bulerabilidat). "
+"OpenKAT ta e \"Kwetsbaarheden Analyse Tool\" (tool pa hasi análisis di bulerabilidat). "
 "Un proyekto Open Source desaroyá pa Ministerio di Salú Públiko, Salú i Deporte pa hasi "
 "nos mundu un lugar mas sigur pa bo i nos."
 

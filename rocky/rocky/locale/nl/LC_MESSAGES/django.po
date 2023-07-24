@@ -3950,7 +3950,7 @@ msgstr "Laat de versie zien en sluit af."
 #: venv/lib/python3.9/site-packages/click/exceptions.py:79
 #, python-brace-format
 msgid "Error: {message}"
-msgstr "Fout: {bericht}"
+msgstr "Fout: {message}"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:71
 #, python-brace-format
@@ -3960,7 +3960,7 @@ msgstr "Probeer '{command} {option}' voor hulp."
 #: venv/lib/python3.9/site-packages/click/exceptions.py:120
 #, python-brace-format
 msgid "Invalid value: {message}"
-msgstr "Ongeldige waarde: {bericht}"
+msgstr "Ongeldige waarde: {message}"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:122
 #, python-brace-format
@@ -4117,7 +4117,7 @@ msgstr "{naam} {bestandsnaam!r} is een bestand."
 #: venv/lib/python3.9/site-packages/click/types.py:878
 #, python-brace-format
 msgid "{name} '{filename}' is a directory."
-msgstr "{naam} '{bestandsnaam}' is een directory."
+msgstr "{name} '{filename}' is een directory."
 
 #: venv/lib/python3.9/site-packages/click/types.py:887
 msgid "{name} {filename!r} is not readable."
@@ -4350,7 +4350,7 @@ msgstr ""
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:126
 msgid "Field of type: %(field_type)s"
-msgstr Veld van type: %(field_type)s
+msgstr "Veld van type: %(field_type)s"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:958
 #, python-format
@@ -4449,7 +4449,7 @@ msgstr "Bestandspad"
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1727
 #, python-format
 msgid "“%(value)s” value must be a float."
-msgstr ""%(value)s" waarde moet een float zijn."
+msgstr "“%(value)s“ waarde moet een float zijn."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1729
 msgid "Floating point number"
@@ -4540,7 +4540,7 @@ msgstr "Ruwe binaire gegevens"
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2399
 #, python-format
 msgid "“%(value)s” is not a valid UUID."
-msgstr ""%(value)s" is geen geldige UUID."
+msgstr "“%(value)s“ is geen geldige UUID."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2401
 msgid "Universally unique identifier"
@@ -4641,7 +4641,7 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] "Zorg ervoor dat deze bestandsnaam maximaal %(max)d karakter heeft (het heeft %(length)d)."
-msgstr[1] "Zorg ervoor dat deze bestandsnaam maximaal %(max)d tekens bevat (deze heeft %(lengte)d)."
+msgstr[1] "Zorg ervoor dat deze bestandsnaam maximaal %(max)d tekens bevat (deze heeft %(length)d)."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:556
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -4688,7 +4688,7 @@ msgstr ":"
 #: venv/lib/python3.9/site-packages/django/forms/forms.py:203
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr "(Verborgen veld %(naam)s) %(error)s"
+msgstr "(Verborgen veld %(name)s) %(error)s"
 
 #: venv/lib/python3.9/site-packages/django/forms/formsets.py:61
 #, python-format
@@ -5190,8 +5190,8 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"U ziet dit bericht omdat deze HTTPS-site een "Referer" vereist
-"header" die door uw webbrowser moet worden verzonden, maar er is geen verzonden. Deze header is "
+"U ziet dit bericht omdat deze HTTPS-site een “Referer header“ vereist "
+"die door uw webbrowser moet worden verzonden, maar er is geen verzonden. Deze header is "
 "noodzakelijk om veiligheidsredenen, om ervoor te zorgen dat uw browser niet wordt "
 "gekaapt door derden."
 
@@ -5267,7 +5267,7 @@ msgstr "Geen week gespecificeerd"
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:367
 #, python-format
 msgid "No %(verbose_name_plural)s available"
-msgstr ""Geen %(verbose_name_plural)s beschikbaar""
+msgstr "Geen %(verbose_name_plural)s beschikbaar"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:594
 #, python-format
@@ -5281,7 +5281,7 @@ msgstr ""
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:628
 #, python-format
 msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
-msgstr "Ongeldige datumstring “%(datestr)s” gegeven formaat “%(format)s””
+msgstr "Ongeldige datumstring “%(datestr)s” gegeven formaat “%(format)s”"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/detail.py:54
 #, python-format
