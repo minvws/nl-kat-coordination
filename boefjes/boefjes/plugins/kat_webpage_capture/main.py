@@ -5,7 +5,6 @@ import tarfile
 from typing import ByteString, Generator, List, Tuple, Union
 
 import docker
-from PIL import Image, UnidentifiedImageError
 
 from boefjes.job_models import BoefjeMeta
 
@@ -114,11 +113,11 @@ def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tu
     )
     try:
         container.wait()
-        image = Image.open(io.BytesIO(get_file_from_container(container=container, path=f"{tmp_path}.png")))
+        image = get_file_from_container(container=container, path=f"{tmp_path}.png")
         har = get_file_from_container(container=container, path=f"{tmp_path}.har.zip")
         storage = get_file_from_container(container=container, path=f"{tmp_path}.json")
-        return image.tobytes(), har, storage
-    except (docker.errors.NotFound, UnidentifiedImageError):
+        return image, har, storage
+    except docker.errors.NotFound:
         raise WebpageCaptureException(
             "Error while running Playwright container, command was: " + " ".join(command),
             container.logs(stdout=True, stderr=True, timestamps=True).decode(),
@@ -132,10 +131,10 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     webpage = f"{input_['scheme']}://{input_['netloc']['name']}{input_['path']}"
 
-    image_bytes, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)
+    image_png, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)
 
     return [
-        (set("image/png"), image_bytes),
+        (set("image/png"), image_png),
         (set("application/zip+json"), har_zip),
         (set("application/json"), storage_json),
     ]
