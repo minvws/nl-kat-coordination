@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-12 12:03+0000\n"
+"POT-Creation-Date: 2023-07-24 13:22+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -148,8 +148,8 @@ msgid ""
 "Set the members status to blocked, so they don't have access to the "
 "organization anymore."
 msgstr ""
-"Stel de status van de leden in op geblokkeerd, zodat ze geen toegang meer hebben tot de "
-"organisatie."
+"Stel de status van de leden in op geblokkeerd, zodat ze geen toegang meer "
+"hebben tot de organisatie."
 
 #: account/forms/account_setup.py:195
 #: build/lib/account/forms/account_setup.py:196
@@ -391,12 +391,12 @@ msgstr "Organisatie"
 msgid "Permission to set OOI clearance levels "
 msgstr "Toestemming om vrijwaringsniveaus van OOIs te zetten "
 
-#: account/templates/account_detail.html:69
+#: account/templates/account_detail.html:70
 #: build/lib/account/templates/account_detail.html:69
 msgid "OOI clearance"
 msgstr "OOI vrijwaringsniveau"
 
-#: account/templates/account_detail.html:72
+#: account/templates/account_detail.html:73
 msgid ""
 "\n"
 "                                You don't have any clearance to scan objects."
@@ -407,34 +407,45 @@ msgid ""
 msgstr ""
 "\n"
 "               U heeft geen vrijwaring om objecten te scannen.<br>\n"
-"               Neem contact op met de beheerder om u het nodige "
-"vrijwaring niveau te geven.\n"
+"               Neem contact op met de beheerder om u het nodige vrijwaring "
+"niveau te geven.\n"
 "              "
 
-#: account/templates/account_detail.html:79
+#: account/templates/account_detail.html:80
 #: build/lib/account/templates/account_detail.html:79
 msgid "You have currently accepted clearance up to level"
 msgstr "U heeft momenteel toestemming geaccepteerd tot niveau"
 
 #: account/templates/account_detail.html:90
+#, python-format
 msgid ""
-"You are granted clearance for level L%(cl)s by your admin. Before you can "
+"You are granted clearance for level L%(tcl)s by your admin. Before you can "
 "change OOI clearance levels up to this level, you need to accept this "
 "permission. Remember: <strong>with great power comes great responsibility.</"
 "strong>"
 msgstr ""
-"U krijgt vrijwaring niveau 4 van uw beheerder. Voordat u OOI-"
-"vrijwaringsniveaus kunt wijzigen tot dit niveau, moet u deze toestemming "
+"U krijgt vrijwaring voor niveau L%(tcl)s van uw beheerder. Voordat u OOI-"
+"vrijwaring niveaus kunt wijzigen tot dit niveau, moet u deze toestemming "
 "accepteren. Onthoud: <strong>met grote macht komt grote verantwoordelijkheid."
 "</strong>"
 
-#: account/templates/account_detail.html:98
+#: account/templates/account_detail.html:94
+#, python-format
+msgid "\"Accept level L%(tcl)s clearance and responsibility\""
+msgstr "\"Accepteer vrijwaring niveau L%(tcl)s en verantwoordelijkheid\""
+
+#: account/templates/account_detail.html:99
 msgid ""
 "You can withdraw this at anytime you like, but know that you won't be able "
 "to change clearance levels anymore when you do."
 msgstr ""
 "U kunt dit op elk gewenst moment intrekken, maar weet dat u de "
 "vrijgaveniveaus niet meer kunt wijzigen als u dat doet."
+
+#: account/templates/account_detail.html:101
+#, python-format
+msgid "\"Withdraw acceptance of level L%(tcl)s clearance and responsibility\""
+msgstr "\"Acceptatie van niveau L%(tcl)s goedkeuring en verantwoordelijkheid intrekken\""
 
 #: account/templates/login.html:10 build/lib/account/templates/login.html:8
 #: rocky/templates/two_factor/core/login.html:8
@@ -702,6 +713,7 @@ msgstr ""
 "Vrijwaring niet aanwezig voor organisatie %s."
 
 #: build/lib/account/mixins.py:105
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                     You "
 "acknowledged a clearance level of %s."
@@ -725,12 +737,13 @@ msgstr ""
 "              "
 
 #: build/lib/account/templates/account_detail.html:89
+#, python-format
 msgid ""
 "You are granted clearance for %(cl)s your admin. Before you can change OOI "
 "clearance levels up to this level, you need to accept this permission. "
 "Remember: <strong>with great power comes great responsibility.</strong>"
 msgstr ""
-"U krijgt toestemming voor niveau 4 van uw beheerder. Voordat u OOI-"
+"U krijgt toestemming voor niveau %(cl)s van uw beheerder. Voordat u OOI-"
 "vrijwaringsniveaus kunt wijzigen tot dit niveau, moet u deze toestemming "
 "accepteren. Onthoud: <strong>met grote macht komt grote verantwoordelijkheid."
 "</strong>"
@@ -745,7 +758,9 @@ msgstr ""
 
 #: build/lib/crisis_room/views.py:103
 msgid "Failed to get list of findings, check server logs for more details."
-msgstr "Kon lijst met bevindingen niet ophalen, controleer serverlogboeken voor meer details."
+msgstr ""
+"Kon lijst met bevindingen niet ophalen, controleer serverlogboeken voor meer "
+"details."
 
 #: build/lib/fmea/forms.py:31 build/lib/fmea/forms.py:123
 #: build/lib/fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:19
@@ -1584,12 +1599,12 @@ msgstr "Uitgeschakeld"
 #: build/lib/katalogus/forms/katalogus_filter.py:14
 #: katalogus/forms/katalogus_filter.py:14
 msgid "Enabled-Disabled"
-msgstr "Uitgeschakeld"
+msgstr "Ingeschakeld-Uitgeschakeld"
 
 #: build/lib/katalogus/forms/katalogus_filter.py:15
 #: katalogus/forms/katalogus_filter.py:15
 msgid "Disabled-Enabled"
-msgstr "Uitschakelen"
+msgstr "Uitgeschakeld-Ingeschakeld"
 
 #: build/lib/katalogus/forms/katalogus_filter.py:23
 #: katalogus/forms/katalogus_filter.py:23
@@ -1735,7 +1750,7 @@ msgstr "Klonen"
 #: build/lib/katalogus/views/plugin_settings_edit.py:44
 #: katalogus/templates/katalogus.html:14
 #: katalogus/views/change_clearance_level.py:56 katalogus/views/katalogus.py:87
-#: katalogus/views/katalogus_settings.py:67 katalogus/views/plugin_detail.py:87
+#: katalogus/views/katalogus_settings.py:82 katalogus/views/plugin_detail.py:87
 #: katalogus/views/plugin_settings_add.py:71
 #: katalogus/views/plugin_settings_delete.py:25
 #: rocky/templates/dashboard_client.html:31
@@ -1795,7 +1810,7 @@ msgstr "Acties"
 #: katalogus/templates/partials/boefje_tile.html:29
 #: katalogus/templates/partials/plugin_tile.html:18
 msgid "See details"
-msgstr "Details openen"
+msgstr "Zie details"
 
 #: build/lib/katalogus/templates/katalogus_settings.html:15
 #: katalogus/templates/katalogus_settings.html:15
@@ -2099,12 +2114,13 @@ msgid "Delete setting"
 msgstr "Instelling verwijderen"
 
 #: build/lib/katalogus/templates/plugin_settings_delete.html:14
+#, python-format
 msgid ""
 "Are you sure you want to delete setting %(setting_name)s for the plugin "
 "%(plugin_name)s?"
 msgstr ""
-"Weet u zeker dat u instelling %(setting_name)s voor plug-in %(plugin_name)s wilt verwijderen?"
-
+"Weet u zeker dat u instelling %(setting_name)s voor plug-in %(plugin_name)s "
+"wilt verwijderen?"
 
 #: build/lib/katalogus/templates/plugin_settings_delete.html:20
 #: build/lib/katalogus/templates/plugin_settings_list.html:18
@@ -2126,7 +2142,7 @@ msgstr "Instelling wijzigen"
 #: build/lib/katalogus/templates/plugin_settings_list.html:8
 #: build/lib/katalogus/views/katalogus_settings.py:71
 #: katalogus/templates/plugin_settings_list.html:8
-#: katalogus/views/katalogus_settings.py:71 rocky/templates/header.html:72
+#: katalogus/views/katalogus_settings.py:89 rocky/templates/header.html:72
 #: rocky/templates/organizations/organization_settings.html:58
 msgid "Settings"
 msgstr "Instellingen"
@@ -2191,16 +2207,19 @@ msgstr "Wijzig vrijwaringsniveau"
 
 #: build/lib/katalogus/views/katalogus.py:39 katalogus/views/katalogus.py:36
 msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-msgstr "Het laden van plug-ins in KATalogus is mislukt. Controleer de KATalogus-logboeken."
+msgstr ""
+"Het laden van plug-ins in KATalogus is mislukt. Controleer de KATalogus-"
+"logboeken."
 
 #: build/lib/katalogus/views/katalogus_settings.py:39
+#, python-format
 msgid "Settings from %s to %s successfully cloned."
-msgstr "Instelling {} voor plugin {} succesvol verwijderd."
+msgstr "Instellingen vanuit %s naar %s succesvol gekloneerd."
 
 #: build/lib/katalogus/views/katalogus_settings.py:88
 #: build/lib/katalogus/views/plugin_settings_add.py:45
 #: build/lib/katalogus/views/plugin_settings_list.py:26
-#: katalogus/views/katalogus_settings.py:88
+#: katalogus/views/katalogus_settings.py:108
 #: katalogus/views/plugin_settings_list.py:23
 msgid "Failed getting settings for boefje {}"
 msgstr "Kan instellingen voor boefje {} niet ophalen"
@@ -2208,7 +2227,9 @@ msgstr "Kan instellingen voor boefje {} niet ophalen"
 #: build/lib/katalogus/views/mixins.py:50 katalogus/views/mixins.py:50
 msgid ""
 "Getting information for plugin {} failed. Please check the KATalogus logs."
-msgstr "Het ophalen van informatie voor plug-in {} is mislukt. Controleer de KAT-alogus-logboeken."
+msgstr ""
+"Het ophalen van informatie voor plug-in {} is mislukt. Controleer de KAT-"
+"alogus-logboeken."
 
 #: build/lib/katalogus/views/plugin_detail.py:159
 msgid "Scanning has failed to start."
@@ -2224,7 +2245,9 @@ msgstr "Boefje '{boefje_id}' uitgezet."
 #: katalogus/views/plugin_enable_disable.py:38
 #, python-brace-format
 msgid "Failed fetching settings for boefje {boefje_id}. Is the Katalogus up?"
-msgstr "Ophalen van instellingen voor boefje {boefje_id} mislukt. Is de Katalogus actief?"
+msgstr ""
+"Ophalen van instellingen voor boefje {boefje_id} mislukt. Is de Katalogus "
+"actief?"
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:60
 #: katalogus/views/plugin_enable_disable.py:57
@@ -2281,8 +2304,9 @@ msgstr "Instelling {} voor plugin {} succesvol verwijderd."
 msgid ""
 "Failed deleting Setting {} for plugin {}. Check the Katalogus logs for more "
 "info."
-msgstr "Verwijderen van instelling {} voor plug-in {} is mislukt. Controleer de Logboeken van KAT-alogus voor meer "
-"info."
+msgstr ""
+"Verwijderen van instelling {} voor plug-in {} is mislukt. Controleer de "
+"Logboeken van KAT-alogus voor meer info."
 
 #: build/lib/katalogus/views/plugin_settings_edit.py:81
 msgid "Setting successfully updated."
@@ -2424,8 +2448,8 @@ msgid ""
 "organization requires a new database."
 msgstr ""
 "Voer de volgende organisatiegegevens in. Deze gegevens kunnen worden bewerkt "
-"indien nodig binnen de organisatiepagina binnen OpenKAT. Een nieuwe organisatie toevoegen "
-"heeft een nieuwe database nodig."
+"indien nodig binnen de organisatiepagina binnen OpenKAT. Een nieuwe "
+"organisatie toevoegen heeft een nieuwe database nodig."
 
 #: build/lib/onboarding/templates/account/step_2a_organization_setup.html:30
 #: build/lib/onboarding/templates/account/step_2a_organization_update.html:26
@@ -3168,8 +3192,8 @@ msgid ""
 "Meaning it requires at least a level 3 clearance level to be set on your "
 "object."
 msgstr ""
-"Een voorbeeld van een agressievere scan. Die heeft een scan niveau van 3."
-"Dit betekent dat er ten minste een vrijwaring niveau van 3 vereist is voor het "
+"Een voorbeeld van een agressievere scan. Die heeft een scan niveau van 3.Dit "
+"betekent dat er ten minste een vrijwaring niveau van 3 vereist is voor het "
 "object."
 
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:57
@@ -3386,16 +3410,19 @@ msgid "OpenKAT Setup"
 msgstr "OpenKAT instellingen"
 
 #: build/lib/onboarding/views.py:477 onboarding/views.py:501
+#, python-brace-format
 msgid "{org_name} successfully created."
 msgstr "{org_name} succesvol aangemaakt."
 
 #: build/lib/onboarding/views.py:508 onboarding/views.py:532
+#, python-brace-format
 msgid "{org_name} successfully updated."
 msgstr "{org_name} succesvol bijgewerkt."
 
 #: build/lib/onboarding/views.py:583 build/lib/onboarding/views.py:611
 #: build/lib/onboarding/views.py:635 onboarding/views.py:601
 #: onboarding/views.py:628 onboarding/views.py:651
+#, python-brace-format
 msgid "{name} successfully created."
 msgstr "{name} succesvol aangemaakt."
 
@@ -3406,7 +3433,9 @@ msgstr "Datum"
 #: build/lib/tools/forms/boefje.py:59 tools/forms/boefje.py:59
 msgid ""
 "Not all required boefjes are selected. Please select all required boefjes."
-msgstr "Niet alle benodigde boefjes zijn geselecteerd. Selecteer alle benodigde boefjes."
+msgstr ""
+"Niet alle benodigde boefjes zijn geselecteerd. Selecteer alle benodigde "
+"boefjes."
 
 #: build/lib/tools/forms/finding_type.py:25 tools/forms/finding_type.py:25
 msgid "KAT-ID"
@@ -3598,7 +3627,7 @@ msgstr "Verklaard"
 #: build/lib/tools/forms/settings.py:42 tools/forms/settings.py:42
 #: rocky/templates/scan_profiles/scan_profile_detail.html:45
 msgid "Inherited"
-msgstr "Geerfd"
+msgstr "Geërfd"
 
 #: build/lib/tools/forms/settings.py:43 tools/forms/settings.py:43
 #: rocky/templates/scan_profiles/scan_profile_detail.html:36
@@ -3694,10 +3723,10 @@ msgid ""
 "raw file to contain dns scan information.</p>"
 msgstr ""
 "<p>Voeg een set mime-typen toe, gescheiden door komma's, bijvoorbeeld:</"
-"p><p><i>\"tekst/html, afbeelding/jpeg\"</i> of <i>\"boefje/dns-records\"</i>.</"
-"p><p>Mime-types worden gebruikt om de juiste normalizer aan een onbewerkt bestand te koppelen. Wanneer "
-"het mime-type \"boefje/dns-records\" is toegevoegd, de normalizer verwacht de "
-"raw-bestand met dns-scaninformatie.</p>"
+"p><p><i>\"tekst/html, afbeelding/jpeg\"</i> of <i>\"boefje/dns-records\"</i>."
+"</p><p>Mime-types worden gebruikt om de juiste normalizer aan een onbewerkt "
+"bestand te koppelen. Wanneer het mime-type \"boefje/dns-records\" is "
+"toegevoegd, de normalizer verwacht de raw-bestand met dns-scaninformatie.</p>"
 
 #: build/lib/tools/forms/upload_raw.py:28 tools/forms/upload_raw.py:28
 #: rocky/templates/partials/ooi_list_toolbar.html:18
@@ -3739,14 +3768,16 @@ msgstr "Selecteer een {option_label}"
 msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
 "more details."
-msgstr "Kon lijst met bevindingen voor organisatie {} niet ophalen, controleer serverlogboeken voor "
-"meer details."
+msgstr ""
+"Kon lijst met bevindingen voor organisatie {} niet ophalen, controleer "
+"serverlogboeken voor meer details."
 
 #: katalogus/templates/partials/enable_disable_plugin.html:21
 msgid "You don't have permission to enable "
 msgstr "U heeft geen toestemming om in te schakelen"
 
 #: katalogus/templates/plugin_detail.html:56
+#, python-format
 msgid "%(plugin_name)s does not need any input objects."
 msgstr "%(plugin_name)s heeft geen invoerobjecten nodig."
 
@@ -3762,7 +3793,7 @@ msgstr ""
 "Weet je zeker dat je de instellingen voor de plugin %(plugin_name)s wilt "
 "verwijderen?"
 
-#: katalogus/views/katalogus_settings.py:39
+#: katalogus/views/katalogus_settings.py:49
 msgid ""
 "Settings from %(from_organization_name) to %(to_organization_name) "
 "successfully cloned."
@@ -3776,24 +3807,25 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                             "
 "Indemnification not present at organization %s."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s."
-"Vrijwaring niet aanwezig bij organisatie %s."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
+"bij organisatie %s."
 
 #: katalogus/views/mixins.py:112
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                             "
 "You acknowledged a clearance level of %s."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s."
-"U heeft een vrijwaring niveau van %s bevestigd."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s.U heeft een vrijwaring "
+"niveau van %s bevestigd."
 
 #: katalogus/views/plugin_detail.py:143
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
 msgstr ""
-"Sommige geselecteerde OOI's vereisen een hoger vrijwaring niveau om scans uit te voeren."
-"U bent niet gemachtigd om het vrijwaring niveau te wijzigen."
+"Sommige geselecteerde OOI's vereisen een hoger vrijwaring niveau om scans "
+"uit te voeren.U bent niet gemachtigd om het vrijwaring niveau te wijzigen."
 
 #: katalogus/views/plugin_detail.py:162
 msgid "Please select an OOI to start scan."
@@ -3801,7 +3833,9 @@ msgstr "Selecteer een OOI om de scan te starten."
 
 #: katalogus/views/plugin_settings_add.py:44
 msgid "No changes to the settings added: no form data present"
-msgstr "Geen wijzigingen aan de instellingen toegevoegd: geen formuliergegevens aanwezig"
+msgstr ""
+"Geen wijzigingen aan de instellingen toegevoegd: geen formuliergegevens "
+"aanwezig"
 
 #: katalogus/views/plugin_settings_add.py:50
 msgid "Added settings for '{}'"
@@ -3824,8 +3858,8 @@ msgid ""
 "Failed deleting Settings for plugin {}. Check the Katalogus logs for more "
 "info."
 msgstr ""
-"Verwijderen van instellingen voor plug-in {} mislukt. Controleer de Katalogus-logboeken voor meer "
-"informatie."
+"Verwijderen van instellingen voor plug-in {} mislukt. Controleer de "
+"Katalogus-logboeken voor meer informatie."
 
 #: onboarding/views.py:282
 #, python-format
@@ -3833,16 +3867,17 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                 "
 "Indemnification not present at organization %s."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s."
-"Vrijwaring niet aanwezig bij organisatie %s."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
+"bij organisatie %s."
 
 #: onboarding/views.py:297
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                 You "
 "acknowledged a clearance level of %s."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s. Jij "
-"erkende een vrijwaring niveau van %s."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s. Jij erkende een "
+"vrijwaring niveau van %s."
 
 #: tools/forms/ooi.py:99
 msgid "Show Boefjes that exceed the objects clearance level"
@@ -3853,8 +3888,8 @@ msgid ""
 "This organization code is reserved by OpenKAT and cannot be used. Choose "
 "another organization code."
 msgstr ""
-"Deze organisatiecode is gereserveerd door OpenKAT en kan niet worden gebruikt. Kies "
-"een andere organisatiecode."
+"Deze organisatiecode is gereserveerd door OpenKAT en kan niet worden "
+"gebruikt. Kies een andere organisatiecode."
 
 #: venv/lib/python3.9/site-packages/click/_termui_impl.py:496
 #, python-brace-format
@@ -4025,11 +4060,13 @@ msgstr[1] "Optie {name!r} vereist {nargs} argumenten."
 
 #: venv/lib/python3.9/site-packages/click/shell_completion.py:316
 msgid "Shell completion is not supported for Bash versions older than 4.4."
-msgstr "Shell-voltooiing wordt niet ondersteund voor Bash-versies ouder dan 4.4."
+msgstr ""
+"Shell-voltooiing wordt niet ondersteund voor Bash-versies ouder dan 4.4."
 
 #: venv/lib/python3.9/site-packages/click/shell_completion.py:322
 msgid "Couldn't detect Bash version, shell completion is not supported."
-msgstr "Kon Bash-versie niet detecteren, shell-voltooiing wordt niet ondersteund."
+msgstr ""
+"Kon Bash-versie niet detecteren, shell-voltooiing wordt niet ondersteund."
 
 #: venv/lib/python3.9/site-packages/click/termui.py:160
 msgid "Repeat for confirmation"
@@ -4061,7 +4098,7 @@ msgstr "Druk op een willekeurige toets om door te gaan..."
 msgid ""
 "Choose from:\n"
 "\t{choices}"
-msgstr
+msgstr ""
 "Kies uit:\n"
 "\t{choices}"
 
@@ -4194,15 +4231,16 @@ msgstr "Voer een geldig e-mailadres in."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Voer een geldige “slug” in bestaande uit letters, cijfers, onderstrepingstekens of koppeltekens."
+"Voer een geldige “slug” in bestaande uit letters, cijfers, "
+"onderstrepingstekens of koppeltekens."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:269
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Voer een geldige “slug” in bestaande uit Unicode-letters, cijfers, underscores of "
-"koppeltekens."
+"Voer een geldige “slug” in bestaande uit Unicode-letters, cijfers, "
+"underscores of koppeltekens."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:278
 #: venv/lib/python3.9/site-packages/django/core/validators.py:288
@@ -4227,17 +4265,20 @@ msgstr "Voer alleen cijfers in, gescheiden door komma's."
 #: venv/lib/python3.9/site-packages/django/core/validators.py:346
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-msgstr "Zorg ervoor dat deze waarde %(limit_value)s is (het is %(show_value)s)."
+msgstr ""
+"Zorg ervoor dat deze waarde %(limit_value)s is (het is %(show_value)s)."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:379
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
-msgstr "Zorg ervoor dat deze waarde kleiner is dan of gelijk is aan %(limit_value)s."
+msgstr ""
+"Zorg ervoor dat deze waarde kleiner is dan of gelijk is aan %(limit_value)s."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:388
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
-msgstr "Zorg ervoor dat deze waarde groter is dan of gelijk is aan %(limit_value)s."
+msgstr ""
+"Zorg ervoor dat deze waarde groter is dan of gelijk is aan %(limit_value)s."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:398
 #, python-format
@@ -4248,11 +4289,11 @@ msgid_plural ""
 "Ensure this value has at least %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Zorg ervoor dat deze waarde ten minste %(limit_value)d karakter heeft (deze heeft "
-"%(show_value)d)."
+"Zorg ervoor dat deze waarde ten minste %(limit_value)d karakter heeft (deze "
+"heeft %(show_value)d)."
 msgstr[1] ""
-"Zorg ervoor dat deze waarde ten minste %(limit_value)d tekens bevat (deze heeft "
-"%(show_value)d)."
+"Zorg ervoor dat deze waarde ten minste %(limit_value)d tekens bevat (deze "
+"heeft %(show_value)d)."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:413
 #, python-format
@@ -4263,11 +4304,11 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Zorg ervoor dat deze waarde maximaal %(limit_value)d karakter heeft (deze heeft "
-"%(show_value)d)."
+"Zorg ervoor dat deze waarde maximaal %(limit_value)d karakter heeft (deze "
+"heeft %(show_value)d)."
 msgstr[1] ""
-"Zorg ervoor dat deze waarde maximaal %(limit_value)d tekens bevat (deze heeft "
-"%(show_value)d)."
+"Zorg ervoor dat deze waarde maximaal %(limit_value)d tekens bevat (deze "
+"heeft %(show_value)d)."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:432
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:292
@@ -4295,8 +4336,10 @@ msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] "Zorg ervoor dat er niet meer dan %(max)s cijfer voor de komma staat."
-msgstr[1] "Zorg ervoor dat er niet meer dan %(max)s cijfers voor de komma staan."
+msgstr[0] ""
+"Zorg ervoor dat er niet meer dan %(max)s cijfer voor de komma staat."
+msgstr[1] ""
+"Zorg ervoor dat er niet meer dan %(max)s cijfers voor de komma staan."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:506
 #, python-format
@@ -4304,8 +4347,8 @@ msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
 msgstr ""
-"Bestandsextensie “%(extension)s” is niet toegestaan. Toegestane extensies zijn: "
-"%(allowed_extensions)s."
+"Bestandsextensie “%(extension)s” is niet toegestaan. Toegestane extensies "
+"zijn: %(allowed_extensions)s."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:559
 msgid "Null characters are not allowed."
@@ -4349,6 +4392,7 @@ msgstr ""
 "%(field_label)s moet uniek zijn voor %(date_field_label)s %(lookup_type)s."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:126
+#, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Veld van type: %(field_type)s"
 
@@ -4381,8 +4425,8 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"“%(value)s” waarde heeft een ongeldige datumnotatie. Het moet in formaat JJJJ-MM-DD zijn."
-
+"“%(value)s” waarde heeft een ongeldige datumnotatie. Het moet in formaat "
+"JJJJ-MM-DD zijn."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1147
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1290
@@ -4391,8 +4435,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"“%(value)s”-waarde heeft de juiste notatie (JJJJ-MM-DD) maar is een ongeldige "
-"datum."
+"“%(value)s”-waarde heeft de juiste notatie (JJJJ-MM-DD) maar is een "
+"ongeldige datum."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1150
 msgid "Date (without time)"
@@ -4404,8 +4448,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"“%(value)s” waarde heeft een ongeldig formaat. Het moet in JJJJ-MM-DD UU:MM[:ss[."
-"uuuuuu]][TZ] formaat."
+"“%(value)s” waarde heeft een ongeldig formaat. Het moet in JJJJ-MM-DD UU:MM[:"
+"ss[.uuuuuu]][TZ] formaat."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1292
 #, python-format
@@ -4435,8 +4479,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"“%(value)s” waarde heeft een ongeldig formaat. Het moet in [DD] [[HH:]MM:]ss[."
-"uuuuuu] formaat."
+"“%(value)s” waarde heeft een ongeldig formaat. Het moet in [DD] "
+"[[HH:]MM:]ss[.uuuuuu] formaat."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1588
 msgid "Duration"
@@ -4517,8 +4561,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"“%(value)s” waarde heeft een ongeldig formaat. Het moet in UU:MM[:ss[.uuuuuu]] formaat zijn."
-
+"“%(value)s” waarde heeft een ongeldig formaat. Het moet in UU:MM[:ss[."
+"uuuuuu]] formaat zijn."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2183
 #, python-format
@@ -4526,8 +4570,8 @@ msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"“%(value)s” waarde heeft de juiste notatie (UU:MM[:ss[.uuuuuu]]) maar het is een "
-"ongeldige tijd."
+"“%(value)s” waarde heeft de juiste notatie (UU:MM[:ss[.uuuuuu]]) maar het is "
+"een ongeldige tijd."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2186
 msgid "Time"
@@ -4555,7 +4599,6 @@ msgid "Image"
 msgstr "Afbeelding"
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/json.py:18
-
 msgid "A JSON object"
 msgstr "Een JSON object"
 
@@ -4625,7 +4668,8 @@ msgstr "Het aantal dagen moet tussen {min_days} en {max_days} liggen."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:549
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Er is geen bestand ingediend. Controleer het coderingstype op het formulier."
+msgstr ""
+"Er is geen bestand ingediend. Controleer het coderingstype op het formulier."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:550
 msgid "No file was submitted."
@@ -4640,27 +4684,34 @@ msgstr "Het ingediende bestand is leeg."
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-msgstr[0] "Zorg ervoor dat deze bestandsnaam maximaal %(max)d karakter heeft (het heeft %(length)d)."
-msgstr[1] "Zorg ervoor dat deze bestandsnaam maximaal %(max)d tekens bevat (deze heeft %(length)d)."
+msgstr[0] ""
+"Zorg ervoor dat deze bestandsnaam maximaal %(max)d karakter heeft (het heeft "
+"%(length)d)."
+msgstr[1] ""
+"Zorg ervoor dat deze bestandsnaam maximaal %(max)d tekens bevat (deze heeft "
+"%(length)d)."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:556
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr "Stuur alstublieft een bestand in of vink het selectievakje Wissen aan, niet beide."
+msgstr ""
+"Stuur alstublieft een bestand in of vink het selectievakje Wissen aan, niet "
+"beide."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:617
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
 msgstr ""
-"Upload een geldige afbeelding. Het bestand dat je hebt geüpload was geen afbeelding of een "
-"beschadigd beeld."
+"Upload een geldige afbeelding. Het bestand dat je hebt geüpload was geen "
+"afbeelding of een beschadigd beeld."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:779
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:869
 #: venv/lib/python3.9/site-packages/django/forms/models.py:1309
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
-msgstr "Selecteer een geldige keuze. %(value)s is niet een van de beschikbare keuzes."
+msgstr ""
+"Selecteer een geldige keuze. %(value)s is niet een van de beschikbare keuzes."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:870
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:985
@@ -4697,7 +4748,8 @@ msgid ""
 "%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
 "ManagementForm-gegevens ontbreken of er is mee geknoeid. Ontbrekende velden: "
-"%(field_names)s. Mogelijk moet u een bugrapport indienen als het probleem zich blijft voordoen."
+"%(field_names)s. Mogelijk moet u een bugrapport indienen als het probleem "
+"zich blijft voordoen."
 
 #: venv/lib/python3.9/site-packages/django/forms/formsets.py:370
 #, python-format
@@ -4734,8 +4786,8 @@ msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Corrigeer de dubbele gegevens voor %(field_name)s die uniek moeten zijn "
-"voor de %(lookup)s in %(date_field)s."
+"Corrigeer de dubbele gegevens voor %(field_name)s die uniek moeten zijn voor "
+"de %(lookup)s in %(date_field)s."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:782
 msgid "Please correct the duplicate values below."
@@ -4747,7 +4799,8 @@ msgstr "De inline waarde komt niet overeen met de bovenliggende instantie."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:1193
 msgid "Select a valid choice. That choice is not one of the available choices."
-msgstr "Kies een geldige keuze. Die keuze is niet een van de beschikbare keuzes."
+msgstr ""
+"Kies een geldige keuze. Die keuze is niet een van de beschikbare keuzes."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:1311
 #, python-format
@@ -4760,8 +4813,8 @@ msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s kon niet worden geïnterpreteerd in tijdzone %(current_timezone)s; het "
-"kan dubbelzinnig zijn of het kan niet bestaan."
+"%(datetime)s kon niet worden geïnterpreteerd in tijdzone "
+"%(current_timezone)s; het kan dubbelzinnig zijn of het kan niet bestaan."
 
 #: venv/lib/python3.9/site-packages/django/forms/widgets.py:403
 msgid "Clear"
@@ -5190,10 +5243,10 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"U ziet dit bericht omdat deze HTTPS-site een “Referer header“ vereist "
-"die door uw webbrowser moet worden verzonden, maar er is geen verzonden. Deze header is "
-"noodzakelijk om veiligheidsredenen, om ervoor te zorgen dat uw browser niet wordt "
-"gekaapt door derden."
+"U ziet dit bericht omdat deze HTTPS-site een “Referer header“ vereist die "
+"door uw webbrowser moet worden verzonden, maar er is geen verzonden. Deze "
+"header is noodzakelijk om veiligheidsredenen, om ervoor te zorgen dat uw "
+"browser niet wordt gekaapt door derden."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:120
 msgid ""
@@ -5201,9 +5254,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
-"Als u uw browser heeft geconfigureerd om “Referer” headers uit te schakelen, gelieve ze opnieuw "
-"in te schakelen, in ieder geval voor deze site, of voor HTTPS-verbindingen, of voor “same-"
-"origin” verzoeken."
+"Als u uw browser heeft geconfigureerd om “Referer” headers uit te schakelen, "
+"gelieve ze opnieuw in te schakelen, in ieder geval voor deze site, of voor "
+"HTTPS-verbindingen, of voor “same-origin” verzoeken."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:124
 msgid ""
@@ -5213,11 +5266,11 @@ msgid ""
 "If you’re concerned about privacy, use alternatives like <a "
 "rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"Als u de tag <meta name=\"referrer\" content=\"no-referrer\"> of "
-"inclusief de kop “Referrer-Policy: no-referrer”, verwijder deze alstublieft. De "
-"CSRF-bescherming vereist de kop “Referer” om strikte verwijzingscontrole uit te voeren. "
-"Als je je zorgen maakt over privacy, gebruik dan alternatieven zoals <a "
-"rel=\"noreferrer\" …> voor links naar sites van derden."
+"Als u de tag <meta name=\"referrer\" content=\"no-referrer\"> of inclusief "
+"de kop “Referrer-Policy: no-referrer”, verwijder deze alstublieft. De CSRF-"
+"bescherming vereist de kop “Referer” om strikte verwijzingscontrole uit te "
+"voeren. Als je je zorgen maakt over privacy, gebruik dan alternatieven zoals "
+"<a rel=\"noreferrer\" …> voor links naar sites van derden."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:132
 msgid ""
@@ -5226,16 +5279,17 @@ msgid ""
 "that your browser is not being hijacked by third parties."
 msgstr ""
 "U ziet dit bericht omdat deze site een CSRF-cookie vereist wanneer "
-"formulieren worden verzonden. Deze cookie is om veiligheidsredenen nodig om ervoor te zorgen dat "
-"dat uw browser niet wordt gekaapt door derden."
+"formulieren worden verzonden. Deze cookie is om veiligheidsredenen nodig om "
+"ervoor te zorgen dat dat uw browser niet wordt gekaapt door derden."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:137
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Als u uw browser hebt geconfigureerd om cookies uit te schakelen, schakel deze dan opnieuw in"
-"in ieder geval voor deze site, of voor verzoeken van dezelfde oorsprong."
+"Als u uw browser hebt geconfigureerd om cookies uit te schakelen, schakel "
+"deze dan opnieuw inin ieder geval voor deze site, of voor verzoeken van "
+"dezelfde oorsprong."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:142
 msgid "More information is available with DEBUG=True."
@@ -5290,7 +5344,9 @@ msgstr "Geen %(verbose_name)s gevonden die overeenkomen met de zoekopdracht"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/list.py:67
 msgid "Page is not “last”, nor can it be converted to an int."
-msgstr "Pagina is niet ”laatste” en kan ook niet worden geconverteerd naar een geheel getal."
+msgstr ""
+"Pagina is niet ”laatste” en kan ook niet worden geconverteerd naar een "
+"geheel getal."
 
 #: venv/lib/python3.9/site-packages/django/views/generic/list.py:72
 #, python-format
@@ -5328,7 +5384,8 @@ msgid ""
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
 "Bekijk <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target=\"_blank\" rel=\"noopener\">releaseopmerkingen</a> voor Django %(version)s"
+"target=\"_blank\" rel=\"noopener\">releaseopmerkingen</a> voor Django "
+"%(version)s"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:222
 #, python-format
@@ -5340,8 +5397,8 @@ msgid ""
 msgstr ""
 "Je ziet deze pagina omdat <a href=\"https://docs.djangoproject.com/en/"
 "%(version)s/ref/settings/#debug\" target=\"_blank\" "
-"rel=\"noopener\">DEBUG=True</a> staat in je instellingenbestand en je hebt niet "
-"alle URL's geconfigureerd."
+"rel=\"noopener\">DEBUG=True</a> staat in je instellingenbestand en je hebt "
+"niet alle URL's geconfigureerd."
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:230
 msgid "Django Documentation"
@@ -5461,7 +5518,9 @@ msgstr "Foutcode 403: Ongeautoriseerd"
 
 #: rocky/templates/403.html:14
 msgid "Your account is not authorized to access this page or organization."
-msgstr "Uw account is niet geautoriseerd om toegang te krijgen tot deze pagina of organisatie."
+msgstr ""
+"Uw account is niet geautoriseerd om toegang te krijgen tot deze pagina of "
+"organisatie."
 
 #: rocky/templates/403.html:16
 msgid "Please contact your system administrator."
@@ -5646,7 +5705,7 @@ msgstr ""
 #: rocky/templates/findings/finding_list.html:33
 #: rocky/templates/organizations/organization_crisis_room.html:33
 msgid "Showing "
-msgstr "Weergegeven "
+msgstr "Toont "
 
 #: rocky/templates/findings/finding_list.html:33
 #: rocky/templates/organizations/organization_crisis_room.html:33
@@ -5656,8 +5715,8 @@ msgstr "van"
 
 #: rocky/templates/findings/finding_list.html:33
 #: rocky/templates/organizations/organization_crisis_room.html:33
-msgid "objects"
-msgstr "Objecten"
+msgid "findings"
+msgstr "bevindingen"
 
 #: rocky/templates/findings/finding_list.html:43
 #: rocky/templates/findings/finding_list.html:68
@@ -5707,6 +5766,7 @@ msgid "Source OOI:"
 msgstr "Bron:"
 
 #: rocky/templates/findings/finding_list.html:106
+#, python-format
 msgid "Show details for %(ooi)s"
 msgstr "Bekijk details van %(ooi)s"
 
@@ -6059,12 +6119,8 @@ msgid "Finding details"
 msgstr "Bevinding details"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html:9
-msgid "Overview of the number of findings found on"
-msgstr "Overzicht van de bevindingen gevonden op"
-
-#: rocky/templates/oois/ooi_detail_findings_overview.html:9
-msgid "and their severity."
-msgstr "en het niveau"
+msgid "Overview of the number of findings and their severity found on"
+msgstr "Overzicht van het aantal bevindingen en de ernst daarvan op"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html:12
 msgid ""
@@ -6072,9 +6128,9 @@ msgid ""
 "table shows the number of unique findings found as well as the number of "
 "occurrences."
 msgstr ""
-"Bevindingen kunnen meerdere keren voorkomen. Om beter inzicht te geven het volgende "
-"tabel toont het aantal gevonden unieke vondsten en het aantal"
-"gebeurtenissen."
+"Bevindingen kunnen meerdere keren voorkomen. Om beter inzicht te geven het "
+"volgende tabel toont het aantal gevonden unieke vondsten en het "
+"aantalgebeurtenissen."
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html:15
 msgid "See finding details"
@@ -6145,8 +6201,8 @@ msgid ""
 "An overview of your object list. Objects can be added manually or by running "
 "boefjes.</br> Click an object for additional information."
 msgstr ""
-"Een overzicht de huidige objecten. Objecten kunnen handmatig of door Boefjes "
-"toegevoegd worden. Klik op een object voor meer informatie."
+"Een overzicht van uw objectenlijst. Objecten kunnen handmatig of door "
+"Boefjes toegevoegd worden. Klik op een object voor meer informatie."
 
 #: rocky/templates/oois/ooi_list.html:21
 msgid "Currently filtered on:"
@@ -6313,8 +6369,8 @@ msgstr ""
 "                            Er is geen vrijwaring ingesteld voor deze "
 "organisatie.\n"
 "                            Ga naar de <a "
-"href=\"%(organization_settings)s\">pagina met organisatie-instellingen</a> om die "
-"toe te voegen.\n"
+"href=\"%(organization_settings)s\">pagina met organisatie-instellingen</a> "
+"om die toe te voegen.\n"
 "                        "
 
 #: rocky/templates/organizations/organization_crisis_room.html:26
@@ -6322,8 +6378,8 @@ msgid ""
 "An overview of the top 10 most severe findings OpenKAT found. Check the "
 "detail section for additional severity information."
 msgstr ""
-"Een overzicht van de top 10 meest ernstige bevindingen die OpenKAT heeft gevonden. Bekijk de "
-"detailsectie voor aanvullende informatie over de ernst."
+"Een overzicht van de top 10 meest ernstige bevindingen die OpenKAT heeft "
+"gevonden. Bekijk de detailsectie voor aanvullende informatie over de ernst."
 
 #: rocky/templates/organizations/organization_crisis_room.html:28
 msgid "Top 10 most severe Findings"
@@ -6348,7 +6404,7 @@ msgstr "Bewerk organisatie"
 
 #: rocky/templates/organizations/organization_edit.html:22
 msgid "Save organization"
-msgstr "Organisatie"
+msgstr "Organisatie opslaan"
 
 #: rocky/templates/organizations/organization_list.html:15
 msgid "Add new organization"
@@ -6386,13 +6442,15 @@ msgid "Save member"
 msgstr "Sla leden op"
 
 #: rocky/templates/organizations/organization_member_list.html:13
+#, python-format
 msgid ""
 "\n"
 "                    An overview of \"%(organization_name)s\" its members.\n"
 "                "
 msgstr ""
 "\n"
-"                        Een overzicht van \"%(organization_name)s\" haar leden.\n"
+"                        Een overzicht van \"%(organization_name)s\" haar "
+"leden.\n"
 "                        "
 
 #: rocky/templates/organizations/organization_member_list.html:20
@@ -6441,7 +6499,7 @@ msgid ""
 "          "
 msgstr ""
 "\n"
-"            Een overzicht van \"%(organization_name)s\". Dit toont algemeen"
+"            Een overzicht van \"%(organization_name)s\". Dit toont algemene "
 "informatie en de bijbehorende instelligen.\n"
 "          "
 
@@ -6698,7 +6756,7 @@ msgstr "Bevinding dempen"
 
 #: rocky/templates/partials/ooi_head.html:7
 msgid "An overview of"
-msgstr "Overzicht van bevindingen:"
+msgstr "Een overzicht van"
 
 #: rocky/templates/partials/ooi_head.html:7
 msgid "object type"
@@ -6710,7 +6768,8 @@ msgid ""
 "possibility to add additional related objects, or to scan for them."
 msgstr ""
 "Dit toont algemene informatie en gerelateerde objecten. Het geeft ook de "
-"mogelijkheid om aanvullende gerelateerde objecten toe te voegen of om ze te scannen."
+"mogelijkheid om aanvullende gerelateerde objecten toe te voegen of om ze te "
+"scannen."
 
 #: rocky/templates/partials/ooi_list_toolbar.html:15
 msgid "Scan for objects"
@@ -6763,8 +6822,8 @@ msgid ""
 "The severity of this findingtype has not (yet) been determined by the data "
 "source. This situation requires manual investigation of the severity."
 msgstr ""
-"De ernst van dit bevindingstype is (nog) niet bepaald door de data"
-"bron. Deze situatie vereist handmatig onderzoek naar de ernst."
+"De ernst van dit bevindingstype is (nog) niet bepaald door de databron. Deze "
+"situatie vereist handmatig onderzoek naar de ernst."
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:67
 #: rocky/templates/partials/ooi_report_severity_totals_table.html:9
@@ -6891,8 +6950,8 @@ msgid "Search by object name"
 msgstr "Zoeken op objectnaam"
 
 #: rocky/templates/partials/scan_history.html:61
-msgid "No scans found for this object"
-msgstr "Geen scans gevonden voor dit object"
+msgid "No scans found for this object."
+msgstr "Geen scans gevonden voor dit object."
 
 #: rocky/templates/partials/scan_history.html:66
 msgid "Object"
@@ -6993,7 +7052,6 @@ msgstr "Het vrijwaring niveau in te stellen van \\"
 #: rocky/templates/scan_profiles/scan_profile_reset.html:24
 msgid "You are about to set the clearance level from \\"
 msgstr "U staat op het punt het vrijwaring niveau in te stellen van \\"
-
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html:28
 msgid "Yes, set to inherit"
@@ -7185,10 +7243,10 @@ msgid ""
 "above or you can insert this key using the secret key option of the "
 "authenticator app."
 msgstr ""
-"De geheime sleutel is een weergave van 32 tekens van de QR-code. Er zijn er 2 "
-"opties om de tweefactorauthenticatie in te stellen. U kunt de QR-code scannen"
-"hierboven of u kunt deze sleutel invoegen met behulp van de geheime sleuteloptie van de "
-"authenticatie-app."
+"De geheime sleutel is een weergave van 32 tekens van de QR-code. Er zijn er "
+"2 opties om de tweefactorauthenticatie in te stellen. U kunt de QR-code "
+"scannenhierboven of u kunt deze sleutel invoegen met behulp van de geheime "
+"sleuteloptie van de authenticatie-app."
 
 #: rocky/templates/two_factor/core/setup_complete.html:11
 msgid "Congratulations, you've successfully enabled two-factor authentication."
@@ -7306,7 +7364,9 @@ msgstr "Dit zijn de criteria voor CSV-upload:"
 
 #: rocky/templates/upload_raw.html:13
 msgid "Automate the creation of multiple objects by uploading a raw file."
-msgstr "Automatiseer het maken van meerdere objecten door een raw-bestand te uploaden."
+msgstr ""
+"Automatiseer het maken van meerdere objecten door een raw-bestand te "
+"uploaden."
 
 #: rocky/templates/upload_raw.html:24 rocky/views/upload_raw.py:33
 msgid "Upload raw"
@@ -7370,6 +7430,7 @@ msgid "Unknown action."
 msgstr "Ongeldige actie."
 
 #: rocky/views/ooi_list.py:88
+#, python-format
 msgid ""
 "Could not raise clearance levels to L%s. Indemnification not present at "
 "organization %s."
@@ -7378,17 +7439,17 @@ msgstr ""
 "organisatie %s."
 
 #: rocky/views/ooi_list.py:99
+#, python-format
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of %s."
 msgstr ""
-"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau bevestigd "
-"van %s."
+"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau "
+"bevestigd van %s."
 
 #: rocky/views/ooi_list.py:107 rocky/views/ooi_list.py:114
 msgid "An error occurred while saving clearance levels."
 msgstr "Er is een fout opgetreden bij het opslaan van vrijwaring niveaus."
-
 
 #: rocky/views/ooi_list.py:114
 msgid "One of the OOI's doesn't exist"
@@ -7401,17 +7462,20 @@ msgstr "Vrijwaringsniveau succesvol gezet op %s voor %d objecten."
 
 #: rocky/views/ooi_list.py:136
 msgid "An error occurred while setting clearance levels to inherit."
-msgstr "Er is een fout opgetreden bij het instellen van vrijwaring niveaus naar overerven."
+msgstr ""
+"Er is een fout opgetreden bij het instellen van vrijwaring niveaus naar "
+"overerven."
 
 #: rocky/views/ooi_list.py:143
 msgid ""
 "An error occurred while setting clearance levels to inherit: one of the OOIs "
 "doesn't exist."
 msgstr ""
-"Er is een fout opgetreden bij het instellen van vrijwaring niveaus naar overerven: een van de OOI's"
-"bestaat niet."
+"Er is een fout opgetreden bij het instellen van vrijwaring niveaus naar "
+"overerven: een van de OOI'sbestaat niet."
 
 #: rocky/views/ooi_list.py:150
+#, python-format
 msgid "Successfully set %d ooi(s) clearance level to inherit."
 msgstr "Succesvol ingesteld %d ooi(s) vrijwaring niveau naar overerven."
 
@@ -7422,7 +7486,8 @@ msgstr "Er is een fout opgetreden bij het verwijderen van oois."
 #: rocky/views/ooi_list.py:165
 msgid "An error occurred while deleting oois: one of the OOIs doesn't exist."
 msgstr ""
-"Er is een fout opgetreden bij het verwijderen van oois: een van de OOI's bestaat niet."
+"Er is een fout opgetreden bij het verwijderen van oois: een van de OOI's "
+"bestaat niet."
 
 #: rocky/views/ooi_list.py:172
 #, python-format
@@ -7451,11 +7516,15 @@ msgstr "Bevindingen rapport"
 
 #: rocky/views/ooi_report.py:93 rocky/views/ooi_report.py:126
 msgid "Generating report failed. See Keiko logs for more information."
-msgstr "Het genereren van het rapport is mislukt. Zie de Keiko-logboeken voor meer informatie."
+msgstr ""
+"Het genereren van het rapport is mislukt. Zie de Keiko-logboeken voor meer "
+"informatie."
 
 #: rocky/views/ooi_report.py:96 rocky/views/ooi_report.py:129
 msgid "Timeout reached generating report. See Keiko logs for more information."
-msgstr "Time-out bereikt bij genereren van rapport. Zie Keiko-logboeken voor meer informatie."
+msgstr ""
+"Time-out bereikt bij genereren van rapport. Zie Keiko-logboeken voor meer "
+"informatie."
 
 #: rocky/views/ooi_tree.py:48
 msgid "Tree Visualisation"
@@ -7478,6 +7547,7 @@ msgid "You are not allowed to add organizations."
 msgstr "Uw mag geen organisaties toevoegen."
 
 #: rocky/views/organization_edit.py:23
+#, python-format
 msgid "Organization %s successfully updated."
 msgstr "Organisatie %s succesvol bijgewerkt."
 
@@ -7490,6 +7560,7 @@ msgid "Member added successfully."
 msgstr "Lid succesvol toegevoegd."
 
 #: rocky/views/organization_member_edit.py:42
+#, python-format
 msgid "Member %s successfully updated."
 msgstr "Lid %s succesvol gewijzigd."
 
@@ -7501,9 +7572,9 @@ msgid ""
 "level L%s. For this reason the acknowledged clearance level has been set at "
 "the same level as trusted clearance level."
 msgstr ""
-"Het bijgewerkte vertrouwde vrijwaring niveau van L%s is lager dan dat van het lid "
-"erkend vrijwaring niveau van L%s. Dit lid heeft alleen toestemming voor "
-"niveau L%s. Om deze reden is het erkende vrijwaring niveau ingesteld op "
+"Het bijgewerkte vertrouwde vrijwaring niveau van L%s is lager dan dat van "
+"het lid erkend vrijwaring niveau van L%s. Dit lid heeft alleen toestemming "
+"voor niveau L%s. Om deze reden is het erkende vrijwaring niveau ingesteld op "
 "hetzelfde niveau als vertrouwd vrijwaring niveau."
 
 #: rocky/views/organization_member_edit.py:90
@@ -7511,18 +7582,20 @@ msgid ""
 "You have trusted this member with a higher trusted level than member "
 "acknowledged. Member must first accept this level to use it."
 msgstr ""
-"Je hebt dit lid vertrouwd met een hoger vrijwaring niveau dan dit lid "
-"erkend heeft. Het lid moet dit niveau eerst accepteren om het te gebruiken."
+"Je hebt dit lid vertrouwd met een hoger vrijwaring niveau dan dit lid erkend "
+"heeft. Het lid moet dit niveau eerst accepteren om het te gebruiken."
 
 #: rocky/views/organization_member_list.py:18
 msgid "Not blocked"
 msgstr "Niet geblokkeerd"
 
 #: rocky/views/organization_member_list.py:77
+#, python-format
 msgid "Blocked member %s successfully."
 msgstr "Geblokkeerd lid %s succesvol."
 
 #: rocky/views/organization_member_list.py:84
+#, python-format
 msgid "Unblocked member %s successfully."
 msgstr "Deblokkeer lid %s succesvol."
 
@@ -7537,16 +7610,17 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                         "
 "Indemnification not present at organization %s."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s."
-"Vrijwaring niet aanwezig bij organisatie %s."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
+"bij organisatie %s."
 
 #: rocky/views/scan_profile.py:64
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                         You "
 "acknowledged a clearance level of %s."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s. Jij "
-"erkende een vrijwaring niveau van %s."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s. Jij erkende een "
+"vrijwaring niveau van %s."
 
 #: rocky/views/scan_profile.py:78
 msgid "Choose a valid level"

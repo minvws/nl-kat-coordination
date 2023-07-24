@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-12 12:04+0000\n"
+"POT-Creation-Date: 2023-07-24 13:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,8 +59,9 @@ msgid ""
 "organization. I have the experience and knowledge to know what the "
 "consequences might be and can be held responsible for them."
 msgstr ""
-"Mi ta deklará ku mi tin autorisashon pa duna e indemnisashon aki den mi organisashon. "
-"Mi tin e eksperensia i konosementu pa sa e konsekensianan i mi por ta responsabel pa nan."
+"Mi ta deklará ku mi tin autorisashon pa duna e indemnisashon aki den mi "
+"organisashon. Mi tin e eksperensia i konosementu pa sa e konsekensianan i mi "
+"por ta responsabel pa nan."
 
 #: account/forms/account_setup.py:71
 #: build/lib/account/forms/account_setup.py:71
@@ -130,7 +131,8 @@ msgstr "Nivel di autorisashon asigná"
 #: account/forms/account_setup.py:179
 #: build/lib/account/forms/account_setup.py:180
 msgid "Select a clearance level you trust this member with."
-msgstr "Selekshoná un nivel di autorisashon ku bo ta konfia e miembro aki ku ne."
+msgstr ""
+"Selekshoná un nivel di autorisashon ku bo ta konfia e miembro aki ku ne."
 
 #: account/forms/account_setup.py:185
 #: build/lib/account/forms/account_setup.py:186
@@ -146,7 +148,8 @@ msgid ""
 "Set the members status to blocked, so they don't have access to the "
 "organization anymore."
 msgstr ""
-"Ajustá e status di e miembro komo blokeá, pa nan no tin akseso na e organisashon mas."
+"Ajustá e status di e miembro komo blokeá, pa nan no tin akseso na e "
+"organisashon mas."
 
 #: account/forms/account_setup.py:195
 #: build/lib/account/forms/account_setup.py:196
@@ -386,12 +389,12 @@ msgstr "Organisashon"
 msgid "Permission to set OOI clearance levels "
 msgstr "Pèrmit pa pone nivél di autorisashonnan pa OOI "
 
-#: account/templates/account_detail.html:69
+#: account/templates/account_detail.html:70
 #: build/lib/account/templates/account_detail.html:69
 msgid "OOI clearance"
 msgstr "OOI autorisá"
 
-#: account/templates/account_detail.html:72
+#: account/templates/account_detail.html:73
 msgid ""
 "\n"
 "                                You don't have any clearance to scan objects."
@@ -406,29 +409,40 @@ msgstr ""
 "autorisashon.\n"
 "            "
 
-#: account/templates/account_detail.html:79
+#: account/templates/account_detail.html:80
 #: build/lib/account/templates/account_detail.html:79
 msgid "You have currently accepted clearance up to level"
 msgstr "Bo a acceptá nivél di autorisashon te na nivel"
 
 #: account/templates/account_detail.html:90
 msgid ""
-"You are granted clearance for level L%(cl)s by your admin. Before you can "
+"You are granted clearance for level L%(tcl)s by your admin. Before you can "
 "change OOI clearance levels up to this level, you need to accept this "
 "permission. Remember: <strong>with great power comes great responsibility.</"
 "strong>"
 msgstr ""
-"Bo a haña nivel di autorisashon di L%(cl)s for di bo administrador. "
-"Promé ku bo por kambia nivelnan di autorisashon di e OOI te na e nivel aki, "
-"bo mester prome aseptá e permiso aki. No lubidá: <strong>ku gran poder ta bini gran responsabilidat.</strong>"
+"Bo a haña nivel di autorisashon di L%(tcl)s for di bo administrador. Promé ku "
+"bo por kambia nivelnan di autorisashon di e OOI te na e nivel aki, bo mester "
+"prome aseptá e permiso aki. No lubidá: <strong>ku gran poder ta bini gran "
+"responsabilidat.</strong>"
 
-#: account/templates/account_detail.html:98
+#: account/templates/account_detail.html:94
+#, python-format
+msgid "\"Accept level L%(tcl)s clearance and responsibility\""
+msgstr "\"Aseptá autorisashon di nivel L%(tcl)s i responsabilidat\""
+
+#: account/templates/account_detail.html:99
 msgid ""
 "You can withdraw this at anytime you like, but know that you won't be able "
 "to change clearance levels anymore when you do."
 msgstr ""
 "Bo por retirá esaki n'e momento ku bo ke, pero sa ku bo no por kambia nivél "
 "di autorisashon mas ora bo hasi esaki."
+
+#: account/templates/account_detail.html:101
+#, python-format
+msgid "\"Withdraw acceptance of level L%(tcl)s clearance and responsibility\""
+msgstr "\"Retirá akseptashon di autorisashon di nivel L%(tcl)s i responsabilidat\""
 
 #: account/templates/login.html:10 build/lib/account/templates/login.html:8
 #: rocky/templates/two_factor/core/login.html:8
@@ -688,14 +702,17 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                     "
 "Indemnification not present at organization %s."
 msgstr ""
-"No por a aumenta e nivel di autorisashon di %s pa L%s. Indemnifikashon no presente pa organisashon %s."
+"No por a aumenta e nivel di autorisashon di %s pa L%s. Indemnifikashon no "
+"presente pa organisashon %s."
 
 #: build/lib/account/mixins.py:105
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                     You "
 "acknowledged a clearance level of %s."
 msgstr ""
-"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di %s."
+"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel "
+"di autorisashon di %s."
 
 #: build/lib/account/templates/account_detail.html:72
 msgid ""
@@ -712,13 +729,16 @@ msgstr ""
 "            "
 
 #: build/lib/account/templates/account_detail.html:89
+#, python-format
 msgid ""
 "You are granted clearance for %(cl)s your admin. Before you can change OOI "
 "clearance levels up to this level, you need to accept this permission. "
 "Remember: <strong>with great power comes great responsibility.</strong>"
 msgstr ""
-"Bo a haña nivel di autorisashon di %(cl)s for di bo administrador. "
-"Promé ku bo por kambia nivelnan di autorisashon di OOI te na e nivel aki, bo mester aseptá e permiso aki. No lubidá: <strong>ku gran pode ta bini gran responsabilidat.</strong>"
+"Bo a haña nivel di autorisashon di %(cl)s for di bo administrador. Promé ku "
+"bo por kambia nivelnan di autorisashon di OOI te na e nivel aki, bo mester "
+"aseptá e permiso aki. No lubidá: <strong>ku gran pode ta bini gran "
+"responsabilidat.</strong>"
 
 #: build/lib/account/templates/account_detail.html:97
 msgid ""
@@ -730,7 +750,9 @@ msgstr ""
 
 #: build/lib/crisis_room/views.py:103
 msgid "Failed to get list of findings, check server logs for more details."
-msgstr "No por a optené lista di diskubrimentu, kontrolá registro di servidor pa detayenan mas."
+msgstr ""
+"No por a optené lista di diskubrimentu, kontrolá registro di servidor pa "
+"detayenan mas."
 
 #: build/lib/fmea/forms.py:31 build/lib/fmea/forms.py:123
 #: build/lib/fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html:19
@@ -1565,7 +1587,7 @@ msgstr "Desaktivá"
 #: build/lib/katalogus/forms/katalogus_filter.py:14
 #: katalogus/forms/katalogus_filter.py:14
 msgid "Enabled-Disabled"
-msgstr "Desaktivá-Aktivá"
+msgstr "Aktivá-Desaktivá"
 
 #: build/lib/katalogus/forms/katalogus_filter.py:15
 #: katalogus/forms/katalogus_filter.py:15
@@ -1697,7 +1719,9 @@ msgstr ""
 "\n"
 " Uza e formulario abou pa kopia e konfigurashon di "
 "<i>%(current_organization)s</i> pa e organisashon selektá.\n"
-" Esaki ta inkluí tanto e konfigurashonnan di KAT-alogus manera tambe e plug-innan aktivá i desaktivá.\n"
+" Esaki ta inkluí tanto e konfigurashonnan di KAT-alogus manera tambe e plug-"
+"innan aktivá i desaktivá.\n"
+"      "
 
 #: build/lib/katalogus/templates/confirmation_clone_settings.html:39
 #: katalogus/templates/confirmation_clone_settings.html:37
@@ -1714,7 +1738,7 @@ msgstr "Kopia"
 #: build/lib/katalogus/views/plugin_settings_edit.py:44
 #: katalogus/templates/katalogus.html:14
 #: katalogus/views/change_clearance_level.py:56 katalogus/views/katalogus.py:87
-#: katalogus/views/katalogus_settings.py:67 katalogus/views/plugin_detail.py:87
+#: katalogus/views/katalogus_settings.py:82 katalogus/views/plugin_detail.py:87
 #: katalogus/views/plugin_settings_add.py:71
 #: katalogus/views/plugin_settings_delete.py:25
 #: rocky/templates/dashboard_client.html:31
@@ -2078,10 +2102,13 @@ msgid "Delete setting"
 msgstr "Kita setting"
 
 #: build/lib/katalogus/templates/plugin_settings_delete.html:14
+#, python-format
 msgid ""
 "Are you sure you want to delete setting %(setting_name)s for the plugin "
 "%(plugin_name)s?"
-msgstr "Bo ta sigur bo ke eliminá setting %(setting_name)s pa e plugin %(plugin_name)s?"
+msgstr ""
+"Bo ta sigur bo ke eliminá setting %(setting_name)s pa e plugin "
+"%(plugin_name)s?"
 
 #: build/lib/katalogus/templates/plugin_settings_delete.html:20
 #: build/lib/katalogus/templates/plugin_settings_list.html:18
@@ -2103,7 +2130,7 @@ msgstr "Kambia setting"
 #: build/lib/katalogus/templates/plugin_settings_list.html:8
 #: build/lib/katalogus/views/katalogus_settings.py:71
 #: katalogus/templates/plugin_settings_list.html:8
-#: katalogus/views/katalogus_settings.py:71 rocky/templates/header.html:72
+#: katalogus/views/katalogus_settings.py:89 rocky/templates/header.html:72
 #: rocky/templates/organizations/organization_settings.html:58
 msgid "Settings"
 msgstr "Settings"
@@ -2168,16 +2195,19 @@ msgstr "Kambia nivél di autorisashon"
 
 #: build/lib/katalogus/views/katalogus.py:39 katalogus/views/katalogus.py:36
 msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-msgstr "Carga di plug-in den KATalogus a falla. Fabor kontrolá e registro di KATalogus."
+msgstr ""
+"Carga di plug-in den KATalogus a falla. Fabor kontrolá e registro di "
+"KATalogus."
 
 #: build/lib/katalogus/views/katalogus_settings.py:39
+#, python-format
 msgid "Settings from %s to %s successfully cloned."
 msgstr "Ajustenan di %s pa %s a wordu di kloon ku éksito."
 
 #: build/lib/katalogus/views/katalogus_settings.py:88
 #: build/lib/katalogus/views/plugin_settings_add.py:45
 #: build/lib/katalogus/views/plugin_settings_list.py:26
-#: katalogus/views/katalogus_settings.py:88
+#: katalogus/views/katalogus_settings.py:108
 #: katalogus/views/plugin_settings_list.py:23
 msgid "Failed getting settings for boefje {}"
 msgstr "Faya den haña ajustenan pa boefje {}"
@@ -2186,7 +2216,8 @@ msgstr "Faya den haña ajustenan pa boefje {}"
 msgid ""
 "Getting information for plugin {} failed. Please check the KATalogus logs."
 msgstr ""
-"Faya den haña informashon pa e plugin {} . Por fabor, kontrolá e lognan di KATalogus."
+"Faya den haña informashon pa e plugin {} . Por fabor, kontrolá e lognan di "
+"KATalogus."
 
 #: build/lib/katalogus/views/plugin_detail.py:159
 msgid "Scanning has failed to start."
@@ -2202,7 +2233,8 @@ msgstr "Boefje '{boefje_id}' desaktivá."
 #: katalogus/views/plugin_enable_disable.py:38
 #, python-brace-format
 msgid "Failed fetching settings for boefje {boefje_id}. Is the Katalogus up?"
-msgstr "Faya den buskamentu di ajustenan pa boefje {boefje_id}. Katalogus ta sende?"
+msgstr ""
+"Faya den buskamentu di ajustenan pa boefje {boefje_id}. Katalogus ta sende?"
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:60
 #: katalogus/views/plugin_enable_disable.py:57
@@ -2257,7 +2289,9 @@ msgstr "Setting {} pa plugin {} a wordu kita ku èxito."
 msgid ""
 "Failed deleting Setting {} for plugin {}. Check the Katalogus logs for more "
 "info."
-msgstr "Faya den eliminashon di Ajuste {} pa plugin {}. Kontrolá e lognan di Katalogus pa mas informashon."
+msgstr ""
+"Faya den eliminashon di Ajuste {} pa plugin {}. Kontrolá e lognan di "
+"Katalogus pa mas informashon."
 
 #: build/lib/katalogus/views/plugin_settings_edit.py:81
 msgid "Setting successfully updated."
@@ -2396,9 +2430,9 @@ msgid ""
 "within the organization page within OpenKAT when necessary. Adding a new "
 "organization requires a new database."
 msgstr ""
-"Por fabor pone e detayenan di e siguiente organisashon. E detayenan aki por wordu "
-"editá den e página di organisashon den OpenKAT si ta nesesario. Agregá un organisashon "
-"nobo ta requeri un base di datos nobo."
+"Por fabor pone e detayenan di e siguiente organisashon. E detayenan aki por "
+"wordu editá den e página di organisashon den OpenKAT si ta nesesario. Agregá "
+"un organisashon nobo ta requeri un base di datos nobo."
 
 #: build/lib/onboarding/templates/account/step_2a_organization_setup.html:30
 #: build/lib/onboarding/templates/account/step_2a_organization_update.html:26
@@ -2416,8 +2450,8 @@ msgid ""
 "Please enter the following organization details. These details can be edited "
 "within the organization page within OpenKAT when necessary."
 msgstr ""
-"Por fabor pone e detayenan di e siguiente organisashon. E detayenan aki por wordu "
-"editá den e página di organisashon den OpenKAT si ta nesesario."
+"Por fabor pone e detayenan di e siguiente organisashon. E detayenan aki por "
+"wordu editá den e página di organisashon den OpenKAT si ta nesesario."
 
 #: build/lib/onboarding/templates/account/step_2a_organization_update.html:29
 #: onboarding/templates/account/step_2a_organization_update.html:29
@@ -2687,9 +2721,9 @@ msgid ""
 "Tool). An Open-Source-project developed by the Ministry of Public Health, "
 "Wellbeing and Sports to make your and our world a safer place."
 msgstr ""
-"OpenKAT ta e \"Kwetsbaarheden Analyse Tool\" (tool pa hasi análisis di bulerabilidat). "
-"Un proyekto Open Source desaroyá pa Ministerio di Salú Públiko, Salú i Deporte pa hasi "
-"nos mundu un lugar mas sigur pa bo i nos."
+"OpenKAT ta e \"Kwetsbaarheden Analyse Tool\" (tool pa hasi análisis di "
+"bulerabilidat). Un proyekto Open Source desaroyá pa Ministerio di Salú "
+"Públiko, Salú i Deporte pa hasi nos mundu un lugar mas sigur pa bo i nos."
 
 #: build/lib/onboarding/templates/step_1_introduction.html:24
 #: onboarding/templates/step_1_introduction.html:24
@@ -2805,9 +2839,9 @@ msgid ""
 "needs, as well as asks for permission to run plugins that you haven’t "
 "enabled yet but are needed to collect or analyze the data."
 msgstr ""
-"Ora bo selektá un tipo di informe, OpenKAT lo guia bo den e ajuste. "
-"OpenKAT lo hasi e preguntanan necesario basá riba e entrada ku e informe "
-"ta nesesitá, tambe lo pidi permiso pa eksekutá plug-innan ku ainda bo no a "
+"Ora bo selektá un tipo di informe, OpenKAT lo guia bo den e ajuste. OpenKAT "
+"lo hasi e preguntanan necesario basá riba e entrada ku e informe ta "
+"nesesitá, tambe lo pidi permiso pa eksekutá plug-innan ku ainda bo no a "
 "habilidá, pero ku ta nesesario pa kolektá òf analisá e datonan."
 
 #: build/lib/onboarding/templates/step_2a_choose_report_info.html:41
@@ -2907,8 +2941,9 @@ msgid ""
 "would like to scan and analyze for the DNS-report. So it can tell you which "
 "plugins are available for the chosen object."
 msgstr ""
-"Plug-innan skan i analisá objektonan. OpenKAT mester sa kua objèkto(s) bo kier "
-"skan i analisá pa e informe DNS. Asina ku por bisa bo ku kuál plug-innan ta disponibel pa e objèkto selektá."
+"Plug-innan skan i analisá objektonan. OpenKAT mester sa kua objèkto(s) bo "
+"kier skan i analisá pa e informe DNS. Asina ku por bisa bo ku kuál plug-"
+"innan ta disponibel pa e objèkto selektá."
 
 #: build/lib/onboarding/templates/step_3a_setup_scan_ooi_info.html:22
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html:22
@@ -3021,7 +3056,8 @@ msgid ""
 "Based on the url you provided OpenKAT added the necessary additional objects "
 "to create a url object."
 msgstr ""
-"Basá riba e URL ku bo a duna, OpenKAT a agrega e ophetonan adishonal necesario pa krea un opheto di URL."
+"Basá riba e URL ku bo a duna, OpenKAT a agrega e ophetonan adishonal "
+"necesario pa krea un opheto di URL."
 
 #: build/lib/onboarding/templates/step_3c_setup_scan_ooi_detail.html:25
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html:25
@@ -3097,10 +3133,11 @@ msgid ""
 "people of companies."
 msgstr ""
 "Algun skan ta ligero, i otro por ta un tiki mas agresivo den nan skaneo. "
-"OpenKAT ta requeri bo pa ajustá un nivel di autorisashon pa kada opheto pa evitá "
-"ku b'a sende skan agresivo sin intenshón. Por ehèmpel, bo por tin e derechi pa "
-"skan kualkier tipo di opheto riba bo propio server, pero probabelmente bo no tin "
-"e derechi pa hasi meskos ku ophetonan ku ta pertenese na otro personanan of kompanianan."
+"OpenKAT ta requeri bo pa ajustá un nivel di autorisashon pa kada opheto pa "
+"evitá ku b'a sende skan agresivo sin intenshón. Por ehèmpel, bo por tin e "
+"derechi pa skan kualkier tipo di opheto riba bo propio server, pero "
+"probabelmente bo no tin e derechi pa hasi meskos ku ophetonan ku ta "
+"pertenese na otro personanan of kompanianan."
 
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:29
 #: onboarding/templates/step_3d_set_clearance_level.html:29
@@ -3116,11 +3153,11 @@ msgid ""
 "notify you before running it. Visually clearance levels and intensity scores "
 "are indicated with little cat paws."
 msgstr ""
-"Kada plug-in ku skan ta tin un puntu di intensidat di skaneo. E intensidat di e "
-"skaneo mester ta igual òf mas abou ku e nivel di autorisashon ku bo a ajustá pa bo opheto. "
-"Si e skaneo tin un nivel di intensidat ku ta hopi haltu, OpenKAT lo notifiká bo promé "
-"di eksekutá e skaneo. Visualmente, nivelnan di autorisashon i punto di intensidat ta indiká "
-"ku patanan di pushi."
+"Kada plug-in ku skan ta tin un puntu di intensidat di skaneo. E intensidat "
+"di e skaneo mester ta igual òf mas abou ku e nivel di autorisashon ku bo a "
+"ajustá pa bo opheto. Si e skaneo tin un nivel di intensidat ku ta hopi "
+"haltu, OpenKAT lo notifiká bo promé di eksekutá e skaneo. Visualmente, "
+"nivelnan di autorisashon i punto di intensidat ta indiká ku patanan di pushi."
 
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:42
 #: onboarding/templates/step_3d_set_clearance_level.html:42
@@ -3140,8 +3177,9 @@ msgid ""
 "Meaning it requires at least a level 3 clearance level to be set on your "
 "object."
 msgstr ""
-"Un ehèmpel di un skaneo mas agresivo. Ku tin un puntu di intensidat di skaneo di 3. "
-"Esaki ta nifiká ku mester tin por lo menos un nivel di autorisashon di 3 pa wordu ajustá riba bo opheto."
+"Un ehèmpel di un skaneo mas agresivo. Ku tin un puntu di intensidat di "
+"skaneo di 3. Esaki ta nifiká ku mester tin por lo menos un nivel di "
+"autorisashon di 3 pa wordu ajustá riba bo opheto."
 
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:57
 #: onboarding/templates/step_3d_set_clearance_level.html:57
@@ -3361,16 +3399,19 @@ msgid "OpenKAT Setup"
 msgstr "OpenKAT Setup"
 
 #: build/lib/onboarding/views.py:477 onboarding/views.py:501
+#, python-brace-format
 msgid "{org_name} successfully created."
 msgstr "{org_name} a wòrdu krea ku èksito."
 
 #: build/lib/onboarding/views.py:508 onboarding/views.py:532
+#, python-brace-format
 msgid "{org_name} successfully updated."
 msgstr "{org_name} a wòrdu kambia ku èksito."
 
 #: build/lib/onboarding/views.py:583 build/lib/onboarding/views.py:611
 #: build/lib/onboarding/views.py:635 onboarding/views.py:601
 #: onboarding/views.py:628 onboarding/views.py:651
+#, python-brace-format
 msgid "{name} successfully created."
 msgstr "{name} a wòrdu krea ku èksito."
 
@@ -3669,11 +3710,11 @@ msgid ""
 "the mime type \"boefje/dns-records\" is added, the normalizer expects the "
 "raw file to contain dns scan information.</p>"
 msgstr ""
-"<p>Agregá un grupo di mime types, separá ku komas, por ehèmpel:</p>"
-"<p><i>"text/html, image/jpeg"</i> òf <i>"boefje/dns-records"</i>.</p>"
-"<p>Tipo mime ta wordu usá pa activa e normalizador korekto na un arkivo "
-"Ora e tipo mime "boefje/dns-records" ta wordu agregá, e normalizador ta spera ku e "
-"arkivo ta kontené informashon di skaneo di dns.</p>"
+"<p>Agregá un grupo di mime types, separá ku komas, por ehèmpel:</"
+"p><p><i>\"text/html, image/jpeg\"</i> òf <i>\"boefje/dns-records\"</i>.</"
+"p><p>Tipo mime ta wordu usá pa activa e normalizador korekto na un arkivo "
+"Ora e tipo mime \"boefje/dns-records\" ta wordu agregá, e normalizador ta "
+"spera ku e arkivo ta kontené informashon di skaneo di dns.</p>"
 
 #: build/lib/tools/forms/upload_raw.py:28 tools/forms/upload_raw.py:28
 #: rocky/templates/partials/ooi_list_toolbar.html:18
@@ -3716,13 +3757,15 @@ msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
 "more details."
 msgstr ""
-"No por a optené lista di diskubrimentu pa e organisashon {}, kontrolá registro di servidor pa detayenan mas."
+"No por a optené lista di diskubrimentu pa e organisashon {}, kontrolá "
+"registro di servidor pa detayenan mas."
 
 #: katalogus/templates/partials/enable_disable_plugin.html:21
 msgid "You don't have permission to enable "
 msgstr "Bo no tin permiso pa aktivá "
 
 #: katalogus/templates/plugin_detail.html:56
+#, python-format
 msgid "%(plugin_name)s does not need any input objects."
 msgstr "%(plugin_name)s no ta nesesitá ningun ophetonan di entrada."
 
@@ -3731,17 +3774,18 @@ msgid "Delete settings"
 msgstr "Eliminá ajustenan"
 
 #: katalogus/templates/plugin_settings_delete.html:14
+#, python-format
 msgid ""
 "Are you sure you want to delete all settings for the plugin %(plugin_name)s?"
-msgstr ""
-"Segur bo ke bo ke eliminá tur ajuste pa e plug-in %(plugin_name)s?"
+msgstr "Segur bo ke bo ke eliminá tur ajuste pa e plug-in %(plugin_name)s?"
 
-#: katalogus/views/katalogus_settings.py:39
+#: katalogus/views/katalogus_settings.py:49
 msgid ""
 "Settings from %(from_organization_name) to %(to_organization_name) "
 "successfully cloned."
 msgstr ""
-"Ajustenan for di %(from_organization_name) pa %(to_organization_name) a wordu di kloon ku éksito."
+"Ajustenan for di %(from_organization_name) pa %(to_organization_name) a "
+"wordu di kloon ku éksito."
 
 #: katalogus/views/mixins.py:98
 #, python-format
@@ -3749,24 +3793,25 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                             "
 "Indemnification not present at organization %s."
 msgstr ""
-"No por subi e nivel di autorisashon di %s pa L%s. "
-"Indemnisashon no ta presente na organisashon %s."
+"No por subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
+"presente na organisashon %s."
 
 #: katalogus/views/mixins.py:112
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                             "
 "You acknowledged a clearance level of %s."
 msgstr ""
-"No por subi e nivel di autorisashon di %s pa L%s. "
-"Bo a rekonosé un nivel di autorisashon di %s."
+"No por subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di "
+"autorisashon di %s."
 
 #: katalogus/views/plugin_detail.py:143
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
 msgstr ""
-"Algun OOI selektá ta nesesitá un aumentu di nivel di autorisashon pa hasi skaneonan. "
-"Bo no tin e permiso pa kambia nivel di autorisashon."
+"Algun OOI selektá ta nesesitá un aumentu di nivel di autorisashon pa hasi "
+"skaneonan. Bo no tin e permiso pa kambia nivel di autorisashon."
 
 #: katalogus/views/plugin_detail.py:162
 msgid "Please select an OOI to start scan."
@@ -3774,7 +3819,9 @@ msgstr "Por fabor, selekshoná un OOI pa kuminsá skan."
 
 #: katalogus/views/plugin_settings_add.py:44
 msgid "No changes to the settings added: no form data present"
-msgstr "Ningun kambio a wordu agrega na e ajustenan: no tin dato di formulario presente"
+msgstr ""
+"Ningun kambio a wordu agrega na e ajustenan: no tin dato di formulario "
+"presente"
 
 #: katalogus/views/plugin_settings_add.py:50
 msgid "Added settings for '{}'"
@@ -3797,22 +3844,26 @@ msgid ""
 "Failed deleting Settings for plugin {}. Check the Katalogus logs for more "
 "info."
 msgstr ""
-"Faya den eliminashon di Ajustenan pa e plug-in {}. Kontrolá e lognan di Katalogus pa mas informashon."
+"Faya den eliminashon di Ajustenan pa e plug-in {}. Kontrolá e lognan di "
+"Katalogus pa mas informashon."
 
 #: onboarding/views.py:282
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                 "
 "Indemnification not present at organization %s."
 msgstr ""
-"No por a subi e nivel di autorisashon di %s pa L%s. "
-"Indemnisashon no ta presente pa organisashon %s."
+"No por a subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
+"presente pa organisashon %s."
 
 #: onboarding/views.py:297
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                 You "
 "acknowledged a clearance level of %s."
 msgstr ""
-"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di %s."
+"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel "
+"di autorisashon di %s."
 
 #: tools/forms/ooi.py:99
 msgid "Show Boefjes that exceed the objects clearance level"
@@ -3823,7 +3874,8 @@ msgid ""
 "This organization code is reserved by OpenKAT and cannot be used. Choose "
 "another organization code."
 msgstr ""
-"E codigo di organisashon aki ta reservá pa OpenKAT i no por wordu usá. Selektá un otro codigo di organisashon."
+"E codigo di organisashon aki ta reservá pa OpenKAT i no por wordu usá. "
+"Selektá un otro codigo di organisashon."
 
 #: venv/lib/python3.9/site-packages/click/_termui_impl.py:496
 #, python-brace-format
@@ -3863,7 +3915,7 @@ msgstr[1] "A enkontra èxtra argumentonan inesperado ({args})"
 
 #: venv/lib/python3.9/site-packages/click/core.py:1399
 msgid "DeprecationWarning: The command {name!r} is deprecated."
-msgstr "Advertensia di desuzo: e komando {name!r} ta den desuzo".
+msgstr "Advertensia di desuzo: e komando {name!r} ta den desuzo."
 
 #: venv/lib/python3.9/site-packages/click/core.py:1605
 msgid "Commands"
@@ -3951,7 +4003,7 @@ msgstr "Falta parametro"
 #: venv/lib/python3.9/site-packages/click/exceptions.py:184
 #, python-brace-format
 msgid "Missing {param_type}"
-msgstr "Falta {param_type}""
+msgstr "Falta {param_type}"
 
 #: venv/lib/python3.9/site-packages/click/exceptions.py:191
 #, python-brace-format
@@ -4163,15 +4215,16 @@ msgstr "Yena un email adres balido."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Pone un “slug” balido konsistiendo di òf letternan, numbernan, underscores òf hyphens."
+"Pone un “slug” balido konsistiendo di òf letternan, numbernan, underscores "
+"òf hyphens."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:269
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Yena un “slug” balido ku ta konsisti di Unicode letranan, numbernan, underscores, òf "
-"hyphens."
+"Yena un “slug” balido ku ta konsisti di Unicode letranan, numbernan, "
+"underscores, òf hyphens."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:278
 #: venv/lib/python3.9/site-packages/django/core/validators.py:288
@@ -4272,7 +4325,9 @@ msgstr[1] ""
 msgid ""
 "File extension “%(extension)s” is not allowed. Allowed extensions are: "
 "%(allowed_extensions)s."
-msgstr "Extension di archivonan “%(extension)s” no ta permití. Extension permití ta: %(allowed_extensions)s."
+msgstr ""
+"Extension di archivonan “%(extension)s” no ta permití. Extension permití ta: "
+"%(allowed_extensions)s."
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:559
 msgid "Null characters are not allowed."
@@ -4316,6 +4371,7 @@ msgstr ""
 "%(field_label)s mester ta uniko pa %(date_field_label)s %(lookup_type)s."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:126
+#, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Vèld di tipo: %(field_type)s"
 
@@ -4348,8 +4404,8 @@ msgid ""
 "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
-"“%(value)s” balor tin un formato di fecha robes. E mester ta den e formato YYYY-MM-DD."
-
+"“%(value)s” balor tin un formato di fecha robes. E mester ta den e formato "
+"YYYY-MM-DD."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1147
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1290
@@ -4358,7 +4414,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
-"“%(value)s” balor tin e formato na drechi (YYYY-MM-DD) pero e ta un fecha inbalido."
+"“%(value)s” balor tin e formato na drechi (YYYY-MM-DD) pero e ta un fecha "
+"inbalido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1150
 msgid "Date (without time)"
@@ -4370,8 +4427,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
-"“%(value)s” balor tin un formato inbalido. E mester ta den e formato YYYY-MM-DD HH:MM[:ss[."
-"uuuuuu]][TZ]."
+"“%(value)s” balor tin un formato inbalido. E mester ta den e formato YYYY-MM-"
+"DD HH:MM[:ss[.uuuuuu]][TZ]."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1292
 #, python-format
@@ -4379,8 +4436,8 @@ msgid ""
 "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
-"“%(value)s” balor tin e formato korekto (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-"[TZ]) pero e tempu fecha/tempu ta inbalido."
+"“%(value)s” balor tin e formato korekto (YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]) "
+"pero e tempu fecha/tempu ta inbalido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1296
 msgid "Date (with time)"
@@ -4401,8 +4458,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
 "uuuuuu] format."
 msgstr ""
-"“%(value)s” balor tin un formato inbalido. E mester ta den e formato [DD] [[HH:]MM:]ss[."
-"uuuuuu]."
+"“%(value)s” balor tin un formato inbalido. E mester ta den e formato [DD] "
+"[[HH:]MM:]ss[.uuuuuu]."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:1588
 msgid "Duration"
@@ -4483,8 +4540,8 @@ msgid ""
 "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
-"“%(value)s” balor tin un formato inbalido. E formato mester ta HH:MM[:ss[.uuuuuu]]."
-
+"“%(value)s” balor tin un formato inbalido. E formato mester ta HH:MM[:ss[."
+"uuuuuu]]."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2183
 #, python-format
@@ -4492,7 +4549,8 @@ msgid ""
 "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
-"“%(value)s” balor tin e formato korekto (HH:MM[:ss[.uuuuuu]]) pero e tempu ta inbalido."
+"“%(value)s” balor tin e formato korekto (HH:MM[:ss[.uuuuuu]]) pero e tempu "
+"ta inbalido."
 
 #: venv/lib/python3.9/site-packages/django/db/models/fields/__init__.py:2186
 msgid "Time"
@@ -4576,7 +4634,7 @@ msgstr "Yena un tempu balido."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:454
 msgid "Enter a valid date/time."
-msgstr Yena un fecha/tempu balido."
+msgstr "Yena un fecha/tempu balido."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:488
 msgid "Enter a valid duration."
@@ -4589,7 +4647,8 @@ msgstr "E kantidad di dia mester ta entre {min_days} y {max_days}."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:549
 msgid "No file was submitted. Check the encoding type on the form."
-msgstr "Ningun archiv a ser entrega. Chèk e tipo di enkodamentu riba e formulario."
+msgstr ""
+"Ningun archiv a ser entrega. Chèk e tipo di enkodamentu riba e formulario."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:550
 msgid "No file was submitted."
@@ -4604,8 +4663,12 @@ msgstr "E arkivo manda ta bashi."
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-msgstr[0] "Sigurá e nòmber di arkivo tin por lo menos %(max)d karakter (e tin %(length)d)."
-msgstr[1] "Sigurá e nòmber di arkivo tin por lo menos %(max)d karakternan (e tin %(length)d)."
+msgstr[0] ""
+"Sigurá e nòmber di arkivo tin por lo menos %(max)d karakter (e tin "
+"%(length)d)."
+msgstr[1] ""
+"Sigurá e nòmber di arkivo tin por lo menos %(max)d karakternan (e tin "
+"%(length)d)."
 
 #: venv/lib/python3.9/site-packages/django/forms/fields.py:556
 msgid "Please either submit a file or check the clear checkbox, not both."
@@ -4697,8 +4760,8 @@ msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
 "for the %(lookup)s in %(date_field)s."
 msgstr ""
-"Por fabor koregi e data duplika pa %(field_name)s, ku mester ta uniko "
-"pa e %(lookup)s den %(date_field)s."
+"Por fabor koregi e data duplika pa %(field_name)s, ku mester ta uniko pa e "
+"%(lookup)s den %(date_field)s."
 
 #: venv/lib/python3.9/site-packages/django/forms/models.py:782
 msgid "Please correct the duplicate values below."
@@ -4723,8 +4786,8 @@ msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
-"%(datetime)s no por wordu interpreta den zona di tempu %(current_timezone)s; e "
-"por ta dubidoso òf porta e no ta èksisti."
+"%(datetime)s no por wordu interpreta den zona di tempu %(current_timezone)s; "
+"e por ta dubidoso òf porta e no ta èksisti."
 
 #: venv/lib/python3.9/site-packages/django/forms/widgets.py:403
 msgid "Clear"
@@ -5153,10 +5216,10 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Bo ta mira e mensahe aki pasobra e sitio HTTPS aki ta exigi un "Referer "
-"header" pa wordu manda pa bo buscador web, pero ningun a wordu manda. E header aki ta "
-"exigi pa motibu di seguridat, pa sigurá cu bo buscador no ta wordu kapturá "
-"pa tercer parti."
+"Bo ta mira e mensahe aki pasobra e sitio HTTPS aki ta exigi un “Referer "
+"header“ pa wordu manda pa bo buscador web, pero ningun a wordu manda. E "
+"header aki ta exigi pa motibu di seguridat, pa sigurá cu bo buscador no ta "
+"wordu kapturá pa tercer parti."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:120
 msgid ""
@@ -5164,9 +5227,9 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
-"Si bo a konfigurá bo buscador pa deshabilitá e "Referer" headers, por fabor aktiv'é "
-"bek, minimo pa e sitio aki, òf pa konekshonnan HTTPS, òf pa peticionnan di "mes "
-"origen."
+"Si bo a konfigurá bo buscador pa deshabilitá e “Referer” headers, por fabor "
+"aktiv'é bek, minimo pa e sitio aki, òf pa konekshonnan HTTPS, òf pa "
+"peticionnan di “mes origen.“"
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:124
 msgid ""
@@ -5176,11 +5239,11 @@ msgid ""
 "If you’re concerned about privacy, use alternatives like <a "
 "rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"Si bo ta usa e etiketa <meta name="referrer" content="no-referrer"> òf "
-"inkluí e "Referrer-Policy: no-referrer" header, por fabor kita nan. "
-"E protekshon CSRF ta exigi e "Referer" header pa hasi strikto kontrol di referer. "
-"Si bo ta preokupá tokante privasidat, usa alternativanan manera <a "
-"rel="noreferrer" ...> pa enlace na sitio di tercer parti."
+"Si bo ta usa e etiketa <meta name=\"referrer\" content=\"no-referrer\"> òf "
+"inkluí e “Referrer-Policy: no-referrer” header, por fabor kita nan. E "
+"protekshon CSRF ta exigi e “Referer” header pa hasi strikto kontrol di "
+"referer. Si bo ta preokupá tokante privasidat, usa alternativanan manera <a "
+"rel=\"noreferrer\" …> pa enlace na sitio di tercer parti."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:132
 msgid ""
@@ -5188,17 +5251,18 @@ msgid ""
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
-"Bo ta mira e mensahe aki pasobra e sitio aki ta exigi un CSRF cookie ora bo ta "
-"manda formulario. E cookie aki ta exigi pa motibu di seguridat, "
-"pa sigurá ku bo buscador no ta wordu kapturá pa tercer parti."
+"Bo ta mira e mensahe aki pasobra e sitio aki ta exigi un CSRF cookie ora bo "
+"ta manda formulario. E cookie aki ta exigi pa motibu di seguridat, pa sigurá "
+"ku bo buscador no ta wordu kapturá pa tercer parti."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:137
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
-"Si bo a konfigurá bo buscador pa deshabilitá kuki (cookies), por fabor aktiv'é bek, "
-"minimo pa e sitio aki, òf pa peticionnan di 'mes origen' (same-origin)."
+"Si bo a konfigurá bo buscador pa deshabilitá kuki (cookies), por fabor "
+"aktiv'é bek, minimo pa e sitio aki, òf pa peticionnan di 'mes origen' (same-"
+"origin)."
 
 #: venv/lib/python3.9/site-packages/django/views/csrf.py:142
 msgid "More information is available with DEBUG=True."
@@ -5237,8 +5301,9 @@ msgstr "Ningun %(verbose_name_plural)s disponibel"
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
 "allow_future is False."
-msgstr "Futuro di %(verbose_name_plural)s no ta disponibel pasobra %(class_name)s. allow_future ta False."
-
+msgstr ""
+"Futuro di %(verbose_name_plural)s no ta disponibel pasobra %(class_name)s. "
+"allow_future ta False."
 
 #: venv/lib/python3.9/site-packages/django/views/generic/dates.py:628
 #, python-format
@@ -5252,7 +5317,9 @@ msgstr "No ta haña %(verbose_name)s ku ta koincidí ku e kwestioná"
 
 #: venv/lib/python3.9/site-packages/django/views/generic/list.py:67
 msgid "Page is not “last”, nor can it be converted to an int."
-msgstr "Página no ta "último" (last), ni tampoko por wordu konvertí pa un número entero."
+msgstr ""
+"Página no ta “último“ (last), ni tampoko por wordu konvertí pa un número "
+"entero."
 
 #: venv/lib/python3.9/site-packages/django/views/generic/list.py:72
 #, python-format
@@ -5289,8 +5356,9 @@ msgid ""
 "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
 "target=\"_blank\" rel=\"noopener\">release notes</a> for Django %(version)s"
 msgstr ""
-"Mira <a href="https://docs.djangoproject.com/en/%(version)s/releases/\" "
-"target="_blank" rel="noopener">notanan di lansamentu</a> pa Django %(version)s"
+"Mira <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
+"target=\"_blank\" rel=\"noopener\">notanan di lansamentu</a> pa Django "
+"%(version)s"
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:222
 #, python-format
@@ -5300,10 +5368,10 @@ msgid ""
 "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
 "configured any URLs."
 msgstr ""
-"Bo ta mira e página aki pasobra <a href="https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug" target="_blank" "
-"rel="noopener">DEBUG=True</a> ta den bo fihernan di konfigurashon i bo no a"
-"konfigurá ningun URL."
+"Bo ta mira e página aki pasobra <a href=\"https://docs.djangoproject.com/en/"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> ta den bo fihernan di konfigurashon i bo no "
+"akonfigurá ningun URL."
 
 #: venv/lib/python3.9/site-packages/django/views/templates/default_urlconf.html:230
 msgid "Django Documentation"
@@ -5423,7 +5491,8 @@ msgstr "Código di eror 403: Sin autorisashon"
 
 #: rocky/templates/403.html:14
 msgid "Your account is not authorized to access this page or organization."
-msgstr "Bo kuenta no tin autorisashon pa drenta riba e página òf organisashon aki."
+msgstr ""
+"Bo kuenta no tin autorisashon pa drenta riba e página òf organisashon aki."
 
 #: rocky/templates/403.html:16
 msgid "Please contact your system administrator."
@@ -5616,8 +5685,8 @@ msgstr "di"
 
 #: rocky/templates/findings/finding_list.html:33
 #: rocky/templates/organizations/organization_crisis_room.html:33
-msgid "objects"
-msgstr "ophetonan"
+msgid "findings"
+msgstr "diskubrimentunan"
 
 #: rocky/templates/findings/finding_list.html:43
 #: rocky/templates/findings/finding_list.html:68
@@ -5667,6 +5736,7 @@ msgid "Source OOI:"
 msgstr "Orígen OOI:"
 
 #: rocky/templates/findings/finding_list.html:106
+#, python-format
 msgid "Show details for %(ooi)s"
 msgstr "Mustra detayes pa %(ooi)s"
 
@@ -6021,12 +6091,8 @@ msgid "Finding details"
 msgstr "Detaye di búskeda"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html:9
-msgid "Overview of the number of findings found on"
-msgstr "Lista di e montante di diskubrimentunan haña riba"
-
-#: rocky/templates/oois/ooi_detail_findings_overview.html:9
-msgid "and their severity."
-msgstr "i nan severidat"
+msgid "Overview of the number of findings and their severity found on"
+msgstr "Resumen di e kantidad di diskubrimentu i nan gravedat enkontrá riba"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html:12
 msgid ""
@@ -6034,8 +6100,9 @@ msgid ""
 "table shows the number of unique findings found as well as the number of "
 "occurrences."
 msgstr ""
-"Diskubrimentunan por okurí varias biaha. Pa brinda mihó bista, e siguiente tabla "
-"ta mustra e número di diskubrimentunan úniko ku a wordu haña, manera tambe e número di okurensianan."
+"Diskubrimentunan por okurí varias biaha. Pa brinda mihó bista, e siguiente "
+"tabla ta mustra e número di diskubrimentunan úniko ku a wordu haña, manera "
+"tambe e número di okurensianan."
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html:15
 msgid "See finding details"
@@ -6276,17 +6343,17 @@ msgstr ""
 "\n"
 " <strong>Advertensia:</strong>\n"
 " Indemnisashon no ta ajustá pa e organisashon aki.\n"
-" Bishitá e <a "
-"href="%(organization_settings)s">página di ajuste di organisashon</a> pa agregá un.\n"
-
+" Bishitá e <a href=\"%(organization_settings)s\">página di ajuste di "
+"organisashon</a> pa agregá un.\n"
+"                        "
 
 #: rocky/templates/organizations/organization_crisis_room.html:26
 msgid ""
 "An overview of the top 10 most severe findings OpenKAT found. Check the "
 "detail section for additional severity information."
 msgstr ""
-"Un bista general di e 10 diskubrimentunan mas serio ku OpenKAT a haña. "
-"Chèk den seccion di detaye pa informashon adishonal tokante severidat."
+"Un bista general di e 10 diskubrimentunan mas serio ku OpenKAT a haña. Chèk "
+"den seccion di detaye pa informashon adishonal tokante severidat."
 
 #: rocky/templates/organizations/organization_crisis_room.html:28
 msgid "Top 10 most severe Findings"
@@ -6349,13 +6416,15 @@ msgid "Save member"
 msgstr "Warda miembronan"
 
 #: rocky/templates/organizations/organization_member_list.html:13
+#, python-format
 msgid ""
 "\n"
 "                    An overview of \"%(organization_name)s\" its members.\n"
 "                "
 msgstr ""
 "\n"
-" Un bista general di e miembronan di "%(organization_name)s".\n"
+" Un bista general di e miembronan di \"%(organization_name)s\".\n"
+"                "
 
 #: rocky/templates/organizations/organization_member_list.html:20
 msgid "Add new member"
@@ -6403,8 +6472,9 @@ msgid ""
 "          "
 msgstr ""
 "\n"
-" Un bista general di "%(organization_name)s". Esaki ta mustra informashon general i su ajustenan.\n"
-
+" Un bista general di \"%(organization_name)s\". Esaki ta mustra informashon "
+"general i su ajustenan.\n"
+"          "
 
 #: rocky/templates/organizations/organization_settings.html:23
 msgid ""
@@ -6416,7 +6486,7 @@ msgstr ""
 "\n"
 " <strong>Advertensia:</strong>\n"
 " Indemnisashon no ta ajustá pa e organisashon aki.\n"
-
+"            "
 
 #: rocky/templates/organizations/organization_settings.html:61
 #: rocky/views/indemnification_add.py:46
@@ -6670,8 +6740,8 @@ msgid ""
 "This shows general information and its related objects. It also gives the "
 "possibility to add additional related objects, or to scan for them."
 msgstr ""
-"Esaki ta mustra informashon general i e ophetonan relashoná. "
-"Tambe ta brinda e posibilidat pa agrega ophetonan relashoná adishonal, òf pa skan pa nan."
+"Esaki ta mustra informashon general i e ophetonan relashoná. Tambe ta brinda "
+"e posibilidat pa agrega ophetonan relashoná adishonal, òf pa skan pa nan."
 
 #: rocky/templates/partials/ooi_list_toolbar.html:15
 msgid "Scan for objects"
@@ -6724,8 +6794,8 @@ msgid ""
 "The severity of this findingtype has not (yet) been determined by the data "
 "source. This situation requires manual investigation of the severity."
 msgstr ""
-"Gravedat di e tìpo di diskubrimentu aki ainda no a ser determiná pa e fuente di dato. "
-"E situashon aki ta requeri investigashon manual di e gravedat."
+"Gravedat di e tìpo di diskubrimentu aki ainda no a ser determiná pa e fuente "
+"di dato. E situashon aki ta requeri investigashon manual di e gravedat."
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html:67
 #: rocky/templates/partials/ooi_report_severity_totals_table.html:9
@@ -6852,8 +6922,8 @@ msgid "Search by object name"
 msgstr "Buska riba nómber di opheto"
 
 #: rocky/templates/partials/scan_history.html:61
-msgid "No scans found for this object"
-msgstr "Ningun skan enkontra pa e opheto"
+msgid "No scans found for this object."
+msgstr "Ningun skan enkontra pa e opheto."
 
 #: rocky/templates/partials/scan_history.html:66
 msgid "Object"
@@ -6953,8 +7023,7 @@ msgstr "Ajustando e nivel di skan for di \\"
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html:24
 msgid "You are about to set the clearance level from \\"
-msgstr ""
-"Bo ta na e punto di pone e nivél di autorisashon for di \\"
+msgstr "Bo ta na e punto di pone e nivél di autorisashon for di \\"
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html:28
 msgid "Yes, set to inherit"
@@ -7147,10 +7216,10 @@ msgid ""
 "above or you can insert this key using the secret key option of the "
 "authenticator app."
 msgstr ""
-"E yabi sekreto ta un representashon di 32 karakter di e QR code. "
-"Tin 2 opcion pa ajustá e autentifikashon di dos faktor. "
-"Bo por skan e QR code aki of por insertá e yabi aki usando e opcion "
-"di yabi sekreto den e aplikashon di autentifikashon."
+"E yabi sekreto ta un representashon di 32 karakter di e QR code. Tin 2 "
+"opcion pa ajustá e autentifikashon di dos faktor. Bo por skan e QR code aki "
+"of por insertá e yabi aki usando e opcion di yabi sekreto den e aplikashon "
+"di autentifikashon."
 
 #: rocky/templates/two_factor/core/setup_complete.html:11
 msgid "Congratulations, you've successfully enabled two-factor authentication."
@@ -7266,8 +7335,7 @@ msgstr "Esakinan ta e kriterianan pa upload CSV:"
 
 #: rocky/templates/upload_raw.html:13
 msgid "Automate the creation of multiple objects by uploading a raw file."
-msgstr ""
-"Automatizá e kreo di varios ophetonan dor di karga un arkivo."
+msgstr "Automatizá e kreo di varios ophetonan dor di karga un arkivo."
 
 #: rocky/templates/upload_raw.html:24 rocky/views/upload_raw.py:33
 msgid "Upload raw"
@@ -7331,23 +7399,28 @@ msgid "Unknown action."
 msgstr "Akshon deskonosí."
 
 #: rocky/views/ooi_list.py:88
+#, python-format
 msgid ""
 "Could not raise clearance levels to L%s. Indemnification not present at "
 "organization %s."
-msgstr "No por a hasi e nivel di autorishon subi pa L%s. Indemnisashon no ta presente na e organisashon %s."
+msgstr ""
+"No por a hasi e nivel di autorishon subi pa L%s. Indemnisashon no ta "
+"presente na e organisashon %s."
 
 #: rocky/views/ooi_list.py:99
+#, python-format
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of %s."
 msgstr ""
-"No por a hasi e nivel di autorisashon subi pa L%s. Bo a rekonosé un nivel di autorisashon di %s."
+"No por a hasi e nivel di autorisashon subi pa L%s. Bo a rekonosé un nivel di "
+"autorisashon di %s."
 
 #: rocky/views/ooi_list.py:107 rocky/views/ooi_list.py:114
 msgid "An error occurred while saving clearance levels."
 msgstr "Un error a sosodé durante e guardamentu di nivelnan di autorisashon."
 
-#: rocky/views/ooi_list.py:114t"
+#: rocky/views/ooi_list.py:114
 msgid "One of the OOI's doesn't exist"
 msgstr "Un di e OOI nan no ta eksistí."
 
@@ -7358,15 +7431,19 @@ msgstr "Ku exito a pone profil di skén pa %s pa %d oois."
 
 #: rocky/views/ooi_list.py:136
 msgid "An error occurred while setting clearance levels to inherit."
-msgstr "Un error a sosodé durante e ajuste di nivelnan di autorisashon pa heredà."
+msgstr ""
+"Un error a sosodé durante e ajuste di nivelnan di autorisashon pa heredà."
 
 #: rocky/views/ooi_list.py:143
 msgid ""
 "An error occurred while setting clearance levels to inherit: one of the OOIs "
 "doesn't exist."
-msgstr "Un error a sosodé durante e ajuste di nivelnan di autorisashon pa heredá: un di e OOI nan no ta eksistí."
+msgstr ""
+"Un error a sosodé durante e ajuste di nivelnan di autorisashon pa heredá: un "
+"di e OOI nan no ta eksistí."
 
 #: rocky/views/ooi_list.py:150
+#, python-format
 msgid "Successfully set %d ooi(s) clearance level to inherit."
 msgstr "Éksito den ajustá %d OOI(s) nivel di autorisashon pa heredá."
 
@@ -7376,7 +7453,9 @@ msgstr "Un error a sosodé durante e eliminashon di OOI nan."
 
 #: rocky/views/ooi_list.py:165
 msgid "An error occurred while deleting oois: one of the OOIs doesn't exist."
-msgstr "Un error a sosodé durante e eliminashon di OOI nan: un di e OOI nan no ta eksistí."
+msgstr ""
+"Un error a sosodé durante e eliminashon di OOI nan: un di e OOI nan no ta "
+"eksistí."
 
 #: rocky/views/ooi_list.py:172
 #, python-format
@@ -7405,13 +7484,13 @@ msgstr "Rapòrt di diskubrimentu"
 
 #: rocky/views/ooi_report.py:93 rocky/views/ooi_report.py:126
 msgid "Generating report failed. See Keiko logs for more information."
-msgstr ""
-"Falamentu den generashon di rapòrt. Wak Keiko logs pa mas informashon."
+msgstr "Falamentu den generashon di rapòrt. Wak Keiko logs pa mas informashon."
 
 #: rocky/views/ooi_report.py:96 rocky/views/ooi_report.py:129
 msgid "Timeout reached generating report. See Keiko logs for more information."
 msgstr ""
-"Tempo di espera a yega na su fin den generashon di rapòrt. Wak e Keiko logs pa mas informashon."
+"Tempo di espera a yega na su fin den generashon di rapòrt. Wak e Keiko logs "
+"pa mas informashon."
 
 #: rocky/views/ooi_tree.py:48
 msgid "Tree Visualisation"
@@ -7434,6 +7513,7 @@ msgid "You are not allowed to add organizations."
 msgstr "Bo no ta pèrmiti pa añadi organisashonnan"
 
 #: rocky/views/organization_edit.py:23
+#, python-format
 msgid "Organization %s successfully updated."
 msgstr "Organisashon %s a wordu kambia ku éksito."
 
@@ -7447,7 +7527,7 @@ msgstr "Miembro a wòrdu agregá ku èksito."
 
 #: rocky/views/organization_member_edit.py:42
 msgid "Member %s successfully updated."
-msgstr "Miembro a wòrdu kambia ku èksito."
+msgstr "Miembro %s a wòrdu kambia ku èksito."
 
 #: rocky/views/organization_member_edit.py:78
 #, python-format
@@ -7457,27 +7537,31 @@ msgid ""
 "level L%s. For this reason the acknowledged clearance level has been set at "
 "the same level as trusted clearance level."
 msgstr ""
-"E nivel di autorisashon di konfiansa ku a wordu kambia pa L%s ta mas abou ku e nivel di autorisashon di L%s di e miembro. "
-"E miembro aki solamente tin autorisashon pa nivel L%s. Pa e motibu aki, e nivel di autorisashon "
-"a wordu ajustá na e mesun nivel ku e nivel di autorisashon di konfiansa."
+"E nivel di autorisashon di konfiansa ku a wordu kambia pa L%s ta mas abou ku "
+"e nivel di autorisashon di L%s di e miembro. E miembro aki solamente tin "
+"autorisashon pa nivel L%s. Pa e motibu aki, e nivel di autorisashon a wordu "
+"ajustá na e mesun nivel ku e nivel di autorisashon di konfiansa."
 
 #: rocky/views/organization_member_edit.py:90
 msgid ""
 "You have trusted this member with a higher trusted level than member "
 "acknowledged. Member must first accept this level to use it."
 msgstr ""
-"Bo a konfia riba e miembro aki ku un nivel di konfiansa mas haltu ku e nivel ku e miembro a rekonosé. "
-"E miembro mester akseptá promé e nivel aki pa por us'é."
+"Bo a konfia riba e miembro aki ku un nivel di konfiansa mas haltu ku e nivel "
+"ku e miembro a rekonosé. E miembro mester akseptá promé e nivel aki pa por "
+"us'é."
 
 #: rocky/views/organization_member_list.py:18
 msgid "Not blocked"
 msgstr "No blòkiá"
 
 #: rocky/views/organization_member_list.py:77
+#, python-format
 msgid "Blocked member %s successfully."
 msgstr "Miembro %s a wordu blokeá ku éksito."
 
 #: rocky/views/organization_member_list.py:84
+#, python-format
 msgid "Unblocked member %s successfully."
 msgstr "Miembro %s a wordu desblokeá ku éksito."
 
@@ -7492,14 +7576,17 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                         "
 "Indemnification not present at organization %s."
 msgstr ""
-"No por a subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta presente pa organisashon %s."
+"No por a subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
+"presente pa organisashon %s."
 
 #: rocky/views/scan_profile.py:64
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                         You "
 "acknowledged a clearance level of %s."
 msgstr ""
-"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di %s."
+"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel "
+"di autorisashon di %s."
 
 #: rocky/views/scan_profile.py:78
 msgid "Choose a valid level"
