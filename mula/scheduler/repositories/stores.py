@@ -23,6 +23,7 @@ class TaskStorer(abc.ABC):
         status: Optional[str] = None,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
+        order_by: Optional[str] = None,
         filters: Optional[List[models.Filter]] = None,
     ):
         raise NotImplementedError

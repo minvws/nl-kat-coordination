@@ -313,6 +313,7 @@ class BoefjeScheduler(Scheduler):
         delayed_tasks, _ = self.ctx.task_store.get_tasks(
             scheduler_id=self.scheduler_id,
             status=TaskStatus.DELAYED,
+            order_by="-created_at",
         )
 
         for delayed_task in delayed_tasks:
