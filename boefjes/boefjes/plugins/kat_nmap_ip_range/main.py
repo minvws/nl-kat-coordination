@@ -1,4 +1,3 @@
-from ipaddress import IPv6Network, ip_network
 from os import getenv
 from typing import List, Tuple, Union
 
@@ -26,8 +25,6 @@ def build_nmap_arguments(ip_range: str, top_ports: int, protocol_str: str) -> Li
         raise ValueError(f"{TOP_PORTS_MIN} <= TOP_PORTS: {top_ports} <= {TOP_PORTS_MAX} is invalid.")
 
     args = ["nmap", "--open", "-T4", "-Pn", "-r", "-v10", f"-s{protocol_str}", "--top-ports", str(top_ports)]
-    if isinstance(ip_network(ip_range), IPv6Network):
-        args.append("-6")
     args.extend(["-oX", "-", ip_range])
 
     return args
