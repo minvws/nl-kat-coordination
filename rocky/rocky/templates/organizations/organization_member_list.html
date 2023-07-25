@@ -41,11 +41,9 @@
                         <caption>{% translate "Member overview:" %}</caption>
                         <thead>
                             <tr>
-                                <th>{% translate "Name" %}</th>
                                 <th>{% translate "E-mail" %}</th>
                                 <th>{% translate "Role" %}</th>
                                 <th>{% translate "Status" %}</th>
-                                <th>{% translate "Added" %}</th>
                                 <th>{% translate "Assigned clearance level" %}</th>
                                 <th>{% translate "Accepted clearance level" %}</th>
                                 <th>{% translate "Edit" %}</th>
@@ -56,7 +54,6 @@
                             {% for member in members %}
                                 {% if not member.user.is_superuser or request.user.is_superuser %}
                                     <tr>
-                                        <td>{{ member.user.full_name }}</td>
                                         <td>
                                             {{ member.user.email }}
                                             <br>
@@ -82,7 +79,6 @@
                                                     {% endif %}
                                             {% endif %}
                                         </td>
-                                        <td>{{ member.user.date_joined|date:"SHORT_DATE_FORMAT" }}</td>
                                         <td>
                                             {% if member.trusted_clearance_level < 0 %}
                                                 None

@@ -126,7 +126,12 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                 try:
                     member, member_created = OrganizationMember.objects.get_or_create(
                         user=user,
-                        defaults={"organization": self.organization},
+                        defaults={
+                            "organization": self.organization,
+                            "status": OrganizationMember.STATUSES.ACTIVE,
+                            "trusted_clearance_level": trusted_clearance_level,
+                            "acknowledged_clearance_level": acknowledged_clearance_level,
+                        },
                     )
                 except Exception:
                     logger.exception("Failed creating organization member")
@@ -135,18 +140,13 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
 
                     continue
 
-                if member_created:
-                    member.organization = self.organization
-                    member.trusted_clearance_level = trusted_clearance_level
-                    member.acknowledged_clearance_level = acknowledged_clearance_level
-
                 try:
                     member.groups.add(Group.objects.get(name=account_type))
                 except ObjectDoesNotExist:
                     logger.exception("Failed adding organization member to group")
                     continue
 
-            messages.add_message(self.request, messages.SUCCESS, _("Successfully added csv."))
+            messages.add_message(self.request, messages.SUCCESS, _("Successfully processed users from csv."))
         except (csv.Error, IndexError):
             logger.exception("Failed handling csv file")
 

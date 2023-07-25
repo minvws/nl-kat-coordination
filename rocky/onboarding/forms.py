@@ -102,10 +102,6 @@ class OnboardingUserForm(OrganizationMemberAddForm):
                 required=False,
             )
 
-    class Meta:
-        model = OrganizationMember
-        fields = ("name", "email", "password")
-
 
 class OnboardingCreateUserAdminForm(OnboardingUserForm):
     """
