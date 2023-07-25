@@ -1,13 +1,19 @@
+from functools import partial
 from typing import Dict, List
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi.responses import FileResponse, JSONResponse, Response
 from requests import HTTPError
-from starlette.responses import FileResponse, JSONResponse, Response
-from starlette.status import HTTP_404_NOT_FOUND
 
-from boefjes.katalogus.dependencies.plugins import PluginService, get_plugin_service
+from boefjes.katalogus.dependencies.plugins import (
+    PluginService,
+    get_pagination_parameters,
+    get_plugin_service,
+    get_plugins_filter_parameters,
+)
 from boefjes.katalogus.models import PluginType
 from boefjes.katalogus.routers.organisations import check_organisation_exists
+from boefjes.katalogus.types import FilterParameters, PaginationParameters
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",
@@ -16,17 +22,52 @@ router = APIRouter(
 )
 
 
+# check if query matches plugin id, name or description
+def _plugin_matches_query(plugin: PluginType, query: str) -> bool:
+    return (
+        query in plugin.id
+        or (plugin.name is not None and query in plugin.name)
+        or (plugin.description is not None and query in plugin.description)
+    )
+
+
+# todo: sorting?
 @router.get("/plugins", response_model=List[PluginType])
 def list_plugins(
     organisation_id: str,
+    filter_params: FilterParameters = Depends(get_plugins_filter_parameters),
+    pagination_params: PaginationParameters = Depends(get_pagination_parameters),
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> List[PluginType]:
     with plugin_service as p:
-        return p.get_all(organisation_id)
+        plugins = p.get_all(organisation_id)
+
+    # filter plugins by id, name or description
+    if filter_params.q is not None:
+        plugins = filter(
+            partial(_plugin_matches_query, query=filter_params.q),
+            plugins,
+        )
+
+    # filter plugins by type
+    if filter_params.type is not None:
+        plugins = filter(lambda plugin: plugin.type == filter_params.type, plugins)
+
+    # filter plugins by state
+    if filter_params.state is not None:
+        plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
+
+    # filter plugins by scan level for boefje plugins
+    plugins = filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins)
+
+    # paginate plugins
+    plugins = list(plugins)[pagination_params.offset : pagination_params.offset + pagination_params.limit]
+
+    return plugins
 
 
 @router.get("/plugins/{plugin_id}", response_model=PluginType)
-def plugin(
+def get_plugin(
     plugin_id: str,
     organisation_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),
@@ -35,7 +76,7 @@ def plugin(
         with plugin_service as p:
             return p.by_plugin_id(plugin_id, organisation_id)
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -64,7 +105,7 @@ def get_repository_plugin(
         with plugin_service as p:
             return p.repository_plugin(repository_id, plugin_id, organisation_id)
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -81,7 +122,7 @@ def update_plugin_state(
         with plugin_service as p:
             p.update_by_id(repository_id, plugin_id, organisation_id, enabled)
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -95,7 +136,7 @@ def get_plugin_schema(
         with plugin_service as p:
             return JSONResponse(p.schema(plugin_id))
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -109,7 +150,7 @@ def get_plugin_cover(
         with plugin_service as p:
             return FileResponse(p.cover(plugin_id))
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
@@ -124,7 +165,7 @@ def get_plugin_description(
         with plugin_service as p:
             return Response(p.description(plugin_id, organisation_id))
     except KeyError:
-        raise HTTPException(HTTP_404_NOT_FOUND, "Unknown repository")
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown repository")
     except HTTPError as ex:
         raise HTTPException(ex.response.status_code)
 
