@@ -19,42 +19,32 @@
                 </div>
                 <dl>
                     <div>
-                        <dt>
-                            {% translate "Full name" %}
-                        </dt>
+                        <dt>{% translate "Full name" %}</dt>
                         <dd>
                             {{ member.user.full_name }}
                         </dd>
                     </div>
                     <div>
-                        <dt>
-                            {% translate "E-mail address" %}
-                        </dt>
+                        <dt>{% translate "E-mail address" %}</dt>
                         <dd>
                             {{ member.user }}
                         </dd>
                     </div>
                     <div>
-                        <dt>
-                            {% translate "Member type" %}
-                        </dt>
+                        <dt>{% translate "Member type" %}</dt>
                         <dd>
                             {{ member.groups.all.0 }}
                         </dd>
                     </div>
                     <div>
-                        <dt>
-                            {% translate "Organization" %}
-                        </dt>
+                        <dt>{% translate "Organization" %}</dt>
                         <dd>
                             {{ member.organization }}
                         </dd>
                     </div>
                     {% if member.acknowledged_clearance_level > 0 %}
                         <div>
-                            <dt>
-                                {% translate "Permission to set OOI clearance levels " %}
-                            </dt>
+                            <dt>{% translate "Permission to set OOI clearance levels " %}</dt>
                             <dd>
                                 L{{ member.acknowledged_clearance_level }}
                             </dd>
@@ -64,46 +54,48 @@
             </div>
         </section>
         {% if perms.tools.can_set_clearance_level %}
-            <section>
-                <div>
-                    <h2>{% translate "OOI clearance" %}</h2>
-                    {% if member.trusted_clearance_level <= 0 %}
-                        <p>
-                            {% blocktranslate %}
+            {% with tcl=member.trusted_clearance_level acl=member.acknowledged_clearance_level %}
+                <section>
+                    <div>
+                        <h2>{% translate "OOI clearance" %}</h2>
+                        {% if tcl <= 0 %}
+                            <p>
+                                {% blocktranslate %}
                                 You don't have any clearance to scan objects.<br>
                                 Get in contact with the admin to give you the necessary clearance level.
-                            {% endblocktranslate %}
-                        </p>
-                    {% else %}
-                        <p>
-                            {% translate "You have currently accepted clearance up to level" %} <strong>
-                            {% if member.acknowledged_clearance_level < 0 %}
-                                L0
-                            {% else %}
-                                L{{ member.acknowledged_clearance_level }}
-                            {% endif %}
-                        </strong>
-                    </p>
-                    {% with cl=member.trusted_clearance_level|stringformat:"s" %}
-                        {% if member.acknowledged_clearance_level < member.trusted_clearance_level %}
-                            <p class="explanation">
-                                {% blocktranslate trimmed %}
-                                    You are granted clearance for level L{{ cl }} by your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>
                                 {% endblocktranslate %}
                             </p>
-                            {% include "partials/single_action_form.html" with btn_text="Accept level L"|add:cl|add:" clearance and responsibility" action="accept_clearance" key="member_id" value=member.id btn_class="ghost" %}
+                        {% else %}
+                            <p>
+                                {% translate "You have currently accepted clearance up to level" %} <strong>
+                                {% if acl < 0 %}
+                                    L0
+                                {% else %}
+                                    L{{ acl }}
+                                {% endif %}
+                            </strong>
+                        </p>
+                        {% if acl < tcl %}
+                            <p class="explanation">
+                                {% blocktranslate trimmed %}
+                                    You are granted clearance for level L{{ tcl }} by your admin. Before you can change OOI clearance levels up to this level, you need to accept this permission. Remember: <strong>with great power comes great responsibility.</strong>
+                                {% endblocktranslate %}
+                            </p>
+                            {% blocktranslate asvar btn_text_accept_tcl %}"Accept level L{{tcl}} clearance and responsibility"{% endblocktranslate %}
+                            {% include "partials/single_action_form.html" with btn_text=btn_text_accept_tcl action="accept_clearance" key="member_id" value=member.id btn_class="ghost" %}
 
                         {% else %}
                             <p class="explanation">
                                 {% translate "You can withdraw this at anytime you like, but know that you won't be able to change clearance levels anymore when you do." %}
                             </p>
-                            {% include "partials/single_action_form.html" with btn_text="Withdraw acceptance of level L"|add:cl|add:" clearance and responsibility" action="withdraw_acceptance" key="member_id" value=member.id btn_class="ghost" %}
+                            {% blocktranslate asvar btn_text_withdraw_tcl %}"Withdraw acceptance of level L{{tcl}} clearance and responsibility"{% endblocktranslate %}
+                            {% include "partials/single_action_form.html" with btn_text=btn_text_withdraw_tcl action="withdraw_acceptance" key="member_id" value=member.id btn_class="ghost" %}
 
                         {% endif %}
-                    {% endwith %}
-                {% endif %}
-            </div>
-        </section>
+                    {% endif %}
+                </div>
+            </section>
+        {% endwith %}
     {% endif %}
 </main>
 {% endblock content %}
