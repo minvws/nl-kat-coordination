@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains
 from tools.models import OrganizationMember
 
-from rocky.views.organization_member_add import MembersUploadView
+from rocky.views.organization_member_add import DownloadMembersTemplateView, MembersUploadView
 from tests.conftest import setup_request
 
 
@@ -19,6 +19,17 @@ def test_upload_members_page(rf, superuser_member):
     assertContains(response, "Upload CSV file")
     assertContains(response, "criteria")
     assertContains(response, "email")
+
+
+def test_download_template(rf, superuser_member):
+    request = setup_request(rf.get("organization_member_upload"), superuser_member.user)
+
+    response = DownloadMembersTemplateView.as_view()(request, organization_code=superuser_member.organization.code)
+    assert response.status_code == 200
+    assert (
+        b"".join(response.streaming_content)
+        == b"full_name,email,account_type,trusted_clearance_level,acknowledged_clearance_level"
+    )
 
 
 def test_upload_members_page_forbidden(rf, redteam_member):
@@ -36,11 +47,10 @@ def test_upload_members(rf, superuser_member):
     response = MembersUploadView.as_view()(request, organization_code=superuser_member.organization.code)
 
     assert response.status_code == 302
-    assert list(request._messages).pop().message == "Successfully added csv."
+    assert list(request._messages).pop().message == "Successfully processed users from csv."
     assert response.url == f"/en/{superuser_member.organization.code}/members"
 
-    assert OrganizationMember.objects.filter(organization=superuser_member.organization).count() == 5
-    assert OrganizationMember.objects.filter(organization=superuser_member.organization, status="new").count() == 4
+    assert OrganizationMember.objects.filter(organization=superuser_member.organization, status="active").count() == 5
     assert not OrganizationMember.objects.filter(organization=superuser_member.organization).last().user.password
 
 

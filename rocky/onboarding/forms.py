@@ -9,7 +9,6 @@ from tools.models import (
     GROUP_CLIENT,
     GROUP_REDTEAM,
     Organization,
-    OrganizationMember,
 )
 
 User = get_user_model()

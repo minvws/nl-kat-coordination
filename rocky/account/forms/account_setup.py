@@ -148,15 +148,16 @@ class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
 
             if created:
                 user.set_password(self.cleaned_data["password"])
-                user.safe()
+                user.save()
 
             member, _ = OrganizationMember.objects.get_or_create(
                 user=user,
+                organization=self.organization,
                 defaults={
                     "organization": self.organization,
                     "status": OrganizationMember.STATUSES.ACTIVE,
-                    "trusted_clearance_level": self.trusted_clearance_level,
-                    "acknowledged_clearance_level": self.trusted_clearance_level,
+                    "trusted_clearance_level": self.cleaned_data["trusted_clearance_level"],
+                    "acknowledged_clearance_level": self.cleaned_data["trusted_clearance_level"],
                 },
             )
             member.groups.add(selected_group.id)

@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import FileResponse
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -19,9 +20,17 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
+
+MEMBER_UPLOAD_COLUMNS = [
+    "full_name",
+    "email",
+    "account_type",
+    "trusted_clearance_level",
+    "acknowledged_clearance_level",
+]
 CSV_CRITERIA = [
     _("Add column titles. Followed by each object on a new line."),
-    _("The columns are: full_name, email, account_type, trusted_clearance_level and acknowledged_clearance_level"),
+    _("The columns are: ") + ", ".join(MEMBER_UPLOAD_COLUMNS),
 ]
 
 
@@ -69,6 +78,17 @@ class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, Organizatio
     def add_success_notification(self):
         success_message = _("Member added successfully.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
+
+
+class DownloadMembersTemplateView(OrganizationPermissionRequiredMixin, OrganizationView):
+    permission_required = "tools.add_organizationmember"
+
+    def get(self, request, **kwargs):
+        """Create a csv file with the right columns to download as a template for uploading organization members"""
+
+        template = ",".join(MEMBER_UPLOAD_COLUMNS)
+
+        return FileResponse(io.BytesIO(template.encode()), filename=f"{self.organization}_organization_members.csv")
 
 
 class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
@@ -126,6 +146,7 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                 try:
                     member, member_created = OrganizationMember.objects.get_or_create(
                         user=user,
+                        organization=self.organization,
                         defaults={
                             "organization": self.organization,
                             "status": OrganizationMember.STATUSES.ACTIVE,

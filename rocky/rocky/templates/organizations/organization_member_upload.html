@@ -10,7 +10,12 @@
         <section>
             <div>
                 <h1>{% translate "Upload a csv file with members for organisation" %} "{{ organization }}"</h1>
-                <p class="emphasized">{% translate "Automate the creation of multiple objects by uploading a CSV file." %}</p>
+                <p class="emphasized">
+                  <a href="{% url 'download_organization_member_template' organization_code=organization.code %}">
+                      {% translate "Download the template" %}
+                  </a>
+                  {% translate "or create a csv file with the following criteria" %}
+                </p>
                 <p>{% translate "These are the criteria for CSV upload:" %}</p>
                 <ul>
                   {% for criterion in criteria %}<li>{{ criterion }}</li>{% endfor %}
