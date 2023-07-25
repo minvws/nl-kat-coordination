@@ -1,16 +1,16 @@
 /* theme: Soft */
 /* Fonts */
 @import "fonts/fonts";
-/* Fonts */
 
 /* Styling sets. E.g color sets */
-@import "manon/kat-purrple.scss";
+@import "colors";
+@import "manon/kat-purrple";
 @import "manon/body-text-set";
 @import "manon/spot-large";
 
 /* Branding colors */
 @import "manon/headings-base-set";
-@import "manon/text-colors.scss";
+@import "manon/text-colors";
 
 /* Defining available heading styles */
 @import "manon/spacing";
