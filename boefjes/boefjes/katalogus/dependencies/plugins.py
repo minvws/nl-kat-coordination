@@ -1,7 +1,7 @@
 import contextlib
 import logging
 from pathlib import Path
-from typing import Dict, Iterable, Iterator, List, Optional
+from typing import Dict, Iterable, Iterator, List, Literal, Optional
 
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
@@ -23,6 +23,12 @@ from boefjes.katalogus.storage.interfaces import (
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
+from boefjes.katalogus.storage.memory import (
+    PluginStatesStorageMemory,
+    RepositoryStorageMemory,
+    SettingsStorageMemory,
+)
+from boefjes.katalogus.types import LIMIT, FilterParameters, PaginationParameters
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
 from boefjes.sql.repository_storage import create_repository_storage
@@ -207,3 +213,15 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
         )
 
     yield from session_managed_iterator(closure)
+
+
+def get_pagination_parameters(offset: int = 0, limit: Optional[int] = LIMIT) -> PaginationParameters:
+    return PaginationParameters(offset=offset, limit=limit)
+
+
+def get_plugins_filter_parameters(
+    q: Optional[str] = None,
+    plugin_type: Optional[Literal["boefje", "normalizer", "bit"]] = None,
+    state: Optional[bool] = None,
+) -> FilterParameters:
+    return FilterParameters(q=q, type=plugin_type, state=state)
