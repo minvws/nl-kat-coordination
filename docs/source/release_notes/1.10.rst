@@ -13,6 +13,10 @@ severity in XTDB. By doing those queries completely in XTDB we fixed several
 performance issues. Finding types are added by boefjes which will also give more
 flexibility adding/changing/updating finding types in the future.
 
+The CVE finding boefje will download the CVE information from
+https://cve.openkat.dev/. It is also possible to run your own instance of this
+API, see :ref:`CVE API` for more information.
+
 The Python version used in the container images have been updated to 3.11.
 Python 3.11 is a lot faster so this should also make OpenKAT faster. Django
 version has also been updated to version 4.2.

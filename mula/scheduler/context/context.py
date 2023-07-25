@@ -52,6 +52,7 @@ class AppContext:
             host=self.config.host_octopoes,
             source=f"scheduler/{scheduler.__version__}",
             orgs=katalogus_service.get_organisations(),
+            timeout=self.config.octopoes_request_timeout,
         )
 
         # Register external services, SimpleNamespace allows us to use dot
