@@ -48,6 +48,9 @@ class TaskStorer(abc.ABC):
     def update_task(self, task: models.Task) -> Optional[models.Task]:
         raise NotImplementedError
 
+    def update_task_status(self, task_id: str, status: models.TaskStatus) -> None:
+        raise NotImplementedError
+
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
         raise NotImplementedError
 

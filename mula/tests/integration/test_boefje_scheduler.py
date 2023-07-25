@@ -1519,9 +1519,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_rate_limited")
-    def test_push_tasks_for_delayed_tasks_rate_limit_passed_valueerror(
-        self, mock_is_task_rate_limited
-    ):
+    def test_push_tasks_for_delayed_tasks_rate_limit_passed_valueerror(self, mock_is_task_rate_limited):
         """When a task is rate limited, and the rate limit passed it should be
         pushed to the queue. When the rate limit check raises a ValueError, the
         task should be removed from the datastore.
