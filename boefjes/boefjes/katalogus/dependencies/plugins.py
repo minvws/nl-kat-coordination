@@ -23,11 +23,6 @@ from boefjes.katalogus.storage.interfaces import (
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
-from boefjes.katalogus.storage.memory import (
-    PluginStatesStorageMemory,
-    RepositoryStorageMemory,
-    SettingsStorageMemory,
-)
 from boefjes.katalogus.types import LIMIT, FilterParameters, PaginationParameters
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
