@@ -136,6 +136,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     return [
         (set("image/png"), image_png),
-        (set("application/zip+json"), har_zip),
+        ({"application/zip+json", "application/har+json"}, har_zip),
         (set("application/json"), storage_json),
     ]
