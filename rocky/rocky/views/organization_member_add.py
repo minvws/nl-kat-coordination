@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -111,23 +112,21 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
             for row in csv.DictReader(csv_data, delimiter=",", quotechar='"'):
                 if not row:
                     continue  # skip empty lines
+
                 try:
                     full_name, email, account_type, trusted_clearance_level, acknowledged_clearance_level = (
                         row["full_name"],
                         row["email"],
                         row["account_type"],
-                        row.get("trusted_clearance_level", 0),
-                        row.get("acknowledged_clearance_level", 0),
+                        row["trusted_clearance_level"],
+                        row["acknowledged_clearance_level"],
                     )
                 except KeyError:
-                    logger.exception("Failed creating user")
-                    continue
+                    messages.add_message(self.request, messages.ERROR, _("The csv file is missing required columns"))
+                    return redirect("organization_member_upload", self.organization.code)
 
-                try:
-                    user, user_created = User.objects.get_or_create(email=email, defaults={"full_name": full_name})
-                except Exception:
-                    logger.exception("Failed creating user")
-                    continue
+                user, user_created = User.objects.get_or_create(email=email, defaults={"full_name": full_name})
+
                 if user_created:
                     form = PasswordResetForm({"email": email})
 
@@ -155,20 +154,22 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                         },
                     )
                 except Exception:
-                    logger.exception("Failed creating organization member")
                     if user_created:
                         user.delete()
 
-                    continue
+                    raise
 
                 try:
                     member.groups.add(Group.objects.get(name=account_type))
                 except ObjectDoesNotExist:
-                    logger.exception("Failed adding organization member to group")
+                    logger.error("Group does not exist")
                     continue
 
             messages.add_message(self.request, messages.SUCCESS, _("Successfully processed users from csv."))
-        except (csv.Error, IndexError):
+        except csv.Error:
+            messages.add_message(
+                self.request, messages.ERROR, _("Error parsing the csv file. Please verify its contents.")
+            )
             logger.exception("Failed handling csv file")
 
     def get_context_data(self, **kwargs):
