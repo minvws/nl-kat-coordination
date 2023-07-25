@@ -436,8 +436,6 @@ class BoefjeScheduler(Scheduler):
             )
             raise ValueError("Could not parse rate limit")  # TODO: what happens when this is raised?
 
-        # TODO: is this thread safe?
-
         with self.rate_limiter_lock:
             can_consume = self.rate_limiter.test(parsed_rate_limit, task.boefje.id)
             if not can_consume:
