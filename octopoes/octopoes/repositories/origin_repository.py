@@ -114,9 +114,6 @@ class XTDBOriginRepository(OriginRepository):
         except ObjectNotFoundException:
             old_origin = None
 
-        if old_origin == origin:
-            return
-
         self.session.add((XTDBOperationType.PUT, self.serialize(origin), valid_time))
 
         event = OriginDBEvent(

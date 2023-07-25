@@ -34,14 +34,16 @@ class NormalizerTaskDetailView(NormalizerMixin, TaskDetailView):
     template_name = "tasks/normalizer_task_detail.html"
     plugin_type = "normalizer"
 
-    def get_output_oois(self, task_id):
+    def get_output_oois(self, task):
         try:
-            return self.octopoes_api_connector.list_origins(task_id=task_id)[0].result
+            return self.octopoes_api_connector.list_origins(
+                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at, task_id=uuid.UUID(task.id).hex
+            )[0].result
         except IndexError:
             return []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["output_oois"] = self.get_output_oois(context["task_id"])
+        context["output_oois"] = self.get_output_oois(context["task"])
         return context

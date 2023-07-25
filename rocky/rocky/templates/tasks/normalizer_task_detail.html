@@ -9,19 +9,45 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Task detail page" %}</h1>
-            </div>
+                <h1>{{ task.type|title }} {% translate "details" %}</h1>
+                <h2>"{{ task.p_item.data.normalizer.id }}" @ {{ task.p_item.data.raw_data.boefje_meta.ended_at }}</h2>
+                <p>
+                  An overview of the various steps that where taken to get to this normalizer task and the resulting OOI's
+                </p>
 
-            <div>
-              <h2>{% translate "Input object" %}</h2>
-              {{ task.p_item.data.raw_data.boefje_meta.input_ooi }}
+                {{ task.p_item.data.raw_data }}
             </div>
 
             <div>
               <h2>{% translate "Yielded objects" %}</h2>
               {% for object in output_oois %}
-                <a href="{% ooi_url 'ooi_detail' object organization.code %}">{{ object }}</a>
+                  <a href="{% ooi_url 'ooi_detail' object organization.code %}">{{ object }}</a>
               {% endfor %}
+            </div>
+
+            <div>
+              <h2>RAW file of type _____</h2>
+              {% for type in task.p_item.data.raw_data.mime_types %}
+                  {{ type.value }}<br>
+              {% endfor %}
+            </div>
+
+            <div>
+              <h2>Boefje</h2>
+              <p>
+                <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">
+                  {{ task.p_item.data.raw_data.boefje_meta.boefje.id }}
+                </a>
+              </p>
+            </div>
+
+            <div>
+              <h2>{% translate "Input object" %}</h2>
+              <p>
+                <a href="{% ooi_url 'ooi_detail' task.p_item.data.raw_data.boefje_meta.input_ooi organization.code %}">
+                  {{ task.p_item.data.raw_data.boefje_meta.input_ooi }}
+                </a>
+              </p>
             </div>
         </section>
     </main>
