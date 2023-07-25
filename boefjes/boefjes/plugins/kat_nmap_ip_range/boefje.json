@@ -1,7 +1,7 @@
 {
     "id": "nmap-ip-range",
     "name": "Nmap IP range",
-    "description": "Scan an IP range and store found IPs.",
+    "description": "Scan an IP range and store found IPs. Defaults to top-250 TCP and top-10 UDP on ranges with 1024 addresses or less. Larger ranges are skipped by default.",
     "consumes": [
         "IPV6NetBlock",
         "IPV4NetBlock"

@@ -18,16 +18,12 @@ def run_nmap(args: List[str]) -> str:
     return client.containers.run(NMAP_IMAGE, args, remove=True).decode()
 
 
-def build_nmap_arguments(
-    ip_range: Union[IPv6Network, IPv4Network], top_ports: int, protocol_str: str
-) -> List[str]:
+def build_nmap_arguments(ip_range: Union[IPv6Network, IPv4Network], top_ports: int, protocol_str: str) -> List[str]:
     """Build nmap arguments from the hosts IP with the required ports."""
     if protocol_str not in ["S", "U"]:
         raise ValueError('Protocol should be "S" or "U"')
     if not TOP_PORTS_MIN <= top_ports <= TOP_PORTS_MAX:
-        raise ValueError(
-            f"{TOP_PORTS_MIN} <= TOP_PORTS: {top_ports} <= {TOP_PORTS_MAX} is invalid."
-        )
+        raise ValueError(f"{TOP_PORTS_MIN} <= TOP_PORTS: {top_ports} <= {TOP_PORTS_MAX} is invalid.")
 
     args = [
         "nmap",
@@ -53,9 +49,9 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         f"{boefje_meta.arguments['input']['start_ip']['address']}/{str(boefje_meta.arguments['input']['mask'])}"
     )
 
-    min_mask = int(getenv("MIN_VLSM_IPV4", 0))
+    min_mask = int(getenv("MIN_VLSM_IPV4", 22))
     if isinstance(ip_range, IPv6Network):
-        min_mask = int(getenv("MIN_VLSM_IPV6", 0))
+        min_mask = int(getenv("MIN_VLSM_IPV6", 118))
 
     if ip_range.prefixlen < min_mask:
         logging.info(
@@ -72,20 +68,8 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     results = []
     if top_ports_tcp:
-        results.append(
-            run_nmap(
-                build_nmap_arguments(
-                    ip_range=ip_range, top_ports=top_ports_tcp, protocol_str="S"
-                )
-            )
-        )
+        results.append(run_nmap(build_nmap_arguments(ip_range=ip_range, top_ports=top_ports_tcp, protocol_str="S")))
     if top_ports_udp:
-        results.append(
-            run_nmap(
-                build_nmap_arguments(
-                    ip_range=ip_range, top_ports=top_ports_udp, protocol_str="U"
-                )
-            )
-        )
+        results.append(run_nmap(build_nmap_arguments(ip_range=ip_range, top_ports=top_ports_udp, protocol_str="U")))
 
     return [(set(), "\n\n".join(results))]
