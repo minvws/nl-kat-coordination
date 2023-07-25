@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
@@ -70,12 +71,12 @@ class OOIDetailView(
                     "Results will be added to the object list when they are in. "
                     "It may take some time, a refresh of the page may be needed to show the results."
                 )
-                messages.add_message(self.request, messages.SUCCESS, success_message)
+                messages.add_message(self.request, messages.SUCCESS, _(success_message))
                 return redirect("task_list", organization_code=self.organization.code)
 
             if action == PageActions.SUBMIT_ANSWER.value:
                 if not isinstance(self.ooi, Question):
-                    messages.add_message(self.request, messages.ERROR, "Only Question OOIs can be answered.")
+                    messages.add_message(self.request, messages.ERROR, _("Only Question OOIs can be answered."))
                     return self.get(self.request, status_code=500, *self.args, **self.kwargs)
 
                 schema_answer = self.request.POST.get("schema")
@@ -86,13 +87,13 @@ class OOIDetailView(
                     for error in validator.iter_errors(parsed_schema_answer):
                         messages.add_message(self.request, messages.ERROR, error.message)
 
-                    return self.get(self.request, status_code=500, *self.args, **self.kwargs)
+                    return self.get(self.request, status_code=422, *self.args, **self.kwargs)
 
                 self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.reference)
                 messages.add_message(self.request, messages.SUCCESS, "Question has been answered.")
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 
-            return self.get(self.request, status_code=500, *self.args, **self.kwargs)
+            return self.get(self.request, status_code=404, *self.args, **self.kwargs)
         except RequestException as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
             return self.get(self.request, status_code=500, *self.args, **self.kwargs)

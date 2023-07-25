@@ -113,6 +113,69 @@ def test_question_detail(
     assertContains(response, "Submit")
 
 
+def test_answer_question(
+    rf,
+    client_member,
+    mock_scheduler,
+    mock_bytes_client,
+    mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
+    mocker,
+):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(QUESTION_DATA)
+    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+
+    query_string = urlencode({"ooi_id": "Question|/test|Network|testnetwork"}, doseq=True)
+    request = setup_request(
+        rf.post(
+            f"/en/{client_member.organization.code}/objects/details/?{query_string}",
+            data={
+                "schema": '{"key": "value", "sa_tcp_ports": "314159,23"}',
+                "action": "submit_answer",
+            },
+        ),
+        client_member.user,
+    )
+    response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
+
+    assertContains(response, "Question has been answered.", status_code=201)
+    assert mock_organization_view_octopoes().get_tree.call_count == 3
+
+
+def test_answer_question_bad_schema(
+    rf,
+    client_member,
+    mock_scheduler,
+    mock_bytes_client,
+    mock_organization_view_octopoes,
+    lazy_task_list_with_boefje,
+    mocker,
+):
+    mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(QUESTION_DATA)
+    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+
+    query_string = urlencode({"ooi_id": "Question|/test|Network|testnetwork"}, doseq=True)
+
+    request = setup_request(
+        rf.post(
+            f"/en/{client_member.organization.code}/objects/details/?{query_string}",
+            data={
+                "schema": '{"key": "value", "sa_tcp_ports": 314159}',
+                "action": "submit_answer",
+            },
+        ),
+        client_member.user,
+    )
+    response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 422
+
+    quote_enc = "&#x27;"
+    assertContains(response, f"314159 is not of type {quote_enc}string{quote_enc}", status_code=422)
+
+
 def test_ooi_detail_start_scan(
     rf,
     client_member,
