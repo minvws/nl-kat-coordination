@@ -2,20 +2,25 @@ from __future__ import annotations
 
 import json
 import logging
+from collections import Counter
 from datetime import datetime
 from http import HTTPStatus
-from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
 from bits.definitions import BitDefinition
 from pydantic import BaseModel, parse_obj_as
 from requests import HTTPError
 
-from octopoes.config.settings import XTDBType
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    XTDBType,
+)
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
 from octopoes.models import (
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     OOI,
     Reference,
     ScanLevel,
@@ -23,6 +28,7 @@ from octopoes.models import (
 )
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
+from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.tree import ReferenceNode, ReferenceTree
@@ -61,7 +67,7 @@ class OOIRepository:
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         raise NotImplementedError
 
-    def get_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
+    def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
         raise NotImplementedError
 
     def get_neighbours(
@@ -106,10 +112,23 @@ class OOIRepository:
     def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
         raise NotImplementedError
 
-    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
+    def count_findings_by_severity(self, valid_time: datetime) -> Counter:
+        raise NotImplementedError
+
+    def list_findings(
+        self,
+        severities,
+        exclude_muted,
+        offset,
+        limit,
+        valid_time,
+    ) -> Paginated[Finding]:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> List[Config]:
+        raise NotImplementedError
+
+    def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> List[OOI]:
         raise NotImplementedError
 
 
@@ -202,7 +221,7 @@ class XTDBOOIRepository(OOIRepository):
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
-    def get_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
+    def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
         ids = list(map(str, references))
         query = generate_pull_query(self.xtdb_type, FieldSet.ALL_FIELDS, {self.pk_prefix(): ids})
         res = self.session.client.query(query, valid_time)
@@ -299,7 +318,7 @@ class XTDBOOIRepository(OOIRepository):
         if not res:
             return []
         references = {Reference.from_str(reference) for reference in res[0][0]}
-        return list(self.get_bulk(references, valid_time).values())
+        return list(self.load_bulk(references, valid_time).values())
 
     def get_tree(
         self,
@@ -321,7 +340,7 @@ class XTDBOOIRepository(OOIRepository):
 
         reference_node.filter_children(lambda child_node: child_node.reference.class_type in search_types)
 
-        store = self.get_bulk(reference_node.collect_references(), valid_time)
+        store = self.load_bulk(reference_node.collect_references(), valid_time)
         return ReferenceTree(root=reference_node, store=store)
 
     def _get_related_objects(self, references: Set[Reference], valid_time: Optional[datetime]) -> List[ReferenceNode]:
@@ -562,14 +581,23 @@ class XTDBOOIRepository(OOIRepository):
         response = self.session.client.query(query, valid_time=valid_time)
         return {Reference.from_str(row[0]) for row in response}
 
-    def get_finding_type_count(self, valid_time: datetime) -> Dict[str, int]:
+    def count_findings_by_severity(self, valid_time: datetime) -> Counter:
+        severity_counts = Counter({severity: 0 for severity in RiskLevelSeverity})
+
         query = """
-                    {:query {
-                     :find [?finding_type (count ?finding)]
-                     :where [[?finding :Finding/finding_type ?finding_type]] }}
-                """
-        response = self.session.client.query(query, valid_time=valid_time)
-        return {finding_type: count for finding_type, count in response}
+            {:query {
+                :find [(pull ?finding_type [*]) (count ?finding)]
+                :where [
+                    [?finding :Finding/finding_type ?finding_type]
+                    (not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])
+                    ]}}
+        """
+
+        for finding_type, finding_count in self.session.client.query(str(query), valid_time=valid_time):
+            ft = cast(FindingType, self.deserialize(finding_type))
+            severity = ft.risk_severity or RiskLevelSeverity.PENDING
+            severity_counts.update([severity] * finding_count)
+        return severity_counts
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> List[Config]:
         path = Path.parse(f"{bit_definition.config_ooi_relation_path}.<ooi [is Config]")
@@ -583,3 +611,83 @@ class XTDBOOIRepository(OOIRepository):
         configs = [self.deserialize(res[0]) for res in self.session.client.query(str(query), valid_time=valid_time)]
 
         return [config for config in configs if isinstance(config, Config)]
+
+    def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> List[OOI]:
+        path_start_alias = path.segments[0].source_type
+        query = Query.from_path(path).where(path_start_alias, primary_key=ooi.primary_key)
+        return [self.deserialize(row[0]) for row in self.session.client.query(str(query), valid_time=valid_time)]
+
+    def list_findings(
+        self,
+        severities: Set[RiskLevelSeverity],
+        exclude_muted=False,
+        offset=DEFAULT_OFFSET,
+        limit=DEFAULT_LIMIT,
+        valid_time: Optional[datetime] = None,
+    ) -> Paginated[Finding]:
+        # clause to find risk_severity
+        concrete_finding_types = to_concrete({FindingType})
+        severity_clauses = [
+            f"[?finding_type :{finding_type.get_object_type()}/risk_severity ?severity]"
+            for finding_type in concrete_finding_types
+        ]
+        or_severities = f"(or {' '.join(severity_clauses)})"
+
+        # clause to find risk_score
+        score_clauses = [
+            f"[?finding_type :{finding_type.get_object_type()}/risk_score ?score]"
+            for finding_type in concrete_finding_types
+        ]
+        or_scores = f"(or {' '.join(score_clauses)})"
+
+        exclude_muted_clause = ""
+        if exclude_muted:
+            exclude_muted_clause = "(not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])"
+
+        severity_values = ", ".join([str_val(severity.value) for severity in severities])
+
+        count_query = f"""
+            {{
+                :query {{
+                    :find [(count ?finding)]
+                    :in [[severities_ ...]]
+                    :where [[?finding :object_type "Finding"]
+                            [?finding :Finding/finding_type ?finding_type]
+                            [(== ?severity severities_)]
+                            {or_severities}
+                            {exclude_muted_clause}]
+                }}
+                :in-args [[{severity_values}]]
+            }}
+        """
+
+        count_results = self.session.client.query(count_query, valid_time)
+        count = 0
+        if count_results and count_results[0]:
+            count = count_results[0][0]
+
+        finding_query = f"""
+            {{
+                :query {{
+                    :find [(pull ?finding [*]) ?score]
+                    :in [[severities_ ...]]
+                    :where [[?finding :object_type "Finding"]
+                            [?finding :Finding/finding_type ?finding_type]
+                            [(== ?severity severities_)]
+                            {or_severities}
+                            {or_scores}
+                            {exclude_muted_clause}]
+                    :limit {limit}
+                    :offset {offset}
+                    :order-by [[?score :desc]]
+                }}
+               :in-args [[{severity_values}]]
+            }}
+        """
+
+        res = self.session.client.query(finding_query, valid_time)
+        findings = [self.deserialize(x[0]) for x in res]
+        return Paginated(
+            count=count,
+            items=findings,
+        )

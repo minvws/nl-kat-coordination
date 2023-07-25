@@ -1,0 +1,52 @@
+name: Check Poetry dependencies
+
+on:
+  push:
+    paths:
+      - '**/requirements.txt'
+      - '**/requirements-dev.txt'
+      - '**/pyproject.toml'
+      - '**/poetry.lock'
+  pull_request:
+    paths:
+      - '**/requirements.txt'
+      - '**/requirements-dev.txt'
+      - '**/pyproject.toml'
+      - '**/poetry.lock'
+
+
+jobs:
+  poetry-dependencies:
+
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        id: py311
+        with:
+          python-version: 3.11
+          cache: pip
+
+      - name: Install pip dependencies
+        run: pip install poetry
+
+      - name: Check, lock, and export Poetry dependencies
+        run: make poetry-dependencies
+
+      - name: Check if there are any changed files
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        run: git diff --exit-code
+
+      - name: Commit, sign, and push changes
+        if: ${{ github.actor == 'dependabot[bot]' }}
+        run: sh .github/scripts/commit_sign_push.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DESTINATION_BRANCH: ${{ github.ref }}

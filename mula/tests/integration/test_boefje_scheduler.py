@@ -292,7 +292,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert
         self.assertFalse(is_running)
 
-    def test_is_task_running_mismatch(self):
+    def test_is_task_running_mismatch_before_grace_period(self):
         """When a task has finished according to the datastore, (e.g. failed
         or completed), but there are no results in bytes, we have a problem.
         """
@@ -331,6 +331,47 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Act
         with self.assertRaises(RuntimeError):
             self.scheduler.is_task_running(task)
+
+    def test_is_task_running_mismatch_after_grace_period(self):
+        """When a task has finished according to the datastore, (e.g. failed
+        or completed), but there are no results in bytes, we have a problem.
+        However when the grace period has been reached we should not raise
+        an error.
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        task_db = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
+            p_item=p_item,
+            status=models.TaskStatus.COMPLETED,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_populate_grace_period),
+        )
+
+        # Mock
+        self.mock_get_latest_task_by_hash.return_value = task_db
+        self.mock_get_last_run_boefje.return_value = None
+
+        # Act
+        self.assertFalse(self.scheduler.is_task_running(task))
 
     def test_has_grace_period_passed_datastore_passed(self):
         """Grace period passed according to datastore, and the status is completed"""
@@ -653,6 +694,96 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+    def test_disable_scheduler(self):
+        # Arrange: start scheduler
+        self.scheduler.run()
+
+        # Arrange: add tasks
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        task = models.BoefjeTask(
+            boefje=BoefjeFactory(),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        p_item = functions.create_p_item(
+            scheduler_id=self.organisation.id,
+            priority=0,
+            data=task,
+        )
+        self.scheduler.push_item_to_queue(p_item)
+
+        # Assert: task should be on priority queue
+        pq_p_item = self.scheduler.queue.peek(0)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(pq_p_item.id, p_item.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: listeners should be running
+        self.assertGreater(len(self.scheduler.listeners), 0)
+
+        # Assert: threads should be running
+        self.assertGreater(len(self.scheduler.threads), 0)
+
+        # Act
+        self.scheduler.disable()
+
+        # Listeners should be stopped
+        self.assertEqual(0, len(self.scheduler.listeners))
+
+        # Threads should be stopped
+        self.assertEqual(0, len(self.scheduler.threads))
+
+        # Queue should be empty
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # All tasks on queue should be set to CANCELLED
+        tasks, _ = self.mock_ctx.task_store.get_tasks(self.scheduler.scheduler_id)
+        for task in tasks:
+            self.assertEqual(task.status, models.TaskStatus.CANCELLED)
+
+        # Scheduler should be disabled
+        self.assertFalse(self.scheduler.is_enabled())
+
+        self.scheduler.stop()
+
+    def test_enable_scheduler(self):
+        self.scheduler.run()
+
+        # Assert: listeners should be running
+        self.assertGreater(len(self.scheduler.listeners), 0)
+
+        # Assert: threads should be running
+        self.assertGreater(len(self.scheduler.threads), 0)
+
+        # Disable scheduler first
+        self.scheduler.disable()
+
+        # Listeners should be stopped
+        self.assertEqual(0, len(self.scheduler.listeners))
+
+        # Threads should be stopped
+        self.assertEqual(0, len(self.scheduler.threads))
+
+        # Queue should be empty
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Re-enable scheduler
+        self.scheduler.enable()
+
+        # Threads should be started
+        self.assertGreater(len(self.scheduler.threads), 0)
+
+        # Scheduler should be enabled
+        self.assertTrue(self.scheduler.is_enabled())
+
+        # Stop the scheduler
+        self.scheduler.stop()
 
 
 class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):

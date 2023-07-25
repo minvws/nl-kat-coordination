@@ -9,9 +9,9 @@ DJANGO_ALLOWED_HOSTS
 
 Django uses the ``DJANGO_ALLOWED_HOSTS`` setting to determine which host/domain names it can serve. This is a security measure to prevent HTTP Host header attacks, which are possible even under many seemingly-safe web server configurations.
 
-The default value for this setting is ``*``, which allows all hosts. You should always set this to the domain and subdomain names that your application uses. For example, if your application is available at ``example.com`` and ``subdomain.example.com``, you should set ``DJANGO_ALLOWED_HOSTS`` to ``example.com subdomain.example.com`` (space separated).
+The default value for this setting is ``*``, which allows all hosts. You should always set this to the domain and subdomain names that your application uses. For example, if your application is available at ``example.com`` and ``subdomain.example.com``, you should set ``DJANGO_ALLOWED_HOSTS`` to ``example.com,subdomain.example.com`` (comma separated).
 
-See the `Django ALLOWED_HOSTS documentation`_ for more information. Note that the KAT setting (environment variable) is named ``DJANGO_ALLOWED_HOSTS`` and its values are separated by spaces.
+See the `Django ALLOWED_HOSTS documentation`_ for more information. Note that the KAT setting (environment variable) is named ``DJANGO_ALLOWED_HOSTS`` and its values are separated by commas.
 
 .. _Django ALLOWED_HOSTS documentation: https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
 
@@ -20,9 +20,9 @@ DJANGO_CSRF_TRUSTED_ORIGINS
 
 Django uses the ``DJANGO_CSRF_TRUSTED_ORIGINS`` setting to determine which hosts are trusted origins for unsafe requests (e.g. ``POST``). For requests that include the ``Origin`` header, Django's CSRF protection requires that the origin host be in this list.
 
-The default value for this setting is empty. You should always set this to your own host names, prefixed with ``https://`` (or ``http://`` for insecure requests). For example, if your application is available at ``example.com`` and ``subdomain.example.com``, you should set ``DJANGO_CSRF_TRUSTED_ORIGINS`` to ``https://example.com https://subdomain.example.com`` (space separated).
+The default value for this setting is empty. You should always set this to your own host names, prefixed with ``https://`` (or ``http://`` for insecure requests). For example, if your application is available at ``example.com`` and ``subdomain.example.com``, you should set ``DJANGO_CSRF_TRUSTED_ORIGINS`` to ``https://example.com,https://subdomain.example.com`` (comma separated).
 
-See the `Django CSRF_TRUSTED_ORIGINS documentation`_ for more information. Note that the KAT setting (environment variable) is named ``DJANGO_CSRF_TRUSTED_ORIGINS`` and its values are separated by spaces.
+See the `Django CSRF_TRUSTED_ORIGINS documentation`_ for more information. Note that the KAT setting (environment variable) is named ``DJANGO_CSRF_TRUSTED_ORIGINS`` and its values are separated by commas.
 
 .. _Django CSRF_TRUSTED_ORIGINS documentation: https://docs.djangoproject.com/en/4.2/ref/settings/#csrf-trusted-origins
 

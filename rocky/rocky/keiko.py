@@ -8,16 +8,10 @@ from typing import Any, BinaryIO, Dict, List, Optional
 import requests
 from django.conf import settings
 from requests import HTTPError
-from tools.ooi_helpers import (
-    RiskLevelSeverity,
-    get_finding_type_from_finding,
-    get_knowledge_base_data_for_ooi,
-    get_knowledge_base_data_for_ooi_store,
-    get_ooi_dict,
-)
+from tools.ooi_helpers import get_ooi_dict
 
 from octopoes.models import OOI
-from octopoes.models.ooi.findings import Finding, FindingType
+from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from rocky.exceptions import RockyError
 from rocky.health import ServiceHealth
 
@@ -111,8 +105,10 @@ class ReportsService:
         organization_name: str,
         findings_metadata: List[Dict[str, Any]],
     ) -> BinaryIO:
-        findings = [item["finding"] for item in findings_metadata]
-        store = {finding.primary_key: finding for finding in findings}
+        store = {}
+        for item in findings_metadata:
+            store[item["finding"].finding.primary_key] = item["finding"].finding
+            store[item["finding"].finding_type.primary_key] = item["finding"].finding_type
 
         return self.get_report(valid_time, "Organisatie", organization_name, store)
 
@@ -167,10 +163,8 @@ def _ooi_field_as_string(findings_grouped: Dict, store: Dict):
 
 
 def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[List[str]] = None) -> Dict:
-    knowledge_base = get_knowledge_base_data_for_ooi_store(ooi_store)
-
     findings = [
-        build_finding_dict(finding_ooi, ooi_store, knowledge_base)
+        build_finding_dict(finding_ooi, ooi_store)
         for finding_ooi in ooi_store.values()
         if isinstance(finding_ooi, Finding)
     ]
@@ -178,7 +172,7 @@ def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[Lis
     if finding_filter is not None:
         findings = [finding for finding in findings if finding["finding_type"]["id"] in finding_filter]
 
-    findings = sorted(findings, key=lambda k: k["finding_type"]["risk_level_score"], reverse=True)
+    findings = sorted(findings, key=lambda k: k["finding_type"]["risk_score"], reverse=True)
 
     findings_grouped = {}
     for finding in findings:
@@ -199,15 +193,12 @@ def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[Lis
 def build_finding_dict(
     finding_ooi: Finding,
     ooi_store: Dict[str, OOI],
-    knowledge_base: Dict,
 ) -> Dict:
     finding_dict = get_ooi_dict(finding_ooi)
 
-    finding_type_ooi = get_finding_type_from_finding(finding_ooi)
+    finding_type_ooi = ooi_store[finding_ooi.finding_type]
 
-    knowledge_base.update({finding_type_ooi.get_information_id(): get_knowledge_base_data_for_ooi(finding_type_ooi)})
-
-    finding_type_dict = build_finding_type_dict(finding_type_ooi, knowledge_base)
+    finding_type_dict = build_finding_type_dict(finding_type_ooi)
 
     finding_dict["ooi"] = get_ooi_dict(ooi_store[str(finding_ooi.ooi)]) if str(finding_ooi.ooi) in ooi_store else None
     finding_dict["finding_type"] = finding_type_dict
@@ -226,7 +217,9 @@ def build_meta(findings: List[Dict]) -> Dict:
             RiskLevelSeverity.HIGH.value: 0,
             RiskLevelSeverity.MEDIUM.value: 0,
             RiskLevelSeverity.LOW.value: 0,
-            RiskLevelSeverity.NONE.value: 0,
+            RiskLevelSeverity.RECOMMENDATION.value: 0,
+            RiskLevelSeverity.PENDING.value: 0,
+            RiskLevelSeverity.UNKNOWN.value: 0,
         },
         "total_by_finding_type": {},
         "total_finding_types": 0,
@@ -235,35 +228,36 @@ def build_meta(findings: List[Dict]) -> Dict:
             RiskLevelSeverity.HIGH.value: 0,
             RiskLevelSeverity.MEDIUM.value: 0,
             RiskLevelSeverity.LOW.value: 0,
-            RiskLevelSeverity.NONE.value: 0,
+            RiskLevelSeverity.RECOMMENDATION.value: 0,
+            RiskLevelSeverity.PENDING.value: 0,
+            RiskLevelSeverity.UNKNOWN.value: 0,
         },
     }
 
     finding_type_ids = []
     for finding in findings:
         finding_type_id = finding["finding_type"]["id"]
-        severity = finding["finding_type"]["risk_level_severity"]
+        severity = finding["finding_type"]["risk_severity"]
 
-        meta["total_by_severity"][severity] = meta["total_by_severity"].get(severity, 0) + 1
+        meta["total_by_severity"][severity] += 1
         meta["total_by_finding_type"][finding_type_id] = meta["total_by_finding_type"].get(finding_type_id, 0) + 1
 
         # count and append finding type id if not already present
         if finding_type_id not in finding_type_ids:
             finding_type_ids.append(finding_type_id)
-            meta["total_by_severity_per_finding_type"][severity] = (
-                meta["total_by_severity_per_finding_type"].get(severity, 0) + 1
-            )
+            meta["total_by_severity_per_finding_type"][severity] += 1
             meta["total_finding_types"] += 1
 
     return meta
 
 
-def build_finding_type_dict(finding_type_ooi: FindingType, knowledge_base: Dict) -> Dict:
+def build_finding_type_dict(finding_type_ooi: FindingType) -> Dict:
     finding_type_dict = get_ooi_dict(finding_type_ooi)
-
-    if knowledge_base[finding_type_ooi.get_information_id()]:
-        finding_type_dict.update(knowledge_base[finding_type_ooi.get_information_id()])
-
     finding_type_dict["findings"] = []
+
+    if finding_type_dict["risk_score"] is None:
+        finding_type_dict["risk_score"] = 0
+    if finding_type_dict["risk_severity"] is None:
+        finding_type_dict["risk_severity"] = RiskLevelSeverity.PENDING.value
 
     return finding_type_dict

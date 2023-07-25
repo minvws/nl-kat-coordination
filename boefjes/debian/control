@@ -7,6 +7,6 @@ Section: python
 Priority: optional
 Architecture: any
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${python}, docker.io, ${misc:Depends}
+Depends: ${python}, docker.io | docker-ce, ${misc:Depends}
 Description: Boefjes component of KAT
   This component runs external tools like scanners.

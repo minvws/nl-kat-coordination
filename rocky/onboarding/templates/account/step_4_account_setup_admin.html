@@ -28,12 +28,12 @@
 
                     <button type="submit">{% translate "Submit" %}</button>
                 </form>
-                <p>
+                <div class="button-container">
                     <a href="{% url "step_choose_user_type" organization.code %}"
                        class="button ghost">{% translate "Go back to previous step" %}</a>
                     <a href="{% url "step_account_setup_red_teamer" organization.code %}"
                        class="button ">{% translate "Skip this step" %}</a>
-                </p>
+                </div>
             </div>
         </section>
     </main>

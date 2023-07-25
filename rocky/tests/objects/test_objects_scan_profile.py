@@ -10,7 +10,7 @@ from tests.conftest import setup_request
 TREE_DATA = {
     "root": {
         "reference": "Network|testnetwork",
-        "children": {"urls": [{"reference": "URL|testnetwork|https://scanme.org/", "children": {}}]},
+        "children": {"urls": [{"reference": "HostnameHTTPURL|https|internet|scanme.org|443|/", "children": {}}]},
     },
     "store": {
         "Network|testnetwork": {

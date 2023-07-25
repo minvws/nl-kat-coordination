@@ -1,15 +1,32 @@
 {% load i18n %}
 
 {% get_current_language as LANGUAGE_CODE %}
-<div class="language">
-    <form action="{% url "set_language" %}" method="post">
+
+<div class="language-selector">
+  <p class="visually-hidden" id="language-selector-description">{% translate "Select your language" %}</p>
+  <div class="language-selector-options" aria-describedby="language-selector-description" aria-expanded="false">
+    {% for language in languages %}
+      {% if LANGUAGE_CODE == language %}
+        {% get_language_info for LANGUAGE_CODE as lang %}
+        <button type="button" aria-haspopup="listbox" aria-current="true">
+          {{ lang.name_local }}
+        </button>
+      {% endif %}
+    {% endfor %}
+      <form action="{% url "set_language" %}" method="post">
         {% csrf_token %}
-        <div class="horizontal-view">
-            {% for language in languages %}
-                <button type="submit" name="language" value={{ language }} {% if LANGUAGE_CODE == language %}aria-current="true"{% endif %}>
-                    {{ language|upper }}
+        <ul role="listbox">
+          {% for language in languages %}
+            {% get_language_info for language as lang %}
+            <li {% if LANGUAGE_CODE == language %}aria-current="true" {% endif %}>
+              <a hreflang="{{ language }}" href="#" role="option" data-value="{{ language }}" lang="{{ language }}">
+                <button type="submit" name="language" value={{ language }}>
+                  {{ lang.name_local }}
                 </button>
-            {% endfor %}
-        </div>
-    </form>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </form>
+    </div>
 </div>

@@ -24,7 +24,7 @@ Login As User For The First Time
     Fill Text    css=#id_generator-token    ${otp-code}
     Click    "Authenticate"
     Click    "Start using OpenKAT"
-    Get Text    .login-meta    contains    Logged in as:    error login failed
+    Get Title    equal    OpenKAT - step_introduction_registration
 
 Login As User Normally
     [Arguments]    ${email}    ${password}

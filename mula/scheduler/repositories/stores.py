@@ -18,8 +18,12 @@ class TaskStorer(abc.ABC):
     @abc.abstractmethod
     def get_tasks(
         self,
-        scheduler_id: str,
-        filters: Optional[List[models.Filter]],
+        scheduler_id: Optional[str] = None,
+        task_type: Optional[str] = None,
+        status: Optional[str] = None,
+        min_created_at: Optional[datetime.datetime] = None,
+        max_created_at: Optional[datetime.datetime] = None,
+        filters: Optional[List[models.Filter]] = None,
     ):
         raise NotImplementedError
 
@@ -41,6 +45,9 @@ class TaskStorer(abc.ABC):
 
     @abc.abstractmethod
     def update_task(self, task: models.Task) -> Optional[models.Task]:
+        raise NotImplementedError
+
+    def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod
@@ -73,6 +80,10 @@ class PriorityQueueStorer(abc.ABC):
 
     @abc.abstractmethod
     def remove(self, scheduler_id: str, item_id: str) -> None:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def clear(self, scheduler_id: str) -> None:
         raise NotImplementedError
 
     @abc.abstractmethod

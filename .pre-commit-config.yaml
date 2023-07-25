@@ -71,13 +71,17 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: ['tomli']
+        args: [-L, lama]
         exclude: |
           (?x)(
           \.po$ |
+          \.xml$ |
           poetry.lock$ |
+          pyproject.toml$ |
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
+          ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
           ^keiko/glossaries |
           ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |
@@ -91,3 +95,13 @@ repos:
     hooks:
       - id: djlint-django
         files: '^rocky/.*/templates/.*$'
+
+  # - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+  #   rev: v15.4.0
+  #   hooks:
+  #     - id: stylelint
+  #       args: [--fix]
+  #       additional_dependencies:
+  #              - stylelint@15.4.0
+  #              - stylelint-config-standard-scss@8.0.0
+  #       files:  "^(rocky\/assets\/src\/|docs\/source\/).*.(css|scss|sass)$"

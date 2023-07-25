@@ -1,62 +1,6 @@
 from pathlib import Path
 
-from tools.add_ooi_information import cve_info, cwe_info, get_info, port_info, retirejs_info, service_info, snyk_info
-from tools.ooi_helpers import RiskLevelSeverity
-
-
-def test_retirejs_info():
-    output = retirejs_info("RetireJS-jquerymobile-4738")
-    output.pop("information updated")  # Remove timestamp
-
-    assert output == {
-        "description": "No summary available. Find more information at: "
-        "http://osvdb.org/show/osvdb/94563, "
-        "http://osvdb.org/show/osvdb/94562, "
-        "http://osvdb.org/show/osvdb/94316, "
-        "http://osvdb.org/show/osvdb/94561 or "
-        "http://osvdb.org/show/osvdb/94560",
-        "severity": "high",
-        "source": "https://github.com/RetireJS/retire.js/blob/master/repository/jsrepository.json",
-    }
-
-
-def test_cve(mocker):
-    CVESearch = mocker.patch("tools.add_ooi_information.CVESearch")
-
-    summary = "The Discovery Service (casdscvc) in CA ARCserve Backup 12.0.5454.0 and earlier allows remote "
-    "attackers to cause a denial of service (crash) via a packet with a large integer value used in "
-    "an increment to TCP port 41523, which triggers a buffer over-read."
-    CVESearch().id.return_value = {"summary": summary, "cvss": 5.0}
-    output = cve_info("CVE-2008-1979")
-    output.pop("information updated")  # Remove timestamp
-
-    assert output == {
-        "description": summary,
-        "cvss": 5.0,
-        "source": "https://cve.circl.lu/cve/CVE-2008-1979",
-    }
-
-    CVESearch().id.return_value = {}
-    assert cve_info("CVE-none") == {"description": "Not found"}
-
-
-def test_snyk_info(mocker):
-    requests_patch = mocker.patch("tools.add_ooi_information.requests")
-    requests_patch.get().content = (Path(__file__).parent / "stubs" / "snyk_response.html").read_bytes()
-
-    output = snyk_info("SNYK-PYTHON-MECHANIZE-3232926")
-    output.pop("information updated")  # Remove timestamp
-
-    assert output == {
-        "affected versions": "[,0.4.6)",
-        "description": "Affected versions of this package are vulnerable to Regular "
-        "Expression Denial of Service (ReDoS) due to insecure usage of "
-        "regular expression in the compile method used in the "
-        "AbstractBasicAuthHandler class. Exploiting this vulnerability "
-        "is possible when parsing a malformed auth header.",
-        "risk": "7.5",
-        "source": "https://snyk.io/vuln/SNYK-PYTHON-MECHANIZE-3232926",
-    }
+from tools.add_ooi_information import get_info, port_info, service_info
 
 
 def test_port_info(mocker):
@@ -100,36 +44,3 @@ def test_service_info(mocker):
         "description": description,
         "source": source,
     }
-
-
-def test_cwe_info():
-    output = cwe_info("CWE-20")
-    output.pop("information updated")  # Remove timestamp
-
-    assert output == {
-        "description": "The product does not validate or incorrectly validates input "
-        "that can affect the control flow or data flow of a program.",
-        "source": "https://cwe.mitre.org/data/definitions/20.html",
-        "risk": "Very low",
-    }
-
-    output = cwe_info("CWE-223230")
-    assert output == {
-        "description": "Not found",
-        "risk": "Very low",
-    }
-
-
-def test_risk_level_comparisons():
-    assert RiskLevelSeverity.CRITICAL >= RiskLevelSeverity.CRITICAL
-    assert RiskLevelSeverity.CRITICAL <= RiskLevelSeverity.CRITICAL
-    assert not RiskLevelSeverity.CRITICAL < RiskLevelSeverity.CRITICAL
-    assert not RiskLevelSeverity.CRITICAL > RiskLevelSeverity.CRITICAL
-
-    assert RiskLevelSeverity.CRITICAL >= RiskLevelSeverity.NONE
-    assert RiskLevelSeverity.CRITICAL > RiskLevelSeverity.NONE
-    assert RiskLevelSeverity.NONE <= RiskLevelSeverity.CRITICAL
-    assert RiskLevelSeverity.NONE < RiskLevelSeverity.CRITICAL
-
-    assert not RiskLevelSeverity.NONE >= RiskLevelSeverity.CRITICAL
-    assert not RiskLevelSeverity.NONE > RiskLevelSeverity.CRITICAL

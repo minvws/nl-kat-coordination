@@ -37,7 +37,7 @@ class App:
                 Application context of shared data (e.g. configuration,
                 external services connections).
         """
-        threading.excepthook = self.shutdown  # type: ignore
+        threading.excepthook = self.unhandled_exception  # type: ignore
 
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
@@ -56,7 +56,6 @@ class App:
             scheduler = schedulers.BoefjeScheduler(
                 ctx=self.ctx,
                 scheduler_id=f"boefje-{org.id}",
-                populate_queue_enabled=self.ctx.config.boefje_populate,
                 organisation=org,
                 callback=self.remove_scheduler,
             )
@@ -71,7 +70,6 @@ class App:
             scheduler = schedulers.NormalizerScheduler(
                 ctx=self.ctx,
                 scheduler_id=f"normalizer-{org.id}",
-                populate_queue_enabled=self.ctx.config.normalizer_populate,
                 organisation=org,
                 callback=self.remove_scheduler,
             )
@@ -124,7 +122,6 @@ class App:
             scheduler_normalizer = schedulers.NormalizerScheduler(
                 ctx=self.ctx,
                 scheduler_id=f"normalizer-{org.id}",
-                populate_queue_enabled=self.ctx.config.normalizer_populate,
                 organisation=org,
                 callback=self.remove_scheduler,
             )
@@ -135,7 +132,6 @@ class App:
             scheduler_boefje = schedulers.BoefjeScheduler(
                 ctx=self.ctx,
                 scheduler_id=f"boefje-{org.id}",
-                populate_queue_enabled=self.ctx.config.boefje_populate,
                 organisation=org,
                 callback=self.remove_scheduler,
             )

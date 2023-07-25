@@ -66,7 +66,7 @@ Each origin consists of:
 An OOI is declared to exist by a user of KAT.
 
 _In this case, OOI B is both source and result_
-```mermaid
+```{mermaid}
 flowchart RL
 
 D[Declaration D]
@@ -84,7 +84,7 @@ An observation is reported by a normalizer
 - An observation has a key that identifies the normalizer
 - An observation always has a source OOI
 - An observation always has a (possibly empty) set of result OOIs
-```mermaid
+```{mermaid}
 flowchart LR
 
 A[OOI A]
@@ -103,7 +103,7 @@ O-.result.- outp
 ## Origin through inference
 An object is inferred from other objects in the knowledge-graph. This is achieved by rules, declared in bits. A bit is a rule that is applied to a pattern in the knowledge-graph.
 
-```mermaid
+```{mermaid}
 flowchart TD
 
   subgraph pattern[ ]
@@ -131,7 +131,7 @@ Mutations can only be made by supplying an origin to Octopoes. This can be an or
 observation. When, after an origin-update, an OOI is no longer referenced by any origin. The OOI will be deleted from the knowledge-graph.
 
 *Example:* observation O has result B and C
-```mermaid
+```{mermaid}
 flowchart LR
 
 A[OOI A]
@@ -148,7 +148,7 @@ O-.result.- result
 
 After a mutation, observation O has result B.
 C is no longer referenced, and is deleted from the knowledge-graph.
-```mermaid
+```{mermaid}
 flowchart LR
 
 A[OOI A]
@@ -171,7 +171,7 @@ classDef someclass fill:#f96, color:#000, stroke:#000;
 If C had been referenced by another origin, it would not have been deleted.
 
 _OOI C is not deleted, since it's still referenced by Observation P_
-```mermaid
+```{mermaid}
 flowchart LR
 
 A[OOI A]
@@ -206,7 +206,7 @@ In high level, the code architecture is as follows:
 - _Data layer sends out a mutation event_
 - _Listener catches the mutation event_
 - _Listener calls service layer to process mutation_
-```mermaid
+```{mermaid}
 flowchart LR
 
 Listener
@@ -225,7 +225,7 @@ EventManager --> Listener
 ```
 
 ### Sequence: save_origin
-```mermaid
+```{mermaid}
 sequenceDiagram
 
 actor Client
@@ -254,7 +254,7 @@ OctopoesService ->- API: #nbsp
 API ->- Client: #nbsp
 ```
 ### Sequence: process update ooi
-```mermaid
+```{mermaid}
 sequenceDiagram
 
 actor EventManager

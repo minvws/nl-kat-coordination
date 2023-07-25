@@ -24,10 +24,13 @@ logger = logging.getLogger(__name__)
 
 
 class TemporaryEnvironment:
+    """Context manager that temporarily clears the environment vars and restores it after exiting the context"""
+
     def __init__(self):
         self._original_environment = os.environ.copy()
 
     def __enter__(self):
+        os.environ.clear()
         return os.environ
 
     def __exit__(self, exc_type, exc_val, exc_tb):

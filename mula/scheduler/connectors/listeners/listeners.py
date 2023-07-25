@@ -65,8 +65,9 @@ class RabbitMQ(Listener):
         """Dispatch a message without a return value"""
         raise NotImplementedError
 
-    def basic_consume(self, queue: str, durable: bool) -> None:
+    def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
         self.channel.queue_declare(queue=queue, durable=durable)
+        self.channel.basic_qos(prefetch_count=prefetch_count)
         self.channel.basic_consume(queue, on_message_callback=self.callback)
         self.channel.start_consuming()
 

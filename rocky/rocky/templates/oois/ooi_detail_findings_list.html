@@ -21,22 +21,15 @@
                 <th>{% translate "Finding details" %}</th>
             </thead>
             <tbody>
-                {% for finding in findings %}
-                    <tr {% if not finding.risk_level_source %} class="warning"{% endif %}>
-                        {% if not ooi|is_finding_type %}
-                            <td>
-                                <span class="{{ finding.risk_level_severity }}">{{ finding.risk_level_severity }}</span>
-                            </td>
-                            <td>
-                                {{ finding.risk_level_score }}
-                                {% if not finding.risk_level_source %}
-                                    <span>({% translate "marked \"critical\" because of unknown score" %})</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ finding.description }}</td>
-                        {% endif %}
+                {% for finding, finding_type in findings %}
+                    <tr>
                         <td>
-                            <a href="{% ooi_url 'ooi_detail' finding.id organization.code query=mandatory_fields %}">{{ finding.human_readable }}</a>
+                            <span class="{{ finding_type.risk_severity.value }}">{{ finding_type.risk_severity.value|capfirst }}</span>
+                        </td>
+                        <td>{{ finding_type.risk_score }}</td>
+                        <td>{{ finding.description }}</td>
+                        <td>
+                            <a href="{% ooi_url 'ooi_detail' finding.primary_key organization.code query=mandatory_fields %}">{{ finding.human_readable }}</a>
                         </td>
                     </tr>
                 {% endfor %}

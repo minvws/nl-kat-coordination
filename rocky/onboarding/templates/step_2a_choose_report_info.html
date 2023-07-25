@@ -53,14 +53,14 @@
             When you generate a report. OpenKAT will let you know which plugins it requires or suggests so you can choose to enable them.
           {% endblocktranslate %}
                 </p>
-                <p>
+                <div class="button-container">
                     {% if organization %}
                         <a href="{% url "complete_onboarding" organization.code %}"
                            class="button ghost">{% translate "Skip onboarding" %}</a>
                     {% endif %}
                     <a href="{% url "step_choose_report_type" organization.code %}"
                        class="button">{% translate "Let's choose a report" %}</a>
-                </p>
+                </div>
             </div>
         </section>
     </main>

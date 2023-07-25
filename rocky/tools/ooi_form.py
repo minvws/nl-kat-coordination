@@ -1,6 +1,6 @@
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, List, Type, Union
+from typing import Dict, List, Optional, Type, Union
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -20,6 +20,7 @@ class OOIForm(BaseRockyForm):
         super().__init__(*args, **kwargs)
         self.ooi_class = ooi_class
         self.api_connector = connector
+        self.initial = kwargs.get("initial", {})
 
         fields = self.get_fields()
         for name, field in fields.items():
@@ -50,7 +51,10 @@ class OOIForm(BaseRockyForm):
                 fields[name] = forms.CharField(widget=forms.HiddenInput())
             elif field.name in get_relations(self.ooi_class):
                 fields[name] = generate_select_ooi_field(
-                    self.api_connector, field, get_relations(self.ooi_class)[field.name]
+                    self.api_connector,
+                    field,
+                    get_relations(self.ooi_class)[field.name],
+                    self.initial.get(field.name, None),
                 )
             elif field.type_ in [IPv4Address, IPv6Address]:
                 fields[name] = generate_ip_field(field)
@@ -61,13 +65,19 @@ class OOIForm(BaseRockyForm):
             elif issubclass(field.type_, Enum):
                 fields[name] = generate_select_ooi_type(field)
             elif issubclass(field.type_, str):
-                fields[name] = forms.CharField(max_length=256, **default_attrs)
+                if name in self.ooi_class.__annotations__ and self.ooi_class.__annotations__[name] == Dict[str, str]:
+                    fields[name] = forms.JSONField(**default_attrs)
+                else:
+                    fields[name] = forms.CharField(max_length=256, **default_attrs)
 
         return fields
 
 
 def generate_select_ooi_field(
-    api_connector: OctopoesAPIConnector, field: ModelField, related_ooi_type: Type[OOI]
+    api_connector: OctopoesAPIConnector,
+    field: ModelField,
+    related_ooi_type: Type[OOI],
+    initial: Optional[str] = None,
 ) -> forms.fields.Field:
     """Select field will have a list of OOIs"""
     # field is a relation, query all objects, and build select
@@ -76,17 +86,22 @@ def generate_select_ooi_field(
     option_label = default_attrs.get("label", _("option"))
 
     option_text = "-- " + _("Optionally choose a {option_label}").format(option_label=option_label) + " --"
-
     if field.required:
         option_text = "-- " + _("Please choose a {option_label}").format(option_label=option_label) + " --"
 
     # Generate select options
     select_options = [] if is_multiselect else [("", option_text)]
+
+    if initial:
+        select_options.append((initial, initial))
+
     oois = api_connector.list({related_ooi_type}).items
     select_options.extend([(ooi.primary_key, ooi.primary_key) for ooi in oois])
 
     if is_multiselect:
-        return forms.MultipleChoiceField(widget=forms.SelectMultiple(), choices=select_options, **default_attrs)
+        return forms.MultipleChoiceField(
+            widget=forms.SelectMultiple(), choices=select_options, initial=initial, **default_attrs
+        )
 
     return forms.CharField(widget=forms.Select(choices=select_options), **default_attrs)
 

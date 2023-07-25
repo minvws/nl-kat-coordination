@@ -225,6 +225,12 @@ class Server:
                     detail="attribute not found",
                 ) from exc
 
+        # Enable or disable the scheduler if needed.
+        if updated_scheduler.enabled:
+            s.enable()
+        elif not updated_scheduler.enabled:
+            s.disable()
+
         return updated_scheduler
 
     def list_tasks(

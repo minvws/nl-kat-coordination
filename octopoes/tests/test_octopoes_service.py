@@ -93,7 +93,7 @@ def test_on_update_origin(octopoes_service, valid_time):
     )
 
     # and the deferenced ooi is no longer referred to by any origins
-    octopoes_service.origin_repository.list_by_result.return_value = []
+    octopoes_service.origin_repository.list.return_value = []
     octopoes_service.process_event(event)
 
     # the ooi should be deleted
@@ -105,7 +105,7 @@ def test_on_update_origin(octopoes_service, valid_time):
 @pytest.mark.parametrize("new_data", [EmptyScanProfile(reference="test_reference"), None])
 @pytest.mark.parametrize("old_data", [EmptyScanProfile(reference="test_reference"), None])
 def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner: MagicMock):
-    octopoes_service.origin_repository.list_by_source.return_value = [
+    octopoes_service.origin_repository.list.return_value = [
         Origin(
             origin_type=OriginType.INFERENCE,
             method="check-csp-header",
@@ -115,7 +115,7 @@ def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner
     octopoes_service.scan_profile_repository.get.return_value = Mock(level=2)
     octopoes_service.ooi_repository.get.return_value = Mock()
     octopoes_service.origin_parameter_repository.list_by_origin.return_value = {}
-    octopoes_service.ooi_repository.get_bulk.return_value = {}
+    octopoes_service.ooi_repository.load_bulk.return_value = {}
 
     mock_oois = [Mock(reference="test1"), Mock(reference="test2")]
     bit_runner().run.return_value = mock_oois

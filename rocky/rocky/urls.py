@@ -20,7 +20,7 @@ from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_edit import OOIEditView
 from rocky.views.ooi_findings import OOIFindingListView
 from rocky.views.ooi_list import OOIListExportView, OOIListView
-from rocky.views.ooi_mute import MuteFindingView
+from rocky.views.ooi_mute import MuteFindingsBulkView, MuteFindingView
 from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
 from rocky.views.organization_add import OrganizationAddView
@@ -67,14 +67,15 @@ urlpatterns += i18n_patterns(
         name="privacy_statement",
     ),
     path(
-        "<organization_code>/indemnifications/",
+        "<organization_code>/settings/indemnifications/",
         IndemnificationAddView.as_view(),
         name="indemnification_add",
     ),
     path("<organization_code>/findings/", FindingListView.as_view(), name="finding_list"),
     path("<organization_code>/findings/add/", FindingAddView.as_view(), name="finding_add"),
     path("<organization_code>/findings/mute/", MuteFindingView.as_view(), name="finding_mute"),
-    path("<organization_code>/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
+    path("<organization_code>/findings/mute/bulk/", MuteFindingsBulkView.as_view(), name="finding_mute_bulk"),
+    path("<organization_code>/findings/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
     path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
     path("<organization_code>/objects/report/", OOIReportView.as_view(), name="ooi_report"),
@@ -89,7 +90,7 @@ urlpatterns += i18n_patterns(
         name="organization_add",
     ),
     path(
-        "<organization_code>/edit/",
+        "<organization_code>/settings/edit/",
         OrganizationEditView.as_view(),
         name="organization_edit",
     ),
@@ -145,9 +146,9 @@ urlpatterns += i18n_patterns(
         ScanProfileDetailView.as_view(),
         name="scan_profile_detail",
     ),
-    path("<organization_code>/scans/", ScanListView.as_view(), name="scan_list"),
-    path("<organization_code>/upload/csv/", UploadCSV.as_view(), name="upload_csv"),
-    path("<organization_code>/upload/raw/", UploadRaw.as_view(), name="upload_raw"),
+    path("<organization_code>/objects/scans/", ScanListView.as_view(), name="scan_list"),
+    path("<organization_code>/objects/upload/csv/", UploadCSV.as_view(), name="upload_csv"),
+    path("<organization_code>/objects/upload/raw/", UploadRaw.as_view(), name="upload_raw"),
     path("<organization_code>/tasks/", BoefjesTaskListView.as_view(), name="task_list"),
     path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
     path(

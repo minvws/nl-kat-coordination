@@ -123,7 +123,7 @@ test: ## Run all tests.
 ##+------------------------------------------------------------------------+
 ##| Building                                                               |
 ##+------------------------------------------------------------------------+
-debian: ## debian
+debian11:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-mula \
@@ -133,10 +133,23 @@ debian: ## debian
 	--env RELEASE_TAG=${RELEASE_TAG} \
 	--mount type=bind,src=${CURDIR},dst=/app \
 	--workdir /app \
-	kat-debian-build-image \
+	kat-debian11-build-image \
 	packaging/scripts/build-debian-package.sh
 
-ubuntu: ## ubuntu
+debian12:
+	mkdir -p build
+	docker run --rm \
+	--env PKG_NAME=kat-mula \
+	--env BUILD_DIR=./build \
+	--env REPOSITORY=minvws/nl-kat-mula \
+	--env RELEASE_VERSION=${RELEASE_VERSION} \
+	--env RELEASE_TAG=${RELEASE_TAG} \
+	--mount type=bind,src=${CURDIR},dst=/app \
+	--workdir /app \
+	kat-debian12-build-image \
+	packaging/scripts/build-debian-package.sh
+
+ubuntu22.04:
 	mkdir -p build
 	docker run --rm \
 	--env PKG_NAME=kat-mula \

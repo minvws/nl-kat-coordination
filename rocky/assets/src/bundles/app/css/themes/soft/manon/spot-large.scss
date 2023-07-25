@@ -1,5 +1,4 @@
 :root {
-
   /* Color sets */
   --link-text-color: #006FB3;
   --link-hover-text-color: #005C94;
@@ -10,28 +9,28 @@
   /* Spot large */
   /* Main colors */
 
-    /* Lavender */
-    --branding-color-1: #EEECF8;
+  /* Lavender */
+  --branding-color-1: var(--kat-purrple-2);
 
-    /* Bright yellow */
-    --branding-color-2: #FECF48;
+  /* Bright yellow */
+  --branding-color-2: #FECF48;
 
   /* Accent colors */
 
-    /* Dark grey */
-    --branding-color-accent-1: #3B3B3B;
+  /* Dark grey */
+  --branding-color-accent-1: var(--text-color-dark);
 
-    /* Bright blue */
-    --branding-color-accent-2: #007EBB;
+  /* Bright blue */
+  --branding-color-accent-2: #007EBB;
 
-    /* Bright green */
-    --branding-color-accent-3: #4CBA51;
+  /* Bright green */
+  --branding-color-accent-3: #4CBA51;
 
-    /* Bright orange */
-    --branding-color-accent-4: #F58900;
+  /* Bright orange */
+  --branding-color-accent-4: #F58900;
 
-    /* Salmon */
-    --branding-color-accent-5: #FE7E6D;
+  /* Salmon */
+  --branding-color-accent-5: #FE7E6D;
 
   /* Branding color combinations.
   e.g if a branding color is used as a background-color. What should the text
@@ -39,7 +38,7 @@
 
   /* Branding color 1 */
   --branding-color-1-background-color: var(--branding-color-1);
-  --branding-color-1-text-color: black;
+  --branding-color-1-text-color: var(--text-color-dark);
 
   --branding-color-1-link-text-color: var(--branding-color-1-text-color);
   --branding-color-1-link-active-text-color: var(--branding-color-1-text-color);
@@ -47,11 +46,11 @@
   --branding-color-1-link-hover-text-color: var(--branding-color-1-text-color);
   --branding-color-1-link-visited-hover-text-color: var(--branding-color-1-text-color);
 
-  --branding-color-1-darker: #8C7CD2;
+  --branding-color-1-darker: var(--kat-purrple-8);
 
   /* Branding color 2 */
   --branding-color-2-background-color: var(--branding-color-2);
-  --branding-color-2-text-color: black;
+  --branding-color-2-text-color: var(--text-color-dark);
 
   --branding-color-2-link-text-color: var(--branding-color-2-text-color);
   --branding-color-2-link-active-text-color: var(--branding-color-2-text-color);

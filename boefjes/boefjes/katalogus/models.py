@@ -40,6 +40,7 @@ class Boefje(Plugin):
     consumes: Set[str] = Field(default_factory=set)
     produces: List[str] = Field(default_factory=list)
     options: Optional[List[str]]
+    runnable_hash: Optional[str]
 
 
 class Normalizer(Plugin):

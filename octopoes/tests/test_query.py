@@ -161,19 +161,33 @@ def test_finding_type_count_query():
     query = Query(FindingType).where(Finding, finding_type=FindingType).group_by(FindingType).count(Finding)
     object_type_options = [
         '[ FindingType :object_type "ADRFindingType" ]',
+        '[ FindingType :object_type "CAPECFindingType" ]',
         '[ FindingType :object_type "CVEFindingType" ]',
         '[ FindingType :object_type "CWEFindingType" ]',
-        '[ FindingType :object_type "CAPECFindingType" ]',
+        '[ FindingType :object_type "KATFindingType" ]',
         '[ FindingType :object_type "RetireJSFindingType" ]',
         '[ FindingType :object_type "SnykFindingType" ]',
-        '[ FindingType :object_type "KATFindingType" ]',
     ]
     or_statement_list = " ".join(object_type_options)
 
     assert (
         query.format()
-        == f"""{{:query {{:find [FindingType (count Finding)] :where [
+        == f"""{{:query {{:find [(pull FindingType [*]) (count Finding)] :where [
     (or {or_statement_list} )
     [ Finding :Finding/finding_type FindingType ]
     [ Finding :object_type "Finding" ]]}}}}"""
     )
+
+
+def test_create_query_from_path_abstract():
+    path = Path.parse("IPAddress.<address[is IPPort]")
+
+    query = Query.from_path(path).where(IPAddress, primary_key="test_pk")
+
+    expected_query = """{:query {:find [(pull IPPort [*])] :where [
+    (or [ IPAddress :IPAddressV4/primary_key "test_pk" ] [ IPAddress :IPAddressV6/primary_key "test_pk" ] )
+    (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )
+    [ IPPort :IPPort/address IPAddress ]
+    [ IPPort :object_type "IPPort" ]]}}"""
+
+    assert query.format() == expected_query

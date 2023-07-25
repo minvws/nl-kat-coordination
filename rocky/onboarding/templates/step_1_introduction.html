@@ -13,7 +13,7 @@
                 <p>
                     {% blocktranslate trimmed %}
             OpenKAT is the "Kwetsbaarheden Analyse Tool" (Vulnerabilities Analysis Tool). An Open-Source-project developed by the
-            Ministry of Public Health, Wellbeing and Sports to make your and our world a safer place.
+            Ministry of Health, Welfare and Sport to make your and our world a safer place.
          {% endblocktranslate %}
                 </p>
                 {% include "partials/stepper.html" %}
@@ -42,14 +42,14 @@
             During this introduction you will be guided through the steps to create a report.
           {% endblocktranslate %}
                 </p>
-                <p>
+                <div class="button-container">
                     {% if organization %}
                         <a href="{% url "complete_onboarding" organization.code %}"
                            class="button ghost">{% translate "Skip onboarding" %}</a>
                     {% endif %}
                     <a href="{% url "step_choose_report_info" organization.code %}"
                        class="button">{% translate "Let's get started" %}</a>
-                </p>
+                </div>
             </div>
         </section>
     </main>

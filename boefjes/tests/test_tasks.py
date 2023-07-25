@@ -1,3 +1,5 @@
+import ast
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -155,3 +157,46 @@ class TaskTest(TestCase):
 
         with self.assertRaises(InvalidReturnValueNormalizer):
             runner.run(meta, b"123")
+
+    def test_cleared_boefje_env(self) -> None:
+        """This test checks if un-containerized (local) boefjes can only access their explicitly set env vars"""
+
+        arguments = {"ARG1": "value1", "ARG2": "value2"}
+
+        meta = BoefjeMeta(
+            id="some-random-job-id",
+            boefje={"id": "dummy_boefje_environment"},
+            input_ooi="Network|internet",
+            arguments=arguments,
+            organization="_dev",
+        )
+
+        local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
+
+        runner = LocalBoefjeJobRunner(local_repository)
+
+        current_env = os.environ.copy()
+
+        output = runner.run(meta, arguments)
+
+        output_dict = ast.literal_eval(output[0][1].decode())
+
+        # Assert that there are no overlapping environment keys
+        assert not set(current_env.keys()) & set(output_dict.keys())
+
+        # Assert that the original environment has been restored correctly
+        assert current_env == os.environ
+
+    def test_correct_local_runner_hash(self) -> None:
+        """This test checks if calculating the hash of local boefjes returns the correct result"""
+
+        local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
+        boefje_resource_1 = local_repository.by_id("dummy_boefje_environment")
+        boefje_resource_2 = local_repository.by_id("dummy")
+
+        # This boefje has a __pycache__ folder with *.pyc files, which should be ignored
+        boefje_resource_3 = local_repository.by_id("dummy_boefje_environment_with_pycache")
+
+        assert boefje_resource_1.runnable_hash == "b07a0ecbb24e49843188a24e5298b9d614535c0ec1761e76366b6d8747515e7a"
+        assert boefje_resource_2.runnable_hash == "1d97b303499cc7ea79c4bb419a79bd5eea750c6430ddd759b7af22383e873a7e"
+        assert boefje_resource_3.runnable_hash == "67f956d89b2e2c5948f2090ac52eb752e2e65393df207180d8c24a6dea13b555"

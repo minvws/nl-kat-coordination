@@ -72,6 +72,8 @@ class APITemplateTestCase(unittest.TestCase):
     def tearDown(self):
         models.Base.metadata.drop_all(self.mock_ctx.datastore.engine)
 
+        self.scheduler.stop()
+
 
 class APITestCase(APITemplateTestCase):
     def test_get_schedulers(self):
@@ -84,16 +86,50 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.json().get("id"), self.scheduler.scheduler_id)
 
     def test_patch_scheduler(self):
-        self.assertEqual(True, self.scheduler.populate_queue_enabled)
-        response = self.client.patch(
-            f"/schedulers/{self.scheduler.scheduler_id}", json={"populate_queue_enabled": False}
-        )
+        self.assertTrue(self.scheduler.is_enabled())
+        response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"enabled": False})
         self.assertEqual(200, response.status_code)
-        self.assertEqual(False, response.json().get("populate_queue_enabled"))
+        self.assertFalse(response.json().get("enabled"))
+        self.assertFalse(self.scheduler.is_enabled())
 
     def test_patch_scheduler_attr_not_found(self):
         response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"not_found": "not found"})
         self.assertEqual(response.status_code, 400)
+
+    def test_patch_scheduler_disable(self):
+        self.assertTrue(self.scheduler.is_enabled())
+        response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"enabled": False})
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(response.json().get("enabled"))
+        self.assertFalse(self.scheduler.is_enabled())
+
+        # Try to push to queue
+        item = create_p_item(self.organisation.id, 0)
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", json=json.loads(item.json()))
+        self.assertNotEqual(response.status_code, 201)
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_patch_scheduler_enable(self):
+        # Disable queue first
+        self.assertTrue(self.scheduler.is_enabled())
+        response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"enabled": False})
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(response.json().get("enabled"))
+        self.assertFalse(self.scheduler.is_enabled())
+
+        # Enable again
+        response = self.client.patch(f"/schedulers/{self.scheduler.scheduler_id}", json={"enabled": True})
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.json().get("enabled"))
+        self.assertTrue(self.scheduler.is_enabled())
+
+        # Try to push to queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+        item = create_p_item(self.organisation.id, 0)
+
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", json=json.loads(item.json()))
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(1, self.scheduler.queue.qsize())
 
     def test_get_queues(self):
         response = self.client.get("/queues")

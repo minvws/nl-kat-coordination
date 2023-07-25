@@ -6,7 +6,7 @@ SHELL := bash
 HIDE:=$(if $(VERBOSE),,@)
 UNAME := $(shell uname)
 
-.PHONY: kat update reset up stop down clean fetch pull upgrade env-if-empty env build debian-build-image ubuntu-build-image
+.PHONY: kat update reset up stop down clean fetch pull upgrade env-if-empty env build debian-build-image ubuntu-build-image docs
 
 # Export Docker buildkit options
 export DOCKER_BUILDKIT=1
@@ -98,3 +98,17 @@ ubuntu22.04-build-image:
 
 docs:
 	sphinx-build -b html docs/source docs/_build
+
+poetry-dependencies:
+	for path in . keiko octopoes boefjes bytes mula rocky
+	do
+		echo $$path
+		poetry check -C $$path
+		poetry lock --check -C $$path
+		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt
+		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt
+	done
+
+	# NOTE: pip does not yet support hash verification for git dependencies;
+	# rocky's requirements-dev.txt unfortunately has no hashing until then
+	sed -i '/--hash/d; s/ \\$$//' rocky/requirements-dev.txt

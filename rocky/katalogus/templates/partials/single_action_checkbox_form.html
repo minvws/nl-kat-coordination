@@ -4,11 +4,13 @@
     {% csrf_token %}
     <input type="hidden" name="action" value="{{ action }}">
     {% if key %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
-    <input type="checkbox"
-           class="submit-on-click {{ input_class }}"
-           {% if input_checked %}checked{% endif %}
-           {% if input_disabled %}disabled{% endif %}>
-    {% if label_text %}<label>{{ label_text }}</label>{% endif %}
+    <div class="checkbox">
+        <input type="checkbox"
+            class="submit-on-click {{ input_class }}"
+            {% if input_checked %}checked{% endif %}
+            {% if input_disabled %}disabled{% endif %}>
+        {% if label_text %}<label>{{ label_text }}</label>{% endif %}
+    </div>
 </form>
 <script src="{% static "/js/autoSubmit.js" %}"
         nonce="{{ request.csp_nonce }}"></script>

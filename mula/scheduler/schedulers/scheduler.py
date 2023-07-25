@@ -14,11 +14,6 @@ class Scheduler(abc.ABC):
     """The Scheduler class combines the priority queue, and ranker.
     The scheduler is responsible for populating the queue, and ranking tasks.
 
-    An implementation of the Scheduler will likely implement the
-    `populate_queue` method, with the strategy for populating the queue. By
-    extending this you can create your own rules of what items should be
-    ranked and put onto the priority queue.
-
     Attributes:
         logger:
             The logger for the class
@@ -31,8 +26,6 @@ class Scheduler(abc.ABC):
             A queues.PriorityQueue instance
         ranker:
             A rankers.Ranker instance.
-        populate_queue_enabled:
-            A boolean whether to populate the queue.
         threads:
             A dict of ThreadRunner instances, used for runner processes
             concurrently.
@@ -50,7 +43,6 @@ class Scheduler(abc.ABC):
         scheduler_id: str,
         queue: queues.PriorityQueue = None,
         callback: Optional[Callable[..., None]] = None,
-        populate_queue_enabled: bool = True,
         max_tries: int = -1,
     ):
         """Initialize the Scheduler.
@@ -65,27 +57,28 @@ class Scheduler(abc.ABC):
                 A queues.PriorityQueue instance
             ranker:
                 A rankers.Ranker instance.
-            populate_queue_enabled:
-                A boolean whether to populate the queue.
             max_tries:
                 The maximum number of retries for a task to be pushed to
                 the queue.
         """
 
         self.logger: logging.Logger = logging.getLogger(__name__)
+        self.enabled: bool = True
         self.ctx: context.AppContext = ctx
         self.scheduler_id = scheduler_id
 
         self.queue: queues.PriorityQueue = queue
 
-        self.populate_queue_enabled: bool = populate_queue_enabled
         self.max_tries: int = max_tries
 
         self.callback: Optional[Callable[[], Any]] = callback
-        self.threads: List[thread.ThreadRunner] = []
-        self.stop_event: threading.Event = threading.Event()
 
+        # Listeners
         self.listeners: Dict[str, connectors.listeners.Listener] = {}
+
+        # Threads
+        self.stop_event_threads: threading.Event = threading.Event()
+        self.threads: List[thread.ThreadRunner] = []
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -212,6 +205,14 @@ class Scheduler(abc.ABC):
         Returns:
             A PrioritizedItem instance.
         """
+        if not self.is_enabled():
+            self.logger.warning(
+                "Scheduler is disabled, not popping item from queue [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.qsize(),
+            )
+            raise queues.errors.NotAllowedError("Scheduler is disabled")
+
         try:
             p_item = self.queue.pop(filters)
         except queues.QueueEmptyError as exc:
@@ -228,6 +229,14 @@ class Scheduler(abc.ABC):
         Args:
             item: The item to push to the queue.
         """
+        if not self.is_enabled():
+            self.logger.warning(
+                "Scheduler is disabled, not pushing item to queue [queue_id=%s, qsize=%d]",
+                self.queue.pq_id,
+                self.queue.qsize(),
+            )
+            raise queues.errors.NotAllowedError("Scheduler is disabled")
+
         try:
             self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
@@ -353,11 +362,12 @@ class Scheduler(abc.ABC):
             func: The function to run in the thread.
             interval: The interval to run the function.
             daemon: Whether the thread should be a daemon.
+            loop: Whether the thread should loop.
         """
         t = utils.ThreadRunner(
             name=name,
             target=target,
-            stop_event=self.stop_event,
+            stop_event=self.stop_event_threads,
             interval=interval,
             daemon=daemon,
             loop=loop,
@@ -365,24 +375,6 @@ class Scheduler(abc.ABC):
         t.start()
 
         self.threads.append(t)
-
-    def stop(self) -> None:
-        """Stop the scheduler."""
-        self.logger.info("Stopping scheduler: %s", self.scheduler_id)
-
-        # First stop the listeners, when those are running in a thread and
-        # they're using rabbitmq, they will block. Setting the stop event
-        # will not stop the thread. We need to explicitly stop the listener.
-        for lst in self.listeners.values():
-            lst.stop()
-
-        for t in self.threads:
-            t.join(5)
-
-        if self.callback:
-            self.callback(self.scheduler_id)  # type: ignore [call-arg]
-
-        self.logger.info("Stopped scheduler: %s", self.scheduler_id)
 
     def is_space_on_queue(self) -> bool:
         """Check if there is space on the queue.
@@ -397,14 +389,89 @@ class Scheduler(abc.ABC):
     def is_item_on_queue_by_hash(self, item_hash: str) -> bool:
         return self.queue.is_item_on_queue_by_hash(item_hash)
 
-    def is_alive(self) -> bool:
-        """Check if the scheduler is alive."""
-        return not self.stop_event.is_set()
+    def disable(self) -> None:
+        """Disable the scheduler.
+
+        This will stop all listeners and threads, and clear the queue, and any
+        tasks that were on the queue will be set to CANCELLED.
+        """
+        if not self.is_enabled():
+            self.logger.debug("Scheduler is already disabled")
+            return
+
+        self.logger.info("Disabling scheduler: %s", self.scheduler_id)
+        self.enabled = False
+
+        self.stop_listeners()
+        self.stop_threads()
+
+        self.queue.clear()
+
+        # Get all tasks that were on the queue and set them to CANCELLED
+        tasks, _ = self.ctx.task_store.get_tasks(
+            scheduler_id=self.scheduler_id,
+            status=models.TaskStatus.QUEUED,
+        )
+        task_ids = [task.id for task in tasks]
+        self.ctx.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
+
+        self.logger.info("Disabled scheduler: %s", self.scheduler_id)
+
+    def enable(self) -> None:
+        """Enable the scheduler.
+
+        This will start the scheduler, and start all listeners and threads.
+        """
+        if self.is_enabled():
+            self.logger.debug("Scheduler is already enabled")
+            return
+
+        self.logger.info("Enabling scheduler: %s", self.scheduler_id)
+        self.enabled = True
+
+        self.stop_event_threads.clear()
+
+        self.run()
+
+        self.logger.info("Enabled scheduler: %s", self.scheduler_id)
+
+    def is_enabled(self) -> bool:
+        """Check if the scheduler is enabled."""
+        return self.enabled
+
+    def stop(self, callback: bool = True) -> None:
+        """Stop the scheduler."""
+        self.logger.info("Stopping scheduler: %s", self.scheduler_id)
+
+        # First, stop the listeners, when those are running in a thread and
+        # they're using rabbitmq, they will block. Setting the stop event
+        # will not stop the thread. We need to explicitly stop the listener.
+        self.stop_listeners()
+        self.stop_threads()
+
+        if self.callback and callback:
+            self.callback(self.scheduler_id)  # type: ignore [call-arg]
+
+        self.logger.info("Stopped scheduler: %s", self.scheduler_id)
+
+    def stop_listeners(self) -> None:
+        """Stop the listeners."""
+        for lst in self.listeners.copy().values():
+            lst.stop()
+
+        self.listeners = {}
+
+    def stop_threads(self) -> None:
+        """Stop the threads."""
+        for t in self.threads.copy():
+            t.join(5)
+
+        self.threads = []
 
     def dict(self) -> Dict[str, Any]:
         return {
             "id": self.scheduler_id,
-            "populate_queue_enabled": self.populate_queue_enabled,
+            "enabled": self.enabled,
             "priority_queue": {
                 "id": self.queue.pq_id,
                 "item_type": self.queue.item_type.type,

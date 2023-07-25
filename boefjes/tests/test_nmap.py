@@ -8,7 +8,7 @@ class NmapTest(TestCase):
         args = build_nmap_arguments("1.1.1.1", Protocol.TCP, 250)
         self.assertListEqual(
             [
-                "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -28,7 +28,7 @@ class NmapTest(TestCase):
         args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, 250)
         self.assertListEqual(
             [
-                "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -49,7 +49,7 @@ class NmapTest(TestCase):
         args = build_nmap_arguments("1.1.1.1", Protocol.TCP, None)
         self.assertListEqual(
             [
-                "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -68,7 +68,7 @@ class NmapTest(TestCase):
         args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, None)
         self.assertListEqual(
             [
-                "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -88,7 +88,7 @@ class NmapTest(TestCase):
         args = build_nmap_arguments("1.1.1.1", Protocol.UDP, None)
         self.assertListEqual(
             [
-                "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -107,7 +107,7 @@ class NmapTest(TestCase):
         args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.UDP, None)
         self.assertListEqual(
             [
-                "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -127,7 +127,7 @@ class NmapTest(TestCase):
         args = build_nmap_arguments("1.1.1.1", Protocol.UDP, 250)
         self.assertListEqual(
             [
-                "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",
@@ -147,7 +147,7 @@ class NmapTest(TestCase):
         args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.UDP, 250)
         self.assertListEqual(
             [
-                "nmap",
+                "--open",
                 "-T4",
                 "-Pn",
                 "-r",

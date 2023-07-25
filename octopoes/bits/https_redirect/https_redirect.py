@@ -14,6 +14,7 @@ def run(input_ooi: HostnameHTTPURL, additional_oois: List[HTTPHeader], config: D
 
     if "location" not in header_keys:
         ft = KATFindingType(id="KAT-NO-HTTPS-REDIRECT")
+        yield ft
         yield Finding(
             ooi=input_ooi.reference,
             finding_type=ft.reference,

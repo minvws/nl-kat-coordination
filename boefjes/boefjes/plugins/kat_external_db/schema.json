@@ -1,0 +1,33 @@
+{
+    "title": "Arguments",
+    "type": "object",
+    "properties": {
+        "DB_URL": {
+            "title": "DB_URL",
+            "type": "string",
+            "maxLength": 2048,
+            "description": "URL for external DB, including port, e.g. 'http://host.docker.internal:9000' (without quotes)."
+        },
+        "DB_ACCESS_TOKEN": {
+            "title": "DB_ACCESS_TOKEN",
+            "maxLength": 2048,
+            "type": "string",
+            "description": "Access token (API KEY) for external DB. Defaults to empty string."
+        },
+        "DB_ORGANIZATION_IDENTIFIER": {
+            "title": "DB_ORGANIZATION_IDENTIFIER",
+            "maxLength": 2048,
+            "type": "string",
+            "description": "Identifier for an organisation. Defaults to KAT organization code."
+        },
+        "DB_ENDPOINT_FORMAT": {
+            "title": "DB_ENDPOINT_FORMAT",
+            "maxLength": 2048,
+            "type": "string",
+            "description": "Python format string with all variables above (optionally empty). E.g. '{DB_URL}/api/v1/participants/assets/{DB_ORGANIZATION_IDENTIFIER}?access_token={DB_ACCESS_TOKEN}' (without quotes)"
+        }
+    },
+    "required": [
+        "DB_URL"
+    ]
+}

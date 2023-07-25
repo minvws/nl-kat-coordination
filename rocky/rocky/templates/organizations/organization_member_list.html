@@ -58,40 +58,29 @@
                                         </td>
                                         <td class="nowrap">
                                             {% if member.user.is_superuser %}
-                                                <span class="active"></span><span>&nbsp;{% translate "Active" %}</span>
+                                                <span class="active"></span> {% translate "Active" %}
                                             {% else %}
                                                 <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span>
-                                                <span>&nbsp;
                                                     {% if member.blocked %}
                                                         {% translate "Blocked" %}
                                                     {% else %}
                                                         {{ member.status|title }}
                                                     {% endif %}
-                                                </span>
                                             {% endif %}
-                                            <br>
                                         </td>
                                         <td>{{ member.user.date_joined|date:"SHORT_DATE_FORMAT" }}</td>
                                         <td>
-                                            {% if member.user.is_superuser %}
-                                                L4
+                                            {% if member.trusted_clearance_level < 0 %}
+                                                None
                                             {% else %}
-                                                {% if member.trusted_clearance_level < 0 %}
-                                                    None
-                                                {% else %}
-                                                    L{{ member.trusted_clearance_level }}
-                                                {% endif %}
+                                                L{{ member.trusted_clearance_level }}
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if member.user.is_superuser %}
-                                                L4
+                                            {% if member.acknowledged_clearance_level < 0 %}
+                                                None
                                             {% else %}
-                                                {% if member.trusted_clearance_level < 0 %}
-                                                    None
-                                                {% else %}
-                                                    L{{ member.acknowledged_clearance_level }}
-                                                {% endif %}
+                                                L{{ member.acknowledged_clearance_level }}
                                             {% endif %}
                                         </td>
                                         <td>

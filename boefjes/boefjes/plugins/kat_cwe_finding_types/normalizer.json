@@ -1,0 +1,10 @@
+{
+    "id": "kat_cwe_finding_types_normalize",
+    "consumes": [
+        "cwe-finding-types"
+    ],
+    "produces": [
+        "CWEFindingType"
+    ],
+    "enabled": true
+}

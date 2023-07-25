@@ -30,9 +30,6 @@ class ScanLevel(IntEnum):
         return str(self.value)
 
 
-DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
-
-
 class ScanProfileType(Enum):
     DECLARED = "declared"
     INHERITED = "inherited"
@@ -73,8 +70,6 @@ class InheritedScanProfile(ScanProfileBase):
 ScanProfile = Annotated[
     Union[EmptyScanProfile, InheritedScanProfile, DeclaredScanProfile], Field(discriminator="scan_profile_type")
 ]
-
-DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in ScanProfileType}
 
 
 class OOI(BaseModel, abc.ABC):

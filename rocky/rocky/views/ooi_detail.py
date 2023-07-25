@@ -173,8 +173,10 @@ class OOIDetailView(
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects()
         context["ooi_current"] = self.get_current_ooi()
-        context["findings_severity_summary"] = self.findings_severity_summary()
-        context["severity_summary_totals"] = self.get_findings_severity_totals()
+
+        context["count_findings_per_severity"] = dict(self.count_findings_per_severity())
+        context["severity_summary_totals"] = sum(context["count_findings_per_severity"].values())
+
         context["possible_boefjes_filter_form"] = filter_form
         context["organization_indemnification"] = self.get_organization_indemnification()
         context["scan_history"] = self.get_scan_history()

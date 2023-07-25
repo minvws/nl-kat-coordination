@@ -8,20 +8,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python 3.8
+      - name: Set up Python
         uses: actions/setup-python@v4
-        id: py38
+        id: py311
         with:
-          python-version: 3.8
+          python-version: 3.11
           cache: pip
 
       - name: Install pip dependencies
-        run: pip install -r requirements-precommit.txt
+        run: pip install -r requirements-dev.txt
 
       - uses: actions/cache@v3
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit|${{ steps.py38.outputs.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit|${{ steps.py311.outputs.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Run pre-commit
         run: pre-commit run --all-files --show-diff-on-failure --color always

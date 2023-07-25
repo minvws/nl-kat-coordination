@@ -2,16 +2,16 @@
 
 Rocky is part of the openKAT project, made with Django.
 
-## Stack
+### Stack
 
 Django is the framework for this project.
 To comply to government standards, use [Manon](https://github.com/minvws/nl-rdo-manon) for style and accessibility.
 Yarn is used as package manager and ParcelJS is used as bundler to compile the frontend (CSS and Javascript).
 You can find the Manon repository here: [https://github.com/minvws/nl-rdo-manon](https://github.com/minvws/nl-rdo-manon)
 
-## Running Rocky
+### Running Rocky
 
-### Containerized
+#### Containerized
 
 To run rocky from the docker container, from the parent directory `nl-kat-coordination`, just run:
 
@@ -21,7 +21,7 @@ $ make kat
 
 and continue reading this document at "First run".
 
-### Locally
+#### Locally
 
 To run rocky locally, follow these steps.
 
@@ -36,7 +36,7 @@ $ make build
 
 This will set up Django and compile the frontend.
 
-### Running
+#### Running
 
 You can run Rocky using:
 
@@ -44,14 +44,14 @@ You can run Rocky using:
 $ make run
 ```
 
-## First run
+#### First run
 
 After running the first time, visit [localhost:8000](http://localhost:8000) in your browser.
 Log in with credentials: admin / admin
 
 You will be prompted to create secure your account with a One Time Password, so get your authenticator ready.
 
-## Testing
+#### Testing
 
 To run all tests, run:
 
@@ -59,7 +59,7 @@ To run all tests, run:
 $ make test
 ```
 
-## Database
+#### Database
 
 To connect to the PostgreSQL database, set the following environment variables (e.g. "localhost", "5432" etc.):
 
@@ -69,10 +69,12 @@ ROCKY_DB_PORT=
 ROCKY_DB=
 ROCKY_DB_USER=
 ROCKY_DB_PASSWORD=
+ROCKY_DB_DSN=
 ```
 
+The `ROCKY_DB_DSN` is optional (e.g. `postgresql://username:password@hostname:port/database_name`) and if unset the other DB variables will be used to setup the database connection.
 
-## KATalogus View Structure
+### KATalogus View Structure
 
 This diagram shows the current view structure and what properties are set in each class for the KATalogus.
 
@@ -120,24 +122,24 @@ direction BT
 ```
 
 
-## Fonts license
+### Fonts license
 
 All fonts used within Rocky remain under their own license. For example: Fredoka, Open Sans & Tabler icons.
 
 For more information check their respective folders for extra/ more specific license (if available) or visit:
 
-### Fredoka
+#### Fredoka
 https://fonts.google.com/specimen/Fredoka/about
 
-### Open Sans
+#### Open Sans
 https://fonts.google.com/specimen/Open+Sans/about
 
-### Tabler icons
+#### Tabler icons
 https://tabler-icons.io/
 
-# Rocky Design
+## Rocky Design
 
-## Running a boefje
+### Running a boefje
 
 The following diagram shows the triggered flows when running a Boefje from Rocky.
 ```{mermaid}
@@ -170,7 +172,7 @@ sequenceDiagram
 Rocky has a hierarchical set of views that are not easy to capture in a single diagram.
 We therefore made several diagrams to show the most coherent components.
 
-### Overview of child Views of the OrganizationViews
+#### Overview of child Views of the OrganizationViews
 
 ```{mermaid}
 classDiagram
@@ -203,7 +205,7 @@ direction RL
 
 
 
-### Exhaustive overview of OctopoesViews
+#### Exhaustive overview of OctopoesViews
 
 ```{mermaid}
 classDiagram
@@ -265,7 +267,7 @@ direction RL
 ```
 
 
-### KATalogus Views
+#### KATalogus Views
 
 ```{mermaid}
 classDiagram

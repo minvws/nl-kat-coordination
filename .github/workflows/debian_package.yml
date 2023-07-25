@@ -1,0 +1,100 @@
+name: Debian packages
+
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
+
+jobs:
+  changes:
+    runs-on: ubuntu-22.04
+    outputs:
+      packages: ${{ steps.filter.outputs.changes }}
+    steps:
+    - uses: dorny/paths-filter@v2
+      if: github.event_name != 'push'
+      id: filter
+      with:
+        filters: |
+          boefjes:
+            - 'boefjes/**'
+            - 'octopoes/**'
+            - '.github/workflows/debian_package.yml'
+          bytes:
+            - 'bytes/**'
+            - '.github/workflows/debian_package.yml'
+          cveapi:
+            - 'cveapi/**'
+            - '.github/workflows/debian_package.yml'
+          keiko:
+            - 'keiko/**'
+            - '.github/workflows/debian_package.yml'
+          mula:
+            - 'mula/**'
+            - '.github/workflows/debian_package.yml'
+          octopoes:
+            - 'octopoes/**'
+            - '.github/workflows/debian_package.yml'
+          rocky:
+            - 'rocky/**'
+            - 'octopoes/**'
+            - '.github/workflows/debian_package.yml'
+
+  build:
+    needs: changes
+    if: ${{ github.event_name == 'push' || (needs.changes.outputs.packages != '[]' && needs.changes.outputs.packages != '') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        dist: [debian11, debian12, ubuntu22.04]
+        # On main, release branches and tags we always want to build all the packages
+        package: ${{ github.event_name == 'push' && fromJSON('["boefjes", "bytes", "cveapi", "keiko", "mula", "octopoes", "rocky"]') || fromJSON(needs.changes.outputs.packages) }}
+        exclude:
+          - package: cveapi
+            dist: debian11
+          - package: cveapi
+            dist: ubuntu22.04
+    runs-on: ubuntu-22.04
+    env:
+      PKG_NAME: kat-${{ matrix.package }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate version.py and set RELEASE_VERSION
+        run: |
+          pip install setuptools-scm==7.1.0
+          echo "RELEASE_VERSION=$(python -m setuptools_scm | sed s/rc/~rc/)" >> $GITHUB_ENV
+          cp _version.py boefjes/boefjes/version.py
+          cp _version.py boefjes/boefjes/katalogus/version.py
+          cp _version.py bytes/bytes/version.py
+          cp _version.py keiko/keiko/version.py
+          cp _version.py mula/scheduler/version.py
+          cp _version.py octopoes/octopoes/version.py
+          cp _version.py rocky/rocky/version.py
+
+      - name: Run debian package build
+        uses: addnab/docker-run-action@v3
+        with:
+          run: packaging/scripts/build-debian-package.sh
+          registry: ghcr.io
+          image: ghcr.io/minvws/nl-kat-${{ matrix.dist }}-build-image:latest
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          options: -v ${{ github.workspace }}/${{ matrix.package }}:/app
+            -v ${{ github.workspace }}/octopoes:/octopoes
+            -e REPOSITORY=${{ github.repository }}
+            -e RELEASE_VERSION=${{ env.RELEASE_VERSION }}
+            -e RELEASE_TAG=${{ env.RELEASE_TAG }}
+            -e PKG_NAME=${{ env.PKG_NAME }}
+            --workdir /app
+
+      - name: Upload .deb to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{env.PKG_NAME}}_${{ env.RELEASE_VERSION }}_${{ matrix.dist }}.deb
+          path: ${{matrix.package}}/build/${{env.PKG_NAME}}_${{ env.RELEASE_VERSION }}_${{ matrix.package == 'cveapi' && 'all' || 'amd64' }}.deb

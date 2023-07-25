@@ -1,37 +1,13 @@
 [tool.poetry]
 name = "octopoes"
-version = "0.1.0"
+version = "0.0.1.dev1"
 description = "KAT's knowledge graph engine"
-authors = ["KAT Developers"]
+authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
 [build-system]
 requires = ["setuptools>=62.2", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
-
-[tool.vulture]
-min_confidence = 90
-paths = ["octopoes", "bits"]
-
-[tool.pylint.format]
-max-line-length = "120"
-
-[tool.pylint."MESSAGES CONTROL"]
-disable = ["R0914","W1514", "R0903", "E0401", "R0401"] # Ignore too-many-local-variables; unspecified encodings; too-few-public-methods; import-error; cyclic-import
-extension-pkg-whitelist = "pydantic" # Ignore pydantic import checks
-
-[tool.black]
-line-length = 120
-target-version = ['py38']
-
-[tool.pydocstyle]
-
-[tool.mypy]
-python_version = "3.8"
-plugins = ["pydantic.mypy"]
-strict = true
-ignore_missing_imports = true
-disallow_untyped_decorators = false # Needed for FastAPI decorators
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
@@ -52,12 +28,13 @@ celery = "^5.2.7"
 pyparsing = "^3.0.9"
 packaging = "^23.0"
 tldextract = "^3.4.0"
-opentelemetry-sdk = "^1.17.0"
-opentelemetry-exporter-otlp-proto-grpc = "1.17.0"
-opentelemetry-instrumentation-fastapi = "^0.38b0"
-opentelemetry-instrumentation-requests = "^0.38b0"
+opentelemetry-sdk = "^1.18.0"
+opentelemetry-exporter-otlp-proto-grpc = "1.18.0"
+opentelemetry-instrumentation-fastapi = "^0.39b0"
+opentelemetry-instrumentation-requests = "^0.39b0"
 certifi = "^2023.5.7"
 sqlalchemy = "1.4.48"
+jsonschema = "^4.18.0"
 
 [tool.poetry.group.dev.dependencies]
 requests-mock = "^1.10.0"
@@ -74,3 +51,8 @@ pytest-cov = "^4.0.0"
 pytest-mock = "^3.10.0"
 pre-commit = "^2.20.0"
 httpx = "^0.23.3"
+pytest-timeout = "^2.1.0"
+
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311"]
+line-length = 120

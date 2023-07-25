@@ -53,19 +53,29 @@ This could be changed in the future when the boefje-runner/plugin-code can decry
 although this would be more complicated.
 
 ## Environment variables
+By design, Boefjes do not have access to the host system's environment variables.
+If a Boefje requires access to an environment variable (e.g. `HTTP_PROXY` or `USER_AGENT`), it should note as such in its `boefje.json` manifest.
+The system-wide variables can be set as environment variable to the boefjes runner by prefixing it with `BOEFJE_`.
+This is to prevent a Boefje from accessing variables it should not have access to, such as secrets.
+To illustrate: if `BOEFJE_HTTP_PROXY=https://proxy:8080` environment variable is configured, the Boefje can access it as `HTTP_PROXY`.
+This feature can also be used to set default values for KAT-alogus settings. For example, configuring the `BOEFJE_TOP_PORTS` environment variable
+will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
+This default value can be overridden by setting any value for `TOP_PORTS` in the KAT-alogus.
 
-| Environment variable       | Value                        | Description                                       |
-|----------------------------|------------------------------|---------------------------------------------------|
-| QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                            |
-| QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                        |
-| QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                 |
-| OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                          |
-| BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                             |
-| KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                         |
-| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                         |
-| ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings      |
-| KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string |
-| KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string  |
+
+| Environment variable       | Value                        | Description                                                      |
+|----------------------------|------------------------------|------------------------------------------------------------------|
+| QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                                           |
+| QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                                       |
+| QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                                |
+| WORKER_HEARTBEAT           | "1.0"                        | Seconds to wait before checking the workers when queues are full |
+| OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                                         |
+| BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                                            |
+| KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                                        |
+| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                                        |
+| ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings                     |
+| KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string                |
+| KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string                 |
 
 ## Design
 

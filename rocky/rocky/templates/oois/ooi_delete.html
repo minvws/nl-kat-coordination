@@ -34,7 +34,7 @@
                 {% if not ooi|is_finding_type %}
                     <form class="inline" method="post">
                         {% csrf_token %}
-                        <div class="horizontal-view">
+                        <div class="button-container">
                             <button type="submit">{% blocktranslate %}Delete {{ display_type }}{% endblocktranslate %}</button>
                             <a href="{% ooi_url 'ooi_detail' ooi.primary_key organization.code %}"
                                class="button ghost">{% translate "Cancel" %}</a>
@@ -42,7 +42,7 @@
                     </form>
                 {% else %}
                     <p>{% translate "Deletion not possible for types: KATFindingType and CVEFindingType" %}</p>
-                    <div class="horizontal-view">
+                    <div class="button-container">
                         <a href="{% ooi_url 'ooi_detail' ooi.primary_key organization.code %}"
                            class="button ghost">{% translate "Cancel" %}</a>
                     </div>

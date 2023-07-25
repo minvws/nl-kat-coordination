@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 from enum import Enum
 from pathlib import Path
 from typing import Optional, Set
 
 from pydantic import BaseSettings
+
+from octopoes.models import ScanLevel, ScanProfileType
+from octopoes.models.ooi.findings import RiskLevelSeverity
 
 
 class XTDBType(Enum):
@@ -29,3 +34,10 @@ class Settings(BaseSettings):
     scan_level_recalculation_interval: int = 60
     bits_enabled: Set[str] = set()
     bits_disabled: Set[str] = set()
+
+
+DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
+DEFAULT_SCAN_PROFILE_TYPE_FILTER = {scan_profile_type for scan_profile_type in ScanProfileType}
+DEFAULT_SEVERITY_FILTER = {severity for severity in RiskLevelSeverity}
+DEFAULT_LIMIT = 50
+DEFAULT_OFFSET = 0

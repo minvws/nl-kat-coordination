@@ -2,4 +2,7 @@
 
 :root {
 	--tile-background-color: #fff;
+	--tile-gap: var(--spacing-grid-small);
+	--tile-font-size: var(--body-text-small-font-size);
+	--tile-border-radius: 12px;
 }

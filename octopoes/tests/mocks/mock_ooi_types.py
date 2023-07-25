@@ -162,6 +162,7 @@ ALL_OOI_TYPES = {
     MockDNSZone,
     MockResolvedHostname,
     MockDNSCNAMERecord,
+    MockLabel,
 }
 
 MockOOIType = Union[
@@ -173,6 +174,7 @@ MockOOIType = Union[
     MockDNSZone,
     MockResolvedHostname,
     MockDNSCNAMERecord,
+    MockLabel,
 ]
 
 for ooi_type in ALL_OOI_TYPES:

@@ -1,7 +1,7 @@
 table td span {
   &:before {
     position: static;
-    font-family: var(--icon-base-font-family);
+    font-family: var(--icon-font-family);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     /* Firefox */

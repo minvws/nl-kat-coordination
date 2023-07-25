@@ -1,15 +1,12 @@
+import json
 from typing import List, Tuple, Union
-
-import requests
 
 from boefjes.job_models import BoefjeMeta
 
-FINDING_TYPES_JSON_LOCATION = (
-    "https://raw.githubusercontent.com/minvws/nl-kat-coordination/main/data/kat_finding_types.json"
-)
+FINDING_TYPE_PATH = "boefjes/plugins/kat_kat_finding_types/kat_finding_types.json"
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
-    response = requests.get(f"{FINDING_TYPES_JSON_LOCATION}")
-
-    return [(set(), response.content)]
+    with open(FINDING_TYPE_PATH) as json_file:
+        data = json.load(json_file)
+        return [(set(), json.dumps(data))]

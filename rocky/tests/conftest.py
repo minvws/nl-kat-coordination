@@ -17,13 +17,12 @@ from tools.models import (
     GROUP_CLIENT,
     GROUP_REDTEAM,
     Indemnification,
-    OOIInformation,
     Organization,
     OrganizationMember,
 )
 
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
@@ -77,6 +76,7 @@ def add_admin_group_permissions(member):
         Permission.objects.get(codename="change_organizationmember").id,
         Permission.objects.get(codename="can_delete_oois").id,
         Permission.objects.get(codename="add_indemnification").id,
+        Permission.objects.get(codename="can_scan_organization").id,
     ]
     group.permissions.set(admin_permissions)
 
@@ -220,6 +220,15 @@ def client_member_b(clientuser_b, organization_b):
 
 
 @pytest.fixture
+def client_user_two_organizations(clientuser, organization, organization_b):
+    member = create_member(clientuser, organization)
+    add_client_group_permissions(member)
+    member = create_member(clientuser, organization_b)
+    add_client_group_permissions(member)
+    return clientuser
+
+
+@pytest.fixture
 def new_member(django_user_model, organization):
     user = create_user(django_user_model, "cl1@openkat.nl", "TestTest123!!", "New user", "default_new_user")
     member = create_member(user, organization)
@@ -359,6 +368,33 @@ def finding():
 
 
 @pytest.fixture
+def finding_types():
+    return [
+        KATFindingType(
+            id="KAT-0001",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=9.5,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+        KATFindingType(
+            id="KAT-0002",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=9.5,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+        KATFindingType(
+            id="KAT-0003",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=3.9,
+            risk_severity=RiskLevelSeverity.LOW,
+        ),
+    ]
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {
@@ -397,13 +433,6 @@ def plugin_schema():
         },
         "required": ["TEST_PROPERTY"],
     }
-
-
-@pytest.fixture
-def ooi_information() -> OOIInformation:
-    data = {"description": "Fake description...", "recommendation": "Fake recommendation...", "risk": "Low"}
-    ooi_information = OOIInformation.objects.create(id="KATFindingType|KAT-000", data=data, consult_api=False)
-    return ooi_information
 
 
 def setup_request(request, user):

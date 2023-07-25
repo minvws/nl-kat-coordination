@@ -8,16 +8,19 @@
         {% if field.field.required %}
             <span class="nota-bene">{% translate "This field is required" %}</span>
         {% endif %}
-        {% if not field.field.widget.attrs.fixed_paws %}
-            {{ field }}
-        {% elif field.field.widget.attrs.fixed_paws < 0 %}
-            {% translate "Not set" %}
-        {% else %}
-            {% include "partials/scan_level_indicator.html" with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
-        {% endif %}
 
-        {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
-        {% include "partials/form/field_input_errors.html" %}
+        <div>
+            {% if not field.field.widget.attrs.fixed_paws %}
+                {{ field }}
+            {% elif field.field.widget.attrs.fixed_paws < 0 %}
+                {% translate "Not set" %}
+            {% else %}
+                {% include "partials/scan_level_indicator.html" with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
+            {% endif %}
+
+            {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+            {% include "partials/form/field_input_errors.html" %}
+        </div>
 
         {% if form_name == "login" and field.name == "username" %}
             <div class="input-link">
@@ -36,10 +39,12 @@
               <span class="nota-bene">{% translate "This field is required" %}</span>
           {% endif %}
 
-          {{ field }}
+        <div>
+            {{ field }}
 
-          {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
-          {% include "partials/form/field_input_errors.html" %}
+            {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+            {% include "partials/form/field_input_errors.html" %}
+        </div>
       </div>
   {% endif %}
 </div>
