@@ -130,6 +130,11 @@ class TaskStore(TaskStorer):
             (session.query(models.TaskORM).filter(models.TaskORM.id == task.id).update(task.dict()))
 
     @retry()
+    def update_task_status(self, task_id: str, status: models.TaskStatus) -> None:
+        with self.datastore.session.begin() as session:
+            session.query(models.TaskORM).filter(models.TaskORM.id == task_id).update({"status": status.name})
+
+    @retry()
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
         with self.datastore.session.begin() as session:
             session.query(models.TaskORM).filter(
@@ -196,7 +201,7 @@ class TaskStore(TaskStorer):
 
             count = query.count()
 
-            tasks_orm = query.order_by(models.TaskORM.created_at.asc()).offset(offset).limit(limit).all()
+            tasks_orm = query.order_by(models.TaskORM.created_at.desc()).offset(offset).limit(limit).all()
 
             tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
 

@@ -585,6 +585,25 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: Second time should be rate limited
         self.assertTrue(is_rate_limited)
 
+    def test_is_task_rate_limited_unparseable(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+            rate_limit="not a valid rate limit",
+        )
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        # Act
+        with self.assertRaises(ValueError):
+            self.scheduler.is_task_rate_limited(task=task)
+
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_rate_limited")
@@ -1498,6 +1517,80 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id.hex, second_task.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_rate_limited")
+    def test_push_tasks_for_delayed_tasks_rate_limit_passed_valueerror(
+        self, mock_is_task_rate_limited
+    ):
+        """When a task is rate limited, and the rate limit passed it should be
+        pushed to the queue. When the rate limit check raises a ValueError, the
+        task should be removed from the datastore.
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(
+            scan_level=0,
+            consumes=[ooi.object_type],
+            rate_limit="1/second",
+        )
+        first_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        second_task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        # Mocks
+        self.mock_get_object_by_primary_key.return_value = ooi
+        mock_is_task_rate_limited.side_effect = [False, True, ValueError]
+
+        self.scheduler.push_task(boefje, ooi, first_task)
+        self.scheduler.push_task(boefje, ooi, second_task)
+
+        # Assert: task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(first_task.id, task_pq.id)
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
+        self.assertEqual(task_db.id.hex, first_task.id)
+        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Assert: second task should be in datastore and delayed
+        task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.id.hex, second_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DELAYED)
+
+        # Act: pop first task from queue
+        self.scheduler.pop_item_from_queue()
+
+        # Assert:
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Assert: first task should be in datastore, and dispatched
+        task_db = self.mock_ctx.task_store.get_task_by_id(first_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        time.sleep(1)
+
+        # Act: push tasks for delayed tasks, not able to parse
+        self.scheduler.push_tasks_for_delayed_tasks()
+
+        # Assert: should not be pushed on queue,
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.task_store.get_task_by_id(second_task.id)
+        self.assertEqual(task_db.status, models.TaskStatus.FAILED)
 
     def test_push_tasks_for_delayed_tasks_multiple(self):
         # Arrange

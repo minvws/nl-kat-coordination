@@ -320,8 +320,22 @@ class BoefjeScheduler(Scheduler):
 
         for delayed_task in delayed_tasks:
             task = BoefjeTask(**delayed_task.p_item.data)
-            if not self.is_task_rate_limited(task, hit=False):
-                tasks_to_push.append(task)
+            try:
+                if not self.is_task_rate_limited(task, hit=False):
+                    tasks_to_push.append(task)
+            except ValueError:
+                self.logger.warning(
+                    "Could not push delayed task %s for organisation: %s [organisation_id=%s, scheduler_id=%s]",
+                    task,
+                    self.organisation.name,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                self.ctx.task_store.update_task_status(
+                    task_id=task.id,
+                    status=TaskStatus.FAILED,
+                )
+                continue
 
         with futures.ThreadPoolExecutor() as executor:
             for task in tasks_to_push:
@@ -425,16 +439,17 @@ class BoefjeScheduler(Scheduler):
         if task.boefje.rate_limit is None:  # TODO: this needs to be returned by a boefje manifest
             return False
 
-        parsed_rate_limit = parse(task.boefje.rate_limit)
-        if parsed_rate_limit is None:
+        try:
+            parsed_rate_limit = parse(task.boefje.rate_limit)
+        except ValueError as exc:
             self.logger.warning(
                 "Could not parse rate limit for boefje: %s [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
-                task.boefje.name,
+                task.boefje.id,
                 task.boefje.id,
                 self.organisation.id,
                 self.scheduler_id,
             )
-            raise ValueError("Could not parse rate limit")  # TODO: what happens when this is raised?
+            raise exc
 
         with self.rate_limiter_lock:
             can_consume = self.rate_limiter.test(parsed_rate_limit, task.boefje.id)
