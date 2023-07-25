@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     rfc3161_provider: Optional[str]
     rfc3161_cert_file: Optional[Path]
 
-    encryption_middleware: EncryptionMiddleware = EncryptionMiddleware.NACL_SEALBOX
+    encryption_middleware: EncryptionMiddleware = EncryptionMiddleware.IDENTITY
     kat_private_key_b64: str = ""
     vws_public_key_b64: str = ""
 
