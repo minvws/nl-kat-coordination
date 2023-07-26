@@ -18,8 +18,8 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
+from tools.forms.ooi_form import OOIForm
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
-from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
     filter_ooi_tree,
@@ -557,6 +557,7 @@ class OnboardingAccountSetupIntroView(
 
 class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, FormView):
     account_type = None
+    permission_required = "tools.add_organizationmember"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
