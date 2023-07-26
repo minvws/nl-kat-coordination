@@ -420,10 +420,10 @@ You can currently configure the ``max-age`` before HSTS headers will be consider
         "config": {"max-age": "4153600"}
     }
 
-Aggregate findings
-------------------
+Port classification
+-------------------
 
-Setting this to ``True`` will aggregate all findings of the same type into one finding,
+Setting aggregate_findings to ``True`` will aggregate all findings of the same type into one finding,
 resulting in cleaner finding reports (both in the web UI and in PDF's). For example, ``KAT-UNCOMMON-OPEN-PORT``
 will be aggregated into one finding, instead of one separate finding per port.
 
@@ -435,3 +435,54 @@ will be aggregated into one finding, instead of one separate finding per port.
         "bit-id": "port-classification-ip",
         "config": {"aggregate_findings": "True"}
     }
+
+Also you can configure which open ports should create findings and which ports should not. This is done by settings
+common_tcp_ports, common_udp_ports, sa_tcp_ports and/or db_tcp_ports. Common TCP ports are ports that will never trigger a finding. A good example is 443. Same counts for common udp ports.
+SA (system administrator) ports will trigger a medium finding that a system administrator port is open, for example, port 22 is usually is SA port. Lastly, DB (database) ports trigger a more severe finding when a database port is open. As an of the configuration example:
+
+.. code-block:: json
+
+    {
+        "object_type": "Config",
+        "ooi": "Network|internet",
+        "bit-id": "port-classification-ip",
+        "config": {"common_tcp_ports": "1,2,3", "sa_tcp_ports": "4,5,6"}
+    }
+
+Defaults are:
+
+.. code-block:: python
+
+    COMMON_TCP_PORTS = [
+        25,  # SMTP
+        53,  # DNS
+        80,  # HTTP
+        110,  # POP3
+        143,  # IMAP
+        443,  # HTTPS
+        465,  # SMTPS
+        587,  # SMTP (message submmission)
+        993,  # IMAPS
+        995,  # POP3S
+    ]
+
+    COMMON_UDP_PORTS = [
+        53,  # DNS
+    ]
+
+    SA_TCP_PORTS = [
+        21,  # FTP
+        22,  # SSH
+        23,  # Telnet
+        3389,  # Remote Desktop
+        5900,  # VNC
+    ]
+    DB_TCP_PORTS = [
+        1433,  # MS SQL Server
+        1434,  # MS SQL Server
+        3050,  # Interbase/Firebase
+        3306,  # MySQL
+        5432,  # PostgreSQL
+    ]
+
+You can set the ports of SA and DB to an empty string to disable the check.
