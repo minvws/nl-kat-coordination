@@ -30,7 +30,7 @@
                     {% endif %}
                     <div class="horizontal-scroll">
                         <table class="action-buttons nowrap">
-                            <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "objects" %}</caption>
+                            <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}</caption>
                             <thead>
                                 <tr>
                                     {% if object_list|length > 1 and perms.tools.can_mute_findings %}
