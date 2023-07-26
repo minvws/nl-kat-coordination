@@ -1,6 +1,6 @@
 from typing import Any
 
-from account.forms import AccountTypeSelectForm, MemberRegistrationForm, RedteamMemberRegistrationForm
+from account.forms import AccountTypeSelectForm, MemberRegistrationForm
 from account.mixins import OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -10,7 +10,6 @@ from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
-from tools.models import GROUP_REDTEAM
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
 User = get_user_model()
@@ -31,15 +30,6 @@ class OrganizationMemberAddAccountTypeView(
         account_type = self.request.GET.get("account_type", None)
         if not account_type:
             return super().get(request, *args, **kwargs)
-        if account_type == GROUP_REDTEAM:
-            return redirect(
-                reverse(
-                    "organization_member_add_redteam",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                    },
-                )
-            )
         return redirect(
             reverse(
                 "organization_member_add",
@@ -57,59 +47,6 @@ class OrganizationMemberAddAccountTypeView(
                 ),
                 "text": _("Add Account Type"),
             },
-        )
-        return breadcrumbs
-
-
-class OrganizationMemberAddRedteamView(
-    OrganizationPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, FormView
-):
-    """
-    View to create a new redteam member.
-    """
-
-    template_name = "organizations/organization_member_add_redteam.html"
-    form_class = RedteamMemberRegistrationForm
-    permission_required = "tools.add_organizationmember"
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["organization"] = self.organization
-        kwargs["account_type"] = GROUP_REDTEAM
-        return kwargs
-
-    def form_valid(self, form):
-        self.add_success_notification()
-        return super().form_valid(form)
-
-    def add_success_notification(self):
-        success_message = _("Member added successfully.")
-        messages.add_message(self.request, messages.SUCCESS, success_message)
-
-    def get_success_url(self, **kwargs):
-        return reverse_lazy("organization_member_list", kwargs={"organization_code": self.organization.code})
-
-    def build_breadcrumbs(self):
-        breadcrumbs = super().build_breadcrumbs()
-        breadcrumbs.extend(
-            [
-                {
-                    "url": reverse(
-                        "organization_member_add_account_type",
-                        kwargs={"organization_code": self.organization.code},
-                    ),
-                    "text": _("Add Account Type"),
-                },
-                {
-                    "url": reverse(
-                        "organization_member_add_redteam",
-                        kwargs={
-                            "organization_code": self.organization.code,
-                        },
-                    ),
-                    "text": _("Add Redteam Member"),
-                },
-            ]
         )
         return breadcrumbs
 

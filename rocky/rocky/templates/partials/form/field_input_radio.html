@@ -7,7 +7,7 @@
     {% endif %}
     {% for choice in field %}
         <div class="radio">
-            <input type="{% if choice.data.value < 0 %}hidden{% else %}radio{% endif %}"
+            <input type="radio"
                    name="{{ field.name }}"
                    value="{{ choice.data.value }}"
                    id="id_{{ field.name }}_{{ forloop.counter0 }}"

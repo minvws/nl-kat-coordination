@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Type
 
-from account.forms import OnboardingOrganizationUpdateForm, OrganizationForm
+from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
 from account.mixins import (
     OrganizationPermissionRequiredMixin,
     OrganizationView,
@@ -20,7 +20,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
-from tools.models import GROUP_REDTEAM, Organization, OrganizationMember
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
@@ -34,9 +34,6 @@ from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
 from octopoes.models.types import type_by_name
 from onboarding.forms import (
-    OnboardingCreateUserAdminForm,
-    OnboardingCreateUserClientForm,
-    OnboardingCreateUserRedTeamerForm,
     OnboardingSetClearanceLevelForm,
 )
 from onboarding.view_helpers import (
@@ -504,12 +501,14 @@ class OnboardingOrganizationSetupView(
 
     def get_or_create_organizationmember(self, organization):
         if self.request.user.is_superuser:
-            OrganizationMember.objects.get_or_create(
+            superuser_member, superuser_member_created = OrganizationMember.objects.get_or_create(
                 user=self.request.user,
                 organization=organization,
-                trusted_clearance_level=4,
-                acknowledged_clearance_level=4,
             )
+            if superuser_member_created:
+                superuser_member.trusted_clearance_level = 4
+                superuser_member.acknowledged_clearance_level = 4
+                superuser_member.save()
         else:
             OrganizationMember.objects.get_or_create(user=self.request.user, organization=organization)
 
@@ -573,10 +572,13 @@ class OnboardingAccountSetupIntroView(AdminRequiredMixin, KatIntroductionAdminSt
     current_step = 4
 
 
-class OnboardingAccountCreationMixin(AdminRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
+class OnboardingAccountCreationMixin(AdminRequiredMixin, KatIntroductionAdminStepsMixin, FormView):
+    account_type = None
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["organization_code"] = self.organization.code
+        kwargs["organization"] = self.organization
+        kwargs["account_type"] = self.account_type
         return kwargs
 
 
@@ -600,10 +602,10 @@ class OnboardingAccountSetupAdminView(
     Step 1: Create an admin account with admin rights
     """
 
-    model = User
     template_name = "account/step_4_account_setup_admin.html"
-    form_class = OnboardingCreateUserAdminForm
+    form_class = MemberRegistrationForm
     current_step = 4
+    account_type = GROUP_ADMIN
 
     def get_success_url(self) -> str:
         return reverse_lazy("step_account_setup_red_teamer", kwargs={"organization_code": self.organization.code})
@@ -627,10 +629,10 @@ class OnboardingAccountSetupRedTeamerView(
     Step 2: Create an redteamer account with redteam rights
     """
 
-    model = User
     template_name = "account/step_5_account_setup_red_teamer.html"
-    form_class = OnboardingCreateUserRedTeamerForm
+    form_class = MemberRegistrationForm
     current_step = 4
+    account_type = GROUP_REDTEAM
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("step_account_setup_client", kwargs={"organization_code": self.organization.code})
@@ -650,10 +652,10 @@ class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingA
     Step 3: Create a client account.
     """
 
-    model = User
     template_name = "account/step_6_account_setup_client.html"
-    form_class = OnboardingCreateUserClientForm
+    form_class = MemberRegistrationForm
     current_step = 4
+    account_type = GROUP_CLIENT
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("crisis_room")
