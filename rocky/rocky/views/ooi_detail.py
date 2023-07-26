@@ -189,7 +189,9 @@ class OOIDetailView(
         context["observations"] = observations
         context["inferences"] = inferences
         context["member"] = self.get_organizationmember()
-        context["object_details"] = format_display(self.get_ooi_properties(self.ooi))
+
+        # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
+        context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.get_observed_at()
