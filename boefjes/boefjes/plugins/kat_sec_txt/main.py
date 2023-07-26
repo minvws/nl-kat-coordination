@@ -8,7 +8,7 @@ from boefjes.job_models import BoefjeMeta
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
-    host = input_["name"]
+    host = input_["netloc"]["name"]
 
     secTXT = SecurityTXT(str(host))
     results = {
