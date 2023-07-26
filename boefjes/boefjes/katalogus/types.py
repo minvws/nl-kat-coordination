@@ -18,4 +18,4 @@ class FilterParameters(BaseModel):
     q: Optional[str] = None
     type: Optional[Literal["boefje", "normalizer", "bit"]] = None
     state: Optional[bool] = None
-    scan_level: int = 1
+    scan_level: int = 0
