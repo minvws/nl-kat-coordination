@@ -47,7 +47,14 @@ def test_upload_members(rf, superuser_member):
     response = MembersUploadView.as_view()(request, organization_code=superuser_member.organization.code)
 
     assert response.status_code == 302
-    assert list(request._messages).pop().message == "Successfully processed users from csv."
+    messages = list(request._messages)
+    assert len(messages) == 4
+
+    assert messages[0].message == "Invalid email address: 'a.dl'"
+    assert messages[1].message == "Invalid data for: 'a@b.ul'"
+    assert messages[2].message == "Invalid data for: 'a@b.ml'"
+    assert messages[3].message == "Successfully processed users from csv."
+
     assert response.url == f"/en/{superuser_member.organization.code}/members"
 
     assert OrganizationMember.objects.filter(organization=superuser_member.organization, status="active").count() == 5

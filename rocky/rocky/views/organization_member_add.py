@@ -16,7 +16,7 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import CreateView, FormView
 from tools.forms.upload_csv import UploadCSVForm
-from tools.models import OrganizationMember
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, OrganizationMember
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +33,8 @@ MEMBER_UPLOAD_COLUMNS = [
 CSV_CRITERIA = [
     _("Add column titles. Followed by each object on a new line."),
     _("The columns are: ") + ", ".join(MEMBER_UPLOAD_COLUMNS),
+    _("Clearance levels should be between -1 and 4."),
+    _("Account type can be one of: ") + f"'{GROUP_CLIENT}', '{GROUP_ADMIN}' and '{GROUP_REDTEAM}'",
 ]
 
 
@@ -131,9 +133,26 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                         # We save all the relevant models and raise an exception on failure to revert the transaction
                         self.save_models(full_name, email, account_type, trusted_clearance, acknowledged_clearance)
                 except ObjectDoesNotExist:
+                    messages.add_message(
+                        self.request,
+                        messages.WARNING,
+                        _("Invalid account type: '{account_type}'").format(account_type=account_type),
+                    )
                     logger.exception("Invalid group")
-                except (ValidationError, ValueError):
-                    logger.exception("Invalid data")
+                except ValidationError:
+                    messages.add_message(
+                        self.request,
+                        messages.WARNING,
+                        _("Invalid data for: '{email}'").format(email=email),
+                    )
+                    logger.warning("Invalid data", exc_info=True)
+                except ValueError:
+                    messages.add_message(
+                        self.request,
+                        messages.WARNING,
+                        _("Invalid email address: '{email}'").format(email=email),
+                    )
+                    logger.warning("Invalid email address: %s", email)
 
             messages.add_message(self.request, messages.SUCCESS, _("Successfully processed users from csv."))
         except csv.Error:
