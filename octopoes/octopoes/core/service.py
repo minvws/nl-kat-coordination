@@ -1,4 +1,5 @@
 import json
+from collections import Counter
 from datetime import datetime, timezone
 from logging import getLogger
 from typing import Callable, Dict, List, Optional, Set, Type
@@ -35,6 +36,7 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import (
+    Path,
     get_max_scan_level_inheritance,
     get_max_scan_level_issuance,
     get_paths_to_neighours,
@@ -115,7 +117,7 @@ class OctopoesService:
         return tree
 
     def _delete_ooi(self, reference: Reference, valid_time: datetime) -> None:
-        referencing_origins = self.origin_repository.list_by_result(reference, valid_time)
+        referencing_origins = self.origin_repository.list(valid_time, result=reference)
         if not referencing_origins:
             self.ooi_repository.delete(reference, valid_time)
 
@@ -134,7 +136,12 @@ class OctopoesService:
         self.origin_repository.save(origin, valid_time=valid_time)
 
     def _run_inference(self, origin: Origin, valid_time: datetime) -> None:
-        bit_definition = get_bit_definitions()[origin.method]
+        bit_definition = get_bit_definitions().get(origin.method, None)
+
+        if bit_definition is None:
+            self.save_origin(origin, [], valid_time)
+            return
+
         is_disabled = bit_definition.id in settings.bits_disabled or (
             not bit_definition.default_enabled and bit_definition.id not in settings.bits_enabled
         )
@@ -361,7 +368,7 @@ class OctopoesService:
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
-        inference_origins = self.origin_repository.list_by_source(event.new_data.reference, valid_time=event.valid_time)
+        inference_origins = self.origin_repository.list(event.valid_time, source=event.new_data.reference)
         inference_params = self.origin_parameter_repository.list_by_reference(
             event.new_data.reference, valid_time=event.valid_time
         )
@@ -376,7 +383,7 @@ class OctopoesService:
         reference = event.old_data.reference
 
         # delete related origins to which it is a source
-        origins = self.origin_repository.list_by_source(reference, event.valid_time)
+        origins = self.origin_repository.list(event.valid_time, source=reference)
         for origin in origins:
             self.origin_repository.delete(origin, event.valid_time)
 
@@ -428,7 +435,7 @@ class OctopoesService:
             return
 
     def _run_inferences(self, event: ScanProfileDBEvent) -> None:
-        inference_origins = self.origin_repository.list_by_source(event.reference, valid_time=event.valid_time)
+        inference_origins = self.origin_repository.list(event.valid_time, source=event.reference)
         inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
@@ -517,7 +524,42 @@ class OctopoesService:
 
     def recalculate_bits(self) -> int:
         valid_time = datetime.now(timezone.utc)
-        origins = self.origin_repository.list(origin_type=OriginType.INFERENCE, valid_time=valid_time)
+        bit_counter = Counter()
+
+        # loop over all bit definitions and add origins and origin params
+        bit_definitions = get_bit_definitions()
+        for bit_id, bit_definition in bit_definitions.items():
+            # loop over all oois that are consumed by the bit
+            for ooi in self.ooi_repository.list({bit_definition.consumes}, limit=20000, valid_time=valid_time).items:
+                if not isinstance(ooi, bit_definition.consumes):
+                    logger.exception("Wut?")
+
+                # insert, if not exists
+                bit_instance = Origin(
+                    origin_type=OriginType.INFERENCE,
+                    method=bit_id,
+                    source=ooi.reference,
+                )
+                try:
+                    self.origin_repository.get(bit_instance.id, valid_time)
+                except ObjectNotFoundException:
+                    self.origin_repository.save(bit_instance, valid_time)
+                    bit_counter.update({bit_instance.method})
+
+                for param_def in bit_definition.parameters:
+                    path = Path.parse(f"{param_def.ooi_type.get_object_type()}.{param_def.relation_path}").reverse()
+
+                    param_oois = self.ooi_repository.list_related(ooi, path, valid_time=valid_time)
+                    for param_ooi in param_oois:
+                        param = OriginParameter(origin_id=bit_instance.id, reference=param_ooi.reference)
+                        self.origin_parameter_repository.save(param, valid_time)
+
+        # TODO: remove all Origins and Origin Parameters, which are no longer in use
+
+        # rerun all existing bits
+        origins = self.origin_repository.list(valid_time, origin_type=OriginType.INFERENCE)
         for origin in origins:
             self._run_inference(origin, valid_time)
-        return len(origins)
+            bit_counter.update({origin.method})
+
+        return sum(bit_counter.values())

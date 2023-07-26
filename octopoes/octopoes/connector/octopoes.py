@@ -24,7 +24,7 @@ from octopoes.models import (
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
-from octopoes.models.origin import Origin, OriginParameter
+from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
@@ -131,9 +131,24 @@ class OctopoesAPIConnector:
         )
         return ReferenceTree.parse_obj(res.json())
 
-    def list_origins(self, reference: Reference, valid_time: Optional[datetime] = None) -> List[Origin]:
-        params = {"reference": str(reference), "valid_time": valid_time}
-        res = self.session.get(f"/{self.client}/origins", params=params)
+    def list_origins(
+        self,
+        valid_time: Optional[datetime] = None,
+        source: Optional[Reference] = None,
+        result: Optional[Reference] = None,
+        task_id: Optional[str] = None,
+        origin_type: Optional[OriginType] = None,
+    ) -> List[Origin]:
+        res = self.session.get(
+            f"/{self.client}/origins",
+            params={
+                "valid_time": valid_time,
+                "source": source,
+                "result": result,
+                "task_id": task_id,
+                "origin_type": origin_type,
+            },
+        )
         return parse_obj_as(List[Origin], res.json())
 
     def save_observation(self, observation: Observation) -> None:

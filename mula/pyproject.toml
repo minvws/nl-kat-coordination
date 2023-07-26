@@ -1,38 +1,44 @@
-[tool.black]
-line-length = 120
-target-version = ['py38']
+[tool.poetry]
+name = "mula"
+version = "0.0.1.dev1"
+description = "KAT's intelligent job scheduler"
+authors = ["MinVWS <maintainer@openkat.nl>"]
+license = "EUPL"
 
-[tool.mypy]
-python_version = 3.8
-strict = false
-install_types = true
-non_interactive = true
-ignore_missing_imports = true
-implicit_reexport = true
-exclude = "^(tests|whitelist.py)"
+[tool.poetry.dependencies]
+python = "^3.8"
+alembic = "^1.8.1"
+celery = "^5.2.7"
+fastapi = "^0.93.0"
+mmh3 = "^4.0.0"
+pika = "^1.2.0"
+prometheus-client = "^0.16.0"
+psycopg2 = "^2.9.6"
+pydantic = "^1.10.9"
+python-dotenv = "^1.0.0"
+requests = "^2.31.0"
+sqlalchemy = "^1.4.48"
+typing-extensions = "^4.5.0"
+uvicorn = "^0.17.1"
 
-[tool.pylint.master]
-fail-under=7.0
-max-line-length=120
-check-quote-consistency=true
-extension-pkg-whitelist = [
-    "pydantic",
-    "mmh3"
-]
-disable = [
-    "missing-module-docstring",
-    "missing-class-docstring",
-    "missing-function-docstring",
-    "too-few-public-methods",
-    "cyclic-import",
-    "fixme",
-    "invalid-name",
-]
+# OpenTelemetry
+opentelemetry-sdk = "^1.18.0"
+opentelemetry-exporter-otlp-proto-grpc = "^1.18.0"
+opentelemetry-instrumentation-fastapi = "^0.39b0"
+opentelemetry-instrumentation-psycopg2 = "^0.39b0"
+opentelemetry-instrumentation-requests = "^0.39b0"
+certifi = "^2023.7.22"
 
-[tool.vulture]
-min_confidence = 90
-paths = ["./"]
-exclude = ["tests"]
+[tool.poetry.group.dev.dependencies]
+factory_boy = "^3.2.1"
+mypy = "^1.0.1"
+black = "^23.1.0"
+pylint = "^2.15.6"
+click = "^8.0.4"
+psutil = "^5.9.5"
+pytest = "^7.2.2"
+pytest-cov = "^4.0.0"
+httpx = "^0.23.3"
 
 [build-system]
 requires = ["setuptools>=59", "wheel"]
@@ -42,3 +48,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 omit = [
     "scheduler/alembic/*"
 ]
+
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311"]
+line-length = 120
