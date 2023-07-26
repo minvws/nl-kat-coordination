@@ -4,6 +4,7 @@ include LICENSE
 recursive-include rocky/templates *.html
 recursive-include rocky/templates *.txt
 recursive-include rocky/locale *.mo
+recursive-include rocky/locale *.po
 recursive-include fmea/templates *.html
 recursive-include fmea/templates *.txt
 recursive-include katalogus/templates *.html

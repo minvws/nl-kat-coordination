@@ -1,0 +1,31 @@
+[Unit]
+Description=Download CVE API files
+
+[Service]
+Type=oneshot
+WorkingDirectory=/var/lib/kat-cveapi
+StateDirectory=kat-cveapi
+ExecStart=/usr/bin/cveapi
+User=kat-cveapi
+CapabilityBoundingSet=
+RestrictNamespaces=yes
+DevicePolicy=closed
+KeyringMode=private
+NoNewPrivileges=yes
+PrivateDevices=yes
+PrivateMounts=yes
+PrivateTmp=yes
+PrivateUsers=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectSystem=strict
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+UMask=0022
+ReadWritePaths=/var/lib/kat-cveapi
