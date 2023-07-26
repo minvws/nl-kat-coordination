@@ -11,39 +11,36 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     ooi_ref = Reference.from_str(boefje_meta.input_ooi)
 
-    invalid = set(
-        [
-            "location",
-            "invalid_cert",
-            "invalid_uri_scheme",
-            "invalid_media",
-            "no_expire",
-            "expired",
-            "no_contact",
-            "no_canonical_match",
-            "invalid_lang",
-        ]
-    )
-    bad_format = set(
-        [
-            "no_content_type",
-            "invalid_media",
-            "invalid_charset",
-            "utf8",
-            "multi_lang",
-            "no_uri",
-            "no_https",
-            "invalid_expiry",
-            "prec_ws",
-            "no_space",
-            "empty_key",
-            "invalid_line",
-            "no_line_seperators",
-            "signed_format_issue",
-            "data_after_sig",
-            "no_csaf_file",
-        ]
-    )
+    invalid = {
+        "location",
+        "invalid_cert",
+        "invalid_uri_scheme",
+        "invalid_media",
+        "no_expire",
+        "expired",
+        "no_contact",
+        "no_canonical_match",
+        "invalid_lang",
+    }
+
+    bad_format = {
+        "no_content_type",
+        "invalid_media",
+        "invalid_charset",
+        "utf8",
+        "multi_lang",
+        "no_uri",
+        "no_https",
+        "invalid_expiry",
+        "prec_ws",
+        "no_space",
+        "empty_key",
+        "invalid_line",
+        "no_line_seperators",
+        "signed_format_issue",
+        "data_after_sig",
+        "no_csaf_file",
+    }
 
     errors_total = ""
     errors_list = []
@@ -61,9 +58,9 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
             errors_total = "Security.txt is missing for this hostname"
         else:
             if errors_list & invalid:
-                kft = KATFindingType(id="KAT-INVALID-TXT")
+                kft = KATFindingType(id="KAT-INVALID-SECURITY-TXT")
             elif errors_list & bad_format:
-                kft = KATFindingType(id="KAT-BAD-FORMAT-TXT")
+                kft = KATFindingType(id="KAT-BAD-FORMAT-SECURITY-TXT")
         yield kft
 
         finding = Finding(finding_type=kft.reference, ooi=ooi_ref, description=errors_total)

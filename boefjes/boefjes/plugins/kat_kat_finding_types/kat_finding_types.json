@@ -461,14 +461,14 @@
         "impact": null,
         "recommendation": "Make sure there is a security.txt available."
     },
-    "KAT-INVALID-TXT": {
+    "KAT-INVALID-SECURITY-TXT": {
         "description": "Required elements of the security.txt are missing.",
         "source": null,
         "risk": "recommendation",
         "impact": null,
         "recommendation": "Make sure the security.txt is in line with the requirements."
     },
-    "KAT-BAD-FORMAT-TXT": {
+    "KAT-BAD-FORMAT-SECURITY-TXT": {
         "description": "There are flaws in the format of the security.txt.",
         "source": null,
         "risk": "recommendation",
