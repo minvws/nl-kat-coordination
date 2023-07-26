@@ -36,7 +36,8 @@ scheduler system with their respective level of abstraction.
 
 First we'll review how the `Scheduler` system interacts and sits in between its
 external services. In this overview arrows from external services indicate how
-and why those services communicate with the scheduler.
+and why those services communicate with the scheduler. The `Scheduler` system
+combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
 ```mermaid
 graph TB
@@ -62,43 +63,99 @@ graph TB
     Scheduler--"Pop task of queue"-->TaskRunner
 ```
 
-* The `Scheduler` system combines data from the `Octopoes`, `Katalogus`,
-`Bytes` and `RabbitMQ` systems.
+The `Scheduler` system can run a multitude of `schedulers`. In a KAT
+implementation two schedulers are created per organistaion, a `boefje` and
+`normalizer` scheduler. With their respective priority queues. These queues are
+persisted in a SQL database.
 
 ```mermaid
-flowchart TB
-    subgraph Scheduler["SchedulerApp [system]"]
-        subgraph OrganizationA["Organization A"]
-            subgraph BoefjeSchedulerA["BoefjeScheduler [class]"]
-                BoefjePriorityQueueA(["PriorityQueue"])
-            end
+C4Component
+    title Component diagram for Scheduler
 
-            subgraph NormalizerSchedulerA["NormalizerScheduler [class]"]
-                NormalizerPriorityQueueA(["PriorityQueue"])
-            end
-        end
+    ContainerDb(db, "Database", "Postgresql Database", "")
 
-        subgraph OrganizationB["Organization B"]
-            subgraph BoefjeSchedulerB["BoefjeScheduler [class]"]
-                BoefjePriorityQueueB(["PriorityQueue"])
-            end
+    Container_Boundary(scheduler_app, "Scheduler App") {
+        Component(boefje_scheduler_a, "Boefje Scheduler Org A", "Scheduler", "Allows users to sign in to the internet banking system")
+        Component(normalizer_scheduler_a, "Normalizer Scheduler Org A", "Scheduler", "Allows users to sign in to the internet banking system")
 
-            subgraph NormalizerSchedulerB["NormalizerScheduler [class]"]
-                NormalizerPriorityQueueB(["PriorityQueue"])
-            end
-        end
+        Component(boefje_scheduler_b, "Boefje Scheduler Org B", "Scheduler", "Allows users to sign in to the internet banking system")
+        Component(normalizer_scheduler_b, "Normalizer Scheduler Org B", "Scheduler", "Allows users to sign in to the internet banking system")
 
 
-        subgraph Server["API Server<br/>[REST API]"]
-        end
-    end
-
-    Datastore[("SQL database<br/> [datastore]")]
+        Component(server, "Server", "REST API")
+    }
 ```
 
-* The `Scheduler` system implements multiple `schedulers` per organisation.
-  Per organisation there is a `boefje` and `normalizer` scheduler. With their
-  respective priority queues. These queues are persisted in a SQL database.
+...
+
+
+```mermaid
+C4Component
+    title Component diagram for Scheduler
+
+    SystemQueue_Ext(rabbitmq_scan_profile_mutations, "RabbitMQ", "scan_profile_mutations")
+    SystemQueue_Ext(rabbitmq_raw_file_received, "RabbitMQ", "raw_file_received")
+
+    System_Ext("katalogus", "Katalogus", "...")
+    System_Ext("rocky", "Rocky", "...")
+    System_Ext("bytes", "Bytes", "...")
+    System_Ext("octopoes", "Octopoes", "...")
+
+    Container_Boundary("scheduler_app", "Scheduler App") {
+
+        %% ContainerDb(pq_store, "Priority Queue Store", "PostgresSQL DatabaseTable", "...")
+        
+        Container_Boundary(boefje_scheduler, "Boefje Scheduler", "Scheduler") {
+            Component("scan_profile_mutations", "Scan Profile Mutations", "Thread", "...")
+            Component("new_boefjes", "New Boefjes", "Thread", "...")
+            Component("random_objects", "Random Objects", "Thread", "...")
+
+            Component("push_task_boefje", "Push Task", "Method")
+
+            SystemQueue(priority_queue_boefje, "PriorityQueue", "Persisted in a PostgeSQL database table") 
+        }
+
+        Container_Boundary(normalizer_scheduler, "Normalizer Scheduler", "Scheduler") {
+            Component("raw_file_received", "Raw File Recieved", "Thread", "...")
+
+            Component("push_task_normalizer", "Push Task", "Method")
+
+            SystemQueue(priority_queue_normalizer, "PriorityQueue", "...")
+        }
+
+        Container_Boundary(server, "Server", "REST API") {
+            Component("api_tasks", "/tasks", "...")
+            Component("api_queues", "/queues", "...")
+        }
+
+        ContainerDb(task_store, "Task Store", "PostgreSQL Database Table", "Persisted in a PostgeSQL database table")
+    }
+
+    %% Boefje Scheduler
+    Rel(scan_profile_mutations, rabbitmq_scan_profile_mutations, "AMQP", "...")
+    Rel(scan_profile_mutations, push_task_boefje, "", "...")
+    UpdateRelStyle(scan_profile_mutations, rabbitmq_scan_profile_mutations, $offsetX="-50")
+
+    Rel(new_boefjes, katalogus, "HTTP", "...")
+    Rel(new_boefjes, push_task_boefje, "", "...")
+    UpdateRelStyle(new_boefjes, katalogus, $offsetX="10")
+
+    Rel(random_objects, octopoes, "HTTP", "...")
+    Rel(random_objects, push_task_boefje, "", "...")
+    UpdateRelStyle(new_boefjes, katalogus, $offsetX="60")
+
+    Rel(push_task_boefje, priority_queue_boefje, "push to queue", "...")
+    Rel(push_task_boefje, task_store, "post push", "...")
+
+    %% Normalizer Scheduler
+    Rel(raw_file_received, rabbitmq_raw_file_received, "AMQP", "...")
+    Rel(raw_file_received, push_task_normalizer, "", "...")
+
+    Rel(push_task_normalizer, priority_queue_normalizer, "push to queue", "...")
+    Rel(push_task_normalizer, task_store, "post push", "...")
+
+    UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
+```
 
 #### Dataflows
 
