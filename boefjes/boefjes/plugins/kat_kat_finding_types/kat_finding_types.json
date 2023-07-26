@@ -457,21 +457,21 @@
     "KAT-NO-SECURITY-TXT": {
         "description": "This hostname does not have a Security.txt file.",
         "source": null,
-        "risk": "high",
+        "risk": "recommendation",
         "impact": null,
         "recommendation": "Make sure there is a security.txt available."
     },
     "KAT-INVALID-TXT": {
         "description": "Required elements of the security.txt are missing.",
         "source": null,
-        "risk": "medium",
+        "risk": "recommendation",
         "impact": null,
         "recommendation": "Make sure the security.txt is in line with the requirements."
     },
     "KAT-BAD-FORMAT-TXT": {
         "description": "There are flaws in the format of the security.txt.",
         "source": null,
-        "risk": "low",
+        "risk": "recommendation",
         "impact": null,
         "recommendation": "Make sure the security.txt is correctly formatted."
     },
