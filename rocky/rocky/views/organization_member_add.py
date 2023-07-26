@@ -7,7 +7,8 @@ from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import transaction
 from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -114,56 +115,25 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                     continue  # skip empty lines
 
                 try:
-                    full_name, email, account_type, trusted_clearance_level, acknowledged_clearance_level = (
+                    full_name, email, account_type, trusted_clearance, acknowledged_clearance = (
                         row["full_name"],
                         row["email"],
                         row["account_type"],
-                        row["trusted_clearance_level"],
-                        row["acknowledged_clearance_level"],
+                        int(row["trusted_clearance_level"]),
+                        int(row["acknowledged_clearance_level"]),
                     )
                 except KeyError:
                     messages.add_message(self.request, messages.ERROR, _("The csv file is missing required columns"))
                     return redirect("organization_member_upload", self.organization.code)
 
-                user, user_created = User.objects.get_or_create(email=email, defaults={"full_name": full_name})
-
-                if user_created:
-                    form = PasswordResetForm({"email": email})
-
-                    if not form.is_valid():
-                        logger.warning("Email not valid: %s", email)
-                        continue
-
-                    form.save(
-                        email_template_name="registration_email.html",
-                        subject_template_name="registration_subject.txt",
-                        extra_email_context={"organization": self.organization.name},
-                        use_https=self.request.is_secure(),
-                        request=self.request,
-                    )
-
                 try:
-                    member, member_created = OrganizationMember.objects.get_or_create(
-                        user=user,
-                        organization=self.organization,
-                        defaults={
-                            "organization": self.organization,
-                            "status": OrganizationMember.STATUSES.ACTIVE,
-                            "trusted_clearance_level": trusted_clearance_level,
-                            "acknowledged_clearance_level": acknowledged_clearance_level,
-                        },
-                    )
-                except Exception:
-                    if user_created:
-                        user.delete()
-
-                    raise
-
-                try:
-                    member.groups.add(Group.objects.get(name=account_type))
+                    with transaction.atomic():
+                        # We save all the relevant models and raise an exception on failure to revert the transaction
+                        self.save_models(full_name, email, account_type, trusted_clearance, acknowledged_clearance)
                 except ObjectDoesNotExist:
-                    logger.error("Group does not exist")
-                    continue
+                    logger.exception("Invalid group")
+                except (ValidationError, ValueError):
+                    logger.exception("Invalid data")
 
             messages.add_message(self.request, messages.SUCCESS, _("Successfully processed users from csv."))
         except csv.Error:
@@ -171,6 +141,41 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                 self.request, messages.ERROR, _("Error parsing the csv file. Please verify its contents.")
             )
             logger.exception("Failed handling csv file")
+
+    def save_models(
+        self, name: str, email: str, account_type: str, trusted_clearance: int, acknowledged_clearance: int
+    ):
+        user, user_created = User.objects.get_or_create(email=email, defaults={"full_name": name})
+
+        member_kwargs = {
+            "organization": self.organization,
+            "status": OrganizationMember.STATUSES.ACTIVE,
+            "trusted_clearance_level": trusted_clearance,
+            "acknowledged_clearance_level": acknowledged_clearance,
+        }
+        OrganizationMember(user=user, **member_kwargs).full_clean()  # Do validation before saving the model
+
+        member, member_created = OrganizationMember.objects.get_or_create(
+            user=user,
+            organization=self.organization,
+            defaults=member_kwargs,
+        )
+        member.groups.add(Group.objects.get(name=account_type))
+
+        if user_created:
+            form = PasswordResetForm({"email": email})
+
+            if not form.is_valid():
+                logger.warning("Email not valid: %s", email)
+                raise ValueError("Email not valid")
+
+            form.save(
+                email_template_name="registration_email.html",
+                subject_template_name="registration_subject.txt",
+                extra_email_context={"organization": self.organization.name},
+                use_https=self.request.is_secure(),
+                request=self.request,
+            )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
