@@ -2,6 +2,6 @@
     "id": "kat_answer_parser",
     "consumes": ["answer"],
     "produces": [
-        "OOIType"
+        "Config"
     ]
 }
