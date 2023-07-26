@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if field.field.widget.allow_multiple_selected %}
-  {% include "partials/form/field_input.html" %}
+  {% include "partials/form/field_input_multiselect.html" %}
 
 {% else %}
   <div class="{% if field.field.required %}required{% endif %}">
