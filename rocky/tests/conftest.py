@@ -3,6 +3,7 @@ import json
 import logging
 from os import urandom
 from pathlib import Path
+from typing import Dict
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -458,8 +459,12 @@ def mock_scheduler(mocker):
     return mocker.patch("rocky.views.ooi_detail.scheduler.client")
 
 
-def get_boefjes_data():
-    return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())
+def get_stub_path(file_name: str) -> Path:
+    return Path(__file__).parent / "stubs" / file_name
+
+
+def get_boefjes_data() -> Dict:
+    return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
 @pytest.fixture()
