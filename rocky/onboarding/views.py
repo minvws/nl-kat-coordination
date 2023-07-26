@@ -46,6 +46,7 @@ from rocky.exceptions import (
     IndemnificationNotPresentException,
     RockyError,
 )
+from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_report import DNSReport, Report, build_findings_list_from_store
 from rocky.views.ooi_view import BaseOOIDetailView, BaseOOIFormView, SingleOOITreeMixin
@@ -624,6 +625,9 @@ class OnboardingAccountSetupRedTeamerView(
 
     def form_valid(self, form):
         name = form.cleaned_data["name"]
+        trusted_clearance_level = form.cleaned_data.get("trusted_clearance_level")
+        if trusted_clearance_level and int(trusted_clearance_level) < 2:
+            clearance_level_warning_dns_report(self.request, trusted_clearance_level)
         self.add_success_notification(name)
         return super().form_valid(form)
 

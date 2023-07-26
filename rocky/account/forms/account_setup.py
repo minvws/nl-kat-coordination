@@ -223,42 +223,6 @@ class AcknowledgeClearanceLevelForm(BaseRockyForm):
     )
 
 
-class OrganizationMemberAddForm(UserRegistrationForm, BaseRockyModelForm):
-    """
-    Form to add a new member
-    """
-
-    group = None
-
-    def __init__(self, *args, **kwargs):
-        self.organization = Organization.objects.get(code=kwargs.pop("organization_code"))
-        return super().__init__(*args, **kwargs)
-
-    def save(self, **kwargs):
-        if self.group:
-            selected_group = Group.objects.get(name=self.group)
-        else:
-            selected_group = Group.objects.get(name=self.cleaned_data["account_type"])
-        if self.organization and selected_group:
-            self.set_user()
-            member, _ = OrganizationMember.objects.get_or_create(
-                user=self.user,
-                organization=self.organization,
-                status=OrganizationMember.STATUSES.ACTIVE,
-            )
-            member.groups.add(selected_group.id)
-            if member.is_admin or self.user.is_superuser:
-                member.acknowledged_clearance_level = 4
-                member.trusted_clearance_level = 4
-                member.save()
-
-
-class OrganizationMemberToGroupAddForm(AccountTypeSelectForm, OrganizationMemberAddForm):
-    class Meta:
-        model = User
-        fields = ("account_type", "name", "email", "password")
-
-
 class OrganizationMemberEditForm(BaseRockyModelForm, TrustedClearanceLevelRadioPawsForm):
     blocked = forms.BooleanField(
         required=False,

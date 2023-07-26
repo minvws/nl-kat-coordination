@@ -12,6 +12,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
+from rocky.messaging import clearance_level_warning_dns_report
+
 User = get_user_model()
 
 
@@ -53,7 +55,7 @@ class OrganizationMemberAddAccountTypeView(
 
 class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, FormView):
     """
-    View to create a new redteam member.
+    View to create a new member.
     """
 
     template_name = "organizations/organization_member_add.html"
@@ -67,6 +69,9 @@ class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, Organizatio
         return kwargs
 
     def form_valid(self, form):
+        trusted_clearance_level = form.cleaned_data.get("trusted_clearance_level")
+        if trusted_clearance_level and int(trusted_clearance_level) < 2:
+            clearance_level_warning_dns_report(self.request, trusted_clearance_level)
         self.add_success_notification()
         return super().form_valid(form)
 
