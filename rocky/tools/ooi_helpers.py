@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -40,8 +40,11 @@ def format_value(value: Any) -> str:
     return value
 
 
-def format_display(data: Dict) -> Dict[str, str]:
-    return {format_attr_name(k): format_value(v) for k, v in data.items()}
+def format_display(data: Dict, ignore: Optional[List] = None) -> Dict[str, str]:
+    if ignore is None:
+        ignore = []
+
+    return {format_attr_name(k): format_value(v) for k, v in data.items() if k not in ignore}
 
 
 def get_knowledge_base_data_for_ooi_store(ooi_store) -> Dict[str, Dict]:
