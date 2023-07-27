@@ -15,6 +15,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
         yield Config(
             ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
-            bit_id="/bit/port-classification-ip",
+            bit_id="port-classification-ip",
             config=json.loads(raw),
         )
