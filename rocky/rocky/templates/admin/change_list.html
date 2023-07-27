@@ -1,0 +1,25 @@
+{% extends "admin/change_list.html" %}
+
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "admin/css/changelists.css" %}">
+    {% if cl.formset %}
+        <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
+    {% endif %}
+    {% if cl.formset or action_form %}
+        <script nonce="{{ request.csp_nonce }}" src="{% url 'admin:jsi18n' %}"></script>
+    {% endif %}
+    {{ media.css }}
+    {% if not actions_on_top and not actions_on_bottom %}
+        <style>#changelist table thead th:first-child {width: inherit}</style>
+    {% endif %}
+{% endblock extrastyle %}
+{% block extrahead %}
+    {{ block.super }}
+    {{ media.js }}
+    <script nonce="{{ request.csp_nonce }}"
+            src="{% static 'admin/js/filters.js' %}"
+            defer></script>
+{% endblock extrahead %}

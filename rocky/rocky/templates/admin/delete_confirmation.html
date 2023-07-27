@@ -1,0 +1,11 @@
+{% extends "admin/delete_confirmation.html" %}
+
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ media }}
+    <script nonce="{{ request.csp_nonce }}"
+            src="{% static 'admin/js/cancel.js' %}"
+            async></script>
+{% endblock extrahead %}
