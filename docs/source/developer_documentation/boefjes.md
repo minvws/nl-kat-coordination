@@ -68,6 +68,8 @@ This default value can be overridden by setting any value for `TOP_PORTS` in the
 | QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                                           |
 | QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                                       |
 | QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                                |
+| POOL_SIZE                  | "2.0"                        | Number of workers to run per queue                               |
+| POLL_INTERVAL              | "10.0"                       | Time to wait before polling for tasks when all queues are empty  |
 | WORKER_HEARTBEAT           | "1.0"                        | Seconds to wait before checking the workers when queues are full |
 | OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                                         |
 | BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                                            |
@@ -86,6 +88,62 @@ Boefjes will run as containerized workers pulling jobs from a centralized job qu
 Connections to other components, represented by the yellow squares, are abstracted by the modules inside them. The red
 components live outside the boefjes module. The green core files however is what can be focused on and can be
 developed/refactored further to support boefjes of all different kinds.
+
+### Boefje and Normalizer Workers
+
+When we configure a `POOL_SIZE` of `n`, we have `n` + 1 processes: one main process and `n` workers.
+The main process pushes to a `multiprocessing.Manager.Queue` and keeps track of the task that was being handled by the workers.
+It sets the status to failed when the worker was killed,
+like when the process [runs out of memory and is killed by Docker](https://github.com/minvws/nl-kat-coordination/pull/1187).
+(Note: `multiprocessing.Queue` will not work due to [`qsize()` not being implemented on macOS](https://github.com/minvws/nl-kat-coordination/pull/1374).)
+No maximum size is defined on the queue since we want to avoid blocking.
+Hence, we manually check if the queue does not pile up beyond the number of workers, i.e. `n`.
+
+The setup:
+```mermaid
+graph LR
+
+SchedulerRuntimeManager -- "pop()" --> Scheduler
+
+subgraph Process 0
+
+  multiprocessing.Queue
+  SchedulerRuntimeManager -- "put(p_item)" --> multiprocessing.Queue["multiprocessing.Manager.Queue()"]
+
+  Worker-1["Worker 1<br/><i>target = _start_working()"] -- "get()" --> multiprocessing.Queue
+
+  subgraph Process 1
+    Worker-1
+    Worker-1 -- runs --> Plugin1["Plugin"]
+  end
+
+  Worker-2["Worker 2<br/><i>target = _start_working()"] -- "get()" --> multiprocessing.Queue
+
+  subgraph Process 2
+      Worker-2
+      Worker-2 -- runs --> Plugin2["Plugin"]
+  end
+end
+```
+
+Rough representation of the failure mode when a SIGKILL has been sent to the worker:
+
+```mermaid
+sequenceDiagram
+  participant SchedulerRuntimeManager
+  participant handling_tasks
+  participant Worker1
+  participant Scheduler
+  participant Worker2
+  Worker1->>handling_tasks: set p_item.id for worker1.pid
+  SchedulerRuntimeManager->>Worker1: if not is_alive()
+  SchedulerRuntimeManager->>handling_tasks: get p_item.id for worker1.pid
+  SchedulerRuntimeManager->>Scheduler: set p_item.status to FAILED
+  SchedulerRuntimeManager->>Worker1: close()
+  SchedulerRuntimeManager->>Worker2: start()
+```
+
+
 
 ### Running as a Docker container
 
