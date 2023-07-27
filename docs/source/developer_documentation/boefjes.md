@@ -99,8 +99,11 @@ like when the process [runs out of memory and is killed by Docker](https://githu
 No maximum size is defined on the queue since we want to avoid blocking.
 Hence, we manually check if the queue does not pile up beyond the number of workers, i.e. `n`.
 
-The setup:
-```mermaid
+#### Design
+
+The setup for the main process and workers:
+
+```{mermaid}
 graph LR
 
 SchedulerRuntimeManager -- "pop()" --> Scheduler
@@ -126,9 +129,10 @@ subgraph Process 0
 end
 ```
 
+#### Worker failure mode
 Rough representation of the failure mode when a SIGKILL has been sent to the worker:
 
-```mermaid
+```{mermaid}
 sequenceDiagram
   participant SchedulerRuntimeManager
   participant handling_tasks
