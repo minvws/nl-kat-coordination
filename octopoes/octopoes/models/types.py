@@ -54,6 +54,7 @@ from octopoes.models.ooi.network import (
     IPV6NetBlock,
     Network,
 )
+from octopoes.models.ooi.question import Question
 from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
@@ -154,6 +155,7 @@ OOIType = Union[
     MutedFinding,
     FindingTypeType,
     ConfigType,
+    Question,
 ]
 
 

@@ -166,7 +166,11 @@ def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[Lis
     findings = [
         build_finding_dict(finding_ooi, ooi_store)
         for finding_ooi in ooi_store.values()
-        if isinstance(finding_ooi, Finding)
+        # In the ooi report view we fetch objects using get_tree with a certain
+        # depth. If the finding is at the max depth, the finding type might not
+        # be fetched if it is only at max depth + 1 so we exclude those findings
+        # here.
+        if isinstance(finding_ooi, Finding) and finding_ooi.finding_type in ooi_store
     ]
 
     if finding_filter is not None:

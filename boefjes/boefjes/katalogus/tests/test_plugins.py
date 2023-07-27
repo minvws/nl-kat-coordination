@@ -35,6 +35,58 @@ class TestPlugins(TestCase):
             set([x["id"] for x in res.json()]),
         )
 
+    def test_list_filter_by_type(self):
+        res = self.client.get("/v1/organisations/test-org/plugins?plugin_type=boefje")
+        self.assertEqual(200, res.status_code)
+        self.assertSetEqual(
+            {
+                "test-boefje-1",
+                "test-boefje-2",
+                "kat_test",
+                "kat_test_2",
+            },
+            set([x["id"] for x in res.json()]),
+        )
+
+    def test_list_filter_by_state(self):
+        res = self.client.get("/v1/organisations/test-org/plugins?state=true")
+        self.assertEqual(200, res.status_code)
+        plugins = res.json()
+        self.assertSetEqual(
+            {
+                "test-bit-1",
+                "test-normalizer-1",
+                "kat_test_normalize",
+                "kat_test_normalize_2",
+            },
+            set([x["id"] for x in plugins]),
+        )
+        self.assertTrue(all([x["enabled"] for x in plugins]))
+
+    def test_list_filter_by_id(self):
+        res = self.client.get("/v1/organisations/test-org/plugins?q=kat")
+        self.assertEqual(200, res.status_code)
+        self.assertSetEqual(
+            {
+                "kat_test",
+                "kat_test_2",
+                "kat_test_normalize",
+                "kat_test_normalize_2",
+            },
+            set([x["id"] for x in (res.json())]),
+        )
+
+    def test_list_pagination(self):
+        res = self.client.get("/v1/organisations/test-org/plugins?offset=2&limit=2")
+        self.assertEqual(200, res.status_code)
+        self.assertSetEqual(
+            {
+                "test-bit-1",
+                "test-normalizer-1",
+            },
+            set([x["id"] for x in (res.json())]),
+        )
+
     def test_list_repository(self):
         res = self.client.get("/v1/organisations/test-org/repositories/test-repo/plugins")
         self.assertEqual(200, res.status_code)
