@@ -83,7 +83,7 @@ This default value can be overridden by setting any value for `TOP_PORTS` in the
 
 Boefjes will run as containerized workers pulling jobs from a centralized job queue:
 
-![design](docs/design.png)
+![design](img/boefje_design.png)
 
 Connections to other components, represented by the yellow squares, are abstracted by the modules inside them. The red
 components live outside the boefjes module. The green core files however is what can be focused on and can be
