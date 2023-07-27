@@ -484,14 +484,15 @@ class OnboardingOrganizationSetupView(
 
     def get_or_create_organizationmember(self, organization):
         if self.request.user.is_superuser:
-            member, member_created = OrganizationMember.objects.get_or_create(
+            OrganizationMember.objects.get_or_create(
                 user=self.request.user,
                 organization=organization,
+                defaults={
+                    "trusted_clearance_level": 4,
+                    "acknowledged_clearance_level": 4,
+                },
             )
-            if member_created:
-                member.trusted_clearance_level = 4
-                member.acknowledged_clearance_level = 4
-                member.save()
+
         else:
             OrganizationMember.objects.get_or_create(user=self.request.user, organization=organization)
 
