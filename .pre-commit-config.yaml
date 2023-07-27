@@ -105,3 +105,9 @@ repos:
   #              - stylelint@15.4.0
   #              - stylelint-config-standard-scss@8.0.0
   #       files:  "^(rocky\/assets\/src\/|docs\/source\/).*.(css|scss|sass)$"
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.5
+    hooks:
+      - id: shellcheck
+        args: ["-e", "SC1091"]
