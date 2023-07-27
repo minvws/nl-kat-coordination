@@ -35,6 +35,7 @@ from onboarding.forms import (
     OnboardingSetClearanceLevelForm,
 )
 from onboarding.view_helpers import (
+    DNS_REPORT_LEAST_CLEARANCE_LEVEL,
     ONBOARDING_PERMISSIONS,
     KatIntroductionAdminStepsMixin,
     KatIntroductionRegistrationStepsMixin,
@@ -118,9 +119,7 @@ class OnboardingSetupScanSelectPluginsView(
 
     def get_form(self):
         boefjes = self.report.get_boefjes(self.organization)
-        boefjes = [
-            boefje for boefje in boefjes if boefje["boefje"].scan_level <= int(self.request.session["clearance_level"])
-        ]
+        boefjes = [boefje for boefje in boefjes if boefje["boefje"].scan_level <= DNS_REPORT_LEAST_CLEARANCE_LEVEL]
         kwargs = {
             "initial": {"boefje": [item["id"] for item in boefjes if item.get("required", False)]},
         }
@@ -267,7 +266,7 @@ class OnboardingSetupScanOOIDetailView(
 
     def post(self, request, *args, **kwargs):
         ooi = self.get_ooi()
-        level = int(self.request.session["clearance_level"])
+        level = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         try:
             self.raise_clearance_level(ooi.reference, level)
         except IndemnificationNotPresentException:
@@ -326,7 +325,7 @@ class OnboardingSetClearanceLevelView(
     form_class = OnboardingSetClearanceLevelForm
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
-    initial = {"level": 2}
+    initial = {"level": DNS_REPORT_LEAST_CLEARANCE_LEVEL}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -338,7 +337,6 @@ class OnboardingSetClearanceLevelView(
         return get_ooi_url("step_setup_scan_select_plugins", self.request.GET.get("ooi_id"), self.organization.code)
 
     def form_valid(self, form):
-        self.request.session["clearance_level"] = form.cleaned_data["level"]
         self.add_success_notification()
         return super().form_valid(form)
 
