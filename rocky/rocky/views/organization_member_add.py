@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
+from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
 from rocky.messaging import clearance_level_warning_dns_report
@@ -70,7 +71,7 @@ class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, Organizatio
 
     def form_valid(self, form):
         trusted_clearance_level = form.cleaned_data.get("trusted_clearance_level")
-        if trusted_clearance_level and int(trusted_clearance_level) < 2:
+        if trusted_clearance_level and int(trusted_clearance_level) < DNS_REPORT_LEAST_CLEARANCE_LEVEL:
             clearance_level_warning_dns_report(self.request, trusted_clearance_level)
         self.add_success_notification()
         return super().form_valid(form)
