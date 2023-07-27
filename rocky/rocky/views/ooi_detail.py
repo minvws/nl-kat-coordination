@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
@@ -7,6 +8,8 @@ from django.contrib import messages
 from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
+from jsonschema.validators import Draft202012Validator
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
@@ -17,6 +20,7 @@ from tools.models import Indemnification, OrganizationMember
 from tools.ooi_helpers import format_display
 
 from octopoes.models import OOI, Reference
+from octopoes.models.ooi.question import Question
 from rocky import scheduler
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
@@ -24,6 +28,7 @@ from rocky.views.ooi_view import BaseOOIDetailView
 
 class PageActions(Enum):
     START_SCAN = "start_scan"
+    SUBMIT_ANSWER = "submit_answer"
 
 
 class OOIDetailView(
@@ -49,17 +54,7 @@ class OOIDetailView(
         self.ooi = self.get_ooi()
 
         action = self.request.POST.get("action")
-        if not self.handle_page_action(action):
-            return self.get(request, status_code=500, *args, **kwargs)
-
-        success_message = (
-            "Your scan is running successfully in the background. \n "
-            "Results will be added to the object list when they are in. "
-            "It may take some time, a refresh of the page may be needed to show the results."
-        )
-        messages.add_message(request, messages.SUCCESS, success_message)
-
-        return redirect("task_list", organization_code=self.organization.code)
+        return self.handle_page_action(action)
 
     def handle_page_action(self, action: str) -> bool:
         try:
@@ -70,10 +65,38 @@ class OOIDetailView(
                 boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
                 ooi = self.get_single_ooi(pk=ooi_id)
                 self.run_boefje_for_oois(boefje, [ooi])
-                return True
 
+                success_message = (
+                    "Your scan is running successfully in the background. \n "
+                    "Results will be added to the object list when they are in. "
+                    "It may take some time, a refresh of the page may be needed to show the results."
+                )
+                messages.add_message(self.request, messages.SUCCESS, _(success_message))
+                return redirect("task_list", organization_code=self.organization.code)
+
+            if action == PageActions.SUBMIT_ANSWER.value:
+                if not isinstance(self.ooi, Question):
+                    messages.add_message(self.request, messages.ERROR, _("Only Question OOIs can be answered."))
+                    return self.get(self.request, status_code=500, *self.args, **self.kwargs)
+
+                schema_answer = self.request.POST.get("schema")
+                parsed_schema_answer = json.loads(schema_answer)
+                validator = Draft202012Validator(json.loads(self.ooi.json_schema))
+
+                if not validator.is_valid(parsed_schema_answer):
+                    for error in validator.iter_errors(parsed_schema_answer):
+                        messages.add_message(self.request, messages.ERROR, error.message)
+
+                    return self.get(self.request, status_code=422, *self.args, **self.kwargs)
+
+                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.reference)
+                messages.add_message(self.request, messages.SUCCESS, "Question has been answered.")
+                return self.get(self.request, status_code=201, *self.args, **self.kwargs)
+
+            return self.get(self.request, status_code=404, *self.args, **self.kwargs)
         except RequestException as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
+            return self.get(self.request, status_code=500, *self.args, **self.kwargs)
 
     def get_current_ooi(self) -> Optional[OOI]:
         # self.ooi is already the current state of the OOI
@@ -166,10 +189,13 @@ class OOIDetailView(
         context["observations"] = observations
         context["inferences"] = inferences
         context["member"] = self.get_organizationmember()
-        context["object_details"] = format_display(self.get_ooi_properties(self.ooi))
+
+        # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
+        context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.get_observed_at()
+        context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects()
         context["ooi_current"] = self.get_current_ooi()
