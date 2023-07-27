@@ -1,4 +1,4 @@
-# Design scheduler
+# Scheduler Architecture
 
 ## Purpose
 
@@ -86,8 +86,8 @@ C4Component
     }
 ```
 
-...
-
+Let's take a look at the internals of a Boefje and Normalizer scheduler, and
+explore how the data flows.
 
 ```mermaid
 C4Component
@@ -179,76 +179,147 @@ events within a KAT installation will trigger dataflows in the `Scheduler`.
 With the current implementation of the scheduler we identify the creation of
 two different type of jobs, `boefje` and `normalizer` jobs.
 
-##### Creation of boefje jobs
+##### Boefje scheduler
 
-For a `boefje` job the following events will trigger a dataflow procedure to be
-executed and subsequently the creation of a `boefje` job.:
+For a `boefje` scheduler the following events will trigger a dataflow procedure
+to be executed and subsequently the creation of a `boefje` task.:
 
-1. When a scan level is increased on an OOI (`schedulers.boefje.push_tasks_for_scan_profile_mutations`),
-   this will get the priority of 2.
+1. scan level mutation of an ooi
+2. new and/or enabled boefje
+3. rescheduling of ooi's and associated boefjes
+4. scan job creation from octopoes
 
-    * When scan level mutation occurred, the `Scheduler` system will get the
-      scan profile mutation from the `RabbitMQ` system.
+**1. Scan level mutation**
 
-    * For the associated OOI of this scan profile mutation, the `Scheduler`
-      system will get the enabled boefjes for this OOI. (`tasks = ooi * boefjes`)
+When a scan level is increased on an OOI
+(`schedulers.boefje.push_tasks_for_scan_profile_mutations`), this will get the
+priority of 2.
 
-    * For each enabled boefje, a `BoefjeTask` will be created and added to the
-     `PriorityQueue` of the `BoefjeScheduler`. A `BoefjeTask` is an object
-     with the correct specification for the task runner to execute a boefje.
+* When scan level mutation occurred, the `Scheduler` system will get the
+  scan profile mutation from the `RabbitMQ` system.
 
-    * Each task will be checked if it is:
+* For the associated OOI of this scan profile mutation, the `Scheduler`
+  system will get the enabled boefjes for this OOI. (`tasks = ooi * boefjes`)
 
-        * `is_allowed_to_run()`
+* For each enabled boefje, a `BoefjeTask` will be created and added to the
+ `PriorityQueue` of the `BoefjeScheduler`. A `BoefjeTask` is an object
+ with the correct specification for the task runner to execute a boefje.
 
-        * `is_task_running()`
+* Each task will be checked if it is:
 
-        * `has_grace_period_passed()`
+    * `is_allowed_to_run()`
 
-        * `is_item_on_queue_by_hash()`
+    * `is_task_running()`
 
-    * The `BoefjeScheduler` will then create a `PrioritizedItem` and push it to
-      the queue. The `PrioritizedItem` will contain the created `BoefjeTask`.
-      Additionally the `BoefjeTask` will be added to the database
-      (`post_push()`). And serves as a log of the tasks that have been
-      queued/executed, and can be queried through the API.
+    * `has_grace_period_passed()`
 
-    ```mermaid
-    flowchart TB
+    * `is_item_on_queue_by_hash()`
 
-        %% External services
-        RabbitMQ["RabbitMQ<br/>[message broker]"]
+* The `BoefjeScheduler` will then create a `PrioritizedItem` and push it to
+  the queue. The `PrioritizedItem` will contain the created `BoefjeTask`.
+  Additionally the `BoefjeTask` will be added to the database
+  (`post_push()`). And serves as a log of the tasks that have been
+  queued/executed, and can be queried through the API.
 
-        %% External services flow
-        RabbitMQ--"Get scan profile mutations<br/>(scan level increase)"-->get_scan_profile_mutation
+```mermaid
+sequenceDiagram
+    participant Scheduler
 
-        %% Boefje flow
-        get_scan_profile_mutation-->get_boefjes_for_ooi-->create_boefje_task-->push_item_to_queue
-        push_item_to_queue-->post_push
-        push_item_to_queue-->push
-        push-->Datastore
-        post_push-->Datastore
+    create participant RabbitMQ
+    Scheduler->>RabbitMQ: consume scan_profile_mutations
+    destroy RabbitMQ
+    RabbitMQ->>Scheduler: consume scan_profile_mutations
 
-        subgraph Scheduler["SchedulerApp [system]"]
+    participant Katalogus
+    participant Bytes
+    participant TaskStore
+    participant PriorityQueueStore
 
-            subgraph BoefjeScheduler["BoefjeScheduler [class]"]
-                subgraph BoefjePopulateQueue["populate_queue() [method]"]
-                    subgraph ScanProfileMutations["push_tasks_for_scan_profile_mutations() [method]"]
-                        get_scan_profile_mutation[["get_scan_profile_mutation()"]]
-                        get_boefjes_for_ooi[["get_boefjes_for_ooi()"]]
-                        create_boefje_task("Create BoefjeTasks for OOI and enabled Boefjes")
-                        push_item_to_queue[["push_item_to_queue()"]]
-                    end
-                end
+    rect rgb(242, 242, 242)
+    note right of Scheduler: get_boefjes_for_ooi()
+        Scheduler->>Katalogus: get_boefjes_by_type_and_org()
+    end
 
-                push[["push()<br/><br/>Add PrioritizedItem to PriorityQueue"]]
-                post_push[["post_push()<br/><br/>Add BoefjeTask to database"]]
-            end
+    Scheduler->>Scheduler: Create BoefjeTask objects
+    
+    Scheduler->>Scheduler: is_task_allowed_to_run()
+    
+    rect rgb(242, 242, 242)
+    note right of Scheduler: is_task_running()
+        Scheduler->>TaskStore: get_latest_task_by_hash()
+        Scheduler->>Bytes: get_last_run_boefje()
+    end
 
-            Datastore[("SQL database<br/>[datastore]<br/>")]
+    rect rgb(242, 242, 242)
+    note right of Scheduler: has_grace_period_passed()
+        Scheduler->>TaskStore: get_latest_task_by_hash()
+        Scheduler->>Bytes: get_last_run_boefje()
+    end
 
+    rect rgb(242, 242, 242)
+    note right of Scheduler: is_item_on_queue_by_hash()
+        Scheduler->>PriorityQueueStore: get_latest_task_by_hash()
+    end
+
+    Scheduler->>Scheduler: Create PrioritizedItem
+    Scheduler->>PriorityQueueStore: push_item_to_queue_with_timeout()
+```
+
+**2. New Boefjes**
+
+When a plugin of type `boefje` is enabled or disabled in Rocky. This is
+triggered when the plugin cache of an organisation is flushed.
+
+* The cache of the organisation will be flushed at a specified interval.
+
+* Due to the flushing of the cache we get a new list of enabled boefjes for
+  an organisation.
+  (`connectors.services.katalogus._flush_organisations_boefje_type_cache()`)
+
+* New tasks will be created for enabled boefjes.
+
+```mermaid
+sequenceDiagram
+    participant Scheduler
+
+    participant Katalogus
+    participant Octopoes
+    participant Bytes
+    participant TaskStore
+    participant PriorityQueueStore
+
+    Scheduler->>Katalogus: get_new_boefjes_by_org_id()
+
+    loop for boefje in new_boefjes
+        Scheduler->>Octopoes: get_objects_by_object_types()
+    end
+
+    rect rgb(191, 223, 255)
+    note right of Scheduler: push_task()
+        Scheduler->>Scheduler: Create BoefjeTask object
+        Scheduler->>Scheduler: is_task_allowed_to_run()
+    
+        rect rgb(242, 242, 242)
+        note right of Scheduler: is_task_running()
+            Scheduler->>TaskStore: get_latest_task_by_hash()
+            Scheduler->>Bytes: get_last_run_boefje()
         end
-    ```
+
+        rect rgb(242, 242, 242)
+        note right of Scheduler: has_grace_period_passed()
+            Scheduler->>TaskStore: get_latest_task_by_hash()
+            Scheduler->>Bytes: get_last_run_boefje()
+        end
+
+        rect rgb(242, 242, 242)
+        note right of Scheduler: is_item_on_queue_by_hash()
+            Scheduler->>PriorityQueueStore: get_latest_task_by_hash()
+        end
+
+        Scheduler->>Scheduler: Create PrioritizedItem
+        Scheduler->>PriorityQueueStore: push_item_to_queue_with_timeout()
+    end
+```
 
 2. Rescheduling of oois (`schedulers.boefje.push_tasks_for_random_objects`). In
    order to fill up the queue and to enforce that we reschedule tasks. We
@@ -355,18 +426,6 @@ executed and subsequently the creation of a `boefje` job.:
     end
    ```
 
-4. When a plugin of type `boefje` is enabled or disabled in Rocky. This is
-   triggered when the plugin cache of an organisation is flushed.
-
-   * The cache of the organisation will be flushed at a specified interval.
-
-   * Due to the flushing of the cache we get a new list of enabled boefjes for
-     an organisation.
-     (`connectors.services.katalogus._flush_organisations_boefje_type_cache()`)
-
-   * New tasks will be created for enabled boefjes, when the OOIs are being
-     rescheduled. This is then done when the `push_tasks_for_random_objects()`
-     method is called.
 
 ##### Creation of normalizer jobs
 
