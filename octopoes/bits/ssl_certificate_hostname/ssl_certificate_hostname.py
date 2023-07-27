@@ -52,7 +52,7 @@ def run(
     for website in websites:
         hostname = website.hostname.tokenized.name.rstrip(".")
 
-        if subject and subject_valid_for_hostname(subject, hostname):
+        if subject is not None and subject_valid_for_hostname(subject, hostname):
             return
 
         if hostname in subject_alternative_name_hostnames:
