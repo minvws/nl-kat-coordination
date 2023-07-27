@@ -458,7 +458,6 @@ class OnboardingOrganizationSetupView(
     def get(self, request, *args, **kwargs):
         organization = Organization.objects.first()
         if organization:
-            self.get_or_create_organizationmember(organization)
             return redirect(reverse("step_organization_update", kwargs={"organization_code": organization.code}))
         return super().get(request, *args, **kwargs)
 
@@ -479,22 +478,17 @@ class OnboardingOrganizationSetupView(
         org_name = form.cleaned_data["name"]
         result = super().form_valid(form)
         self.add_success_notification(org_name)
-
         return result
 
     def get_or_create_organizationmember(self, organization):
-        if self.request.user.is_superuser:
-            OrganizationMember.objects.get_or_create(
-                user=self.request.user,
-                organization=organization,
-                defaults={
-                    "trusted_clearance_level": 4,
-                    "acknowledged_clearance_level": 4,
-                },
-            )
-
-        else:
-            OrganizationMember.objects.get_or_create(user=self.request.user, organization=organization)
+        OrganizationMember.objects.get_or_create(
+            user=self.request.user,
+            organization=organization,
+            defaults={
+                "trusted_clearance_level": 4,
+                "acknowledged_clearance_level": 4,
+            },
+        )
 
     def add_success_notification(self, org_name):
         success_message = _("{org_name} successfully created.").format(org_name=org_name)
