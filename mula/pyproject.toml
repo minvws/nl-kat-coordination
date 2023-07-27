@@ -28,6 +28,7 @@ opentelemetry-exporter-otlp-proto-grpc = "^1.18.0"
 opentelemetry-instrumentation-fastapi = "^0.39b0"
 opentelemetry-instrumentation-psycopg2 = "^0.39b0"
 opentelemetry-instrumentation-requests = "^0.39b0"
+certifi = "^2023.7.22"
 
 [tool.poetry.group.dev.dependencies]
 factory_boy = "^3.2.1"
