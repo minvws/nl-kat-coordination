@@ -322,7 +322,7 @@ john.primary_key # 'Person/John/Doe'
 OOIs can be related to each other. At time of writing the OOI data structure looks like this:
 
 *Directional arrows indicate a foreign key pointing to referred object*
-![KAT Data Structure](https://github.com/minvws/nl-kat-coordination/tree/main/octopoes/docs/img/kat_data_structure.png "KAT Data Structure")
+![KAT Data Structure](img/kat_data_structure.png "KAT Data Structure")
 
 In a one-to-many relationship (`A 1-* B`), the relationship is stored in B (**B points to A**). For example, an IP-address belongs to a Network. So the Network primary key is stored as a foreign key in the IP-address object.
 
@@ -340,7 +340,7 @@ class IpAddressV6(OOI):
 
 ## A few example records
 
-![KAT Data Example](https://github.com/minvws/nl-kat-coordination/tree/main/octopoes/docs/img/kat_data_example.png "KAT Data Example")
+![KAT Data Example](img/kat_data_example.png "KAT Data Example")
 
 ## OOI Reference
 
@@ -372,7 +372,7 @@ ref.tokenized.protocol # 'tcp'
 ref.tokenized.port # '5050'
 ref.tokenized.address.address # '2001:db8::1'
 ```
-![KAT Ref Example](https://github.com/minvws/nl-kat-coordination/tree/main/octopoes/docs/img/kat_ref_example.png "KAT Ref Example")
+![KAT Ref Example](img/kat_ref_example.png "KAT Ref Example")
 
 ## Octopoes API
 
