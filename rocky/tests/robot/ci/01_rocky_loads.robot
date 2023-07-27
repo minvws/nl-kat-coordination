@@ -13,7 +13,7 @@ I want to add indemnifications
     Fill Text    xpath=//*[@id="id_name"]    Dev Org
     Fill Text    xpath=//*[@id="id_code"]    dev
     Click    "Submit"
-    #Click    xpath=//button[contains(text(),"Submit")]
+    # Click    xpath=//button[contains(text(),"Submit")]
     Check Checkbox    css=#id_may_scan
     Check Checkbox    css=#id_am_authorized
     Click    "Submit"
@@ -33,11 +33,8 @@ I want to create a redteamer account
 I want to create a client account
     Create A User While Onboarding    Client    client@localhost    P@SSw00rdClient!123456789
 
-I can confirm that I can proceed
-    Click    xpath=//a[@class="button"]
-    Click    "Continue"
-    Click    "Continue"
-    Click    "Continue with this account, onboard me!"
+I want to land on crisis room after adding optional users
+    Get Title    equal    OpenKAT - crisis_room
 
 # Note: the CI should be extended when the error 500 is properly debugged
 
@@ -49,4 +46,4 @@ Create A User While Onboarding
     Fill Text    xpath=//*[@id="id_email"]    ${email}
     Fill Text    xpath=//*[@id="id_password"]    ${password}
     Click    "Submit"
-    #Get Text    .confirmation    contains    successfully    error account creation failed
+    # Get Text    .confirmation    contains    successfully    error account creation failed

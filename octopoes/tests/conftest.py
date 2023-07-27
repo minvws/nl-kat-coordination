@@ -161,9 +161,9 @@ def declared_scan_profile():
 
 
 @pytest.fixture
-def xtdbtype_multinode():
+def xtdbtype_crux():
     def get_settings_override():
-        return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
+        return Settings(xtdb_type=XTDBType.CRUX)
 
     app.dependency_overrides[settings] = get_settings_override
     yield
@@ -172,7 +172,7 @@ def xtdbtype_multinode():
 
 @pytest.fixture
 def app_settings():
-    return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
+    return Settings()
 
 
 @pytest.fixture

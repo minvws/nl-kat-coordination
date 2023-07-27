@@ -10,7 +10,7 @@ python = "^3.8"
 ares = "^0.7.1"
 asgiref = "^3.6.0"
 beautifulsoup4 = "^4.11.2"
-certifi = "^2023.5.7"
+certifi = "^2023.7.22"
 chardet = "^5.1.0"
 cwe = "^1.6"
 Django = "^4.2.3"
@@ -103,3 +103,7 @@ max_line_length = 120
 blank_line_after_tag = "load,extends,include"
 # https://www.djlint.com/docs/linter/#rules
 ignore = "H006,H016,H017,H030,H031"
+
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311"]
+line-length = 120

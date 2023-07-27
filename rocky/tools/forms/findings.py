@@ -24,13 +24,11 @@ FINDING_TYPES_LIST = [
 ]
 
 FINDING_TYPES_CHOICES = (
-    (str(finding_type.__name__), str(finding_type.__name__))
-    for finding_type in FINDING_TYPES_LIST
+    (str(finding_type.__name__), str(finding_type.__name__)) for finding_type in FINDING_TYPES_LIST
 )
 
 FINDINGS_SEVERITIES_CHOICES = (
-    (str(severity.name).lower(), str(severity.value).lower())
-    for severity in RiskLevelSeverity
+    (str(severity.name).lower(), str(severity.value).lower()) for severity in RiskLevelSeverity
 )
 
 MUTED_FINDINGS_CHOICES = (
