@@ -306,7 +306,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert
         self.assertFalse(is_running)
 
-    def test_is_task_running_mismatch(self):
+    def test_is_task_running_mismatch_before_grace_period(self):
         """When a task has finished according to the datastore, (e.g. failed
         or completed), but there are no results in bytes, we have a problem.
         """
@@ -345,6 +345,47 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Act
         with self.assertRaises(RuntimeError):
             self.scheduler.is_task_running(task)
+
+    def test_is_task_running_mismatch_after_grace_period(self):
+        """When a task has finished according to the datastore, (e.g. failed
+        or completed), but there are no results in bytes, we have a problem.
+        However when the grace period has been reached we should not raise
+        an error.
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task,
+            hash=task.hash,
+        )
+
+        task_db = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
+            p_item=p_item,
+            status=models.TaskStatus.COMPLETED,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_populate_grace_period),
+        )
+
+        # Mock
+        self.mock_get_latest_task_by_hash.return_value = task_db
+        self.mock_get_last_run_boefje.return_value = None
+
+        # Act
+        self.assertFalse(self.scheduler.is_task_running(task))
 
     def test_has_grace_period_passed_datastore_passed(self):
         """Grace period passed according to datastore, and the status is completed"""

@@ -9,7 +9,7 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Crisis room" %}: {{ organization.name|title }} ({{ organization.code }})</h1>
+                <h1>{% translate "Crisis room" %}: {{ organization.name }}</h1>
                 {% if not indemnification_present %}
                     <p class="warning"
                        role="group"
@@ -30,7 +30,7 @@
                 {% translate "Object list" as filter_title %}
                 <div class="horizontal-scroll">
                     <table class="action-buttons nowrap">
-                        <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "objects" %}</caption>
+                        <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}</caption>
                         <thead>
                             <tr>
                                 <th>{% translate "Severity" %}</th>

@@ -32,8 +32,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES", default="boefjes")
-QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS", default="normalizers")
 QUEUE_URI = env.url("QUEUE_URI", "").geturl()
 
 OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()
@@ -283,7 +281,7 @@ LOGIN_REDIRECT_URL = "crisis_room"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-SESSION_EXPIRE_SECONDS = 60 * 60 * 2  # 2 hours
+SESSION_EXPIRE_SECONDS = env.int("SESSION_EXPIRE_SECONDS", 7200)
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 
 # Require session cookie to be secure, so only a https session can be started
