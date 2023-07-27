@@ -1,10 +1,10 @@
 import csv
 from pathlib import Path
-from typing import Iterator, List, Tuple
+from typing import Dict, Iterator, List, Tuple
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
-from octopoes.models.ooi.service import SSLCipher
+from octopoes.models.ooi.service import TLSCipher
 
 SEVERITY_TO_ID = {
     "Critical": "KAT-CRITICAL-BAD-CIPHER",
@@ -37,17 +37,21 @@ def get_severity_and_reasons(cipher_suite) -> List[Tuple[str, str]]:
             # Check if there's a severity rating and a reason in the row
             if row[severity_col] and row[reason_col]:
                 # Append the severity and reason as a tuple to the list
-                severities_and_reasons.append((row[severity_col], row[reason_col]))
-
+                severities_and_reasons.append(
+                    (row[severity_col], f"{cipher_suite} - {row[reason_col]} ({row[severity_col]}).")
+                )
     return severities_and_reasons
 
 
-def get_highest_severity_and_all_reasons(cipher_suite) -> Tuple[str, str]:
+def get_highest_severity_and_all_reasons(cipher_suites: Dict) -> Tuple[str, str]:
     # Define severity levels
     severity_levels = {"Critical": 3, "Medium": 2, "Recommendation": 1}
 
     # Get severities and reasons
-    severities_and_reasons = get_severity_and_reasons(cipher_suite)
+    severities_and_reasons = []
+    for protocol, suites in cipher_suites.items():
+        for suite in suites:
+            severities_and_reasons.extend(get_severity_and_reasons(suite["cipher_suite_name"]))
 
     if not severities_and_reasons:
         return "", ""
@@ -71,9 +75,9 @@ def get_highest_severity_and_all_reasons(cipher_suite) -> Tuple[str, str]:
     return highest_severity, all_reasons_str
 
 
-def run(input_ooi: SSLCipher, additional_oois, config) -> Iterator[OOI]:
+def run(input_ooi: TLSCipher, additional_oois, config) -> Iterator[OOI]:
     # Get the highest severity and all reasons for the cipher suite
-    highest_severity, all_reasons = get_highest_severity_and_all_reasons(input_ooi.suite)
+    highest_severity, all_reasons = get_highest_severity_and_all_reasons(input_ooi.suites)
 
     # If no severity is found, return an empty list
     if not highest_severity:
@@ -87,5 +91,5 @@ def run(input_ooi: SSLCipher, additional_oois, config) -> Iterator[OOI]:
         yield Finding(
             finding_type=ft.reference,
             ooi=input_ooi.reference,
-            description=f"This cipher suite should not be used because:\n{all_reasons}",
+            description=f"One or more of the cipher suites should not be used because:\n{all_reasons}",
         )

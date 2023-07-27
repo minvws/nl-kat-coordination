@@ -1,9 +1,9 @@
 from bits.definitions import BitDefinition
-from octopoes.models.ooi.service import SSLCipher
+from octopoes.models.ooi.service import TLSCipher
 
 BIT = BitDefinition(
     id="cipher-classification",
-    consumes=SSLCipher,
+    consumes=TLSCipher,
     parameters=[],
     module="bits.cipher_classification.cipher_classification",
 )
