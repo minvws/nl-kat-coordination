@@ -120,12 +120,13 @@ C4Component
 
             Component("push_task_normalizer", "Push Task", "Method")
 
-            SystemQueue(priority_queue_normalizer, "PriorityQueue", "...")
+            SystemQueue(priority_queue_normalizer, "PriorityQueue", "Persisted in a PostgeSQL database table")
         }
 
         Container_Boundary(server, "Server", "REST API") {
             Component("api_tasks", "/tasks", "...")
-            Component("api_queues", "/queues", "...")
+            Component("api_queues_push", "/queues/{id}/push", "...")
+            Component("api_queues_pop", "/queues/{id}/pop", "...")
         }
 
         ContainerDb(task_store, "Task Store", "PostgreSQL Database Table", "Persisted in a PostgeSQL database table")
@@ -151,8 +152,21 @@ C4Component
     Rel(raw_file_received, rabbitmq_raw_file_received, "AMQP", "...")
     Rel(raw_file_received, push_task_normalizer, "", "...")
 
+    Rel(push_task_normalizer, bytes, "", "")
     Rel(push_task_normalizer, priority_queue_normalizer, "push to queue", "...")
     Rel(push_task_normalizer, task_store, "post push", "...")
+
+    %% Server
+    Rel(priority_queue_boefje, api_queues_pop, "pop", "")
+    Rel(api_queues_push, priority_queue_boefje, "push", "")
+    Rel(priority_queue_normalizer, api_queues_pop, "pop", "")
+    Rel(api_queues_push, priority_queue_normalizer, "push", "")
+    Rel(task_store, api_tasks, "GET", "")
+
+    %% Rocky
+    Rel(rocky, api_queues_push, "POST", "")
+    Rel(rocky, api_queues_pop, "GET", "")
+    Rel(rocky, api_tasks, "GET", "")
 
     UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
 ```
