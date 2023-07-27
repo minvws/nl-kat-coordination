@@ -331,6 +331,7 @@ class OnboardingSetClearanceLevelView(
         context = super().get_context_data(**kwargs)
         context["boefjes"] = self.get_boefjes_tiles()
         context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         return context
 
     def get_success_url(self, **kwargs):
