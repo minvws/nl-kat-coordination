@@ -1,7 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from tools.view_helpers import get_ooi_url
 
-from octopoes.models import Reference
 from rocky.views.ooi_view import BaseOOIFormView
 
 
@@ -17,12 +16,13 @@ class OOIEditView(BaseOOIFormView):
         initial = super().get_initial()
 
         for attr, value in self.ooi:
-            if isinstance(value, Reference):
-                initial[attr] = str(value)
-            elif isinstance(value, list):
+            if isinstance(value, list):
                 initial[attr] = [str(x) for x in value]
-            else:
+            elif isinstance(value, dict):
+                # Config OOIs use dicts for their values
                 initial[attr] = value
+            else:
+                initial[attr] = str(value)
 
         return initial
 
