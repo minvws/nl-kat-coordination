@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 from tools.ooi_helpers import (
     format_attr_name,
 )
-from tools.view_helpers import existing_ooi_type, url_with_querystring
+from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with_querystring
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
@@ -17,7 +17,7 @@ from rocky.views.ooi_view import SingleOOITreeMixin
 
 
 class OOIRelatedObjectManager(SingleOOITreeMixin):
-    def get_related_objects(self):
+    def get_related_objects(self, observed_at):
         related = []
         for relation_name, children in self.tree.root.children.items():
             for child in children:
@@ -25,7 +25,11 @@ class OOIRelatedObjectManager(SingleOOITreeMixin):
                     continue
                 rel_name = format_attr_name(relation_name)
                 if rel_name.lower() != "findings":
-                    rel = {"name": rel_name, "reference": child.reference}
+                    rel = {
+                        "name": rel_name,
+                        "reference": child.reference,
+                        "mandatory_fields": get_mandatory_fields(self.request, params=["observed_at"]),
+                    }
                     related.append(rel)
         return related
 

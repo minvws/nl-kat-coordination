@@ -18,7 +18,7 @@ from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
-from rocky.views.mixins import OOIList
+from rocky.views.mixins import OctopoesView, OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -27,7 +27,7 @@ class PageActions(Enum):
     UPDATE_SCAN_PROFILE = "update-scan-profile"
 
 
-class OOIListView(BaseOOIListView):
+class OOIListView(BaseOOIListView, OctopoesView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
 
@@ -36,6 +36,7 @@ class OOIListView(BaseOOIListView):
 
         context["types_display"] = self.get_ooi_types_display()
         context["object_type_filters"] = self.get_ooi_type_filters()
+        context["observed_at"] = self.get_observed_at()
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["select_oois_form"] = SelectOOIForm(
             context.get("ooi_list", []),
