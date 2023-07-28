@@ -5,12 +5,22 @@ import tarfile
 from typing import ByteString, Generator, List, Tuple, Union
 
 import docker
-from PIL import Image
 
 from boefjes.job_models import BoefjeMeta
 
-PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:v1.33.0-jammy"
+PLAYWRIGHT_IMAGE = "mcr.microsoft.com/playwright:latest"
 BROWSER = "chromium"
+
+
+class WebpageCaptureException(Exception):
+    """Exception raised when webpage capture fails."""
+
+    def __init__(self, message, container_log=None):
+        self.message = message
+        self.container_log = container_log
+
+    def __str__(self):
+        return str(self.message) + "\n\nContainer log:\n" + self.container_log
 
 
 class TarStream(io.RawIOBase):
@@ -54,11 +64,11 @@ def get_file_from_container(container: docker.models.containers.Container, path:
     """Returns a file from a docker container."""
     try:
         stream, _ = container.get_archive(path)
-    except docker.errors.NotFound:
-        logging.warning(
+    except docker.errors.NotFound as e:
+        logging.error(
             "[Webpage Capture] %s not found in container %s %s", path, container.short_id, container.image.tags
         )
-        return None
+        raise e
 
     f = tarfile.open(mode="r|", fileobj=TarStream(stream).reader())
     tarobject = f.next()
@@ -68,40 +78,53 @@ def get_file_from_container(container: docker.models.containers.Container, path:
 
 def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
     """Returns playwright command including webpage, browser and locations for image, har and storage."""
-    return " ".join(
-        [
-            "npx playwright screenshot",
-            f"-b {browser}",
-            "--full-page",
-            f"--save-har={tmp_path}.har.zip",
-            f"--save-storage={tmp_path}.json",
-            webpage,
-            f"{tmp_path}.png",
-        ]
-    )
+    return [
+        "/usr/bin/npx",
+        "playwright",
+        "screenshot",
+        "-b",
+        browser,
+        "--full-page",
+        "--ignore-https-errors",
+        f"--save-har={tmp_path}.har.zip",
+        f"--save-storage={tmp_path}.json",
+        webpage,
+        f"{tmp_path}.png",
+    ]
 
 
 def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tuple[bytes]:
     """Run Playwright in Docker."""
     client = docker.from_env()
-    res = client.containers.run(
+    client.images.pull(PLAYWRIGHT_IMAGE)
+    # https://playwright.dev/docs/docker#crawling-and-scraping
+    command = build_playwright_command(webpage=webpage, browser=browser, tmp_path=tmp_path)
+    container = client.containers.run(
         image=PLAYWRIGHT_IMAGE,
-        command=[
-            "/bin/sh",
-            "-c",
-            f"npx -y {build_playwright_command(webpage=webpage, browser=browser, tmp_path=tmp_path)}",
-        ],
+        command=command,
         detach=True,
+        ipc_mode="host",
+        user="pwuser",
+        security_opt=[
+            (
+                'seccomp={"comment": "Allow create user namespaces", "names": ["clone", "setns", "unshare"], '
+                '"action": "SCMP_ACT_ALLOW", "args": [], "includes": {}, "excludes": {}}'
+            )
+        ],
     )
     try:
-        res.wait()
-        image = Image.open(io.BytesIO(get_file_from_container(container=res, path=f"{tmp_path}.png")))
-        har = get_file_from_container(container=res, path=f"{tmp_path}.har.zip")
-        storage = get_file_from_container(container=res, path=f"{tmp_path}.json")
+        container.wait()
+        image = get_file_from_container(container=container, path=f"{tmp_path}.png")
+        har = get_file_from_container(container=container, path=f"{tmp_path}.har.zip")
+        storage = get_file_from_container(container=container, path=f"{tmp_path}.json")
+        return image, har, storage
+    except docker.errors.NotFound:
+        raise WebpageCaptureException(
+            "Error while running Playwright container, command was: " + " ".join(command),
+            container.logs(stdout=True, stderr=True, timestamps=True).decode(),
+        )
     finally:
-        res.remove()
-
-    return image.tobytes(), har, storage
+        container.remove()
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
@@ -109,10 +132,10 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     webpage = f"{input_['scheme']}://{input_['netloc']['name']}{input_['path']}"
 
-    image_bytes, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)
+    image_png, har_zip, storage_json = run_playwright(webpage=webpage, browser=BROWSER)
 
     return [
-        (set("image/png"), image_bytes),
-        (set("application/zip+json"), har_zip),
-        (set("application/json"), storage_json),
+        ({"image/png"}, image_png),
+        ({"application/zip+json", "application/har+json"}, har_zip),
+        ({"application/json", "application/localstorage+json"}, storage_json),
     ]
