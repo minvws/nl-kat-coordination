@@ -66,13 +66,14 @@ class SelectOOIForm(BaseRockyForm):
         self,
         oois: List[OOI],
         organization_code: str,
-        mandatory_fields: list,
+        mandatory_fields: list = None,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.fields["ooi"].widget.attrs["organization_code"] = organization_code
-        self.fields["ooi"].widget.attrs["mandatory_fields"] = mandatory_fields
+        if mandatory_fields:
+            self.fields["ooi"].widget.attrs["mandatory_fields"] = mandatory_fields
         self.set_choices_for_field("ooi", [self._to_choice(ooi) for ooi in oois])
         if len(self.fields["ooi"].choices) == 1:
             self.fields["ooi"].initial = self.fields["ooi"].choices[0][0]
