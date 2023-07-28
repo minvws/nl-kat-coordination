@@ -24,11 +24,11 @@
                             <thead>
                                 <tr>
                                   {% comment %} <th scope="col">{% translate "OOI" %}</th> {% endcomment %}
-                                    <th scope="col">{% translate "MimeType" %}</th>
+                                    {% comment %} <th scope="col">{% translate "MimeType" %}</th> {% endcomment %}
                                     <th scope="col">{% translate "Normalizer" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
-                                    <th scope="col">{% translate "Consumed Raw File" %}</th>
+                                    <th scope="col">{% translate "Task input details" %}</th>
                                     <th scope="col">{% translate "RAW Produced by Boefje" %}</th>
                                     {% comment %} <th scope="col">{% translate "Output OOI's" %}</th> {% endcomment %}
                                     <th scope="col">{% translate "Reschedule" %}</th>
@@ -44,13 +44,13 @@
                                         {% else %}
                                             <td>{% translate "No input OOI" %}</td>
                                             {% endif %} {% endcomment %}
-                                        <td>
+                                        {% comment %} <td>
                                             {% if task.status.value in "completed" %}
                                                 {% for type in task.p_item.data.raw_data.mime_types %}
                                                     {{ type.value }}<br>
                                                 {% endfor %}
                                             {% endif %}
-                                        </td>
+                                        </td> {% endcomment %}
                                         <td>
                                           <a href="{% url 'normalizers_task_view' organization_code=organization.code task_id=task.id %}">
                                             {{ task.p_item.data.normalizer.id }}
