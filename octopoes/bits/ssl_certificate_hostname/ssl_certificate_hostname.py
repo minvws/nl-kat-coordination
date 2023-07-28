@@ -26,8 +26,6 @@ def run(
     additional_oois: List[Union[Website, SubjectAlternativeNameHostname]],
     config: Dict[str, str],
 ) -> Iterator[OOI]:
-    subject = input_ooi.subject.rstrip(".") if input_ooi.subject is not None else ""
-
     websites = [website for website in additional_oois if isinstance(website, Website)]
     subject_alternative_name_hostnames = [
         subject_alternative_name.hostname.tokenized.name.rstrip(".")
