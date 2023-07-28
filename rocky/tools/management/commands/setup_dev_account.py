@@ -49,6 +49,12 @@ class Command(BaseCommand):
                 "can_delete_oois",
                 "add_indemnification",
                 "can_recalculate_bits",
+                "can_scan_organization",
+                "can_enable_disable_boefje",
+                "can_set_clearance_level",
+                "can_mute_findings",
+                "can_view_katalogus_settings",
+                "can_set_katalogus_settings",
             ]
         )
         self.group_admin.permissions.set(admin_permissions)
