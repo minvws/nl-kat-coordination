@@ -23,36 +23,20 @@
                             <caption>{% translate "List of tasks for " %}{{ organization.name }}</caption>
                             <thead>
                                 <tr>
-                                  {% comment %} <th scope="col">{% translate "OOI" %}</th> {% endcomment %}
-                                    {% comment %} <th scope="col">{% translate "MimeType" %}</th> {% endcomment %}
                                     <th scope="col">{% translate "Normalizer" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
                                     <th scope="col">{% translate "Task input details" %}</th>
                                     <th scope="col">{% translate "RAW Produced by Boefje" %}</th>
-                                    {% comment %} <th scope="col">{% translate "Output OOI's" %}</th> {% endcomment %}
+                                    <th scope="col">{% translate "Details" %}</th>
                                     <th scope="col">{% translate "Reschedule" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for task in object_list %}
                                     <tr>
-                                        {% comment %} {% if task.p_item.data.raw_data.boefje_meta.input_ooi %}
-                                            <td>
-                                                <a href="{% ooi_url "ooi_detail" ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
-                                            </td>
-                                        {% else %}
-                                            <td>{% translate "No input OOI" %}</td>
-                                            {% endif %} {% endcomment %}
-                                        {% comment %} <td>
-                                            {% if task.status.value in "completed" %}
-                                                {% for type in task.p_item.data.raw_data.mime_types %}
-                                                    {{ type.value }}<br>
-                                                {% endfor %}
-                                            {% endif %}
-                                        </td> {% endcomment %}
                                         <td>
-                                          <a href="{% url 'normalizers_task_view' organization_code=organization.code task_id=task.id %}">
+                                          <a href="{% url 'normalizer_task_view' organization_code=organization.code task_id=task.id %}">
                                             {{ task.p_item.data.normalizer.id }}
                                           </a>
                                         </td>
@@ -72,11 +56,11 @@
                                         <td>
                                             <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
                                         </td>
-                                        {% comment %} <td>
-                                            {% if task.status.value in "completed,failed" %}
-                                            {% else %}
-                                            {% endif %}
-                                        </td> {% endcomment %}
+                                        <td>
+                                          <a href="{% url 'normalizer_task_view' organization_code=organization.code task_id=task.id %}" class="button ghost">
+                                            {% translate "Task details" %}
+                                          </a>
+                                        </td>
                                         <td>
                                             {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id btn_class="ghost" %}
                                         </td>

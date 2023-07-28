@@ -9,13 +9,13 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{{ task.type|title }} {% translate "details" %}</h1>
-                <h2>"{{ task.p_item.data.normalizer.id }}" @ {{ task.p_item.data.raw_data.boefje_meta.ended_at }}</h2>
+                <h1>"{{ task.p_item.data.normalizer.id }}" {% translate "details" %}</h1>
+                <h2>{{ task.p_item.data.raw_data.boefje_meta.ended_at }}</h2>
                 <p>
-                  An overview of the various steps that where taken to get to this normalizer task and the resulting OOI's
+                  {% blocktranslate trimmed %}
+                      An overview of the normalizer task, the RAW input and the objects it yielded as a result.
+                  {% endblocktranslate %}
                 </p>
-
-                {{ task.p_item.data.raw_data }}
             </div>
 
             <div>
@@ -26,10 +26,9 @@
             </div>
 
             <div>
-              <h2>RAW file of type _____</h2>
-              {% for type in task.p_item.data.raw_data.mime_types %}
-                  {{ type.value }}<br>
-              {% endfor %}
+              <h2>RAW input</h2>
+
+              <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{% translate "Download meta and raw data" %}</a>
             </div>
 
             <div>

@@ -28,6 +28,7 @@
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
                                     <th scope="col">{% translate "Download task details" %}</th>
+                                    <th scope="col">{% translate "Details" %}</th>
                                     <th scope="col">{% translate "Reschedule" %}</th>
                                 </tr>
                             </thead>
@@ -58,6 +59,11 @@
                                             {% else %}
                                                 <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate "Download meta data" %}</a>
                                             {% endif %}
+                                        </td>
+                                        <td>
+                                          <a href="{% url 'boefje_task_view' organization_code=organization.code task_id=task.p_item.data.id %}" class="button ghost">
+                                            {% translate "Task details" %}
+                                          </a>
                                         </td>
                                         <td>
                                           {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id btn_class="ghost" %}
