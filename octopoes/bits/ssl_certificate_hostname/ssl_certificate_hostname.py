@@ -17,14 +17,6 @@ def is_part_of_wildcard(hostname: str, wildcard: str) -> bool:
     return wildcard_domain == higher_level_domain
 
 
-def subject_valid_for_hostname(subject: str, hostname: str) -> bool:
-    if subject == hostname:
-        return True
-    if subject.startswith("*"):
-        return is_part_of_wildcard(hostname, subject)
-    return False
-
-
 def hostname_in_qualifiers(hostname: str, qualifiers: List[str]) -> bool:
     return any(is_part_of_wildcard(hostname, qualifier) for qualifier in qualifiers)
 
@@ -51,9 +43,6 @@ def run(
 
     for website in websites:
         hostname = website.hostname.tokenized.name.rstrip(".")
-
-        if subject is not None and subject_valid_for_hostname(subject, hostname):
-            return
 
         if hostname in subject_alternative_name_hostnames:
             return
