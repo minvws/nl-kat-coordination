@@ -15,7 +15,10 @@ from katalogus.client import get_katalogus
 
 
 class ConfirmCloneSettingsView(
-    OrganizationPermissionRequiredMixin, OrganizationView, UserPassesTestMixin, TemplateView
+    OrganizationPermissionRequiredMixin,
+    OrganizationView,
+    UserPassesTestMixin,
+    TemplateView,
 ):
     template_name = "confirmation_clone_settings.html"
     permission_required = "tools.can_set_katalogus_settings"
@@ -36,11 +39,7 @@ class ConfirmCloneSettingsView(
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            _("Settings from %s to %s successfully cloned.")
-            % (
-                self.organization.name,
-                to_organization.name,
-            ),
+            _("Settings from {} to {} successfully cloned.").format(self.organization.name, to_organization.name),
         )
         return HttpResponseRedirect(
             reverse(
@@ -65,7 +64,10 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
                 "text": _("KAT-alogus"),
             },
             {
-                "url": reverse("katalogus_settings", kwargs={"organization_code": self.organization.code}),
+                "url": reverse(
+                    "katalogus_settings",
+                    kwargs={"organization_code": self.organization.code},
+                ),
                 "text": _("Settings"),
             },
         ]
@@ -83,7 +85,9 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
                 plugin_setting = katalogus_client.get_plugin_settings(boefje.id)
             except RequestException:
                 messages.add_message(
-                    self.request, messages.ERROR, _("Failed getting settings for boefje {}").format(self.plugin.id)
+                    self.request,
+                    messages.ERROR,
+                    _("Failed getting settings for boefje {}").format(self.plugin.id),
                 )
                 continue
 
@@ -113,5 +117,8 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
     def get_success_url(self, **kwargs):
         return reverse_lazy(
             "confirm_clone_settings",
-            kwargs={"organization_code": self.organization.code, "to_organization": kwargs["to_organization"]},
+            kwargs={
+                "organization_code": self.organization.code,
+                "to_organization": kwargs["to_organization"],
+            },
         )
