@@ -315,6 +315,18 @@ class OnboardingSetupScanOOIDetailView(
         return context
 
 
+class OnboardingAcknowledgeClearanceLevelView(
+    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, TemplateView
+):
+    permission_required = "tools.can_set_clearance_level"
+    current_step = 3
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
+        return context
+
+
 class OnboardingSetClearanceLevelView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
