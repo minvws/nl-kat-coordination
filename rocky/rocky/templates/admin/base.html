@@ -1,3 +1,16 @@
 {% extends "admin/base.html" %}
 
 {% load static %}
+
+{% block dark-mode-vars %}
+    <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
+    <script nonce="{{ request.csp_nonce }}"
+            src="{% static "admin/js/theme.js" %}"
+            defer></script>
+{% endblock dark-mode-vars %}
+{% if not is_popup and is_nav_sidebar_enabled %}
+    <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
+    <script nonce="{{ request.csp_nonce }}"
+            src="{% static 'admin/js/nav_sidebar.js' %}"
+            defer></script>
+{% endif %}
