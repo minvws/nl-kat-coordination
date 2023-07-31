@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     runtime: RuntimeConfiguration = RuntimeConfiguration.LOCAL
 
     katalogus_db_uri: PostgresDsn = Field(
-        "postgresql://xx:xx@host:5432/katalogus", description="Katalogus Postgres DB URI", env="KATALOGUS_DB"
+        "postgresql://xx:xx@host:5432/katalogus", description="Katalogus Postgres DB URI", env="KATALOGUS_DB_URI"
     )
 
     scheduler_api: AnyHttpUrl = Field("http://localhost:8004", description="Mula API URL", env="SCHEDULER_API")
