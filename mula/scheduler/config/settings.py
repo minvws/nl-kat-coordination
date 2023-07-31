@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     host_mutation: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     host_raw_data: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     queue_prefetch_count: int = Field(100, env="SCHEDULER_QUEUE_PREFETCH_COUNT")
-    host_normalizer_meta: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
+    host_normalizer_meta: str = Field(..., env="QUEUE_URI")
     span_export_grpc_endpoint: Optional[str] = Field(None, env="SPAN_EXPORT_GRPC_ENDPOINT")
 
     # Queue settings (0 is infinite)
