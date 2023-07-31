@@ -74,14 +74,14 @@ class OrganizationMemberListView(
                 messages.add_message(
                     self.request,
                     messages.SUCCESS,
-                    _("Blocked member %s successfully.") % (organizationmember.user.full_name),
+                    _("Blocked member %s successfully.") % (organizationmember.user.email),
                 )
             elif action == PageActions.UNBLOCK.value:
                 organizationmember.blocked = False
                 messages.add_message(
                     self.request,
                     messages.SUCCESS,
-                    _("Unblocked member %s successfully.") % (organizationmember.user.full_name),
+                    _("Unblocked member %s successfully.") % (organizationmember.user.email),
                 )
             else:
                 raise Exception(f"Unhandled allowed action: {action}")
