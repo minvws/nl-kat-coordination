@@ -455,8 +455,13 @@ class OnboardingOrganizationSetupView(
     current_step = 2
     permission_required = "tools.add_organization"
 
+    def get_queryset(self) -> Organization | None:
+        member = OrganizationMember.objects.filter(user=self.request.user)
+        if member:
+            return member.first().organization
+
     def get(self, request, *args, **kwargs):
-        organization = Organization.objects.first()
+        organization = self.get_queryset()
         if organization:
             return redirect(reverse("step_organization_update", kwargs={"organization_code": organization.code}))
         return super().get(request, *args, **kwargs)
@@ -470,9 +475,8 @@ class OnboardingOrganizationSetupView(
         return self.get(request, *args, **kwargs)
 
     def get_success_url(self) -> str:
-        organization = Organization.objects.first()
-        self.get_or_create_organizationmember(organization)
-        return reverse_lazy("step_indemnification_setup", kwargs={"organization_code": organization.code})
+        self.create_first_member(self.object)
+        return reverse_lazy("step_indemnification_setup", kwargs={"organization_code": self.object.code})
 
     def form_valid(self, form):
         org_name = form.cleaned_data["name"]
@@ -480,15 +484,15 @@ class OnboardingOrganizationSetupView(
         self.add_success_notification(org_name)
         return result
 
-    def get_or_create_organizationmember(self, organization):
-        OrganizationMember.objects.get_or_create(
+    def create_first_member(self, organization):
+        member = OrganizationMember.objects.create(
             user=self.request.user,
             organization=organization,
-            defaults={
-                "trusted_clearance_level": 4,
-                "acknowledged_clearance_level": 4,
-            },
         )
+        if member.user.is_superuser:
+            member.trusted_clearance_level = 4
+            member.acknowledged_clearance_level = 4
+            member.save()
 
     def add_success_notification(self, org_name):
         success_message = _("{org_name} successfully created.").format(org_name=org_name)
