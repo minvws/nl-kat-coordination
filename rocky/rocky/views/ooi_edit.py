@@ -1,3 +1,5 @@
+from enum import Enum
+
 from django.utils.translation import gettext_lazy as _
 from tools.view_helpers import get_ooi_url
 
@@ -18,6 +20,8 @@ class OOIEditView(BaseOOIFormView):
         for attr, value in self.ooi:
             if isinstance(value, list):
                 initial[attr] = [str(x) for x in value]
+            elif isinstance(value, Enum):
+                initial[attr] = value.value
             elif isinstance(value, dict):
                 # Config OOIs use dicts for their values
                 initial[attr] = value
