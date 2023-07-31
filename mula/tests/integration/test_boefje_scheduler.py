@@ -1247,6 +1247,8 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
     def test_push_tasks_for_rescheduling_boefje_not_found(self):
+        """When boefje isn't found anymore for the job we disable the job
+        """
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1270,6 +1272,9 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
             p_item=p_item,
         )
+
+        # Arrange: create job in database
+        self.mock_ctx.job_store.create_job(job)
 
         # Mocks
         self.mock_get_jobs.return_value = ([job], 1)

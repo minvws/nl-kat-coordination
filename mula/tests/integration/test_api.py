@@ -6,28 +6,13 @@ from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, queues, repositories, schedulers, server
+from scheduler import config, models, repositories, server
 
 from tests.factories import OrganisationFactory
+from tests.mocks import queue as mock_queue
+from tests.mocks import scheduler as mock_scheduler
 from tests.utils import functions
 from tests.utils.functions import create_p_item
-
-
-class MockScheduler(schedulers.Scheduler):
-    def __init__(self, ctx, scheduler_id, queue, organisation):
-        super().__init__(ctx, scheduler_id, queue, organisation)
-        self._populate_queue_enabled = True
-
-    def populate_queue(self):
-        pass
-
-    def run(self):
-        pass
-
-
-class MockPriorityQueue(queues.PriorityQueue):
-    def create_hash(self, item: functions.TestModel) -> str:
-        return item.id.hex
 
 
 class APITemplateTestCase(unittest.TestCase):
@@ -50,7 +35,7 @@ class APITemplateTestCase(unittest.TestCase):
         # Scheduler
         self.organisation = OrganisationFactory()
 
-        queue = MockPriorityQueue(
+        queue = mock_queue.MockPriorityQueue(
             pq_id=self.organisation.id,
             maxsize=10,
             item_type=functions.TestModel,
@@ -58,11 +43,10 @@ class APITemplateTestCase(unittest.TestCase):
             pq_store=self.pq_store,
         )
 
-        self.scheduler = MockScheduler(
+        self.scheduler = mock_scheduler.MockScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
             queue=queue,
-            organisation=self.organisation,
         )
 
         self.server = server.Server(self.mock_ctx, {self.scheduler.scheduler_id: self.scheduler})

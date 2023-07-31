@@ -146,3 +146,11 @@ class JobStorer(abc.ABC):
     @abc.abstractmethod
     def update_job(self, job: models.Job) -> None:
         raise NotImplementedError
+
+    @abc.abstractmethod
+    def update_job_deadline(self, job_id: str, deadline: datetime.datetime) -> None:
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def update_job_enabled(self, job_id: str, enabled: bool) -> None:
+        raise NotImplementedError
