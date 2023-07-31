@@ -71,13 +71,18 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: ['tomli']
+        args: [-L, lama]
         exclude: |
           (?x)(
           \.po$ |
+          \.xml$ |
           poetry.lock$ |
+          pyproject.toml$ |
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
+          ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
+          ^boefjes/tests/examples/inputs/cve-result-with-cvss2.json |
           ^keiko/glossaries |
           ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |

@@ -32,7 +32,7 @@ By default, on Ubuntu systems, nginx puts its configurations in the directory /e
 
     $ nano /etc/nginx/sites-available/openkat.example.com
 
-Then put the following content in there:
+Then put the following content in there, but replace the domain name `openkat.example.com` with the domain name you are using for this OpenKAT install:
 
 .. code-block:: sh
 
@@ -51,11 +51,12 @@ Then put the following content in there:
     }
 
 With this, we have set up minimal things for OpenKAT. Much more is possible, but this is the minimum we need to use OpenKAT properly.
+we assume that OpenKAT listens on the server to port 8000, you could check this by doing `wget -O- localhost:8000` it should show you some html output.
 
 Logging
 =======
 
-we assume that OpenKAT listens on the server to port 8000. Furthermore, we write the log files away to the directory /var/log/nginx/. If you rename the log files (in particular, give them an extension other than .log) or put them in a different place, you will have to reconfigure Logrotate for this as well, otherwise the log files will continue to grow indefinitely. For this, see the configuration in the file /etc/logrotate.d/nginx
+We write the log files in the directory `/var/log/nginx/`. If you rename the log files (in particular, give them an extension other than .log) or put them in a different place, you will have to reconfigure Logrotate for this as well, otherwise, the log files will continue to grow indefinitely. For this, see the configuration in the file `/etc/logrotate.d/nginx`
 
 Activation
 ==========
@@ -64,7 +65,7 @@ Now that we have the configuration, we need to activate it. To do this, use the 
 
 .. code-block:: sh
 
-    $ ln -sf /etc/nginx/sites-available/openkat.example.com /etc/nginx/sites-enabled/openkat.example.com
+    $ ln -sf /etc/nginx/sites-available/openkat.example.com /etc/nginx/sites-enabled/
 
 (Obviously adjust the file names to what you have used yourself)
 
@@ -76,10 +77,15 @@ You can check that the configuration is correct with the following command:
 
 If everything is okay, it will report it that way. If there is an error in the configuration (because you forgot an ; somewhere, for example), it will show you the line number where the problem is near. Note: So you might need to add an ; on the previous line.
 
+.. code-block:: sh
+
+    $ service nginx reload
+
 SSL certificates
 ================
 
 With this basic configuration, we can then let Certbot arrange an SSL certificate; Certbot itself will also take care of setting this up in your web server configuration.
+Before we can setup a certificate, you need to make sure the domain name you used in the earlier config points to the external IP address for the host running nginx.
 
 This is very simple: you just need to start Certbot and answer the questions. Starting Certbot is done with the following command:
 

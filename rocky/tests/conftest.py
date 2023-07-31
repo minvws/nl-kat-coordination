@@ -3,6 +3,7 @@ import json
 import logging
 from os import urandom
 from pathlib import Path
+from typing import Dict
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -76,6 +77,7 @@ def add_admin_group_permissions(member):
         Permission.objects.get(codename="change_organizationmember").id,
         Permission.objects.get(codename="can_delete_oois").id,
         Permission.objects.get(codename="add_indemnification").id,
+        Permission.objects.get(codename="can_scan_organization").id,
     ]
     group.permissions.set(admin_permissions)
 
@@ -450,8 +452,12 @@ def mock_scheduler(mocker):
     return mocker.patch("rocky.views.ooi_detail.scheduler.client")
 
 
-def get_boefjes_data():
-    return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())
+def get_stub_path(file_name: str) -> Path:
+    return Path(__file__).parent / "stubs" / file_name
+
+
+def get_boefjes_data() -> Dict:
+    return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
 @pytest.fixture()

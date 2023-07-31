@@ -3,12 +3,15 @@ from __future__ import annotations
 from enum import Enum
 from typing import List, Optional, Set, Tuple, Type
 
-from pyparsing import ParseException, Word, alphas
+from pyparsing import Literal, Opt, ParseException, Word, alphas
 
 from octopoes.models import OOI
 from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
 
-incoming_step_grammar = "<" + Word(alphas + "_") + "[" + "is" + Word(alphas) + "]"
+type_intersection_grammar = Literal("[") + "is" + Word(alphas) + "]"
+
+incoming_step_grammar = "<" + Word(alphas + "_") + type_intersection_grammar
+outgoing_step_grammar = Word(alphas + "_") + Opt(type_intersection_grammar)
 
 
 class Direction(Enum):
@@ -36,7 +39,14 @@ class Segment:
             incoming, property_name, _, _, target_type, _ = parsed_step
             return Direction.INCOMING, property_name, type_by_name(target_type)
         except ParseException:
-            return Direction.OUTGOING, step, None
+            try:
+                parsed_step = outgoing_step_grammar.parse_string(step)
+                if len(parsed_step) == 1:
+                    return Direction.OUTGOING, parsed_step[0], None
+                property_name, _, _, target_type, _ = parsed_step
+                return Direction.OUTGOING, property_name, type_by_name(target_type)
+            except ParseException:
+                raise ValueError(f"Could not parse step: {step}")
 
     @classmethod
     def calculate_step(cls, source_type: Type[OOI], step: str):
@@ -99,6 +109,9 @@ class Path:
 
     def __hash__(self):
         return hash(str(self))
+
+    def __repr__(self):
+        return str(self)
 
 
 def get_paths_to_neighours(source_type: Type[OOI]) -> Set[Path]:

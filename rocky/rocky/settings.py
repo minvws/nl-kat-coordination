@@ -32,8 +32,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES", default="boefjes")
-QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS", default="normalizers")
 QUEUE_URI = env.url("QUEUE_URI", "").geturl()
 
 OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()
@@ -85,7 +83,17 @@ if SPAN_EXPORT_GRPC_ENDPOINT is not None:
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 EMAIL_FILE_PATH = env.path("EMAIL_FILE_PATH", BASE_DIR / "rocky/email_logs")  # directory to store output files
 EMAIL_HOST = env("EMAIL_HOST", default="localhost")  # localhost
-EMAIL_PORT = env.int("EMAIL_PORT", default=25)  # 25
+try:
+    EMAIL_PORT = env.int("EMAIL_PORT", default=25)
+except ValueError:
+    # We have an empty EMAIL_PORT= to rocky.conf in the Debian package. We
+    # handle the empty string as default value here so we don't generate an
+    # exception for this
+    if env("EMAIL_PORT"):
+        raise
+
+    EMAIL_PORT = 25
+
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="")
@@ -273,7 +281,7 @@ LOGIN_REDIRECT_URL = "crisis_room"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-SESSION_EXPIRE_SECONDS = 60 * 60 * 2  # 2 hours
+SESSION_EXPIRE_SECONDS = env.int("SESSION_EXPIRE_SECONDS", 7200)
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 
 # Require session cookie to be secure, so only a https session can be started

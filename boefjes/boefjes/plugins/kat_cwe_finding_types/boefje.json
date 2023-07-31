@@ -1,0 +1,14 @@
+{
+    "id": "cwe-finding-types",
+    "name": "CWE Finding Types",
+    "description": "Hydrate information of CWE finding types",
+    "consumes": [
+        "CWEFindingType"
+    ],
+    "produces": [
+        "CWEFindingType"
+    ],
+    "environment_keys": [],
+    "scan_level": 0,
+    "enabled": true
+}

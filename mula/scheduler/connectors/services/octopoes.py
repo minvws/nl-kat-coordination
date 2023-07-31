@@ -10,9 +10,15 @@ class Octopoes(HTTPService):
     name = "octopoes"
     health_endpoint = None
 
-    def __init__(self, host: str, source: str, orgs: List[Organisation]):
+    def __init__(
+        self,
+        host: str,
+        source: str,
+        orgs: List[Organisation],
+        timeout: int = 10,
+    ):
         self.orgs: List[Organisation] = orgs
-        super().__init__(host, source)
+        super().__init__(host, source, timeout)
 
     @exception_handler
     def get_objects_by_object_types(

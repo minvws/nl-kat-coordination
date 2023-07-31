@@ -29,7 +29,7 @@
                         <td>{{ finding_type.risk_score }}</td>
                         <td>{{ finding.description }}</td>
                         <td>
-                            <a href="{% ooi_url 'ooi_detail' finding.id organization.code query=mandatory_fields %}">{{ finding.human_readable }}</a>
+                            <a href="{% ooi_url 'ooi_detail' finding.primary_key organization.code query=mandatory_fields %}">{{ finding.human_readable }}</a>
                         </td>
                     </tr>
                 {% endfor %}

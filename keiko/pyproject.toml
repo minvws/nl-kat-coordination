@@ -1,31 +1,9 @@
 [tool.poetry]
 name = "keiko"
-version = "0.1.0"
+version = "0.0.1.dev1"
 description = "KAT report engine using LateX to generate PDF"
 authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
-
-
-[tool.vulture]
-min_confidence = 90
-paths = ["keiko"]
-
-[tool.pylint.format]
-max-line-length = "120"
-
-[tool.pylint."MESSAGES CONTROL"]
-disable = ["R0914", "R0903"] # Ignore too-many-local-variables; too-few-public-methods
-extension-pkg-whitelist = "pydantic"
-
-[tool.black]
-line-length = 119
-target-version = ['py38']
-
-[tool.pydocstyle]
-
-[tool.mypy]
-python_version = "3.8"
-strict = true
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -39,7 +17,7 @@ opentelemetry-sdk = "^1.18.0"
 opentelemetry-exporter-otlp-proto-grpc = "1.18.0"
 opentelemetry-instrumentation-fastapi = "^0.39b0"
 requests = "^2.31.0"
-certifi = "^2023.5.7"
+certifi = "^2023.7.22"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
@@ -56,3 +34,7 @@ httpx = "^0.23.3"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+target-version = ["py38", "py39", "py310", "py311"]
+line-length = 120

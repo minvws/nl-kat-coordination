@@ -43,7 +43,10 @@ services:
   octopoes_api:
     restart: unless-stopped
     depends_on:
-      - crux
+      crux:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "127.0.0.1:8001:80"
     build:
@@ -60,8 +63,10 @@ services:
   octopoes_api_worker:
     restart: unless-stopped
     depends_on:
-      - crux
-      - rabbitmq
+      crux:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     build:
       context: octopoes/
       target: dev

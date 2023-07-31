@@ -29,6 +29,7 @@
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
                                     <th scope="col">{% translate "Download task details" %}</th>
+                                    <th scope="col">{% translate "Reschedule" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -41,7 +42,9 @@
                                         {% else %}
                                             <td>{% translate "No input OOI" %}</td>
                                         {% endif %}
-                                        <td>{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</td>
+                                        <td>
+                                          <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                                        </td>
                                         <td>{{ task.p_item.data.normalizer.id }}</td>
                                         {% if task.status.value == "completed" %}
                                             <td class="confirmation">{{ task.status.value|capfirst }}</td>
@@ -57,6 +60,9 @@
                                             {% else %}
                                                 <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate "Download meta data" %}</a>
                                             {% endif %}
+                                        </td>
+                                        <td>
+                                          {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id btn_class="ghost" %}
                                         </td>
                                     </tr>
                                 {% endfor %}

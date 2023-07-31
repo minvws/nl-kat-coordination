@@ -54,37 +54,100 @@ although this would be more complicated.
 
 ## Environment variables
 By design, Boefjes do not have access to the host system's environment variables.
-If a Boefje requires access to a system-wide variable (e.g. `HTTP_PROXY` or `USER_AGENT`), it should note as such in its `boefje.json` manifest.
-These system-wide variables can be set in OpenKAT's global `.env`, by prefixing it with `BOEFJE_`.
+If a Boefje requires access to an environment variable (e.g. `HTTP_PROXY` or `USER_AGENT`), it should note as such in its `boefje.json` manifest.
+The system-wide variables can be set as environment variable to the boefjes runner by prefixing it with `BOEFJE_`.
 This is to prevent a Boefje from accessing variables it should not have access to, such as secrets.
-To illustrate: if `BOEFJE_HTTP_PROXY=HTTP_PROXY` is set in the global `.env`, the Boefje can access it as `HTTP_PROXY`.
-This feature can also be used to set default values for Katalogus settings. For example, configuring `BOEFJE_TOP_PORTS`
-in the global `.env` will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
-This default value can be overridden by setting any value for `TOP_PORTS` in the Katalogus.
+To illustrate: if `BOEFJE_HTTP_PROXY=https://proxy:8080` environment variable is configured, the Boefje can access it as `HTTP_PROXY`.
+This feature can also be used to set default values for KAT-alogus settings. For example, configuring the `BOEFJE_TOP_PORTS` environment variable
+will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
+This default value can be overridden by setting any value for `TOP_PORTS` in the KAT-alogus.
 
 
-| Environment variable       | Value                        | Description                                       |
-|----------------------------|------------------------------|---------------------------------------------------|
-| QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                            |
-| QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                        |
-| QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                 |
-| OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                          |
-| BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                             |
-| KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                         |
-| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                         |
-| ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings      |
-| KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string |
-| KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string  |
+| Environment variable       | Value                        | Description                                                      |
+|----------------------------|------------------------------|------------------------------------------------------------------|
+| QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                                           |
+| QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                                       |
+| QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                                |
+| POOL_SIZE                  | "2.0"                        | Number of workers to run per queue                               |
+| POLL_INTERVAL              | "10.0"                       | Time to wait before polling for tasks when all queues are empty  |
+| WORKER_HEARTBEAT           | "1.0"                        | Seconds to wait before checking the workers when queues are full |
+| OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                                         |
+| BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                                            |
+| KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                                        |
+| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                                        |
+| ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings                     |
+| KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string                |
+| KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string                 |
 
 ## Design
 
 Boefjes will run as containerized workers pulling jobs from a centralized job queue:
 
-![design](docs/design.png)
+![design](img/boefje_design.png)
 
 Connections to other components, represented by the yellow squares, are abstracted by the modules inside them. The red
 components live outside the boefjes module. The green core files however is what can be focused on and can be
 developed/refactored further to support boefjes of all different kinds.
+
+### Boefje and Normalizer Workers
+
+When we configure a `POOL_SIZE` of `n`, we have `n` + 1 processes: one main process and `n` workers.
+The main process pushes to a `multiprocessing.Manager.Queue` and keeps track of the task that was being handled by the workers.
+It sets the status to failed when the worker was killed,
+like when the process [runs out of memory and is killed by Docker](https://github.com/minvws/nl-kat-coordination/pull/1187).
+(Note: `multiprocessing.Queue` will not work due to [`qsize()` not being implemented on macOS](https://github.com/minvws/nl-kat-coordination/pull/1374).)
+No maximum size is defined on the queue since we want to avoid blocking.
+Hence, we manually check if the queue does not pile up beyond the number of workers, i.e. `n`.
+
+#### Design
+
+The setup for the main process and workers:
+
+```{mermaid}
+graph LR
+
+SchedulerRuntimeManager -- "pop()" --> Scheduler
+
+subgraph Process 0
+
+  multiprocessing.Queue
+  SchedulerRuntimeManager -- "put(p_item)" --> multiprocessing.Queue["multiprocessing.Manager.Queue()"]
+
+  Worker-1["Worker 1<br/><i>target = _start_working()"] -- "get()" --> multiprocessing.Queue
+
+  subgraph Process 1
+    Worker-1
+    Worker-1 -- runs --> Plugin1["Plugin"]
+  end
+
+  Worker-2["Worker 2<br/><i>target = _start_working()"] -- "get()" --> multiprocessing.Queue
+
+  subgraph Process 2
+      Worker-2
+      Worker-2 -- runs --> Plugin2["Plugin"]
+  end
+end
+```
+
+#### Worker failure mode
+Rough representation of the failure mode when a SIGKILL has been sent to the worker:
+
+```{mermaid}
+sequenceDiagram
+  participant SchedulerRuntimeManager
+  participant handling_tasks
+  participant Worker1
+  participant Scheduler
+  participant Worker2
+  Worker1->>handling_tasks: set p_item.id for worker1.pid
+  SchedulerRuntimeManager->>Worker1: if not is_alive()
+  SchedulerRuntimeManager->>handling_tasks: get p_item.id for worker1.pid
+  SchedulerRuntimeManager->>Scheduler: set p_item.status to FAILED
+  SchedulerRuntimeManager->>Worker1: close()
+  SchedulerRuntimeManager->>Worker2: start()
+```
+
+
 
 ### Running as a Docker container
 

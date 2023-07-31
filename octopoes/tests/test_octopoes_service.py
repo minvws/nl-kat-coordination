@@ -93,7 +93,7 @@ def test_on_update_origin(octopoes_service, valid_time):
     )
 
     # and the deferenced ooi is no longer referred to by any origins
-    octopoes_service.origin_repository.list_by_result.return_value = []
+    octopoes_service.origin_repository.list.return_value = []
     octopoes_service.process_event(event)
 
     # the ooi should be deleted
@@ -105,7 +105,7 @@ def test_on_update_origin(octopoes_service, valid_time):
 @pytest.mark.parametrize("new_data", [EmptyScanProfile(reference="test_reference"), None])
 @pytest.mark.parametrize("old_data", [EmptyScanProfile(reference="test_reference"), None])
 def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner: MagicMock):
-    octopoes_service.origin_repository.list_by_source.return_value = [
+    octopoes_service.origin_repository.list.return_value = [
         Origin(
             origin_type=OriginType.INFERENCE,
             method="check-csp-header",

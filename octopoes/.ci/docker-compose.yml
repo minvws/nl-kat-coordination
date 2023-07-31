@@ -35,7 +35,7 @@ services:
       args:
         ENVIRONMENT: dev
       context: .
-    command: pytest -x tests/integration
+    command: pytest -x tests/integration --timeout=300
     depends_on:
       - xtdb_multinode
       - ci_octopoes

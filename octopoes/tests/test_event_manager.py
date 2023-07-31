@@ -12,7 +12,7 @@ def test_event_manager_create_ooi(mocker, network):
     channel_mock = mocker.Mock()
 
     mocker.patch.object(uuid, "uuid4", return_value="1754a4c8-f0b8-42c8-b294-5706ce23a47d")
-    manager = EventManager("test", celery_mock, "queue", channel_mock)
+    manager = EventManager("test", "amqp://test-queue-uri", celery_mock, "queue", lambda x: channel_mock)
     event = OOIDBEvent(operation_type=OperationType.CREATE, valid_time=datetime(2023, 1, 1), new_data=network)
     manager.publish(event)
 
@@ -45,7 +45,7 @@ def test_event_manager_create_empty_scan_profile(mocker, empty_scan_profile):
     channel_mock = mocker.Mock()
 
     mocker.patch.object(uuid, "uuid4", return_value="1754a4c8-f0b8-42c8-b294-5706ce23a47d")
-    manager = EventManager("test", celery_mock, "queue", channel_mock)
+    manager = EventManager("test", "amqp://test-queue-uri", celery_mock, "queue", lambda x: channel_mock)
     event = ScanProfileDBEvent(
         operation_type=OperationType.CREATE,
         valid_time=datetime(2023, 1, 1),
@@ -87,7 +87,7 @@ def test_event_manager_create_declared_scan_profile(mocker, declared_scan_profil
     channel_mock = mocker.Mock()
 
     mocker.patch.object(uuid, "uuid4", return_value="1754a4c8-f0b8-42c8-b294-5706ce23a47d")
-    manager = EventManager("test", celery_mock, "queue", channel_mock)
+    manager = EventManager("test", "amqp://test-queue-uri", celery_mock, "queue", lambda x: channel_mock)
     event = ScanProfileDBEvent(
         operation_type=OperationType.CREATE,
         valid_time=datetime(2023, 1, 1),
@@ -139,7 +139,7 @@ def test_event_manager_delete_empty_scan_profile(mocker, empty_scan_profile):
     channel_mock = mocker.Mock()
 
     mocker.patch.object(uuid, "uuid4", return_value="1754a4c8-f0b8-42c8-b294-5706ce23a47d")
-    manager = EventManager("test", celery_mock, "queue", channel_mock)
+    manager = EventManager("test", "amqp://test-queue-uri", celery_mock, "queue", lambda x: channel_mock)
     event = ScanProfileDBEvent(
         operation_type=OperationType.DELETE,
         valid_time=datetime(2023, 1, 1),

@@ -2,7 +2,7 @@ import uuid
 from collections import Counter
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import List, Optional, Set, Type
+from typing import Generator, List, Optional, Set, Type
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from requests import RequestException
@@ -76,21 +76,23 @@ def settings() -> Settings:
     return Settings()
 
 
-def xtdb_session(client: str = Depends(extract_client), settings_: Settings = Depends(settings)) -> XTDBSession:
-    xtdb_client_ = get_xtdb_client(settings_.xtdb_uri, client, settings_.xtdb_type)
-    return XTDBSession(xtdb_client_)
+def xtdb_session(
+    client: str = Depends(extract_client), settings_: Settings = Depends(settings)
+) -> Generator[XTDBSession, None, None]:
+    session = XTDBSession(get_xtdb_client(settings_.xtdb_uri, client, settings_.xtdb_type))
+
+    yield session
+    session.commit()
+
+    logger.info("Committed XTDBSession")
 
 
 def octopoes_service(
     client: str = Depends(extract_client),
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
+    session: XTDBSession = Depends(xtdb_session),
     settings_: Settings = Depends(settings),
-):
-    octopoes, _, session, rabbit_connection = bootstrap_octopoes(settings_, client, xtdb_session_)
-    try:
-        yield octopoes
-    finally:
-        rabbit_connection.close()
+) -> OctopoesService:
+    return bootstrap_octopoes(settings_, client, session)
 
 
 # Endpoints
@@ -165,26 +167,21 @@ def list_random_objects(
 
 @router.delete("/", tags=["Objects"])
 def delete_object(
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     reference: Reference = Depends(extract_reference),
 ) -> None:
     octopoes.ooi_repository.delete(reference, valid_time)
-    xtdb_session_.commit()
 
 
 @router.post("/objects/delete_many", tags=["Objects"])
 def delete_many(
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     references: List[Reference] = Depends(extract_references),
 ) -> None:
     for reference in references:
         octopoes.ooi_repository.delete(reference, valid_time)
-
-    xtdb_session_.commit()
 
 
 @router.get("/tree", tags=["Objects"])
@@ -207,9 +204,18 @@ def get_tree(
 def list_origins(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    reference: Reference = Depends(extract_reference),
+    source: Optional[Reference] = Query(None),
+    result: Optional[Reference] = Query(None),
+    task_id: Optional[str] = Query(None),
+    origin_type: Optional[OriginType] = Query(None),
 ) -> List[Origin]:
-    return octopoes.origin_repository.list_by_result(reference, valid_time)
+    return octopoes.origin_repository.list(
+        valid_time,
+        task_id=task_id,
+        source=source,
+        result=result,
+        origin_type=origin_type,
+    )
 
 
 @router.get("/origin_parameters", tags=["Origins"])
@@ -224,7 +230,6 @@ def list_origin_parameters(
 @router.post("/observations", tags=["Origins"])
 def save_observation(
     observation: ValidatedObservation,
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
     octopoes: OctopoesService = Depends(octopoes_service),
 ) -> None:
     origin = Origin(
@@ -235,13 +240,11 @@ def save_observation(
         task_id=observation.task_id,
     )
     octopoes.save_origin(origin, observation.result, observation.valid_time)
-    xtdb_session_.commit()
 
 
 @router.post("/declarations", tags=["Origins"])
 def save_declaration(
     declaration: ValidatedDeclaration,
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
     octopoes: OctopoesService = Depends(octopoes_service),
 ) -> None:
     origin = Origin(
@@ -252,7 +255,6 @@ def save_declaration(
         task_id=declaration.task_id if declaration.task_id else str(uuid.uuid4()),
     )
     octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time)
-    xtdb_session_.commit()
 
 
 # ScanProfile-related endpoints
@@ -268,7 +270,6 @@ def list_scan_profiles(
 @router.put("/scan_profiles", tags=["Scan Profiles"])
 def save_scan_profile(
     scan_profile: ScanProfile,
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_required_valid_time),
 ) -> None:
@@ -278,13 +279,11 @@ def save_scan_profile(
         old_scan_profile = None
 
     octopoes.scan_profile_repository.save(old_scan_profile, scan_profile, valid_time)
-    xtdb_session_.commit()
 
 
 @router.post("/scan_profiles/save_many", tags=["Scan Profiles"])
 def save_many(
     scan_profiles: List[ScanProfile],
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
@@ -296,17 +295,13 @@ def save_many(
 
         octopoes.scan_profile_repository.save(old_scan_profile, scan_profile, valid_time)
 
-    xtdb_session_.commit()
-
 
 @router.get("/scan_profiles/recalculate", tags=["Scan Profiles"])
 def recalculate_scan_profiles(
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_required_valid_time),
 ) -> None:
     octopoes.recalculate_scan_profiles(valid_time)
-    xtdb_session_.commit()
 
 
 @router.get("/scan_profiles/inheritance", tags=["Scan Profiles"])
@@ -375,9 +370,6 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
 
 
 @router.post("/bits/recalculate", tags=["Bits"])
-def recalculate_bits(
-    xtdb_session_: XTDBSession = Depends(xtdb_session), octopoes: OctopoesService = Depends(octopoes_service)
-) -> int:
+def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> int:
     inference_count = octopoes.recalculate_bits()
-    xtdb_session_.commit()
     return inference_count
