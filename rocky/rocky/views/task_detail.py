@@ -37,7 +37,7 @@ class BoefjeTaskDetailView(BoefjeMixin, TaskDetailView):
             {
                 "url": reverse(
                     "boefje_task_view",
-                    kwargs={"organization_code": self.organization.code, "task_id": uuid.UUID(context["task"].id).hex},
+                    kwargs={"organization_code": self.organization.code, "task_id": context["task_id"]},
                 ),
                 "text": context["task"].p_item.data.boefje.id,
             },
@@ -70,7 +70,7 @@ class NormalizerTaskDetailView(NormalizerMixin, TaskDetailView):
             {
                 "url": reverse(
                     "normalizer_task_view",
-                    kwargs={"organization_code": self.organization.code, "task_id": uuid.UUID(context["task"].id).hex},
+                    kwargs={"organization_code": self.organization.code, "task_id": context["task_id"]},
                 ),
                 "text": context["task"].p_item.data.normalizer.id,
             },
