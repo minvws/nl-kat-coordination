@@ -9,7 +9,6 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import BadRequest
-from django.db.models import QuerySet
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -456,11 +455,8 @@ class OnboardingOrganizationSetupView(
     current_step = 2
     permission_required = "tools.add_organization"
 
-    def get_queryset(self) -> QuerySet[Any]:
-        return OrganizationMember.objects.filter(user=self.request.user)
-
     def get(self, request, *args, **kwargs):
-        members = self.get_queryset()
+        members = OrganizationMember.objects.filter(user=self.request.user)
         if members:
             return redirect(
                 reverse("step_organization_update", kwargs={"organization_code": members.first().organization.code})
