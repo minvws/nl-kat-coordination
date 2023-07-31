@@ -72,12 +72,6 @@ class AssignClearanceLevelForm(BaseRockyForm):
     )
 
 
-class AcknowledgeClearanceLevelForm(BaseRockyForm):
-    acknowledged_level = forms.BooleanField(
-        label=_("Acknowledged to change Clearance Levels."),
-    )
-
-
 class UserAddForm(forms.Form):
     """
     Basic User form fields, name, email and password.
@@ -121,19 +115,6 @@ class UserAddForm(forms.Form):
         validators=[validate_password],
     )
 
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            self.add_error("email", _("Choose another email."))
-        return email
-
-    def set_user(self):
-        self.user = User.objects.create_user(
-            full_name=self.cleaned_data["name"],
-            email=self.cleaned_data["email"],
-            password=self.cleaned_data["password"],
-        )
-
 
 class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
     """
@@ -141,6 +122,14 @@ class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
     """
 
     group = None
+
+    trusted_clearance_level = forms.ChoiceField(
+        required=False,
+        label=_("Assigned clearance level"),
+        choices=[(-1, "")] + SCAN_LEVEL.choices,
+        help_text=_("Select a clearance level you trust this member with."),
+        widget=forms.RadioSelect(attrs={"radio_paws": True}),
+    )
 
     def __init__(self, *args, **kwargs):
         self.organization = Organization.objects.get(code=kwargs.pop("organization_code"))
@@ -152,23 +141,34 @@ class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
         else:
             selected_group = Group.objects.get(name=self.cleaned_data["account_type"])
         if self.organization and selected_group:
-            self.set_user()
+            user, created = User.objects.get_or_create(
+                email=self.cleaned_data["email"],
+                defaults={"full_name": self.cleaned_data["name"]},
+            )
+
+            if created:
+                user.set_password(self.cleaned_data["password"])
+                user.save()
+
             member, _ = OrganizationMember.objects.get_or_create(
-                user=self.user,
+                user=user,
                 organization=self.organization,
-                status=OrganizationMember.STATUSES.ACTIVE,
+                defaults={
+                    "organization": self.organization,
+                    "status": OrganizationMember.STATUSES.ACTIVE,
+                    "trusted_clearance_level": self.cleaned_data["trusted_clearance_level"],
+                    "acknowledged_clearance_level": self.cleaned_data["trusted_clearance_level"],
+                },
             )
             member.groups.add(selected_group.id)
-            if member.has_perm("change_organizationmember") or self.user.is_superuser:
-                member.acknowledged_clearance_level = 4
-                member.trusted_clearance_level = 4
-                member.save()
+
+    class Meta:
+        model = OrganizationMember
+        fields = ("name", "email", "password")
 
 
 class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
-    class Meta:
-        model = User
-        fields = ("account_type", "name", "email", "password")
+    pass
 
 
 class OrganizationMemberEditForm(BaseRockyModelForm):
