@@ -42,7 +42,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
         elif "cvssMetricV30" in metrics:
             cvss = metrics["cvssMetricV30"]
         else:
-            cvss = metrics["cvssMetricV20"]
+            cvss = metrics["cvssMetricV2"]
 
         for item in cvss:
             if item["type"] == "Primary":
