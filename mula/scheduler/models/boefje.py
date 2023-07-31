@@ -3,13 +3,15 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field
 
+from .plugin import RateLimit
+
 
 class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
     version: Optional[str] = Field(default=None)
-    rate_limit: Optional[str] = Field(default=None)  # TODO: update when this is implemented
+    rate_limit: Optional[RateLimit] = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):

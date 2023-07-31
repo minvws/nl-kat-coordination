@@ -436,11 +436,18 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the task is rate limited, False otherwise.
         """
-        if task.boefje.rate_limit is None:  # TODO: this needs to be returned by a boefje manifest
+        if task.boefje.rate_limit is None:
             return False
 
         try:
-            parsed_rate_limit = parse(task.boefje.rate_limit)
+            parsed_rate_limit = None
+            if isinstance(task.boefje.rate_limit.interval, str):
+                parsed_rate_limit = parse(task.boefje.rate_limit.interval)
+            elif isinstance(task.boefje.rate_limit.interval, int):
+                parsed_rate_limit = parse(f"{task.boefje.rate_limit.interval}/minute")
+
+            if parsed_rate_limit is None:
+                raise ValueError("Invalid rate limit interval")
         except ValueError as exc:
             self.logger.warning(
                 "Could not parse rate limit for boefje: %s [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
@@ -452,13 +459,13 @@ class BoefjeScheduler(Scheduler):
             raise exc
 
         with self.rate_limiter_lock:
-            can_consume = self.rate_limiter.test(parsed_rate_limit, task.boefje.id)
+            can_consume = self.rate_limiter.test(parsed_rate_limit, task.boefje.rate_limit.identifier)
             if not can_consume:
                 return True
 
             # When we can consume, we hit the rate limiter
             if hit:
-                self.rate_limiter.hit(parsed_rate_limit, task.boefje.id)
+                self.rate_limiter.hit(parsed_rate_limit, task.boefje.rate_limit.identifier)
 
             return False
 

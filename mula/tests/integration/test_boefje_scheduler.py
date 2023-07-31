@@ -565,7 +565,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(
             scan_level=0,
             consumes=[ooi.object_type],
-            rate_limit="1/hour",
+            rate_limit=models.RateLimit(
+                identifier="test",
+                interval="1/hour",
+            )
         )
         task = models.BoefjeTask(
             boefje=boefje,
@@ -592,7 +595,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(
             scan_level=0,
             consumes=[ooi.object_type],
-            rate_limit="not a valid rate limit",
+            rate_limit=models.RateLimit(
+                identifier="test",
+                interval="not a valid rate limit",
+            ),
         )
         task = models.BoefjeTask(
             boefje=boefje,
@@ -1385,7 +1391,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(
             scan_level=0,
             consumes=[ooi.object_type],
-            rate_limit="1/minute",
+            rate_limit=models.RateLimit(
+                identifier="test",
+                interval="1/minute",
+            )
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
@@ -1453,7 +1462,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(
             scan_level=0,
             consumes=[ooi.object_type],
-            rate_limit="1/second",
+            rate_limit=models.RateLimit(
+                identifier="test",
+                interval="1/second",
+            )
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
@@ -1530,7 +1542,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(
             scan_level=0,
             consumes=[ooi.object_type],
-            rate_limit="1/second",
+            rate_limit=models.RateLimit(
+                identifier="test",
+                interval="1/second",
+            )
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
@@ -1597,7 +1612,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(
             scan_level=0,
             consumes=[ooi.object_type],
-            rate_limit="1/hour",
+            rate_limit=models.RateLimit(
+                identifier="test",
+                interval="1/hour",
+            )
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
@@ -1679,7 +1697,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(
             scan_level=0,
             consumes=[ooi.object_type],
-            rate_limit="1/second",
+            rate_limit=models.RateLimit(
+                identifier="test",
+                interval="1/second",
+            )
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
