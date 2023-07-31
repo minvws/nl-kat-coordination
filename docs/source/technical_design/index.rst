@@ -18,3 +18,4 @@ Contains documentation for developers and contributors.
    latex
    externalauthentication
    cveapi
+   environment_settings/index
