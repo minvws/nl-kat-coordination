@@ -84,7 +84,7 @@
                                             {% if member.user.is_superuser %}
                                                 L4
                                             {% else %}
-                                                {% if member.trusted_clearance_level < 0 %}
+                                                {% if member.acknowledged_clearance_level < 0 %}
                                                     None
                                                 {% else %}
                                                     L{{ member.acknowledged_clearance_level }}
