@@ -89,7 +89,7 @@ class OOIDetailView(
 
                     return self.get(self.request, status_code=422, *self.args, **self.kwargs)
 
-                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.reference)
+                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
                 messages.add_message(self.request, messages.SUCCESS, "Question has been answered.")
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 
