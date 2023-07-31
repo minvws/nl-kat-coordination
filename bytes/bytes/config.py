@@ -16,9 +16,7 @@ class Settings(BaseSettings):
     queue_uri: Optional[str]
     log_cfg: Path = BASE_DIR / "dev.logging.conf"
 
-    db_uri: PostgresDsn = Field(
-        "postgresql://xx:xx@host:5432/bytes", description="Bytes Postgres DB URI", env="BYTES_DB"
-    )
+    db_uri: PostgresDsn = Field("postgresql://xx:xx@host:5432/bytes", description="Bytes Postgres DB URI")
     data_dir: Path = Field("/data", description="Directory where Bytes stores its data")
 
     log_file: str = Field("bytes.log", description="Log file name and extension")
