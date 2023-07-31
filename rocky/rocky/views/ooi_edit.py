@@ -43,6 +43,7 @@ class OOIEditView(BaseOOIFormView):
         )
 
         context["type"] = self.ooi_class.get_ooi_type()
+        context["ooi_human_readable"] = self.ooi.human_readable
         context["breadcrumbs"] = breadcrumb_list
 
         return context
