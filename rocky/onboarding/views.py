@@ -460,10 +460,10 @@ class OnboardingOrganizationSetupView(
         return OrganizationMember.objects.filter(user=self.request.user)
 
     def get(self, request, *args, **kwargs):
-        member = self.get_queryset()
-        if member:
+        members = self.get_queryset()
+        if members:
             return redirect(
-                reverse("step_organization_update", kwargs={"organization_code": member.first().organization.code})
+                reverse("step_organization_update", kwargs={"organization_code": members.first().organization.code})
             )
         return super().get(request, *args, **kwargs)
 
