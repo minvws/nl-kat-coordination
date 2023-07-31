@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     pq_populate_max_random_objects: int = Field(50, description="Priority queue populate max random objects")
 
     # Database settings
-    db_dsn: PostgresDsn = Field("postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI")
+    db_uri: PostgresDsn = Field("postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI")
 
     class Config:
         env_prefix = "SCHEDULER_"
