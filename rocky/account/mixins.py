@@ -67,7 +67,7 @@ class OrganizationPermWrapper:
 class OrganizationView(View):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.organization = None
+        self.organization: Optional[Organization] = None
         self.octopoes_api_connector: Optional[OctopoesAPIConnector] = None
         self.bytes_client: BytesClient = None
         self.organization_member = None

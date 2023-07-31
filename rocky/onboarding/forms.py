@@ -9,7 +9,6 @@ from tools.models import (
     GROUP_CLIENT,
     GROUP_REDTEAM,
     Organization,
-    OrganizationMember,
 )
 
 User = get_user_model()
@@ -101,10 +100,6 @@ class OnboardingUserForm(OrganizationMemberAddForm):
                 help_text=_("Give this user permission to set clearance levels on OOI's"),
                 required=False,
             )
-
-    class Meta:
-        model = OrganizationMember
-        fields = ("name", "email", "password")
 
 
 class OnboardingCreateUserAdminForm(OnboardingUserForm):
