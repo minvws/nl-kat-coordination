@@ -4,10 +4,12 @@ from typing import Any, Dict, List, Optional
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
+from tools.forms.base import ObservedAtForm
+from tools.forms.findings import FindingMutedSelectionForm, FindingSeverityMultiSelectForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from rocky.views.mixins import FindingList, OctopoesView, SeveritiesMixin
+from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
 
 logger = logging.getLogger(__name__)
 
@@ -46,13 +48,31 @@ def generate_findings_metadata(
     return sort_by_severity_desc(findings_meta)
 
 
-class FindingListView(BreadcrumbsMixin, SeveritiesMixin, OctopoesView, ListView):
-    template_name = "findings/finding_list.html"
-    paginate_by = 20
+class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListView):
+    connector_form_class = ObservedAtForm
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.severities = self.get_severities()
+        self.valid_time = self.get_observed_at()
+        self.exclude_muted = request.GET.get("exclude_muted", False)
 
     def get_queryset(self) -> FindingList:
-        severities = self.get_severities()
-        return FindingList(self.octopoes_api_connector, self.get_observed_at(), severities)
+        return FindingList(
+            self.octopoes_api_connector, self.valid_time, self.severities, exclude_muted=self.exclude_muted
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["observed_at_form"] = self.get_connector_form()
+        context["severity_filter_form"] = FindingSeverityMultiSelectForm(self.request.GET)
+        context["muted_findings_filter_form"] = FindingMutedSelectionForm(self.request.GET)
+        return context
+
+
+class FindingListView(BreadcrumbsMixin, FindingListFilter):
+    template_name = "findings/finding_list.html"
+    paginate_by = 20
 
     def build_breadcrumbs(self):
         return [
