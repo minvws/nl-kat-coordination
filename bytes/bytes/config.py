@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseSettings, Field, PostgresDsn
+from pydantic import AmqpDsn, BaseSettings, Field, PostgresDsn
 
 from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     secret: str
     username: str
     password: str
-    queue_uri: Optional[str]
+    queue_uri: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
     log_cfg: Path = BASE_DIR / "dev.logging.conf"
 
     db_uri: PostgresDsn = Field("postgresql://xx:xx@host:5432/bytes", description="Bytes Postgres DB URI")

@@ -26,7 +26,7 @@ class APITemplateTestCase(unittest.TestCase):
         self.mock_ctx.config = cfg
 
         # Datastore
-        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy(cfg.db_dsn)
+        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy(cfg.db_uri)
         models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
 
         self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
