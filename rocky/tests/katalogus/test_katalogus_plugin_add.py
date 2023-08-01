@@ -45,7 +45,7 @@ def test_plugin_settings_add(
     )
 
     assert response.status_code == 302
-    assert list(request._messages).pop().message == "Added settings for 'test-boefje'"
+    assert list(request._messages).pop().message == "Added settings for 'TestBoefje'"
 
 
 def test_plugin_settings_add_wrong_property_but_required(
