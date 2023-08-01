@@ -12,7 +12,8 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
-from tools.forms.upload_csv import CSV_ERRORS, UploadCSVForm
+from tools.forms.upload_csv import CSV_ERRORS
+from tools.forms.upload_oois import UploadOOICSVForm
 
 from octopoes.api.models import Declaration
 from octopoes.models import Reference
@@ -40,7 +41,7 @@ CSV_CRITERIA = [
 
 class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
-    form_class = UploadCSVForm
+    form_class = UploadOOICSVForm
     permission_required = "tools.can_scan_organization"
     reference_cache: Dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
     ooi_types: ClassVar[Dict[str, Any]] = {
@@ -124,7 +125,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         return ooi_type(**kwargs)
 
     def form_valid(self, form):
-        if not self.proccess_csv(form):
+        if not self.process_csv(form):
             return redirect("upload_csv", organization_code=self.organization.code)
         return super().form_valid(form)
 
@@ -136,7 +137,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         messages.add_message(self.request, messages.SUCCESS, success_message)
         return True
 
-    def proccess_csv(self, form):
+    def process_csv(self, form):
         object_type = form.cleaned_data["object_type"]
         csv_file = form.cleaned_data["csv_file"]
 

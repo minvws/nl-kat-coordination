@@ -89,7 +89,7 @@ class OOIDetailView(
 
                     return self.get(self.request, status_code=422, *self.args, **self.kwargs)
 
-                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.reference)
+                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
                 messages.add_message(self.request, messages.SUCCESS, "Question has been answered.")
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 
@@ -197,7 +197,7 @@ class OOIDetailView(
         context["observed_at"] = self.get_observed_at()
         context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
-        context["related"] = self.get_related_objects()
+        context["related"] = self.get_related_objects(context["observed_at"])
         context["ooi_current"] = self.get_current_ooi()
 
         context["count_findings_per_severity"] = dict(self.count_findings_per_severity())

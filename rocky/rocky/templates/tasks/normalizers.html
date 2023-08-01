@@ -43,7 +43,11 @@
                                             <td>{% translate "No input OOI" %}</td>
                                         {% endif %}
                                         <td>
-                                          <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                                          {% if task.p_item.data.raw_data.boefje_meta.boefje.id != 'manual' %}
+                                              <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                                          {% else %}
+                                              {{ task.p_item.data.raw_data.boefje_meta.boefje.id }}
+                                          {% endif %}
                                         </td>
                                         <td>{{ task.p_item.data.normalizer.id }}</td>
                                         {% if task.status.value == "completed" %}
