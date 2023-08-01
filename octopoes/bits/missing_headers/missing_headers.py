@@ -77,16 +77,6 @@ def run(
         yield ft
         yield finding
 
-    if "expect-ct" not in header_keys:
-        ft = KATFindingType(id="KAT-NO-EXCPECT-CT")
-        finding = Finding(
-            finding_type=ft.reference,
-            ooi=resource.reference,
-            description="Header expect-ct is missing or not configured correctly.",
-        )
-        yield ft
-        yield finding
-
     if "permissions-policy" not in header_keys:
         ft = KATFindingType(id="KAT-NO-PERMISSIONS-POLICY")
         finding = Finding(

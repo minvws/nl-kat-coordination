@@ -197,7 +197,7 @@ class OOIDetailView(
         context["observed_at"] = self.get_observed_at()
         context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
-        context["related"] = self.get_related_objects()
+        context["related"] = self.get_related_objects(context["observed_at"])
         context["ooi_current"] = self.get_current_ooi()
 
         context["count_findings_per_severity"] = dict(self.count_findings_per_severity())
