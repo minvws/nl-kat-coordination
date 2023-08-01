@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from typing import Callable, List, Optional
 
 import requests
+from jinja2 import Environment
 from limits import parse, storage, strategies
 from opentelemetry import trace
 
@@ -22,8 +23,6 @@ from scheduler.models import (
     ScanProfileMutation,
     TaskStatus,
 )
-
-from jinja2 import Environment
 
 from .scheduler import Scheduler
 
@@ -429,7 +428,6 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def is_task_rate_limited(self, task: BoefjeTask, hit: bool = True) -> bool:
-        # {{ task.input_ooi }}
         """Checks whether a task is rate limited.
 
         Args:
