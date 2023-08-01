@@ -6,7 +6,6 @@ from . import listener
 
 
 class MockScheduler(schedulers.Scheduler):
-
     def run(self) -> None:
         # Listener
         self.listeners["mock-listener"] = listener.MockListener()
