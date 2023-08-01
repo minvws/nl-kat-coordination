@@ -25,8 +25,8 @@
                                 <a href="{% ooi_url 'ooi_detail' observation.origin.source organization.code %}">{{ observation.origin.source }}</a>
                             </td>
                             <td>
-                                {% if observation.normalizer.boefje_meta.id %}
-                                    <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=observation.normalizer.boefje_meta.id %}">{{ observation.normalizer.boefje_meta.id }}</a>
+                                {% if observation.normalizer.raw_data.boefje_meta.id %}
+                                    <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=observation.normalizer.raw_data.boefje_meta.id %}">{{ observation.normalizer.raw_data.boefje_meta.id }}</a>
                                 {% endif %}
                             </td>
                         </tr>
