@@ -1,1 +1,1 @@
-forcediphttpsadapter==1.0.2
+git+https://github.com/nagylzs/forcediphttpsadapter.git
