@@ -22,7 +22,7 @@
                             </button>
                             <ul id="export-add" aria-expanded="false" class="dropdown-list">
                                 <li>
-                                    <a href="{% url "organization_member_add" organization.code %}">{% translate "Manually" %}</a>
+                                    <a href="{% url "organization_member_add_account_type" organization.code %}">{% translate "Manually" %}</a>
                                 </li>
                                 <li>
                                     <a href="{% url "organization_member_upload" organization.code %}">{% translate "Upload a CSV" %}</a>
