@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # External services settings
     queue_uri: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
     xtdb_uri: str = Field("http://crux:3000", description="XTDB API", env="XTDB_URI")
-    xtdb_type: XTDBType = XTDBType.XTDB_MULTINODE
+    xtdb_type: XTDBType = Field(XTDBType.XTDB_MULTINODE)
 
     span_export_grpc_endpoint: Optional[str] = Field(None, env="SPAN_EXPORT_GRPC_ENDPOINT")
 
