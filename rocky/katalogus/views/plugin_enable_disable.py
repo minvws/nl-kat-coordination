@@ -25,7 +25,9 @@ class PluginEnableDisableView(SinglePluginView):
         if plugin_state == "True":
             self.katalogus_client.disable_boefje(self.plugin)
             messages.add_message(
-                self.request, messages.WARNING, _("Boefje '{boefje_id}' disabled.").format(boefje_id=self.plugin.id)
+                self.request,
+                messages.WARNING,
+                _("Boefje '{boefje_name}' disabled.").format(boefje_name=self.plugin.name),
             )
             return HttpResponseRedirect(request.POST.get("current_url"))
 
@@ -35,8 +37,8 @@ class PluginEnableDisableView(SinglePluginView):
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _("Failed fetching settings for boefje {boefje_id}. Is the Katalogus up?").format(
-                    boefje_id=self.plugin.id
+                _("Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?").format(
+                    boefje_name=self.plugin.name
                 ),
             )
             return redirect(
@@ -54,8 +56,8 @@ class PluginEnableDisableView(SinglePluginView):
             messages.add_message(
                 self.request,
                 messages.INFO,
-                _("Before enabling, please set the required settings for boefje '{boefje_id}'.").format(
-                    boefje_id=self.plugin.id
+                _("Before enabling, please set the required settings for boefje '{boefje_name}'.").format(
+                    boefje_name=self.plugin.name
                 ),
             )
             return redirect(
@@ -71,7 +73,7 @@ class PluginEnableDisableView(SinglePluginView):
 
         self.katalogus_client.enable_boefje(self.plugin)
         messages.add_message(
-            self.request, messages.SUCCESS, _("Boefje '{boefje_id}' enabled.").format(boefje_id=self.plugin.id)
+            self.request, messages.SUCCESS, _("Boefje '{boefje_name}' enabled.").format(boefje_name=self.plugin.name)
         )
 
         return HttpResponseRedirect(request.POST.get("current_url"))
