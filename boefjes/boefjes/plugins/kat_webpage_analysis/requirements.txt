@@ -1,1 +1,1 @@
-git+https://github.com/nagylzs/forcediphttpsadapter.git
+git+https://github.com/nagylzs/forcediphttpsadapter.git@390da58df94b1524c33cd284ce99d140ab25c2af
