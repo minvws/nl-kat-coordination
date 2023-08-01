@@ -13,7 +13,11 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
 define build-settings-doc
-	PYTHONPATH=./$(1) settings-doc generate -f markdown -m $(2) -u docs/source/technical_design/environment_settings/$(3).md --heading-offset 1  --between "<!-- generated env. vars. start -->" "<!-- generated env. vars. end -->"
+	PYTHONPATH=./$(1) settings-doc generate \
+	-f markdown -m $(2) \
+	-u docs/source/technical_design/environment_settings/$(3).md \
+	--heading-offset 1 \
+	--between "<!-- generated env. vars. start -->" "<!-- generated env. vars. end -->"
 endef
 
 
