@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" with view_type="onboarding" %}
+
+    <main id="main-content" class="explanation-page">
+        <section>
+            <div>
+                <h1>{% translate "OpenKAT Introduction" %}</h1>
+                {% include "partials/stepper.html" %}
+
+                <h2>{% translate "Setup scan - OOI clearance" %}</h2>
+                <h3>{% translate "Introduction" %}</h3>
+                <p>
+                    {% blocktranslate trimmed %}
+                        Some scans are lightweight while others might be a bit more aggressive with their scanning.
+                        OpenKAT requires you to set a clearance level for each object to prevent you from unintentionally
+                        running aggressive scans. For example you might have the right to run any type of scan on your own server but you
+                        probably don’t have the right to do so for objects owned by other people of companies.
+                    {% endblocktranslate %}
+                </p>
+                <h3>{% translate "Acknowledge clearance level" %}</h3>
+                {% blocktranslate asvar extra_context %}
+                    As an L{{dns_report_least_clearance_level}} clearance level holder,
+                    you have been granted access to scan objects using Boefjes with a maximum scan level of L{{dns_report_least_clearance_level}}.
+                    Before utilizing this clearance level, you must acknowledge your trusted status as an L{{dns_report_least_clearance_level}} clearance level holder.
+                {% endblocktranslate %}
+                {% include "partials/ooi_clearance.html" with member=organization_member extra_context=extra_context %}
+
+                <div class="button-container">
+                    <a href="{% url "complete_onboarding" organization.code %}"
+                       class="button ghost">{% translate "Skip onboarding" %}</a>
+                    <a href="{% url "step_set_clearance_level" organization.code %}?ooi_id={{ ooi }}"
+                       class="button">{% translate "Acknowledge clearance level" %}</a>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
