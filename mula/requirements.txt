@@ -278,6 +278,9 @@ importlib-metadata==6.0.1 ; python_version >= "3.8" and python_version < "4.0" \
 importlib-resources==6.0.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:4cf94875a8368bd89531a756df9a9ebe1f150e0f885030b461237bc7f2d905f2 \
     --hash=sha256:d952faee11004c045f785bb5636e8f885bed30dc3c940d5d42798a2a4541c185
+jinja2==3.1.2 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852 \
+    --hash=sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61
 kombu==5.3.1 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:48ee589e8833126fd01ceaa08f8a2041334e9f5894e5763c8486a550454551e9 \
     --hash=sha256:fbd7572d92c0bf71c112a6b45163153dea5a7b6a701ec16b568c27d0fd2370f2

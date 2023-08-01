@@ -441,12 +441,7 @@ class BoefjeScheduler(Scheduler):
             return False
 
         try:
-            parsed_rate_limit = None
-            if isinstance(rate_limit.interval, str):
-                parsed_rate_limit = parse(rate_limit.interval)
-            elif isinstance(rate_limit.interval, int):
-                parsed_rate_limit = parse(f"{rate_limit.interval}/minute")
-
+            parsed_rate_limit = parse(task.boefje.rate_limit.interval)
             if parsed_rate_limit is None:
                 raise ValueError("Invalid rate limit interval")
         except ValueError as exc:

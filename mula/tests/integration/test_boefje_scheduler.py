@@ -562,11 +562,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
+        boefje = models.Boefje(
+            id="test-boefje",
             rate_limit=models.RateLimit(
-                identifier="test",
+                identifier="{{ task.boefje.id }}",
                 interval="1/hour",
             ),
         )
@@ -592,14 +591,14 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
+        boefje = models.Boefje(
+            id="test-boefje",
             rate_limit=models.RateLimit(
-                identifier="test",
+                identifier="{{ task.boefje.id }}",
                 interval="not a valid rate limit",
             ),
         )
+
         task = models.BoefjeTask(
             boefje=boefje,
             input_ooi=ooi.primary_key,
@@ -1388,11 +1387,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
+        boefje = models.Boefje(
+            id="test-boefje",
             rate_limit=models.RateLimit(
-                identifier="test",
+                identifier="{{ task.boefje.id }}",
                 interval="1/minute",
             ),
         )
@@ -1459,11 +1457,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
+        boefje = models.Boefje(
+            id="test-boefje",
             rate_limit=models.RateLimit(
-                identifier="test",
+                identifier="{{ task.boefje.id }}",
                 interval="1/second",
             ),
         )
@@ -1539,11 +1536,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
+        boefje = models.Boefje(
+            id="test-boefje",
             rate_limit=models.RateLimit(
-                identifier="test",
+                identifier="{{ task.boefje.id }}",
                 interval="1/second",
             ),
         )
@@ -1609,12 +1605,11 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
+        boefje = models.Boefje(
+            id="test-boefje",
             rate_limit=models.RateLimit(
-                identifier="test",
-                interval="1/hour",
+                identifier="{{ task.boefje.id }}",
+                interval="1/second",
             ),
         )
         first_task = models.BoefjeTask(
@@ -1694,11 +1689,10 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(
-            scan_level=0,
-            consumes=[ooi.object_type],
+        boefje = models.Boefje(
+            id="test-boefje",
             rate_limit=models.RateLimit(
-                identifier="test",
+                identifier="{{ task.boefje.id }}",
                 interval="1/second",
             ),
         )
