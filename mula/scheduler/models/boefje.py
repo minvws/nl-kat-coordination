@@ -1,11 +1,11 @@
 import datetime
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field, constr
+from pydantic import BaseModel, Field
 
 
 class RateLimit(BaseModel):
-    identifier: str = constr(min_length=1)
+    identifier: str
     interval: str
 
 

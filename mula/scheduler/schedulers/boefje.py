@@ -6,7 +6,7 @@ from types import SimpleNamespace
 from typing import Callable, List, Optional
 
 import requests
-from jinja2 import Environment
+from jinja2 import BaseLoader, Environment
 from limits import parse, storage, strategies
 from opentelemetry import trace
 
@@ -457,8 +457,8 @@ class BoefjeScheduler(Scheduler):
         with self.rate_limiter_lock:
             # Get the identifier for the rate limiter
             identifier_template = rate_limit.identifier
-            environment = Environment()
-            identifier = environment.get_template(identifier_template).render(task=task)
+            environment = Environment(loader=BaseLoader())
+            identifier = environment.from_string(identifier_template).render(task=task)
 
             can_consume = self.rate_limiter.test(parsed_rate_limit, identifier)
             if not can_consume:
