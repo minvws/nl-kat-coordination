@@ -89,7 +89,7 @@ class OctopoesView(OrganizationView):
                     client.login()
 
                     normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
-                    boefje_id = normalizer_data["boefje_meta"]["boefje"]["id"]
+                    boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
                     origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
                 except requests.exceptions.RequestException as e:
