@@ -8,8 +8,10 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    debug: bool = Field(False, env="DEBUG")
-    log_cfg: str = Field(str(Path(__file__).parent.parent.parent / "logging.json"))
+    debug: bool = Field(False, description="Enables/disables global debugging mode", env="DEBUG")
+    log_cfg: str = Field(
+        str(Path(__file__).parent.parent.parent / "logging.json"), description="Path to the logging configuration file"
+    )
 
     # Server settings
     api_host: str = Field("0.0.0.0", description="Host to bind the scheduler to")
@@ -32,8 +34,6 @@ class Settings(BaseSettings):
     host_raw_data: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
     host_normalizer_meta: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
 
-    span_export_grpc_endpoint: Optional[str] = Field(None, env="SPAN_EXPORT_GRPC_ENDPOINT")
-
     # Queue settings (0 is infinite)
     pq_maxsize: int = Field(1000, description="Priority queue max size")
     pq_populate_interval: int = Field(60, description="Priority queue populate interval in seconds")
@@ -42,6 +42,10 @@ class Settings(BaseSettings):
 
     # Database settings
     db_uri: PostgresDsn = Field("postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI")
+
+    span_export_grpc_endpoint: Optional[str] = Field(
+        None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
+    )
 
     class Config:
         env_prefix = "SCHEDULER_"

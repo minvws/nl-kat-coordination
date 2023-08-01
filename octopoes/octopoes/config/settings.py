@@ -20,20 +20,26 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    log_cfg: str = str(Path(__file__).parent.parent.parent / "logging.yml")
+    log_cfg: str = Field(str(Path(__file__).parent.parent.parent / "logging.yml"))
 
     # External services settings
     queue_uri: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
     xtdb_uri: str = Field("http://crux:3000", description="XTDB API", env="XTDB_URI")
-    xtdb_type: XTDBType = Field(XTDBType.XTDB_MULTINODE)
-
-    span_export_grpc_endpoint: Optional[str] = Field(None, env="SPAN_EXPORT_GRPC_ENDPOINT")
+    xtdb_type: XTDBType = Field(
+        XTDBType.XTDB_MULTINODE, description="XTDB server type", possible_values=["crux", "xtdb", "xtdb-multinode"]
+    )
 
     katalogus_api: AnyHttpUrl = Field("http://localhost:8003", description="Katalogus API URL", env="KATALOGUS_API")
 
     scan_level_recalculation_interval: int = Field(60, description="Scan level recalculation interval in seconds")
-    bits_enabled: Set[str] = Field(set(), description="Explicitly enabled bits")
-    bits_disabled: Set[str] = Field(set(), description="Explicitly disabled bits")
+    bits_enabled: Set[str] = Field(set(), example="{'port-classification-bit'}", description="Explicitly enabled bits")
+    bits_disabled: Set[str] = Field(
+        set(), example="{'port-classification-bit'}", description="Explicitly disabled bits"
+    )
+
+    span_export_grpc_endpoint: Optional[str] = Field(
+        None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
+    )
 
     class Config:
         env_prefix = "OCTOPOES_"
