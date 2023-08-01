@@ -1,8 +1,5 @@
 #!/bin/bash
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
 set -e
 
 # TODO: generate proper changelog using a tool like git-dch
@@ -21,5 +18,4 @@ yarn build
 
 dpkg-buildpackage -us -uc -b
 
-
-mv /${PKG_NAME}_${RELEASE_VERSION}_*.deb /app/build/
+mv /"${PKG_NAME}"_"${RELEASE_VERSION}"_*.deb /app/build/
