@@ -4,11 +4,6 @@ from typing import List, Optional, Union
 from pydantic import BaseModel
 
 
-class RateLimit(BaseModel):
-    interval: Union[str, int]
-    identifier: str
-
-
 class Plugin(BaseModel):
     id: str
     name: Optional[str]
@@ -24,4 +19,3 @@ class Plugin(BaseModel):
     options: Optional[List[str]]
     produces: List[str]
     enabled: bool
-    rate_limit: Optional[RateLimit]

@@ -1,17 +1,20 @@
 import datetime
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, constr
 
-from .plugin import RateLimit
+
+class RateLimit(BaseModel):
+    interval: str
+    identifier: str = constr(min_length=1)
 
 
 class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
-    version: Optional[str] = Field(default=None)
-    rate_limit: Optional[RateLimit] = Field(default=None)
+    version: Optional[str]
+    rate_limit: Optional[RateLimit]
 
 
 class BoefjeMeta(BaseModel):

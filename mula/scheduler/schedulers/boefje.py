@@ -23,6 +23,8 @@ from scheduler.models import (
     TaskStatus,
 )
 
+from jinja2 import Environment
+
 from .scheduler import Scheduler
 
 tracer = trace.get_tracer(__name__)
@@ -427,6 +429,7 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def is_task_rate_limited(self, task: BoefjeTask, hit: bool = True) -> bool:
+        # {{ task.input_ooi }}
         """Checks whether a task is rate limited.
 
         Args:
@@ -459,13 +462,18 @@ class BoefjeScheduler(Scheduler):
             raise exc
 
         with self.rate_limiter_lock:
-            can_consume = self.rate_limiter.test(parsed_rate_limit, task.boefje.rate_limit.identifier)
+            # Get the identifier for the rate limiter
+            identifier_template = task.boefje.rate_limit.identifier
+            environment = Environment()
+            identifier = environment.get_template(identifier_template).render(task=task)
+
+            can_consume = self.rate_limiter.test(parsed_rate_limit, identifier)
             if not can_consume:
                 return True
 
             # When we can consume, we hit the rate limiter
             if hit:
-                self.rate_limiter.hit(parsed_rate_limit, task.boefje.rate_limit.identifier)
+                self.rate_limiter.hit(parsed_rate_limit, identifier)
 
             return False
 
