@@ -164,7 +164,6 @@ class XTDBSession:
         self.client = client
 
         self._operations = []
-        self._committed = False
         self.post_commit_callbacks = []
 
     def __enter__(self):
@@ -180,14 +179,10 @@ class XTDBSession:
         self.add((OperationType.PUT, document, valid_time))
 
     def commit(self) -> None:
-        if self._committed:
-            raise RuntimeError("Session already committed")
-
         if self._operations:
             logger.debug(self._operations)
             self.client.submit_transaction(self._operations)
-
-        self._committed = True
+            self._operations = []
 
         if not self.post_commit_callbacks:
             return
@@ -196,6 +191,7 @@ class XTDBSession:
             callback()
 
         logger.info("Called %s callbacks after committing XTDBSession", len(self.post_commit_callbacks))
+        self.post_commit_callbacks = []
 
     def listen_post_commit(self, callback: Callable[[], None]):
         self.post_commit_callbacks.append(callback)

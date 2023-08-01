@@ -18,7 +18,7 @@ class AlgorithmType(Enum):
 class X509Certificate(OOI):
     object_type: Literal["X509Certificate"] = "X509Certificate"
 
-    subject: str
+    subject: Optional[str]
     issuer: Optional[str]
     valid_from: str
     valid_until: str
