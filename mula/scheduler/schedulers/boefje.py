@@ -439,15 +439,15 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the task is rate limited, False otherwise.
         """
-        if task.boefje.rate_limit is None:
+        if (rate_limit := task.boefje.rate_limit) is None:
             return False
 
         try:
             parsed_rate_limit = None
-            if isinstance(task.boefje.rate_limit.interval, str):
-                parsed_rate_limit = parse(task.boefje.rate_limit.interval)
-            elif isinstance(task.boefje.rate_limit.interval, int):
-                parsed_rate_limit = parse(f"{task.boefje.rate_limit.interval}/minute")
+            if isinstance(rate_limit.interval, str):
+                parsed_rate_limit = parse(rate_limit.interval)
+            elif isinstance(rate_limit.interval, int):
+                parsed_rate_limit = parse(f"{rate_limit.interval}/minute")
 
             if parsed_rate_limit is None:
                 raise ValueError("Invalid rate limit interval")
@@ -463,7 +463,7 @@ class BoefjeScheduler(Scheduler):
 
         with self.rate_limiter_lock:
             # Get the identifier for the rate limiter
-            identifier_template = task.boefje.rate_limit.identifier
+            identifier_template = rate_limit.identifier
             environment = Environment()
             identifier = environment.get_template(identifier_template).render(task=task)
 
