@@ -172,6 +172,8 @@ class Scheduler(abc.ABC):
             # Update task: For the task create the relationship with the associated job
             task_db.job_id = job_db.id
             self.ctx.task_store.update_task(task_db)
+
+            # TODO: handle_signal_task_updated() ?
         except Exception as e:
             self.logger.warning(
                 "Task %s could not be updated [task_id=%s, queue_id=%s]: %s",
