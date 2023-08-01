@@ -22,10 +22,12 @@ class AppTestCase(unittest.TestCase):
 
         self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
         self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
+        self.job_store = repositories.sqlalchemy.JobStore(self.mock_ctx.datastore)
 
         # Application context
         self.mock_ctx.pq_store = self.pq_store
         self.mock_ctx.task_store = self.task_store
+        self.mock_ctx.job_store = self.job_store
         self.mock_ctx.services.katalogus = MockKatalogusService()
 
         # App
