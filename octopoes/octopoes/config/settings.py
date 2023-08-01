@@ -23,15 +23,17 @@ class Settings(BaseSettings):
     log_cfg: str = Field(str(Path(__file__).parent.parent.parent / "logging.yml"))
 
     # External services settings
-    queue_uri: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
-    xtdb_uri: str = Field("http://crux:3000", description="XTDB API", env="XTDB_URI")
+    queue_uri: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
+    xtdb_uri: str = Field(..., example="http://crux:3000", description="XTDB API", env="XTDB_URI")
     xtdb_type: XTDBType = Field(
         XTDBType.XTDB_MULTINODE,
         description="Determines how Octopoes will format documents' primary in serialization (crux.db/id vs xt/id)",
         possible_values=["crux", "xtdb", "xtdb-multinode"],
     )
 
-    katalogus_api: AnyHttpUrl = Field("http://localhost:8003", description="Katalogus API URL", env="KATALOGUS_API")
+    katalogus_api: AnyHttpUrl = Field(
+        ..., example="http://localhost:8003", description="Katalogus API URL", env="KATALOGUS_API"
+    )
 
     scan_level_recalculation_interval: int = Field(
         60, description="Interval in seconds of the periodic task that recalculates scan levels"

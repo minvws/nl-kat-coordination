@@ -29,16 +29,20 @@ class Settings(BaseSettings):
     octopoes_request_timeout: int = Field(10, description="Octopoes request timeout in seconds")
 
     # External services settings
-    host_katalogus: str = Field(..., env="KATALOGUS_API", description="Katalogus API URL")
-    host_bytes: str = Field(..., env="BYTES_API", description="Bytes API URL")
-    host_bytes_user: str = Field("test", description="Bytes JWT login username", env="BYTES_USERNAME")
-    host_bytes_password: str = Field("secret", description="Bytes JWT login password", env="BYTES_PASSWORD")
-    host_octopoes: str = Field(..., env="OCTOPOES_API", description="Octopoes API URL")
+    host_katalogus: str = Field(
+        ..., example="http://localhost:8003", env="KATALOGUS_API", description="Katalogus API URL"
+    )
+    host_bytes: str = Field(..., example="http://localhost:8004", env="BYTES_API", description="Bytes API URL")
+    host_bytes_user: str = Field(..., example="test", description="Bytes JWT login username", env="BYTES_USERNAME")
+    host_bytes_password: str = Field(
+        ..., example="secret", description="Bytes JWT login password", env="BYTES_PASSWORD"
+    )
+    host_octopoes: str = Field(..., example="http://localhost:8001", env="OCTOPOES_API", description="Octopoes API URL")
 
     queue_prefetch_count: int = Field(100)
-    host_mutation: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
-    host_raw_data: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
-    host_normalizer_meta: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
+    host_mutation: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
+    host_raw_data: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
+    host_normalizer_meta: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
 
     # Queue settings (0 is infinite)
     pq_maxsize: int = Field(1000, description="How many items a priority queue can hold")
@@ -55,7 +59,9 @@ class Settings(BaseSettings):
     )
 
     # Database settings
-    db_uri: PostgresDsn = Field("postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI")
+    db_uri: PostgresDsn = Field(
+        ..., example="postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI"
+    )
 
     span_export_grpc_endpoint: Optional[str] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"

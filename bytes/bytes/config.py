@@ -10,13 +10,17 @@ BASE_DIR = Path(__file__).parent.parent
 
 
 class Settings(BaseSettings):
-    secret: str = Field(..., description="Secret key used for generating Bytes' API JWT")
-    username: str = Field(..., description="Username used for generating Bytes' API JWT")
-    password: str = Field(..., description="Password used for generating Bytes' API JWT")
-    queue_uri: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
+    secret: str = Field(
+        ...,
+        example="bec4837fe5108205ce6cd1bc11735d4a220e253345e90619c6",
+        description="Secret key used for generating Bytes' API JWT",
+    )
+    username: str = Field(..., example="test", description="Username used for generating Bytes' API JWT")
+    password: str = Field(..., example="secret", description="Password used for generating Bytes' API JWT")
+    queue_uri: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
     log_cfg: Path = Field(BASE_DIR / "dev.logging.conf", description="Path to the logging configuration file")
 
-    db_uri: PostgresDsn = Field("postgresql://xx:xx@host:5432/bytes", description="Bytes Postgres DB URI")
+    db_uri: PostgresDsn = Field(..., example="postgresql://xx:xx@host:5432/bytes", description="Bytes Postgres DB URI")
     data_dir: Path = Field(
         "/data",
         description="Root for all the data. "
@@ -44,12 +48,14 @@ class Settings(BaseSettings):
     )
     rfc3161_provider: str = Field(
         None,
+        example="https://freetsa.org/tsr",
         description="Timestamping. "
         "See https://github.com/trbs/rfc3161ng for a list of public providers and their certificates. "
         "Required when using RFC3161 hashing repository.",
     )
     rfc3161_cert_file: Path = Field(
         None,
+        example="/path/to/cert.pem",
         description="Path to the certificate of the RFC3161 provider. Required when using RFC3161 hashing repository.",
     )
 
