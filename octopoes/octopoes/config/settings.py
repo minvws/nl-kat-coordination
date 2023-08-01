@@ -26,12 +26,16 @@ class Settings(BaseSettings):
     queue_uri: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
     xtdb_uri: str = Field("http://crux:3000", description="XTDB API", env="XTDB_URI")
     xtdb_type: XTDBType = Field(
-        XTDBType.XTDB_MULTINODE, description="XTDB server type", possible_values=["crux", "xtdb", "xtdb-multinode"]
+        XTDBType.XTDB_MULTINODE,
+        description="Determines how Octopoes will format documents' primary in serialization (crux.db/id vs xt/id)",
+        possible_values=["crux", "xtdb", "xtdb-multinode"],
     )
 
     katalogus_api: AnyHttpUrl = Field("http://localhost:8003", description="Katalogus API URL", env="KATALOGUS_API")
 
-    scan_level_recalculation_interval: int = Field(60, description="Scan level recalculation interval in seconds")
+    scan_level_recalculation_interval: int = Field(
+        60, description="Interval in seconds of the periodic task that recalculates scan levels"
+    )
     bits_enabled: Set[str] = Field(set(), example="{'port-classification-bit'}", description="Explicitly enabled bits")
     bits_disabled: Set[str] = Field(
         set(), example="{'port-classification-bit'}", description="Explicitly disabled bits"

@@ -19,7 +19,13 @@ class Settings(BaseSettings):
 
     # Application settings
     katalogus_cache_ttl: int = Field(30, description="Katalogus cache TTL in seconds")
-    monitor_organisations_interval: int = Field(60, description="Monitor organisations interval in seconds")
+    monitor_organisations_interval: int = Field(
+        60,
+        description="Interval in seconds of the execution of the "
+        "`monitor_organisations` method of the scheduler application"
+        " to check newly created or removed organisations from katalogus. "
+        "It updates the organisations, their plugins, and the creation of their schedulers.",
+    )
     octopoes_request_timeout: int = Field(10, description="Octopoes request timeout in seconds")
 
     # External services settings
@@ -35,10 +41,18 @@ class Settings(BaseSettings):
     host_normalizer_meta: AmqpDsn = Field("amqp://", description="KAT queue URI", env="QUEUE_URI")
 
     # Queue settings (0 is infinite)
-    pq_maxsize: int = Field(1000, description="Priority queue max size")
-    pq_populate_interval: int = Field(60, description="Priority queue populate interval in seconds")
-    pq_populate_grace_period: int = Field(86400, description="Priority queue populate grace period in seconds")
-    pq_populate_max_random_objects: int = Field(50, description="Priority queue populate max random objects")
+    pq_maxsize: int = Field(1000, description="How many items a priority queue can hold")
+    pq_populate_interval: int = Field(
+        60,
+        description="Interval in seconds of the "
+        "execution of the `populate_queue` method of the `scheduler.Scheduler` class",
+    )
+    pq_populate_grace_period: int = Field(
+        86400, description="Grace period of when a job is considered to be running again (in seconds),"
+    )
+    pq_populate_max_random_objects: int = Field(
+        50, description="Maximum number of random objects to be added to the priority queue"
+    )
 
     # Database settings
     db_uri: PostgresDsn = Field("postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI")

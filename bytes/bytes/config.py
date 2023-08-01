@@ -17,12 +17,18 @@ class Settings(BaseSettings):
     log_cfg: Path = Field(BASE_DIR / "dev.logging.conf", description="Path to the logging configuration file")
 
     db_uri: PostgresDsn = Field("postgresql://xx:xx@host:5432/bytes", description="Bytes Postgres DB URI")
-    data_dir: Path = Field("/data", description="Directory where Bytes stores its data")
+    data_dir: Path = Field(
+        "/data",
+        description="Root for all the data. "
+        "A change means that you no longer have access to old data unless you move it!",
+    )
 
-    log_file: str = Field("bytes.log", description="Log file name and extension")
+    log_file: str = Field("bytes.log", description="Optional file with Bytes logs")
     access_token_expire_minutes: float = Field(15.0, description="Access token expiration time in minutes")
-    folder_permission: str = Field("740", description="Unix file system permission for folders")
-    file_permission: str = Field("640", description="Unix file system permission for files")
+    folder_permission: str = Field(
+        "740", description="Unix permission level on the folders Bytes creates to save raw files"
+    )
+    file_permission: str = Field("640", description="Unix permission level on the raw files themselves")
 
     hashing_algorithm: HashingAlgorithm = Field(
         HashingAlgorithm.SHA512, description="Hashing algorithm used in Bytes", possible_values=["sha512", "sha224"]
@@ -30,14 +36,17 @@ class Settings(BaseSettings):
 
     ext_hash_repository: HashingRepositoryReference = Field(
         HashingRepositoryReference.IN_MEMORY,
-        description="Encryption middleware used in Bytes",
+        description="Encryption to use for the katalogus settings",
         possible_values=["IN_MEMORY", "PASTEBIN", "RFC3161"],
     )
     pastebin_api_dev_key: str = Field(
         None, description="API key for Pastebin. Required when using PASTEBIN hashing repository."
     )
     rfc3161_provider: str = Field(
-        None, description="URL of the RFC3161 provider. Required when using RFC3161 hashing repository."
+        None,
+        description="Timestamping. "
+        "See https://github.com/trbs/rfc3161ng for a list of public providers and their certificates. "
+        "Required when using RFC3161 hashing repository.",
     )
     rfc3161_cert_file: Path = Field(
         None,
@@ -51,16 +60,18 @@ class Settings(BaseSettings):
     )
     private_key_b64: str = Field(
         None,
-        description="Private key for Bytes' storage in base64 format. "
+        description="KATalogus NaCl Sealbox base-64 private key string. "
         "Required when using NACL_SEALBOX encryption middleware.",
     )
     public_key_b64: str = Field(
         None,
-        description="Public key for Bytes' storage in base64 format. "
+        description="KATalogus NaCl Sealbox base-64 public key string. "
         "Required when using NACL_SEALBOX encryption middleware.",
     )
 
-    metrics_ttl_seconds: int = Field(300, description="Time to live for metrics in seconds")
+    metrics_ttl_seconds: int = Field(
+        300, description="The time to cache slow queries performed in the metrics endpoint"
+    )
 
     span_export_grpc_endpoint: Optional[str] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
