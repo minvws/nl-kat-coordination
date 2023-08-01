@@ -568,7 +568,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             rate_limit=models.RateLimit(
                 identifier="test",
                 interval="1/hour",
-            )
+            ),
         )
         task = models.BoefjeTask(
             boefje=boefje,
@@ -1394,7 +1394,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             rate_limit=models.RateLimit(
                 identifier="test",
                 interval="1/minute",
-            )
+            ),
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
@@ -1465,7 +1465,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             rate_limit=models.RateLimit(
                 identifier="test",
                 interval="1/second",
-            )
+            ),
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
@@ -1545,7 +1545,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             rate_limit=models.RateLimit(
                 identifier="test",
                 interval="1/second",
-            )
+            ),
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
@@ -1615,7 +1615,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             rate_limit=models.RateLimit(
                 identifier="test",
                 interval="1/hour",
-            )
+            ),
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
@@ -1700,7 +1700,7 @@ class DelayedTasksTestCase(BoefjeSchedulerBaseTestCase):
             rate_limit=models.RateLimit(
                 identifier="test",
                 interval="1/second",
-            )
+            ),
         )
         first_task = models.BoefjeTask(
             boefje=boefje,
