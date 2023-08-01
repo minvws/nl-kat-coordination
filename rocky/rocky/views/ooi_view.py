@@ -8,9 +8,9 @@ from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
 from tools.forms.base import BaseRockyForm, ObservedAtForm
+from tools.forms.ooi_form import ClearanceFilterForm, OOIForm
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
-from tools.ooi_form import ClearanceFilterForm, OOIForm
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 

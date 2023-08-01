@@ -18,8 +18,8 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
+from tools.forms.ooi_form import OOIForm
 from tools.models import Organization, OrganizationMember
-from tools.ooi_form import OOIForm
 from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
     filter_ooi_tree,
@@ -456,10 +456,11 @@ class OnboardingOrganizationSetupView(
     permission_required = "tools.add_organization"
 
     def get(self, request, *args, **kwargs):
-        organization = Organization.objects.first()
-        if organization:
-            self.get_or_create_organizationmember(organization)
-            return redirect(reverse("step_organization_update", kwargs={"organization_code": organization.code}))
+        members = OrganizationMember.objects.filter(user=self.request.user)
+        if members:
+            return redirect(
+                reverse("step_organization_update", kwargs={"organization_code": members.first().organization.code})
+            )
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -471,27 +472,24 @@ class OnboardingOrganizationSetupView(
         return self.get(request, *args, **kwargs)
 
     def get_success_url(self) -> str:
-        organization = Organization.objects.first()
-        self.get_or_create_organizationmember(organization)
-        return reverse_lazy("step_indemnification_setup", kwargs={"organization_code": organization.code})
+        self.create_first_member(self.object)
+        return reverse_lazy("step_indemnification_setup", kwargs={"organization_code": self.object.code})
 
     def form_valid(self, form):
         org_name = form.cleaned_data["name"]
         result = super().form_valid(form)
         self.add_success_notification(org_name)
-
         return result
 
-    def get_or_create_organizationmember(self, organization):
-        if self.request.user.is_superuser:
-            OrganizationMember.objects.get_or_create(
-                user=self.request.user,
-                organization=organization,
-                trusted_clearance_level=4,
-                acknowledged_clearance_level=4,
-            )
-        else:
-            OrganizationMember.objects.get_or_create(user=self.request.user, organization=organization)
+    def create_first_member(self, organization):
+        member = OrganizationMember.objects.create(
+            user=self.request.user,
+            organization=organization,
+        )
+        if member.user.is_superuser:
+            member.trusted_clearance_level = 4
+            member.acknowledged_clearance_level = 4
+            member.save()
 
     def add_success_notification(self, org_name):
         success_message = _("{org_name} successfully created.").format(org_name=org_name)

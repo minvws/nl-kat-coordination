@@ -16,8 +16,22 @@
                 <h2>{% translate "Members" %}</h2>
                 {% if perms.tools.add_organizationmember %}
                     <div class="horizontal-view toolbar">
-                        <a href="{% url "organization_member_add" organization.code %}"
-                           class="button">{% translate "Add new member" %}</a>
+                      <div class="dropdown">
+                          <button aria-controls="export-add" class="dropdown-button">
+                            {% translate "Add member(s)" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+                          </button>
+                        <ul id="export-add" aria-expanded="false" class="dropdown-list">
+                          <li>
+                            <a href="{% url "organization_member_add" organization.code %}">
+                            {% translate "Manually" %}</a>
+                          </li>
+                          <li>
+                            <a href="{% url "organization_member_upload" organization.code %}">
+                            {% translate "Upload a CSV" %}</a>
+                          </li>
+                        </ul>
+                      </div>
+
                     </div>
                 {% endif %}
                 {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}
@@ -27,11 +41,9 @@
                         <caption>{% translate "Member overview:" %}</caption>
                         <thead>
                             <tr>
-                                <th>{% translate "Name" %}</th>
                                 <th>{% translate "E-mail" %}</th>
                                 <th>{% translate "Role" %}</th>
                                 <th>{% translate "Status" %}</th>
-                                <th>{% translate "Added" %}</th>
                                 <th>{% translate "Assigned clearance level" %}</th>
                                 <th>{% translate "Accepted clearance level" %}</th>
                                 <th>{% translate "Edit" %}</th>
@@ -42,7 +54,6 @@
                             {% for member in members %}
                                 {% if not member.user.is_superuser or request.user.is_superuser %}
                                     <tr>
-                                        <td>{{ member.user.full_name }}</td>
                                         <td>
                                             {{ member.user.email }}
                                             <br>
@@ -68,7 +79,6 @@
                                                     {% endif %}
                                             {% endif %}
                                         </td>
-                                        <td>{{ member.user.date_joined|date:"SHORT_DATE_FORMAT" }}</td>
                                         <td>
                                             {% if member.trusted_clearance_level < 0 %}
                                                 None
@@ -77,7 +87,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if member.trusted_clearance_level < 0 %}
+                                            {% if member.acknowledged_clearance_level < 0 %}
                                                 None
                                             {% else %}
                                                 L{{ member.acknowledged_clearance_level }}
