@@ -46,12 +46,6 @@ class BoefjeScheduler(Scheduler):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
 
-        super().__init__(
-            ctx=ctx,
-            scheduler_id=scheduler_id,
-            callback=callback,
-        )
-
         self.queue = queue or queues.BoefjePriorityQueue(
             pq_id=self.scheduler_id,
             maxsize=self.ctx.config.pq_maxsize,
@@ -66,6 +60,13 @@ class BoefjeScheduler(Scheduler):
 
         self.job_ranker = rankers.JobDeadlineRanker(
             ctx=self.ctx,
+        )
+
+        super().__init__(
+            ctx=ctx,
+            queue=self.queue,
+            scheduler_id=scheduler_id,
+            callback=callback,
         )
 
     @tracer.start_as_current_span("run")

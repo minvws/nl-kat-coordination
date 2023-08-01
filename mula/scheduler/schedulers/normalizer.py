@@ -31,12 +31,6 @@ class NormalizerScheduler(Scheduler):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
 
-        super().__init__(
-            ctx=ctx,
-            scheduler_id=scheduler_id,
-            callback=callback,
-        )
-
         self.queue = queue or queues.NormalizerPriorityQueue(
             pq_id=self.scheduler_id,
             maxsize=self.ctx.config.pq_maxsize,
@@ -47,6 +41,13 @@ class NormalizerScheduler(Scheduler):
 
         self.ranker = rankers.NormalizerRanker(
             ctx=self.ctx,
+        )
+
+        super().__init__(
+            ctx=ctx,
+            queue=self.queue,
+            scheduler_id=scheduler_id,
+            callback=callback,
         )
 
     def run(self) -> None:

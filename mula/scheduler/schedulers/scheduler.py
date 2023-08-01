@@ -41,7 +41,7 @@ class Scheduler(abc.ABC):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue = None,
+        queue: queues.PriorityQueue,
         callback: Optional[Callable[..., None]] = None,
         max_tries: int = -1,
     ):
@@ -155,10 +155,19 @@ class Scheduler(abc.ABC):
                 )
                 return
 
+        if job_db is None:
+            self.logger.warning(
+                "Job %s could not be created [task_id=%s, queue_id=%s]",
+                p_item.data.get("id"),
+                p_item.data.get("id"),
+                self.queue.pq_id,
+            )
+            return
+
         try:
             # Update job, if was already disabled, we enable it again.
             if not job_db.enabled:
-                self.ctx.job_store.update_job_enabled(job_db.id, True)
+                self.ctx.job_store.update_job_enabled(str(job_db.id), True)
 
             # Update task: For the task create the relationship with the associated job
             task_db.job_id = job_db.id
