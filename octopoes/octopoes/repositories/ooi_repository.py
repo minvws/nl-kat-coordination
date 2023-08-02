@@ -33,6 +33,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.tree import ReferenceNode, ReferenceTree
 from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
+from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
@@ -60,7 +61,7 @@ def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> Tuple[OOI, bool]:
     return ooi_new.__class__.parse_obj(data_old), changed
 
 
-class OOIRepository:
+class OOIRepository(Repository):
     def __init__(self, event_manager: EventManager):
         self.event_manager = event_manager
 
@@ -181,6 +182,9 @@ class XTDBOOIRepository(OOIRepository):
         super().__init__(event_manager)
         self.session = session
         self.__class__.xtdb_type = xtdb_type
+
+    def commit(self):
+        self.session.commit()
 
     @classmethod
     def pk_prefix(cls):
