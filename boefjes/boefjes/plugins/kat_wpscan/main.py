@@ -10,7 +10,6 @@ WPSCAN_IMAGE = "wpscanteam/wpscan:latest"
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
-    client = docker.from_env()
     input_ = boefje_meta.arguments["input"]
 
     if input_["software"]["name"] != "WordPress" or (
@@ -27,19 +26,25 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     url = f"{scheme}://{hostname}{path}"
 
-    # since wpscan can give positive exit codes on completion, docker-py's run() can fail on this
+    argv = [
+        "--url",
+        url,
+        "--format",
+        "json",
+        "--plugins-version-detection",
+        "aggressive",
+    ]
+    if wpscan_api_token := getenv("WP_SCAN_API"):
+        argv += ["--api-token", wpscan_api_token]
+
+    # update WPScan image
+    client = docker.from_env()
+    client.images.pull(WPSCAN_IMAGE)
+
+    # since WPScan can give positive exit codes on completion, docker-py's run() can fail on this
     container = client.containers.run(
         WPSCAN_IMAGE,
-        [
-            "--url",
-            url,
-            "--format",
-            "json",
-            "--plugins-version-detection",
-            "aggressive",
-            "--api-token",
-            getenv("WP_SCAN_API"),
-        ],
+        argv,
         detach=True,
     )
 
