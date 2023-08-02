@@ -10,7 +10,8 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Object list" %}</h1>
+                <h1>{% translate "Object list" %} @ {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}</h1>
+
                 <p>
                     {% blocktranslate trimmed %}
             An overview of your object list. Objects can be added manually or by running boefjes.</br>
@@ -28,6 +29,7 @@
                 <p class="de-emphasized">
                     {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
                 </p>
+
                 <form method="post" class="inline column" action="#bulk_clearance_level_submit">
                     {% csrf_token %}
                     <div class="horizontal-scroll">
