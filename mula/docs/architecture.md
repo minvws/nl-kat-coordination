@@ -104,7 +104,7 @@ C4Component
     Container_Boundary("scheduler_app", "Scheduler App") {
 
         %% ContainerDb(pq_store, "Priority Queue Store", "PostgresSQL DatabaseTable", "...")
-        
+
         Container_Boundary(boefje_scheduler, "Boefje Scheduler", "Scheduler") {
             Component("scan_profile_mutations", "Scan Profile Mutations", "Thread", "...")
             Component("new_boefjes", "New Boefjes", "Thread", "...")
@@ -112,7 +112,7 @@ C4Component
 
             Component("push_task_boefje", "Push Task", "Method")
 
-            SystemQueue(priority_queue_boefje, "PriorityQueue", "Persisted in a PostgeSQL database table") 
+            SystemQueue(priority_queue_boefje, "PriorityQueue", "Persisted in a PostgeSQL database table")
         }
 
         Container_Boundary(normalizer_scheduler, "Normalizer Scheduler", "Scheduler") {
@@ -241,9 +241,9 @@ sequenceDiagram
     end
 
     Scheduler->>Scheduler: Create BoefjeTask objects
-    
+
     Scheduler->>Scheduler: is_task_allowed_to_run()
-    
+
     rect rgb(242, 242, 242)
     note right of Scheduler: is_task_running()
         Scheduler->>TaskStore: get_latest_task_by_hash()
@@ -298,7 +298,7 @@ sequenceDiagram
     note right of Scheduler: push_task()
         Scheduler->>Scheduler: Create BoefjeTask object
         Scheduler->>Scheduler: is_task_allowed_to_run()
-    
+
         rect rgb(242, 242, 242)
         note right of Scheduler: is_task_running()
             Scheduler->>TaskStore: get_latest_task_by_hash()
@@ -355,75 +355,64 @@ sequenceDiagram
       queued/executed, and can be queried through the API.
 
     ```mermaid
-    flowchart TB
+    sequenceDiagram
+    participant Scheduler
 
-    %% External services
-    Octopoes["Octopoes<br/>[graph database]"]
+    participant Octopoes
+    participant Bytes
+    participant TaskStore
+    participant PriorityQueueStore
 
-    %% External services flow
-    Octopoes--"Get random OOI's"-->get_random_objects
+    Scheduler->>Octopoes: get_random_objects()
 
-    %% Boefje flow
-    get_random_objects-->get_boefjes_for_ooi-->create_boefje_task-->push_item_to_queue
-    push_item_to_queue-->post_push
-    push_item_to_queue-->push
-    push-->Datastore
-    post_push-->Datastore
+    loop for ooi in random_oois
+        Scheduler->>Octopoes: get_boefjes_for_ooi()
+    end
 
-    subgraph Scheduler["SchedulerApp [system]"]
+    rect rgb(191, 223, 255)
+    note right of Scheduler: push_task(boefje, ooi)
+        Scheduler->>Scheduler: Create BoefjeTask object
+        Scheduler->>Scheduler: is_task_allowed_to_run()
 
-        subgraph BoefjeScheduler["BoefjeScheduler [class]"]
-            subgraph BoefjePopulateQueue["populate_queue() [method]"]
-                subgraph RandomObjects["push_tasks_for_random_objects() [method]"]
-                    get_random_objects[["get_random_objects()"]]
-                    get_boefjes_for_ooi[["get_boefjes_for_ooi()"]]
-                    create_boefje_task("Create BoefjeTasks for OOI and enabled Boefjes")
-                    push_item_to_queue[["push_item_to_queue()"]]
-                end
-            end
-
-            push[["push()<br/><br/>Add PrioritizedItem to PriorityQueue"]]
-            post_push[["post_push()<br/><br/>Add BoefjeTask to database"]]
+        rect rgb(242, 242, 242)
+        note right of Scheduler: is_task_running()
+            Scheduler->>TaskStore: get_latest_task_by_hash()
+            Scheduler->>Bytes: get_last_run_boefje()
         end
 
-        Datastore[("SQL database<br/>[datastore]<br/>")]
+        rect rgb(242, 242, 242)
+        note right of Scheduler: has_grace_period_passed()
+            Scheduler->>TaskStore: get_latest_task_by_hash()
+            Scheduler->>Bytes: get_last_run_boefje()
+        end
 
+        rect rgb(242, 242, 242)
+        note right of Scheduler: is_item_on_queue_by_hash()
+            Scheduler->>PriorityQueueStore: get_latest_task_by_hash()
+        end
+
+        Scheduler->>Scheduler: Create PrioritizedItem
+        Scheduler->>PriorityQueueStore: push_item_to_queue_with_timeout()
     end
     ```
 
 3. Scan jobs created by the user in Rocky (`server.push_queue`), these tasks
-   will get the highest priority of 1.
+   will get the highest priority of 1. Note, that this will circumvent all 
+   the checks that are present in
 
    * Rocky will create a `BoefjeTask` that will be pushed directly to the
      specified queue.
 
    ```mermaid
-   flowchart TB
+   sequenceDiagram
+    participant Rocky
+    participant Server
+    participant Scheduler
+    participant PriorityQueueStore
 
-    Rocky["Rocky<br/>[webapp]"]
-
-    Rocky--"Create scan job<br/>HTTP POST"-->push_item_to_queue
-
-    push_item_to_queue-->post_push
-    push_item_to_queue-->push
-    push-->Datastore
-    post_push-->Datastore
-
-    subgraph Scheduler["SchedulerApp [system]"]
-
-        subgraph Server["Server [class]"]
-            push_item_to_queue[["push_item_to_queue()"]]
-
-        end
-
-        subgraph BoefjeScheduler["BoefjeScheduler [class]"]
-            push[["push()<br/><br/>Add PrioritizedItem to PriorityQueue"]]
-            post_push[["post_push()<br/><br/>Add BoefjeTask to database"]]
-        end
-
-        Datastore[("SQL database<br/>[datastore]<br/>")]
-
-    end
+    Rocky->>Server: POST /queues/{queue_id}/push
+    Server->>Scheduler: push_item_to_queue()
+    Scheduler->>PriorityQueueStore: push()
    ```
 
 
@@ -442,6 +431,55 @@ For a `normalizer` job the following events will trigger a dataflow procedure
 
     * For every enabled normalizer, a `NormalizerTask` will be created and
       added to the `PriorityQueue` of the `NormalizerScheduler`.
+
+```mermaid
+sequenceDiagram
+    participant Scheduler
+
+    create participant RabbitMQ
+    Scheduler->>RabbitMQ: consume raw_file_received
+    destroy RabbitMQ
+    RabbitMQ->>Scheduler: consume raw_file_received
+
+    participant Katalogus
+    participant Bytes
+    participant TaskStore
+    participant PriorityQueueStore
+
+    loop for mime_type in raw_file.mime_types
+        Scheduler->>Katalogus: get_normalizers_for_mime_type()
+    end
+
+    rect rgb(191, 223, 255)
+    note right of Scheduler: push_task()
+        Scheduler->>Scheduler: Create NormalizerTask object
+        Scheduler->>Scheduler: is_task_allowed_to_run()
+
+        rect rgb(242, 242, 242)
+        note right of Scheduler: is_task_running()
+            Scheduler->>TaskStore: get_latest_task_by_hash()
+            Scheduler->>Bytes: get_last_run_boefje()
+        end
+
+        rect rgb(242, 242, 242)
+        note right of Scheduler: has_grace_period_passed()
+            Scheduler->>TaskStore: get_latest_task_by_hash()
+            Scheduler->>Bytes: get_last_run_boefje()
+        end
+
+        rect rgb(242, 242, 242)
+        note right of Scheduler: is_item_on_queue_by_hash()
+            Scheduler->>PriorityQueueStore: get_latest_task_by_hash()
+        end
+
+        Scheduler->>Scheduler: Create PrioritizedItem
+        Scheduler->>PriorityQueueStore: push_item_to_queue_with_timeout()
+    end
+
+
+    Scheduler->>Scheduler: Create PrioritizedItem
+    Scheduler->>PriorityQueueStore: push_item_to_queue_with_timeout()
+```
 
 #### C4 Code level (Condensed class diagram)
 
