@@ -38,16 +38,16 @@ def strip_vsp_and_build(url: str) -> Iterable[str]:
     for part in url_parts:
         if str(part).lower() == "vsp":
             continue
-        if part.lower() == "build":
+        if str(part).lower() == "build":
             break
         yield part
 
 
 def check_for_versions(patched_versions: List[version.Version], detected_versions: List[version.Version]) -> bool:
     for detected_version in detected_versions:
-        if detected_version in patched_versions:
+        if any(detected_version >= patched_version for patched_version in patched_versions):
             return False
-        return any(detected_version < patched_version for patched_version in patched_versions)
+    return True
 
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes) -> Iterable[OOI]:
