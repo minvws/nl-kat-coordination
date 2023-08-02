@@ -32,15 +32,11 @@ class NormalizerScheduler(Scheduler):
         self.organisation: Organisation = organisation
 
         self.queue = queue or queues.NormalizerPriorityQueue(
-            pq_id=self.scheduler_id,
-            maxsize=self.ctx.config.pq_maxsize,
+            pq_id=scheduler_id,
+            maxsize=ctx.config.pq_maxsize,
             item_type=NormalizerTask,
             allow_priority_updates=True,
-            pq_store=self.ctx.pq_store,
-        )
-
-        self.ranker = rankers.NormalizerRanker(
-            ctx=self.ctx,
+            pq_store=ctx.pq_store,
         )
 
         super().__init__(
@@ -48,6 +44,10 @@ class NormalizerScheduler(Scheduler):
             queue=self.queue,
             scheduler_id=scheduler_id,
             callback=callback,
+        )
+
+        self.ranker = rankers.NormalizerRanker(
+            ctx=self.ctx,
         )
 
     def run(self) -> None:

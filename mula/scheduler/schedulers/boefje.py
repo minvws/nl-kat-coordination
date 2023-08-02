@@ -47,11 +47,18 @@ class BoefjeScheduler(Scheduler):
         self.organisation: Organisation = organisation
 
         self.queue = queue or queues.BoefjePriorityQueue(
-            pq_id=self.scheduler_id,
-            maxsize=self.ctx.config.pq_maxsize,
+            pq_id=scheduler_id,
+            maxsize=ctx.config.pq_maxsize,
             item_type=models.BoefjeTask,
             allow_priority_updates=True,
-            pq_store=self.ctx.pq_store,
+            pq_store=ctx.pq_store,
+        )
+
+        super().__init__(
+            ctx=ctx,
+            queue=self.queue,
+            scheduler_id=scheduler_id,
+            callback=callback,
         )
 
         self.boefje_ranker = rankers.BoefjeRanker(
@@ -60,13 +67,6 @@ class BoefjeScheduler(Scheduler):
 
         self.job_ranker = rankers.JobDeadlineRanker(
             ctx=self.ctx,
-        )
-
-        super().__init__(
-            ctx=ctx,
-            queue=self.queue,
-            scheduler_id=scheduler_id,
-            callback=callback,
         )
 
     @tracer.start_as_current_span("run")
