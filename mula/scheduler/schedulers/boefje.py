@@ -441,7 +441,7 @@ class BoefjeScheduler(Scheduler):
             return False
 
         try:
-            parsed_rate_limit = parse(task.boefje.rate_limit.interval)
+            parsed_rate_limit = parse(task.boefje.rate_limit.interval)  # type: ignore[union-attr]
             if parsed_rate_limit is None:
                 raise ValueError("Invalid rate limit interval")
         except ValueError as exc:
