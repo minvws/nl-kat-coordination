@@ -35,6 +35,11 @@ urlpatterns = [
         name="step_clearance_level_introduction",
     ),
     path(
+        "<organization_code>/step/acknowledge-clearance-level/",
+        views.OnboardingAcknowledgeClearanceLevelView.as_view(),
+        name="step_acknowledge_clearance_level",
+    ),
+    path(
         "<organization_code>/step/set-clearance-level/",
         views.OnboardingSetClearanceLevelView.as_view(),
         name="step_set_clearance_level",

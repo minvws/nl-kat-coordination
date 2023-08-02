@@ -5,6 +5,7 @@ from account.mixins import (
     OrganizationPermissionRequiredMixin,
     OrganizationView,
 )
+from account.views import OOIClearanceManager
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -112,7 +113,7 @@ class OnboardingSetupScanSelectPluginsView(
     KatIntroductionStepsMixin,
     TemplateView,
 ):
-    template_name = "step_3e_setup_scan_select_plugins.html"
+    template_name = "step_3g_setup_scan_select_plugins.html"
     current_step = 3
     report: Type[Report] = DNSReport
     permission_required = "tools.can_enable_disable_boefje"
@@ -349,13 +350,27 @@ class OnboardingClearanceLevelIntroductionView(
         return context
 
 
+class OnboardingAcknowledgeClearanceLevelView(
+    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, OOIClearanceManager
+):
+    template_name = "step_3e_trusted_acknowledge_clearance_level.html"
+    permission_required = "tools.can_set_clearance_level"
+    current_step = 3
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
+        return context
+
+
 class OnboardingSetClearanceLevelView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     FormView,
 ):
-    template_name = "step_3e_set_clearance_level.html"
+    template_name = "step_3f_set_clearance_level.html"
     form_class = OnboardingSetClearanceLevelForm
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
