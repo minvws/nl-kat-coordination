@@ -43,7 +43,7 @@ services:
       - ".ci/ci-multinode.env"
 
   xtdb_multinode:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.6"
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.7"
 
   ci_octopoes:
     build:
