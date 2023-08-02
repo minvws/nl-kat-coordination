@@ -105,6 +105,34 @@ class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, Organizatio
         success_message = _("Member added successfully.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
+    def get_success_url(self, **kwargs):
+        return reverse_lazy("organization_member_list", kwargs={"organization_code": self.organization.code})
+
+    def build_breadcrumbs(self):
+        breadcrumbs = super().build_breadcrumbs()
+        breadcrumbs.extend(
+            [
+                {
+                    "url": reverse(
+                        "organization_member_add_account_type",
+                        kwargs={"organization_code": self.organization.code},
+                    ),
+                    "text": _("Add Account Type"),
+                },
+                {
+                    "url": reverse(
+                        "organization_member_add",
+                        kwargs={
+                            "organization_code": self.organization.code,
+                            "account_type": self.kwargs["account_type"],
+                        },
+                    ),
+                    "text": _("Add Member"),
+                },
+            ]
+        )
+        return breadcrumbs
+
 
 class DownloadMembersTemplateView(OrganizationPermissionRequiredMixin, OrganizationView):
     permission_required = "tools.add_organizationmember"
