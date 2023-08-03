@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 import requests
 from fastapi.testclient import TestClient
@@ -125,10 +127,14 @@ def test_delete_node_multinode(requests_mock):
     assert response.status_code == 200
 
 
-def test_count_findings_by_severity(requests_mock, patch_pika, xtdbtype_crux):
+def test_count_findings_by_severity(requests_mock, patch_pika, xtdbtype_crux, caplog):
+    logger = logging.getLogger("octopoes")
+    logger.propagate = True
+
     requests_mock.real_http = True
     xt_response = [
         [
+            "KATFindingType|KAT-NO-DKIM",
             {
                 "object_type": "KATFindingType",
                 "KATFindingType/risk_severity": "medium",
@@ -139,7 +145,12 @@ def test_count_findings_by_severity(requests_mock, patch_pika, xtdbtype_crux):
                 "crux.db/id": "KATFindingType|KAT-NO-DKIM",
             },
             1,
-        ]
+        ],
+        [
+            "KATFindingType|KAT-NO-FINDING-TYPE",
+            None,
+            2,
+        ],
     ]
 
     requests_mock.post(
@@ -147,7 +158,8 @@ def test_count_findings_by_severity(requests_mock, patch_pika, xtdbtype_crux):
         json=xt_response,
         status_code=200,
     )
-    response = client.get("/_dev/findings/count_by_severity")
+    with caplog.at_level(logging.WARNING):
+        response = client.get("/_dev/findings/count_by_severity")
     assert response.status_code == 200
     assert response.json() == {
         "critical": 0,
@@ -158,3 +170,11 @@ def test_count_findings_by_severity(requests_mock, patch_pika, xtdbtype_crux):
         "pending": 0,
         "unknown": 0,
     }
+
+    assert caplog.record_tuples == [
+        (
+            "octopoes.repositories.ooi_repository",
+            logging.WARNING,
+            "There are 2 KATFindingType|KAT-NO-FINDING-TYPE findings but the finding type is not in the database",
+        )
+    ]

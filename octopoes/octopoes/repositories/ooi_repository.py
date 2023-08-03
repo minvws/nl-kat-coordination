@@ -602,7 +602,9 @@ class XTDBOOIRepository(OOIRepository):
         ):
             if not finding_type_object:
                 logger.warning(
-                    "There are %d %s findings but finding type is not in the database", finding_count, finding_type_name
+                    "There are %d %s findings but the finding type is not in the database",
+                    finding_count,
+                    finding_type_name,
                 )
                 continue
             ft = cast(FindingType, self.deserialize(finding_type_object))
