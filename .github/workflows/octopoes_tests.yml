@@ -33,8 +33,12 @@ jobs:
       - name: Run unit tests
         run: pytest --cov-report=xml
         working-directory: ./octopoes
+        env:
+          QUEUE_URI: "amqp://"
+          XTDB_URI: "http://"
+          KATALOGUS_API: "http://"
 
-      - if: ${{ matrix.version == '3.8' }}
+      - if: ${{ matrix.version == '3.11' }}
         name: Upload coverage as artifact
         uses: actions/upload-artifact@v3
         with:
