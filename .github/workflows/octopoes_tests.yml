@@ -34,9 +34,9 @@ jobs:
         run: pytest --cov-report=xml
         working-directory: ./octopoes
         env:
-          QUEUE_URI: "amqp://"
-          XTDB_URI: "http://crux:3000"
-          KATALOGUS_API: "http://localhost:8003"
+          QUEUE_URI: "amqp://placeholder"
+          XTDB_URI: "http://placeholder:3000"
+          KATALOGUS_API: "http://placeholder:8003"
 
       - if: ${{ matrix.version == '3.11' }}
         name: Upload coverage as artifact

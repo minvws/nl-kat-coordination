@@ -47,3 +47,12 @@ jobs:
       - name: Run pytests
         run: python3 -m pytest
         working-directory: ./boefjes
+        env:
+          KATALOGUS_DB_URI: "postgresql://placeholder@host:5432/katalogus"
+          QUEUE_URI: "amqp://placeholder"
+          XTDB_URI: "http://placeholder:3000"
+          KATALOGUS_API: "http://placeholder:8000"
+          OCTOPOES_API: "http://placeholder:8001"
+          BYTES_API: "http://placeholder:8002"
+          BYTES_USERNAME: "placeholder"
+          BYTES_PASSWORD: "placeholder"
