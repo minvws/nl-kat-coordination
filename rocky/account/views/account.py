@@ -1,6 +1,8 @@
 from enum import Enum
+from typing import Any
 
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
 from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 from requests.exceptions import RequestException
@@ -35,6 +37,10 @@ class OOIClearanceManager(OrganizationView, TemplateView):
 class AccountView(OOIClearanceManager, DetailView):
     template_name = "account_detail.html"
     context_object_name = "member"
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        self.object = self.get_object()
+        return super().get(request, *args, **kwargs)
 
     def get_object(self):
         return self.organization_member

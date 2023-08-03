@@ -51,8 +51,10 @@
                         {% blocktranslate asvar btn_text_accept_tcl %}
                             Accept level L{{tcl}} clearance and responsibility
                         {% endblocktranslate %}
-                        {% include "partials/single_action_form.html" with btn_text=btn_text_accept_tcl action="accept_clearance" key="member_id" value=member.id btn_class="ghost" %}
+                        {% include "partials/single_action_form.html" with btn_text=btn_text_accept_tcl action="accept_clearance" key="member_id" value=member.id btn_class="button" %}
 
+                        <a href="{% url "complete_onboarding" organization.code %}"
+                           class="button ghost">{% translate "Skip onboarding" %}</a>
                     {% else %}
                         <p>
                             {% blocktranslate %}

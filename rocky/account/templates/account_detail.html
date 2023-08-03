@@ -33,7 +33,11 @@
                     <div>
                         <dt>{% translate "Member type" %}</dt>
                         <dd>
-                            {{ member.groups.all.0 }}
+                            {% if member.user.is_superuser %}
+                                Super user
+                            {% else %}
+                                {{ member.groups.all.0 }}
+                            {% endif %}
                         </dd>
                     </div>
                     <div>
@@ -42,7 +46,7 @@
                             {{ member.organization }}
                         </dd>
                     </div>
-                    {% if member.acknowledged_clearance_level > 0 %}
+                    {% if member.acknowledged_clearance_level >= 0 %}
                         <div>
                             <dt>{% translate "Permission to set OOI clearance levels " %}</dt>
                             <dd>
@@ -52,7 +56,6 @@
                     {% endif %}
                 </dl>
             </div>
-            <h2>{% translate "OOI clearance" %}</h2>
             {% include "partials/ooi_clearance.html" %}
 
         </section>

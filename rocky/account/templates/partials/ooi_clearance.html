@@ -1,6 +1,7 @@
 {% load i18n %}
 
 {% if perms.tools.can_set_clearance_level %}
+    <h2>{% translate "OOI clearance" %}</h2>
     {% with tcl=member.trusted_clearance_level acl=member.acknowledged_clearance_level %}
         <section>
             <div>

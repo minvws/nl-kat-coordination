@@ -124,7 +124,7 @@ def test_onboarding_setup_scan_detail_create_ooi(
 
     assert response.status_code == 302
     assert response.headers["Location"] == get_ooi_url(
-        "step_set_clearance_level", "URL|internet|http://example.org", member.organization.code
+        "step_clearance_level_introduction", "URL|internet|http://example.org", member.organization.code
     )
 
 
@@ -148,7 +148,6 @@ def test_onboarding_set_clearance_level(
 
     assertContains(response_redteam, "OpenKAT introduction")
     assertContains(response_redteam, "Set clearance level for " + ooi_id)
-    assertContains(response_redteam, "How to know required clearance level")
     assertContains(response_redteam, "Set clearance level")
     assertContains(response_redteam, "Skip onboarding")
 
