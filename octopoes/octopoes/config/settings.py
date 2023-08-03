@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # External services settings
     queue_uri: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
-    xtdb_uri: str = Field(..., example="http://crux:3000", description="XTDB API", env="XTDB_URI")
+    xtdb_uri: AnyHttpUrl = Field(..., example="http://crux:3000", description="XTDB API", env="XTDB_URI")
     xtdb_type: XTDBType = Field(
         XTDBType.XTDB_MULTINODE,
         description="Determines how Octopoes will format documents' primary in serialization (crux.db/id vs xt/id)",

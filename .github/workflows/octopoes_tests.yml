@@ -35,8 +35,8 @@ jobs:
         working-directory: ./octopoes
         env:
           QUEUE_URI: "amqp://"
-          XTDB_URI: "http://"
-          KATALOGUS_API: "http://"
+          XTDB_URI: "http://crux:3000"
+          KATALOGUS_API: "http://localhost:8003"
 
       - if: ${{ matrix.version == '3.11' }}
         name: Upload coverage as artifact
