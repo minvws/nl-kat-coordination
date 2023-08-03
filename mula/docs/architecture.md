@@ -225,15 +225,20 @@ priority of 2.
 sequenceDiagram
     participant Scheduler
 
-    create participant RabbitMQ
-    Scheduler->>RabbitMQ: consume scan_profile_mutations
-    destroy RabbitMQ
-    RabbitMQ->>Scheduler: consume scan_profile_mutations
+    %% enable when github uses v10.3.0+ of mermaid
+    %% create participant RabbitMQ
+    %% scheduler->>rabbitmq: consume scan_profile_mutations
+    %% destroy rabbitmq
+    %% rabbitmq->>scheduler: consume scan_profile_mutations
 
+    participant RabbitMQ
     participant Katalogus
     participant Bytes
     participant TaskStore
     participant PriorityQueueStore
+
+    Scheduler->>RabbitMQ: consume scan_profile_mutations
+    RabbitMQ->>Scheduler: consume scan_profile_mutations
 
     rect rgb(242, 242, 242)
     note right of Scheduler: get_boefjes_for_ooi()
@@ -241,7 +246,6 @@ sequenceDiagram
     end
 
     Scheduler->>Scheduler: Create BoefjeTask objects
-
     Scheduler->>Scheduler: is_task_allowed_to_run()
 
     rect rgb(242, 242, 242)
@@ -403,8 +407,8 @@ sequenceDiagram
    * Rocky will create a `BoefjeTask` that will be pushed directly to the
      specified queue.
 
-   ```mermaid
-   sequenceDiagram
+```mermaid
+sequenceDiagram
     participant Rocky
     participant Server
     participant Scheduler
@@ -413,7 +417,7 @@ sequenceDiagram
     Rocky->>Server: POST /queues/{queue_id}/push
     Server->>Scheduler: push_item_to_queue()
     Scheduler->>PriorityQueueStore: push()
-   ```
+```
 
 
 ##### Creation of normalizer jobs
@@ -436,15 +440,20 @@ For a `normalizer` job the following events will trigger a dataflow procedure
 sequenceDiagram
     participant Scheduler
 
-    create participant RabbitMQ
-    Scheduler->>RabbitMQ: consume raw_file_received
-    destroy RabbitMQ
-    RabbitMQ->>Scheduler: consume raw_file_received
+    %% enable when github uses v10.3.0+ of mermaid
+    %% create participant RabbitMQ
+    %% Scheduler->>RabbitMQ: consume raw_file_received
+    %% destroy RabbitMQ
+    %% RabbitMQ->>Scheduler: consume raw_file_received
 
+    participant RabbitMQ
     participant Katalogus
     participant Bytes
     participant TaskStore
     participant PriorityQueueStore
+
+    Scheduler->>RabbitMQ: consume raw_file_received
+    RabbitMQ->>Scheduler: consume raw_file_received
 
     loop for mime_type in raw_file.mime_types
         Scheduler->>Katalogus: get_normalizers_for_mime_type()
