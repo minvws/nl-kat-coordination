@@ -53,6 +53,7 @@ jobs:
           XTDB_URI: "http://placeholder:3000"
           KATALOGUS_API: "http://placeholder:8000"
           OCTOPOES_API: "http://placeholder:8001"
-          BYTES_API: "http://placeholder:8002"
+          SCHEDULER_API: "http://placeholder:8002"
+          BYTES_API: "http://placeholder:8003"
           BYTES_USERNAME: "placeholder"
           BYTES_PASSWORD: "placeholder"

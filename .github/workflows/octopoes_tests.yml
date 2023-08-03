@@ -35,7 +35,7 @@ jobs:
         working-directory: ./octopoes
         env:
           QUEUE_URI: "amqp://placeholder"
-          XTDB_URI: "http://placeholder:3000"
+          XTDB_URI: "http://crux:3000"
           KATALOGUS_API: "http://placeholder:8003"
 
       - if: ${{ matrix.version == '3.11' }}
