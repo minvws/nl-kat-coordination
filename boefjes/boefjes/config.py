@@ -57,6 +57,3 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "BOEFJES_"
-
-
-settings = Settings()

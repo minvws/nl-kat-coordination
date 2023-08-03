@@ -1,12 +1,14 @@
 from datetime import datetime, timedelta, timezone
 from typing import Iterable, Union
 
-from boefjes.config import settings
+from boefjes.config import Settings
 from boefjes.job_models import NormalizerMeta
 from octopoes.connector.octopoes import ObjectNotFoundException, OctopoesAPIConnector
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPPort
+
+settings = Settings()
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:

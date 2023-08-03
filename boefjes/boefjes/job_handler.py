@@ -10,7 +10,7 @@ from pydantic.tools import parse_obj_as
 from requests import RequestException
 
 from boefjes.clients.bytes_client import BytesAPIClient
-from boefjes.config import settings
+from boefjes.config import Settings
 from boefjes.job_models import (
     BoefjeMeta,
     NormalizerMeta,
@@ -24,6 +24,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.types import OOIType
 
+settings = Settings()
 logger = logging.getLogger(__name__)
 bytes_api_client = BytesAPIClient(
     settings.bytes_api,

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from boefjes.config import settings
+from boefjes.config import Settings
 from boefjes.katalogus.clients import MockPluginRepositoryClient
 from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
@@ -11,6 +11,8 @@ from boefjes.katalogus.storage.memory import (
     RepositoryStorageMemory,
     SettingsStorageMemory,
 )
+
+settings = Settings()
 
 
 def get_plugin_seed():

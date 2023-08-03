@@ -1,4 +1,6 @@
-from boefjes.config import settings
+from boefjes.config import Settings
+
+settings = Settings()
 
 
 def get_dummy_data(filename: str) -> bytes:

@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from sqlalchemy.orm import Session
 
-from boefjes.config import Settings, settings
+from boefjes.config import Settings
 from boefjes.katalogus.models import Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
@@ -14,6 +14,7 @@ from boefjes.sql.db_models import OrganisationInDB, RepositoryInDB
 from boefjes.sql.repository_storage import SQLRepositoryStorage
 from boefjes.sql.session import SessionMixin
 
+settings = Settings()
 logger = logging.getLogger(__name__)
 
 

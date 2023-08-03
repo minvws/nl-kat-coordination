@@ -3,13 +3,14 @@ from typing import Dict
 
 from sqlalchemy.orm import Session
 
-from boefjes.config import Settings, settings
+from boefjes.config import Settings
 from boefjes.katalogus.models import Repository
 from boefjes.katalogus.storage.interfaces import RepositoryNotFound, RepositoryStorage
 from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.db_models import RepositoryInDB
 from boefjes.sql.session import SessionMixin
 
+settings = Settings()
 logger = logging.getLogger(__name__)
 
 

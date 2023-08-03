@@ -7,9 +7,10 @@ import dns.resolver
 from dns.name import Name
 from dns.resolver import Answer
 
-from boefjes.config import settings
+from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta
 
+settings = Settings()
 logger = logging.getLogger(__name__)
 
 
