@@ -2,7 +2,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
 
 
 class RuntimeConfiguration(Enum):
@@ -18,7 +18,9 @@ class Settings(BaseSettings):
     poll_interval: float = Field(10.0, description="Time to wait before polling for tasks when all queues are empty")
     worker_heartbeat: float = Field(1.0, description="Seconds to wait before checking the workers when queues are full")
 
-    remote_ns: str = Field("1.1.1.1", description="Name server used for remote DNS resolution in the boefje runner")
+    remote_ns: IPvAnyAddress = Field(
+        "1.1.1.1", description="Name server used for remote DNS resolution in the boefje runner"
+    )
 
     # Queue configuration
     queue_uri: AmqpDsn = Field(..., description="KAT queue URI", example="amqp://", env="QUEUE_URI")
@@ -49,7 +51,7 @@ class Settings(BaseSettings):
     bytes_username: str = Field(..., example="test", description="Bytes JWT login username", env="BYTES_USERNAME")
     bytes_password: str = Field(..., example="secret", description="Bytes JWT login password", env="BYTES_PASSWORD")
 
-    span_export_grpc_endpoint: Optional[str] = Field(
+    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 

@@ -43,7 +43,7 @@ class Settings(BaseSettings):
         set(), example="{'port-classification-bit'}", description="Explicitly disabled bits"
     )
 
-    span_export_grpc_endpoint: Optional[str] = Field(
+    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 

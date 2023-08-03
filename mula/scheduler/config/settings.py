@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
-from pydantic import AmqpDsn, BaseSettings, Field, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
 
 
 class Settings(BaseSettings):
@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     )
 
     # Server settings
-    api_host: str = Field("0.0.0.0", description="Host to bind the scheduler to")
+    api_host: IPvAnyAddress = Field("0.0.0.0", description="Host to bind the scheduler to")
     api_port: int = Field(8000, description="Host port to bind the scheduler to")
 
     # Application settings
@@ -29,15 +29,17 @@ class Settings(BaseSettings):
     octopoes_request_timeout: int = Field(10, description="Octopoes request timeout in seconds")
 
     # External services settings
-    host_katalogus: str = Field(
+    host_katalogus: AnyHttpUrl = Field(
         ..., example="http://localhost:8003", env="KATALOGUS_API", description="Katalogus API URL"
     )
-    host_bytes: str = Field(..., example="http://localhost:8004", env="BYTES_API", description="Bytes API URL")
+    host_bytes: AnyHttpUrl = Field(..., example="http://localhost:8004", env="BYTES_API", description="Bytes API URL")
     host_bytes_user: str = Field(..., example="test", description="Bytes JWT login username", env="BYTES_USERNAME")
     host_bytes_password: str = Field(
         ..., example="secret", description="Bytes JWT login password", env="BYTES_PASSWORD"
     )
-    host_octopoes: str = Field(..., example="http://localhost:8001", env="OCTOPOES_API", description="Octopoes API URL")
+    host_octopoes: AnyHttpUrl = Field(
+        ..., example="http://localhost:8001", env="OCTOPOES_API", description="Octopoes API URL"
+    )
 
     queue_prefetch_count: int = Field(100)
     host_mutation: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
@@ -63,7 +65,7 @@ class Settings(BaseSettings):
         ..., example="postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI"
     )
 
-    span_export_grpc_endpoint: Optional[str] = Field(
+    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 

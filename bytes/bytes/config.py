@@ -2,7 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
-from pydantic import AmqpDsn, BaseSettings, Field, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, PostgresDsn
 
 from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     pastebin_api_dev_key: str = Field(
         None, description="API key for Pastebin. Required when using PASTEBIN hashing repository."
     )
-    rfc3161_provider: str = Field(
+    rfc3161_provider: AnyHttpUrl = Field(
         None,
         example="https://freetsa.org/tsr",
         description="Timestamping. "
@@ -79,7 +79,7 @@ class Settings(BaseSettings):
         300, description="The time to cache slow queries performed in the metrics endpoint"
     )
 
-    span_export_grpc_endpoint: Optional[str] = Field(
+    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
