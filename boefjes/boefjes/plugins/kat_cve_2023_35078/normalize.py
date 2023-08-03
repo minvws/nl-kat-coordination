@@ -1,4 +1,4 @@
-from typing import Iterable, List, Union
+from typing import Iterable, List, Tuple, Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
@@ -6,7 +6,7 @@ from octopoes.models.ooi.findings import CVEFindingType, Finding
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from packaging import version
 
-PATCHED_VERSIONS: List[str] = ["11.10.0.2", "11.9.1.1", "11.8.1.1"]
+VULNERABLE_RANGES: List[Tuple[str, str]] = [("0", "11.8.1.1"), ("11.9.0.0", "11.9.1.1"), ("11.10.0.0", "11.10.0.2")]
 
 
 def extract_js_version(html_content: str) -> Union[version.Version, bool]:
@@ -43,11 +43,14 @@ def strip_vsp_and_build(url: str) -> Iterable[str]:
         yield part
 
 
-def check_for_versions(patched_versions: List[version.Version], detected_versions: List[version.Version]) -> bool:
+def are_vulnerable_versions(
+    vulnerable_ranges: List[Tuple[version.Version, version.Version]], detected_versions: List[version.Version]
+) -> bool:
     for detected_version in detected_versions:
-        if any(detected_version >= patched_version for patched_version in patched_versions):
-            return False
-    return True
+        for start, end in vulnerable_ranges:
+            if start <= detected_version < end:
+                return True
+    return False
 
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes) -> Iterable[OOI]:
@@ -61,8 +64,8 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes) -> Iterable[OOI]:
     software_instance = SoftwareInstance(ooi=ooi, software=software.reference)
     yield software
     yield software_instance
-    vulnerable = check_for_versions(
-        [version.parse(patched_version) for patched_version in PATCHED_VERSIONS], detected_versions
+    vulnerable = are_vulnerable_versions(
+        [(version.parse(start), version.parse(end)) for start, end in VULNERABLE_RANGES], detected_versions
     )
     if vulnerable:
         finding_type = CVEFindingType(id="CVE-2023-35078")
