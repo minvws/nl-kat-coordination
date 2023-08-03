@@ -504,21 +504,32 @@ classDiagram
         +Dict[str, Scheduler] schedulers
         +Dict[str, Listener] listeners
         +Server server
+        shutdown()
         run()
     }
 
     class Scheduler {
         <<abstract>>
         +AppContext ctx
-        +Dict[str, ThreadRunner] threads
         +PriorityQueue queue
         +Ranker ranker
-        populate_queue()
+        +Dict[str, ThreadRunner] threads
+        +Dict[str, Listener] listeners
         push_items_to_queue()
         push_item_to_queue()
         pop_item_from_queue()
+        pop_item_from_queue_with_timeout()
         post_push()
         post_pop()
+        run_in_thread()
+        enable()
+        disabled()
+        is_enabled()
+        is_space_on_queue()
+        is_item_on_queue_by_hash()
+        stop()
+        stop_listeners()
+        stop_threads()
         run()
     }
 
@@ -559,7 +570,6 @@ classDiagram
         rank()
     }
 
-
     class Listener {
         listen()
     }
@@ -569,6 +579,8 @@ classDiagram
 
     Scheduler --|> "1" PriorityQueue : Has
     Scheduler --|> "1" Ranker : Has
+    Scheduler --|> "many" ThreadRunner : Has
+    Scheduler --|> "many" Listener : Has
 
     PriorityQueue --|> PriorityQueueStore: References
 ```
@@ -584,8 +596,8 @@ The following describes the main components of the scheduler application:
 
 * `Scheduler` - And implementation of a `Scheduler` class is responsible for
   populating the queue with tasks. Contains has a `PriorityQueue` and a
-  `Ranker`. The `run()` method starts the `populate_queue()` method, which
-  fill up the queue with tasks. The `run()` method is run in a thread.
+  `Ranker`. The `run()` method starts executes threads and listeners, which
+  fill up the queue with tasks.
 
 * `PriorityQueue` - The queue class, which is responsible for storing the
   tasks.
