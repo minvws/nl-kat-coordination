@@ -15,6 +15,8 @@ def extract_js_version(html_content: str) -> Union[version.Version, bool]:
     if telltale_position == -1:
         return False
     version_end = html_content.find('"', telltale_position)
+    if version_end == -1:
+        return False
     version_string = html_content[telltale_position + len(telltale) : version_end]
     if not version_string:
         return False
@@ -27,6 +29,8 @@ def extract_css_version(html_content: str) -> Union[version.Version, bool]:
     if telltale_position == -1:
         return False
     version_end = html_content.find('"', telltale_position)
+    if version_end == -1:
+        return False
     version_string = html_content[telltale_position + len(telltale) : version_end]
     if not version_string:
         return False
