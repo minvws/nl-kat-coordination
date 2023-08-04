@@ -167,7 +167,7 @@ def test_count_findings_by_severity(requests_mock, patch_pika, xtdbtype_crux, ca
         "medium": 1,
         "low": 0,
         "recommendation": 0,
-        "pending": 0,
+        "pending": 2,
         "unknown": 0,
     }
 

@@ -606,9 +606,10 @@ class XTDBOOIRepository(OOIRepository):
                     finding_count,
                     finding_type_name,
                 )
-                continue
-            ft = cast(FindingType, self.deserialize(finding_type_object))
-            severity = ft.risk_severity or RiskLevelSeverity.PENDING
+                severity = RiskLevelSeverity.PENDING
+            else:
+                ft = cast(FindingType, self.deserialize(finding_type_object))
+                severity = ft.risk_severity or RiskLevelSeverity.PENDING
             severity_counts.update([severity] * finding_count)
         return severity_counts
 
