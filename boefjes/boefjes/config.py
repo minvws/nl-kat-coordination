@@ -1,12 +1,7 @@
-from enum import Enum
 from pathlib import Path
 from typing import Optional
 
 from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
-
-
-class RuntimeConfiguration(Enum):
-    LOCAL = "local"
 
 
 class Settings(BaseSettings):
@@ -24,11 +19,6 @@ class Settings(BaseSettings):
 
     # Queue configuration
     queue_uri: AmqpDsn = Field(..., description="KAT queue URI", example="amqp://", env="QUEUE_URI")
-
-    # Runtime configuration
-    runtime: RuntimeConfiguration = Field(
-        RuntimeConfiguration.LOCAL, description="Type of runtime to use", possible_values=["local"]
-    )
 
     katalogus_db_uri: PostgresDsn = Field(
         ...,
