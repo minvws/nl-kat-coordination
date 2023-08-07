@@ -6,7 +6,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
-from boefjes.config import Settings
+from boefjes.config import settings
 from boefjes.katalogus.api import app
 from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
 from boefjes.katalogus.models import Organisation, Repository
@@ -15,8 +15,6 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 from boefjes.sql.repository_storage import SQLRepositoryStorage
 from boefjes.sql.setting_storage import SQLSettingsStorage
-
-settings = Settings()
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")

@@ -5,7 +5,7 @@ from unittest import TestCase, skipIf
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import sessionmaker
 
-from boefjes.config import Settings
+from boefjes.config import settings
 from boefjes.katalogus.models import Boefje, Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
@@ -19,8 +19,6 @@ from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
 from boefjes.sql.repository_storage import SQLRepositoryStorage
 from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
-
-settings = Settings()
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")

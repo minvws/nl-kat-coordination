@@ -5,10 +5,8 @@ from typing import List, Tuple, Union
 
 import docker
 
-from boefjes.config import Settings
+from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
-
-settings = Settings()
 
 DNSSEC_IMAGE = "noamblitz/drill:latest"
 
