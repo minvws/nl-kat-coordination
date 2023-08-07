@@ -3,7 +3,7 @@ from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from boefjes.config import Settings
+from boefjes.config import Settings, settings
 from boefjes.katalogus.storage.interfaces import (
     OrganisationNotFound,
     PluginEnabledStorage,
@@ -14,7 +14,6 @@ from boefjes.sql.db import ObjectNotFoundException, get_engine
 from boefjes.sql.db_models import OrganisationInDB, PluginStateInDB, RepositoryInDB
 from boefjes.sql.session import SessionMixin
 
-settings = Settings()
 logger = logging.getLogger(__name__)
 
 

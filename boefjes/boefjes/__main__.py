@@ -4,10 +4,8 @@ import logging.config
 import click
 
 from boefjes.app import get_runtime_manager
-from boefjes.config import Settings
+from boefjes.config import settings
 from boefjes.runtime_interfaces import WorkerManager
-
-settings = Settings()
 
 with settings.log_cfg.open() as f:
     logging.config.dictConfig(json.load(f))

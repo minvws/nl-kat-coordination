@@ -6,9 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
-from boefjes.config import Settings
+from boefjes.config import settings
 
-settings = Settings()
 logger = logging.getLogger(__name__)
 
 SQL_BASE = declarative_base()
