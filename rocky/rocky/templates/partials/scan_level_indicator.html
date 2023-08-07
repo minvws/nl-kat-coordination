@@ -1,6 +1,7 @@
 {% load static %}
 {% load i18n %}
 
+{% if value < 0 %}{{ choice.choice_label }}{% endif %}
 {% if value >= 0 %}
     <ul class="level-indicator l{{ value }} {{ custom_class }}">
         {% get_scan_levels as scan_levels %}

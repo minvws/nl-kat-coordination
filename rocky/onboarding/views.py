@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Type
 
-from account.forms import OnboardingOrganizationUpdateForm, OrganizationForm
+from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
 from account.mixins import (
     OrganizationPermissionRequiredMixin,
     OrganizationView,
@@ -19,7 +19,7 @@ from django.views.generic.edit import CreateView, FormView, UpdateView
 from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
 from tools.forms.ooi_form import OOIForm
-from tools.models import Organization, OrganizationMember
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import (
     create_object_tree_item_from_ref,
     filter_ooi_tree,
@@ -32,12 +32,10 @@ from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
 from octopoes.models.types import type_by_name
 from onboarding.forms import (
-    OnboardingCreateUserAdminForm,
-    OnboardingCreateUserClientForm,
-    OnboardingCreateUserRedTeamerForm,
     OnboardingSetClearanceLevelForm,
 )
 from onboarding.view_helpers import (
+    DNS_REPORT_LEAST_CLEARANCE_LEVEL,
     ONBOARDING_PERMISSIONS,
     KatIntroductionAdminStepsMixin,
     KatIntroductionRegistrationStepsMixin,
@@ -49,6 +47,7 @@ from rocky.exceptions import (
     IndemnificationNotPresentException,
     RockyError,
 )
+from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_report import DNSReport, Report, build_findings_list_from_store
 from rocky.views.ooi_view import BaseOOIDetailView, BaseOOIFormView, SingleOOITreeMixin
@@ -120,9 +119,7 @@ class OnboardingSetupScanSelectPluginsView(
 
     def get_form(self):
         boefjes = self.report.get_boefjes(self.organization)
-        boefjes = [
-            boefje for boefje in boefjes if boefje["boefje"].scan_level <= int(self.request.session["clearance_level"])
-        ]
+        boefjes = [boefje for boefje in boefjes if boefje["boefje"].scan_level <= DNS_REPORT_LEAST_CLEARANCE_LEVEL]
         kwargs = {
             "initial": {"boefje": [item["id"] for item in boefjes if item.get("required", False)]},
         }
@@ -269,7 +266,7 @@ class OnboardingSetupScanOOIDetailView(
 
     def post(self, request, *args, **kwargs):
         ooi = self.get_ooi()
-        level = int(self.request.session["clearance_level"])
+        level = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         try:
             self.raise_clearance_level(ooi.reference, level)
         except IndemnificationNotPresentException:
@@ -328,19 +325,19 @@ class OnboardingSetClearanceLevelView(
     form_class = OnboardingSetClearanceLevelForm
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
-    initial = {"level": 2}
+    initial = {"level": DNS_REPORT_LEAST_CLEARANCE_LEVEL}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["boefjes"] = self.get_boefjes_tiles()
         context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         return context
 
     def get_success_url(self, **kwargs):
         return get_ooi_url("step_setup_scan_select_plugins", self.request.GET.get("ooi_id"), self.organization.code)
 
     def form_valid(self, form):
-        self.request.session["clearance_level"] = form.cleaned_data["level"]
         self.add_success_notification()
         return super().form_valid(form)
 
@@ -554,12 +551,14 @@ class OnboardingAccountSetupIntroView(
     permission_required = "tools.add_organizationmember"
 
 
-class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, CreateView):
+class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, FormView):
+    account_type = None
     permission_required = "tools.add_organizationmember"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["organization_code"] = self.organization.code
+        kwargs["organization"] = self.organization
+        kwargs["account_type"] = self.account_type
         return kwargs
 
 
@@ -584,10 +583,10 @@ class OnboardingAccountSetupAdminView(
     Step 1: Create an admin account with admin rights
     """
 
-    model = User
     template_name = "account/step_4_account_setup_admin.html"
-    form_class = OnboardingCreateUserAdminForm
+    form_class = MemberRegistrationForm
     current_step = 4
+    account_type = GROUP_ADMIN
 
     def get_success_url(self) -> str:
         return reverse_lazy("step_account_setup_red_teamer", kwargs={"organization_code": self.organization.code})
@@ -611,16 +610,19 @@ class OnboardingAccountSetupRedTeamerView(
     Step 2: Create an redteamer account with redteam rights
     """
 
-    model = User
     template_name = "account/step_5_account_setup_red_teamer.html"
-    form_class = OnboardingCreateUserRedTeamerForm
+    form_class = MemberRegistrationForm
     current_step = 4
+    account_type = GROUP_REDTEAM
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("step_account_setup_client", kwargs={"organization_code": self.organization.code})
 
     def form_valid(self, form):
         name = form.cleaned_data["name"]
+        trusted_clearance_level = form.cleaned_data.get("trusted_clearance_level")
+        if trusted_clearance_level and int(trusted_clearance_level) < DNS_REPORT_LEAST_CLEARANCE_LEVEL:
+            clearance_level_warning_dns_report(self.request, trusted_clearance_level)
         self.add_success_notification(name)
         return super().form_valid(form)
 
@@ -634,10 +636,10 @@ class OnboardingAccountSetupClientView(RegistrationBreadcrumbsMixin, OnboardingA
     Step 3: Create a client account.
     """
 
-    model = User
     template_name = "account/step_6_account_setup_client.html"
-    form_class = OnboardingCreateUserClientForm
+    form_class = MemberRegistrationForm
     current_step = 4
+    account_type = GROUP_CLIENT
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("complete_onboarding", kwargs={"organization_code": self.organization.code})
