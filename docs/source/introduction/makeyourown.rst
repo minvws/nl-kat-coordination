@@ -8,12 +8,10 @@ OpenKAT comes with a KATalog of boefjes, which can be viewed through the front e
 
 OpenKAT can access multiple KATalogs, so it is possible to create your own overview of boefjes in addition to the official KATalog. This is of interest to organizations that use boefjes for specific purposes or with software that has a different licensing model.
 
-This guide explains how the plugins work and how they are created, and gives an overview of which plugins already exist.
+This guide explains how the plugins work and how they are created, and gives an overview of which plugins already exist. It also explains the configuration options available.
 
-The community is working on sample boefjes with a ``enter your code here`` option and a repository with a prebuilt CI that provides boefjes as artifacts. Please send an email to meedoen@openkat.nl if you would like to participate in this.
-
-What types of plugins are there?
-================================
+What types of plugins are available?
+====================================
 
 There are three types of plugins, deployed by OpenKAT to collect information, translate it into objects for the data model and then analyze it. Boefjes gather facts, Whiskers structure the information for the data model and Bits determine what you want to think about it; they are the business rules. Each action is cut into the smallest possible pieces.
 
@@ -23,7 +21,7 @@ There are three types of plugins, deployed by OpenKAT to collect information, tr
 
 - Bits contain the business rules that do the analysis on the objects.
 
-Boefjes and Whiskers are linked together through the mime-type that the boefje passes along to the information. For each mime-type, multiple Boefjes and Whiskers are possible, each with its own specialization. Thus, the data from a crook can be delivered to multiple whiskers to extract a different object each time. Bits are linked to objects and assess the objects in the data model.
+Boefjes and Whiskers are linked together through the mime-type that the boefje passes along to the information. For each mime-type, multiple Boefjes and Whiskers are possible, each with its own specialization. Thus, the data from a boefje can be delivered to multiple whiskers to extract a different object each time. Bits are linked to objects and assess the objects in the data model. Some bits are configurable with a specific configuration stored in the graph.
 
 How does it work?
 =================
@@ -288,7 +286,7 @@ The PortState is defined separately. This can be done for information that has a
 Bits: businessrules
 ===================
 
-Bits are businessrules that assess objects. Which ports are allowed to be open, which are not, which software version is acceptable, which is not. Does a system as a whole meet a set of requirements associated with a particular certification or not?
+Bits are businessrules that assess objects. Which ports are allowed to be open, which are not, which software version is acceptable, which is not. Does a system as a whole meet a set of requirements associated with a particular certification or not? Some bits are configurable through a specific 'question object', which is explained below.
 
 In the hostname example, that provides an IP address, and based on the IP address, we look at which ports are open. These include some ports that should be open because certain software is running and ports that should be closed because they are not used from a security or configuration standpoint.
 
@@ -388,6 +386,69 @@ For example: The Bit for *internet.nl* can thus deduce from a series of objects 
 	    module="bits.internetnl.internetnl",
 	)
 
+
+Configurable bits
+=================
+
+As policy differs per organization or situation, certain bits can be configured through the webinterface of OpenKAT. Currently the interface is quite rough, but it provides the framework for future development in this direction.
+
+Question object
+---------------
+
+Configurable bits require a place where the configuration is stored. It needs to be tracable, as the configuration is important when judging the results of a scan. The solution is to store the config in the graph. 
+
+When a relevant object is created, a configurable bit throws a question object at the user. This question can be answered with a json file or through the webinterface. The configuration of the bit is then stored as an object in the graph.
+
+My first question object
+------------------------
+
+Under 'Objects', create a network object called 'internet'. Automagically a question object will be created. You will be able to find it in the objects list. If you already have a lot of objects, filter it using the 'question' objecttype.
+
+The question object allows you to customize the relevant parameters. At the time of writing, the only configurable bit is IPport. This allows you to change the allowed ports on a host.
+
+Open the question object, answer the questions and store the policy of your organization. Besides the allowed and not allowed ports, this bit also has the option to aggregate findings directly.
+
+The IPport question object has five fields:
+
+Allowed:
+
+- common udp ports
+- common tcp ports
+
+Not allowed:
+
+- sa ports (sysadmin)
+- db ports (database)
+
+Findings:
+
+- aggregate findings
+
+
+.. image:: img/questionobject.png
+  :alt: Question object
+
+After adding the relevant information, your question object will be stored and applied directly. It can be changed or added through the webinterface.
+
+What happens in the background?
+-------------------------------
+
+The question object is more than just a tool to allow or disallow ports, it is the framework for future development on configurations. A configurable ruleset is a basic requirement for a system like OpenKAT and we expect it to evolve.
+
+The dataflow of the question object works as per this diagram:
+
+.. image:: img/dataflowquestionobject.png
+  :alt: Dataflow question object
+
+After the relevant object has been created, within the normal flow of OpenKAT a question object will be created. The advantage of this is to store all relevant data in the graph itself, which allows for future development.
+
+Advantages and outlook
+----------------------
+
+Storing the configs in the graph is a bit more complex than just using a config file which can be edited and reloaded at will. The advantage of storing the configuration in the graph is that it allows the user to see from when to when a certain configuration was used within OpenKAT.
+
+In the future, one goal is to have 'profiles' with a specific configuration that can be deployed automagically. Another wish is to add scope to these question objects, relating them to specific objects or for instance network segments.
+
 Add Boefjes
 ===========
 
@@ -399,4 +460,3 @@ There are a number of ways to add your new boefje to OpenKAT.
 
 ``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the Github CI.
 
-The goal is to set up a separate Github repo with a complete CI to create artifacts based on a template boefje. You can clone this repo. Your OpenKAT installation points you to the artifacts so they are usable from your system. This is now being worked on by the OpenKAT community. Send an email to meedoen@openkat.nl if you want to help. (status: Dec. 2022)
