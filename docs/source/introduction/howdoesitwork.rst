@@ -18,7 +18,7 @@ OpenKAT uses a configurable data model. All information is translated into objec
 Basic concepts
 ==============
 
-Central to OpenKAT are objects and the data model. Objects (or 'objects of interest, ooi') are created by collecting and analyzing information. The objects found are analyzed using business rules, leading to findings that are included as objects in the data model.
+Central to OpenKAT are objects and `the data model, which defines objecttypes <https://mispo.es/model-explorer/model-explorer.html>`_. Objects (or 'objects of interest, ooi') are created by collecting and analyzing information. The objects found are analyzed using business rules, leading to findings that are included as objects in the data model.
 
 The data model helps in the search for more information, through the logical coherence of objects. Objecttypes are defined in the datamodel. When an object is found, OpenKAT automatically checks whether related objects are also present. Based on this, it searches for information again, completing the circle.
 
