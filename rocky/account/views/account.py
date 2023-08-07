@@ -31,7 +31,7 @@ class AccountView(OrganizationView, DetailView):
             if action == PageActions.ACCEPT_CLEARANCE.value:
                 organizationmember.acknowledged_clearance_level = organizationmember.trusted_clearance_level
             elif action == PageActions.WITHDRAW_ACCEPTANCE.value:
-                organizationmember.acknowledged_clearance_level = 0
+                organizationmember.acknowledged_clearance_level = -1
             else:
                 raise Exception(f"Unhandled allowed action: {action}")
             organizationmember.save()

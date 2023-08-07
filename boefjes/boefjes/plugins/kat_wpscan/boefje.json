@@ -1,7 +1,7 @@
     {
         "id": "wp-scan",
         "name": "WPScan",
-        "description": "Scan wordpress sites",
+        "description": "WordPress security scanner",
         "consumes": [
             "SoftwareInstance"
         ],
