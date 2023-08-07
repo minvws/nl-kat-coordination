@@ -211,7 +211,7 @@ class Scheduler(abc.ABC):
 
         self.logger.debug(
             "Pushed item (%s) to queue %s with priority %s "
-            "[p_item.id=%s, p_item.hash=%s, queue.pq_id=%s, queue.qsize=%d]",
+            "[p_item_id=%s, p_item_hash=%s, queue_pq_id=%s, queue_qsize=%d]",
             p_item.id,
             self.queue.pq_id,
             p_item.priority,
@@ -424,8 +424,7 @@ class Scheduler(abc.ABC):
         self.threads = []
 
     def dict(self) -> Dict[str, Any]:
-        """Get a dict representation of the scheduler.
-        """
+        """Get a dict representation of the scheduler."""
         return {
             "id": self.scheduler_id,
             "enabled": self.enabled,

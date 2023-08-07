@@ -103,7 +103,7 @@ C4Component
 
     Container_Boundary("scheduler_app", "Scheduler App") {
 
-        %% ContainerDb(pq_store, "Priority Queue Store", "PostgresSQL DatabaseTable", "...")
+        %% ContainerDb(pq_store, "Priority Queue Store", "postgresql DatabaseTable", "...")
 
         Container_Boundary(boefje_scheduler, "Boefje Scheduler", "Scheduler") {
             Component("scan_profile_mutations", "Scan Profile Mutations", "Thread", "...")
@@ -112,15 +112,15 @@ C4Component
 
             Component("push_task_boefje", "Push Task", "Method")
 
-            SystemQueue(priority_queue_boefje, "PriorityQueue", "Persisted in a PostgeSQL database table")
+            SystemQueue(priority_queue_boefje, "PriorityQueue", "Persisted in a postgresql database table")
         }
 
         Container_Boundary(normalizer_scheduler, "Normalizer Scheduler", "Scheduler") {
-            Component("raw_file_received", "Raw File Recieved", "Thread", "...")
+            Component("raw_file_received", "Raw File Received", "Thread", "...")
 
             Component("push_task_normalizer", "Push Task", "Method")
 
-            SystemQueue(priority_queue_normalizer, "PriorityQueue", "Persisted in a PostgeSQL database table")
+            SystemQueue(priority_queue_normalizer, "PriorityQueue", "Persisted in a postgresql database table")
         }
 
         Container_Boundary(server, "Server", "REST API") {
@@ -129,7 +129,7 @@ C4Component
             Component("api_queues_pop", "/queues/{id}/pop", "...")
         }
 
-        ContainerDb(task_store, "Task Store", "PostgreSQL Database Table", "Persisted in a PostgeSQL database table")
+        ContainerDb(task_store, "Task Store", "postgresql Database Table", "Persisted in a postgresql database table")
     }
 
     %% Boefje Scheduler
@@ -401,7 +401,7 @@ sequenceDiagram
     ```
 
 3. Scan jobs created by the user in Rocky (`server.push_queue`), these tasks
-   will get the highest priority of 1. Note, that this will circumvent all 
+   will get the highest priority of 1. Note, that this will circumvent all
    the checks that are present in
 
    * Rocky will create a `BoefjeTask` that will be pushed directly to the
