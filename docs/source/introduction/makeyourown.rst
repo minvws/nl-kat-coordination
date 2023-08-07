@@ -437,7 +437,7 @@ The question object is more than just a tool to allow or disallow ports, it is t
 
 The dataflow of the question object works as per this diagram:
 
-.. image:: img/dataflowquestionobject.png
+.. image:: img/dataflowquestionobjects.png
   :alt: Dataflow question object
 
 After the relevant object has been created, within the normal flow of OpenKAT a question object will be created. The advantage of this is to store all relevant data in the graph itself, which allows for future development.
