@@ -24,13 +24,13 @@
             right to run any type of scan on your own server but you
             probably don’t have the right to do so for objects owned
             by other people of companies.
-          {% endblocktranslate %}
+                    {% endblocktranslate %}
                 </p>
                 <h3>{% translate "How to know required clearance level" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
             Each plugin that scans will have a scan intensity score. The intensity of the scan must be equal to or below the clearance level you set for your object. If the scan has an intensity level that is too high, OpenKAT will notify you before running it. Visually clearance levels and intensity scores are indicated with little cat paws.
-          {% endblocktranslate %}
+                    {% endblocktranslate %}
                 </p>
                 <div id="id_boefjes" class="column-4 plugins tiles images-cover">
                     {% include "partials/boefje_tile_static.html" %}
@@ -42,7 +42,7 @@
                             {% blocktranslate trimmed %}
                 This scan has a scan intensity score of 1, requiring a level 1 clearance level to be run.
                 This means that the scan does not touch the object itself, but only searches for information about the object.
-              {% endblocktranslate %}
+                            {% endblocktranslate %}
                         </p>
                     </div>
                     <div role="group">
@@ -50,7 +50,7 @@
                             {% blocktranslate trimmed %}
                 An example of a more aggressive scan. Which has a scan intensity score of 3.
                 Meaning it requires at least a level 3 clearance level to be set on your object.
-              {% endblocktranslate %}
+                            {% endblocktranslate %}
                         </p>
                     </div>
                 </div>
@@ -59,8 +59,8 @@
                     {% blocktranslate trimmed %}
             After creating a new object OpenKAT will ask you to set a clearance level.
             On the object detail page you can always change the clearance level.
-            For the onboarding we will suggest to set the clearance level to L2.
-          {% endblocktranslate %}
+            For the onboarding we will suggest to set the clearance level to L{{dns_report_least_clearance_level}}.
+                    {% endblocktranslate %}
                 </p>
                 <form novalidate action="" method="post" class="horizontal-view help">
                     {% csrf_token %}
