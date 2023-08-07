@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Optional
 
@@ -47,3 +48,8 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "BOEFJES_"
+
+
+# Do not initialize the settings module when compiling environment docs
+if not os.getenv("DOCS"):
+    settings = Settings()

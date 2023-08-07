@@ -14,7 +14,7 @@ export COMPOSE_DOCKER_CLI_BUILD=1
 
 define build-settings-doc
 	echo "# $$(echo "$(3)" | sed 's/.*/\u&/')" > docs/source/technical_design/environment_settings/$(3).md
-	PYTHONPATH=./$(1) settings-doc generate \
+	DOCS=True PYTHONPATH=./$(1) settings-doc generate \
 	-f markdown -m $(2) \
 	--templates docs/settings-doc-templates \
 	>> docs/source/technical_design/environment_settings/$(3).md
