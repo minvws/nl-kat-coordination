@@ -20,59 +20,7 @@ from account.validators import get_password_validators_help_texts
 User = get_user_model()
 
 
-class GroupAddForm(forms.Form):
-    """Add group dropdown field to form"""
-
-    GROUP_CHOICES = [
-        ("", _("--- Please select one of the available options ----")),
-        (GROUP_ADMIN, GROUP_ADMIN),
-        (GROUP_REDTEAM, GROUP_REDTEAM),
-        (GROUP_CLIENT, GROUP_CLIENT),
-    ]
-
-    account_type = forms.CharField(
-        label=_("Account Type"),
-        help_text=_("Every member of OpenKAT must be part of a group."),
-        error_messages={
-            "group": {
-                "required": _("Please select a group to proceed."),
-            },
-        },
-        widget=forms.Select(
-            choices=GROUP_CHOICES,
-            attrs={
-                "aria-describedby": "explanation-account-type",
-            },
-        ),
-    )
-
-
-class IndemnificationAddForm(BaseRockyForm):
-    may_scan = forms.CharField(
-        label=_(
-            "I declare that OpenKAT may scan the assets of my organization and "
-            "that I have permission to scan these assets. "
-            "I am aware of the implications a scan with a higher scan level brings on my systems."
-        ),
-        widget=forms.CheckboxInput(),
-    )
-    am_authorized = forms.CharField(
-        label=_(
-            "I declare that I am authorized to give this indemnification within my organization. "
-            "I have the experience and knowledge to know what the consequences might be and"
-            " can be held responsible for them."
-        ),
-        widget=forms.CheckboxInput(),
-    )
-
-
-class AssignClearanceLevelForm(BaseRockyForm):
-    assigned_level = forms.BooleanField(
-        label=_("Trusted to change Clearance Levels."),
-    )
-
-
-class UserAddForm(forms.Form):
+class UserRegistrationForm(forms.Form):
     """
     Basic User form fields, name, email and password.
     With fields validation.
@@ -115,103 +63,94 @@ class UserAddForm(forms.Form):
         validators=[validate_password],
     )
 
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if User.objects.filter(email=email).exists():
+            self.add_error("email", _("Choose another email."))
+        return email
 
-class OrganizationMemberAddForm(UserAddForm, BaseRockyModelForm):
+    def register_user(self):
+        user = User.objects.create_user(
+            full_name=self.cleaned_data.get("name"),
+            email=self.cleaned_data.get("email"),
+            password=self.cleaned_data.get("password"),
+        )
+        return user
+
+
+class AccountTypeSelectForm(forms.Form):
     """
-    Form to add a new member
+    Shows a dropdown list of account types
     """
 
-    group = None
+    ACCOUNT_TYPE_CHOICES = [
+        ("", _("--- Please select one of the available options ----")),
+        (GROUP_ADMIN, GROUP_ADMIN),
+        (GROUP_REDTEAM, GROUP_REDTEAM),
+        (GROUP_CLIENT, GROUP_CLIENT),
+    ]
 
+    account_type = forms.CharField(
+        label=_("Account Type"),
+        help_text=_("Every member of OpenKAT must be part of an account type."),
+        error_messages={
+            "group": {
+                "required": _("Please select an account type to proceed."),
+            },
+        },
+        widget=forms.Select(
+            choices=ACCOUNT_TYPE_CHOICES,
+            attrs={
+                "aria-describedby": "explanation-account-type",
+            },
+        ),
+    )
+
+
+class TrustedClearanceLevelRadioPawsForm(forms.Form):
     trusted_clearance_level = forms.ChoiceField(
-        required=False,
-        label=_("Assigned clearance level"),
-        choices=[(-1, "")] + SCAN_LEVEL.choices,
+        required=True,
+        label=_("Trusted clearance level"),
+        choices=[(-1, "Unset")] + SCAN_LEVEL.choices,
+        initial=-1,
         help_text=_("Select a clearance level you trust this member with."),
         widget=forms.RadioSelect(attrs={"radio_paws": True}),
+        error_messages={
+            "trusted_clearance_level": {
+                "required": _("Please select a clearance level to proceed."),
+            },
+        },
     )
+
+
+class MemberRegistrationForm(UserRegistrationForm, TrustedClearanceLevelRadioPawsForm):
+    field_order = ["name", "email", "password", "trusted_clearance_level"]
 
     def __init__(self, *args, **kwargs):
-        self.organization = Organization.objects.get(code=kwargs.pop("organization_code"))
-        return super().__init__(*args, **kwargs)
-
-    def save(self, **kwargs):
-        if self.group:
-            selected_group = Group.objects.get(name=self.group)
-        else:
-            selected_group = Group.objects.get(name=self.cleaned_data["account_type"])
-        if self.organization and selected_group:
-            user, created = User.objects.get_or_create(
-                email=self.cleaned_data["email"],
-                defaults={"full_name": self.cleaned_data["name"]},
-            )
-
-            if created:
-                user.set_password(self.cleaned_data["password"])
-                user.save()
-
-            member, _ = OrganizationMember.objects.get_or_create(
-                user=user,
-                organization=self.organization,
-                defaults={
-                    "organization": self.organization,
-                    "status": OrganizationMember.STATUSES.ACTIVE,
-                    "trusted_clearance_level": self.cleaned_data["trusted_clearance_level"],
-                    "acknowledged_clearance_level": self.cleaned_data["trusted_clearance_level"],
-                },
-            )
-            member.groups.add(selected_group.id)
-
-    class Meta:
-        model = OrganizationMember
-        fields = ("name", "email", "password")
-
-
-class OrganizationMemberToGroupAddForm(GroupAddForm, OrganizationMemberAddForm):
-    pass
-
-
-class OrganizationMemberEditForm(BaseRockyModelForm):
-    trusted_clearance_level = forms.ChoiceField(
-        required=False,
-        label=_("Assigned clearance level"),
-        choices=[(-1, "")] + SCAN_LEVEL.choices,
-        help_text=_("Select a clearance level you trust this member with."),
-        widget=forms.RadioSelect(attrs={"radio_paws": True}),
-    )
-
-    blocked = forms.BooleanField(
-        required=False,
-        label=_("Blocked"),
-        help_text=_("Set the members status to blocked, so they don't have access to the organization anymore."),
-        widget=forms.CheckboxInput(),
-    )
-
-    def __init__(self, *args, **kwargs):
+        self.organization = kwargs.pop("organization")
+        self.account_type = kwargs.pop("account_type")
         super().__init__(*args, **kwargs)
-        self.fields["blocked"].widget.attrs["field_form_label"] = "Status"
-        if self.instance.user.is_superuser:
-            self.fields["trusted_clearance_level"].disabled = True
-        self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
-        self.fields["acknowledged_clearance_level"].required = False
-        self.fields["acknowledged_clearance_level"].widget.attrs[
-            "fixed_paws"
-        ] = self.instance.acknowledged_clearance_level
-        self.fields["acknowledged_clearance_level"].widget.attrs["class"] = "level-indicator-form"
-        if self.instance.user.is_superuser:
-            self.fields["trusted_clearance_level"].disabled = True
+        if self.account_type != GROUP_REDTEAM:
+            self.fields.pop("trusted_clearance_level")
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if instance.trusted_clearance_level < instance.acknowledged_clearance_level:
-            instance.acknowledged_clearance_level = instance.trusted_clearance_level
-        if commit:
-            instance.save()
-        return instance
+    def register_member(self):
+        user = self.register_user()
+        member = OrganizationMember.objects.create(user=user, organization=self.organization)
+        member.groups.add(Group.objects.get(name=self.account_type))
 
-    class Meta:
-        model = OrganizationMember
-        fields = ["blocked", "trusted_clearance_level", "acknowledged_clearance_level"]
+        if self.account_type == GROUP_REDTEAM:
+            member.trusted_clearance_level = self.cleaned_data.get("trusted_clearance_level")
+
+        if self.account_type == GROUP_ADMIN:
+            member.trusted_clearance_level = 4
+            member.acknowledged_clearance_level = 4
+        member.save()
+
+    def is_valid(self):
+        is_valid = super().is_valid()
+        if is_valid:
+            self.register_member()
+        return is_valid
 
 
 class OrganizationForm(BaseRockyModelForm):
@@ -251,6 +190,72 @@ class OrganizationForm(BaseRockyModelForm):
                 "unique": _("Choose another code for your organization."),
             },
         }
+
+
+class IndemnificationAddForm(BaseRockyForm):
+    may_scan = forms.CharField(
+        label=_(
+            "I declare that OpenKAT may scan the assets of my organization and "
+            "that I have permission to scan these assets. "
+            "I am aware of the implications a scan with a higher scan level brings on my systems."
+        ),
+        widget=forms.CheckboxInput(),
+    )
+    am_authorized = forms.CharField(
+        label=_(
+            "I declare that I am authorized to give this indemnification within my organization. "
+            "I have the experience and knowledge to know what the consequences might be and"
+            " can be held responsible for them."
+        ),
+        widget=forms.CheckboxInput(),
+    )
+
+
+class AssignClearanceLevelForm(BaseRockyForm):
+    assigned_level = forms.BooleanField(
+        label=_("Trusted to change Clearance Levels."),
+    )
+
+
+class AcknowledgeClearanceLevelForm(BaseRockyForm):
+    acknowledged_level = forms.BooleanField(
+        label=_("Acknowledged to change Clearance Levels."),
+    )
+
+
+class OrganizationMemberEditForm(BaseRockyModelForm, TrustedClearanceLevelRadioPawsForm):
+    blocked = forms.BooleanField(
+        required=False,
+        label=_("Blocked"),
+        help_text=_("Set the members status to blocked, so they don't have access to the organization anymore."),
+        widget=forms.CheckboxInput(),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["blocked"].widget.attrs["field_form_label"] = "Status"
+        if self.instance.user.is_superuser:
+            self.fields["trusted_clearance_level"].disabled = True
+        self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
+        self.fields["acknowledged_clearance_level"].required = False
+        self.fields["acknowledged_clearance_level"].widget.attrs[
+            "fixed_paws"
+        ] = self.instance.acknowledged_clearance_level
+        self.fields["acknowledged_clearance_level"].widget.attrs["class"] = "level-indicator-form"
+        if self.instance.user.is_superuser:
+            self.fields["trusted_clearance_level"].disabled = True
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if instance.trusted_clearance_level < instance.acknowledged_clearance_level:
+            instance.acknowledged_clearance_level = instance.trusted_clearance_level
+        if commit:
+            instance.save()
+        return instance
+
+    class Meta:
+        model = OrganizationMember
+        fields = ["blocked", "trusted_clearance_level", "acknowledged_clearance_level"]
 
 
 class OnboardingOrganizationUpdateForm(OrganizationForm):
