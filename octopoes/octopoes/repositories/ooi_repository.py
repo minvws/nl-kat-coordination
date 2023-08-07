@@ -583,16 +583,26 @@ class XTDBOOIRepository(OOIRepository):
 
         query = """
             {:query {
-                :find [(pull ?finding_type [*]) (count ?finding)]
+                :find [?finding_type (pull ?finding_type [*]) (count ?finding)]
                 :where [
                     [?finding :Finding/finding_type ?finding_type]
                     (not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])
                     ]}}
         """
 
-        for finding_type, finding_count in self.session.client.query(str(query), valid_time=valid_time):
-            ft = cast(FindingType, self.deserialize(finding_type))
-            severity = ft.risk_severity or RiskLevelSeverity.PENDING
+        for finding_type_name, finding_type_object, finding_count in self.session.client.query(
+            str(query), valid_time=valid_time
+        ):
+            if not finding_type_object:
+                logger.warning(
+                    "There are %d %s findings but the finding type is not in the database",
+                    finding_count,
+                    finding_type_name,
+                )
+                severity = RiskLevelSeverity.PENDING
+            else:
+                ft = cast(FindingType, self.deserialize(finding_type_object))
+                severity = ft.risk_severity or RiskLevelSeverity.PENDING
             severity_counts.update([severity] * finding_count)
         return severity_counts
 
