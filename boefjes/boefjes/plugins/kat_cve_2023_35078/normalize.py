@@ -47,30 +47,34 @@ def strip_vsp_and_build(url: str) -> Iterable[str]:
         yield part
 
 
-def are_vulnerable_versions(
-    vulnerable_ranges: List[Tuple[version.Version, version.Version]], detected_versions: List[version.Version]
+def is_vulnerable_version(
+    vulnerable_ranges: List[Tuple[version.Version, version.Version]], detected_version: version.Version
 ) -> bool:
-    for detected_version in detected_versions:
-        for start, end in vulnerable_ranges:
-            if start <= detected_version < end:
-                return True
-    return False
+    return any(start <= detected_version < end for start, end in vulnerable_ranges)
 
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes) -> Iterable[OOI]:
     ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
     html = raw.decode()
-    detected_versions = [extract_js_version(html), extract_css_version(html)]
-    if not any(detected_versions):
+    js_detected_version = extract_js_version(html)
+    css_detected_version = extract_css_version(html)
+    if not js_detected_version and not css_detected_version:
         return
 
-    software = Software(name="Ivanti EPMM", version=str(detected_versions[0]))
+    if js_detected_version:
+        software = Software(name="Ivanti EPMM", version=str(js_detected_version))
+    else:
+        software = Software(name="Ivanti EPMM", version=str(css_detected_version))
     software_instance = SoftwareInstance(ooi=ooi, software=software.reference)
     yield software
     yield software_instance
-    vulnerable = are_vulnerable_versions(
-        [(version.parse(start), version.parse(end)) for start, end in VULNERABLE_RANGES], detected_versions
-    )
+    if js_detected_version:
+        vulnerable = is_vulnerable_version(
+            [(version.parse(start), version.parse(end)) for start, end in VULNERABLE_RANGES], js_detected_version
+        )
+    else:
+        # The CSS version only included the first two parts of the version number so we don't know the patch level
+        vulnerable = css_detected_version < version.parse("11.8")
     if vulnerable:
         finding_type = CVEFindingType(id="CVE-2023-35078")
         finding = Finding(
