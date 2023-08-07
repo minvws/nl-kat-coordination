@@ -459,4 +459,3 @@ There are a number of ways to add your new boefje to OpenKAT.
 - Add an image server in the KAT catalog config file ``*``
 
 ``*`` If you want to add an image server, join the ongoing project to standardize and describe it. The idea is to add an image server in the KAT catalog config file that has artifacts from your boefjes and normalizers as outputted by the Github CI.
-
