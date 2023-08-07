@@ -1,0 +1,13 @@
+{
+    "id": "CVE_2023_35078",
+    "name": "CVE_2023_35078",
+    "description": "Use NFIR script to find CVE-2023-35078",
+    "consumes": [
+        "Website"
+    ],
+    "produces": [
+        "Finding",
+        "CVEFindingType"
+    ],
+    "scan_level": 2
+}
