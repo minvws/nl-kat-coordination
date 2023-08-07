@@ -71,7 +71,6 @@ class OrganizationView(View):
         self.octopoes_api_connector: Optional[OctopoesAPIConnector] = None
         self.bytes_client: BytesClient = None
         self.organization_member = None
-        self.indemnification_present = False
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -81,8 +80,6 @@ class OrganizationView(View):
             self.organization = Organization.objects.get(code=organization_code)
         except Organization.DoesNotExist:
             raise Http404()
-
-        self.indemnification_present = Indemnification.objects.filter(organization=self.organization).exists()
 
         try:
             self.organization_member = OrganizationMember.objects.get(
@@ -101,20 +98,22 @@ class OrganizationView(View):
         context = super().get_context_data(**kwargs)
         context["organization"] = self.organization
         context["organization_member"] = self.organization_member
-        context["may_update_clearance_level"] = self.may_update_clearance_level
-        context["indemnification_present"] = self.indemnification_present
         context["perms"] = OrganizationPermWrapper(self.organization_member)
         return context
 
+
+class IndemnificationManagementView(OrganizationView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.indemnification_present = False
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.indemnification_present = Indemnification.objects.filter(organization=self.organization).exists()
+
     @property
     def may_update_clearance_level(self) -> bool:
-        if not self.indemnification_present:
-            return False
-        if self.organization_member.acknowledged_clearance_level < 0:
-            return False
-        if self.organization_member.trusted_clearance_level < 0:
-            return False
-        return True
+        return self.indemnification_present and self.organization_member.has_ooi_clearance
 
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
@@ -142,6 +141,12 @@ class OrganizationView(View):
         )
 
         return True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["may_update_clearance_level"] = self.may_update_clearance_level
+        context["indemnification_present"] = self.indemnification_present
+        return context
 
 
 class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):

@@ -248,6 +248,29 @@ class OrganizationMember(models.Model):
     def has_perms(self, perm_list: Iterable[str]) -> bool:
         return all(self.has_perm(perm) for perm in perm_list)
 
+    @property
+    def has_ooi_clearance(self) -> bool:
+        """
+        If member has least permsision to set clearance levels on OOIs.
+        """
+
+        return (
+            self.has_perm("tools.can_set_clearance_level")
+            and self.user.indemnification_set.exists()
+            and self.trusted_clearance_level >= 0
+            and self.acknowledged_clearance_level >= 0
+            and self.trusted_clearance_level == self.acknowledged_clearance_level
+        )
+
+    def __check_clearance_level(self):
+        """Acknowledged clearance level must reset if trusted clearance level is still not acknowledged."""
+        if self.trusted_clearance_level != self.acknowledged_clearance_level:
+            self.acknowledged_clearance_level = -1
+
+    def save(self, *args, **kwargs):
+        self.__check_clearance_level()
+        super().save(*args, **kwargs)
+
     class Meta:
         unique_together = ["user", "organization"]
 

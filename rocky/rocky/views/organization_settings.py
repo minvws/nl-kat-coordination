@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from account.mixins import OrganizationPermissionRequiredMixin
+from account.mixins import IndemnificationManagementView, OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
@@ -14,7 +14,12 @@ class PageActions(Enum):
     RECALCULATE = "recalculate"
 
 
-class OrganizationSettingsView(OrganizationPermissionRequiredMixin, OrganizationDetailBreadcrumbsMixin, TemplateView):
+class OrganizationSettingsView(
+    OrganizationPermissionRequiredMixin,
+    OrganizationDetailBreadcrumbsMixin,
+    IndemnificationManagementView,
+    TemplateView,
+):
     template_name = "organizations/organization_settings.html"
     permission_required = "tools.view_organization"
 

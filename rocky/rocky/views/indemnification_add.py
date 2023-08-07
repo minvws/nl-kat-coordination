@@ -1,5 +1,5 @@
 from account.forms import IndemnificationAddForm
-from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
+from account.mixins import IndemnificationManagementView, OrganizationPermissionRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.urls.base import reverse
@@ -8,7 +8,7 @@ from django.views.generic import FormView
 from tools.models import Indemnification
 
 
-class IndemnificationAddView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
+class IndemnificationAddView(OrganizationPermissionRequiredMixin, IndemnificationManagementView, FormView):
     template_name = "indemnification_add.html"
     form_class = IndemnificationAddForm
     permission_required = "tools.add_indemnification"
@@ -30,9 +30,6 @@ class IndemnificationAddView(OrganizationPermissionRequiredMixin, OrganizationVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["indemnification_present"] = Indemnification.objects.filter(
-            user=self.request.user, organization=self.organization
-        )
         context["breadcrumbs"] = [
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),

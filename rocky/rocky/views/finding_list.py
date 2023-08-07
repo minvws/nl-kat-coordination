@@ -1,6 +1,7 @@
 import logging
 from typing import Any, Dict, List, Optional
 
+from account.mixins import IndemnificationManagementView
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -46,7 +47,7 @@ def generate_findings_metadata(
     return sort_by_severity_desc(findings_meta)
 
 
-class FindingListView(BreadcrumbsMixin, SeveritiesMixin, OctopoesView, ListView):
+class FindingListView(BreadcrumbsMixin, SeveritiesMixin, OctopoesView, IndemnificationManagementView, ListView):
     template_name = "findings/finding_list.html"
     paginate_by = 20
 
