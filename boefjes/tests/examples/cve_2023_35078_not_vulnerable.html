@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Workplace Sign In</title>
+    <script type="text/javascript" src="/mifs/scripts/auth.js?VSP 11.10.0.3 Build 2 "></script>
+    <link href="https://example.com/mifs/css/windowsAllAuth.css?11.10" rel="stylesheet" />
+</head>
+<body onload="onLoad();">
+    <div class="container" >
+        <p class="windowsPhoneData" >
+            <img src="/mifs/whitelabel/mobileiron/img/brand-med.svg" width="400" height="90"/>
+        </p>
+
+            <form id="form" action="/mifs/c/wp/EnrollmentServer/Authentication.svc" method="POST">
+            <h1 class="windowsText">Sign in to your Ivanti account</h1>
+            <p id="error" class="hidden"></p>
+
+            <p>
+                <label for="login">Email address</label><br/>
+                <input id="login" name="login" type="text" value="" autocomplete="on" />
+            </p>
+
+
+                <p class="textBox">
+                    <label for="password">Password</label><br/>
+                    <input id="password" name="password" type="password" value="" autocomplete="off" />
+                </p>
+
+
+
+
+            <button type="submit" id="signIn" class="button btn-new btn-new-default">
+                Sign in
+            </button>
+
+            <input name="app" type="hidden" value="" />
+            <input name="errorCode" id="errorCode" type="hidden" value=""/>
+            <input name="backOffDelay" id="backOffDelay" type="hidden" value=""/>
+        </form>
+
+        <div class="windowsText">
+            <img src="/mifs/whitelabel/mobileiron/img/brand-med.svg"
+                 alt="Ivanti Logo" style="width: 150pt; height: 43pt;" />
+            <p class="description">Ivanti ist führend im Bereich Enterprise Mobility Management und ermöglicht es Unternehmen auf der ganzen Welt, Mobilsysteme als primäre IT-Plattform einzusetzen.<br/><br/>Die Lösungen von Ivanti wurden speziell für Unternehmen entwickelt, die auf Mobilplattformen setzen. Sie ermöglichen Ihnen das Absichern und Verwalten all Ihrer Mobilgeräte und -anwendungen, die auf den führenden Mobilgeräteplattformen laufen, darunter Windows und Windows Phone.</p>
+        </div>
+
+    </div>
+</body>
+</html>
