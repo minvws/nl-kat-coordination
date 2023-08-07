@@ -40,7 +40,7 @@ class Settings(BaseSettings):
 
     ext_hash_repository: HashingRepositoryReference = Field(
         HashingRepositoryReference.IN_MEMORY,
-        description="Encryption to use for the katalogus settings",
+        description="Hashing repository used in Bytes (IN_MEMORY is a stub)",
         possible_values=["IN_MEMORY", "PASTEBIN", "RFC3161"],
     )
     pastebin_api_dev_key: str = Field(

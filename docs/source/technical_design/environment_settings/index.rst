@@ -7,9 +7,9 @@ Complete list with environment settings for each module, generated from Pydantic
    :maxdepth: 2
    :caption: Contents
 
-   rocky
-   mula
-   octopoes
-   bytes
-   boefjes
-   keiko
+    boefjes
+    bytes
+    keiko
+    mula
+    octopoes
+    rocky
