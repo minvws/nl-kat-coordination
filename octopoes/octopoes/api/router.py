@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from logging import getLogger
 from typing import Generator, List, Optional, Set, Type
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status, Body
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
