@@ -8,7 +8,7 @@ BASE_DIR: Path = Path(__file__).parent.parent.parent.resolve()
 
 # Set base dir to something generic when compiling environment docs
 if os.getenv("DOCS"):
-    BASE_DIR = Path("./")
+    BASE_DIR = Path("../../../")
 
 
 class Settings(BaseSettings):
