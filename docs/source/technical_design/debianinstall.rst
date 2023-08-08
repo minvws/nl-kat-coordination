@@ -6,7 +6,8 @@ OpenKAT has Debian packages available. In the near future we will have an apt
 repository that will allow you to keep your installation up-to-date using apt.
 An installation of KAT can be done on a single machine or spread out on several
 machines for a high availability setup. This guide will take you through the
-steps for installing it on a single machine.
+steps for installing it on a single machine. There are also :ref:`scripts<Scripts>`
+available if you don't want to do this by hand.
 
 Supported distributions
 =======================
@@ -16,7 +17,7 @@ and Ubuntu LTS releases and stop supporting the previous version 6 months after
 the release. Currently this means we support Debian 11 (bullseye) and 12
 (bookworm) and Ubuntu 22.04. Debian 12 has been released on 10th of June so we
 will stop providing packages for Debian 11 in December 2023. After Ubuntu 24.04
-is releases we will provide Ubuntu 22.02 packages until October 2024.
+is released we will provide Ubuntu 22.02 packages until October 2024.
 
 Prerequisites
 =============

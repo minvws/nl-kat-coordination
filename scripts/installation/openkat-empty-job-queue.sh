@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 # Stop openKAT
 echo "Stopping openKAT processes"
@@ -15,7 +15,4 @@ EOF
 echo "Starting openKAT processes"
 sudo systemctl start xtdb-http-multinode kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
 
-echo "Waiting 60 seconds to ensure all processes started up..."
-sleep 60
-
-echo "End of script..."
+echo "End of script. It might take a few more seconds for OpenKAT to be fully started and available."

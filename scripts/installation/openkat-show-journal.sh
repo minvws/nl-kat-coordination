@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 if [[ ${1} == "" ]]; then
         echo "Usage ./show_journal_openkat.sh [nr. of lines]"

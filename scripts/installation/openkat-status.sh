@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 if [[ ${1} == "" ]]; then
 	echo "Usage ./status_openkat.sh [process]"
