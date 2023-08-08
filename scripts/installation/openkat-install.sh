@@ -94,19 +94,19 @@ MULADB_PASSWORD=${MULADB_PASSWORD}
 EOF
 
  # restore umask
-umask ${umask}
+umask "${umask}"
 
 # This will prevent "could not change directory" errors due to permissions when
 # using sudo
 pushd /
 
 echo "Step 4.3 - Rocky DB"
-if [ ! $(sudo -u postgres psql -lqt | cut -d \| -f 1 | grep rocky_db) ]; then
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q rocky_db ; then
 	echo "Create rocky_db..."
 	sudo -u postgres createdb rocky_db
 fi
 
-if [ ! $(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='rocky'") ]; then
+if [ ! "$(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='rocky'")" ]; then
 	echo "Create rocky user with password ${ROCKY_DB_PASSWORD}..."
 	sudo -u postgres psql -c "CREATE USER rocky WITH PASSWORD '${ROCKY_DB_PASSWORD}';"
 
@@ -118,12 +118,12 @@ else
 fi
 
 echo "Step 4.4 - KAT-alogus DB"
-if [ ! $(sudo -u postgres psql -lqt | cut -d \| -f 1 | grep katalogus_db) ]; then
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q katalogus_db ; then
 	echo "Create katalogus_db..."
 	sudo -u postgres createdb katalogus_db
 fi
 
-if [ ! $(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='katalogus'") ]; then
+if [ ! "$(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='katalogus'")" ]; then
 	echo "Create katalogus user with password ${KATALOGUSDB_PASSWORD}..."
 	sudo -u postgres psql -c "CREATE USER katalogus WITH PASSWORD '${KATALOGUSDB_PASSWORD}';"
 
@@ -135,12 +135,12 @@ else
 fi
 
 echo "Step 4.5 - Bytes DB"
-if [ ! $(sudo -u postgres psql -lqt | cut -d \| -f 1 | grep bytes_db) ]; then
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q bytes_db ; then
 	echo "Create bytes_db..."
 	sudo -u postgres createdb bytes_db
 fi
 
-if [ ! $(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='bytes'") ]; then
+if [ ! "$(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='bytes'")" ]; then
 	echo "Create bytes user with password ${BYTESDB_PASSWORD}..."
 	sudo -u postgres psql -c "CREATE USER bytes WITH PASSWORD '${BYTESDB_PASSWORD}';"
 
@@ -152,13 +152,12 @@ else
 fi
 
 echo "Step 4.5b - Mula DB"
-DB=
-if [ ! $(sudo -u postgres psql -lqt | cut -d \| -f 1 | grep mula_db) ]; then
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q mula_db ; then
 	echo "Create mula_db..."
 	sudo -u postgres createdb mula_db
 fi
 
-if [ ! $(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='mula'") ]; then
+if [ ! "$(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='mula'")" ]; then
 	echo  "Create mula user with password ${MULADB_PASSWORD}..."
 	sudo -u postgres psql -c "CREATE USER mula WITH PASSWORD '${MULADB_PASSWORD}';"
 
@@ -260,7 +259,7 @@ echo "Step 6.8 - Restart rabbitmq-server"
 sudo systemctl restart rabbitmq-server
 
 echo "Step 6.9 - Add or change kat user to rabbitmq and set password to ${RABBITMQ_PASSWORD}"
-if [ ! $(sudo rabbitmqctl list_users|grep kat) ] ; then
+if ! sudo rabbitmqctl list_users | grep -q kat ; then
 	echo "Create kat user in rabbitmq with password ${RABBITMQ_PASSWORD}"
 	sudo rabbitmqctl add_user kat "${RABBITMQ_PASSWORD}"
 else
