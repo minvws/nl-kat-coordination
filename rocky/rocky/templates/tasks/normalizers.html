@@ -19,81 +19,74 @@
                 {% else %}
                     <p class="emphasized">{% translate "List of tasks for normalizers" %}</p>
 
-                    <form method="post"
-                      class="inline"
-                      action="{% url 'tasks_reschedule_bulk' organization.code %}">
-                      {% csrf_token %}
-
-                        <div class="horizontal-scroll">
-                            <table rf-selector="table-normalizers" >
-                                <caption>{% translate "List of tasks for " %}{{ organization.name }}</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">{% translate "Normalizer" %}</th>
-                                        <th scope="col">{% translate "Status" %}</th>
-                                        <th scope="col">{% translate "Created date" %}</th>
-                                        <th scope="col">{% translate "Input from boefje" %}</th>
-                                        <th scope="col">{% translate "Details" %}</th>
+                    <div class="horizontal-scroll">
+                        <table rf-selector="table-normalizers" >
+                            <caption>{% translate "List of tasks for " %}{{ organization.name }}</caption>
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% translate "Normalizer" %}</th>
+                                    <th scope="col">{% translate "Status" %}</th>
+                                    <th scope="col">{% translate "Created date" %}</th>
+                                    <th scope="col">{% translate "Input from boefje" %}</th>
+                                    <th scope="col">{% translate "Details" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for task in object_list %}
+                                    <tr data-task-id="{{ task.id }}">
+                                        <td>
+                                          <a href="{% url 'normalizer_task_view' organization_code=organization.code task_id=task.id %}">
+                                            {{ task.p_item.data.normalizer.id }}
+                                          </a>
+                                        </td>
+                                        {% if task.status.value == "completed" %}
+                                        <td class="confirmation">{{ task.status.value|capfirst }}</td>
+                                        {% elif task.status.value == "failed" %}
+                                        <td class="warning">{{ task.status.value|capfirst }}</td>
+                                        {% else %}
+                                        <td>{{ task.status.value|capfirst }}</td>
+                                        {% endif %}
+                                        <td>
+                                            {{ task.created_at }}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                                        </td>
+                                        <td class="actions action-buttons" >
+                                          <button type="button"
+                                                  class="expando-button normalizer-list-table-row"
+                                                  data-icon-open-class="icon ti-chevron-down"
+                                                  data-icon-close-class="icon ti-chevron-up"
+                                                  data-close-label="{% translate "Close details" %}">
+                                              {% translate "Open details" %}
+                                          </button>
+                                      </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {% for task in object_list %}
-                                        <tr data-task-id="{{ task.id }}">
-                                            <td>
-                                              <a href="{% url 'normalizer_task_view' organization_code=organization.code task_id=task.id %}">
-                                                {{ task.p_item.data.normalizer.id }}
-                                              </a>
-                                            </td>
-                                            {% if task.status.value == "completed" %}
-                                            <td class="confirmation">{{ task.status.value|capfirst }}</td>
-                                            {% elif task.status.value == "failed" %}
-                                            <td class="warning">{{ task.status.value|capfirst }}</td>
-                                            {% else %}
-                                            <td>{{ task.status.value|capfirst }}</td>
-                                            {% endif %}
-                                            <td>
-                                                {{ task.created_at }}
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
-                                            </td>
-                                            <td class="actions action-buttons" >
-                                              <button type="button"
-                                                      class="expando-button normalizer-list-table-row"
-                                                      data-icon-open-class="icon ti-chevron-down"
-                                                      data-icon-close-class="icon ti-chevron-up"
-                                                      data-close-label="{% translate "Close details" %}">
-                                                  {% translate "Open details" %}
-                                              </button>
-                                          </td>
-                                        </tr>
-                                        <tr class="expando-row">
-                                          <td colspan="7">
-                                            <section>
-                                              <div id="yielded-objects-{{ task.id }}">
-                                                <h2>
-                                                  {% translate "Yielded objects" %}
-                                                </h2>
-                                              </div>
-                                            </section>
-                                            <br>
-                                            <section>
-                                              <div>
-                                                <div class="button-container">
-                                                  <a class="button" href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
-                                                  {% include "partials/single_action_form.html" with btn_text="Reschedule" btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
-                                                </div>
-                                              </div>
-                                            </section>
-                                          </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
+                                    <tr class="expando-row">
+                                      <td colspan="7">
+                                        <section>
+                                          <div id="yielded-objects-{{ task.id }}">
+                                            <h2>
+                                              {% translate "Yielded objects" %}
+                                            </h2>
+                                          </div>
+                                        </section>
+                                        <br>
+                                        <section>
+                                          <div>
+                                            <div class="button-container">
+                                              <a class="button" href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                              {% include "partials/single_action_form.html" with btn_text="Reschedule" btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+                                            </div>
+                                          </div>
+                                        </section>
+                                      </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                     {% include "partials/list_paginator.html" %}
-
                 {% endif %}
             </div>
         </section>

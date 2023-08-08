@@ -39,7 +39,7 @@ from rocky.views.organization_settings import OrganizationSettingsView
 from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileDetailView, ScanProfileResetView
 from rocky.views.scans import ScanListView
-from rocky.views.task_detail import BoefjeTaskDetailView, NormalizerTaskDetailView, RescheduleTasksBulkView
+from rocky.views.task_detail import BoefjeTaskDetailView, NormalizerTaskDetailView
 from rocky.views.tasks import BoefjesTaskListView, DownloadTaskDetail, NormalizersTaskListView
 from rocky.views.upload_csv import UploadCSV
 from rocky.views.upload_raw import UploadRaw
@@ -192,7 +192,6 @@ urlpatterns += i18n_patterns(
         DownloadTaskDetail.as_view(),
         name="download_task_meta",
     ),
-    path("<organization_code>/tasks/reschedule/bulk/", RescheduleTasksBulkView.as_view(), name="tasks_reschedule_bulk"),
     path("<organization_code>/bytes/<boefje_meta_id>/raw", BytesRawView.as_view(), name="bytes_raw"),
     path("<organization_code>/kat-alogus/", include("katalogus.urls"), name="katalogus"),
 )
