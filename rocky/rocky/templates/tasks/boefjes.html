@@ -34,14 +34,25 @@
                                 {% for task in object_list %}
                                     <tr id="{{ task.id }}">
                                       <td>
+                                        <span class="icon ti-clock-hour-5"></span>
+                                        <span class="icon ti-progress"></span>
+                                        <span class="icon ti-exlamation-mark"></span>
+                                        <span class="icon ti-circle-x"></span>
+                                        <span class="icon ti-check"></span>
                                         <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.id }}</a>
                                       </td>
                                       {% if task.status.value == "completed" %}
-                                      <td class="confirmation">{{ task.status.value|capfirst }}</td>
+                                          <td class="confirmation">
+                                            <span class="icon ti-check"></span>{{ task.status.value|capfirst }}
+                                          </td>
                                       {% elif task.status.value == "failed" %}
-                                      <td class="warning">{{ task.status.value|capfirst }}</td>
+                                          <td class="warning">
+                                            <span class="icon ti-circle-x"></span>{{ task.status.value|capfirst }}
+                                          </td>
                                       {% else %}
-                                      <td>{{ task.status.value|capfirst }}</td>
+                                          <td>
+                                            {{ task.status.value|capfirst }}
+                                          </td>
                                       {% endif %}
                                       <td>{{ task.created_at }}</td>
                                       {% if task.p_item.data.input_ooi %}
@@ -64,21 +75,13 @@
                                     <tr class="expando-row">
                                           <td colspan="7">
                                             <section>
-                                              <div>
-                                                <h2>
-                                                  {% translate "Download task details" %}
-                                                </h2>
+                                              <div class="button-container">
                                                 {% if task.status.value in "completed,failed" %}
-                                                    <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}">{% translate "Download meta and raw data" %}</a>
+                                                    <a class="button" href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
                                                 {% else %}
-                                                    <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate "Download meta data" %}</a>
+                                                    <a class="button" href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta data" %}</a>
                                                 {% endif %}
-                                              </div>
-                                            </section>
-                                            <section>
-                                              <div>
-                                                <h2>Reschedule boefje</h2>
-                                                {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id %}
+                                                {% include "partials/single_action_form.html" with btn_text="Reschedule" btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
                                               </div>
                                             </section>
                                           </td>
