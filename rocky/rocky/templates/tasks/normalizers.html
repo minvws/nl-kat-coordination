@@ -76,18 +76,13 @@
                                                 </h2>
                                               </div>
                                             </section>
+                                            <br>
                                             <section>
                                               <div>
-                                                <h2>
-                                                  {% translate "Download input (RAW file)" %}
-                                                </h2>
-                                                <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}">{% translate "Download meta and raw data" %}</a>
-                                              </div>
-                                            </section>
-                                            <section>
-                                              <div>
-                                                <h2>Reschedule normalizer</h2>
-                                                {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id %}
+                                                <div class="button-container">
+                                                  <a class="button" href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                                  {% include "partials/single_action_form.html" with btn_text="Reschedule" btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+                                                </div>
                                               </div>
                                             </section>
                                           </td>
