@@ -9,10 +9,10 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{{ view.kwargs.account_type|capfirst }}{% translate " member account setup" %}</h1>
-                <form novalidate  method="post" class="horizontal-view help">
-                    {% csrf_token %}
-                    {% translate "Member details" as fieldset_legend %}
+                <h1>{% translate "Member account type setup" %}</h1>
+                <p>{% translate "Choose an account type for this new member." %}</p>
+                <form novalidate  method="get" class="horizontal-view help">
+                    {% translate "Account type details" as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
                     <button type="submit">{% translate "Submit" %}</button>
