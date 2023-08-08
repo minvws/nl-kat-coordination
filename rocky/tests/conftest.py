@@ -3,6 +3,7 @@ import json
 import logging
 from os import urandom
 from pathlib import Path
+from typing import Dict
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -66,7 +67,7 @@ def create_member(user, organization):
 
 
 def add_admin_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_ADMIN)
+    group = Group.objects.get(name=GROUP_ADMIN)
     member.groups.add(group)
     admin_permissions = [
         Permission.objects.get(codename="view_organization").id,
@@ -82,7 +83,7 @@ def add_admin_group_permissions(member):
 
 
 def add_redteam_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_REDTEAM)
+    group = Group.objects.get(name=GROUP_REDTEAM)
     member.groups.add(group)
     redteam_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
@@ -97,12 +98,19 @@ def add_redteam_group_permissions(member):
 
 
 def add_client_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
+    group = Group.objects.get(name=GROUP_CLIENT)
     member.groups.add(group)
     client_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
     ]
     group.permissions.set(client_permissions)
+
+
+@pytest.fixture(autouse=True)
+def seed_groups(db):
+    Group.objects.get_or_create(name=GROUP_CLIENT)
+    Group.objects.get_or_create(name=GROUP_REDTEAM)
+    Group.objects.get_or_create(name=GROUP_ADMIN)
 
 
 @pytest.fixture
@@ -451,8 +459,12 @@ def mock_scheduler(mocker):
     return mocker.patch("rocky.views.ooi_detail.scheduler.client")
 
 
-def get_boefjes_data():
-    return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())
+def get_stub_path(file_name: str) -> Path:
+    return Path(__file__).parent / "stubs" / file_name
+
+
+def get_boefjes_data() -> Dict:
+    return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
 @pytest.fixture()
