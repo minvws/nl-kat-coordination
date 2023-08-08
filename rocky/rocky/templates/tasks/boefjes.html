@@ -27,7 +27,6 @@
                                   <th scope="col">{% translate "Status" %}</th>
                                   <th scope="col">{% translate "Created date" %}</th>
                                   <th scope="col">{% translate "Input Object" %}</th>
-                                  <th scope="col">{% translate "Download task details" %}</th>
                                   <th scope="col">{% translate "Details" %}</th>
                                 </tr>
                             </thead>
@@ -52,25 +51,30 @@
                                       {% else %}
                                           <td>{% translate "No input OOI" %}</td>
                                       {% endif %}
-                                        <td>
-                                            {% if task.status.value in "completed,failed" %}
-                                                <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}">{% translate "Download meta and raw data" %}</a>
-                                            {% else %}
-                                                <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate "Download meta data" %}</a>
-                                            {% endif %}
-                                        </td>
-                                        <td class="actions action-buttons" >
-                                              <button type="button"
-                                                      class="expando-button normalizer-list-table-row"
-                                                      data-icon-open-class="icon ti-chevron-down"
-                                                      data-icon-close-class="icon ti-chevron-up"
-                                                      data-close-label="{% translate "Close details" %}">
-                                                  {% translate "Open details" %}
-                                              </button>
-                                          </td>
+                                      <td class="actions action-buttons" >
+                                          <button type="button"
+                                                  class="expando-button normalizer-list-table-row"
+                                                  data-icon-open-class="icon ti-chevron-down"
+                                                  data-icon-close-class="icon ti-chevron-up"
+                                                  data-close-label="{% translate "Close details" %}">
+                                              {% translate "Open details" %}
+                                          </button>
+                                      </td>
                                     </tr>
                                     <tr class="expando-row">
                                           <td colspan="7">
+                                            <section>
+                                              <div>
+                                                <h2>
+                                                  {% translate "Download task details" %}
+                                                </h2>
+                                                {% if task.status.value in "completed,failed" %}
+                                                    <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}">{% translate "Download meta and raw data" %}</a>
+                                                {% else %}
+                                                    <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate "Download meta data" %}</a>
+                                                {% endif %}
+                                              </div>
+                                            </section>
                                             <section>
                                               <div>
                                                 <h2>Reschedule boefje</h2>
