@@ -437,8 +437,27 @@ The question object is more than just a tool to allow or disallow ports, it is t
 
 The dataflow of the question object works as per this diagram:
 
-.. image:: img/dataflowquestionobjects.png
-  :alt: Dataflow question object
+.. mermaid::
+
+.. mermaid::
+
+sequenceDiagram
+    participant User
+    participant Rocky
+    participant Normalizer
+    participant Octopoes
+    participant Bits
+    participant Bytes
+end
+    Normalizer->>Octopoes: Add Network
+    Bits->>Octopoes: Add Question["What ports may be open for this Network?"]
+    Rocky->>Octopoes: Get Question
+    Rocky->>User: Prompt Question to user
+    User->>Rocky: Give answer (form)
+    Rocky->>Bytes: Add answer (json) to Bytes
+    Bytes->>Normalizer: Read answer
+    Normalizer->>Octopoes: Create Config
+    Bits->>Octopoes: Read Config
 
 After the relevant object has been created, within the normal flow of OpenKAT a question object will be created. The advantage of this is to store all relevant data in the graph itself, which allows for future development.
 
