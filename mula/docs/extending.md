@@ -29,7 +29,7 @@ One example implementation could be that tasks are scheduled for at specific
 time, or need to be put onto the queue at a specific time.
 
 When you've defined your own schedulers, be sure to initialize and start them
-from the `app.py` file. 
+from the `app.py` file.
 
 ## Ranking tasks
 

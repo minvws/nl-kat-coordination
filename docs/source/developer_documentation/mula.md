@@ -24,7 +24,7 @@ rankers.
 |----------------|----------|----------------------------------------------------|
 | Python         | ^3.8     |                                                    |
 | FastAPI        | ^0.93.0  | Used for api server                                |
-| SQLAlchemy     | ^1.4.48  |                                                    | 
+| SQLAlchemy     | ^1.4.48  |                                                    |
 
 ### External services
 
