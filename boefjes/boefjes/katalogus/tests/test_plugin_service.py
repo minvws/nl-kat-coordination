@@ -97,7 +97,7 @@ def mock_plugin_service(organisation_id: str) -> PluginService:
     for id_, repo in _mocked_repositories.items():
         repo_store.create(repo)
 
-    test_boefjes_dir = settings.base_dir / "katalogus" / "tests" / "boefjes_test_dir"
+    test_boefjes_dir = settings.BASE_DIR / "katalogus" / "tests" / "boefjes_test_dir"
 
     return PluginService(
         PluginStatesStorageMemory(organisation_id),

@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Optional
@@ -6,7 +7,11 @@ from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, PostgresDsn
 
 from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR: Path = Path(__file__).parent.parent.resolve()
+
+# Set base dir to something generic when compiling environment docs
+if os.getenv("DOCS"):
+    BASE_DIR = Path("./")
 
 
 class Settings(BaseSettings):

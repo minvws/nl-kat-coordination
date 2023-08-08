@@ -1,7 +1,14 @@
+import os
 from pathlib import Path
 from typing import Optional
 
 from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
+
+BASE_DIR: Path = Path(__file__).parent.parent.parent.resolve()
+
+# Set base dir to something generic when compiling environment docs
+if os.getenv("DOCS"):
+    BASE_DIR = Path("./")
 
 
 class Settings(BaseSettings):
@@ -9,9 +16,7 @@ class Settings(BaseSettings):
 
     # Application settings
     debug: bool = Field(False, description="Enables/disables global debugging mode", env="DEBUG")
-    log_cfg: str = Field(
-        str(Path(__file__).parent.parent.parent / "logging.json"), description="Path to the logging configuration file"
-    )
+    log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
 
     # Server settings
     api_host: IPvAnyAddress = Field("0.0.0.0", description="Host to bind the scheduler to")

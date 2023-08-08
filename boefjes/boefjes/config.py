@@ -4,10 +4,15 @@ from typing import Optional
 
 from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
 
+BASE_DIR: Path = Path(__file__).parent.resolve()
+
+# Set base dir to something generic when compiling environment docs
+if os.getenv("DOCS"):
+    BASE_DIR = Path("./")
+
 
 class Settings(BaseSettings):
-    base_dir: Path = Field(Path(__file__).parent.resolve())
-    log_cfg: Path = Field(Path(__file__).parent / "logging.json", description="Path to the logging configuration file")
+    log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
 
     # Worker configuration
     pool_size: int = Field(2, description="Number of workers to run per queue")

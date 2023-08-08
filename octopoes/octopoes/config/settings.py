@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from enum import Enum
 from pathlib import Path
 from typing import Optional, Set
@@ -8,6 +9,12 @@ from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field
 
 from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import RiskLevelSeverity
+
+BASE_DIR: Path = Path(__file__).parent.parent.parent.resolve()
+
+# Set base dir to something generic when compiling environment docs
+if os.getenv("DOCS"):
+    BASE_DIR = Path("./")
 
 
 class XTDBType(Enum):
@@ -20,7 +27,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    log_cfg: str = Field(str(Path(__file__).parent.parent.parent / "logging.yml"))
+    log_cfg: Path = Field(BASE_DIR / "logging.yml", description="Path to the logging configuration file")
 
     # External services settings
     queue_uri: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
