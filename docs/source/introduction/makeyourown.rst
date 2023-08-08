@@ -438,17 +438,14 @@ The question object is more than just a tool to allow or disallow ports, it is t
 The dataflow of the question object works as per this diagram:
 
 .. mermaid::
-
-.. mermaid::
-
-sequenceDiagram
-    participant User
-    participant Rocky
-    participant Normalizer
-    participant Octopoes
-    participant Bits
-    participant Bytes
-end
+   sequenceDiagram
+      participant User
+      participant Rocky
+      participant Normalizer
+      participant Octopoes
+      participant Bits
+      participant Bytes
+    end
     Normalizer->>Octopoes: Add Network
     Bits->>Octopoes: Add Question["What ports may be open for this Network?"]
     Rocky->>Octopoes: Get Question
