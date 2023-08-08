@@ -1,10 +1,11 @@
 
 const buttons = document.querySelectorAll(".expando-button.normalizer-list-table-row");
+const url_without_params = location.protocol + '//' + location.host + location.pathname
 
 buttons.forEach((button) => {
   const raw_task_id = button.closest('tr').getAttribute('data-task-id');
   const task_id = button.closest('tr').getAttribute('data-task-id').replace(/-/g, "");
-  const json_url = window.location.href + "/" + task_id;
+  const json_url = url_without_params + "/" + task_id;
 
   const getJson = (url, callback) => {
     var xhr = new XMLHttpRequest();
@@ -28,8 +29,8 @@ buttons.forEach((button) => {
       alert('Somthing went wrong: ' + err);
     } else {
       if(data.length > 0) {
+        const url = url_without_params.replace('/tasks/normalizers', '')
         data.forEach(object => {
-          const url = window.location.href.replace('/tasks/normalizers', '')
           element.innerHTML = "<a href='" + url + "/objects/detail/?ooi_id=" + object +"'>" + object + "</a>"
         });
       } else {
