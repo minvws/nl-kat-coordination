@@ -563,3 +563,9 @@ class OctopoesService:
             bit_counter.update({origin.method})
 
         return sum(bit_counter.values())
+
+    def commit(self):
+        self.ooi_repository.commit()
+        self.origin_repository.commit()
+        self.origin_parameter_repository.commit()
+        self.scan_profile_repository.commit()

@@ -2,7 +2,7 @@ import pytest
 from django.core.exceptions import PermissionDenied
 from pytest_django.asserts import assertContains, assertNotContains
 
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from rocky.views.finding_list import FindingListView
@@ -316,3 +316,66 @@ def test_can_mute_findings_perms(
 
     assert response.status_code == 200
     assertNotContains(response, '<button type="submit">Mute Findings</button>')
+
+
+@pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
+def test_findings_list_filtering(
+    rf,
+    request,
+    member,
+    mock_organization_view_octopoes,
+    network,
+    finding_types,
+    mocker,
+    mock_bytes_client,
+    mock_scheduler,
+):
+    member = request.getfixturevalue(member)
+    # Severity Critical
+    finding_1 = Finding(
+        finding_type=finding_types[1].reference,
+        ooi=network.reference,
+        proof="proof",
+        description="test description 123",
+        reproduce="reproduce",
+    )
+    # Severity Low
+    finding_2 = Finding(
+        finding_type=finding_types[2].reference,
+        ooi=network.reference,
+        proof="proof",
+        description="test description 123",
+        reproduce="reproduce",
+    )
+    mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
+        count=2,
+        items=[finding_1, finding_2],
+    )
+
+    mock_organization_view_octopoes().load_objects_bulk.return_value = {
+        network.reference: network,
+        finding_types[1].reference: finding_types[1],
+        finding_types[2].reference: finding_types[2],
+    }
+
+    response = FindingListView.as_view()(
+        setup_request(rf.get("finding_list"), member.user),
+        organization_code=member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assert len(response.context_data["object_list"]) == 2
+
+    request_filtering = setup_request(
+        rf.get(
+            "finding_list",
+            {
+                "severity": "low",
+            },
+        ),
+        member.user,
+    )
+    FindingListView.as_view()(request_filtering, organization_code=member.organization.code)
+
+    assert mock_organization_view_octopoes().list_findings.mock_calls[2].kwargs["severities"] == {RiskLevelSeverity.LOW}
+    assert mock_organization_view_octopoes().list_findings.mock_calls[3].kwargs["severities"] == {RiskLevelSeverity.LOW}
