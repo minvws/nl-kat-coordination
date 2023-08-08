@@ -22,24 +22,21 @@ buttons.forEach((button) => {
   };
 
 
+  const element = document.createElement('p')
   button.addEventListener("click", () => getJson(json_url, function(err, data) {
     if (err !== null) {
       alert('Somthing went wrong: ' + err);
     } else {
       if(data.length > 0) {
         data.forEach(object => {
-          const element = document.createElement('p')
           const url = window.location.href.replace('/tasks/normalizers', '')
           element.innerHTML = "<a href='" + url + "/objects/detail/?ooi_id=" + object +"'>" + object + "</a>"
-
-          button.closest('tr').nextElementSibling.querySelector('#yielded-objects-'+raw_task_id).appendChild(element);
         });
       } else {
         const element = document.createElement('p');
         element.innerText = "Normalizer task yielded no objects.";
-        console.log(element)
-        button.closest('tr').nextElementSibling.querySelector('#yielded-objects-'+raw_task_id).appendChild(element);
       }
     }
   }));
+  button.closest('tr').nextElementSibling.querySelector('#yielded-objects-'+raw_task_id).appendChild(element);
 });
