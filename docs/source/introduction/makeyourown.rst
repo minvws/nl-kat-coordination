@@ -438,6 +438,7 @@ The question object is more than just a tool to allow or disallow ports, it is t
 The dataflow of the question object works as per this diagram:
 
 .. mermaid::
+
    sequenceDiagram
       participant User
       participant Rocky
