@@ -23,8 +23,6 @@ override_dh_fixperms:
 
 override_dh_virtualenv:
 	dh_virtualenv $(DH_VENV_ARGS)
-	# install individual boefjes requirements
-	find boefjes/ -name requirements.txt | xargs -I{} $(DH_VENV_DIR)/bin/python -m pip install --no-binary pillow -r {}
 
 	$(DH_VENV_DIR)/bin/python -m pip install gunicorn==20.1.0
 	cd /octopoes && /usr/bin/python3 setup.py bdist_wheel
