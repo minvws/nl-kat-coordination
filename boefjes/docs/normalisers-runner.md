@@ -58,6 +58,7 @@ Options that this gives us:
 | --- | --- | --- | --- | --- |
 | MicroVM (Firecracker) | Excellent isolation | High | Hard | VM image |
 | Containers (Docker) | Medium isolation | Medium-high | Moderate | OCI image |
+| Containers (hardened runtimes) | Excellent isolation | High | Moderate | OCI image |
 | WebAssembly | High isolation, sandboxed | Medium-low | Hard | Several |
 | Python Subprocess | Limited isolation, security concerns | Medium-low | Easy | Zipfile with Python code |
 | Python Inline | Limited isolation, security concerns | Low | Easy | Zipfile with Python code |
@@ -75,6 +76,15 @@ Options that this gives us:
  * **Startup overhead:** Medium-high
  * **Ease of Use:** Moderate, Docker is easy to run but does have some moving parts compared to a simple Python process. A big advantage is that many organisations already use Docker. There are many other container orchestrators such as Kubernetes and Nomand in use, but these require the use of a different API (but do use the same container image for distribution).
  * **Distribution:** [OCI image](https://github.com/opencontainers/image-spec/blob/main/spec.md), with many build tools available (including in CI like GitHub Actions). OCI images can be distributed using [OCI registries](https://github.com/opencontainers/distribution-spec/blob/main/spec.md) and metadata can be provided in the OCI image manifest.
+
+#### Containers (hardened runtimes)
+
+Other container runtimes, such as [Kata Containers](https://katacontainers.io) or [gVisor](https://gvisor.dev) can provide excellent isolation while using the same OCI image distribution format used by Docker. When using container ochestrators such as Kubernetes, these runtimes can be used as a drop-in replacement for Docker. This means that the same OCI image can be used for distribution, and the same API can be used to run the container. For security-conscious organisations, using these hardened runtimes can provide additional security guarantees without requiring special adaptations in KAT.
+
+ * **Security:** Excellent isolation
+ * **Startup overhead:** High
+ * **Ease of Use:** Moderate, the runtime can be harder to set up than Docker, but the rest of the workflow is the same.
+ * **Distribution:** OCI image (see above)
 
 #### WebAssembly (Wasm)
 
