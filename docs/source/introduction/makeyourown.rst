@@ -446,7 +446,7 @@ The dataflow of the question object works as per this diagram:
       participant Octopoes
       participant Bits
       participant Bytes
-    end
+
     Normalizer->>Octopoes: Add Network
     Bits->>Octopoes: Add Question["What ports may be open for this Network?"]
     Rocky->>Octopoes: Get Question
