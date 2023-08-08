@@ -32,7 +32,6 @@
                                         <th scope="col">{% translate "Normalizer" %}</th>
                                         <th scope="col">{% translate "Status" %}</th>
                                         <th scope="col">{% translate "Created date" %}</th>
-                                        <th scope="col">{% translate "Input (RAW file)" %}</th>
                                         <th scope="col">{% translate "Input from boefje" %}</th>
                                         <th scope="col">{% translate "Details" %}</th>
                                     </tr>
@@ -54,9 +53,6 @@
                                             {% endif %}
                                             <td>
                                                 {{ task.created_at }}
-                                            </td>
-                                            <td>
-                                                <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}">{% translate "Download meta and raw data" %}</a>
                                             </td>
                                             <td>
                                                 <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
@@ -82,12 +78,20 @@
                                             </section>
                                             <section>
                                               <div>
+                                                <h2>
+                                                  {% translate "Download input (RAW file)" %}
+                                                </h2>
+                                                <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}">{% translate "Download meta and raw data" %}</a>
+                                              </div>
+                                            </section>
+                                            <section>
+                                              <div>
                                                 <h2>Reschedule normalizer</h2>
                                                 {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id %}
                                               </div>
                                             </section>
                                           </td>
-                                      </tr>
+                                        </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
