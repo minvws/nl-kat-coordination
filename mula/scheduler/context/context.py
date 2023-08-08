@@ -6,9 +6,9 @@ from types import SimpleNamespace
 from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
+from scheduler import storage
 from scheduler.config import settings
 from scheduler.connectors import services
-from scheduler.repositories import sqlalchemy, stores
 
 
 class AppContext:
@@ -65,13 +65,14 @@ class AppContext:
             }
         )
 
-        # Repositories
-        if not self.config.database_dsn.startswith("postgresql"):
-            raise Exception("PostgreSQL is the only supported database backend")
-
-        datastore = sqlalchemy.SQLAlchemy(self.config.database_dsn)
-        self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
-        self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
+        # Datastores, SimpleNamespace allows us to use dot notation
+        dbconn = storage.DBConn(self.config.database_dsn)
+        self.datastores: SimpleNamespace = SimpleNamespace(
+            **{
+                storage.TaskStore.name: storage.TaskStore(dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
+            }
+        )
 
         # Metrics collector registry
         self.metrics_registry: CollectorRegistry = CollectorRegistry()

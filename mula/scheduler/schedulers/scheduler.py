@@ -6,12 +6,12 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from scheduler import connectors, context, models, queues, rankers, utils
+from scheduler import connectors, context, models, queues, utils
 from scheduler.utils import thread
 
 
 class Scheduler(abc.ABC):
-    """The Scheduler class combines the priority queue, and ranker.
+    """The Scheduler class combines the priority queue.
     The scheduler is responsible for populating the queue, and ranking tasks.
 
     Attributes:
@@ -24,8 +24,6 @@ class Scheduler(abc.ABC):
             The id of the scheduler.
         queue:
             A queues.PriorityQueue instance
-        ranker:
-            A rankers.Ranker instance.
         threads:
             A dict of ThreadRunner instances, used for runner processes
             concurrently.
@@ -42,7 +40,6 @@ class Scheduler(abc.ABC):
         ctx: context.AppContext,
         scheduler_id: str,
         queue: queues.PriorityQueue,
-        ranker: rankers.Ranker,
         callback: Optional[Callable[..., None]] = None,
         max_tries: int = -1,
     ):
@@ -68,7 +65,6 @@ class Scheduler(abc.ABC):
         self.ctx: context.AppContext = ctx
         self.scheduler_id = scheduler_id
         self.queue: queues.PriorityQueue = queue
-        self.ranker: rankers.Ranker = ranker
 
         self.max_tries: int = max_tries
 

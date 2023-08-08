@@ -5,7 +5,6 @@ from unittest import mock
 from scheduler import config, models, queues, repositories
 
 from tests.mocks import queue as mock_queue
-from tests.mocks import ranker as mock_ranker
 from tests.mocks import scheduler as mock_scheduler
 from tests.mocks import task as mock_task
 from tests.utils import functions
@@ -37,15 +36,10 @@ class SchedulerTestCase(unittest.TestCase):
             pq_store=self.pq_store,
         )
 
-        ranker = mock_ranker.MockRanker(
-            ctx=self.mock_ctx,
-        )
-
         self.scheduler = mock_scheduler.MockScheduler(
             ctx=self.mock_ctx,
             scheduler_id=identifier,
             queue=queue,
-            ranker=ranker,
         )
 
     def test_post_push(self):

@@ -2,27 +2,18 @@ from typing import List, Optional, Tuple
 
 from scheduler import models
 
-from ..stores import PriorityQueueStorer  # noqa: TID252
-from .datastore import SQLAlchemy, retry
+from .storage import DBConn, retry
 
 
-class PriorityQueueStore(PriorityQueueStorer):
-    """Datastore for PriorityQueue.
+class PriorityQueueStore:
+    name: str = "pq_store"
 
-    Exposes methods to interface with the database.
-
-    Attributes:
-        datastore: SQAlchemy satastore to use for the database connection.
-    """
-
-    def __init__(self, datastore: SQLAlchemy) -> None:
-        super().__init__()
-
-        self.datastore = datastore
+    def __init__(self, dbconn: DBConn) -> None:
+        self.dbconn = dbconn
 
     @retry()
     def pop(self, scheduler_id: str, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemORM).filter(
                 models.PrioritizedItemORM.scheduler_id == scheduler_id
             )
@@ -40,7 +31,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def push(self, scheduler_id: str, item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             item_orm = models.PrioritizedItemORM(**item.dict())
             session.add(item_orm)
 
@@ -48,7 +39,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def peek(self, scheduler_id: str, index: int) -> Optional[models.PrioritizedItem]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.PrioritizedItemORM)
                 .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
@@ -65,7 +56,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def update(self, scheduler_id: str, item: models.PrioritizedItem) -> None:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             (
                 session.query(models.PrioritizedItemORM)
                 .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
@@ -75,7 +66,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def remove(self, scheduler_id: str, item_id: str) -> None:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             (
                 session.query(models.PrioritizedItemORM)
                 .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
@@ -85,7 +76,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def get(self, scheduler_id, item_id: str) -> Optional[models.PrioritizedItem]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.PrioritizedItemORM)
                 .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
@@ -100,7 +91,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def empty(self, scheduler_id: str) -> bool:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             count = (
                 session.query(models.PrioritizedItemORM)
                 .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
@@ -110,7 +101,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def qsize(self, scheduler_id: str) -> int:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             count = (
                 session.query(models.PrioritizedItemORM)
                 .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
@@ -125,7 +116,7 @@ class PriorityQueueStore(PriorityQueueStorer):
         scheduler_id: str,
         filters: Optional[List[models.Filter]] = None,
     ) -> Tuple[List[models.PrioritizedItem], int]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemORM).filter(
                 models.PrioritizedItemORM.scheduler_id == scheduler_id
             )
@@ -141,7 +132,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> Optional[models.PrioritizedItem]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.PrioritizedItemORM)
                 .order_by(models.PrioritizedItemORM.created_at.desc())
@@ -157,7 +148,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def get_items_by_scheduler_id(self, scheduler_id: str) -> List[models.PrioritizedItem]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             items_orm = (
                 session.query(models.PrioritizedItemORM)
                 .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
@@ -168,7 +159,7 @@ class PriorityQueueStore(PriorityQueueStorer):
 
     @retry()
     def clear(self, scheduler_id: str) -> None:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             (
                 session.query(models.PrioritizedItemORM)
                 .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)

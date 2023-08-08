@@ -5,9 +5,7 @@ from typing import Dict, Optional, Set
 
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers, schedulers, server
-from scheduler.connectors import listeners
-from scheduler.models import BoefjeTask, NormalizerTask, Organisation
+from scheduler import context, schedulers, server
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -26,8 +24,6 @@ class App:
             event across threads.
         schedulers:
             A dict of schedulers, keyed by scheduler id.
-        listeners:
-            A dict of connector.Listener instances.
     """
 
     def __init__(self, ctx: context.AppContext) -> None:
@@ -45,7 +41,6 @@ class App:
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
         self.schedulers: Dict[str, schedulers.Scheduler] = {}
-        self.listeners: Dict[str, listeners.Listener] = {}
         self.server: Optional[server.Server] = None
 
     def initialize_boefje_schedulers(self) -> None:
@@ -54,8 +49,13 @@ class App:
         """
         orgs = self.ctx.services.katalogus.get_organisations()
         for org in orgs:
-            s = self.create_boefje_scheduler(org)
-            self.schedulers[s.scheduler_id] = s
+            scheduler = schedulers.BoefjeScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"boefje-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+            self.schedulers[scheduler.scheduler_id] = scheduler
 
     def initialize_normalizer_schedulers(self) -> None:
         """Initialize the schedulers for the Normalizer tasks. We will create
@@ -63,66 +63,13 @@ class App:
         """
         orgs = self.ctx.services.katalogus.get_organisations()
         for org in orgs:
-            s = self.create_normalizer_scheduler(org)
-            self.schedulers[s.scheduler_id] = s
-
-    def create_normalizer_scheduler(self, org: Organisation) -> schedulers.NormalizerScheduler:
-        """Create a normalizer scheduler for the given organisation."""
-        identifier = f"normalizer-{org.id}"
-
-        queue = queues.NormalizerPriorityQueue(
-            pq_id=identifier,
-            maxsize=self.ctx.config.pq_maxsize,
-            item_type=NormalizerTask,
-            allow_priority_updates=True,
-            pq_store=self.ctx.pq_store,
-        )
-
-        ranker = rankers.NormalizerRanker(
-            ctx=self.ctx,
-        )
-
-        scheduler = schedulers.NormalizerScheduler(
-            ctx=self.ctx,
-            scheduler_id=identifier,
-            queue=queue,
-            ranker=ranker,
-            organisation=org,
-            callback=self.remove_scheduler,
-        )
-
-        return scheduler
-
-    def create_boefje_scheduler(self, org: Organisation) -> schedulers.BoefjeScheduler:
-        """Create a scheduler for the given organisation.
-
-        Args:
-            org: The organisation to create a scheduler for.
-        """
-        identifier = f"boefje-{org.id}"
-
-        queue = queues.BoefjePriorityQueue(
-            pq_id=identifier,
-            maxsize=self.ctx.config.pq_maxsize,
-            item_type=BoefjeTask,
-            allow_priority_updates=True,
-            pq_store=self.ctx.pq_store,
-        )
-
-        ranker = rankers.BoefjeRanker(
-            ctx=self.ctx,
-        )
-
-        scheduler = schedulers.BoefjeScheduler(
-            ctx=self.ctx,
-            scheduler_id=identifier,
-            queue=queue,
-            ranker=ranker,
-            organisation=org,
-            callback=self.remove_scheduler,
-        )
-
-        return scheduler
+            scheduler = schedulers.NormalizerScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"normalizer-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+            self.schedulers[scheduler.scheduler_id] = scheduler
 
     @tracer.start_as_current_span("monitor_organisations")
     def monitor_organisations(self) -> None:
@@ -168,11 +115,23 @@ class App:
         for org_id in additions:
             org = self.ctx.services.katalogus.get_organisation(org_id)
 
-            scheduler_normalizer = self.create_normalizer_scheduler(org)
+            scheduler_normalizer = schedulers.NormalizerScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"normalizer-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+
             self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
             scheduler_normalizer.run()
 
-            scheduler_boefje = self.create_boefje_scheduler(org)
+            scheduler_boefje = schedulers.BoefjeScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"boefje-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+
             self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
             scheduler_boefje.run()
 
@@ -204,7 +163,6 @@ class App:
         following processes:
 
             * api server
-            * listeners
             * schedulers
             * monitors
             * metrics collecting
@@ -214,14 +172,6 @@ class App:
         self.initialize_normalizer_schedulers()
         for scheduler in self.schedulers.values():
             scheduler.run()
-
-        # Start the listeners
-        for name, listener in self.listeners.items():
-            thread.ThreadRunner(
-                name=f"listener_{name}",
-                target=listener.listen,
-                stop_event=self.stop_event,
-            ).start()
 
         # Start monitors
         thread.ThreadRunner(

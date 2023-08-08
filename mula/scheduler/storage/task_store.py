@@ -3,21 +3,14 @@ from typing import List, Optional, Tuple
 
 from scheduler import models
 
-from ..stores import TaskStorer  # noqa: TID252
-from .datastore import SQLAlchemy, retry
+from .storage import DBConn, retry
 
 
-class TaskStore(TaskStorer):
-    """Datastore for Tasks.
+class TaskStore:
+    name: str = "task_store"
 
-    Attributes:
-        datastore: SQAlchemy satastore to use for the database connection.
-    """
-
-    def __init__(self, datastore: SQLAlchemy) -> None:
-        super().__init__()
-
-        self.datastore = datastore
+    def __init__(self, dbconn: DBConn) -> None:
+        self.dbconn = dbconn
 
     @retry()
     def get_tasks(
@@ -29,7 +22,7 @@ class TaskStore(TaskStorer):
         max_created_at: Optional[datetime.datetime] = None,
         filters: Optional[List[models.Filter]] = None,
     ) -> Tuple[List[models.Task], int]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             query = session.query(models.TaskORM).filter(
                 models.TaskORM.scheduler_id == scheduler_id,
             )
@@ -62,7 +55,7 @@ class TaskStore(TaskStorer):
 
     @retry()
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             task_orm = session.query(models.TaskORM).filter(models.TaskORM.id == task_id).first()
             if task_orm is None:
                 return None
@@ -73,7 +66,7 @@ class TaskStore(TaskStorer):
 
     @retry()
     def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             tasks_orm = (
                 session.query(models.TaskORM)
                 .filter(models.TaskORM.p_item["hash"].as_string() == task_hash)
@@ -90,7 +83,7 @@ class TaskStore(TaskStorer):
 
     @retry()
     def get_latest_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             task_orm = (
                 session.query(models.TaskORM)
                 .filter(models.TaskORM.p_item["hash"].as_string() == task_hash)
@@ -107,7 +100,7 @@ class TaskStore(TaskStorer):
 
     @retry()
     def create_task(self, task: models.Task) -> Optional[models.Task]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             task_orm = models.TaskORM(**task.dict())
             session.add(task_orm)
 
@@ -117,12 +110,12 @@ class TaskStore(TaskStorer):
 
     @retry()
     def update_task(self, task: models.Task) -> None:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             (session.query(models.TaskORM).filter(models.TaskORM.id == task.id).update(task.dict()))
 
     @retry()
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             session.query(models.TaskORM).filter(
                 models.TaskORM.scheduler_id == scheduler_id, models.TaskORM.id.in_(task_ids)
             ).update({"status": models.TaskStatus.CANCELLED.name})
@@ -140,7 +133,7 @@ class TaskStore(TaskStorer):
         offset: int = 0,
         limit: int = 100,
     ) -> Tuple[List[models.Task], int]:
-        with self.datastore.session.begin() as session:
+        with self.dbconn.session.begin() as session:
             query = session.query(models.TaskORM)
 
             if scheduler_id is not None:

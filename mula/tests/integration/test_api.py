@@ -6,9 +6,11 @@ from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, queues, rankers, repositories, schedulers, server
+from scheduler import config, models, queues, repositories, server
 
 from tests.factories import OrganisationFactory
+from tests.mocks import queue as mock_queue
+from tests.mocks import scheduler as mock_scheduler
 from tests.utils import functions
 from tests.utils.functions import create_p_item
 
@@ -38,7 +40,7 @@ class APITemplateTestCase(unittest.TestCase):
         # Scheduler
         self.organisation = OrganisationFactory()
 
-        queue = MockPriorityQueue(
+        queue = mock_queue.MockPriorityQueue(
             pq_id=self.organisation.id,
             maxsize=10,
             item_type=functions.TestModel,
@@ -46,16 +48,10 @@ class APITemplateTestCase(unittest.TestCase):
             pq_store=self.pq_store,
         )
 
-        ranker = rankers.BoefjeRanker(
-            ctx=self.mock_ctx,
-        )
-
-        self.scheduler = schedulers.BoefjeScheduler(
+        self.scheduler = mock_scheduler.MockScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
             queue=queue,
-            ranker=ranker,
-            organisation=self.organisation,
         )
 
         self.server = server.Server(self.mock_ctx, {self.scheduler.scheduler_id: self.scheduler})

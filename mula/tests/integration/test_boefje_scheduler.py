@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
-from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
+from scheduler import config, connectors, models, repositories, schedulers
 
 from tests.factories import (
     BoefjeFactory,
@@ -62,23 +62,9 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
         # Scheduler
         self.organisation = OrganisationFactory()
 
-        queue = queues.BoefjePriorityQueue(
-            pq_id=self.organisation.id,
-            maxsize=cfg.pq_maxsize,
-            item_type=models.BoefjeTask,
-            allow_priority_updates=True,
-            pq_store=self.pq_store,
-        )
-
-        ranker = rankers.BoefjeRanker(
-            ctx=self.mock_ctx,
-        )
-
         self.scheduler = schedulers.BoefjeScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
-            queue=queue,
-            ranker=ranker,
             organisation=self.organisation,
         )
 

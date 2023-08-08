@@ -39,20 +39,30 @@ class BoefjeScheduler(Scheduler):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue,
-        ranker: rankers.Ranker,
         organisation: Organisation,
+        queue: Optional[queues.PriorityQueue] = None,
         callback: Optional[Callable[..., None]] = None,
     ):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
 
+        self.queue = queue or queues.BoefjePriorityQueue(
+            pq_id=scheduler_id,
+            maxsize=ctx.config.pq_maxsize,
+            item_type=models.BoefjeTask,
+            allow_priority_updates=True,
+            pq_store=ctx.pq_store,
+        )
+
         super().__init__(
             ctx=ctx,
+            queue=self.queue,
             scheduler_id=scheduler_id,
-            queue=queue,
-            ranker=ranker,
             callback=callback,
+        )
+
+        self.ranker = rankers.BoefjeRanker(
+            ctx=self.ctx,
         )
 
     def run(self) -> None:
