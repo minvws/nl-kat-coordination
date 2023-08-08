@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Workplace Sign In</title>
+    <script type="text/javascript" src="/mifs/scripts/auth.js?VSP 10.8.0.0 Build 34 "></script>
+    <link href="/mifs/css/windowsAllAuth.css?10.8" rel="stylesheet" />
+</head>
+<body onload="onLoad();">
+    <div class="container" >
+        <p class="windowsPhoneData" >
+            <img src="/mifs/whitelabel/mobileiron/img/brand-med.svg" width="400" height="90"/>
+        </p>
+
+            <form id="form" action="/mifs/c/wp/EnrollmentServer/Authentication.svc" method="POST">
+            <h1 class="windowsText">Sign in to your MobileIron account</h1>
+            <p id="error" class="hidden"></p>
+
+            <p>
+                <label for="login">Email address</label><br/>
+                <input id="login" name="login" type="text" value="" autocomplete="on" />
+            </p>
+
+
+                <p class="textBox">
+                    <label for="password">Password</label><br/>
+                    <input id="password" name="password" type="password" value="" autocomplete="off" />
+                </p>
+
+
+
+
+            <button type="submit" id="signIn" class="button btn-new btn-new-default">
+                Sign in
+            </button>
+
+            <input name="app" type="hidden" value="" />
+            <input name="errorCode" id="errorCode" type="hidden" value=""/>
+            <input name="backOffDelay" id="backOffDelay" type="hidden" value=""/>
+        </form>
+
+        <div class="windowsText">
+            <img src="/mifs/whitelabel/mobileiron/img/brand-med.svg"
+                 alt="MobileIron Logo" style="width: 150pt; height: 43pt;" />
+            <p class="description">The leader in enterprise mobility management, MobileIron enables organizations around the world to embrace mobility as their primary IT platform.<br/><br/>MobileIron's solutions are purpose-built for the Mobile First enterprise, allowing you to secure and manage all of your mobile devices and applications running on the leading mobile platforms, including Windows and Windows Phone.</p>
+        </div>
+
+    </div>
+</body>
+</html>
