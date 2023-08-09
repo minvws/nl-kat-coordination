@@ -22,18 +22,17 @@ class Settings(BaseSettings):
     katalogus_cache_ttl: int = Field(30, env="SCHEDULER_KATALOGUS_CACHE_TTL")
     monitor_organisations_interval: int = Field(60, env="SCHEDULER_MONITOR_ORGANISATIONS_INTERVAL")
     octopoes_request_timeout: int = Field(10, env="SCHEDULER_OCTOPOES_REQUEST_TIMEOUT")
+    rabbitmq_prefetch_count: int = Field(100, env="SCHEDULER_RABBITMQ_PREFETCH_COUNT")
 
-    # External services settings
-    host_katalogus: str = Field(..., env="KATALOGUS_API")
-    host_bytes: str = Field(..., env="BYTES_API")
-    host_bytes_user: str = Field(..., env="BYTES_USERNAME")
-    host_bytes_password: str = Field(..., env="BYTES_PASSWORD")
-    host_octopoes: str = Field(..., env="OCTOPOES_API")
+    # External services
+    host_katalogus: str = Field(..., env="SCHEDULER_KATALOGUS_URL")
+    host_bytes: str = Field(..., env="SCHEDULER_BYTES_URL")
+    host_bytes_user: str = Field(..., env="SCHEDULER_BYTES_USERNAME")
+    host_bytes_password: str = Field(..., env="SCHEDULER_BYTES_PASSWORD")
+    host_octopoes: str = Field(..., env="SCHEDULER_OCTOPOES_URL")
     host_mutation: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
     host_raw_data: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
-    queue_prefetch_count: int = Field(100, env="SCHEDULER_QUEUE_PREFETCH_COUNT")
-    host_normalizer_meta: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
-    span_export_grpc_endpoint: Optional[str] = Field(None, env="SPAN_EXPORT_GRPC_ENDPOINT")
+    host_metrics: Optional[str] = Field(None, env="SCHEDULER_METRICS_URL")
 
     # Queue settings (0 is infinite)
     pq_maxsize: int = Field(1000, env="SCHEDULER_PQ_MAXSIZE")
