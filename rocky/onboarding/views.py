@@ -42,11 +42,7 @@ from onboarding.view_helpers import (
     KatIntroductionStepsMixin,
 )
 from rocky.bytes_client import get_bytes_client
-from rocky.exceptions import (
-    ClearanceLevelTooLowException,
-    IndemnificationNotPresentException,
-    RockyError,
-)
+from rocky.exceptions import RockyError
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_report import DNSReport, Report, build_findings_list_from_store
@@ -267,38 +263,8 @@ class OnboardingSetupScanOOIDetailView(
     def post(self, request, *args, **kwargs):
         ooi = self.get_ooi()
         level = DNS_REPORT_LEAST_CLEARANCE_LEVEL
-        try:
-            self.raise_clearance_level(ooi.reference, level)
-        except IndemnificationNotPresentException:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _(
-                    "Could not raise clearance level of %s to L%s. \
-                Indemnification not present at organization %s."
-                )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization.name,
-                ),
-            )
-            return self.get(request, *args, **kwargs)
-        except ClearanceLevelTooLowException:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _(
-                    "Could not raise clearance level of %s to L%s. \
-                You acknowledged a clearance level of %s."
-                )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
-            )
-            return self.get(request, *args, **kwargs)
+
+        self.raise_clearance_level(ooi.reference, level)
 
         self.enable_selected_boefjes()
         return redirect(get_ooi_url("step_report", self.get_ooi_id(), self.organization.code))

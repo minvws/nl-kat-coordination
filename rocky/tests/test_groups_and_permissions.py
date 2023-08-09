@@ -9,7 +9,7 @@ from tests.conftest import setup_request
 
 
 def test_indemnification_present(superuser_member):
-    assert superuser_member.user.indemnification_set.exists()
+    assert superuser_member.indemnification_present
 
 
 def test_account_detail_perms(rf, superuser_member, admin_member, redteam_member, client_member):

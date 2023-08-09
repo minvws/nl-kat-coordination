@@ -10,7 +10,7 @@
         <section>
             <div>
                 <h1>{% translate "Crisis room" %}: {{ organization.name }}</h1>
-                {% if not indemnification_present %}
+                {% if not organization_member.indemnification_present %}
                     <p class="warning"
                        role="group"
                        aria-label="{% translate "indemnification warning" %}">
@@ -41,50 +41,50 @@
                         <tbody>
                             {% for hydr in object_list %}
                                 {% with ft=hydr.finding_type ooi=hydr.ooi finding=hydr.finding %}
-                                <tr>
-                                    <td>
-                                        <span class="{{ ft.risk_severity|lower }}">{{ ft.risk_severity|capfirst }}</span>
-                                    </td>
-                                    <td>
-                                        <a href="{% ooi_url "ooi_detail" finding.primary_key organization.code query=mandatory_fields %}"
-                                           title="{% blocktranslate trimmed with finding=finding.human_readable %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.human_readable }}</a>
-                                    </td>
-                                    <td class="actions">
-                                        <button class="expando-button"
-                                                data-icon-open-class="icon ti-chevron-down"
-                                                data-icon-close-class="icon ti-chevron-up"
-                                                data-close-label="{% translate "Close details" %}">
-                                            {% translate "Open details" %}
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="expando-row">
-                                    <td colspan="6">
-                                        <table>
-                                            <tr>
-                                                <td>{% translate "Finding type" %}:</td>
-                                                <td>
-                                                    <a href="{% ooi_url "ooi_detail" ft.primary_key organization.code query=mandatory_fields %}"
-                                                       title="{% blocktranslate trimmed with finding_type=ft.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ ft.human_readable }}</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>{% translate "OOI type" %}:</td>
-                                                <td>
-                                                    <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi.object_type }}"
-                                                       title="{% blocktranslate trimmed with ooi_type=ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ ooi.object_type }}</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>{% translate "Source OOI" %}:</td>
-                                                <td>
-                                                    <a href="{% ooi_url "ooi_detail" ooi.primary_key organization.code query=mandatory_fields %}"
-                                                       title="{% blocktranslate trimmed with finding=ooi.human_readable %} Show details for {{ finding }} {% endblocktranslate %}">{{ ooi.human_readable }}</a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="{{ ft.risk_severity|lower }}">{{ ft.risk_severity|capfirst }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="{% ooi_url "ooi_detail" finding.primary_key organization.code query=mandatory_fields %}"
+                                               title="{% blocktranslate trimmed with finding=finding.human_readable %} Show details for {{ finding }} {% endblocktranslate %}">{{ finding.human_readable }}</a>
+                                        </td>
+                                        <td class="actions">
+                                            <button class="expando-button"
+                                                    data-icon-open-class="icon ti-chevron-down"
+                                                    data-icon-close-class="icon ti-chevron-up"
+                                                    data-close-label="{% translate "Close details" %}">
+                                                {% translate "Open details" %}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="expando-row">
+                                        <td colspan="6">
+                                            <table>
+                                                <tr>
+                                                    <td>{% translate "Finding type" %}:</td>
+                                                    <td>
+                                                        <a href="{% ooi_url "ooi_detail" ft.primary_key organization.code query=mandatory_fields %}"
+                                                           title="{% blocktranslate trimmed with finding_type=ft.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ ft.human_readable }}</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>{% translate "OOI type" %}:</td>
+                                                    <td>
+                                                        <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi.object_type }}"
+                                                           title="{% blocktranslate trimmed with ooi_type=ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ ooi.object_type }}</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>{% translate "Source OOI" %}:</td>
+                                                    <td>
+                                                        <a href="{% ooi_url "ooi_detail" ooi.primary_key organization.code query=mandatory_fields %}"
+                                                           title="{% blocktranslate trimmed with finding=ooi.human_readable %} Show details for {{ finding }} {% endblocktranslate %}">{{ ooi.human_readable }}</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
                                 {% endwith %}
                             {% endfor %}
                         </tbody>

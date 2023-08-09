@@ -15,15 +15,16 @@
 
                 {% endif %}
                 {% include "partials/ooi_head.html" with ooi=ooi view="ooi_detail" %}
-            </div>
 
+            </div>
             <div>
                 {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
+
                 {% if is_question %}
-                  {% include "forms/json_schema_form.html" with json_schema=ooi.json_schema %}
+                    {% include "forms/json_schema_form.html" with json_schema=ooi.json_schema %}
+
                 {% endif %}
             </div>
-
             <div>
                 {% include "oois/ooi_detail_origins_declarations.html" %}
                 {% include "oois/ooi_detail_origins_observations.html" %}
@@ -43,7 +44,7 @@
                 {% if enabled_boefjes_available %}
                     <div class="horizontal-view">
                         <div>
-                            {% if member.acknowledged_clearance_level > 0 and organization_indemnification %}
+                            {% if self.organization_member.has_ooi_clearance %}
                                 <form method="get" class="inline">
                                     <input type="hidden" name="ooi_id" value="{{ ooi }}">
                                     {% include "partials/form/form_errors.html" with form=possible_boefjes_filter_form %}
@@ -103,9 +104,7 @@
                             <p>
                                 {% translate "There are no boefjes available within the current clearance level of" %} "{{ ooi.human_readable }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
                             </p>
-                            <p>
-                                {% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".
-                            </p>
+                            <p>{% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".</p>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -119,8 +118,10 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
-{% if is_question %}
-    <script src="{% static "/js/jsonSchemaToForm.js" %}" nonce="{{ request.csp_nonce }}"></script>
-{% endif %}
+    <script src="{% static "/js/autoSubmit.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
+    {% if is_question %}
+        <script src="{% static "/js/jsonSchemaToForm.js" %}"
+                nonce="{{ request.csp_nonce }}"></script>
+    {% endif %}
 {% endblock html_at_end_body %}

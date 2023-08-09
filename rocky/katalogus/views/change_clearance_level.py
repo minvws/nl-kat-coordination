@@ -35,8 +35,6 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
 
     def post(self, request, *args, **kwargs):
         """Start scanning oois at plugin detail page."""
-        if not self.indemnification_present:
-            return self.get(request, *args, **kwargs)
 
         self.run_boefje_for_oois(boefje=self.plugin, oois=self.oois)
         messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))

@@ -6,7 +6,6 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from tools.forms.ooi import SetClearanceLevelForm
-from tools.models import Indemnification, OrganizationMember
 from tools.view_helpers import (
     Breadcrumb,
     get_mandatory_fields,
@@ -25,14 +24,10 @@ class ScanProfileDetailView(OOIDetailView, FormView):
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["user"] = OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
-        context["organization_indemnification"] = Indemnification.objects.filter(
-            organization=self.organization
-        ).exists()
         return context
 
     def post(self, request, *args, **kwargs):
-        if not self.indemnification_present:
+        if not self.organization_member.indemnification_present:
             return self.get(request, status_code=403, *args, **kwargs)
 
         super().post(request, *args, **kwargs)
@@ -40,7 +35,7 @@ class ScanProfileDetailView(OOIDetailView, FormView):
         if form.is_valid():
             level = form.cleaned_data["level"]
             try:
-                self.raise_clearance_level(self.ooi.reference, level)
+                self.indemnification.raise_clearance_level(self.ooi.reference, level)
             except IndemnificationNotPresentException:
                 messages.add_message(
                     self.request,

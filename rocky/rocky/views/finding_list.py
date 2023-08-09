@@ -1,7 +1,6 @@
 import logging
 from typing import Any, Dict, List, Optional
 
-from account.mixins import IndemnificationManagementView
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -84,7 +83,7 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
         ]
 
 
-class Top10FindingListView(FindingListView, IndemnificationManagementView):
+class Top10FindingListView(FindingListView):
     template_name = "findings/finding_list.html"
     paginate_by = 10
 

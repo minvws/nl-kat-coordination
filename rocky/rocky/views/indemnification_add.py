@@ -1,5 +1,5 @@
 from account.forms import IndemnificationAddForm
-from account.mixins import IndemnificationManagementView, OrganizationPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.urls.base import reverse
@@ -8,7 +8,7 @@ from django.views.generic import FormView
 from tools.models import Indemnification
 
 
-class IndemnificationAddView(OrganizationPermissionRequiredMixin, IndemnificationManagementView, FormView):
+class IndemnificationAddView(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "indemnification_add.html"
     form_class = IndemnificationAddForm
     permission_required = "tools.add_indemnification"

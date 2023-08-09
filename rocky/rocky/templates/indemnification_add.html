@@ -9,7 +9,7 @@
     <main id="main-content">
         <section>
             <div>
-                {% if indemnification_present %}
+                {% if organization_member.indemnification_present %}
                     {% include "indemnification_present.html" %}
 
                 {% else %}

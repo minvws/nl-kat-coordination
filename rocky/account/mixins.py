@@ -2,20 +2,17 @@ from datetime import datetime, timezone
 from typing import List, Optional
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from django.utils.translation import gettext_lazy as _
 from django.views import View
-from tools.models import Indemnification, Organization, OrganizationMember
+from tools.models import Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
 from rocky.bytes_client import BytesClient, get_bytes_client
-from rocky.exceptions import (
-    AcknowledgedClearanceLevelTooLowException,
-    IndemnificationNotPresentException,
-    TrustedClearanceLevelTooLowException,
-)
 
 
 # There are modified versions of PermLookupDict and PermWrapper from
@@ -71,6 +68,7 @@ class OrganizationView(View):
         self.octopoes_api_connector: Optional[OctopoesAPIConnector] = None
         self.bytes_client: BytesClient = None
         self.organization_member = None
+        self.clearance_errors = {}
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -101,52 +99,47 @@ class OrganizationView(View):
         context["perms"] = OrganizationPermWrapper(self.organization_member)
         return context
 
+    def can_raise_clearance_level(self, level: int) -> bool:
+        if (
+            self.organization_member.has_ooi_clearance
+            and level <= self.organization_member.acknowledged_clearance_level
+        ):
+            return True
+        self.clearance_errors["raise_clearance_level"] = _(
+            "Could not raise clearance level to L{}. You can raise clearance level to a maximum of L{}."
+        ).format(level, self.organization_member.acknowledged_clearance_level)
 
-class IndemnificationManagementView(OrganizationView):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.indemnification_present = False
+        if not self.organization_member.indemnification_present:
+            self.clearance_errors["indemnification_present"] = _(
+                "Indemnification not present at organization {}."
+            ).format(self.organization.name)
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.indemnification_present = Indemnification.objects.filter(organization=self.organization).exists()
-
-    @property
-    def may_update_clearance_level(self) -> bool:
-        return self.indemnification_present and self.organization_member.has_ooi_clearance
-
-    def verify_raise_clearance_level(self, level: int) -> bool:
-        if not self.indemnification_present:
-            raise IndemnificationNotPresentException()
-        if self.organization_member.acknowledged_clearance_level < level:
-            raise AcknowledgedClearanceLevelTooLowException()
-        if self.organization_member.trusted_clearance_level < level:
-            raise TrustedClearanceLevelTooLowException()
-        return True
+        return False
 
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
-        self.verify_raise_clearance_level(level)
-        self.octopoes_api_connector.save_scan_profile(
-            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level)),
-            datetime.now(timezone.utc),
-        )
-
-        return True
+        if self.can_raise_clearance_level(level):
+            self.octopoes_api_connector.save_scan_profile(
+                DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level)),
+                datetime.now(timezone.utc),
+            )
+        else:
+            self.error_message_no_clearance()
 
     def raise_clearance_levels(self, ooi_references: List[Reference], level: int) -> bool:
-        self.verify_raise_clearance_level(level)
-        self.octopoes_api_connector.save_many_scan_profiles(
-            [DeclaredScanProfile(reference=reference, level=ScanLevel(level)) for reference in ooi_references],
-            datetime.now(timezone.utc),
-        )
+        if self.can_raise_clearance_level(level):
+            self.octopoes_api_connector.save_many_scan_profiles(
+                [DeclaredScanProfile(reference=reference, level=ScanLevel(level)) for reference in ooi_references],
+                datetime.now(timezone.utc),
+            )
+        else:
+            self.error_message_no_clearance()
 
-        return True
+    def error_message_no_clearance(self):
+        clearance_messages = ""
+        for error in self.clearance_errors.values():
+            clearance_messages += error
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["may_update_clearance_level"] = self.may_update_clearance_level
-        context["indemnification_present"] = self.indemnification_present
-        return context
+        messages.add_message(self.request, messages.ERROR, clearance_messages)
 
 
 class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):

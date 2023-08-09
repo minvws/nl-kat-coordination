@@ -13,7 +13,6 @@ from rest_framework.status import HTTP_404_NOT_FOUND
 
 from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
 from octopoes.models import OOI
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
 from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData, client
 from rocky.views.mixins import OctopoesView
 
@@ -102,34 +101,5 @@ class BoefjeMixin(OctopoesView):
 
         for ooi in oois:
             if ooi.scan_profile.level < boefje.scan_level:
-                try:
-                    self.raise_clearance_level(ooi.reference, boefje.scan_level)
-                except IndemnificationNotPresentException:
-                    messages.add_message(
-                        self.request,
-                        messages.ERROR,
-                        _(
-                            "Could not raise clearance level of %s to L%s. \
-                            Indemnification not present at organization %s."
-                        )
-                        % (
-                            ooi.reference.human_readable,
-                            boefje.scan_level,
-                            self.organization.name,
-                        ),
-                    )
-                except ClearanceLevelTooLowException:
-                    messages.add_message(
-                        self.request,
-                        messages.ERROR,
-                        _(
-                            "Could not raise clearance level of %s to L%s. \
-                            You acknowledged a clearance level of %s."
-                        )
-                        % (
-                            ooi.reference.human_readable,
-                            boefje.scan_level,
-                            self.organization_member.acknowledged_clearance_level,
-                        ),
-                    )
+                self.raise_clearance_level(ooi.reference, boefje.scan_level)
             self.run_boefje(boefje, ooi)

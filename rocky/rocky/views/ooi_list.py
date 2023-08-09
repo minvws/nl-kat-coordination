@@ -11,14 +11,12 @@ from django.utils.translation import gettext_lazy as _
 from requests import RequestException
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
-from tools.models import Indemnification
 from tools.view_helpers import get_mandatory_fields
 
 from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
-from rocky.views.mixins import OctopoesView, OOIList
+from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -27,7 +25,7 @@ class PageActions(Enum):
     UPDATE_SCAN_PROFILE = "update-scan-profile"
 
 
-class OOIListView(BaseOOIListView, OctopoesView):
+class OOIListView(BaseOOIListView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
 
@@ -39,13 +37,10 @@ class OOIListView(BaseOOIListView, OctopoesView):
         context["observed_at"] = self.get_observed_at()
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["select_oois_form"] = SelectOOIForm(
-            context.get("ooi_list", []),
-            organization_code=self.organization.code,
-            mandatory_fields=context["mandatory_fields"],
+            context.get("ooi_list", []), organization_code=self.organization.code
         )
-        context["member"] = self.organization_member
+
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
-        context["organization_indemnification"] = self.get_organization_indemnification
         context["breadcrumbs"] = [
             {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": _("Objects")},
         ]
@@ -86,28 +81,6 @@ class OOIListView(BaseOOIListView, OctopoesView):
     ) -> HttpResponse:
         try:
             self.raise_clearance_levels(selected_oois, level.value)
-        except IndemnificationNotPresentException:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _("Could not raise clearance levels to L%s. Indemnification not present at organization %s.")
-                % (
-                    level,
-                    self.organization.name,
-                ),
-            )
-            return self.get(request, status=403, *args, **kwargs)
-        except ClearanceLevelTooLowException:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _("Could not raise clearance level to L%s. You acknowledged a clearance level of %s.")
-                % (
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
-            )
-            return self.get(request, status=403, *args, **kwargs)
         except (RequestException, RemoteException, ConnectionError):
             messages.add_message(request, messages.ERROR, _("An error occurred while saving clearance levels."))
 
@@ -178,9 +151,6 @@ class OOIListView(BaseOOIListView, OctopoesView):
         )
 
         return self.get(request, *args, **kwargs)
-
-    def get_organization_indemnification(self):
-        return Indemnification.objects.filter(organization=self.organization).exists()
 
 
 class OOIListExportView(BaseOOIListView):

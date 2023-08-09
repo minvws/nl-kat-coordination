@@ -13,7 +13,7 @@
                 {% include "partials/stepper.html" %}
 
                 <h2>{% translate "Indemnification setup" %}</h2>
-                {% if indemnification_present %}
+                {% if organization_member.indemnification_present %}
                     <p>{% translate "Indemnification on the organization is already present." %}</p>
                     <a class="button"
                        href="{% url 'step_account_setup_intro' organization.code %}">{% translate "Continue" %}</a>

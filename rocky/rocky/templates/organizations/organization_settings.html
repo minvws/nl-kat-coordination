@@ -15,7 +15,7 @@
             An overview of "{{ organization_name }}". This shows general information and its settings.
           {% endblocktranslate %}
         </p>
-        {% if not indemnification_present %}
+        {% if not organization_member.indemnification_present %}
           <p class="warning"
              role="group"
              aria-label="{% translate "indemnification warning" %}">
@@ -60,7 +60,6 @@
           <a href="{% url "indemnification_add" organization.code %}"
              class="button ghost">{% translate "Add indemnification" %}</a>
         {% endif %}
-
         <h2>{% translate "Actions" %}</h2>
         {% if perms.tools.can_recalculate_bits %}
           <form method="post" class="inline">
@@ -68,9 +67,7 @@
             <button type="submit"
                     class="dropdown-button"
                     name="action"
-                    value="recalculate">
-              {% translate "Rerun all bits" %}
-            </button>
+                    value="recalculate">{% translate "Rerun all bits" %}</button>
           </form>
         {% endif %}
       </div>
@@ -88,5 +85,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
   {{ block.super }}
-  <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+  <script src="{% static "/js/checkboxToggler.js" %}"
+          nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

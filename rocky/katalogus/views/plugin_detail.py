@@ -112,8 +112,6 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         """Start scanning oois at plugin detail page."""
-        if not self.indemnification_present:
-            return self.get(request, *args, **kwargs)
 
         if "boefje_id" not in request.POST:
             raise BadRequest("No boefje_id provided")
