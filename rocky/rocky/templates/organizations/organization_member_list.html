@@ -16,22 +16,19 @@
                 <h2>{% translate "Members" %}</h2>
                 {% if perms.tools.add_organizationmember %}
                     <div class="horizontal-view toolbar">
-                      <div class="dropdown">
-                          <button aria-controls="export-add" class="dropdown-button">
-                            {% translate "Add member(s)" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
-                          </button>
-                        <ul id="export-add" aria-expanded="false" class="dropdown-list">
-                          <li>
-                            <a href="{% url "organization_member_add" organization.code %}">
-                            {% translate "Manually" %}</a>
-                          </li>
-                          <li>
-                            <a href="{% url "organization_member_upload" organization.code %}">
-                            {% translate "Upload a CSV" %}</a>
-                          </li>
-                        </ul>
-                      </div>
-
+                        <div class="dropdown">
+                            <button aria-controls="export-add" class="dropdown-button">
+                                {% translate "Add member(s)" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+                            </button>
+                            <ul id="export-add" aria-expanded="false" class="dropdown-list">
+                                <li>
+                                    <a href="{% url "organization_member_add_account_type" organization.code %}">{% translate "Manually" %}</a>
+                                </li>
+                                <li>
+                                    <a href="{% url "organization_member_upload" organization.code %}">{% translate "Upload a CSV" %}</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 {% endif %}
                 {% include "partials/organization_member_list_filters.html" with checkbox_filters=checkbox_filters %}
@@ -72,11 +69,11 @@
                                                 <span class="active"></span> {% translate "Active" %}
                                             {% else %}
                                                 <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span>
-                                                    {% if member.blocked %}
-                                                        {% translate "Blocked" %}
-                                                    {% else %}
-                                                        {{ member.status|title }}
-                                                    {% endif %}
+                                                {% if member.blocked %}
+                                                    {% translate "Blocked" %}
+                                                {% else %}
+                                                    {{ member.status|title }}
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                         <td>
@@ -129,5 +126,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

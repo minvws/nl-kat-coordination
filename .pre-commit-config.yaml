@@ -24,7 +24,7 @@ repos:
     hooks:
       - id: rstcheck
         # https://github.com/rstcheck/rstcheck-core/issues/4
-        args: ["--ignore-messages", "Hyperlink target .* is not referenced"]
+        args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid"]
         additional_dependencies: ["rstcheck[sphinx]"]
 
   - repo: https://github.com/MarketSquare/robotframework-tidy
@@ -81,8 +81,7 @@ repos:
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
-          ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
-          ^boefjes/tests/examples/inputs/cve-result-with-cvss2.json |
+          ^boefjes/tests/examples |
           ^keiko/glossaries |
           ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |

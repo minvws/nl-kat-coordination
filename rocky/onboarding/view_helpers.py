@@ -9,6 +9,8 @@ ONBOARDING_PERMISSIONS = (
     "tools.can_enable_disable_boefje",
 )
 
+DNS_REPORT_LEAST_CLEARANCE_LEVEL = 1
+
 
 class KatIntroductionStepsMixin(StepsMixin, OrganizationView):
     def build_steps(self):
