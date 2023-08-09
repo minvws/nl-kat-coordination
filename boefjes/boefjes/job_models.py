@@ -44,6 +44,8 @@ class BoefjeMeta(Job):
     input_ooi: Optional[str]
     arguments: Dict = {}
     organization: str
+    runnable_hash: Optional[str]
+    environment: Optional[Dict[str, str]]
 
     @property
     def parameterized_arguments_hash(self) -> str:

@@ -24,7 +24,7 @@ repos:
     hooks:
       - id: rstcheck
         # https://github.com/rstcheck/rstcheck-core/issues/4
-        args: ["--ignore-messages", "Hyperlink target .* is not referenced"]
+        args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid"]
         additional_dependencies: ["rstcheck[sphinx]"]
 
   - repo: https://github.com/MarketSquare/robotframework-tidy
@@ -71,14 +71,17 @@ repos:
     hooks:
       - id: codespell
         additional_dependencies: ['tomli']
+        args: [-L, lama]
         exclude: |
           (?x)(
           \.po$ |
           \.xml$ |
           poetry.lock$ |
+          pyproject.toml$ |
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
+          ^boefjes/tests/examples |
           ^keiko/glossaries |
           ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |
@@ -102,3 +105,9 @@ repos:
   #              - stylelint@15.4.0
   #              - stylelint-config-standard-scss@8.0.0
   #       files:  "^(rocky\/assets\/src\/|docs\/source\/).*.(css|scss|sass)$"
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.5
+    hooks:
+      - id: shellcheck
+        args: ["-e", "SC1091"]

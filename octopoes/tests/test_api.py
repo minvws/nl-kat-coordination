@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 import requests
 from fastapi.testclient import TestClient
@@ -13,7 +15,7 @@ def patch_pika(mocker):
     return mocker.patch("pika.BlockingConnection")
 
 
-def test_health(requests_mock, patch_pika):
+def test_health(requests_mock, patch_pika, xtdbtype_crux):
     crux_status = {
         "version": "21.05-1.17.0-beta",
         "revision": None,
@@ -72,7 +74,7 @@ def test_openapi():
     assert response.status_code == 200
 
 
-def test_get_scan_profiles(requests_mock, patch_pika):
+def test_get_scan_profiles(requests_mock, patch_pika, xtdbtype_crux):
     requests_mock.real_http = True
     scan_profile = {
         "type": "ScanProfile",
@@ -91,19 +93,19 @@ def test_get_scan_profiles(requests_mock, patch_pika):
     assert response.json() == [{"level": 0, "reference": "Hostname|internet|mispo.es", "scan_profile_type": "empty"}]
 
 
-def test_create_node():
+def test_create_node(xtdbtype_crux):
     res = client.post("/_dev/node")
     assert res.status_code == 501
     assert res.json() == {"detail": "XTDB multinode is not set up for Octopoes."}
 
 
-def test_delete_node():
+def test_delete_node(xtdbtype_crux):
     res = client.delete("/_dev/node")
     assert res.status_code == 501
     assert res.json() == {"detail": "XTDB multinode is not set up for Octopoes."}
 
 
-def test_create_node_multinode(requests_mock, xtdbtype_multinode):
+def test_create_node_multinode(requests_mock):
     requests_mock.real_http = True
     requests_mock.post(
         "http://crux:3000/_xtdb/create-node",
@@ -114,7 +116,7 @@ def test_create_node_multinode(requests_mock, xtdbtype_multinode):
     assert response.status_code == 200
 
 
-def test_delete_node_multinode(requests_mock, xtdbtype_multinode):
+def test_delete_node_multinode(requests_mock):
     requests_mock.real_http = True
     requests_mock.post(
         "http://crux:3000/_xtdb/delete-node",
@@ -125,10 +127,14 @@ def test_delete_node_multinode(requests_mock, xtdbtype_multinode):
     assert response.status_code == 200
 
 
-def test_count_findings_by_severity(requests_mock, patch_pika):
+def test_count_findings_by_severity(requests_mock, patch_pika, xtdbtype_crux, caplog):
+    logger = logging.getLogger("octopoes")
+    logger.propagate = True
+
     requests_mock.real_http = True
     xt_response = [
         [
+            "KATFindingType|KAT-NO-DKIM",
             {
                 "object_type": "KATFindingType",
                 "KATFindingType/risk_severity": "medium",
@@ -139,7 +145,12 @@ def test_count_findings_by_severity(requests_mock, patch_pika):
                 "crux.db/id": "KATFindingType|KAT-NO-DKIM",
             },
             1,
-        ]
+        ],
+        [
+            "KATFindingType|KAT-NO-FINDING-TYPE",
+            None,
+            2,
+        ],
     ]
 
     requests_mock.post(
@@ -147,7 +158,8 @@ def test_count_findings_by_severity(requests_mock, patch_pika):
         json=xt_response,
         status_code=200,
     )
-    response = client.get("/_dev/findings/count_by_severity")
+    with caplog.at_level(logging.WARNING):
+        response = client.get("/_dev/findings/count_by_severity")
     assert response.status_code == 200
     assert response.json() == {
         "critical": 0,
@@ -155,6 +167,14 @@ def test_count_findings_by_severity(requests_mock, patch_pika):
         "medium": 1,
         "low": 0,
         "recommendation": 0,
-        "pending": 0,
+        "pending": 2,
         "unknown": 0,
     }
+
+    assert caplog.record_tuples == [
+        (
+            "octopoes.repositories.ooi_repository",
+            logging.WARNING,
+            "There are 2 KATFindingType|KAT-NO-FINDING-TYPE findings but the finding type is not in the database",
+        )
+    ]

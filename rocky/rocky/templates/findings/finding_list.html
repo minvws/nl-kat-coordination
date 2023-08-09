@@ -13,96 +13,126 @@
                 <h1>{% translate "Findings" %}</h1>
                 <p>
                     {% blocktranslate trimmed with observed_at|date as date %}
-        An overview of all findings OpenKAT found on {{ date }}. Each finding relates to an object.
-        Click a finding for additional information.
-      {% endblocktranslate %}
+                        An overview of all findings OpenKAT found on {{ date }}.
+                        Each finding relates to an object.
+                        Click a finding for additional information.
+                    {% endblocktranslate %}
                 </p>
                 {{ object_type_filters }}
                 {% include "partials/findings_list_toolbar.html" %}
+                {% include "findings/findings_filter.html" %}
 
                 {% translate "Object list" as filter_title %}
-                {% include "partials/ooi_list_filters.html" with title=filter_title %}
-
-                <div class="horizontal-scroll">
-                    <table class="action-buttons nowrap">
-                        <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "objects" %}</caption>
-                        <thead>
-                            <tr>
-                                <th>Nr</th>
-                                <th>{% translate "Severity" %}</th>
-                                <th>{% translate "Finding" %}</th>
-                                <th>{% translate "Tree" %}</th>
-                                <th>{% translate "Graph" %}</th>
-                                <th>{% translate "Details" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for hydrated_finding in object_list %}
+                {% if object_list|length > 1 and perms.tools.can_mute_findings %}
+                    <form method="post"
+                          class="inline"
+                          action="{% url 'finding_mute_bulk' organization.code %}">
+                        {% csrf_token %}
+                    {% endif %}
+                    <div class="horizontal-scroll">
+                        <table class="action-buttons nowrap">
+                            <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}</caption>
+                            <thead>
                                 <tr>
-                                    <td>{{ page_obj.start_index|add:forloop.counter0 }}</td>
-                                    <td>
-                                        <span class="{{ hydrated_finding.finding_type.risk_severity.value|lower }}">{{ hydrated_finding.finding_type.risk_severity.value|capfirst }}</span>
-                                    </td>
-                                    <td>
-                                        <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}"
-                                           title="{% blocktranslate trimmed with finding=hydrated_finding.finding.primary_key %} Show details for {{ finding }} {% endblocktranslate %}">{{ hydrated_finding.finding.human_readable }}</a>
-                                    </td>
-                                    <td class="actions">
-                                        <a aria-label="Navigate to tree view of {{ hydrated_finding.finding.human_readable }}"
-                                           class="icon ti-subtask button"
-                                           href="{% ooi_url 'ooi_tree' hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}">{% translate "Tree" %}</a>
-                                    </td>
-                                    <td class="actions">
-                                        <a aria-label="Navigate to graph view of {{ hydrated_finding.finding.human_readable }}"
-                                           class="icon ti-affiliate button"
-                                           href="{% ooi_url 'ooi_graph' hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}">{% translate "Graph" %}</a>
-                                    </td>
-                                    <td class="actions">
-                                        <button class="expando-button"
-                                                data-icon-open-class="icon ti-chevron-down"
-                                                data-icon-close-class="icon ti-chevron-up"
-                                                data-close-label="{% translate "Close details" %}">
-                                            {% translate "Open details" %}
-                                        </button>
-                                    </td>
+                                    {% if object_list|length > 1 and perms.tools.can_mute_findings %}
+                                        <th>
+                                            <input class="toggle-all" data-toggle-target="finding" type="checkbox">
+                                        </th>
+                                    {% endif %}
+                                    <th>{% translate "Severity" %}</th>
+                                    <th>{% translate "Finding" %}</th>
+                                    <th>{% translate "Tree" %}</th>
+                                    <th>{% translate "Graph" %}</th>
+                                    <th>{% translate "Details" %}</th>
                                 </tr>
-                                <tr class="expando-row">
-                                    <td colspan="6">
-                                        <table>
-                                            <tr>
-                                                <td>{% translate "Finding type:" %}</td>
-                                                <td>
-                                                    <a href="{% ooi_url "ooi_detail" hydrated_finding.finding_type organization.code query=mandatory_fields %}"
-                                                       title="{% blocktranslate trimmed with finding_type=hydrated_finding.finding_type.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ hydrated_finding.finding_type.human_readable }}</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>{% translate "OOI type:" %}</td>
-                                                <td>
-                                                    <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ hydrated_finding.ooi.object_type }}"
-                                                       title="{% blocktranslate trimmed with ooi_type=hydrated_finding.ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ hydrated_finding.ooi.object_type }}</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>{% translate "Source OOI:" %}</td>
-                                                <td>
-                                                    <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.ooi organization.code query=mandatory_fields %}"
-                                                       title="{% blocktranslate trimmed with ooi=hydrated_finding.finding.ooi.human_readable %} Show details for {{ ooi }} {% endblocktranslate %}">{{ hydrated_finding.finding.ooi.human_readable }}</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>{% translate "Risk score:" %}</td>
-                                                <td>
-                                                    {{ hydrated_finding.finding_type.risk_score }}
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {% for hydrated_finding in object_list %}
+                                    <tr>
+                                        {% if object_list|length > 1 and perms.tools.can_mute_findings %}
+                                            <td>
+                                                <input type="checkbox"
+                                                       name="finding"
+                                                       value="{{ hydrated_finding.finding.primary_key }}">
+                                            </td>
+                                        {% endif %}
+                                        <td>
+                                            <span class="{{ hydrated_finding.finding_type.risk_severity.value|lower }}">{{ hydrated_finding.finding_type.risk_severity.value|capfirst }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}"
+                                               title="{% blocktranslate trimmed with finding=hydrated_finding.finding.primary_key %} Show details for {{ finding }} {% endblocktranslate %}">{{ hydrated_finding.finding.human_readable }}</a>
+                                        </td>
+                                        <td class="actions">
+                                            <a aria-label="Navigate to tree view of {{ hydrated_finding.finding.human_readable }}"
+                                               class="icon ti-subtask button"
+                                               href="{% ooi_url 'ooi_tree' hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}">{% translate "Tree" %}</a>
+                                        </td>
+                                        <td class="actions">
+                                            <a aria-label="Navigate to graph view of {{ hydrated_finding.finding.human_readable }}"
+                                               class="icon ti-affiliate button"
+                                               href="{% ooi_url 'ooi_graph' hydrated_finding.finding.primary_key organization.code query=mandatory_fields %}">{% translate "Graph" %}</a>
+                                        </td>
+                                        <td class="actions">
+                                            <button type="button"
+                                                    class="expando-button"
+                                                    data-icon-open-class="icon ti-chevron-down"
+                                                    data-icon-close-class="icon ti-chevron-up"
+                                                    data-close-label="{% translate "Close details" %}">
+                                                {% translate "Open details" %}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="expando-row">
+                                        <td colspan="6">
+                                            <table>
+                                                <tr>
+                                                    <td>{% translate "Finding type:" %}</td>
+                                                    <td>
+                                                        <a href="{% ooi_url "ooi_detail" hydrated_finding.finding_type organization.code query=mandatory_fields %}"
+                                                           title="{% blocktranslate trimmed with finding_type=hydrated_finding.finding_type.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ hydrated_finding.finding_type.human_readable }}</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>{% translate "OOI type:" %}</td>
+                                                    <td>
+                                                        <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ hydrated_finding.ooi.object_type }}"
+                                                           title="{% blocktranslate trimmed with ooi_type=hydrated_finding.ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ hydrated_finding.ooi.object_type }}</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>{% translate "Source OOI:" %}</td>
+                                                    <td>
+                                                        <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.ooi organization.code query=mandatory_fields %}"
+                                                           title="{% blocktranslate trimmed with ooi=hydrated_finding.finding.ooi.human_readable %} Show details for {{ ooi }} {% endblocktranslate %}">{{ hydrated_finding.finding.ooi.human_readable }}</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>{% translate "Risk score:" %}</td>
+                                                    <td>{{ hydrated_finding.finding_type.risk_score }}</td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if object_list|length > 1 and perms.tools.can_mute_findings %}
+                        <fieldset>
+                            <legend>{% translate "Mute findings" %}</legend>
+                            <div>
+                                <label for="id_reason">{% translate "Reason" %}:</label>
+                                <div>
+                                    <textarea name="reason" cols="5" rows="3" id="id_reason"></textarea>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <div class="button-container">
+                            <button type="submit">{% translate "Mute Findings" %}</button>
+                        </div>
+                    {% endif %}
+                </form>
                 {% include "partials/pagination.html" %}
 
             </div>
@@ -111,5 +141,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}"
+            nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

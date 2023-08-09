@@ -77,7 +77,7 @@ class OctopoesView(OrganizationView):
         organization: Organization,
     ) -> Tuple[List[OriginData], List[OriginData], List[OriginData]]:
         try:
-            origins = self.octopoes_api_connector.list_origins(reference, valid_time)
+            origins = self.octopoes_api_connector.list_origins(valid_time, result=reference)
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
@@ -89,7 +89,7 @@ class OctopoesView(OrganizationView):
                     client.login()
 
                     normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
-                    boefje_id = normalizer_data["boefje_meta"]["boefje"]["id"]
+                    boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
                     origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
                 except requests.exceptions.RequestException as e:

@@ -108,7 +108,10 @@ def read_certificates(
         pem_contents = f"-----BEGIN CERTIFICATE-----{m.group()}-----END CERTIFICATE-----"
 
         cert = x509.load_pem_x509_certificate(pem_contents.encode(), default_backend())
-        subject = cert.subject.get_attributes_for_oid(x509.OID_COMMON_NAME)[0].value
+        try:
+            subject = cert.subject.get_attributes_for_oid(x509.OID_COMMON_NAME)[0].value
+        except IndexError:
+            subject = None
         issuer = cert.issuer.get_attributes_for_oid(x509.OID_ORGANIZATION_NAME)[0].value
         try:
             subject_alternative_names = [

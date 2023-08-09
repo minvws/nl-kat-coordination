@@ -15,17 +15,18 @@ def convert_date_to_datetime(d: date) -> datetime:
     return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
 
 
-def get_mandatory_fields(request):
+def get_mandatory_fields(request, params: List[str] = None):
     mandatory_fields = []
 
-    params = ["observed_at", "depth", "view"]
+    if not params:
+        params = ["observed_at", "depth", "view"]
+
+        for type_ in request.GET.getlist("ooi_type", []):
+            mandatory_fields.append(("ooi_type", type_))
 
     for param in params:
         if param in request.GET:
             mandatory_fields.append((param, request.GET.get(param)))
-
-    for type_ in request.GET.getlist("ooi_type", []):
-        mandatory_fields.append(("ooi_type", type_))
 
     return mandatory_fields
 

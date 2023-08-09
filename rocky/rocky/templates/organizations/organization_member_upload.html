@@ -1,0 +1,32 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Upload a csv file with members for organisation" %} "{{ organization }}"</h1>
+                <p class="emphasized">
+                  <a href="{% url 'download_organization_member_template' organization_code=organization.code %}">
+                      {% translate "Download the template" %}
+                  </a>
+                  {% translate "or create a csv file with the following criteria" %}
+                </p>
+                <p>{% translate "These are the criteria for CSV upload:" %}</p>
+                <ul>
+                  {% for criterion in criteria %}<li>{{ criterion }}</li>{% endfor %}
+                </ul>
+                <form novalidate method="post" class="horizontal-view help" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
+
+                    <button type="submit">{% translate "Upload" %}</button>
+                </form>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

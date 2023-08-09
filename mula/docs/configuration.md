@@ -103,4 +103,8 @@ creation of their schedulers. Default is `60`.
 
 `SCHEDULER_RABBITMQ_DSN` is the url of the RabbitMQ host.
 
+`SCHEDULER_RABBITMQ_PREFETCH_COUNT` is the RabbitMQ prefetch count for
+`channel.basic_qos()`, i.e. the number of unacknowledged messages on a channel.
+Also see https://www.rabbitmq.com/consumer-prefetch.html.
+
 `SCHEDULER_DB_DSN` is the locator of the database

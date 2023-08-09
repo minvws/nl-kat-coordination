@@ -20,14 +20,19 @@ from rocky.views.ooi_detail_related_object import OOIRelatedObjectAddView
 from rocky.views.ooi_edit import OOIEditView
 from rocky.views.ooi_findings import OOIFindingListView
 from rocky.views.ooi_list import OOIListExportView, OOIListView
-from rocky.views.ooi_mute import MuteFindingView
+from rocky.views.ooi_mute import MuteFindingsBulkView, MuteFindingView
 from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from rocky.views.ooi_tree import OOIGraphView, OOISummaryView, OOITreeView
 from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
-from rocky.views.organization_member_add import OrganizationMemberAddView
+from rocky.views.organization_member_add import (
+    DownloadMembersTemplateView,
+    MembersUploadView,
+    OrganizationMemberAddAccountTypeView,
+    OrganizationMemberAddView,
+)
 from rocky.views.organization_member_edit import OrganizationMemberEditView
 from rocky.views.organization_member_list import OrganizationMemberListView
 from rocky.views.organization_settings import OrganizationSettingsView
@@ -74,6 +79,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/findings/", FindingListView.as_view(), name="finding_list"),
     path("<organization_code>/findings/add/", FindingAddView.as_view(), name="finding_add"),
     path("<organization_code>/findings/mute/", MuteFindingView.as_view(), name="finding_mute"),
+    path("<organization_code>/findings/mute/bulk/", MuteFindingsBulkView.as_view(), name="finding_mute_bulk"),
     path("<organization_code>/findings/finding_type/add/", FindingTypeAddView.as_view(), name="finding_type_add"),
     path("<organization_code>/findings/report/pdf", FindingReportPDFView.as_view(), name="findings_pdf_report"),
     path("<organization_code>/objects/graph/", OOIGraphView.as_view(), name="ooi_graph"),
@@ -95,8 +101,23 @@ urlpatterns += i18n_patterns(
     ),
     path(
         "<organization_code>/members/add/",
+        OrganizationMemberAddAccountTypeView.as_view(),
+        name="organization_member_add_account_type",
+    ),
+    path(
+        "<organization_code>/members/add/<account_type>/",
         OrganizationMemberAddView.as_view(),
         name="organization_member_add",
+    ),
+    path(
+        "<organization_code>/members/upload/member_template",
+        DownloadMembersTemplateView.as_view(),
+        name="download_organization_member_template",
+    ),
+    path(
+        "<organization_code>/members/upload/",
+        MembersUploadView.as_view(),
+        name="organization_member_upload",
     ),
     path(
         "<organization_code>/",

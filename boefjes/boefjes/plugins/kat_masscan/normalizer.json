@@ -1,0 +1,11 @@
+{
+    "id": "kat_masscan_normalize",
+    "consumes": [
+        "masscan"
+    ],
+    "produces": [
+        "IPAddressV4",
+        "IPAddressV6",
+        "IPPort"
+    ]
+}

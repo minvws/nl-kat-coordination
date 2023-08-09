@@ -39,32 +39,35 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.setup_kat_groups()
 
+        redteamer_permissions = [
+            "can_scan_organization",
+            "can_enable_disable_boefje",
+            "can_set_clearance_level",
+            "can_delete_oois",
+            "can_mute_findings",
+            "can_view_katalogus_settings",
+            "can_set_katalogus_settings",
+        ]
+
+        redteam_permissions = self.get_permissions(redteamer_permissions)
+        self.group_redteam.permissions.set(redteam_permissions)
+
         admin_permissions = self.get_permissions(
-            [
+            redteamer_permissions
+            + [
                 "view_organization",
                 "view_organizationmember",
                 "add_organizationmember",
                 "change_organization",
+                "can_scan_organization",
                 "change_organizationmember",
-                "can_delete_oois",
                 "add_indemnification",
                 "can_recalculate_bits",
             ]
         )
         self.group_admin.permissions.set(admin_permissions)
 
-        redteam_permissions = self.get_permissions(
-            [
-                "can_scan_organization",
-                "can_enable_disable_boefje",
-                "can_set_clearance_level",
-                "can_delete_oois",
-                "can_mute_findings",
-                "can_view_katalogus_settings",
-                "can_set_katalogus_settings",
-            ]
-        )
-        self.group_redteam.permissions.set(redteam_permissions)
         client_permissions = self.get_permissions(["can_scan_organization"])
         self.group_client.permissions.set(client_permissions)
+
         logging.info("ROCKY HAS BEEN SETUP SUCCESSFULLY")
