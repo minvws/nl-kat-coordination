@@ -34,11 +34,6 @@
                                 {% for task in object_list %}
                                     <tr id="{{ task.id }}">
                                       <td>
-                                        <span class="icon ti-clock-hour-5"></span>
-                                        <span class="icon ti-progress"></span>
-                                        <span class="icon ti-exlamation-mark"></span>
-                                        <span class="icon ti-circle-x"></span>
-                                        <span class="icon ti-check"></span>
                                         <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.id }}</a>
                                       </td>
                                       {% if task.status.value == "completed" %}
@@ -81,7 +76,9 @@
                                                 {% else %}
                                                     <a class="button" href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta data" %}</a>
                                                 {% endif %}
-                                                {% include "partials/single_action_form.html" with btn_text="Reschedule" btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+                                                {% if task.status.value == "completed" %}
+                                                    {% include "partials/single_action_form.html" with btn_text="Reschedule" btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+                                                {% endif %}
                                               </div>
                                             </section>
                                           </td>
