@@ -23,28 +23,28 @@ class TaskStore:
         filters: Optional[List[models.Filter]] = None,
     ) -> Tuple[List[models.Task], int]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.TaskORM).filter(
-                models.TaskORM.scheduler_id == scheduler_id,
+            query = session.query(models.TaskDB).filter(
+                models.TaskDB.scheduler_id == scheduler_id,
             )
 
             if scheduler_id is not None:
-                query = query.filter(models.TaskORM.scheduler_id == scheduler_id)
+                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
 
             if task_type is not None:
-                query = query.filter(models.TaskORM.type == task_type)
+                query = query.filter(models.TaskDB.type == task_type)
 
             if status is not None:
-                query = query.filter(models.TaskORM.status == models.TaskStatus(status).name)
+                query = query.filter(models.TaskDB.status == models.TaskStatus(status).name)
 
             if min_created_at is not None:
-                query = query.filter(models.TaskORM.created_at >= min_created_at)
+                query = query.filter(models.TaskDB.created_at >= min_created_at)
 
             if max_created_at is not None:
-                query = query.filter(models.TaskORM.created_at <= max_created_at)
+                query = query.filter(models.TaskDB.created_at <= max_created_at)
 
             if filters is not None:
                 for f in filters:
-                    query.filter(models.TaskORM.p_item[f.get_field()].astext == f.value)
+                    query.filter(models.TaskDB.p_item[f.get_field()].astext == f.value)
 
             count = query.count()
             tasks_orm = query.all()
@@ -56,7 +56,7 @@ class TaskStore:
     @retry()
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.dbconn.session.begin() as session:
-            task_orm = session.query(models.TaskORM).filter(models.TaskORM.id == task_id).first()
+            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
             if task_orm is None:
                 return None
 
@@ -68,9 +68,9 @@ class TaskStore:
     def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
         with self.dbconn.session.begin() as session:
             tasks_orm = (
-                session.query(models.TaskORM)
-                .filter(models.TaskORM.p_item["hash"].as_string() == task_hash)
-                .order_by(models.TaskORM.created_at.desc())
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
+                .order_by(models.TaskDB.created_at.desc())
                 .all()
             )
 
@@ -85,9 +85,9 @@ class TaskStore:
     def get_latest_task_by_hash(self, task_hash: str) -> Optional[models.Task]:
         with self.dbconn.session.begin() as session:
             task_orm = (
-                session.query(models.TaskORM)
-                .filter(models.TaskORM.p_item["hash"].as_string() == task_hash)
-                .order_by(models.TaskORM.created_at.desc())
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
+                .order_by(models.TaskDB.created_at.desc())
                 .first()
             )
 
@@ -101,7 +101,7 @@ class TaskStore:
     @retry()
     def create_task(self, task: models.Task) -> Optional[models.Task]:
         with self.dbconn.session.begin() as session:
-            task_orm = models.TaskORM(**task.dict())
+            task_orm = models.TaskDB(**task.dict())
             session.add(task_orm)
 
             created_task = models.Task.from_orm(task_orm)
@@ -111,13 +111,13 @@ class TaskStore:
     @retry()
     def update_task(self, task: models.Task) -> None:
         with self.dbconn.session.begin() as session:
-            (session.query(models.TaskORM).filter(models.TaskORM.id == task.id).update(task.dict()))
+            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.dict()))
 
     @retry()
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
         with self.dbconn.session.begin() as session:
-            session.query(models.TaskORM).filter(
-                models.TaskORM.scheduler_id == scheduler_id, models.TaskORM.id.in_(task_ids)
+            session.query(models.TaskDB).filter(
+                models.TaskDB.scheduler_id == scheduler_id, models.TaskDB.id.in_(task_ids)
             ).update({"status": models.TaskStatus.CANCELLED.name})
 
     @retry()
@@ -134,53 +134,53 @@ class TaskStore:
         limit: int = 100,
     ) -> Tuple[List[models.Task], int]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.TaskORM)
+            query = session.query(models.TaskDB)
 
             if scheduler_id is not None:
-                query = query.filter(models.TaskORM.scheduler_id == scheduler_id)
+                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
 
             if task_type is not None:
-                query = query.filter(models.TaskORM.type == task_type)
+                query = query.filter(models.TaskDB.type == task_type)
 
             if status is not None:
-                query = query.filter(models.TaskORM.status == models.TaskStatus(status).name)
+                query = query.filter(models.TaskDB.status == models.TaskStatus(status).name)
 
             if min_created_at is not None:
-                query = query.filter(models.TaskORM.created_at >= min_created_at)
+                query = query.filter(models.TaskDB.created_at >= min_created_at)
 
             if max_created_at is not None:
-                query = query.filter(models.TaskORM.created_at <= max_created_at)
+                query = query.filter(models.TaskDB.created_at <= max_created_at)
 
             if input_ooi is not None:
                 if type == "boefje":
-                    query = query.filter(models.TaskORM.p_item[["data", "input_ooi"]].as_string() == input_ooi)
+                    query = query.filter(models.TaskDB.p_item[["data", "input_ooi"]].as_string() == input_ooi)
                 elif type == "normalizer":
                     query = query.filter(
-                        models.TaskORM.p_item[["data", "raw_data", "boefje_meta", "input_ooi"]].as_string() == input_ooi
+                        models.TaskDB.p_item[["data", "raw_data", "boefje_meta", "input_ooi"]].as_string() == input_ooi
                     )
                 else:
                     query = query.filter(
-                        (models.TaskORM.p_item[["data", "input_ooi"]].as_string() == input_ooi)
+                        (models.TaskDB.p_item[["data", "input_ooi"]].as_string() == input_ooi)
                         | (
-                            models.TaskORM.p_item[["data", "raw_data", "boefje_meta", "input_ooi"]].as_string()
+                            models.TaskDB.p_item[["data", "raw_data", "boefje_meta", "input_ooi"]].as_string()
                             == input_ooi
                         )
                     )
 
             if plugin_id is not None:
                 if type == "boefje":
-                    query = query.filter(models.TaskORM.p_item[["data", "boefje", "id"]].as_string() == plugin_id)
+                    query = query.filter(models.TaskDB.p_item[["data", "boefje", "id"]].as_string() == plugin_id)
                 elif type == "normalizer":
-                    query = query.filter(models.TaskORM.p_item[["data", "normalizer", "id"]].as_string() == plugin_id)
+                    query = query.filter(models.TaskDB.p_item[["data", "normalizer", "id"]].as_string() == plugin_id)
                 else:
                     query = query.filter(
-                        (models.TaskORM.p_item[["data", "boefje", "id"]].as_string() == plugin_id)
-                        | (models.TaskORM.p_item[["data", "normalizer", "id"]].as_string() == plugin_id)
+                        (models.TaskDB.p_item[["data", "boefje", "id"]].as_string() == plugin_id)
+                        | (models.TaskDB.p_item[["data", "normalizer", "id"]].as_string() == plugin_id)
                     )
 
             count = query.count()
 
-            tasks_orm = query.order_by(models.TaskORM.created_at.desc()).offset(offset).limit(limit).all()
+            tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
 
             tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
 

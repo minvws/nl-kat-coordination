@@ -37,12 +37,7 @@ class PrioritizedItem(BaseModel):
         orm_mode = True
 
 
-class PrioritizedItemORM(Base):
-    """Representation of an queue.PrioritizedItem on the priority queue. Used
-    for marshalling of priority queue prioritized items to a database
-    representation.
-    """
-
+class PrioritizedItemDB(Base):
     __tablename__ = "items"
 
     id = Column(GUID, primary_key=True)
@@ -66,10 +61,6 @@ class PrioritizedItemORM(Base):
 
 
 class Queue(BaseModel):
-    """Representation of an queue.PriorityQueue object. Used for unmarshalling
-    of priority queues to a JSON representation.
-    """
-
     id: str
     size: int
     maxsize: int

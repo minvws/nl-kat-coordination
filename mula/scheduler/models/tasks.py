@@ -21,8 +21,6 @@ from .raw_data import RawData
 
 
 class TaskStatus(str, enum.Enum):
-    """Status of a task."""
-
     PENDING = "pending"
     QUEUED = "queued"
     DISPATCHED = "dispatched"
@@ -50,9 +48,7 @@ class Task(BaseModel):
         orm_mode = True
 
 
-class TaskORM(Base):
-    """A SQLAlchemy datastore model representation of a Task"""
-
+class TaskDB(Base):
     __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)

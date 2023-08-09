@@ -14,13 +14,13 @@ class PriorityQueueStore:
     @retry()
     def pop(self, scheduler_id: str, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.PrioritizedItemORM).filter(
-                models.PrioritizedItemORM.scheduler_id == scheduler_id
+            query = session.query(models.PrioritizedItemDB).filter(
+                models.PrioritizedItemDB.scheduler_id == scheduler_id
             )
 
             if filters is not None:
                 for f in filters:
-                    query = query.filter(models.PrioritizedItemORM.data[f.get_field()].as_string() == f.value)
+                    query = query.filter(models.PrioritizedItemDB.data[f.get_field()].as_string() == f.value)
 
             item_orm = query.first()
 
@@ -32,7 +32,7 @@ class PriorityQueueStore:
     @retry()
     def push(self, scheduler_id: str, item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
-            item_orm = models.PrioritizedItemORM(**item.dict())
+            item_orm = models.PrioritizedItemDB(**item.dict())
             session.add(item_orm)
 
             return models.PrioritizedItem.from_orm(item_orm)
@@ -41,10 +41,10 @@ class PriorityQueueStore:
     def peek(self, scheduler_id: str, index: int) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             item_orm = (
-                session.query(models.PrioritizedItemORM)
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
-                .order_by(models.PrioritizedItemORM.priority.asc())
-                .order_by(models.PrioritizedItemORM.created_at.asc())
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
+                .order_by(models.PrioritizedItemDB.priority.asc())
+                .order_by(models.PrioritizedItemDB.created_at.asc())
                 .offset(index)
                 .first()
             )
@@ -58,9 +58,9 @@ class PriorityQueueStore:
     def update(self, scheduler_id: str, item: models.PrioritizedItem) -> None:
         with self.dbconn.session.begin() as session:
             (
-                session.query(models.PrioritizedItemORM)
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
-                .filter(models.PrioritizedItemORM.id == item.id)
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
+                .filter(models.PrioritizedItemDB.id == item.id)
                 .update(item.dict())
             )
 
@@ -68,9 +68,9 @@ class PriorityQueueStore:
     def remove(self, scheduler_id: str, item_id: str) -> None:
         with self.dbconn.session.begin() as session:
             (
-                session.query(models.PrioritizedItemORM)
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
-                .filter(models.PrioritizedItemORM.id == item_id)
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
+                .filter(models.PrioritizedItemDB.id == item_id)
                 .delete()
             )
 
@@ -78,9 +78,9 @@ class PriorityQueueStore:
     def get(self, scheduler_id, item_id: str) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             item_orm = (
-                session.query(models.PrioritizedItemORM)
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
-                .filter(models.PrioritizedItemORM.id == item_id)
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
+                .filter(models.PrioritizedItemDB.id == item_id)
                 .first()
             )
 
@@ -93,8 +93,8 @@ class PriorityQueueStore:
     def empty(self, scheduler_id: str) -> bool:
         with self.dbconn.session.begin() as session:
             count = (
-                session.query(models.PrioritizedItemORM)
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
                 .count()
             )
             return count == 0
@@ -103,8 +103,8 @@ class PriorityQueueStore:
     def qsize(self, scheduler_id: str) -> int:
         with self.dbconn.session.begin() as session:
             count = (
-                session.query(models.PrioritizedItemORM)
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
                 .count()
             )
 
@@ -117,13 +117,13 @@ class PriorityQueueStore:
         filters: Optional[List[models.Filter]] = None,
     ) -> Tuple[List[models.PrioritizedItem], int]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.PrioritizedItemORM).filter(
-                models.PrioritizedItemORM.scheduler_id == scheduler_id
+            query = session.query(models.PrioritizedItemDB).filter(
+                models.PrioritizedItemDB.scheduler_id == scheduler_id
             )
 
             if filters is not None:
                 for f in filters:
-                    query = query.filter(models.PrioritizedItemORM.data[f.get_field()].astext == f.value)
+                    query = query.filter(models.PrioritizedItemDB.data[f.get_field()].astext == f.value)
 
             count = query.count()
             items_orm = query.all()
@@ -134,10 +134,10 @@ class PriorityQueueStore:
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             item_orm = (
-                session.query(models.PrioritizedItemORM)
-                .order_by(models.PrioritizedItemORM.created_at.desc())
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
-                .filter(models.PrioritizedItemORM.hash == item_hash)
+                session.query(models.PrioritizedItemDB)
+                .order_by(models.PrioritizedItemDB.created_at.desc())
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
+                .filter(models.PrioritizedItemDB.hash == item_hash)
                 .first()
             )
 
@@ -150,8 +150,8 @@ class PriorityQueueStore:
     def get_items_by_scheduler_id(self, scheduler_id: str) -> List[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             items_orm = (
-                session.query(models.PrioritizedItemORM)
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
                 .all()
             )
 
@@ -161,7 +161,7 @@ class PriorityQueueStore:
     def clear(self, scheduler_id: str) -> None:
         with self.dbconn.session.begin() as session:
             (
-                session.query(models.PrioritizedItemORM)
-                .filter(models.PrioritizedItemORM.scheduler_id == scheduler_id)
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
                 .delete()
             )
