@@ -184,7 +184,7 @@ two different type of jobs, `boefje` and `normalizer` jobs.
 For a `boefje` scheduler the following events will trigger a dataflow procedure
 to be executed and subsequently the creation of a `boefje` task.:
 
-1. scan level mutation of an ooi
+1. scan level mutation of an ooi (object or object-of-interest)
 2. new and/or enabled boefje
 3. rescheduling of ooi's and associated boefjes
 4. scan job creation from octopoes
