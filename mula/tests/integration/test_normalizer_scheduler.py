@@ -1,8 +1,9 @@
 import datetime
 import unittest
+from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, models, queues, repositories, schedulers
+from scheduler import config, models, schedulers, storage
 
 from tests.factories import (
     BoefjeMetaFactory,
@@ -17,36 +18,25 @@ from tests.utils import functions
 
 class NormalizerSchedulerBaseTestCase(unittest.TestCase):
     def setUp(self):
-        cfg = config.settings.Settings()
-
+        # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = cfg
+        self.mock_ctx.config = config.settings.Settings()
 
-        # Datastore
-        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy(cfg.database_dsn)
-
-        models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
-        self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
-        self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
-
-        self.mock_ctx.pq_store = self.pq_store
-        self.mock_ctx.task_store = self.task_store
+        # Database
+        self.dbconn = storage.DBConn(self.mock_ctx.config.database_dsn)
+        models.Base.metadata.create_all(self.dbconn.engine)
+        self.mock_ctx.datastores = SimpleNamespace(
+            **{
+                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+            }
+        )
 
         # Scheduler
         self.organisation = OrganisationFactory()
-
-        queue = queues.NormalizerPriorityQueue(
-            pq_id=self.organisation.id,
-            maxsize=cfg.pq_maxsize,
-            item_type=models.NormalizerTask,
-            allow_priority_updates=True,
-            pq_store=self.pq_store,
-        )
-
         self.scheduler = schedulers.NormalizerScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
-            queue=queue,
             organisation=self.organisation,
         )
 
@@ -83,7 +73,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -104,7 +94,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -133,7 +123,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
-        self.mock_ctx.task_store.create_task(task)
+        self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
             id=p_item.id.hex,
@@ -163,7 +153,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Task should be in datastore
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -180,7 +170,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
-        self.mock_ctx.task_store.create_task(task)
+        self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
             id=p_item.id.hex,
@@ -219,7 +209,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
-        self.mock_ctx.task_store.create_task(task)
+        self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
             id=p_item.id.hex,
@@ -259,7 +249,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
-        self.mock_ctx.task_store.create_task(task)
+        self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
             id=p_item.id.hex,
@@ -299,7 +289,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
-        self.mock_ctx.task_store.create_task(task)
+        self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
             id=p_item.id.hex,
@@ -339,7 +329,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Task should be in datastore
-        task_db = self.mock_ctx.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id.hex, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -356,7 +346,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
-        self.mock_ctx.task_store.create_task(task)
+        self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
             id=p_item.id.hex,

@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional
 
 import pydantic
 
-from scheduler import models, repositories
+from scheduler import models, storage
 
 from .errors import (
     InvalidPrioritizedItemError,
@@ -51,7 +51,7 @@ class PriorityQueue(abc.ABC):
         pq_id: str,
         maxsize: int,
         item_type: Any,
-        pq_store: repositories.stores.PriorityQueueStorer,
+        pq_store: storage.PriorityQueueStore,
         allow_replace: bool = False,
         allow_updates: bool = False,
         allow_priority_updates: bool = False,
@@ -87,7 +87,7 @@ class PriorityQueue(abc.ABC):
         self.allow_replace: bool = allow_replace
         self.allow_updates: bool = allow_updates
         self.allow_priority_updates: bool = allow_priority_updates
-        self.pq_store: repositories.stores.PriorityQueueStorer = pq_store
+        self.pq_store: storage.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
     def pop(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:

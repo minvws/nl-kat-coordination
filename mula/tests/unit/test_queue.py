@@ -6,10 +6,7 @@ import unittest
 import uuid
 from typing import Optional
 
-from scheduler import config, models, queues
-from scheduler.models import Base
-from scheduler.repositories import sqlalchemy
-from sqlalchemy.orm import sessionmaker
+from scheduler import config, models, queues, storage
 
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
@@ -18,10 +15,10 @@ from tests.utils import functions
 class PriorityQueueTestCase(unittest.TestCase):
     def setUp(self) -> None:
         cfg = config.settings.Settings()
-        self.datastore = sqlalchemy.SQLAlchemy(cfg.database_dsn)
-        Base.metadata.create_all(self.datastore.engine)
+        self.dbconn = storage.DBConn(cfg.database_dsn)
+        models.Base.metadata.create_all(self.dbconn.engine)
 
-        self.pq_store = sqlalchemy.PriorityQueueStore(datastore=self.datastore)
+        self.pq_store = storage.PriorityQueueStore(self.dbconn)
 
         self.pq = mock_queue.MockPriorityQueue(
             pq_id="test",
@@ -33,15 +30,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         self._check_queue_empty()
 
     def tearDown(self) -> None:
-        session = sessionmaker(bind=self.datastore.engine)()
-
-        for table in Base.metadata.tables:
-            session.execute(f"DELETE FROM {table}")
-
-        session.commit()
-        session.close()
-
-        del self.pq
+        models.Base.metadata.drop_all(self.dbconn.engine)
 
     def _check_queue_empty(self):
         self.assertEqual(0, self.pq.qsize())

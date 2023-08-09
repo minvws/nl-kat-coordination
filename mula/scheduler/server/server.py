@@ -250,7 +250,7 @@ class Server:
             if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
                 raise ValueError("min_date must be less than max_date")
 
-            results, count = self.ctx.task_store.api_list_tasks(
+            results, count = self.ctx.datastores.task_store.api_list_tasks(
                 scheduler_id=scheduler_id,
                 task_type=task_type,
                 status=status,
@@ -277,7 +277,7 @@ class Server:
 
     def get_task(self, task_id: str) -> Any:
         try:
-            task = self.ctx.task_store.get_task_by_id(task_id)
+            task = self.ctx.datastores.task_store.get_task_by_id(task_id)
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=400,
@@ -306,7 +306,7 @@ class Server:
             )
 
         try:
-            task_db = self.ctx.task_store.get_task_by_id(task_id)
+            task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=400,
@@ -323,7 +323,7 @@ class Server:
 
         # Update task in database
         try:
-            self.ctx.task_store.update_task(updated_task)
+            self.ctx.datastores.task_store.update_task(updated_task)
         except Exception as exc:
             self.logger.error(exc)
             raise fastapi.HTTPException(

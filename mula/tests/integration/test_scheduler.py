@@ -1,8 +1,9 @@
 import unittest
 import uuid
+from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, models, queues, repositories
+from scheduler import config, models, queues, storage
 
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -12,28 +13,28 @@ from tests.utils import functions
 
 class SchedulerTestCase(unittest.TestCase):
     def setUp(self):
-        cfg = config.settings.Settings()
-
+        # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = cfg
+        self.mock_ctx.config = config.settings.Settings()
 
-        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy(cfg.database_dsn)
-        models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
-
-        self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
-        self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
-
-        self.mock_ctx.pq_store = self.pq_store
-        self.mock_ctx.task_store = self.task_store
+        # Database
+        self.dbconn = storage.DBConn(self.mock_ctx.config.database_dsn)
+        models.Base.metadata.create_all(self.dbconn.engine)
+        self.mock_ctx.datastores = SimpleNamespace(
+            **{
+                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+            }
+        )
 
         identifier = uuid.uuid4().hex
 
         queue = mock_queue.MockPriorityQueue(
             pq_id=identifier,
-            maxsize=cfg.pq_maxsize,
+            maxsize=self.mock_ctx.config.pq_maxsize,
             item_type=mock_task.MockTask,
             allow_priority_updates=True,
-            pq_store=self.pq_store,
+            pq_store=self.mock_ctx.datastores.pq_store,
         )
 
         self.scheduler = mock_scheduler.MockScheduler(
@@ -59,7 +60,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(pq_p_item.id, p_item.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -80,7 +81,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(pq_p_item.id, p_item.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -89,7 +90,7 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Assert: task should be in datastore, and dispatched
         self.assertEqual(0, self.scheduler.queue.qsize())
-        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
@@ -110,7 +111,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(pq_p_item.id, p_item.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -133,7 +134,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -173,7 +174,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 

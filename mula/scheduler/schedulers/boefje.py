@@ -51,7 +51,7 @@ class BoefjeScheduler(Scheduler):
             maxsize=ctx.config.pq_maxsize,
             item_type=models.BoefjeTask,
             allow_priority_updates=True,
-            pq_store=ctx.pq_store,
+            pq_store=ctx.datastores.pq_store,
         )
 
         super().__init__(
@@ -131,7 +131,7 @@ class BoefjeScheduler(Scheduler):
         if mutation.operation == MutationOperationType.DELETE:
             # When there are tasks of the ooi are on the queue, we need to
             # remove them from the queue.
-            items, _ = self.ctx.pq_store.get_items(
+            items, _ = self.ctx.datastores.pq_store.get_items(
                 scheduler_id=self.scheduler_id,
                 filters=[
                     models.Filter(
@@ -145,7 +145,7 @@ class BoefjeScheduler(Scheduler):
             # Delete all items for this ooi, update all tasks for this ooi
             # to cancelled.
             for item in items:
-                self.ctx.pq_store.remove(
+                self.ctx.datastores.pq_store.remove(
                     scheduler_id=self.scheduler_id,
                     item_id=item.id.hex,
                 )
@@ -153,12 +153,12 @@ class BoefjeScheduler(Scheduler):
                 if item.hash is None:
                     continue
 
-                task = self.ctx.task_store.get_latest_task_by_hash(item.hash)
+                task = self.ctx.datastores.task_store.get_latest_task_by_hash(item.hash)
                 if task is None:
                     continue
 
                 task.status = TaskStatus.CANCELLED
-                self.ctx.task_store.update_task(task)
+                self.ctx.datastores.task_store.update_task(task)
 
             return
 
@@ -391,7 +391,7 @@ class BoefjeScheduler(Scheduler):
         # Is task still running according to the datastore?
         task_db = None
         try:
-            task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
             self.logger.warning(
                 "Could not get latest task by hash: %s [organisation_id=%s, scheduler_id=%s]",
@@ -550,7 +550,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
+        prior_tasks = self.ctx.datastores.task_store.get_tasks_by_hash(task.hash)
         score = self.ranker.rank(
             SimpleNamespace(
                 prior_tasks=prior_tasks,
@@ -603,7 +603,7 @@ class BoefjeScheduler(Scheduler):
         by checking if the task is still running or not.
         """
         try:
-            task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
             self.logger.warning(
                 "Could not get latest task by hash: %s [task.hash=%s, organisation_id=%s, scheduler_id=%s]",

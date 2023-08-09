@@ -33,8 +33,6 @@ class Scheduler(abc.ABC):
             A dict of connector.Listener instances.
     """
 
-    organisation: models.Organisation
-
     def __init__(
         self,
         ctx: context.AppContext,
@@ -100,12 +98,12 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
-        task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))
+        task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
-            self.ctx.task_store.update_task(task)
+            self.ctx.datastores.task_store.update_task(task)
             return
 
-        self.ctx.task_store.create_task(task)
+        self.ctx.datastores.task_store.create_task(task)
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
@@ -116,7 +114,7 @@ class Scheduler(abc.ABC):
         """
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
-        task = self.ctx.task_store.get_task_by_id(str(p_item.id))
+        task = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task is None:
             self.logger.warning(
                 "Task %s not found in datastore, not updating status [task_id=%s, queue_id=%s]",
@@ -127,7 +125,7 @@ class Scheduler(abc.ABC):
             return None
 
         task.status = models.TaskStatus.DISPATCHED
-        self.ctx.task_store.update_task(task)
+        self.ctx.datastores.task_store.update_task(task)
 
         return None
 
@@ -340,12 +338,12 @@ class Scheduler(abc.ABC):
         self.queue.clear()
 
         # Get all tasks that were on the queue and set them to CANCELLED
-        tasks, _ = self.ctx.task_store.get_tasks(
+        tasks, _ = self.ctx.datastores.task_store.get_tasks(
             scheduler_id=self.scheduler_id,
             status=models.TaskStatus.QUEUED,
         )
         task_ids = [task.id for task in tasks]
-        self.ctx.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
+        self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
 
         self.logger.info("Disabled scheduler: %s", self.scheduler_id)
 

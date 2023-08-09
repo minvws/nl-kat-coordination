@@ -3,10 +3,11 @@ import json
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, queues, repositories, server
+from scheduler import config, models, server, storage
 
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
@@ -15,37 +16,32 @@ from tests.utils import functions
 from tests.utils.functions import create_p_item
 
 
-class MockPriorityQueue(queues.PriorityQueue):
-    def create_hash(self, item: functions.TestModel) -> str:
-        return item.id.hex
-
-
 class APITemplateTestCase(unittest.TestCase):
     def setUp(self):
-        cfg = config.settings.Settings()
-
+        # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = cfg
+        self.mock_ctx.config = config.settings.Settings()
 
-        # Datastore
-        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy(cfg.database_dsn)
-        models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
+        # Database
+        self.dbconn = storage.DBConn(self.mock_ctx.config.database_dsn)
+        models.Base.metadata.create_all(self.dbconn.engine)
+        self.mock_ctx.datastores = SimpleNamespace(
+            **{
+                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+            }
+        )
 
-        self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
-        self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
-
-        self.mock_ctx.pq_store = self.pq_store
-        self.mock_ctx.task_store = self.task_store
-
-        # Scheduler
+        # Organisation
         self.organisation = OrganisationFactory()
 
+        # Queue and Scheduler
         queue = mock_queue.MockPriorityQueue(
             pq_id=self.organisation.id,
             maxsize=10,
             item_type=functions.TestModel,
             allow_priority_updates=True,
-            pq_store=self.pq_store,
+            pq_store=self.mock_ctx.datastores.pq_store,
         )
 
         self.scheduler = mock_scheduler.MockScheduler(
@@ -54,13 +50,12 @@ class APITemplateTestCase(unittest.TestCase):
             queue=queue,
         )
 
+        # API server and Test Client
         self.server = server.Server(self.mock_ctx, {self.scheduler.scheduler_id: self.scheduler})
-
         self.client = TestClient(self.server.api)
 
     def tearDown(self):
-        models.Base.metadata.drop_all(self.mock_ctx.datastore.engine)
-
+        models.Base.metadata.drop_all(self.dbconn.engine)
         self.scheduler.stop()
 
 

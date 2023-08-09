@@ -36,7 +36,7 @@ class NormalizerScheduler(Scheduler):
             maxsize=ctx.config.pq_maxsize,
             item_type=NormalizerTask,
             allow_priority_updates=True,
-            pq_store=ctx.pq_store,
+            pq_store=ctx.datastores.pq_store,
         )
 
         super().__init__(
@@ -297,7 +297,7 @@ class NormalizerScheduler(Scheduler):
         # Get the last tasks that have run or are running for the hash
         # of this particular NormalizerTask.
         try:
-            task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
             self.logger.warning(
                 "Could not get latest task by hash: %s [organisation.id=%s, scheduler_id=%s]",
