@@ -24,7 +24,7 @@ repos:
     hooks:
       - id: rstcheck
         # https://github.com/rstcheck/rstcheck-core/issues/4
-        args: ["--ignore-messages", "Hyperlink target .* is not referenced"]
+        args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid"]
         additional_dependencies: ["rstcheck[sphinx]"]
 
   - repo: https://github.com/MarketSquare/robotframework-tidy
