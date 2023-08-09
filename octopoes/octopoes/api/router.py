@@ -326,6 +326,7 @@ def get_scan_profile_inheritance(
 @router.get("/findings", tags=["Findings"])
 def list_findings(
     exclude_muted: bool = True,
+    only_muted: bool = False,
     offset=DEFAULT_OFFSET,
     limit=DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
@@ -335,6 +336,7 @@ def list_findings(
     return octopoes.ooi_repository.list_findings(
         severities,
         exclude_muted,
+        only_muted,
         offset,
         limit,
         valid_time,

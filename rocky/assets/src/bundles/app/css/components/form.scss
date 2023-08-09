@@ -1,4 +1,7 @@
 /* Added min height for form buttons */
+
+$breakpoint-filter: 60rem;
+
 form {
 	button,
 	a.button,
@@ -6,6 +9,22 @@ form {
 	input[type="submit"],
 	input[type="reset"] {
 		min-height: 2.75rem;
+	}
+
+	.filter-fields-direction {
+		display: flex;
+
+		&.column {
+			flex-direction: column;
+		}
+	}
+
+	@media (min-width:$breakpoint-filter) {
+		.filter-fields-direction {
+			&.row {
+				flex-direction: row;
+			}
+		}
 	}
 }
 
