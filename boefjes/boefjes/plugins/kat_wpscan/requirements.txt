@@ -1,1 +1,0 @@
-wpscan-out-parse==1.9.3
