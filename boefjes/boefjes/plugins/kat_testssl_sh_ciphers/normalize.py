@@ -6,9 +6,9 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.service import TLSCipher
 
 
-def parse_cipher(cipher: str) -> Union[Dict, None]:
-    parts = cipher.split()
-    if len(parts) == 8:
+def parse_cipher(cipher: Dict) -> Union[Dict, None]:
+    if cipher["id"].startswith("cipher-tls"):
+        parts = cipher["finding"].split()
         return {
             parts[0]: {  # parts[0] is the protocol
                 "cipher_suite_code": parts[1],
@@ -29,11 +29,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     tls_dict = {}
     for item in output:
-        cipher = parse_cipher(item["finding"])
+        cipher = parse_cipher(item)
         if cipher:
             for protocol, suite in cipher.items():
                 if protocol not in tls_dict:
                     tls_dict[protocol] = []
                 tls_dict[protocol].append(suite)
-
-    yield TLSCipher(ip_service=input_ooi, suites=tls_dict)
+    if tls_dict:
+        yield TLSCipher(ip_service=input_ooi, suites=tls_dict)
