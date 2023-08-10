@@ -1012,6 +1012,9 @@ pynacl==1.5.0 ; python_version >= "3.8" and python_version < "4.0" \
 pynetdicom==2.0.2 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:231212e9b9c5e0debf2af4f17d8afa14ecd1b262a11cdb891b2b2b15f7ab5939 \
     --hash=sha256:6726173d25a51f66f2a4557d816c0f93b3b2a8435ce3d319e6cdd8e48bf657d5
+pytest-env==0.8.2 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:5e533273f4d9e6a41c3a3120e0c7944aae5674fa773b329f00a5eb1f23c53a38 \
+    --hash=sha256:baed9b3b6bae77bd75b9238e0ed1ee6903a42806ae9d6aeffb8754cd5584d4ff
 pytest==7.4.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:78bf16451a2eb8c7a2ea98e32dc119fd2aa758f1d5d66dbf0a59d69a3969df32 \
     --hash=sha256:b4bf8c45bd59934ed84001ad51e11b4ee40d40a1229d2c79f9c592b0a3f6bd8a
