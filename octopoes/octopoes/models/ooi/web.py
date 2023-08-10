@@ -219,18 +219,24 @@ class ImageMetadata(OOI):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        t = reference.tokenized
-
-        port = f":{t.resource.web_url.port}" if t.resource.web_url.port else ""
         try:
-            netloc = t.resource.web_url.netloc.address
-        except KeyError:
-            netloc = t.resource.web_url.netloc.name
+            t = reference.tokenized
 
-        web_url = f"{t.resource.web_url.scheme}://{netloc}{port}{t.resource.web_url.path}"
-        address = t.resource.website.ip_service.ip_port.address.address
+            port = f":{t.resource.web_url.port}" if t.resource.web_url.port else ""
+            try:
+                netloc = t.resource.web_url.netloc.address
+            except KeyError:
+                netloc = t.resource.web_url.netloc.name
 
-        return f"{web_url} @ {address}"
+            web_url = f"{t.resource.web_url.scheme}://{netloc}{port}{t.resource.web_url.path}"
+            address = t.resource.website.ip_service.ip_port.address.address
+
+            return f"{web_url} @ {address}"
+        except IndexError:
+            # try parsing reference as a HostnameHTTPURL instead
+            tokenized = HostnameHTTPURL.get_tokenized_primary_key(reference.natural_key)
+            port = f":{tokenized.port}" if tokenized.port else ""
+            return f"{tokenized.scheme}://{tokenized.netloc.name}{port}{tokenized.path}"
 
 
 class RESTAPI(OOI):
