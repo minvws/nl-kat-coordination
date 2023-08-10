@@ -14,7 +14,7 @@ SEVERITY_TO_ID = {
 
 
 def get_severity_and_reasons(cipher_suite) -> List[Tuple[str, str]]:
-    with Path.open(Path(__file__).parent / "List-ciphers-openssl-with-finding-type.csv", newline="") as csvfile:
+    with Path.open(Path(__file__).parent / "list-ciphers-openssl-with-finding-type.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         data = [{k.strip(): v.strip() for k, v in row.items()} for row in reader]
 

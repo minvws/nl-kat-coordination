@@ -5,7 +5,7 @@ import docker
 from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
 
-SSL_TEST_IMAGE = "drwetter/testssl.sh"
+SSL_TEST_IMAGE = "drwetter/testssl.sh:3.2"
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
@@ -23,6 +23,5 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     container.wait()
 
     output = get_file_from_container(container, "tmp/output.json")
-    # Do not crash the boefje if the output is known, instead log a warning.
 
     return [(set(), output)]

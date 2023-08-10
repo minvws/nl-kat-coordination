@@ -1,10 +1,9 @@
 {
     "id": "kat_ssl_test_ciphers_normalize",
     "consumes": [
-        "ssl-test-ciphers"
+        "testssl-sh-ciphers"
     ],
     "produces": [
-        "KATFindingType",
-        "Finding"
+        "TLSCipher"
     ]
 }
