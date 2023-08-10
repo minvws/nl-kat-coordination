@@ -60,6 +60,7 @@ fetch:
 # Pull the latest changes from the default upstream
 pull:
 	git pull
+	docker-compose pull
 
 # Upgrade to the latest release without losing persistent data. Usage: `make upgrade version=v1.5.0` (version is optional)
 VERSION?=$(shell curl -sSf "https://api.github.com/repos/minvws/nl-kat-coordination/tags" | jq -r '[.[].name | select(. | contains("rc") | not)][0]')
