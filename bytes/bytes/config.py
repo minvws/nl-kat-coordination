@@ -1,9 +1,11 @@
+import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional, Tuple
 
 from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, PostgresDsn
+from pydantic.env_settings import SettingsSourceCallable
 
 from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
@@ -12,6 +14,40 @@ BASE_DIR: Path = Path(__file__).parent.parent.resolve()
 # Set base dir to something generic when compiling environment docs
 if os.getenv("DOCS"):
     BASE_DIR = Path("../../")
+
+
+class BackwardsCompatibleEnvSettings:
+    backwards_compatibility_mapping = {
+        "SECRET": "BYTES_SECRET",
+        "ACCESS_TOKEN_EXPIRE_MINUTES": "BYTES_ACCESS_TOKEN_EXPIRE_MINUTES",
+        "ENCRYPTION_MIDDLEWARE": "BYTES_ENCRYPTION_MIDDLEWARE",
+        "LOG_CFG": "BYTES_LOG_CFG",
+        "EXT_HASH_REPOSITORY": "BYTES_EXT_HASH_REPOSITORY",
+        "EXT_HASH_SERVICE": "BYTES_EXT_HASH_REPOSITORY",
+        "PASTEBIN_API_DEV_KEY": "BYTES_PASTEBIN_API_DEV_KEY",
+        "HASHING_ALGORITHM": "BYTES_HASHING_ALGORITHM",
+        "KAT_PRIVATE_KEY_B64": "BYTES_PRIVATE_KEY_B64",
+        "VWS_PUBLIC_KEY_B64": "BYTES_PUBLIC_KEY_B64",
+        "RFC3161_PROVIDER": "BYTES_RFC3161_PROVIDER",
+        "RFC3161_CERT_FILE": "BYTES_RFC3161_CERT_FILE",
+    }
+
+    def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
+        env_vars = {k.lower(): v for k, v in os.environ.items()}
+
+        for old_name, new_name in self.backwards_compatibility_mapping.items():
+            old_name, new_name = old_name.lower(), new_name.lower()
+
+            # New variable not explicitly set through env,
+            # ...but old variable has been explicitly set through env
+            if new_name not in env_vars and old_name in env_vars:
+                logging.warning("Deprecation: %s is not valid, use %s instead", old_name.upper(), new_name.upper())
+
+                env_prefix = settings.__config__.env_prefix.lower()
+                d[new_name[len(env_prefix) :]] = env_vars[old_name]
+
+        return d
 
 
 class Settings(BaseSettings):
@@ -90,6 +126,16 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "BYTES_"
+
+        @classmethod
+        def customise_sources(
+            cls,
+            init_settings: SettingsSourceCallable,
+            env_settings: SettingsSourceCallable,
+            file_secret_settings: SettingsSourceCallable,
+        ) -> Tuple[SettingsSourceCallable, ...]:
+            backwards_compatible_settings = BackwardsCompatibleEnvSettings()
+            return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
 
 @lru_cache

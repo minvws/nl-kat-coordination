@@ -1,14 +1,40 @@
+import logging
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional, Tuple
 
 from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
+from pydantic.env_settings import SettingsSourceCallable
 
 BASE_DIR: Path = Path(__file__).parent.parent.parent.resolve()
 
 # Set base dir to something generic when compiling environment docs
 if os.getenv("DOCS"):
     BASE_DIR = Path("../../../")
+
+
+class BackwardsCompatibleEnvSettings:
+    backwards_compatibility_mapping = {
+        "SCHEDULER_RABBITMQ_DSN": "QUEUE_URI",
+        "SCHEDULER_DB_DSN": "SCHEDULER_DB_URI",
+    }
+
+    def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
+        env_vars = {k.lower(): v for k, v in os.environ.items()}
+
+        for old_name, new_name in self.backwards_compatibility_mapping.items():
+            old_name, new_name = old_name.lower(), new_name.lower()
+
+            # New variable not explicitly set through env,
+            # ...but old variable has been explicitly set through env
+            if new_name not in env_vars and old_name in env_vars:
+                logging.warning("Deprecation: %s is not valid, use %s instead", old_name.upper(), new_name.upper())
+
+                env_prefix = settings.__config__.env_prefix.lower()
+                d[new_name[len(env_prefix) :]] = env_vars[old_name]
+
+        return d
 
 
 class Settings(BaseSettings):
@@ -47,9 +73,15 @@ class Settings(BaseSettings):
     )
 
     queue_prefetch_count: int = Field(100)
-    host_mutation: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
-    host_raw_data: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
-    host_normalizer_meta: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
+    host_mutation: AmqpDsn = Field(
+        ..., example="amqp://", description="KAT queue URI for host mutations", env="QUEUE_URI"
+    )
+    host_raw_data: AmqpDsn = Field(
+        ..., example="amqp://", description="KAT queue URI for host raw data", env="QUEUE_URI"
+    )
+    host_normalizer_meta: AmqpDsn = Field(
+        ..., example="amqp://", description="KAT queue URI for host normalizer meta", env="QUEUE_URI"
+    )
 
     # Queue settings (0 is infinite)
     pq_maxsize: int = Field(1000, description="How many items a priority queue can hold")
@@ -76,3 +108,13 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "SCHEDULER_"
+
+        @classmethod
+        def customise_sources(
+            cls,
+            init_settings: SettingsSourceCallable,
+            env_settings: SettingsSourceCallable,
+            file_secret_settings: SettingsSourceCallable,
+        ) -> Tuple[SettingsSourceCallable, ...]:
+            backwards_compatible_settings = BackwardsCompatibleEnvSettings()
+            return env_settings, init_settings, file_secret_settings, backwards_compatible_settings

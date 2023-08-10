@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import logging
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Set
+from typing import Any, Dict, Optional, Set, Tuple
 
 from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field
+from pydantic.env_settings import SettingsSourceCallable
 
 from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -21,6 +23,30 @@ class XTDBType(Enum):
     CRUX = "crux"
     XTDB = "xtdb"
     XTDB_MULTINODE = "xtdb-multinode"
+
+
+class BackwardsCompatibleEnvSettings:
+    backwards_compatibility_mapping = {
+        "LOG_CFG": "OCTOPOES_LOG_CFG",
+        "XTDB_TYPE": "OCTOPOES_XTDB_TYPE",
+    }
+
+    def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
+        env_vars = {k.lower(): v for k, v in os.environ.items()}
+
+        for old_name, new_name in self.backwards_compatibility_mapping.items():
+            old_name, new_name = old_name.lower(), new_name.lower()
+
+            # New variable not explicitly set through env,
+            # ...but old variable has been explicitly set through env
+            if new_name not in env_vars and old_name in env_vars:
+                logging.warning("Deprecation: %s is not valid, use %s instead", old_name.upper(), new_name.upper())
+
+                env_prefix = settings.__config__.env_prefix.lower()
+                d[new_name[len(env_prefix) :]] = env_vars[old_name]
+
+        return d
 
 
 class Settings(BaseSettings):
@@ -56,6 +82,16 @@ class Settings(BaseSettings):
 
     class Config:
         env_prefix = "OCTOPOES_"
+
+        @classmethod
+        def customise_sources(
+            cls,
+            init_settings: SettingsSourceCallable,
+            env_settings: SettingsSourceCallable,
+            file_secret_settings: SettingsSourceCallable,
+        ) -> Tuple[SettingsSourceCallable, ...]:
+            backwards_compatible_settings = BackwardsCompatibleEnvSettings()
+            return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
 
 DEFAULT_SCAN_LEVEL_FILTER = {scan_level for scan_level in ScanLevel}
