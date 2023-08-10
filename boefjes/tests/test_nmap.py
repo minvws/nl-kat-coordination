@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from boefjes.plugins.kat_nmap.main import Protocol, build_nmap_arguments
+from boefjes.plugins.kat_nmap_tcp.main import Protocol, build_nmap_arguments
 
 
 class NmapTest(TestCase):
