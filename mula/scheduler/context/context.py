@@ -66,7 +66,7 @@ class AppContext:
         )
 
         # Datastores, SimpleNamespace allows us to use dot notation
-        dbconn = storage.DBConn(self.config.database_dsn)
+        dbconn = storage.DBConn(self.config.db_dsn)
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(dbconn),

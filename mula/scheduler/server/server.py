@@ -36,9 +36,9 @@ class Server:
         self.api = fastapi.FastAPI()
 
         # Set up OpenTelemetry instrumentation
-        if self.config.span_export_grpc_endpoint is not None:
+        if self.config.host_metrics is not None:
             self.logger.info(
-                "Setting up instrumentation with span exporter endpoint [%s]", self.config.span_export_grpc_endpoint
+                "Setting up instrumentation with span exporter endpoint [%s]", self.config.host_metrics
             )
 
             FastAPIInstrumentor.instrument_app(self.api)
@@ -47,7 +47,7 @@ class Server:
 
             resource = Resource(attributes={SERVICE_NAME: "mula"})
             provider = TracerProvider(resource=resource)
-            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=self.config.span_export_grpc_endpoint))
+            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=self.config.host_metrics))
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 

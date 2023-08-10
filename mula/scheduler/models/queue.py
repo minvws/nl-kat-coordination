@@ -35,6 +35,7 @@ class PrioritizedItem(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 class PrioritizedItemDB(Base):
@@ -68,4 +69,4 @@ class Queue(BaseModel):
     allow_replace: bool
     allow_updates: bool
     allow_priority_updates: bool
-    pq: Optional[List[PrioritizedItem]]
+    pq: Optional[List[PrioritizedItem]] = None

@@ -51,7 +51,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
         self.mock_ctx.services.bytes = self.mock_bytes
 
         # Database
-        self.dbconn = storage.DBConn(self.mock_ctx.config.database_dsn)
+        self.dbconn = storage.DBConn(self.mock_ctx.config.db_dsn)
         models.Base.metadata.create_all(self.dbconn.engine)
         self.mock_ctx.datastores = SimpleNamespace(
             **{

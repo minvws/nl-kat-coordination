@@ -1,11 +1,12 @@
 from pathlib import Path
-from typing import Optional
 
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+    model_config = SettingsConfigDict(env_prefix="SCHEDULER_")
 
     # Application settings
     debug: bool = Field(False, env="SCHEDULER_DEBUG")
@@ -15,30 +16,30 @@ class Settings(BaseSettings):
     )
 
     # Server settings
-    api_host: str = Field("0.0.0.0", env="SCHEDULER_API_HOST")
-    api_port: int = Field(8000, env="SCHEDULER_API_PORT")
+    api_host: str = "0.0.0.0"
+    api_port: int = 8000
 
     # Application settings
-    katalogus_cache_ttl: int = Field(30, env="SCHEDULER_KATALOGUS_CACHE_TTL")
-    monitor_organisations_interval: int = Field(60, env="SCHEDULER_MONITOR_ORGANISATIONS_INTERVAL")
-    octopoes_request_timeout: int = Field(10, env="SCHEDULER_OCTOPOES_REQUEST_TIMEOUT")
-    rabbitmq_prefetch_count: int = Field(100, env="SCHEDULER_RABBITMQ_PREFETCH_COUNT")
+    katalogus_cache_ttl: int = 30
+    monitor_organisations_interval: int = 60
+    octopoes_request_timeout: int = 10
+    rabbitmq_prefetch_count: int = 100
 
     # External services
-    host_katalogus: str = Field(..., env="SCHEDULER_KATALOGUS_URL")
-    host_bytes: str = Field(..., env="SCHEDULER_BYTES_URL")
-    host_bytes_user: str = Field(..., env="SCHEDULER_BYTES_USERNAME")
-    host_bytes_password: str = Field(..., env="SCHEDULER_BYTES_PASSWORD")
-    host_octopoes: str = Field(..., env="SCHEDULER_OCTOPOES_URL")
-    host_mutation: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
-    host_raw_data: str = Field(..., env="SCHEDULER_RABBITMQ_DSN")
-    host_metrics: Optional[str] = Field(None, env="SCHEDULER_METRICS_URL")
+    host_katalogus: str = ""
+    host_bytes: str = ""
+    host_bytes_user: str = ""
+    host_bytes_password: str = ""
+    host_octopoes: str = ""
+    host_mutation: str = ""
+    host_raw_data: str = ""
+    host_metrics: str = ""
 
     # Queue settings (0 is infinite)
-    pq_maxsize: int = Field(1000, env="SCHEDULER_PQ_MAXSIZE")
-    pq_populate_interval: int = Field(60, env="SCHEDULER_PQ_INTERVAL")
-    pq_populate_grace_period: int = Field(86400, env="SCHEDULER_PQ_GRACE")
-    pq_populate_max_random_objects: int = Field(50, env="SCHEDULER_PQ_MAX_RANDOM_OBJECTS")
+    pq_maxsize: int = 1000
+    pq_interval: int = 60
+    pq_grace: int = 86400
+    pq_max_random_objects: int = 50
 
     # Database settings
-    database_dsn: str = Field(..., env="SCHEDULER_DB_DSN")
+    db_dsn: str = ""
