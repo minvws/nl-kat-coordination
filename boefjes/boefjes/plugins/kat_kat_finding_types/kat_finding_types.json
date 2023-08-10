@@ -111,13 +111,6 @@
         "impact": null,
         "recommendation": "Enable support for TLS version 1.2."
     },
-    "KAT-TLS-1.2": {
-      "description": "A minimum TLS 1.2 is required for all legacy systems that can not be upgraded. Efforts must be made to move to the newer TLS version.",
-      "source": null,
-      "risk": "low",
-      "impact": null,
-      "recommendation": "Enable support for TLS version 1.2."
-    },
     "KAT-NO-TLS-1.3": {
         "description": "TLS version 1.3 is not supported. This is a current and recommended protocol that securely encrypts data traffic.",
         "source": null,
@@ -509,13 +502,6 @@
         "risk": "recommendation",
         "impact": null,
         "recommendation": "Ideally to minimize the attack surface as much as possible these panels should not be directly exposed to the internet"
-    },
-    "KAT-UNKNOWN_CIPHERS": {
-          "description": "Ciphers are used that are not found in our list of ciphers. Manually verify that these ciphers are labelled as 'good'",
-          "source": null,
-          "risk": "recommendation",
-          "impact": null,
-          "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
     },
     "KAT-CRITICAL-BAD-CIPHER": {
           "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
