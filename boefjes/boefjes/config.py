@@ -21,6 +21,7 @@ class BackwardsCompatibleEnvSettings:
     def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
         d: Dict[str, Any] = {}
         env_vars = {k.lower(): v for k, v in os.environ.items()}
+        env_prefix = settings.__config__.env_prefix.lower()
 
         for old_name, new_name in self.backwards_compatibility_mapping.items():
             old_name, new_name = old_name.lower(), new_name.lower()
@@ -29,8 +30,6 @@ class BackwardsCompatibleEnvSettings:
             # ...but old variable has been explicitly set through env
             if new_name not in env_vars and old_name in env_vars:
                 logging.warning("Deprecation: %s is not valid, use %s instead", old_name.upper(), new_name.upper())
-
-                env_prefix = settings.__config__.env_prefix.lower()
                 d[new_name[len(env_prefix) :]] = env_vars[old_name]
 
         return d
