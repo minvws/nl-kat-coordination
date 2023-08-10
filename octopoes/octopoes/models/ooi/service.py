@@ -37,7 +37,7 @@ class IPService(OOI):
 
 
 class TLSCipher(OOI):
-    object_type: Literal["IPService"] = "IPService"
+    object_type: Literal["TLSCipher"] = "TLSCipher"
 
     ip_service: Reference = ReferenceField(IPService, max_issue_scan_level=0, max_inherit_scan_level=4)
     suites: Dict
