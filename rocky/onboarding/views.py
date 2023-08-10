@@ -5,7 +5,7 @@ from account.mixins import (
     OrganizationPermissionRequiredMixin,
     OrganizationView,
 )
-from account.views import OOIClearanceManager
+from account.views import OOIClearanceMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -351,7 +351,7 @@ class OnboardingClearanceLevelIntroductionView(
 
 
 class OnboardingAcknowledgeClearanceLevelView(
-    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, OOIClearanceManager
+    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, OOIClearanceMixin
 ):
     template_name = "step_3e_trusted_acknowledge_clearance_level.html"
     permission_required = "tools.can_set_clearance_level"
