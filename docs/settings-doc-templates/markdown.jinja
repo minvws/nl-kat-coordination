@@ -5,7 +5,7 @@
 
 {% else %}{% endif %}## `{{ field.field_info.extra["env_names"]|list|first|upper }}`
 
-*{% if field.required %}*Required*{% else %}Optional{% endif %}*{% if field.default != None %}, default value: `{{ field.default }}`{% endif %}
+*{% if field.required %}*Required*{% else %}Optional{% endif %}* `{{  field.type_.__name__ }}`{% if field.default != None %}, default value: `{{ field.default }}`{% endif %}
 
 {% if field.field_info.description %}
 
