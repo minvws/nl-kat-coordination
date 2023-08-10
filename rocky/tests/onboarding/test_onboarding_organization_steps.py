@@ -166,15 +166,6 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
     assertContains(response, "Trusted clearance level")
     assertContains(response, "Acknowledge clearance level")
     assertContains(response, "What is my clearance level?")
-
-    """ assertContains(
-        response,
-        "Your administrator has trusted you with a clearance level of L"
-        + str(redteam_member.trusted_clearance_level)
-        + ".",
-    ) """
-
-    """ ß """
     assertContains(
         response,
         "Your administrator has <strong>trusted</strong> you with a clearance level of <strong>L"
@@ -187,6 +178,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
         + "</strong>."
     )
     assertContains(response, "Set clearance level")
+
     redteam_member.trusted_clearance_level = 2
     redteam_member.acknowledged_clearance_level = -1
     redteam_member.save()
