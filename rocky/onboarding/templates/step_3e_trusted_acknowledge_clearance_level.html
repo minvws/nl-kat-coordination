@@ -15,11 +15,9 @@
                 <h2>{% translate "Setup scan - OOI clearance for" %} {{ ooi }}</h2>
                 <h3>{% translate "Trusted clearance level" %}</h3>
                 {% blocktranslate %}
-                    The administrators have implemented a trusted clearance level permission,
-                    ensuring that scanning capabilities are restricted to
-                    objects within this trusted clearance level. This precautionary measure helps
-                    maintain a secure environment by limiting their access to sensitive information
-                    beyond the designated threshold.
+                    OpenKAT has a permission system that allows administrators to 
+                    configure which users can set a certain clearance level. The will make sure
+                    that only users that are trusted can start the more aggresive scans.
                 {% endblocktranslate %}
                 <h3>{% translate "Acknowledge clearance level" %}</h3>
                 {% blocktranslate %}
