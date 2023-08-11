@@ -29,8 +29,11 @@ jobs:
         run: pip install -r requirements.txt
         working-directory: ./rocky
 
+      - name: Install Octopoes
+        run: pip install wheel && cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
+
       - name: Generate the .po files if they changed
-        run: mkdir locale && make lang
+        run: SECRET_KEY="whatever" make lang
         working-directory: ./rocky
 
       - name: Check if there are any changed files
