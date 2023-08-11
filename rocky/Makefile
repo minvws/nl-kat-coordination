@@ -52,6 +52,7 @@ export_migrations:
 	python manage.py export_migrations accounts 0001
 
 languages:
+	# Extracts strings to .po files which should be translated
 	python manage.py makemessages --locale nl
 	python manage.py makemessages --locale pap
 
