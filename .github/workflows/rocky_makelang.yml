@@ -30,7 +30,7 @@ jobs:
         working-directory: ./rocky
 
       - name: Generate the .po files if they changed
-        run: make lang
+        run: mkdir locale && make lang
         working-directory: ./rocky
 
       - name: Check if there are any changed files
