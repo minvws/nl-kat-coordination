@@ -16,10 +16,10 @@ SEVERITY_TO_ID = {
 def get_severity_and_reasons(cipher_suite) -> List[Tuple[str, str]]:
     with Path.open(Path(__file__).parent / "list-ciphers-openssl-with-finding-type.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
-        data = [{k.strip(): v.strip() for k, v in row.items()} for row in reader]
+        data = [{k.strip(): v.strip() for k, v in row.items() if k} for row in reader]
 
     # Filter the data for the provided cipher suite
-    cipher_suite_data = [row for row in data if row["\ufeffCipher suite"] == cipher_suite]
+    cipher_suite_data = [row for row in data if row["Cipher suite"] == cipher_suite]
 
     # If the cipher suite is not found, return an empty list
     if not cipher_suite_data:
@@ -67,7 +67,8 @@ def get_highest_severity_and_all_reasons(cipher_suites: Dict) -> Tuple[str, str]
             highest_severity_level = severity_levels.get(severity, 0)
             highest_severity = severity
         # Add all reasons to the list
-        all_reasons.append(reason)
+        if severity in severity_levels:
+            all_reasons.append(reason)
 
     # Join all reasons into a single string, separated by newlines
     all_reasons_str = "\n".join(all_reasons)

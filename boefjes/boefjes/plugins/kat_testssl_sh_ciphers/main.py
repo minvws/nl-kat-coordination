@@ -1,3 +1,4 @@
+import logging
 from ipaddress import ip_address
 from typing import List, Tuple, Union
 
@@ -29,5 +30,10 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     container.wait()
 
     output = get_file_from_container(container, "tmp/output.json")
+
+    try:
+        container.remove()
+    except Exception as e:
+        logging.warning(e)
 
     return [(set(), output)]
