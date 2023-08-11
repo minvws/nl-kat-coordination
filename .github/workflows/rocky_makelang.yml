@@ -25,8 +25,8 @@ jobs:
       - name: Install GNU gettext utilities
         run: sudo apt-get install -y --no-install-recommends gettext
 
-      - name: Install requirements-dev.txt
-        run: pip install -r requirements-dev.txt
+      - name: Install requirements.txt
+        run: pip install -r requirements.txt
         working-directory: ./rocky
 
       - name: Generate the .po files if they changed
