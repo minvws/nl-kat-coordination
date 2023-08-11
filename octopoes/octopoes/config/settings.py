@@ -42,7 +42,7 @@ class BackwardsCompatibleEnvSettings:
             # New variable not explicitly set through env,
             # ...but old variable has been explicitly set through env
             if new_name not in env_vars and old_name in env_vars:
-                logging.warning("Deprecation: %s is not valid, use %s instead", old_name.upper(), new_name.upper())
+                logging.warning("Deprecation: %s is deprecated, use %s instead", old_name.upper(), new_name.upper())
                 d[new_name[len(env_prefix) :]] = env_vars[old_name]
 
         return d
