@@ -1,0 +1,28 @@
+============
+OpenKAT 1.11
+============
+
+A few scripts have been added that make it easier to install, upgrade and debug
+OpenKAT on Debian. See :ref:`Scripts` for more information. Thanks to Rob
+Musquetier for contributing the scripts.
+
+New Features
+============
+
+ *
+
+Bug fixes
+=========
+
+ *
+
+Upgrading
+=========
+
+The normal instructions for upgrading :ref:`Debian packages<Upgrading Debian>`
+or upgrading :ref:`containers <Upgrading_Containers>` should be followed.
+
+Full Changelog
+==============
+
+The full changelog can be found on `Github <https://github.com/minvws/nl-kat-coordination/releases/tag/v1.11.0>`_.
