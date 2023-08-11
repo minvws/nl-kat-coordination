@@ -2,8 +2,8 @@ name: Rocky Check if translations are up to date
 
 on:
   push:
-    paths:
-      - rocky/**
+#    paths:
+#      - rocky/**
   pull_request:
     paths:
       - rocky/**
