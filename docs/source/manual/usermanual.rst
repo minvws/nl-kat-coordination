@@ -162,7 +162,7 @@ Select the organization to which the new users will be added. On the members pag
 .. image:: img/csvupload.png
   :alt: CSV upload page
 
-Download the template file, fill in the data of the users you want to add and upload them into the system. The new users will be added to the organization of your choice. 
+Download the template file, fill in the data of the users you want to add and upload them into the system. The new users will be added to the organization of your choice.
 
 .. image:: img/csvformat.png
   :alt: CSV format
@@ -191,14 +191,14 @@ Through the CSV upload you can add the usertypes client, admin and redteam. Read
 
 Clearance levels are related to the scan level of the Boefjes a user is able to dispatch. Read about this in the `scan level section of the documentation <https://docs.openkat.nl/manual/usermanual.html#scan-levels-and-indemnities>`_.
 
-The trusted_clearance_level is the level a user receives from the organization. It is the maximum level available for this user, based on the decision of the admin or superuser. The acknowledged_clearance_level is the level accepted by the user. Both can be added in the CSV file. The accepted level can be changed by the user. 
+The trusted_clearance_level is the level a user receives from the organization. It is the maximum level available for this user, based on the decision of the admin or superuser. The acknowledged_clearance_level is the level accepted by the user. Both can be added in the CSV file. The accepted level can be changed by the user.
 
 * trusted_clearance_level : between -1 and 4
 * accepted_clearance_level : between -1 and 4
 
 *Warnings*
 
-If the CSV file contains data that cannot be parsed OpenKAT will give a warning with the data concerned. 
+If the CSV file contains data that cannot be parsed OpenKAT will give a warning with the data concerned.
 
 User notification
 *****************
@@ -223,7 +223,6 @@ After the CSV file has been uploaded the users receive a welcome email on their 
 
  Sincerely,
  The OpenKAT team
-
 
 OpenKAT Objects
 ===============
