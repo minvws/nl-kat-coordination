@@ -172,11 +172,11 @@ How should I prepare the CSV file?
 
 CSV files are great when they work. Edit the downloaded template file and use a plain texteditor to make sure your CSV file contains exactly what is needed for its purpose.
 
-Each user wil have its on line in the CSV file. The template has five columns: full_name, email, account_type, trusted_clearance_level, acknowledged_clearance_level.
+Each user will have its on line in the CSV file. The template has five columns: full_name, email, account_type, trusted_clearance_level, acknowledged_clearance_level.
 
 *User details:*
 
-A user is recognized by their full name and email adress.
+A user is recognized by their full name and email address.
 
 * full_name : the full name of the user
 * email : a working emailadress of the user
