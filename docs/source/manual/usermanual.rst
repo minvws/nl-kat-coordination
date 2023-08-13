@@ -149,6 +149,80 @@ User management
 
 Users and organizations can be created in the on boarding flow, in the Web interface or automated. The administrator of the system can create organizations and do user management. The administrator of an organization in turn can create users within the organization. The django interface provides additional capabilities for user management via the command line, for use in an automated deployment and linkage to external user management.
 
+Adding users through a CSV file
+-------------------------------
+
+Adding multiple users at a time to OpenKAT can be done using a CSV file.
+
+How does it work?
+*****************
+
+Select the organization to which the new users will be added. On the members page click the Add member(s) menu and select Upload a CSV. This takes you to the CSV upload page.
+
+.. image:: img/csvupload.png
+  :alt: CSV upload page
+
+Download the template file, fill in the data of the users you want to add and upload them into the system. The new users will be added to the organization of your choice. 
+
+.. image:: img/csvformat.png
+  :alt: CSV format
+
+How should I prepare the CSV file?
+**********************************
+
+CSV files are great when they work. Edit the downloaded template file and use a plain texteditor to make sure your CSV file contains exactly what is needed for its purpose.
+
+Each user wil have its on line in the CSV file. The template has five columns: full_name, email, account_type, trusted_clearance_level, acknowledged_clearance_level.
+
+*User details:*
+
+A user is recognized by their full name and email adress.
+
+* full_name : the full name of the user
+* email : a working emailadress of the user
+
+*User type:*
+
+Through the CSV upload you can add the usertypes client, admin and redteam. Read about users and roles in the `user section of the documentation <https://docs.openkat.nl/manual/usermanual.html#users>`_
+
+* account_type : client, admin or redteam
+
+*User clearance:*
+
+Clearance levels are related to the scan level of the Boefjes a user is able to dispatch. Read about this in the `scan level section of the documentation <https://docs.openkat.nl/manual/usermanual.html#scan-levels-and-indemnities>`_.
+
+The trusted_clearance_level is the level a user receives from the organization. It is the maximum level available for this user, based on the decision of the admin or superuser. The acknowledged_clearance_level is the level accepted by the user. Both can be added in the CSV file. The accepted level can be changed by the user. 
+
+* trusted_clearance_level : between -1 and 4
+* accepted_clearance_level : between -1 and 4
+
+*Warnings*
+
+If the CSV file contains data that cannot be parsed OpenKAT will give a warning with the data concerned. 
+
+User notification
+*****************
+
+After the CSV file has been uploaded the users receive a welcome email on their account. The link in this email allows them to create a password for their account.
+
+::
+
+ Content-Type: text/plain; charset="utf-8"
+ MIME-Version: 1.0
+ Content-Transfer-Encoding: 7bit
+ Subject: Verify OpenKAT account on localhost:8000
+ From:
+ To: a@bbbb.dl
+ Date: Thu, 20 Jul 2023 13:34:32 -0000
+ Message-ID: <168986007241.76.14464090403674779824@af745d470510>
+
+ Welcome to OpenKAT. You're receiving this email because you have been added to organization "test" at localhost:8000.
+ Please go to the following page and choose a new password:
+
+  http://localhost:8000/en/reset/MTY/brn1pk-914a9d550dbb2a5b0269c85f6b667e21/
+
+ Sincerely,
+ The OpenKAT team
 
 
 OpenKAT Objects
