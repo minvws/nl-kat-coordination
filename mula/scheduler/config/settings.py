@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, PostgresDsn
 from pydantic.env_settings import SettingsSourceCallable
 
 BASE_DIR: Path = Path(__file__).parent.parent.parent.resolve()
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
 
     # Server settings
-    api_host: IPvAnyAddress = Field("0.0.0.0", description="Host address of the scheduler api server")
+    api_host: str = Field("0.0.0.0", description="Host address of the scheduler api server")
     api_port: int = Field(8000, description="Host api server port")
 
     # Application settings
