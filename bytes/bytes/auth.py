@@ -26,8 +26,8 @@ class TokenResponse(BaseModel):
 
 def get_access_token(form_data: OAuth2PasswordRequestForm) -> Tuple[str, datetime]:
     settings = get_settings()
-    system_username = settings.bytes_username
-    hashed_password = pwd_context.hash(settings.bytes_password)
+    system_username = settings.username
+    hashed_password = pwd_context.hash(settings.password)
 
     authenticated = form_data.username == system_username and pwd_context.verify(form_data.password, hashed_password)
 

@@ -18,7 +18,7 @@ from tests.utils import functions
 class PriorityQueueTestCase(unittest.TestCase):
     def setUp(self) -> None:
         cfg = config.settings.Settings()
-        self.datastore = sqlalchemy.SQLAlchemy(cfg.database_dsn)
+        self.datastore = sqlalchemy.SQLAlchemy(cfg.db_uri)
         Base.metadata.create_all(self.datastore.engine)
 
         self.pq_store = sqlalchemy.PriorityQueueStore(datastore=self.datastore)
