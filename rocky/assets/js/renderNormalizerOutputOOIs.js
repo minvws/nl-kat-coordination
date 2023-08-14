@@ -49,11 +49,13 @@ buttons.forEach((button) => {
       getJson(json_url, function(data) {
         if(data.length > 0) {
           const url = location.pathname.replace('/tasks/normalizers', '');
+          let object_list = "";
 
           // Build HTML snippet for every yielded object.
           data.forEach(object => {
-            element.innerHTML = "<a href='" + url + "/objects/detail/?ooi_id=" + encodeURIComponent(object) +"'>" + object + "</a>";
+            object_list += "<a href='" + url + "/objects/detail/?ooi_id=" + encodeURIComponent(object) +"'>" + object + "</a>";
           });
+          element.innerHTML = object_list;
         } else {
           element.innerText = "Normalizer task yielded no objects.";
         }

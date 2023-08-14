@@ -102,13 +102,11 @@ class TaskListView(OrganizationView, ListView):
             task_id = self.request.POST.get("task_id")
             task = client.get_task_details(task_id)
 
-            new_id = (
-                uuid.uuid4().hex
-            )  # TODO: Consistent UUI-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
+            # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
+            new_id = uuid.uuid4().hex
 
-            p_item = task.p_item
-            p_item.id = new_id
-            p_item.data.id = new_id
+            task.p_item.id = new_id
+            task.p_item.data.id = new_id
 
             client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
 
