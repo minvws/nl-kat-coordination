@@ -88,6 +88,7 @@ class OOIReportPDFView(SingleOOITreeMixin):
                 self.ooi.object_type,
                 self.ooi.human_readable,
                 self.tree.store,
+                "bevindingenrapport",
             )
         except GeneratingReportFailed:
             messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
@@ -117,10 +118,11 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
         reports_service = ReportsService(keiko_client)
 
         try:
-            report = reports_service.get_organization_finding_report(
+            report = reports_service.get_organization_report(
                 self.get_observed_at(),
                 self.organization.name,
                 generate_findings_metadata(findings, severities),
+                "bevindingenrapport",
             )
         except GeneratingReportFailed:
             messages.error(request, _("Generating report failed. See Keiko logs for more information."))
