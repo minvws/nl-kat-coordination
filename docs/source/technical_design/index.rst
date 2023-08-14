@@ -10,11 +10,13 @@ Contains documentation for developers and contributors.
    install
    containers
    debianinstall
+   scripts
    hardening
    localinstall
    gitpod
    nginx
    debuggingtroubleshooting
    latex
+   environment_settings/index
    externalauthentication
    cveapi
