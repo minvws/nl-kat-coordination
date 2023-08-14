@@ -290,8 +290,9 @@ class OnboardingSetupScanOOIDetailView(
                 self.request,
                 messages.ERROR,
                 _(
-                    "Could not raise clearance level of %s to L%s. \
-                You acknowledged a clearance level of %s."
+                    "Could not raise clearance level of %s to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Contact your administrator to receive a higher clearance."
                 )
                 % (
                     ooi.reference.human_readable,
@@ -351,7 +352,11 @@ class OnboardingClearanceLevelIntroductionView(
 
 
 class OnboardingAcknowledgeClearanceLevelView(
-    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, OOIClearanceMixin
+    OrganizationPermissionRequiredMixin,
+    KatIntroductionStepsMixin,
+    OnboardingBreadcrumbsMixin,
+    OOIClearanceMixin,
+    TemplateView,
 ):
     template_name = "step_3e_trusted_acknowledge_clearance_level.html"
     permission_required = "tools.can_set_clearance_level"

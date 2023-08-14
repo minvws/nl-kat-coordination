@@ -30,11 +30,13 @@
                 {% endblocktranslate %}
                 <h3>{% translate "What is my clearance level?" %}</h3>
                 {% with tcl=organization_member.trusted_clearance_level acl=organization_member.acknowledged_clearance_level %}
-                    {% if tcl < dns_report_least_clearance_level and tcl < 0 %}
+                    {% if tcl < dns_report_least_clearance_level or tcl < 0 %}
                         <p>
                             {% blocktranslate %}
                                 Unfortunately you cannot continue the onboarding. </br>
-                                You don't have enough clearance to scan <strong>{{ooi}}</strong>
+                                Your administrator has trusted you with a clearance level of <strong>L{{tcl}}</strong>.</br>
+                                You need at least a clearance level of <strong>L{{dns_report_least_clearance_level}}</strong> to scan <strong>{{ ooi }}</strong></br>
+                                Contact your administrator to receive a higher clearance.
                             {% endblocktranslate %}
                         </p>
                         <a href="{% url "complete_onboarding" organization.code %}"
