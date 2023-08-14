@@ -7,11 +7,17 @@ import requests
 
 
 class Connector:
+    """A class that provides methods to check if a host is available and healthy."""
+
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def is_host_available(self, hostname: str, port: int) -> bool:
         """Check if the host is available.
+
+        Args:
+            hostname: A string representing the hostname.
+            port: An integer representing the port number.
 
         Returns:
             A boolean
@@ -24,6 +30,10 @@ class Connector:
 
     def is_host_healthy(self, host: str, health_endpoint: str) -> bool:
         """Check if host is healthy by inspecting the host's health endpoint.
+
+        Args:
+            host: A string representing the hostname.
+            health_endpoint: A string representing the health endpoint.
 
         Returns:
             A boolean
