@@ -2,11 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-24 14:55+0000\n"
+"POT-Creation-Date: 2023-08-14 07:26+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/nl/>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -62,12 +62,6 @@ msgstr "Kies een ander emailadres."
 #: account/forms/account_setup.py:87 tools/forms/settings.py:12
 msgid "--- Please select one of the available options ----"
 msgstr "--- Selecteer één van de beschikbare opties ---"
-
-#: account/forms/account_setup.py:177
-#: build/lib/account/forms/account_setup.py:178
-#: rocky/templates/organizations/organization_member_list.html:35
-msgid "Assigned clearance level"
-msgstr "Toegewezen vrijwaringsniveau"
 
 #: account/forms/account_setup.py:94
 #, fuzzy
@@ -4375,7 +4369,7 @@ msgstr "Status"
 
 #: rocky/templates/organizations/organization_member_list.html:44
 msgid "Assigned clearance level"
-msgstr "Toegewezen vrijwaring niveau"
+msgstr "Toegewezen vrijwaringsniveau"
 
 #: rocky/templates/organizations/organization_member_list.html:60
 msgid "Super user"
