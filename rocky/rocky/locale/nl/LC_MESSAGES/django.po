@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-14 12:56+0000\n"
+"POT-Creation-Date: 2023-08-14 15:52+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -431,14 +431,17 @@ msgstr ""
 "vrijgaveniveaus niet meer kunt wijzigen als u dat doet."
 
 #: account/templates/account_detail.html:80
+#, python-format
 msgid ""
 "\n"
 "                            \"Withdraw acceptance of level L%(acl)s "
 "clearance and responsibility\"\n"
 "                    "
 msgstr ""
-"\"Acceptatie van niveau L%(acl)s goedkeuring en verantwoordelijkheid "
-"intrekken\""
+"\n"
+"                            \"Acceptatie van niveau L%(acl)s "
+"goedkeuring en verantwoordelijkheid intrekken\"\n"
+"                    "
 
 #: account/templates/account_detail.html:88
 msgid "Explanation OOI clearance"
@@ -458,6 +461,7 @@ msgstr ""
 "</strong>"
 
 #: account/templates/account_detail.html:96
+#, python-format
 msgid ""
 "\n"
 "                        \"Accept level L%(tcl)s clearance and "
@@ -679,10 +683,11 @@ msgid ""
 "Welcome to OpenKAT. You're receiving this email because you have been added "
 "to organization \"%(organization)s\" at %(site_name)s."
 msgstr ""
-"Welkom bij OpenKAT. U ontvangt deze e-mail omdat u bent toegevoegd "
-"aan organisatie \"%(organisatie)s\" op %(site_name)s."
+"Welkom bij OpenKAT. U ontvangt deze e-mail omdat u bent toegevoegd aan "
+"organisatie \"%(organisatie)s\" op %(site_name)s."
 
 #: account/templates/registration_subject.txt:2
+#, python-format
 msgid "Verify OpenKAT account on %(site_name)s"
 msgstr "Verifieer OpenKAT-account op %(site_name)s"
 
@@ -2292,16 +2297,19 @@ msgid "Scanning has failed to start."
 msgstr "Het starten van de scan is gefaald."
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:31
+#, python-brace-format
 msgid "Boefje '{boefje_id}' disabled."
 msgstr "Boefje '{boefje_id}' uitgezet."
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:41
+#, python-brace-format
 msgid "Failed fetching settings for boefje {boefje_id}. Is the Katalogus up?"
 msgstr ""
 "Ophalen van instellingen voor boefje {boefje_id} mislukt. Is de Katalogus "
 "actief?"
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:60
+#, python-brace-format
 msgid ""
 "Before enabling, please set the required settings for boefje '{boefje_id}'."
 msgstr ""
@@ -2309,6 +2317,7 @@ msgstr ""
 "instellingen."
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:77
+#, python-brace-format
 msgid "Boefje '{boefje_id}' enabled."
 msgstr "Boefje '{boefje_id}' aangezet."
 
@@ -3254,10 +3263,10 @@ msgid ""
 "On the object detail page you can always change the clearance level. For the "
 "onboarding we will suggest to set the clearance level to L2."
 msgstr ""
-"Na het maken van een nieuw object zal OpenKAT u vragen een vrijwaring niveau in "
-"te stellen. Op de objectdetailpagina kunt u altijd het vrijwaring niveau "
-"wijzigen. Voor de onboarding stellen wij voor het vrijwaring niveau op L2 "
-"te zetten."
+"Na het maken van een nieuw object zal OpenKAT u vragen een vrijwaring niveau "
+"in te stellen. Op de objectdetailpagina kunt u altijd het vrijwaring niveau "
+"wijzigen. Voor de onboarding stellen wij voor het vrijwaring niveau op L2 te "
+"zetten."
 
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:67
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:70
@@ -3854,12 +3863,14 @@ msgstr ""
 "bij organisatie %s."
 
 #: katalogus/views/mixins.py:126 rocky/views/scan_profile.py:64
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een vrijwaring niveau bevestigd "
-"van L%s. Neem contact op met uw beheerder om je vrijwaring niveau te verhogen."
+"Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een vrijwaring "
+"niveau bevestigd van L%s. Neem contact op met uw beheerder om je vrijwaring "
+"niveau te verhogen."
 
 #: katalogus/views/plugin_detail.py:143
 msgid ""
@@ -3875,24 +3886,24 @@ msgstr "Selecteer een OOI om de scan te starten."
 
 #: katalogus/views/plugin_enable_disable.py:30
 msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_id}' uitgezet."
+msgstr "Boefje '{boefje_name}' uitgezet."
 
 #: katalogus/views/plugin_enable_disable.py:40
 msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
 msgstr ""
-"Ophalen van instellingen voor boefje {boefje_id} mislukt. Is de Katalogus "
+"Ophalen van instellingen voor boefje {boefje_name} mislukt. Is de Katalogus "
 "actief?"
 
 #: katalogus/views/plugin_enable_disable.py:59
 msgid ""
 "Before enabling, please set the required settings for boefje '{boefje_name}'."
 msgstr ""
-"Voordat je '{boefje_id}' inschakeld, zet alsjeblieft de verplichte "
+"Voordat je '{boefje_name}' inschakeld, zet alsjeblieft de verplichte "
 "instellingen."
 
 #: katalogus/views/plugin_enable_disable.py:76
 msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_id}' aangezet."
+msgstr "Boefje '{boefje_name}' aangezet."
 
 #: katalogus/views/plugin_settings_add.py:44
 msgid "No changes to the settings added: no form data present"
@@ -3952,8 +3963,9 @@ msgid ""
 msgstr ""
 "\n"
 "OpenKAT heeft een toestemmingssysteem dat administrators in staat stelt om "
-"te configureren welke gebruikers een bepaald vrijwaring niveau kunnen instellen. "
-"Dit zorgt ervoor dat alleen gebruikers die vertrouwd zijn, de meer agressieve scans kunnen starten."
+"te configureren welke gebruikers een bepaald vrijwaring niveau kunnen "
+"instellen. Dit zorgt ervoor dat alleen gebruikers die vertrouwd zijn, de "
+"meer agressieve scans kunnen starten."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:22
 msgid "Acknowledge clearance level"
@@ -3977,12 +3989,15 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"Voordat een lid de mogelijkheid krijgt om vrijwaring niveaus voor een object in te stellen, "
-"moeten ze eerst het vrijwaring niveau dat door de beheerders is ingesteld, erkennen en accepteren. "
-"Het maximale scan-niveau dat voor een lid is toegestaan, is afgestemd op het vertrouwde vrijwaring niveau. "
-"Door het erkennen van het vertrouwde vrijwaring niveau stemt dit lid formeel in met het naleven van deze toestemming "
-"en krijgt het de mogelijkheid om scans uit te voeren tot alleen dit vertrouwde vrijwaring niveau. "
-"Dit tweestapsproces zorgt ervoor dat het lid binnen geautoriseerde grenzen opereert."
+"Voordat een lid de mogelijkheid krijgt om vrijwaring niveaus voor een object "
+"in te stellen, moeten ze eerst het vrijwaring niveau dat door de beheerders "
+"is ingesteld, erkennen en accepteren. Het maximale scan-niveau dat voor een "
+"lid is toegestaan, is afgestemd op het vertrouwde vrijwaring niveau. Door "
+"het erkennen van het vertrouwde vrijwaring niveau stemt dit lid formeel in "
+"met het naleven van deze toestemming en krijgt het de mogelijkheid om scans "
+"uit te voeren tot alleen dit vertrouwde vrijwaring niveau. Dit "
+"tweestapsproces zorgt ervoor dat het lid binnen geautoriseerde grenzen "
+"opereert."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:31
 msgid "What is my clearance level?"
@@ -4004,13 +4019,18 @@ msgid ""
 "                            "
 msgstr ""
 "\n"
-"Helaas kun je het onboarding niet voortzetten. "
-"</br>\nJe beheerder heeft je een vrijwaring niveau van <strong>L%(tcl)s</strong> toegewezen."
-"</br>\nJe hebt minimaal een vrijwaring niveau van <strong>L%(dns_report_least_clearance_level)s</strong> "
-"nodig om <strong>%(ooi)s</strong> te scannen.</br>\nNeem contact op met je beheerder om een hoger vrijwaring niveau "
-"te verkrijgen.\n"
+"Helaas kun je het onboarding niet voortzetten. </br>\n"
+"Je beheerder heeft je een vrijwaring niveau van <strong>L%(tcl)s</strong> "
+"toegewezen.</br>\n"
+"Je hebt minimaal een vrijwaring niveau van "
+"<strong>L%(dns_report_least_clearance_level)s</strong> nodig om "
+"<strong>%(ooi)s</strong> te scannen.</br>\n"
+"Neem contact op met je beheerder om een hoger vrijwaring niveau te "
+"verkrijgen.\n"
+"                            "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:46
+#, python-format
 msgid ""
 "\n"
 "                            Your administrator has trusted you with a "
@@ -4022,11 +4042,11 @@ msgstr ""
 "\n"
 "                            Uw beheerder heeft u toevertrouwd met een "
 "vrijwaring niveau van <strong>L%(tcl)s</strong>.</br>\n"
-" U moet dit vrijwaring niveau eerst accepteren om "
-"verder te gaan.\n"
+" U moet dit vrijwaring niveau eerst accepteren om verder te gaan.\n"
 "                            "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:51
+#, python-format
 msgid ""
 "\n"
 "                            Accept level L%(tcl)s clearance and "
@@ -4035,9 +4055,10 @@ msgid ""
 msgstr ""
 "\n"
 " Accepteer vrijwaring niveau L%(tcl)s en verantwoordelijkheid\n"
-
+"                        "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:60
+#, python-format
 msgid ""
 "\n"
 "                            Your administrator has <strong>trusted</strong> "
@@ -4047,10 +4068,10 @@ msgid ""
 "                            "
 msgstr ""
 "\n"
-" Uw beheerder heeft u <strong>toevertrouwd</strong> "
-"met een vrijwaring niveau van <strong>L%(tcl)s</strong>.</br>\n"
-" U heeft ook <strong>bevestigd</strong> om "
-"dit vrijwaring niveau van <strong>L%(acl)s</strong> te gebruiken.\n"
+" Uw beheerder heeft u <strong>toevertrouwd</strong> met een vrijwaring "
+"niveau van <strong>L%(tcl)s</strong>.</br>\n"
+" U heeft ook <strong>bevestigd</strong> om dit vrijwaring niveau van "
+"<strong>L%(acl)s</strong> te gebruiken.\n"
 " "
 
 #: onboarding/templates/step_3f_set_clearance_level.html:15
@@ -4058,16 +4079,17 @@ msgid "Setup scan - Set clearance level for"
 msgstr "Opzet scan - Zet vrijwaring niveau voor"
 
 #: onboarding/templates/step_3f_set_clearance_level.html:17
+#, python-format
 msgid ""
 "After creating a new object OpenKAT will ask you to set a clearance level. "
 "On the object detail page you can always change the clearance level. For the "
 "onboarding we will suggest to set the clearance level to "
 "L%(dns_report_least_clearance_level)s."
 msgstr ""
-"Na het maken van een nieuw object zal OpenKAT u vragen een vrijwaring niveau in "
-"te stellen. Op de objectdetailpagina kunt u altijd het vrijwaring niveau "
-"wijzigen. Voor de onboarding stellen wij voor het vrijwaring niveau op L%(dns_report_least_clearance_level)s."
-"te zetten."
+"Na het maken van een nieuw object zal OpenKAT u vragen een vrijwaring niveau "
+"in te stellen. Op de objectdetailpagina kunt u altijd het vrijwaring niveau "
+"wijzigen. Voor de onboarding stellen wij voor het vrijwaring niveau op "
+"L%(dns_report_least_clearance_level)s.te zetten."
 
 #: onboarding/views.py:278
 #, python-format
@@ -4075,8 +4097,8 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                 "
 "Indemnification not present at organization %s."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s. Vrijwaring niet aanwezig "
-"bij organisatie %s."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s. Vrijwaring niet "
+"aanwezig bij organisatie %s."
 
 #: onboarding/views.py:293
 msgid ""
@@ -4084,8 +4106,8 @@ msgid ""
 "level of L{}. Contact your administrator to receive a higher clearance."
 msgstr ""
 "Het was niet mogelijk om het vrijwaring niveau van {} te verhogen naar L{}. "
-"Je hebt een vrijwaring niveau van L{} erkend. Neem contact op met je beheerder "
-"om een hoger vrijwaring niveau te verkrijgen."
+"Je hebt een vrijwaring niveau van L{} erkend. Neem contact op met je "
+"beheerder om een hoger vrijwaring niveau te verkrijgen."
 
 #: tools/forms/findings.py:14
 msgid "Filter by severity"
@@ -5646,9 +5668,9 @@ msgid ""
 "needs at least a clearance level of L{} in order to do a proper onboarding. "
 "Edit this member and change the clearance level if necessary."
 msgstr ""
-"Je hebt dit lid vertrouwd met een vrijwaring niveau van L{}. "
-"Dit lid heeft minimaal een vrijwaring niveau van L{} nodig om een correcte onboarding "
-"uit te voeren. Bewerk dit lid en wijzig indien nodig het vrijwaring niveau."
+"Je hebt dit lid vertrouwd met een vrijwaring niveau van L{}. Dit lid heeft "
+"minimaal een vrijwaring niveau van L{} nodig om een correcte onboarding uit "
+"te voeren. Bewerk dit lid en wijzig indien nodig het vrijwaring niveau."
 
 #: rocky/settings.py:379
 msgid "Blue light"
@@ -7710,12 +7732,14 @@ msgstr ""
 "organisatie %s."
 
 #: rocky/views/ooi_list.py:105
+#, python-format
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau "
-"bevestigd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring te krijgen."
+"bevestigd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring "
+"te krijgen."
 
 #: rocky/views/ooi_list.py:116 rocky/views/ooi_list.py:123
 msgid "An error occurred while saving clearance levels."
@@ -7865,6 +7889,7 @@ msgid "Invalid data for: '{email}'"
 msgstr "Ongeldige gegevens voor: '{email}'"
 
 #: rocky/views/organization_member_add.py:203
+#, python-brace-format
 msgid "Invalid email address: '{email}'"
 msgstr "Ongeldig e-mailadres: '{email}'"
 

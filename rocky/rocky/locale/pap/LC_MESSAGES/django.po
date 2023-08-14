@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-14 12:56+0000\n"
+"POT-Creation-Date: 2023-08-14 15:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -406,9 +406,9 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-" Bo no tin ningun nivel di autorisashon pa skan ophetonan."
-"<br>\n"
-" Tuma kontakto ku e administradó pa duna bo e nivel di autorisashon nesesario.\n"
+" Bo no tin ningun nivel di autorisashon pa skan ophetonan.<br>\n"
+" Tuma kontakto ku e administradó pa duna bo e nivel di autorisashon "
+"nesesario.\n"
 " "
 
 #: account/templates/account_detail.html:73
@@ -428,6 +428,7 @@ msgstr ""
 "di autorisashon mas ora bo hasi esaki."
 
 #: account/templates/account_detail.html:80
+#, python-format
 msgid ""
 "\n"
 "                            \"Withdraw acceptance of level L%(acl)s "
@@ -435,8 +436,7 @@ msgid ""
 "                    "
 msgstr ""
 "\n"
-"\"Retirá aseptashon di nivel di autorisashon L%(acl)s "
-"i responsabilidat\"\n"
+"\"Retirá aseptashon di nivel di autorisashon L%(acl)s i responsabilidat\"\n"
 " "
 
 #: account/templates/account_detail.html:88
@@ -457,6 +457,7 @@ msgstr ""
 "gran responsabilidat.</strong>"
 
 #: account/templates/account_detail.html:96
+#, python-format
 msgid ""
 "\n"
 "                        \"Accept level L%(tcl)s clearance and "
@@ -464,8 +465,7 @@ msgid ""
 "                    "
 msgstr ""
 "\n"
-"\"Aseptá nivel di autorisashon L%(tcl)s i "
-"responsabilidat\"\n"
+"\"Aseptá nivel di autorisashon L%(tcl)s i responsabilidat\"\n"
 " "
 
 #: account/templates/login.html:10 build/lib/account/templates/login.html:8
@@ -670,6 +670,7 @@ msgid "Back to login"
 msgstr "Bèk na login"
 
 #: account/templates/registration_email.html:4
+#, python-format
 msgid ""
 "Welcome to OpenKAT. You're receiving this email because you have been added "
 "to organization \"%(organization)s\" at %(site_name)s."
@@ -678,6 +679,7 @@ msgstr ""
 "na organisashon \"%(organization)s\" na %(site_name)s."
 
 #: account/templates/registration_subject.txt:2
+#, python-format
 msgid "Verify OpenKAT account on %(site_name)s"
 msgstr "Verifiká kuenta di OpenKAT riba %(site_name)s"
 
@@ -2282,18 +2284,24 @@ msgid "Scanning has failed to start."
 msgstr "Skèn a faya pa start."
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:31
+#, python-brace-format
 msgid "Boefje '{boefje_id}' disabled."
 msgstr "Boefje '{boefje_id}' desaktivá."
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:41
+#, python-brace-format
 msgid "Failed fetching settings for boefje {boefje_id}. Is the Katalogus up?"
-msgstr "Faya den buskamentu di ajustenan pa boefje {boefje_id}. Katalogus ta sende?"
+msgstr ""
+"Faya den buskamentu di ajustenan pa boefje {boefje_id}. Katalogus ta sende?"
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:60
-msgid "Before enabling, please set the required settings for boefje '{boefje_id}'."
+#, python-brace-format
+msgid ""
+"Before enabling, please set the required settings for boefje '{boefje_id}'."
 msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_id}'."
 
 #: build/lib/katalogus/views/plugin_enable_disable.py:77
+#, python-brace-format
 msgid "Boefje '{boefje_id}' enabled."
 msgstr "Boefje '{boefje_id}' aktivá."
 
@@ -3239,9 +3247,10 @@ msgid ""
 "On the object detail page you can always change the clearance level. For the "
 "onboarding we will suggest to set the clearance level to L2."
 msgstr ""
-"Despues di krea un opheto nobo, OpenKAT lo puntra bo pa pone un nivel di autorisashon. "
-"Na e página di detaye di e opheto, bo por kambia e nivel di autorisashon semper. Pa e "
-"proceso di adaptashon nos lo sugeri pa pone e nivel di autorisashon na L2."
+"Despues di krea un opheto nobo, OpenKAT lo puntra bo pa pone un nivel di "
+"autorisashon. Na e página di detaye di e opheto, bo por kambia e nivel di "
+"autorisashon semper. Pa e proceso di adaptashon nos lo sugeri pa pone e "
+"nivel di autorisashon na L2."
 
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:67
 #: build/lib/onboarding/templates/step_3d_set_clearance_level.html:70
@@ -3840,12 +3849,14 @@ msgstr ""
 "presente na organisashon %s."
 
 #: katalogus/views/mixins.py:126 rocky/views/scan_profile.py:64
+#, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "No por subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di "
-"autorisashon di L%s. Tuma kontakto ku bo administrator pa risibí un nivel di autorisashon mas haltu."
+"autorisashon di L%s. Tuma kontakto ku bo administrator pa risibí un nivel di "
+"autorisashon mas haltu."
 
 #: katalogus/views/plugin_detail.py:143
 msgid ""
@@ -3861,20 +3872,21 @@ msgstr "Por fabor, selekshoná un OOI pa kuminsá skan."
 
 #: katalogus/views/plugin_enable_disable.py:30
 msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_id}' desaktivá."
+msgstr "Boefje '{boefje_name}' desaktivá."
 
 #: katalogus/views/plugin_enable_disable.py:40
 msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
 msgstr ""
-"Faya den buskamentu di ajustenan pa boefje {boefje_id}. Katalogus ta sende?"
+"Faya den buskamentu di ajustenan pa boefje {boefje_name}. Katalogus ta sende?"
 
 #: katalogus/views/plugin_enable_disable.py:59
-msgid "Before enabling, please set the required settings for boefje '{boefje_name}'."
-msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_id}'."
+msgid ""
+"Before enabling, please set the required settings for boefje '{boefje_name}'."
+msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_name}'."
 
 #: katalogus/views/plugin_enable_disable.py:76
 msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_id}' aktivá."
+msgstr "Boefje '{boefje_name}' aktivá."
 
 #: katalogus/views/plugin_settings_add.py:44
 msgid "No changes to the settings added: no form data present"
@@ -3934,8 +3946,10 @@ msgid ""
 msgstr ""
 "\n"
 "OpenKAT tin un sistema di permiso ku ta laga administratornan\n"
-"configure kua usuarionan por pone un nivel di autorisashon determiná. Esaki lo segurá\n"
-"ku solamente usuarionan ku ta konfiable por inisiá e skaneonan mas agresivo.\n"
+"configure kua usuarionan por pone un nivel di autorisashon determiná. Esaki "
+"lo segurá\n"
+"ku solamente usuarionan ku ta konfiable por inisiá e skaneonan mas "
+"agresivo.\n"
 " "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:22
@@ -3960,12 +3974,18 @@ msgid ""
 "                "
 msgstr ""
 "\n"
-"Promé ku un miembro ta otorgá e habilidat pa pone nivelnan di autorisashon riba un opheto,\n"
-"promé nan mester reconosé i aseptá e nivel di autorisashon poni pa e administratornan.\n"
-"E nivel máksimo di skaneo permití pa un miembro ta aliná ku e nivel di autorisashon konfiable.\n"
-"Pa reconosé e nivel di autorisashon konfiable, e miembro aki formalmente ta akordá pa kumpli ku\n"
-"e permiso aki i ta haña e kapasidat pa realizá skaneonan solamente te na e nivel di autorisashon konfiable aki.\n"
-"E proheso di dos pason aki ta garantisá ku e miembro ta operá den fronteranan autorisá.\n"
+"Promé ku un miembro ta otorgá e habilidat pa pone nivelnan di autorisashon "
+"riba un opheto,\n"
+"promé nan mester reconosé i aseptá e nivel di autorisashon poni pa e "
+"administratornan.\n"
+"E nivel máksimo di skaneo permití pa un miembro ta aliná ku e nivel di "
+"autorisashon konfiable.\n"
+"Pa reconosé e nivel di autorisashon konfiable, e miembro aki formalmente ta "
+"akordá pa kumpli ku\n"
+"e permiso aki i ta haña e kapasidat pa realizá skaneonan solamente te na e "
+"nivel di autorisashon konfiable aki.\n"
+"E proheso di dos pason aki ta garantisá ku e miembro ta operá den "
+"fronteranan autorisá.\n"
 " "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:31
@@ -3989,13 +4009,17 @@ msgid ""
 msgstr ""
 "\n"
 " Desafortunadamente bo no por sigui ku e proceso di onboarding. </br>\n"
-" Bo administrator a konfia bo ku un nivel di autorisashon di <strong>L%(tcl)s</strong>.</br>\n"
-" Bo mester tin almenos un nivel di autorisashon di <strong>L%(dns_report_least_clearance_level)s</strong> pa skaneá\n"
+" Bo administrator a konfia bo ku un nivel di autorisashon di "
+"<strong>L%(tcl)s</strong>.</br>\n"
+" Bo mester tin almenos un nivel di autorisashon di "
+"<strong>L%(dns_report_least_clearance_level)s</strong> pa skaneá\n"
 " <strong>%(ooi)s</strong></br>\n"
-" Tuma kontakto ku bo administrator pa risibí un nivel di autorisashon mas haltu.\n"
+" Tuma kontakto ku bo administrator pa risibí un nivel di autorisashon mas "
+"haltu.\n"
 " "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:46
+#, python-format
 msgid ""
 "\n"
 "                            Your administrator has trusted you with a "
@@ -4005,11 +4029,13 @@ msgid ""
 "                            "
 msgstr ""
 "\n"
-" Bo administrator a konfia bo ku un nivel di autorisashon di <strong>L%(tcl)s</strong>.</br>\n"
+" Bo administrator a konfia bo ku un nivel di autorisashon di "
+"<strong>L%(tcl)s</strong>.</br>\n"
 " Promé bo mester aseptá e nivel di autorisashon aki pa por sigui.\n"
 " "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:51
+#, python-format
 msgid ""
 "\n"
 "                            Accept level L%(tcl)s clearance and "
@@ -4017,11 +4043,11 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-"Aseptá nivel di autorisashon L%(tcl)s i "
-"responsabilidat\n"
+"Aseptá nivel di autorisashon L%(tcl)s i responsabilidat\n"
 "                        "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html:60
+#, python-format
 msgid ""
 "\n"
 "                            Your administrator has <strong>trusted</strong> "
@@ -4031,8 +4057,10 @@ msgid ""
 "                            "
 msgstr ""
 "\n"
-" Bo administrator a <strong>konfia</strong> bo ku un nivel di autorisashon di <strong>L%(tcl)s</strong>.</br>\n"
-" Bo tambe a <strong>rekonosé</strong> pa usa e nivel di autorisashon aki di <strong>L%(acl)s</strong>.\n"
+" Bo administrator a <strong>konfia</strong> bo ku un nivel di autorisashon "
+"di <strong>L%(tcl)s</strong>.</br>\n"
+" Bo tambe a <strong>rekonosé</strong> pa usa e nivel di autorisashon aki di "
+"<strong>L%(acl)s</strong>.\n"
 " "
 
 #: onboarding/templates/step_3f_set_clearance_level.html:15
@@ -4040,16 +4068,17 @@ msgid "Setup scan - Set clearance level for"
 msgstr "Sètup skan- Pone nivel di autorisashon pa"
 
 #: onboarding/templates/step_3f_set_clearance_level.html:17
+#, python-format
 msgid ""
 "After creating a new object OpenKAT will ask you to set a clearance level. "
 "On the object detail page you can always change the clearance level. For the "
 "onboarding we will suggest to set the clearance level to "
 "L%(dns_report_least_clearance_level)s."
 msgstr ""
-"Despues di krea un opheto nobo, OpenKAT lo puntra bo pa pone un nivel di autorisashon. "
-"Na e página di detaye di e opheto, bo por kambia e nivel di autorisashon semper. Pa e "
-"proceso di onboarding nos lo sugeri pa pone e nivel di autorisashon na "
-"L%(dns_report_least_clearance_level)s."
+"Despues di krea un opheto nobo, OpenKAT lo puntra bo pa pone un nivel di "
+"autorisashon. Na e página di detaye di e opheto, bo por kambia e nivel di "
+"autorisashon semper. Pa e proceso di onboarding nos lo sugeri pa pone e "
+"nivel di autorisashon na L%(dns_report_least_clearance_level)s."
 
 #: onboarding/views.py:278
 #, python-format
@@ -4065,15 +4094,15 @@ msgid ""
 "Could not raise clearance level of {} to L{}. You acknowledged a clearance "
 "level of L{}. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por subi e nivel di autorisashon di {} pa L{}. Bo a rekonosé un nivel di autorisashon di L{}. "
-"Tuma kontakto ku bo administrator pa risibí un nivel di autorisashon mas haltu."
+"No por subi e nivel di autorisashon di {} pa L{}. Bo a rekonosé un nivel di "
+"autorisashon di L{}. Tuma kontakto ku bo administrator pa risibí un nivel di "
+"autorisashon mas haltu."
 
 #: tools/forms/findings.py:14
 msgid "Filter by severity"
 msgstr "Filtra pa gravedat"
 
 #: tools/forms/findings.py:22
-
 msgid "Exclude Muted Findings"
 msgstr "Ekskluí Diskubrimentu den Mudansa"
 
@@ -4524,6 +4553,7 @@ msgstr[0] "Chèk si no tin mas ku %(max)s luga decimal."
 msgstr[1] ""
 
 #: venv/lib/python3.9/site-packages/django/core/validators.py:444
+#, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
 msgid_plural ""
@@ -5615,7 +5645,8 @@ msgid ""
 "Edit this member and change the clearance level if necessary."
 msgstr ""
 "Bo a konfia e miembro aki ku un nivel di autorisashon di L{}. E miembro aki\n"
-"mester tin almenos un nivel di autorisashon di L{} pa por hasi un adaptashon adekuá.\n"
+"mester tin almenos un nivel di autorisashon di L{} pa por hasi un adaptashon "
+"adekuá.\n"
 "Editá e miembro aki i kambia e nivel di autorisashon si ta nesesario."
 
 #: rocky/settings.py:379
@@ -7672,12 +7703,14 @@ msgstr ""
 "presente na e organisashon %s."
 
 #: rocky/views/ooi_list.py:105
+#, python-format
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por subi e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. "
-"Tuma kontakto ku bo administrator pa risibí un nivel di autorisashon mas haltu."
+"No por subi e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di "
+"autorisashon di L%s. Tuma kontakto ku bo administrator pa risibí un nivel di "
+"autorisashon mas haltu."
 
 #: rocky/views/ooi_list.py:116 rocky/views/ooi_list.py:123
 msgid "An error occurred while saving clearance levels."
@@ -7824,6 +7857,7 @@ msgid "Invalid data for: '{email}'"
 msgstr "Datos no válido pa: '{email}'"
 
 #: rocky/views/organization_member_add.py:203
+#, python-brace-format
 msgid "Invalid email address: '{email}'"
 msgstr "Adres di email no válido: '{email}'"
 
