@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import PermissionDenied
+from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
 from onboarding.views import (
     OnboardingAcknowledgeClearanceLevelView,
     OnboardingChooseReportInfoView,
@@ -196,17 +197,42 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
     )
     assertContains(response_accept, "You must first accept this clearance level to continue.")
 
-    redteam_member.trusted_clearance_level = -1
-    redteam_member.acknowledged_clearance_level = -1
-    redteam_member.save()
 
-    response_no_clearance = OnboardingAcknowledgeClearanceLevelView.as_view()(
+@pytest.mark.parametrize("clearance_level", [-1, 0])
+def test_onboarding_acknowledge_clearance_level_no_clearance(
+    rf, redteam_member, clearance_level, mock_organization_view_octopoes, network
+):
+    mock_organization_view_octopoes().get.return_value = network
+    ooi_id = "Network|internet"
+
+    response = OnboardingAcknowledgeClearanceLevelView.as_view()(
         setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
-    assertContains(response_no_clearance, "Unfortunately you cannot continue the onboarding.")
-    assertContains(response_no_clearance, "You don't have enough clearance to scan <strong>" + ooi_id + "</strong>")
+    assert response.status_code == 200
+    redteam_member.trusted_clearance_level = clearance_level
+    redteam_member.acknowledged_clearance_level = clearance_level
+    redteam_member.save()
+
+    response = OnboardingAcknowledgeClearanceLevelView.as_view()(
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+    assertContains(response, "Unfortunately you cannot continue the onboarding.")
+    assertContains(
+        response,
+        "Your administrator has trusted you with a clearance level of <strong>L" + str(clearance_level) + "</strong>.",
+    )
+    assertContains(
+        response,
+        "You need at least a clearance level of <strong>L"
+        + str(DNS_REPORT_LEAST_CLEARANCE_LEVEL)
+        + "</strong> to scan <strong>"
+        + ooi_id
+        + "</strong>",
+    )
+    assertContains(response, "Contact your administrator to receive a higher clearance.")
 
     assertContains(response, "Skip onboarding")
 
