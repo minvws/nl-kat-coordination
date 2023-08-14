@@ -1,8 +1,10 @@
+import threading
 import time
 import unittest
 from datetime import datetime, timedelta, timezone
 from unittest import mock
 
+from limits import storage, strategies
 from scheduler import config, connectors, models, queues, rankers, repositories, schedulers
 
 from tests.factories import (
@@ -59,6 +61,10 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
         self.mock_ctx.pq_store = self.pq_store
         self.mock_ctx.task_store = self.task_store
+
+        # Rate limiter
+        self.mock_ctx.rate_limiter = strategies.MovingWindowRateLimiter(storage=storage.MemoryStorage())
+        self.mock_ctx.rate_limiter_lock = threading.Lock()
 
         # Scheduler
         self.organisation = OrganisationFactory()

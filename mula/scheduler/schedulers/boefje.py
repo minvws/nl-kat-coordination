@@ -1,5 +1,4 @@
 import logging
-import threading
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
@@ -7,7 +6,7 @@ from typing import Callable, List, Optional
 
 import requests
 from jinja2 import BaseLoader, Environment
-from limits import parse, storage, strategies
+from limits import parse
 from opentelemetry import trace
 
 from scheduler import context, models, queues, rankers
@@ -49,8 +48,6 @@ class BoefjeScheduler(Scheduler):
     ):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
-        self.rate_limiter = strategies.MovingWindowRateLimiter(storage=storage.MemoryStorage())
-        self.rate_limiter_lock = threading.Lock()
 
         super().__init__(
             ctx=ctx,
@@ -465,19 +462,19 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc
 
-        with self.rate_limiter_lock:
+        with self.ctx.rate_limiter_lock:
             # Get the identifier for the rate limiter
             identifier_template = rate_limit.identifier
             environment = Environment(loader=BaseLoader())
             identifier = environment.from_string(identifier_template).render(task=task)
 
-            can_consume = self.rate_limiter.test(parsed_rate_limit, identifier)
+            can_consume = self.ctx.rate_limiter.test(parsed_rate_limit, identifier)
             if not can_consume:
                 return True
 
             # When we can consume, we hit the rate limiter
             if hit:
-                self.rate_limiter.hit(parsed_rate_limit, identifier)
+                self.ctx.rate_limiter.hit(parsed_rate_limit, identifier)
 
             return False
 

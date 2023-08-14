@@ -1,8 +1,10 @@
 import json
 import logging.config
+import threading
 from pathlib import Path
 from types import SimpleNamespace
 
+from limits import storage, strategies
 from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
@@ -78,6 +80,10 @@ class AppContext:
         datastore = sqlalchemy.SQLAlchemy(self.config.db_uri)
         self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
         self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
+
+        # Rate limiter
+        self.rate_limiter = strategies.MovingWindowRateLimiter(storage=storage.MemoryStorage())
+        self.rate_limiter_lock = threading.Lock()
 
         # Metrics collector registry
         self.metrics_registry: CollectorRegistry = CollectorRegistry()
