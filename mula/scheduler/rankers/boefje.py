@@ -6,6 +6,10 @@ from .ranker import Ranker
 
 
 class BoefjeRanker(Ranker):
+    """The BoefjeRanker is a ranker that is used to rank tasks based on the
+    procedure listed in the `rank()` method.
+    """
+
     MAX_PRIORITY = 1000
     MAX_DAYS = 7
 

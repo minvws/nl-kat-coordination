@@ -21,13 +21,29 @@ from .pagination import PaginatedResponse, paginate
 
 
 class Server:
-    """Server that exposes API endpoints for the scheduler."""
+    """Server that exposes API endpoints for the scheduler.
+
+    Attributes:
+        logger: A logging.Logger object used for logging.
+        ctx: A context.AppContext object used for sharing data between modules.
+        schedulers: A dict containing all the schedulers.
+        config: A settings.Settings object containing the configuration settings.
+        api: A fastapi.FastAPI object used for exposing API endpoints.
+
+    """
 
     def __init__(
         self,
         ctx: context.AppContext,
         s: Dict[str, schedulers.Scheduler],
     ):
+        """Initializer of the Server class.
+
+        Args:
+            ctx: A context.AppContext object used for sharing data between modules.
+            s: A dict containing all the schedulers.
+        """
+
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.schedulers: Dict[str, schedulers.Scheduler] = s
