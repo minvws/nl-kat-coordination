@@ -84,7 +84,7 @@ The scans of KAT can be found on the Tasks page as tasks. A task is created per 
 Members
 -------
 
-The Members page allows for usermanagement and is visible to users who have the rights to do this. 
+The Members page allows for usermanagement and is visible to users who have the rights to do this.
 
 .. image:: img/members.png
   :alt: Members page
@@ -92,7 +92,7 @@ The Members page allows for usermanagement and is visible to users who have the 
 Settings
 --------
 
-The Settings page shows general information and its settings: 
+The Settings page shows general information and its settings:
 
 * Organization data
 * Indemnification
@@ -110,7 +110,7 @@ OpenKAT has a superuser, several usertypes and organizations.
 Organizations
 -------------
 
-Organizations own the systems for which KAT is deployed. From KAT, multiple organizations can be monitored simultaneously, each with its own settings. The superuser can add new organizations and each organization has its own users. 
+Organizations own the systems for which KAT is deployed. From KAT, multiple organizations can be monitored simultaneously, each with its own settings. The superuser can add new organizations and each organization has its own users.
 
 Users
 -----
@@ -248,7 +248,7 @@ After the CSV file has been uploaded the users receive a welcome email on their 
 Objects
 =======
 
-Adding an initial object with an appropriate safeguard puts OpenKAT to work. This can be done in on-boarding, but objects can also be added individually or as CSV files. Objects are also refered to as 'objects of interest' or OOI. The object itself contains the actual data: an objecttype describes the object and its logical relations to other objecttypes.
+Adding an initial object with an appropriate safeguard puts OpenKAT to work. This can be done in on-boarding, but objects can also be added individually or as CSV files. Objects are also referred to as 'objects of interest' or OOI. The object itself contains the actual data: an objecttype describes the object and its logical relations to other objecttypes.
 
 Properties
 ----------
@@ -271,7 +271,7 @@ Findings appear on the general findings page, but can also be viewed by object.
 Scan levels, clearance & indemnities
 ====================================
 
-Boefjes can collect information with varying intensity. OpenKAT has a system of safeguards to control permission to perform scans and prevent damage to the systems under test. 
+Boefjes can collect information with varying intensity. OpenKAT has a system of safeguards to control permission to perform scans and prevent damage to the systems under test.
 
 * Boefjes have a scan level
 * Objects have clearance
