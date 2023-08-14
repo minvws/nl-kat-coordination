@@ -4,9 +4,6 @@ User Guide
 
 This manual covers the day-to-day use of OpenKAT via the web interface. The concepts behind OpenKAT are explained in the "How does OpenKAT work" section. When using OpenKAT for the first time, the on-boarding flow is available, see the section in this chapter.
 
-.. image:: img/landingpage.png
-  :alt: landingpage
-
 Web interface
 =============
 
