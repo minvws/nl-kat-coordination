@@ -152,7 +152,7 @@ Users and organizations can be created in the on boarding flow, in the Web inter
 Adding users through a CSV file
 -------------------------------
 
-Adding multiple users at a time to OpenKAT can be done using a CSV file.
+Adding multiple users at a time to OpenKAT can be done using a CSV file. To make this work SMTP should be configured.
 
 How does it work?
 *****************
@@ -196,6 +196,8 @@ The trusted_clearance_level is the level a user receives from the organization. 
 * trusted_clearance_level : between -1 and 4
 * accepted_clearance_level : between -1 and 4
 
+The ability to add the accepted clearance level allows you to copy users from one organization to another, which might be needed on larger installs. The user should have accepted this level at some point, in- or outside OpenKAT.
+
 *Warnings*
 
 If the CSV file contains data that cannot be parsed OpenKAT will give a warning with the data concerned.
@@ -203,7 +205,7 @@ If the CSV file contains data that cannot be parsed OpenKAT will give a warning 
 User notification
 *****************
 
-After the CSV file has been uploaded the users receive a welcome email on their account. The link in this email allows them to create a password for their account.
+After the CSV file has been uploaded the users receive a welcome email on their account. The link in this email allows them to create a password for their account. If SMTP is not configured on your install, this will not work.
 
 ::
 
