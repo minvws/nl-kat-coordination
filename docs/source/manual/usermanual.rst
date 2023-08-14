@@ -245,8 +245,8 @@ After the CSV file has been uploaded the users receive a welcome email on their 
  Sincerely,
  The OpenKAT team
 
-Objects
-=======
+Working with objects
+====================
 
 Adding an initial object with an appropriate safeguard puts OpenKAT to work. This can be done in on-boarding, but objects can also be added individually or as CSV files. Objects are also referred to as 'objects of interest' or OOI. The object itself contains the actual data: an objecttype describes the object and its logical relations to other objecttypes.
 
@@ -492,9 +492,3 @@ Automation of the verification process
 **************************************
 
 OpenKAT has been created to automate tedious tasks such as this one. We like to include an automated verification process for objects that includes the entire chain of information, with nice green checkmarks. It is on the roadmap, if you want to contribute to it you are most welcome! Get in touch through meedoen@openkat.nl.
-
-
-        5432,  # PostgreSQL
-    ]
-
-You can set the ports of SA and DB to an empty string to disable the check.
