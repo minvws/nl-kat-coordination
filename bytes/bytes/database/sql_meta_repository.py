@@ -215,7 +215,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 def create_meta_data_repository() -> Iterator[MetaDataRepository]:
     settings = get_settings()
 
-    session = sessionmaker(bind=get_engine(settings.bytes_db_uri))()
+    session = sessionmaker(bind=get_engine(settings.db_uri))()
     repository = SQLMetaDataRepository(
         session, create_raw_repository(settings), create_hash_repository(settings), settings
     )
