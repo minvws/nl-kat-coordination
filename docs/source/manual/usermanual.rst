@@ -17,6 +17,8 @@ The user interface of OpenKAT consists of five screens, which provide access to 
 - Findings
 - Objects
 - Tasks
+- Members
+- Settings
 
 Crisis Room
 -----------
@@ -82,21 +84,41 @@ The scans of KAT can be found on the Tasks page as tasks. A task is created per 
 .. image:: img/boefjes.png
   :alt: tasks
 
+Members
+-------
+
+The Members page allows for usermanagement and is visible to users who have the rights to do this. 
+
+.. image:: img/members.png
+  :alt: Members page
+
+Settings
+--------
+
+The Settings page shows general information and its settings: 
+
+* Organization data
+* Indemnification
+* Rerun all bits on the current dataset
+
+.. image:: img/settings.png
+  :alt: Settings page
+
 
 Users and organizations
 =======================
 
-OpenKAT has administrators, users and organizations.
+OpenKAT has a superuser, several usertypes and organizations.
 
 Organizations
 -------------
 
-Organizations own the systems for which KAT is deployed. From KAT, multiple organizations can be monitored simultaneously, each with its own settings. The 1.4rc2 includes additional options for creating new organizations via an API. Please contact meedoen@openkat.nl if you would like to help test and develop this.
+Organizations own the systems for which KAT is deployed. From KAT, multiple organizations can be monitored simultaneously, each with its own settings. The superuser can add new organizations and each organization has its own users. 
 
 Users
 -----
 
-OpenKAT knows four types of users: the client, the red team user, the admin and the superuser. In OpenKAT, permissions utilise a stacked model. This means that a higher permission level includes all lower permissions of the lower levels. The client is a 'read only' type of user, the red teamer is a researcher who can start scans. The admin is an administrative user who can do user management etc, the superuser can do all.
+OpenKAT knows four types of users: the client, the red team user, the admin and the superuser. In OpenKAT, permissions utilise a stacked model. This means that a higher permission level includes all lower permissions of the lower levels. The client is a 'read only' type of user, the red teamer is a researcher who can start scans. The admin is an administrative user who can do user management etc, the superuser has the ability to do everything.
 
 Rights and functions per user type
 ----------------------------------
@@ -138,7 +160,7 @@ Rights and functions per user type
 +-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
 | Can add organisations                                                                               |      |          |       | x         |
 +-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
-| Can start scans on objects with not enough clearance, and the user also hasn’t got enough clearance |      |          |       | x         |
+| Can start scans on objects regardless of clearance                                                  |      |          |       | x         |
 +-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
 | Can access Django admin                                                                             |      |          |       | x         |
 +-----------------------------------------------------------------------------------------------------+------+----------+-------+-----------+
@@ -226,10 +248,10 @@ After the CSV file has been uploaded the users receive a welcome email on their 
  Sincerely,
  The OpenKAT team
 
-OpenKAT Objects
-===============
+Objects
+=======
 
-Adding an initial object with an appropriate safeguard puts OpenKAT to work. This can be done in on-boarding, but objects can also be added individually or as CSV files.
+Adding an initial object with an appropriate safeguard puts OpenKAT to work. This can be done in on-boarding, but objects can also be added individually or as CSV files. Objects are also refered to as 'objects of interest' or OOI. The object itself contains the actual data: an objecttype describes the object and its logical relations to other objecttypes.
 
 Properties
 ----------
@@ -249,12 +271,16 @@ View Findings
 Findings appear on the general findings page, but can also be viewed by object.
 
 
-Scan levels and indemnities
-===========================
+Scan levels, clearance & indemnities
+====================================
 
-Boefjes can collect information with varying intensity. OpenKAT has a system of safeguards to control permission to perform scans and prevent damage to the systems under test.
+Boefjes can collect information with varying intensity. OpenKAT has a system of safeguards to control permission to perform scans and prevent damage to the systems under test. 
 
-For each object, the 'indemnification level' menu indicates how deeply scanning is allowed. Here the user gives an agreement on the risks of the scans and permission to store the information gathered on these systems.
+* Boefjes have a scan level
+* Objects have clearance
+* Users can receive and accept the ability to give clearance to an object and to start a scan
+
+For each object, the 'clearance level' menu indicates how deeply scanning is allowed. Here the user agrees to the risks of the scans and gives permission to store the information gathered on these systems.
 
 The levels used range from level 0 to level 4, from 'do not scan' to 'very intrusive'. Scanning levels are distributed in the data model, either by inheritance or by user statements. The different levels are qualitative in nature. L1 'do not touch' is obvious, but the difference between L2 'normal user' and L3 'detectable scanning' is at the discretion of the developer and administrator. The use of NMAP, for example, falls in between and depends heavily on the arguments the tool brings.
 
@@ -336,7 +362,9 @@ The premise of the test profile is to verify whether an attacker can exploit vul
 Bits
 ====
 
-Bits are businessrules that assess objects. These can be disabled or enabled using environment variables. Almost all bits are enabled by default and be disabled by adding the bit to `BITS_DISABLED`. The disabled bits can be enabled using `BITS_ENABLED`. For example:
+Bits are businessrules that assess objects. These can be disabled or enabled using environment variables. The parameters of a Bit can be configured using config objects, which are explained in detail in `the business rule section <https://docs.openkat.nl/introduction/makeyourown.html#bits-businessrules>`_ of the introducion.
+
+Almost all bits are enabled by default and be disabled by adding the bit to `BITS_DISABLED`. The disabled bits can be enabled using `BITS_ENABLED`. For example:
 
 .. code-block:: sh
 
@@ -344,7 +372,7 @@ Bits are businessrules that assess objects. These can be disabled or enabled usi
     BITS_DISABLED='["bit3"]'
 
 
-Note that if you enable a bit that was previously enabled the bit won't be automatically run for every OOIs it should have run on, but only when it is triggered again after a new scan or other bit that has run. When a bit that was previously enabled is disabled the resulting OOIs from that bit will also not be automatically removed. Only when the bit triggers instead of running the bit the resulting OOIs of the previous run will be deleted. This also means that if the bit isn't triggered the old OOIs will not be removed.
+Note that if you enable a bit that was previously enabled the bit won't be automatically run for every object it should have run on, but only when it is triggered again after a new scan or other bit that has run. When a bit that was previously enabled is disabled the resulting objects from that bit will also not be automatically removed. Only when the bit triggers instead of running the bit the resulting OOIs of the previous run will be deleted. This also means that if the bit isn't triggered the old objects will not be removed.
 
 Reports
 =======
@@ -468,95 +496,7 @@ Automation of the verification process
 
 OpenKAT has been created to automate tedious tasks such as this one. We like to include an automated verification process for objects that includes the entire chain of information, with nice green checkmarks. It is on the roadmap, if you want to contribute to it you are most welcome! Get in touch through meedoen@openkat.nl.
 
-What are Config OOI's?
-======================
 
-Config OOI's are, in principle, the same as regular objects, but serve to apply preferences to underlying OOI's.
-They are an extra input for specific bits that run on underlying objects.
-Re-running all bits (through the Settings menu) will make sure they are applied.
-
-The below Config OOI's can be added by going to the ``Network|internet`` object detail page,
-clicking "Add" under "Related objects", selecting "Config" in the dropdown menu, and then clicking "Add object".
-
-The ``Type`` and ``ooi`` fields should be automatically filled by default.
-In principle, only the ``bit-id`` string field and ``config`` JSON field should be filled in manually.
-
-HSTS
-----
-
-You can currently configure the ``max-age`` before HSTS headers will be considered to be too short lived.
-
-.. code-block:: json
-
-    {
-        "object_type": "Config",
-        "ooi": "Network|internet",
-        "bit-id": "check-hsts-header",
-        "config": {"max-age": "4153600"}
-    }
-
-Port classification
--------------------
-
-Setting aggregate_findings to ``True`` will aggregate all findings of the same type into one finding,
-resulting in cleaner finding reports (both in the web UI and in PDF's). For example, ``KAT-UNCOMMON-OPEN-PORT``
-will be aggregated into one finding, instead of one separate finding per port.
-
-.. code-block:: json
-
-    {
-        "object_type": "Config",
-        "ooi": "Network|internet",
-        "bit-id": "port-classification-ip",
-        "config": {"aggregate_findings": "True"}
-    }
-
-Also you can configure which open ports should create findings and which ports should not. This is done by settings
-common_tcp_ports, common_udp_ports, sa_tcp_ports and/or db_tcp_ports. Common TCP ports are ports that will never trigger a finding. A good example is 443. Same counts for common udp ports.
-SA (system administrator) ports will trigger a medium finding that a system administrator port is open, for example, port 22 is usually is SA port. Lastly, DB (database) ports trigger a more severe finding when a database port is open. As an of the configuration example:
-
-.. code-block:: json
-
-    {
-        "object_type": "Config",
-        "ooi": "Network|internet",
-        "bit-id": "port-classification-ip",
-        "config": {"common_tcp_ports": "1,2,3", "sa_tcp_ports": "4,5,6"}
-    }
-
-Defaults are:
-
-.. code-block:: python
-
-    COMMON_TCP_PORTS = [
-        25,  # SMTP
-        53,  # DNS
-        80,  # HTTP
-        110,  # POP3
-        143,  # IMAP
-        443,  # HTTPS
-        465,  # SMTPS
-        587,  # SMTP (message submmission)
-        993,  # IMAPS
-        995,  # POP3S
-    ]
-
-    COMMON_UDP_PORTS = [
-        53,  # DNS
-    ]
-
-    SA_TCP_PORTS = [
-        21,  # FTP
-        22,  # SSH
-        23,  # Telnet
-        3389,  # Remote Desktop
-        5900,  # VNC
-    ]
-    DB_TCP_PORTS = [
-        1433,  # MS SQL Server
-        1434,  # MS SQL Server
-        3050,  # Interbase/Firebase
-        3306,  # MySQL
         5432,  # PostgreSQL
     ]
 
