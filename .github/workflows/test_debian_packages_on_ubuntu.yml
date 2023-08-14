@@ -180,7 +180,7 @@ jobs:
 
       - name: Update configs for rabbitmq
         run: |
-          sudo sed -i "s/SCHEDULER_RABBITMQ_DSN=/SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
+          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/rocky.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/bytes.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/boefjes.conf
@@ -204,7 +204,7 @@ jobs:
 
       - name: Migrations for Mula
         run: |
-          sudo sed -i "s/SCHEDULER_DB_DSN=/SCHEDULER_DB_DSN=postgresql:\/\/mula:postgres@localhost\/mula_db/g" /etc/kat/mula.conf
+          sudo sed -i "s/SCHEDULER_DB_URI=/SCHEDULER_DB_URI=postgresql:\/\/mula:postgres@localhost\/mula_db/g" /etc/kat/mula.conf
           sudo -u kat update-mula-db
 
       - name: Setup Bytes credentials
@@ -212,9 +212,6 @@ jobs:
           sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(sudo grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/rocky.conf
           sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(sudo grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/boefjes.conf
           sudo sed -i "s/BYTES_PASSWORD=\$/BYTES_PASSWORD=$(sudo grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/mula.conf
-
-      - name: Setup Octopoes to use xtdb-multinode
-        run: sudo sed -i "s/XTDB_TYPE=\"xtdb\"/XTDB_TYPE=\"xtdb-multinode\"/g" /etc/kat/octopoes.conf
 
       - name: Restart KAT
         run: sudo systemctl restart kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker

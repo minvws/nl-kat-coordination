@@ -11,10 +11,10 @@ SQL_BASE = declarative_base()
 
 
 @lru_cache(maxsize=1)
-def get_engine(bytes_db_uri: str) -> Engine:
+def get_engine(db_uri: str) -> Engine:
     logger.info("Connecting to database..")
 
-    engine = create_engine(bytes_db_uri, pool_pre_ping=True, pool_size=25)
+    engine = create_engine(db_uri, pool_pre_ping=True, pool_size=25)
 
     logger.info("Connected to database")
 

@@ -17,5 +17,6 @@ Contains documentation for developers and contributors.
    nginx
    debuggingtroubleshooting
    latex
+   environment_settings/index
    externalauthentication
    cveapi
