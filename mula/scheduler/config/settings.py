@@ -44,11 +44,11 @@ class Settings(BaseSettings):
     log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
 
     # Server settings
-    api_host: IPvAnyAddress = Field("0.0.0.0", description="Host to bind the scheduler to")
-    api_port: int = Field(8000, description="Host port to bind the scheduler to")
+    api_host: IPvAnyAddress = Field("0.0.0.0", description="Host address of the scheduler api server")
+    api_port: int = Field(8000, description="Host api server port")
 
     # Application settings
-    katalogus_cache_ttl: int = Field(30, description="Katalogus cache TTL in seconds")
+    katalogus_cache_ttl: int = Field(30, description="The lifetime of the katalogus cache in seconds")
     monitor_organisations_interval: int = Field(
         60,
         description="Interval in seconds of the execution of the "
@@ -56,7 +56,7 @@ class Settings(BaseSettings):
         " to check newly created or removed organisations from katalogus. "
         "It updates the organisations, their plugins, and the creation of their schedulers.",
     )
-    octopoes_request_timeout: int = Field(10, description="Octopoes request timeout in seconds")
+    octopoes_request_timeout: int = Field(10, description="The timeout in seconds for the requests to the octopoes api")
 
     # External services settings
     host_katalogus: AnyHttpUrl = Field(
@@ -71,7 +71,12 @@ class Settings(BaseSettings):
         ..., example="http://localhost:8001", env="OCTOPOES_API", description="Octopoes API URL"
     )
 
-    queue_prefetch_count: int = Field(100)
+    queue_prefetch_count: int = Field(
+        100,
+        description="RabbitMQ prefetch_count for `channel.basic_qos()`, "
+        "which is the number of unacknowledged messages on a channel. "
+        "Also see https://www.rabbitmq.com/consumer-prefetch.html",
+    )
     host_mutation: AmqpDsn = Field(
         ..., example="amqp://", description="KAT queue URI for host mutations", env="QUEUE_URI"
     )
@@ -93,7 +98,7 @@ class Settings(BaseSettings):
         86400, description="Grace period of when a job is considered to be running again (in seconds),"
     )
     pq_populate_max_random_objects: int = Field(
-        50, description="Maximum number of random objects to be added to the priority queue"
+        50, description="The maximum number of random objects that can be added to the priority queue, per call"
     )
 
     # Database settings
