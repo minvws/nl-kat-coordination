@@ -88,17 +88,20 @@ class Settings(BaseSettings):
     )
 
     # Queue settings (0 is infinite)
-    pq_maxsize: int = Field(1000, description="How many items a priority queue can hold")
+    pq_maxsize: int = Field(1000, description="How many items a priority queue can hold (0 is infinite)")
     pq_populate_interval: int = Field(
         60,
         description="Interval in seconds of the "
         "execution of the `populate_queue` method of the `scheduler.Scheduler` class",
     )
     pq_populate_grace_period: int = Field(
-        86400, description="Grace period of when a job is considered to be running again (in seconds),"
+        86400,
+        description="Grace period of when a job is considered to be running again in seconds (0 is infinite)",
     )
     pq_populate_max_random_objects: int = Field(
-        50, description="The maximum number of random objects that can be added to the priority queue, per call"
+        50,
+        description="The maximum number of random objects that can be added to the priority queue, "
+        "per call (0 is infinite)",
     )
 
     # Database settings
