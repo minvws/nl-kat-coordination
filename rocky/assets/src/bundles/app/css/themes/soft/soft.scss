@@ -45,11 +45,8 @@
 @import "manon/accordion";
 @import "manon/breadcrumb-bar";
 @import "manon/button-ghost";
-
-/* Ghost button */
+@import "manon/button-destructive";
 @import "manon/button-icon";
-
-/* Icon button */
 @import "manon/collapsible";
 @import "manon/emphasized";
 @import "manon/expando-rows";
@@ -69,6 +66,7 @@
 @import "manon/form-radio";
 @import "manon/form-help";
 @import "manon/form-inline";
+@import "manon/form-button";
 @import "manon/layout";
 @import "manon/login-meta";
 @import "manon/logo";
