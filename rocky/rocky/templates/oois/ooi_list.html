@@ -43,7 +43,7 @@
                     {% if ooi_list %}
                         <fieldset>
                             <div class="horizontal-view">
-                                {% if organization_member.has_ooi_clearance %}
+                                {% if perms.tools.can_set_clearance_level %}
                                     <select id="scan-profiles" name="scan-profile">
                                         {% for level in scan_levels %}<option value="{{ level }}">{{ level }}</option>{% endfor %}
                                     </select>
