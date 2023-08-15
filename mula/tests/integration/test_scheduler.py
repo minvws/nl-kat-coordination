@@ -15,10 +15,10 @@ class SchedulerTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = config.settings.Settings()
+        cfg = config.settings.Settings()
 
         # Database
-        self.dbconn = storage.DBConn(self.mock_ctx.config.db_dsn)
+        self.dbconn = storage.DBConn(cfg.db_uri.url)
         models.Base.metadata.create_all(self.dbconn.engine)
         self.mock_ctx.datastores = SimpleNamespace(
             **{

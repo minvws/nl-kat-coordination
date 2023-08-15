@@ -17,6 +17,7 @@ class NormalizerScheduler(Scheduler):
     the `Scheduler` class by adding a `organisation` attribute.
 
     Attributes:
+        logger: A logger instance.
         organisation: The organisation that this scheduler is for.
     """
 
@@ -51,6 +52,15 @@ class NormalizerScheduler(Scheduler):
         )
 
     def run(self) -> None:
+        """The run method is called when the scheduler is started. It will
+        start the listeners and the scheduling loops in separate threads. It
+        is mainly tasked with populating the queue with tasks.
+
+        * Raw data listener: This listener will listen to the raw file received
+        messaging queue. When a new raw file is received, it will create a task
+        for each normalizer that is registered for the mime type of the raw
+        file.
+        """
         listener = listeners.RawData(
             dsn=self.ctx.config.host_raw_data,
             queue=f"{self.organisation.id}__raw_file_received",
@@ -74,7 +84,7 @@ class NormalizerScheduler(Scheduler):
             message queue.
         """
         self.logger.debug(
-            "Received new raw data from message queue [raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
+            "Received new raw data from message queue [raw_data_id=%s, organisation_id=%s, scheduler_id=%s]",
             latest_raw_data.raw_data.id,
             self.organisation.id,
             self.scheduler_id,
@@ -86,7 +96,7 @@ class NormalizerScheduler(Scheduler):
         for mime_type in latest_raw_data.raw_data.mime_types:
             if mime_type.get("value", "").startswith("error/"):
                 self.logger.warning(
-                    "Skipping raw data with error mime type [raw_data.id=%s ,organisation.id=%s, scheduler_id=%s]",
+                    "Skipping raw data with error mime type [raw_data_id=%s, organisation_id=%s, scheduler_id=%s]",
                     latest_raw_data.raw_data.id,
                     self.organisation.id,
                     self.scheduler_id,
@@ -103,7 +113,7 @@ class NormalizerScheduler(Scheduler):
 
         if not normalizers:
             self.logger.debug(
-                "No normalizers found for raw data [raw_data.id=%s, organisation.id=%s, scheduler_id=%s]",
+                "No normalizers found for raw data [raw_data_id=%s, organisation_id=%s, scheduler_id=%s]",
                 latest_raw_data.raw_data.id,
                 self.organisation.id,
                 self.scheduler_id,
@@ -125,7 +135,7 @@ class NormalizerScheduler(Scheduler):
         Args:
             normalizer: The normalizer to create a task for.
             raw_data: The raw data to create a task for.
-            caller: The name of the function that called this function.
+            caller: The name of the function that called this function, used for logging.
         """
         task = NormalizerTask(
             normalizer=normalizer,
@@ -134,7 +144,7 @@ class NormalizerScheduler(Scheduler):
 
         if not self.is_task_allowed_to_run(normalizer):
             self.logger.debug(
-                "Task is not allowed to run: %s [organisation.id=%s, scheduler_id=%s, caller=%s]",
+                "Task is not allowed to run: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.organisation.id,
                 self.scheduler_id,
@@ -145,7 +155,7 @@ class NormalizerScheduler(Scheduler):
         try:
             if self.is_task_running(task):
                 self.logger.debug(
-                    "Task is already running: %s [organisation.id=%s, scheduler_id=%s, caller=%s]",
+                    "Task is already running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
                     task,
                     self.organisation.id,
                     self.scheduler_id,
@@ -154,7 +164,7 @@ class NormalizerScheduler(Scheduler):
                 return
         except Exception:
             self.logger.warning(
-                "Could not check if task is running: %s [organisation.id=%s, scheduler_id=%s, caller=%s]",
+                "Could not check if task is running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.organisation.id,
                 self.scheduler_id,
@@ -164,7 +174,7 @@ class NormalizerScheduler(Scheduler):
 
         if self.is_item_on_queue_by_hash(task.hash):
             self.logger.debug(
-                "Normalizer task is already on queue: %s [organisation.id=%s, scheduler_id=%s, caller=%s]",
+                "Normalizer task is already on queue: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.organisation.id,
                 self.scheduler_id,
@@ -194,7 +204,7 @@ class NormalizerScheduler(Scheduler):
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s "
-                "[queue.qsize=%d, queue.maxsize=%d, organisation.id=%s, scheduler_id=%s, caller=%s]",
+                "[queue_qsize=%d, queue_maxsize=%d, organisation_id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.queue.qsize(),
                 self.queue.maxsize,
@@ -206,7 +216,7 @@ class NormalizerScheduler(Scheduler):
 
         self.logger.info(
             "Created normalizer task: %s for raw data: %s "
-            "[normalizer.id=%s, raw_data.id=%s, organisation.id=%s, scheduler_id=%s, caller=%s]",
+            "[normalizer_id=%s, raw_data_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,
             raw_data.id,
             normalizer.id,
@@ -232,7 +242,7 @@ class NormalizerScheduler(Scheduler):
             )
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
-                "Could not get normalizers for mime_type: %s [mime_type=%s, organisation.id=%s, scheduler_id=%s]",
+                "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,
                 mime_type,
                 self.organisation.id,
@@ -243,7 +253,7 @@ class NormalizerScheduler(Scheduler):
 
         if normalizers is None:
             self.logger.debug(
-                "No normalizer found for mime_type: %s [mime_type=%s, organisation.id=%s, scheduler_id=%s]",
+                "No normalizer found for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,
                 mime_type,
                 self.organisation.id,
@@ -253,7 +263,7 @@ class NormalizerScheduler(Scheduler):
 
         self.logger.debug(
             "Found %d normalizers for mime_type: %s "
-            "[mime_type=%s, normalizers=%s, organisation.id=%s, scheduler_id=%s]",
+            "[mime_type=%s, normalizers=%s, organisation_id=%s, scheduler_id=%s]",
             len(normalizers),
             mime_type,
             mime_type,
@@ -268,14 +278,14 @@ class NormalizerScheduler(Scheduler):
         """Check if the task is allowed to run.
 
         Args:
-            task: The task to check.
+            normalizer: The normalizer to check.
 
         Returns:
             True if the task is allowed to run, False otherwise.
         """
         if not normalizer.enabled:
             self.logger.debug(
-                "Normalizer: %s is disabled [normalizer.id= %s, organisation.id=%s, scheduler_id=%s]",
+                "Normalizer: %s is disabled [normalizer_id= %s, organisation_id=%s, scheduler_id=%s]",
                 normalizer.id,
                 normalizer.id,
                 self.organisation.id,
@@ -289,10 +299,10 @@ class NormalizerScheduler(Scheduler):
         """Check if the same task is already running.
 
         Args:
-            task: The task to check.
+            task: The NormalizerTask to check.
 
         Returns:
-            True if the task is already running, False otherwise.
+            True if the task is still running, False otherwise.
         """
         # Get the last tasks that have run or are running for the hash
         # of this particular NormalizerTask.
@@ -300,7 +310,7 @@ class NormalizerScheduler(Scheduler):
             task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
             self.logger.warning(
-                "Could not get latest task by hash: %s [organisation.id=%s, scheduler_id=%s]",
+                "Could not get latest task by hash: %s [organisation_id=%s, scheduler_id=%s]",
                 task.hash,
                 self.organisation.id,
                 self.scheduler_id,
@@ -312,7 +322,7 @@ class NormalizerScheduler(Scheduler):
         if task_db is not None and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
-                "[task.id=%s, task.hash=%s, organisation.id=%s, scheduler_id=%s]",
+                "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,
                 self.organisation.id,

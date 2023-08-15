@@ -92,6 +92,13 @@ class PriorityQueue(abc.ABC):
 
     def pop(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
         """Remove and return the highest priority item from the queue.
+        Optionally apply filters to the queue.
+
+        Args:
+            filters: A list of filters to be applied to the queue.
+
+        Returns:
+            The highest priority item from the queue.
 
         Raises:
             QueueEmptyError: If the queue is empty.
@@ -113,6 +120,9 @@ class PriorityQueue(abc.ABC):
 
         Args:
             p_item: The item to be pushed onto the queue.
+
+        Returns:
+            The item that was pushed onto the queue.
 
         Raises:
             NotAllowedError: If the item is not allowed to be pushed.
@@ -180,6 +190,9 @@ class PriorityQueue(abc.ABC):
 
         Args:
             index: The index of the item to be returned.
+
+        Returns:
+            The item at index.
         """
         return self.pq_store.peek(self.pq_id, index)
 
@@ -188,6 +201,9 @@ class PriorityQueue(abc.ABC):
 
         Args:
             p_item: The item to be removed from the queue.
+
+        Returns:
+            The item that was removed from the queue.
         """
         self.pq_store.remove(self.pq_id, str(p_item.id))
 
@@ -287,7 +303,8 @@ class PriorityQueue(abc.ABC):
 
     @abc.abstractmethod
     def create_hash(self, p_item: models.PrioritizedItem) -> str:
-        """Create a hash for the item.
+        """Create a hash for the given item. This hash is used to determine if
+        the item is already in the queue.
 
         Abstract method to be implemented by the concrete implementation of
         the queue. It needs to create a unique identifier for the item on

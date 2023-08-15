@@ -8,16 +8,18 @@ Examples on how to extend the classes can be found in their respective folders.
 The files are named `boefje.py`, and `normalizer.py` that are a specific KAT
 implementations.
 
-Helpful resources are: the directory structure from the `README.md` file and the
-C4 Code level (Condensed class diagram) from the `design.md` file.
+Helpful resources are: the directory structure from the `README.md` file and
+the C4 Code level (Condensed class diagram) from the
+[architecture](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/architecture.md)
+file.
 
 ## Populating the queue
 
-We can subclass the `schedulers.Scheduler` class and implement our own
-`populate_queue` method. Because we have the `context.AppContext` as
-an attribute, we're able to access shared data. In this case we can reference
-external services, such as `Octopoes`, `Katalogus`, `Bytes`, etc. This can help
-us make fine-grained decisions on what tasks you want to push on to the queue.
+We can subclass the `schedulers.Scheduler` class and implement our own `run()`
+method. Because we have the `context.AppContext` as an attribute, we're able to
+access shared data. In this case we can reference external services, such as
+`Octopoes`, `Katalogus`, `Bytes`, etc. This can help us make fine-grained
+decisions on what tasks you want to push on to the queue.
 
 Take a look in the [`schedulers/`](schedulers/) folder for an example, how
 this is implemented, and reference either the `boefje.py` or `normalizer.py`
@@ -25,6 +27,9 @@ file for the current implementation.
 
 One example implementation could be that tasks are scheduled for at specific
 time, or need to be put onto the queue at a specific time.
+
+When you've defined your own schedulers, be sure to initialize and start them
+from the `app.py` file.
 
 ## Ranking tasks
 

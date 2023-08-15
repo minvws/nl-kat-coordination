@@ -8,6 +8,8 @@ from .services import HTTPService
 
 
 class Katalogus(HTTPService):
+    """A class that provides methods to interact with the Katalogus API."""
+
     name = "katalogus"
 
     def __init__(self, host: str, source: str, timeout: int = 5, cache_ttl: int = 30):

@@ -7,6 +7,8 @@ from .services import HTTPService
 
 
 class Octopoes(HTTPService):
+    """A class that provides methods to interact with the Octopoes API."""
+
     name = "octopoes"
     health_endpoint = None
 

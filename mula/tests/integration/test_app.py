@@ -18,7 +18,7 @@ class AppTestCase(unittest.TestCase):
         self.mock_ctx.services.katalogus = MockKatalogusService()
 
         # Database
-        self.dbconn = storage.DBConn(self.mock_ctx.config.db_dsn)
+        self.dbconn = storage.DBConn(self.mock_ctx.config.db_uri.url)
         models.Base.metadata.create_all(self.dbconn.engine)
         self.mock_ctx.datastores = SimpleNamespace(
             **{

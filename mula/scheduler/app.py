@@ -14,6 +14,20 @@ tracer = trace.get_tracer(__name__)
 class App:
     """Main application definition for the scheduler implementation of KAT.
 
+    The App is responsible for starting and managing:
+
+        * Schedulers: The schedulers are responsible for managing the queues
+        and tasks for a specific organisation.
+
+        * Monitors: The monitors are responsible for monitoring the state of
+        the application, and executing procedures based on the state of the
+        application.
+
+        * Server: The server is responsible for exposing the application
+        through a REST API.
+
+        * Metrics: The collection of application specific metrics.
+
     Attributes:
         logger:
             The logger for the class.
@@ -24,6 +38,8 @@ class App:
             event across threads.
         schedulers:
             A dict of schedulers, keyed by scheduler id.
+        server:
+            The server instance.
     """
 
     def __init__(self, ctx: context.AppContext) -> None:
@@ -38,8 +54,10 @@ class App:
 
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
+
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
+
         self.schedulers: Dict[str, schedulers.Scheduler] = {}
         self.server: Optional[server.Server] = None
 
@@ -162,10 +180,11 @@ class App:
         """Start the main scheduler application, and run in threads the
         following processes:
 
-            * api server
             * schedulers
+            * listeners
             * monitors
             * metrics collecting
+            * api server
         """
         # Start the schedulers
         self.initialize_boefje_schedulers()
@@ -234,7 +253,9 @@ class App:
         os._exit(1)
 
     def remove_scheduler(self, scheduler_id: str) -> None:
-        """Remove a scheduler from the application.
+        """Remove a scheduler from the application. This method is passed
+        as a callback to the scheduler, so that the scheduler can remove
+        itself from the application.
 
         Args:
             scheduler_id: The id of the scheduler to remove.
