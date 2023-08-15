@@ -13,7 +13,7 @@ from tests.loading import get_raw_data
 def has_encryption_keys() -> bool:
     settings = get_settings()
 
-    return settings.kat_private_key_b64 and settings.vws_public_key_b64
+    return settings.private_key_b64 and settings.public_key_b64
 
 
 def test_save_raw(raw_repository: FileRawRepository) -> None:

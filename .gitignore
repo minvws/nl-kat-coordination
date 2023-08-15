@@ -436,3 +436,6 @@ deployment/github_config.sh
 
 nl-kat-*
 /_version.py
+
+# Automatically generated markdown files for the environment variables
+/docs/source/technical_design/environment_settings/*.md
