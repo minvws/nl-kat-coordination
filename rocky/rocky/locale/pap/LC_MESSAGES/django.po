@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 08:53+0000\n"
+"POT-Creation-Date: 2023-08-15 10:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3126,11 +3126,29 @@ msgid "OOI doesn't exist"
 msgstr "OOI no ta èksisti"
 
 #: tools/forms/findings.py
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show non-muted findings"
+msgstr "Muta diskubrimentu"
+
+#: tools/forms/findings.py
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show muted findings"
+msgstr "Muta diskubrimentu"
+
+#: tools/forms/findings.py
+msgid "Show muted and non-muted findings"
+msgstr ""
+
+#: tools/forms/findings.py
 msgid "Filter by severity"
 msgstr "Filtra pa gravedat"
 
 #: tools/forms/findings.py
-msgid "Exclude Muted Findings"
+#, fuzzy
+#| msgid "Exclude Muted Findings"
+msgid "Filter by muted findings"
 msgstr "Ekskluí Diskubrimentu den Mudansa"
 
 #: tools/forms/ooi.py
