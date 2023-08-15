@@ -55,6 +55,9 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
+    def tearDown(self):
+        self.scheduler.stop()
+
 
 class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def setUp(self):
