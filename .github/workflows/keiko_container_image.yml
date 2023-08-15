@@ -46,7 +46,7 @@ jobs:
           cp _version.py keiko/keiko/version.py
 
       - name: Build container image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4.1.1
         with:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827
