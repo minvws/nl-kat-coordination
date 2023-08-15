@@ -3133,11 +3133,29 @@ msgid "OOI doesn't exist"
 msgstr "Object bestaat niet"
 
 #: tools/forms/findings.py
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show non-muted findings"
+msgstr "Bevindingen Dempen"
+
+#: tools/forms/findings.py
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show muted findings"
+msgstr "Bevindingen Dempen"
+
+#: tools/forms/findings.py
+msgid "Show muted and non-muted findings"
+msgstr ""
+
+#: tools/forms/findings.py
 msgid "Filter by severity"
 msgstr "Filteren op ernst"
 
 #: tools/forms/findings.py
-msgid "Exclude Muted Findings"
+#, fuzzy
+#| msgid "Exclude Muted Findings"
+msgid "Filter by muted findings"
 msgstr "Gemuteerde bevindingen uitsluiten"
 
 #: tools/forms/ooi.py

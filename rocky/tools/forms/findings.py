@@ -8,6 +8,12 @@ FINDINGS_SEVERITIES_CHOICES = (
     (str(severity.name).lower(), str(severity.value).lower()) for severity in RiskLevelSeverity
 )
 
+MUTED_FINDINGS_CHOICES = (
+    ("non-muted", _("Show non-muted findings")),
+    ("muted", _("Show muted findings")),
+    ("all", _("Show muted and non-muted findings")),
+)
+
 
 class FindingSeverityMultiSelectForm(forms.Form):
     severity = forms.MultipleChoiceField(
@@ -18,5 +24,11 @@ class FindingSeverityMultiSelectForm(forms.Form):
     )
 
 
-class FindingMutedSelectionForm(BaseRockyForm):
-    exclude_muted = forms.BooleanField(label=_("Exclude Muted Findings"), required=False)
+class MutedFindingSelectionForm(BaseRockyForm):
+    muted_findings = forms.ChoiceField(
+        initial="non-muted",
+        label=_("Filter by muted findings"),
+        required=False,
+        choices=MUTED_FINDINGS_CHOICES,
+        widget=forms.RadioSelect,
+    )

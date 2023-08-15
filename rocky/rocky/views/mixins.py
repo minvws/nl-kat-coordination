@@ -199,7 +199,8 @@ class FindingList:
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
         severities: Set[RiskLevelSeverity],
-        exclude_muted: bool = True,
+        exclude_muted: bool = False,
+        only_muted: bool = False,
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
@@ -207,12 +208,14 @@ class FindingList:
         self._count = None
         self.severities = severities
         self.exclude_muted = exclude_muted
+        self.only_muted = only_muted
 
     @cached_property
     def count(self) -> int:
         return self.octopoes_connector.list_findings(
             severities=self.severities,
             exclude_muted=self.exclude_muted,
+            only_muted=self.only_muted,
             valid_time=self.valid_time,
             limit=0,
         ).count
@@ -227,6 +230,7 @@ class FindingList:
             findings = self.octopoes_connector.list_findings(
                 severities=self.severities,
                 exclude_muted=self.exclude_muted,
+                only_muted=self.only_muted,
                 valid_time=self.valid_time,
                 offset=offset,
                 limit=limit,
