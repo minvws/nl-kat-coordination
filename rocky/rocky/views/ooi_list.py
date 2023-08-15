@@ -101,7 +101,11 @@ class OOIListView(BaseOOIListView, OctopoesView):
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _("Could not raise clearance level to L%s. You acknowledged a clearance level of %s.")
+                _(
+                    "Could not raise clearance level to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Contact your administrator to receive a higher clearance."
+                )
                 % (
                     level,
                     self.organization_member.acknowledged_clearance_level,

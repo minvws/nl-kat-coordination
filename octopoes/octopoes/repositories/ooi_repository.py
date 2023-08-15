@@ -635,6 +635,7 @@ class XTDBOOIRepository(OOIRepository):
         self,
         severities: Set[RiskLevelSeverity],
         exclude_muted=False,
+        only_muted=False,
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
         valid_time: Optional[datetime] = None,
@@ -654,9 +655,11 @@ class XTDBOOIRepository(OOIRepository):
         ]
         or_scores = f"(or {' '.join(score_clauses)})"
 
-        exclude_muted_clause = ""
+        muted_clause = ""
         if exclude_muted:
-            exclude_muted_clause = "(not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])"
+            muted_clause = "(not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])"
+        elif only_muted:
+            muted_clause = "[?muted_finding :MutedFinding/finding ?finding]"
 
         severity_values = ", ".join([str_val(severity.value) for severity in severities])
 
@@ -669,7 +672,7 @@ class XTDBOOIRepository(OOIRepository):
                             [?finding :Finding/finding_type ?finding_type]
                             [(== ?severity severities_)]
                             {or_severities}
-                            {exclude_muted_clause}]
+                            {muted_clause}]
                 }}
                 :in-args [[{severity_values}]]
             }}
@@ -690,7 +693,7 @@ class XTDBOOIRepository(OOIRepository):
                             [(== ?severity severities_)]
                             {or_severities}
                             {or_scores}
-                            {exclude_muted_clause}]
+                            {muted_clause}]
                     :limit {limit}
                     :offset {offset}
                     :order-by [[?score :desc]]
