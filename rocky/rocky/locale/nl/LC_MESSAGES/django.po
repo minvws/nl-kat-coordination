@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-14 07:26+0000\n"
+"POT-Creation-Date: 2023-08-15 07:35+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1166,6 +1166,8 @@ msgstr "Risico klasse"
 #: rocky/templates/findings/finding_list.html:46
 #: rocky/templates/organizations/organization_crisis_room.html:38
 #: rocky/templates/partials/ooi_report_findings_block_table.html:16
+#: rocky/templates/tasks/boefjes.html:30
+#: rocky/templates/tasks/normalizers.html:32
 msgid "Details"
 msgstr "Details"
 
@@ -1410,8 +1412,6 @@ msgstr "Geselecteerde objecten:"
 #: katalogus/templates/change_clearance_level.html:31
 #: rocky/templates/partials/explanations.html:13
 #: rocky/templates/partials/explanations.html:22
-#: rocky/templates/tasks/boefjes.html:26
-#: rocky/templates/tasks/normalizers.html:26
 msgid "OOI"
 msgstr "OOI"
 
@@ -3274,91 +3274,91 @@ msgid ""
 "Edit this member and change the clearance level if necessary."
 msgstr ""
 
-#: rocky/settings.py:379
+#: rocky/settings.py:380
 msgid "Blue light"
 msgstr "Lichtblauw"
 
-#: rocky/settings.py:380
+#: rocky/settings.py:381
 msgid "Blue medium"
 msgstr "Blauw"
 
-#: rocky/settings.py:381
+#: rocky/settings.py:382
 msgid "Blue dark"
 msgstr "Donkerblauw"
 
-#: rocky/settings.py:382
+#: rocky/settings.py:383
 msgid "Green light"
 msgstr "Lichtgroen"
 
-#: rocky/settings.py:383
+#: rocky/settings.py:384
 msgid "Green medium"
 msgstr "Groen"
 
-#: rocky/settings.py:384
+#: rocky/settings.py:385
 msgid "Green dark"
 msgstr "Donkergroen"
 
-#: rocky/settings.py:385
+#: rocky/settings.py:386
 msgid "Yellow light"
 msgstr "Lichtgeel"
 
-#: rocky/settings.py:386
+#: rocky/settings.py:387
 msgid "Yellow medium"
 msgstr "Geel"
 
-#: rocky/settings.py:387
+#: rocky/settings.py:388
 msgid "Yellow dark"
 msgstr "Donkergeel"
 
-#: rocky/settings.py:388
+#: rocky/settings.py:389
 msgid "Orange light"
 msgstr "Lichtoranje"
 
-#: rocky/settings.py:389
+#: rocky/settings.py:390
 msgid "Orange medium"
 msgstr "Oranje"
 
-#: rocky/settings.py:390
+#: rocky/settings.py:391
 msgid "Orange dark"
 msgstr "Donkeroranje"
 
-#: rocky/settings.py:391
+#: rocky/settings.py:392
 msgid "Red light"
 msgstr "Lichtrood"
 
-#: rocky/settings.py:392
+#: rocky/settings.py:393
 msgid "Red medium"
 msgstr "Rood"
 
-#: rocky/settings.py:393
+#: rocky/settings.py:394
 msgid "Red dark"
 msgstr "Donkerrood"
 
-#: rocky/settings.py:394
+#: rocky/settings.py:395
 msgid "Violet light"
 msgstr "Lichtviolet"
 
-#: rocky/settings.py:395
+#: rocky/settings.py:396
 msgid "Violet medium"
 msgstr "Violet"
 
-#: rocky/settings.py:396
+#: rocky/settings.py:397
 msgid "Violet dark"
 msgstr "Donkerviolet"
 
-#: rocky/settings.py:400
+#: rocky/settings.py:401
 msgid "Plain"
 msgstr "Vlak"
 
-#: rocky/settings.py:401
+#: rocky/settings.py:402
 msgid "Solid"
 msgstr "Solide"
 
-#: rocky/settings.py:402
+#: rocky/settings.py:403
 msgid "Dashed"
 msgstr "Onderbroken"
 
-#: rocky/settings.py:403
+#: rocky/settings.py:404
 msgid "Dotted"
 msgstr "Gestippeld"
 
@@ -3417,6 +3417,8 @@ msgstr "Totaal aantal Bevindingen"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html:96
 #: rocky/templates/findings/finding_list.html:81
 #: rocky/templates/organizations/organization_crisis_room.html:56
+#: rocky/templates/tasks/boefjes.html:65
+#: rocky/templates/tasks/normalizers.html:68
 msgid "Close details"
 msgstr "Sluit details"
 
@@ -3424,6 +3426,8 @@ msgstr "Sluit details"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html:97
 #: rocky/templates/findings/finding_list.html:82
 #: rocky/templates/organizations/organization_crisis_room.html:57
+#: rocky/templates/tasks/boefjes.html:66
+#: rocky/templates/tasks/normalizers.html:69
 msgid "Open details"
 msgstr "Details openen"
 
@@ -3687,7 +3691,8 @@ msgstr "OpenKAT logo, ga naar de homepage van OpenKAT"
 msgid "Crisis room"
 msgstr "Crisis Room"
 
-#: rocky/templates/header.html:61 rocky/views/tasks.py:123
+#: rocky/templates/header.html:61 rocky/views/task_detail.py:36
+#: rocky/views/tasks.py:111 rocky/views/tasks.py:131
 msgid "Tasks"
 msgstr "Taken"
 
@@ -3902,8 +3907,8 @@ msgstr "met boefjes"
 
 #: rocky/templates/oois/ooi_detail.html:66
 #: rocky/templates/oois/ooi_detail_origins_observations.html:11
-#: rocky/templates/scan.html:17 rocky/templates/tasks/boefjes.html:27
-#: rocky/templates/tasks/normalizers.html:27
+#: rocky/templates/scan.html:17 rocky/templates/tasks/boefjes.html:26
+#: rocky/templates/tasks/normalizers.html:30
 msgid "Boefje"
 msgstr "Boefje"
 
@@ -4361,8 +4366,8 @@ msgstr "Rol"
 #: rocky/templates/organizations/organization_member_list.html:43
 #: rocky/templates/partials/scan_history.html:29
 #: rocky/templates/partials/scan_history.html:68
-#: rocky/templates/tasks/boefjes.html:28
-#: rocky/templates/tasks/normalizers.html:29
+#: rocky/templates/tasks/boefjes.html:27
+#: rocky/templates/tasks/normalizers.html:28
 #: rocky/templates/tasks/partials/task_filter.html:20
 msgid "Status"
 msgstr "Status"
@@ -4872,8 +4877,8 @@ msgid "Object"
 msgstr "Object"
 
 #: rocky/templates/partials/scan_history.html:69
-#: rocky/templates/tasks/boefjes.html:29
-#: rocky/templates/tasks/normalizers.html:30
+#: rocky/templates/tasks/boefjes.html:28
+#: rocky/templates/tasks/normalizers.html:29
 msgid "Created date"
 msgstr "Datum toegevoegd"
 
@@ -4971,6 +4976,28 @@ msgstr "U staat op het punt het vrijwaring niveau in te stellen van \\"
 msgid "Yes, set to inherit"
 msgstr "Ja, stel in"
 
+#: rocky/templates/tasks/boefje_task_detail.html:15
+msgid ""
+"An overview of the boefje task, the input OOI and the RAW data it generated."
+msgstr ""
+
+#: rocky/templates/tasks/boefje_task_detail.html:25
+#: rocky/templates/tasks/boefjes.html:75
+#: rocky/templates/tasks/normalizers.html:86
+msgid "Download meta and raw data"
+msgstr "Meta- en ruwe gegevens downloaden"
+
+#: rocky/templates/tasks/boefje_task_detail.html:27
+#: rocky/templates/tasks/boefjes.html:77
+msgid "Download meta data"
+msgstr "Metagegevens downloaden"
+
+#: rocky/templates/tasks/boefje_task_detail.html:32
+#, fuzzy
+#| msgid "Create object"
+msgid "Input object"
+msgstr "Maak object aan"
+
 #: rocky/templates/tasks/boefjes.html:18
 msgid "There are no tasks for boefjes"
 msgstr "Er zijn geen taken voor boefjes"
@@ -4980,34 +5007,20 @@ msgid "List of tasks for boefjes"
 msgstr "Takenlijst van boefjes"
 
 #: rocky/templates/tasks/boefjes.html:23
-#: rocky/templates/tasks/normalizers.html:23
+#: rocky/templates/tasks/normalizers.html:24
 msgid "List of tasks for "
 msgstr "Lijst van taken voor "
 
-#: rocky/templates/tasks/boefjes.html:30
-#: rocky/templates/tasks/normalizers.html:31
-msgid "Download task details"
-msgstr "Download taakdetails"
+#: rocky/templates/tasks/boefjes.html:29
+#, fuzzy
+#| msgid "Object"
+msgid "Input Object"
+msgstr "Object"
 
-#: rocky/templates/tasks/boefjes.html:31
-#: rocky/templates/tasks/normalizers.html:32
-msgid "Reschedule"
-msgstr "Opnieuw plannen"
-
-#: rocky/templates/tasks/boefjes.html:42
-#: rocky/templates/tasks/normalizers.html:43
+#: rocky/templates/tasks/boefjes.html:58
+#: rocky/templates/tasks/normalizers.html:61
 msgid "No input OOI"
 msgstr "Geen input object"
-
-#: rocky/templates/tasks/boefjes.html:57
-#: rocky/templates/tasks/normalizers.html:63
-msgid "Download meta and raw data"
-msgstr "Meta- en ruwe gegevens downloaden"
-
-#: rocky/templates/tasks/boefjes.html:59
-#: rocky/templates/tasks/normalizers.html:65
-msgid "Download meta data"
-msgstr "Metagegevens downloaden"
 
 #: rocky/templates/tasks/normalizers.html:18
 msgid "There are no tasks for normalizers"
@@ -5017,9 +5030,21 @@ msgstr "Er zijn geen taken voor normalizers"
 msgid "List of tasks for normalizers"
 msgstr "Lijst van taken voor normalizers"
 
-#: rocky/templates/tasks/normalizers.html:28
+#: rocky/templates/tasks/normalizers.html:27
 msgid "Normalizer"
 msgstr "Normalizer"
+
+#: rocky/templates/tasks/normalizers.html:31
+#, fuzzy
+#| msgid "No input OOI"
+msgid "Boefje input OOI"
+msgstr "Geen input object"
+
+#: rocky/templates/tasks/normalizers.html:78
+#, fuzzy
+#| msgid "Related objects"
+msgid "Yielded objects"
+msgstr "Gerelateerde objecten"
 
 #: rocky/templates/tasks/partials/tab_navigation.html:3
 msgid "List of tasks"
@@ -5315,7 +5340,12 @@ msgstr "Verfraaid"
 msgid "Indemnification successfully set."
 msgstr "Vrijwaringsniveau ingesteld."
 
-#: rocky/views/mixins.py:287
+#: rocky/views/mixins.py:126
+msgid ""
+"Can not parse observed_at parameter, falling back to showing current object"
+msgstr ""
+
+#: rocky/views/mixins.py:294
 msgid "All"
 msgstr "Alle"
 
@@ -5662,6 +5692,12 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py:62
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#~ msgid "Download task details"
+#~ msgstr "Download taakdetails"
+
+#~ msgid "Reschedule"
+#~ msgstr "Opnieuw plannen"
 
 #, python-format
 #~ msgid ""

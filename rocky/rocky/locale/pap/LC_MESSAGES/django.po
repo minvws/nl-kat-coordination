@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-11 14:34+0000\n"
+"POT-Creation-Date: 2023-08-15 07:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1154,6 +1154,8 @@ msgstr "Nivel di rísiko"
 #: rocky/templates/findings/finding_list.html:46
 #: rocky/templates/organizations/organization_crisis_room.html:38
 #: rocky/templates/partials/ooi_report_findings_block_table.html:16
+#: rocky/templates/tasks/boefjes.html:30
+#: rocky/templates/tasks/normalizers.html:32
 msgid "Details"
 msgstr "Detayes"
 
@@ -1398,8 +1400,6 @@ msgstr "OOI's selektá:"
 #: katalogus/templates/change_clearance_level.html:31
 #: rocky/templates/partials/explanations.html:13
 #: rocky/templates/partials/explanations.html:22
-#: rocky/templates/tasks/boefjes.html:26
-#: rocky/templates/tasks/normalizers.html:26
 msgid "OOI"
 msgstr "OOI"
 
@@ -3261,91 +3261,91 @@ msgid ""
 "Edit this member and change the clearance level if necessary."
 msgstr ""
 
-#: rocky/settings.py:379
+#: rocky/settings.py:380
 msgid "Blue light"
 msgstr "Blòw kla"
 
-#: rocky/settings.py:380
+#: rocky/settings.py:381
 msgid "Blue medium"
 msgstr "Blòw mediano"
 
-#: rocky/settings.py:381
+#: rocky/settings.py:382
 msgid "Blue dark"
 msgstr "Blòw skur"
 
-#: rocky/settings.py:382
+#: rocky/settings.py:383
 msgid "Green light"
 msgstr "Bèrdè kla"
 
-#: rocky/settings.py:383
+#: rocky/settings.py:384
 msgid "Green medium"
 msgstr "Bèrdè mediano"
 
-#: rocky/settings.py:384
+#: rocky/settings.py:385
 msgid "Green dark"
 msgstr "Bèrdè skur"
 
-#: rocky/settings.py:385
+#: rocky/settings.py:386
 msgid "Yellow light"
 msgstr "Hel kla"
 
-#: rocky/settings.py:386
+#: rocky/settings.py:387
 msgid "Yellow medium"
 msgstr "Hel mediano"
 
-#: rocky/settings.py:387
+#: rocky/settings.py:388
 msgid "Yellow dark"
 msgstr "Hel skur"
 
-#: rocky/settings.py:388
+#: rocky/settings.py:389
 msgid "Orange light"
 msgstr "Oraño kla"
 
-#: rocky/settings.py:389
+#: rocky/settings.py:390
 msgid "Orange medium"
 msgstr "Oraño mediano"
 
-#: rocky/settings.py:390
+#: rocky/settings.py:391
 msgid "Orange dark"
 msgstr "Oraño skur"
 
-#: rocky/settings.py:391
+#: rocky/settings.py:392
 msgid "Red light"
 msgstr "Kòra kla"
 
-#: rocky/settings.py:392
+#: rocky/settings.py:393
 msgid "Red medium"
 msgstr "Kòra mediano"
 
-#: rocky/settings.py:393
+#: rocky/settings.py:394
 msgid "Red dark"
 msgstr "Kòra skur"
 
-#: rocky/settings.py:394
+#: rocky/settings.py:395
 msgid "Violet light"
 msgstr "Violeta kla"
 
-#: rocky/settings.py:395
+#: rocky/settings.py:396
 msgid "Violet medium"
 msgstr "Violeta mediano"
 
-#: rocky/settings.py:396
+#: rocky/settings.py:397
 msgid "Violet dark"
 msgstr "Violeta skur"
 
-#: rocky/settings.py:400
+#: rocky/settings.py:401
 msgid "Plain"
 msgstr "Plano"
 
-#: rocky/settings.py:401
+#: rocky/settings.py:402
 msgid "Solid"
 msgstr "Solido"
 
-#: rocky/settings.py:402
+#: rocky/settings.py:403
 msgid "Dashed"
 msgstr "Strepiá"
 
-#: rocky/settings.py:403
+#: rocky/settings.py:404
 msgid "Dotted"
 msgstr "Puntá"
 
@@ -3401,6 +3401,8 @@ msgstr "Diskubrimentu Totál"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html:96
 #: rocky/templates/findings/finding_list.html:81
 #: rocky/templates/organizations/organization_crisis_room.html:56
+#: rocky/templates/tasks/boefjes.html:65
+#: rocky/templates/tasks/normalizers.html:68
 msgid "Close details"
 msgstr "Sera detayes"
 
@@ -3408,6 +3410,8 @@ msgstr "Sera detayes"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html:97
 #: rocky/templates/findings/finding_list.html:82
 #: rocky/templates/organizations/organization_crisis_room.html:57
+#: rocky/templates/tasks/boefjes.html:66
+#: rocky/templates/tasks/normalizers.html:69
 msgid "Open details"
 msgstr "Habri detayes"
 
@@ -3671,7 +3675,8 @@ msgstr "KAT logo, bai na e homepage di OpenKAT"
 msgid "Crisis room"
 msgstr "Sala di krísis"
 
-#: rocky/templates/header.html:61 rocky/views/tasks.py:123
+#: rocky/templates/header.html:61 rocky/views/task_detail.py:36
+#: rocky/views/tasks.py:111 rocky/views/tasks.py:131
 msgid "Tasks"
 msgstr "Enkargonan"
 
@@ -3891,8 +3896,8 @@ msgstr "uzando boefjes"
 
 #: rocky/templates/oois/ooi_detail.html:66
 #: rocky/templates/oois/ooi_detail_origins_observations.html:11
-#: rocky/templates/scan.html:17 rocky/templates/tasks/boefjes.html:27
-#: rocky/templates/tasks/normalizers.html:27
+#: rocky/templates/scan.html:17 rocky/templates/tasks/boefjes.html:26
+#: rocky/templates/tasks/normalizers.html:30
 msgid "Boefje"
 msgstr "Boefje"
 
@@ -4346,8 +4351,8 @@ msgstr "Rol"
 #: rocky/templates/organizations/organization_member_list.html:43
 #: rocky/templates/partials/scan_history.html:29
 #: rocky/templates/partials/scan_history.html:68
-#: rocky/templates/tasks/boefjes.html:28
-#: rocky/templates/tasks/normalizers.html:29
+#: rocky/templates/tasks/boefjes.html:27
+#: rocky/templates/tasks/normalizers.html:28
 #: rocky/templates/tasks/partials/task_filter.html:20
 msgid "Status"
 msgstr "Estádo"
@@ -4856,8 +4861,8 @@ msgid "Object"
 msgstr "Opheto"
 
 #: rocky/templates/partials/scan_history.html:69
-#: rocky/templates/tasks/boefjes.html:29
-#: rocky/templates/tasks/normalizers.html:30
+#: rocky/templates/tasks/boefjes.html:28
+#: rocky/templates/tasks/normalizers.html:29
 msgid "Created date"
 msgstr "Fecha kreá"
 
@@ -4955,6 +4960,28 @@ msgstr "Bo ta na e punto di pone e nivél di autorisashon for di \\"
 msgid "Yes, set to inherit"
 msgstr "Si, poné na heredá"
 
+#: rocky/templates/tasks/boefje_task_detail.html:15
+msgid ""
+"An overview of the boefje task, the input OOI and the RAW data it generated."
+msgstr ""
+
+#: rocky/templates/tasks/boefje_task_detail.html:25
+#: rocky/templates/tasks/boefjes.html:75
+#: rocky/templates/tasks/normalizers.html:86
+msgid "Download meta and raw data"
+msgstr "Download meta data i data krudo"
+
+#: rocky/templates/tasks/boefje_task_detail.html:27
+#: rocky/templates/tasks/boefjes.html:77
+msgid "Download meta data"
+msgstr "Download meta data"
+
+#: rocky/templates/tasks/boefje_task_detail.html:32
+#, fuzzy
+#| msgid "Create object"
+msgid "Input object"
+msgstr "Krea opheto"
+
 #: rocky/templates/tasks/boefjes.html:18
 msgid "There are no tasks for boefjes"
 msgstr "No tin tareanan pa boefjes"
@@ -4964,34 +4991,20 @@ msgid "List of tasks for boefjes"
 msgstr "Lista di tareanan pa boefjes"
 
 #: rocky/templates/tasks/boefjes.html:23
-#: rocky/templates/tasks/normalizers.html:23
+#: rocky/templates/tasks/normalizers.html:24
 msgid "List of tasks for "
 msgstr "Lista di tareanan pa "
 
-#: rocky/templates/tasks/boefjes.html:30
-#: rocky/templates/tasks/normalizers.html:31
-msgid "Download task details"
-msgstr "Download detayes di tarea"
+#: rocky/templates/tasks/boefjes.html:29
+#, fuzzy
+#| msgid "Object"
+msgid "Input Object"
+msgstr "Opheto"
 
-#: rocky/templates/tasks/boefjes.html:31
-#: rocky/templates/tasks/normalizers.html:32
-msgid "Reschedule"
-msgstr "Reagenda"
-
-#: rocky/templates/tasks/boefjes.html:42
-#: rocky/templates/tasks/normalizers.html:43
+#: rocky/templates/tasks/boefjes.html:58
+#: rocky/templates/tasks/normalizers.html:61
 msgid "No input OOI"
 msgstr "No tin entrada OOI"
-
-#: rocky/templates/tasks/boefjes.html:57
-#: rocky/templates/tasks/normalizers.html:63
-msgid "Download meta and raw data"
-msgstr "Download meta data i data krudo"
-
-#: rocky/templates/tasks/boefjes.html:59
-#: rocky/templates/tasks/normalizers.html:65
-msgid "Download meta data"
-msgstr "Download meta data"
 
 #: rocky/templates/tasks/normalizers.html:18
 msgid "There are no tasks for normalizers"
@@ -5001,9 +5014,21 @@ msgstr "No tin tareanan pa normalizers"
 msgid "List of tasks for normalizers"
 msgstr "Lista di tareanan pa normalizers"
 
-#: rocky/templates/tasks/normalizers.html:28
+#: rocky/templates/tasks/normalizers.html:27
 msgid "Normalizer"
 msgstr "Normalizer"
+
+#: rocky/templates/tasks/normalizers.html:31
+#, fuzzy
+#| msgid "No input OOI"
+msgid "Boefje input OOI"
+msgstr "No tin entrada OOI"
+
+#: rocky/templates/tasks/normalizers.html:78
+#, fuzzy
+#| msgid "Related objects"
+msgid "Yielded objects"
+msgstr "Ophetonan relatá"
 
 #: rocky/templates/tasks/partials/tab_navigation.html:3
 msgid "List of tasks"
@@ -5296,7 +5321,12 @@ msgstr "Bunitifiká"
 msgid "Indemnification successfully set."
 msgstr "Indemnizashon pone ku èxito."
 
-#: rocky/views/mixins.py:287
+#: rocky/views/mixins.py:126
+msgid ""
+"Can not parse observed_at parameter, falling back to showing current object"
+msgstr ""
+
+#: rocky/views/mixins.py:294
 msgid "All"
 msgstr "Tur"
 
@@ -5638,6 +5668,12 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py:62
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "Download task details"
+#~ msgstr "Download detayes di tarea"
+
+#~ msgid "Reschedule"
+#~ msgstr "Reagenda"
 
 #, python-format
 #~ msgid ""
