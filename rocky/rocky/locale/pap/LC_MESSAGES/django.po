@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 09:33+0000\n"
+"POT-Creation-Date: 2023-08-15 10:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,28 +61,21 @@ msgid "--- Please select one of the available options ----"
 msgstr "--- Por fabor selektá ún di e opcionnan disponibel ----"
 
 #: account/forms/account_setup.py
-#, fuzzy
-#| msgid "Account Type"
 msgid "Account Type"
 msgstr "Tipo di account"
 
 #: account/forms/account_setup.py
-#, fuzzy
-#| msgid "Every member of OpenKAT must be part of a group."
 msgid "Every member of OpenKAT must be part of an account type."
-msgstr "Kada miembro di OpenKAT mester ta parti di un grupo."
+msgstr "Kada miembro di OpenKAT mester ta parti di un tipo di kuenta."
 
 #: account/forms/account_setup.py
-#, fuzzy
-#| msgid "Please select a group to proceed."
 msgid "Please select an account type to proceed."
-msgstr "Por favor selektá un grupo pa por sigi."
+msgstr "Por fabor, selekshoná un tipo di kuenta pa sigui."
 
 #: account/forms/account_setup.py
-#, fuzzy
-#| msgid "Set clearance level"
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
-msgstr "Pone nivél di autorisashon"
+msgstr "Nivel di autorisashon konfiable"
 
 #: account/forms/account_setup.py
 msgid "Select a clearance level you trust this member with."
@@ -301,10 +294,8 @@ msgid "date joined"
 msgstr "fecha di registro"
 
 #: account/templates/account_detail.html
-#, fuzzy
-#| msgid "Account details"
 msgid "Account details"
-msgstr "Habri detayes"
+msgstr "Detayenan di kuenta"
 
 #: account/templates/account_detail.html account/templates/password_reset.html
 #: account/views/password_reset.py
@@ -343,21 +334,49 @@ msgstr "OOI autorisá"
 #: account/templates/account_detail.html
 msgid ""
 "\n"
-"                                You don't have any clearance to scan objects."
+"                            You don't have any clearance to scan objects."
 "<br>\n"
-"                                Get in contact with the admin to give you "
-"the necessary clearance level.\n"
-"                                "
+"                            Get in contact with the admin to give you the "
+"necessary clearance level.\n"
+"                        "
 msgstr ""
 "\n"
-"              Bo no tin autorisashon pa skan ophetonan.<br>\n"
-"              Tuma kontacto ku e admin pa duna'bo e necesario nivél di "
-"autorisashon.\n"
-"            "
+" Bo no tin ningun nivel di autorisashon pa skan ophetonan.<br>\n"
+" Tuma kontakto ku e administradó pa duna bo e nivel di autorisashon "
+"nesesario.\n"
+" "
 
 #: account/templates/account_detail.html
-msgid "You have currently accepted clearance up to level"
-msgstr "Bo a acceptá nivél di autorisashon te na nivel"
+msgid "You have currently accepted clearance up to level "
+msgstr "Bo aktualmente a aseptá e nivel di autorisashon te na nivel "
+
+#: account/templates/account_detail.html
+msgid "Explanation OOI Clearance"
+msgstr "Splikashon OOI Autorisashon"
+
+#: account/templates/account_detail.html
+msgid ""
+"You can withdraw this at anytime you like, but know that you won't be able "
+"to change clearance levels anymore when you do."
+msgstr ""
+"Bo por retirá esaki n'e momento ku bo ke, pero sa ku bo no por kambia nivél "
+"di autorisashon mas ora bo hasi esaki."
+
+#: account/templates/account_detail.html
+#, python-format
+msgid ""
+"\n"
+"                            \"Withdraw acceptance of level L%(acl)s "
+"clearance and responsibility\"\n"
+"                    "
+msgstr ""
+"\n"
+"\"Retirá aseptashon di nivel di autorisashon L%(acl)s i responsabilidat\"\n"
+" "
+
+#: account/templates/account_detail.html
+msgid "Explanation OOI clearance"
+msgstr "Splikashon OOI autorisashon"
 
 #: account/templates/account_detail.html
 #, python-format
@@ -374,22 +393,15 @@ msgstr ""
 
 #: account/templates/account_detail.html
 #, python-format
-msgid "\"Accept level L%(tcl)s clearance and responsibility\""
-msgstr "\"Aseptá autorisashon di nivel L%(tcl)s i responsabilidat\""
-
-#: account/templates/account_detail.html
 msgid ""
-"You can withdraw this at anytime you like, but know that you won't be able "
-"to change clearance levels anymore when you do."
+"\n"
+"                        \"Accept level L%(tcl)s clearance and "
+"responsibility\"\n"
+"                    "
 msgstr ""
-"Bo por retirá esaki n'e momento ku bo ke, pero sa ku bo no por kambia nivél "
-"di autorisashon mas ora bo hasi esaki."
-
-#: account/templates/account_detail.html
-#, python-format
-msgid "\"Withdraw acceptance of level L%(tcl)s clearance and responsibility\""
-msgstr ""
-"\"Retirá akseptashon di autorisashon di nivel L%(tcl)s i responsabilidat\""
+"\n"
+"\"Aseptá nivel di autorisashon L%(tcl)s i responsabilidat\"\n"
+" "
 
 #: account/templates/login.html rocky/templates/two_factor/core/login.html
 msgid "You are logged in."
@@ -554,22 +566,18 @@ msgid "Back to login"
 msgstr "Bèk na login"
 
 #: account/templates/registration_email.html
-#, fuzzy, python-format
-#| msgid ""
-#| "You're receiving this email because you requested a password reset for "
-#| "your user account at %(site_name)s."
+#, python-format
 msgid ""
 "Welcome to OpenKAT. You're receiving this email because you have been added "
 "to organization \"%(organization)s\" at %(site_name)s."
 msgstr ""
-"Bo ta risibiendo e mensahe aki paso bo a pidi un password resèt pa bo user "
-"account riba %(site_name)s."
+"Bon bini na OpenKAT. Bo ta risibí e email aki pasobra bo a ser agrega\n"
+"na organisashon \"%(organization)s\" na %(site_name)s."
 
 #: account/templates/registration_subject.txt
-#, fuzzy, python-format
-#| msgid "Password reset on %(site_name)s"
+#, python-format
 msgid "Verify OpenKAT account on %(site_name)s"
-msgstr "Password resèt riba %(site_name)s"
+msgstr "Verifiká kuenta di OpenKAT riba %(site_name)s"
 
 #: account/validators.py
 msgid "Your password must contain at least the following:"
@@ -1839,14 +1847,15 @@ msgstr ""
 "No por subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
 "presente na organisashon %s."
 
-#: katalogus/views/mixins.py
+#: katalogus/views/mixins.py rocky/views/scan_profile.py
 #, python-format
 msgid ""
-"Could not raise clearance level of %s to L%s.                             "
-"You acknowledged a clearance level of %s."
+"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
+"level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "No por subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di "
-"autorisashon di %s."
+"autorisashon di L%s. Tuma kontakto ku bo administrator pa risibí un nivel di "
+"autorisashon mas haltu."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -1861,33 +1870,26 @@ msgid "Please select an OOI to start scan."
 msgstr "Por fabor, selekshoná un OOI pa kuminsá skan."
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy, python-brace-format
-#| msgid "Boefje '{boefje_id}' disabled."
+#, python-brace-format
 msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_id}' desaktivá."
+msgstr "Boefje '{boefje_name}' desaktivá."
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "Failed fetching settings for boefje {boefje_id}. Is the Katalogus up?"
+#, python-brace-format
 msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
 msgstr ""
-"Faya den buskamentu di ajustenan pa boefje {boefje_id}. Katalogus ta sende?"
+"Faya den buskamentu di ajustenan pa boefje {boefje_name}. Katalogus ta sende?"
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "Before enabling, please set the required settings for boefje "
-#| "'{boefje_id}'."
+#, python-brace-format
 msgid ""
 "Before enabling, please set the required settings for boefje '{boefje_name}'."
-msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_id}'."
+msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_name}'."
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy, python-brace-format
-#| msgid "Boefje '{boefje_id}' enabled."
+#, python-brace-format
 msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_id}' aktivá."
+msgstr "Boefje '{boefje_name}' aktivá."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
@@ -2044,6 +2046,7 @@ msgstr "Enviá kambionan"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Continue"
 msgstr "Sigi"
 
@@ -2300,7 +2303,9 @@ msgstr ""
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_3f_set_clearance_level.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
 msgstr "Legumai onboarding"
@@ -2576,19 +2581,22 @@ msgstr "Nètwèrk"
 msgid "Start scanning"
 msgstr "Start skan"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_3f_set_clearance_level.html
 msgid "OpenKAT Introduction"
 msgstr "OpenKAT Introdukshon"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
-msgid "Setup - Set clearance level for"
-msgstr "Sètup - Pone nivel di autorisashon pa example.org"
+#: onboarding/templates/step_3d_clearance_level_introduction.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+msgid "Setup scan - OOI clearance for"
+msgstr "Sètup skan- OOI autorisashon pa"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Introduction"
 msgstr "Introdukshon"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 #: rocky/templates/partials/form/indemnification_add_form.html
 msgid ""
 "Some scans are lightweight while others might be a bit more aggressive with "
@@ -2605,11 +2613,11 @@ msgstr ""
 "probabelmente bo no tin e derechi pa hasi meskos ku ophetonan ku ta "
 "pertenese na otro personanan of kompanianan."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "How to know required clearance level"
 msgstr "Kon pa sa nivél di autorisashon requerí"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
 "Each plugin that scans will have a scan intensity score. The intensity of "
 "the scan must be equal to or below the clearance level you set for your "
@@ -2623,7 +2631,7 @@ msgstr ""
 "haltu, OpenKAT lo notifiká bo promé di eksekutá e skaneo. Visualmente, "
 "nivelnan di autorisashon i punto di intensidat ta indiká ku patanan di pushi."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
 "This scan has a scan intensity score of 1, requiring a level 1 clearance "
 "level to be run. This means that the scan does not touch the object itself, "
@@ -2633,7 +2641,7 @@ msgstr ""
 "autorisashon pa start. Esaki ta nifika ku e skan no ta mishi ku e opheto "
 "riba su mes, pero solamente ta buska informashon tokante e opheto."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
 "An example of a more aggressive scan. Which has a scan intensity score of 3. "
 "Meaning it requires at least a level 3 clearance level to be set on your "
@@ -2643,43 +2651,170 @@ msgstr ""
 "skaneo di 3. Esaki ta nifiká ku mester tin por lo menos un nivel di "
 "autorisashon di 3 pa wordu ajustá riba bo opheto."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
-msgid "Setting and changing your clearance level"
-msgstr "Poniendo i kambiando bo nivél di autorisashon"
-
-#: onboarding/templates/step_3d_set_clearance_level.html
-#, fuzzy, python-format
-#| msgid ""
-#| "After creating a new object OpenKAT will ask you to set a clearance "
-#| "level. On the object detail page you can always change the clearance "
-#| "level. For the onboarding we will suggest to set the clearance level to "
-#| "L2."
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid ""
-"After creating a new object OpenKAT will ask you to set a clearance level. "
-"On the object detail page you can always change the clearance level. For the "
-"onboarding we will suggest to set the clearance level to "
-"L%(dns_report_least_clearance_level)s."
+"\n"
+"                    OpenKAT has a permission system that allows "
+"administrators to\n"
+"                    configure which users can set a certain clearance level. "
+"The will make sure\n"
+"                    that only users that are trusted can start the more "
+"aggressive scans.\n"
+"                "
 msgstr ""
-"Despues di krea un opheto nobo OpenKAT lo puntra'bu pa pone un nivél di "
-"autorisashon. Riba e opheto su página detaya por por semper kambia e nivél "
-"di authorisahon. Pa e abòrdamentu aki nos lo sugerí'bu pa pone e nivél na L2."
+"\n"
+"OpenKAT tin un sistema di permiso ku ta laga administratornan\n"
+"configure kua usuarionan por pone un nivel di autorisashon determiná. Esaki "
+"lo segurá\n"
+"ku solamente usuarionan ku ta konfiable por inisiá e skaneonan mas "
+"agresivo.\n"
+" "
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+msgid "Acknowledge clearance level"
+msgstr "Rekonosé nivel di autorisashon"
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+msgid ""
+"\n"
+"                    Before a member is granted the ability to set clearance "
+"levels on an object,\n"
+"                    they must first acknowledge and accept the clearance "
+"level set by the administrators.\n"
+"                    The maximum scanning level permitted for a member is "
+"aligned with the trusted clearance level.\n"
+"                    By acknowledging the trusted clearance level, this "
+"member formally agrees to abide by\n"
+"                    this permission and gains the capability to perform "
+"scans only up to this trusted clearance level.\n"
+"                    This two-step process ensures that the member operates "
+"within authorized boundaries.\n"
+"                "
+msgstr ""
+"\n"
+"Promé ku un miembro ta otorgá e habilidat pa pone nivelnan di autorisashon "
+"riba un opheto,\n"
+"promé nan mester reconosé i aseptá e nivel di autorisashon poni pa e "
+"administratornan.\n"
+"E nivel máksimo di skaneo permití pa un miembro ta aliná ku e nivel di "
+"autorisashon konfiable.\n"
+"Pa reconosé e nivel di autorisashon konfiable, e miembro aki formalmente ta "
+"akordá pa kumpli ku\n"
+"e permiso aki i ta haña e kapasidat pa realizá skaneonan solamente te na e "
+"nivel di autorisashon konfiable aki.\n"
+"E proheso di dos pason aki ta garantisá ku e miembro ta operá den "
+"fronteranan autorisá.\n"
+" "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+msgid "What is my clearance level?"
+msgstr "Kiko ta mi nivel di autorisashon?"
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, python-format
+msgid ""
+"\n"
+"                                Unfortunately you cannot continue the "
+"onboarding. </br>\n"
+"                                Your administrator has trusted you with a "
+"clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+"                                You need at least a clearance level of "
+"<strong>L%(dns_report_least_clearance_level)s</strong> to scan "
+"<strong>%(ooi)s</strong></br>\n"
+"                                Contact your administrator to receive a "
+"higher clearance.\n"
+"                            "
+msgstr ""
+"\n"
+" Desafortunadamente bo no por sigui ku e proceso di onboarding. </br>\n"
+" Bo administrator a konfia bo ku un nivel di autorisashon di "
+"<strong>L%(tcl)s</strong>.</br>\n"
+" Bo mester tin almenos un nivel di autorisashon di "
+"<strong>L%(dns_report_least_clearance_level)s</strong> pa skaneá\n"
+" <strong>%(ooi)s</strong></br>\n"
+" Tuma kontakto ku bo administrator pa risibí un nivel di autorisashon mas "
+"haltu.\n"
+" "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, python-format
+msgid ""
+"\n"
+"                            Your administrator has trusted you with a "
+"clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+"                            You must first accept this clearance level to "
+"continue.\n"
+"                            "
+msgstr ""
+"\n"
+" Bo administrator a konfia bo ku un nivel di autorisashon di "
+"<strong>L%(tcl)s</strong>.</br>\n"
+" Promé bo mester aseptá e nivel di autorisashon aki pa por sigui.\n"
+" "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, python-format
+msgid ""
+"\n"
+"                            Accept level L%(tcl)s clearance and "
+"responsibility\n"
+"                        "
+msgstr ""
+"\n"
+"Aseptá nivel di autorisashon L%(tcl)s i responsabilidat\n"
+"                        "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, python-format
+msgid ""
+"\n"
+"                            Your administrator has <strong>trusted</strong> "
+"you with a clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+"                            You have also <strong>acknowledged</strong> to "
+"use this clearance level of <strong>L%(acl)s</strong>.\n"
+"                            "
+msgstr ""
+"\n"
+" Bo administrator a <strong>konfia</strong> bo ku un nivel di autorisashon "
+"di <strong>L%(tcl)s</strong>.</br>\n"
+" Bo tambe a <strong>rekonosé</strong> pa usa e nivel di autorisashon aki di "
+"<strong>L%(acl)s</strong>.\n"
+" "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_3f_set_clearance_level.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level"
 msgstr "Pone nivél di autorisashon"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3f_set_clearance_level.html
+msgid "Setup scan - Set clearance level for"
+msgstr "Sètup skan- Pone nivel di autorisashon pa"
+
+#: onboarding/templates/step_3f_set_clearance_level.html
+#, python-format
+msgid ""
+"After creating a new object OpenKAT will ask you to set a clearance level. "
+"On the object detail page you can always change the clearance level. For the "
+"onboarding we will suggest to set the clearance level to "
+"L%(dns_report_least_clearance_level)s."
+msgstr ""
+"Despues di krea un opheto nobo, OpenKAT lo puntra bo pa pone un nivel di "
+"autorisashon. Na e página di detaye di e opheto, bo por kambia e nivel di "
+"autorisashon semper. Pa e proceso di onboarding nos lo sugeri pa pone e "
+"nivel di autorisashon na L%(dns_report_least_clearance_level)s."
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Setup scan - Enable plugins"
 msgstr "Configurá skan - Aktivá plugins"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Plugins introduction"
 msgstr "Plugins su introduskhon"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a "
 "specific skillset that will help to generate your report. There are three "
@@ -2688,14 +2823,14 @@ msgstr ""
 "OpenKAT ta huza plugins pa scan, check i analisá. Kada plugin ta trese un "
 "abilidát specifikó ku lo juda pa generá bo rapòrt. Tin tres tipo di plugins."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: tools/forms/boefje.py rocky/templates/scan.html
 #: rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr "Boefjes"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
@@ -2704,28 +2839,28 @@ msgstr ""
 "prevení scannan invasivo riba opheto kaminda bo no tin autorisashon pa hasi "
 "esaki."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Normalizers"
 msgstr "Normalizers"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Check the data for specific objects and add these object to your object list."
 msgstr ""
 "Chèk e data pa ophetonan specifikó i añadi e ophetonan aki na bo lista di "
 "opheto."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Bits"
 msgstr "Bits"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Analyze the available data to come to insights and conclusions."
 msgstr "Analisá e data disponibel pa yega na konklushonnan i perspectivanan."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "OpenKAT will be able to generate a full report when all the required and "
 "suggested plugins are enabled. If you choose not to give a plugin permission "
@@ -2740,11 +2875,11 @@ msgstr ""
 "generá a base di e data ku tin disponibel kolektá pa e plugins aktivo. Abou "
 "bo por mira e plugins nan ku ta requerí pa e rapòrt aki."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr "Laga nos ban setup e skan dor di aktivá e plugins di bo eskoho abou."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Suggested plugins"
 msgstr "Plugins sugerí"
 
@@ -2832,19 +2967,17 @@ msgstr ""
 "presente pa organisashon %s."
 
 #: onboarding/views.py
-#, python-format
 msgid ""
-"Could not raise clearance level of %s to L%s.                 You "
-"acknowledged a clearance level of %s."
+"Could not raise clearance level of {} to L{}. You acknowledged a clearance "
+"level of L{}. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel "
-"di autorisashon di %s."
+"No por subi e nivel di autorisashon di {} pa L{}. Bo a rekonosé un nivel di "
+"autorisashon di L{}. Tuma kontakto ku bo administrator pa risibí un nivel di "
+"autorisashon mas haltu."
 
 #: onboarding/views.py
-#, fuzzy
-#| msgid "Clearance level inheritance"
 msgid "Clearance level has been set"
-msgstr "Herensia di nivel di autorisashon"
+msgstr "Nivel di autorisashon a ser poni"
 
 #: onboarding/views.py
 msgid "OpenKAT Setup"
@@ -2993,16 +3126,12 @@ msgid "OOI doesn't exist"
 msgstr "OOI no ta èksisti"
 
 #: tools/forms/findings.py
-#, fuzzy
-#| msgid "Filter by"
 msgid "Filter by severity"
-msgstr "Filtra pa"
+msgstr "Filtra pa gravedat"
 
 #: tools/forms/findings.py
-#, fuzzy
-#| msgid "Mute Findings"
 msgid "Exclude Muted Findings"
-msgstr "Muta Diskubrimentu"
+msgstr "Ekskluí Diskubrimentu den Mudansa"
 
 #: tools/forms/ooi.py
 msgid "Filter types"
@@ -3212,6 +3341,10 @@ msgid ""
 "needs at least a clearance level of L{} in order to do a proper onboarding. "
 "Edit this member and change the clearance level if necessary."
 msgstr ""
+"Bo a konfia e miembro aki ku un nivel di autorisashon di L{}. E miembro aki\n"
+"mester tin almenos un nivel di autorisashon di L{} pa por hasi un adaptashon "
+"adekuá.\n"
+"Editá e miembro aki i kambia e nivel di autorisashon si ta nesesario."
 
 #: rocky/settings.py
 msgid "Blue light"
@@ -3567,10 +3700,8 @@ msgid "Set filters"
 msgstr "Pone filternan"
 
 #: rocky/templates/findings/findings_filter.html
-#, fuzzy
-#| msgid "Set filters"
 msgid "Clear filters"
-msgstr "Pone filternan"
+msgstr "Kita filters"
 
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
@@ -3958,13 +4089,11 @@ msgstr "Tarea ID"
 #: rocky/templates/oois/ooi_edit.html
 #, python-format
 msgid "Edit %(type)s: %(ooi_human_readable)s"
-msgstr ""
+msgstr "Editá %(type)s: %(ooi_human_readable)s"
 
 #: rocky/templates/oois/ooi_edit.html
-#, fuzzy
-#| msgid "This field cannot be null."
 msgid "Primary key fields cannot be edited."
-msgstr "E vèld aki no por ta bashi."
+msgstr "Primary key no por ser editá."
 
 #: rocky/templates/oois/ooi_edit.html
 #, python-format
@@ -4203,30 +4332,24 @@ msgid "Tags"
 msgstr "Labelnan"
 
 #: rocky/templates/organizations/organization_member_add.html
-#, fuzzy
-#| msgid "Member account setup"
 msgid " member account setup"
-msgstr "Account setup pa miembro"
+msgstr " konfigurashon di kuenta di miembro"
 
 #: rocky/templates/organizations/organization_member_add.html
 msgid "Member details"
 msgstr "Detayes di miembro"
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
-#, fuzzy
-#| msgid "Member account setup"
 msgid "Member account type setup"
-msgstr "Account setup pa miembro"
+msgstr "Konfigurashon di tipo di kuenta di miembro"
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
 msgid "Choose an account type for this new member."
-msgstr ""
+msgstr "Selekshoná un tipo di kuenta pa e miembro nobo aki."
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
-#, fuzzy
-#| msgid "Account details"
 msgid "Account type details"
-msgstr "Habri detayes"
+msgstr "Detayenan di tipo di kuenta"
 
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/views/organization_member_edit.py
@@ -4249,22 +4372,16 @@ msgstr ""
 "                "
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy
-#| msgid "Add member"
 msgid "Add member(s)"
-msgstr "Añadí miembro"
+msgstr "Añadí miembro(nan)"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy
-#| msgid "January"
 msgid "Manually"
-msgstr "Januari"
+msgstr "Manualmente"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy
-#| msgid "Upload CSV"
 msgid "Upload a CSV"
-msgstr "Subi CSV"
+msgstr "Subi un CSV"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
@@ -4299,17 +4416,15 @@ msgstr "Aktivá"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
-msgstr ""
+msgstr "Subi un archivo csv ku miembronan pa e organisashon"
 
 #: rocky/templates/organizations/organization_member_upload.html
-#, fuzzy
-#| msgid "Download meta data"
 msgid "Download the template"
-msgstr "Download meta data"
+msgstr "Download e template"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "or create a csv file with the following criteria"
-msgstr ""
+msgstr "òf krea un archivo csv ku e kriterionan sigiente"
 
 #: rocky/templates/organizations/organization_member_upload.html
 #: rocky/templates/upload_csv.html
@@ -4317,10 +4432,8 @@ msgid "These are the criteria for CSV upload:"
 msgstr "Esakinan ta e kriterianan pa upload CSV:"
 
 #: rocky/templates/organizations/organization_member_upload.html
-#, fuzzy
-#| msgid "Upload CSV"
 msgid "Upload"
-msgstr "Subi CSV"
+msgstr "Upload"
 
 #: rocky/templates/organizations/organization_settings.html
 #, python-format
@@ -5259,7 +5372,7 @@ msgstr "Añadí %(ooi_type)s"
 
 #: rocky/views/ooi_detail.py
 msgid "Only Question OOIs can be answered."
-msgstr ""
+msgstr "Solamente Question OOIs por ser respondí."
 
 #: rocky/views/ooi_detail_related_object.py
 msgid " (as "
@@ -5290,10 +5403,11 @@ msgstr ""
 #, python-format
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
-"of %s."
+"of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por a hasi e nivel di autorisashon subi pa L%s. Bo a rekonosé un nivel di "
-"autorisashon di %s."
+"No por subi e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di "
+"autorisashon di L%s. Tuma kontakto ku bo administrator pa risibí un nivel di "
+"autorisashon mas haltu."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5402,63 +5516,54 @@ msgstr "Añadi titulo pa kòlòm. Sigi pa kada opheto riba un liña nobo."
 
 #: rocky/views/organization_member_add.py
 msgid "The columns are: "
-msgstr ""
+msgstr "E kolumnannan ta: "
 
 #: rocky/views/organization_member_add.py
-#, fuzzy
-#| msgid "Clearance level has been set"
 msgid "Clearance levels should be between -1 and 4."
-msgstr "Clearance nivél a wòrdu poné"
+msgstr "Niveles di autorisashon mester ta entre -1 i 4."
 
 #: rocky/views/organization_member_add.py
 msgid "Account type can be one of: "
-msgstr ""
+msgstr "Tipo di kuenta por ta un di e siguiente: "
 
 #: rocky/views/organization_member_add.py
-#, fuzzy
-#| msgid "Account Type"
 msgid "Add Account Type"
-msgstr "Tipo di account"
+msgstr "Añadi Tipo di account"
 
 #: rocky/views/organization_member_add.py
 msgid "Member added successfully."
 msgstr "Miembro a wòrdu agregá ku èksito."
 
 #: rocky/views/organization_member_add.py
-#, fuzzy
-#| msgid "Add member"
 msgid "Add Member"
 msgstr "Añadí miembro"
 
 #: rocky/views/organization_member_add.py
-#, fuzzy
-#| msgid "This field is required"
 msgid "The csv file is missing required columns"
-msgstr "E vèld aki ta obligatorio"
+msgstr "E archivo csv ta falta kolumnanan necesario"
 
 #: rocky/views/organization_member_add.py
 #, python-brace-format
 msgid "Invalid account type: '{account_type}'"
-msgstr ""
+msgstr "Tipo di kuenta no válido: '{account_type}'"
 
 #: rocky/views/organization_member_add.py
 #, python-brace-format
 msgid "Invalid data for: '{email}'"
-msgstr ""
+msgstr "Datos no válido pa: '{email}'"
 
 #: rocky/views/organization_member_add.py
-#, fuzzy, python-brace-format
-#| msgid "Enter a valid email address."
+#, python-brace-format
 msgid "Invalid email address: '{email}'"
-msgstr "Yena un email adres balido."
+msgstr "Adres di email no válido: '{email}'"
 
 #: rocky/views/organization_member_add.py
 msgid "Successfully processed users from csv."
-msgstr ""
+msgstr "Usuarionan a ser prosesá exitosamente for di csv."
 
 #: rocky/views/organization_member_add.py
 msgid "Error parsing the csv file. Please verify its contents."
-msgstr ""
+msgstr "Error analizando e archivo csv. Por fabor, verifica su kontenido."
 
 #: rocky/views/organization_member_edit.py
 #, python-format
@@ -5514,15 +5619,6 @@ msgid ""
 msgstr ""
 "No por a subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
 "presente pa organisashon %s."
-
-#: rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                         You "
-"acknowledged a clearance level of %s."
-msgstr ""
-"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel "
-"di autorisashon di %s."
 
 #: rocky/views/scan_profile.py
 msgid "Choose a valid level"
@@ -5591,1335 +5687,3 @@ msgstr "Arkivo crudo añadi ku èxito."
 
 #~ msgid "Reschedule"
 #~ msgstr "Reagenda"
-
-#, python-format
-#~ msgid ""
-#~ "Could not raise clearance level of %s to L%s.                     "
-#~ "Indemnification not present at organization %s."
-#~ msgstr ""
-#~ "No por a aumenta e nivel di autorisashon di %s pa L%s. Indemnifikashon no "
-#~ "presente pa organisashon %s."
-
-#, python-format
-#~ msgid ""
-#~ "Could not raise clearance level of %s to L%s.                     You "
-#~ "acknowledged a clearance level of %s."
-#~ msgstr ""
-#~ "No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un "
-#~ "nivel di autorisashon di %s."
-
-#~ msgid ""
-#~ "\n"
-#~ "              You don't have any clearance to scan objects.<br>\n"
-#~ "              Get in contact with the admin to give you the necessary "
-#~ "clearance level.\n"
-#~ "            "
-#~ msgstr ""
-#~ "\n"
-#~ "              Bo no tin autorisashon pa skan ophetonan.<br>\n"
-#~ "              Tuma kontacto ku e admin pa duna'bo e necesario nivél di "
-#~ "autorisashon.\n"
-#~ "            "
-
-#, python-format
-#~ msgid ""
-#~ "You are granted clearance for %(cl)s your admin. Before you can change "
-#~ "OOI clearance levels up to this level, you need to accept this "
-#~ "permission. Remember: <strong>with great power comes great responsibility."
-#~ "</strong>"
-#~ msgstr ""
-#~ "Bo a haña nivel di autorisashon di %(cl)s for di bo administrador. Promé "
-#~ "ku bo por kambia nivelnan di autorisashon di OOI te na e nivel aki, bo "
-#~ "mester aseptá e permiso aki. No lubidá: <strong>ku gran pode ta bini gran "
-#~ "responsabilidat.</strong>"
-
-#~ msgid ""
-#~ "You can withdraw this at anytime you like, but know that you're not able "
-#~ "to change clearance levels anymore when you do."
-#~ msgstr ""
-#~ "Bo por retirá esaki n'e momento ku bo ke, pero sa ku bo no por kambia "
-#~ "nivél di autorisashon mas ora bo hasi esaki."
-
-#~ msgid "Failed to get list of findings, check server logs for more details."
-#~ msgstr ""
-#~ "No por a optené lista di diskubrimentu, kontrolá registro di servidor pa "
-#~ "detayenan mas."
-
-#~ msgid "Redteam can enable "
-#~ msgstr "Red team por activá "
-
-#~ msgid "Delete setting"
-#~ msgstr "Kita setting"
-
-#, python-format
-#~ msgid ""
-#~ "Are you sure you want to delete setting %(setting_name)s for the plugin "
-#~ "%(plugin_name)s?"
-#~ msgstr ""
-#~ "Bo ta sigur bo ke eliminá setting %(setting_name)s pa e plugin "
-#~ "%(plugin_name)s?"
-
-#~ msgid "Edit setting"
-#~ msgstr "Kambia setting"
-
-#~ msgid "Update setting"
-#~ msgstr "Kambia setting"
-
-#, python-format
-#~ msgid "Settings from %s to %s successfully cloned."
-#~ msgstr "Ajustenan di %s pa %s a wordu di kloon ku éksito."
-
-#~ msgid "Scanning has failed to start."
-#~ msgstr "Skèn a faya pa start."
-
-#~ msgid "Setting {} already exists. Use the edit link."
-#~ msgstr "Ajuste {} ya ta eksistí. Uza e enlase di editá."
-
-#~ msgid "Setting {} added for {} "
-#~ msgstr "Ajuste {} a wordu agregá pa {}"
-
-#~ msgid "Failed adding setting {}"
-#~ msgstr "Faya den agrega ajuste {}"
-
-#~ msgid "Setting {} for plugin {} successfully deleted."
-#~ msgstr "Setting {} pa plugin {} a wordu kita ku èxito."
-
-#~ msgid ""
-#~ "Failed deleting Setting {} for plugin {}. Check the Katalogus logs for "
-#~ "more info."
-#~ msgstr ""
-#~ "Faya den eliminashon di Ajuste {} pa plugin {}. Kontrolá e lognan di "
-#~ "Katalogus pa mas informashon."
-
-#~ msgid "Setting successfully updated."
-#~ msgstr "Setting kambia ku èxito."
-
-#~ msgid "Failed updating setting."
-#~ msgstr "Faya den aktualisashon di ajuste."
-
-#~ msgid "What is the name of your organization."
-#~ msgstr "Kiko ta bo nòmber di organisashon?"
-
-#~ msgid "The name of the organization this OpenKAT account is for."
-#~ msgstr "E nòmber di e organisashon e OpenKAT account aki ta pe."
-
-#~ msgid "Trusted to set clearance levels on OOI's"
-#~ msgstr "Konfiá pa pone nivél di autorisashon riba OOI's"
-
-#~ msgid "Give this user permission to set clearance levels on OOI's"
-#~ msgstr "Duna e usario pèrmiso pa pone nivel di authorisashon riba OOI's"
-
-#~ msgid ""
-#~ "OpenKAT is the \"Kwetsbaarheden Analyse Tool\" (Vulnerabilities Analysis "
-#~ "Tool). An Open-Source-project developed by the Ministry of Public Health, "
-#~ "Wellbeing and Sports to make your and our world a safer place."
-#~ msgstr ""
-#~ "OpenKAT ta e \"Kwetsbaarheden Analyse Tool\" (tool pa hasi análisis di "
-#~ "bulerabilidat). Un proyekto Open Source desaroyá pa Ministerio di Salú "
-#~ "Públiko, Salú i Deporte pa hasi nos mundu un lugar mas sigur pa bo i nos."
-
-#~ msgid "No DNS zone found."
-#~ msgstr "Zona di DNS no por a wòrdu enkontrá."
-
-#~ msgid "Show Boefjes that exceed the OOI's scan level"
-#~ msgstr "Mustra Boefjes ku ku a surpasa OOI's su nivel di skan"
-
-#~ msgid "Organization code(s) in CSV does not exist in our database"
-#~ msgstr "Codigo di organisashon den e CSV no ta èksisti den nos database"
-
-#, python-brace-format
-#~ msgid "{editor}: Editing failed"
-#~ msgstr "{editor}: Fallo den edishon"
-
-#, python-brace-format
-#~ msgid "{editor}: Editing failed: {e}"
-#~ msgstr "{editor}: Falla den edishon: {e}"
-
-#~ msgid "Aborted!"
-#~ msgstr "Abòrtá!"
-
-#~ msgid "Show this message and exit."
-#~ msgstr "Mustra e mensahe aki i sali."
-
-#, python-brace-format
-#~ msgid "(Deprecated) {text}"
-#~ msgstr "(Depreketá) {text}"
-
-#~ msgid "Options"
-#~ msgstr "Opcionan"
-
-#, python-brace-format
-#~ msgid "Got unexpected extra argument ({args})"
-#~ msgid_plural "Got unexpected extra arguments ({args})"
-#~ msgstr[0] "A enkontra èxtra argumento inesperado ({args})"
-#~ msgstr[1] "A enkontra èxtra argumentonan inesperado ({args})"
-
-#~ msgid "DeprecationWarning: The command {name!r} is deprecated."
-#~ msgstr "Advertensia di desuzo: e komando {name!r} ta den desuzo."
-
-#~ msgid "Commands"
-#~ msgstr "Komandonan"
-
-#~ msgid "Missing command."
-#~ msgstr "Falta komando"
-
-#~ msgid "No such command {name!r}."
-#~ msgstr "No tin komando {name!r}."
-
-#~ msgid "Value must be an iterable."
-#~ msgstr "Balor mester ta un iterabel."
-
-#, python-brace-format
-#~ msgid "Takes {nargs} values but 1 was given."
-#~ msgid_plural "Takes {nargs} values but {len} were given."
-#~ msgstr[0] "Ta tuma {nargs} balornan pero 1 a wordu duna."
-#~ msgstr[1] "Ta tuma {nargs} balornan perot {len} a wordu duna."
-
-#, python-brace-format
-#~ msgid "env var: {var}"
-#~ msgstr "env var: {var}"
-
-#~ msgid "(dynamic)"
-#~ msgstr "(dynamic)"
-
-#, python-brace-format
-#~ msgid "default: {default}"
-#~ msgstr "defòlt: {default}"
-
-#~ msgid "required"
-#~ msgstr "Nesesario"
-
-#, python-format
-#~ msgid "%(prog)s, version %(version)s"
-#~ msgstr "%(prog)s, version %(version)s"
-
-#~ msgid "Show the version and exit."
-#~ msgstr "Mustra e version i sali."
-
-#, python-brace-format
-#~ msgid "Error: {message}"
-#~ msgstr "Error: {message}"
-
-#, python-brace-format
-#~ msgid "Try '{command} {option}' for help."
-#~ msgstr "Purba '{command} {option}' pa ajudo."
-
-#, python-brace-format
-#~ msgid "Invalid value: {message}"
-#~ msgstr "Balor no ta balido: {message}"
-
-#, python-brace-format
-#~ msgid "Invalid value for {param_hint}: {message}"
-#~ msgstr "Balor no ta balido pa {param_hint}: {message}"
-
-#~ msgid "Missing argument"
-#~ msgstr "Falta argumento"
-
-#~ msgid "Missing option"
-#~ msgstr "Falta opcion"
-
-#~ msgid "Missing parameter"
-#~ msgstr "Falta parametro"
-
-#, python-brace-format
-#~ msgid "Missing {param_type}"
-#~ msgstr "Falta {param_type}"
-
-#, python-brace-format
-#~ msgid "Missing parameter: {param_name}"
-#~ msgstr "Falta parametro: {param_name}"
-
-#, python-brace-format
-#~ msgid "No such option: {name}"
-#~ msgstr "No tin e opcion aki: {name}"
-
-#, python-brace-format
-#~ msgid "Did you mean {possibility}?"
-#~ msgid_plural "(Possible options: {possibilities})"
-#~ msgstr[0] "Bo kemen {possibility}?"
-#~ msgstr[1] "(Opshonan posibel: {possibilities})"
-
-#~ msgid "unknown error"
-#~ msgstr "error deskonosi"
-
-#~ msgid "Could not open file {filename!r}: {message}"
-#~ msgstr "No por habri arkivo {filename!r}: {message}"
-
-#~ msgid "Argument {name!r} takes {nargs} values."
-#~ msgstr "Argumento {name!r} ta tuma {nargs} balornan."
-
-#~ msgid "Option {name!r} does not take a value."
-#~ msgstr "Opshon {name!r} no ta tuma un balor."
-
-#~ msgid "Option {name!r} requires an argument."
-#~ msgid_plural "Option {name!r} requires {nargs} arguments."
-#~ msgstr[0] "Opshon {name!r} mester di un argumto."
-#~ msgstr[1] "Opshon {name!r} mester {nargs} argumentonan."
-
-#~ msgid "Shell completion is not supported for Bash versions older than 4.4."
-#~ msgstr ""
-#~ "Shell completion no ta sostenibel pa Bash versionnan mas biew ku 4.4."
-
-#~ msgid "Couldn't detect Bash version, shell completion is not supported."
-#~ msgstr "No por detekta Bash version, shell completion no ta aportá."
-
-#~ msgid "Repeat for confirmation"
-#~ msgstr "Ripiti pa konfirmashon"
-
-#~ msgid "Error: The value you entered was invalid."
-#~ msgstr "Error: e balor ku ba pone no ta balido"
-
-#, python-brace-format
-#~ msgid "Error: {e.message}"
-#~ msgstr "Error: {e.message}"
-
-#~ msgid "Error: The two entered values do not match."
-#~ msgstr "Error: E dos balornan pone no ta kwadra."
-
-#~ msgid "Error: invalid input"
-#~ msgstr "Error: input no ta balido"
-
-#~ msgid "Press any key to continue..."
-#~ msgstr "Primi kwalke boton pa continua..."
-
-#, python-brace-format
-#~ msgid ""
-#~ "Choose from:\n"
-#~ "\t{choices}"
-#~ msgstr ""
-#~ "Skohe for di:\n"
-#~ "\t{choices}"
-
-#~ msgid "{value!r} is not {choice}."
-#~ msgid_plural "{value!r} is not one of {choices}."
-#~ msgstr[0] "{value!r} no ta {choice}."
-#~ msgstr[1] "{value!r} no ta un di e {choices}."
-
-#~ msgid "{value!r} does not match the format {format}."
-#~ msgid_plural "{value!r} does not match the formats {formats}."
-#~ msgstr[0] "{value!r} no ta kwadra e format {format}."
-#~ msgstr[1] "{value!r} no ta kwadra formatnan {formats}."
-
-#~ msgid "{value!r} is not a valid {number_type}."
-#~ msgstr "{value!r} no ta un balido {number_type}."
-
-#, python-brace-format
-#~ msgid "{value} is not in the range {range}."
-#~ msgstr "{value} no ta den rango {range}."
-
-#~ msgid "{value!r} is not a valid boolean."
-#~ msgstr "{value!r} no ta un boolean balido."
-
-#~ msgid "{value!r} is not a valid UUID."
-#~ msgstr "{value!r} no ta un UUID balido."
-
-#~ msgid "file"
-#~ msgstr "arkivo"
-
-#~ msgid "directory"
-#~ msgstr "katálogo"
-
-#~ msgid "path"
-#~ msgstr "ruta"
-
-#~ msgid "{name} {filename!r} does not exist."
-#~ msgstr "{name} {filename!r} no ta èksisti."
-
-#~ msgid "{name} {filename!r} is a file."
-#~ msgstr "{name} {filename!r} ta un arkivo."
-
-#, python-brace-format
-#~ msgid "{name} '{filename}' is a directory."
-#~ msgstr "{name} '{filename}' ta un katólogo."
-
-#~ msgid "{name} {filename!r} is not readable."
-#~ msgstr "{name} {filename!r} no por lesé."
-
-#~ msgid "{name} {filename!r} is not writable."
-#~ msgstr "{name} {filename!r} no ta skribibel."
-
-#~ msgid "{name} {filename!r} is not executable."
-#~ msgstr "{name} {filename!r} no ta eksekutabel."
-
-#, python-brace-format
-#~ msgid "{len_type} values are required, but {len_value} was given."
-#~ msgid_plural "{len_type} values are required, but {len_value} were given."
-#~ msgstr[0] "{len_type} balornan ta nesesario, pero {len_value} a wordu pone."
-#~ msgstr[1] "{len_type} balornan ta nesesario, pero {len_value} a wordu pone."
-
-#~ msgid "Messages"
-#~ msgstr "Mensahenan"
-
-#~ msgid "Site Maps"
-#~ msgstr "Mapanan di sitio"
-
-#~ msgid "Static Files"
-#~ msgstr "Arkivo statiko"
-
-#~ msgid "Syndication"
-#~ msgstr "Sindikashon"
-
-#~ msgid "…"
-#~ msgstr "…"
-
-#~ msgid "That page number is not an integer"
-#~ msgstr "E number di pagina no ta un nùmero entero"
-
-#~ msgid "That page number is less than 1"
-#~ msgstr "E number di pagina ta menos ku 1"
-
-#~ msgid "That page contains no results"
-#~ msgstr "E pagina ta kontene ningun resultado"
-
-#~ msgid "Enter a valid value."
-#~ msgstr "Yena un balor balido"
-
-#~ msgid "Enter a valid URL."
-#~ msgstr "Yena un URL balido."
-
-#~ msgid "Enter a valid integer."
-#~ msgstr "Yena un nùmero entero balido."
-
-#~ msgid ""
-#~ "Enter a valid “slug” consisting of letters, numbers, underscores or "
-#~ "hyphens."
-#~ msgstr ""
-#~ "Pone un “slug” balido konsistiendo di òf letternan, numbernan, "
-#~ "underscores òf hyphens."
-
-#~ msgid ""
-#~ "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, "
-#~ "or hyphens."
-#~ msgstr ""
-#~ "Yena un “slug” balido ku ta konsisti di Unicode letranan, numbernan, "
-#~ "underscores, òf hyphens."
-
-#~ msgid "Enter a valid IPv4 address."
-#~ msgstr "Yena un IPv4 adres balido."
-
-#~ msgid "Enter a valid IPv6 address."
-#~ msgstr "Yena un IPv6 adres balido."
-
-#~ msgid "Enter a valid IPv4 or IPv6 address."
-#~ msgstr "Yena un IPv4 òf IPv6 adres balido."
-
-#~ msgid "Enter only digits separated by commas."
-#~ msgstr "Yena solamente cifranan separa dor di kòma."
-
-#, python-format
-#~ msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-#~ msgstr "E balor aki mester ta %(limit_value)s (pero e ta %(show_value)s)."
-
-#, python-format
-#~ msgid "Ensure this value is less than or equal to %(limit_value)s."
-#~ msgstr "E balor aki mester ta menos of parew ku %(limit_value)s."
-
-#, python-format
-#~ msgid "Ensure this value is greater than or equal to %(limit_value)s."
-#~ msgstr "E balor aki mester ta mas grandi òf igual ku %(limit_value)s."
-
-#, python-format
-#~ msgid ""
-#~ "Ensure this value has at least %(limit_value)d character (it has "
-#~ "%(show_value)d)."
-#~ msgid_plural ""
-#~ "Ensure this value has at least %(limit_value)d characters (it has "
-#~ "%(show_value)d)."
-#~ msgstr[0] ""
-#~ "E balor aki mester tin por lo menos %(limit_value)d karakternan (e tin "
-#~ "%(show_value)d)."
-#~ msgstr[1] ""
-#~ "E balor aki mester tin por lo menos %(limit_value)d karakternan (e tin "
-#~ "%(show_value)d)."
-
-#, python-format
-#~ msgid ""
-#~ "Ensure this value has at most %(limit_value)d character (it has "
-#~ "%(show_value)d)."
-#~ msgid_plural ""
-#~ "Ensure this value has at most %(limit_value)d characters (it has "
-#~ "%(show_value)d)."
-#~ msgstr[0] ""
-#~ "E balor aki mester tin por lo menos %(limit_value)d karakternan (e tin "
-#~ "%(show_value)d)."
-#~ msgstr[1] ""
-#~ "E balor aki mester tin por lo menos %(limit_value)d karakternan (e tin "
-#~ "%(show_value)d)."
-
-#~ msgid "Enter a number."
-#~ msgstr "Yena un nùmber numerico."
-
-#, python-format
-#~ msgid "Ensure that there are no more than %(max)s digit in total."
-#~ msgid_plural "Ensure that there are no more than %(max)s digits in total."
-#~ msgstr[0] "Chèk si no tin mas ku %(max)s number den totalidat."
-#~ msgstr[1] "Chèk si no tin mas ku %(max)s numbernan den totalidat."
-
-#, python-format
-#~ msgid "Ensure that there are no more than %(max)s decimal place."
-#~ msgid_plural "Ensure that there are no more than %(max)s decimal places."
-#~ msgstr[0] "Chèk si no tin mas ku %(max)s luga decimal."
-#~ msgstr[1] ""
-
-#, python-format
-#~ msgid ""
-#~ "File extension “%(extension)s” is not allowed. Allowed extensions are: "
-#~ "%(allowed_extensions)s."
-#~ msgstr ""
-#~ "Extension di archivonan “%(extension)s” no ta permití. Extension permití "
-#~ "ta: %(allowed_extensions)s."
-
-#~ msgid "Null characters are not allowed."
-#~ msgstr "Karakternan nul no ta permití."
-
-#~ msgid "and"
-#~ msgstr "i"
-
-#, python-format
-#~ msgid "%(model_name)s with this %(field_labels)s already exists."
-#~ msgstr "%(model_name)s ku nomber %(field_labels)s ta èksisti kaba."
-
-#, python-format
-#~ msgid "Value %(value)r is not a valid choice."
-#~ msgstr "E balor %(value)r no ta un selekshon balido."
-
-#~ msgid "This field cannot be blank."
-#~ msgstr "E vèld aki no por ta bashi."
-
-#, python-format
-#~ msgid "%(model_name)s with this %(field_label)s already exists."
-#~ msgstr "%(model_name)s ku e %(field_label)s no ta èksisti."
-
-#, python-format
-#~ msgid ""
-#~ "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
-#~ msgstr ""
-#~ "%(field_label)s mester ta uniko pa %(date_field_label)s %(lookup_type)s."
-
-#, python-format
-#~ msgid "Field of type: %(field_type)s"
-#~ msgstr "Vèld di tipo: %(field_type)s"
-
-#, python-format
-#~ msgid "“%(value)s” value must be either True or False."
-#~ msgstr "“%(value)s” balor mester ta òf True òf False."
-
-#, python-format
-#~ msgid "“%(value)s” value must be either True, False, or None."
-#~ msgstr "“%(value)s” balor mester ta un di nan True, False, òf None."
-
-#~ msgid "Boolean (Either True or False)"
-#~ msgstr "Boolean (un di nan True òf False)"
-
-#, python-format
-#~ msgid "String (up to %(max_length)s)"
-#~ msgstr "String (te na %(max_length)s)"
-
-#~ msgid "Comma-separated integers"
-#~ msgstr "Nùmero numerico separa pa kòma"
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
-#~ "format."
-#~ msgstr ""
-#~ "“%(value)s” balor tin un formato di fecha robes. E mester ta den e "
-#~ "formato YYYY-MM-DD."
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an "
-#~ "invalid date."
-#~ msgstr ""
-#~ "“%(value)s” balor tin e formato na drechi (YYYY-MM-DD) pero e ta un fecha "
-#~ "inbalido."
-
-#~ msgid "Date (without time)"
-#~ msgstr "Fecha (sin tempu)"
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:"
-#~ "ss[.uuuuuu]][TZ] format."
-#~ msgstr ""
-#~ "“%(value)s” balor tin un formato inbalido. E mester ta den e formato YYYY-"
-#~ "MM-DD HH:MM[:ss[.uuuuuu]][TZ]."
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-#~ "[TZ]) but it is an invalid date/time."
-#~ msgstr ""
-#~ "“%(value)s” balor tin e formato korekto (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-#~ "[TZ]) pero e tempu fecha/tempu ta inbalido."
-
-#~ msgid "Date (with time)"
-#~ msgstr "Fecha (ku tempu)"
-
-#, python-format
-#~ msgid "“%(value)s” value must be a decimal number."
-#~ msgstr "“%(value)s” balor mester ta un nùmero decimal."
-
-#~ msgid "Decimal number"
-#~ msgstr "Nùmero decimal"
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-#~ "uuuuuu] format."
-#~ msgstr ""
-#~ "“%(value)s” balor tin un formato inbalido. E mester ta den e formato [DD] "
-#~ "[[HH:]MM:]ss[.uuuuuu]."
-
-#~ msgid "Duration"
-#~ msgstr "Durashon"
-
-#~ msgid "File path"
-#~ msgstr "Ruta arkivo"
-
-#, python-format
-#~ msgid "“%(value)s” value must be a float."
-#~ msgstr "“%(value)s” balor mester ta un float."
-
-#~ msgid "Floating point number"
-#~ msgstr "Floating punto nùmero"
-
-#, python-format
-#~ msgid "“%(value)s” value must be an integer."
-#~ msgstr "“%(value)s” balor mester ta un nùmero numerico."
-
-#~ msgid "Integer"
-#~ msgstr "Numerico"
-
-#~ msgid "Big (8 byte) integer"
-#~ msgstr "Big (8 byte) numerico"
-
-#~ msgid "Small integer"
-#~ msgstr "Numerico chiki"
-
-#~ msgid "IPv4 address"
-#~ msgstr "IPv4 adrès"
-
-#~ msgid "IP address"
-#~ msgstr "IP adrès"
-
-#, python-format
-#~ msgid "“%(value)s” value must be either None, True or False."
-#~ msgstr "“%(value)s” balor mester ta un di nan: None, True òf False."
-
-#~ msgid "Boolean (Either True, False or None)"
-#~ msgstr "Boolean (un di nan True, False òf None)"
-
-#~ msgid "Positive big integer"
-#~ msgstr "Nùmero numerico positivo grandi"
-
-#~ msgid "Positive integer"
-#~ msgstr "Nùmero numerico positivo"
-
-#~ msgid "Positive small integer"
-#~ msgstr "Nùmero numerico positivo chiki"
-
-#, python-format
-#~ msgid "Slug (up to %(max_length)s)"
-#~ msgstr "Slug (te na %(max_length)s)"
-
-#~ msgid "Text"
-#~ msgstr "Teksto"
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[."
-#~ "uuuuuu]] format."
-#~ msgstr ""
-#~ "“%(value)s” balor tin un formato inbalido. E formato mester ta HH:MM[:ss[."
-#~ "uuuuuu]]."
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is "
-#~ "an invalid time."
-#~ msgstr ""
-#~ "“%(value)s” balor tin e formato korekto (HH:MM[:ss[.uuuuuu]]) pero e "
-#~ "tempu ta inbalido."
-
-#~ msgid "Time"
-#~ msgstr "Tempu"
-
-#~ msgid "Raw binary data"
-#~ msgstr "Data binario crudo"
-
-#, python-format
-#~ msgid "“%(value)s” is not a valid UUID."
-#~ msgstr "“%(value)s” no ta un UUID balido."
-
-#~ msgid "Universally unique identifier"
-#~ msgstr "Identifikadó universal uniko"
-
-#~ msgid "File"
-#~ msgstr "Arkivo"
-
-#~ msgid "Image"
-#~ msgstr "Imágen"
-
-#~ msgid "A JSON object"
-#~ msgstr "Un JSON opheto"
-
-#~ msgid "Value must be valid JSON."
-#~ msgstr "Balor mester ta un JSON balido."
-
-#, python-format
-#~ msgid "%(model)s instance with %(field)s %(value)r does not exist."
-#~ msgstr "%(model)s instance with %(field)s %(value)r does not exist."
-
-#~ msgid "Foreign Key (type determined by related field)"
-#~ msgstr "Foreign Key (tipo determina pa e vèld relata)"
-
-#~ msgid "One-to-one relationship"
-#~ msgstr "One-to-one relashon"
-
-#, python-format
-#~ msgid "%(from)s-%(to)s relationship"
-#~ msgstr "%(from)s-%(to)s relashon"
-
-#, python-format
-#~ msgid "%(from)s-%(to)s relationships"
-#~ msgstr "%(from)s-%(to)s relashonnan"
-
-#~ msgid "Many-to-many relationship"
-#~ msgstr "Relashon many-to-many"
-
-#~ msgid ":?.!"
-#~ msgstr ":?.!"
-
-#~ msgid "Enter a whole number."
-#~ msgstr "Yena un nùmero henter."
-
-#~ msgid "Enter a valid date."
-#~ msgstr "Yena un fecha balido."
-
-#~ msgid "Enter a valid time."
-#~ msgstr "Yena un tempu balido."
-
-#~ msgid "Enter a valid date/time."
-#~ msgstr "Yena un fecha/tempu balido."
-
-#~ msgid "Enter a valid duration."
-#~ msgstr "Yena un durashon balido."
-
-#, python-brace-format
-#~ msgid "The number of days must be between {min_days} and {max_days}."
-#~ msgstr "E kantidad di dia mester ta entre {min_days} y {max_days}."
-
-#~ msgid "No file was submitted. Check the encoding type on the form."
-#~ msgstr ""
-#~ "Ningun archiv a ser entrega. Chèk e tipo di enkodamentu riba e formulario."
-
-#~ msgid "No file was submitted."
-#~ msgstr "Arkivo no a wordu manda."
-
-#~ msgid "The submitted file is empty."
-#~ msgstr "E arkivo manda ta bashi."
-
-#, python-format
-#~ msgid ""
-#~ "Ensure this filename has at most %(max)d character (it has %(length)d)."
-#~ msgid_plural ""
-#~ "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-#~ msgstr[0] ""
-#~ "Sigurá e nòmber di arkivo tin por lo menos %(max)d karakter (e tin "
-#~ "%(length)d)."
-#~ msgstr[1] ""
-#~ "Sigurá e nòmber di arkivo tin por lo menos %(max)d karakternan (e tin "
-#~ "%(length)d)."
-
-#~ msgid "Please either submit a file or check the clear checkbox, not both."
-#~ msgstr "Fabor entrega un archiv òf marka e checkbox, pero no ambos."
-
-#~ msgid ""
-#~ "Upload a valid image. The file you uploaded was either not an image or a "
-#~ "corrupted image."
-#~ msgstr ""
-#~ "Subi un imagen balido. E arkivo ku b'a subi no ta un imagen òf e ta "
-#~ "korupt."
-
-#, python-format
-#~ msgid ""
-#~ "Select a valid choice. %(value)s is not one of the available choices."
-#~ msgstr "Selekta un opcion balido. %(value)s no ta un di e opcionnan balido."
-
-#~ msgid "Enter a list of values."
-#~ msgstr "Yena un lista di balornan."
-
-#~ msgid "Enter a complete value."
-#~ msgstr "Yena un balor kompletu."
-
-#~ msgid "Enter a valid UUID."
-#~ msgstr "Yena un UUID balido."
-
-#~ msgid "Enter a valid JSON."
-#~ msgstr "Yena un JSON balido."
-
-#~ msgid ":"
-#~ msgstr ":"
-
-#, python-format
-#~ msgid "(Hidden field %(name)s) %(error)s"
-#~ msgstr "(Vèld skondi %(name)s) %(error)s"
-
-#, python-format
-#~ msgid ""
-#~ "ManagementForm data is missing or has been tampered with. Missing fields: "
-#~ "%(field_names)s. You may need to file a bug report if the issue persists."
-#~ msgstr ""
-#~ "ManagementForm falta data òf a shoemel ku ne. Falta vèldnan: "
-#~ "%(field_names)s. Bo lo mester manda un rapòrt di bug di e problema "
-#~ "pèrsisti."
-
-#, python-format
-#~ msgid "Please submit at most %d form."
-#~ msgid_plural "Please submit at most %d forms."
-#~ msgstr[0] "Por fabor manda por lo menos %d formulario."
-#~ msgstr[1] "Por fabor manda por lo menos %d formularionan."
-
-#, python-format
-#~ msgid "Please submit at least %d form."
-#~ msgid_plural "Please submit at least %d forms."
-#~ msgstr[0] "Por fabor manda por lo menos %d formulario."
-#~ msgstr[1] "Por fabor manda por lo menos %d formularionan."
-
-#~ msgid "Order"
-#~ msgstr "Orden"
-
-#, python-format
-#~ msgid "Please correct the duplicate data for %(field)s."
-#~ msgstr "Por fabor koregi data duplika pa %(field)s."
-
-#, python-format
-#~ msgid ""
-#~ "Please correct the duplicate data for %(field)s, which must be unique."
-#~ msgstr "Por fabor koregi e data duplika pa %(field)s, ku mester ta uniko."
-
-#, python-format
-#~ msgid ""
-#~ "Please correct the duplicate data for %(field_name)s which must be unique "
-#~ "for the %(lookup)s in %(date_field)s."
-#~ msgstr ""
-#~ "Por fabor koregi e data duplika pa %(field_name)s, ku mester ta uniko pa "
-#~ "e %(lookup)s den %(date_field)s."
-
-#~ msgid "Please correct the duplicate values below."
-#~ msgstr "Por fabor drecha abou e balornan duplika."
-
-#~ msgid "The inline value did not match the parent instance."
-#~ msgstr "E inline balor no ta kwadra e instancia major."
-
-#~ msgid ""
-#~ "Select a valid choice. That choice is not one of the available choices."
-#~ msgstr ""
-#~ "Selekta un opcion balido. E opcion no ta un di e opcionnan disponibel."
-
-#, python-format
-#~ msgid "“%(pk)s” is not a valid value."
-#~ msgstr "“%(pk)s” no ta un balor balido."
-
-#, python-format
-#~ msgid ""
-#~ "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; "
-#~ "it may be ambiguous or it may not exist."
-#~ msgstr ""
-#~ "%(datetime)s no por wordu interpreta den zona di tempu "
-#~ "%(current_timezone)s; e por ta dubidoso òf porta e no ta èksisti."
-
-#~ msgid "Clear"
-#~ msgstr "Borá"
-
-#~ msgid "Currently"
-#~ msgstr "Aktualmente"
-
-#~ msgid "Change"
-#~ msgstr "Kambia"
-
-#~ msgid "Unknown"
-#~ msgstr "Deskonosí"
-
-#~ msgid "yes,no,maybe"
-#~ msgstr "si, nò, porta"
-
-#, python-format
-#~ msgid "%(size)d byte"
-#~ msgid_plural "%(size)d bytes"
-#~ msgstr[0] "%(size)d byte"
-#~ msgstr[1] "%(size)d bytes"
-
-#, python-format
-#~ msgid "%s KB"
-#~ msgstr "%s KB"
-
-#, python-format
-#~ msgid "%s MB"
-#~ msgstr "%s MB"
-
-#, python-format
-#~ msgid "%s GB"
-#~ msgstr "%s GB"
-
-#, python-format
-#~ msgid "%s TB"
-#~ msgstr "%s TB"
-
-#, python-format
-#~ msgid "%s PB"
-#~ msgstr "%s PB"
-
-#~ msgid "p.m."
-#~ msgstr "p.m."
-
-#~ msgid "a.m."
-#~ msgstr "a.m."
-
-#~ msgid "PM"
-#~ msgstr "PM"
-
-#~ msgid "AM"
-#~ msgstr "AM"
-
-#~ msgid "midnight"
-#~ msgstr "marduga"
-
-#~ msgid "noon"
-#~ msgstr "atardi"
-
-#~ msgid "Monday"
-#~ msgstr "Djaluna"
-
-#~ msgid "Tuesday"
-#~ msgstr "Djamars"
-
-#~ msgid "Wednesday"
-#~ msgstr "Djarason"
-
-#~ msgid "Thursday"
-#~ msgstr "Djaweps"
-
-#~ msgid "Friday"
-#~ msgstr "Djabierne"
-
-#~ msgid "Saturday"
-#~ msgstr "Djasabra"
-
-#~ msgid "Sunday"
-#~ msgstr "Djadumingu"
-
-#~ msgid "Mon"
-#~ msgstr "Mon"
-
-#~ msgid "Tue"
-#~ msgstr "Tue"
-
-#~ msgid "Wed"
-#~ msgstr "Wed"
-
-#~ msgid "Thu"
-#~ msgstr "Thu"
-
-#~ msgid "Fri"
-#~ msgstr "Fri"
-
-#~ msgid "Sat"
-#~ msgstr "Sat"
-
-#~ msgid "Sun"
-#~ msgstr "Sun"
-
-#~ msgid "February"
-#~ msgstr "Februari"
-
-#~ msgid "March"
-#~ msgstr "Maart"
-
-#~ msgid "April"
-#~ msgstr "April"
-
-#~ msgid "May"
-#~ msgstr "Mayo"
-
-#~ msgid "June"
-#~ msgstr "Juni"
-
-#~ msgid "July"
-#~ msgstr "Juli"
-
-#~ msgid "August"
-#~ msgstr "Agosto"
-
-#~ msgid "September"
-#~ msgstr "Sèptèmber"
-
-#~ msgid "October"
-#~ msgstr "Òktober"
-
-#~ msgid "November"
-#~ msgstr "November"
-
-#~ msgid "December"
-#~ msgstr "December"
-
-#~ msgid "jan"
-#~ msgstr "jan"
-
-#~ msgid "feb"
-#~ msgstr "feb"
-
-#~ msgid "mar"
-#~ msgstr "mar"
-
-#~ msgid "apr"
-#~ msgstr "apr"
-
-#~ msgid "may"
-#~ msgstr "may"
-
-#~ msgid "jun"
-#~ msgstr "jun"
-
-#~ msgid "jul"
-#~ msgstr "jul"
-
-#~ msgid "aug"
-#~ msgstr "aug"
-
-#~ msgid "sep"
-#~ msgstr "sep"
-
-#~ msgid "oct"
-#~ msgstr "oct"
-
-#~ msgid "nov"
-#~ msgstr "nov"
-
-#~ msgid "dec"
-#~ msgstr "dec"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Jan."
-#~ msgstr "Jan."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Feb."
-#~ msgstr "Feb."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "March"
-#~ msgstr "Maart"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "April"
-#~ msgstr "April"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "May"
-#~ msgstr "Mayo"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "June"
-#~ msgstr "Juni"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "July"
-#~ msgstr "Juli"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Aug."
-#~ msgstr "Aug."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Sept."
-#~ msgstr "Sept."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Oct."
-#~ msgstr "Oct."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Nov."
-#~ msgstr "Nov."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Dec."
-#~ msgstr "Dec."
-
-#~ msgctxt "alt. month"
-#~ msgid "January"
-#~ msgstr "Januari"
-
-#~ msgctxt "alt. month"
-#~ msgid "February"
-#~ msgstr "Februari"
-
-#~ msgctxt "alt. month"
-#~ msgid "March"
-#~ msgstr "Maart"
-
-#~ msgctxt "alt. month"
-#~ msgid "April"
-#~ msgstr "April"
-
-#~ msgctxt "alt. month"
-#~ msgid "May"
-#~ msgstr "Mayo"
-
-#~ msgctxt "alt. month"
-#~ msgid "June"
-#~ msgstr "Juni"
-
-#~ msgctxt "alt. month"
-#~ msgid "July"
-#~ msgstr "Juli"
-
-#~ msgctxt "alt. month"
-#~ msgid "August"
-#~ msgstr "Augosto"
-
-#~ msgctxt "alt. month"
-#~ msgid "September"
-#~ msgstr "Sèptèmber"
-
-#~ msgctxt "alt. month"
-#~ msgid "October"
-#~ msgstr "Òktober"
-
-#~ msgctxt "alt. month"
-#~ msgid "November"
-#~ msgstr "November"
-
-#~ msgctxt "alt. month"
-#~ msgid "December"
-#~ msgstr "December"
-
-#~ msgid "This is not a valid IPv6 address."
-#~ msgstr "Esaki no ta un IPv6 adres korekto."
-
-#, python-format
-#~ msgctxt "String to return when truncating text"
-#~ msgid "%(truncated_text)s…"
-#~ msgstr "%(truncated_text)s…"
-
-#~ msgid "or"
-#~ msgstr "òf"
-
-#~ msgid ", "
-#~ msgstr ", "
-
-#, python-format
-#~ msgid "%d year"
-#~ msgid_plural "%d years"
-#~ msgstr[0] "%d aña"
-#~ msgstr[1] "%d añanan"
-
-#, python-format
-#~ msgid "%d month"
-#~ msgid_plural "%d months"
-#~ msgstr[0] "%d luna"
-#~ msgstr[1] "%d lunanan"
-
-#, python-format
-#~ msgid "%d week"
-#~ msgid_plural "%d weeks"
-#~ msgstr[0] "%d siman"
-#~ msgstr[1] "%d simannan"
-
-#, python-format
-#~ msgid "%d day"
-#~ msgid_plural "%d days"
-#~ msgstr[0] "%d dia"
-#~ msgstr[1] "%d dianan"
-
-#, python-format
-#~ msgid "%d hour"
-#~ msgid_plural "%d hours"
-#~ msgstr[0] "%d ora"
-#~ msgstr[1] "%d oranan"
-
-#, python-format
-#~ msgid "%d minute"
-#~ msgid_plural "%d minutes"
-#~ msgstr[0] "%d minút"
-#~ msgstr[1] "%d minútnan"
-
-#~ msgid "Forbidden"
-#~ msgstr "Prohibi"
-
-#~ msgid "CSRF verification failed. Request aborted."
-#~ msgstr "CSRF verifikashon a faya. Peticion interumpí."
-
-#~ msgid ""
-#~ "You are seeing this message because this HTTPS site requires a “Referer "
-#~ "header” to be sent by your Web browser, but none was sent. This header is "
-#~ "required for security reasons, to ensure that your browser is not being "
-#~ "hijacked by third parties."
-#~ msgstr ""
-#~ "Bo ta mira e mensahe aki pasobra e sitio HTTPS aki ta exigi un “Referer "
-#~ "header“ pa wordu manda pa bo buscador web, pero ningun a wordu manda. E "
-#~ "header aki ta exigi pa motibu di seguridat, pa sigurá cu bo buscador no "
-#~ "ta wordu kapturá pa tercer parti."
-
-#~ msgid ""
-#~ "If you have configured your browser to disable “Referer” headers, please "
-#~ "re-enable them, at least for this site, or for HTTPS connections, or for "
-#~ "“same-origin” requests."
-#~ msgstr ""
-#~ "Si bo a konfigurá bo buscador pa deshabilitá e “Referer” headers, por "
-#~ "fabor aktiv'é bek, minimo pa e sitio aki, òf pa konekshonnan HTTPS, òf pa "
-#~ "peticionnan di “mes origen.“"
-
-#~ msgid ""
-#~ "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag "
-#~ "or including the “Referrer-Policy: no-referrer” header, please remove "
-#~ "them. The CSRF protection requires the “Referer” header to do strict "
-#~ "referer checking. If you’re concerned about privacy, use alternatives "
-#~ "like <a rel=\"noreferrer\" …> for links to third-party sites."
-#~ msgstr ""
-#~ "Si bo ta usa e etiketa <meta name=\"referrer\" content=\"no-referrer\"> "
-#~ "òf inkluí e “Referrer-Policy: no-referrer” header, por fabor kita nan. E "
-#~ "protekshon CSRF ta exigi e “Referer” header pa hasi strikto kontrol di "
-#~ "referer. Si bo ta preokupá tokante privasidat, usa alternativanan manera "
-#~ "<a rel=\"noreferrer\" …> pa enlace na sitio di tercer parti."
-
-#~ msgid ""
-#~ "You are seeing this message because this site requires a CSRF cookie when "
-#~ "submitting forms. This cookie is required for security reasons, to ensure "
-#~ "that your browser is not being hijacked by third parties."
-#~ msgstr ""
-#~ "Bo ta mira e mensahe aki pasobra e sitio aki ta exigi un CSRF cookie ora "
-#~ "bo ta manda formulario. E cookie aki ta exigi pa motibu di seguridat, pa "
-#~ "sigurá ku bo buscador no ta wordu kapturá pa tercer parti."
-
-#~ msgid ""
-#~ "If you have configured your browser to disable cookies, please re-enable "
-#~ "them, at least for this site, or for “same-origin” requests."
-#~ msgstr ""
-#~ "Si bo a konfigurá bo buscador pa deshabilitá kuki (cookies), por fabor "
-#~ "aktiv'é bek, minimo pa e sitio aki, òf pa peticionnan di 'mes "
-#~ "origen' (same-origin)."
-
-#~ msgid "More information is available with DEBUG=True."
-#~ msgstr "Más informashon ta disponibel ku DEBUG=True."
-
-#~ msgid "No year specified"
-#~ msgstr "Aña no spesifiká"
-
-#~ msgid "Date out of range"
-#~ msgstr "Fecha fuera di rango"
-
-#~ msgid "No month specified"
-#~ msgstr "Luna no spesifiká"
-
-#~ msgid "No day specified"
-#~ msgstr "Dia no spesifiká"
-
-#~ msgid "No week specified"
-#~ msgstr "Siman no spesifiká"
-
-#, python-format
-#~ msgid "No %(verbose_name_plural)s available"
-#~ msgstr "Ningun %(verbose_name_plural)s disponibel"
-
-#, python-format
-#~ msgid ""
-#~ "Future %(verbose_name_plural)s not available because %(class_name)s."
-#~ "allow_future is False."
-#~ msgstr ""
-#~ "Futuro di %(verbose_name_plural)s no ta disponibel pasobra "
-#~ "%(class_name)s. allow_future ta False."
-
-#, python-format
-#~ msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
-#~ msgstr "Kadena di fecha no válido “%(datestr)s” den format “%(format)s”"
-
-#, python-format
-#~ msgid "No %(verbose_name)s found matching the query"
-#~ msgstr "No ta haña %(verbose_name)s ku ta koincidí ku e kwestioná"
-
-#~ msgid "Page is not “last”, nor can it be converted to an int."
-#~ msgstr ""
-#~ "Página no ta “último“ (last), ni tampoko por wordu konvertí pa un número "
-#~ "entero."
-
-#, python-format
-#~ msgid "Invalid page (%(page_number)s): %(message)s"
-#~ msgstr "Página no válido (%(page_number)s): %(message)s"
-
-#, python-format
-#~ msgid "Empty list and “%(class_name)s.allow_empty” is False."
-#~ msgstr "Lista bòki i “%(class_name)s.allow_empty” ta Falso (False)."
-
-#~ msgid "Directory indexes are not allowed here."
-#~ msgstr "Indeksnan di direktorio no ta permití aki."
-
-#, python-format
-#~ msgid "“%(path)s” does not exist"
-#~ msgstr "“%(path)s” no eksistí"
-
-#, python-format
-#~ msgid "Index of %(directory)s"
-#~ msgstr "Indeks di %(directory)s"
-
-#~ msgid "The install worked successfully! Congratulations!"
-#~ msgstr "E instalashon a logra éksito! Felisitashon!"
-
-#, python-format
-#~ msgid ""
-#~ "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-#~ "target=\"_blank\" rel=\"noopener\">release notes</a> for Django "
-#~ "%(version)s"
-#~ msgstr ""
-#~ "Mira <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-#~ "target=\"_blank\" rel=\"noopener\">notanan di lansamentu</a> pa Django "
-#~ "%(version)s"
-
-#, python-format
-#~ msgid ""
-#~ "You are seeing this page because <a href=\"https://docs.djangoproject.com/"
-#~ "en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-#~ "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
-#~ "configured any URLs."
-#~ msgstr ""
-#~ "Bo ta mira e página aki pasobra <a href=\"https://docs.djangoproject.com/"
-#~ "en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-#~ "rel=\"noopener\">DEBUG=True</a> ta den bo fihernan di konfigurashon i bo "
-#~ "no akonfigurá ningun URL."
-
-#~ msgid "Django Documentation"
-#~ msgstr "Dokumentashon di Django"
-
-#~ msgid "Topics, references, &amp; how-to’s"
-#~ msgstr "Tòpikonan, referensianan, i kon pa hasi"
-
-#~ msgid "Tutorial: A Polling App"
-#~ msgstr "Tutorial: Un App di Enkuesta"
-
-#~ msgid "Get started with Django"
-#~ msgstr "Kuminsá ku Django"
-
-#~ msgid "Django Community"
-#~ msgstr "Komunidat di Django"
-
-#~ msgid "Connect, get help, or contribute"
-#~ msgstr "Konéktá, haña yudansa, òf kontribuí"
-
-#, python-format
-#~ msgid "Here you can edit the %(display_type)s."
-#~ msgstr "Akinan bo por editá e %(display_type)s."
-
-#~ msgid ""
-#~ "Some fields are disabled:<br>In this version primary key fields can't be "
-#~ "edited."
-#~ msgstr ""
-#~ "Algun vak ta disabled:<br>Den e version aki primary key vaknan no por "
-#~ "wordu editá."
-
-#~ msgid "Add new member"
-#~ msgstr "Añadí miembro nobo"
-
-#~ msgid "Added"
-#~ msgstr "Agregá"
