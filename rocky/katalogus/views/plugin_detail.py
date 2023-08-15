@@ -126,10 +126,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
             oois_without_clearance_level = oois["oois_without_clearance"]
 
             if oois_with_clearance_level:
-                self.run_boefje_for_oois(
-                    boefje=boefje,
-                    oois=oois_with_clearance_level,
-                )
+                self.run_boefje_for_oois(boefje, oois_with_clearance_level)
                 messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
 
             if oois_without_clearance_level:

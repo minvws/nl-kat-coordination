@@ -91,11 +91,7 @@ class BoefjeMixin(OctopoesView):
         item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
         client.push_task(f"boefje-{self.organization.code}", item)
 
-    def run_boefje_for_oois(
-        self,
-        boefje: Plugin,
-        oois: List[OOI],
-    ) -> None:
+    def run_boefje_for_oois(self, boefje: Plugin, oois: List[OOI]) -> None:
         if not oois and not boefje.consumes:
             self.run_boefje(boefje, None)
 

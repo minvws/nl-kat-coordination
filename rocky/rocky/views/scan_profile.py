@@ -13,7 +13,6 @@ from tools.view_helpers import (
 )
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
 from rocky.views.ooi_detail import OOIDetailView
 
 
@@ -27,45 +26,11 @@ class ScanProfileDetailView(OOIDetailView, FormView):
         return context
 
     def post(self, request, *args, **kwargs):
-        if not self.organization_member.indemnification_present:
-            return self.get(request, status_code=403, *args, **kwargs)
-
         super().post(request, *args, **kwargs)
         form = self.get_form()
         if form.is_valid():
             level = form.cleaned_data["level"]
-            try:
-                self.indemnification.raise_clearance_level(self.ooi.reference, level)
-            except IndemnificationNotPresentException:
-                messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _(
-                        "Could not raise clearance level of %s to L%s. \
-                        Indemnification not present at organization %s."
-                    )
-                    % (
-                        self.ooi.reference.human_readable,
-                        level,
-                        self.organization.name,
-                    ),
-                )
-                return self.get(request, status=403, *args, **kwargs)
-            except ClearanceLevelTooLowException:
-                messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _(
-                        "Could not raise clearance level of %s to L%s. \
-                        You acknowledged a clearance level of %s."
-                    )
-                    % (
-                        self.ooi.reference.human_readable,
-                        level,
-                        self.organization_member.acknowledged_clearance_level,
-                    ),
-                )
-                return self.get(request, status=403, *args, **kwargs)
+            self.raise_clearance_level(self.ooi.reference, level)
         else:
             messages.add_message(
                 self.request,

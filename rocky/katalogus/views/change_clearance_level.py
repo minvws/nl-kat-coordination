@@ -36,7 +36,7 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
     def post(self, request, *args, **kwargs):
         """Start scanning oois at plugin detail page."""
 
-        self.run_boefje_for_oois(boefje=self.plugin, oois=self.oois)
+        self.run_boefje_for_oois(self.plugin, self.oois)
         messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
         del request.session["selected_oois"]  # delete session
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))

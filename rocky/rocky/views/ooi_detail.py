@@ -41,12 +41,6 @@ class OOIDetailView(
     scan_history_limit = 10
 
     def post(self, request, *args, **kwargs):
-        if not self.organization_member.indemnification_present:
-            messages.add_message(
-                request, messages.ERROR, f"Indemnification not present at organization {self.organization}."
-            )
-            return self.get(request, status_code=403, *args, **kwargs)
-
         if "action" not in self.request.POST:
             return self.get(request, status_code=404, *args, **kwargs)
 

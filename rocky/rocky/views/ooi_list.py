@@ -14,7 +14,7 @@ from tools.forms.ooi import SelectOOIForm
 from tools.view_helpers import get_mandatory_fields
 
 from octopoes.connector import RemoteException
-from octopoes.models import EmptyScanProfile, Reference
+from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
@@ -47,19 +47,12 @@ class OOIListView(BaseOOIListView):
 
         return context
 
-    def get(self, request: HttpRequest, status=200, *args, **kwargs) -> HttpResponse:
-        """Override the response status in case submitting a form returns an error message"""
-        response = super().get(request, *args, **kwargs)
-        response.status_code = status
-
-        return response
-
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """Perform bulk action on selected oois."""
         selected_oois = request.POST.getlist("ooi")
         if not selected_oois:
             messages.add_message(request, messages.ERROR, _("No OOIs selected."))
-            return self.get(request, status=422, *args, **kwargs)
+            return self.get(request, *args, **kwargs)
 
         action = request.POST.get("action")
 
@@ -71,63 +64,7 @@ class OOIListView(BaseOOIListView):
             level = CUSTOM_SCAN_LEVEL[str(scan_profile).upper()]
             if level.value == "inherit":
                 return self._set_oois_to_inherit(selected_oois, request, *args, **kwargs)
-            return self._set_scan_profiles(selected_oois, level, request, *args, **kwargs)
-
-        messages.add_message(request, messages.ERROR, _("Unknown action."))
-        return self.get(request, status=404, *args, **kwargs)
-
-    def _set_scan_profiles(
-        self, selected_oois: List[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
-    ) -> HttpResponse:
-        try:
-            self.raise_clearance_levels(selected_oois, level.value)
-        except (RequestException, RemoteException, ConnectionError):
-            messages.add_message(request, messages.ERROR, _("An error occurred while saving clearance levels."))
-
-            return self.get(request, status=500, *args, **kwargs)
-        except ObjectNotFoundException:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("An error occurred while saving clearance levels.") + _("One of the OOI's doesn't exist"),
-            )
-            return self.get(request, status=404, *args, **kwargs)
-
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Successfully set scan profile to %s for %d oois.") % (level.name, len(selected_oois)),
-        )
-        return self.get(request, *args, **kwargs)
-
-    def _set_oois_to_inherit(
-        self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs
-    ) -> HttpResponse:
-        scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
-
-        try:
-            self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=datetime.now(timezone.utc))
-        except (RequestException, RemoteException, ConnectionError):
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("An error occurred while setting clearance levels to inherit."),
-            )
-            return self.get(request, status=500, *args, **kwargs)
-        except ObjectNotFoundException:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("An error occurred while setting clearance levels to inherit: one of the OOIs doesn't exist."),
-            )
-            return self.get(request, status=404, *args, **kwargs)
-
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois),
-        )
-        return self.get(request, *args, **kwargs)
+            return self.raise_clearance_level(selected_oois, level.value)
 
     def _delete_oois(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
         connector = self.octopoes_api_connector

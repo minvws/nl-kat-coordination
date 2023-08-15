@@ -266,9 +266,8 @@ class OrganizationMember(models.Model):
         )
 
     @property
-    def get_clearance_level(self) -> int | None:
-        if self.has_ooi_clearance:
-            return self.trusted_clearance_level
+    def is_trusted_clearance_level_acknowledged(self):
+        return self.trusted_clearance_level >= 0 and self.trusted_clearance_level == self.acknowledged_clearance_level
 
     def __reset_clearance_level(self):
         """Acknowledged clearance level must reset if trusted clearance level is still not acknowledged."""
