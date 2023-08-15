@@ -5,6 +5,7 @@ from account.mixins import (
     OrganizationPermissionRequiredMixin,
     OrganizationView,
 )
+from account.views import OOIClearanceMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -112,7 +113,7 @@ class OnboardingSetupScanSelectPluginsView(
     KatIntroductionStepsMixin,
     TemplateView,
 ):
-    template_name = "step_3e_setup_scan_select_plugins.html"
+    template_name = "step_3g_setup_scan_select_plugins.html"
     current_step = 3
     report: Type[Report] = DNSReport
     permission_required = "tools.can_enable_disable_boefje"
@@ -228,7 +229,7 @@ class OnboardingSetupScanOOIAddView(
 
     def get_ooi_success_url(self, ooi: OOI) -> str:
         self.request.session["ooi_id"] = ooi.primary_key
-        return get_ooi_url("step_set_clearance_level", ooi.primary_key, self.organization.code)
+        return get_ooi_url("step_clearance_level_introduction", ooi.primary_key, self.organization.code)
 
     def build_breadcrumbs(self) -> List[Breadcrumb]:
         return super().build_breadcrumbs() + [
@@ -289,10 +290,10 @@ class OnboardingSetupScanOOIDetailView(
                 self.request,
                 messages.ERROR,
                 _(
-                    "Could not raise clearance level of %s to L%s. \
-                You acknowledged a clearance level of %s."
-                )
-                % (
+                    "Could not raise clearance level of {} to L{}. "
+                    "You acknowledged a clearance level of L{}. "
+                    "Contact your administrator to receive a higher clearance."
+                ).format(
                     ooi.reference.human_readable,
                     level,
                     self.organization_member.acknowledged_clearance_level,
@@ -315,35 +316,12 @@ class OnboardingSetupScanOOIDetailView(
         return context
 
 
-class OnboardingSetClearanceLevelView(
-    OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
-    OnboardingBreadcrumbsMixin,
-    FormView,
+class OnboardingClearanceLevelIntroductionView(
+    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, TemplateView
 ):
-    template_name = "step_3d_set_clearance_level.html"
-    form_class = OnboardingSetClearanceLevelForm
+    template_name = "step_3d_clearance_level_introduction.html"
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
-    initial = {"level": DNS_REPORT_LEAST_CLEARANCE_LEVEL}
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["boefjes"] = self.get_boefjes_tiles()
-        context["ooi"] = self.request.GET.get("ooi_id", None)
-        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
-        return context
-
-    def get_success_url(self, **kwargs):
-        return get_ooi_url("step_setup_scan_select_plugins", self.request.GET.get("ooi_id"), self.organization.code)
-
-    def form_valid(self, form):
-        self.add_success_notification()
-        return super().form_valid(form)
-
-    def add_success_notification(self):
-        success_message = _("Clearance level has been set")
-        messages.add_message(self.request, messages.SUCCESS, success_message)
 
     def get_boefje_cover_img(self, boefje_id):
         return reverse("plugin_cover", kwargs={"plugin_id": boefje_id, "organization_code": self.organization.code})
@@ -364,6 +342,60 @@ class OnboardingSetClearanceLevelView(
             },
         ]
         return tiles
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["boefjes"] = self.get_boefjes_tiles()
+        return context
+
+
+class OnboardingAcknowledgeClearanceLevelView(
+    OrganizationPermissionRequiredMixin,
+    KatIntroductionStepsMixin,
+    OnboardingBreadcrumbsMixin,
+    OOIClearanceMixin,
+    TemplateView,
+):
+    template_name = "step_3e_trusted_acknowledge_clearance_level.html"
+    permission_required = "tools.can_set_clearance_level"
+    current_step = 3
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
+        return context
+
+
+class OnboardingSetClearanceLevelView(
+    OrganizationPermissionRequiredMixin,
+    KatIntroductionStepsMixin,
+    OnboardingBreadcrumbsMixin,
+    FormView,
+):
+    template_name = "step_3f_set_clearance_level.html"
+    form_class = OnboardingSetClearanceLevelForm
+    permission_required = "tools.can_set_clearance_level"
+    current_step = 3
+    initial = {"level": DNS_REPORT_LEAST_CLEARANCE_LEVEL}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
+        return context
+
+    def get_success_url(self, **kwargs):
+        return get_ooi_url("step_setup_scan_select_plugins", self.request.GET.get("ooi_id"), self.organization.code)
+
+    def form_valid(self, form):
+        self.add_success_notification()
+        return super().form_valid(form)
+
+    def add_success_notification(self):
+        success_message = _("Clearance level has been set")
+        messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
 class OnboardingReportView(
