@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 09:53+0000\n"
+"POT-Creation-Date: 2023-08-15 10:05+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -63,28 +63,21 @@ msgid "--- Please select one of the available options ----"
 msgstr "--- Selecteer één van de beschikbare opties ---"
 
 #: account/forms/account_setup.py
-#, fuzzy
-#| msgid "Account Type"
 msgid "Account Type"
 msgstr "Account Type"
 
 #: account/forms/account_setup.py
-#, fuzzy
-#| msgid "Every member of OpenKAT must be part of a group."
 msgid "Every member of OpenKAT must be part of an account type."
-msgstr "Elke gebruiker van OpenKAT moet deel uitmaken van een groep."
+msgstr "Elke gebruiker van OpenKAT moet deel uitmaken van een account type."
 
 #: account/forms/account_setup.py
-#, fuzzy
-#| msgid "Please select a group to proceed."
 msgid "Please select an account type to proceed."
-msgstr "Selecteer een groep om door te gaan."
+msgstr "Selecteer een account type om door te gaan."
 
 #: account/forms/account_setup.py
-#, fuzzy
-#| msgid "Set clearance level"
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
-msgstr "Zet vrijwaringsniveau"
+msgstr "Toegewezen vrijwaring niveau"
 
 #: account/forms/account_setup.py
 msgid "Select a clearance level you trust this member with."
@@ -304,8 +297,6 @@ msgid "date joined"
 msgstr "startdatum"
 
 #: account/templates/account_detail.html
-#, fuzzy
-#| msgid "Account details"
 msgid "Account details"
 msgstr "Account gegevens"
 
@@ -346,11 +337,11 @@ msgstr "OOI vrijwaringsniveau"
 #: account/templates/account_detail.html
 msgid ""
 "\n"
-"                                You don't have any clearance to scan objects."
+"                            You don't have any clearance to scan objects."
 "<br>\n"
-"                                Get in contact with the admin to give you "
-"the necessary clearance level.\n"
-"                                "
+"                            Get in contact with the admin to give you the "
+"necessary clearance level.\n"
+"                        "
 msgstr ""
 "\n"
 "               U heeft geen vrijwaring om objecten te scannen.<br>\n"
@@ -359,8 +350,37 @@ msgstr ""
 "              "
 
 #: account/templates/account_detail.html
-msgid "You have currently accepted clearance up to level"
-msgstr "U heeft momenteel toestemming geaccepteerd tot niveau"
+msgid "You have currently accepted clearance up to level "
+msgstr "U heeft momenteel toestemming geaccepteerd tot niveau "
+
+#: account/templates/account_detail.html
+msgid "Explanation OOI Clearance"
+msgstr "Uitleg OOI vrijwaring"
+
+#: account/templates/account_detail.html
+msgid ""
+"You can withdraw this at anytime you like, but know that you won't be able "
+"to change clearance levels anymore when you do."
+msgstr ""
+"U kunt dit op elk gewenst moment intrekken, maar weet dat u de "
+"vrijgaveniveaus niet meer kunt wijzigen als u dat doet."
+
+#: account/templates/account_detail.html
+#, python-format
+msgid ""
+"\n"
+"                            \"Withdraw acceptance of level L%(acl)s "
+"clearance and responsibility\"\n"
+"                    "
+msgstr ""
+"\n"
+"                            \"Acceptatie van niveau L%(acl)s goedkeuring en "
+"verantwoordelijkheid intrekken\"\n"
+"                    "
+
+#: account/templates/account_detail.html
+msgid "Explanation OOI clearance"
+msgstr "Uitleg OOI vrijwaring"
 
 #: account/templates/account_detail.html
 #, python-format
@@ -377,23 +397,16 @@ msgstr ""
 
 #: account/templates/account_detail.html
 #, python-format
-msgid "\"Accept level L%(tcl)s clearance and responsibility\""
-msgstr "\"Accepteer vrijwaring niveau L%(tcl)s en verantwoordelijkheid\""
-
-#: account/templates/account_detail.html
 msgid ""
-"You can withdraw this at anytime you like, but know that you won't be able "
-"to change clearance levels anymore when you do."
+"\n"
+"                        \"Accept level L%(tcl)s clearance and "
+"responsibility\"\n"
+"                    "
 msgstr ""
-"U kunt dit op elk gewenst moment intrekken, maar weet dat u de "
-"vrijgaveniveaus niet meer kunt wijzigen als u dat doet."
-
-#: account/templates/account_detail.html
-#, python-format
-msgid "\"Withdraw acceptance of level L%(tcl)s clearance and responsibility\""
-msgstr ""
-"\"Acceptatie van niveau L%(tcl)s goedkeuring en verantwoordelijkheid "
-"intrekken\""
+"\n"
+"                        \"Accepteer vrijwaring niveau L%(tcl)s en "
+"verantwoordelijkheid\"\n"
+"                    "
 
 #: account/templates/login.html rocky/templates/two_factor/core/login.html
 msgid "You are logged in."
@@ -562,22 +575,18 @@ msgid "Back to login"
 msgstr "Terug naar login"
 
 #: account/templates/registration_email.html
-#, fuzzy, python-format
-#| msgid ""
-#| "You're receiving this email because you requested a password reset for "
-#| "your user account at %(site_name)s."
+#, python-format
 msgid ""
 "Welcome to OpenKAT. You're receiving this email because you have been added "
 "to organization \"%(organization)s\" at %(site_name)s."
 msgstr ""
-"U ontvangt deze e-mail omdat er een verzoek is gedaan om het wachtwoord voor "
-"uw profiel op %(site_name)s te herstellen."
+"Welkom bij OpenKAT. U ontvangt deze e-mail omdat u bent toegevoegd aan "
+"organisatie \"%(organization)s\" op %(site_name)s."
 
 #: account/templates/registration_subject.txt
-#, fuzzy, python-format
-#| msgid "Password reset on %(site_name)s"
+#, python-format
 msgid "Verify OpenKAT account on %(site_name)s"
-msgstr "Wachtwoord opnieuw instellen op %(site_name)s"
+msgstr "Verifieer OpenKAT-account op %(site_name)s"
 
 #: account/validators.py
 msgid "Your password must contain at least the following:"
@@ -1853,14 +1862,15 @@ msgstr ""
 "Kon vrijwaring niveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
 "bij organisatie %s."
 
-#: katalogus/views/mixins.py
+#: katalogus/views/mixins.py rocky/views/scan_profile.py
 #, python-format
 msgid ""
-"Could not raise clearance level of %s to L%s.                             "
-"You acknowledged a clearance level of %s."
+"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
+"level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s.U heeft een vrijwaring "
-"niveau van %s bevestigd."
+"Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een vrijwaring "
+"niveau bevestigd van L%s. Neem contact op met uw beheerder om je vrijwaring "
+"niveau te verhogen."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -1875,36 +1885,29 @@ msgid "Please select an OOI to start scan."
 msgstr "Selecteer een OOI om de scan te starten."
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy, python-brace-format
-#| msgid "Boefje '{boefje_id}' disabled."
+#, python-brace-format
 msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_id}' uitgezet."
+msgstr "Boefje '{boefje_name}' uitgezet."
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "Failed fetching settings for boefje {boefje_id}. Is the Katalogus up?"
+#, python-brace-format
 msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
 msgstr ""
-"Ophalen van instellingen voor boefje {boefje_id} mislukt. Is de Katalogus "
+"Ophalen van instellingen voor boefje {boefje_name} mislukt. Is de Katalogus "
 "actief?"
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy, python-brace-format
-#| msgid ""
-#| "Before enabling, please set the required settings for boefje "
-#| "'{boefje_id}'."
+#, python-brace-format
 msgid ""
 "Before enabling, please set the required settings for boefje '{boefje_name}'."
 msgstr ""
-"Voordat je '{boefje_id}' inschakeld, zet alsjeblieft de verplichte "
+"Voordat je '{boefje_name}' inschakeld, zet alsjeblieft de verplichte "
 "instellingen."
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy, python-brace-format
-#| msgid "Boefje '{boefje_id}' enabled."
+#, python-brace-format
 msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_id}' aangezet."
+msgstr "Boefje '{boefje_name}' aangezet."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
@@ -2062,6 +2065,7 @@ msgstr "Veranderingen opslaan"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Continue"
 msgstr "Verder gaan"
 
@@ -2314,7 +2318,9 @@ msgstr "Deze introductie legt uit hoe je een rapportage maakt."
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_3f_set_clearance_level.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
 msgstr "Sla onboarding over"
@@ -2593,19 +2599,22 @@ msgstr "Netwerk"
 msgid "Start scanning"
 msgstr "Begin met scannen"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_3f_set_clearance_level.html
 msgid "OpenKAT Introduction"
 msgstr "OpenKAT Inleiding"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
-msgid "Setup - Set clearance level for"
-msgstr "Opzet - Zet het vrijwaring niveau"
+#: onboarding/templates/step_3d_clearance_level_introduction.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+msgid "Setup scan - OOI clearance for"
+msgstr "Opzet scan - OOI vrijwaring voor"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Introduction"
 msgstr "Introductie"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 #: rocky/templates/partials/form/indemnification_add_form.html
 msgid ""
 "Some scans are lightweight while others might be a bit more aggressive with "
@@ -2622,11 +2631,11 @@ msgstr ""
 "waarschijnlijk niet het recht om dat te doen voor objecten die eigendom zijn "
 "van andere mensen of bedrijven."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "How to know required clearance level"
 msgstr "Hoe kiest u het juiste vrijwaringsniveau?"
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
 "Each plugin that scans will have a scan intensity score. The intensity of "
 "the scan must be equal to or below the clearance level you set for your "
@@ -2640,7 +2649,7 @@ msgstr ""
 "OpenKAT u waarschuwen voordat hij wordt uitgevoerd. Visueel worden clearance "
 "levels en intesitas scores aangegeven met kleine kattenpootjes."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
 "This scan has a scan intensity score of 1, requiring a level 1 clearance "
 "level to be run. This means that the scan does not touch the object itself, "
@@ -2649,7 +2658,7 @@ msgstr ""
 "Deze scan heeft intensiteit niveau 1. De scan raakt het object niet aan en "
 "verzamelt alleen informatie."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
 "An example of a more aggressive scan. Which has a scan intensity score of 3. "
 "Meaning it requires at least a level 3 clearance level to be set on your "
@@ -2659,44 +2668,164 @@ msgstr ""
 "betekent dat er ten minste een vrijwaring niveau van 3 vereist is voor het "
 "object."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
-msgid "Setting and changing your clearance level"
-msgstr "Je vrijwaring niveau instellen en wijzigen"
-
-#: onboarding/templates/step_3d_set_clearance_level.html
-#, fuzzy, python-format
-#| msgid ""
-#| "After creating a new object OpenKAT will ask you to set a clearance "
-#| "level. On the object detail page you can always change the clearance "
-#| "level. For the onboarding we will suggest to set the clearance level to "
-#| "L2."
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid ""
-"After creating a new object OpenKAT will ask you to set a clearance level. "
-"On the object detail page you can always change the clearance level. For the "
-"onboarding we will suggest to set the clearance level to "
-"L%(dns_report_least_clearance_level)s."
+"\n"
+"                    OpenKAT has a permission system that allows "
+"administrators to\n"
+"                    configure which users can set a certain clearance level. "
+"The will make sure\n"
+"                    that only users that are trusted can start the more "
+"aggressive scans.\n"
+"                "
 msgstr ""
-"Na het maken van een nieuw object zal OpenKAT u vragen een vrijgaveniveau in "
-"te stellen. Op de objectdetailpagina kunt u altijd het toestemmingsniveau "
-"wijzigen. Voor de onboarding stellen wij voor het toestemmingsniveau op L2 "
-"te zetten."
+"\n"
+"OpenKAT heeft een toestemmingssysteem dat administrators in staat stelt om "
+"te configureren welke gebruikers een bepaald vrijwaring niveau kunnen "
+"instellen. Dit zorgt ervoor dat alleen gebruikers die vertrouwd zijn, de "
+"meer agressieve scans kunnen starten."
 
-#: onboarding/templates/step_3d_set_clearance_level.html
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+msgid "Acknowledge clearance level"
+msgstr "Bevestig vrijwaring niveau"
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+msgid ""
+"\n"
+"                    Before a member is granted the ability to set clearance "
+"levels on an object,\n"
+"                    they must first acknowledge and accept the clearance "
+"level set by the administrators.\n"
+"                    The maximum scanning level permitted for a member is "
+"aligned with the trusted clearance level.\n"
+"                    By acknowledging the trusted clearance level, this "
+"member formally agrees to abide by\n"
+"                    this permission and gains the capability to perform "
+"scans only up to this trusted clearance level.\n"
+"                    This two-step process ensures that the member operates "
+"within authorized boundaries.\n"
+"                "
+msgstr ""
+"\n"
+"Voordat een lid de mogelijkheid krijgt om vrijwaring niveaus voor een object "
+"in te stellen, moeten ze eerst het vrijwaring niveau dat door de beheerders "
+"is ingesteld, erkennen en accepteren. Het maximale scan-niveau dat voor een "
+"lid is toegestaan, is afgestemd op het vertrouwde vrijwaring niveau. Door "
+"het erkennen van het vertrouwde vrijwaring niveau stemt dit lid formeel in "
+"met het naleven van deze toestemming en krijgt het de mogelijkheid om scans "
+"uit te voeren tot alleen dit vertrouwde vrijwaring niveau. Dit "
+"tweestapsproces zorgt ervoor dat het lid binnen geautoriseerde grenzen "
+"opereert."
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+msgid "What is my clearance level?"
+msgstr "Wat is mijn vrijwaring niveau"
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, python-format
+msgid ""
+"\n"
+"                                Unfortunately you cannot continue the "
+"onboarding. </br>\n"
+"                                Your administrator has trusted you with a "
+"clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+"                                You need at least a clearance level of "
+"<strong>L%(dns_report_least_clearance_level)s</strong> to scan "
+"<strong>%(ooi)s</strong></br>\n"
+"                                Contact your administrator to receive a "
+"higher clearance.\n"
+"                            "
+msgstr ""
+"\n"
+"Helaas kun je het onboarding niet voortzetten. </br>\n"
+"Je beheerder heeft je een vrijwaring niveau van <strong>L%(tcl)s</strong> "
+"toegewezen.</br>\n"
+"Je hebt minimaal een vrijwaring niveau van "
+"<strong>L%(dns_report_least_clearance_level)s</strong> nodig om "
+"<strong>%(ooi)s</strong> te scannen.</br>\n"
+"Neem contact op met je beheerder om een hoger vrijwaring niveau te "
+"verkrijgen.\n"
+"                            "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, python-format
+msgid ""
+"\n"
+"                            Your administrator has trusted you with a "
+"clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+"                            You must first accept this clearance level to "
+"continue.\n"
+"                            "
+msgstr ""
+"\n"
+"                            Uw beheerder heeft u toevertrouwd met een "
+"vrijwaring niveau van <strong>L%(tcl)s</strong>.</br>\n"
+" U moet dit vrijwaring niveau eerst accepteren om verder te gaan.\n"
+"                            "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, python-format
+msgid ""
+"\n"
+"                            Accept level L%(tcl)s clearance and "
+"responsibility\n"
+"                        "
+msgstr ""
+"\n"
+" Accepteer vrijwaring niveau L%(tcl)s en verantwoordelijkheid\n"
+"                        "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#, python-format
+msgid ""
+"\n"
+"                            Your administrator has <strong>trusted</strong> "
+"you with a clearance level of <strong>L%(tcl)s</strong>.</br>\n"
+"                            You have also <strong>acknowledged</strong> to "
+"use this clearance level of <strong>L%(acl)s</strong>.\n"
+"                            "
+msgstr ""
+"\n"
+" Uw beheerder heeft u <strong>toevertrouwd</strong> met een vrijwaring "
+"niveau van <strong>L%(tcl)s</strong>.</br>\n"
+" U heeft ook <strong>bevestigd</strong> om dit vrijwaring niveau van "
+"<strong>L%(acl)s</strong> te gebruiken.\n"
+" "
+
+#: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
+#: onboarding/templates/step_3f_set_clearance_level.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level"
 msgstr "Zet vrijwaringsniveau"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3f_set_clearance_level.html
+msgid "Setup scan - Set clearance level for"
+msgstr "Opzet scan - Zet vrijwaring niveau voor"
+
+#: onboarding/templates/step_3f_set_clearance_level.html
+#, python-format
+msgid ""
+"After creating a new object OpenKAT will ask you to set a clearance level. "
+"On the object detail page you can always change the clearance level. For the "
+"onboarding we will suggest to set the clearance level to "
+"L%(dns_report_least_clearance_level)s."
+msgstr ""
+"Na het maken van een nieuw object zal OpenKAT u vragen een vrijwaring niveau "
+"in te stellen. Op de objectdetailpagina kunt u altijd het vrijwaring niveau "
+"wijzigen. Voor de onboarding stellen wij voor het vrijwaring niveau op "
+"L%(dns_report_least_clearance_level)s.te zetten."
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Setup scan - Enable plugins"
 msgstr "Scan opzetten - Activeer plugins"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Plugins introduction"
 msgstr "Plugin introductie"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a "
 "specific skillset that will help to generate your report. There are three "
@@ -2706,14 +2835,14 @@ msgstr ""
 "Elke plugin brengt een specifieke vaardighedenset mee die helpt bij het "
 "genereren van uw rapport. Er zijn drie soorten plugins."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: tools/forms/boefje.py rocky/templates/scan.html
 #: rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr "Boefjes"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
@@ -2721,29 +2850,29 @@ msgstr ""
 "Scan objecten voor data. Elke boefje heeft een vrijwaringsniveau om te "
 "zorgen dat objecten niet te agressief worden gescant."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Normalizers"
 msgstr "Normalizers"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Check the data for specific objects and add these object to your object list."
 msgstr ""
 "Check de data voor specifieke objecten en voeg deze toe aan je objecten "
 "lijst."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Bits"
 msgstr "Bits"
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Analyze the available data to come to insights and conclusions."
 msgstr ""
 "Bits zijn de businessrules die de objecten analyseren en conclusies trekken."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "OpenKAT will be able to generate a full report when all the required and "
 "suggested plugins are enabled. If you choose not to give a plugin permission "
@@ -2755,11 +2884,11 @@ msgstr ""
 "OpenKAT levert een compleet rapport als alle benodigde boefjes kunnen "
 "werken. Hieronder zijn de mogelijke en benodigde boefjes opgenomen."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr "Start met het aanzetten van boefjes."
 
-#: onboarding/templates/step_3e_setup_scan_select_plugins.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Suggested plugins"
 msgstr "Aangeraden boefjes"
 
@@ -2840,23 +2969,21 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                 "
 "Indemnification not present at organization %s."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
-"bij organisatie %s."
+"Kon vrijwaring niveau van %s niet verhogen naar L%s. Vrijwaring niet "
+"aanwezig bij organisatie %s."
 
 #: onboarding/views.py
-#, python-format
 msgid ""
-"Could not raise clearance level of %s to L%s.                 You "
-"acknowledged a clearance level of %s."
+"Could not raise clearance level of {} to L{}. You acknowledged a clearance "
+"level of L{}. Contact your administrator to receive a higher clearance."
 msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s. Jij erkende een "
-"vrijwaring niveau van %s."
+"Het was niet mogelijk om het vrijwaring niveau van {} te verhogen naar L{}. "
+"Je hebt een vrijwaring niveau van L{} erkend. Neem contact op met je "
+"beheerder om een hoger vrijwaring niveau te verkrijgen."
 
 #: onboarding/views.py
-#, fuzzy
-#| msgid "Clearance level inheritance"
 msgid "Clearance level has been set"
-msgstr "Overerving op vrijwaring niveau"
+msgstr "Vrijwaring niveau is gezet"
 
 #: onboarding/views.py
 msgid "OpenKAT Setup"
@@ -3018,22 +3145,18 @@ msgid "Show muted findings"
 msgstr "Bevindingen Dempen"
 
 #: tools/forms/findings.py
-#, fuzzy
-#| msgid "Mute findings"
 msgid "Show muted and non-muted findings"
-msgstr "Bevindingen Dempen"
+msgstr ""
 
 #: tools/forms/findings.py
-#, fuzzy
-#| msgid "Filter by"
 msgid "Filter by severity"
-msgstr "Filteren op"
+msgstr "Filteren op ernst"
 
 #: tools/forms/findings.py
 #, fuzzy
-#| msgid "Mute Findings"
+#| msgid "Exclude Muted Findings"
 msgid "Filter by muted findings"
-msgstr "Bevindingen dempen"
+msgstr "Gemuteerde bevindingen uitsluiten"
 
 #: tools/forms/ooi.py
 msgid "Filter types"
@@ -3243,6 +3366,9 @@ msgid ""
 "needs at least a clearance level of L{} in order to do a proper onboarding. "
 "Edit this member and change the clearance level if necessary."
 msgstr ""
+"Je hebt dit lid vertrouwd met een vrijwaring niveau van L{}. Dit lid heeft "
+"minimaal een vrijwaring niveau van L{} nodig om een correcte onboarding uit "
+"te voeren. Bewerk dit lid en wijzig indien nodig het vrijwaring niveau."
 
 #: rocky/settings.py
 msgid "Blue light"
@@ -3599,10 +3725,8 @@ msgid "Set filters"
 msgstr "Selecteer filters"
 
 #: rocky/templates/findings/findings_filter.html
-#, fuzzy
-#| msgid "Set filters"
 msgid "Clear filters"
-msgstr "Selecteer filters"
+msgstr "Filters wissen"
 
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
@@ -3988,13 +4112,11 @@ msgstr "Taak ID"
 #: rocky/templates/oois/ooi_edit.html
 #, python-format
 msgid "Edit %(type)s: %(ooi_human_readable)s"
-msgstr ""
+msgstr "Bewerk %(type)s: %(ooi_human_readable)s"
 
 #: rocky/templates/oois/ooi_edit.html
-#, fuzzy
-#| msgid "This field cannot be null."
 msgid "Primary key fields cannot be edited."
-msgstr "Dit veld is verplicht."
+msgstr "Primaire sleutelvelden kunnen niet worden bewerkt."
 
 #: rocky/templates/oois/ooi_edit.html
 #, python-format
@@ -4233,39 +4355,33 @@ msgid "Tags"
 msgstr "Labels"
 
 #: rocky/templates/organizations/organization_member_add.html
-#, fuzzy
-#| msgid "Member account setup"
 msgid " member account setup"
-msgstr "Leden account opzetten"
+msgstr " lid account instellen"
 
 #: rocky/templates/organizations/organization_member_add.html
 msgid "Member details"
 msgstr "Leden details"
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
-#, fuzzy
-#| msgid "Member account setup"
 msgid "Member account type setup"
 msgstr "Leden account opzetten"
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
 msgid "Choose an account type for this new member."
-msgstr ""
+msgstr "Kies een accounttype voor dit nieuwe lid."
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
-#, fuzzy
-#| msgid "Account details"
 msgid "Account type details"
-msgstr "Account gegevens"
+msgstr "Account type gegevens"
 
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/views/organization_member_edit.py
 msgid "Edit member"
-msgstr "Bekijk leden"
+msgstr "Wijzig lid"
 
 #: rocky/templates/organizations/organization_member_edit.html
 msgid "Save member"
-msgstr "Sla leden op"
+msgstr "Lid opslaan"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
@@ -4280,20 +4396,14 @@ msgstr ""
 "                        "
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy
-#| msgid "Add member"
 msgid "Add member(s)"
-msgstr "Lid toevoegen"
+msgstr "Lid (Leden) toevoegen"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy
-#| msgid "January"
 msgid "Manually"
-msgstr "Januari"
+msgstr "Handmatig"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy
-#| msgid "Upload CSV"
 msgid "Upload a CSV"
 msgstr "Upload CSV"
 
@@ -4330,17 +4440,15 @@ msgstr "Actief"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
-msgstr ""
+msgstr "Upload een csv-bestand met leden voor organisatie"
 
 #: rocky/templates/organizations/organization_member_upload.html
-#, fuzzy
-#| msgid "Download meta data"
 msgid "Download the template"
-msgstr "Metagegevens downloaden"
+msgstr "Download de sjabloon"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "or create a csv file with the following criteria"
-msgstr ""
+msgstr "of maak een csv-bestand met de volgende criteria"
 
 #: rocky/templates/organizations/organization_member_upload.html
 #: rocky/templates/upload_csv.html
@@ -4348,10 +4456,8 @@ msgid "These are the criteria for CSV upload:"
 msgstr "Dit zijn de criteria voor CSV-upload:"
 
 #: rocky/templates/organizations/organization_member_upload.html
-#, fuzzy
-#| msgid "Upload CSV"
 msgid "Upload"
-msgstr "Upload CSV"
+msgstr "Uploaden"
 
 #: rocky/templates/organizations/organization_settings.html
 #, python-format
@@ -5266,7 +5372,7 @@ msgstr "Voeg %(ooi_type)s toe"
 
 #: rocky/views/ooi_detail.py
 msgid "Only Question OOIs can be answered."
-msgstr ""
+msgstr "Alleen Question OOI's kunnen worden beantwoord."
 
 #: rocky/views/ooi_detail_related_object.py
 msgid " (as "
@@ -5297,10 +5403,11 @@ msgstr ""
 #, python-format
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
-"of %s."
+"of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau "
-"bevestigd van %s."
+"bevestigd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring "
+"te krijgen."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5412,64 +5519,54 @@ msgstr "Voeg kolomtitels toe. Gevolgd door elk object op een nieuwe regel."
 
 #: rocky/views/organization_member_add.py
 msgid "The columns are: "
-msgstr ""
+msgstr "De kolommen zijn: "
 
 #: rocky/views/organization_member_add.py
-#, fuzzy
-#| msgid "Clearance level has been set"
 msgid "Clearance levels should be between -1 and 4."
-msgstr "Vrijwaringsniveau toegepast"
+msgstr "Vrijwaring niveau moet tussen -1 en 4 liggen."
 
 #: rocky/views/organization_member_add.py
 msgid "Account type can be one of: "
-msgstr ""
+msgstr "Account type kan zijn een van: "
 
 #: rocky/views/organization_member_add.py
-#, fuzzy
-#| msgid "Account Type"
 msgid "Add Account Type"
-msgstr "Account Type"
+msgstr "Account Type toeveogen"
 
 #: rocky/views/organization_member_add.py
 msgid "Member added successfully."
 msgstr "Lid succesvol toegevoegd."
 
 #: rocky/views/organization_member_add.py
-#, fuzzy
-#| msgid "Add member"
 msgid "Add Member"
 msgstr "Lid toevoegen"
 
 #: rocky/views/organization_member_add.py
-#, fuzzy
-#| msgid "This field is required"
 msgid "The csv file is missing required columns"
-msgstr "Dit veld is verplicht"
+msgstr "Het csv-bestand mist vereiste kolommen"
 
 #: rocky/views/organization_member_add.py
 #, python-brace-format
 msgid "Invalid account type: '{account_type}'"
-msgstr ""
+msgstr "Ongeldig accounttype: '{account_type}'"
 
 #: rocky/views/organization_member_add.py
-#, fuzzy, python-brace-format
-#| msgid "Enter a valid email address."
+#, python-brace-format
 msgid "Invalid data for: '{email}'"
-msgstr "Voer een geldig e-mailadres in."
+msgstr "Ongeldige gegevens voor: '{email}'"
 
 #: rocky/views/organization_member_add.py
-#, fuzzy, python-brace-format
-#| msgid "Enter a valid email address."
+#, python-brace-format
 msgid "Invalid email address: '{email}'"
-msgstr "Voer een geldig e-mailadres in."
+msgstr "Ongeldig e-mailadres: '{email}'"
 
 #: rocky/views/organization_member_add.py
 msgid "Successfully processed users from csv."
-msgstr ""
+msgstr "Succesvol verwerkte gebruikers van csv."
 
 #: rocky/views/organization_member_add.py
 msgid "Error parsing the csv file. Please verify its contents."
-msgstr ""
+msgstr "Fout bij het ontleden van het csv-bestand. Controleer de inhoud."
 
 #: rocky/views/organization_member_edit.py
 #, python-format
@@ -5524,15 +5621,6 @@ msgid ""
 msgstr ""
 "Kon vrijwaring niveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
 "bij organisatie %s."
-
-#: rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                         You "
-"acknowledged a clearance level of %s."
-msgstr ""
-"Kon vrijwaring niveau van %s niet verhogen naar L%s. Jij erkende een "
-"vrijwaring niveau van %s."
 
 #: rocky/views/scan_profile.py
 msgid "Choose a valid level"
@@ -5598,1360 +5686,3 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
-
-#, python-format
-#~ msgid ""
-#~ "Could not raise clearance level of %s to L%s.                     "
-#~ "Indemnification not present at organization %s."
-#~ msgstr ""
-#~ "Kon vrijwaring niveau van %s niet verhogen naar L%s.                     "
-#~ "Vrijwaring niet aanwezig voor organisatie %s."
-
-#, python-format
-#~ msgid ""
-#~ "Could not raise clearance level of %s to L%s.                     You "
-#~ "acknowledged a clearance level of %s."
-#~ msgstr ""
-#~ "U hebt geen machtiging voor niveau %s.                         U wordt "
-#~ "vertrouwd met machtigingsniveau %s en u hebt een machtigingsniveau van %s "
-#~ "erkend."
-
-#~ msgid ""
-#~ "\n"
-#~ "              You don't have any clearance to scan objects.<br>\n"
-#~ "              Get in contact with the admin to give you the necessary "
-#~ "clearance level.\n"
-#~ "            "
-#~ msgstr ""
-#~ "\n"
-#~ "               U heeft geen toestemming om objecten te scannen.<br>\n"
-#~ "               Neem contact op met de beheerder om u het nodige "
-#~ "vrijwaringsniveau te geven.\n"
-#~ "              "
-
-#, python-format
-#~ msgid ""
-#~ "You are granted clearance for %(cl)s your admin. Before you can change "
-#~ "OOI clearance levels up to this level, you need to accept this "
-#~ "permission. Remember: <strong>with great power comes great responsibility."
-#~ "</strong>"
-#~ msgstr ""
-#~ "U krijgt toestemming voor niveau %(cl)s van uw beheerder. Voordat u OOI-"
-#~ "vrijwaringsniveaus kunt wijzigen tot dit niveau, moet u deze toestemming "
-#~ "accepteren. Onthoud: <strong>met grote macht komt grote "
-#~ "verantwoordelijkheid.</strong>"
-
-#~ msgid ""
-#~ "You can withdraw this at anytime you like, but know that you're not able "
-#~ "to change clearance levels anymore when you do."
-#~ msgstr ""
-#~ "U kunt dit op elk gewenst moment intrekken, maar weet dat u de "
-#~ "vrijgaveniveaus niet meer kunt wijzigen als u dat doet."
-
-#~ msgid "Failed to get list of findings, check server logs for more details."
-#~ msgstr ""
-#~ "Kon lijst met bevindingen niet ophalen, controleer serverlogboeken voor "
-#~ "meer details."
-
-#~ msgid "Redteam can enable "
-#~ msgstr "Red team kan inschakelen"
-
-#~ msgid "Delete setting"
-#~ msgstr "Instelling verwijderen"
-
-#, python-format
-#~ msgid ""
-#~ "Are you sure you want to delete setting %(setting_name)s for the plugin "
-#~ "%(plugin_name)s?"
-#~ msgstr ""
-#~ "Weet u zeker dat u instelling %(setting_name)s voor plug-in "
-#~ "%(plugin_name)s wilt verwijderen?"
-
-#~ msgid "Edit setting"
-#~ msgstr "Instelling wijzigen"
-
-#~ msgid "Update setting"
-#~ msgstr "Instelling wijzigen"
-
-#, python-format
-#~ msgid "Settings from %s to %s successfully cloned."
-#~ msgstr "Instellingen vanuit %s naar %s succesvol gekloneerd."
-
-#~ msgid "Scanning has failed to start."
-#~ msgstr "Het starten van de scan is gefaald."
-
-#~ msgid "Setting {} already exists. Use the edit link."
-#~ msgstr "Deze setting bestaat al. Gebruik anders de edit link."
-
-#~ msgid "Setting {} added for {} "
-#~ msgstr "Instelling {} succesvol toegevoegd voor {} "
-
-#~ msgid "Failed adding setting {}"
-#~ msgstr "Kan instelling {} niet toevoegen"
-
-#~ msgid "Setting {} for plugin {} successfully deleted."
-#~ msgstr "Instelling {} voor plugin {} succesvol verwijderd."
-
-#~ msgid ""
-#~ "Failed deleting Setting {} for plugin {}. Check the Katalogus logs for "
-#~ "more info."
-#~ msgstr ""
-#~ "Verwijderen van instelling {} voor plug-in {} is mislukt. Controleer de "
-#~ "Logboeken van KAT-alogus voor meer info."
-
-#~ msgid "Setting successfully updated."
-#~ msgstr "Instelling wijzigen gelukt."
-
-#~ msgid "Failed updating setting."
-#~ msgstr "Bijwerken van instelling mislukt."
-
-#~ msgid "What is the name of your organization."
-#~ msgstr "Wat is de naam van uw organisatie."
-
-#~ msgid "The name of the organization this OpenKAT account is for."
-#~ msgstr "De naam van de organisatie waar deze OpenKAT account voor is."
-
-#~ msgid "Trusted to set clearance levels on OOI's"
-#~ msgstr "Vertrouwd om vrijwaringsniveau te zetten voor OOI's"
-
-#~ msgid "Give this user permission to set clearance levels on OOI's"
-#~ msgstr ""
-#~ "Geef deze gebruiker toestemming om vrijwaringsniveaus op OOI's in te "
-#~ "stellen"
-
-#~ msgid ""
-#~ "OpenKAT is the \"Kwetsbaarheden Analyse Tool\" (Vulnerabilities Analysis "
-#~ "Tool). An Open-Source-project developed by the Ministry of Public Health, "
-#~ "Wellbeing and Sports to make your and our world a safer place."
-#~ msgstr ""
-#~ "OpenKAT is de Kwetsbaarheden Analyse Tool. Een Open-Source-project "
-#~ "ontwikkeld door het Ministerie van Volksgezondheid, Welzijn en Sport om "
-#~ "uw en onze wereld veiliger te maken."
-
-#~ msgid "No DNS zone found."
-#~ msgstr "Geen DNS zone gevonden."
-
-#~ msgid "Show Boefjes that exceed the OOI's scan level"
-#~ msgstr "Toon Boefjes die het scanniveau van OOI's overschrijden"
-
-#~ msgid "Organization code(s) in CSV does not exist in our database"
-#~ msgstr "Organisatiecode in CSV bestaat niet in onze database"
-
-#, python-brace-format
-#~ msgid "{editor}: Editing failed"
-#~ msgstr "{editor}: bewerken mislukt"
-
-#, python-brace-format
-#~ msgid "{editor}: Editing failed: {e}"
-#~ msgstr "{editor}: bewerken mislukt: {e}"
-
-#~ msgid "Aborted!"
-#~ msgstr "Afgebroken!"
-
-#~ msgid "Show this message and exit."
-#~ msgstr "Toon dit bericht en sluit af."
-
-#, python-brace-format
-#~ msgid "(Deprecated) {text}"
-#~ msgstr "(Verouderd) {text}"
-
-#~ msgid "Options"
-#~ msgstr "Opties"
-
-#, python-brace-format
-#~ msgid "Got unexpected extra argument ({args})"
-#~ msgid_plural "Got unexpected extra arguments ({args})"
-#~ msgstr[0] "Onverwacht extra argument gekregen ({args})"
-#~ msgstr[1] "Heb onverwachte extra argumenten ({args})"
-
-#~ msgid "DeprecationWarning: The command {name!r} is deprecated."
-#~ msgstr "BeëindigingWaarschuwing: het commando {name!r} is verouderd."
-
-#~ msgid "Commands"
-#~ msgstr "Opdrachten"
-
-#~ msgid "Missing command."
-#~ msgstr "Ontbrekende opdracht."
-
-#~ msgid "No such command {name!r}."
-#~ msgstr "Zo'n commando {name!r} bestaat niet."
-
-#~ msgid "Value must be an iterable."
-#~ msgstr "Waarde moet een herhaling zijn."
-
-#, python-brace-format
-#~ msgid "Takes {nargs} values but 1 was given."
-#~ msgid_plural "Takes {nargs} values but {len} were given."
-#~ msgstr[0] "Neemt {nargs} waarden, maar er is 1 gegeven."
-#~ msgstr[1] "Neemt {nargs} waarden, maar {len} zijn gegeven."
-
-#, python-brace-format
-#~ msgid "env var: {var}"
-#~ msgstr "env var: {var}"
-
-#~ msgid "(dynamic)"
-#~ msgstr "(dynamic)"
-
-#, python-brace-format
-#~ msgid "default: {default}"
-#~ msgstr "default: {default}"
-
-#~ msgid "required"
-#~ msgstr "vereist"
-
-#, python-format
-#~ msgid "%(prog)s, version %(version)s"
-#~ msgstr "%(prog)s, versie %(version)s"
-
-#~ msgid "Show the version and exit."
-#~ msgstr "Laat de versie zien en sluit af."
-
-#, python-brace-format
-#~ msgid "Error: {message}"
-#~ msgstr "Fout: {message}"
-
-#, python-brace-format
-#~ msgid "Try '{command} {option}' for help."
-#~ msgstr "Probeer '{command} {option}' voor hulp."
-
-#, python-brace-format
-#~ msgid "Invalid value: {message}"
-#~ msgstr "Ongeldige waarde: {message}"
-
-#, python-brace-format
-#~ msgid "Invalid value for {param_hint}: {message}"
-#~ msgstr "Ongeldige waarde voor {param_hint}: {message}"
-
-#~ msgid "Missing argument"
-#~ msgstr "Ontbrekend argument"
-
-#~ msgid "Missing option"
-#~ msgstr "Ontbrekende optie"
-
-#~ msgid "Missing parameter"
-#~ msgstr "Ontbrekende parameters"
-
-#, python-brace-format
-#~ msgid "Missing {param_type}"
-#~ msgstr "Vermist {param_type}"
-
-#, python-brace-format
-#~ msgid "Missing parameter: {param_name}"
-#~ msgstr "Ontbrekende parameter: {param_name}"
-
-#, python-brace-format
-#~ msgid "No such option: {name}"
-#~ msgstr "Niet zo'n optie: {name}"
-
-#, python-brace-format
-#~ msgid "Did you mean {possibility}?"
-#~ msgid_plural "(Possible options: {possibilities})"
-#~ msgstr[0] "Bedoelde je {possibility}?"
-#~ msgstr[1] "(Mogelijke opties: {possibilities})"
-
-#~ msgid "unknown error"
-#~ msgstr "onbekende fout"
-
-#~ msgid "Could not open file {filename!r}: {message}"
-#~ msgstr "Kon bestand {bestandsnaam!r} niet openen: {message}"
-
-#~ msgid "Argument {name!r} takes {nargs} values."
-#~ msgstr "Argument {name!r} neemt {nargs} waarden."
-
-#~ msgid "Option {name!r} does not take a value."
-#~ msgstr "Optie {name!r} heeft geen waarde."
-
-#~ msgid "Option {name!r} requires an argument."
-#~ msgid_plural "Option {name!r} requires {nargs} arguments."
-#~ msgstr[0] "Optie {name!r} vereist een argument."
-#~ msgstr[1] "Optie {name!r} vereist {nargs} argumenten."
-
-#~ msgid "Shell completion is not supported for Bash versions older than 4.4."
-#~ msgstr ""
-#~ "Shell-voltooiing wordt niet ondersteund voor Bash-versies ouder dan 4.4."
-
-#~ msgid "Couldn't detect Bash version, shell completion is not supported."
-#~ msgstr ""
-#~ "Kon Bash-versie niet detecteren, shell-voltooiing wordt niet ondersteund."
-
-#~ msgid "Repeat for confirmation"
-#~ msgstr "Herhaal ter bevestiging"
-
-#~ msgid "Error: The value you entered was invalid."
-#~ msgstr "Fout: de ingevoerde waarde is ongeldig."
-
-#, python-brace-format
-#~ msgid "Error: {e.message}"
-#~ msgstr "Fout: {e.message}"
-
-#~ msgid "Error: The two entered values do not match."
-#~ msgstr "Fout: de twee ingevoerde waarden komen niet overeen."
-
-#~ msgid "Error: invalid input"
-#~ msgstr "Fout: ongeldige invoer"
-
-#~ msgid "Press any key to continue..."
-#~ msgstr "Druk op een willekeurige toets om door te gaan..."
-
-#, python-brace-format
-#~ msgid ""
-#~ "Choose from:\n"
-#~ "\t{choices}"
-#~ msgstr ""
-#~ "Kies uit:\n"
-#~ "\t{choices}"
-
-#~ msgid "{value!r} is not {choice}."
-#~ msgid_plural "{value!r} is not one of {choices}."
-#~ msgstr[0] "{value!r} is niet {choice}."
-#~ msgstr[1] "{value!r} is niet een van {choices}."
-
-#~ msgid "{value!r} does not match the format {format}."
-#~ msgid_plural "{value!r} does not match the formats {formats}."
-#~ msgstr[0] "{value!r} komt niet overeen met het formaat {format}."
-#~ msgstr[1] "{value!r} komt niet overeen met de formaten {formats}."
-
-#~ msgid "{value!r} is not a valid {number_type}."
-#~ msgstr "{value!r} is geen geldig {number_type}."
-
-#, python-brace-format
-#~ msgid "{value} is not in the range {range}."
-#~ msgstr "{value} ligt niet in het bereik {range}."
-
-#~ msgid "{value!r} is not a valid boolean."
-#~ msgstr "{value!r} is geen geldige boolean."
-
-#~ msgid "{value!r} is not a valid UUID."
-#~ msgstr "{value!r} is geen geldige UUID."
-
-#~ msgid "file"
-#~ msgstr "bestand"
-
-#~ msgid "directory"
-#~ msgstr "directory"
-
-#~ msgid "path"
-#~ msgstr "pad"
-
-#~ msgid "{name} {filename!r} does not exist."
-#~ msgstr "{naam} {bestandsnaam!r} bestaat niet."
-
-#~ msgid "{name} {filename!r} is a file."
-#~ msgstr "{naam} {bestandsnaam!r} is een bestand."
-
-#, python-brace-format
-#~ msgid "{name} '{filename}' is a directory."
-#~ msgstr "{name} '{filename}' is een directory."
-
-#~ msgid "{name} {filename!r} is not readable."
-#~ msgstr "{naam} {bestandsnaam!r} is niet leesbaar."
-
-#~ msgid "{name} {filename!r} is not writable."
-#~ msgstr "{name} {filename!r} is niet beschrijfbaar."
-
-#~ msgid "{name} {filename!r} is not executable."
-#~ msgstr "{name} {filename!r} is niet uitvoerbaar."
-
-#, python-brace-format
-#~ msgid "{len_type} values are required, but {len_value} was given."
-#~ msgid_plural "{len_type} values are required, but {len_value} were given."
-#~ msgstr[0] "{len_type} waarden zijn vereist, maar {len_value} is gegeven."
-#~ msgstr[1] "{len_type} waarden zijn vereist, maar {len_value} zijn gegeven."
-
-#~ msgid "Messages"
-#~ msgstr "Berichten"
-
-#~ msgid "Site Maps"
-#~ msgstr "Sitemaps"
-
-#~ msgid "Static Files"
-#~ msgstr "Statische bestanden"
-
-#~ msgid "Syndication"
-#~ msgstr "Syndicatie"
-
-#~ msgid "…"
-#~ msgstr "…"
-
-#~ msgid "That page number is not an integer"
-#~ msgstr "Dat paginanummer is geen geheel getal"
-
-#~ msgid "That page number is less than 1"
-#~ msgstr "Dat paginanummer is minder dan 1"
-
-#~ msgid "That page contains no results"
-#~ msgstr "Die pagina bevat geen resultaten"
-
-#~ msgid "Enter a valid value."
-#~ msgstr "Kies een geldig niveau"
-
-#~ msgid "Enter a valid URL."
-#~ msgstr "Voer een geldige URL in."
-
-#~ msgid "Enter a valid integer."
-#~ msgstr "Voer een geldig geheel getal in."
-
-#~ msgid ""
-#~ "Enter a valid “slug” consisting of letters, numbers, underscores or "
-#~ "hyphens."
-#~ msgstr ""
-#~ "Voer een geldige “slug” in bestaande uit letters, cijfers, "
-#~ "onderstrepingstekens of koppeltekens."
-
-#~ msgid ""
-#~ "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, "
-#~ "or hyphens."
-#~ msgstr ""
-#~ "Voer een geldige “slug” in bestaande uit Unicode-letters, cijfers, "
-#~ "underscores of koppeltekens."
-
-#~ msgid "Enter a valid IPv4 address."
-#~ msgstr "Voer een geldig IPv4-adres in."
-
-#~ msgid "Enter a valid IPv6 address."
-#~ msgstr "Voer een geldig IPv6-adres in."
-
-#~ msgid "Enter a valid IPv4 or IPv6 address."
-#~ msgstr "Voer een geldig IPv4- of IPv6-adres in."
-
-#~ msgid "Enter only digits separated by commas."
-#~ msgstr "Voer alleen cijfers in, gescheiden door komma's."
-
-#, python-format
-#~ msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
-#~ msgstr ""
-#~ "Zorg ervoor dat deze waarde %(limit_value)s is (het is %(show_value)s)."
-
-#, python-format
-#~ msgid "Ensure this value is less than or equal to %(limit_value)s."
-#~ msgstr ""
-#~ "Zorg ervoor dat deze waarde kleiner is dan of gelijk is aan "
-#~ "%(limit_value)s."
-
-#, python-format
-#~ msgid "Ensure this value is greater than or equal to %(limit_value)s."
-#~ msgstr ""
-#~ "Zorg ervoor dat deze waarde groter is dan of gelijk is aan "
-#~ "%(limit_value)s."
-
-#, python-format
-#~ msgid ""
-#~ "Ensure this value has at least %(limit_value)d character (it has "
-#~ "%(show_value)d)."
-#~ msgid_plural ""
-#~ "Ensure this value has at least %(limit_value)d characters (it has "
-#~ "%(show_value)d)."
-#~ msgstr[0] ""
-#~ "Zorg ervoor dat deze waarde ten minste %(limit_value)d karakter heeft "
-#~ "(deze heeft %(show_value)d)."
-#~ msgstr[1] ""
-#~ "Zorg ervoor dat deze waarde ten minste %(limit_value)d tekens bevat (deze "
-#~ "heeft %(show_value)d)."
-
-#, python-format
-#~ msgid ""
-#~ "Ensure this value has at most %(limit_value)d character (it has "
-#~ "%(show_value)d)."
-#~ msgid_plural ""
-#~ "Ensure this value has at most %(limit_value)d characters (it has "
-#~ "%(show_value)d)."
-#~ msgstr[0] ""
-#~ "Zorg ervoor dat deze waarde maximaal %(limit_value)d karakter heeft (deze "
-#~ "heeft %(show_value)d)."
-#~ msgstr[1] ""
-#~ "Zorg ervoor dat deze waarde maximaal %(limit_value)d tekens bevat (deze "
-#~ "heeft %(show_value)d)."
-
-#~ msgid "Enter a number."
-#~ msgstr "Voer een nummer in."
-
-#, python-format
-#~ msgid "Ensure that there are no more than %(max)s digit in total."
-#~ msgid_plural "Ensure that there are no more than %(max)s digits in total."
-#~ msgstr[0] "Zorg ervoor dat er in totaal niet meer dan %(max)s cijfer is."
-#~ msgstr[1] "Zorg ervoor dat er in totaal niet meer dan %(max)s cijfers zijn."
-
-#, python-format
-#~ msgid "Ensure that there are no more than %(max)s decimal place."
-#~ msgid_plural "Ensure that there are no more than %(max)s decimal places."
-#~ msgstr[0] "Zorg ervoor dat er niet meer dan %(max)s decimaal is."
-#~ msgstr[1] "Zorg ervoor dat er niet meer dan %(max)s decimalen zijn."
-
-#, python-format
-#~ msgid ""
-#~ "Ensure that there are no more than %(max)s digit before the decimal point."
-#~ msgid_plural ""
-#~ "Ensure that there are no more than %(max)s digits before the decimal "
-#~ "point."
-#~ msgstr[0] ""
-#~ "Zorg ervoor dat er niet meer dan %(max)s cijfer voor de komma staat."
-#~ msgstr[1] ""
-#~ "Zorg ervoor dat er niet meer dan %(max)s cijfers voor de komma staan."
-
-#, python-format
-#~ msgid ""
-#~ "File extension “%(extension)s” is not allowed. Allowed extensions are: "
-#~ "%(allowed_extensions)s."
-#~ msgstr ""
-#~ "Bestandsextensie “%(extension)s” is niet toegestaan. Toegestane extensies "
-#~ "zijn: %(allowed_extensions)s."
-
-#~ msgid "Null characters are not allowed."
-#~ msgstr "Nultekens zijn niet toegestaan."
-
-#~ msgid "and"
-#~ msgstr "en"
-
-#, python-format
-#~ msgid "%(model_name)s with this %(field_labels)s already exists."
-#~ msgstr "%(model_name)s met deze %(field_labels)s bestaat al."
-
-#, python-format
-#~ msgid "Value %(value)r is not a valid choice."
-#~ msgstr "Waarde %(value)r is geen geldige keuze."
-
-#~ msgid "This field cannot be blank."
-#~ msgstr "Dit veld mag niet leeg zijn."
-
-#, python-format
-#~ msgid "%(model_name)s with this %(field_label)s already exists."
-#~ msgstr "%(model_name)s met dit %(field_label)s bestaat al."
-
-#, python-format
-#~ msgid ""
-#~ "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
-#~ msgstr ""
-#~ "%(field_label)s moet uniek zijn voor %(date_field_label)s %(lookup_type)s."
-
-#, python-format
-#~ msgid "Field of type: %(field_type)s"
-#~ msgstr "Veld van type: %(field_type)s"
-
-#, python-format
-#~ msgid "“%(value)s” value must be either True or False."
-#~ msgstr "“%(value)s”-waarde moet Waar of Onwaar zijn."
-
-#, python-format
-#~ msgid "“%(value)s” value must be either True, False, or None."
-#~ msgstr "“%(value)s”-waarde moet Waar, Onwaar of Geen zijn."
-
-#~ msgid "Boolean (Either True or False)"
-#~ msgstr "Booleaans (waar of niet waar)"
-
-#, python-format
-#~ msgid "String (up to %(max_length)s)"
-#~ msgstr "String (tot %(max_length)s)"
-
-#~ msgid "Comma-separated integers"
-#~ msgstr "Door komma's gescheiden gehele getallen"
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has an invalid date format. It must be in YYYY-MM-DD "
-#~ "format."
-#~ msgstr ""
-#~ "“%(value)s” waarde heeft een ongeldige datumnotatie. Het moet in formaat "
-#~ "JJJJ-MM-DD zijn."
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has the correct format (YYYY-MM-DD) but it is an "
-#~ "invalid date."
-#~ msgstr ""
-#~ "“%(value)s”-waarde heeft de juiste notatie (JJJJ-MM-DD) maar is een "
-#~ "ongeldige datum."
-
-#~ msgid "Date (without time)"
-#~ msgstr "Datum (zonder tijd)"
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has an invalid format. It must be in YYYY-MM-DD HH:MM[:"
-#~ "ss[.uuuuuu]][TZ] format."
-#~ msgstr ""
-#~ "“%(value)s” waarde heeft een ongeldig formaat. Het moet in JJJJ-MM-DD UU:"
-#~ "MM[:ss[.uuuuuu]][TZ] formaat."
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
-#~ "[TZ]) but it is an invalid date/time."
-#~ msgstr ""
-#~ "“%(value)s” waarde heeft de juiste notatie (JJJJ-MM-DD UU:MM[:ss[.uuuuuu]]"
-#~ "[TZ]) maar het is een ongeldige datum/tijd."
-
-#~ msgid "Date (with time)"
-#~ msgstr "Datum (met tijd)"
-
-#, python-format
-#~ msgid "“%(value)s” value must be a decimal number."
-#~ msgstr "“%(value)s” waarde moet een decimaal getal zijn."
-
-#~ msgid "Decimal number"
-#~ msgstr "Decimaal getal"
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has an invalid format. It must be in [DD] [[HH:]MM:]ss[."
-#~ "uuuuuu] format."
-#~ msgstr ""
-#~ "“%(value)s” waarde heeft een ongeldig formaat. Het moet in [DD] "
-#~ "[[HH:]MM:]ss[.uuuuuu] formaat."
-
-#~ msgid "Duration"
-#~ msgstr "Duur"
-
-#~ msgid "File path"
-#~ msgstr "Bestandspad"
-
-#, python-format
-#~ msgid "“%(value)s” value must be a float."
-#~ msgstr "“%(value)s“ waarde moet een float zijn."
-
-#~ msgid "Floating point number"
-#~ msgstr "Floating point number"
-
-#, python-format
-#~ msgid "“%(value)s” value must be an integer."
-#~ msgstr "“%(value)s” waarde moet een geheel getal zijn."
-
-#~ msgid "Integer"
-#~ msgstr "Geheel getal"
-
-#~ msgid "Big (8 byte) integer"
-#~ msgstr "Groot (8 byte) geheel getal"
-
-#~ msgid "Small integer"
-#~ msgstr "Klein geheel getal"
-
-#~ msgid "IPv4 address"
-#~ msgstr "IPv4 adres"
-
-#~ msgid "IP address"
-#~ msgstr "IP adres"
-
-#, python-format
-#~ msgid "“%(value)s” value must be either None, True or False."
-#~ msgstr "“%(value)s” waarde moet Geen, Waar of Onwaar zijn."
-
-#~ msgid "Boolean (Either True, False or None)"
-#~ msgstr "Booleaans (ofwel waar, onwaar of geen)"
-
-#~ msgid "Positive big integer"
-#~ msgstr "Positief groot geheel getal"
-
-#~ msgid "Positive integer"
-#~ msgstr "Positief geheel getal"
-
-#~ msgid "Positive small integer"
-#~ msgstr "Positief klein geheel getal"
-
-#, python-format
-#~ msgid "Slug (up to %(max_length)s)"
-#~ msgstr "Slug (tot %(max_length)s)"
-
-#~ msgid "Text"
-#~ msgstr "Tekst"
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has an invalid format. It must be in HH:MM[:ss[."
-#~ "uuuuuu]] format."
-#~ msgstr ""
-#~ "“%(value)s” waarde heeft een ongeldig formaat. Het moet in UU:MM[:ss[."
-#~ "uuuuuu]] formaat zijn."
-
-#, python-format
-#~ msgid ""
-#~ "“%(value)s” value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is "
-#~ "an invalid time."
-#~ msgstr ""
-#~ "“%(value)s” waarde heeft de juiste notatie (UU:MM[:ss[.uuuuuu]]) maar het "
-#~ "is een ongeldige tijd."
-
-#~ msgid "Time"
-#~ msgstr "Tijd"
-
-#~ msgid "Raw binary data"
-#~ msgstr "Ruwe binaire gegevens"
-
-#, python-format
-#~ msgid "“%(value)s” is not a valid UUID."
-#~ msgstr "“%(value)s“ is geen geldige UUID."
-
-#~ msgid "Universally unique identifier"
-#~ msgstr "Universeel unieke identificatiecode"
-
-#~ msgid "File"
-#~ msgstr "Bestand"
-
-#~ msgid "Image"
-#~ msgstr "Afbeelding"
-
-#~ msgid "A JSON object"
-#~ msgstr "Een JSON object"
-
-#~ msgid "Value must be valid JSON."
-#~ msgstr "Waarde moet geldige JSON zijn."
-
-#, python-format
-#~ msgid "%(model)s instance with %(field)s %(value)r does not exist."
-#~ msgstr "%(model)s instantie met %(field)s %(value)r bestaat niet."
-
-#~ msgid "Foreign Key (type determined by related field)"
-#~ msgstr "Vreemde sleutel (type bepaald door gerelateerd veld)"
-
-#~ msgid "One-to-one relationship"
-#~ msgstr "Een-op-een relatie"
-
-#, python-format
-#~ msgid "%(from)s-%(to)s relationship"
-#~ msgstr "%(from)s-%(to)s relatie"
-
-#, python-format
-#~ msgid "%(from)s-%(to)s relationships"
-#~ msgstr "%(from)s-%(to)s relaties"
-
-#~ msgid "Many-to-many relationship"
-#~ msgstr "Veel-op-veel relatie"
-
-#~ msgid ":?.!"
-#~ msgstr ":?.!"
-
-#~ msgid "Enter a whole number."
-#~ msgstr "Voer een geheel getal in."
-
-#~ msgid "Enter a valid date."
-#~ msgstr "Voer een geldige datum in."
-
-#~ msgid "Enter a valid time."
-#~ msgstr "Voer een geldige tijd in."
-
-#~ msgid "Enter a valid date/time."
-#~ msgstr "Voer een geldige datum/tijd in."
-
-#~ msgid "Enter a valid duration."
-#~ msgstr "Voer een geldige duur in."
-
-#, python-brace-format
-#~ msgid "The number of days must be between {min_days} and {max_days}."
-#~ msgstr "Het aantal dagen moet tussen {min_days} en {max_days} liggen."
-
-#~ msgid "No file was submitted. Check the encoding type on the form."
-#~ msgstr ""
-#~ "Er is geen bestand ingediend. Controleer het coderingstype op het "
-#~ "formulier."
-
-#~ msgid "No file was submitted."
-#~ msgstr "Er is geen bestand ingediend."
-
-#~ msgid "The submitted file is empty."
-#~ msgstr "Het ingediende bestand is leeg."
-
-#, python-format
-#~ msgid ""
-#~ "Ensure this filename has at most %(max)d character (it has %(length)d)."
-#~ msgid_plural ""
-#~ "Ensure this filename has at most %(max)d characters (it has %(length)d)."
-#~ msgstr[0] ""
-#~ "Zorg ervoor dat deze bestandsnaam maximaal %(max)d karakter heeft (het "
-#~ "heeft %(length)d)."
-#~ msgstr[1] ""
-#~ "Zorg ervoor dat deze bestandsnaam maximaal %(max)d tekens bevat (deze "
-#~ "heeft %(length)d)."
-
-#~ msgid "Please either submit a file or check the clear checkbox, not both."
-#~ msgstr ""
-#~ "Stuur alstublieft een bestand in of vink het selectievakje Wissen aan, "
-#~ "niet beide."
-
-#~ msgid ""
-#~ "Upload a valid image. The file you uploaded was either not an image or a "
-#~ "corrupted image."
-#~ msgstr ""
-#~ "Upload een geldige afbeelding. Het bestand dat je hebt geüpload was geen "
-#~ "afbeelding of een beschadigd beeld."
-
-#, python-format
-#~ msgid ""
-#~ "Select a valid choice. %(value)s is not one of the available choices."
-#~ msgstr ""
-#~ "Selecteer een geldige keuze. %(value)s is niet een van de beschikbare "
-#~ "keuzes."
-
-#~ msgid "Enter a list of values."
-#~ msgstr "Voer een lijst met waarden in."
-
-#~ msgid "Enter a complete value."
-#~ msgstr "Voer een volledige waarde in."
-
-#~ msgid "Enter a valid UUID."
-#~ msgstr "Voer een geldige UUID in."
-
-#~ msgid "Enter a valid JSON."
-#~ msgstr "Voer een geldige JSON in."
-
-#~ msgid ":"
-#~ msgstr ":"
-
-#, python-format
-#~ msgid "(Hidden field %(name)s) %(error)s"
-#~ msgstr "(Verborgen veld %(name)s) %(error)s"
-
-#, python-format
-#~ msgid ""
-#~ "ManagementForm data is missing or has been tampered with. Missing fields: "
-#~ "%(field_names)s. You may need to file a bug report if the issue persists."
-#~ msgstr ""
-#~ "ManagementForm-gegevens ontbreken of er is mee geknoeid. Ontbrekende "
-#~ "velden: %(field_names)s. Mogelijk moet u een bugrapport indienen als het "
-#~ "probleem zich blijft voordoen."
-
-#, python-format
-#~ msgid "Please submit at most %d form."
-#~ msgid_plural "Please submit at most %d forms."
-#~ msgstr[0] "Stuur maximaal %d formulier in."
-#~ msgstr[1] "Dien maximaal %d formulieren in."
-
-#, python-format
-#~ msgid "Please submit at least %d form."
-#~ msgid_plural "Please submit at least %d forms."
-#~ msgstr[0] "Stuur maximaal %d formulier in."
-#~ msgstr[1] "Dien maximaal %d formulieren in."
-
-#~ msgid "Order"
-#~ msgstr "Volgorde"
-
-#, python-format
-#~ msgid "Please correct the duplicate data for %(field)s."
-#~ msgstr "Corrigeer de dubbele gegevens voor %(field)s."
-
-#, python-format
-#~ msgid ""
-#~ "Please correct the duplicate data for %(field)s, which must be unique."
-#~ msgstr ""
-#~ "Corrigeer de dubbele gegevens voor %(field)s, die uniek moeten zijn."
-
-#, python-format
-#~ msgid ""
-#~ "Please correct the duplicate data for %(field_name)s which must be unique "
-#~ "for the %(lookup)s in %(date_field)s."
-#~ msgstr ""
-#~ "Corrigeer de dubbele gegevens voor %(field_name)s die uniek moeten zijn "
-#~ "voor de %(lookup)s in %(date_field)s."
-
-#~ msgid "Please correct the duplicate values below."
-#~ msgstr "Corrigeer de dubbele waarden hieronder."
-
-#~ msgid "The inline value did not match the parent instance."
-#~ msgstr "De inline waarde komt niet overeen met de bovenliggende instantie."
-
-#~ msgid ""
-#~ "Select a valid choice. That choice is not one of the available choices."
-#~ msgstr ""
-#~ "Kies een geldige keuze. Die keuze is niet een van de beschikbare keuzes."
-
-#, python-format
-#~ msgid "“%(pk)s” is not a valid value."
-#~ msgstr "“%(pk)s” is geen geldige waarde."
-
-#, python-format
-#~ msgid ""
-#~ "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; "
-#~ "it may be ambiguous or it may not exist."
-#~ msgstr ""
-#~ "%(datetime)s kon niet worden geïnterpreteerd in tijdzone "
-#~ "%(current_timezone)s; het kan dubbelzinnig zijn of het kan niet bestaan."
-
-#~ msgid "Clear"
-#~ msgstr "Wissen"
-
-#~ msgid "Currently"
-#~ msgstr "Momenteel"
-
-#~ msgid "Change"
-#~ msgstr "Wijzigen"
-
-#~ msgid "Unknown"
-#~ msgstr "Onbekend"
-
-#~ msgid "yes,no,maybe"
-#~ msgstr "ja,nee,misschien"
-
-#, python-format
-#~ msgid "%(size)d byte"
-#~ msgid_plural "%(size)d bytes"
-#~ msgstr[0] "%(size)d byte"
-#~ msgstr[1] "%(size)d bytes"
-
-#, python-format
-#~ msgid "%s KB"
-#~ msgstr "%s KB"
-
-#, python-format
-#~ msgid "%s MB"
-#~ msgstr "%s MB"
-
-#, python-format
-#~ msgid "%s GB"
-#~ msgstr "%s GB"
-
-#, python-format
-#~ msgid "%s TB"
-#~ msgstr "%s TB"
-
-#, python-format
-#~ msgid "%s PB"
-#~ msgstr "%s PB"
-
-#~ msgid "p.m."
-#~ msgstr "p.m."
-
-#~ msgid "a.m."
-#~ msgstr "a.m."
-
-#~ msgid "PM"
-#~ msgstr "PM"
-
-#~ msgid "AM"
-#~ msgstr "AM"
-
-#~ msgid "midnight"
-#~ msgstr "middernacht"
-
-#~ msgid "noon"
-#~ msgstr "middag"
-
-#~ msgid "Monday"
-#~ msgstr "Maandag"
-
-#~ msgid "Tuesday"
-#~ msgstr "Dinsdag"
-
-#~ msgid "Wednesday"
-#~ msgstr "Woensdag"
-
-#~ msgid "Thursday"
-#~ msgstr "Donderdag"
-
-#~ msgid "Friday"
-#~ msgstr "Vrijdag"
-
-#~ msgid "Saturday"
-#~ msgstr "Zaterdag"
-
-#~ msgid "Sunday"
-#~ msgstr "Zondag"
-
-#~ msgid "Mon"
-#~ msgstr "Ma."
-
-#~ msgid "Tue"
-#~ msgstr "Di."
-
-#~ msgid "Wed"
-#~ msgstr "Wo."
-
-#~ msgid "Thu"
-#~ msgstr "Do."
-
-#~ msgid "Fri"
-#~ msgstr "Vr."
-
-#~ msgid "Sat"
-#~ msgstr "Za."
-
-#~ msgid "Sun"
-#~ msgstr "Zo."
-
-#~ msgid "February"
-#~ msgstr "Februari"
-
-#~ msgid "March"
-#~ msgstr "Maart"
-
-#~ msgid "April"
-#~ msgstr "April"
-
-#~ msgid "May"
-#~ msgstr "Mei"
-
-#~ msgid "June"
-#~ msgstr "Juni"
-
-#~ msgid "July"
-#~ msgstr "Juli"
-
-#~ msgid "August"
-#~ msgstr "Augustus"
-
-#~ msgid "September"
-#~ msgstr "September"
-
-#~ msgid "October"
-#~ msgstr "Oktober"
-
-#~ msgid "November"
-#~ msgstr "November"
-
-#~ msgid "December"
-#~ msgstr "December"
-
-#~ msgid "jan"
-#~ msgstr "jan"
-
-#~ msgid "feb"
-#~ msgstr "feb"
-
-#~ msgid "mar"
-#~ msgstr "mrt"
-
-#~ msgid "apr"
-#~ msgstr "apr"
-
-#~ msgid "may"
-#~ msgstr "mei"
-
-#~ msgid "jun"
-#~ msgstr "jun"
-
-#~ msgid "jul"
-#~ msgstr "jul"
-
-#~ msgid "aug"
-#~ msgstr "aug"
-
-#~ msgid "sep"
-#~ msgstr "sep"
-
-#~ msgid "oct"
-#~ msgstr "oct"
-
-#~ msgid "nov"
-#~ msgstr "nov"
-
-#~ msgid "dec"
-#~ msgstr "dec"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Jan."
-#~ msgstr "Jan."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Feb."
-#~ msgstr "Feb."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "March"
-#~ msgstr "Maart"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "April"
-#~ msgstr "April"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "May"
-#~ msgstr "Mei"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "June"
-#~ msgstr "Juni"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "July"
-#~ msgstr "Juli"
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Aug."
-#~ msgstr "Aug."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Sept."
-#~ msgstr "Sept."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Oct."
-#~ msgstr "Oct."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Nov."
-#~ msgstr "Nov."
-
-#~ msgctxt "abbrev. month"
-#~ msgid "Dec."
-#~ msgstr "Dec."
-
-#~ msgctxt "alt. month"
-#~ msgid "January"
-#~ msgstr "Januari"
-
-#~ msgctxt "alt. month"
-#~ msgid "February"
-#~ msgstr "Februari"
-
-#~ msgctxt "alt. month"
-#~ msgid "March"
-#~ msgstr "Maart"
-
-#~ msgctxt "alt. month"
-#~ msgid "April"
-#~ msgstr "April"
-
-#~ msgctxt "alt. month"
-#~ msgid "May"
-#~ msgstr "Mei"
-
-#~ msgctxt "alt. month"
-#~ msgid "June"
-#~ msgstr "Juni"
-
-#~ msgctxt "alt. month"
-#~ msgid "July"
-#~ msgstr "Juli"
-
-#~ msgctxt "alt. month"
-#~ msgid "August"
-#~ msgstr "Augustus"
-
-#~ msgctxt "alt. month"
-#~ msgid "September"
-#~ msgstr "September"
-
-#~ msgctxt "alt. month"
-#~ msgid "October"
-#~ msgstr "Oktober"
-
-#~ msgctxt "alt. month"
-#~ msgid "November"
-#~ msgstr "November"
-
-#~ msgctxt "alt. month"
-#~ msgid "December"
-#~ msgstr "December"
-
-#~ msgid "This is not a valid IPv6 address."
-#~ msgstr "Dit is geen geldig IPv6-adres."
-
-#, python-format
-#~ msgctxt "String to return when truncating text"
-#~ msgid "%(truncated_text)s…"
-#~ msgstr "%(truncated_text)s…"
-
-#~ msgid "or"
-#~ msgstr "of"
-
-#~ msgid ", "
-#~ msgstr ", "
-
-#, python-format
-#~ msgid "%d year"
-#~ msgid_plural "%d years"
-#~ msgstr[0] "%d jaar"
-#~ msgstr[1] "%d jaren"
-
-#, python-format
-#~ msgid "%d month"
-#~ msgid_plural "%d months"
-#~ msgstr[0] "%d maand"
-#~ msgstr[1] "%d maanden"
-
-#, python-format
-#~ msgid "%d week"
-#~ msgid_plural "%d weeks"
-#~ msgstr[0] "%d week"
-#~ msgstr[1] "%d weken"
-
-#, python-format
-#~ msgid "%d day"
-#~ msgid_plural "%d days"
-#~ msgstr[0] "%d dag"
-#~ msgstr[1] "%d dagen"
-
-#, python-format
-#~ msgid "%d hour"
-#~ msgid_plural "%d hours"
-#~ msgstr[0] "%d uur"
-#~ msgstr[1] "%d uren"
-
-#, python-format
-#~ msgid "%d minute"
-#~ msgid_plural "%d minutes"
-#~ msgstr[0] "%d minuut"
-#~ msgstr[1] "%d minuten"
-
-#~ msgid "Forbidden"
-#~ msgstr "Verboden"
-
-#~ msgid "CSRF verification failed. Request aborted."
-#~ msgstr "CSFR verificatie gefaald. Aanvraag afgebroken."
-
-#~ msgid ""
-#~ "You are seeing this message because this HTTPS site requires a “Referer "
-#~ "header” to be sent by your Web browser, but none was sent. This header is "
-#~ "required for security reasons, to ensure that your browser is not being "
-#~ "hijacked by third parties."
-#~ msgstr ""
-#~ "U ziet dit bericht omdat deze HTTPS-site een “Referer header“ vereist die "
-#~ "door uw webbrowser moet worden verzonden, maar er is geen verzonden. Deze "
-#~ "header is noodzakelijk om veiligheidsredenen, om ervoor te zorgen dat uw "
-#~ "browser niet wordt gekaapt door derden."
-
-#~ msgid ""
-#~ "If you have configured your browser to disable “Referer” headers, please "
-#~ "re-enable them, at least for this site, or for HTTPS connections, or for "
-#~ "“same-origin” requests."
-#~ msgstr ""
-#~ "Als u uw browser heeft geconfigureerd om “Referer” headers uit te "
-#~ "schakelen, gelieve ze opnieuw in te schakelen, in ieder geval voor deze "
-#~ "site, of voor HTTPS-verbindingen, of voor “same-origin” verzoeken."
-
-#~ msgid ""
-#~ "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag "
-#~ "or including the “Referrer-Policy: no-referrer” header, please remove "
-#~ "them. The CSRF protection requires the “Referer” header to do strict "
-#~ "referer checking. If you’re concerned about privacy, use alternatives "
-#~ "like <a rel=\"noreferrer\" …> for links to third-party sites."
-#~ msgstr ""
-#~ "Als u de tag <meta name=\"referrer\" content=\"no-referrer\"> of "
-#~ "inclusief de kop “Referrer-Policy: no-referrer”, verwijder deze "
-#~ "alstublieft. De CSRF-bescherming vereist de kop “Referer” om strikte "
-#~ "verwijzingscontrole uit te voeren. Als je je zorgen maakt over privacy, "
-#~ "gebruik dan alternatieven zoals <a rel=\"noreferrer\" …> voor links naar "
-#~ "sites van derden."
-
-#~ msgid ""
-#~ "You are seeing this message because this site requires a CSRF cookie when "
-#~ "submitting forms. This cookie is required for security reasons, to ensure "
-#~ "that your browser is not being hijacked by third parties."
-#~ msgstr ""
-#~ "U ziet dit bericht omdat deze site een CSRF-cookie vereist wanneer "
-#~ "formulieren worden verzonden. Deze cookie is om veiligheidsredenen nodig "
-#~ "om ervoor te zorgen dat dat uw browser niet wordt gekaapt door derden."
-
-#~ msgid ""
-#~ "If you have configured your browser to disable cookies, please re-enable "
-#~ "them, at least for this site, or for “same-origin” requests."
-#~ msgstr ""
-#~ "Als u uw browser hebt geconfigureerd om cookies uit te schakelen, schakel "
-#~ "deze dan opnieuw inin ieder geval voor deze site, of voor verzoeken van "
-#~ "dezelfde oorsprong."
-
-#~ msgid "More information is available with DEBUG=True."
-#~ msgstr "Meer informatie is beschikbaar met DEBUG=True."
-
-#~ msgid "No year specified"
-#~ msgstr "Geen jaar gespecificeerd"
-
-#~ msgid "Date out of range"
-#~ msgstr "Datum buiten bereik"
-
-#~ msgid "No month specified"
-#~ msgstr "Geen maand gespecificeerd"
-
-#~ msgid "No day specified"
-#~ msgstr "Geen dag gespecificeerd"
-
-#~ msgid "No week specified"
-#~ msgstr "Geen week gespecificeerd"
-
-#, python-format
-#~ msgid "No %(verbose_name_plural)s available"
-#~ msgstr "Geen %(verbose_name_plural)s beschikbaar"
-
-#, python-format
-#~ msgid ""
-#~ "Future %(verbose_name_plural)s not available because %(class_name)s."
-#~ "allow_future is False."
-#~ msgstr ""
-#~ "Toekomstige %(verbose_name_plural)s niet beschikbaar omdat %(class_name)s."
-#~ "allow_future is niet waar."
-
-#, python-format
-#~ msgid "Invalid date string “%(datestr)s” given format “%(format)s”"
-#~ msgstr "Ongeldige datumstring “%(datestr)s” gegeven formaat “%(format)s”"
-
-#, python-format
-#~ msgid "No %(verbose_name)s found matching the query"
-#~ msgstr "Geen %(verbose_name)s gevonden die overeenkomen met de zoekopdracht"
-
-#~ msgid "Page is not “last”, nor can it be converted to an int."
-#~ msgstr ""
-#~ "Pagina is niet ”laatste” en kan ook niet worden geconverteerd naar een "
-#~ "geheel getal."
-
-#, python-format
-#~ msgid "Invalid page (%(page_number)s): %(message)s"
-#~ msgstr "Ongeldige pagina (%(page_number)s): %(message)s"
-
-#, python-format
-#~ msgid "Empty list and “%(class_name)s.allow_empty” is False."
-#~ msgstr "Lege lijst en “%(class_name)s.allow_empty” is False."
-
-#~ msgid "Directory indexes are not allowed here."
-#~ msgstr "Directory-indexen zijn hier niet toegestaan."
-
-#, python-format
-#~ msgid "“%(path)s” does not exist"
-#~ msgstr "“%(path)s” bestaat niet"
-
-#, python-format
-#~ msgid "Index of %(directory)s"
-#~ msgstr "Index van %(directory)s"
-
-#~ msgid "The install worked successfully! Congratulations!"
-#~ msgstr "De installatie is gelukt! Gefeliciteerd!"
-
-#, python-format
-#~ msgid ""
-#~ "View <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/\" "
-#~ "target=\"_blank\" rel=\"noopener\">release notes</a> for Django "
-#~ "%(version)s"
-#~ msgstr ""
-#~ "Bekijk <a href=\"https://docs.djangoproject.com/en/%(version)s/releases/"
-#~ "\" target=\"_blank\" rel=\"noopener\">releaseopmerkingen</a> voor Django "
-#~ "%(version)s"
-
-#, python-format
-#~ msgid ""
-#~ "You are seeing this page because <a href=\"https://docs.djangoproject.com/"
-#~ "en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
-#~ "rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
-#~ "configured any URLs."
-#~ msgstr ""
-#~ "Je ziet deze pagina omdat <a href=\"https://docs.djangoproject.com/en/"
-#~ "%(version)s/ref/settings/#debug\" target=\"_blank\" "
-#~ "rel=\"noopener\">DEBUG=True</a> staat in je instellingenbestand en je "
-#~ "hebt niet alle URL's geconfigureerd."
-
-#~ msgid "Django Documentation"
-#~ msgstr "Django-documentatie"
-
-#~ msgid "Topics, references, &amp; how-to’s"
-#~ msgstr "Onderwerpen, referenties en how-to's"
-
-#~ msgid "Tutorial: A Polling App"
-#~ msgstr "Zelfstudie: een peiling-app"
-
-#~ msgid "Get started with Django"
-#~ msgstr "Aan de slag met Django"
-
-#~ msgid "Django Community"
-#~ msgstr "Django-gemeenschap"
-
-#~ msgid "Connect, get help, or contribute"
-#~ msgstr "Verbinden, hulp krijgen of bijdragen"
-
-#, python-format
-#~ msgid "Here you can edit the %(display_type)s."
-#~ msgstr "Hier kunt u de  %(display_type)s bewerken."
-
-#~ msgid ""
-#~ "Some fields are disabled:<br>In this version primary key fields can't be "
-#~ "edited."
-#~ msgstr "Sommige velden zijn uitgeschakeld. Deze kunnen niet worden bewerkt."
-
-#~ msgid "Add new member"
-#~ msgstr "Nieuw lid toevoegen"
-
-#~ msgid "Added"
-#~ msgstr "Toegevoegd op"
