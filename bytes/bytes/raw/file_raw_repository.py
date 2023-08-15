@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 def create_raw_repository(settings: Settings) -> RawRepository:
     return FileRawRepository(
-        settings.bytes_data_dir,
+        settings.data_dir,
         make_middleware(),
-        folder_permissions=int(settings.bytes_folder_permission, 8),
-        file_permissions=int(settings.bytes_file_permission, 8),
+        folder_permissions=int(settings.folder_permission, 8),
+        file_permissions=int(settings.file_permission, 8),
     )
 
 

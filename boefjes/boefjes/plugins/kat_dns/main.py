@@ -31,7 +31,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     for type_ in dns_record_types:
         try:
             resolver = dns.resolver.Resolver()
-            resolver.nameservers = [settings.remote_ns]
+            resolver.nameservers = [str(settings.remote_ns)]
             answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)
         except dns.resolver.NoAnswer:
@@ -67,7 +67,7 @@ def get_parent_zone_soa(name: Name) -> Answer:
 def get_email_security_records(hostname: str, record_subdomain: str) -> str:
     try:
         resolver = dns.resolver.Resolver()
-        resolver.nameservers = [settings.remote_ns]
+        resolver.nameservers = [str(settings.remote_ns)]
         answer = resolver.resolve(f"{record_subdomain}.{hostname}", "TXT", raise_on_no_answer=False)
         return answer.response.to_text()
     except dns.resolver.NXDOMAIN:

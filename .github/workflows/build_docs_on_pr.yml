@@ -28,7 +28,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Compile static HTML
-        run: sphinx-build -b html docs/source docs/_build
+        run: make docs
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
