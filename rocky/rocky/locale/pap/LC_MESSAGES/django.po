@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-11 14:34+0000\n"
+"POT-Creation-Date: 2023-08-15 08:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3034,16 +3034,32 @@ msgstr "Doc! Mi ta bin di futuro, mi tei pa hibabu bèk!"
 msgid "OOI doesn't exist"
 msgstr "OOI no ta èksisti"
 
+#: tools/forms/findings.py:12
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show non-muted findings"
+msgstr "Muta diskubrimentu"
+
+#: tools/forms/findings.py:13
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show muted findings"
+msgstr "Muta diskubrimentu"
+
 #: tools/forms/findings.py:14
+msgid "Show muted and not-muted findings"
+msgstr ""
+
+#: tools/forms/findings.py:20
 #, fuzzy
 #| msgid "Filter by"
 msgid "Filter by severity"
 msgstr "Filtra pa"
 
-#: tools/forms/findings.py:22
+#: tools/forms/findings.py:30
 #, fuzzy
 #| msgid "Mute Findings"
-msgid "Exclude Muted Findings"
+msgid "Filter by muted findings"
 msgstr "Muta Diskubrimentu"
 
 #: tools/forms/ooi.py:34
@@ -3463,7 +3479,7 @@ msgstr "Indemnizashon"
 #: rocky/templates/oois/ooi_detail_findings_overview.html:7
 #: rocky/templates/oois/ooi_page_tabs.html:25
 #: rocky/templates/partials/ooi_report_findings_block.html:5
-#: rocky/views/finding_list.py:81 rocky/views/finding_type_add.py:28
+#: rocky/views/finding_list.py:88 rocky/views/finding_type_add.py:28
 #: rocky/views/ooi_view.py:92
 msgid "Findings"
 msgstr "Diskubrimentu"
@@ -3620,14 +3636,14 @@ msgstr "Motibu"
 msgid "Mute Findings"
 msgstr "Muta Diskubrimentu"
 
-#: rocky/templates/findings/findings_filter.html:19
+#: rocky/templates/findings/findings_filter.html:20
 #: rocky/templates/partials/elements/ooi_list_settings_form.html:38
 #: rocky/templates/partials/elements/ooi_list_settings_form.html:49
 #: rocky/templates/tasks/partials/task_filter.html:40
 msgid "Set filters"
 msgstr "Pone filternan"
 
-#: rocky/templates/findings/findings_filter.html:21
+#: rocky/templates/findings/findings_filter.html:22
 #, fuzzy
 #| msgid "Set filters"
 msgid "Clear filters"
@@ -3667,7 +3683,7 @@ msgstr "KAT logo, bai na e homepage di OpenKAT"
 
 #: rocky/templates/header.html:33 rocky/templates/header.html:39
 #: rocky/templates/organizations/organization_crisis_room.html:12
-#: rocky/views/finding_list.py:94
+#: rocky/views/finding_list.py:101
 msgid "Crisis room"
 msgstr "Sala di krísis"
 
@@ -5296,7 +5312,7 @@ msgstr "Bunitifiká"
 msgid "Indemnification successfully set."
 msgstr "Indemnizashon pone ku èxito."
 
-#: rocky/views/mixins.py:287
+#: rocky/views/mixins.py:291
 msgid "All"
 msgstr "Tur"
 

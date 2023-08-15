@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-14 07:26+0000\n"
+"POT-Creation-Date: 2023-08-15 08:53+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -3047,16 +3047,32 @@ msgstr "Doc! Ik kom uit de toekomst, ik ben hier om je terug te brengen!"
 msgid "OOI doesn't exist"
 msgstr "Object bestaat niet"
 
+#: tools/forms/findings.py:12
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show non-muted findings"
+msgstr "Bevindingen Dempen"
+
+#: tools/forms/findings.py:13
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show muted findings"
+msgstr "Bevindingen Dempen"
+
 #: tools/forms/findings.py:14
+msgid "Show muted and not-muted findings"
+msgstr ""
+
+#: tools/forms/findings.py:20
 #, fuzzy
 #| msgid "Filter by"
 msgid "Filter by severity"
 msgstr "Filteren op"
 
-#: tools/forms/findings.py:22
+#: tools/forms/findings.py:30
 #, fuzzy
 #| msgid "Mute Findings"
-msgid "Exclude Muted Findings"
+msgid "Filter by muted findings"
 msgstr "Bevindingen dempen"
 
 #: tools/forms/ooi.py:34
@@ -3479,7 +3495,7 @@ msgstr "Vrijwaringen"
 #: rocky/templates/oois/ooi_detail_findings_overview.html:7
 #: rocky/templates/oois/ooi_page_tabs.html:25
 #: rocky/templates/partials/ooi_report_findings_block.html:5
-#: rocky/views/finding_list.py:81 rocky/views/finding_type_add.py:28
+#: rocky/views/finding_list.py:88 rocky/views/finding_type_add.py:28
 #: rocky/views/ooi_view.py:92
 msgid "Findings"
 msgstr "Bevindingen"
@@ -3636,14 +3652,14 @@ msgstr "Reden"
 msgid "Mute Findings"
 msgstr "Bevindingen dempen"
 
-#: rocky/templates/findings/findings_filter.html:19
+#: rocky/templates/findings/findings_filter.html:20
 #: rocky/templates/partials/elements/ooi_list_settings_form.html:38
 #: rocky/templates/partials/elements/ooi_list_settings_form.html:49
 #: rocky/templates/tasks/partials/task_filter.html:40
 msgid "Set filters"
 msgstr "Selecteer filters"
 
-#: rocky/templates/findings/findings_filter.html:21
+#: rocky/templates/findings/findings_filter.html:22
 #, fuzzy
 #| msgid "Set filters"
 msgid "Clear filters"
@@ -3683,7 +3699,7 @@ msgstr "OpenKAT logo, ga naar de homepage van OpenKAT"
 
 #: rocky/templates/header.html:33 rocky/templates/header.html:39
 #: rocky/templates/organizations/organization_crisis_room.html:12
-#: rocky/views/finding_list.py:94
+#: rocky/views/finding_list.py:101
 msgid "Crisis room"
 msgstr "Crisis Room"
 
@@ -5315,7 +5331,7 @@ msgstr "Verfraaid"
 msgid "Indemnification successfully set."
 msgstr "Vrijwaringsniveau ingesteld."
 
-#: rocky/views/mixins.py:287
+#: rocky/views/mixins.py:291
 msgid "All"
 msgstr "Alle"
 
