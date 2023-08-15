@@ -81,21 +81,9 @@ class TaskListView(OrganizationView, ListView):
             return []
 
     def post(self, request, *args, **kwargs):
-        if "action" in self.request.POST:
-            self.handle_page_action(request.POST["action"])
-            if request.POST["action"] == PageActions.RESCHEDULE_TASK.value:
-                task_id = self.request.POST.get("task_id")
-                task = client.get_task_details(task_id)
+        self.handle_page_action(request.POST["action"])
 
-                if task.type == "normalizer":
-                    return redirect(
-                        reverse("normalizers_task_list", kwargs={"organization_code": self.organization.code})
-                    )
-                if task.type == "boefje":
-                    return redirect(reverse("boefjes_task_list", kwargs={"organization_code": self.organization.code}))
-
-                return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
-        return self.get(request, *args, **kwargs)
+        return redirect(request.path)
 
     def handle_page_action(self, action: str):
         if action == PageActions.RESCHEDULE_TASK.value:
@@ -116,7 +104,6 @@ class TaskListView(OrganizationView, ListView):
                 "It may take some time, a refresh of the page may be needed to show the results."
             )
             messages.add_message(self.request, messages.SUCCESS, success_message)
-            return
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

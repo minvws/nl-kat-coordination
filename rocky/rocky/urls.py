@@ -39,7 +39,7 @@ from rocky.views.organization_settings import OrganizationSettingsView
 from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileDetailView, ScanProfileResetView
 from rocky.views.scans import ScanListView
-from rocky.views.task_detail import BoefjeTaskDetailView, NormalizerTaskDetailView
+from rocky.views.task_detail import BoefjeTaskDetailView, NormalizerTaskJSONView
 from rocky.views.tasks import BoefjesTaskListView, DownloadTaskDetail, NormalizersTaskListView
 from rocky.views.upload_csv import UploadCSV
 from rocky.views.upload_raw import UploadRaw
@@ -184,7 +184,7 @@ urlpatterns += i18n_patterns(
     ),
     path(
         "<organization_code>/tasks/normalizers/<task_id>",
-        NormalizerTaskDetailView.as_view(),
+        NormalizerTaskJSONView.as_view(),
         name="normalizer_task_view",
     ),
     path(

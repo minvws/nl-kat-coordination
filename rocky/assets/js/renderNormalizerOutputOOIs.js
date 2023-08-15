@@ -47,15 +47,15 @@ buttons.forEach((button) => {
     if (!button.closest('tr').nextElementSibling.querySelector('#yielded-objects-'+raw_task_id).querySelector('.yielded-objects-paragraph')) {
       // Retrieve JSON containing yielded objects of task.
       getJson(json_url, function(data) {
-        if(data.length > 0) {
+        if(data['oois'].length > 0) {
           const url = location.pathname.replace('/tasks/normalizers', '');
           let object_list = "";
 
           // Build HTML snippet for every yielded object.
-          data.forEach(object => {
-            object_list += "<a href='" + url + "/objects/detail/?ooi_id=" + encodeURIComponent(object) +"'>" + object + "</a>";
+          data['oois'].forEach(object => {
+            object_list += `<li><a href='${url}/objects/detail/?observed_at=${data['valid_time']}&ooi_id=${encodeURIComponent(object)}'>${object}</a></li>`;
           });
-          element.innerHTML = object_list;
+          element.innerHTML = `<ul>${object_list}</ul>`;
         } else {
           element.innerText = "Normalizer task yielded no objects.";
         }

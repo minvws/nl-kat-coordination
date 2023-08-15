@@ -27,7 +27,8 @@
                                     <th scope="col">{% translate "Normalizer" %}</th>
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
-                                    <th scope="col">{% translate "Input from boefje" %}</th>
+                                    <th scope="col">{% translate "Boefje" %}</th>
+                                    <th scope="col">{% translate "Boefje input OOI" %}</th>
                                     <th scope="col">{% translate "Details" %}</th>
                                 </tr>
                             </thead>
@@ -35,9 +36,7 @@
                                 {% for task in object_list %}
                                     <tr data-task-id="{{ task.id }}">
                                         <td>
-                                          <a href="{% url 'normalizer_task_view' organization_code=organization.code task_id=task.id %}">
-                                            {{ task.p_item.data.normalizer.id }}
-                                          </a>
+                                          {{ task.p_item.data.normalizer.id }}
                                         </td>
                                         {% if task.status.value == "completed" %}
                                         <td class="confirmation">{{ task.status.value|capfirst }}</td>
@@ -52,6 +51,15 @@
                                         <td>
                                             <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
                                         </td>
+                                        {% if task.p_item.data.raw_data.boefje_meta.input_ooi %}
+                                        <td>
+                                          <a href="{% ooi_url "ooi_detail" ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code %}">
+                                            {{ task.p_item.data.raw_data.boefje_meta.input_ooi }}
+                                          </a>
+                                        </td>
+                                        {% else %}
+                                        <td>{% translate "No input OOI" %}</td>
+                                        {% endif %}
                                         <td class="actions action-buttons" >
                                           <button type="button"
                                                   class="expando-button normalizer-list-table-row"

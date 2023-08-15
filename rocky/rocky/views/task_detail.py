@@ -47,7 +47,7 @@ class BoefjeTaskDetailView(BoefjeMixin, TaskDetailView):
         return context
 
 
-class NormalizerTaskDetailView(NormalizerMixin, TaskDetailView):
+class NormalizerTaskJSONView(NormalizerMixin, TaskDetailView):
     plugin_type = "normalizer"
 
     def get_output_oois(self, task):
@@ -61,4 +61,10 @@ class NormalizerTaskDetailView(NormalizerMixin, TaskDetailView):
     def get(self, request, *args, **kwargs):
         task_id = uuid.UUID(kwargs["task_id"]).hex
         task = self.get_task(task_id)
-        return JsonResponse(self.get_output_oois(task), safe=False)
+        return JsonResponse(
+            {
+                "oois": self.get_output_oois(task),
+                "valid_time": task.p_item.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            },
+            safe=False,
+        )
