@@ -641,8 +641,8 @@ develop = false
 [package.source]
 type = "git"
 url = "https://github.com/dekkers/django-admin-auto-tests"
-reference = "a2150fabf92ca73de77f0542ee9ec6545e4f175d"
-resolved_reference = "a2150fabf92ca73de77f0542ee9ec6545e4f175d"
+reference = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e"
+resolved_reference = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e"
 
 [[package]]
 name = "django-csp"
@@ -3371,4 +3371,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "f2d9d5eafee6d4136fd1992845e5e41ed28228b00339e9a9679c14f470bb1d00"
+content-hash = "74c86d59f15757f7393a8522aa7ca020005bbb2b003c66cce227bd517199b9c9"
