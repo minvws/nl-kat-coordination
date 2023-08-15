@@ -58,7 +58,7 @@ line-length = 120
 [tool.pytest.ini_options]
 addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
 env = [
-    "XTDB_URI=http://crux:3000",
+    "XTDB_URI=http://testxtdb:3000",
     "QUEUE_URI=amqp://placeholder",
     "KATALOGUS_API=http://placeholder:8000",
 ]

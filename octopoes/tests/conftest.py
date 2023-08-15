@@ -218,5 +218,10 @@ def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository
 
 
 @pytest.fixture
-def origin_repository(xtdb_session):
-    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+def mock_xtdb_session():
+    return XTDBSession(Mock())
+
+
+@pytest.fixture
+def origin_repository(mock_xtdb_session):
+    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)
