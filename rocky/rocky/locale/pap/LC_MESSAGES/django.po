@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 08:53+0000\n"
+"POT-Creation-Date: 2023-08-15 09:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2992,29 +2992,31 @@ msgstr "Doc! Mi ta bin di futuro, mi tei pa hibabu bèk!"
 msgid "OOI doesn't exist"
 msgstr "OOI no ta èksisti"
 
-#: tools/forms/findings.py:12
+#: tools/forms/findings.py
 #, fuzzy
 #| msgid "Mute findings"
 msgid "Show non-muted findings"
 msgstr "Muta diskubrimentu"
 
-#: tools/forms/findings.py:13
+#: tools/forms/findings.py
 #, fuzzy
 #| msgid "Mute findings"
 msgid "Show muted findings"
 msgstr "Muta diskubrimentu"
 
-#: tools/forms/findings.py:14
-msgid "Show muted and not-muted findings"
-msgstr ""
+#: tools/forms/findings.py
+#, fuzzy
+#| msgid "Mute findings"
+msgid "Show muted and non-muted findings"
+msgstr "Muta diskubrimentu"
 
-#: tools/forms/findings.py:20
+#: tools/forms/findings.py
 #, fuzzy
 #| msgid "Filter by"
 msgid "Filter by severity"
 msgstr "Filtra pa"
 
-#: tools/forms/findings.py:30
+#: tools/forms/findings.py
 #, fuzzy
 #| msgid "Mute Findings"
 msgid "Filter by muted findings"
