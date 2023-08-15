@@ -204,6 +204,7 @@ class OctopoesAPIConnector:
         self,
         severities: Set[RiskLevelSeverity],
         exclude_muted: bool = True,
+        only_muted: bool = False,
         valid_time: Optional[datetime] = None,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
@@ -214,6 +215,7 @@ class OctopoesAPIConnector:
             "limit": limit,
             "severities": {s.value for s in severities},
             "exclude_muted": exclude_muted,
+            "only_muted": only_muted,
         }
         res = self.session.get(f"/{self.client}/findings", params=params)
         return Paginated[Finding].parse_obj(res.json())

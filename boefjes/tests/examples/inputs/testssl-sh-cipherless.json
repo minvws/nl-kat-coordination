@@ -1,0 +1,16 @@
+[
+         {
+              "id"           : "optimal_proto",
+              "ip"           : "134.209.85.72/134.209.85.72",
+              "port"         : "80",
+              "severity"     : "WARN",
+              "finding"      : "134.209.85.72:80 doesn't seem to be a TLS/SSL enabled server."
+          }
+,         {
+              "id"           : "scanTime",
+              "ip"           : "134.209.85.72/134.209.85.72",
+              "port"         : "80",
+              "severity"     : "WARN",
+              "finding"      : "Scan interrupted"
+          }
+]
