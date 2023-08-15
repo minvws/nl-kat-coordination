@@ -23,6 +23,7 @@ from octopoes.models.ooi.dns.records import (
     DNSSOARecord,
 )
 from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.service import TLSCipher
 from rocky.keiko import (
     GeneratingReportFailed,
     ReportNotFoundException,
@@ -122,7 +123,7 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
                 self.get_observed_at(),
                 self.organization.name,
                 generate_findings_metadata(findings, severities),
-                "bevindingenrapport",
+                request.GET.get("report_type", "bevindingenrapport"),
             )
         except GeneratingReportFailed:
             messages.error(request, _("Generating report failed. See Keiko logs for more information."))
@@ -135,6 +136,43 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
             report,
             as_attachment=True,
             filename=ReportsService.organization_report_file_name(self.organization.code),
+        )
+
+
+class CipherReportPDFView(SingleOOITreeMixin, SeveritiesMixin, OctopoesView):
+    paginate_by = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.api_connector = self.octopoes_api_connector
+        self.depth = 2
+        self.ooi = self.get_ooi()
+
+    def get(self, request, *args, **kwargs):
+        self.setup(request, *args, **kwargs)
+
+        if not isinstance(self.ooi, TLSCipher):
+            messages.error(self.request, _("Can only generate Cipher report for a TLSCipher OOI."))
+            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+
+        valid_time = self.get_observed_at()
+        reports_service = ReportsService(keiko_client)
+
+        try:
+            report = reports_service.get_report(
+                valid_time, self.ooi.object_type, self.ooi.human_readable, self.tree.store, "cipher_report"
+            )
+        except GeneratingReportFailed:
+            messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
+            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+        except ReportNotFoundException:
+            messages.error(self.request, _("Timeout reached generating report. See Keiko logs for more information."))
+            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+
+        return FileResponse(
+            report,
+            as_attachment=True,
+            filename=ReportsService.ooi_report_file_name(valid_time, self.organization.code, self.ooi.primary_key),
         )
 
 

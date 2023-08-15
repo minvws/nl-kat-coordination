@@ -12,6 +12,8 @@
             <div class="horizontal-view toolbar">
                 <a href="{% ooi_url 'ooi_pdf_report' ooi.primary_key organization.code query=mandatory_fields %}"
                    class="button ghost">{% translate "Download PDF" %}</a>
+                <a href="{% ooi_url 'ooi_cipher_pdf_report' ooi.primary_key organization.code query=mandatory_fields %}"
+                   class="button ghost">{% translate "Download Cipher Report PDF" %}</a>
             </div>
             <div>
                 {% include "partials/elements/ooi_report_settings.html" %}
