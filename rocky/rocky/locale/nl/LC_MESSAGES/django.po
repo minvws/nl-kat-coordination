@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 08:53+0000\n"
+"POT-Creation-Date: 2023-08-15 09:05+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -575,6 +575,7 @@ msgid "Back to login"
 msgstr "Terug naar login"
 
 #: account/templates/registration_email.html
+#, python-format
 msgid ""
 "Welcome to OpenKAT. You're receiving this email because you have been added "
 "to organization \"%(organization)s\" at %(site_name)s."
