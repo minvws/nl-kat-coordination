@@ -95,8 +95,9 @@ class Settings(BaseSettings):
     )
     rfc3161_cert_file: FilePath = Field(
         None,
-        example="/path/to/cert.pem",
-        description="Path to the certificate of the RFC3161 provider. Required when using RFC3161 hashing repository.",
+        example="bytes/timestamping/certificates/freetsa.crt",
+        description="Path to the certificate of the RFC3161 provider. Required when using RFC3161 hashing repository. "
+        "`freetsa.crt` is included in the Bytes source code.",
     )
 
     encryption_middleware: EncryptionMiddleware = Field(
