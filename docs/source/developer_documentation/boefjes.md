@@ -11,7 +11,7 @@ To run a development environment you need to have:
 
 - A running RabbitMQ service
 - A running Bytes API service
-- A copy of `./.env-dist` in `./env` containing the environment variables explained below
+- A `./env` containing the environment variables explained below
 - Everything in `requirements.txt` installed
 
 Optionally, you could have an instance of the octopoes api listening on a port that receives the normalized data from
@@ -46,7 +46,7 @@ Supported HTTP methods (for CRUD): `POST`, `GET`, `DELETE`, `PUT`.
 Includes an endpoint that lists all objects.
 
 The KATalogus stores environment settings for the different organisations and plugins, accessible through the API.
-These can be encrypted by setting the `ENCRYPTION_MIDDLEWARE=NACL_SEALBOX`, and the public and private key env vars.
+These can be encrypted by setting the `BYTES_ENCRYPTION_MIDDLEWARE=NACL_SEALBOX`, and the public and private key env vars.
 More info about the encryption scheme can be found here: https://pynacl.readthedocs.io/en/latest/public/.
 Currently, the settings are encrypted when stored, and returned decrypted.
 This could be changed in the future when the boefje-runner/plugin-code can decrypt the secrets itself,

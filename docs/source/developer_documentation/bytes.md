@@ -18,9 +18,9 @@ $ docker build . -t bytes
 
 # Without an env-file
 $ export BYTES_PASSWORD=$(openssl rand -hex 20) \
-    && export SECRET=$(openssl rand -hex 20) \
+    && export BYTES_SECRET=$(openssl rand -hex 20) \
     && export BYTES_DB_URI=postgresql://USER:PWD@bytes-db:5432/bytes  # change accordingly!
-$ docker run --rm -p 8002:8002 -e BYTES_USERNAME=bytes -e BYTES_PASSWORD -e SECRET -e BYTES_DB_URI bytes
+$ docker run --rm -p 8002:8002 -e BYTES_USERNAME=bytes -e BYTES_PASSWORD -e BYTES_SECRET -e BYTES_DB_URI bytes
 
 
 # With an env-file
