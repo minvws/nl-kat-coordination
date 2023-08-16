@@ -5026,7 +5026,7 @@ msgstr "Download meta data i data krudo"
 
 #: rocky/templates/tasks/boefje_task_detail.html
 msgid "Download meta data"
-msgstr "Download meta data"
+msgstr "Deskarga meta datonan"
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #, fuzzy
