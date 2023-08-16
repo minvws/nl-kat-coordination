@@ -13,7 +13,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     try:
         resolver = dns.resolver.Resolver()
-        resolver.nameservers = [settings.remote_ns]
+        resolver.nameservers = [str(settings.remote_ns)]
         reverse_ip = dns.reversename.from_address(ip)
         answer: Answer = resolver.resolve(reverse_ip, "PTR")
         result = f"RESOLVER: {answer.nameserver}\n{answer.response}"
