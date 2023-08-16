@@ -10,7 +10,7 @@ class PageActions(Enum):
     WITHDRAW_ACCEPTANCE = "withdraw_acceptance"
 
 
-class OOIClearanceMixin:
+class OOIChangeClearanceMixin:
     def post(self, request, *args, **kwargs):
         if "action" in self.request.POST:
             self.handle_page_action(request.POST["action"])
@@ -24,7 +24,7 @@ class OOIClearanceMixin:
         self.organization_member.save()
 
 
-class AccountView(OrganizationView, TemplateView, OOIClearanceMixin):
+class AccountView(OrganizationView, TemplateView, OOIChangeClearanceMixin):
     template_name = "account_detail.html"
 
     def get_context_data(self, **kwargs):

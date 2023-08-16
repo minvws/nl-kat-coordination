@@ -5,10 +5,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import Http404
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from requests import RequestException
+from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.models import Organization, OrganizationMember
 
 from octopoes.connector import RemoteException
@@ -65,11 +66,11 @@ class OrganizationPermWrapper:
 
 
 class OOIClearanceMixin:
-    def get_clearance_notifications(self):
+    def get_no_clearance_notifications(self, level=None):
         if not self.organization_member.indemnification_present:
             messages.add_message(
                 self.request,
-                messages.ERROR,
+                messages.WARNING,
                 _(
                     "Indemnification not present at organization {}. Go to the organization settings page to set this."
                 ).format(self.organization.name),
@@ -83,7 +84,7 @@ class OOIClearanceMixin:
         if self.organization_member.trusted_clearance_level < 0:
             messages.add_message(
                 self.request,
-                messages.ERROR,
+                messages.WARNING,
                 _(
                     "Your administrator has not assigned to you a trusted clearance level. "
                     "Contact your administrator to set a trusted clearance level to continue."
@@ -95,86 +96,62 @@ class OOIClearanceMixin:
                 self.request,
                 messages.WARNING,
                 _(
-                    "Your administrator has trusted you to set clearance levels on OOIs to a maximum of L{}, "
+                    "Your administrator has trusted you to set clearance levels on OOIs to a maximum level of {}, "
                     "however you did not acknowledge this clearance level yet. Go to your profile to set this."
                 ).format(self.organization_member.trusted_clearance_level),
             )
 
-    def can_raise_clearance_level(self, level: int) -> bool:
-        if not self.organization_member.has_ooi_clearance:
-            self.get_clearance_notifications()
-            return False
-        if level > self.organization_member.trusted_clearance_level:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _(
-                    "Could not raise clearance level to L{}. You can raise clearance level to a maximum of L{}. "
-                    "Contact your administrator to receive a higher clearance."
-                ).format(level, self.organization_member.trusted_clearance_level),
-            )
-            return False
-        return True
+    def get_success_notifications(self, level, counted_oois):
+        extra_message = ""
+        if counted_oois > 1:
+            extra_message = f"for {counted_oois} OOIs"
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            _("Successfully changed clearance level to {} " + extra_message).format(level),
+        )
 
-    def raise_clearance_level(self, ooi_references: Reference | List[Reference], level: int) -> HttpResponse:
+    def change_clearance_level(self, ooi_references: List[Reference], level: int | str) -> None:
+        if not ooi_references:
+            messages.add_message(self.request, messages.ERROR, _("No OOIs selected to set clearance level."))
+            return self.get(self.request, *self.args, **self.kwargs)
         try:
-            if self.can_raise_clearance_level(level):
-                if isinstance(ooi_references, list):
-                    self.octopoes_api_connector.save_many_scan_profiles(
-                        [
-                            DeclaredScanProfile(reference=reference, level=ScanLevel(level))
-                            for reference in ooi_references
-                        ],
-                        datetime.now(timezone.utc),
-                    )
-                else:
-                    self.octopoes_api_connector.save_scan_profile(
-                        DeclaredScanProfile(reference=ooi_references, level=ScanLevel(level)),
-                        datetime.now(timezone.utc),
-                    )
+            if level == CUSTOM_SCAN_LEVEL.INHERIT.value:
+                self.octopoes_api_connector.save_many_scan_profiles(
+                    [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in ooi_references],
+                    valid_time=datetime.now(timezone.utc),
+                )
+                self.get_success_notifications(level, len(ooi_references))
+            elif (
+                isinstance(level, int)
+                and self.organization_member.has_ooi_clearance
+                and level <= self.organization_member.trusted_clearance_level
+            ):
+                self.octopoes_api_connector.save_many_scan_profiles(
+                    [DeclaredScanProfile(reference=reference, level=ScanLevel(level)) for reference in ooi_references],
+                    datetime.now(timezone.utc),
+                )
+                self.get_success_notifications(level, len(ooi_references))
+            else:
+                self.get_no_clearance_notifications(level)
                 messages.add_message(
                     self.request,
-                    messages.SUCCESS,
-                    _("Successfully raised clearance level to L{}.").format(level),
+                    messages.ERROR,
+                    _(
+                        "Could not change clearance level to level {}. You can change clearance level to a maximum of "
+                        "level {}. Contact your administrator to receive a higher clearance."
+                    ).format(level, self.organization_member.trusted_clearance_level),
                 )
 
         except (RequestException, RemoteException, ConnectionError):
-            messages.add_message(self.request, messages.ERROR, _("An error occurred while saving clearance levels."))
+            messages.add_message(self.request, messages.ERROR, _("An error occurred while changing clearance levels."))
 
         except ObjectNotFoundException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _("An error occurred while saving clearance levels.") + _("One of the OOI's doesn't exist"),
+                _("An error occurred while changing clearance levels. One of the OOI's doesn't exist"),
             )
-        return self.get(self.request, *self.args, **self.kwargs)
-
-    def _set_oois_to_inherit(
-        self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs
-    ) -> HttpResponse:
-        scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
-
-        try:
-            self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=datetime.now(timezone.utc))
-        except (RequestException, RemoteException, ConnectionError):
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("An error occurred while setting clearance levels to inherit."),
-            )
-        except ObjectNotFoundException:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("An error occurred while setting clearance levels to inherit: one of the OOIs doesn't exist."),
-            )
-
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            _("Successfully set %d ooi(s) clearance level to inherit.") % len(selected_oois),
-        )
-        return self.get(request, *args, **kwargs)
 
 
 class OrganizationView(View, OOIClearanceMixin):

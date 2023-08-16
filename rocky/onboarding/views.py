@@ -5,7 +5,7 @@ from account.mixins import (
     OrganizationPermissionRequiredMixin,
     OrganizationView,
 )
-from account.views import OOIClearanceMixin
+from account.views import OOIChangeClearanceMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -264,9 +264,7 @@ class OnboardingSetupScanOOIDetailView(
     def post(self, request, *args, **kwargs):
         ooi = self.get_ooi()
         level = DNS_REPORT_LEAST_CLEARANCE_LEVEL
-
-        self.raise_clearance_level(ooi.reference, level)
-
+        self.change_clearance_level(ooi.reference, level)
         self.enable_selected_boefjes()
         return redirect(get_ooi_url("step_report", self.get_ooi_id(), self.organization.code))
 
@@ -320,7 +318,7 @@ class OnboardingAcknowledgeClearanceLevelView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
-    OOIClearanceMixin,
+    OOIChangeClearanceMixin,
     TemplateView,
 ):
     template_name = "step_3e_trusted_acknowledge_clearance_level.html"
@@ -356,12 +354,11 @@ class OnboardingSetClearanceLevelView(
         return get_ooi_url("step_setup_scan_select_plugins", self.request.GET.get("ooi_id"), self.organization.code)
 
     def form_valid(self, form):
-        self.add_success_notification()
+        ooi_reference = self.request.GET.get("ooi_id", None)
+        level = form.cleaned_data.get("level")
+        if not self.change_clearance_level(ooi_reference, level):
+            return self.get(self.request, *self.args, **self.kwargs)
         return super().form_valid(form)
-
-    def add_success_notification(self):
-        success_message = _("Clearance level has been set")
-        messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
 class OnboardingReportView(

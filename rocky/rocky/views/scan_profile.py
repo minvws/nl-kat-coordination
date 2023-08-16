@@ -20,32 +20,23 @@ class ScanProfileDetailView(OOIDetailView, FormView):
     template_name = "scan_profiles/scan_profile_detail.html"
     form_class = SetClearanceLevelForm
 
+    def get_initial(self):
+        initial = super().get_initial()
+        if not isinstance(self.ooi.scan_profile, InheritedScanProfile):
+            initial["level"] = self.ooi.scan_profile.level
+        return initial
+
     def get_context_data(self, **kwargs) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         return context
 
     def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
         form = self.get_form()
         if form.is_valid():
-            level = form.cleaned_data["level"]
-            self.raise_clearance_level(self.ooi.reference, level)
-        else:
-            messages.add_message(
-                self.request,
-                messages.WARNING,
-                _("Choose a valid level").format(ooi_name=self.ooi.human_readable),
-            )
+            level = form.cleaned_data.get("level", None)
+            self.change_clearance_level(self.ooi.reference, level)
         return redirect(get_ooi_url("scan_profile_detail", self.ooi.primary_key, self.organization.code))
-
-    def get_initial(self):
-        initial = super().get_initial()
-
-        if not isinstance(self.ooi.scan_profile, InheritedScanProfile):
-            initial["level"] = self.ooi.scan_profile.level
-
-        return initial
 
 
 class ScanProfileResetView(OOIDetailView):

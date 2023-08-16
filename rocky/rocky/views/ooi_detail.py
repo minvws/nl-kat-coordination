@@ -40,14 +40,14 @@ class OOIDetailView(
     connector_form_class = ObservedAtForm
     scan_history_limit = 10
 
-    def post(self, request, *args, **kwargs):
-        if "action" not in self.request.POST:
-            return self.get(request, status_code=404, *args, **kwargs)
-
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.ooi = self.get_ooi()
 
-        action = self.request.POST.get("action")
-        return self.handle_page_action(action)
+    def post(self, request, *args, **kwargs):
+        action = self.request.POST.get("action", None)
+        if action:
+            return self.handle_page_action(action)
 
     def handle_page_action(self, action: str) -> bool:
         try:

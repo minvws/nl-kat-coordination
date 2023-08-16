@@ -49,22 +49,16 @@ class OOIListView(BaseOOIListView):
 
     def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         """Perform bulk action on selected oois."""
-        selected_oois = request.POST.getlist("ooi")
-        if not selected_oois:
-            messages.add_message(request, messages.ERROR, _("No OOIs selected."))
-            return self.get(request, *args, **kwargs)
-
-        action = request.POST.get("action")
+        selected_oois = request.POST.getlist("ooi", None)
+        action = request.POST.get("action", None)
+        scan_profile = request.POST.get("scan-profile", None)
+        level = CUSTOM_SCAN_LEVEL[str(scan_profile).upper()]
 
         if action == PageActions.DELETE.value:
             return self._delete_oois(selected_oois, request, *args, **kwargs)
-
         if action == PageActions.UPDATE_SCAN_PROFILE.value:
-            scan_profile = request.POST.get("scan-profile")
-            level = CUSTOM_SCAN_LEVEL[str(scan_profile).upper()]
-            if level.value == "inherit":
-                return self._set_oois_to_inherit(selected_oois, request, *args, **kwargs)
-            return self.raise_clearance_level(selected_oois, level.value)
+            self.change_clearance_level(selected_oois, level.value)
+        return self.get(request, *args, **kwargs)
 
     def _delete_oois(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
         connector = self.octopoes_api_connector
