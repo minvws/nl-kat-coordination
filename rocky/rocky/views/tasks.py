@@ -1,4 +1,3 @@
-import json
 import uuid
 from datetime import datetime
 from enum import Enum
@@ -29,7 +28,7 @@ class DownloadTaskDetail(OrganizationView):
         task_details = client.get_task_details(task_id)
         if not self.is_task_id(task_id) or "detail" in task_details:
             return self.show_error_message()
-        response = HttpResponse(FileResponse(json.dumps(task_details.json())), content_type="application/json")
+        response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
         response["Content-Disposition"] = "attachment; filename=" + filename
         return response
 
