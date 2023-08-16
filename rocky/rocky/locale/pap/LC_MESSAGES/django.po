@@ -5088,7 +5088,7 @@ msgstr "Opheto di Entrada \"Boefje\""
 #, fuzzy
 #| msgid "Related objects"
 msgid "Yielded objects"
-msgstr "Ophetonan relatá"
+msgstr "Ophetonan generá"
 
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
