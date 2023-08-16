@@ -5032,7 +5032,7 @@ msgstr "Download meta data"
 #, fuzzy
 #| msgid "Create object"
 msgid "Input object"
-msgstr "Krea opheto"
+msgstr "Opheto di entrada"
 
 #: rocky/templates/tasks/boefjes.html
 msgid "There are no tasks for boefjes"
