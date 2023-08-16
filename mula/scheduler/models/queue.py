@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
@@ -17,6 +17,7 @@ class PrioritizedItem(BaseModel):
     for unmarshalling of priority queue prioritized items to a JSON
     representation.
     """
+    model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
@@ -32,10 +33,6 @@ class PrioritizedItem(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    class Config:
-        orm_mode = True
-        from_attributes = True
 
 
 class PrioritizedItemDB(Base):

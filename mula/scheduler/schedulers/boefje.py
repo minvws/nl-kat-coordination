@@ -85,7 +85,7 @@ class BoefjeScheduler(Scheduler):
 
         # Scan profile mutations
         listener = listeners.ScanProfileMutation(
-            dsn=self.ctx.config.host_raw_data,
+            dsn=str(self.ctx.config.host_raw_data),
             queue=f"{self.organisation.id}__scan_profile_mutations",
             func=self.push_tasks_for_scan_profile_mutations,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
@@ -266,7 +266,7 @@ class BoefjeScheduler(Scheduler):
         try:
             random_oois = self.ctx.services.octopoes.get_random_objects(
                 organisation_id=self.organisation.id,
-                n=self.ctx.config.pq_populate_max_random_objects,
+                n=self.ctx.config.pq_max_random_objects,
                 scan_level=[1, 2, 3, 4],
             )
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
@@ -453,7 +453,7 @@ class BoefjeScheduler(Scheduler):
             and (
                 task_db.modified_at is not None
                 and task_db.modified_at
-                > datetime.now(timezone.utc) - timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+                > datetime.now(timezone.utc) - timedelta(seconds=self.ctx.config.pq_grace_period)
             )
         ):
             self.logger.error(
@@ -575,7 +575,7 @@ class BoefjeScheduler(Scheduler):
             id=task.id,
             scheduler_id=self.scheduler_id,
             priority=score,
-            data=task,
+            data=task.model_dump(),
             hash=task.hash,
         )
 
@@ -634,7 +634,7 @@ class BoefjeScheduler(Scheduler):
 
         # Has grace period passed according to datastore?
         if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timedelta(
-            seconds=self.ctx.config.pq_populate_grace_period
+            seconds=self.ctx.config.pq_grace_period
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to the datastore "
@@ -669,7 +669,7 @@ class BoefjeScheduler(Scheduler):
             task_bytes is not None
             and task_bytes.ended_at is not None
             and datetime.now(timezone.utc) - task_bytes.ended_at
-            < timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+            < timedelta(seconds=self.ctx.config.pq_grace_period)
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to bytes "

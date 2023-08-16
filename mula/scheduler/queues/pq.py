@@ -278,7 +278,7 @@ class PriorityQueue(abc.ABC):
             A boolean, True if the item is valid, False otherwise.
         """
         try:
-            self.item_type.parse_obj(item)
+            self.item_type.model_validate(item)
         except pydantic.ValidationError:
             return False
 

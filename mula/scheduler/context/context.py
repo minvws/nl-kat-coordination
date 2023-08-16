@@ -72,7 +72,7 @@ class AppContext:
         )
 
         # Datastores, SimpleNamespace allows us to use dot notation
-        dbconn = storage.DBConn(self.config.db_uri.url)
+        dbconn = storage.DBConn(str(self.config.db_uri))
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(dbconn),
@@ -90,8 +90,8 @@ class AppContext:
         ).info(
             {
                 "pq_maxsize": str(self.config.pq_maxsize),
-                "pq_populate_grace_period": str(self.config.pq_populate_grace_period),
-                "pq_populate_max_random_objects": str(self.config.pq_populate_max_random_objects),
+                "pq_grace_period": str(self.config.pq_grace_period),
+                "pq_max_random_objects": str(self.config.pq_max_random_objects),
                 "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
                 "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
             }

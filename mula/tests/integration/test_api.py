@@ -23,7 +23,7 @@ class APITemplateTestCase(unittest.TestCase):
         self.mock_ctx.config = config.settings.Settings()
 
         # Database
-        self.dbconn = storage.DBConn(self.mock_ctx.config.db_uri.url)
+        self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
         models.Base.metadata.create_all(self.dbconn.engine)
         self.mock_ctx.datastores = SimpleNamespace(
             **{

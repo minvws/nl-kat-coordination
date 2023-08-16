@@ -19,12 +19,10 @@ def create_p_item(scheduler_id: str, priority: int, data: Optional[TestModel] = 
             name=uuid.uuid4().hex,
         )
 
-    data = data.model_dump()
-
     return models.PrioritizedItem(
         scheduler_id=scheduler_id,
         priority=priority,
-        data=data,
+        data=data.model_dump(),
     )
 
 

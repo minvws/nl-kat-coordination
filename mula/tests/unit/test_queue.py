@@ -15,7 +15,7 @@ from tests.utils import functions
 class PriorityQueueTestCase(unittest.TestCase):
     def setUp(self) -> None:
         cfg = config.settings.Settings()
-        self.dbconn = storage.DBConn(cfg.db_uri.url)
+        self.dbconn = storage.DBConn(str(cfg.db_uri))
         models.Base.metadata.create_all(self.dbconn.engine)
 
         self.pq_store = storage.PriorityQueueStore(self.dbconn)

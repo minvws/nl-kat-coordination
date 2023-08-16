@@ -27,15 +27,15 @@ class PriorityQueueStore:
             if item_orm is None:
                 return None
 
-            return models.PrioritizedItem.from_orm(item_orm)
+            return models.PrioritizedItem.model_validate(item_orm)
 
     @retry()
     def push(self, scheduler_id: str, item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
-            item_orm = models.PrioritizedItemDB(**item.dict())
+            item_orm = models.PrioritizedItemDB(**item.model_dump())
             session.add(item_orm)
 
-            return models.PrioritizedItem.from_orm(item_orm)
+            return models.PrioritizedItem.model_validate(item_orm)
 
     @retry()
     def peek(self, scheduler_id: str, index: int) -> Optional[models.PrioritizedItem]:
@@ -52,7 +52,7 @@ class PriorityQueueStore:
             if item_orm is None:
                 return None
 
-            return models.PrioritizedItem.from_orm(item_orm)
+            return models.PrioritizedItem.model_validate(item_orm)
 
     @retry()
     def update(self, scheduler_id: str, item: models.PrioritizedItem) -> None:
@@ -61,7 +61,7 @@ class PriorityQueueStore:
                 session.query(models.PrioritizedItemDB)
                 .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
                 .filter(models.PrioritizedItemDB.id == item.id)
-                .update(item.dict())
+                .update(item.model_dump())
             )
 
     @retry()
@@ -87,7 +87,7 @@ class PriorityQueueStore:
             if item_orm is None:
                 return None
 
-            return models.PrioritizedItem.from_orm(item_orm)
+            return models.PrioritizedItem.model_validate(item_orm)
 
     @retry()
     def empty(self, scheduler_id: str) -> bool:
@@ -128,7 +128,7 @@ class PriorityQueueStore:
             count = query.count()
             items_orm = query.all()
 
-            return ([models.PrioritizedItem.from_orm(item_orm) for item_orm in items_orm], count)
+            return ([models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm], count)
 
     @retry()
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> Optional[models.PrioritizedItem]:
@@ -144,7 +144,7 @@ class PriorityQueueStore:
             if item_orm is None:
                 return None
 
-            return models.PrioritizedItem.from_orm(item_orm)
+            return models.PrioritizedItem.model_validate(item_orm)
 
     @retry()
     def get_items_by_scheduler_id(self, scheduler_id: str) -> List[models.PrioritizedItem]:
@@ -155,7 +155,7 @@ class PriorityQueueStore:
                 .all()
             )
 
-            return [models.PrioritizedItem.from_orm(item_orm) for item_orm in items_orm]
+            return [models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm]
 
     @retry()
     def clear(self, scheduler_id: str) -> None:

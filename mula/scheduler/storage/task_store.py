@@ -49,7 +49,7 @@ class TaskStore:
             count = query.count()
             tasks_orm = query.all()
 
-            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
+            tasks = [models.Task.model_validate(task_orm) for task_orm in tasks_orm]
 
             return tasks, count
 
@@ -60,7 +60,7 @@ class TaskStore:
             if task_orm is None:
                 return None
 
-            task = models.Task.from_orm(task_orm)
+            task = models.Task.model_validate(task_orm)
 
             return task
 
@@ -77,7 +77,7 @@ class TaskStore:
             if tasks_orm is None:
                 return None
 
-            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
+            tasks = [models.Task.model_validate(task_orm) for task_orm in tasks_orm]
 
             return tasks
 
@@ -94,24 +94,24 @@ class TaskStore:
             if task_orm is None:
                 return None
 
-            task = models.Task.from_orm(task_orm)
+            task = models.Task.model_validate(task_orm)
 
             return task
 
     @retry()
     def create_task(self, task: models.Task) -> Optional[models.Task]:
         with self.dbconn.session.begin() as session:
-            task_orm = models.TaskDB(**task.dict())
+            task_orm = models.TaskDB(**task.model_dump())
             session.add(task_orm)
 
-            created_task = models.Task.from_orm(task_orm)
+            created_task = models.Task.model_validate(task_orm)
 
             return created_task
 
     @retry()
     def update_task(self, task: models.Task) -> None:
         with self.dbconn.session.begin() as session:
-            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.dict()))
+            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump()))
 
     @retry()
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
@@ -182,6 +182,6 @@ class TaskStore:
 
             tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
 
-            tasks = [models.Task.from_orm(task_orm) for task_orm in tasks_orm]
+            tasks = [models.Task.model_validate(task_orm) for task_orm in tasks_orm]
 
             return tasks, count

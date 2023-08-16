@@ -62,7 +62,7 @@ class NormalizerScheduler(Scheduler):
         file.
         """
         listener = listeners.RawData(
-            dsn=self.ctx.config.host_raw_data,
+            dsn=str(self.ctx.config.host_raw_data),
             queue=f"{self.organisation.id}__raw_file_received",
             func=self.push_tasks_for_received_raw_data,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,

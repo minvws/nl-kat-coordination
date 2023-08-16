@@ -149,7 +149,7 @@ class Settings(BaseSettings):
         "execution of the `` method of the `scheduler.Scheduler` class",
     )
 
-    pq_grace: int = Field(
+    pq_grace_period: int = Field(
         86400,
         description="Grace period of when a job is considered to be running "
         "again in seconds",

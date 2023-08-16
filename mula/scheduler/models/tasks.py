@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import ClassVar, List, Optional
 
 import mmh3
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Column, DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.schema import Index
@@ -31,10 +31,16 @@ class TaskStatus(str, enum.Enum):
 
 
 class Task(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
+
     scheduler_id: str
+
     type: str
+
     p_item: PrioritizedItem
+
     status: TaskStatus
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -43,10 +49,6 @@ class Task(BaseModel):
 
     def __repr__(self):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
-
-    class Config:
-        orm_mode = True
-        from_attributes = True
 
 
 class TaskDB(Base):
