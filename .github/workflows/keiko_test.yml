@@ -44,6 +44,9 @@ jobs:
         run: pip install -r requirements-dev.txt
         working-directory: ./keiko
 
+      - name: Create writeable directory for reports
+        run: mkdir /reports && chmod -R 700 /reports
+
       - name: Run unit tests
         run: make test
         working-directory: ./keiko
