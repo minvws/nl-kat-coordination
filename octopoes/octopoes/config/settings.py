@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional, Set, Tuple
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, FilePath
 from pydantic.env_settings import SettingsSourceCallable
 
 from octopoes.models import ScanLevel, ScanProfileType
@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    log_cfg: Path = Field(BASE_DIR / "logging.yml", description="Path to the logging configuration file")
+    log_cfg: FilePath = Field(BASE_DIR / "logging.yml", description="Path to the logging configuration file")
 
     # External services settings
     queue_uri: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")

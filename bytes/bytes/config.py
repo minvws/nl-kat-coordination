@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, DirectoryPath, Field, FilePath, PostgresDsn
 from pydantic.env_settings import SettingsSourceCallable
 
 from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
@@ -58,10 +58,10 @@ class Settings(BaseSettings):
     username: str = Field(..., example="test", description="Username used for generating Bytes' API JWT")
     password: str = Field(..., example="secret", description="Password used for generating Bytes' API JWT")
     queue_uri: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
-    log_cfg: Path = Field(BASE_DIR / "dev.logging.conf", description="Path to the logging configuration file")
+    log_cfg: FilePath = Field(BASE_DIR / "dev.logging.conf", description="Path to the logging configuration file")
 
     db_uri: PostgresDsn = Field(..., example="postgresql://xx:xx@host:5432/bytes", description="Bytes Postgres DB URI")
-    data_dir: Path = Field(
+    data_dir: DirectoryPath = Field(
         "/data",
         description="Root for all the data. "
         "A change means that you no longer have access to old data unless you move it!",
@@ -93,7 +93,7 @@ class Settings(BaseSettings):
         "See https://github.com/trbs/rfc3161ng for a list of public providers and their certificates. "
         "Required when using RFC3161 hashing repository.",
     )
-    rfc3161_cert_file: Path = Field(
+    rfc3161_cert_file: FilePath = Field(
         None,
         example="/path/to/cert.pem",
         description="Path to the certificate of the RFC3161 provider. Required when using RFC3161 hashing repository.",
