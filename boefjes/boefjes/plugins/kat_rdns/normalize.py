@@ -14,7 +14,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
     input_ = normalizer_meta.raw_data.boefje_meta.arguments["input"]
     answers = raw.decode()
-    if "NXDOMAIN" in answers or "NoAnswer" in answers:
+    if answers == "NXDOMAIN" or answers == "NoAnswer":
         return
     lines = answers.split("\n")
     for rrset in from_text("\n".join(lines[1:])).answer:
