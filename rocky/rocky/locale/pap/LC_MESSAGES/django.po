@@ -5382,7 +5382,7 @@ msgstr "Indemnizashon pone ku èxito."
 #: rocky/views/mixins.py
 msgid ""
 "Can not parse observed_at parameter, falling back to showing current object"
-msgstr ""
+msgstr "No por parse e parametro observed_at, regresando na munstra e opheto aktual"
 
 #: rocky/views/mixins.py
 msgid "All"
