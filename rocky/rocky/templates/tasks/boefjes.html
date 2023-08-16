@@ -74,7 +74,7 @@
                                                 {% if task.status.value in "completed,failed" %}
                                                     <a class="button" href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
                                                 {% else %}
-                                                    <a class="button" href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta data" %}</a>
+                                                    <a class="button" href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download task data" %}</a>
                                                 {% endif %}
                                                 {% if task.status.value == "completed" %}
                                                     {% include "partials/single_action_form.html" with btn_text="Reschedule" btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
