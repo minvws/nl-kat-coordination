@@ -5050,7 +5050,7 @@ msgstr "Lista di tareanan pa "
 #, fuzzy
 #| msgid "Object"
 msgid "Input Object"
-msgstr "Opheto"
+msgstr "Opheto di entrada"
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "No input OOI"
