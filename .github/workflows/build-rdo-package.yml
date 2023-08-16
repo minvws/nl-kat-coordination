@@ -116,7 +116,7 @@ jobs:
         working-directory: ./rocky
 
       - name: Rocky Compilemessages
-        run: SECRET_KEY="whatever" /var/www/html/.venv/bin/python3.8 manage.py compilemessages
+        run: SECRET_KEY="whatever" /var/www/html/.venv/bin/python3.8 manage.py compilemessages --use-fuzzy
         working-directory: ./rocky
 
       - name: Rocky Create rocky release
