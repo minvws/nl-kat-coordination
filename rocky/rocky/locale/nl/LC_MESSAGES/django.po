@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 10:26+0000\n"
+"POT-Creation-Date: 2023-08-16 09:41+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -5034,7 +5034,6 @@ msgid "Download meta and raw data"
 msgstr "Meta- en ruwe gegevens downloaden"
 
 #: rocky/templates/tasks/boefje_task_detail.html
-#: rocky/templates/tasks/boefjes.html
 msgid "Download meta data"
 msgstr "Metagegevens downloaden"
 
@@ -5065,6 +5064,12 @@ msgstr "Object"
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "No input OOI"
 msgstr "Geen input object"
+
+#: rocky/templates/tasks/boefjes.html
+#, fuzzy
+#| msgid "Download meta data"
+msgid "Download task data"
+msgstr "Download taakgegevens"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
