@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-16 09:41+0000\n"
+"POT-Creation-Date: 2023-08-16 09:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5062,6 +5062,10 @@ msgstr "No tin entrada OOI"
 msgid "Download task data"
 msgstr "Descarga datonan di tarea"
 
+#: rocky/templates/tasks/boefjes.html
+msgid "Reschedule"
+msgstr "Reagenda"
+
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
 msgstr "No tin tareanan pa normalizers"
@@ -5707,6 +5711,3 @@ msgstr "Arkivo crudo añadi ku èxito."
 
 #~ msgid "Download task details"
 #~ msgstr "Download detayes di tarea"
-
-#~ msgid "Reschedule"
-#~ msgstr "Reagenda"

@@ -77,7 +77,7 @@
                                                     <a class="button" href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download task data" %}</a>
                                                 {% endif %}
                                                 {% if task.status.value == "completed" %}
-                                                    {% include "partials/single_action_form.html" with btn_text="Reschedule" btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+                                                    {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
                                                 {% endif %}
                                               </div>
                                             </section>
