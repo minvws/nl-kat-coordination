@@ -119,17 +119,29 @@ class XTDBOriginRepository(OriginRepository):
             old_origin = None
 
         if old_origin == origin:
-            return
+            # Declared and inferered origins won't have a task id, so if the old
+            # origin is the same as the one being saved we can just return. In
+            # case an observed origin is saved, we will delete the origin with
+            # the old task id and create a new one. We can still fetch the old
+            # origin using the previous valid time.
+            if origin.task_id == old_origin.task_id:
+                return
+
+            self.session.add((XTDBOperationType.DELETE, old_origin.id, valid_time))
 
         self.session.add((XTDBOperationType.PUT, self.serialize(origin), valid_time))
 
-        event = OriginDBEvent(
-            operation_type=OperationType.CREATE if old_origin is None else OperationType.UPDATE,
-            valid_time=valid_time,
-            old_data=old_origin,
-            new_data=origin,
-        )
-        self.session.listen_post_commit(lambda: self.event_manager.publish(event))
+        if old_origin != origin:
+            # Only publish an event if there is a change in data. We won't send
+            # events when only the normalizer task id of an observed origin is
+            # updated.
+            event = OriginDBEvent(
+                operation_type=OperationType.CREATE if old_origin is None else OperationType.UPDATE,
+                valid_time=valid_time,
+                old_data=old_origin,
+                new_data=origin,
+            )
+            self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
     def delete(self, origin: Origin, valid_time: datetime) -> None:
         self.session.add((XTDBOperationType.DELETE, origin.id, valid_time))
