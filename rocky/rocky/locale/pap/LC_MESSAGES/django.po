@@ -5064,7 +5064,7 @@ msgstr "Descarga datonan di tarea"
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Reschedule"
-msgstr "Reagenda"
+msgstr "Kambia fecha"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
