@@ -61,8 +61,9 @@ class ScanProfileDetailView(OOIDetailView, FormView):
                     self.request,
                     messages.ERROR,
                     _(
-                        "Could not raise clearance level of %s to L%s. \
-                        You acknowledged a clearance level of %s."
+                        "Could not raise clearance level of %s to L%s. "
+                        "You acknowledged a clearance level of L%s. "
+                        "Contact your administrator to receive a higher clearance."
                     )
                     % (
                         self.ooi.reference.human_readable,

@@ -30,6 +30,16 @@ urlpatterns = [
         name="step_setup_scan_ooi_detail",
     ),
     path(
+        "<organization_code>/step/clearance-level-introduction/",
+        views.OnboardingClearanceLevelIntroductionView.as_view(),
+        name="step_clearance_level_introduction",
+    ),
+    path(
+        "<organization_code>/step/acknowledge-clearance-level/",
+        views.OnboardingAcknowledgeClearanceLevelView.as_view(),
+        name="step_acknowledge_clearance_level",
+    ),
+    path(
         "<organization_code>/step/set-clearance-level/",
         views.OnboardingSetClearanceLevelView.as_view(),
         name="step_set_clearance_level",

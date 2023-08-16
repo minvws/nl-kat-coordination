@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from logging import getLogger
 from typing import Generator, List, Optional, Set, Type
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
@@ -269,7 +269,7 @@ def list_scan_profiles(
 
 @router.put("/scan_profiles", tags=["Scan Profiles"])
 def save_scan_profile(
-    scan_profile: ScanProfile,
+    scan_profile: ScanProfile = Body(discriminator="scan_profile_type"),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_required_valid_time),
 ) -> None:
@@ -326,6 +326,7 @@ def get_scan_profile_inheritance(
 @router.get("/findings", tags=["Findings"])
 def list_findings(
     exclude_muted: bool = True,
+    only_muted: bool = False,
     offset=DEFAULT_OFFSET,
     limit=DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
@@ -335,6 +336,7 @@ def list_findings(
     return octopoes.ooi_repository.list_findings(
         severities,
         exclude_muted,
+        only_muted,
         offset,
         limit,
         valid_time,
