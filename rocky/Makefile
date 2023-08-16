@@ -18,7 +18,7 @@ build-rocky-native:
 	-python3 manage.py createsuperuser --no-input
 	python3 manage.py loaddata OOI_database_seed.json
 	python3 manage.py setup_dev_account
-	python3 manage.py compilemessages --use-fuzzy
+	python3 manage.py compilemessages
 
 build-rocky-frontend:
 	docker run --rm -v $$PWD:/app/rocky node:18-bookworm sh -c "cd /app/rocky && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"

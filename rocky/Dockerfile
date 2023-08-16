@@ -51,7 +51,7 @@ COPY --link --from=node_builder /app/assets/dist assets/dist
 
 # The secret key isn't used by the commands, but Django won't work do anything
 # without it
-RUN export SECRET_KEY="secret" && python manage.py collectstatic -l && python manage.py compilemessages --use-fuzzy
+RUN export SECRET_KEY="secret" && python manage.py collectstatic -l && python manage.py compilemessages
 
 USER rocky
 

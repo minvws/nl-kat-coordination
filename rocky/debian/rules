@@ -28,7 +28,7 @@ override_dh_virtualenv:
 	$(DH_VENV_DIR)/bin/python -m pip install /octopoes/dist/octopoes*.whl
 
 	SECRET_KEY="foo" $(DH_VENV_DIR)/bin/python manage.py collectstatic --noinput --clear
-	SECRET_KEY="foo" $(DH_VENV_DIR)/bin/python manage.py compilemessages --use-fuzzy
+	SECRET_KEY="foo" $(DH_VENV_DIR)/bin/python manage.py compilemessages
 	find static -type f -exec install -D "{}" "$(DESTDIR)/usr/share/kat-rocky/{}" \;
 
 
