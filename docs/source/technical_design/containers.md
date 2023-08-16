@@ -26,13 +26,16 @@ To set up an installation with pre-built containers, you can pull the repository
 git clone https://github.com/minvws/nl-kat-coordination.git
 ```
 
-If this is your first install, and you do not have an .env file yet, you can create an .env file using the following command:
+If this is your first install, and you do not have an .env file yet, you can create an `.env` file using the following command:
 
 ```shell
 make env
 ```
 
-This will create an .env file with the default values. You can edit this file to change the default values. Now you can pull and start the containers using the following command:
+This will create an `.env` file with the default values. You can edit this file to change the default values.
+Make sure that you also add the keys and values from `.env-defaults` to your `.env` file, and modify them for production use where necessary.
+
+Now you can pull and start the containers using the following command:
 
 ```shell
 docker-compose -f docker-compose.release-example.yml up -d
