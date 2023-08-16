@@ -62,23 +62,6 @@ This feature can also be used to set default values for KAT-alogus settings. For
 will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
 This default value can be overridden by setting any value for `TOP_PORTS` in the KAT-alogus.
 
-
-| Environment variable       | Value                        | Description                                                      |
-|----------------------------|------------------------------|------------------------------------------------------------------|
-| QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                                           |
-| QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                                       |
-| QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                                |
-| POOL_SIZE                  | "2.0"                        | Number of workers to run per queue                               |
-| POLL_INTERVAL              | "10.0"                       | Time to wait before polling for tasks when all queues are empty  |
-| WORKER_HEARTBEAT           | "1.0"                        | Seconds to wait before checking the workers when queues are full |
-| OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                                         |
-| BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                                            |
-| KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                                        |
-| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                                        |
-| ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings                     |
-| KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string                |
-| KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string                 |
-
 ## Design
 
 Boefjes will run as containerized workers pulling jobs from a centralized job queue:
