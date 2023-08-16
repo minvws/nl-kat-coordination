@@ -5082,7 +5082,7 @@ msgstr "Normalizer"
 #, fuzzy
 #| msgid "No input OOI"
 msgid "Boefje input OOI"
-msgstr "No tin entrada OOI"
+msgstr "Opheto di Entrada \"Boefje\""
 
 #: rocky/templates/tasks/normalizers.html
 #, fuzzy
