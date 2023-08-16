@@ -5017,7 +5017,7 @@ msgstr "Si, poné na heredá"
 #: rocky/templates/tasks/boefje_task_detail.html
 msgid ""
 "An overview of the boefje task, the input OOI and the RAW data it generated."
-msgstr ""
+msgstr "Un bista general di e tarea boefje, e opheto di entrada OOI, y e datonan RAW cu el a generá."
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
