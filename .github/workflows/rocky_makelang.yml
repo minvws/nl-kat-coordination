@@ -1,0 +1,40 @@
+name: Rocky Check if translations are up to date
+
+on:
+  push:
+    paths:
+      - rocky/**
+  pull_request:
+    paths:
+      - rocky/**
+
+jobs:
+  makelang:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        id: py311
+        with:
+          python-version: 3.11
+          cache: pip
+
+      - name: Install GNU gettext utilities
+        run: sudo apt-get install -y --no-install-recommends gettext
+
+      - name: Install requirements.txt
+        run: pip install -r requirements.txt
+        working-directory: ./rocky
+
+      - name: Install Octopoes
+        run: pip install wheel && cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
+
+      - name: Generate the .po files if they changed
+        run: SECRET_KEY="whatever" make lang
+        working-directory: ./rocky
+
+      - name: Check if there are any changed files
+        run: git diff --exit-code

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from boefjes.config import settings
+from boefjes.config import BASE_DIR
 from boefjes.katalogus.clients import MockPluginRepositoryClient
 from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
@@ -97,7 +97,7 @@ def mock_plugin_service(organisation_id: str) -> PluginService:
     for id_, repo in _mocked_repositories.items():
         repo_store.create(repo)
 
-    test_boefjes_dir = settings.base_dir / "katalogus" / "tests" / "boefjes_test_dir"
+    test_boefjes_dir = BASE_DIR / "katalogus" / "tests" / "boefjes_test_dir"
 
     return PluginService(
         PluginStatesStorageMemory(organisation_id),

@@ -29,9 +29,20 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
 
 
 class Bytes(HTTPService):
+    """A class that provides methods to interact with the Bytes API."""
+
     name = "bytes"
 
     def __init__(self, host: str, source: str, user: str, password: str, timeout: int = 5):
+        """Initialize the Bytes service.
+
+        Args:
+            host: A string representing the host.
+            source: A string representing the source.
+            user: A string representing the username.
+            password: A string representing the password.
+            timeout: An integer representing the timeout.
+        """
         self.credentials: Dict[str, str] = {
             "username": user,
             "password": password,

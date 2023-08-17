@@ -3,3 +3,9 @@
 :root {
   --form-horizontal-view-fieldset-label-margin-top: 0;
 }
+
+form legend {
+  font-weight: var(--form-fieldset-legend-font-weight);
+  margin-bottom: var(--form-fieldset-legend-margin-bottom);
+  padding: 0;
+}

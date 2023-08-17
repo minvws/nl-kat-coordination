@@ -21,9 +21,15 @@ class AppContext:
         services:
             A dict containing all the external services connectors that
             are used and need to be shared in the scheduler application.
-        datastore:
-            A SQLAlchemy.SQLAlchemy object used for storing and retrieving
-            tasks.
+        task_store:
+            A stores.TaskStore object used for storing tasks.
+        pq_store:
+            A stores.PriorityQueueStore object used for storing priority queues.
+        metrics_registry:
+            A prometheus_client.CollectorRegistry object used for storing metrics.
+        metrics_qsize:
+            A prometheus_client.Gauge object used for storing the queue size of
+            the schedulers.
     """
 
     def __init__(self) -> None:
@@ -66,10 +72,10 @@ class AppContext:
         )
 
         # Repositories
-        if not self.config.database_dsn.startswith("postgresql"):
+        if not self.config.db_uri.startswith("postgresql"):
             raise Exception("PostgreSQL is the only supported database backend")
 
-        datastore = sqlalchemy.SQLAlchemy(self.config.database_dsn)
+        datastore = sqlalchemy.SQLAlchemy(self.config.db_uri)
         self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
         self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
 
@@ -83,7 +89,6 @@ class AppContext:
         ).info(
             {
                 "pq_maxsize": str(self.config.pq_maxsize),
-                "pq_populate_interval": str(self.config.pq_populate_interval),
                 "pq_populate_grace_period": str(self.config.pq_populate_grace_period),
                 "pq_populate_max_random_objects": str(self.config.pq_populate_max_random_objects),
                 "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
