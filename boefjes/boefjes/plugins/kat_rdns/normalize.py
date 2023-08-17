@@ -16,7 +16,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     answers = raw.decode()
     if answers == "NXDOMAIN" or answers == "NoAnswer":
         return
-    lines = answers.split("\n")
+    lines = [line for line in answers.split("\n") if not line.startswith("option")]
     for rrset in from_text("\n".join(lines[1:])).answer:
         for rr in rrset:
             if isinstance(rr, PTR):
