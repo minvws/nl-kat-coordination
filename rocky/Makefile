@@ -5,6 +5,8 @@
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+# Do not turn on OpenTelemetry when building Rocky
+unexport SPAN_EXPORT_GRPC_ENDPOINT
 
 build: build-rocky build-rocky-frontend
 

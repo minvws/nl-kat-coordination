@@ -228,10 +228,16 @@ services:
     profiles:
     - jaeger
     restart: unless-stopped
-    image: jaegertracing/all-in-one:1.44
+    image: jaegertracing/all-in-one:1.48
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: "true"
+      SPAN_STORAGE_TYPE: badger
+      BADGER_EPHEMERAL: "false"
+      BADGER_DIRECTORY_VALUE: /badger/data
+      BADGER_DIRECTORY_KEY: /badger/key
+    volumes:
+      - jaeger-data:/badger
     ports:
       - "127.0.0.1:16686:16686"
 
@@ -240,3 +246,4 @@ volumes:
   bytes-data:
   keiko-reports:
   xtdb-data:
+  jaeger-data:
