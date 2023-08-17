@@ -346,6 +346,7 @@ CSP_FRAME_ANCESTORS = ["'none'"]
 CSP_BASE = ["'none'"]
 CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
+CSP_CONNECT_SRC = ["'self'"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 

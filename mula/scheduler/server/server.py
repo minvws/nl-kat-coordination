@@ -436,7 +436,7 @@ class Server:
     def run(self) -> None:
         uvicorn.run(
             self.api,
-            host=self.ctx.config.api_host,
+            host=str(self.ctx.config.api_host),
             port=self.ctx.config.api_port,
             log_config=None,
         )

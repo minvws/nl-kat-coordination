@@ -12,6 +12,7 @@ services:
       interval: 5s
       retries: 10
     env_file:
+      - .env-defaults
       - .env
 
   postgres:
@@ -28,6 +29,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
     env_file:
+      - .env-defaults
       - .env
     environment:
       APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
@@ -56,6 +58,7 @@ services:
         ENVIRONMENT: dev
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
     env_file:
+      - .env-defaults
       - .env
     volumes:
       - ./octopoes:/app/octopoes
@@ -74,6 +77,7 @@ services:
         ENVIRONMENT: dev
     command: worker-beat
     env_file:
+      - .env-defaults
       - .env
     volumes:
       - ./octopoes:/app/octopoes
@@ -97,6 +101,7 @@ services:
       replicas: 1
     command: boefje
     env_file:
+      - .env-defaults
       - .env
 
   normalizer:
@@ -117,6 +122,7 @@ services:
       replicas: 1
     command: normalizer
     env_file:
+      - .env-defaults
       - .env
 
   rocky:
@@ -136,6 +142,7 @@ services:
       - ./rocky:/app/rocky
       - ./octopoes/octopoes:/app/rocky/octopoes
     env_file:
+      - .env-defaults
       - .env
     environment:
       - GITPOD_WORKSPACE_URL=${GITPOD_WORKSPACE_URL:-}
@@ -157,6 +164,7 @@ services:
       - ./bytes:/app/bytes
       - bytes-data:/data
     env_file:
+      - .env-defaults
       - .env
 
   katalogus:
@@ -176,6 +184,7 @@ services:
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
+      - .env-defaults
       - .env
 
   scheduler:
@@ -188,6 +197,7 @@ services:
     ports:
       - "127.0.0.1:8004:8000"
     env_file:
+      - .env-defaults
       - .env
     volumes:
       - ./mula:/app/scheduler
@@ -208,6 +218,7 @@ services:
       - "127.0.0.1:8005:8000"
     command: uvicorn keiko.app:api --host 0.0.0.0 --port 8000 --reload --reload-dir /app/keiko/keiko
     env_file:
+      - .env-defaults
       - .env
     volumes:
       - ./keiko:/app/keiko
@@ -217,10 +228,16 @@ services:
     profiles:
     - jaeger
     restart: unless-stopped
-    image: jaegertracing/all-in-one:1.44
+    image: jaegertracing/all-in-one:1.48
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: "true"
+      SPAN_STORAGE_TYPE: badger
+      BADGER_EPHEMERAL: "false"
+      BADGER_DIRECTORY_VALUE: /badger/data
+      BADGER_DIRECTORY_KEY: /badger/key
+    volumes:
+      - jaeger-data:/badger
     ports:
       - "127.0.0.1:16686:16686"
 
@@ -229,3 +246,4 @@ volumes:
   bytes-data:
   keiko-reports:
   xtdb-data:
+  jaeger-data:
