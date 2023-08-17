@@ -28,7 +28,7 @@ tracer = trace.get_tracer(__name__)
 
 class BoefjeScheduler(Scheduler):
     """A KAT specific implementation of a Boefje scheduler. It extends
-    the `Scheduler` class by adding a `organisation` attribute.
+    the `Scheduler` class by adding an `organisation` attribute.
 
     Attributes:
         logger: A logger instance.
@@ -56,14 +56,21 @@ class BoefjeScheduler(Scheduler):
         )
 
     def run(self) -> None:
-        """Populate the PriorityQueue.
+        """The run method is called when the scheduler is started. It will
+        start the listeners and the scheduling loops in separate threads. It
+        is mainly tasked with populating the queue with tasks.
 
-        While the queue is not full we will try to fill it with items that have
-        been created, e.g. when the scan level was increased (since oois start
-        with a scan level 0 and will not start any boefjes).
+        * Scan profile mutations; when a scan profile is updated for an ooi
+        e.g. the scan level is changed, we need to create new tasks for the
+        ooi. We gather all boefjes that can run on the ooi and create tasks
+        for them.
 
-        When this is done we will try and fill the rest of the queue with
-        random items from octopoes and schedule them accordingly.
+        * New boefjes; when new boefjes are added or enabled we find the ooi's
+        that boefjes can run on, and create tasks for it.
+
+        * Random OOI's from Octopoes; every minute we get a random OOI from
+        Octopoes and create a task for it for the available boefjes for this
+        OOI.
         """
 
         # Scan profile mutations
@@ -98,9 +105,13 @@ class BoefjeScheduler(Scheduler):
 
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
-        """Create tasks for oois that have a scan level change."""
+        """Create tasks for oois that have a scan level change.
+
+        Args:
+            mutation: The mutation that was received.
+        """
         self.logger.info(
-            "Received scan level mutation %s for: %s [ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
+            "Received scan level mutation %s for: %s [ooi_primary_key=%s, organisation_id=%s, scheduler_id=%s]",
             mutation.operation,
             mutation.primary_key,
             mutation.primary_key,
@@ -112,7 +123,7 @@ class BoefjeScheduler(Scheduler):
         ooi = mutation.value
         if ooi is None:
             self.logger.debug(
-                "Mutation value is None, skipping [organisation.id=%s, scheduler_id=%s]",
+                "Mutation value is None, skipping [organisation_id=%s, scheduler_id=%s]",
                 self.organisation.id,
                 self.scheduler_id,
             )
@@ -231,11 +242,11 @@ class BoefjeScheduler(Scheduler):
 
     @tracer.start_as_current_span("push_tasks_for_random_objects")
     def push_tasks_for_random_objects(self) -> None:
-        """Push tasks for random objects from octopoes to the queue."""
+        """Push tasks for random ooi's from octopoes to the queue."""
         if self.queue.full():
             self.logger.warning(
                 "Boefjes queue is full, not populating with new tasks "
-                "[queue.qsize=%d, organisation_id=%s, scheduler_id=%s]",
+                "[queue_qsize=%d, organisation_id=%s, scheduler_id=%s]",
                 self.queue.qsize(),
                 self.organisation.id,
                 self.scheduler_id,
@@ -305,7 +316,7 @@ class BoefjeScheduler(Scheduler):
         """
         if boefje.enabled is False:
             self.logger.debug(
-                "Boefje: %s is disabled [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
+                "Boefje: %s is disabled [boefje_id=%s, organisation_id=%s, scheduler_id=%s]",
                 boefje.name,
                 boefje.id,
                 self.organisation.id,
@@ -316,7 +327,7 @@ class BoefjeScheduler(Scheduler):
         if ooi.scan_profile is None:
             self.logger.debug(
                 "No scan_profile found for ooi: %s "
-                "[ooi.primary_key=%s, ooi.scan_profile=%s, organisation_id=%s, scheduler_id=%s]",
+                "[ooi_primary_key=%s, ooi_scan_profile=%s, organisation_id=%s, scheduler_id=%s]",
                 ooi.primary_key,
                 ooi,
                 ooi.scan_profile,
@@ -328,7 +339,7 @@ class BoefjeScheduler(Scheduler):
         ooi_scan_level = ooi.scan_profile.level
         if ooi_scan_level is None:
             self.logger.warning(
-                "No scan level found for ooi: %s [ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
+                "No scan level found for ooi: %s [ooi_primary_key=%s, organisation_id=%s, scheduler_id=%s]",
                 ooi.primary_key,
                 ooi,
                 self.organisation.id,
@@ -339,7 +350,7 @@ class BoefjeScheduler(Scheduler):
         boefje_scan_level = boefje.scan_level
         if boefje_scan_level is None:
             self.logger.warning(
-                "No scan level found for boefje: %s [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
+                "No scan level found for boefje: %s [boefje_id=%s, organisation_id=%s, scheduler_id=%s]",
                 boefje.id,
                 boefje.id,
                 self.organisation.id,
@@ -354,7 +365,7 @@ class BoefjeScheduler(Scheduler):
         if boefje_scan_level > ooi_scan_level:
             self.logger.debug(
                 "Boefje: %s scan level %s is too intense for ooi: %s scan level %s "
-                "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s]",
+                "[boefje_id=%s, ooi_primary_key=%s, organisation_id=%s, scheduler_id=%s]",
                 boefje.id,
                 boefje_scan_level,
                 ooi.primary_key,
@@ -369,8 +380,7 @@ class BoefjeScheduler(Scheduler):
         return True
 
     def is_task_running(self, task: BoefjeTask) -> bool:
-        """Get the last tasks that have run or are running for the hash
-        of this particular BoefjeTask.
+        """Check if the same task is already running.
 
         Args:
             task: The BoefjeTask to check.
@@ -395,7 +405,7 @@ class BoefjeScheduler(Scheduler):
         if task_db is not None and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
-                "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
+                "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,
                 self.organisation.id,
@@ -413,7 +423,7 @@ class BoefjeScheduler(Scheduler):
         except Exception as exc_bytes:
             self.logger.error(
                 "Failed to get last run boefje from bytes "
-                "[boefje.id=%s, input.primary_key=%s, organisation_id=%s, scheduler_id=%s, exc=%s]",
+                "[boefje_id=%s, input_primary_key=%s, organisation_id=%s, scheduler_id=%s, exc=%s]",
                 task.boefje.id,
                 task.input_ooi,
                 self.organisation.id,
@@ -440,7 +450,7 @@ class BoefjeScheduler(Scheduler):
                 "Task has been finished, but no results found in bytes, "
                 "please review the bytes logs for more information regarding "
                 "this error. "
-                "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
+                "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,
                 self.organisation.id,
@@ -451,7 +461,7 @@ class BoefjeScheduler(Scheduler):
         if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
             self.logger.debug(
                 "Task is still running, according to bytes "
-                "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
+                "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task_bytes.id,
                 task.hash,
                 self.organisation.id,
@@ -468,7 +478,7 @@ class BoefjeScheduler(Scheduler):
         Args:
             boefje: Boefje to run.
             ooi: OOI to run Boefje on.
-            caller: Caller of this function. Defaults to "".
+            caller: The name of the function that called this function, used for logging.
 
         """
         task = BoefjeTask(
@@ -513,10 +523,11 @@ class BoefjeScheduler(Scheduler):
             grace_period_passed = self.has_grace_period_passed(task)
             if not grace_period_passed:
                 self.logger.debug(
-                    "Task has not passed grace period: %s [organisation_id=%s, scheduler_id=%s]",
+                    "Task has not passed grace period: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
                     task,
                     self.organisation.id,
                     self.scheduler_id,
+                    caller,
                 )
                 return
         except Exception as exc_grace_period:
@@ -563,7 +574,7 @@ class BoefjeScheduler(Scheduler):
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s "
-                "[queue.qsize=%d, queue.maxsize=%d, organisation_id=%s, scheduler_id=%s, caller=%s]",
+                "[queue_qsize=%d, queue_maxsize=%d, organisation_id=%s, scheduler_id=%s, caller=%s]",
                 task,
                 self.queue.qsize(),
                 self.queue.maxsize,
@@ -575,7 +586,7 @@ class BoefjeScheduler(Scheduler):
 
         self.logger.info(
             "Created boefje task: %s for ooi: %s "
-            "[boefje.id=%s, ooi.primary_key=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
+            "[boefje_id=%s, ooi_primary_key=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,
             ooi.primary_key,
             boefje.id,
@@ -591,12 +602,18 @@ class BoefjeScheduler(Scheduler):
 
         NOTE: We don't check the status of the task since this needs to be done
         by checking if the task is still running or not.
+
+        Args:
+            task: Task to check.
+
+        Returns:
+            True if the grace period has passed, False otherwise.
         """
         try:
             task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
             self.logger.warning(
-                "Could not get latest task by hash: %s [task.hash=%s, organisation_id=%s, scheduler_id=%s]",
+                "Could not get latest task by hash: %s [task_hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task.hash,
                 task.hash,
                 self.organisation.id,
@@ -611,7 +628,7 @@ class BoefjeScheduler(Scheduler):
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to the datastore "
-                "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
+                "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task_db.id,
                 task.hash,
                 self.organisation.id,
@@ -628,7 +645,7 @@ class BoefjeScheduler(Scheduler):
         except Exception as exc_bytes:
             self.logger.error(
                 "Failed to get last run boefje from bytes "
-                "[task.boefje.id=%s, task.input_ooi=%s, organisation_id=%s, scheduler_id=%s, exc=%s]",
+                "[task_boefje_id=%s, task_input_ooi=%s, organisation_id=%s, scheduler_id=%s, exc=%s]",
                 task.boefje.id,
                 task.input_ooi,
                 self.organisation.id,
@@ -646,7 +663,7 @@ class BoefjeScheduler(Scheduler):
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to bytes "
-                "[task.id=%s, task.hash=%s, organisation_id=%s, scheduler_id=%s]",
+                "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",
                 task_bytes.id,
                 task.hash,
                 self.organisation.id,
@@ -672,7 +689,7 @@ class BoefjeScheduler(Scheduler):
             )
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
-                "Could not get boefjes for object_type: %s [ooi.object_type=%s, organisation_id=%s, scheduler_id=%s]",
+                "Could not get boefjes for object_type: %s [ooi_object_type=%s, organisation_id=%s, scheduler_id=%s]",
                 ooi.object_type,
                 ooi.object_type,
                 self.organisation.id,

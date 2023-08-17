@@ -13,7 +13,7 @@ httpx = "^0.23.3"
 jsonschema = "^4.17.0"
 pydantic = "^1.10.9"
 docker = "^6.1.3"
-fastapi = "^0.93.0"
+fastapi = "^0.101.0"
 uvicorn = "^0.20.0"
 psycopg2 = "^2.9.6"
 pynacl = "^1.5.0"
@@ -55,10 +55,13 @@ urllib3 = "^1.26.0"
 python-Wappalyzer = "0.3.1"
 # required by kat_wpscan
 wpscan-out-parse = "1.9.3"
+# required by kat_sec_txt
+sectxt = "0.9.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
 pytest = "^7.2.2"
+pytest-env = "^0.8.2"
 black = "^23.1.0"
 
 [build-system]
@@ -72,3 +75,15 @@ transform-concats = true
 [tool.black]
 target-version = ["py38", "py39", "py310", "py311"]
 line-length = 120
+
+[tool.pytest.ini_options]
+env = [
+    "KATALOGUS_DB_URI=postgresql://placeholder@host:5432/katalogus",
+    "QUEUE_URI=amqp://placeholder",
+    "KATALOGUS_API=http://placeholder:8000",
+    "OCTOPOES_API=http://placeholder:8001",
+    "SCHEDULER_API=http://placeholder:8002",
+    "BYTES_API=http://placeholder:8003",
+    "BYTES_USERNAME=placeholder",
+    "BYTES_PASSWORD=placeholder",
+]
