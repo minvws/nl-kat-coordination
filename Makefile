@@ -125,4 +125,5 @@ poetry-dependencies:
 
 	# NOTE: pip does not yet support hash verification for git dependencies;
 	# rocky's requirements-dev.txt unfortunately has no hashing until then
-	sed -i '' '/--hash/d; s/ \\$$//' rocky/requirements-dev.txt
+	sed -i.bak '/--hash/d; s/ \\$$//' rocky/requirements-dev.txt
+	rm rocky/requirements-dev.txt.bak
