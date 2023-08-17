@@ -593,7 +593,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
             priority=0,
-            data=task.model_dump(),
+            data=task,
         )
 
         # Act
@@ -623,7 +623,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
             priority=0,
-            data=task.model_dump(),
+            data=task,
         )
 
         # Act
@@ -663,7 +663,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
             priority=0,
-            data=task.model_dump(),
+            data=task,
         )
         self.scheduler.push_item_to_queue(p_item)
 

@@ -8,9 +8,9 @@ from scheduler import config, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
+    NormalizerFactory,
     OOIFactory,
     OrganisationFactory,
-    PluginFactory,
     RawDataFactory,
     ScanProfileFactory,
 )
@@ -143,7 +143,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_normalizers_for_mime_type.return_value = [
-            PluginFactory(type="normalizer"),
+            NormalizerFactory(),
         ]
 
         # Act
@@ -318,7 +318,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         )
 
         self.mock_get_normalizers_for_mime_type.return_value = [
-            PluginFactory(type="normalizer"),
+            NormalizerFactory(),
         ]
 
         # Act

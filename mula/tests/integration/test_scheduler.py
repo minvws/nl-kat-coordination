@@ -31,7 +31,7 @@ class SchedulerTestCase(unittest.TestCase):
 
         queue = mock_queue.MockPriorityQueue(
             pq_id=identifier,
-            maxsize=self.mock_ctx.config.pq_maxsize,
+            maxsize=cfg.pq_maxsize,
             item_type=mock_task.MockTask,
             allow_priority_updates=True,
             pq_store=self.mock_ctx.datastores.pq_store,

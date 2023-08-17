@@ -195,7 +195,7 @@ class NormalizerScheduler(Scheduler):
             id=task.id,
             scheduler_id=self.scheduler_id,
             priority=score,
-            data=task,
+            data=task.model_dump(),
             hash=task.hash,
         )
 

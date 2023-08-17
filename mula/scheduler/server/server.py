@@ -221,14 +221,14 @@ class Server:
             )
 
         stored_scheduler_model = models.Scheduler(**s.dict())
-        patch_data = item.dict(exclude_unset=True)
+        patch_data = item.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
             raise fastapi.HTTPException(
                 status_code=400,
                 detail="no data to patch",
             )
 
-        updated_scheduler = stored_scheduler_model.copy(update=patch_data)
+        updated_scheduler = stored_scheduler_model.model_copy(update=patch_data)
 
         # We update the patched attributes, since the schedulers are kept
         # in memory.
@@ -312,7 +312,7 @@ class Server:
                 detail="task not found",
             )
 
-        return models.Task(**task.dict())
+        return models.Task(**task.model_dump())
 
     def patch_task(self, task_id: str, item: Dict) -> Any:
         if len(item) == 0:
@@ -335,7 +335,7 @@ class Server:
                 detail="task not found",
             )
 
-        updated_task = task_db.copy(update=item)
+        updated_task = task_db.model_copy(update=item)
 
         # Update task in database
         try:
@@ -388,7 +388,7 @@ class Server:
                 detail="could not pop item from queue, check your filters",
             )
 
-        return models.PrioritizedItem(**p_item.dict())
+        return models.PrioritizedItem(**p_item.model_dump())
 
     def push_queue(self, queue_id: str, item: models.PrioritizedItem) -> Any:
         s = self.schedulers.get(queue_id)
@@ -399,7 +399,7 @@ class Server:
             )
 
         try:
-            p_item = models.PrioritizedItem(**item.dict())
+            p_item = models.PrioritizedItem(**item.model_dump())
             if p_item.scheduler_id is None:
                 p_item.scheduler_id = s.scheduler_id
 
@@ -431,7 +431,7 @@ class Server:
                 detail="not allowed",
             ) from exc_not_allowed
 
-        return models.PrioritizedItem(**p_item.dict())
+        return models.PrioritizedItem(**p_item.model_dump())
 
     def run(self) -> None:
         uvicorn.run(
