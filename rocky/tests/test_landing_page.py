@@ -15,7 +15,7 @@ def test_landing_page_redirect(rf, client_member):
     assert response.status_code == 302  # Redirects to crisis-room
 
 
-LANG_LIST = [lang[0] for lang in settings.LANGUAGES]
+LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 
 @pytest.mark.parametrize("language", LANG_LIST)
