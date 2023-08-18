@@ -29,7 +29,7 @@ class GeneratingReportFailed(ReportException):
 
 
 class KeikoClient:
-    def __init__(self, base_uri: str, timeout: int = 15):
+    def __init__(self, base_uri: str, timeout: int = 60):
         self.session = requests.Session()
         self._base_uri = base_uri
         self._timeout = timeout
@@ -51,7 +51,7 @@ class KeikoClient:
         return res.json()["report_id"]
 
     def get_report(self, report_id: str) -> BinaryIO:
-        # try max 15 times to get the report, 1 second interval
+        # try retrieving a report with a configured timeout
         try:
             for _ in range(self._timeout):
                 time.sleep(1)

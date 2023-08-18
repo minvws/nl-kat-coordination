@@ -19,9 +19,7 @@ from django.utils.translation import gettext_lazy as _
 
 from rocky.otel import OpenTelemetryHelper
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,10 +45,11 @@ BYTES_USERNAME = env("BYTES_USERNAME", default="")
 BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
 KEIKO_API = env.url("KEIKO_API", "").geturl()
-KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 15)
+# Report generation timeout in seconds
+KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG", False)
 
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
