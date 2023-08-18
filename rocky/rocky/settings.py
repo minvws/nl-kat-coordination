@@ -47,6 +47,7 @@ BYTES_USERNAME = env("BYTES_USERNAME", default="")
 BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
 KEIKO_API = env.url("KEIKO_API", "").geturl()
+KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 15)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
