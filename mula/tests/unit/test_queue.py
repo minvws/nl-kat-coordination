@@ -5,6 +5,7 @@ import time
 import unittest
 import uuid
 from typing import Optional
+from unittest import mock
 
 from scheduler import config, models, queues, storage
 
@@ -41,13 +42,45 @@ class PriorityQueueTestCase(unittest.TestCase):
         item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
         self.pq.push(p_item=item)
 
+        item_db = self.pq_store.get(self.pq.pq_id, item.id.hex)
+        self.assertIsNotNone(item_db)
+        self.assertEqual(item.id, item_db.id)
+
         self.assertEqual(1, self.pq.qsize())
+
+    @mock.patch("scheduler.storage.PriorityQueueStore.push")
+    def test_push_item_not_found_in_db(self, mock_push):
+        """When adding an item to the priority queue, but the item is not
+        found in the database, the item shouldn't be added.
+        """
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+
+        mock_push.return_value = None
+
+        with self.assertRaises(queues.errors.PrioritizedItemNotFoundError):
+            self.pq.push(p_item=item)
+
+        self.assertEqual(0, self.pq.qsize())
+        item_db = self.pq_store.get(self.pq.pq_id, item.id.hex)
+        self.assertIsNone(item_db)
 
     def test_push_incorrect_p_item_type(self):
         """When pushing an item that is not of the correct type, the item
         shouldn't be pushed.
         """
         p_item = {"priority": 1, "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)}
+
+        with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
+            self.pq.push(p_item=p_item)
+
+        self.assertEqual(0, self.pq.qsize())
+
+    def test_push_invalid_p_item(self):
+        """When pushing an item that can not be validated, the item shouldn't
+        be pushed.
+        """
+        p_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        p_item.data = {"invalid": "data"}
 
         with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
             self.pq.push(p_item=p_item)

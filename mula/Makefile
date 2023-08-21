@@ -62,7 +62,7 @@ done: ## Prepare for a commit.
 	make test
 
 cov: ## Generate a test coverage report
-	docker-compose run --rm scheduler \
+	$(ci-docker-compose) run --rm ci_scheduler_integration \
 		python -m pytest \
 		--cov-report term-missing:skip-covered \
 		--cov=scheduler tests/
