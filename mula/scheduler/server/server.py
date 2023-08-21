@@ -53,9 +53,7 @@ class Server:
 
         # Set up OpenTelemetry instrumentation
         if self.config.host_metrics is not None:
-            self.logger.info(
-                "Setting up instrumentation with span exporter endpoint [%s]", self.config.host_metrics
-            )
+            self.logger.info("Setting up instrumentation with span exporter endpoint [%s]", self.config.host_metrics)
 
             FastAPIInstrumentor.instrument_app(self.api)
             Psycopg2Instrumentor().instrument()

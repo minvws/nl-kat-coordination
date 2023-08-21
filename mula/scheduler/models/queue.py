@@ -17,6 +17,7 @@ class PrioritizedItem(BaseModel):
     for unmarshalling of priority queue prioritized items to a JSON
     representation.
     """
+
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)

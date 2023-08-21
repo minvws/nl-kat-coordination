@@ -34,14 +34,14 @@ class BackwardsCompatibleEnvSettings(PydanticBaseSettingsSource):
             # ...but old variable has been explicitly set through env
             if new_name not in env_vars and old_name in env_vars:
                 logging.warning("Deprecation: %s is deprecated, use %s instead", old_name.upper(), new_name.upper())
-                d[new_name[len(env_prefix):]] = env_vars[old_name]
+                d[new_name[len(env_prefix) :]] = env_vars[old_name]
 
         return d
 
 
-
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+
     model_config = SettingsConfigDict(env_prefix="SCHEDULER_")
 
     # Application settings
@@ -84,8 +84,7 @@ class Settings(BaseSettings):
 
     octopoes_request_timeout: int = Field(
         10,
-        description="The timeout in seconds for the requests to the octopoes "
-        "api",
+        description="The timeout in seconds for the requests to the octopoes " "api",
     )
 
     rabbitmq_prefetch_count: int = Field(
@@ -159,27 +158,22 @@ class Settings(BaseSettings):
 
     pq_interval: int = Field(
         60,
-        description="Interval in seconds of the "
-        "execution of the `` method of the `scheduler.Scheduler` class",
+        description="Interval in seconds of the " "execution of the `` method of the `scheduler.Scheduler` class",
     )
 
     pq_grace_period: int = Field(
         86400,
-        description="Grace period of when a job is considered to be running "
-        "again in seconds",
+        description="Grace period of when a job is considered to be running " "again in seconds",
     )
 
     pq_max_random_objects: int = Field(
         50,
-        description="The maximum number of random objects that can be added "
-        "to the priority queue, per call",
+        description="The maximum number of random objects that can be added " "to the priority queue, per call",
     )
 
     # Database settings
     db_uri: PostgresDsn = Field(
-        ...,
-        example="postgresql://xx:xx@host:5432/scheduler",
-        description="Scheduler Postgres DB URI"
+        ..., example="postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI"
     )
 
     @classmethod
@@ -191,4 +185,10 @@ class Settings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
-        return (init_settings, env_settings, dotenv_settings, file_secret_settings, BackwardsCompatibleEnvSettings(settings_cls))
+        return (
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            file_secret_settings,
+            BackwardsCompatibleEnvSettings(settings_cls),
+        )

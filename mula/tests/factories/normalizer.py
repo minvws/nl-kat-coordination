@@ -1,4 +1,3 @@
-
 from factory import Factory, Faker
 from scheduler.models import Normalizer
 

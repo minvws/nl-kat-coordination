@@ -6,7 +6,6 @@ import sqlalchemy
 
 
 class DBConn:
-
     def __init__(self, dsn: str) -> None:
         super().__init__()
 

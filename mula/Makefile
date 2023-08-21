@@ -49,7 +49,7 @@ black: ## Check code style with black.
 		black --check --diff .
 
 pylint: ## Rate the code with pylint.
-	docker-compsoe run --rm scheduler \
+	$(ci-docker-compose) run --rm ci_scheduler_unit \
 		pylint --rcfile pyproject.toml scheduler
 
 fmt: ## Format the code using black.
