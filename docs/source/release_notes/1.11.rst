@@ -57,7 +57,7 @@ Bug fixes
  * A problem with the many ports open normalizer throwing an exception has been
    fixed.
  * Enable/disable boefjes notification correctly shows name instead of ID.
- * Wrongly displayed clearance level in organization membe rlist has been fixed.
+ * Wrongly displayed clearance level in organization member list has been fixed.
  * A task will be rescheduled if no results in bytes are found after a grace
    period
  * The nmap boefje will only report open ports reducing the amount of data in
