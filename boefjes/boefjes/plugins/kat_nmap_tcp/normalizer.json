@@ -1,6 +1,7 @@
 {
     "id": "kat_nmap_normalize",
     "consumes": [
+        "nmap",
         "nmap-tcp",
         "nmap-udp",
         "nmap-ports",
