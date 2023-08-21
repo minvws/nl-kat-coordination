@@ -1,9 +1,10 @@
+import logging
 import os
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional, Tuple, Type
 
-from pydantic import AmqpDsn, AnyHttpUrl, Field, PostgresDsn
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import AmqpDsn, AnyHttpUrl, Field, PostgresDsn, fields
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 
 BASE_DIR: Path = Path(__file__).parent.parent.parent.resolve()
 
@@ -12,18 +13,31 @@ if os.getenv("DOCS"):
     BASE_DIR = Path("../../../")
 
 
-# class BackwardsCompatibleEnvSettings(PydanticBaseSettingsSource):
-#
-#     def get_field_value(self, field: FieldInfo, field_name: str) -> Tuple[Any, str, bool]:
-#
-#     def __call__(self) -> Dict[str, Any]:
-# /
-#         for old_name, new_name in self.backwards_compatibility_mapping.items():
-#
-#             # New variable not explicitly set through env,
-#             # ...but old variable has been explicitly set through env
-#             if new_name not in env_vars and old_name in env_vars:
-#
+class BackwardsCompatibleEnvSettings(PydanticBaseSettingsSource):
+    backwards_compatibility_mapping = {
+        "SCHEDULER_RABBITMQ_DSN": "QUEUE_URI",
+        "SCHEDULER_DB_DSN": "SCHEDULER_DB_URI",
+    }
+
+    def get_field_value(self, field: fields.FieldInfo, field_name: str) -> Tuple[Any, str, bool]:
+        return super().get_field_value(field, field_name)
+
+    def __call__(self) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
+        env_vars = {k.lower(): v for k, v in os.environ.items()}
+        env_prefix = self.settings_cls.model_config.get("env_prefix").lower()
+
+        for old_name, new_name in self.backwards_compatibility_mapping.items():
+            old_name, new_name = old_name.lower(), new_name.lower()
+
+            # New variable not explicitly set through env,
+            # ...but old variable has been explicitly set through env
+            if new_name not in env_vars and old_name in env_vars:
+                logging.warning("Deprecation: %s is deprecated, use %s instead", old_name.upper(), new_name.upper())
+                d[new_name[len(env_prefix):]] = env_vars[old_name]
+
+        return d
+
 
 
 class Settings(BaseSettings):
@@ -168,12 +182,13 @@ class Settings(BaseSettings):
         description="Scheduler Postgres DB URI"
     )
 
-    # @classmethod
-    # def settings_customise_sources(
-    #     cls,
-    #     settings_cls: Type[BaseSettings],
-    #     init_settings: PydanticBaseSettingsSource,
-    #     env_settings: PydanticBaseSettingsSource,
-    #     dotenv_settings: PydanticBaseSettingsSource,
-    #     file_secret_settings: PydanticBaseSettingsSource,
-    # ) -> Tuple[PydanticBaseSettingsSource, ...]:
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        return (init_settings, env_settings, dotenv_settings, file_secret_settings, BackwardsCompatibleEnvSettings(settings_cls))
