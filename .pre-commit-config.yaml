@@ -79,8 +79,7 @@ repos:
           requirements-.*.txt$ |
           retirejs.json$ |
           ^boefjes/boefjes/plugins/kat_fierce/lists |
-          ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
-          ^boefjes/tests/examples/inputs/cve-result-with-cvss2.json |
+          ^boefjes/tests/examples |
           ^keiko/glossaries |
           ^keiko/templates/.*/template.tex$ |
           ^rocky/assets/js/vendor |
