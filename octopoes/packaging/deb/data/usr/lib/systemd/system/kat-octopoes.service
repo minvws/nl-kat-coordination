@@ -8,6 +8,7 @@ User=kat
 Group=kat
 SyslogIdentifier=kat-octopoes
 WorkingDirectory=/opt/venvs/kat-octopoes
+EnvironmentFile=/usr/lib/kat/octopoes.defaults
 EnvironmentFile=/etc/kat/octopoes.conf
 ExecStart=/opt/venvs/kat-octopoes/bin/python -m gunicorn \
           --access-logfile - \
