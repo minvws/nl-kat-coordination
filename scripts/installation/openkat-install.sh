@@ -187,19 +187,19 @@ echo "Step 4.6.4 - Update KATALOGUS_DB_URI in /etc/kat/boefjes.conf to ${KATALOG
 sudo sed -i "/KATALOGUS_DB_URI=/s/.*/KATALOGUS_DB_URI=postgresql:\/\/katalogus:${KATALOGUSDB_PASSWORD}@localhost\/katalogus_db/" /etc/kat/boefjes.conf
 
 echo "Step 4.6.5 - Update SCHEDULER_DSP_BROKER_URL in /etc/kat/mula.conf to ${RABBITMQ_PASSWORD}"
-sudo sed -i "/SCHEDULER_DSP_BROKER_URL=/s/.*/SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/mula.conf
+sudo sed -i "/SCHEDULER_DSP_BROKER_URL=/s/.*/SCHEDULER_DSP_BROKER_URL=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/mula.conf
 
 echo "Step 4.6.6 - Update SCHEDULER_RABBITMQ_DSN in /etc/kat/mula.conf to ${RABBITMQ_PASSWORD}"
-sudo sed -i "/SCHEDULER_RABBITMQ_DSN=/s/.*/SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/mula.conf
+sudo sed -i "/SCHEDULER_RABBITMQ_DSN=/s/.*/SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/mula.conf
 
 echo "Step 4.6.7 - Update SCHEDULER_DB_DSN in /etc/kat/mula.conf to ${MULADB_PASSWORD}"
 sudo sed -i "/SCHEDULER_DB_DSN=/s/.*/SCHEDULER_DB_DSN=postgresql:\/\/mula:${MULADB_PASSWORD}@localhost\/mula_db/" /etc/kat/mula.conf
 
 echo "Step 4.6.8 - Update QUEUE_URI in rocky.conf, bytes.conf, boefjes.conf, octopoes.conf to ${RABBITMQ_PASSWORD}"
-sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/rocky.conf
-sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/bytes.conf
-sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/boefjes.conf
-sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@localhost:5672\/kat/" /etc/kat/octopoes.conf
+sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/rocky.conf
+sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/bytes.conf
+sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/boefjes.conf
+sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/octopoes.conf
 
 echo "Step 4.7 - Initialize databases"
 
