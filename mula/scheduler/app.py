@@ -1,7 +1,7 @@
 import logging
 import os
 import threading
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, Union
 
 from opentelemetry import trace
 
@@ -58,7 +58,9 @@ class App:
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
 
-        self.schedulers: Dict[str, schedulers.Scheduler] = {}
+        self.schedulers: Dict[
+            str, Union[schedulers.Scheduler, schedulers.BoefjeScheduler, schedulers.NormalizerScheduler]
+        ] = {}
         self.server: Optional[server.Server] = None
 
     def initialize_boefje_schedulers(self) -> None:
@@ -100,7 +102,9 @@ class App:
         # by the schedulers, and the organisation id's that are in the
         # Katalogus service. We will add/remove schedulers based on the
         # difference between these two sets.
-        scheduler_orgs: Set[str] = {s.organisation.id for s in current_schedulers.values()}
+        scheduler_orgs: Set[str] = {
+            s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
+        }
         katalogus_orgs: Set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
@@ -112,7 +116,9 @@ class App:
         # We need to get scheduler ids of the schedulers that are associated
         # with the removed organisations
         removal_scheduler_ids: Set[str] = {
-            s.scheduler_id for s in current_schedulers.values() if s.organisation.id in removals
+            s.scheduler_id
+            for s in current_schedulers.values()
+            if hasattr(s, "organisation") and s.organisation.id in removals
         }
 
         # Remove schedulers for removed organisations
@@ -178,13 +184,17 @@ class App:
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the
-        following processes:
+                following processes:
 
-            * schedulers
-            * listeners
-            * monitors
-            * metrics collecting
-            * api server
+        <<<<<<< HEAD
+                    * api server
+        =======
+        >>>>>>> main
+                    * schedulers
+                    * listeners
+                    * monitors
+                    * metrics collecting
+                    * api server
         """
         # Start the schedulers
         self.initialize_boefje_schedulers()

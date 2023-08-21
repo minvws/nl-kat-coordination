@@ -84,7 +84,7 @@ class Settings(BaseSettings):
 
     octopoes_request_timeout: int = Field(
         10,
-        description="The timeout in seconds for the requests to the octopoes " "api",
+        description="The timeout in seconds for the requests to the octopoes api",
     )
 
     rabbitmq_prefetch_count: int = Field(
@@ -158,17 +158,17 @@ class Settings(BaseSettings):
 
     pq_interval: int = Field(
         60,
-        description="Interval in seconds of the " "execution of the `` method of the `scheduler.Scheduler` class",
+        description="Interval in seconds of the execution of the `` method of the `scheduler.Scheduler` class",
     )
 
     pq_grace_period: int = Field(
         86400,
-        description="Grace period of when a job is considered to be running " "again in seconds",
+        description="Grace period of when a job is considered to be running again in seconds",
     )
 
     pq_max_random_objects: int = Field(
         50,
-        description="The maximum number of random objects that can be added " "to the priority queue, per call",
+        description="The maximum number of random objects that can be added to the priority queue, per call",
     )
 
     # Database settings

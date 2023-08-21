@@ -1,8 +1,11 @@
 import json
+import logging
 import time
 from functools import partial, wraps
 
 import sqlalchemy
+
+logger = logging.getLogger(__name__)
 
 
 class DBConn:
