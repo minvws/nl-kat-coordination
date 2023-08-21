@@ -19,6 +19,9 @@
 
             <div>
                 {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
+                {% if is_question %}
+                  {% include "forms/json_schema_form.html" with json_schema=ooi.json_schema %}
+                {% endif %}
             </div>
 
             <div>
@@ -108,7 +111,6 @@
                 {% endif %}
                 {% if ooi.scan_profile.scan_profile_type == 'inherited' %}
                     {% include "partials/explanations.html" %}
-
                 {% endif %}
             </div>
         </section>
@@ -117,4 +119,7 @@
 {% block html_at_end_body %}
     {{ block.super }}
     <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% if is_question %}
+    <script src="{% static "/js/jsonSchemaToForm.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endif %}
 {% endblock html_at_end_body %}

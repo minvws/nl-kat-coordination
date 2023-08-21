@@ -20,6 +20,7 @@
                 </p>
                 {{ object_type_filters }}
                 {% include "partials/findings_list_toolbar.html" %}
+                {% include "findings/findings_filter.html" %}
 
                 {% translate "Object list" as filter_title %}
                 {% if object_list|length > 1 and perms.tools.can_mute_findings %}

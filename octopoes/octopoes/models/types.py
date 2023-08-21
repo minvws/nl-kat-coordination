@@ -19,6 +19,7 @@ from octopoes.models.ooi.dns.records import (
     DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
+    DNSPTRRecord,
     DNSSOARecord,
     DNSTXTRecord,
 )
@@ -55,7 +56,7 @@ from octopoes.models.ooi.network import (
     Network,
 )
 from octopoes.models.ooi.question import Question
-from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
     RESTAPI,
@@ -85,6 +86,7 @@ DnsRecordType = Union[
     DNSTXTRecord,
     DNSMXRecord,
     DNSNSRecord,
+    DNSPTRRecord,
     DNSSOARecord,
     DNSCNAMERecord,
     ResolvedHostname,
@@ -108,7 +110,7 @@ NetworkType = Union[
     IPV6NetBlock,
     IPPort,
 ]
-ServiceType = Union[Service, IPService]
+ServiceType = Union[Service, IPService, TLSCipher]
 SoftwareType = Union[Software, SoftwareInstance]
 WebType = Union[
     Website,

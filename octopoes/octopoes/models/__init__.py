@@ -15,8 +15,7 @@ from typing import (
     Union,
 )
 
-from pydantic import BaseModel, Field
-from typing_extensions import Annotated
+from pydantic import BaseModel
 
 
 class ScanLevel(IntEnum):
@@ -67,9 +66,7 @@ class InheritedScanProfile(ScanProfileBase):
     scan_profile_type: Literal["inherited"] = ScanProfileType.INHERITED.value
 
 
-ScanProfile = Annotated[
-    Union[EmptyScanProfile, InheritedScanProfile, DeclaredScanProfile], Field(discriminator="scan_profile_type")
-]
+ScanProfile = Union[EmptyScanProfile, InheritedScanProfile, DeclaredScanProfile]
 
 
 class OOI(BaseModel, abc.ABC):

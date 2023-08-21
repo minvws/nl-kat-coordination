@@ -9,7 +9,7 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Member account setup" %}</h1>
+                <h1>{{ view.kwargs.account_type|capfirst }}{% translate " member account setup" %}</h1>
                 <form novalidate  method="post" class="horizontal-view help">
                     {% csrf_token %}
                     {% translate "Member details" as fieldset_legend %}

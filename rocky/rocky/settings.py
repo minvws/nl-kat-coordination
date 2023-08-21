@@ -26,6 +26,8 @@ env = environ.Env(
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+environ.Env.read_env(BASE_DIR / ".env")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -344,6 +346,7 @@ CSP_FRAME_ANCESTORS = ["'none'"]
 CSP_BASE = ["'none'"]
 CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
+CSP_CONNECT_SRC = ["'self'"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 

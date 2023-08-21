@@ -71,13 +71,13 @@ class BytesClient:
             ),
         )
 
-    def upload_raw(self, raw: bytes, manual_mime_types: Set[str]):
+    def upload_raw(self, raw: bytes, manual_mime_types: Set[str], input_ooi: Optional[str] = None):
         self.login()
 
         boefje_meta = BoefjeMeta(
             id=str(uuid.uuid4()),
             boefje=Boefje(id="manual"),
-            input_ooi=None,
+            input_ooi=input_ooi,
             arguments={},
             organization=self.organization,
             started_at=datetime.now(timezone.utc),
