@@ -31,7 +31,12 @@ class BackwardsCompatibleEnvSettings:
             # ...but old variable has been explicitly set through env
             if new_name not in env_vars and old_name in env_vars:
                 logging.warning("Deprecation: %s is deprecated, use %s instead", old_name.upper(), new_name.upper())
-                d[new_name[len(env_prefix) :]] = env_vars[old_name]
+                if new_name == "queue_uri":
+                    d["host_mutation"] = env_vars[old_name]
+                    d["host_raw_data"] = env_vars[old_name]
+                    d["host_normalizer_meta"] = env_vars[old_name]
+                else:
+                    d[new_name[len(env_prefix) :]] = env_vars[old_name]
 
         return d
 
