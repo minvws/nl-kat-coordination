@@ -1,19 +1,17 @@
 {% load i18n %}
 
-{% with plugin_type=request.GET.plugin_type %}
-    <div>
-        <nav class="tabs" aria-label="{% translate "Plugins Navigation" %}">
-            <ul>
-                <li {% if not plugin_type %}aria-current="page"{% endif %}>
-                    <a href="{% url 'katalogus' organization.code %}">{% translate "All" %}</a>
-                </li>
-                <li {% if plugin_type == "boefje" %}aria-current="page"{% endif %}>
-                    <a href="{% url 'katalogus' organization.code %}?plugin_type=boefje">{% translate "Boefjes" %}</a>
-                </li>
-                <li {% if plugin_type == "normalizer" %}aria-current="page"{% endif %}>
-                    <a href="{% url 'katalogus' organization.code %}?plugin_type=normalizer">{% translate "Normalizers" %}</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-{% endwith %}
+<div>
+    <nav class="tabs" aria-label="{% translate "Plugins Navigation" %}">
+        <ul>
+            <li {% if active == "all" %}aria-current="page"{% endif %}>
+                <a href="{% url 'katalogus' organization.code %}">{% translate "All" %}</a>
+            </li>
+            <li {% if active == "boefjes" %}aria-current="page"{% endif %}>
+                <a href="{% url 'boefjes_list' organization.code %}">{% translate "Boefjes" %}</a>
+            </li>
+            <li {% if active == "normalizers" %}aria-current="page"{% endif %}>
+                <a href="{% url 'normalizers_list' organization.code %}">{% translate "Normalizers" %}</a>
+            </li>
+        </ul>
+    </nav>
+</div>

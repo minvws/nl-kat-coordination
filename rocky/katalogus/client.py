@@ -132,10 +132,9 @@ class KATalogusClientV1:
         return ServiceHealth.parse_obj(response.json())
 
     def get_normalizers(self) -> List[Normalizer]:
-        response = self.session.get(f"{self.organization_uri}/plugins")
+        response = self.session.get(f"{self.organization_uri}/plugins?plugin_type=normalizer")
         response.raise_for_status()
-
-        return [parse_normalizer(plugin) for plugin in response.json() if plugin["type"] == "normalizer"]
+        return [parse_plugin(plugin) for plugin in response.json()]
 
     def get_boefjes(self) -> List[Plugin]:
         response = self.session.get(f"{self.organization_uri}/plugins?plugin_type=boefje")

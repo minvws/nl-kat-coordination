@@ -9,6 +9,21 @@ from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 
 
+class KATalogusBreadCrumbsMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {
+                "url": reverse(
+                    "katalogus",
+                    kwargs={"organization_code": self.organization.code},
+                ),
+                "text": _("KAT-alogus"),
+            },
+        ]
+        return context
+
+
 class KATalogusFilterView(FormView):
     form_class = KATalogusFilter
 
@@ -48,7 +63,7 @@ class KATalogusFilterView(FormView):
             return sorted(queryset, key=lambda item: item["enabled"])
 
 
-class KATalogusView(OrganizationView, ListView, KATalogusFilterView):
+class KATalogusView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATalogusFilterView):
     """View of all plugins in KAT-alogus"""
 
     template_name = "katalogus.html"
@@ -60,21 +75,8 @@ class KATalogusView(OrganizationView, ListView, KATalogusFilterView):
     def get_queryset(self):
         return self.filter_katalogus(self.katalogus_client.get_all_plugins())
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {
-                "url": reverse(
-                    "katalogus",
-                    kwargs={"organization_code": self.organization.code},
-                ),
-                "text": _("KAT-alogus"),
-            },
-        ]
-        return context
 
-
-class BoefjesListView(ListView, KATalogusFilterView):
+class BoefjesListView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATalogusFilterView):
     template_name = "boefjes.html"
 
     def setup(self, request, *args, **kwargs):
@@ -83,3 +85,14 @@ class BoefjesListView(ListView, KATalogusFilterView):
 
     def get_queryset(self):
         return self.filter_katalogus(self.katalogus_client.get_boefjes())
+
+
+class NormalizerListView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATalogusFilterView):
+    template_name = "normalizers.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.katalogus_client = get_katalogus(self.organization.code)
+
+    def get_queryset(self):
+        return self.filter_katalogus(self.katalogus_client.get_normalizers())

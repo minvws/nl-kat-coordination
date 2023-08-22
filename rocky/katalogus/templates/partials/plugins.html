@@ -1,0 +1,40 @@
+{% load i18n %}
+{% load static %}
+
+{% if request.GET.view == "table" %}
+    <div class="horizontal-scroll">
+        <table>
+            <caption>{% translate "Boefjes overview:" %}</caption>
+            <thead>
+                <tr>
+                    <th>{% translate "Boefje name" %}</th>
+                    <th>{% translate "Boefje description" %}</th>
+                    <th colspan="2">{% translate "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plugin in object_list %}
+                    <tr id="plugin_{{ plugin.id|slugify }}">
+                        <td scope="row">{{ plugin.name }}</td>
+                        <td>{{ plugin.description }}</td>
+                        <td>
+                            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
+
+                        </td>
+                        <td>
+                            <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
+                               class="nowrap">{% translate "See details" %}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="column-4 tiles plugins images-cover">
+        {% for plugin in object_list %}
+            {% include "partials/plugin_tile.html" with plugin=plugin %}
+
+        {% endfor %}
+    </div>
+{% endif %}

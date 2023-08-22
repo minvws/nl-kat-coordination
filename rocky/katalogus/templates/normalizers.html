@@ -9,19 +9,21 @@
     <main id="main-content" tabindex="-1" class="katalogus">
         <section>
             {% include "partials/katalogus_header.html" %}
-            {% include "partials/plugins_navigation.html" with active="all" %}
+            {% include "partials/plugins_navigation.html" with active="normalizers" %}
 
             <div class="fifty-fifty">
                 <div>
-                    <h2>All plugins</h2>
+                    <h2>Normalizers</h2>
                     <p>
                         {% blocktranslate %}
-                            Plugins gather data, objects and insight. Each plugin has its own focus area
-                            and strengths and may be able to work with other plugins to gain even more insights.
+                            Read the dataset and search for specific objects to add to your objectlist
+                            as a separate object. Each normalizer searches for a specific object.
+                            You could run one to find all the phonenumbers within a document,
+                            as well as a normalizer to find all the url's.
                         {% endblocktranslate %}
                     </p>
                     <p class="emphasized">
-                        <strong>{{ object_list|length }}</strong> Plugins {% translate "available" %}
+                        <strong>{{ object_list|length }}</strong> Normalizers {% translate "available" %}
                     </p>
                 </div>
             </div>

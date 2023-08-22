@@ -1,47 +1,34 @@
+{% extends "layouts/base.html" %}
+
 {% load i18n %}
+{% load static %}
 
-{% if request.GET.view == "table" %}
-    <section>
-        <div>
-            <div class="horizontal-scroll">
-                <table>
-                    <caption>{% translate "Boefjes overview:" %}</caption>
-                    <thead>
-                        <tr>
-                            <th>{% translate "Boefje name" %}</th>
-                            <th>{% translate "Boefje description" %}</th>
-                            <th colspan="2">{% translate "Actions" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for plugin in object_list %}
-                            <tr id="plugin_{{ plugin.id|slugify }}">
-                                <td scope="row">{{ plugin.name }}</td>
-                                <td>{{ plugin.description }}</td>
-                                <td>
-                                    {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
+{% block content %}
+    {% include "header.html" %}
 
-                                </td>
-                                <td>
-                                    <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
-                                       class="nowrap">{% translate "See details" %}</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <main id="main-content" tabindex="-1" class="katalogus">
+        <section>
+            {% include "partials/katalogus_header.html" %}
+            {% include "partials/plugins_navigation.html" with active="boefjes" %}
+
+            <div class="fifty-fifty">
+                <div>
+                    <h2>Boefjes</h2>
+                    <p>
+                        {% blocktranslate %}
+                            Boefjes are used to scan for objects. They detect vulnerabilities, security issues, and
+                            to give insight. Each boefje is a separate scan that can run on a selection of objects.
+                        {% endblocktranslate %}
+                    </p>
+                    <p class="emphasized">
+                        <strong>{{ object_list|length }}</strong> Boefjes {% translate "available" %}
+                    </p>
+                </div>
             </div>
-        </div>
-    </section>
-{% else %}
-    <section>
-        <div>
-            <div class="column-4 tiles plugins images-cover">
-                {% for plugin in object_list %}
-                    {% include "partials/plugin_tile.html" with plugin=plugin %}
+            {% include "partials/katalogus_filter.html" with form=form %}
+            {% include "partials/katalogus_toolbar.html" %}
+            {% include "partials/plugins.html" %}
 
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-{% endif %}
+        </section>
+    </main>
+{% endblock content %}
