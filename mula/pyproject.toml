@@ -22,11 +22,11 @@ typing-extensions = "^4.5.0"
 uvicorn = "^0.17.1"
 
 # OpenTelemetry
-opentelemetry-sdk = "^1.18.0"
-opentelemetry-exporter-otlp-proto-grpc = "^1.18.0"
-opentelemetry-instrumentation-fastapi = "^0.39b0"
-opentelemetry-instrumentation-psycopg2 = "^0.39b0"
-opentelemetry-instrumentation-requests = "^0.39b0"
+opentelemetry-sdk = "^1.19.0"
+opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
+opentelemetry-instrumentation-fastapi = "^0.40b0"
+opentelemetry-instrumentation-psycopg2 = "^0.40b0"
+opentelemetry-instrumentation-requests = "^0.40b0"
 certifi = "^2023.7.22"
 
 [tool.poetry.group.dev.dependencies]

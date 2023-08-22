@@ -7,7 +7,7 @@ User=kat
 Group=kat
 SyslogIdentifier=kat-mula
 WorkingDirectory=/opt/venvs/kat-mula/
-# TODO: don't load env here. It exposes the values over dbus IPC
+EnvironmentFile=/usr/lib/kat/mula.defaults
 EnvironmentFile=/etc/kat/mula.conf
 ExecStart=/opt/venvs/kat-mula/bin/python -m scheduler
 Restart=on-failure
