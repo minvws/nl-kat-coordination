@@ -184,17 +184,13 @@ class App:
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the
-                following processes:
+        following processes:
 
-        <<<<<<< HEAD
-                    * api server
-        =======
-        >>>>>>> main
-                    * schedulers
-                    * listeners
-                    * monitors
-                    * metrics collecting
-                    * api server
+            * schedulers
+            * listeners
+            * monitors
+            * metrics collecting
+            * api server
         """
         # Start the schedulers
         self.initialize_boefje_schedulers()

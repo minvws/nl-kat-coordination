@@ -240,6 +240,7 @@ class BoefjeScheduler(Scheduler):
                     self.organisation.id,
                     self.scheduler_id,
                 )
+                continue
 
             with futures.ThreadPoolExecutor() as executor:
                 for ooi in oois_by_object_type:

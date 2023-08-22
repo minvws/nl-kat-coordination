@@ -46,7 +46,13 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.coverage.run]
 omit = [
-    "scheduler/alembic/*"
+    "scheduler/alembic/*",
+    "scheduler/connectors/*",
+    "scheduler/config/*",
+    "scheduler/context/*",
+    "scheduler/models/*",
+    "scheduler/utils/*",
+    "scheduler/__main__.py",
 ]
 
 [tool.black]

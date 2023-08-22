@@ -437,3 +437,24 @@ class PriorityQueueTestCase(unittest.TestCase):
         # Pop the item
         popped_item = self.pq.pop()
         self.assertEqual(first_item.priority, popped_item.priority)
+
+    def test_is_item_on_queue(self):
+        """When checking if an item is on the queue, it should return True if
+        the item is on the queue, and False if it isn't.
+        """
+        # Add an item to the queue
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=item)
+
+        # Check if the item is on the queue
+        self.assertTrue(self.pq.is_item_on_queue(item))
+
+    def test_is_item_not_on_queue(self):
+        """When checking if an item is on the queue, it should return True if
+        the item is on the queue, and False if it isn't.
+        """
+        # Add an item to the queue
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+
+        # Check if the item is on the queue
+        self.assertFalse(self.pq.is_item_on_queue(item))
