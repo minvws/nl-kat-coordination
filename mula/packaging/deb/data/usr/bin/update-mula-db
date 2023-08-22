@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -ae
+source /usr/lib/kat/mula.defaults
 source /etc/kat/mula.conf
 cd /opt/venvs/kat-mula/lib/python*/site-packages
 /opt/venvs/kat-mula/bin/python -m alembic --config scheduler/alembic.ini upgrade head
