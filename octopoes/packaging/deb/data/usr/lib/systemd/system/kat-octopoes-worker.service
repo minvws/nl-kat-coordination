@@ -7,6 +7,7 @@ User=kat
 Group=kat
 SyslogIdentifier=kat-octopoes-worker
 WorkingDirectory=/opt/venvs/kat-octopoes
+EnvironmentFile=/usr/lib/kat/octopoes.defaults
 EnvironmentFile=/etc/kat/octopoes.conf
 ExecStart=/opt/venvs/kat-octopoes/bin/python -m celery -A octopoes.tasks.tasks worker -B -s /tmp/celerybeat-schedule --loglevel=WARNING
 Restart=on-failure
