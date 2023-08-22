@@ -27,7 +27,7 @@ def test_health(requests_mock, patch_pika, xtdbtype_crux):
     }
 
     requests_mock.real_http = True
-    requests_mock.get("http://crux:3000/_crux/status", json=crux_status, status_code=200)
+    requests_mock.get("http://testxtdb:3000/_crux/status", json=crux_status, status_code=200)
     response = client.get("/_dev/health")
     assert response.json() == {
         "service": "octopoes",
@@ -49,7 +49,7 @@ def test_health(requests_mock, patch_pika, xtdbtype_crux):
 
 def test_health_no_xtdb_connection(requests_mock, patch_pika):
     requests_mock.real_http = True
-    requests_mock.get("http://crux:3000/_crux/status", exc=requests.exceptions.ConnectTimeout)
+    requests_mock.get("http://testxtdb:3000/_crux/status", exc=requests.exceptions.ConnectTimeout)
     response = client.get("/_dev/health")
     assert response.json() == {
         "service": "octopoes",
@@ -84,7 +84,7 @@ def test_get_scan_profiles(requests_mock, patch_pika, xtdbtype_crux):
         "xt/id": "ScanProfile|DNSZone|internet|mispo.es",
     }
     requests_mock.post(
-        "http://crux:3000/_crux/query",
+        "http://testxtdb:3000/_crux/query",
         json=[[scan_profile]],
         status_code=200,
     )
@@ -108,7 +108,7 @@ def test_delete_node(xtdbtype_crux):
 def test_create_node_multinode(requests_mock):
     requests_mock.real_http = True
     requests_mock.post(
-        "http://crux:3000/_xtdb/create-node",
+        "http://testxtdb:3000/_xtdb/create-node",
         json={"created": "true"},
         status_code=200,
     )
@@ -119,7 +119,7 @@ def test_create_node_multinode(requests_mock):
 def test_delete_node_multinode(requests_mock):
     requests_mock.real_http = True
     requests_mock.post(
-        "http://crux:3000/_xtdb/delete-node",
+        "http://testxtdb:3000/_xtdb/delete-node",
         json={"deleted": "true"},
         status_code=200,
     )
@@ -154,7 +154,7 @@ def test_count_findings_by_severity(requests_mock, patch_pika, xtdbtype_crux, ca
     ]
 
     requests_mock.post(
-        "http://crux:3000/_crux/query",
+        "http://testxtdb:3000/_crux/query",
         json=xt_response,
         status_code=200,
     )

@@ -48,11 +48,11 @@ drf-standardized-errors = "^0.12.5"
 reportlab = "^3.6.13"
 
 # OpenTelemetry
-opentelemetry-sdk = "^1.18.0"
-opentelemetry-exporter-otlp-proto-grpc = "^1.18.0"
-opentelemetry-instrumentation-django = "^0.39b0"
-opentelemetry-instrumentation-psycopg2 = "^0.39b0"
-opentelemetry-instrumentation-requests = "^0.39b0"
+opentelemetry-sdk = "^1.19.0"
+opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
+opentelemetry-instrumentation-django = "^0.40b0"
+opentelemetry-instrumentation-psycopg2 = "^0.40b0"
+opentelemetry-instrumentation-requests = "^0.40b0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -84,8 +84,8 @@ factory-boy = "^3.2.1"
 
 # NOTE: pip does not yet support hash verification for git dependencies;
 # rocky's requirements-dev.txt unfortunately has no hashing until then
-# a2150fabf92ca73de77f0542ee9ec6545e4f175d -> Fix for models with unique fields
-django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "a2150fabf92ca73de77f0542ee9ec6545e4f175d" }
+# f6eb4cbb9112b5aa933313d79e4da823adb41e1e -> Remove pip import in setup.py
+django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
 
 [build-system]
 requires = ["setuptools>=62.2", "wheel"]

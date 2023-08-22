@@ -9,7 +9,7 @@ User = get_user_model()
 
 
 class ClearanceLevelSelect(forms.Select):
-    """Only level 2 is enabled in onboarding flow"""
+    """A custom clearance level selection, disabling some clearance levels"""
 
     def create_option(self, *args, **kwargs):
         option = super().create_option(*args, **kwargs)
