@@ -1,0 +1,19 @@
+{% load i18n %}
+
+{% with plugin_type=request.GET.plugin_type %}
+    <div>
+        <nav class="tabs" aria-label="{% translate "Plugins Navigation" %}">
+            <ul>
+                <li {% if not plugin_type %}aria-current="page"{% endif %}>
+                    <a href="{% url 'katalogus' organization.code %}">{% translate "All" %}</a>
+                </li>
+                <li {% if plugin_type == "boefje" %}aria-current="page"{% endif %}>
+                    <a href="{% url 'katalogus' organization.code %}?plugin_type=boefje">{% translate "Boefjes" %}</a>
+                </li>
+                <li {% if plugin_type == "normalizer" %}aria-current="page"{% endif %}>
+                    <a href="{% url 'katalogus' organization.code %}?plugin_type=normalizer">{% translate "Normalizers" %}</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+{% endwith %}

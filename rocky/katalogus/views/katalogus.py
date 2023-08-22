@@ -1,21 +1,15 @@
 from typing import Any, Dict
 
 from account.mixins import OrganizationView
-from django.contrib import messages
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, ListView
-from requests import RequestException
 
 from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 
 
-class KATalogusView(ListView, OrganizationView, FormView):
-    """View of all plugins in KAT-alogus"""
-
-    template_name = "katalogus.html"
+class KATalogusFilterView(FormView):
     form_class = KATalogusFilter
 
     def get_initial(self) -> Dict[str, Any]:
@@ -26,33 +20,7 @@ class KATalogusView(ListView, OrganizationView, FormView):
 
         return initial
 
-    def get(self, request, *args, **kwargs):
-        katalogus_client = get_katalogus(self.organization.code)
-
-        try:
-            self.all_plugins = katalogus_client.get_all_plugins()
-        except RequestException:
-            messages.add_message(
-                self.request, messages.ERROR, _("Loading plugins in KATalogus failed. Please check the KATalogus logs.")
-            )
-            return redirect(reverse("organization_crisis_room", kwargs={"organization_code": self.organization.code}))
-
-        self.set_katalogus_view(kwargs)
-        return super().get(request, *args, **kwargs)
-
-    def set_katalogus_view(self, kwargs):
-        self.view = ""
-        if "view" in kwargs:
-            self.view = kwargs["view"]
-
-    def get_all_boefjes(self):
-        return [plugin for plugin in self.all_plugins if plugin["type"] == "boefje"]
-
-    def get_all_normalizers(self):
-        return [plugin for plugin in self.all_plugins if plugin["type"] == "normalizer"]
-
-    def get_queryset(self):
-        queryset = self.get_all_boefjes()
+    def filter_katalogus(self, queryset):
         if "filter_options" in self.request.GET:
             filter_options = self.request.GET.get("filter_options")
             queryset = self.filter_queryset(queryset, filter_options)
@@ -79,13 +47,39 @@ class KATalogusView(ListView, OrganizationView, FormView):
         if sort_options == "disabled-enabled":
             return sorted(queryset, key=lambda item: item["enabled"])
 
+
+class KATalogusView(OrganizationView, ListView, KATalogusFilterView):
+    """View of all plugins in KAT-alogus"""
+
+    template_name = "katalogus.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.katalogus_client = get_katalogus(self.organization.code)
+
+    def get_queryset(self):
+        return self.filter_katalogus(self.katalogus_client.get_all_plugins())
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {
-                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
+                "url": reverse(
+                    "katalogus",
+                    kwargs={"organization_code": self.organization.code},
+                ),
                 "text": _("KAT-alogus"),
             },
         ]
-        context["view"] = self.view
         return context
+
+
+class BoefjesListView(ListView, KATalogusFilterView):
+    template_name = "boefjes.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.katalogus_client = get_katalogus(self.organization.code)
+
+    def get_queryset(self):
+        return self.filter_katalogus(self.katalogus_client.get_boefjes())

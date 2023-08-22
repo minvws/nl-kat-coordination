@@ -1,0 +1,25 @@
+{% load i18n %}
+
+{% with plugin_type=request.GET.plugin_type %}
+    <div class="fifty-fifty">
+        <div>
+            <h2>All plugins</h2>
+            <p>
+                {% blocktranslate %}
+                        Plugins gather data, objects and insight.
+                        Each plugin has its own focus area and strengths and
+                        may be able to work with other plugins to gain even more insights.
+                {% endblocktranslate %}
+            </p>
+            <p class="emphasized">
+                <strong>{{ object_list|length }}</strong>
+                {% if not plugin_type %}
+                    {% translate "Plugins" %}
+                {% else %}
+                    {{ plugin_type|title }}s
+                {% endif %}
+                {% translate "available" %}
+            </p>
+        </div>
+    </div>
+{% endwith %}

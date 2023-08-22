@@ -10,7 +10,6 @@ from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 
 urlpatterns = [
     path("", KATalogusView.as_view(), name="katalogus"),
-    path("view/<view>/", KATalogusView.as_view(), name="katalogus"),
     path(
         "settings/",
         KATalogusSettingsView.as_view(),

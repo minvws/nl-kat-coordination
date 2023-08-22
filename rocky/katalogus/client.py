@@ -38,6 +38,20 @@ class Plugin(BaseModel):
         return plugin_dict
 
 
+class Normalizer(BaseModel):
+    id: str
+    type: str
+    name: str
+    enabled: bool
+    consumes: List[str]
+    produces: Set[Type[OOI]]
+
+    def dict(self, *args, **kwargs):
+        plugin_dict = super().dict(*args, **kwargs)
+        plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
+        return plugin_dict
+
+
 class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
         self.session = requests.Session()
@@ -60,7 +74,18 @@ class KATalogusClientV1:
 
     def get_all_plugins(self):
         response = self.session.get(f"{self.organization_uri}/plugins")
-        return response.json()
+        response.raise_for_status()
+        return [parse_plugin(plugin) for plugin in response.json()]
+
+    def get_plugins_by_type(self, plugin_type):
+        response = self.session.get(f"{self.organization_uri}/plugins?plugin_type={plugin_type}")
+        response.raise_for_status()
+        return [parse_plugin(plugin) for plugin in response.json()]
+
+    def get_plugins(self, plugin_type: str = None):
+        if plugin_type:
+            return self.get_plugins_by_type(plugin_type)
+        return self.get_all_plugins()
 
     def get_plugin(self, plugin_id: str) -> Plugin:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
@@ -106,11 +131,16 @@ class KATalogusClientV1:
 
         return ServiceHealth.parse_obj(response.json())
 
-    def get_boefjes(self) -> List[Plugin]:
+    def get_normalizers(self) -> List[Normalizer]:
         response = self.session.get(f"{self.organization_uri}/plugins")
         response.raise_for_status()
 
-        return [parse_plugin(boefje) for boefje in response.json() if boefje["type"] == "boefje"]
+        return [parse_normalizer(plugin) for plugin in response.json() if plugin["type"] == "normalizer"]
+
+    def get_boefjes(self) -> List[Plugin]:
+        response = self.session.get(f"{self.organization_uri}/plugins?plugin_type=boefje")
+        response.raise_for_status()
+        return [parse_plugin(plugin) for plugin in response.json()]
 
     def enable_boefje(self, plugin: Plugin) -> None:
         self._patch_boefje_state(plugin.id, True, plugin.repository_id)
@@ -144,7 +174,28 @@ class KATalogusClientV1:
         return BytesIO(response.content)
 
 
+def parse_normalizer(plugin: Dict) -> Normalizer:
+    produces = set()
+    for ooi in plugin["produces"]:
+        with contextlib.suppress(StopIteration):
+            produces.add(type_by_name(ooi))
+
+    # TODO: give normalizers a proper name in backend
+    name = plugin["id"].replace("_", " ").replace("kat", "").title()
+
+    return Normalizer(
+        id=plugin["id"],
+        type=plugin["type"],
+        name=name,
+        enabled=plugin["enabled"],
+        consumes=plugin["consumes"],
+        produces=produces,
+    )
+
+
 def parse_plugin(plugin: Dict) -> Plugin:
+    if plugin["type"] == "normalizer":
+        return parse_normalizer(plugin)
     try:
         consumes = {type_by_name(consumes) for consumes in plugin["consumes"]}
     except StopIteration:
