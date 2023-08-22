@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -ae
+source /usr/lib/kat/boefjes.defaults
 source /etc/kat/boefjes.conf
 cd /opt/venvs/kat-boefjes/lib/python*/site-packages
 
