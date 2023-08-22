@@ -3142,7 +3142,7 @@ msgstr "Laat gedempte bevindingen zien"
 
 #: tools/forms/findings.py
 msgid "Show muted and non-muted findings"
-msgstr ""
+msgstr "Toon gedempte en niet-gedempte bevindingen"
 
 #: tools/forms/findings.py
 msgid "Filter by severity"
@@ -5021,6 +5021,7 @@ msgstr "Ja, stel in"
 msgid ""
 "An overview of the boefje task, the input OOI and the RAW data it generated."
 msgstr ""
+"Een overzicht van de boefje-taak, de invoer OOI en de RAW-gegevens die het heeft gegenereerd."
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -5379,6 +5380,7 @@ msgstr "Vrijwaringsniveau ingesteld."
 msgid ""
 "Can not parse observed_at parameter, falling back to showing current object"
 msgstr ""
+"Kan de parameter observed_at niet ontleden, terugvallen op het weergeven van het huidige object"
 
 #: rocky/views/mixins.py
 msgid "All"
