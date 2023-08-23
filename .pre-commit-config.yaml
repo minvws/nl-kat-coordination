@@ -14,7 +14,7 @@ repos:
       - id: end-of-file-fixer
         exclude: |
           (?x)(
-          ^boefjes/tests/examples/rdns-nxdomain.txt$ |
+          ^boefjes/tests/examples/rdns-nxdomain.txt$
           )
 
 
