@@ -26,12 +26,12 @@ urlpatterns = [
         name="confirm_clone_settings",
     ),
     path(
-        "/plugins/boefjes/",
+        "plugins/boefjes/",
         BoefjeListView.as_view(),
         name="boefjes_list",
     ),
     path(
-        "/plugins/normalizers/",
+        "plugins/normalizers/",
         NormalizerListView.as_view(),
         name="normalizers_list",
     ),

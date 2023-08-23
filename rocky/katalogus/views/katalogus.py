@@ -29,10 +29,8 @@ class KATalogusFilterView(FormView):
 
     def get_initial(self) -> Dict[str, Any]:
         initial = super().get_initial()
-
         initial["sorting_options"] = self.request.GET.get("sorting_options")
         initial["filter_options"] = self.request.GET.get("filter_options")
-
         return initial
 
     def filter_katalogus(self, queryset):
@@ -77,6 +75,8 @@ class KATalogusView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATal
 
 
 class BoefjeListView(KATalogusView):
+    """Showing only Boefjes in KAT-alogus"""
+
     template_name = "boefjes.html"
 
     def get_queryset(self):
@@ -84,6 +84,8 @@ class BoefjeListView(KATalogusView):
 
 
 class NormalizerListView(KATalogusView):
+    """Showing only Normalizers in KAT-alogus"""
+
     template_name = "normalizers.html"
 
     def get_queryset(self):

@@ -27,7 +27,7 @@ class Plugin(BaseModel):
     scan_level: SCAN_LEVEL
     consumes: Set[Type[OOI]]
     produces: Set[Type[OOI]]
-    enabled: bool = True
+    enabled: bool
 
     def dict(self, *args, **kwargs):
         """Pydantic does not stringify the OOI classes, but then templates can't render them"""
@@ -42,6 +42,7 @@ class Normalizer(BaseModel):
     id: str
     type: str
     name: str
+    repository_id: str
     enabled: bool
     consumes: List[str]
     produces: Set[Type[OOI]]
@@ -176,6 +177,7 @@ def parse_normalizer(plugin: Dict) -> Normalizer:
         id=plugin["id"],
         type=plugin["type"],
         name=name,
+        repository_id=plugin["repository_id"],
         enabled=plugin["enabled"],
         consumes=plugin["consumes"],
         produces=produces,
