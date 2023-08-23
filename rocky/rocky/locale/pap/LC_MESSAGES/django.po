@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-16 10:16+0000\n"
+"POT-Creation-Date: 2023-08-23 08:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3143,7 +3143,7 @@ msgstr "Filtra pa gravedat"
 
 #: tools/forms/findings.py
 msgid "Filter by muted findings"
-msgstr "Ekskluí Diskubrimentu den Mudansa"
+msgstr "Filtra pa diskubrimentu muted"
 
 #: tools/forms/ooi.py
 msgid "Filter types"
@@ -4635,6 +4635,12 @@ msgstr "Solamente mustra ophetonan di e tipo %(type)s"
 msgid "Select your language"
 msgstr "Selekshoná bo idioma"
 
+#: rocky/templates/partials/language-switcher.html
+#, python-format
+msgid ""
+"Current language is %(current_language)s. Choose your preferred language."
+msgstr "Idioma aktual ta %(current_language)s. Escoge bo idioma preferí."
+
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
 msgstr "Skonde opcionnan di filter"
@@ -5011,7 +5017,9 @@ msgstr "Si, poné na heredá"
 #: rocky/templates/tasks/boefje_task_detail.html
 msgid ""
 "An overview of the boefje task, the input OOI and the RAW data it generated."
-msgstr "Un bista general di e tarea boefje, e opheto di entrada OOI, y e datonan RAW cu el a generá."
+msgstr ""
+"Un bista general di e tarea boefje, e opheto di entrada OOI, y e datonan RAW "
+"cu el a generá."
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -5046,13 +5054,13 @@ msgstr "Opheto di entrada"
 msgid "No input OOI"
 msgstr "No tin entrada OOI"
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Download task data"
-msgstr "Descarga datonan di tarea"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Reschedule"
 msgstr "Kambia fecha"
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Download task data"
+msgstr "Descarga datonan di tarea"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
@@ -5366,7 +5374,8 @@ msgstr "Indemnizashon pone ku èxito."
 #: rocky/views/mixins.py
 msgid ""
 "Can not parse observed_at parameter, falling back to showing current object"
-msgstr "No por parse e parametro observed_at, regresando na munstra e opheto aktual"
+msgstr ""
+"No por parse e parametro observed_at, regresando na munstra e opheto aktual"
 
 #: rocky/views/mixins.py
 msgid "All"
@@ -5692,6 +5701,3 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
-
-#~ msgid "Download task details"
-#~ msgstr "Download detayes di tarea"
