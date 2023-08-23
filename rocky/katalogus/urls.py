@@ -1,7 +1,7 @@
 from django.urls import path
 
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
-from katalogus.views.katalogus import BoefjesListView, KATalogusView, NormalizerListView
+from katalogus.views.katalogus import BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -26,12 +26,12 @@ urlpatterns = [
         name="confirm_clone_settings",
     ),
     path(
-        "boefjes/",
-        BoefjesListView.as_view(),
+        "/plugins/boefjes/",
+        BoefjeListView.as_view(),
         name="boefjes_list",
     ),
     path(
-        "normalizers/",
+        "/plugins/normalizers/",
         NormalizerListView.as_view(),
         name="normalizers_list",
     ),

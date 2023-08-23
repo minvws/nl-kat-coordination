@@ -73,26 +73,18 @@ class KATalogusView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATal
         self.katalogus_client = get_katalogus(self.organization.code)
 
     def get_queryset(self):
-        return self.filter_katalogus(self.katalogus_client.get_all_plugins())
+        return self.filter_katalogus(self.katalogus_client.get_plugins())
 
 
-class BoefjesListView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATalogusFilterView):
+class BoefjeListView(KATalogusView):
     template_name = "boefjes.html"
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.katalogus_client = get_katalogus(self.organization.code)
 
     def get_queryset(self):
         return self.filter_katalogus(self.katalogus_client.get_boefjes())
 
 
-class NormalizerListView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATalogusFilterView):
+class NormalizerListView(KATalogusView):
     template_name = "normalizers.html"
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.katalogus_client = get_katalogus(self.organization.code)
 
     def get_queryset(self):
         return self.filter_katalogus(self.katalogus_client.get_normalizers())

@@ -72,20 +72,10 @@ class KATalogusClientV1:
         response = self.session.delete(f"{self.organization_uri}")
         response.raise_for_status()
 
-    def get_all_plugins(self):
+    def get_plugins(self):
         response = self.session.get(f"{self.organization_uri}/plugins")
         response.raise_for_status()
         return [parse_plugin(plugin) for plugin in response.json()]
-
-    def get_plugins_by_type(self, plugin_type):
-        response = self.session.get(f"{self.organization_uri}/plugins?plugin_type={plugin_type}")
-        response.raise_for_status()
-        return [parse_plugin(plugin) for plugin in response.json()]
-
-    def get_plugins(self, plugin_type: str = None):
-        if plugin_type:
-            return self.get_plugins_by_type(plugin_type)
-        return self.get_all_plugins()
 
     def get_plugin(self, plugin_id: str) -> Plugin:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
