@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-22 14:52+0000\n"
+"POT-Creation-Date: 2023-08-23 08:59+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -4647,8 +4647,7 @@ msgstr "Selecteer je taal"
 #, python-format
 msgid ""
 "Current language is %(current_language)s. Choose your preferred language."
-msgstr ""
-"De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
+msgstr "De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
 
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
@@ -5068,7 +5067,7 @@ msgstr "Geen input object"
 msgid "Reschedule"
 msgstr "Opnieuw plannen"
 
-#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Download task data"
 msgstr "Download taakgegevens"
 
