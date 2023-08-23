@@ -4635,12 +4635,6 @@ msgstr "Solamente mustra ophetonan di e tipo %(type)s"
 msgid "Select your language"
 msgstr "Selekshoná bo idioma"
 
-#: rocky/templates/partials/language-switcher.html
-#, python-format
-msgid ""
-"Current language is %(current_language)s. Choose your preferred language."
-msgstr "Idioma aktual ta %(current_language)s. Escoge bo idioma preferí."
-
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
 msgstr "Skonde opcionnan di filter"
