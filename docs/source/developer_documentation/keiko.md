@@ -19,9 +19,9 @@ Make sure `pdflatex` is installed and added to `$PATH`, because Keiko invokes
 _Recommended LateX distro for report developers: [MikTex](https://docs.miktex.org/manual/installing.html)_
 
 ## File system permissions
-Keiko needs to be able to write to the `reports` directory. The location of this folder is configurable with the
-environment variable `KEIKO_REPORTS_FOLDER`. If you are running Keiko as a non-root user, make sure that this directory
-is writable by the user.
+Keiko needs to be able to write to the `reports` directory, which should be created before running Keiko.
+The location of this folder is configurable with the environment variable `KEIKO_REPORTS_FOLDER`.
+If you are running Keiko as a non-root user, make sure that this directory is writable by the user.
 
 Keiko creates a temporary directory for each report, which is deleted after the report is compiled. This directory is
 created with Python's [tempfile module](https://docs.python.org/3/library/tempfile.html). This should by default work
