@@ -32,6 +32,21 @@ The high level documentation on OpenKAT explains the purpose and operation of Op
 - `the 'TL;DR' of 2 pages (English) <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/introduction/pdf/OpenKAT%20handout_ENG.pdf>`_
 - `the extensive brochure on OpenKAT (Dutch) <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/introduction/pdf/introductie%20OpenKAT%20V20220621.pdf>`_
 
+Translations
+============
+
+We currently support the following languages:
+
+- English (default; used in the source code)
+- Dutch
+- Papiamentu
+
+We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
+Community contributions are very welcome and can be made via Weblate's interface.
+This is a great way to help the project forward and doesn't require any technical expertise.
+If you would like to see OpenKAT in another language, let us know!
+
+
 Current release
 ===============
 
