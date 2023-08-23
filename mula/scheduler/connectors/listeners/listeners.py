@@ -66,7 +66,19 @@ class RabbitMQ(Listener):
         raise NotImplementedError
 
     def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
-        self.channel.queue_declare(queue=queue, durable=durable)
+        try:
+            self.channel.queue_declare(queue=queue, durable=durable)
+        except pika.exceptions.ChannelClosedByBroker as exc:
+            if "inequivalent arg 'durable'" in exc.reply_text:
+                # Queue changed from non-durable to durable. Given that
+                # previously they weren't durable and contents would also be
+                # lost if RabbitMQ restarted, we will just delete the queue and
+                # recreate it to provide for a smooth upgrade.
+                self.channel = self.connection.channel()
+                self.channel.queue_delete(queue=queue)
+                self.channel.queue_declare(queue=queue, durable=durable)
+            else:
+                raise
         self.channel.basic_qos(prefetch_count=prefetch_count)
         self.channel.basic_consume(queue, on_message_callback=self.callback)
         self.channel.start_consuming()

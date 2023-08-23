@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-15 10:05+0000\n"
+"POT-Creation-Date: 2023-08-21 09:43+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1150,6 +1150,7 @@ msgstr "Risico klasse"
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Details"
 msgstr "Details"
 
@@ -1391,7 +1392,6 @@ msgstr "Geselecteerde objecten:"
 
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/partials/explanations.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "OOI"
 msgstr "OOI"
 
@@ -3133,30 +3133,24 @@ msgid "OOI doesn't exist"
 msgstr "Object bestaat niet"
 
 #: tools/forms/findings.py
-#, fuzzy
-#| msgid "Mute findings"
 msgid "Show non-muted findings"
-msgstr "Bevindingen Dempen"
+msgstr "Laat niet-gedempte bevindingen zien"
 
 #: tools/forms/findings.py
-#, fuzzy
-#| msgid "Mute findings"
 msgid "Show muted findings"
-msgstr "Bevindingen Dempen"
+msgstr "Laat gedempte bevindingen zien"
 
 #: tools/forms/findings.py
 msgid "Show muted and non-muted findings"
-msgstr ""
+msgstr "Toon gedempte en niet-gedempte bevindingen"
 
 #: tools/forms/findings.py
 msgid "Filter by severity"
 msgstr "Filteren op ernst"
 
 #: tools/forms/findings.py
-#, fuzzy
-#| msgid "Exclude Muted Findings"
 msgid "Filter by muted findings"
-msgstr "Gemuteerde bevindingen uitsluiten"
+msgstr "Gedempte bevindingen uitsluiten"
 
 #: tools/forms/ooi.py
 msgid "Filter types"
@@ -3512,12 +3506,14 @@ msgstr "Totaal aantal Bevindingen"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Close details"
 msgstr "Sluit details"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Open details"
 msgstr "Details openen"
 
@@ -3766,7 +3762,7 @@ msgstr "OpenKAT logo, ga naar de homepage van OpenKAT"
 msgid "Crisis room"
 msgstr "Crisis Room"
 
-#: rocky/templates/header.html rocky/views/tasks.py
+#: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr "Taken"
 
@@ -4647,6 +4643,13 @@ msgstr "Toon alleen objecten van type %(type)s"
 msgid "Select your language"
 msgstr "Selecteer je taal"
 
+#: rocky/templates/partials/language-switcher.html
+#, python-format
+msgid ""
+"Current language is %(current_language)s. Choose your preferred language."
+msgstr ""
+"De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
+
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
 msgstr "Filteropties verbergen"
@@ -5021,6 +5024,25 @@ msgstr "U staat op het punt het vrijwaring niveau in te stellen van \\"
 msgid "Yes, set to inherit"
 msgstr "Ja, stel in"
 
+#: rocky/templates/tasks/boefje_task_detail.html
+msgid ""
+"An overview of the boefje task, the input OOI and the RAW data it generated."
+msgstr ""
+"Een overzicht van de boefje-taak, de invoer OOI en de RAW-gegevens die het heeft gegenereerd."
+
+#: rocky/templates/tasks/boefje_task_detail.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Download meta and raw data"
+msgstr "Meta- en ruwe gegevens downloaden"
+
+#: rocky/templates/tasks/boefje_task_detail.html
+msgid "Download meta data"
+msgstr "Metagegevens downloaden"
+
+#: rocky/templates/tasks/boefje_task_detail.html
+msgid "Input object"
+msgstr "Inputobject"
+
 #: rocky/templates/tasks/boefjes.html
 msgid "There are no tasks for boefjes"
 msgstr "Er zijn geen taken voor boefjes"
@@ -5033,25 +5055,21 @@ msgstr "Takenlijst van boefjes"
 msgid "List of tasks for "
 msgstr "Lijst van taken voor "
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Download task details"
-msgstr "Download taakdetails"
-
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Reschedule"
-msgstr "Opnieuw plannen"
+#: rocky/templates/tasks/boefjes.html
+msgid "Input Object"
+msgstr "Inputobject"
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "No input OOI"
 msgstr "Geen input object"
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Download meta and raw data"
-msgstr "Meta- en ruwe gegevens downloaden"
+#: rocky/templates/tasks/boefjes.html
+msgid "Download task data"
+msgstr "Download taakgegevens"
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Download meta data"
-msgstr "Metagegevens downloaden"
+msgid "Reschedule"
+msgstr "Opnieuw plannen"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
@@ -5064,6 +5082,14 @@ msgstr "Lijst van taken voor normalizers"
 #: rocky/templates/tasks/normalizers.html
 msgid "Normalizer"
 msgstr "Normalizer"
+
+#: rocky/templates/tasks/normalizers.html
+msgid "Boefje input OOI"
+msgstr "Boefje input OOI"
+
+#: rocky/templates/tasks/normalizers.html
+msgid "Yielded objects"
+msgstr "Opgeleverde objecten"
 
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
@@ -5356,6 +5382,12 @@ msgstr "Verfraaid"
 #: rocky/views/indemnification_add.py
 msgid "Indemnification successfully set."
 msgstr "Vrijwaringsniveau ingesteld."
+
+#: rocky/views/mixins.py
+msgid ""
+"Can not parse observed_at parameter, falling back to showing current object"
+msgstr ""
+"Kan de parameter observed_at niet ontleden, terugvallen op het weergeven van het huidige object"
 
 #: rocky/views/mixins.py
 msgid "All"

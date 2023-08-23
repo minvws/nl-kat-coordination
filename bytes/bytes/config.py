@@ -46,6 +46,10 @@ class BackwardsCompatibleEnvSettings:
                 logging.warning("Deprecation: %s is deprecated, use %s instead", old_name.upper(), new_name.upper())
                 d[new_name[len(env_prefix) :]] = env_vars[old_name]
 
+        # We previously accepted an empty value for this field
+        if "rfc3161_provider" in d and not d["rfc3161_provider"]:
+            del d["rfc3161_provider"]
+
         return d
 
 

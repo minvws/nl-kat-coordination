@@ -7,9 +7,11 @@ from typing import Dict
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
@@ -27,8 +29,22 @@ from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSever
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
+LANG_LIST = [code for code, _ in settings.LANGUAGES]
+
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+@pytest.fixture(params=LANG_LIST)
+def current_language(request):
+    return request.param
+
+
+@pytest.fixture
+def language(current_language):
+    activate(current_language)
+    yield current_language
+    deactivate()
 
 
 def create_user(django_user_model, email, password, name, device_name, superuser=False):
