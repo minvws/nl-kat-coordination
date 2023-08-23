@@ -4643,6 +4643,13 @@ msgstr "Toon alleen objecten van type %(type)s"
 msgid "Select your language"
 msgstr "Selecteer je taal"
 
+#: rocky/templates/partials/language-switcher.html
+#, python-format
+msgid ""
+"Current language is %(current_language)s. Choose your preferred language."
+msgstr ""
+"De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
+
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
 msgstr "Filteropties verbergen"

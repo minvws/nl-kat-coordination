@@ -3143,7 +3143,7 @@ msgstr "Filtra pa gravedat"
 
 #: tools/forms/findings.py
 msgid "Filter by muted findings"
-msgstr "Ekskluí Diskubrimentu den Mudansa"
+msgstr "Filtra pa diskubrimentu muted"
 
 #: tools/forms/ooi.py
 msgid "Filter types"
@@ -4634,6 +4634,13 @@ msgstr "Solamente mustra ophetonan di e tipo %(type)s"
 #: rocky/templates/partials/language-switcher.html
 msgid "Select your language"
 msgstr "Selekshoná bo idioma"
+
+#: rocky/templates/partials/language-switcher.html
+#, python-format
+msgid ""
+"Current language is %(current_language)s. Choose your preferred language."
+msgstr ""
+"Idioma aktual ta %(current_language)s. Escoge bo idioma preferí."
 
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
