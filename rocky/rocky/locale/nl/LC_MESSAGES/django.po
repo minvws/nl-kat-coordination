@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-16 10:16+0000\n"
+"POT-Creation-Date: 2023-08-21 09:43+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -4642,6 +4642,13 @@ msgstr "Toon alleen objecten van type %(type)s"
 #: rocky/templates/partials/language-switcher.html
 msgid "Select your language"
 msgstr "Selecteer je taal"
+
+#: rocky/templates/partials/language-switcher.html
+#, python-format
+msgid ""
+"Current language is %(current_language)s. Choose your preferred language."
+msgstr ""
+"De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
 
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
