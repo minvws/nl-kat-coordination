@@ -1122,7 +1122,10 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Mocks
-        self.mock_get_objects_by_object_types.side_effect = [requests.exceptions.RetryError(), requests.exceptions.ConnectionError()]
+        self.mock_get_objects_by_object_types.side_effect = [
+            requests.exceptions.RetryError(),
+            requests.exceptions.ConnectionError(),
+        ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
@@ -1170,7 +1173,10 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Mocks
-        self.mock_get_objects_by_object_types.side_effect = [requests.exceptions.RetryError(), requests.exceptions.ConnectionError()]
+        self.mock_get_objects_by_object_types.side_effect = [
+            requests.exceptions.RetryError(),
+            requests.exceptions.ConnectionError(),
+        ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
@@ -1320,7 +1326,10 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
         # Mocks
-        self.mock_get_random_objects.side_effect = [requests.exceptions.RetryError(), requests.exceptions.ConnectionError()]
+        self.mock_get_random_objects.side_effect = [
+            requests.exceptions.RetryError(),
+            requests.exceptions.ConnectionError(),
+        ]
 
         # Act
         self.scheduler.push_tasks_for_random_objects()

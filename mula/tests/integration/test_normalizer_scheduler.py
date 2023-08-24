@@ -146,7 +146,10 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     @mock.patch("scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type")
     def test_get_normalizers_for_mime_type_request_exception(self, mock_get_normalizers_by_org_id_and_type):
         # Mocks
-        mock_get_normalizers_by_org_id_and_type.side_effect = [requests.exceptions.RetryError(), requests.exceptions.ConnectionError()]
+        mock_get_normalizers_by_org_id_and_type.side_effect = [
+            requests.exceptions.RetryError(),
+            requests.exceptions.ConnectionError(),
+        ]
 
         # Act
         result = self.scheduler.get_normalizers_for_mime_type("text/plain")
@@ -167,7 +170,6 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
 
 class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
-
     def setUp(self):
         super().setUp()
 

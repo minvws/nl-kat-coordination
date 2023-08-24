@@ -59,6 +59,7 @@ class APITemplateTestCase(unittest.TestCase):
         self.scheduler.stop()
         self.dbconn.engine.dispose()
 
+
 class APITestCase(APITemplateTestCase):
     def test_get_schedulers(self):
         response = self.client.get("/schedulers")
