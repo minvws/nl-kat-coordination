@@ -108,6 +108,7 @@ We have two container images that are used to run multiple containers. What the 
 | octopoes        | worker-beat | Celery worker running beat. There must only be exactly one container of this type |
 | octopoes        | worker      | Celery worker. Use this if you need to more than one work container for scaling   |
 
+(Upgrading_Containers)=
 ## Upgrading
 
 When deploying new container images the database migrations are automatically
