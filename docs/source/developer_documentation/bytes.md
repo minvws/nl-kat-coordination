@@ -18,9 +18,9 @@ $ docker build . -t bytes
 
 # Without an env-file
 $ export BYTES_PASSWORD=$(openssl rand -hex 20) \
-    && export SECRET=$(openssl rand -hex 20) \
+    && export BYTES_SECRET=$(openssl rand -hex 20) \
     && export BYTES_DB_URI=postgresql://USER:PWD@bytes-db:5432/bytes  # change accordingly!
-$ docker run --rm -p 8002:8002 -e BYTES_USERNAME=bytes -e BYTES_PASSWORD -e SECRET -e BYTES_DB_URI bytes
+$ docker run --rm -p 8002:8002 -e BYTES_USERNAME=bytes -e BYTES_PASSWORD -e BYTES_SECRET -e BYTES_DB_URI bytes
 
 
 # With an env-file
@@ -49,47 +49,6 @@ $ uvicorn bytes.api:app --host 127.0.0.1 --port 8002 --reload --reload-dir /app/
 ```
 See http://localhost:8002/docs for the OpenAPI documentation.
 
-## Configuration
-You can configure several settings with your environment, see the env-dist:
-
-```shell
-$ cat .env-dist
-# Bytes API, which uses JWT
-SECRET=
-BYTES_USERNAME=
-BYTES_PASSWORD=
-ACCESS_TOKEN_EXPIRE_MINUTES=1000
-
-# Bytes DB
-BYTES_DB_URI=
-
-# Hashing/Encryption
-HASHING_ALGORITHM="SHA512"
-EXT_HASH_SERVICE="IN_MEMORY"
-PASTEBIN_API_DEV_KEY=""
-KAT_PRIVATE_KEY_B64=""
-VWS_PUBLIC_KEY_B64=""
-
-# Timestamping. See https://github.com/trbs/rfc3161ng for a list of public providers and their certificates
-RFC3161_PROVIDER=
-RFC3161_CERT_FILE=
-
-# File system
-BYTES_FOLDER_PERMISSION=740  # Unix permission level on the folders Bytes creates to save raw files
-BYTES_FILE_PERMISSION=640  # Unix permission level on the raw files themselves
-ENCRYPTION_MIDDLEWARE=IDENTITY
-
-# QUEUE for messages other services in KAT listen to
-QUEUE_URI=
-
-# Optional environment variables
-BYTES_LOG_FILE=  # Optional file with Bytes logs.
-BYTES_DATA_DIR=  # Root for all the data. A change means that you no longer have access to old data unless you move it!
-BYTES_METRICS_TTL_SECONDS=0  # The time to cache slow queries performed in the metrics endpoint.
-```
-
-Most of these are self-explanatory, but a few sets of variables require more explanation.
-
 
 ### Hashing and Encryption
 
@@ -98,38 +57,32 @@ which functions as a 'proof' of it being uploaded at that time.
 These proofs can be uploaded externally (a 3rd party) such that we can verify that this data was saved in the past.
 
 Current implementations are
-- `EXT_HASH_SERVICE="IN_MEMORY"` (just a stub)
-- `EXT_HASH_SERVICE="PASTEBIN"` (Needs pastebin API development key)
-- `EXT_HASH_SERVICE="RFC3161"`
+- `BYTES_EXT_HASH_REPOSITORY="IN_MEMORY"` (just a stub)
+- `BYTES_EXT_HASH_REPOSITORY="PASTEBIN"` (Needs pastebin API development key)
+- `BYTES_EXT_HASH_REPOSITORY="RFC3161"`
 
 For the RFC3161 implementation, see https://www.ietf.org/rfc/rfc3161.txt and https://github.com/trbs/rfc3161ng as a reference.
 To use this implementation, set your environment to
-- `EXT_HASH_SERVICE=RFC3161`
-- `RFC3161_PROVIDER="https://freetsa.org/tsr"` (example)
-- `RFC3161_CERT_FILE="bytes/timestamping/certificates/freetsa.crt"` (example)
+- `BYTES_EXT_HASH_REPOSITORY=RFC3161`
+- `BYTES_RFC3161_PROVIDER="https://freetsa.org/tsr"` (example)
+- `BYTES_RFC3161_CERT_FILE="bytes/timestamping/certificates/freetsa.crt"` (example)
 
 Adding a new implementation means implementing the `bytes.repositories.hash_repository::HashRepository` interface.
 Bind your new implementation in `bytes.timestamping.provider::create_hash_repository`.
 
-The secure-hashing-algorithm can be specified with an env var: `HASHING_ALGORITHM="SHA512"`.
+The secure-hashing-algorithm can be specified with an env var: `BYTES_HASHING_ALGORITHM="SHA512"`.
 ```bash
-HASHING_ALGORITHM="SHA512"
-EXT_HASH_SERVICE="IN_MEMORY"
-PASTEBIN_API_DEV_KEY=""
+BYTES_HASHING_ALGORITHM="SHA512"
+BYTES_EXT_HASH_REPOSITORY="IN_MEMORY"
+BYTES_PASTEBIN_API_DEV_KEY=""
 ```
 
 Files in bytes can be saved encrypted to disk,
-the implementation can be set using an env-var, `ENCRYPTION_MIDDLEWARE`. The options are:
+the implementation can be set using an env-var, `BYTES_ENCRYPTION_MIDDLEWARE`. The options are:
 - `"IDENTITY"`
 - `"NACL_SEALBOX"`
 
-
-The `"NACL_SEALBOX"` option requires the `KAT_PRIVATE_KEY_B64` and `VWS_PUBLIC_KEY_B64` env vars.
-```bash
-ENCRYPTION_MIDDLEWARE="IDENTITY"
-KAT_PRIVATE_KEY_B64=""
-VWS_PUBLIC_KEY_B64=""
-```
+The `"NACL_SEALBOX"` option requires the `BYTES_PRIVATE_KEY_B64` and `BYTES_PUBLIC_KEY_B64` env vars.
 
 ### Observability
 
