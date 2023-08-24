@@ -3,25 +3,10 @@ from typing import Any, Dict
 from account.mixins import OrganizationView
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, TemplateView
 
 from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
-
-
-class KATalogusBreadCrumbsMixin:
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {
-                "url": reverse(
-                    "katalogus",
-                    kwargs={"organization_code": self.organization.code},
-                ),
-                "text": _("KAT-alogus"),
-            },
-        ]
-        return context
 
 
 class KATalogusFilterView(FormView):
@@ -46,9 +31,9 @@ class KATalogusFilterView(FormView):
         if filter_options == "all":
             return queryset
         if filter_options == "enabled":
-            return [plugin for plugin in queryset if plugin["enabled"]]
+            return [plugin for plugin in queryset if plugin.enabled]
         if filter_options == "disabled":
-            return [plugin for plugin in queryset if not plugin["enabled"]]
+            return [plugin for plugin in queryset if not plugin.enabled]
 
     def sort_queryset(self, queryset, sort_options):
         if sort_options == "a-z":
@@ -56,12 +41,15 @@ class KATalogusFilterView(FormView):
         if sort_options == "z-a":
             return queryset[::-1]
         if sort_options == "enabled-disabled":
-            return sorted(queryset, key=lambda item: not item["enabled"])
+            return sorted(queryset, key=lambda item: not item.enabled)
         if sort_options == "disabled-enabled":
-            return sorted(queryset, key=lambda item: item["enabled"])
+            return sorted(queryset, key=lambda item: item.enabled)
+
+    def sort_alphabetic_ascending(self, queryset):
+        return sorted(queryset, key=lambda item: item.name.lower())
 
 
-class KATalogusView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATalogusFilterView):
+class KATalogusView(OrganizationView, ListView, KATalogusFilterView):
     """View of all plugins in KAT-alogus"""
 
     template_name = "katalogus.html"
@@ -71,7 +59,21 @@ class KATalogusView(OrganizationView, ListView, KATalogusBreadCrumbsMixin, KATal
         self.katalogus_client = get_katalogus(self.organization.code)
 
     def get_queryset(self):
-        return self.filter_katalogus(self.katalogus_client.get_plugins())
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins())
+        return self.filter_katalogus(queryset)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {
+                "url": reverse(
+                    "katalogus",
+                    kwargs={"organization_code": self.organization.code},
+                ),
+                "text": _("KAT-alogus"),
+            },
+        ]
+        return context
 
 
 class BoefjeListView(KATalogusView):
@@ -80,7 +82,8 @@ class BoefjeListView(KATalogusView):
     template_name = "boefjes.html"
 
     def get_queryset(self):
-        return self.filter_katalogus(self.katalogus_client.get_boefjes())
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_boefjes())
+        return self.filter_katalogus(queryset)
 
 
 class NormalizerListView(KATalogusView):
@@ -89,4 +92,9 @@ class NormalizerListView(KATalogusView):
     template_name = "normalizers.html"
 
     def get_queryset(self):
-        return self.filter_katalogus(self.katalogus_client.get_normalizers())
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_normalizers())
+        return self.filter_katalogus(queryset)
+
+
+class AboutPluginsView(OrganizationView, TemplateView):
+    template_name = "about_plugins.html"

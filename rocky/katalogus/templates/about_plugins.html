@@ -1,0 +1,47 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="katalogus">
+        <section>
+            {% include "partials/katalogus_header.html" %}
+            {% include "partials/plugins_navigation.html" with active="about-plugins" %}
+
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "About plugins" %}</h1>
+                    <p>
+                        {% blocktranslate %}
+                            Plugins gather data, objects and insight. Each plugin has its own focus area
+                            and strengths and may be able to work with other plugins to gain even more insights.
+                        {% endblocktranslate %}
+                    </p>
+                    <h2>Boefjes</h2>
+                    <p>
+                        {% blocktranslate %}
+                            Scan objects for specific data. Each boefje scans for specific data.
+                            The data boefjes find will be added to your dataset.
+                        {% endblocktranslate %}
+                    </p>
+                    <h2>Normalizers</h2>
+                    <p>
+                        {% blocktranslate %}
+                            Read the dataset and search for specific objects to add to your objectlist as a separate object.
+                            Each normalizer searches for a specific object. You could run one to find all the phonenumbers within a document, as well as a normalizer to find all the url’s.
+                        {% endblocktranslate %}
+                    </p>
+                    <h2>Bits</h2>
+                    <p>
+                        {% blocktranslate %}
+                            Bits are business rules that look for insight within the current dataset and search for specific insight and draw conclusions.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}

@@ -1,5 +1,5 @@
 /* Level indicator alignment within tiles */
-$plugin-disabled: #C3372C;
+
 
 .tiles {
   .level-indicator {
@@ -11,31 +11,19 @@ $plugin-disabled: #C3372C;
   }
 
   &.plugins {
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
-  button,
-  a.button {
-    min-width: auto;
-    min-height: auto;
-    font-weight: 700;
-    line-height: var(--form-button-line-height);
 
-    &.plugin-disabled {
-      color: $plugin-disabled;
 
-      &:hover {
-        border-color: $plugin-disabled;
-      }
-    }
-  }
+
 
 
   &>div {
     min-width: 0;
-    padding: 1rem;
     border: 0;
     box-shadow: 0px 8px 16px 0px #11141626;
+    gap: 1rem;
 
     &>div.scan-intensity {
       border: 0;

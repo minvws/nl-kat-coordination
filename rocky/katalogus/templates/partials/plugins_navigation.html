@@ -12,6 +12,9 @@
             <li {% if active == "normalizers" %}aria-current="page"{% endif %}>
                 <a href="{% url 'normalizers_list' organization.code %}">{% translate "Normalizers" %}</a>
             </li>
+            <li {% if active == "about-plugins" %}aria-current="page"{% endif %}>
+                <a href="{% url 'about_plugins' organization.code %}">{% translate "About plugins" %}</a>
+            </li>
         </ul>
     </nav>
 </div>

@@ -1,29 +1,43 @@
 {% load i18n %}
 {% load static %}
 
-{% if request.GET.view == "table" %}
+{% if view.kwargs.view == "tableview" %}
     <div class="horizontal-scroll">
-        <table>
-            <caption>{% translate "Boefjes overview:" %}</caption>
+        <table class="plugins">
+            <caption>{% translate "Plugins overview:" %}</caption>
             <thead>
                 <tr>
-                    <th>{% translate "Boefje name" %}</th>
-                    <th>{% translate "Boefje description" %}</th>
+                    <th>{% translate "Plugin name" %}</th>
+                    <th>{% translate "Plugin type" %}</th>
+                    <th>{% translate "Plugin description" %}</th>
                     <th colspan="2">{% translate "Actions" %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for plugin in object_list %}
                     <tr id="plugin_{{ plugin.id|slugify }}">
-                        <td scope="row">{{ plugin.name }}</td>
-                        <td>{{ plugin.description }}</td>
+                        <td scope="row">
+                            <span class="plugin-title">
+                                <strong>{{ plugin.name }}</strong>
+                            </span>
+                        </td>
+                        <td scope="row">
+                            <p class="plugin-title">
+                                <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
+                            </p>
+                        </td>
+                        <td>
+                            <span class="plugin-description">{{ plugin.description }}</span>
+                        </td>
                         <td>
                             {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
                         </td>
                         <td>
-                            <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
-                               class="nowrap">{% translate "See details" %}</a>
+                            {% if plugin.scan_level != None %}
+                                <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
+                                   class="nowrap">{% translate "See details" %}</a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
