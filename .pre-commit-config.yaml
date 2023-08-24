@@ -98,6 +98,9 @@ repos:
 - repo: https://github.com/Riverside-Healthcare/djLint
   rev: v1.32.1
   hooks:
+  - id: djlint-reformat-django
+    files: '^rocky/.*/templates/.*$'
+
   - id: djlint-django
 
 # - repo: https://github.com/thibaudcolas/pre-commit-stylelint
