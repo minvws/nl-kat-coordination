@@ -196,7 +196,7 @@ sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/octopoes.conf
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/mula.conf
 
-echo "<v1.11 Backwards compatibility for Mula environment variables"
+echo "<v1.11 Backwards compatibility for Mula environment variables (if they exist)"
 
 echo "Step 4.6.7B - Update SCHEDULER_RABBITMQ_DSN in /etc/kat/mula.conf to ${RABBITMQ_PASSWORD}"
 sudo sed -i "/SCHEDULER_RABBITMQ_DSN=/s/.*/SCHEDULER_RABBITMQ_DSN=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/mula.conf
