@@ -43,6 +43,10 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
+    def tearDown(self):
+        self.scheduler.stop()
+        self.dbconn.engine.dispose()
+
 
 class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def setUp(self):

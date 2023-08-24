@@ -57,7 +57,7 @@ class APITemplateTestCase(unittest.TestCase):
     def tearDown(self):
         models.Base.metadata.drop_all(self.dbconn.engine)
         self.scheduler.stop()
-
+        self.dbconn.engine.dispose()
 
 class APITestCase(APITemplateTestCase):
     def test_get_schedulers(self):

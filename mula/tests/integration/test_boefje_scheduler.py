@@ -69,6 +69,10 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
             organisation=self.organisation,
         )
 
+    def tearDown(self):
+        self.scheduler.stop()
+        self.dbconn.engine.dispose()
+
 
 class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):

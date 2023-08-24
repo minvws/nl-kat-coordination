@@ -43,6 +43,10 @@ class SchedulerTestCase(unittest.TestCase):
             queue=queue,
         )
 
+    def tearDown(self):
+        self.scheduler.stop()
+        self.dbconn.engine.dispose()
+
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
