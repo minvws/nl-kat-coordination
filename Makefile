@@ -107,6 +107,7 @@ ubuntu22.04-build-image:
 	docker build -t kat-ubuntu22.04-build-image packaging/ubuntu22.04
 
 docs:
+	$(call build-settings-doc,rocky,rocky.settings,rocky)
 	$(call build-settings-doc,keiko,keiko.settings,keiko)
 	$(call build-settings-doc,octopoes,octopoes.config.settings,octopoes)
 	$(call build-settings-doc,boefjes,boefjes.config,boefjes)
