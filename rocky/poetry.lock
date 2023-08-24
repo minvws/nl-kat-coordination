@@ -805,13 +805,13 @@ pytz = "*"
 
 [[package]]
 name = "djlint"
-version = "1.31.1"
+version = "1.32.1"
 description = "HTML Template Linter and Formatter"
 optional = false
 python-versions = ">=3.8.0,<4.0.0"
 files = [
-    {file = "djlint-1.31.1-py3-none-any.whl", hash = "sha256:9b2e2fc3a059a8e5a62f309edea15c1aeee331a279ab2699b9fb51a31d8c0934"},
-    {file = "djlint-1.31.1.tar.gz", hash = "sha256:a11739e2f919f760b3986eb13d06e00171f3bd342b8d88e9bd914a4260eaa8ce"},
+    {file = "djlint-1.32.1-py3-none-any.whl", hash = "sha256:8aaec6776376cfd41f3e742ed9f5e3c46dc7c6cd7646abf9e99860fb1ec9f19a"},
+    {file = "djlint-1.32.1.tar.gz", hash = "sha256:c1e2141acf1547d244af7ef8abd15fbbae2abcc7a03e2bf31f8a491de69a6c72"},
 ]
 
 [package.dependencies]
@@ -2028,7 +2028,7 @@ name = "prompt-toolkit"
 version = "2.0.10"
 description = "Library for building powerful interactive command lines in Python"
 optional = false
-python-versions = ">=2.6,<3.0.0 || >=3.3.0"
+python-versions = ">=2.6,<3.0.dev0 || >=3.3.dev0"
 files = [
     {file = "prompt_toolkit-2.0.10-py2-none-any.whl", hash = "sha256:e7f8af9e3d70f514373bf41aa51bc33af12a6db3f71461ea47fea985defb2c31"},
     {file = "prompt_toolkit-2.0.10-py3-none-any.whl", hash = "sha256:46642344ce457641f28fc9d1c9ca939b63dadf8df128b86f1b9860e59c73a5e4"},
@@ -3373,4 +3373,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "8711720bd3815ba47a1e3224c13d225678df03e3bc9b95ae260904f8c8e95216"
+content-hash = "fc99915baa0d4dc01889b581a4a9d39f8ee5499db92ef4277f3b66b085c26db7"
