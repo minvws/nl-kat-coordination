@@ -759,8 +759,8 @@ uritools==4.0.1 ; python_version >= "3.8" and python_version < "4.0" \
 urllib3==2.0.3 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:48e7fafa40319d358848e1bc6809b208340fafe2096f1725d05d67443d0483d1 \
     --hash=sha256:bee28b5e56addb8226c96f7f13ac28cb4c301dd5ea8a6ca179c0b9835e032825
-uwsgi==2.0.21 ; python_version >= "3.8" and python_version < "4.0" \
-    --hash=sha256:35a30d83791329429bc04fe44183ce4ab512fcf6968070a7bfba42fc5a0552a9
+uwsgi==2.0.22 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:4cc4727258671ac5fa17ab422155e9aaef8a2008ebb86e4404b66deaae965db2
 webencodings==0.5.1 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:a0af1213f3c2226497a97e2b3aa01a7e4bee4f403f95be16fc9acd2947514a78 \
     --hash=sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923
