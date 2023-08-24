@@ -10,7 +10,7 @@
             <p>{% translate "Two factor authentication is enabled for your account." %}</p>
         {% else %}
             <p>{% translate "Two factor authentication is not enabled for your account. Enable it to continue." %}</p>
-            <a class="button" href="{% url "setup" %}" class="a-button">{% trans "Setup two factor authentication" %}</a>
+            <a class="button a-button" href="{% url "setup" %}">{% trans "Setup two factor authentication" %}</a>
         {% endif %}
     {% else %}
         <section class="layout-authentication">
