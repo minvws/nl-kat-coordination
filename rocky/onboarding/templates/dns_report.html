@@ -13,9 +13,9 @@
                 <h2>{% translate "DNS Report" %}</h2>
                 <p>
                     {% blocktranslate trimmed %}
-          These are the findings of a OpenKAT-analysis ({{ observed_at }}).
-          Click a finding for more detailed information about the issue, its origin, severity and possible solutions.
-          {% endblocktranslate %}
+                        These are the findings of a OpenKAT-analysis ({{ observed_at }}).
+                        Click a finding for more detailed information about the issue, its origin, severity and possible solutions.
+                    {% endblocktranslate %}
                 </p>
                 {% include "partials/ooi_report_severity_totals.html" %}
                 {% include "partials/ooi_report_findings_block.html" %}
@@ -33,6 +33,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

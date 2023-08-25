@@ -10,16 +10,14 @@
 
         {% endwith %}
         <fieldset class="column-4">
-            <legend>
-                {% translate "Shown types" %}
-            </legend>
+            <legend>{% translate "Shown types" %}</legend>
             {% for checkbox in object_type_filters %}
                 <div class="checkbox">
                     <input type="checkbox"
                            id="type-{{ checkbox.value }}"
                            name="ooi_type"
                            value="{{ checkbox.value }}"
-                           {% if checkbox.checked %} checked{% endif %}/>
+                           {% if checkbox.checked %}checked{% endif %} />
                     <label for="type-{{ checkbox.value }}">{{ checkbox.label }}</label>
                 </div>
             {% endfor %}
@@ -27,10 +25,8 @@
         {% if object_type_filters|length > 4 %}
             <button type="button"
                     class="toggle-all toggle-on ghost"
-                    data-toggle-target="ooi_type">
-                {% translate "Toggle all" %}
-            </button>
+                    data-toggle-target="ooi_type">{% translate "Toggle all" %}</button>
         {% endif %}
-        <input type="submit" value="{% translate "Update List" %}"/>
+        <input type="submit" value="{% translate "Update List" %}" />
     </form>
 {% endif %}

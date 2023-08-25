@@ -59,7 +59,7 @@ opentelemetry-instrumentation-requests = "^0.40b0"
 mypy = "^1.0.1"
 pylint = "^2.15.5"
 vulture = "^2.6"
-djlint = "^1.19.17"
+djlint = "^1.32.1"
 black = "^23.1.0"
 robotframework-tidy = "^4.1.0"
 
