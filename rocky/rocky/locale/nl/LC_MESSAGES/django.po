@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-16 10:16+0000\n"
+"POT-Creation-Date: 2023-08-23 08:59+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -3142,7 +3142,7 @@ msgstr "Laat gedempte bevindingen zien"
 
 #: tools/forms/findings.py
 msgid "Show muted and non-muted findings"
-msgstr ""
+msgstr "Toon gedempte en niet-gedempte bevindingen"
 
 #: tools/forms/findings.py
 msgid "Filter by severity"
@@ -4643,6 +4643,12 @@ msgstr "Toon alleen objecten van type %(type)s"
 msgid "Select your language"
 msgstr "Selecteer je taal"
 
+#: rocky/templates/partials/language-switcher.html
+#, python-format
+msgid ""
+"Current language is %(current_language)s. Choose your preferred language."
+msgstr "De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
+
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
 msgstr "Filteropties verbergen"
@@ -5021,6 +5027,8 @@ msgstr "Ja, stel in"
 msgid ""
 "An overview of the boefje task, the input OOI and the RAW data it generated."
 msgstr ""
+"Een overzicht van de boefje-taak, de invoer OOI en de RAW-gegevens die het "
+"heeft gegenereerd."
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -5055,13 +5063,13 @@ msgstr "Inputobject"
 msgid "No input OOI"
 msgstr "Geen input object"
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Download task data"
-msgstr "Download taakgegevens"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Reschedule"
 msgstr "Opnieuw plannen"
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Download task data"
+msgstr "Download taakgegevens"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
@@ -5379,6 +5387,8 @@ msgstr "Vrijwaringsniveau ingesteld."
 msgid ""
 "Can not parse observed_at parameter, falling back to showing current object"
 msgstr ""
+"Kan de parameter observed_at niet ontleden, terugvallen op het weergeven van "
+"het huidige object"
 
 #: rocky/views/mixins.py
 msgid "All"

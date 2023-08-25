@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, FilePath, PostgresDsn
 from pydantic.env_settings import SettingsSourceCallable
 
 BASE_DIR: Path = Path(__file__).parent.parent.parent.resolve()
@@ -31,7 +31,12 @@ class BackwardsCompatibleEnvSettings:
             # ...but old variable has been explicitly set through env
             if new_name not in env_vars and old_name in env_vars:
                 logging.warning("Deprecation: %s is deprecated, use %s instead", old_name.upper(), new_name.upper())
-                d[new_name[len(env_prefix) :]] = env_vars[old_name]
+                if new_name == "queue_uri":
+                    d["host_mutation"] = env_vars[old_name]
+                    d["host_raw_data"] = env_vars[old_name]
+                    d["host_normalizer_meta"] = env_vars[old_name]
+                else:
+                    d[new_name[len(env_prefix) :]] = env_vars[old_name]
 
         return d
 
@@ -40,8 +45,8 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    debug: bool = Field(False, description="Enables/disables global debugging mode", env="DEBUG")
-    log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
+    debug: bool = Field(False, description="Enable global debug mode, which increases logging verbosity", env="DEBUG")
+    log_cfg: FilePath = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
 
     # Server settings
     api_host: str = Field("0.0.0.0", description="Host address of the scheduler api server")

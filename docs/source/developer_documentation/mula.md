@@ -81,10 +81,7 @@ free to use whatever you want.
 ### Prerequisites
 
 By the use of environment variables we load in the configuration of the
-scheduler. Look at the [.env-dist](.env-dist) file for the application
-configuration settings, to build a `.env` file. Refer to the
-[`configuration.md`](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/configuration.md) file for more information on the
-individual settings.
+scheduler. See the environment settings section under Installation and Deployment for more information.
 
 ### Running
 
