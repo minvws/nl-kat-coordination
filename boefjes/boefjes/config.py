@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, FilePath, IPvAnyAddress, PostgresDsn
 from pydantic.env_settings import SettingsSourceCallable
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
@@ -36,7 +36,7 @@ class BackwardsCompatibleEnvSettings:
 
 
 class Settings(BaseSettings):
-    log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
+    log_cfg: FilePath = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
 
     # Worker configuration
     pool_size: int = Field(2, description="Number of workers to run per queue")
