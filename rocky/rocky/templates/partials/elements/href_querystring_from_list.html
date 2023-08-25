@@ -1,8 +1,0 @@
-{% if list %}
-    {% for tuple in list %}
-        {% if not ignore_params or tuple.0 not in ignore_params %}
-            {{ tuple.0 }}={{ tuple.1 }}
-            {% if not forloop.last %}&{% endif %}
-        {% endif %}
-    {% endfor %}
-{% endif %}
