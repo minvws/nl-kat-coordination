@@ -53,7 +53,8 @@ def url_with_querystring(path, **kwargs) -> str:
 
 
 def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
-    kwargs["ooi_id"] = ooi_id
+    if ooi_id:
+        kwargs["ooi_id"] = ooi_id
 
     if "query" in kwargs:
         kwargs["query"] = {key: value for key, value in kwargs["query"] if key not in kwargs}
