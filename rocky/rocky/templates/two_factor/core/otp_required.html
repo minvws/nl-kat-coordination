@@ -9,14 +9,18 @@
         {% endblock title %}
     </h1>
     <p>
-        {% blocktrans trimmed %}The page you requested, enforces users to verify using
-    two-factor authentication for security reasons. You need to enable these
-    security features in order to access this page.{% endblocktrans %}
+        {% blocktrans trimmed %}
+            The page you requested, enforces users to verify using
+            two-factor authentication for security reasons. You need to enable these
+            security features in order to access this page.
+        {% endblocktrans %}
     </p>
     <p>
-        {% blocktrans trimmed %}Two-factor authentication is not enabled for your
-    account. Enable two-factor authentication for enhanced account
-    security.{% endblocktrans %}
+        {% blocktrans trimmed %}
+            Two-factor authentication is not enabled for your
+            account. Enable two-factor authentication for enhanced account
+            security.
+        {% endblocktrans %}
     </p>
     <p>
         <a href="#" onclick="history.back()" class="button">{% trans "Go back" %}</a>

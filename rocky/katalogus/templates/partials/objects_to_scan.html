@@ -6,9 +6,9 @@
         <h2>{{ form_title }}</h2>
         <p>
             {% blocktranslate trimmed with scan_level=plugin.scan_level %}
-        This boefje will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
-        or higher. There is no indemnification for this boefje to scan an OOI with a lower clearance level than <strong>L{{ scan_level }}</strong>. Use the filter to show OOI's with a lower clearance level.
-      {% endblocktranslate %}
+                This boefje will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
+                or higher. There is no indemnification for this boefje to scan an OOI with a lower clearance level than <strong>L{{ scan_level }}</strong>. Use the filter to show OOI's with a lower clearance level.
+            {% endblocktranslate %}
         </p>
         <form method="get" class="inline">
             <div class="horizontal-view">
@@ -16,9 +16,9 @@
 
                 {% for field in select_ooi_filter_form %}
                     <input type="{{ field.field.widget.input_type }}"
-                            name="{{ field.name }}"
-                            class="{{ field.field.widget.attrs.class }}"
-                            {% if "show_all=on" in request.get_full_path %}checked{% endif %}/>
+                           name="{{ field.name }}"
+                           class="{{ field.field.widget.attrs.class }}"
+                           {% if "show_all=on" in request.get_full_path %}checked{% endif %} />
                     <label>{{ field.label }}</label>
                 {% endfor %}
             </div>
