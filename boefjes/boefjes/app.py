@@ -208,7 +208,11 @@ class SchedulerWorkerManager(WorkerManager):
                 worker.close()
         finally:
             self.exited = True
-            sys.exit()
+            # If we are called from the main run loop we are already in the
+            # process of exiting, so we only need to call sys.exit() in the
+            # signal handler.
+            if signum:
+                sys.exit()
 
 
 def _format_exit_code(exitcode: int) -> str:
