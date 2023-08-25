@@ -11,12 +11,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import environ
 from django.conf import locale
-from pydantic import Field
-from pydantic_settings.settings import PydanticSettings
+from django.core.management.utils import get_random_secret_key
+from pydantic import BaseSettings, DirectoryPath, Field
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,32 +29,42 @@ if os.getenv("DOCS"):
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 env = environ.Env()
-
 environ.Env.read_env(BASE_DIR / ".env")
 
 
-class DjangoSettings(PydanticSettings):
+class DjangoSettings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # SECURITY WARNING: keep the secret key used in production secret!
 
+    BASE_DIR: Optional[DirectoryPath] = BASE_DIR
+    SECRET_KEY: str = Field(default_factory=get_random_secret_key)
+    DEBUG: bool = Field(True)
+
+    QUEUE_URI: str = Field("")
+
     SCHEDULER_API: str = Field("")
-    #
-    KEIKO_API = env.url("KEIKO_API", "").geturl()
-    OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()
+    KEIKO_API: str = Field("")
+    BYTES_API: str = Field("")
+    OCTOPOES_API: str = Field("")
+
+    BYTES_USERNAME: str = Field("")
+    BYTES_PASSWORD: str = Field("")
+
     # # Report generation timeout in seconds
-    KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
-    #
-    # # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = env.bool("DEBUG", False)
+    KEIKO_REPORT_TIMEOUT: int = Field(60)
 
     SPAN_EXPORT_GRPC_ENDPOINT: str = Field(None)
+    # TODO:
+    # if SPAN_EXPORT_GRPC_ENDPOINT is not None:
+
+    #### DJANGO SPECIFIC ####
 
     # Django specific
 
     # A list of strings representing the host/domain names that this Django site can serve.
     # https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts
-    ALLOWED_HOSTS: str = Field("", env="ALLOWED_HOSTS")
+    ALLOWED_HOSTS: List[str] = Field(["*"])
 
     # Make sure this header can never be set by an attacker, see also the security
     # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
@@ -65,7 +75,7 @@ class DjangoSettings(PydanticSettings):
         # Optional list of default organizations to add remote users to,
         # format: space separated list of ORGANIZATION_CODE:GROUP_NAME, e.g. `test:admin test2:redteam`
         REMOTE_USER_DEFAULT_ORGANIZATIONS = env.list("REMOTE_USER_DEFAULT_ORGANIZATIONS", default=[])
-        AUTHENTICATION_BACKENDS: List = [
+        AUTHENTICATION_BACKENDS: Optional[List[str]] = [
             "rocky.auth.remote_user.RemoteUserBackend",
         ]
         if REMOTE_USER_FALLBACK:
@@ -150,10 +160,8 @@ class DjangoSettings(PydanticSettings):
         ("dashed", ("Dashed")),
         ("dotted", ("Dotted")),
     ]
-    #
-    #
+
     AUTH_USER_MODEL = "account.KATUser"
-    #
 
     CACHES: Dict = {
         "default": {
