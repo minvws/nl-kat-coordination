@@ -1,18 +1,20 @@
+# Patrick <Darwinkel@users.noreply.hosted.weblate.org>, 2023.
+# Patrick <patrick@code050.nl>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-23 08:59+0000\n"
-"PO-Revision-Date: 2023-08-11 07:29+0000\n"
-"Last-Translator: Patrick <patrick@darwinkel.net>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/nl/>\n"
+"PO-Revision-Date: 2023-08-25 07:15+0000\n"
+"Last-Translator: Patrick <patrick@code050.nl>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.0-dev\n"
+"X-Generator: Weblate 5.0.1-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -64,11 +66,11 @@ msgstr "--- Selecteer één van de beschikbare opties ---"
 
 #: account/forms/account_setup.py
 msgid "Account Type"
-msgstr "Account Type"
+msgstr "Accounttype"
 
 #: account/forms/account_setup.py
 msgid "Every member of OpenKAT must be part of an account type."
-msgstr "Elke gebruiker van OpenKAT moet deel uitmaken van een account type."
+msgstr "Elke gebruiker van OpenKAT moet deel uitmaken van een acounttype."
 
 #: account/forms/account_setup.py
 msgid "Please select an account type to proceed."
@@ -77,7 +79,7 @@ msgstr "Selecteer een account type om door te gaan."
 #: account/forms/account_setup.py
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
-msgstr "Toegewezen vrijwaring niveau"
+msgstr "Zet vrijwaringsniveau"
 
 #: account/forms/account_setup.py
 msgid "Select a clearance level you trust this member with."
@@ -250,7 +252,7 @@ msgstr "Plaats het token dat door uw token authenticator app is gegenereerd."
 
 #: account/forms/token.py
 msgid "Backup token"
-msgstr "Backup tokens"
+msgstr "Backup token"
 
 #: account/models.py
 msgid "The Email must be set"
@@ -802,7 +804,7 @@ msgstr "Dit effect bestaat al."
 
 #: fmea/forms.py
 msgid "Choose a severity level."
-msgstr "Kies een scan niveau"
+msgstr "Kies een scanniveau"
 
 #: fmea/models.py
 msgid "Finances"
@@ -1041,7 +1043,7 @@ msgstr "Eigenschappen"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Risk class"
-msgstr "Risico niveau"
+msgstr "Risiconiveau"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Frequency level"
@@ -3953,7 +3955,7 @@ msgstr "Weet u het zeker?"
 #: rocky/templates/oois/ooi_delete.html
 #, python-format
 msgid "Here you can delete the %(display_type)s."
-msgstr "Hier kunt u de  %(display_type)s verwijderen."
+msgstr "Hier kunt u de %(display_type)s verwijderen."
 
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
