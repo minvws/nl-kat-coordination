@@ -9,14 +9,17 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import logging
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import environ
 from django.conf import locale
 from django.core.management.utils import get_random_secret_key
-from pydantic import BaseSettings, DirectoryPath, Field
+from pydantic import BaseSettings, DirectoryPath, Field, root_validator
+from pydantic.env_settings import SettingsSourceCallable
+from sqlalchemy.engine.url import make_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,6 +33,33 @@ if os.getenv("DOCS"):
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 env = environ.Env()
 environ.Env.read_env(BASE_DIR / ".env")
+
+
+class BackwardsCompatibleEnvSettings:
+    backwards_compatibility_list = [
+        "ROCKY_DB",
+        "ROCKY_DB_USER",
+        "ROCKY_DB_PASSWORD",
+        "ROCKY_DB_HOST",
+        "ROCKY_DB_PORT",
+    ]
+
+    def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
+        d: Dict[str, Any] = {}
+        env_vars = {k.upper(): v for k, v in os.environ.items()}
+
+        if any(old_var in env_vars for old_var in self.backwards_compatibility_list):
+            logging.warning("Deprecation: ROCKY_DB_* variables are deprecated, use ROCKY_DB_DSN instead")
+            d["ROCKY_DB_DSN"] = (
+                f"postgresql://"
+                f"{env_vars['ROCKY_DB_USER']}"
+                f":{env_vars['ROCKY_DB_PASSWORD']}"
+                f"@{env_vars['ROCKY_DB_HOST']}"
+                f":{env_vars['ROCKY_DB_PORT']}"
+                f"/{env_vars['ROCKY_DB']}"
+            )
+
+        return d
 
 
 class DjangoSettings(BaseSettings):
@@ -192,16 +222,23 @@ class DjangoSettings(BaseSettings):
         },
     ]
 
-    POSTGRES_DB = {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("ROCKY_DB", default=None),
-        "USER": env("ROCKY_DB_USER", default=None),
-        "PASSWORD": env("ROCKY_DB_PASSWORD", default=None),
-        "HOST": env("ROCKY_DB_HOST", default=None),
-        "PORT": env.int("ROCKY_DB_PORT", default=5432),
-    }
+    ROCKY_DB_DSN: str = Field("postgresql://postgres:postgres@localhost:5432/rocky")
 
-    DATABASES: Dict = {"default": POSTGRES_DB}
+    @root_validator(allow_reuse=True)
+    def default_database(cls, values):
+        url = make_url(values["ROCKY_DB_DSN"])
+
+        values["DATABASES"] = {}
+        values["DATABASES"]["default"] = {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": url.database,
+            "USER": url.username,
+            "PASSWORD": url.password,
+            "HOST": url.host,
+            "PORT": url.port,
+        }
+
+        return values
 
     #
     #
@@ -423,4 +460,13 @@ class DjangoSettings(BaseSettings):
         MIDDLEWARE += ["csp.middleware.CSPMiddleware"]
         INSTALLED_APPS += ["csp"]
 
-    # class Config:
+    class Config:
+        @classmethod
+        def customise_sources(
+            cls,
+            init_settings: SettingsSourceCallable,
+            env_settings: SettingsSourceCallable,
+            file_secret_settings: SettingsSourceCallable,
+        ) -> Tuple[SettingsSourceCallable, ...]:
+            backwards_compatible_settings = BackwardsCompatibleEnvSettings()
+            return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
