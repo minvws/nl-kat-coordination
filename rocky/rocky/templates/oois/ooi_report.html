@@ -18,14 +18,14 @@
 
                 <h1>
                     {% blocktranslate trimmed with name=ooi.human_readable %}
-            Findings report for {{ name }}
-          {% endblocktranslate %}
+                        Findings report for {{ name }}
+                    {% endblocktranslate %}
                 </h1>
                 <p>
                     {% blocktranslate trimmed %}
-            These are the findings of a OpenKAT-analysis on {{ observed_at }}. Click a finding for more detailed
-            information about the issue, its origin, severity and possible solutions.
-          {% endblocktranslate %}
+                        These are the findings of a OpenKAT-analysis on {{ observed_at }}. Click a finding for more detailed
+                        information about the issue, its origin, severity and possible solutions.
+                    {% endblocktranslate %}
                 </p>
             </div>
         </section>
@@ -36,6 +36,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

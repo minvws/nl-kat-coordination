@@ -10,7 +10,7 @@
                         {% for filter in object_type_filters %}
                             <li>
                                 <a href="{% if ooi_id %}{% url request.resolver_match.url_name ooi_id %}{% else %}{% url request.resolver_match.url_name %}{% endif %}?ooi_type={{ filter.value }}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
-                                " title="{% translate "Filter by" %} {{ filter.label }}">{{ filter.label }}</a>
+                                 " title="{% translate "Filter by" %} {{ filter.label }}">{{ filter.label }}</a>
                             </li>
                         {% endfor %}
                     {% endwith %}
