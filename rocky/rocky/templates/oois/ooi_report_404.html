@@ -14,14 +14,15 @@
 
                 <h1>
                     {% blocktranslate trimmed with name=ooi.human_readable %}
-            A report for {{ name }} wasn't found.
-          {% endblocktranslate %}
+                        A report for {{ name }} wasn't found.
+                    {% endblocktranslate %}
                 </h1>
                 <p>
                     {% blocktranslate trimmed %}
-            Perhaps it never was, perhaps it just didn't exist on {{ observed_at }}<br>
-            Try some other dates!
-          {% endblocktranslate %}
+                        Perhaps it never was, perhaps it just didn't exist on {{ observed_at }}
+                        <br>
+                        Try some other dates!
+                    {% endblocktranslate %}
                 </p>
             </div>
         </section>
@@ -29,6 +30,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

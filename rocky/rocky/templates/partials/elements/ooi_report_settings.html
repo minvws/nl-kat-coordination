@@ -2,7 +2,9 @@
 
 {% load i18n %}
 
-{% block title %}{{ observed_at|date:'M d, Y' }}{% endblock title %}
+{% block title %}
+    {{ observed_at|date:'M d, Y' }}
+{% endblock title %}
 {% block show_text %}
     {% translate "Show settings" %}
 {% endblock show_text %}

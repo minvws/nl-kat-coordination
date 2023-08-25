@@ -28,7 +28,7 @@
                 <div class="image-square">
                     <div class="image-container">
                         <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
-                             alt="boefje placeholder image"/>
+                             alt="boefje placeholder image" />
                     </div>
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 {% if plugin.consumes %}
                     <p>
                         {% blocktranslate trimmed with plugin_name=plugin.name %}
-              {{plugin_name}} is able to scan the following object types:
+                            {{ plugin_name }} is able to scan the following object types:
                         {% endblocktranslate %}
                     </p>
                     <p>
@@ -54,13 +54,13 @@
                     </p>
                 {% else %}
                     {% blocktranslate trimmed with plugin_name=plugin.name %}
-                  {{plugin_name}} does not need any input objects.
+                        {{ plugin_name }} does not need any input objects.
                     {% endblocktranslate %}
                 {% endif %}
                 <h2>{% translate "Produces" %}</h2>
                 <p>
                     {% blocktranslate trimmed with plugin_name=plugin.name %}
-                {{plugin_name}} can produce the following output:
+                        {{ plugin_name }} can produce the following output:
                     {% endblocktranslate %}
                 </p>
                 <p>
@@ -83,8 +83,6 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
-    <script src="{% static "/js/autoSubmit.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

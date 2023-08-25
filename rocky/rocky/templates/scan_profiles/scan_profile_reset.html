@@ -15,23 +15,26 @@
                 <p>
                     {% translate "Setting the scan level from \"declared\" to \"inherit\" means it will inherit a clearance level from other objects, or that no clearance level will be inherited. " %}
                 </p>
-                <form action="{% ooi_url 'scan_profile_reset' ooi.primary_key organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}" method="post">
+                {# djlint:off H033 #}
+                <form action="{% ooi_url 'scan_profile_reset' ooi.primary_key organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
+                     " method="post">
+                    {# djlint:on #}
                     {% csrf_token %}
                     <fieldset>
-                        <legend>
-                            {% translate "Set clearance level" %}
-                        </legend>
+                        <legend>{% translate "Set clearance level" %}</legend>
                         <p>{% translate "You are about to set the clearance level from \"declared\" to \"inherit\"." %}</p>
                         <p>{% translate "Are you sure?" %}</p>
                     </fieldset>
                     <div class="button-container">
                         <button type="submit">{% translate "Yes, set to inherit" %}</button>
                         <a href="{% ooi_url 'scan_profile_detail' ooi.primary_key organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
-                        " class="button ghost">Cancel</a>
+                         " class="button ghost">Cancel</a>
                     </div>
                 </form>
             </div>
         </section>
     </main>
 {% endblock content %}
-{% block html_at_end_body %}{{ block.super }}{% endblock html_at_end_body %}
+{% block html_at_end_body %}
+    {{ block.super }}
+{% endblock html_at_end_body %}

@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% with id=widget.attrs.id %}
-    <div {% if id %} id="{{ id }}"{% endif %}
+    <div {% if id %}id="{{ id }}"{% endif %}
          class="column-4 plugins tiles images-cover {% if widget.attrs.class %}{{ widget.attrs.class }}{% endif %}">
         {% for group, options, index in widget.optgroups %}
             {% for option in options %}

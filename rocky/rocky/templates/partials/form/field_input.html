@@ -1,50 +1,47 @@
 {% load i18n %}
 
-<div {% if field.field.required %} class="required"{% endif %}>
-  {{ field.label_tag }}
-
-  {% if form_view != "vertical" %}
-    <div>
-        {% if field.field.required %}
-            <span class="nota-bene">{% translate "This field is required" %}</span>
-        {% endif %}
-
+<div {% if field.field.required %}class="required"{% endif %}>
+    {{ field.label_tag }}
+    {% if form_view != "vertical" %}
         <div>
-            {% if not field.field.widget.attrs.fixed_paws %}
-                {{ field }}
-            {% elif field.field.widget.attrs.fixed_paws < 0 %}
-                {% translate "Not set" %}
-            {% else %}
-                {% include "partials/scan_level_indicator.html" with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
+            {% if field.field.required %}
+                <span class="nota-bene">{% translate "This field is required" %}</span>
             {% endif %}
+            <div>
+                {% if not field.field.widget.attrs.fixed_paws %}
+                    {{ field }}
+                {% elif field.field.widget.attrs.fixed_paws < 0 %}
+                    {% translate "Not set" %}
+                {% else %}
+                    {% include "partials/scan_level_indicator.html" with value=field.field.widget.attrs.fixed_paws custom_class=field.field.widget.attrs.class %}
 
-            {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
-            {% include "partials/form/field_input_errors.html" %}
+                {% endif %}
+                {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+                {% include "partials/form/field_input_errors.html" %}
+
+            </div>
+            {% if form_name == "login" and field.name == "username" %}
+                <div class="input-link">
+                    <a href="{% url "recover_email" %}">{% translate "Forgot email" %}</a>
+                </div>
+            {% endif %}
+            {% if form_name == "login" and field.name == "password" %}
+                <div class="input-link">
+                    <a href="{% url "password_reset" %}">{% translate "Forgot password" %}</a>
+                </div>
+            {% endif %}
         </div>
-
-        {% if form_name == "login" and field.name == "username" %}
-            <div class="input-link">
-                <a href="{% url "recover_email" %}">{% translate "Forgot email" %}</a>
-            </div>
-        {% endif %}
-        {% if form_name == "login" and field.name == "password" %}
-            <div class="input-link">
-                <a href="{% url "password_reset" %}">{% translate "Forgot password" %}</a>
-            </div>
-        {% endif %}
-    </div>
-  {% else %}
-      <div>
-          {% if field.field.required %}
-              <span class="nota-bene">{% translate "This field is required" %}</span>
-          {% endif %}
-
+    {% else %}
         <div>
-            {{ field }}
+            {% if field.field.required %}
+                <span class="nota-bene">{% translate "This field is required" %}</span>
+            {% endif %}
+            <div>
+                {{ field }}
+                {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
+                {% include "partials/form/field_input_errors.html" %}
 
-            {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
-            {% include "partials/form/field_input_errors.html" %}
+            </div>
         </div>
-      </div>
-  {% endif %}
+    {% endif %}
 </div>

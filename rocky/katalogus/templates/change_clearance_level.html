@@ -11,17 +11,17 @@
            role="group"
            aria-label="{% translate "scan level warning" %}">
             <strong>Warning:</strong>
-            {% blocktranslate trimmed with plugin_name=plugin.name scan_level=plugin.scan_level%}
-        {{plugin_name}} will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
-        or higher.
+            {% blocktranslate trimmed with plugin_name=plugin.name scan_level=plugin.scan_level %}
+                {{ plugin_name }} will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
+                or higher.
             {% endblocktranslate %}
         </p>
         <section>
             <div>
                 <h1>{% translate "Scan OOI" %}</h1>
                 <p class="emphasized">
-                    {% blocktranslate trimmed with scan_level=plugin.scan_level%}
-            The following objects are not yet cleared for level {{scan_level}}, please be advised that by continuing you will declare a level {{scan_level}} on these objects.
+                    {% blocktranslate trimmed with scan_level=plugin.scan_level %}
+                        The following objects are not yet cleared for level {{ scan_level }}, please be advised that by continuing you will declare a level {{ scan_level }} on these objects.
                     {% endblocktranslate %}
                 </p>
                 <table>
