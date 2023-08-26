@@ -16,6 +16,7 @@ ExecStart=/opt/venvs/kat-keiko/bin/python -m gunicorn \
           keiko.app:api
 Restart=on-failure
 RestartSec=3s
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

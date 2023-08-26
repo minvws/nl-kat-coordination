@@ -12,6 +12,7 @@ EnvironmentFile=/etc/kat/octopoes.conf
 ExecStart=/opt/venvs/kat-octopoes/bin/python -m celery -A octopoes.tasks.tasks worker -B -s /tmp/celerybeat-schedule --loglevel=WARNING
 Restart=on-failure
 RestartSec=3s
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

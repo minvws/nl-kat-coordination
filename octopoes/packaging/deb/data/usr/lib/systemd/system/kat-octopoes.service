@@ -17,6 +17,7 @@ ExecStart=/opt/venvs/kat-octopoes/bin/python -m gunicorn \
           octopoes.api.api:app
 Restart=on-failure
 RestartSec=3s
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target
