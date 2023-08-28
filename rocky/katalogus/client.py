@@ -22,9 +22,9 @@ class Plugin(BaseModel):
     id: str
     type: str
     name: str
-    description: str
+    description: str | None
     repository_id: str
-    scan_level: SCAN_LEVEL
+    scan_level: SCAN_LEVEL | None
     consumes: Set[Type[OOI]]
     produces: Set[Type[OOI]]
     enabled: bool
@@ -35,21 +35,6 @@ class Plugin(BaseModel):
         plugin_dict["consumes"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["consumes"]}
         plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
 
-        return plugin_dict
-
-
-class Normalizer(BaseModel):
-    id: str
-    type: str
-    name: str
-    repository_id: str
-    enabled: bool
-    consumes: List[str]
-    produces: Set[Type[OOI]]
-
-    def dict(self, *args, **kwargs):
-        plugin_dict = super().dict(*args, **kwargs)
-        plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
         return plugin_dict
 
 
@@ -122,7 +107,7 @@ class KATalogusClientV1:
 
         return ServiceHealth.parse_obj(response.json())
 
-    def get_normalizers(self) -> List[Normalizer]:
+    def get_normalizers(self) -> List[Plugin]:
         response = self.session.get(f"{self.organization_uri}/plugins?plugin_type=normalizer")
         response.raise_for_status()
         return [parse_plugin(plugin) for plugin in response.json()]
@@ -164,46 +149,33 @@ class KATalogusClientV1:
         return BytesIO(response.content)
 
 
-def parse_normalizer(plugin: Dict) -> Normalizer:
-    produces = set()
-    for ooi in plugin["produces"]:
-        with contextlib.suppress(StopIteration):
-            produces.add(type_by_name(ooi))
+def parse_plugin(plugin: Dict) -> Plugin:
+    name = plugin.get("name") or plugin["id"]
+    scan_level = None
+    if plugin["type"] != "normalizer":  # Scan levels not applicable for Normalizers
+        scan_level = SCAN_LEVEL(plugin["scan_level"])
 
     # TODO: give normalizers a proper name in backend
-    name = plugin["id"].replace("_", " ").replace("kat ", "").title()
-
-    return Normalizer(
-        id=plugin["id"],
-        type=plugin["type"],
-        name=name,
-        repository_id=plugin["repository_id"],
-        enabled=plugin["enabled"],
-        consumes=plugin["consumes"],
-        produces=produces,
-    )
-
-
-def parse_plugin(plugin: Dict) -> Plugin:
     if plugin["type"] == "normalizer":
-        return parse_normalizer(plugin)
-    try:
-        consumes = {type_by_name(consumes) for consumes in plugin["consumes"]}
-    except StopIteration:
-        consumes = set()
+        name = plugin["id"].replace("_", " ").replace("kat ", "").title()
 
+    consumes = set()
     produces = set()
-    for ooi in plugin["produces"]:
-        with contextlib.suppress(StopIteration):
-            produces.add(type_by_name(ooi))
+
+    with contextlib.suppress(StopIteration):
+        if plugin["type"] != "normalizer":
+            consumes.add(
+                type_by_name(plugin["consumes"])
+            )  # TODO: No OOI type for normalizers but get consumable Boefjes objects. Refactoring needed.
+        produces.add(type_by_name(plugin["produces"]))
 
     return Plugin(
         id=plugin["id"],
         type=plugin["type"],
-        name=plugin.get("name"),
+        name=name,
         repository_id=plugin["repository_id"],
         description=plugin["description"],
-        scan_level=SCAN_LEVEL(plugin["scan_level"]),
+        scan_level=scan_level,
         consumes=consumes,  # TODO: check if we still want to support multiple
         produces=produces,
         enabled=plugin["enabled"],
