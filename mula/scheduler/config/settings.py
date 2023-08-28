@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, FilePath, PostgresDsn
 from pydantic.env_settings import SettingsSourceCallable
 
 BASE_DIR: Path = Path(__file__).parent.parent.parent.resolve()
@@ -45,8 +45,8 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    debug: bool = Field(False, description="Enables/disables global debugging mode", env="DEBUG")
-    log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
+    debug: bool = Field(False, description="Enable global debug mode, which increases logging verbosity", env="DEBUG")
+    log_cfg: FilePath = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
 
     # Server settings
     api_host: str = Field("0.0.0.0", description="Host address of the scheduler api server")

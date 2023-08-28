@@ -16,7 +16,8 @@
         "DB_URL",
         "DB_ACCESS_TOKEN",
         "DB_ORGANIZATION_IDENTIFIER",
-        "DB_ENDPOINT_FORMAT"
+        "DB_ENDPOINT_FORMAT",
+        "REQUESTS_CA_BUNDLE"
     ],
     "scan_level": 0
 }

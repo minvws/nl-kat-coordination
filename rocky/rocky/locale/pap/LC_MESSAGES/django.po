@@ -3922,9 +3922,13 @@ msgid "OpenKAT sees"
 msgstr "OpenKAT ta mira"
 
 #: rocky/templates/landing_page.html
+#, fuzzy
+#| msgid ""
+#| "Dozens of tools are integrated in OpenKAT to view the world (digital and "
+#| "analog). <br>Our motto is therefore: I see, I see, what you do not see."
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br>Our motto is therefore: I see, I see, what you do not see."
+"analog). <br> Our motto is therefore: I see, I see, what you do not see."
 msgstr ""
 "Mayoria tools ta integra den OpenKAT pa mira e mundu (digital i anologo). "
 "<br>Nos motto ta e ora ey: Mi ta mira, mi ta mira loke bo no ta mira."
@@ -4216,9 +4220,13 @@ msgid "Currently there are no findings for OOI"
 msgstr "Aktualmente no a diskubri nada pa OOI"
 
 #: rocky/templates/oois/ooi_list.html
+#, fuzzy
+#| msgid ""
+#| "An overview of your object list. Objects can be added manually or by "
+#| "running boefjes.</br> Click an object for additional information."
 msgid ""
 "An overview of your object list. Objects can be added manually or by running "
-"boefjes.</br> Click an object for additional information."
+"boefjes. </br> Click an object for additional information."
 msgstr ""
 "Un relato general di bo lista di opheto. Ophetonan por wordu agregá "
 "manualmente òf ora start boefjes. Klék un opheto pa informashon adishonál."
@@ -4327,9 +4335,12 @@ msgid "A report for %(name)s wasn't found."
 msgstr "Un rapport pa %(name)s no por a wordu haña."
 
 #: rocky/templates/oois/ooi_report_404.html
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
+#| "Try some other dates!"
 msgid ""
-"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
+"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
 "Try some other dates!"
 msgstr ""
 "Probablemente e no tabata, probablemente e nunka a eksistí riba "
@@ -5166,13 +5177,13 @@ msgstr "Opheto di entrada"
 msgid "No input OOI"
 msgstr "No tin entrada OOI"
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Download task data"
-msgstr "Descarga datonan di tarea"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Reschedule"
 msgstr "Kambia fecha"
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Download task data"
+msgstr "Descarga datonan di tarea"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"

@@ -23,7 +23,7 @@ Development environment
 make kat
 ********
 
-The 'developer option' or local install of OpenKAT builds the system from the source using make kat or make kat-stable. The manual for this install explains how to set up your computer for an install of OpenKAT.
+The 'developer option' or local install of OpenKAT builds the system from the source using ``make kat``. The manual for this install explains how to set up your computer for an install of OpenKAT.
 
 Minimum requirements
 ====================

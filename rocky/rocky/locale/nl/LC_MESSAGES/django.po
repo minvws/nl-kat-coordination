@@ -3930,9 +3930,13 @@ msgid "OpenKAT sees"
 msgstr "OpenKAT ziet"
 
 #: rocky/templates/landing_page.html
+#, fuzzy
+#| msgid ""
+#| "Dozens of tools are integrated in OpenKAT to view the world (digital and "
+#| "analog). <br>Our motto is therefore: I see, I see, what you do not see."
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br>Our motto is therefore: I see, I see, what you do not see."
+"analog). <br> Our motto is therefore: I see, I see, what you do not see."
 msgstr ""
 "In OpenKAT zijn tientallen hulpmiddelen geïntegreerd om de wereld (digitaal "
 "en analoog) te bekijken. <br>Het motto is dan ook: Ik zie, ik zie, wat jij "
@@ -4222,9 +4226,13 @@ msgid "Currently there are no findings for OOI"
 msgstr "Er zijn geen bevindingen voor het object"
 
 #: rocky/templates/oois/ooi_list.html
+#, fuzzy
+#| msgid ""
+#| "An overview of your object list. Objects can be added manually or by "
+#| "running boefjes.</br> Click an object for additional information."
 msgid ""
 "An overview of your object list. Objects can be added manually or by running "
-"boefjes.</br> Click an object for additional information."
+"boefjes. </br> Click an object for additional information."
 msgstr ""
 "Een overzicht van uw objectenlijst. Objecten kunnen handmatig of door "
 "Boefjes toegevoegd worden. Klik op een object voor meer informatie."
@@ -4331,9 +4339,12 @@ msgid "A report for %(name)s wasn't found."
 msgstr "Kan rapport voor %(name)s niet vinden."
 
 #: rocky/templates/oois/ooi_report_404.html
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
+#| "Try some other dates!"
 msgid ""
-"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
+"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
 "Try some other dates!"
 msgstr ""
 "Misschien heeft het nooit bestaan, misschien alleen niet op "
@@ -5174,13 +5185,13 @@ msgstr "Inputobject"
 msgid "No input OOI"
 msgstr "Geen input object"
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Download task data"
-msgstr "Download taakgegevens"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Reschedule"
 msgstr "Opnieuw plannen"
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Download task data"
+msgstr "Download taakgegevens"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"

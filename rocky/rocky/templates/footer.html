@@ -3,9 +3,7 @@
 
 <footer>
     <span>Kwetsbaarheden Analyse Tool</span>
-      {% if request.user.is_authenticated %}
-        <span>{{ rocky_version }}</span>
-      {% endif %}
+    {% if request.user.is_authenticated %}<span>{{ rocky_version }}</span>{% endif %}
     <nav aria-labelledby="footer-nav-1">
         <h1 id="footer-nav-1" class="visually-hidden">{% translate "Service" %}</h1>
         <ul>
