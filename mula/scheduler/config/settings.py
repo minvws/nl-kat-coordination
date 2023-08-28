@@ -39,7 +39,7 @@ class BackwardsCompatibleEnvSettings(PydanticBaseSettingsSource):
                     d["host_raw_data"] = env_vars[old_name]
                     d["host_normalizer_meta"] = env_vars[old_name]
                 else:
-                    d[new_name[len(env_prefix) :]] = env_vars[old_name]
+                    d[new_name[len(env_prefix):]] = env_vars[old_name]
 
         return d
 
@@ -60,7 +60,7 @@ class Settings(BaseSettings):
         BASE_DIR / "logging.json",
         description="Path to the logging configuration file",
     )
-
+      
     # Server settings
     api_host: str = Field(
         "0.0.0.0",

@@ -11,7 +11,7 @@ To run a development environment you need to have:
 
 - A running RabbitMQ service
 - A running Bytes API service
-- A copy of `./.env-dist` in `./env` containing the environment variables explained below
+- A `./env` containing the environment variables explained below
 - Everything in `requirements.txt` installed
 
 Optionally, you could have an instance of the octopoes api listening on a port that receives the normalized data from
@@ -46,7 +46,7 @@ Supported HTTP methods (for CRUD): `POST`, `GET`, `DELETE`, `PUT`.
 Includes an endpoint that lists all objects.
 
 The KATalogus stores environment settings for the different organisations and plugins, accessible through the API.
-These can be encrypted by setting the `ENCRYPTION_MIDDLEWARE=NACL_SEALBOX`, and the public and private key env vars.
+These can be encrypted by setting the `BYTES_ENCRYPTION_MIDDLEWARE=NACL_SEALBOX`, and the public and private key env vars.
 More info about the encryption scheme can be found here: https://pynacl.readthedocs.io/en/latest/public/.
 Currently, the settings are encrypted when stored, and returned decrypted.
 This could be changed in the future when the boefje-runner/plugin-code can decrypt the secrets itself,
@@ -61,23 +61,6 @@ To illustrate: if `BOEFJE_HTTP_PROXY=https://proxy:8080` environment variable is
 This feature can also be used to set default values for KAT-alogus settings. For example, configuring the `BOEFJE_TOP_PORTS` environment variable
 will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
 This default value can be overridden by setting any value for `TOP_PORTS` in the KAT-alogus.
-
-
-| Environment variable       | Value                        | Description                                                      |
-|----------------------------|------------------------------|------------------------------------------------------------------|
-| QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                                           |
-| QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                                       |
-| QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                                |
-| POOL_SIZE                  | "2.0"                        | Number of workers to run per queue                               |
-| POLL_INTERVAL              | "10.0"                       | Time to wait before polling for tasks when all queues are empty  |
-| WORKER_HEARTBEAT           | "1.0"                        | Seconds to wait before checking the workers when queues are full |
-| OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                                         |
-| BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                                            |
-| KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                                        |
-| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                                        |
-| ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings                     |
-| KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string                |
-| KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string                 |
 
 ## Design
 
