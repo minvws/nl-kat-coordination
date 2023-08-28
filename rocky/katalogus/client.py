@@ -28,7 +28,6 @@ class Plugin(BaseModel):
     consumes: Set[Type[OOI]]
     produces: Set[Type[OOI]]
     enabled: bool
-    environment_keys: List[str]
 
     def dict(self, *args, **kwargs):
         """Pydantic does not stringify the OOI classes, but then templates can't render them"""
@@ -47,7 +46,6 @@ class Normalizer(BaseModel):
     enabled: bool
     consumes: List[str]
     produces: Set[Type[OOI]]
-    environment_keys: List[str]
 
     def dict(self, *args, **kwargs):
         plugin_dict = super().dict(*args, **kwargs)
@@ -183,7 +181,6 @@ def parse_normalizer(plugin: Dict) -> Normalizer:
         enabled=plugin["enabled"],
         consumes=plugin["consumes"],
         produces=produces,
-        environment_keys=plugin["environment_keys"],
     )
 
 
@@ -210,7 +207,6 @@ def parse_plugin(plugin: Dict) -> Plugin:
         consumes=consumes,  # TODO: check if we still want to support multiple
         produces=produces,
         enabled=plugin["enabled"],
-        environment_keys=plugin["environment_keys"],
     )
 
 

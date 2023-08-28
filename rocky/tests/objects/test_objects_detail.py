@@ -193,7 +193,7 @@ def test_ooi_detail_start_scan(
         repository_id="",
         name="",
         description="",
-        environment_keys=[],
+        enabled=True,
         type="boefje",
         scan_level=SCAN_LEVEL.L2,
         consumes=[],
