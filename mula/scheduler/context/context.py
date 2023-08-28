@@ -40,22 +40,23 @@ class AppContext:
         with Path(self.config.log_cfg).open("rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
+        print(str(self.config.host_katalogus))
         # Services
         katalogus_service = services.Katalogus(
-            host=self.config.host_katalogus,
+            host=str(self.config.host_katalogus),
             source=f"scheduler/{scheduler.__version__}",
             cache_ttl=self.config.katalogus_cache_ttl,
         )
 
         bytes_service = services.Bytes(
-            host=self.config.host_bytes,
+            host=str(self.config.host_bytes),
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
             source=f"scheduler/{scheduler.__version__}",
         )
 
         octopoes_service = services.Octopoes(
-            host=self.config.host_octopoes,
+            host=str(self.config.host_octopoes),
             source=f"scheduler/{scheduler.__version__}",
             orgs=katalogus_service.get_organisations(),
             timeout=self.config.octopoes_request_timeout,
