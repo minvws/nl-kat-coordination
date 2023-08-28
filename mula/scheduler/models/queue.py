@@ -22,7 +22,7 @@ class PrioritizedItem(BaseModel):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
-    scheduler_id: Optional[str]
+    scheduler_id: Optional[str] = None
 
     # A unique generated identifier for the object contained in data
     hash: Optional[str] = Field(None, max_length=32)
