@@ -61,7 +61,7 @@ class Server:
 
             resource = Resource(attributes={SERVICE_NAME: "mula"})
             provider = TracerProvider(resource=resource)
-            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=self.config.host_metrics))
+            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(self.config.host_metrics)))
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 
