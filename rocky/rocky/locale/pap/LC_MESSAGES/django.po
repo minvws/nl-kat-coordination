@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-21 09:43+0000\n"
+"POT-Creation-Date: 2023-08-28 12:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1344,6 +1344,82 @@ msgstr "Opshonnan súrtí"
 msgid "This field is required."
 msgstr "E vèld aki ta obligatorio"
 
+#: katalogus/templates/about_plugins.html
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "About plugins"
+msgstr "Tokante plug-in"
+
+#: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
+msgid ""
+"\n"
+"                            Plugins gather data, objects and insight. Each "
+"plugin has its own focus area\n"
+"                            and strengths and may be able to work with other "
+"plugins to gain even more insights.\n"
+"                        "
+msgstr ""
+"\n"
+" Plug-innan ta reuni dato, ophetonan, y tin bista riba dato. Kada plug-in tin su mes area di enfoke\n"
+" i potenshanan i por kapás di traha ku otro plug-innan pa tin mas bista riba e datonan.\n"
+" "
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"\n"
+"                            Scan objects for specific data. Each boefje "
+"scans for specific data.\n"
+"                            The data boefjes find will be added to your "
+"dataset.\n"
+"                        "
+msgstr ""
+"\n"
+" Skohe ophetonan pa datonan spesífiko. Kada boefje\n"
+" ta skohe pa datonan spesífiko.\n"
+" E datonan ku boefjenan ta topa lo wòrdu agrega na bo dataset.\n"
+" "
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"\n"
+"                            Read the dataset and search for specific objects "
+"to add to your objectlist as a separate object.\n"
+"                            Each normalizer searches for a specific object. "
+"You could run one to find all the phonenumbers within a document, as well as "
+"a normalizer to find all the url’s.\n"
+"                        "
+msgstr ""
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"\n"
+"                            Bits are business rules that look for insight "
+"within the current dataset and search for specific insight and draw "
+"conclusions.\n"
+"                        "
+msgstr ""
+"\n"
+" Bitnan ta reglanan di negoshi ku ta buska bista den e dataset aktual i ta buska bista spesífiko i trese konklushonnan.\n"
+" "
+
+#: katalogus/templates/boefjes.html
+msgid ""
+"\n"
+"                            Boefjes are used to scan for objects. They "
+"detect vulnerabilities, security issues, and\n"
+"                            to give insight. Each boefje is a separate scan "
+"that can run on a selection of objects.\n"
+"                        "
+msgstr ""
+"\n"
+" Boefjenan ta wordu usa pa skohe ophetonan. Nan ta detektá vulnerabilidat, problema di seguridat, i\n"
+" pa duna bista. Kada boefje ta un skaneo separá ku por kore riba un selekshon di ophetonan.\n"
+" "
+
+#: katalogus/templates/boefjes.html katalogus/templates/katalogus.html
+#: katalogus/templates/normalizers.html
+msgid "available"
+msgstr "disponibel"
+
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
 msgid "scan level warning"
@@ -1435,58 +1511,9 @@ msgstr ""
 msgid "Clone"
 msgstr "Kopia"
 
-#: katalogus/templates/katalogus.html katalogus/views/change_clearance_level.py
-#: katalogus/views/katalogus.py katalogus/views/katalogus_settings.py
-#: katalogus/views/plugin_detail.py katalogus/views/plugin_settings_add.py
-#: katalogus/views/plugin_settings_delete.py
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-msgid "KAT-alogus"
-msgstr "KAT-alogus"
-
-#: katalogus/templates/katalogus.html
-msgid ""
-"\n"
-"                An overview of all available boefjes.\n"
-"                Boefjes can be used to scan for vulnerablilities and "
-"security issues within specified objects.\n"
-"                Each boefje has his own focus area and strengths.\n"
-"              "
-msgstr ""
-"\n"
-"                Un relato generál di tur boefjes ku tin.\n"
-"                Boefjes por wordu úza pa investigashón pa ophetonan "
-"specífiko vulnerabel i ku problemanan di siguridát.\n"
-"                Kada boefje tin su mes área di enfoké i fortalesanan.\n"
-"              "
-
-#: katalogus/templates/katalogus.html
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
 msgstr "KAT-alogus Settings"
-
-#: katalogus/templates/katalogus.html rocky/templates/scan.html
-msgid "Boefjes overview:"
-msgstr "Relato general di Boefjes:"
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje name"
-msgstr "Nòmber di Boefje"
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje description"
-msgstr "Boefje informashon"
-
-#: katalogus/templates/katalogus.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Actions"
-msgstr "Akshonnan"
-
-#: katalogus/templates/katalogus.html
-#: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-msgid "See details"
-msgstr "Habri detayes"
 
 #: katalogus/templates/katalogus_settings.html
 msgid ""
@@ -1519,8 +1546,20 @@ msgstr "Plugin"
 msgid "Value"
 msgstr "Balor"
 
+#: katalogus/templates/normalizers.html
+msgid ""
+"\n"
+"                            Read the dataset and search for specific objects "
+"to add to your objectlist\n"
+"                            as a separate object. Each normalizer searches "
+"for a specific object.\n"
+"                            You could run one to find all the phonenumbers "
+"within a document,\n"
+"                            as well as a normalizer to find all the url's.\n"
+"                        "
+msgstr ""
+
 #: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
 #: onboarding/templates/partials/boefje_tile_static.html
 msgid "Scan level:"
 msgstr "Nivél di skan:"
@@ -1528,6 +1567,12 @@ msgstr "Nivél di skan:"
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Publisher"
 msgstr "Editora"
+
+#: katalogus/templates/partials/boefje_tile.html
+#: katalogus/templates/partials/plugin_tile.html
+#: katalogus/templates/partials/plugins.html
+msgid "See details"
+msgstr "Habri detayes"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "Enable"
@@ -1543,14 +1588,33 @@ msgid "You don't have permission to enable "
 msgstr "Bo no tin permiso pa aktivá "
 
 #: katalogus/templates/partials/katalogus_filter.html
-msgid "Available plugins"
-msgstr "Plugins disponibel"
+msgid "Filter plugins"
+msgstr "Filtro di plug-in"
 
 #: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/ooi_type_filters.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Update List"
-msgstr "Update Lista"
+msgid "Clear filter"
+msgstr "Kita filters"
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
+#: katalogus/views/katalogus_settings.py katalogus/views/plugin_detail.py
+#: katalogus/views/plugin_settings_add.py
+#: katalogus/views/plugin_settings_delete.py
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+msgid "KAT-alogus"
+msgstr "KAT-alogus"
+
+#: katalogus/templates/partials/katalogus_header.html
+msgid "An overview of all available plugins."
+msgstr "Un bista general di tur plug-innan disponibel."
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/templates/plugin_settings_list.html
+#: katalogus/views/katalogus_settings.py rocky/templates/header.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Settings"
+msgstr "Settings"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Gridview"
@@ -1651,9 +1715,49 @@ msgstr "Settings requeri"
 msgid "Add"
 msgstr "Añadí"
 
-#: katalogus/templates/partials/plugin_tile.html
-msgid "Publisher:"
-msgstr "Editora:"
+#: katalogus/templates/partials/plugins.html
+msgid "Plugins overview:"
+msgstr "Resumen di Plug-innan:"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin name"
+msgstr "Nombre di Plug-in"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin type"
+msgstr "Tipo di Plug-in"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin description"
+msgstr "Deskripshon di Plug-in"
+
+#: katalogus/templates/partials/plugins.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Actions"
+msgstr "Akshonnan"
+
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "Plugins Navigation"
+msgstr "Navegashon di Plug-innan"
+
+#: katalogus/templates/partials/plugins_navigation.html rocky/views/mixins.py
+msgid "All"
+msgstr "Tur"
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: tools/forms/boefje.py rocky/templates/scan.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Boefjes"
+msgstr "Boefjes"
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Normalizers"
+msgstr "Normalizers"
 
 #: katalogus/templates/plugin_detail.html
 msgid "Scan level"
@@ -1775,12 +1879,6 @@ msgid " Details"
 msgstr "Detayes"
 
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Settings"
-msgstr "Settings"
-
-#: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
 msgstr "Relato di settings:"
 
@@ -1815,12 +1913,6 @@ msgstr "Skèn a start ku èxito."
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
 msgstr "Kambia nivél di autorisashon"
-
-#: katalogus/views/katalogus.py
-msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-msgstr ""
-"Carga di plug-in den KATalogus a falla. Fabor kontrolá e registro di "
-"KATalogus."
 
 #: katalogus/views/katalogus_settings.py
 msgid "Settings from {} to {} successfully cloned."
@@ -1870,26 +1962,20 @@ msgid "Please select an OOI to start scan."
 msgstr "Por fabor, selekshoná un OOI pa kuminsá skan."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_name}' desaktivá."
+msgid "{} '{}' disabled."
+msgstr "{} '{}' desaktivá."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
-msgstr ""
-"Faya den buskamentu di ajustenan pa boefje {boefje_name}. Katalogus ta sende?"
+msgid "Failed fetching settings for {}. Is the Katalogus up?"
+msgstr "No por a enkontra e ajustamentunan pa {}. Katalogus ta disponibel?"
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid ""
-"Before enabling, please set the required settings for boefje '{boefje_name}'."
-msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_name}'."
+msgid "Before enabling, please set the required settings for '{}'."
+msgstr "Promé ku aktivá, por fabor pone e ajustamentunan necesario pa '{}'."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_name}' aktivá."
+msgid "{} '{}' enabled."
+msgstr "{} '{}' aktiva."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
@@ -2824,13 +2910,6 @@ msgstr ""
 "abilidát specifikó ku lo juda pa generá bo rapòrt. Tin tres tipo di plugins."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: tools/forms/boefje.py rocky/templates/scan.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Boefjes"
-msgstr "Boefjes"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
@@ -2838,12 +2917,6 @@ msgstr ""
 "Skèn ophetonan pa data. Kada boefje tin un intesidát score pa skan pa "
 "prevení scannan invasivo riba opheto kaminda bo no tin autorisashon pa hasi "
 "esaki."
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Normalizers"
-msgstr "Normalizers"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -4639,8 +4712,7 @@ msgstr "Selekshoná bo idioma"
 #, python-format
 msgid ""
 "Current language is %(current_language)s. Choose your preferred language."
-msgstr ""
-"Idioma aktual ta %(current_language)s. Escoge bo idioma preferí."
+msgstr "Idioma aktual ta %(current_language)s. Escoge bo idioma preferí."
 
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
@@ -4810,6 +4882,11 @@ msgstr "Mapa - aparensia tablatura"
 msgid "Shown types"
 msgstr "Tiponan mustra"
 
+#: rocky/templates/partials/ooi_type_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+msgid "Update List"
+msgstr "Update Lista"
+
 #: rocky/templates/partials/ooi_type_filters_linklist.html
 msgid "Quickly filter by type"
 msgstr "Rapidamente filtrá pa tipo"
@@ -4941,6 +5018,10 @@ msgstr "Perfil"
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
 msgstr "Bai na e kontenido"
+
+#: rocky/templates/scan.html
+msgid "Boefjes overview:"
+msgstr "Relato general di Boefjes:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
@@ -5378,10 +5459,6 @@ msgid ""
 msgstr ""
 "No por parse e parametro observed_at, regresando na munstra e opheto aktual"
 
-#: rocky/views/mixins.py
-msgid "All"
-msgstr "Tur"
-
 #: rocky/views/ooi_add.py
 msgid "Type select"
 msgstr "Selektá tipo"
@@ -5702,3 +5779,26 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "Boefje name"
+#~ msgstr "Nòmber di Boefje"
+
+#~ msgid "Boefje description"
+#~ msgstr "Boefje informashon"
+
+#~ msgid "Publisher:"
+#~ msgstr "Editora:"
+
+#~ msgid ""
+#~ "Loading plugins in KATalogus failed. Please check the KATalogus logs."
+#~ msgstr ""
+#~ "Carga di plug-in den KATalogus a falla. Fabor kontrolá e registro di "
+#~ "KATalogus."
+
+#, python-brace-format
+#~ msgid "Boefje '{boefje_name}' disabled."
+#~ msgstr "Boefje '{boefje_name}' desaktivá."
+
+#, python-brace-format
+#~ msgid "Boefje '{boefje_name}' enabled."
+#~ msgstr "Boefje '{boefje_name}' aktivá."

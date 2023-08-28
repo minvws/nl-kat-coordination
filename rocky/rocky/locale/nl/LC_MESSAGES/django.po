@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-21 09:43+0000\n"
+"POT-Creation-Date: 2023-08-28 12:33+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1357,6 +1357,96 @@ msgstr "Sorteer-opties"
 msgid "This field is required."
 msgstr "Dit veld is verplicht."
 
+#: katalogus/templates/about_plugins.html
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "About plugins"
+msgstr "Over plug-ins"
+
+#: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
+msgid ""
+"\n"
+"                            Plugins gather data, objects and insight. Each "
+"plugin has its own focus area\n"
+"                            and strengths and may be able to work with other "
+"plugins to gain even more insights.\n"
+"                        "
+msgstr ""
+"\n"
+"                            Plug-ins verzamelen gegevens, objecten en inzichten. Elke "
+"plug-in heeft zijn eigen focusgebied\n"
+"                            en sterke punten en kan mogelijk samenwerken met andere "
+"plug-ins om nog meer inzichten te krijgen.\n"
+"                        "
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"\n"
+"                            Scan objects for specific data. Each boefje "
+"scans for specific data.\n"
+"                            The data boefjes find will be added to your "
+"dataset.\n"
+"                        "
+msgstr ""
+"\n"
+"                            Objecten scannen op specifieke gegevens. Elk boefje "
+"scant naar specifieke gegevens.\n"
+"                            De gevonden gegevens door boefjes worden toegevoegd aan uw "
+"gegevensset.\n"
+"                        "
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"\n"
+"                            Read the dataset and search for specific objects "
+"to add to your objectlist as a separate object.\n"
+"                            Each normalizer searches for a specific object. "
+"You could run one to find all the phonenumbers within a document, as well as "
+"a normalizer to find all the url’s.\n"
+"                        "
+msgstr ""
+"\n"
+"                            Lees de dataset en zoek naar specifieke objecten "
+"om als afzonderlijk object aan uw objectlijst toe te voegen.\n"
+"                           Elke normalizer zoekt naar een specifiek object."
+"Je zou er een kunnen uitvoeren om alle telefoonnummers in een document te vinden, maar ook "
+"een normalizer om alle url's te vinden.\n"
+"                        "
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"\n"
+"                            Bits are business rules that look for insight "
+"within the current dataset and search for specific insight and draw "
+"conclusions.\n"
+"                        "
+msgstr ""
+"\n"
+"                            Bits zijn bedrijfsregels die zoeken naar inzichten "
+"binnen de huidige dataset. Ze zoeken naar specifiek inzichten en maken"
+"daarvan conclusies.\n"
+"                        "
+
+#: katalogus/templates/boefjes.html
+msgid ""
+"\n"
+"                            Boefjes are used to scan for objects. They "
+"detect vulnerabilities, security issues, and\n"
+"                            to give insight. Each boefje is a separate scan "
+"that can run on a selection of objects.\n"
+"                        "
+msgstr ""
+"\n"
+"                            Boefjes worden gebruikt om objecten te scannen. Ze detecteren"
+"kwetsbaarheden, beveiligingsproblemen en\n"
+"                            om inzicht te geven. Elk boefje is een aparte scan"
+"die op een selectie van objecten kan draaien.\n"
+"                        "
+
+#: katalogus/templates/boefjes.html katalogus/templates/katalogus.html
+#: katalogus/templates/normalizers.html
+msgid "available"
+msgstr "beschikbaar"
+
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
 msgid "scan level warning"
@@ -1448,58 +1538,9 @@ msgstr ""
 msgid "Clone"
 msgstr "Klonen"
 
-#: katalogus/templates/katalogus.html katalogus/views/change_clearance_level.py
-#: katalogus/views/katalogus.py katalogus/views/katalogus_settings.py
-#: katalogus/views/plugin_detail.py katalogus/views/plugin_settings_add.py
-#: katalogus/views/plugin_settings_delete.py
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-msgid "KAT-alogus"
-msgstr "KAT-alogus"
-
-#: katalogus/templates/katalogus.html
-msgid ""
-"\n"
-"                An overview of all available boefjes.\n"
-"                Boefjes can be used to scan for vulnerablilities and "
-"security issues within specified objects.\n"
-"                Each boefje has his own focus area and strengths.\n"
-"              "
-msgstr ""
-"\n"
-"                Een overzicht van alle beschikbare boefjes.\n"
-"                Boefjes kunnen worden gebruikt om te scannen op "
-"kwetsbaarheden en beveiligingsproblemen binnen gespecificeerde objecten.\n"
-"                Elk boefje heeft zijn eigen toepassing.\n"
-"              "
-
-#: katalogus/templates/katalogus.html
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
 msgstr "KAT-alogus Instellingen"
-
-#: katalogus/templates/katalogus.html rocky/templates/scan.html
-msgid "Boefjes overview:"
-msgstr "Boefjes-overzicht:"
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje name"
-msgstr "Naam boefje"
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje description"
-msgstr "Omschrijving boefje"
-
-#: katalogus/templates/katalogus.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Actions"
-msgstr "Acties"
-
-#: katalogus/templates/katalogus.html
-#: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-msgid "See details"
-msgstr "Zie details"
 
 #: katalogus/templates/katalogus_settings.html
 msgid ""
@@ -1532,8 +1573,20 @@ msgstr "Plugin"
 msgid "Value"
 msgstr "Waarde"
 
+#: katalogus/templates/normalizers.html
+msgid ""
+"\n"
+"                            Read the dataset and search for specific objects "
+"to add to your objectlist\n"
+"                            as a separate object. Each normalizer searches "
+"for a specific object.\n"
+"                            You could run one to find all the phonenumbers "
+"within a document,\n"
+"                            as well as a normalizer to find all the url's.\n"
+"                        "
+msgstr ""
+
 #: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
 #: onboarding/templates/partials/boefje_tile_static.html
 msgid "Scan level:"
 msgstr "Vrijwaringsniveau:"
@@ -1541,6 +1594,12 @@ msgstr "Vrijwaringsniveau:"
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Publisher"
 msgstr "Uitgever"
+
+#: katalogus/templates/partials/boefje_tile.html
+#: katalogus/templates/partials/plugin_tile.html
+#: katalogus/templates/partials/plugins.html
+msgid "See details"
+msgstr "Zie details"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "Enable"
@@ -1556,14 +1615,33 @@ msgid "You don't have permission to enable "
 msgstr "U heeft geen toestemming om in te schakelen"
 
 #: katalogus/templates/partials/katalogus_filter.html
-msgid "Available plugins"
-msgstr "Beschikbare plug-ins"
+msgid "Filter plugins"
+msgstr "Filter plug-ins"
 
 #: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/ooi_type_filters.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Update List"
-msgstr "Lijst updaten"
+msgid "Clear filter"
+msgstr "Filters wissen"
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
+#: katalogus/views/katalogus_settings.py katalogus/views/plugin_detail.py
+#: katalogus/views/plugin_settings_add.py
+#: katalogus/views/plugin_settings_delete.py
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+msgid "KAT-alogus"
+msgstr "KAT-alogus"
+
+#: katalogus/templates/partials/katalogus_header.html
+msgid "An overview of all available plugins."
+msgstr "Een overzicht van alle beschikbare plug-ins."
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/templates/plugin_settings_list.html
+#: katalogus/views/katalogus_settings.py rocky/templates/header.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Settings"
+msgstr "Instellingen"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Gridview"
@@ -1664,9 +1742,49 @@ msgstr "Verplichte instellingen"
 msgid "Add"
 msgstr "Toevoegen"
 
-#: katalogus/templates/partials/plugin_tile.html
-msgid "Publisher:"
-msgstr "Uitgever:"
+#: katalogus/templates/partials/plugins.html
+msgid "Plugins overview:"
+msgstr "Overzicht plug-ins:"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin name"
+msgstr "Plug-in naam"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin type"
+msgstr "Plug-in type"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin description"
+msgstr "Plug-in beschrijving"
+
+#: katalogus/templates/partials/plugins.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Actions"
+msgstr "Acties"
+
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "Plugins Navigation"
+msgstr "Plug-ins navigatie"
+
+#: katalogus/templates/partials/plugins_navigation.html rocky/views/mixins.py
+msgid "All"
+msgstr "Alle"
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: tools/forms/boefje.py rocky/templates/scan.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Boefjes"
+msgstr "Boefjes"
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Normalizers"
+msgstr "Normalizers"
 
 #: katalogus/templates/plugin_detail.html
 msgid "Scan level"
@@ -1790,12 +1908,6 @@ msgid " Details"
 msgstr " Details"
 
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Settings"
-msgstr "Instellingen"
-
-#: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
 msgstr "Overzicht van instellingen:"
 
@@ -1830,12 +1942,6 @@ msgstr "Scan met success ingepland."
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
 msgstr "Wijzig vrijwaringsniveau"
-
-#: katalogus/views/katalogus.py
-msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-msgstr ""
-"Het laden van plug-ins in KATalogus is mislukt. Controleer de KATalogus-"
-"logboeken."
 
 #: katalogus/views/katalogus_settings.py
 msgid "Settings from {} to {} successfully cloned."
@@ -1885,29 +1991,22 @@ msgid "Please select an OOI to start scan."
 msgstr "Selecteer een OOI om de scan te starten."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_name}' uitgezet."
+msgid "{} '{}' disabled."
+msgstr "{} '{}' uitgezet."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
+msgid "Failed fetching settings for {}. Is the Katalogus up?"
 msgstr ""
-"Ophalen van instellingen voor boefje {boefje_name} mislukt. Is de Katalogus "
+"Ophalen van instellingen {} mislukt. Is de Katalogus "
 "actief?"
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid ""
-"Before enabling, please set the required settings for boefje '{boefje_name}'."
-msgstr ""
-"Voordat je '{boefje_name}' inschakeld, zet alsjeblieft de verplichte "
-"instellingen."
+msgid "Before enabling, please set the required settings for '{}'."
+msgstr "Stel vóór het inschakelen de vereiste instellingen in voor '{}'."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_name}' aangezet."
+msgid "{} '{}' enabled."
+msgstr "{} '{}' aangezet."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
@@ -2836,25 +2935,12 @@ msgstr ""
 "genereren van uw rapport. Er zijn drie soorten plugins."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: tools/forms/boefje.py rocky/templates/scan.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Boefjes"
-msgstr "Boefjes"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
 msgstr ""
 "Scan objecten voor data. Elke boefje heeft een vrijwaringsniveau om te "
 "zorgen dat objecten niet te agressief worden gescant."
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Normalizers"
-msgstr "Normalizers"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -4647,8 +4733,7 @@ msgstr "Selecteer je taal"
 #, python-format
 msgid ""
 "Current language is %(current_language)s. Choose your preferred language."
-msgstr ""
-"De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
+msgstr "De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
 
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
@@ -4819,6 +4904,11 @@ msgstr "Boom - tabelweergave"
 msgid "Shown types"
 msgstr "Getoonde typen"
 
+#: rocky/templates/partials/ooi_type_filters.html
+#: rocky/templates/partials/organization_member_list_filters.html
+msgid "Update List"
+msgstr "Lijst updaten"
+
 #: rocky/templates/partials/ooi_type_filters_linklist.html
 msgid "Quickly filter by type"
 msgstr "Snel filteren op type"
@@ -4951,6 +5041,10 @@ msgstr "Profiel"
 msgid "Go to content"
 msgstr "Ga direct naar de inhoud"
 
+#: rocky/templates/scan.html
+msgid "Boefjes overview:"
+msgstr "Boefjes-overzicht:"
+
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
 msgid ""
@@ -5028,7 +5122,8 @@ msgstr "Ja, stel in"
 msgid ""
 "An overview of the boefje task, the input OOI and the RAW data it generated."
 msgstr ""
-"Een overzicht van de boefje-taak, de invoer OOI en de RAW-gegevens die het heeft gegenereerd."
+"Een overzicht van de boefje-taak, de invoer OOI en de RAW-gegevens die het "
+"heeft gegenereerd."
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -5387,11 +5482,8 @@ msgstr "Vrijwaringsniveau ingesteld."
 msgid ""
 "Can not parse observed_at parameter, falling back to showing current object"
 msgstr ""
-"Kan de parameter observed_at niet ontleden, terugvallen op het weergeven van het huidige object"
-
-#: rocky/views/mixins.py
-msgid "All"
-msgstr "Alle"
+"Kan de parameter observed_at niet ontleden, terugvallen op het weergeven van "
+"het huidige object"
 
 #: rocky/views/ooi_add.py
 msgid "Type select"
