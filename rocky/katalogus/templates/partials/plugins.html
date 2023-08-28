@@ -27,7 +27,7 @@
                             </p>
                         </td>
                         <td>
-                            <span class="plugin-description">{{ plugin.description }}</span>
+                            {% if plugin.description %}<span class="plugin-description">{{ plugin.description }}</span>{% endif %}
                         </td>
                         <td>
                             {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
