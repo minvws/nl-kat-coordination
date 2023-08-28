@@ -40,7 +40,6 @@ class AppContext:
         with Path(self.config.log_cfg).open("rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
-        print(str(self.config.host_katalogus))
         # Services
         katalogus_service = services.Katalogus(
             host=str(self.config.host_katalogus),
