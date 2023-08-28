@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-28 12:33+0000\n"
+"POT-Creation-Date: 2023-08-28 15:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1347,7 +1347,7 @@ msgstr "E vèld aki ta obligatorio"
 #: katalogus/templates/about_plugins.html
 #: katalogus/templates/partials/plugins_navigation.html
 msgid "About plugins"
-msgstr "Tokante plug-in"
+msgstr "Tokante plug-innan"
 
 #: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
 msgid ""
@@ -1359,23 +1359,25 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-" Plug-innan ta reuni dato, ophetonan, y tin bista riba dato. Kada plug-in tin su mes area di enfoke\n"
-" i potenshanan i por kapás di traha ku otro plug-innan pa tin mas bista riba e datonan.\n"
+" Plug-innan ta reuni dato, ophetonan, y tin bista riba dato. Kada plug-in "
+"tin su mes area di enfoke\n"
+" i potenshanan i por kapás di traha ku otro plug-innan pa tin mas bista riba "
+"e datonan.\n"
 " "
 
 #: katalogus/templates/about_plugins.html
 msgid ""
 "\n"
-"                            Scan objects for specific data. Each boefje "
+"                            Scan objects for specific data. Each Boefje "
 "scans for specific data.\n"
-"                            The data boefjes find will be added to your "
+"                            The data Boefjes find will be added to your "
 "dataset.\n"
 "                        "
 msgstr ""
 "\n"
-" Skohe ophetonan pa datonan spesífiko. Kada boefje\n"
+" Skohe ophetonan pa datonan spesífiko. Kada Boefje\n"
 " ta skohe pa datonan spesífiko.\n"
-" E datonan ku boefjenan ta topa lo wòrdu agrega na bo dataset.\n"
+" E datonan ku Boefjenan ta topa lo wòrdu agrega na bo dataset.\n"
 " "
 
 #: katalogus/templates/about_plugins.html
@@ -1383,11 +1385,18 @@ msgid ""
 "\n"
 "                            Read the dataset and search for specific objects "
 "to add to your objectlist as a separate object.\n"
-"                            Each normalizer searches for a specific object. "
+"                            Each Normalizer searches for a specific object. "
 "You could run one to find all the phonenumbers within a document, as well as "
-"a normalizer to find all the url’s.\n"
+"a Normalizer to find all the url’s.\n"
 "                        "
 msgstr ""
+"\n"
+" Lesa e dataset i buska pa ophetonan spesífiko\n"
+" pa agrega nan na bo lista di ophetonan komo un opheto separá.\n"
+" Kada Normalizer ta buska pa un opheto spesífiko. Bo por lanta un pa topa "
+"tur e númeronan di telefòn den un dokument, manera tambe un Normalizer pa "
+"topa tur e urlnan.\n"
+" "
 
 #: katalogus/templates/about_plugins.html
 msgid ""
@@ -1398,7 +1407,8 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-" Bitnan ta reglanan di negoshi ku ta buska bista den e dataset aktual i ta buska bista spesífiko i trese konklushonnan.\n"
+" Bitnan ta reglanan di negoshi ku ta buska bista den e dataset aktual i ta "
+"buska bista spesífiko i trese konklushonnan.\n"
 " "
 
 #: katalogus/templates/boefjes.html
@@ -1406,17 +1416,18 @@ msgid ""
 "\n"
 "                            Boefjes are used to scan for objects. They "
 "detect vulnerabilities, security issues, and\n"
-"                            to give insight. Each boefje is a separate scan "
+"                            to give insight. Each Boefje is a separate scan "
 "that can run on a selection of objects.\n"
 "                        "
 msgstr ""
 "\n"
-" Boefjenan ta wordu usa pa skohe ophetonan. Nan ta detektá vulnerabilidat, problema di seguridat, i\n"
-" pa duna bista. Kada boefje ta un skaneo separá ku por kore riba un selekshon di ophetonan.\n"
+" Boefjenan ta wordu usa pa skohe ophetonan. Nan ta detektá vulnerabilidat, "
+"problema di seguridat, i\n"
+" pa duna bista. Kada Boefje ta un skaneo separá ku por kore riba un "
+"selekshon di ophetonan.\n"
 " "
 
-#: katalogus/templates/boefjes.html katalogus/templates/katalogus.html
-#: katalogus/templates/normalizers.html
+#: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
 msgid "available"
 msgstr "disponibel"
 
@@ -1511,6 +1522,14 @@ msgstr ""
 msgid "Clone"
 msgstr "Kopia"
 
+#: katalogus/templates/katalogus.html
+msgid "All plugins"
+msgstr "Tur plug-ins"
+
+#: katalogus/templates/katalogus.html
+msgid "Plugins available"
+msgstr "Plug-ins disponibel"
+
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
 msgstr "KAT-alogus Settings"
@@ -1551,13 +1570,20 @@ msgid ""
 "\n"
 "                            Read the dataset and search for specific objects "
 "to add to your objectlist\n"
-"                            as a separate object. Each normalizer searches "
+"                            as a separate object. Each Normalizer searches "
 "for a specific object.\n"
 "                            You could run one to find all the phonenumbers "
 "within a document,\n"
-"                            as well as a normalizer to find all the url's.\n"
+"                            as well as a Normalizer to find all the url's.\n"
 "                        "
 msgstr ""
+"\n"
+" Les e dataset i buska pa ophetonan spesífiko\n"
+" pa agrega nan na bo list di ophetonan komo un opheton separá.\n"
+" Kada Normalizer ta buska pa un opheton spesífiko. Bo por lanta un pa topa "
+"tur e númeronan di telefòn den un dokument, manera tambe un Normalizer pa "
+"topa tur e urlnan.\n"
+" "
 
 #: katalogus/templates/partials/boefje_tile.html
 #: onboarding/templates/partials/boefje_tile_static.html
@@ -4722,6 +4748,10 @@ msgstr "Skonde opcionnan di filter"
 msgid "Show filter options"
 msgstr "Mustra opcionnan di filter"
 
+#: rocky/templates/partials/list_filters.html
+msgid "Filters are on"
+msgstr "Filters ta sendi"
+
 #: rocky/templates/partials/list_paginator.html
 msgid "List pagination"
 msgstr "Listra pagina"
@@ -5779,26 +5809,3 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
-
-#~ msgid "Boefje name"
-#~ msgstr "Nòmber di Boefje"
-
-#~ msgid "Boefje description"
-#~ msgstr "Boefje informashon"
-
-#~ msgid "Publisher:"
-#~ msgstr "Editora:"
-
-#~ msgid ""
-#~ "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-#~ msgstr ""
-#~ "Carga di plug-in den KATalogus a falla. Fabor kontrolá e registro di "
-#~ "KATalogus."
-
-#, python-brace-format
-#~ msgid "Boefje '{boefje_name}' disabled."
-#~ msgstr "Boefje '{boefje_name}' desaktivá."
-
-#, python-brace-format
-#~ msgid "Boefje '{boefje_name}' enabled."
-#~ msgstr "Boefje '{boefje_name}' aktivá."
