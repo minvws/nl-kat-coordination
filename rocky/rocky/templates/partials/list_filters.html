@@ -7,6 +7,11 @@
                 data-hide-filters-label="{% block hide_text %}{% translate "Hide filter options" %}{% endblock hide_text %} ">
             {% translate "Show filter options" %}
         </button>
+        {% if request.GET %}
+            <p class="confirmation">
+                <span class="icon ti-circle-check"></span><strong>{% translate "Filters are on" %}</strong>
+            </p>
+        {% endif %}
     </div>
     {% block filter_form %}
     {% endblock filter_form %}
