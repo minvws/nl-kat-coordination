@@ -3,14 +3,20 @@
 
 <section class="filter">
     <div>
+        <p>
+            {% block title %}
+            {% endblock title %}
+        </p>
         <button aria-expanded="false"
                 data-hide-filters-label="{% block hide_text %}{% translate "Hide filter options" %}{% endblock hide_text %} ">
             {% translate "Show filter options" %}
         </button>
         {% if request.GET %}
-            <p class="confirmation">
-                <span class="icon ti-circle-check"></span><strong>{% translate "Filters are on" %}</strong>
-            </p>
+            <div class="confirmation">
+                <p>
+                    <span class="icon ti-circle-check"></span><strong>{% translate "Filters are on" %}</strong>
+                </p>
+            </div>
         {% endif %}
     </div>
     {% block filter_form %}
