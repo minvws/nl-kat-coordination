@@ -1,7 +1,6 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from http import HTTPStatus
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -13,7 +12,7 @@ from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 
-from rocky.scheduler import client
+from rocky.scheduler import TaskAlreadyQueued, client
 
 TASK_LIMIT = 50
 
@@ -98,16 +97,13 @@ class TaskListView(OrganizationView, ListView):
 
             try:
                 client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
-            except HTTPError as e:
-                if e.response.status_code == HTTPStatus.BAD_REQUEST:
-                    messages.add_message(
-                        self.request,
-                        messages.WARNING,
-                        _("Cannot reschedule task: it is already running."),
-                    )
-                    return
-
-                raise
+            except TaskAlreadyQueued:
+                messages.add_message(
+                    self.request,
+                    messages.WARNING,
+                    _("Cannot reschedule task: it has probably already been queued."),
+                )
+                return
 
             success_message = (
                 "Your task is scheduled and will soon be started in the background. \n "
