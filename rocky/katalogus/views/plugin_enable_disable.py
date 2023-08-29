@@ -20,7 +20,7 @@ class PluginEnableDisableView(SinglePluginView):
 
         return all([field in settings for field in self.plugin_schema["required"]])
 
-    def has_clearance(self, scan_level: int):
+    def has_clearance(self, scan_level: int) -> bool:
         return self.organization_member.trusted_clearance_level >= scan_level
 
     def post(self, request, *args, **kwargs):
@@ -74,7 +74,7 @@ class PluginEnableDisableView(SinglePluginView):
                 )
             )
 
-        if self.organization_member.trusted_clearance_level >= self.plugin.scan_level.value:
+        if self.has_clearance(self.plugin.scan_level.value):
             self.katalogus_client.enable_boefje(self.plugin)
             messages.add_message(
                 self.request,
