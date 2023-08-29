@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 10:25+0000\n"
+"POT-Creation-Date: 2023-08-29 13:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5671,6 +5671,10 @@ msgstr "Detayes di tarea no por wordu haña."
 #: rocky/views/tasks.py
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "No por haña tarea: no tin konekshon ku scheduler"
+
+#: rocky/views/tasks.py
+msgid "Cannot reschedule task: it has probably already been queued."
+msgstr ""
 
 #: rocky/views/upload_csv.py
 msgid ""

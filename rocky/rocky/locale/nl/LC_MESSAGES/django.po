@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 10:25+0000\n"
+"POT-Creation-Date: 2023-08-29 13:14+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -5688,6 +5688,10 @@ msgstr "Taakdetails niet gevonden."
 #: rocky/views/tasks.py
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "Ophalen van taken mislukt: geen verbinding met scheduler"
+
+#: rocky/views/tasks.py
+msgid "Cannot reschedule task: it has probably already been queued."
+msgstr "Taak kan niet worden herstart: waarschijnlijk staat deze al ingepland."
 
 #: rocky/views/upload_csv.py
 msgid ""
