@@ -86,7 +86,7 @@ class PluginEnableDisableView(SinglePluginView):
                 self.request,
                 messages.ERROR,
                 _(
-                    "To to enable {} you need at least a clearance level of L{}. "
+                    "To enable {} you need at least a clearance level of L{}. "
                     "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
                 ).format(
                     self.plugin.name.title(),

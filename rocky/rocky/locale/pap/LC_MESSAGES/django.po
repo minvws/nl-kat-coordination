@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 10:25+0000\n"
+"POT-Creation-Date: 2023-08-29 14:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1890,6 +1890,14 @@ msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_name}'."
 #, python-brace-format
 msgid "Boefje '{boefje_name}' enabled."
 msgstr "Boefje '{boefje_name}' aktivá."
+
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
+"To enable {} you need at least a clearance level of L{}. Your clearance "
+"level is L{}. Contact your administrator to get a higher clearance level."
+msgstr ""
+"Pa aktivá {} bo mester di por lo ménos un nivel di autorisashon di L{}. Bo nivel di autorisashon "
+"ta L{}. Tuma kontakto ku bo administrador pa haña un nivel di autorisashon mas haltu."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
@@ -3823,16 +3831,12 @@ msgid "OpenKAT sees"
 msgstr "OpenKAT ta mira"
 
 #: rocky/templates/landing_page.html
-#, fuzzy
-#| msgid ""
-#| "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-#| "analog). <br>Our motto is therefore: I see, I see, what you do not see."
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
 "analog). <br> Our motto is therefore: I see, I see, what you do not see."
 msgstr ""
-"Mayoria tools ta integra den OpenKAT pa mira e mundu (digital i anologo). "
-"<br>Nos motto ta e ora ey: Mi ta mira, mi ta mira loke bo no ta mira."
+"Dosen di hermentnan ta integrá den OpenKAT pa mira e mundu (digital i "
+"anoloog). <br>Nos lema ta: Mi ta mira, mi ta mira loke bo no ta mira."
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT knows"
@@ -4121,16 +4125,13 @@ msgid "Currently there are no findings for OOI"
 msgstr "Aktualmente no a diskubri nada pa OOI"
 
 #: rocky/templates/oois/ooi_list.html
-#, fuzzy
-#| msgid ""
-#| "An overview of your object list. Objects can be added manually or by "
-#| "running boefjes.</br> Click an object for additional information."
 msgid ""
 "An overview of your object list. Objects can be added manually or by running "
 "boefjes. </br> Click an object for additional information."
 msgstr ""
-"Un relato general di bo lista di opheto. Ophetonan por wordu agregá "
-"manualmente òf ora start boefjes. Klék un opheto pa informashon adishonál."
+"Un bista general di bo lista di ophetonan. Ophetonan por wòrdu añadí "
+"manualmente òf dor di ehekutá boefjes. </br> Klik riba un opheto pa mas "
+"informashon."
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
@@ -4236,10 +4237,7 @@ msgid "A report for %(name)s wasn't found."
 msgstr "Un rapport pa %(name)s no por a wordu haña."
 
 #: rocky/templates/oois/ooi_report_404.html
-#, fuzzy, python-format
-#| msgid ""
-#| "Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
-#| "Try some other dates!"
+#, python-format
 msgid ""
 "Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
 "Try some other dates!"
