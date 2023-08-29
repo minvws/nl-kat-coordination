@@ -22,11 +22,15 @@
                             <tr>
                                 <td>{{ setting.name }}</td>
                                 <td>
-                                    {% if setting.value is None %}
-                                        {% translate "Unset" %}
-                                    {% else %}
-                                        {{ setting.value }}
-                                    {% endif %}
+                                    {% with sname=setting.name.lower %}
+                                        {% if setting.value is None %}
+                                            {% translate "Unset" %}
+                                        {% elif "token" in sname or "key" in sname or "api" in sname or "secret" in sname %}
+                                            •••••••••••••
+                                        {% else %}
+                                            {{ setting.value }}
+                                        {% endif %}
+                                    {% endwith %}
                                 </td>
                                 <td>
                                     {% if setting.required %}
