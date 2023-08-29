@@ -482,7 +482,7 @@ class BoefjeScheduler(Scheduler):
 
         """
         task = BoefjeTask(
-            boefje=Boefje(id=boefje.id, version=boefje.version),
+            boefje=Boefje.parse_obj(boefje.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
