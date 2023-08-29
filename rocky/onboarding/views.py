@@ -330,12 +330,14 @@ class OnboardingClearanceLevelIntroductionView(
         tiles = [
             {
                 "tile_image": self.get_boefje_cover_img("dns_zone"),
+                "type": "boefje",
                 "scan_level": "l1",
                 "name": "DNS-Zone",
                 "description": "Fetch the parent DNS zone of a hostname",
             },
             {
                 "tile_image": self.get_boefje_cover_img("fierce"),
+                "type": "boefje",
                 "scan_level": "l3",
                 "name": "Fierce",
                 "description": "Finds subdomains by brute force",

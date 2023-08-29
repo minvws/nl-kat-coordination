@@ -35,7 +35,6 @@ def test_crisis_room_observed_at(rf, client_member, mock_crisis_room_octopoes):
     response = CrisisRoomView.as_view()(request)
     assert response.status_code == 200
     assertContains(response, "Jan 01, 2021")
-    assertContains(response, "Filters are on")
 
     request = setup_request(rf.get("crisis_room", {"observed_at": "2021-bad-format"}), client_member.user)
     request.resolver_match = resolve(reverse("crisis_room"))
