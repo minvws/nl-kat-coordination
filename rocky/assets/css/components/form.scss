@@ -1,4 +1,7 @@
 /* Added min height for form buttons */
+
+$breakpoint-filter: 60rem;
+
 form {
 	button,
 	a.button,
@@ -7,4 +10,32 @@ form {
 	input[type="reset"] {
 		min-height: 2.75rem;
 	}
+
+	.filter-fields-direction {
+		display: flex;
+
+		&.column {
+			flex-direction: column;
+		}
+	}
+
+	@media (min-width:$breakpoint-filter) {
+		.filter-fields-direction {
+			&.row {
+				flex-direction: row;
+			}
+		}
+	}
+}
+
+.indented-form fieldset.indented fieldset {
+  padding-left: 3rem;
+}
+
+.indented-form fieldset div {
+  padding-bottom: .5rem;
+}
+
+.indented-form fieldset button {
+  margin-left: .5rem;
 }

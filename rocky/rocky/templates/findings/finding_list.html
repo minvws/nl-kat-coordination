@@ -20,6 +20,7 @@
                 </p>
                 {{ object_type_filters }}
                 {% include "partials/findings_list_toolbar.html" %}
+                {% include "findings/findings_filter.html" %}
 
                 {% translate "Object list" as filter_title %}
                 {% if object_list|length > 1 and perms.tools.can_mute_findings %}
@@ -30,7 +31,7 @@
                     {% endif %}
                     <div class="horizontal-scroll">
                         <table class="action-buttons nowrap">
-                            <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "objects" %}</caption>
+                            <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}</caption>
                             <thead>
                                 <tr>
                                     {% if object_list|length > 1 and perms.tools.can_mute_findings %}
@@ -140,6 +141,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

@@ -7,11 +7,12 @@ User=kat
 Group=kat
 SyslogIdentifier=kat-boefjes
 WorkingDirectory=/opt/venvs/kat-boefjes/lib/python3.9/site-packages
-# TODO: don't load env here
+EnvironmentFile=/usr/lib/kat/boefjes.defaults
 EnvironmentFile=/etc/kat/boefjes.conf
 ExecStart=/opt/venvs/kat-boefjes/bin/python -m boefjes boefje
 Restart=on-failure
 RestartSec=3s
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

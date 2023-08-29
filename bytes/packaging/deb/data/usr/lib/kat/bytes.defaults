@@ -1,0 +1,4 @@
+BYTES_ACCESS_TOKEN_EXPIRE_MINUTES=1000
+BYTES_LOG_FILE=/var/log/kat-bytes/bytes.log
+BYTES_DATA_DIR=/var/lib/kat-bytes/
+BYTES_LOG_CFG=/etc/kat/bytes.logging.conf

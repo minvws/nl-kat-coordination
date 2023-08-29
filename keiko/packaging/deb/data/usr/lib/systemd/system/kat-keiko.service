@@ -7,6 +7,7 @@ User=kat
 Group=kat
 SyslogIdentifier=kat-keiko
 WorkingDirectory=/opt/venvs/kat-keiko/
+EnvironmentFile=/usr/lib/kat/keiko.defaults
 EnvironmentFile=/etc/kat/keiko.conf
 ExecStart=/opt/venvs/kat-keiko/bin/python -m gunicorn \
           --access-logfile - \
@@ -15,6 +16,7 @@ ExecStart=/opt/venvs/kat-keiko/bin/python -m gunicorn \
           keiko.app:api
 Restart=on-failure
 RestartSec=3s
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

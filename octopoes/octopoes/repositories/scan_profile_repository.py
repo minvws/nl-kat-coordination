@@ -15,6 +15,7 @@ from octopoes.models import (
     ScanProfileBase,
 )
 from octopoes.models.exception import ObjectNotFoundException
+from octopoes.repositories.repository import Repository
 from octopoes.xtdb import FieldSet
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
@@ -23,7 +24,7 @@ from octopoes.xtdb.query_builder import generate_pull_query
 logger = getLogger(__name__)
 
 
-class ScanProfileRepository:
+class ScanProfileRepository(Repository):
     def __init__(self, event_manager: EventManager):
         self.event_manager = event_manager
 
@@ -52,6 +53,9 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         super().__init__(event_manager)
         self.session = session
         self.__class__.xtdb_type = xtdb_type
+
+    def commit(self):
+        self.session.commit()
 
     @classmethod
     def pk_prefix(cls):

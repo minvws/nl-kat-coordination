@@ -7,6 +7,7 @@ User=kat
 Group=kat
 SyslogIdentifier=kat-bytes
 WorkingDirectory=/opt/venvs/kat-bytes/
+EnvironmentFile=/usr/lib/kat/bytes.defaults
 EnvironmentFile=/etc/kat/bytes.conf
 ExecStart=/opt/venvs/kat-bytes/bin/python -m gunicorn \
           --access-logfile - \
@@ -15,6 +16,7 @@ ExecStart=/opt/venvs/kat-bytes/bin/python -m gunicorn \
           bytes.api:app
 Restart=on-failure
 RestartSec=3s
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

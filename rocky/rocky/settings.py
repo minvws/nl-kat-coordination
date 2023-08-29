@@ -19,12 +19,12 @@ from django.utils.translation import gettext_lazy as _
 
 from rocky.otel import OpenTelemetryHelper
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -32,8 +32,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES", default="boefjes")
-QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS", default="normalizers")
 QUEUE_URI = env.url("QUEUE_URI", "").geturl()
 
 OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()
@@ -47,9 +45,11 @@ BYTES_USERNAME = env("BYTES_USERNAME", default="")
 BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
 KEIKO_API = env.url("KEIKO_API", "").geturl()
+# Report generation timeout in seconds
+KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG", False)
 
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
@@ -283,7 +283,7 @@ LOGIN_REDIRECT_URL = "crisis_room"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-SESSION_EXPIRE_SECONDS = 60 * 60 * 2  # 2 hours
+SESSION_EXPIRE_SECONDS = env.int("SESSION_EXPIRE_SECONDS", 7200)
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 
 # Require session cookie to be secure, so only a https session can be started
@@ -346,6 +346,7 @@ CSP_FRAME_ANCESTORS = ["'none'"]
 CSP_BASE = ["'none'"]
 CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
+CSP_CONNECT_SRC = ["'self'"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 

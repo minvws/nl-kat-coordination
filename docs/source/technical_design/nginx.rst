@@ -51,12 +51,14 @@ Then put the following content in there, but replace the domain name `openkat.ex
     }
 
 With this, we have set up minimal things for OpenKAT. Much more is possible, but this is the minimum we need to use OpenKAT properly.
-we assume that OpenKAT listens on the server to port 8000, you could check this by doing `wget -O- localhost:8000` it should show you some html output.
+we assume that OpenKAT listens on the server to port 8000, you could check this by doing ``wget -O- localhost:8000`` it should show you some html output.
 
 Logging
 =======
 
-We write the log files in the directory `/var/log/nginx/`. If you rename the log files (in particular, give them an extension other than .log) or put them in a different place, you will have to reconfigure Logrotate for this as well, otherwise, the log files will continue to grow indefinitely. For this, see the configuration in the file `/etc/logrotate.d/nginx`
+We write the log files in the directory ``/var/log/nginx/``.
+If you rename the log files (in particular, give them an extension other than .log) or put them in a different place, you will have to reconfigure Logrotate for this as well, otherwise, the log files will continue to grow indefinitely.
+For this, see the configuration in the file ``/etc/logrotate.d/nginx``
 
 Activation
 ==========

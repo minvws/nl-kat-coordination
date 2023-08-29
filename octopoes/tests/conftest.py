@@ -13,10 +13,12 @@ from octopoes.config.settings import Settings, XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.app import get_xtdb_client
 from octopoes.core.service import OctopoesService
+from octopoes.events.manager import EventManager
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
 from octopoes.repositories.ooi_repository import OOIRepository, XTDBOOIRepository
+from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
@@ -161,9 +163,9 @@ def declared_scan_profile():
 
 
 @pytest.fixture
-def xtdbtype_multinode():
+def xtdbtype_crux():
     def get_settings_override():
-        return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
+        return Settings(xtdb_type=XTDBType.CRUX)
 
     app.dependency_overrides[settings] = get_settings_override
     yield
@@ -172,7 +174,7 @@ def xtdbtype_multinode():
 
 @pytest.fixture
 def app_settings():
-    return Settings(xtdb_type=XTDBType.XTDB_MULTINODE)
+    return Settings()
 
 
 @pytest.fixture
@@ -212,4 +214,14 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
 
 @pytest.fixture
 def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOOIRepository(Mock(), xtdb_session, XTDBType.XTDB_MULTINODE)
+    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def mock_xtdb_session():
+    return XTDBSession(Mock())
+
+
+@pytest.fixture
+def origin_repository(mock_xtdb_session):
+    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)

@@ -13,25 +13,17 @@
                 <div>
                     <h3>{% translate "Add related object" %}</h3>
                     <form method="get" class="horizontal-view help">
-                        {% if ooi_id %}<input type="hidden" name="ooi_id" value="{{ ooi_id }}"/>{% endif %}
+                        {% if ooi_id %}<input type="hidden" name="ooi_id" value="{{ ooi_id }}" />{% endif %}
                         <fieldset>
-                            <legend>
-                                {% translate "Object details" %}
-                            </legend>
+                            <legend>{% translate "Object details" %}</legend>
                             <div class="required">
                                 <label for="select_ooi_type">{% translate "Object type" %}</label>
                                 <span class="nota-bene">This field is required</span>
                                 <div>
                                     <select id="select_ooi_type" name="add_ooi_type" required>
-                                        <option disabled selected value="">
-                                            -- {% translate "Choose an object type to add" %} --
-                                        </option>
+                                        <option disabled selected value="">-- {% translate "Choose an object type to add" %} --</option>
                                         {% for option in ooi_types %}
-                                            {% if option.text != "Finding" %}
-                                                <option value="{{ option.value }}">
-                                                    {{ option.text }}
-                                                </option>
-                                            {% endif %}
+                                            {% if option.text != "Finding" %}<option value="{{ option.value }}">{{ option.text }}</option>{% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -39,7 +31,7 @@
                                 {% include "partials/form/field_input_help_text.html" with help_text=help_text %}
 
                             </fieldset>
-                            <input class="button" type="submit" value="{% translate "Add object" %}"/>
+                            <input class="button" type="submit" value="{% translate "Add object" %}" />
                         </form>
                     </div>
                 </div>

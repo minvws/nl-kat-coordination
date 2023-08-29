@@ -11,11 +11,13 @@
     <form method="post">
         {% csrf_token %}
         <p>
-            {% blocktrans trimmed %}Backup tokens can be used when your primary and backup
-        phone numbers aren't available. The backup tokens below can be used
-        for login verification. If you've used up all your backup tokens, you
-        can generate a new set of backup tokens. Only the backup tokens shown
-        below will be valid.{% endblocktrans %}
+            {% blocktrans trimmed %}
+                Backup tokens can be used when your primary and backup
+                phone numbers aren't available. The backup tokens below can be used
+                for login verification. If you've used up all your backup tokens, you
+                can generate a new set of backup tokens. Only the backup tokens shown
+                below will be valid.
+            {% endblocktrans %}
         </p>
         {% if device.token_set.count %}
             <ul>
