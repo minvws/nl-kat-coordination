@@ -106,7 +106,7 @@ class NormalizerScheduler(Scheduler):
         # Get all normalizers for the mime types of the raw data
         normalizers: Dict[str, Normalizer] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: List[Normalizer] = self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type: List[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -128,7 +128,7 @@ class NormalizerScheduler(Scheduler):
                     self.push_tasks_for_received_raw_data.__name__,
                 )
 
-    def push_task(self, normalizer: Normalizer, raw_data: RawData, caller: str = "") -> None:
+    def push_task(self, normalizer: Plugin, raw_data: RawData, caller: str = "") -> None:
         """Given a normalizer and raw data, create a task and push it to the
         queue.
 
@@ -138,7 +138,7 @@ class NormalizerScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
         """
         task = NormalizerTask(
-            normalizer=normalizer,
+            normalizer=Normalizer(id=normalizer.id),
             raw_data=raw_data,
         )
 
@@ -226,7 +226,7 @@ class NormalizerScheduler(Scheduler):
             caller,
         )
 
-    def get_normalizers_for_mime_type(self, mime_type: str) -> List[Normalizer]:
+    def get_normalizers_for_mime_type(self, mime_type: str) -> List[Plugin]:
         """Get available normalizers for a given mime type.
 
         Args:
@@ -267,7 +267,7 @@ class NormalizerScheduler(Scheduler):
             len(normalizers),
             mime_type,
             mime_type,
-            [normalizer.name for normalizer in normalizers],
+            [normalizer.id for normalizer in normalizers],
             self.organisation.id,
             self.scheduler_id,
         )

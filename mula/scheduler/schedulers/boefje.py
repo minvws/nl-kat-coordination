@@ -482,7 +482,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    def push_task(self, boefje: Boefje, ooi: OOI, caller: str = "") -> None:
+    def push_task(self, boefje: Plugin, ooi: OOI, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
