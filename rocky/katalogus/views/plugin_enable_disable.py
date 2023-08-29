@@ -20,6 +20,9 @@ class PluginEnableDisableView(SinglePluginView):
 
         return all([field in settings for field in self.plugin_schema["required"]])
 
+    def has_clearance(self, scan_level: int):
+        return self.organization_member.trusted_clearance_level >= scan_level
+
     def post(self, request, *args, **kwargs):
         plugin_state = kwargs["plugin_state"]
         if plugin_state == "True":
@@ -71,9 +74,25 @@ class PluginEnableDisableView(SinglePluginView):
                 )
             )
 
-        self.katalogus_client.enable_boefje(self.plugin)
-        messages.add_message(
-            self.request, messages.SUCCESS, _("Boefje '{boefje_name}' enabled.").format(boefje_name=self.plugin.name)
-        )
+        if self.organization_member.trusted_clearance_level >= self.plugin.scan_level.value:
+            self.katalogus_client.enable_boefje(self.plugin)
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                _("Boefje '{boefje_name}' enabled.").format(boefje_name=self.plugin.name),
+            )
+        else:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "To to enable {} you need at least a clearance level of L{}. "
+                    "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
+                ).format(
+                    self.plugin.name.title(),
+                    self.plugin.scan_level.value,
+                    self.organization_member.trusted_clearance_level,
+                ),
+            )
 
         return HttpResponseRedirect(request.POST.get("current_url"))
