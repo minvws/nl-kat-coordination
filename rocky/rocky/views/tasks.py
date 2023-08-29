@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
+from http import HTTPStatus
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -84,7 +85,7 @@ class TaskListView(OrganizationView, ListView):
 
         return redirect(request.path)
 
-    def handle_page_action(self, action: str):
+    def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
             task = client.get_task_details(task_id)
@@ -95,7 +96,18 @@ class TaskListView(OrganizationView, ListView):
             task.p_item.id = new_id
             task.p_item.data.id = new_id
 
-            client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
+            try:
+                client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
+            except HTTPError as e:
+                if e.response.status_code == HTTPStatus.BAD_REQUEST:
+                    messages.add_message(
+                        self.request,
+                        messages.WARNING,
+                        _("Cannot reschedule task: it is already running."),
+                    )
+                    return
+
+                raise
 
             success_message = (
                 "Your task is scheduled and will soon be started in the background. \n "
