@@ -11,7 +11,7 @@
                 data-hide-filters-label="{% block hide_text %}{% translate "Hide filter options" %}{% endblock hide_text %} ">
             {% translate "Show filter options" %}
         </button>
-        {% if request.GET %}
+        {% if request.GET.sorting_options or request.GET.filter_options %}
             <div class="notification">
                 <p>
                     <span class="icon ti-circle-check"></span><strong>{% translate "Filters are on" %}</strong>
