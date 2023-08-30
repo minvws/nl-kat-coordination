@@ -1,73 +1,36 @@
-/*
-For a tree-view (tables in tables), we can save some space
-*/
-table.tree-view tbody > tr > td[colspan] {
-  padding-right: 0;
-}
+$start: 2;
+$end: 15;
 
-table.tree-view tr > .col-ooi-id {
-  width: 65%;
-}
-table.tree-view tr > .col-ooi-type {
-  width: 20%;
-}
-table.tree-view tr > .col-action {
-  width: 15%;
-}
+table {
 
-table.tree-view tr.folded > td {
-  background-color: #cccccc;
-  overflow: hidden;
-}
+  &.tree-view {
 
-table.tree-view tr.folded > td:first-child {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 100%;
-}
+    .tree-children-counter {
+      display: inline-block;
+      border-radius: 100%;
+      border: 1px solid var(--tabs-item-text-color);
+      font-size: var(--tile-font-size);
+      min-width: 15px;
+      height: 15px;
+      text-align: center;
+      line-height: 15px;
+      padding: 4px;
+    }
 
-/*
-show/hide table body, easy-mode (NOT accessibility compliant)
+    tr {
 
-You'll need to include checkboxToggler.js in the HTML
+      &.tree {
 
-Markup:
-<input type="checkbox" class="toggle-table-body is-hidden" id="checkbox-id">
-<table>
-  <thead>
-    <tr><th>
-      <label for="checkbox-id">
-        Title of table
-      </label>
-    </th></tr>
-  </thead>
-  <tbody>
-    <tr><td>Body of table</td></tr>
-  </tbody>
-</table>
-*/
-.toggle-table-body:not(:checked) + table.tree-view tbody {
-  display: none;
-}
+        td {
 
-.toggle-table-body + table.tree-view > thead label {
-  cursor: pointer;
-}
+          @for $i from $start through $end {
+            &.indent-#{$i} {
+              padding-left: calc(16px + #{$i * 16}px);
+            }
+          }
 
-.toggle-table-body:checked + table.tree-view > thead .ro-icon.open {
-  display: none;
-}
-
-.toggle-table-body:not(:checked) + table.tree-view > thead .ro-icon.close {
-  display: none;
-}
-
-table.tree-view {
-  table-layout: fixed;
-}
-
-table.tree-view th > div {
-  display: flex;
-  justify-content: space-between;
+        }
+      }
+    }
+  }
 }
