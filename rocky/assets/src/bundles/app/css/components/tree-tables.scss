@@ -1,5 +1,5 @@
-$start: 2;
-$end: 15;
+$depth-start: 2;
+$depth-end: 15;
 
 table {
 
@@ -15,6 +15,7 @@ table {
       text-align: center;
       line-height: 15px;
       padding: 4px;
+      margin-left: 8px;
     }
 
     tr {
@@ -23,7 +24,7 @@ table {
 
         td {
 
-          @for $i from $start through $end {
+          @for $i from $depth-start through $depth-end {
             &.indent-#{$i} {
               padding-left: calc(16px + #{$i * 16}px);
             }
