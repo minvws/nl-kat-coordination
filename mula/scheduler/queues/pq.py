@@ -173,10 +173,17 @@ class PriorityQueue(abc.ABC):
                     )
 
                 if item_on_queue and item_changed and not self.allow_updates:
-                    message = "Item already on queue, and item changed, we're not allowed to update the item that is already on the queue."
+                    message = (
+                        "Item already on queue, and item changed, we're not "
+                        "allowed to update the item that is already on the queue."
+                    )
 
                 if item_on_queue and priority_changed and not self.allow_priority_updates:
-                    message = "Item already on queue, and priority changed, we're not allowed to update the priority of the item that is already on the queue."
+                    message = (
+                        "Item already on queue, and priority changed, "
+                        "we're not allowed to update the priority of the item "
+                        "that is already on the queue."
+                    )
 
                 raise NotAllowedError(message)
 

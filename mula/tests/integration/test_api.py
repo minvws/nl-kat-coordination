@@ -234,7 +234,8 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertEqual(
             response.json().get("detail"),
-            "Item already on queue, and item changed, we're not allowed to update the item that is already on the queue.",
+            "Item already on queue, and item changed, we're not allowed to "
+            "update the item that is already on the queue.",
         )
 
     def test_push_updates_allowed(self):
@@ -286,7 +287,8 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertEqual(
             response.json().get("detail"),
-            "Item already on queue, and priority changed, we're not allowed to update the priority of the item that is already on the queue.",
+            "Item already on queue, and priority changed, we're not allowed to "
+            "update the priority of the item that is already on the queue.",
         )
 
     def test_update_priority_higher(self):
