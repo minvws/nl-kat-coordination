@@ -1656,10 +1656,6 @@ msgstr "Een overzicht van alle beschikbare plug-ins."
 msgid "Settings"
 msgstr "Instellingen"
 
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Update List"
-msgstr "Lijst updaten"
-
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Gridview"
 msgstr "Rasterweergave"
