@@ -170,6 +170,8 @@ class APITestCase(APITemplateTestCase):
         """
         # Set queue to not allow duplicates
         self.scheduler.queue.allow_replace = False
+        self.scheduler.queue.allow_updates = False
+        self.scheduler.queue.allow_priority_updates = False
 
         # Add one task to the queue
         initial_item = create_p_item(self.organisation.id, 0)
@@ -183,6 +185,10 @@ class APITestCase(APITemplateTestCase):
         # The queue should still have one item
         self.assertEqual(response.status_code, 400)
         self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(
+            response.json().get("detail"),
+            "Item already on queue, we're not allowed to replace the item that is already on the queue.",
+        )
 
     def test_push_replace_allowed(self):
         # Set queue to not allow duplicates
@@ -206,7 +212,9 @@ class APITestCase(APITemplateTestCase):
 
     def test_push_updates_not_allowed(self):
         # Set queue to no allow updates
+        self.scheduler.queue.allow_replace = False
         self.scheduler.queue.allow_updates = False
+        self.scheduler.queue.allow_priority_updates = False
 
         # Add one task to the queue
         initial_item = create_p_item(self.organisation.id, 0)
@@ -224,6 +232,10 @@ class APITestCase(APITemplateTestCase):
         # The queue should still have one item
         self.assertEqual(response.status_code, 400)
         self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(
+            response.json().get("detail"),
+            "Item already on queue, and item changed, we're not allowed to update the item that is already on the queue.",
+        )
 
     def test_push_updates_allowed(self):
         # Set queue to allow updates
@@ -252,6 +264,8 @@ class APITestCase(APITemplateTestCase):
 
     def test_push_priority_updates_not_allowed(self):
         # Set queue to no allow updates
+        self.scheduler.queue.allow_replace = False
+        self.scheduler.queue.allow_updates = True
         self.scheduler.queue.allow_priority_updates = False
 
         # Add one task to the queue
@@ -270,6 +284,10 @@ class APITestCase(APITemplateTestCase):
         # The queue should still have one item
         self.assertEqual(response.status_code, 400)
         self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(
+            response.json().get("detail"),
+            "Item already on queue, and priority changed, we're not allowed to update the priority of the item that is already on the queue.",
+        )
 
     def test_update_priority_higher(self):
         """When updating the priority of the initial item on the priority queue

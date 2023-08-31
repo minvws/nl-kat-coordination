@@ -409,26 +409,26 @@ class Server:
                 p_item.data = models.NormalizerTask(**p_item.data).dict()
         except Exception as exc:
             raise fastapi.HTTPException(
-                status_code=400,
+                status_code=500,
                 detail=str(exc),
             ) from exc
 
         try:
             s.push_item_to_queue(p_item)
-        except queues.QueueFullError as exc_full:
-            raise fastapi.HTTPException(
-                status_code=400,
-                detail="queue is full",
-            ) from exc_full
         except ValueError as exc_value:
             raise fastapi.HTTPException(
                 status_code=400,
                 detail="invalid item",
             ) from exc_value
+        except queues.QueueFullError as exc_full:
+            raise fastapi.HTTPException(
+                status_code=429,
+                detail="queue is full",
+            ) from exc_full
         except queues.errors.NotAllowedError as exc_not_allowed:
             raise fastapi.HTTPException(
-                status_code=400,
-                detail="not allowed",
+                status_code=409,
+                detail=str(exc_not_allowed),
             ) from exc_not_allowed
 
         return models.PrioritizedItem(**p_item.dict())
