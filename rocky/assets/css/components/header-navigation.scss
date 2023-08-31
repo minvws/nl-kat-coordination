@@ -1,0 +1,22 @@
+/* Header navigation */
+
+body > header {
+    nav {
+        width: 100%;
+
+        &.collapsible-menu {
+            width: 100%;
+        }
+
+        .collapsing-menu {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        @media screen and (width >= 42rem) {
+            > div {
+                gap: 2rem;
+            }
+        }
+    }
+}
