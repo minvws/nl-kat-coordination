@@ -28,8 +28,8 @@
                     </p>
                     {% if user.acknowledged_clearance_level > -1 and organization_indemnification and user.trusted_clearance_level > -1 %}
                         <div class="horizontal-view">
-                            <a href="{% ooi_url "scan_profile_reset" ooi.reference organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
-                             " class="button">{% translate "Set clearance level to inherit" %}</a>
+                            <a href="{% ooi_url "scan_profile_reset" ooi.reference organization.code query=mandatory_fields %}"
+                               class="button">{% translate "Set clearance level to inherit" %}</a>
                         </div>
                     {% endif %}
                 {% elif ooi.scan_profile.scan_profile_type == "empty" %}
