@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-29 14:43+0000\n"
+"POT-Creation-Date: 2023-09-04 15:31+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1909,18 +1909,12 @@ msgid "Boefje '{boefje_name}' enabled."
 msgstr "Boefje '{boefje_name}' aangezet."
 
 #: katalogus/views/plugin_enable_disable.py
-#, fuzzy
-#| msgid ""
-#| "To to enable {} you need at least a clearance level of L{}. Your "
-#| "clearance level is L{}. Contact your administrator to get a higher "
-#| "clearance level."
-msgid ""
-"To enable {} you need at least a clearance level of L{}. Your clearance "
-"level is L{}. Contact your administrator to get a higher clearance level."
-msgstr ""
-"Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} nodig. "
-"Uw vrijwaring niveau is L{}. Neem contact op met uw beheerder om een hogere "
-"vrijwaring niveau te krijgen."
+msgid "Your clearance level has not yet been set. Contact your administrator."
+msgstr "Uw vrijwaring niveau is nog niet ingesteld. Neem contact op met uw beheerder."
+
+#: katalogus/views/plugin_enable_disable.py
+msgid "To enable {} you need at least a clearance level of L{}. "
+msgstr "Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} nodig.
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
