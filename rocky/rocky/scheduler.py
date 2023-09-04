@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from enum import Enum
+from http import HTTPStatus
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -214,7 +215,7 @@ class SchedulerClient:
 
         if res.status_code == HTTPStatus.TOO_MANY_REQUESTS:
             raise TooManyRequestsError(res.json().get("detail"))
-        elif res.status_code == HTTPSatus.BAD_REQUEST:
+        elif res.status_code == HTTPStatus.BAD_REQUEST:
             raise BadRequestError(res.json().get("detail"))
         elif res.status_code == HTTPStatus.CONFLICT:
             raise ConflictError(res.json().get("detail"))

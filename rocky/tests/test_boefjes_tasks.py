@@ -66,6 +66,7 @@ def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje)
     assertContains(response, "error")
     assertContains(response, "Fetching tasks failed")
 
+
 def test_reschedule_task(rf, client_member, mocker, lazy_task_list_with_boefje):
     mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
     mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
