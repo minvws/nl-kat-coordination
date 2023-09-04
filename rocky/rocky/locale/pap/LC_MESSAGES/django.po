@@ -1547,7 +1547,6 @@ msgid "Available plugins"
 msgstr "Plugins disponibel"
 
 #: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/ooi_type_filters.html
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Update List"
 msgstr "Update Lista"
@@ -4509,7 +4508,6 @@ msgid "Filter by OOI types"
 msgstr "Filtra pa tiponan di OOI"
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
-#: rocky/templates/partials/ooi_type_filters.html
 msgid "Toggle all"
 msgstr "Pone tur"
 
@@ -4813,18 +4811,6 @@ msgstr "Mapa - aparensia denso"
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
 msgid "Tree - table view"
 msgstr "Mapa - aparensia tablatura"
-
-#: rocky/templates/partials/ooi_type_filters.html
-msgid "Shown types"
-msgstr "Tiponan mustra"
-
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Quickly filter by type"
-msgstr "Rapidamente filtrá pa tipo"
-
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Filter by"
-msgstr "Filtra pa"
 
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Shown status types"
@@ -5710,3 +5696,12 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "Shown types"
+#~ msgstr "Tiponan mustra"
+
+#~ msgid "Quickly filter by type"
+#~ msgstr "Rapidamente filtrá pa tipo"
+
+#~ msgid "Filter by"
+#~ msgstr "Filtra pa"

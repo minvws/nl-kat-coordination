@@ -1,8 +1,8 @@
 CREATE TABLE signing_provider (
-                                  id SERIAL NOT NULL,
-                                  url VARCHAR(256) NOT NULL,
-                                  PRIMARY KEY (id),
-                                  UNIQUE (url)
+    id SERIAL NOT NULL,
+    url VARCHAR(256) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE (url)
 );
 
 ALTER TABLE raw_file ADD COLUMN signing_provider_id INTEGER;
