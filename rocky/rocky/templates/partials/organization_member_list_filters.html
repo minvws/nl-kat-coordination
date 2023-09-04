@@ -8,9 +8,7 @@
 {% block filter_form %}
     <form method="get">
         <fieldset>
-            <legend>
-                {% translate "Shown status types" %}
-            </legend>
+            <legend>{% translate "Shown status types" %}</legend>
             <div>
                 {% for option in status_filters %}
                     <div class="checkbox">
@@ -18,29 +16,27 @@
                                id="option-filter-{{ option.value }}"
                                name="client_status"
                                value="{{ option.value }}"
-                               {% if option.checked %} checked{% endif %}>
+                               {% if option.checked %}checked{% endif %}>
                         <label for="option-filter-{{ option.value }}">{{ option.label }}</label>
                     </div>
                 {% endfor %}
             </div>
         </fieldset>
         <fieldset>
-          <legend>
-              {% translate "Blocked status" %}
-          </legend>
-          <div>
-              {% for option in blocked_filters %}
-                  <div class="checkbox">
-                      <input type="checkbox"
-                             id="option-filter-{{ option.value }}"
-                             name="blocked_status"
-                             value="{{ option.value }}"
-                             {% if option.checked %} checked{% endif %}>
-                      <label for="option-filter-{{ option.value }}">{{ option.label }}</label>
-                  </div>
-              {% endfor %}
-          </div>
-      </fieldset>
+            <legend>{% translate "Blocked status" %}</legend>
+            <div>
+                {% for option in blocked_filters %}
+                    <div class="checkbox">
+                        <input type="checkbox"
+                               id="option-filter-{{ option.value }}"
+                               name="blocked_status"
+                               value="{{ option.value }}"
+                               {% if option.checked %}checked{% endif %}>
+                        <label for="option-filter-{{ option.value }}">{{ option.label }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        </fieldset>
         <input type="submit" value="{% translate "Update List" %}">
     </form>
 {% endblock filter_form %}

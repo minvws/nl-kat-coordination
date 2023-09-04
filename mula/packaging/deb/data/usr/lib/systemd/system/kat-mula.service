@@ -12,6 +12,7 @@ EnvironmentFile=/etc/kat/mula.conf
 ExecStart=/opt/venvs/kat-mula/bin/python -m scheduler
 Restart=on-failure
 RestartSec=3s
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

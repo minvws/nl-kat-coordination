@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-21 09:43+0000\n"
+"POT-Creation-Date: 2023-08-25 13:17+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1560,7 +1560,6 @@ msgid "Available plugins"
 msgstr "Beschikbare plug-ins"
 
 #: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/ooi_type_filters.html
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Update List"
 msgstr "Lijst updaten"
@@ -3834,10 +3833,10 @@ msgstr "OpenKAT ziet"
 #: rocky/templates/landing_page.html
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br>Our motto is therefore: I see, I see, what you do not see."
+"analog). <br> Our motto is therefore: I see, I see, what you do not see."
 msgstr ""
-"In OpenKAT zijn tientallen hulpmiddelen geïntegreerd om de wereld (digitaal "
-"en analoog) te bekijken. <br>Het motto is dan ook: Ik zie, ik zie, wat jij "
+"In OpenKAT zijn tientallen tools geïntegreerd om de wereld te bekijken "
+"(digitaal en analoog). <br> Ons motto is dan ook: ik zie, ik zie, wat jij "
 "niet ziet."
 
 #: rocky/templates/landing_page.html
@@ -4126,10 +4125,11 @@ msgstr "Er zijn geen bevindingen voor het object"
 #: rocky/templates/oois/ooi_list.html
 msgid ""
 "An overview of your object list. Objects can be added manually or by running "
-"boefjes.</br> Click an object for additional information."
+"boefjes. </br> Click an object for additional information."
 msgstr ""
-"Een overzicht van uw objectenlijst. Objecten kunnen handmatig of door "
-"Boefjes toegevoegd worden. Klik op een object voor meer informatie."
+"Een overzicht van uw objectenlijst. Objecten kunnen handmatig worden "
+"toegevoegd of door het uitvoeren van boefjes.</br> Klik op een object voor "
+"meer informatie."
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
@@ -4235,7 +4235,7 @@ msgstr "Kan rapport voor %(name)s niet vinden."
 #: rocky/templates/oois/ooi_report_404.html
 #, python-format
 msgid ""
-"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
+"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
 "Try some other dates!"
 msgstr ""
 "Misschien heeft het nooit bestaan, misschien alleen niet op "
@@ -4508,7 +4508,6 @@ msgid "Filter by OOI types"
 msgstr "Filter op OOI-types"
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
-#: rocky/templates/partials/ooi_type_filters.html
 msgid "Toggle all"
 msgstr "Alles (de-)selecteren"
 
@@ -4647,8 +4646,7 @@ msgstr "Selecteer je taal"
 #, python-format
 msgid ""
 "Current language is %(current_language)s. Choose your preferred language."
-msgstr ""
-"De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
+msgstr "De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
 
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
@@ -4814,18 +4812,6 @@ msgstr "Boom - compacte weergave"
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
 msgid "Tree - table view"
 msgstr "Boom - tabelweergave"
-
-#: rocky/templates/partials/ooi_type_filters.html
-msgid "Shown types"
-msgstr "Getoonde typen"
-
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Quickly filter by type"
-msgstr "Snel filteren op type"
-
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Filter by"
-msgstr "Filteren op"
 
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Shown status types"
@@ -5028,7 +5014,8 @@ msgstr "Ja, stel in"
 msgid ""
 "An overview of the boefje task, the input OOI and the RAW data it generated."
 msgstr ""
-"Een overzicht van de boefje-taak, de invoer OOI en de RAW-gegevens die het heeft gegenereerd."
+"Een overzicht van de boefje-taak, de invoer OOI en de RAW-gegevens die het "
+"heeft gegenereerd."
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -5063,13 +5050,13 @@ msgstr "Inputobject"
 msgid "No input OOI"
 msgstr "Geen input object"
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Download task data"
-msgstr "Download taakgegevens"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Reschedule"
 msgstr "Opnieuw plannen"
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Download task data"
+msgstr "Download taakgegevens"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
@@ -5387,7 +5374,8 @@ msgstr "Vrijwaringsniveau ingesteld."
 msgid ""
 "Can not parse observed_at parameter, falling back to showing current object"
 msgstr ""
-"Kan de parameter observed_at niet ontleden, terugvallen op het weergeven van het huidige object"
+"Kan de parameter observed_at niet ontleden, terugvallen op het weergeven van "
+"het huidige object"
 
 #: rocky/views/mixins.py
 msgid "All"
@@ -5718,3 +5706,11 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#~ msgid ""
+#~ "To enable {} you need at least a clearance level of L{}. Your clearance "
+#~ "level is L{}. Contact your administrator to get a higher clearance level."
+#~ msgstr ""
+#~ "Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} "
+#~ "nodig. Uw vrijwaring niveau is L{}. Neem contact op met uw beheerder om "
+#~ "een hogere vrijwaring niveau te krijgen."

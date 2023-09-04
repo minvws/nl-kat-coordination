@@ -3,7 +3,7 @@
 
 {% for boefje in boefjes %}
     <div role="group">
-        <img src="{{ boefje.tile_image }}" alt="placeholder image"/>
+        <img src="{{ boefje.tile_image }}" alt="placeholder image" />
         <div class="horizontal-view scan-intensity">
             <span class="de-emphasized">{% translate "Scan level:" %}</span>
             <ul class="level-indicator {{ boefje.scan_level }}">

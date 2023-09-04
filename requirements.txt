@@ -263,18 +263,18 @@ rich==13.5.2 ; python_version >= "3.8" and python_version < "4.0" \
 settings-doc==2.0.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:136f3876619e112bfddc67f23b1ce8f4ed7264a3b5fdae4f99c639200947cf4c \
     --hash=sha256:492fce39832fbb1d72eff8b7ea7104fe2f97d9b08f18e1f49b09c05554644443
-shellingham==1.5.0.post1 ; python_version >= "3.8" and python_version < "4.0" \
-    --hash=sha256:368bf8c00754fd4f55afb7bbb86e272df77e4dc76ac29dbcbb81a59e9fc15744 \
-    --hash=sha256:823bc5fb5c34d60f285b624e7264f4dda254bc803a3774a147bf99c0e3004a28
+shellingham==1.5.2 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:95946024df2db98c83382606a9ae875f613b15c950c980a3bf7a5adde40e7720 \
+    --hash=sha256:db9b385e903ebfe07958f6df493d47d4432ff5bed71e75ed3e613ace090be5f3
 snowballstemmer==2.2.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:09b16deb8547d3412ad7b590689584cd0fe25ec8db3be37788be3810cbf19cb1 \
     --hash=sha256:c8e1716e83cc398ae16824e5572ae04e0d9fc2c6b985fb0f900f5f0c96ecba1a
 sphinx-rtd-theme==1.2.2 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:01c5c5a72e2d025bd23d1f06c59a4831b06e6ce6c01fdd5ebfe9986c0a880fc7 \
     --hash=sha256:6a7e7d8af34eb8fc57d52a09c6b6b9c46ff44aea5951bc831eeb9245378f3689
-sphinx==6.1.3 ; python_version >= "3.8" and python_version < "4.0" \
-    --hash=sha256:0dac3b698538ffef41716cf97ba26c1c7788dba73ce6f150c1ff5b4720786dd2 \
-    --hash=sha256:807d1cb3d6be87eb78a381c3e70ebd8d346b9a25f3753e9947e866b2786865fc
+sphinx==6.2.1 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:6d56a34697bb749ffa0152feafc4b19836c755d90a7c59b72bc7dfd371b9cc6b \
+    --hash=sha256:97787ff1fa3256a3eef9eda523a63dbf299f7b47e053cfcf684a1c2a8380c912
 sphinxcontrib-applehelp==1.0.4 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:29d341f67fb0f6f586b23ad80e072c8e6ad0b48417db2bde114a4c9746feb228 \
     --hash=sha256:828f867945bbe39817c210a1abfd1bc4895c8b73fcaade56d45357a348a07d7e
