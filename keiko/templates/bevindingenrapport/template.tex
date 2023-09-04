@@ -116,6 +116,13 @@ niet vertrouwelijk en kan openbaar worden gedeeld.
 
 \section{Samenvatting}
 Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().strftime("%Y-%m-%d %H:%m:%S %Z") }@@. % chktex 36 chktex 18
+De volgende filters zijn van toepassing op deze bevindingen:
+
+\begin{longtable}{ p{.25\textwidth}  p{.75\textwidth} }
+        {% for name, filter in filters.items() %}
+            @@{ name|latex_escape }@@ & @@{ filter|latex_escape }@@ \\
+        {% endfor %}
+\end{longtable}
 
 \bgroup{}
 \def\arraystretch{1.2}

@@ -88,6 +88,10 @@ class OOIReportPDFView(SingleOOITreeMixin):
                 self.ooi.object_type,
                 self.ooi.human_readable,
                 self.tree.store,
+                {
+                    "ooi": self.ooi.reference,
+                    "valid_time": str(valid_time),
+                },
             )
         except GeneratingReportFailed:
             messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
@@ -125,6 +129,10 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
                 self.get_observed_at(),
                 self.organization.name,
                 generate_findings_metadata(findings, severities),
+                {
+                    "severities": [severity.value for severity in severities],
+                    "valid_time": str(self.get_observed_at()),
+                },
             )
         except GeneratingReportFailed:
             messages.error(request, _("Generating report failed. See Keiko logs for more information."))

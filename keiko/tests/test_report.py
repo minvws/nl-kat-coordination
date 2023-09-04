@@ -32,6 +32,7 @@ report_data_empty = {
     "valid_time": "2022-08-26 08:23:58.373810+00:00",
     "report_source_type": "Hostname",
     "report_source_value": "mispo.es.",
+    "filters": {},
 }
 
 
@@ -106,6 +107,7 @@ report_data_underscores = {
     "valid_time": "2022-08-26 08:23:58.373810+00:00",
     "report_source_type": "Hostname",
     "report_source_value": "mispo.es.",
+    "filters": {},
 }
 
 
@@ -127,6 +129,7 @@ def test_generate_report_empty(report_args):
     report_file = report_args["settings"].reports_folder / "test.keiko.pdf"
     tex_file = report_args["settings"].reports_folder / "test.keiko.tex"
     json_file = report_args["settings"].reports_folder / "test.keiko.json"
+
     assert report_file.exists()
     assert not tex_file.exists()
     assert not json_file.exists()

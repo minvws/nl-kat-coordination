@@ -89,12 +89,14 @@ class ReportsService:
         source_type: str,
         source_value: str,
         store: Dict,
+        filters: Dict,
     ) -> BinaryIO:
         report_data = build_findings_list_from_store(store)  # reuse existing dict structure
         report_data["findings_grouped"] = _ooi_field_as_string(report_data["findings_grouped"], store)
         report_data["valid_time"] = str(valid_time)
         report_data["report_source_type"] = source_type
         report_data["report_source_value"] = source_value
+        report_data["filters"] = filters
 
         report_id = self.keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
 
@@ -105,13 +107,14 @@ class ReportsService:
         valid_time: datetime,
         organization_name: str,
         findings_metadata: List[Dict[str, Any]],
+        filters: Dict,
     ) -> BinaryIO:
         store = {}
         for item in findings_metadata:
             store[item["finding"].finding.primary_key] = item["finding"].finding
             store[item["finding"].finding_type.primary_key] = item["finding"].finding_type
 
-        return self.get_report(valid_time, "Organisatie", organization_name, store)
+        return self.get_report(valid_time, "Organisatie", organization_name, store, filters)
 
     @classmethod
     def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str):
