@@ -1,6 +1,8 @@
 import datetime
 from typing import List, Optional, Tuple
 
+from sqlalchemy import asc, desc
+
 from scheduler import models
 
 from ..stores import TaskStorer  # noqa: TID252
@@ -27,6 +29,7 @@ class TaskStore(TaskStorer):
         status: Optional[str] = None,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
+        order_by: Optional[str] = None,
         filters: Optional[List[models.Filter]] = None,
     ) -> Tuple[List[models.Task], int]:
         with self.datastore.session.begin() as session:
@@ -48,6 +51,12 @@ class TaskStore(TaskStorer):
 
             if max_created_at is not None:
                 query = query.filter(models.TaskORM.created_at <= max_created_at)
+
+            if order_by is not None:
+                if order_by.startswith("-"):
+                    query = query.order_by(desc(order_by[1:]))
+                else:
+                    query = query.order_by(asc(order_by))
 
             if filters is not None:
                 for f in filters:
@@ -119,6 +128,11 @@ class TaskStore(TaskStorer):
     def update_task(self, task: models.Task) -> None:
         with self.datastore.session.begin() as session:
             (session.query(models.TaskORM).filter(models.TaskORM.id == task.id).update(task.dict()))
+
+    @retry()
+    def update_task_status(self, task_id: str, status: models.TaskStatus) -> None:
+        with self.datastore.session.begin() as session:
+            session.query(models.TaskORM).filter(models.TaskORM.id == task_id).update({"status": status.name})
 
     @retry()
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:

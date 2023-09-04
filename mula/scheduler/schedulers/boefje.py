@@ -5,6 +5,8 @@ from types import SimpleNamespace
 from typing import Callable, List, Optional
 
 import requests
+from jinja2 import BaseLoader, Environment
+from limits import parse
 from opentelemetry import trace
 
 from scheduler import context, models, queues, rankers
@@ -103,6 +105,13 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
+        # Delayed tasks
+        self.run_in_thread(
+            name=f"scheduler-{self.scheduler_id}-delayed_tasks",
+            target=self.push_tasks_for_delayed_tasks,
+            interval=60.0,
+        )
+
     @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
         """Create tasks for oois that have a scan level change.
@@ -178,9 +187,9 @@ class BoefjeScheduler(Scheduler):
             for boefje in boefjes:
                 executor.submit(
                     self.push_task,
-                    boefje,
-                    ooi,
-                    self.push_tasks_for_scan_profile_mutations.__name__,
+                    boefje=boefje,
+                    ooi=ooi,
+                    caller=self.push_tasks_for_scan_profile_mutations.__name__,
                 )
 
     @tracer.start_as_current_span("push_tasks_for_new_boefjes")
@@ -223,7 +232,10 @@ class BoefjeScheduler(Scheduler):
                     boefje.consumes,
                     list(range(boefje.scan_level, 5)),
                 )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            except (
+                requests.exceptions.RetryError,
+                requests.exceptions.ConnectionError,
+            ):
                 self.logger.warning(
                     "Could not get oois for organisation: %s [organisation_id=%s, scheduler_id=%s]",
                     self.organisation.name,
@@ -235,9 +247,9 @@ class BoefjeScheduler(Scheduler):
                 for ooi in oois_by_object_type:
                     executor.submit(
                         self.push_task,
-                        boefje,
-                        ooi,
-                        self.push_tasks_for_new_boefjes.__name__,
+                        boefje=boefje,
+                        ooi=ooi,
+                        caller=self.push_tasks_for_new_boefjes.__name__,
                     )
 
     @tracer.start_as_current_span("push_tasks_for_random_objects")
@@ -299,10 +311,54 @@ class BoefjeScheduler(Scheduler):
                 for boefje in boefjes:
                     executor.submit(
                         self.push_task,
-                        boefje,
-                        ooi,
-                        self.push_tasks_for_random_objects.__name__,
+                        boefje=boefje,
+                        ooi=ooi,
+                        caller=self.push_tasks_for_random_objects.__name__,
                     )
+
+    def push_tasks_for_delayed_tasks(self) -> None:
+        """Check for tasks that are delayed and push them to the queue
+        when the rate limit is over.
+        """
+        tasks_to_push: List[BoefjeTask] = []
+        delayed_tasks, _ = self.ctx.task_store.get_tasks(
+            scheduler_id=self.scheduler_id,
+            status=TaskStatus.DELAYED,
+            order_by="created_at",
+        )
+
+        for delayed_task in delayed_tasks:
+            task = BoefjeTask(**delayed_task.p_item.data)
+            try:
+                if not self.is_task_rate_limited(task, hit=False):
+                    tasks_to_push.append(task)
+            except ValueError:
+                self.logger.warning(
+                    "Could not push delayed task %s for organisation: %s [organisation_id=%s, scheduler_id=%s]",
+                    task,
+                    self.organisation.name,
+                    self.organisation.id,
+                    self.scheduler_id,
+                )
+                self.ctx.task_store.update_task_status(
+                    task_id=task.id,
+                    status=TaskStatus.FAILED,
+                )
+                continue
+
+        with futures.ThreadPoolExecutor() as executor:
+            for task in tasks_to_push:
+                ooi = self.ctx.services.octopoes.get_object(
+                    organisation_id=self.organisation.id,
+                    reference=task.input_ooi,
+                )
+                executor.submit(
+                    self.push_task,
+                    task=task,
+                    boefje=task.boefje,
+                    ooi=ooi,
+                    caller=self.push_tasks_for_delayed_tasks.__name__,
+                )
 
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
@@ -379,6 +435,49 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
+    def is_task_rate_limited(self, task: BoefjeTask, hit: bool = True) -> bool:
+        """Checks whether a task is rate limited.
+
+        Args:
+            task: The task to check.
+            hit: Whether to hit the rate limiter or not.
+
+        Returns:
+            True if the task is rate limited, False otherwise.
+        """
+        if (rate_limit := task.boefje.rate_limit) is None:
+            return False
+
+        try:
+            parsed_rate_limit = parse(task.boefje.rate_limit.interval)  # type: ignore[union-attr]
+            if parsed_rate_limit is None:
+                raise ValueError("Invalid rate limit interval")
+        except ValueError as exc:
+            self.logger.warning(
+                "Could not parse rate limit for boefje: %s [boefje.id=%s, organisation_id=%s, scheduler_id=%s]",
+                task.boefje.id,
+                task.boefje.id,
+                self.organisation.id,
+                self.scheduler_id,
+            )
+            raise exc
+
+        with self.ctx.rate_limiter_lock:
+            # Get the identifier for the rate limiter
+            identifier_template = rate_limit.identifier
+            environment = Environment(loader=BaseLoader())
+            identifier = environment.from_string(identifier_template).render(task=task)
+
+            can_consume = self.ctx.rate_limiter.test(parsed_rate_limit, identifier)
+            if not can_consume:
+                return True
+
+            # When we can consume, we hit the rate limiter
+            if hit:
+                self.ctx.rate_limiter.hit(parsed_rate_limit, identifier)
+
+            return False
+
     def is_task_running(self, task: BoefjeTask) -> bool:
         """Check if the same task is already running.
 
@@ -402,7 +501,10 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
-        if task_db is not None and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]:
+        if task_db is not None and task_db.status not in [
+            TaskStatus.FAILED,
+            TaskStatus.COMPLETED,
+        ]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
                 "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",
@@ -471,7 +573,13 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
-    def push_task(self, boefje: Boefje, ooi: OOI, caller: str = "") -> None:
+    def push_task(
+        self,
+        boefje: Boefje,
+        ooi: OOI,
+        task: Optional[BoefjeTask] = None,
+        caller: str = "",
+    ) -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -481,11 +589,32 @@ class BoefjeScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
 
         """
-        task = BoefjeTask(
-            boefje=Boefje(id=boefje.id, version=boefje.version),
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
+        if task is None:
+            task = BoefjeTask(
+                boefje=Boefje(id=boefje.id, version=boefje.version),
+                input_ooi=ooi.primary_key,
+                organization=self.organisation.id,
+            )
+
+        # We need to create a PrioritizedItem for this task, to push
+        # it to the priority queue.
+        p_item = PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler_id,
+            data=task,
+            hash=task.hash,
         )
+
+        if self.is_task_rate_limited(task):
+            self.logger.debug(
+                "Task is rate limited: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                task,
+                self.organisation.id,
+                self.scheduler_id,
+                caller,
+            )
+            self.post_push(p_item, models.TaskStatus.DELAYED)
+            return
 
         if not self.is_task_allowed_to_run(boefje, ooi):
             self.logger.debug(
@@ -552,21 +681,11 @@ class BoefjeScheduler(Scheduler):
             return
 
         prior_tasks = self.ctx.task_store.get_tasks_by_hash(task.hash)
-        score = self.ranker.rank(
+        p_item.priority = self.ranker.rank(
             SimpleNamespace(
                 prior_tasks=prior_tasks,
                 task=task,
             )
-        )
-
-        # We need to create a PrioritizedItem for this task, to push
-        # it to the priority queue.
-        p_item = PrioritizedItem(
-            id=task.id,
-            scheduler_id=self.scheduler_id,
-            priority=score,
-            data=task,
-            hash=task.hash,
         )
 
         try:
@@ -585,12 +704,9 @@ class BoefjeScheduler(Scheduler):
             return
 
         self.logger.info(
-            "Created boefje task: %s for ooi: %s "
-            "[boefje_id=%s, ooi_primary_key=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
+            "Created boefje task: %s [task_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,
-            ooi.primary_key,
-            boefje.id,
-            ooi.primary_key,
+            task.id,
             self.organisation.id,
             self.scheduler_id,
             caller,

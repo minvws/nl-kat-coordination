@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from typing import List, Literal, NewType, Optional, Set, Union
 
-from pydantic import AnyHttpUrl, BaseModel, Field
+from pydantic import AnyHttpUrl, BaseModel, Field, constr
 
 RESERVED_LOCAL_ID = "LOCAL"
 
@@ -16,6 +16,11 @@ class Repository(BaseModel):
 class Organisation(BaseModel):
     id: str
     name: str
+
+
+class RateLimit(BaseModel):
+    interval: str
+    identifier: str = constr(min_length=1)
 
 
 class Plugin(BaseModel):
@@ -41,6 +46,7 @@ class Boefje(Plugin):
     produces: List[str] = Field(default_factory=list)
     options: Optional[List[str]]
     runnable_hash: Optional[str]
+    rate_limit: Optional[RateLimit]
 
 
 class Normalizer(Plugin):

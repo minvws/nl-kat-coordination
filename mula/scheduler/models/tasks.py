@@ -24,6 +24,7 @@ class TaskStatus(str, enum.Enum):
     """Status of a task."""
 
     PENDING = "pending"
+    DELAYED = "delayed"
     QUEUED = "queued"
     DISPATCHED = "dispatched"
     RUNNING = "running"

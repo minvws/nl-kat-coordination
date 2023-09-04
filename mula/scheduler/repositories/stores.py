@@ -23,6 +23,7 @@ class TaskStorer(abc.ABC):
         status: Optional[str] = None,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
+        order_by: Optional[str] = None,
         filters: Optional[List[models.Filter]] = None,
     ):
         raise NotImplementedError
@@ -45,6 +46,9 @@ class TaskStorer(abc.ABC):
 
     @abc.abstractmethod
     def update_task(self, task: models.Task) -> Optional[models.Task]:
+        raise NotImplementedError
+
+    def update_task_status(self, task_id: str, status: models.TaskStatus) -> None:
         raise NotImplementedError
 
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:

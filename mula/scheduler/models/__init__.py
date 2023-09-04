@@ -1,5 +1,5 @@
 from .base import Base
-from .boefje import Boefje, BoefjeMeta
+from .boefje import Boefje, BoefjeMeta, RateLimit
 from .events import NormalizerMetaReceivedEvent, RawData, RawDataReceivedEvent
 from .filter import Filter
 from .health import ServiceHealth
