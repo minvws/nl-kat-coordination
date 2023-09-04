@@ -291,10 +291,11 @@ class OnboardingSetupScanOOIDetailView(
                 self.request,
                 messages.ERROR,
                 _(
-                    "Could not raise clearance level of {} to L{}. "
-                    "You were trusted a clearance level of L{}. "
+                    "Could not raise clearance level of %s to L%s. "
+                    "You were trusted a clearance level of L%s. "
                     "Contact your administrator to receive a higher clearance."
-                ).format(
+                )
+                % (
                     ooi.reference.human_readable,
                     level,
                     self.organization_member.acknowledged_clearance_level,
