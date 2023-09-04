@@ -430,6 +430,7 @@ class Server:
             ) from exc_full
         except queues.errors.NotAllowedError as exc_not_allowed:
             raise fastapi.HTTPException(
+                headers={"Retry-After": "60"},
                 status_code=status.HTTP_409_CONFLICT,
                 detail=str(exc_not_allowed),
             ) from exc_not_allowed
