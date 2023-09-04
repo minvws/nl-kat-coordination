@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-24 10:25+0000\n"
+"POT-Creation-Date: 2023-08-25 13:17+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1560,7 +1560,6 @@ msgid "Available plugins"
 msgstr "Beschikbare plug-ins"
 
 #: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/ooi_type_filters.html
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Update List"
 msgstr "Lijst updaten"
@@ -3832,16 +3831,12 @@ msgid "OpenKAT sees"
 msgstr "OpenKAT ziet"
 
 #: rocky/templates/landing_page.html
-#, fuzzy
-#| msgid ""
-#| "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-#| "analog). <br>Our motto is therefore: I see, I see, what you do not see."
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
 "analog). <br> Our motto is therefore: I see, I see, what you do not see."
 msgstr ""
-"In OpenKAT zijn tientallen hulpmiddelen geïntegreerd om de wereld (digitaal "
-"en analoog) te bekijken. <br>Het motto is dan ook: Ik zie, ik zie, wat jij "
+"In OpenKAT zijn tientallen tools geïntegreerd om de wereld te bekijken "
+"(digitaal en analoog). <br> Ons motto is dan ook: ik zie, ik zie, wat jij "
 "niet ziet."
 
 #: rocky/templates/landing_page.html
@@ -4128,16 +4123,13 @@ msgid "Currently there are no findings for OOI"
 msgstr "Er zijn geen bevindingen voor het object"
 
 #: rocky/templates/oois/ooi_list.html
-#, fuzzy
-#| msgid ""
-#| "An overview of your object list. Objects can be added manually or by "
-#| "running boefjes.</br> Click an object for additional information."
 msgid ""
 "An overview of your object list. Objects can be added manually or by running "
 "boefjes. </br> Click an object for additional information."
 msgstr ""
-"Een overzicht van uw objectenlijst. Objecten kunnen handmatig of door "
-"Boefjes toegevoegd worden. Klik op een object voor meer informatie."
+"Een overzicht van uw objectenlijst. Objecten kunnen handmatig worden "
+"toegevoegd of door het uitvoeren van boefjes.</br> Klik op een object voor "
+"meer informatie."
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
@@ -4241,10 +4233,7 @@ msgid "A report for %(name)s wasn't found."
 msgstr "Kan rapport voor %(name)s niet vinden."
 
 #: rocky/templates/oois/ooi_report_404.html
-#, fuzzy, python-format
-#| msgid ""
-#| "Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
-#| "Try some other dates!"
+#, python-format
 msgid ""
 "Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
 "Try some other dates!"
@@ -4519,7 +4508,6 @@ msgid "Filter by OOI types"
 msgstr "Filter op OOI-types"
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
-#: rocky/templates/partials/ooi_type_filters.html
 msgid "Toggle all"
 msgstr "Alles (de-)selecteren"
 
@@ -4824,18 +4812,6 @@ msgstr "Boom - compacte weergave"
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
 msgid "Tree - table view"
 msgstr "Boom - tabelweergave"
-
-#: rocky/templates/partials/ooi_type_filters.html
-msgid "Shown types"
-msgstr "Getoonde typen"
-
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Quickly filter by type"
-msgstr "Snel filteren op type"
-
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Filter by"
-msgstr "Filteren op"
 
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Shown status types"
@@ -5730,3 +5706,11 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#~ msgid ""
+#~ "To enable {} you need at least a clearance level of L{}. Your clearance "
+#~ "level is L{}. Contact your administrator to get a higher clearance level."
+#~ msgstr ""
+#~ "Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} "
+#~ "nodig. Uw vrijwaring niveau is L{}. Neem contact op met uw beheerder om "
+#~ "een hogere vrijwaring niveau te krijgen."
