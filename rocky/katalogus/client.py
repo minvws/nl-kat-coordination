@@ -22,7 +22,7 @@ class Plugin(BaseModel):
     id: str
     type: str
     name: str
-    description: str = None
+    description: Optional[str] = None
     repository_id: str
     scan_level: SCAN_LEVEL = None
     consumes: Set[Type[OOI]]
