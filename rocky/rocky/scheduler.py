@@ -157,6 +157,18 @@ class LazyTaskList:
         return res.results
 
 
+class TooManyRequestsError(Exception):
+    pass
+
+
+class BadRequestError(Exception):
+    pass
+
+
+class ConflictError(Exception):
+    pass
+
+
 class SchedulerClient:
     def __init__(self, base_uri: str):
         self.session = requests.Session()
@@ -199,6 +211,14 @@ class SchedulerClient:
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
+
+        if res.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            raise TooManyRequestsError(res.json().get("detail"))
+        elif res.status_code == HTTPSatus.BAD_REQUEST:
+            raise BadRequestError(res.json().get("detail"))
+        elif res.status_code == HTTPStatus.CONFLICT:
+            raise ConflictError(res.json().get("detail"))
+
         res.raise_for_status()
 
     def health(self) -> ServiceHealth:

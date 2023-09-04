@@ -421,7 +421,7 @@ class Server:
         except ValueError as exc_value:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="invalid item",
+                detail="malformed item",
             ) from exc_value
         except queues.QueueFullError as exc_full:
             raise fastapi.HTTPException(

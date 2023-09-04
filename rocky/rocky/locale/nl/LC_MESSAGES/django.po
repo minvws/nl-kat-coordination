@@ -5665,6 +5665,18 @@ msgstr "Taakdetails niet gevonden."
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "Ophalen van taken mislukt: geen verbinding met scheduler"
 
+#: rocky/views/tasks.py
+msgid "Task queue is full, please try again later."
+msgstr "Wachtrij is vol, probeer het later opnieuw"
+
+#: rocky/views/tasks.py
+msgid "Task already queued."
+msgstr "Taak al in de wachtrij"
+
+#: rocky/views/tasks.py
+msgid "Task is invalid"
+msgstr "Taak is ongeldig"
+
 #: rocky/views/upload_csv.py
 msgid ""
 "For URL object type, a column 'raw' with URL values is required, starting "
