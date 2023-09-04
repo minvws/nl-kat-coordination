@@ -79,16 +79,21 @@ class PluginEnableDisableView(SinglePluginView):
                 _("Boefje '{boefje_name}' enabled.").format(boefje_name=self.plugin.name),
             )
         else:
+            member_clearance_level_text = (
+                "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
+            ).format(self.organization_member.trusted_clearance_level)
+
+            if self.organization_member.trusted_clearance_level < 0:
+                member_clearance_level_text = _(
+                    "Your clearance level has not yet been set. Contact your administrator."
+                )
+
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _(
-                    "To enable {} you need at least a clearance level of L{}. "
-                    "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
-                ).format(
+                _("To enable {} you need at least a clearance level of L{}. " + member_clearance_level_text).format(
                     self.plugin.name.title(),
                     self.plugin.scan_level.value,
-                    self.organization_member.trusted_clearance_level,
                 ),
             )
 
