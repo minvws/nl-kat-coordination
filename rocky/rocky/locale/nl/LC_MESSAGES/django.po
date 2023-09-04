@@ -5674,7 +5674,7 @@ msgid "Task already queued."
 msgstr "Taak al in de wachtrij"
 
 #: rocky/views/tasks.py
-msgid "Task is invalid"
+msgid "Task is invalid."
 msgstr "Taak is ongeldig"
 
 #: rocky/views/upload_csv.py
