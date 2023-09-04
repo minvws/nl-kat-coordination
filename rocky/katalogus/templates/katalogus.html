@@ -21,7 +21,12 @@
                         {% endblocktranslate %}
                     </p>
                     <p class="emphasized">
-                        <strong>{{ object_list|length }}</strong> {% translate "Plugins available" %}
+                        <strong>{{ object_list|length }}</strong>
+                        {% blocktranslate count counter=object_list|length %}
+                            Plugin available
+                        {% plural %}
+                            Plugins available
+                        {% endblocktranslate %}
                     </p>
                 </div>
             </div>

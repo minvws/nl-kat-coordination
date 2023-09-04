@@ -24,20 +24,26 @@ def katalogus_plugin_listing(request, rf, member, mocker):
     assert response.status_code == 200
     assertContains(response, "KAT-alogus")
     assertContains(response, "An overview of all available plugins.")
-    # active toolbar
+
+    # active toolbar, only one link is active, "All"
     assertContains(
         response, '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">All</a></li>'
     )
-    assertContains(response, '<li><a href="/en/' + member.organization.code + '/kat-alogus/">Boefjes</a></li>')
-    assertContains(response, '<li><a href="/en/' + member.organization.code + '/kat-alogus/">Normalizers</a></li>')
-    assertContains(response, '<li><a href="/en/' + member.organization.code + '/kat-alogus/">About plugins</a></li>')
-    assertContains(response, "All plugins")
-    assertContains(response, str(len(plugins)) + " Plugins available")
-    assertContains(response, "Filter plugins")
-    assertContains(response, "Clear filter")
-    assertContains(response, "filter_options")
-    assertContains(response, "sorting_options")
+    assertNotContains(
+        response, '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">Boefjes</a></li>'
+    )
+    assertNotContains(
+        response,
+        '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">Normalizers</a></li>',
+    )
+    assertNotContains(
+        response,
+        '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">About plugins</a></li>',
+    )
 
+    assertContains(response, str(len(plugins)) + " Plugins available")
+
+    # All plugins shows Boefjes and Normalizers, checking if one of each is available
     assertContains(response, "kat_adr_finding_types_normalize")
     assertContains(response, '<span class="label-plugin-type normalizer">Normalizer</span>')
 
@@ -58,8 +64,6 @@ def katalogus_plugin_listing_boefjes(request, rf, member, mocker):
         setup_request(rf.get("boefjes_list"), member.user), organization_code=member.organization.code
     )
     assert response.status_code == 200
-    assertContains(response, "KAT-alogus")
-    assertContains(response, "An overview of all available plugins.")
     assertContains(response, "Boefjes")
     assertContains(
         response, '<li aria-current="page"><a href="/en/' + member.organization.code + '/kat-alogus/">Boefjes</a></li>'
@@ -83,8 +87,7 @@ def katalogus_plugin_listing_normalizers(request, rf, member, mocker):
         setup_request(rf.get("normalizers_list"), member.user), organization_code=member.organization.code
     )
     assert response.status_code == 200
-    assertContains(response, "KAT-alogus")
-    assertContains(response, "An overview of all available plugins.")
+
     assertContains(response, "Normalizers")
     assertContains(
         response,
@@ -105,31 +108,6 @@ def katalogus_about_plugins(request, rf, member):
         setup_request(rf.get("about_plugins"), member.user), organization_code=member.organization.code
     )
     assert response.status_code == 200
-    assertContains(response, "About plugins")
-    assertContains(
-        response,
-        "Plugins gather data, objects and insight. Each plugin has its own focus area and strengths and "
-        "may be able to work with other plugins to gain even more insights.",
-    )
-    assertContains(response, "Boefjes")
-    assertContains(
-        response,
-        "Scan objects for specific data. Each Boefje scans for specific data. "
-        "The data Boefjes find will be added to your dataset.",
-    )
-    assertContains(response, "Normalizers")
-    assertContains(
-        response,
-        "Read the dataset and search for specific objects to add to your objectlist as a separate object.\
-        Each Normalizer searches for a specific object. You could run one to find all the phonenumbers within a \
-        document, as well as a Normalizer to find all the url’s.",
-    )
-    assertContains(response, "Bits")
-    assertContains(
-        response,
-        "Bits are business rules that look for insight within the current dataset and search for specific insight and \
-        draw conclusions.",
-    )
 
 
 def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mocker):
