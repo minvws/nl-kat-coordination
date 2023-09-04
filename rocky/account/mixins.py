@@ -97,7 +97,7 @@ class OrganizationView(View):
                 organization=self.organization,
                 status=OrganizationMember.STATUSES.ACTIVE,
                 trusted_clearance_level=4,
-                acknowledged_clearance_level=4,
+                acknowledged_clearance_level=0,
             )
 
         if self.organization_member.blocked:
@@ -128,10 +128,10 @@ class OrganizationView(View):
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
             raise IndemnificationNotPresentException()
-        if self.organization_member.acknowledged_clearance_level < level:
-            raise AcknowledgedClearanceLevelTooLowException()
         if self.organization_member.trusted_clearance_level < level:
             raise TrustedClearanceLevelTooLowException()
+        if self.organization_member.acknowledged_clearance_level < level:
+            raise AcknowledgedClearanceLevelTooLowException()
         return True
 
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
