@@ -15,10 +15,8 @@
                 <p>
                     {% translate "Setting the scan level from \"declared\" to \"inherit\" means it will inherit a clearance level from other objects, or that no clearance level will be inherited. " %}
                 </p>
-                {# djlint:off H033 #}
-                <form action="{% ooi_url 'scan_profile_reset' ooi.primary_key organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
-                     " method="post">
-                    {# djlint:on #}
+                <form action="{% ooi_url 'scan_profile_reset' ooi.primary_key organization.code query=mandatory_fields %}"
+                      method="post">
                     {% csrf_token %}
                     <fieldset>
                         <legend>{% translate "Set clearance level" %}</legend>
@@ -27,8 +25,8 @@
                     </fieldset>
                     <div class="button-container">
                         <button type="submit">{% translate "Yes, set to inherit" %}</button>
-                        <a href="{% ooi_url 'scan_profile_detail' ooi.primary_key organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
-                         " class="button ghost">Cancel</a>
+                        <a href="{% ooi_url 'scan_profile_detail' ooi.primary_key organization.code query=mandatory_fields %}"
+                           class="button ghost">Cancel</a>
                     </div>
                 </form>
             </div>
