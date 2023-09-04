@@ -8,12 +8,14 @@
     <tr class="tree"
         data-location="{{ object.tree_meta.location }}"
         data-ooi-type="{{ object.ooi_type }}">
+        <td>
+            {% if child_count|add:"0" > 0 %}<span class="tree-children-counter">{{ child_count }}</span>{% endif %}
+        </td>
         <td class="indent-{{ object.tree_meta.depth }}">
             <a href="{% ooi_url "ooi_detail" object.id organization.code query=mandatory_fields %}"
                title="{% blocktranslate %}Show details for {{ object_id }}, with {{ child_count }} children.{% endblocktranslate %}">
                 {{ object.human_readable }}
             </a>
-            {% if child_count|add:"0" > 0 %}<span class="tree-children-counter">{{ child_count }}</span>{% endif %}
         </td>
         <td>
             <a href="{% ooi_url "ooi_tree" object.id organization.code ooi_type=object.ooi_type %}"

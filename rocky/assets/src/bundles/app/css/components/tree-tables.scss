@@ -5,19 +5,6 @@ table {
 
   &.tree-view {
 
-    .tree-children-counter {
-      display: inline-block;
-      border-radius: 100%;
-      border: 1px solid var(--tabs-item-text-color);
-      font-size: var(--tile-font-size);
-      min-width: 15px;
-      height: 15px;
-      text-align: center;
-      line-height: 15px;
-      padding: 4px;
-      margin-left: 8px;
-    }
-
     tr {
 
       &.tree {

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-29 14:58+0000\n"
+"POT-Creation-Date: 2023-09-04 15:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4504,6 +4504,10 @@ msgstr "Filtra pa tiponan di OOI"
 #: rocky/templates/partials/ooi_type_filters.html
 msgid "Toggle all"
 msgstr "Pone tur"
+
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+msgid "Degree"
+msgstr "Grado"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format

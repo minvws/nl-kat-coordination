@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-29 15:01+0000\n"
+"POT-Creation-Date: 2023-09-04 15:20+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -4512,6 +4512,10 @@ msgstr "Filter op OOI-types"
 #: rocky/templates/partials/ooi_type_filters.html
 msgid "Toggle all"
 msgstr "Alles (de-)selecteren"
+
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+msgid "Degree"
+msgstr "Graad"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
