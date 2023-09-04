@@ -104,6 +104,10 @@ class OOIReportPDFView(SingleOOITreeMixin):
 
 
 class FindingReportPDFView(SeveritiesMixin, OctopoesView):
+    """Used from the FindingListView. The request to this endpoint inherits all query parameters from this page, so that
+    the report shows the same filtered findings.
+    """
+
     paginate_by = None
 
     def get(self, request, *args, **kwargs):
