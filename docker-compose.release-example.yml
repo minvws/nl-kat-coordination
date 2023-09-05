@@ -164,4 +164,3 @@ volumes:
   postgres-data:
   bytes-data:
   xtdb-data:
-  
