@@ -33,6 +33,7 @@ report_data_empty = {
     "report_source_type": "Hostname",
     "report_source_value": "mispo.es.",
     "filters": {},
+    "report_url": "http://test.test",
 }
 
 
@@ -108,6 +109,7 @@ report_data_underscores = {
     "report_source_type": "Hostname",
     "report_source_value": "mispo.es.",
     "filters": {},
+    "report_url": "http://test.test",
 }
 
 
