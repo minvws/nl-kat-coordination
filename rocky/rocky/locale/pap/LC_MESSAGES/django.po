@@ -1859,7 +1859,7 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Please accept the clearance level first on your profile page "
 "to proceed."
-msgstr ""
+msgstr "No por a subi na e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon promé riba bo página di perfil pa por sigui."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
