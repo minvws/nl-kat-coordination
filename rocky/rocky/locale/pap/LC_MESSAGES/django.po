@@ -5414,7 +5414,7 @@ msgstr ""
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of L%s. Please accept the clearance level below to proceed."
-msgstr ""
+msgstr "No por a subi na e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon abou pa por sigui."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
