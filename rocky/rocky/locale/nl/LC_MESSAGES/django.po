@@ -1914,7 +1914,7 @@ msgstr "Uw vrijwaring niveau is nog niet ingesteld. Neem contact op met uw behee
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "To enable {} you need at least a clearance level of L{}. "
-msgstr "Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} nodig.
+msgstr "Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} nodig."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
