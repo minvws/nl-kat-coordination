@@ -290,3 +290,20 @@ class APIDesignRuleResult(OOI):
         api_url = format_web_url_token(t.rest_api.api_url)
 
         return f"{rule} @ {api_url}"
+
+
+class SecurityTXT(OOI):
+    object_type: Literal["SecurityTXT"] = "SecurityTXT"
+
+    website: Reference = ReferenceField("Website")
+    url: Reference = ReferenceField("URL")
+
+    redirects_to: Optional[Reference] = ReferenceField("SecurityTXT", default=None)
+    security_txt: Optional[str]
+
+    _natural_key_attrs = ["website", "url"]
+    _reverse_relation_names = {
+        "website": "security_txt_of",
+        "url": "security_txt",
+        "redirects_to": "is_being_redirected_to_by",
+    }
