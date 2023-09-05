@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 11:59+0000\n"
+"POT-Creation-Date: 2023-09-05 10:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1852,7 +1852,6 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You were trusted a clearance "
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-""
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -1861,7 +1860,6 @@ msgid ""
 "level of L%s. Please accept the clearance level first on your profile page "
 "to proceed."
 msgstr ""
-""
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -5405,20 +5403,18 @@ msgstr ""
 "presente na e organisashon %s."
 
 #: rocky/views/ooi_list.py
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-""
 
 #: rocky/views/ooi_list.py
 #, python-format
 msgid ""
-"Could not raise clearance level of to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level below to proceed."
+"Could not raise clearance level to L%s. You acknowledged a clearance level "
+"of L%s. Please accept the clearance level below to proceed."
 msgstr ""
-""
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5637,7 +5633,6 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Please accept the clearance level below to proceed."
 msgstr ""
-""
 
 #: rocky/views/scan_profile.py
 msgid "Choose a valid level"
