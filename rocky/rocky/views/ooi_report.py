@@ -24,7 +24,9 @@ from octopoes.models.ooi.dns.records import (
 )
 from octopoes.models.ooi.dns.zone import Hostname
 from rocky.keiko import (
+    FindingReportQuery,
     GeneratingReportFailed,
+    OOIReportQuery,
     ReportNotFoundException,
     ReportsService,
     build_findings_list_from_store,
@@ -88,10 +90,13 @@ class OOIReportPDFView(SingleOOITreeMixin):
                 self.ooi.object_type,
                 self.ooi.human_readable,
                 self.tree.store,
-                {
-                    "ooi": self.ooi.reference,
-                    "valid_time": str(valid_time),
-                },
+                OOIReportQuery(
+                    self.organization.code,
+                    valid_time.date(),
+                    self.ooi,
+                    self.depth,
+                    origin=f"{request.scheme}://{request.get_host()}",
+                ),
             )
         except GeneratingReportFailed:
             messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
@@ -129,10 +134,12 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
                 self.get_observed_at(),
                 self.organization.name,
                 generate_findings_metadata(findings, severities),
-                {
-                    "severities": [severity.value for severity in severities],
-                    "valid_time": str(self.get_observed_at()),
-                },
+                FindingReportQuery(
+                    self.organization.code,
+                    self.get_observed_at().date(),
+                    severities,
+                    origin=f"{request.scheme}://{request.get_host()}",
+                ),
             )
         except GeneratingReportFailed:
             messages.error(request, _("Generating report failed. See Keiko logs for more information."))
