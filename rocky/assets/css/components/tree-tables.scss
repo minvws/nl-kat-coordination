@@ -3,7 +3,9 @@ $depth-end: 15;
 
 table {
   &.tree-view {
-    table-layout: fixed;
+    &.table {
+      table-layout: fixed;
+    }
 
     th {
       >div {
