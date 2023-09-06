@@ -1846,15 +1846,20 @@ msgstr ""
 "No por subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
 "presente na organisashon %s."
 
-#: katalogus/views/mixins.py rocky/views/scan_profile.py
+#: katalogus/views/mixins.py onboarding/views.py rocky/views/scan_profile.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You were trusted a clearance "
+"level of L%s. Contact your administrator to receive a higher clearance."
+msgstr ""
+
+#: katalogus/views/mixins.py onboarding/views.py
 #, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Contact your administrator to receive a higher clearance."
-msgstr ""
-"No por subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di "
-"autorisashon di L%s. Tuma kontakto ku bo administrator pa risibí un nivel di "
-"autorisashon mas haltu."
+"level of L%s. Please accept the clearance level first on your profile page "
+"to proceed."
+msgstr "No por a subi na e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon promé riba bo página di perfil pa por sigui."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -2972,15 +2977,6 @@ msgid ""
 msgstr ""
 "No por a subi e nivel di autorisashon di %s pa L%s. Indemnisashon no ta "
 "presente pa organisashon %s."
-
-#: onboarding/views.py
-msgid ""
-"Could not raise clearance level of {} to L{}. You acknowledged a clearance "
-"level of L{}. Contact your administrator to receive a higher clearance."
-msgstr ""
-"No por subi e nivel di autorisashon di {} pa L{}. Bo a rekonosé un nivel di "
-"autorisashon di L{}. Tuma kontakto ku bo administrator pa risibí un nivel di "
-"autorisashon mas haltu."
 
 #: onboarding/views.py
 msgid "Clearance level has been set"
@@ -5417,12 +5413,16 @@ msgstr ""
 #: rocky/views/ooi_list.py
 #, python-format
 msgid ""
-"Could not raise clearance level to L%s. You acknowledged a clearance level "
+"Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por subi e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di "
-"autorisashon di L%s. Tuma kontakto ku bo administrator pa risibí un nivel di "
-"autorisashon mas haltu."
+
+#: rocky/views/ooi_list.py
+#, python-format
+msgid ""
+"Could not raise clearance level to L%s. You acknowledged a clearance level "
+"of L%s. Please accept the clearance level below to proceed."
+msgstr "No por a subi na e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon abou pa por sigui."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5636,6 +5636,13 @@ msgstr ""
 "presente pa organisashon %s."
 
 #: rocky/views/scan_profile.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
+"level of L%s. Please accept the clearance level below to proceed."
+msgstr "No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon mas abou pa por sigui."
+
+#: rocky/views/scan_profile.py
 msgid "Choose a valid level"
 msgstr "Skohé un nivél balido"
 
@@ -5655,6 +5662,10 @@ msgstr "Detayes di tarea no por wordu haña."
 #: rocky/views/tasks.py
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "No por haña tarea: no tin konekshon ku scheduler"
+
+#: rocky/views/tasks.py
+msgid "Cannot reschedule task: it has probably already been queued."
+msgstr ""
 
 #: rocky/views/upload_csv.py
 msgid ""

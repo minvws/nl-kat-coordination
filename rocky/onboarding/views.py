@@ -44,9 +44,10 @@ from onboarding.view_helpers import (
 )
 from rocky.bytes_client import get_bytes_client
 from rocky.exceptions import (
-    ClearanceLevelTooLowException,
+    AcknowledgedClearanceLevelTooLowException,
     IndemnificationNotPresentException,
     RockyError,
+    TrustedClearanceLevelTooLowException,
 )
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
@@ -285,15 +286,32 @@ class OnboardingSetupScanOOIDetailView(
                 ),
             )
             return self.get(request, *args, **kwargs)
-        except ClearanceLevelTooLowException:
+        except TrustedClearanceLevelTooLowException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
                 _(
-                    "Could not raise clearance level of {} to L{}. "
-                    "You acknowledged a clearance level of L{}. "
+                    "Could not raise clearance level of %s to L%s. "
+                    "You were trusted a clearance level of L%s. "
                     "Contact your administrator to receive a higher clearance."
-                ).format(
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
+            return self.get(request, *args, **kwargs)
+        except AcknowledgedClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Please accept the clearance level first on your profile page to proceed."
+                )
+                % (
                     ooi.reference.human_readable,
                     level,
                     self.organization_member.acknowledged_clearance_level,
