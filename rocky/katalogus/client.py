@@ -18,24 +18,41 @@ from rocky.health import ServiceHealth
 logger = getLogger(__name__)
 
 
-class Plugin(BaseModel):
+class Boefje(BaseModel):
     id: str
-    type: str
+    repository_id: Optional[str] = None
     name: str
     description: Optional[str] = None
-    repository_id: str
-    scan_level: Optional[SCAN_LEVEL] = None
+    enabled: bool
+    type: str
+    scan_level: SCAN_LEVEL
     consumes: Set[Type[OOI]]
     produces: Set[Type[OOI]]
-    enabled: bool
 
     def dict(self, *args, **kwargs):
         """Pydantic does not stringify the OOI classes, but then templates can't render them"""
-        plugin_dict = super().dict(*args, **kwargs)
-        plugin_dict["consumes"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["consumes"]}
-        plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
+        boefje_dict = super().dict(*args, **kwargs)
+        boefje_dict["consumes"] = {ooi_class.get_ooi_type() for ooi_class in boefje_dict["consumes"]}
+        boefje_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in boefje_dict["produces"]}
 
-        return plugin_dict
+        return boefje_dict
+
+
+class Normalizer(BaseModel):
+    id: str
+    repository_id: Optional[str] = None
+    name: str
+    description: Optional[str] = None
+    enabled: bool
+    type: str
+    consumes: Set[str]
+    produces: Set[Type[OOI]]
+
+    def dict(self, *args, **kwargs):
+        """Pydantic does not stringify the OOI classes, but then templates can't render them"""
+        normalizer_dict = super().dict(*args, **kwargs)
+        normalizer_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in normalizer_dict["produces"]}
+        return normalizer_dict
 
 
 class KATalogusClientV1:
@@ -65,7 +82,7 @@ class KATalogusClientV1:
         response.raise_for_status()
         return [parse_plugin(plugin) for plugin in response.json()]
 
-    def get_plugin(self, plugin_id: str) -> Plugin:
+    def get_plugin(self, plugin_id: str) -> Boefje | Normalizer:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
 
@@ -109,22 +126,22 @@ class KATalogusClientV1:
 
         return ServiceHealth.parse_obj(response.json())
 
-    def get_normalizers(self) -> List[Plugin]:
+    def get_normalizers(self) -> List[Normalizer]:
         return self.get_plugins("normalizer")
 
-    def get_boefjes(self) -> List[Plugin]:
+    def get_boefjes(self) -> List[Boefje]:
         return self.get_plugins("boefje")
 
-    def enable_boefje(self, plugin: Plugin) -> None:
+    def enable_boefje(self, plugin: Boefje) -> None:
         self._patch_boefje_state(plugin.id, True, plugin.repository_id)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
         self.enable_boefje(self.get_plugin(boefje_id))
 
-    def disable_boefje(self, plugin: Plugin) -> None:
+    def disable_boefje(self, plugin: Boefje) -> None:
         self._patch_boefje_state(plugin.id, False, plugin.repository_id)
 
-    def get_enabled_boefjes(self) -> List[Plugin]:
+    def get_enabled_boefjes(self) -> List[Boefje]:
         return [boefje for boefje in self.get_boefjes() if boefje.enabled]
 
     def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
@@ -147,37 +164,56 @@ class KATalogusClientV1:
         return BytesIO(response.content)
 
 
-def parse_plugin(plugin: Dict) -> Plugin:
-    name = plugin.get("name") or plugin["id"]
-    scan_level = None
-    if plugin["type"] != "normalizer":  # Scan levels not applicable for Normalizers
-        scan_level = SCAN_LEVEL(plugin["scan_level"])
-
-    # TODO: give normalizers a proper name in backend
-    if plugin["type"] == "normalizer":
-        name = plugin["id"].replace("_", " ").replace("kat ", "").title()
+def parse_boefje(boefje: Dict) -> Boefje:
+    scan_level = SCAN_LEVEL(boefje["scan_level"])
 
     consumes = set()
     produces = set()
-
     with contextlib.suppress(StopIteration):
-        if plugin["type"] != "normalizer":
-            consumes.add(
-                type_by_name(plugin["consumes"])
-            )  # TODO: No OOI type for normalizers but get consumable Boefjes objects. Refactoring needed.
-        produces.add(type_by_name(plugin["produces"]))
+        consumes.add(type_by_name(boefje["consumes"]))
+        produces.add(type_by_name(boefje["produces"]))
 
-    return Plugin(
-        id=plugin["id"],
-        type=plugin["type"],
-        name=name,
-        repository_id=plugin["repository_id"],
-        description=plugin["description"],
+    return Boefje(
+        id=boefje["id"],
+        repository_id=boefje["repository_id"],
+        name=boefje.get("name") or boefje["id"],
+        description=boefje["description"],
+        enabled=boefje["enabled"],
+        type=boefje["type"],
         scan_level=scan_level,
-        consumes=consumes,  # TODO: check if we still want to support multiple
+        consumes=consumes,
         produces=produces,
-        enabled=plugin["enabled"],
     )
+
+
+def parse_normalizer(normalizer: Dict) -> Normalizer:
+    # TODO: give normalizers a proper name in backend
+    name = normalizer["id"].replace("_", " ").replace("kat ", "").title()
+
+    consumes = set()
+    produces = set()
+    with contextlib.suppress(StopIteration):
+        for mime_type in normalizer["consumes"]:
+            consumes.add(mime_type)
+        produces.add(type_by_name(normalizer["produces"]))
+
+    return Normalizer(
+        id=normalizer["id"],
+        repository_id=normalizer["repository_id"],
+        name=name or normalizer["id"],
+        description=normalizer["description"],
+        enabled=normalizer["enabled"],
+        type=normalizer["type"],
+        consumes=consumes,
+        produces=produces,
+    )
+
+
+def parse_plugin(plugin: Dict) -> Boefje | Normalizer:
+    if plugin["type"] == "boefje":
+        return parse_boefje(plugin)
+    if plugin["type"] == "normalizer":
+        return parse_normalizer(plugin)
 
 
 def get_katalogus(organization: str) -> KATalogusClientV1:
