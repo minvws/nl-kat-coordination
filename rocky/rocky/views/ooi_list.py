@@ -6,6 +6,7 @@ from typing import List
 
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from requests import RequestException
@@ -17,7 +18,11 @@ from tools.view_helpers import get_mandatory_fields
 from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
+from rocky.exceptions import (
+    AcknowledgedClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    TrustedClearanceLevelTooLowException,
+)
 from rocky.views.mixins import OctopoesView, OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -97,21 +102,37 @@ class OOIListView(BaseOOIListView, OctopoesView):
                 ),
             )
             return self.get(request, status=403, *args, **kwargs)
-        except ClearanceLevelTooLowException:
+        except TrustedClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level to L%s. "
+                    "You were trusted a clearance level of L%s. "
+                    "Contact your administrator to receive a higher clearance."
+                )
+                % (
+                    level,
+                    self.organization_member.trusted_clearance_level,
+                ),
+            )
+            return self.get(request, status=403, *args, **kwargs)
+        except AcknowledgedClearanceLevelTooLowException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
                 _(
                     "Could not raise clearance level to L%s. "
                     "You acknowledged a clearance level of L%s. "
-                    "Contact your administrator to receive a higher clearance."
+                    "Please accept the clearance level below to proceed."
                 )
                 % (
                     level,
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
-            return self.get(request, status=403, *args, **kwargs)
+            return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
+
         except (RequestException, RemoteException, ConnectionError):
             messages.add_message(request, messages.ERROR, _("An error occurred while saving clearance levels."))
 

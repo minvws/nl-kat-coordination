@@ -1,0 +1,30 @@
+/* Button Ghost - Variables */
+
+:root {
+	/* Button */
+	--button-ghost-background-color: transparent;
+	--button-ghost-border-color: #D4D4D4;
+	--button-ghost-text-color: #006FB3;
+
+	/* Text */
+	--button-ghost-font-size: 1rem;
+	--button-ghost-font-weight: bold;
+	--button-ghost-line-height: 1;
+
+	/* States */
+
+		/* Hover */
+		--button-ghost-hover-background-color: transparent;
+		--button-ghost-hover-border-color: #006FB3;
+		--button-ghost-hover-text-color: #006FB3;
+
+		/* Active */
+		--button-ghost-active-background-color: transparent;
+		--button-ghost-active-border-color: var(--branding-color-1-darker);
+		--button-ghost-active-text-color: #006FB3;
+
+		/* Focus */
+		--button-ghost-focus-background-color: transparent;
+		--button-ghost-focus-border-color: var(--branding-color-1-darker);
+		--button-ghost-focus-text-color: #006FB3;
+}

@@ -19,9 +19,7 @@
                         {% for key, value in tree_node.items %}
                             {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
                                 <div>
-                                    <dt>
-                                        {{ key }}
-                                    </dt>
+                                    <dt>{{ key }}</dt>
                                     <dd>
                                         {{ value }}
                                     </dd>
@@ -79,9 +77,7 @@
                         {% for key, value in tree_node.items %}
                             {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
                                 <div>
-                                    <dt>
-                                        {{ key }}
-                                    </dt>
+                                    <dt>{{ key }}</dt>
                                     <dd>
                                         {{ value }}
                                     </dd>

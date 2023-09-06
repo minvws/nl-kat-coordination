@@ -4,9 +4,7 @@
         {% for key, value in finding.items %}
             {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
                 <div>
-                    <dt>
-                        {{ key }}
-                    </dt>
+                    <dt>{{ key }}</dt>
                     <dd>
                         {{ value }}
                     </dd>
@@ -21,9 +19,7 @@
                 {% for key, value in finding_type.items %}
                     {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
                         <div>
-                            <dt>
-                                {{ key }}
-                            </dt>
+                            <dt>{{ key }}</dt>
                             <dd>
                                 {{ value }}
                             </dd>
@@ -33,7 +29,7 @@
             </dl>
         {% endif %}
     {% endfor %}
-    <aside class="ooi_summary__risk-rating">
+    <aside class="ooi-summary-risk-rating">
         <h5>Risk Rating</h5>
         <span>99.99</span>
     </aside>

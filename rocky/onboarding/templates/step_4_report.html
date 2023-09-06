@@ -16,21 +16,21 @@
                 <h3>{% translate "Boefjes are scanning" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
-            The enabled boefjes are collecting the data needed to generate the DNS-report.
-            This may take some time based on the type of scans and the number of objects found.
-            For the current scan we expect boefjes to take about 3 minutes.
-          {% endblocktranslate %}
+                        The enabled boefjes are collecting the data needed to generate the DNS-report.
+                        This may take some time based on the type of scans and the number of objects found.
+                        For the current scan we expect boefjes to take about 3 minutes.
+                    {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-            During this introduction we ask you to wait till the scan is ready. After which you can view the report.
-          {% endblocktranslate %}
+                        During this introduction we ask you to wait till the scan is ready. After which you can view the report.
+                    {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-            After the onboarding, boefjes run in the background. This enables you to use OpenKAT in the meantime without waiting for scans to finish.
-            When you would like to see the status of a scan you can open the "tasks" page.
-          {% endblocktranslate %}
+                        After the onboarding, boefjes run in the background. This enables you to use OpenKAT in the meantime without waiting for scans to finish.
+                        When you would like to see the status of a scan you can open the "tasks" page.
+                    {% endblocktranslate %}
                 </p>
                 {% include "partials/cat_loader.html" %}
 
@@ -44,6 +44,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/enableButtonTimeout.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/enableButtonTimeout.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

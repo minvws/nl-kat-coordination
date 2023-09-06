@@ -45,7 +45,7 @@ class OrganizationAddView(PermissionRequiredMixin, CreateView):
 
         try:
             member, created = OrganizationMember.objects.get_or_create(user=self.request.user, organization=self.object)
-            member.acknowledged_clearance_level = 4
+            member.acknowledged_clearance_level = 0
             member.trusted_clearance_level = 4
             member.save()
         except Exception:

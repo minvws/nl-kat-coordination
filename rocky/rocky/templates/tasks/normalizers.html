@@ -14,13 +14,13 @@
 
                 <h1>{% translate "Normalizers" %}</h1>
                 {% include "tasks/partials/task_filter.html" %}
+
                 {% if not object_list %}
                     <p class="emphasized">{% translate "There are no tasks for normalizers" %}</p>
                 {% else %}
                     <p class="emphasized">{% translate "List of tasks for normalizers" %}</p>
-
                     <div class="horizontal-scroll">
-                        <table rf-selector="table-normalizers" >
+                        <table rf-selector="table-normalizers">
                             <caption>{% translate "List of tasks for " %}{{ organization.name }}</caption>
                             <thead>
                                 <tr>
@@ -35,74 +35,73 @@
                             <tbody>
                                 {% for task in object_list %}
                                     <tr data-task-id="{{ task.id }}">
-                                        <td>
-                                          {{ task.p_item.data.normalizer.id }}
-                                        </td>
+                                        <td>{{ task.p_item.data.normalizer.id }}</td>
                                         {% if task.status.value == "completed" %}
-                                        <td class="confirmation">{{ task.status.value|capfirst }}</td>
+                                            <td class="confirmation">{{ task.status.value|capfirst }}</td>
                                         {% elif task.status.value == "failed" %}
-                                        <td class="warning">{{ task.status.value|capfirst }}</td>
+                                            <td class="warning">{{ task.status.value|capfirst }}</td>
                                         {% else %}
-                                        <td>{{ task.status.value|capfirst }}</td>
+                                            <td>{{ task.status.value|capfirst }}</td>
                                         {% endif %}
-                                        <td>
-                                            {{ task.created_at }}
-                                        </td>
+                                        <td>{{ task.created_at }}</td>
                                         <td>
                                             <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
                                         </td>
                                         {% if task.p_item.data.raw_data.boefje_meta.input_ooi %}
-                                        <td>
-                                          <a href="{% ooi_url "ooi_detail" ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code %}">
-                                            {{ task.p_item.data.raw_data.boefje_meta.input_ooi }}
-                                          </a>
-                                        </td>
+                                            <td>
+                                                <a href="{% ooi_url "ooi_detail" ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code %}">
+                                                    {{ task.p_item.data.raw_data.boefje_meta.input_ooi }}
+                                                </a>
+                                            </td>
                                         {% else %}
-                                        <td>{% translate "No input OOI" %}</td>
+                                            <td>{% translate "No input OOI" %}</td>
                                         {% endif %}
-                                        <td class="actions action-buttons" >
-                                          <button type="button"
-                                                  class="expando-button normalizer-list-table-row"
-                                                  data-icon-open-class="icon ti-chevron-down"
-                                                  data-icon-close-class="icon ti-chevron-up"
-                                                  data-close-label="{% translate "Close details" %}">
-                                              {% translate "Open details" %}
-                                          </button>
-                                      </td>
+                                        <td class="actions action-buttons">
+                                            <button type="button"
+                                                    class="expando-button normalizer-list-table-row"
+                                                    data-icon-open-class="icon ti-chevron-down"
+                                                    data-icon-close-class="icon ti-chevron-up"
+                                                    data-close-label="{% translate "Close details" %}">
+                                                {% translate "Open details" %}
+                                            </button>
+                                        </td>
                                     </tr>
                                     <tr class="expando-row">
-                                      <td colspan="7">
-                                        <section>
-                                          <div id="yielded-objects-{{ task.id }}">
-                                            <h2>
-                                              {% translate "Yielded objects" %}
-                                            </h2>
-                                          </div>
-                                        </section>
-                                        <br>
-                                        <section>
-                                          <div>
-                                            <div class="button-container">
-                                              <a class="button" href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
-                                              {% if task.status.value == "completed" %}
-                                                  {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
-                                              {% endif %}
-                                            </div>
-                                          </div>
-                                        </section>
-                                      </td>
+                                        <td colspan="7">
+                                            <section>
+                                                <div id="yielded-objects-{{ task.id }}">
+                                                    <h2>{% translate "Yielded objects" %}</h2>
+                                                </div>
+                                            </section>
+                                            <br>
+                                            <section>
+                                                <div>
+                                                    <div class="button-container">
+                                                        {% if task.status.value in "completed,failed" %}
+                                                            <a class="button"
+                                                               href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                                            {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+
+                                                        {% else %}
+                                                            <a class="button"
+                                                               href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download task data" %}</a>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </section>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                     {% include "partials/list_paginator.html" %}
+
                 {% endif %}
             </div>
         </section>
     </main>
 {% endblock content %}
-
 {% block html_at_end_body %}
     {{ block.super }}
     <script src="{% static "/js/renderNormalizerOutputOOIs.js" %}" nonce="{{ request.csp_nonce }}"></script>

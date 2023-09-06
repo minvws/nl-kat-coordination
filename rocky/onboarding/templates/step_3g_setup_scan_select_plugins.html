@@ -15,47 +15,47 @@
                 <h2>{% translate "Plugins introduction" %}</h2>
                 <p>
                     {% blocktranslate trimmed %}
-              OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a
-              specific skillset that will help to generate your report.
-              There are three types of plugins.
-          {% endblocktranslate %}
+                        OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a
+                        specific skillset that will help to generate your report.
+                        There are three types of plugins.
+                    {% endblocktranslate %}
                 </p>
                 <ul>
                     <li>
                         <strong>{% translate "Boefjes" %}:</strong>
                         {% blocktranslate trimmed %}
-                Scan objects for data. Each boefje has a scan intensity score to
-                prevent invasive scanning on objects where you don’t have the clearance to
-                do so.
-            {% endblocktranslate %}
+                            Scan objects for data. Each boefje has a scan intensity score to
+                            prevent invasive scanning on objects where you don’t have the clearance to
+                            do so.
+                        {% endblocktranslate %}
                     </li>
                     <li>
                         <strong>{% translate "Normalizers" %}:</strong>
                         {% blocktranslate trimmed %}
-                Check the data for specific objects and add these object to your object list.
-            {% endblocktranslate %}
+                            Check the data for specific objects and add these object to your object list.
+                        {% endblocktranslate %}
                     </li>
                     <li>
                         <strong>{% translate "Bits" %}:</strong>
                         {% blocktranslate trimmed %}
-                Analyze the available data to come to insights and conclusions.
-            {% endblocktranslate %}
+                            Analyze the available data to come to insights and conclusions.
+                        {% endblocktranslate %}
                     </li>
                 </ul>
                 <p>
                     {% blocktranslate trimmed %}
-              OpenKAT will be able to generate a full report when all the required and
-              suggested plugins are enabled. If you choose not to give a plugin
-              permission to run, the data that plugin would collect or produce will be
-              left out of the report which will then be generated based on the available
-              data collected by the enabled plugins. Below are the suggested and required
-              plugins for this report.
-          {% endblocktranslate %}
+                        OpenKAT will be able to generate a full report when all the required and
+                        suggested plugins are enabled. If you choose not to give a plugin
+                        permission to run, the data that plugin would collect or produce will be
+                        left out of the report which will then be generated based on the available
+                        data collected by the enabled plugins. Below are the suggested and required
+                        plugins for this report.
+                    {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-              Let’s setup your scan by enabling the plugins of your choice below.
-          {% endblocktranslate %}
+                        Let’s setup your scan by enabling the plugins of your choice below.
+                    {% endblocktranslate %}
                 </p>
                 <h2>{% translate "Suggested plugins" %}</h2>
                 {% if form_view == "table" %}
@@ -71,6 +71,5 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}"
-            nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}
