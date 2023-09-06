@@ -1995,15 +1995,26 @@ msgstr ""
 "Kon vrijwaring niveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
 "bij organisatie %s."
 
-#: katalogus/views/mixins.py rocky/views/scan_profile.py
+#: katalogus/views/mixins.py onboarding/views.py rocky/views/scan_profile.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You were trusted a clearance "
+"level of L%s. Contact your administrator to receive a higher clearance."
+msgstr ""
+"Kan vrijwaring niveau van %s niet verhogen naar L%s. U bent een vrijwaring "
+"niveau toevertrouwd van L%s. Neem contact op met uw beheerder om uw vrijwaring "
+"niveau te verhogen."
+
+#: katalogus/views/mixins.py onboarding/views.py
 #, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Contact your administrator to receive a higher clearance."
+"level of L%s. Please accept the clearance level first on your profile page "
+"to proceed."
 msgstr ""
 "Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een vrijwaring "
-"niveau bevestigd van L%s. Neem contact op met uw beheerder om je vrijwaring "
-"niveau te verhogen."
+"niveau bevestigd van L%s. Accepteer eerst het vrijwaring niveau op uw "
+"profiel pagina om verder te gaan."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -3082,15 +3093,6 @@ msgid ""
 msgstr ""
 "Kon vrijwaring niveau van %s niet verhogen naar L%s. Vrijwaring niet "
 "aanwezig bij organisatie %s."
-
-#: onboarding/views.py
-msgid ""
-"Could not raise clearance level of {} to L{}. You acknowledged a clearance "
-"level of L{}. Contact your administrator to receive a higher clearance."
-msgstr ""
-"Het was niet mogelijk om het vrijwaring niveau van {} te verhogen naar L{}. "
-"Je hebt een vrijwaring niveau van L{} erkend. Neem contact op met je "
-"beheerder om een hoger vrijwaring niveau te verkrijgen."
 
 #: onboarding/views.py
 msgid "Clearance level has been set"
@@ -5542,12 +5544,22 @@ msgstr ""
 #: rocky/views/ooi_list.py
 #, python-format
 msgid ""
-"Could not raise clearance level to L%s. You acknowledged a clearance level "
+"Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau "
-"bevestigd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring "
+"Kan vrijwaring niveau niet verhogen naar L%s. U bent een vrijwaring niveau "
+"toevertrouwd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring "
 "te krijgen."
+
+#: rocky/views/ooi_list.py
+#, python-format
+msgid ""
+"Could not raise clearance level to L%s. You acknowledged a clearance "
+"level of L%s. Please accept the clearance level below to proceed."
+msgstr ""
+"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring "
+"niveau bevestigd van L%s. Accepteer het vrijwaring niveau onderaan de pagina "
+"om verder te gaan."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5763,6 +5775,16 @@ msgstr ""
 "bij organisatie %s."
 
 #: rocky/views/scan_profile.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
+"level of L%s. Please accept the clearance level below to proceed."
+msgstr ""
+"Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een vrijwaring "
+"niveau bevestigd van L%s. Accepteer het vrijwaring niveau onderaan de pagina "
+"om verder te gaan."
+
+#: rocky/views/scan_profile.py
 msgid "Choose a valid level"
 msgstr "Kies een geldig niveau"
 
@@ -5784,6 +5806,10 @@ msgstr "Taakdetails niet gevonden."
 #: rocky/views/tasks.py
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "Ophalen van taken mislukt: geen verbinding met scheduler"
+
+#: rocky/views/tasks.py
+msgid "Cannot reschedule task: it has probably already been queued."
+msgstr "Taak kan niet worden herstart: waarschijnlijk staat deze al ingepland."
 
 #: rocky/views/upload_csv.py
 msgid ""

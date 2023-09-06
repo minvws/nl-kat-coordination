@@ -22,7 +22,11 @@ from katalogus.client import (
     Normalizer as KATalogusNormalizer,
 )
 from octopoes.models import OOI
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
+from rocky.exceptions import (
+    AcknowledgedClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    TrustedClearanceLevelTooLowException,
+)
 from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData, client
 from rocky.views.mixins import OctopoesView
 
@@ -127,14 +131,29 @@ class BoefjeMixin(OctopoesView):
                             self.organization.name,
                         ),
                     )
-                except ClearanceLevelTooLowException:
+                except TrustedClearanceLevelTooLowException:
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Could not raise clearance level of %s to L%s. "
+                            "You were trusted a clearance level of L%s. "
+                            "Contact your administrator to receive a higher clearance."
+                        )
+                        % (
+                            ooi.reference.human_readable,
+                            boefje.scan_level,
+                            self.organization_member.trusted_clearance_level,
+                        ),
+                    )
+                except AcknowledgedClearanceLevelTooLowException:
                     messages.add_message(
                         self.request,
                         messages.ERROR,
                         _(
                             "Could not raise clearance level of %s to L%s. "
                             "You acknowledged a clearance level of L%s. "
-                            "Contact your administrator to receive a higher clearance."
+                            "Please accept the clearance level first on your profile page to proceed."
                         )
                         % (
                             ooi.reference.human_readable,
@@ -142,4 +161,5 @@ class BoefjeMixin(OctopoesView):
                             self.organization_member.acknowledged_clearance_level,
                         ),
                     )
+
             self.run_boefje(boefje, ooi)
