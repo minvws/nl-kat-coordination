@@ -2,7 +2,7 @@ import contextlib
 import json
 from io import BytesIO
 from logging import getLogger
-from typing import Dict, List, Optional, Set, Type
+from typing import Dict, List, Optional, Set, Type, Union
 
 import requests
 from django.conf import settings
@@ -82,7 +82,7 @@ class KATalogusClientV1:
         response.raise_for_status()
         return [parse_plugin(plugin) for plugin in response.json()]
 
-    def get_plugin(self, plugin_id: str) -> Boefje | Normalizer:
+    def get_plugin(self, plugin_id: str) -> Union[Boefje, Normalizer]:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
 
@@ -209,7 +209,7 @@ def parse_normalizer(normalizer: Dict) -> Normalizer:
     )
 
 
-def parse_plugin(plugin: Dict) -> Boefje | Normalizer:
+def parse_plugin(plugin: Dict) -> Union[Boefje, Normalizer]:
     if plugin["type"] == "boefje":
         return parse_boefje(plugin)
     if plugin["type"] == "normalizer":
