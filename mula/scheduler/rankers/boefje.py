@@ -28,7 +28,7 @@ class BoefjeRanker(Ranker):
         """
         max_priority = self.MAX_PRIORITY
         max_days_in_seconds = self.MAX_DAYS * (60 * 60 * 24)
-        grace_period = timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+        grace_period = timedelta(seconds=self.ctx.config.pq_grace_period)
 
         # New tasks that have not yet run before
         if obj.prior_tasks is None or not obj.prior_tasks:

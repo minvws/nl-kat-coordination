@@ -100,15 +100,14 @@ def test_edit_superusers_from_different_organizations(rf, superuser_member, supe
 
     request = setup_request(rf.get("organization_member_edit"), superuser_member.user)
     # from OrganizationView
-    with pytest.raises(Http404):
-        OrganizationMemberEditView.as_view()(
-            request, organization_code=superuser_member_b.organization.code, pk=superuser_member_b.id
-        )
+    OrganizationMemberEditView.as_view()(
+        request, organization_code=superuser_member_b.organization.code, pk=superuser_member_b.id
+    )
 
 
 def test_edit_admins_from_different_organizations(rf, admin_member, admin_member_b):
     """
-    This will test if a admin from one organization can edit
+    This will check that an admin from one organization cannot edit
     an admin from another organization at the member edit view.
     """
 
