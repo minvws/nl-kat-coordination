@@ -2,6 +2,7 @@ import logging
 import socket
 import time
 from typing import Callable
+from urllib.parse import urljoin
 
 import requests
 
@@ -39,7 +40,8 @@ class Connector:
             A boolean
         """
         try:
-            response = requests.get(f"{host}{health_endpoint}", timeout=5)
+            url = urljoin(host, health_endpoint)
+            response = requests.get(url, timeout=5)
             healthy = response.json().get("healthy")
             return healthy
         except requests.exceptions.RequestException as exc:
