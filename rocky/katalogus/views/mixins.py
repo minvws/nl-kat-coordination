@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import List, Optional
+from typing import List, Optional, Union
 from uuid import uuid4
 
 from account.mixins import OrganizationView
@@ -38,7 +38,7 @@ class SinglePluginView(OrganizationView):
         super().__init__(*args, **kwargs)
         self.katalogus_client: Optional[KATalogusClientV1] = None
         self.plugin_schema = None
-        self.plugin: KATalogusBoefje | KATalogusNormalizer = None
+        self.plugin: Union[KATalogusBoefje, KATalogusNormalizer] = None
 
     def setup(self, request, *args, **kwargs):
         """
