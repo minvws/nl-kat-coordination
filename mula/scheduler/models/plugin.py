@@ -6,16 +6,16 @@ from pydantic import BaseModel
 
 class Plugin(BaseModel):
     id: str
-    name: Optional[str]
-    version: Optional[str]
-    authors: Optional[List[str]]
-    created: Optional[datetime.datetime]
-    description: Optional[str]
-    environment_keys: Optional[List[str]]
-    related: Optional[List[str]]
     type: str
-    scan_level: Optional[int]
-    consumes: Union[str, List[str]]
-    options: Optional[List[str]]
-    produces: List[str]
     enabled: bool
+    name: Optional[str] = None
+    version: Optional[str] = None
+    authors: Optional[List[str]] = None
+    created: Optional[datetime.datetime] = None
+    description: Optional[str] = None
+    environment_keys: Optional[List[str]] = None
+    related: Optional[List[str]] = None
+    scan_level: Optional[int] = None
+    consumes: Union[str, List[str]]
+    options: Optional[List[str]] = None
+    produces: List[str]

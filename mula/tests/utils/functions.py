@@ -9,7 +9,7 @@ class TestModel(pydantic.BaseModel):
     type: ClassVar[str] = "test-model"
     id: str
     name: str
-    child: Any
+    child: Any = None
 
 
 def create_p_item(scheduler_id: str, priority: int, data: Optional[TestModel] = None) -> models.PrioritizedItem:
@@ -22,7 +22,7 @@ def create_p_item(scheduler_id: str, priority: int, data: Optional[TestModel] = 
     return models.PrioritizedItem(
         scheduler_id=scheduler_id,
         priority=priority,
-        data=data,
+        data=data.model_dump(),
     )
 
 
