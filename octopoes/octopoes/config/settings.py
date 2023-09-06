@@ -70,10 +70,8 @@ class Settings(BaseSettings):
     scan_level_recalculation_interval: int = Field(
         60, description="Interval in seconds of the periodic task that recalculates scan levels"
     )
-    bits_enabled: Set[str] = Field(set(), example="{'port-classification-bit'}", description="Explicitly enabled bits")
-    bits_disabled: Set[str] = Field(
-        set(), example="{'port-classification-bit'}", description="Explicitly disabled bits"
-    )
+    bits_enabled: Set[str] = Field(set(), example='["port-common"]', description="Explicitly enabled bits")
+    bits_disabled: Set[str] = Field(set(), example='["port-classification-ip"]', description="Explicitly disabled bits")
 
     span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"

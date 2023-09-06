@@ -6,12 +6,12 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from scheduler import connectors, context, models, queues, rankers, utils
+from scheduler import connectors, context, models, queues, utils
 from scheduler.utils import thread
 
 
 class Scheduler(abc.ABC):
-    """The Scheduler class combines the priority queue, and ranker.
+    """The Scheduler class combines the priority queue.
     The scheduler is responsible for populating the queue, and ranking tasks.
 
     Attributes:
@@ -25,11 +25,7 @@ class Scheduler(abc.ABC):
         scheduler_id:
             The id of the scheduler.
         queue:
-            A queues.PriorityQueue instance, the associated queue for the
-            scheduler.
-        ranker:
-            A rankers.Ranker instance used for prioritizing tasks for the
-            queue.
+            A queues.PriorityQueue instance
         threads:
             A dict of ThreadRunner instances, used for running processes
             concurrently.
@@ -40,14 +36,11 @@ class Scheduler(abc.ABC):
             external events.
     """
 
-    organisation: models.Organisation
-
     def __init__(
         self,
         ctx: context.AppContext,
         scheduler_id: str,
         queue: queues.PriorityQueue,
-        ranker: rankers.Ranker,
         callback: Optional[Callable[..., None]] = None,
         max_tries: int = -1,
     ):
@@ -73,7 +66,6 @@ class Scheduler(abc.ABC):
         self.enabled: bool = True
         self.scheduler_id: str = scheduler_id
         self.queue: queues.PriorityQueue = queue
-        self.ranker: rankers.Ranker = ranker
 
         self.max_tries: int = max_tries
 
@@ -109,12 +101,12 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
-        task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))
+        task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
-            self.ctx.task_store.update_task(task)
+            self.ctx.datastores.task_store.update_task(task)
             return
 
-        self.ctx.task_store.create_task(task)
+        self.ctx.datastores.task_store.create_task(task)
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
@@ -125,7 +117,7 @@ class Scheduler(abc.ABC):
         """
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
-        task = self.ctx.task_store.get_task_by_id(str(p_item.id))
+        task = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task is None:
             self.logger.warning(
                 "Task %s not found in datastore, not updating status [task_id=%s, queue_id=%s]",
@@ -136,7 +128,7 @@ class Scheduler(abc.ABC):
             return None
 
         task.status = models.TaskStatus.DISPATCHED
-        self.ctx.task_store.update_task(task)
+        self.ctx.datastores.task_store.update_task(task)
 
         return None
 
@@ -355,12 +347,12 @@ class Scheduler(abc.ABC):
         self.queue.clear()
 
         # Get all tasks that were on the queue and set them to CANCELLED
-        tasks, _ = self.ctx.task_store.get_tasks(
+        tasks, _ = self.ctx.datastores.task_store.get_tasks(
             scheduler_id=self.scheduler_id,
             status=models.TaskStatus.QUEUED,
         )
         task_ids = [task.id for task in tasks]
-        self.ctx.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
+        self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
 
         self.logger.info("Disabled scheduler: %s", self.scheduler_id)
 
