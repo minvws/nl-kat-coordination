@@ -3,6 +3,15 @@ $depth-end: 15;
 
 table {
   &.tree-view {
+    table-layout: fixed;
+
+    th {
+      >div {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
     tr {
       &.tree {
         td {
@@ -14,6 +23,36 @@ table {
 
         }
       }
+
+      &.folded {
+        >td {
+          background-color: #cccccc;
+          overflow: hidden;
+
+          &:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+          }
+        }
+      }
     }
   }
+}
+
+.toggle-table-body:not(:checked)+table.tree-view tbody {
+  display: none;
+}
+
+.toggle-table-body+table.tree-view>thead label {
+  cursor: pointer;
+}
+
+.toggle-table-body:checked+table.tree-view>thead .ro-icon.open {
+  display: none;
+}
+
+.toggle-table-body:not(:checked)+table.tree-view>thead .ro-icon.close {
+  display: none;
 }
