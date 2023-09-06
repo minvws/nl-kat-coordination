@@ -2,7 +2,7 @@ from urllib.parse import urlencode
 
 import pytest
 from django.http import HttpResponseRedirect
-from katalogus.client import Plugin
+from katalogus.client import Boefje
 from pytest_django.asserts import assertContains, assertNotContains
 from tools.enums import SCAN_LEVEL
 from tools.models import Indemnification
@@ -188,7 +188,7 @@ def test_ooi_detail_start_scan(
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
-    mock_katalogus().get_plugin.return_value = Plugin(
+    mock_katalogus().get_plugin.return_value = Boefje(
         id="nmap",
         repository_id="",
         name="",
