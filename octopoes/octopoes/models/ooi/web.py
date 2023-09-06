@@ -295,10 +295,12 @@ class APIDesignRuleResult(OOI):
 class SecurityTXT(OOI):
     object_type: Literal["SecurityTXT"] = "SecurityTXT"
 
-    website: Reference = ReferenceField("Website")
-    url: Reference = ReferenceField("URL")
+    website: Reference = ReferenceField("Website", max_issue_scan_level=0, max_inherit_scan_level=4)
+    url: Reference = ReferenceField("URL", max_issue_scan_level=0, max_inherit_scan_level=4)
 
-    redirects_to: Optional[Reference] = ReferenceField("SecurityTXT", default=None)
+    redirects_to: Optional[Reference] = ReferenceField(
+        "SecurityTXT", max_issue_scan_level=2, max_inherit_scan_level=0, default=None
+    )
     security_txt: Optional[str]
 
     _natural_key_attrs = ["website", "url"]
