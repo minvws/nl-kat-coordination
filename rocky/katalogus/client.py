@@ -190,11 +190,10 @@ def parse_normalizer(normalizer: Dict) -> Normalizer:
     # TODO: give normalizers a proper name in backend
     name = normalizer["id"].replace("_", " ").replace("kat ", "").title()
 
-    consumes = set()
+    consumes = set(normalizer["consumes"])
     produces = set()
     with contextlib.suppress(StopIteration):
-        for mime_type in normalizer["consumes"]:
-            consumes.add(mime_type)
+        consumes.add(f"normalizer/{name.lower()}")
         produces.add(type_by_name(normalizer["produces"]))
 
     return Normalizer(
