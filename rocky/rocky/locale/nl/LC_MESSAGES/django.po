@@ -5665,6 +5665,10 @@ msgstr "Taakdetails niet gevonden."
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "Ophalen van taken mislukt: geen verbinding met scheduler"
 
+#: rocky/views/tasks.py
+msgid "Cannot reschedule task: it has probably already been queued."
+msgstr "Taak kan niet worden herstart: waarschijnlijk staat deze al ingepland."
+
 #: rocky/views/upload_csv.py
 msgid ""
 "For URL object type, a column 'raw' with URL values is required, starting "
