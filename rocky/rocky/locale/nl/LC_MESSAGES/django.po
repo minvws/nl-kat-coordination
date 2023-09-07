@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 11:59+0000\n"
+"POT-Creation-Date: 2023-09-07 13:02+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1868,8 +1868,8 @@ msgid ""
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "Kan vrijwaring niveau van %s niet verhogen naar L%s. U bent een vrijwaring "
-"niveau toevertrouwd van L%s. Neem contact op met uw beheerder om uw vrijwaring "
-"niveau te verhogen."
+"niveau toevertrouwd van L%s. Neem contact op met uw beheerder om uw "
+"vrijwaring niveau te verhogen."
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -4436,6 +4436,12 @@ msgstr "Super gebruiker"
 msgid "Active"
 msgstr "Actief"
 
+#: rocky/templates/organizations/organization_member_list.html
+#, fuzzy
+#| msgid "new"
+msgid "New"
+msgstr "nieuw"
+
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
 msgstr "Upload een csv-bestand met leden voor organisatie"
@@ -5428,18 +5434,18 @@ msgid ""
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "Kan vrijwaring niveau niet verhogen naar L%s. U bent een vrijwaring niveau "
-"toevertrouwd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring "
-"te krijgen."
+"toevertrouwd van L%s. Neem contact op met uw beheerder om een ​​hogere "
+"vrijwaring te krijgen."
 
 #: rocky/views/ooi_list.py
 #, python-format
 msgid ""
-"Could not raise clearance level to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level below to proceed."
+"Could not raise clearance level to L%s. You acknowledged a clearance level "
+"of L%s. Please accept the clearance level below to proceed."
 msgstr ""
-"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring "
-"niveau bevestigd van L%s. Accepteer het vrijwaring niveau onderaan de pagina "
-"om verder te gaan."
+"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau "
+"bevestigd van L%s. Accepteer het vrijwaring niveau onderaan de pagina om "
+"verder te gaan."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."

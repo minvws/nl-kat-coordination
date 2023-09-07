@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-05 10:14+0000\n"
+"POT-Creation-Date: 2023-09-07 13:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1859,7 +1859,10 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Please accept the clearance level first on your profile page "
 "to proceed."
-msgstr "No por a subi na e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon promé riba bo página di perfil pa por sigui."
+msgstr ""
+"No por a subi na e nivel di autorisashon di %s pa L%s. Bo a rekonosé un "
+"nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon "
+"promé riba bo página di perfil pa por sigui."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -4422,6 +4425,12 @@ msgstr "Super usario"
 msgid "Active"
 msgstr "Aktivá"
 
+#: rocky/templates/organizations/organization_member_list.html
+#, fuzzy
+#| msgid "new"
+msgid "New"
+msgstr "nobo"
+
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
 msgstr "Subi un archivo csv ku miembronan pa e organisashon"
@@ -5414,7 +5423,10 @@ msgstr ""
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of L%s. Please accept the clearance level below to proceed."
-msgstr "No por a subi na e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon abou pa por sigui."
+msgstr ""
+"No por a subi na e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di "
+"autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon abou pa por "
+"sigui."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5632,7 +5644,10 @@ msgstr ""
 msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Please accept the clearance level below to proceed."
-msgstr "No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon mas abou pa por sigui."
+msgstr ""
+"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel "
+"di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon mas abou "
+"pa por sigui."
 
 #: rocky/views/scan_profile.py
 msgid "Choose a valid level"
