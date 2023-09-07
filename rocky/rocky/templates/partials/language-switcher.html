@@ -14,7 +14,7 @@
                     <button aria-label="{{ aria_label_current_language }}"
                             type="button"
                             aria-haspopup="listbox"
-                            aria-current="true">{{ current_language }}</button>
+                            aria-current="true">{{ current_language.title }}</button>
                 {% endwith %}
             {% endif %}
         {% endfor %}
@@ -31,7 +31,7 @@
                            data-value="{{ language }}"
                            lang="{{ language }}">
                             <button type="submit" name="language" value={{ language }}>
-                                {{ lang.name_local }}
+                                {{ lang.name_local.title }}
                             </button>
                         </a>
                     </li>
