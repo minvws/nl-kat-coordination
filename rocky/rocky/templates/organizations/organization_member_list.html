@@ -66,13 +66,14 @@
                                         </td>
                                         <td class="nowrap">
                                             {% if member.user.is_superuser %}
-                                                <span class="active"></span> {% translate "Active" %}
+                                                <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
                                             {% else %}
-                                                <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span>
-                                                {% if member.blocked %}
-                                                    {% translate "Blocked" %}
-                                                {% else %}
-                                                    {{ member.status|title }}
+                                                {% if member.status == 'active' %}
+                                                    <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
+                                                {% elif member.blocked %}
+                                                    <span class="icon negative">{% translate "Blocked" %}</span>&nbsp;{% translate "Blocked" %}
+                                                {% elif member.status == 'new' %}
+                                                    <span class="icon neutral">{% translate "New" %}</span>&nbsp;{% translate "New" %}
                                                 {% endif %}
                                             {% endif %}
                                         </td>
