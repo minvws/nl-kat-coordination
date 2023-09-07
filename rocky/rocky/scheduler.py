@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from enum import Enum
+from http import HTTPStatus
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -157,6 +158,10 @@ class LazyTaskList:
         return res.results
 
 
+class TaskAlreadyQueued(Exception):
+    pass
+
+
 class SchedulerClient:
     def __init__(self, base_uri: str):
         self.session = requests.Session()
@@ -199,6 +204,10 @@ class SchedulerClient:
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
+
+        if res.status_code == HTTPStatus.BAD_REQUEST and res.json().get("detail") == "not allowed":
+            raise TaskAlreadyQueued
+
         res.raise_for_status()
 
     def health(self) -> ServiceHealth:
