@@ -1,5 +1,6 @@
 from enum import Enum
 
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from account.mixins import OrganizationView
@@ -30,6 +31,6 @@ class AccountView(OrganizationView, TemplateView, OOIClearanceMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
-            {"url": "", "text": "Account details"},
+            {"url": "", "text": _("Account details")},
         ]
         return context
