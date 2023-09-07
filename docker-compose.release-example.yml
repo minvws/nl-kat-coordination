@@ -11,9 +11,6 @@ services:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 10
-    env_file:
-      - .env-defaults
-      - .env
 
   postgres:
     image: postgres:15
@@ -23,9 +20,6 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    env_file:
-      - .env-defaults
-      - .env
     environment:
       APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
 
@@ -45,9 +39,6 @@ services:
       - "127.0.0.1:8001:80"
     image: "ghcr.io/minvws/nl-kat-octopoes:${KAT_VERSION}"
     command: web
-    env_file:
-      - .env-defaults
-      - .env
 
   octopoes_api_worker:
     restart: on-failure
@@ -56,9 +47,6 @@ services:
       - rabbitmq
     image: "ghcr.io/minvws/nl-kat-octopoes:${KAT_VERSION}"
     command: worker-beat
-    env_file:
-      - .env-defaults
-      - .env
 
   boefje:
     restart: on-failure
@@ -71,9 +59,6 @@ services:
     deploy:
       replicas: 1
     command: boefje
-    env_file:
-      - .env-defaults
-      - .env
 
   normalizer:
     restart: on-failure
@@ -84,9 +69,6 @@ services:
     deploy:
       replicas: 1
     command: normalizer
-    env_file:
-      - .env-defaults
-      - .env
 
   rocky:
     restart: on-failure
@@ -101,9 +83,6 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     image: "ghcr.io/minvws/nl-kat-rocky:${KAT_VERSION}"
-    env_file:
-      - .env-defaults
-      - .env
     environment:
       - DATABASE_MIGRATION=true
 
@@ -114,9 +93,6 @@ services:
     ports:
       - "127.0.0.1:8002:8000"
     image: "ghcr.io/minvws/nl-kat-bytes:${KAT_VERSION}"
-    env_file:
-      - .env-defaults
-      - .env
     environment:
       - BYTES_DATA_DIR=/data
     volumes:
@@ -130,9 +106,6 @@ services:
     command: katalogus
     ports:
       - "127.0.0.1:8003:8000"
-    env_file:
-      - .env-defaults
-      - .env
     environment:
       - DATABASE_MIGRATION=true
 
@@ -141,9 +114,6 @@ services:
     image: "ghcr.io/minvws/nl-kat-mula:${KAT_VERSION}"
     ports:
       - "127.0.0.1:8004:8000"
-    env_file:
-      - .env-defaults
-      - .env
     depends_on:
       - postgres
       - boefje
@@ -156,9 +126,6 @@ services:
     image: "ghcr.io/minvws/nl-kat-keiko:${KAT_VERSION}"
     ports:
       - "127.0.0.1:8005:8000"
-    env_file:
-      - .env-defaults
-      - .env
 
 volumes:
   postgres-data:
