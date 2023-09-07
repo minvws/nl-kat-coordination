@@ -15,6 +15,10 @@ table {
     }
 
     tr {
+      td {
+        word-break: break-all;
+      }
+
       &.tree {
         td {
           @for $i from $depth-start through $depth-end {
