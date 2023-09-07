@@ -51,6 +51,11 @@
                                    {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
                             </li>
                             <li>
+                                {% url "reports" organization.code as index_url %}
+                                <a href="{{ index_url }}"
+                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Reports" %}</a>
+                            </li>
+                            <li>
                                 {% url "ooi_list" organization.code as index_url %}
                                 <a href="{{ index_url }}"
                                    {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Objects" %}</a>

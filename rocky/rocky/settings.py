@@ -134,6 +134,7 @@ INSTALLED_APPS = [
     "django_password_validators.password_history",
     "rest_framework",
     "tagulous",
+    "reports"
     # "drf_standardized_errors",
 ]
 
