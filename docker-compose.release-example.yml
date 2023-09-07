@@ -26,11 +26,11 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
-    environment:
-      APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
     env_file:
       - .env-prod
       - .env
+    environment:
+      APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
 
   crux:
     image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.6"
