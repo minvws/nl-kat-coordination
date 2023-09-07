@@ -266,6 +266,7 @@ LANGUAGES = [
     ("en", "en"),
     ("nl", "nl"),
     ("pap", "pap"),
+    ("it", "it"),
 ]
 
 # Static files (CSS, JavaScript, Images)
