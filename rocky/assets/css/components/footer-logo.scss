@@ -1,0 +1,200 @@
+.kat-logo {
+  display: flex;
+  max-width: 10rem;
+
+  img {
+    border: 4px solid white;
+    object-fit: cover;
+    overflow: hidden;
+    width: 100%;
+    background-color: white;
+  }
+}
+
+.kat-logo:hover img {
+  animation: rainbow 1s infinite;
+}
+
+@keyframes rainbow {
+  0% {
+    border-color: #ff0000;
+  }
+
+  10% {
+    border-color: #ff8000;
+  }
+
+  20% {
+    border-color: #ffff00;
+  }
+
+  30% {
+    border-color: #80ff00;
+  }
+
+  40% {
+    border-color: #00ff00;
+  }
+
+  50% {
+    border-color: #00ff80;
+  }
+
+  60% {
+    border-color: #00ffff;
+  }
+
+  70% {
+    border-color: #0080ff;
+  }
+
+  80% {
+    border-color: #0000ff;
+  }
+
+  90% {
+    border-color: #8000ff;
+  }
+
+  100% {
+    border-color: #ff0080;
+  }
+}
+
+@keyframes rainbow {
+  0% {
+    border-color: #ff0000;
+  }
+
+  10% {
+    border-color: #ff8000;
+  }
+
+  20% {
+    border-color: #ffff00;
+  }
+
+  30% {
+    border-color: #80ff00;
+  }
+
+  40% {
+    border-color: #00ff00;
+  }
+
+  50% {
+    border-color: #00ff80;
+  }
+
+  60% {
+    border-color: #00ffff;
+  }
+
+  70% {
+    border-color: #0080ff;
+  }
+
+  80% {
+    border-color: #0000ff;
+  }
+
+  90% {
+    border-color: #8000ff;
+  }
+
+  100% {
+    border-color: #ff0080;
+  }
+}
+
+@keyframes rainbow {
+  0% {
+    border-color: #ff0000;
+  }
+
+  10% {
+    border-color: #ff8000;
+  }
+
+  20% {
+    border-color: #ffff00;
+  }
+
+  30% {
+    border-color: #80ff00;
+  }
+
+  40% {
+    border-color: #00ff00;
+  }
+
+  50% {
+    border-color: #00ff80;
+  }
+
+  60% {
+    border-color: #00ffff;
+  }
+
+  70% {
+    border-color: #0080ff;
+  }
+
+  80% {
+    border-color: #0000ff;
+  }
+
+  90% {
+    border-color: #8000ff;
+  }
+
+  100% {
+    border-color: #ff0080;
+  }
+}
+
+@keyframes rainbow {
+  0% {
+    border-color: #ff0000;
+  }
+
+  10% {
+    border-color: #ff8000;
+  }
+
+  20% {
+    border-color: #ffff00;
+  }
+
+  30% {
+    border-color: #80ff00;
+  }
+
+  40% {
+    border-color: #00ff00;
+  }
+
+  50% {
+    border-color: #00ff80;
+  }
+
+  60% {
+    border-color: #00ffff;
+  }
+
+  70% {
+    border-color: #0080ff;
+  }
+
+  80% {
+    border-color: #0000ff;
+  }
+
+  90% {
+    border-color: #8000ff;
+  }
+
+  100% {
+    border-color: #ff0080;
+  }
+}
