@@ -27,8 +27,6 @@
                 <div class="graph-overlay graph-overlay--centered is-hidden"></div>
             </div>
         </div>
-        {% include "partials/ooi_type_filters_linklist.html" %}
-
     </main>
 {% endblock content %}
 {% block html_at_end_body %}
@@ -37,6 +35,6 @@
     {{ tree|json_script:"tree-data" }}
     <script src="{% static "/js/stringHelpers.js" %}" nonce="{{ request.csp_nonce }}"></script>
     <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    <script src="{% static "/dist/graph.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    <link href="{% static "/dist/graph.css" %}" rel="stylesheet">
+    <script src="{% static "/dist/imports/graph.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <link href="{% static "/dist/imports/graph.css" %}" rel="stylesheet">
 {% endblock html_at_end_body %}
