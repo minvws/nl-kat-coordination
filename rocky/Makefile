@@ -55,9 +55,7 @@ export_migrations:
 
 languages:
 	# Extracts strings to .po files which should be translated
-	for LANG in nl pap ; do \
-		python manage.py makemessages -i "venv/*" -i "build/*" -i "octopoes/*" -i "node_modules/*" --verbosity 2 --add-location file --locale $$LANG ; \
-	done
+	python manage.py makemessages -i "venv/*" -i "build/*" -i "octopoes/*" -i "node_modules/*" --verbosity 2 --add-location file -a ; \
 
 lang: languages
 
