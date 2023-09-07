@@ -47,3 +47,7 @@ jobs:
       - name: Run pytests
         run: python3 -m pytest
         working-directory: ./boefjes
+
+      - name: Run integration tests
+        run: make itest build_args='--build-arg PYTHON_VERSION=${{ matrix.version }}'
+        working-directory: ./boefjes
