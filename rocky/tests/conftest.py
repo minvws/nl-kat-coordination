@@ -419,7 +419,7 @@ def finding_types():
 
 
 @pytest.fixture
-def plugin_details():
+def boefje_details():
     return parse_plugin(
         {
             "id": "test-boefje",

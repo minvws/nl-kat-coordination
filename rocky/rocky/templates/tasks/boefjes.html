@@ -35,7 +35,7 @@
                                 {% for task in object_list %}
                                     <tr id="{{ task.id }}">
                                         <td>
-                                            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.id }}</a>
+                                            <a href="{% url 'boefje_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.id }}</a>
                                         </td>
                                         {% if task.status.value == "completed" %}
                                             <td class="confirmation">

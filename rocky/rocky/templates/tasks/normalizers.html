@@ -45,7 +45,7 @@
                                         {% endif %}
                                         <td>{{ task.created_at }}</td>
                                         <td>
-                                            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                                            <a href="{% url 'boefje_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
                                         </td>
                                         {% if task.p_item.data.raw_data.boefje_meta.input_ooi %}
                                             <td>

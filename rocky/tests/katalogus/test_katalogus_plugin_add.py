@@ -9,10 +9,10 @@ def test_plugin_settings_add_view(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
-    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin.return_value = boefje_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
     request = setup_request(rf.get("plugin_settings_add"), superuser_member.user)
@@ -31,11 +31,11 @@ def test_plugin_settings_add(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
     mock_katalogus = mock_mixins_katalogus()
-    mock_katalogus.get_plugin.return_value = plugin_details
+    mock_katalogus.get_plugin.return_value = boefje_details
     mock_katalogus.get_plugin_schema.return_value = plugin_schema
     mock_katalogus.get_plugin_settings.return_value = {"TEST_PROPERTY": "abc"}
 
@@ -52,10 +52,10 @@ def test_plugin_settings_add_wrong_property_but_required(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
-    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin.return_value = boefje_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
     mock_mixins_katalogus().get_plugin_settings.return_value = {"TEST_PROPERTY": "abc"}
 
@@ -71,10 +71,10 @@ def test_plugin_settings_add_string_too_long(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
-    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin.return_value = boefje_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
     mock_mixins_katalogus().get_plugin_settings.return_value = {"TEST_PROPERTY": "abc"}
 
@@ -90,10 +90,10 @@ def test_plugin_settings_add_error_message_about_integer_for_string_type(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
-    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin.return_value = boefje_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
     request = setup_request(
@@ -111,10 +111,10 @@ def test_plugin_settings_add_error_message_about_integer_too_small(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
-    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin.return_value = boefje_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
     request = setup_request(
@@ -132,10 +132,10 @@ def test_plugin_settings_add_error_message_about_integer_too_big(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
-    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin.return_value = boefje_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
     request = setup_request(
@@ -149,9 +149,9 @@ def test_plugin_settings_add_error_message_about_integer_too_big(
     assertContains(response, "1000 is greater than the maximum of 200")
 
 
-def test_plugin_single_settings_add_view_no_schema(rf, superuser_member, mock_mixins_katalogus, plugin_details):
+def test_plugin_single_settings_add_view_no_schema(rf, superuser_member, mock_mixins_katalogus, boefje_details):
     mock_katalogus = mock_mixins_katalogus()
-    mock_katalogus.get_plugin.return_value = plugin_details
+    mock_katalogus.get_plugin.return_value = boefje_details
     mock_katalogus.get_plugin_schema.return_value = None
     mock_katalogus.get_plugin_settings.return_value = None
 
@@ -167,7 +167,7 @@ def test_plugin_single_settings_add_view_no_schema(rf, superuser_member, mock_mi
     mock_katalogus.upsert_plugin_settings.assert_not_called()
 
     assert response.headers["Location"] == reverse(
-        "plugin_detail",
+        "boefje_detail",
         kwargs={
             "organization_code": superuser_member.organization.code,
             "plugin_type": "boefje",

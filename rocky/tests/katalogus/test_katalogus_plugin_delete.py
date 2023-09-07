@@ -10,10 +10,10 @@ def test_plugin_settings_delete_view(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
-    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin.return_value = boefje_details
     mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema
 
     request = setup_request(rf.get("plugin_settings_delete"), superuser_member.user)
@@ -33,11 +33,11 @@ def test_plugin_settings_delete(
     rf,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
     mock_katalogus = mock_mixins_katalogus()
-    mock_katalogus.get_plugin.return_value = plugin_details
+    mock_katalogus.get_plugin.return_value = boefje_details
     mock_katalogus.get_plugin_schema.return_value = plugin_schema
 
     request = setup_request(rf.post("plugin_settings_delete"), superuser_member.user)
@@ -50,7 +50,7 @@ def test_plugin_settings_delete(
 
     assert response.status_code == 302
     assert response.headers["Location"] == reverse(
-        "plugin_detail",
+        "boefje_detail",
         kwargs={
             "organization_code": superuser_member.organization.code,
             "plugin_type": "boefje",
@@ -65,11 +65,11 @@ def test_plugin_settings_delete_failed(
     mocker,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
     mock_katalogus = mock_mixins_katalogus()
-    mock_katalogus.get_plugin.return_value = plugin_details
+    mock_katalogus.get_plugin.return_value = boefje_details
     mock_katalogus.get_plugin_schema.return_value = plugin_schema
     mock_katalogus.delete_plugin_settings.side_effect = RequestException(response=mocker.MagicMock(status_code=500))
 
@@ -83,7 +83,7 @@ def test_plugin_settings_delete_failed(
 
     assert response.status_code == 302
     assert response.headers["Location"] == reverse(
-        "plugin_detail",
+        "boefje_detail",
         kwargs={
             "organization_code": superuser_member.organization.code,
             "plugin_type": "boefje",
@@ -101,11 +101,11 @@ def test_plugin_settings_delete_no_settings_present(
     mocker,
     superuser_member,
     mock_mixins_katalogus,
-    plugin_details,
+    boefje_details,
     plugin_schema,
 ):
     mock_katalogus = mock_mixins_katalogus()
-    mock_katalogus.get_plugin.return_value = plugin_details
+    mock_katalogus.get_plugin.return_value = boefje_details
     mock_katalogus.get_plugin_schema.return_value = plugin_schema
     mock_katalogus.delete_plugin_settings.side_effect = RequestException(response=mocker.MagicMock(status_code=404))
 
@@ -119,7 +119,7 @@ def test_plugin_settings_delete_no_settings_present(
 
     assert response.status_code == 302
     assert response.headers["Location"] == reverse(
-        "plugin_detail",
+        "boefje_detail",
         kwargs={
             "organization_code": superuser_member.organization.code,
             "plugin_type": "boefje",

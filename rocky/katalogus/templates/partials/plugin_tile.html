@@ -15,7 +15,7 @@
     </p>
     <p>{{ plugin.description }}</p>
     <span class="de-emphasized">{% translate "Publisher:" %} OpenKAT</span>
-    <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "See details" %}</a>
+    <a href="{% url "boefje_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "See details" %}</a>
     <div class="action-buttons">
         {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 

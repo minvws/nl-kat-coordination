@@ -1,9 +1,9 @@
 from django.urls import path
 
+from katalogus.views.boefje_detail import BoefjeDetailView, PluginCoverImgView
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
 from katalogus.views.katalogus import KATalogusView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
-from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from katalogus.views.plugin_settings_add import PluginSettingsAddView
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
@@ -28,8 +28,8 @@ urlpatterns = [
     ),
     path(
         "plugins/<plugin_type>/<plugin_id>/",
-        PluginDetailView.as_view(),
-        name="plugin_detail",
+        BoefjeDetailView.as_view(),
+        name="boefje_detail",
     ),
     path(
         "plugins/<plugin_type>/<plugin_id>/<plugin_state>/",

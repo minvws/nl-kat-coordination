@@ -30,10 +30,10 @@ class PluginCoverImgView(OrganizationView):
         return file
 
 
-class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
+class BoefjeDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
     """Detail view for a specific plugin. Shows plugin settings and consumable oois for scanning."""
 
-    template_name = "plugin_detail.html"
+    template_name = "boefje_detail.html"
     scan_history_limit = 10
     limit_ooi_list = 9999
 
@@ -88,7 +88,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
             },
             {
                 "url": reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
                         "plugin_type": self.plugin.type,
