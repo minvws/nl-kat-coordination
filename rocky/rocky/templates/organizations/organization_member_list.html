@@ -68,12 +68,14 @@
                                             {% if member.user.is_superuser %}
                                                 <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
                                             {% else %}
-                                                {% if member.status == 'active' %}
-                                                    <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
-                                                {% elif member.blocked %}
+                                                {% if member.blocked %}
                                                     <span class="icon negative">{% translate "Blocked" %}</span>&nbsp;{% translate "Blocked" %}
-                                                {% elif member.status == 'new' %}
-                                                    <span class="icon neutral">{% translate "New" %}</span>&nbsp;{% translate "New" %}
+                                                {% else %}
+                                                    {% if member.status == 'active' %}
+                                                        <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
+                                                    {% elif member.status == 'new' %}
+                                                        <span class="icon neutral">{% translate "New" %}</span>&nbsp;{% translate "New" %}
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                         </td>
