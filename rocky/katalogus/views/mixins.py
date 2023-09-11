@@ -87,7 +87,7 @@ class BoefjeMixin(OctopoesView):
 
     def run_boefje(self, katalogus_boefje: Plugin, ooi: Optional[OOI]) -> None:
         boefje_task = BoefjeTask(
-            id=uuid4().hex,
+            id=uuid4(),
             boefje=Boefje(id=katalogus_boefje.id, version=None),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
