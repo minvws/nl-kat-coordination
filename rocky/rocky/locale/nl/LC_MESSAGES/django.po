@@ -296,7 +296,7 @@ msgstr ""
 msgid "date joined"
 msgstr "startdatum"
 
-#: account/templates/account_detail.html
+#: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr "Account gegevens"
 
@@ -1789,7 +1789,8 @@ msgid " Details"
 msgstr " Details"
 
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py rocky/templates/header.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr "Instellingen"
@@ -1868,8 +1869,8 @@ msgid ""
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "Kan vrijwaring niveau van %s niet verhogen naar L%s. U bent een vrijwaring "
-"niveau toevertrouwd van L%s. Neem contact op met uw beheerder om uw vrijwaring "
-"niveau te verhogen."
+"niveau toevertrouwd van L%s. Neem contact op met uw beheerder om uw "
+"vrijwaring niveau te verhogen."
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -3199,6 +3200,14 @@ msgstr "Kies optioneel een {option_label}"
 msgid "Please choose a {option_label}"
 msgstr "Selecteer een {option_label}"
 
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance level"
+msgstr "Filter op vrijwaring niveau"
+
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance type"
+msgstr "Filter op vrijwaringstype"
+
 #: tools/forms/settings.py
 msgid "--- Show all ----"
 msgstr "Toon alles"
@@ -3362,6 +3371,14 @@ msgstr ""
 #: tools/models.py
 msgid "new"
 msgstr "nieuw"
+
+#: tools/view_helpers.py rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/views/organization_member_edit.py
+msgid "Members"
+msgstr "Leden"
 
 #: rocky/messaging.py
 msgid ""
@@ -3774,13 +3791,6 @@ msgstr "Crisis Room"
 #: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr "Taken"
-
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Members"
-msgstr "Leden"
 
 #: rocky/templates/header.html
 msgid "Breadcrumbs"
@@ -4520,6 +4530,10 @@ msgstr "Filter op OOI-types"
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Toggle all"
 msgstr "Alles (de-)selecteren"
+
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+msgid "Children"
+msgstr "Kinderen"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
@@ -5436,18 +5450,18 @@ msgid ""
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "Kan vrijwaring niveau niet verhogen naar L%s. U bent een vrijwaring niveau "
-"toevertrouwd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring "
-"te krijgen."
+"toevertrouwd van L%s. Neem contact op met uw beheerder om een ​​hogere "
+"vrijwaring te krijgen."
 
 #: rocky/views/ooi_list.py
 #, python-format
 msgid ""
-"Could not raise clearance level to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level below to proceed."
+"Could not raise clearance level to L%s. You acknowledged a clearance level "
+"of L%s. Please accept the clearance level below to proceed."
 msgstr ""
-"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring "
-"niveau bevestigd van L%s. Accepteer het vrijwaring niveau onderaan de pagina "
-"om verder te gaan."
+"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau "
+"bevestigd van L%s. Accepteer het vrijwaring niveau onderaan de pagina om "
+"verder te gaan."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5696,8 +5710,16 @@ msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "Ophalen van taken mislukt: geen verbinding met scheduler"
 
 #: rocky/views/tasks.py
-msgid "Cannot reschedule task: it has probably already been queued."
-msgstr "Taak kan niet worden herstart: waarschijnlijk staat deze al ingepland."
+msgid "Task queue is full, please try again later."
+msgstr "Wachtrij is vol, probeer het later opnieuw"
+
+#: rocky/views/tasks.py
+msgid "Task already queued."
+msgstr "Taak al in de wachtrij"
+
+#: rocky/views/tasks.py
+msgid "Task is invalid."
+msgstr "Taak is ongeldig"
 
 #: rocky/views/upload_csv.py
 msgid ""

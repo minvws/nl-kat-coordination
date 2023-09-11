@@ -12,6 +12,7 @@ services:
       interval: 5s
       retries: 10
     env_file:
+      - .env-defaults
       - .env
 
   postgres:
@@ -23,6 +24,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
     env_file:
+      - .env-defaults
       - .env
     environment:
       APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
@@ -44,6 +46,7 @@ services:
     image: "ghcr.io/minvws/nl-kat-octopoes:${KAT_VERSION}"
     command: web
     env_file:
+      - .env-defaults
       - .env
 
   octopoes_api_worker:
@@ -54,6 +57,7 @@ services:
     image: "ghcr.io/minvws/nl-kat-octopoes:${KAT_VERSION}"
     command: worker-beat
     env_file:
+      - .env-defaults
       - .env
 
   boefje:
@@ -68,6 +72,7 @@ services:
       replicas: 1
     command: boefje
     env_file:
+      - .env-defaults
       - .env
 
   normalizer:
@@ -80,6 +85,7 @@ services:
       replicas: 1
     command: normalizer
     env_file:
+      - .env-defaults
       - .env
 
   rocky:
@@ -96,6 +102,7 @@ services:
       - "127.0.0.1:8000:8000"
     image: "ghcr.io/minvws/nl-kat-rocky:${KAT_VERSION}"
     env_file:
+      - .env-defaults
       - .env
     environment:
       - DATABASE_MIGRATION=true
@@ -108,6 +115,7 @@ services:
       - "127.0.0.1:8002:8000"
     image: "ghcr.io/minvws/nl-kat-bytes:${KAT_VERSION}"
     env_file:
+      - .env-defaults
       - .env
     environment:
       - BYTES_DATA_DIR=/data
@@ -123,6 +131,7 @@ services:
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
+      - .env-defaults
       - .env
     environment:
       - DATABASE_MIGRATION=true
@@ -133,6 +142,7 @@ services:
     ports:
       - "127.0.0.1:8004:8000"
     env_file:
+      - .env-defaults
       - .env
     depends_on:
       - postgres
@@ -147,6 +157,7 @@ services:
     ports:
       - "127.0.0.1:8005:8000"
     env_file:
+      - .env-defaults
       - .env
 
 volumes:

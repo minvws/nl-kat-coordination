@@ -1,7 +1,0 @@
-#!/bin/sh -e
-
-if [ "$1" != "upgrade" ]; then
-    systemctl disable --now kat-bytes.service
-fi
-
-#DEBHELPER#
