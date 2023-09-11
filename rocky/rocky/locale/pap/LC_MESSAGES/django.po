@@ -5664,7 +5664,15 @@ msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "No por haña tarea: no tin konekshon ku scheduler"
 
 #: rocky/views/tasks.py
-msgid "Cannot reschedule task: it has probably already been queued."
+msgid "Task queue is full, please try again later."
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "Task already queued."
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "Task is invalid."
 msgstr ""
 
 #: rocky/views/upload_csv.py
