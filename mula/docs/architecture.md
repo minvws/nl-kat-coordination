@@ -198,7 +198,7 @@ flowchart LR
 
   subgraph mula
     subgraph boefje scheduler organisation 1
-    
+
       pq_boefjes(priority queue boefjes)
 
       subgraph threads_boefje["threads"]
@@ -208,7 +208,7 @@ flowchart LR
       end
 
       ranker_boefje{{ranker}}
-      
+
     end
 
     thread_scan_profile-->ranker_boefje
@@ -217,9 +217,9 @@ flowchart LR
     ranker_boefje-->pq_boefjes
 
     subgraph normalizer scheduler organisation 1
-    
+
       pq_normalizer(priority queue normalizer)
-    
+
       subgraph threads_normalizer["threads"]
         thread_raw_file_received[[raw file received]]
       end
@@ -236,7 +236,7 @@ flowchart LR
     pq_boefjes<-->server
     pq_normalizer<-->server
   end
-  
+
   rmq_scan_profile-->thread_scan_profile
   rmq_raw_file-->thread_raw_file_received
 
