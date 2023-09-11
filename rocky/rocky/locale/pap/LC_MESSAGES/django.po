@@ -293,7 +293,7 @@ msgstr ""
 msgid "date joined"
 msgstr "fecha di registro"
 
-#: account/templates/account_detail.html
+#: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr "Detayenan di kuenta"
 
@@ -1918,6 +1918,13 @@ msgid " Details"
 msgstr "Detayes"
 
 #: katalogus/templates/plugin_settings_list.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Settings"
+msgstr "Settings"
+
+#: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
 msgstr "Relato di settings:"
 
@@ -1984,6 +1991,8 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You were trusted a clearance "
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"No por a aumenta e nivel di autorisashon di %s pa L%s. B'a haya un nivel di "
+"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un autorisashon mas haltu."
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -1991,7 +2000,10 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Please accept the clearance level first on your profile page "
 "to proceed."
-msgstr "No por a subi na e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon promé riba bo página di perfil pa por sigui."
+msgstr ""
+"No por a subi na e nivel di autorisashon di %s pa L%s. Bo a rekonosé un "
+"nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon "
+"promé riba bo página di perfil pa por sigui."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -3291,6 +3303,14 @@ msgstr "Opshonalmente skohé un {option_label}"
 msgid "Please choose a {option_label}"
 msgstr "Por favor skohé un {option_label}"
 
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance level"
+msgstr "Filtra pa nivel di autorisashon"
+
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance type"
+msgstr "Filtra pa tipo autorisashon"
+
 #: tools/forms/settings.py
 msgid "--- Show all ----"
 msgstr "--- Mustra tur ---"
@@ -3454,6 +3474,14 @@ msgstr ""
 #: tools/models.py
 msgid "new"
 msgstr "nobo"
+
+#: tools/view_helpers.py rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/views/organization_member_edit.py
+msgid "Members"
+msgstr "Miembronan"
 
 #: rocky/messaging.py
 msgid ""
@@ -3864,13 +3892,6 @@ msgstr "Sala di krísis"
 #: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr "Enkargonan"
-
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Members"
-msgstr "Miembronan"
 
 #: rocky/templates/header.html
 msgid "Breadcrumbs"
@@ -4611,6 +4632,10 @@ msgstr "Filtra pa tiponan di OOI"
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Toggle all"
 msgstr "Pone tur"
+
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+msgid "Children"
+msgstr "Yunan"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
@@ -5529,13 +5554,18 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un nivel di autorashon di L%s. "
+"Tuma kontakto ku bo administrator pa haña un nivel di autorisashon mas halto."
 
 #: rocky/views/ooi_list.py
 #, python-format
 msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of L%s. Please accept the clearance level below to proceed."
-msgstr "No por a subi na e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon abou pa por sigui."
+msgstr ""
+"No por a subi na e nivel di autorisashon pa L%s. Bo a rekonosé un nivel di "
+"autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon abou pa por "
+"sigui."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5753,7 +5783,10 @@ msgstr ""
 msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Please accept the clearance level below to proceed."
-msgstr "No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon mas abou pa por sigui."
+msgstr ""
+"No por a subi e nivel di autorisashon di %s pa L%s. Bo a rekonosé un nivel "
+"di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon mas abou "
+"pa por sigui."
 
 #: rocky/views/scan_profile.py
 msgid "Choose a valid level"
@@ -5778,15 +5811,15 @@ msgstr "No por haña tarea: no tin konekshon ku scheduler"
 
 #: rocky/views/tasks.py
 msgid "Task queue is full, please try again later."
-msgstr ""
+msgstr "Lista di trabou ta yen, por fabor purba atrobe mas laat."
 
 #: rocky/views/tasks.py
 msgid "Task already queued."
-msgstr ""
+msgstr "Tarea ta pone kla kaba."
 
 #: rocky/views/tasks.py
 msgid "Task is invalid."
-msgstr ""
+msgstr "Tarea ta inbalido"
 
 #: rocky/views/upload_csv.py
 msgid ""

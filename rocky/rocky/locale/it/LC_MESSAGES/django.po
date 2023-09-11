@@ -280,7 +280,7 @@ msgstr ""
 msgid "date joined"
 msgstr ""
 
-#: account/templates/account_detail.html
+#: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr ""
 
@@ -1736,6 +1736,13 @@ msgid " Details"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Settings"
+msgstr ""
+
+#: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
 msgstr ""
 
@@ -2908,6 +2915,14 @@ msgstr ""
 msgid "Please choose a {option_label}"
 msgstr ""
 
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance level"
+msgstr ""
+
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance type"
+msgstr ""
+
 #: tools/forms/settings.py
 msgid "--- Show all ----"
 msgstr ""
@@ -3058,6 +3073,14 @@ msgstr ""
 
 #: tools/models.py
 msgid "new"
+msgstr ""
+
+#: tools/view_helpers.py rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/views/organization_member_edit.py
+msgid "Members"
 msgstr ""
 
 #: rocky/messaging.py
@@ -3455,13 +3478,6 @@ msgstr ""
 
 #: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
-msgstr ""
-
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Members"
 msgstr ""
 
 #: rocky/templates/header.html
@@ -4142,6 +4158,10 @@ msgstr ""
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Toggle all"
+msgstr ""
+
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+msgid "Children"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
