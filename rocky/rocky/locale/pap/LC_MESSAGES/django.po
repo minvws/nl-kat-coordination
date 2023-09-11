@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-11 12:52+0000\n"
+"POT-Creation-Date: 2023-09-07 12:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -293,7 +293,7 @@ msgstr ""
 msgid "date joined"
 msgstr "fecha di registro"
 
-#: account/templates/account_detail.html
+#: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr "Detayenan di kuenta"
 
@@ -1774,7 +1774,8 @@ msgid " Details"
 msgstr "Detayes"
 
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py rocky/templates/header.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr "Settings"
@@ -3183,6 +3184,14 @@ msgstr "Opshonalmente skohé un {option_label}"
 msgid "Please choose a {option_label}"
 msgstr "Por favor skohé un {option_label}"
 
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance level"
+msgstr "Filtra pa nivel di autorisashon"
+
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance type"
+msgstr "Filtra pa tipo autorisashon"
+
 #: tools/forms/settings.py
 msgid "--- Show all ----"
 msgstr "--- Mustra tur ---"
@@ -3346,6 +3355,14 @@ msgstr ""
 #: tools/models.py
 msgid "new"
 msgstr "nobo"
+
+#: tools/view_helpers.py rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/views/organization_member_edit.py
+msgid "Members"
+msgstr "Miembronan"
 
 #: rocky/messaging.py
 msgid ""
@@ -3756,13 +3773,6 @@ msgstr "Sala di krísis"
 #: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr "Enkargonan"
-
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Members"
-msgstr "Miembronan"
 
 #: rocky/templates/header.html
 msgid "Breadcrumbs"
@@ -5724,6 +5734,3 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
-
-#~ msgid "Degree"
-#~ msgstr "Grado"
