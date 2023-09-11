@@ -18,41 +18,42 @@ from rocky.health import ServiceHealth
 logger = getLogger(__name__)
 
 
-class Boefje(BaseModel):
+class Plugin(BaseModel):
     id: str
     repository_id: Optional[str] = None
     name: str
+    version: Optional[str] = None
+    authors: Optional[str] = None
+    created: Optional[str] = None
     description: Optional[str] = None
+    environment_keys: List[str] = None
+    related: List[str] = None
     enabled: bool
     type: str
+    produces: Set[Type[OOI]]
+
+    def dict(self, *args, **kwargs):
+        """Pydantic does not stringify the OOI classes, but then templates can't render them"""
+        plugin_dict = super().dict(*args, **kwargs)
+        plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
+        return plugin_dict
+
+
+class Boefje(Plugin):
     scan_level: SCAN_LEVEL
     consumes: Set[Type[OOI]]
-    produces: Set[Type[OOI]]
+    options: List[str] = None
+    runnable_hash: Optional[str] = None
 
     def dict(self, *args, **kwargs):
         """Pydantic does not stringify the OOI classes, but then templates can't render them"""
         boefje_dict = super().dict(*args, **kwargs)
         boefje_dict["consumes"] = {ooi_class.get_ooi_type() for ooi_class in boefje_dict["consumes"]}
-        boefje_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in boefje_dict["produces"]}
-
         return boefje_dict
 
 
-class Normalizer(BaseModel):
-    id: str
-    repository_id: Optional[str] = None
-    name: str
-    description: Optional[str] = None
-    enabled: bool
-    type: str
+class Normalizer(Plugin):
     consumes: Set[str]
-    produces: Set[Type[OOI]]
-
-    def dict(self, *args, **kwargs):
-        """Pydantic does not stringify the OOI classes, but then templates can't render them"""
-        normalizer_dict = super().dict(*args, **kwargs)
-        normalizer_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in normalizer_dict["produces"]}
-        return normalizer_dict
 
 
 class KATalogusClientV1:
