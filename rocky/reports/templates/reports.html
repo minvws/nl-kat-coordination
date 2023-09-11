@@ -12,13 +12,41 @@
                 <div>
                     <h1>{% translate "Reports" %}</h1>
                     <p class="emphasized">
-                        {{ object_list }}
                         {% blocktranslate %}
                         This can be one of the commonly used reports which
                         combine which combines a set of scans to give insight.
                         {% endblocktranslate %}
                     </p>
                 </div>
+            </div>
+            <div class="horizontal-view">
+                <table>
+                    <thead>
+                        <th>
+                            <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                        </th>
+                        <th>OOI</th>
+                        <th>{% translate "OOI-Type" %}</th>
+                        <th>{% translate "Clearance level" %}</th>
+                    </thead>
+                    <tbody>
+                        <form method="post" class="inline column">
+                            {% for object in object_list %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="ooi" value={{ object.primary_key }}>
+                                    </td>
+                                    <td>{{ object.human_readable }}</td>
+                                    <td>{{ object.ooi_type }}</td>
+                                    <td>
+                                        {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
+
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </form>
+                    </tbody>
+                </table>
             </div>
         </section>
     </main>
