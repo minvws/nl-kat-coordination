@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 10:09+0000\n"
+"POT-Creation-Date: 2023-09-11 14:58+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1665,7 +1665,8 @@ msgstr "Een overzicht van alle beschikbare plug-ins."
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py rocky/templates/header.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr "Instellingen"
@@ -1933,13 +1934,6 @@ msgstr "Verwijderen"
 #: katalogus/templates/plugin_settings_list.html
 msgid " Details"
 msgstr " Details"
-
-#: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py tools/view_helpers.py
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Settings"
-msgstr "Instellingen"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-11 11:33+0000\n"
+"POT-Creation-Date: 2023-09-11 14:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1517,7 +1517,8 @@ msgstr ""
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py rocky/templates/header.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr ""
@@ -1733,13 +1734,6 @@ msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
 msgid " Details"
-msgstr ""
-
-#: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py tools/view_helpers.py
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Settings"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html

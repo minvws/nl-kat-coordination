@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 10:09+0000\n"
+"POT-Creation-Date: 2023-09-11 14:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1650,7 +1650,8 @@ msgstr "Un bista general di tur plug-innan disponibel."
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py rocky/templates/header.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
 msgstr "Settings"
@@ -1918,13 +1919,6 @@ msgid " Details"
 msgstr "Detayes"
 
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py tools/view_helpers.py
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Settings"
-msgstr "Settings"
-
-#: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
 msgstr "Relato di settings:"
 
@@ -1992,7 +1986,8 @@ msgid ""
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "No por a aumenta e nivel di autorisashon di %s pa L%s. B'a haya un nivel di "
-"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un autorisashon mas haltu."
+"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un "
+"autorisashon mas haltu."
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -5554,8 +5549,9 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un nivel di autorashon di L%s. "
-"Tuma kontakto ku bo administrator pa haña un nivel di autorisashon mas halto."
+"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un "
+"nivel di autorashon di L%s. Tuma kontakto ku bo administrator pa haña un "
+"nivel di autorisashon mas halto."
 
 #: rocky/views/ooi_list.py
 #, python-format
