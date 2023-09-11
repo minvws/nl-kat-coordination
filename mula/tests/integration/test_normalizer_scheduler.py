@@ -203,7 +203,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id.hex,
+            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )

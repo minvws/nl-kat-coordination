@@ -83,7 +83,7 @@ class SimulationTestCase(unittest.TestCase):
                 queues.PrioritizedItem(
                     0,
                     models.BoefjeTask(
-                        id=uuid.uuid4().hex,
+                        id=uuid.uuid4(),
                         boefje=BoefjeFactory(),
                         input_ooi=ooi.primary_key,
                         organization=self.organisation.id,
@@ -121,7 +121,7 @@ class SimulationTestCase(unittest.TestCase):
                 queues.PrioritizedItem(
                     0,
                     models.NormalizerTask(
-                        id=uuid.uuid4().hex,
+                        id=uuid.uuid4(),
                         normalizer=PluginFactory(type="normalizer"),
                         boefje_meta=raw_file.boefje_meta,
                     ),
