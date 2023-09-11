@@ -5707,12 +5707,3 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
-
-#~ msgid "Shown types"
-#~ msgstr "Tiponan mustra"
-
-#~ msgid "Quickly filter by type"
-#~ msgstr "Rapidamente filtrá pa tipo"
-
-#~ msgid "Filter by"
-#~ msgstr "Filtra pa"

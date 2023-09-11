@@ -5740,11 +5740,3 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
-
-#~ msgid ""
-#~ "To enable {} you need at least a clearance level of L{}. Your clearance "
-#~ "level is L{}. Contact your administrator to get a higher clearance level."
-#~ msgstr ""
-#~ "Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} "
-#~ "nodig. Uw vrijwaring niveau is L{}. Neem contact op met uw beheerder om "
-#~ "een hogere vrijwaring niveau te krijgen."
