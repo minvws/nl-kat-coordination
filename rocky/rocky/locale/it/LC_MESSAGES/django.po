@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-07 15:38+0000\n"
+"POT-Creation-Date: 2023-09-11 08:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5737,10 +5737,18 @@ msgstr ""
 "Recupero dei compiti non riuscito: nessuna connessione con il pianificatore"
 
 #: rocky/views/tasks.py
-msgid "Cannot reschedule task: it has probably already been queued."
+msgid "Task queue is full, please try again later."
 msgstr ""
-"Impossibile riprogrammare il compito: probabilmente è già stato messo in "
-"coda."
+
+#: rocky/views/tasks.py
+msgid "Task already queued."
+msgstr ""
+
+#: rocky/views/tasks.py
+#, fuzzy
+#| msgid "The link is invalid"
+msgid "Task is invalid."
+msgstr "Il link non è valido"
 
 #: rocky/views/upload_csv.py
 msgid ""
@@ -5783,3 +5791,8 @@ msgstr "Impossibile caricare il file raw su Bytes: codice di stato %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "File raw aggiunto con successo."
+
+#~ msgid "Cannot reschedule task: it has probably already been queued."
+#~ msgstr ""
+#~ "Impossibile riprogrammare il compito: probabilmente è già stato messo in "
+#~ "coda."
