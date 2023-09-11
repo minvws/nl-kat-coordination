@@ -77,9 +77,7 @@ class KATalogusClientV1:
         response.raise_for_status()
 
     def get_plugins(self, plugin_type: Optional[str] = ""):
-        if plugin_type:
-            plugin_type = "?plugin_type=" + plugin_type
-        response = self.session.get(f"{self.organization_uri}/plugins{plugin_type}")
+        response = self.session.get(f"{self.organization_uri}/plugins", params={"plugin_type": plugin_type})
         response.raise_for_status()
         return [parse_plugin(plugin) for plugin in response.json()]
 
