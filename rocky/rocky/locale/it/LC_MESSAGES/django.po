@@ -1397,7 +1397,7 @@ msgstr "OOI selezionati:"
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/partials/explanations.html
 msgid "OOI"
-msgstr ""
+msgstr "OOI"
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
@@ -1408,7 +1408,7 @@ msgstr "Livello di autorizzazione"
 
 #: katalogus/templates/change_clearance_level.html
 msgid "Are you sure you want to scan anyways?"
-msgstr ""
+msgstr "Sei sicuro/a di voler eseguire la scansione comunque?"
 
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/oois/ooi_detail.html
@@ -5738,17 +5738,15 @@ msgstr ""
 
 #: rocky/views/tasks.py
 msgid "Task queue is full, please try again later."
-msgstr ""
+msgstr "La coda delle attività è piena, ti preghiamo di riprovare più tardi."
 
 #: rocky/views/tasks.py
 msgid "Task already queued."
-msgstr ""
+msgstr "Attività già in coda."
 
 #: rocky/views/tasks.py
-#, fuzzy
-#| msgid "The link is invalid"
 msgid "Task is invalid."
-msgstr "Il link non è valido"
+msgstr "L'attività non è valida."
 
 #: rocky/views/upload_csv.py
 msgid ""
@@ -5791,8 +5789,3 @@ msgstr "Impossibile caricare il file raw su Bytes: codice di stato %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "File raw aggiunto con successo."
-
-#~ msgid "Cannot reschedule task: it has probably already been queued."
-#~ msgstr ""
-#~ "Impossibile riprogrammare il compito: probabilmente è già stato messo in "
-#~ "coda."
