@@ -3,7 +3,7 @@
 ## Purpose
 
 The *scheduler* is tasked with populating and maintaining a priority queue of
-items that are ranked, and can be popped off through http api calls.
+items that are ranked, and can be popped off through HTTP API calls.
 The scheduler is designed to be extensible, such that you're able to create
 your own rules for the population, and prioritization of tasks.
 
