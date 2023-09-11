@@ -4523,6 +4523,10 @@ msgstr "Filter op OOI-types"
 msgid "Toggle all"
 msgstr "Alles (de-)selecteren"
 
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+msgid "Children"
+msgstr "Kinderen"
+
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
 msgid "Show details for %(object_id)s, with %(child_count)s children."

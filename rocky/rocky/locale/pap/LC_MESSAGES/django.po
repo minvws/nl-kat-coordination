@@ -4512,6 +4512,10 @@ msgstr "Filtra pa tiponan di OOI"
 msgid "Toggle all"
 msgstr "Pone tur"
 
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+msgid "Children"
+msgstr "Yunan"
+
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
 msgid "Show details for %(object_id)s, with %(child_count)s children."
@@ -5726,12 +5730,3 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
-
-#~ msgid "Shown types"
-#~ msgstr "Tiponan mustra"
-
-#~ msgid "Quickly filter by type"
-#~ msgstr "Rapidamente filtrá pa tipo"
-
-#~ msgid "Filter by"
-#~ msgstr "Filtra pa"
