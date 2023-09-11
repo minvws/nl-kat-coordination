@@ -76,7 +76,7 @@ class KATalogusClientV1:
         response = self.session.delete(f"{self.organization_uri}")
         response.raise_for_status()
 
-    def get_plugins(self, plugin_type: Optional[str] = ""):
+    def get_plugins(self, plugin_type: Optional[str] = None):
         response = self.session.get(f"{self.organization_uri}/plugins", params={"plugin_type": plugin_type})
         response.raise_for_status()
         return [parse_plugin(plugin) for plugin in response.json()]
@@ -126,10 +126,10 @@ class KATalogusClientV1:
         return ServiceHealth.parse_obj(response.json())
 
     def get_normalizers(self) -> List[Normalizer]:
-        return self.get_plugins("normalizer")
+        return self.get_plugins(plugin_type="normalizer")
 
     def get_boefjes(self) -> List[Boefje]:
-        return self.get_plugins("boefje")
+        return self.get_plugins(plugin_type="boefje")
 
     def enable_boefje(self, plugin: Boefje) -> None:
         self._patch_boefje_state(plugin.id, True, plugin.repository_id)
