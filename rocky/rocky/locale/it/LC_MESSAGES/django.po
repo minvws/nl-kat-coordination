@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-07 08:31+0000\n"
+"POT-Creation-Date: 2023-09-11 10:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5141,7 +5141,15 @@ msgid "Fetching tasks failed: no connection with scheduler"
 msgstr ""
 
 #: rocky/views/tasks.py
-msgid "Cannot reschedule task: it has probably already been queued."
+msgid "Task queue is full, please try again later."
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "Task already queued."
+msgstr ""
+
+#: rocky/views/tasks.py
+msgid "Task is invalid."
 msgstr ""
 
 #: rocky/views/upload_csv.py
