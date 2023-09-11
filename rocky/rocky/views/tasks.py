@@ -12,7 +12,7 @@ from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 
-from rocky.scheduler import TaskAlreadyQueued, client
+from rocky.scheduler import BadRequestError, ConflictError, TooManyRequestsError, client
 
 TASK_LIMIT = 50
 
@@ -97,12 +97,17 @@ class TaskListView(OrganizationView, ListView):
 
             try:
                 client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
-            except TaskAlreadyQueued:
-                messages.add_message(
-                    self.request,
-                    messages.WARNING,
-                    _("Cannot reschedule task: it has probably already been queued."),
-                )
+            except TooManyRequestsError:
+                error_message = _("Task queue is full, please try again later.")
+                messages.add_message(self.request, messages.ERROR, error_message)
+                return
+            except ConflictError:
+                error_message = _("Task already queued.")
+                messages.add_message(self.request, messages.ERROR, error_message)
+                return
+            except BadRequestError:
+                error_message = _("Task is invalid.")
+                messages.add_message(self.request, messages.ERROR, error_message)
                 return
 
             success_message = (
