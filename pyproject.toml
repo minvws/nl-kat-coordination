@@ -82,7 +82,7 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 
 [tool.ruff.flake8-tidy-imports]
 [tool.ruff.flake8-tidy-imports.banned-api]
-"rocky.settings".msg = "Use django.conf.settings"
+"rocky.helper".msg = "Use django.conf.settings"
 
 [tool.codespell]
 ignore-words-list = 'edn,juxt'

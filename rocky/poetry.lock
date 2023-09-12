@@ -738,24 +738,6 @@ phonenumbers = ["phonenumbers (>=7.0.2)"]
 phonenumberslite = ["phonenumberslite (>=7.0.2)"]
 
 [[package]]
-name = "django-pydantic-settings"
-version = "0.7.0"
-description = "Manage Django settings with Pydantic."
-optional = false
-python-versions = ">=3.8,<4.0"
-files = [
-    {file = "django-pydantic-settings-0.7.0.tar.gz", hash = "sha256:22b7b35e6bbc092b4d856600a8a9ecc45bc8cd9215a3b618ec49e146a171a983"},
-    {file = "django_pydantic_settings-0.7.0-py3-none-any.whl", hash = "sha256:983a32c94179e8032b2d9e9e13ae798a492b9936d93aeb50419db67f8897a719"},
-]
-
-[package.dependencies]
-Django = ">=1.11"
-pydantic = {version = ">=1.8,<2.0", extras = ["email"]}
-
-[package.extras]
-sentry = ["sentry-sdk"]
-
-[[package]]
 name = "django-tagulous"
 version = "1.3.3"
 description = "Fabulous Tagging for Django"
@@ -896,21 +878,6 @@ files = [
     {file = "EditorConfig-0.12.3-py3-none-any.whl", hash = "sha256:6b0851425aa875b08b16789ee0eeadbd4ab59666e9ebe728e526314c4a2e52c1"},
     {file = "EditorConfig-0.12.3.tar.gz", hash = "sha256:57f8ce78afcba15c8b18d46b5170848c88d56fd38f05c2ec60dbbfcb8996e89e"},
 ]
-
-[[package]]
-name = "email-validator"
-version = "2.0.0.post2"
-description = "A robust email address syntax and deliverability validation library."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "email_validator-2.0.0.post2-py3-none-any.whl", hash = "sha256:2466ba57cda361fb7309fd3d5a225723c788ca4bbad32a0ebd5373b99730285c"},
-    {file = "email_validator-2.0.0.post2.tar.gz", hash = "sha256:1ff6e86044200c56ae23595695c54e9614f4a9551e0e393614f764860b3d7900"},
-]
-
-[package.dependencies]
-dnspython = ">=2.0.0"
-idna = ">=2.0.0"
 
 [[package]]
 name = "exceptiongroup"
@@ -2192,7 +2159,6 @@ files = [
 ]
 
 [package.dependencies]
-email-validator = {version = ">=1.0.3", optional = true, markers = "extra == \"email\""}
 typing-extensions = ">=4.2.0"
 
 [package.extras]
@@ -3514,4 +3480,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "200134d373267daa9f4aadfcca55c7aa57ee6c82b1405560f455b33b9b0665ce"
+content-hash = "c4f765be15c51af1ec4c0a98e439cc5a700f26adaceb733c699b8af1db9ab2ec"
