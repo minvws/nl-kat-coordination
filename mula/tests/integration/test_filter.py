@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
+from scheduler.storage import filters
 from sqlalchemy import select
 
 from tests.factories import OrganisationFactory
@@ -76,4 +77,45 @@ class FilterTestCase(unittest.TestCase):
 
             print(session.execute(query1).all())
             print(query2.all())
+            breakpoint()
+
+    def test_apply_filter(self):
+        # Add tasks
+        p_item = functions.create_p_item(self.organisation.id, 0)
+        task = functions.create_task(p_item)
+        self.mock_ctx.datastores.task_store.create_task(task)
+
+        values = json.dumps({"id": p_item.data.get("id")})
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data",
+                    operator="@>",
+                    value=values,
+                )
+            ],
+        )
+
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            print(query.all())
+
+        values = p_item.data.get("id")
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__id",
+                    operator="==",
+                    value=values,
+                )
+            ],
+        )
+
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            print(query.all())
             breakpoint()
