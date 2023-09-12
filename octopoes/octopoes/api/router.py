@@ -204,7 +204,7 @@ def list_origins(
     valid_time: datetime = Depends(extract_valid_time),
     source: Optional[Reference] = Query(None),
     result: Optional[Reference] = Query(None),
-    task_id: Optional[str] = Query(None),
+    task_id: Optional[uuid.UUID] = Query(None),
     origin_type: Optional[OriginType] = Query(None),
 ) -> List[Origin]:
     return octopoes.origin_repository.list(

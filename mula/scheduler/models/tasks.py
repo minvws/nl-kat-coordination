@@ -104,7 +104,7 @@ class NormalizerTask(BaseModel):
 
     type: ClassVar[str] = "normalizer"
 
-    id: str = Field(default_factory=lambda: uuid.uuid4().hex)
+    id: uuid.UUID = Field(default_factory=lambda: uuid.uuid4())
     normalizer: Normalizer
     raw_data: RawData
 
@@ -123,7 +123,7 @@ class BoefjeTask(BaseModel):
 
     type: ClassVar[str] = "boefje"
 
-    id: str = Field(default_factory=lambda: uuid.uuid4().hex)
+    id: uuid.UUID = Field(default_factory=lambda: uuid.uuid4())
     boefje: Boefje
     input_ooi: Optional[str]
     organization: str
