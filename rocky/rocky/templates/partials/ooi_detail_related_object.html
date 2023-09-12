@@ -29,7 +29,7 @@
                 {% for related_ooi in related %}
                     <tr>
                         <td>
-                            <a href="{% ooi_url "ooi_detail" related_ooi.reference organization.code %}">{{ related_ooi.reference.human_readable }}</a>
+                            <a href="{% ooi_url "ooi_detail" related_ooi.reference organization.code query=related_ooi.mandatory_fields %}">{{ related_ooi.reference.human_readable }}</a>
                         </td>
                         <td>{{ related_ooi.name }}</td>
                     </tr>

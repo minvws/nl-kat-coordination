@@ -7,28 +7,34 @@
   "required": [],
   "properties": {
     "common_udp_ports": {
-      "title": "Comma separated list of allowed UDP ports",
+      "description": "Comma separated list of allowed UDP ports",
       "type": "string",
       "pattern": "^(\\s*(,*)[0-9]+,?\\s*)*$",
       "default": "53"
     },
     "common_tcp_ports": {
-      "title": "Comma separated list of allowed TCP ports",
+      "description": "Comma separated list of allowed TCP ports",
       "type": "string",
       "pattern": "^(\\s*(,*)[0-9]+,?\\s*)*$",
       "default": "25,53,80,110,143,443,465,587,993,995"
     },
     "sa_tcp_ports": {
-      "title": "Comma separated list of allowed UDP ports",
+      "description": "Comma separated list of common system administrator ports",
       "type": "string",
       "pattern": "^(\\s*(,*)[0-9]+,?\\s*)*$",
       "default": "21,22,23,3389,5900"
     },
     "db_tcp_ports": {
-      "title": "Comma separated list of allowed TCP ports",
+      "description": "Comma separated list of common database ports",
       "type": "string",
       "pattern": "^(\\s*(,*)[0-9]+,?\\s*)*$",
       "default": "1433,1434,3050,3306,5432"
+    },
+    "aggregate_findings": {
+      "description": "Do you want to aggregate findings into one finding of the IP? Answer with true or false.",
+      "type": "string",
+      "pattern": "^(true|false)$",
+      "default": "false"
     }
   }
 }

@@ -6,6 +6,10 @@ from .ranker import Ranker
 
 
 class BoefjeRanker(Ranker):
+    """The BoefjeRanker is a ranker that is used to rank tasks based on the
+    procedure listed in the `rank()` method.
+    """
+
     MAX_PRIORITY = 1000
     MAX_DAYS = 7
 
@@ -24,7 +28,7 @@ class BoefjeRanker(Ranker):
         """
         max_priority = self.MAX_PRIORITY
         max_days_in_seconds = self.MAX_DAYS * (60 * 60 * 24)
-        grace_period = timedelta(seconds=self.ctx.config.pq_populate_grace_period)
+        grace_period = timedelta(seconds=self.ctx.config.pq_grace_period)
 
         # New tasks that have not yet run before
         if obj.prior_tasks is None or not obj.prior_tasks:

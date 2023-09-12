@@ -1,4 +1,4 @@
-<fieldset class="grouped-choice-list">
+<fieldset class="{{ fieldset_class }}">
     <legend>{{ field.label }}</legend>
     {% for choice in field %}
         <div class="checkbox">
@@ -7,7 +7,7 @@
                    value="{{ choice.data.value }}"
                    id="id_{{ field.name }}_{{ forloop.counter0 }}"
                    {% if choice.data.attrs.disabled %}disabled{% endif %}
-                   {% if choice.data.attrs.checked %}checked{% endif %}/>
+                   {% if choice.data.attrs.checked %}checked{% endif %} />
             <label for="id_{{ field.name }}_{{ forloop.counter0 }}">{{ choice.choice_label|capfirst }}</label>
         </div>
     {% endfor %}

@@ -1,4 +1,5 @@
 from typing import List
+from urllib.parse import urljoin
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import OOI, Organisation
@@ -7,6 +8,8 @@ from .services import HTTPService
 
 
 class Octopoes(HTTPService):
+    """A class that provides methods to interact with the Octopoes API."""
+
     name = "octopoes"
     health_endpoint = None
 
@@ -28,7 +31,7 @@ class Octopoes(HTTPService):
         if scan_level is None:
             scan_level = []
 
-        url = f"{self.host}/{organisation_id}/objects"
+        url = urljoin(self.host, f"/{organisation_id}/objects")
 
         params = {
             "types": object_types,
@@ -60,7 +63,7 @@ class Octopoes(HTTPService):
         if scan_level is None:
             scan_level = []
 
-        url = f"{self.host}/{organisation_id}/objects/random"
+        url = urljoin(self.host, f"/{organisation_id}/objects/random")
 
         params = {
             "amount": str(n),

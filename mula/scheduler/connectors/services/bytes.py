@@ -1,6 +1,7 @@
 import typing
 from functools import wraps
 from typing import Any, Callable, Dict, Optional
+from urllib.parse import urljoin
 
 import requests
 from requests.models import HTTPError
@@ -29,9 +30,20 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
 
 
 class Bytes(HTTPService):
+    """A class that provides methods to interact with the Bytes API."""
+
     name = "bytes"
 
     def __init__(self, host: str, source: str, user: str, password: str, timeout: int = 5):
+        """Initialize the Bytes service.
+
+        Args:
+            host: A string representing the host.
+            source: A string representing the source.
+            user: A string representing the username.
+            password: A string representing the password.
+            timeout: An integer representing the timeout.
+        """
         self.credentials: Dict[str, str] = {
             "username": user,
             "password": password,
@@ -47,7 +59,7 @@ class Bytes(HTTPService):
         response.raise_for_status()
 
     def _get_token(self) -> str:
-        url = f"{self.host}/token"
+        url = urljoin(self.host, "/token")
         response = self.post(
             url=url,
             payload=self.credentials,
@@ -61,7 +73,7 @@ class Bytes(HTTPService):
     @retry_with_login
     @exception_handler
     def get_last_run_boefje(self, boefje_id: str, input_ooi: str, organization_id: str) -> Optional[BoefjeMeta]:
-        url = f"{self.host}/bytes/boefje_meta"
+        url = urljoin(self.host, "/bytes/boefje_meta")
         response = self.get(
             url=url,
             params={
@@ -83,7 +95,7 @@ class Bytes(HTTPService):
     @retry_with_login
     @exception_handler
     def get_last_run_boefje_by_organisation_id(self, organization_id: str) -> Optional[BoefjeMeta]:
-        url = f"{self.host}/bytes/boefje_meta"
+        url = urljoin(self.host, "/bytes/boefje_meta")
         response = self.get(
             url=url,
             params={

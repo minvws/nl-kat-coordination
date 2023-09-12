@@ -18,7 +18,7 @@ def make_middleware() -> FileMiddleware:
     settings = get_settings()
 
     if settings.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
-        return NaclBoxMiddleware(settings.kat_private_key_b64, settings.vws_public_key_b64)
+        return NaclBoxMiddleware(settings.private_key_b64, settings.public_key_b64)
 
     return IdentityMiddleware()
 

@@ -6,18 +6,24 @@ from typing import List
 
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from requests import RequestException
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
 from tools.models import Indemnification
+from tools.view_helpers import get_mandatory_fields
 
 from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
-from rocky.views.mixins import OOIList
+from rocky.exceptions import (
+    AcknowledgedClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    TrustedClearanceLevelTooLowException,
+)
+from rocky.views.mixins import OctopoesView, OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -26,7 +32,7 @@ class PageActions(Enum):
     UPDATE_SCAN_PROFILE = "update-scan-profile"
 
 
-class OOIListView(BaseOOIListView):
+class OOIListView(BaseOOIListView, OctopoesView):
     breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
     template_name = "oois/ooi_list.html"
 
@@ -35,8 +41,12 @@ class OOIListView(BaseOOIListView):
 
         context["types_display"] = self.get_ooi_types_display()
         context["object_type_filters"] = self.get_ooi_type_filters()
+        context["observed_at"] = self.get_observed_at()
+        context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["select_oois_form"] = SelectOOIForm(
-            context.get("ooi_list", []), organization_code=self.organization.code
+            context.get("ooi_list", []),
+            organization_code=self.organization.code,
+            mandatory_fields=context["mandatory_fields"],
         )
         context["member"] = self.organization_member
         context["scan_levels"] = [alias for _, alias in CUSTOM_SCAN_LEVEL.choices]
@@ -92,17 +102,37 @@ class OOIListView(BaseOOIListView):
                 ),
             )
             return self.get(request, status=403, *args, **kwargs)
-        except ClearanceLevelTooLowException:
+        except TrustedClearanceLevelTooLowException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _("Could not raise clearance level to L%s. You acknowledged a clearance level of %s.")
+                _(
+                    "Could not raise clearance level to L%s. "
+                    "You were trusted a clearance level of L%s. "
+                    "Contact your administrator to receive a higher clearance."
+                )
+                % (
+                    level,
+                    self.organization_member.trusted_clearance_level,
+                ),
+            )
+            return self.get(request, status=403, *args, **kwargs)
+        except AcknowledgedClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Please accept the clearance level below to proceed."
+                )
                 % (
                     level,
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
-            return self.get(request, status=403, *args, **kwargs)
+            return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
+
         except (RequestException, RemoteException, ConnectionError):
             messages.add_message(request, messages.ERROR, _("An error occurred while saving clearance levels."))
 

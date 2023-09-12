@@ -1,0 +1,64 @@
+$depth-start: 2;
+$depth-end: 15;
+
+table {
+  &.tree-view {
+    &.table {
+      table-layout: fixed;
+    }
+
+    th {
+      >div {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    tr {
+      td {
+        word-break: break-all;
+      }
+
+      &.tree {
+        td {
+          @for $i from $depth-start through $depth-end {
+            &.indent-#{$i} {
+              padding-left: calc(16px + #{$i * 16}px);
+            }
+          }
+
+        }
+      }
+
+      &.folded {
+        >td {
+          background-color: #cccccc;
+          overflow: hidden;
+
+          &:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+.toggle-table-body:not(:checked)+table.tree-view tbody {
+  display: none;
+}
+
+.toggle-table-body+table.tree-view>thead label {
+  cursor: pointer;
+}
+
+.toggle-table-body:checked+table.tree-view>thead .ro-icon.open {
+  display: none;
+}
+
+.toggle-table-body:not(:checked)+table.tree-view>thead .ro-icon.close {
+  display: none;
+}

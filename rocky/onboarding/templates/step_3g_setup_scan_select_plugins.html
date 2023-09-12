@@ -1,0 +1,75 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" with view_type="onboarding" %}
+
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Setup scan - Enable plugins" %}</h1>
+                {% include "partials/stepper.html" %}
+
+                <h2>{% translate "Plugins introduction" %}</h2>
+                <p>
+                    {% blocktranslate trimmed %}
+                        OpenKAT uses plugins to scan, check and analyze. Each plugin will bring a
+                        specific skillset that will help to generate your report.
+                        There are three types of plugins.
+                    {% endblocktranslate %}
+                </p>
+                <ul>
+                    <li>
+                        <strong>{% translate "Boefjes" %}:</strong>
+                        {% blocktranslate trimmed %}
+                            Scan objects for data. Each boefje has a scan intensity score to
+                            prevent invasive scanning on objects where you don’t have the clearance to
+                            do so.
+                        {% endblocktranslate %}
+                    </li>
+                    <li>
+                        <strong>{% translate "Normalizers" %}:</strong>
+                        {% blocktranslate trimmed %}
+                            Check the data for specific objects and add these object to your object list.
+                        {% endblocktranslate %}
+                    </li>
+                    <li>
+                        <strong>{% translate "Bits" %}:</strong>
+                        {% blocktranslate trimmed %}
+                            Analyze the available data to come to insights and conclusions.
+                        {% endblocktranslate %}
+                    </li>
+                </ul>
+                <p>
+                    {% blocktranslate trimmed %}
+                        OpenKAT will be able to generate a full report when all the required and
+                        suggested plugins are enabled. If you choose not to give a plugin
+                        permission to run, the data that plugin would collect or produce will be
+                        left out of the report which will then be generated based on the available
+                        data collected by the enabled plugins. Below are the suggested and required
+                        plugins for this report.
+                    {% endblocktranslate %}
+                </p>
+                <p>
+                    {% blocktranslate trimmed %}
+                        Let’s setup your scan by enabling the plugins of your choice below.
+                    {% endblocktranslate %}
+                </p>
+                <h2>{% translate "Suggested plugins" %}</h2>
+                {% if form_view == "table" %}
+                    {% include "partials/form/checkbox_group_table_form.html" with checkbox_group_table_form=select_boefjes_form btn_text="Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
+
+                {% else %}
+                    {% include "partials/form/boefje_tiles_form.html" with checkbox_group_table_form=select_boefjes_form btn_text="Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
+
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

@@ -27,13 +27,19 @@ from rocky.views.organization_add import OrganizationAddView
 from rocky.views.organization_crisis_room import OrganizationCrisisRoomView
 from rocky.views.organization_edit import OrganizationEditView
 from rocky.views.organization_list import OrganizationListView
-from rocky.views.organization_member_add import OrganizationMemberAddView
+from rocky.views.organization_member_add import (
+    DownloadMembersTemplateView,
+    MembersUploadView,
+    OrganizationMemberAddAccountTypeView,
+    OrganizationMemberAddView,
+)
 from rocky.views.organization_member_edit import OrganizationMemberEditView
 from rocky.views.organization_member_list import OrganizationMemberListView
 from rocky.views.organization_settings import OrganizationSettingsView
 from rocky.views.privacy_statement import PrivacyStatementView
 from rocky.views.scan_profile import ScanProfileDetailView, ScanProfileResetView
 from rocky.views.scans import ScanListView
+from rocky.views.task_detail import BoefjeTaskDetailView, NormalizerTaskJSONView
 from rocky.views.tasks import BoefjesTaskListView, DownloadTaskDetail, NormalizersTaskListView
 from rocky.views.upload_csv import UploadCSV
 from rocky.views.upload_raw import UploadRaw
@@ -96,8 +102,23 @@ urlpatterns += i18n_patterns(
     ),
     path(
         "<organization_code>/members/add/",
+        OrganizationMemberAddAccountTypeView.as_view(),
+        name="organization_member_add_account_type",
+    ),
+    path(
+        "<organization_code>/members/add/<account_type>/",
         OrganizationMemberAddView.as_view(),
         name="organization_member_add",
+    ),
+    path(
+        "<organization_code>/members/upload/member_template",
+        DownloadMembersTemplateView.as_view(),
+        name="download_organization_member_template",
+    ),
+    path(
+        "<organization_code>/members/upload/",
+        MembersUploadView.as_view(),
+        name="organization_member_upload",
     ),
     path(
         "<organization_code>/",
@@ -152,9 +173,19 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/tasks/", BoefjesTaskListView.as_view(), name="task_list"),
     path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
     path(
+        "<organization_code>/tasks/boefjes/<task_id>",
+        BoefjeTaskDetailView.as_view(),
+        name="boefje_task_view",
+    ),
+    path(
         "<organization_code>/tasks/normalizers",
         NormalizersTaskListView.as_view(),
         name="normalizers_task_list",
+    ),
+    path(
+        "<organization_code>/tasks/normalizers/<task_id>",
+        NormalizerTaskJSONView.as_view(),
+        name="normalizer_task_view",
     ),
     path(
         "<organization_code>/tasks/<task_id>/download/",

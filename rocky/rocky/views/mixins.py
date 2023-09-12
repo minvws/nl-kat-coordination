@@ -89,7 +89,7 @@ class OctopoesView(OrganizationView):
                     client.login()
 
                     normalizer_data = client.get_normalizer_meta(origin.origin.task_id)
-                    boefje_id = normalizer_data["boefje_meta"]["boefje"]["id"]
+                    boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
                     origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
                 except requests.exceptions.RequestException as e:
@@ -115,10 +115,17 @@ class OctopoesView(OrganizationView):
             return datetime.now(timezone.utc)
 
         try:
-            datetime_format = "%Y-%m-%d"
+            datetime_format = "%Y-%m-%dT%H:%M:%S"
             return convert_date_to_datetime(datetime.strptime(self.request.GET.get("observed_at"), datetime_format))
         except ValueError:
-            return datetime.now(timezone.utc)
+            try:
+                datetime_format = "%Y-%m-%d"
+                return convert_date_to_datetime(datetime.strptime(self.request.GET.get("observed_at"), datetime_format))
+            except ValueError:
+                messages.error(
+                    self.request, _("Can not parse observed_at parameter, falling back to showing current object")
+                )
+                return datetime.now(timezone.utc)
 
     def get_depth(self, default_depth=DEPTH_DEFAULT) -> int:
         try:
@@ -192,7 +199,8 @@ class FindingList:
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
         severities: Set[RiskLevelSeverity],
-        exclude_muted: bool = True,
+        exclude_muted: bool = False,
+        only_muted: bool = False,
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
@@ -200,12 +208,14 @@ class FindingList:
         self._count = None
         self.severities = severities
         self.exclude_muted = exclude_muted
+        self.only_muted = only_muted
 
     @cached_property
     def count(self) -> int:
         return self.octopoes_connector.list_findings(
             severities=self.severities,
             exclude_muted=self.exclude_muted,
+            only_muted=self.only_muted,
             valid_time=self.valid_time,
             limit=0,
         ).count
@@ -220,6 +230,7 @@ class FindingList:
             findings = self.octopoes_connector.list_findings(
                 severities=self.severities,
                 exclude_muted=self.exclude_muted,
+                only_muted=self.only_muted,
                 valid_time=self.valid_time,
                 offset=offset,
                 limit=limit,

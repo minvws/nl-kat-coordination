@@ -19,12 +19,12 @@ from django.utils.translation import gettext_lazy as _
 
 from rocky.otel import OpenTelemetryHelper
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -45,9 +45,11 @@ BYTES_USERNAME = env("BYTES_USERNAME", default="")
 BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 
 KEIKO_API = env.url("KEIKO_API", "").geturl()
+# Report generation timeout in seconds
+KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG", False)
 
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
@@ -264,6 +266,7 @@ LANGUAGES = [
     ("en", "en"),
     ("nl", "nl"),
     ("pap", "pap"),
+    ("it", "it"),
 ]
 
 # Static files (CSS, JavaScript, Images)
@@ -344,6 +347,7 @@ CSP_FRAME_ANCESTORS = ["'none'"]
 CSP_BASE = ["'none'"]
 CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
+CSP_CONNECT_SRC = ["'self'"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 

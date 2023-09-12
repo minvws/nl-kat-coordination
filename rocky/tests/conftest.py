@@ -7,9 +7,11 @@ from typing import Dict
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
@@ -27,8 +29,22 @@ from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSever
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
+LANG_LIST = [code for code, _ in settings.LANGUAGES]
+
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+@pytest.fixture(params=LANG_LIST)
+def current_language(request):
+    return request.param
+
+
+@pytest.fixture
+def language(current_language):
+    activate(current_language)
+    yield current_language
+    deactivate()
 
 
 def create_user(django_user_model, email, password, name, device_name, superuser=False):
@@ -67,7 +83,7 @@ def create_member(user, organization):
 
 
 def add_admin_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_ADMIN)
+    group = Group.objects.get(name=GROUP_ADMIN)
     member.groups.add(group)
     admin_permissions = [
         Permission.objects.get(codename="view_organization").id,
@@ -83,7 +99,7 @@ def add_admin_group_permissions(member):
 
 
 def add_redteam_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_REDTEAM)
+    group = Group.objects.get(name=GROUP_REDTEAM)
     member.groups.add(group)
     redteam_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
@@ -98,12 +114,19 @@ def add_redteam_group_permissions(member):
 
 
 def add_client_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
+    group = Group.objects.get(name=GROUP_CLIENT)
     member.groups.add(group)
     client_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
     ]
     group.permissions.set(client_permissions)
+
+
+@pytest.fixture(autouse=True)
+def seed_groups(db):
+    Group.objects.get_or_create(name=GROUP_CLIENT)
+    Group.objects.get_or_create(name=GROUP_REDTEAM)
+    Group.objects.get_or_create(name=GROUP_ADMIN)
 
 
 @pytest.fixture

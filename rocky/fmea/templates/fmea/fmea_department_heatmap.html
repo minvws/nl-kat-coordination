@@ -23,7 +23,7 @@
                                         <td>{{ data.failure_mode }}</td>
                                         {% for department in departments %}
                                             {% if department in data.affected_departments %}
-                                                <td >
+                                                <td>
                                                     <span class="{{ data.risk_class.split|join:'-'|lower }}">{{ data.risk_class }}</span>
                                                 </td>
                                             {% else %}

@@ -16,7 +16,7 @@ from katalogus.views.mixins import BoefjeMixin
 from requests.exceptions import RequestException
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
-from tools.models import Indemnification, OrganizationMember
+from tools.models import Indemnification
 from tools.ooi_helpers import format_display
 
 from octopoes.models import OOI, Reference
@@ -89,7 +89,7 @@ class OOIDetailView(
 
                     return self.get(self.request, status_code=422, *self.args, **self.kwargs)
 
-                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.reference)
+                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
                 messages.add_message(self.request, messages.SUCCESS, "Question has been answered.")
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 
@@ -107,9 +107,6 @@ class OOIDetailView(
             return self.get_ooi(pk=self.get_ooi_id(), observed_at=datetime.now(timezone.utc))
         except Http404:
             return None
-
-    def get_organizationmember(self):
-        return OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
 
     def get_organization_indemnification(self):
         return Indemnification.objects.filter(organization=self.organization).exists()
@@ -160,10 +157,10 @@ class OOIDetailView(
 
         # Filter boefjes on scan level <= OOI clearance level when not "show all"
         # or when not "acknowledged clearance level > 0"
-        member = self.get_organizationmember()
+
         if (
             (filter_form.is_valid() and not filter_form.cleaned_data["show_all"])
-            or member.acknowledged_clearance_level <= 0
+            or self.organization_member.acknowledged_clearance_level <= 0
             or self.get_organization_indemnification()
         ):
             boefjes = [boefje for boefje in boefjes if boefje.scan_level.value <= self.ooi.scan_profile.level]
@@ -188,7 +185,7 @@ class OOIDetailView(
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
-        context["member"] = self.get_organizationmember()
+        context["member"] = self.organization_member
 
         # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])
@@ -197,7 +194,7 @@ class OOIDetailView(
         context["observed_at"] = self.get_observed_at()
         context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
-        context["related"] = self.get_related_objects()
+        context["related"] = self.get_related_objects(context["observed_at"])
         context["ooi_current"] = self.get_current_ooi()
 
         context["count_findings_per_severity"] = dict(self.count_findings_per_severity())

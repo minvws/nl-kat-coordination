@@ -11,29 +11,32 @@ normalizer tasks.
 
 ## Architecture
 
-See [design](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/design.md) document for the architecture and the
-[extending](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/extending.md) document for the extending the scheduler with
-your own custom schedulers, and rankers.
+See
+[architecture](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/architecture.md)
+document for the architecture and the
+[extending](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/extending.md)
+document for the extending the scheduler with your own custom schedulers, and
+rankers.
 
 ### Stack, packages and libraries
 
 | Name           | Version  | Description                                        |
 |----------------|----------|----------------------------------------------------|
-| Python         | 3.8      |                                                    |
-| FastAPI        | 0.73.0   | Used for api server                                |
-| Celery         | 5.2.3    | Used for event listening, and dispatching of tasks |
+| Python         | ^3.8     |                                                    |
+| FastAPI        | ^0.93.0  | Used for api server                                |
+| SQLAlchemy     | ^1.4.48  |                                                    |
 
 ### External services
 
 The scheduler interfaces with the following services:
 
-| Service | Usage |
-|---------|-------|
-| [Octopoes] | Retrieving random OOI's of organizations |
-| [Katalogus] | Used for referencing available plugins and organizations |
-| [Bytes] | Retrieve last run boefje for organization and OOI |
-| [Boefjes] | Sending boefje, and normalizer tasks to Celery |
-| [RabbitMQ] | Used for retrieving scan profile changes, and created raw data in bytes  |
+| Service     | Usage                                                                    |
+|-------------|--------------------------------------------------------------------------|
+| [Octopoes]  | Retrieving random OOI's of organizations                                 |
+| [Katalogus] | Used for referencing available plugins and organizations                 |
+| [Bytes]     | Retrieve last run boefje for organization and OOI                        |
+| [Boefjes]   | Sending boefje, and normalizer tasks to Celery                           |
+| [RabbitMQ]  | Used for retrieving scan profile changes, and created raw data in bytes  |
 
 ### Project structure
 
@@ -70,18 +73,15 @@ $ tree -L 3 --dirsfirst
 ## Running / Developing
 
 Typically the scheduler will be run from the overarching
-[nl-kat-coordination](https://github.com/minvws/nl-kat-coordination) project. When
-you want to run and the scheduler individually you can use the following setup.
-We are using docker to setup our development environment, but you are free
-to use whatever you want.
+[nl-kat-coordination](https://github.com/minvws/nl-kat-coordination) project.
+When you want to run and the scheduler individually you can use the following
+setup. We are using docker to setup our development environment, but you are
+free to use whatever you want.
 
 ### Prerequisites
 
 By the use of environment variables we load in the configuration of the
-scheduler. Look at the [.env-dist](.env-dist) file for the application
-configuration settings, to build a `.env` file. Refer to the
-[`configuration.md`](https://github.com/minvws/nl-kat-coordination/tree/main/mula/docs/configuration.md) file for more information on the
-individual settings.
+scheduler. See the environment settings section under Installation and Deployment for more information.
 
 ### Running
 

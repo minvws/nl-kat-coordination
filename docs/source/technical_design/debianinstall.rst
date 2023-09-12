@@ -6,7 +6,8 @@ OpenKAT has Debian packages available. In the near future we will have an apt
 repository that will allow you to keep your installation up-to-date using apt.
 An installation of KAT can be done on a single machine or spread out on several
 machines for a high availability setup. This guide will take you through the
-steps for installing it on a single machine.
+steps for installing it on a single machine. There are also :ref:`scripts<Scripts>`
+available if you don't want to do this by hand.
 
 Supported distributions
 =======================
@@ -16,7 +17,7 @@ and Ubuntu LTS releases and stop supporting the previous version 6 months after
 the release. Currently this means we support Debian 11 (bullseye) and 12
 (bookworm) and Ubuntu 22.04. Debian 12 has been released on 10th of June so we
 will stop providing packages for Debian 11 in December 2023. After Ubuntu 24.04
-is releases we will provide Ubuntu 22.02 packages until October 2024.
+is released we will provide Ubuntu 22.02 packages until October 2024.
 
 Prerequisites
 =============
@@ -56,13 +57,13 @@ If you will be running the database on the same machine as KAT, you can install 
 Rocky DB
 --------
 
-Generate a secure password for the Rocky database user, as an example we'll use /dev/urandom:
+Generate a secure password for the Rocky database user, as an example we'll use ``/dev/urandom``:
 
 .. code-block:: sh
 
     echo $(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
 
-To configure rocky to use this password, open `/etc/kat/rocky.conf` and fill in this password for `ROCKY_DB_PASSWORD`.
+To configure rocky to use this password, open ``/etc/kat/rocky.conf`` and fill in this password for ``ROCKY_DB_PASSWORD``.
 
 Create the database and user for Rocky in Postgres:
 
@@ -86,7 +87,7 @@ KAT-alogus DB
 
 Generate a unique secure password for the KAT-alogus database user. You can use the same method we used for generating the Rocky database user password.
 
-Insert this password into the connection string for the KAT-alogus DB in `/etc/kat/boefjes.conf`. For example:
+Insert this password into the connection string for the KAT-alogus DB in ``/etc/kat/boefjes.conf``. For example:
 
 .. code-block:: sh
 
@@ -110,7 +111,7 @@ Bytes DB
 --------
 
 Generate a unique password for the Bytes database user. Insert this password
-into the connection string for the Bytes DB in `/etc/kat/bytes.conf`. For
+into the connection string for the Bytes DB in ``/etc/kat/bytes.conf``. For
 example:
 
 .. code-block:: sh
@@ -135,11 +136,11 @@ Mula DB
 --------
 
 Generate a unique password for the Mula database user. Insert this password into
-the connection string for the Mula DB in `/etc/kat/mula.conf`. For example:
+the connection string for the Mula DB in ``/etc/kat/mula.conf``. For example:
 
 .. code-block:: sh
 
-    SCHEDULER_DB_DSN=postgresql://mula:<password>@localhost/mula_db
+    SCHEDULER_DB_URI=postgresql://mula:<password>@localhost/mula_db
 
 Create a new database and user for Mula:
 
@@ -184,7 +185,8 @@ Start by installing RabbitMQ:
 
     sudo apt install rabbitmq-server
 
-By default RabbitMQ will listen on all interfaces. For a single node setup this is not what we want. To prevent RabbitMQ from being accessed from the internet add the following lines to `/etc/rabbitmq/rabbitmq-env.conf`:
+By default RabbitMQ will listen on all interfaces. For a single node setup this is not what we want.
+To prevent RabbitMQ from being accessed from the internet add the following lines to ``/etc/rabbitmq/rabbitmq-env.conf``:
 
 .. code-block:: sh
 
@@ -198,13 +200,13 @@ Stop RabbitMQ and epmd:
     sudo systemctl stop rabbitmq-server
     sudo epmd -kill
 
-Create a new file `/etc/rabbitmq/rabbitmq.conf` and add the following lines:
+Create a new file ``/etc/rabbitmq/rabbitmq.conf`` and add the following lines:
 
 .. code-block:: unixconfig
 
     listeners.tcp.local = 127.0.0.1:5672
 
-Create a new file `/etc/rabbitmq/advanced.conf` and add the following lines:
+Create a new file ``/etc/rabbitmq/advanced.conf`` and add the following lines:
 
 .. code-block:: erlang
 
@@ -237,18 +239,17 @@ Now create a KAT user for RabbitMQ, create the virtual host and set the permissi
     sudo rabbitmqctl add_vhost kat
     sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
-Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for `/etc/kat/mula.conf`:
+Now configure KAT to use the vhost we created and with the kat user. To do this, update ``QUEUE_URI`` in the following files:
+
+ * ``/etc/kat/mula.conf``
+ * ``/etc/kat/rocky.conf``
+ * ``/etc/kat/bytes.conf``
+ * ``/etc/kat/boefjes.conf``
+ * ``/etc/kat/octopoes.conf``
 
 .. code-block:: sh
 
-    SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@127.0.0.1:5672/kat
-
-And update the `QUEUE_URI` setting to the same value for the following files:
-
- * `/etc/kat/rocky.conf`
- * `/etc/kat/bytes.conf`
- * `/etc/kat/boefjes.conf`
- * `/etc/kat/octopoes.conf`
+    QUEUE_URI=amqp://kat:<password>@127.0.0.1:5672/kat
 
 Or use this command to do it for you:
 
@@ -259,11 +260,11 @@ Or use this command to do it for you:
 Configure Bytes credentials
 ===========================
 
-copy the value of `BYTES_PASSWORD` in `/etc/kat/bytes.conf` to the setting with the same name in the following files:
+copy the value of ``BYTES_PASSWORD`` in ``/etc/kat/bytes.conf`` to the setting with the same name in the following files:
 
-- `/etc/kat/rocky.conf`
-- `/etc/kat/boefjes.conf`
-- `/etc/kat/mula.conf`
+- ``/etc/kat/rocky.conf``
+- ``/etc/kat/boefjes.conf``
+- ``/etc/kat/mula.conf``
 
 This oneliner will do it for you, executed as root:
 
@@ -274,9 +275,9 @@ This oneliner will do it for you, executed as root:
 Configure hostname in Rocky
 ===========================
 
-The `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` variables in
-`/etc/kat/rocky.conf` need to be configured with the hostname (or hostnames separated by commas) that will be used
-to access OpenKAT. If `openkat.example.org` is used to access OpenKAT the
+The ``DJANGO_ALLOWED_HOSTS`` and ``DJANGO_CSRF_TRUSTED_ORIGINS`` variables in
+``/etc/kat/rocky.conf`` need to be configured with the hostname (or hostnames separated by commas) that will be used
+to access OpenKAT. If ``openkat.example.org`` is used to access OpenKAT the
 configuration should be:
 
 .. code-block:: sh
@@ -305,7 +306,7 @@ To start KAT when the system boots, enable all KAT services:
 Start using OpenKAT
 ===================
 
-By default OpenKAT will be accessible in your browser through `https://<server IP>:8443` (http://<server IP>:8000 for docker based installs). There, Rocky will take you through the steps of setting up your account and running your first boefjes.
+By default OpenKAT will be accessible in your browser through ``https://<server IP>:8443`` (http://<server IP>:8000 for docker based installs). There, Rocky will take you through the steps of setting up your account and running your first boefjes.
 
 .. _Upgrading Debian:
 

@@ -13,10 +13,24 @@ from octopoes.config.settings import Settings, XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.app import get_xtdb_client
 from octopoes.core.service import OctopoesService
+from octopoes.events.manager import EventManager
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.path import Direction, Path
-from octopoes.models.types import DNSZone, Hostname, IPAddressV4, Network, ResolvedHostname
+from octopoes.models.types import (
+    DNSZone,
+    Hostname,
+    HostnameHTTPURL,
+    HTTPResource,
+    IPAddressV4,
+    IPPort,
+    IPService,
+    Network,
+    ResolvedHostname,
+    Service,
+    Website,
+)
 from octopoes.repositories.ooi_repository import OOIRepository, XTDBOOIRepository
+from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
@@ -133,7 +147,7 @@ def hostname(network, ooi_repository, scan_profile_repository, valid_time):
 @pytest.fixture
 def ipaddressv4(network, ooi_repository, scan_profile_repository, valid_time):
     return add_ooi(
-        IPAddressV4(network=network.reference, address=IPv4Address("1.1.1.1")),
+        IPAddressV4(network=network.reference, address=IPv4Address("192.0.2.1")),
         ooi_repository,
         scan_profile_repository,
         valid_time,
@@ -148,6 +162,24 @@ def resolved_hostname(hostname, ipaddressv4, ooi_repository, scan_profile_reposi
         scan_profile_repository,
         valid_time,
     )
+
+
+@pytest.fixture
+def http_resource_http(hostname, ipaddressv4, network):
+    ip_port = IPPort(address=ipaddressv4.reference, protocol="tcp", port=80)
+    ip_service = IPService(ip_port=ip_port.reference, service=Service(name="http").reference)
+    website = Website(ip_service=ip_service.reference, hostname=hostname.reference)
+    web_url = HostnameHTTPURL(netloc=hostname.reference, path="/", scheme="http", network=network.reference, port=80)
+    return HTTPResource(website=website.reference, web_url=web_url.reference)
+
+
+@pytest.fixture
+def http_resource_https(hostname, ipaddressv4, network):
+    ip_port = IPPort(address=ipaddressv4.reference, protocol="tcp", port=443)
+    ip_service = IPService(ip_port=ip_port.reference, service=Service(name="https").reference)
+    website = Website(ip_service=ip_service.reference, hostname=hostname.reference)
+    web_url = HostnameHTTPURL(netloc=hostname.reference, path="/", scheme="https", network=network.reference, port=443)
+    return HTTPResource(website=website.reference, web_url=web_url.reference)
 
 
 @pytest.fixture
@@ -212,4 +244,14 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
 
 @pytest.fixture
 def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOOIRepository(Mock(), xtdb_session, XTDBType.XTDB_MULTINODE)
+    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def mock_xtdb_session():
+    return XTDBSession(Mock())
+
+
+@pytest.fixture
+def origin_repository(mock_xtdb_session):
+    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)

@@ -15,17 +15,18 @@ def convert_date_to_datetime(d: date) -> datetime:
     return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
 
 
-def get_mandatory_fields(request):
+def get_mandatory_fields(request, params: List[str] = None):
     mandatory_fields = []
 
-    params = ["observed_at", "depth", "view"]
+    if not params:
+        params = ["observed_at", "depth", "view"]
+
+        for type_ in request.GET.getlist("ooi_type", []):
+            mandatory_fields.append(("ooi_type", type_))
 
     for param in params:
         if param in request.GET:
             mandatory_fields.append((param, request.GET.get(param)))
-
-    for type_ in request.GET.getlist("ooi_type", []):
-        mandatory_fields.append(("ooi_type", type_))
 
     return mandatory_fields
 
@@ -52,7 +53,8 @@ def url_with_querystring(path, **kwargs) -> str:
 
 
 def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
-    kwargs["ooi_id"] = ooi_id
+    if ooi_id:
+        kwargs["ooi_id"] = ooi_id
 
     if "query" in kwargs:
         kwargs["query"] = {key: value for key, value in kwargs["query"] if key not in kwargs}
@@ -124,7 +126,7 @@ class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         breadcrumbs = [
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
-                "text": "Settings",
+                "text": _("Settings"),
             },
         ]
 
@@ -136,7 +138,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         breadcrumbs = [
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
-                "text": "Members",
+                "text": _("Members"),
             },
         ]
 
