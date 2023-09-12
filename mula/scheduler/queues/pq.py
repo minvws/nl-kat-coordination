@@ -222,7 +222,7 @@ class PriorityQueue(abc.ABC):
         Returns:
             The item that was removed from the queue.
         """
-        self.pq_store.remove(self.pq_id, str(p_item.id))
+        self.pq_store.remove(self.pq_id, p_item.id)
 
     def clear(self) -> None:
         """Clear the queue."""

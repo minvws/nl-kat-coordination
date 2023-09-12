@@ -72,7 +72,7 @@ class NormalizerMixin:
 
     def run_normalizer(self, normalizer: Plugin, raw_data: RawData) -> None:
         normalizer_task = NormalizerTask(
-            id=uuid4().hex, normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
+            id=uuid4(), normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
         )
 
         item = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
@@ -87,7 +87,7 @@ class BoefjeMixin(OctopoesView):
 
     def run_boefje(self, katalogus_boefje: Plugin, ooi: Optional[OOI]) -> None:
         boefje_task = BoefjeTask(
-            id=uuid4().hex,
+            id=uuid4(),
             boefje=Boefje(id=katalogus_boefje.id, version=None),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
