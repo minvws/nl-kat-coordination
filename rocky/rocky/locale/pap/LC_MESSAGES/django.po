@@ -4441,7 +4441,7 @@ msgstr "Aktivá"
 #, fuzzy
 #| msgid "new"
 msgid "New"
-msgstr "nobo"
+msgstr "Nobo"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
