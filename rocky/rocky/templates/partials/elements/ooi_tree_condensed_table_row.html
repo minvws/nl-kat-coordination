@@ -41,11 +41,12 @@
                 {% if object.tree_meta.child_ids %}> {{ object.tree_meta.child_ids|join:' > ' }}{% endif %}
             </td>
             <td colspan="3">
-                <a href="{% ooi_url "ooi_tree" ooi_id organization.code query=mandatory_fields ooi_type=object.ooi_type %}" title="{% blocktranslate %}Unfold {{ object_id }} with {{ child_count }} children{% endblocktranslate %}: {% if object.tree_meta.child_ids %} > {{ object.tree_meta.child_ids|join:" > " }}{% endif %}
-                    ">{{ object.ooi_type }}
-                    {% if object.tree_meta.child_ooi_types %}> {{ object.tree_meta.child_ooi_types|join:' > ' }}{% endif %}
-                </a>
-            </td>
-        </tr>
-    {% endif %}
+                <a href="{% ooi_url "ooi_tree" ooi_id organization.code query=mandatory_fields ooi_type=object.ooi_type %}"
+                   title="{% blocktranslate %}Unfold {{ object_id }} with {{ child_count }} children{% endblocktranslate %}: {% if object.tree_meta.child_ids %}> {{ object.tree_meta.child_ids|join:"> " }}{% endif %}
+                ">{{ object.ooi_type }}
+                {% if object.tree_meta.child_ooi_types %}> {{ object.tree_meta.child_ooi_types|join:' > ' }}{% endif %}
+            </a>
+        </td>
+    </tr>
+{% endif %}
 {% endif %}

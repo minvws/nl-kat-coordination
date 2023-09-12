@@ -12,6 +12,7 @@ EnvironmentFile=/etc/kat/boefjes.conf
 ExecStart=/opt/venvs/kat-boefjes/bin/python -m boefjes normalizer
 Restart=on-failure
 RestartSec=3s
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

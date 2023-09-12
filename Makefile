@@ -52,6 +52,7 @@ down:
 # Remove containers and all volumes (data loss!)
 clean:
 	-docker-compose down --timeout 0 --volumes --remove-orphans
+	-rm -Rf rocky/node_modules rocky/assets/dist rocky/.parcel-cache
 
 # Fetch the latest changes from the Git remote
 fetch:

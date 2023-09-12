@@ -16,7 +16,7 @@ from katalogus.views.mixins import BoefjeMixin
 from requests.exceptions import RequestException
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
-from tools.models import Indemnification, OrganizationMember
+from tools.models import Indemnification
 from tools.ooi_helpers import format_display
 
 from octopoes.models import OOI, Reference
@@ -108,9 +108,6 @@ class OOIDetailView(
         except Http404:
             return None
 
-    def get_organizationmember(self):
-        return OrganizationMember.objects.get(user=self.request.user, organization=self.organization)
-
     def get_organization_indemnification(self):
         return Indemnification.objects.filter(organization=self.organization).exists()
 
@@ -160,10 +157,10 @@ class OOIDetailView(
 
         # Filter boefjes on scan level <= OOI clearance level when not "show all"
         # or when not "acknowledged clearance level > 0"
-        member = self.get_organizationmember()
+
         if (
             (filter_form.is_valid() and not filter_form.cleaned_data["show_all"])
-            or member.acknowledged_clearance_level <= 0
+            or self.organization_member.acknowledged_clearance_level <= 0
             or self.get_organization_indemnification()
         ):
             boefjes = [boefje for boefje in boefjes if boefje.scan_level.value <= self.ooi.scan_profile.level]
@@ -188,7 +185,7 @@ class OOIDetailView(
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
-        context["member"] = self.get_organizationmember()
+        context["member"] = self.organization_member
 
         # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])

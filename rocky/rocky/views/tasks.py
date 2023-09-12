@@ -12,7 +12,7 @@ from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 
-from rocky.scheduler import client
+from rocky.scheduler import TaskAlreadyQueued, client
 
 TASK_LIMIT = 50
 
@@ -84,7 +84,7 @@ class TaskListView(OrganizationView, ListView):
 
         return redirect(request.path)
 
-    def handle_page_action(self, action: str):
+    def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
             task = client.get_task_details(task_id)
@@ -95,7 +95,15 @@ class TaskListView(OrganizationView, ListView):
             task.p_item.id = new_id
             task.p_item.data.id = new_id
 
-            client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
+            try:
+                client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
+            except TaskAlreadyQueued:
+                messages.add_message(
+                    self.request,
+                    messages.WARNING,
+                    _("Cannot reschedule task: it has probably already been queued."),
+                )
+                return
 
             success_message = (
                 "Your task is scheduled and will soon be started in the background. \n "

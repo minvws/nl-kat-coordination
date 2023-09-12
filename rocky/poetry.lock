@@ -738,24 +738,6 @@ phonenumbers = ["phonenumbers (>=7.0.2)"]
 phonenumberslite = ["phonenumberslite (>=7.0.2)"]
 
 [[package]]
-name = "django-pydantic-settings"
-version = "0.7.0"
-description = "Manage Django settings with Pydantic."
-optional = false
-python-versions = ">=3.8,<4.0"
-files = [
-    {file = "django-pydantic-settings-0.7.0.tar.gz", hash = "sha256:22b7b35e6bbc092b4d856600a8a9ecc45bc8cd9215a3b618ec49e146a171a983"},
-    {file = "django_pydantic_settings-0.7.0-py3-none-any.whl", hash = "sha256:983a32c94179e8032b2d9e9e13ae798a492b9936d93aeb50419db67f8897a719"},
-]
-
-[package.dependencies]
-Django = ">=1.11"
-pydantic = {version = ">=1.8,<2.0", extras = ["email"]}
-
-[package.extras]
-sentry = ["sentry-sdk"]
-
-[[package]]
 name = "django-tagulous"
 version = "1.3.3"
 description = "Fabulous Tagging for Django"
@@ -888,21 +870,6 @@ files = [
 ]
 
 [[package]]
-name = "email-validator"
-version = "2.0.0.post2"
-description = "A robust email address syntax and deliverability validation library."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "email_validator-2.0.0.post2-py3-none-any.whl", hash = "sha256:2466ba57cda361fb7309fd3d5a225723c788ca4bbad32a0ebd5373b99730285c"},
-    {file = "email_validator-2.0.0.post2.tar.gz", hash = "sha256:1ff6e86044200c56ae23595695c54e9614f4a9551e0e393614f764860b3d7900"},
-]
-
-[package.dependencies]
-dnspython = ">=2.0.0"
-idna = ">=2.0.0"
-
-[[package]]
 name = "exceptiongroup"
 version = "1.1.3"
 description = "Backport of PEP 654 (exception groups)"
@@ -936,13 +903,13 @@ doc = ["Sphinx", "sphinx-rtd-theme", "sphinxcontrib-spelling"]
 
 [[package]]
 name = "faker"
-version = "19.3.0"
+version = "19.3.1"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-19.3.0-py3-none-any.whl", hash = "sha256:bee54278d6e1289573317604ab6f4782acca724396bf261eaf1890de228e553d"},
-    {file = "Faker-19.3.0.tar.gz", hash = "sha256:7d6ed00de3eef9bd57504500c67ee034cab959e4248f9c24aca33e08af82ca93"},
+    {file = "Faker-19.3.1-py3-none-any.whl", hash = "sha256:e2722fdf622cf24e974aaba15a3dee97a6f8b98d869bd827ff1af9c87695af46"},
+    {file = "Faker-19.3.1.tar.gz", hash = "sha256:a6624d9574623bb27dfca33fff94581cd7b23b562901db8ad59acbde9a52543e"},
 ]
 
 [package.dependencies]
@@ -1937,13 +1904,13 @@ files = [
 
 [[package]]
 name = "pathspec"
-version = "0.11.1"
+version = "0.11.2"
 description = "Utility library for gitignore style pattern matching of file paths."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pathspec-0.11.1-py3-none-any.whl", hash = "sha256:d8af70af76652554bd134c22b3e8a1cc46ed7d91edcdd721ef1a0c51a84a5293"},
-    {file = "pathspec-0.11.1.tar.gz", hash = "sha256:2798de800fa92780e33acca925945e9a19a133b715067cf165b8866c15a31687"},
+    {file = "pathspec-0.11.2-py3-none-any.whl", hash = "sha256:1d6ed233af05e679efb96b1851550ea95bbb64b7c490b0f5aa52996c11e92a20"},
+    {file = "pathspec-0.11.2.tar.gz", hash = "sha256:e0d8d0ac2f12da61956eb2306b69f9469b42f4deb0f3cb6ed47b9cce9996ced3"},
 ]
 
 [[package]]
@@ -2182,7 +2149,6 @@ files = [
 ]
 
 [package.dependencies]
-email-validator = {version = ">=1.0.3", optional = true, markers = "extra == \"email\""}
 typing-extensions = ">=4.2.0"
 
 [package.extras]
@@ -2973,26 +2939,26 @@ files = [
 
 [[package]]
 name = "robotframework-tidy"
-version = "4.4.0"
+version = "4.5.0"
 description = "Code autoformatter for Robot Framework"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "robotframework-tidy-4.4.0.tar.gz", hash = "sha256:1fc23ded8e49cd0fcc409e552d8417add5d66c13ff926cf9c0a44d8d1afaff4f"},
-    {file = "robotframework_tidy-4.4.0-py3-none-any.whl", hash = "sha256:07d57d0c6e790679a4acc5d166f4c2447456cddaa78056898101181279a2be49"},
+    {file = "robotframework-tidy-4.5.0.tar.gz", hash = "sha256:90f66b7956d4355421de4df7ad5de2407b0bd29ad3544149f25908a6315d71ab"},
+    {file = "robotframework_tidy-4.5.0-py3-none-any.whl", hash = "sha256:cc55fbea1a9796bcd35ddba2c6b01394c5ea9dceea056ed9f7b2886b1101dcf8"},
 ]
 
 [package.dependencies]
 click = "==8.1.*"
 colorama = ">=0.4.3,<0.4.7"
 jinja2 = ">=3.0,<4.0"
-pathspec = ">=0.9.0,<0.11.2"
+pathspec = ">=0.9.0,<0.11.3"
 rich-click = ">=1.4,<1.6.2"
 robotframework = ">=4.0"
 tomli = "==2.0.*"
 
 [package.extras]
-dev = ["coverage", "invoke", "jinja2", "packaging (>=21.0)", "pre-commit", "pyflakes (>=2.4,<3.1)", "pylama", "pytest"]
+dev = ["coverage", "invoke", "jinja2", "packaging (>=21.0)", "pre-commit", "pyflakes (>=2.4,<3.2)", "pylama", "pytest"]
 doc = ["furo", "sphinx", "sphinx-copybutton (==0.5.2)", "sphinx-design"]
 
 [[package]]
@@ -3504,4 +3470,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "eed631cabf99f3ffe982ec108974e2c828121d72a4d2183a00d98dcc05e54474"
+content-hash = "d6318921b591fcfa4b6c56d2471bbf10bc1804e74aea0e097b1139c958548cdc"

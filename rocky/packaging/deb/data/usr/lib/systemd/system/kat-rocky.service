@@ -13,6 +13,7 @@ ExecStart=/opt/venvs/kat-rocky/bin/uwsgi --ini /etc/kat/rocky.uwsgi.ini
 Restart=on-failure
 RestartSec=3s
 KillSignal=SIGQUIT
+KillMode=mixed
 Type=notify
 NotifyAccess=all
 

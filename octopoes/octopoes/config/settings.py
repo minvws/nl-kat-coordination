@@ -6,7 +6,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional, Set, Tuple
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, FilePath
 from pydantic.env_settings import SettingsSourceCallable
 
 from octopoes.models import ScanLevel, ScanProfileType
@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Application settings
-    log_cfg: Path = Field(BASE_DIR / "logging.yml", description="Path to the logging configuration file")
+    log_cfg: FilePath = Field(BASE_DIR / "logging.yml", description="Path to the logging configuration file")
 
     # External services settings
     queue_uri: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
@@ -70,10 +70,8 @@ class Settings(BaseSettings):
     scan_level_recalculation_interval: int = Field(
         60, description="Interval in seconds of the periodic task that recalculates scan levels"
     )
-    bits_enabled: Set[str] = Field(set(), example="{'port-classification-bit'}", description="Explicitly enabled bits")
-    bits_disabled: Set[str] = Field(
-        set(), example="{'port-classification-bit'}", description="Explicitly disabled bits"
-    )
+    bits_enabled: Set[str] = Field(set(), example='["port-common"]', description="Explicitly enabled bits")
+    bits_disabled: Set[str] = Field(set(), example='["port-classification-ip"]', description="Explicitly disabled bits")
 
     span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
