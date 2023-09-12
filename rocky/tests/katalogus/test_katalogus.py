@@ -186,7 +186,7 @@ def test_katalogus_client(mocker):
 
 
 def test_enable_disable_plugin_no_clearance(rf, redteam_member, mocker):
-    redteam_member.trusted_clearance_level = 1
+    redteam_member.acknowledged_clearance_level = 1
     redteam_member.save()
 
     plugin = get_boefjes_data()[0]
@@ -221,13 +221,14 @@ def test_enable_disable_plugin_no_clearance(rf, redteam_member, mocker):
         + str(plugin["scan_level"])
         + ". "
         "Your clearance level is L"
-        + str(redteam_member.trusted_clearance_level)
+        + str(redteam_member.acknowledged_clearance_level)
         + ". Contact your administrator to get a higher clearance level."
     )
 
 
 def test_enable_disable_plugin_no_clearance_other_text(rf, redteam_member, mocker):
     redteam_member.trusted_clearance_level = -1
+    redteam_member.acknowledged_clearance_level = 1
     redteam_member.save()
 
     plugin = get_boefjes_data()[0]
