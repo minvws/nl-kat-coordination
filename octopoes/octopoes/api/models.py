@@ -25,7 +25,7 @@ class _BaseObservation(BaseModel):
     source: Reference
     result: List[OOIType]
     valid_time: TimezoneAwareDatetime
-    task_id: str
+    task_id: uuid.UUID
 
 
 # Connector models (more generic)
@@ -42,7 +42,7 @@ class Declaration(BaseModel):
     ooi: OOI
     valid_time: datetime
     method: Optional[str]
-    task_id: Optional[str]
+    task_id: Optional[uuid.UUID]
 
 
 class ScanProfileDeclaration(BaseModel):
@@ -65,4 +65,4 @@ class ValidatedDeclaration(BaseModel):
     ooi: OOIType
     valid_time: TimezoneAwareDatetime
     method: Optional[str] = "manual"
-    task_id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
+    task_id: Optional[uuid.UUID] = Field(default_factory=lambda: uuid.uuid4())
