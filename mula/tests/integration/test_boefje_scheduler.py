@@ -889,7 +889,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
 
         # Task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_push_tasks_for_scan_profile_mutations_value_empty(self):
@@ -979,7 +979,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
 
         # Task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_push_task_for_scan_profile_mutations_delete(self):
@@ -1112,7 +1112,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_push_tasks_for_new_boefjes_request_exception(self):
@@ -1241,7 +1241,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Act
@@ -1298,7 +1298,7 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
 
         # Task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_push_tasks_for_random_objects_queue_full(self):
@@ -1400,7 +1400,7 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
 
         # Task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_push_tasks_for_random_objects_no_boefjes_found(self):
@@ -1473,5 +1473,5 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
 
         # Task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)

@@ -90,7 +90,7 @@ class TaskListView(OrganizationView, ListView):
             task = client.get_task_details(task_id)
 
             # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-            new_id = uuid.uuid4().hex
+            new_id = uuid.uuid4()
 
             task.p_item.id = new_id
             task.p_item.data.id = new_id
