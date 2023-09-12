@@ -55,11 +55,11 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         logger.info("Added boefje meta [id=%s]", boefje_meta.id)
 
-    def get_boefje_meta_by_id(self, boefje_meta_id: str) -> BoefjeMeta:
-        boefje_meta_in_db = self.session.get(BoefjeMetaInDB, boefje_meta_id)
+    def get_boefje_meta_by_id(self, boefje_meta_id: uuid.UUID) -> BoefjeMeta:
+        boefje_meta_in_db = self.session.get(BoefjeMetaInDB, str(boefje_meta_id))
 
         if boefje_meta_in_db is None:
-            raise ObjectNotFoundException(BoefjeMetaInDB, id=boefje_meta_id)
+            raise ObjectNotFoundException(BoefjeMetaInDB, id=str(boefje_meta_id))
 
         return to_boefje_meta(boefje_meta_in_db)
 
@@ -85,11 +85,11 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         logger.info("Added normalizer meta [id=%s]", normalizer_meta.id)
 
-    def get_normalizer_meta_by_id(self, normalizer_meta_id: str) -> NormalizerMeta:
-        normalizer_meta_in_db = self.session.get(NormalizerMetaInDB, normalizer_meta_id)
+    def get_normalizer_meta_by_id(self, normalizer_meta_id: uuid.UUID) -> NormalizerMeta:
+        normalizer_meta_in_db = self.session.get(NormalizerMetaInDB, str(normalizer_meta_id))
 
         if normalizer_meta_in_db is None:
-            raise ObjectNotFoundException(NormalizerMetaInDB, id=normalizer_meta_id)
+            raise ObjectNotFoundException(NormalizerMetaInDB, id=str(normalizer_meta_id))
 
         return to_normalizer_meta(normalizer_meta_in_db)
 
@@ -97,7 +97,9 @@ class SQLMetaDataRepository(MetaDataRepository):
         logger.debug("Querying normalizer meta: %s", query_filter.json())
 
         if query_filter.raw_id is not None:
-            query = self.session.query(NormalizerMetaInDB).filter(NormalizerMetaInDB.raw_file_id == query_filter.raw_id)
+            query = self.session.query(NormalizerMetaInDB).filter(
+                NormalizerMetaInDB.raw_file_id == str(query_filter.raw_id)
+            )
         else:
             query = (
                 self.session.query(NormalizerMetaInDB)
@@ -117,7 +119,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return [to_normalizer_meta(normalizer_meta) for normalizer_meta in query]
 
-    def save_raw(self, raw: RawData) -> str:
+    def save_raw(self, raw: RawData) -> uuid.UUID:
         # Hash the data
         secure_hash = hash_data(raw, raw.boefje_meta.ended_at, self.app_settings.hashing_algorithm)
 
@@ -137,13 +139,15 @@ class SQLMetaDataRepository(MetaDataRepository):
         self.raw_repository.save_raw(raw_file_in_db.id, raw)
         logger.info("Added raw data [id=%s]", raw_file_in_db.id)
 
-        return str(raw_file_in_db.id)
+        return raw_file_in_db.id
 
     def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
         logger.debug("Querying raw data: %s", query_filter.json())
 
         if query_filter.boefje_meta_id:
-            query = self.session.query(RawFileInDB).filter(RawFileInDB.boefje_meta_id == query_filter.boefje_meta_id)
+            query = self.session.query(RawFileInDB).filter(
+                RawFileInDB.boefje_meta_id == str(query_filter.boefje_meta_id)
+            )
         else:
             query = (
                 self.session.query(RawFileInDB)
@@ -164,17 +168,17 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return [to_raw_meta(raw_file_in_db) for raw_file_in_db in query]
 
-    def get_raw_by_id(self, raw_id: str) -> RawData:
-        raw_in_db: Optional[RawFileInDB] = self.session.get(RawFileInDB, raw_id)
+    def get_raw_by_id(self, raw_id: uuid.UUID) -> RawData:
+        raw_in_db: Optional[RawFileInDB] = self.session.get(RawFileInDB, str(raw_id))
 
         if raw_in_db is None:
-            raise ObjectNotFoundException(RawFileInDB, id=raw_id)
+            raise ObjectNotFoundException(RawFileInDB, id=str(raw_id))
 
         boefje_meta = to_boefje_meta(raw_in_db.boefje_meta)
         return self.raw_repository.get_raw(raw_in_db.id, boefje_meta)
 
     def has_raw(self, boefje_meta: BoefjeMeta, mime_types: List[MimeType]) -> bool:
-        query = self.session.query(RawFileInDB).filter(RawFileInDB.boefje_meta_id == boefje_meta.id)
+        query = self.session.query(RawFileInDB).filter(RawFileInDB.boefje_meta_id == str(boefje_meta.id))
 
         if len(mime_types) > 0:
             query = query.filter(RawFileInDB.mime_types.contains([mime_type.value for mime_type in mime_types]))
@@ -244,7 +248,7 @@ class MetaIntegrityError(Exception):
 
 def to_boefje_meta_in_db(boefje_meta: BoefjeMeta) -> BoefjeMetaInDB:
     return BoefjeMetaInDB(
-        id=boefje_meta.id,
+        id=str(boefje_meta.id),
         boefje_id=boefje_meta.boefje.id,
         boefje_version=boefje_meta.boefje.version,
         arguments=boefje_meta.arguments,
@@ -273,12 +277,12 @@ def to_boefje_meta(boefje_meta_in_db: BoefjeMetaInDB) -> BoefjeMeta:
 
 def to_normalizer_meta_in_db(normalizer_meta: NormalizerMeta) -> NormalizerMetaInDB:
     return NormalizerMetaInDB(
-        id=normalizer_meta.id,
+        id=str(normalizer_meta.id),
         normalizer_id=normalizer_meta.normalizer.id,
         normalizer_version=normalizer_meta.normalizer.version,
         started_at=normalizer_meta.started_at,
         ended_at=normalizer_meta.ended_at,
-        raw_file_id=normalizer_meta.raw_data.id,
+        raw_file_id=str(normalizer_meta.raw_data.id),
     )
 
 
@@ -300,7 +304,7 @@ def to_normalizer_meta(normalizer_meta_in_db: NormalizerMetaInDB) -> NormalizerM
 def to_raw_file_in_db(raw_data: RawData, signing_provider: Optional[SigningProviderInDB]) -> RawFileInDB:
     return RawFileInDB(
         id=str(uuid.uuid4()),
-        boefje_meta_id=raw_data.boefje_meta.id,
+        boefje_meta_id=str(raw_data.boefje_meta.id),
         secure_hash=raw_data.secure_hash,
         signing_provider=signing_provider if signing_provider else None,
         hash_retrieval_link=raw_data.hash_retrieval_link,
@@ -310,7 +314,7 @@ def to_raw_file_in_db(raw_data: RawData, signing_provider: Optional[SigningProvi
 
 def raw_meta_to_raw_file_in_db(raw_data_meta: RawDataMeta, signing_provider_id: Optional[int]) -> RawFileInDB:
     return RawFileInDB(
-        id=raw_data_meta.id,
+        id=str(raw_data_meta.id),
         boefje_meta_id=raw_data_meta.boefje_meta.id,
         secure_hash=raw_data_meta.secure_hash,
         signing_provider_id=signing_provider_id if signing_provider_id else None,

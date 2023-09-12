@@ -1,6 +1,7 @@
 import json
 from datetime import timezone
 from typing import Any, Dict, Optional
+from uuid import UUID
 
 from bytes.config import BASE_DIR
 from bytes.models import (
@@ -28,7 +29,7 @@ def load_stub_raw(relative_path: str) -> bytes:
 
 
 def get_boefje_meta(
-    meta_id: str = "d63d755b-6c23-44ab-8de6-8d144c448a71",
+    meta_id: UUID = UUID("d63d755b-6c23-44ab-8de6-8d144c448a71"),
     boefje_id: str = "kat_test.main",
     input_ooi: Optional[str] = "Hostname|internet|test.org",
 ) -> BoefjeMeta:
@@ -43,9 +44,9 @@ def get_boefje_meta(
     )
 
 
-def get_normalizer_meta(raw_file_id: str = "2c9f47db-dfca-4928-b29f-368e64b3c779") -> NormalizerMeta:
+def get_normalizer_meta(raw_file_id: UUID = UUID("2c9f47db-dfca-4928-b29f-368e64b3c779")) -> NormalizerMeta:
     return NormalizerMeta(
-        id="203eedee-a590-43e1-8f80-6d18ffe529f5",
+        id=UUID("203eedee-a590-43e1-8f80-6d18ffe529f5"),
         raw_data=get_raw_data_meta(raw_file_id),
         normalizer=Normalizer(id="kat_test.main"),
         started_at=TimezoneAwareDatetime(1001, 10, 10, 10, 10, 10, tzinfo=timezone.utc),
@@ -61,7 +62,7 @@ def get_raw_data() -> RawData:
     )
 
 
-def get_raw_data_meta(raw_file_id="2c9f47db-dfca-4928-b29f-368e64b3c779") -> RawDataMeta:
+def get_raw_data_meta(raw_file_id: UUID = UUID("2c9f47db-dfca-4928-b29f-368e64b3c779")) -> RawDataMeta:
     raw_data = get_raw_data()
 
     return RawDataMeta(
