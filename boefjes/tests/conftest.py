@@ -64,7 +64,7 @@ class MockSchedulerClient(SchedulerClientInterface):
 
     def patch_task(self, task_id: UUID, status: TaskStatus) -> None:
         with self.log_path.open("a") as f:
-            f.write(f"{str(task_id)},{status.value}\n")
+            f.write(f"{task_id},{status.value}\n")
 
         task = self._task_from_id(task_id) if task_id not in self._tasks else self._tasks[str(task_id)]
         task.status = status
