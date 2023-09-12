@@ -1,5 +1,5 @@
 # You should use this file in the following manner:
-# `docker compose --env-file .env-prod --env-file .env -f docker-compose.release-example.yml`
+# `docker compose --env-file .env-prod -f docker-compose.release-example.yml`
 
 version: "3.9"
 
