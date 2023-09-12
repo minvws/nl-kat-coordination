@@ -23,7 +23,7 @@ class Boefje(BaseModel):
 class BoefjeMeta(BaseModel):
     """BoefjeMeta is the response object returned by the Bytes API"""
 
-    id: str
+    id: uuid.UUID
     boefje: Boefje
     input_ooi: Optional[str]
     arguments: Dict[str, Any]
@@ -33,7 +33,7 @@ class BoefjeMeta(BaseModel):
 
 
 class RawData(BaseModel):
-    id: str
+    id: uuid.UUID
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
     secure_hash: Optional[str]
@@ -49,7 +49,7 @@ class Normalizer(BaseModel):
 
 
 class NormalizerMeta(BaseModel):
-    id: str
+    id: uuid.UUID
     raw_data: RawData
     normalizer: Normalizer
     started_at: datetime.datetime
@@ -59,7 +59,7 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
-    id: Optional[str]
+    id: uuid.UUID
     normalizer: Normalizer
     raw_data: RawData
 
@@ -67,7 +67,7 @@ class NormalizerTask(BaseModel):
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
-    id: Optional[str]
+    id: uuid.UUID
     boefje: Boefje
     input_ooi: Optional[str]
     organization: str
@@ -97,7 +97,7 @@ class TaskStatus(Enum):
 
 
 class Task(BaseModel):
-    id: str
+    id: uuid.UUID
     scheduler_id: str
     type: str
     p_item: QueuePrioritizedItem
