@@ -14,12 +14,12 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+import dsnparse
 import environ
 from django.conf import locale
 from django.core.management.utils import get_random_secret_key
 from pydantic import BaseSettings, DirectoryPath, Field, root_validator
 from pydantic.env_settings import SettingsSourceCallable
-from sqlalchemy.engine.url import make_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -226,12 +226,12 @@ class DjangoSettings(BaseSettings):
 
     @root_validator(allow_reuse=True)
     def default_database(cls, values):
-        url = make_url(values["ROCKY_DB_DSN"])
+        url = dsnparse.parse(values["ROCKY_DB_DSN"])
 
         values["DATABASES"] = {}
         values["DATABASES"]["default"] = {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": url.database,
+            "NAME": url.paths[0],
             "USER": url.username,
             "PASSWORD": url.password,
             "HOST": url.host,

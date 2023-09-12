@@ -260,6 +260,8 @@ dnspython==2.4.2 ; python_version >= "3.8" and python_version < "4.0" \
 drf-standardized-errors==0.12.5 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:20db40c4f4288c36046ee6e0e3727539fbe3306d60f6f1aa88326629022f69c4 \
     --hash=sha256:46eda8c7442730a7d0069f6213ea588e5c386dc2858a14b9a3ae08e78fd8975d
+dsnparse==0.2.1 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:90956235967569c875994adbad0928c347a1592b5fc8ecd9c1b1a20397dae697
 email-validator==2.0.0.post2 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:1ff6e86044200c56ae23595695c54e9614f4a9551e0e393614f764860b3d7900 \
     --hash=sha256:2466ba57cda361fb7309fd3d5a225723c788ca4bbad32a0ebd5373b99730285c

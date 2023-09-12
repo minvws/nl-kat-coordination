@@ -877,6 +877,16 @@ release = ["flit", "keyring", "tbump"]
 test = ["tox", "tox-gh-actions"]
 
 [[package]]
+name = "dsnparse"
+version = "0.2.1"
+description = "parse dsn urls"
+optional = false
+python-versions = "*"
+files = [
+    {file = "dsnparse-0.2.1.tar.gz", hash = "sha256:90956235967569c875994adbad0928c347a1592b5fc8ecd9c1b1a20397dae697"},
+]
+
+[[package]]
 name = "editorconfig"
 version = "0.12.3"
 description = "EditorConfig File Locator and Interpreter for Python"
@@ -3504,4 +3514,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "767a050d0e4d7b88143aa64c9a7d8288bb757eb1ece91c7b0cee88480afa0959"
+content-hash = "200134d373267daa9f4aadfcca55c7aa57ee6c82b1405560f455b33b9b0665ce"
