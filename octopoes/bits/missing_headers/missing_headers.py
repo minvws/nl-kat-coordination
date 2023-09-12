@@ -1,14 +1,11 @@
-from typing import Dict, Iterator, List, Union
+from typing import Dict, Iterator, List
 
 from octopoes.models import OOI
-from octopoes.models.ooi.dns.zone import ResolvedHostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
 
-def run(
-    resource: HTTPResource, additional_oois: List[Union[HTTPHeader, ResolvedHostname]], config: Dict[str, str]
-) -> Iterator[OOI]:
+def run(resource: HTTPResource, additional_oois: List[HTTPHeader], config: Dict[str, str]) -> Iterator[OOI]:
     if not additional_oois:
         return
 
@@ -17,7 +14,7 @@ def run(
     if "location" in header_keys:
         return
 
-    if "strict-transport-security" not in header_keys:
+    if "strict-transport-security" not in header_keys and resource.reference.tokenized.web_url.scheme != "http":
         ft = KATFindingType(id="KAT-NO-HSTS")
         yield ft
         finding = Finding(
