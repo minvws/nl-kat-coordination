@@ -1,6 +1,7 @@
 /* Table overrides */
 
-table i.icon {
+table i.icon,
+table span.icon {
   float: left;
 
   &:before {
