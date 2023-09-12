@@ -1,9 +1,0 @@
-#!/bin/sh -e
-
-if [ "$1" != "upgrade" ]; then
-    systemctl disable --now kat-katalogus.service
-    systemctl disable --now kat-boefjes.service
-    systemctl disable --now kat-normalizers.service
-fi
-
-#DEBHELPER#
