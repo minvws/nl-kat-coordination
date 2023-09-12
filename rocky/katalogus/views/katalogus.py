@@ -9,8 +9,12 @@ from katalogus.client import get_katalogus
 from katalogus.forms import KATalogusFilter
 
 
-class KATalogusFilterView(FormView):
+class BaseKATalogusView(OrganizationView, ListView, FormView):
     form_class = KATalogusFilter
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.katalogus_client = get_katalogus(self.organization.code)
 
     def get_initial(self) -> Dict[str, Any]:
         initial = super().get_initial()
@@ -48,35 +52,30 @@ class KATalogusFilterView(FormView):
     def sort_alphabetic_ascending(self, queryset):
         return sorted(queryset, key=lambda item: item.name.lower())
 
-
-class KATalogusView(OrganizationView, ListView, KATalogusFilterView):
-    """View of all plugins in KAT-alogus"""
-
-    template_name = "katalogus.html"
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.katalogus_client = get_katalogus(self.organization.code)
-
-    def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins())
-        return self.filter_katalogus(queryset)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["breadcrumbs"] = [
             {
-                "url": reverse(
-                    "katalogus",
-                    kwargs={"organization_code": self.organization.code},
-                ),
+                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
                 "text": _("KAT-alogus"),
             },
         ]
         return context
 
 
-class BoefjeListView(KATalogusView):
+class PluginListView(BaseKATalogusView):
+    def get_queryset(self):
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins())
+        return self.filter_katalogus(queryset)
+
+
+class KATalogusView(PluginListView):
+    """View of all plugins in KAT-alogus"""
+
+    template_name = "katalogus.html"
+
+
+class BoefjeListView(BaseKATalogusView):
     """Showing only Boefjes in KAT-alogus"""
 
     template_name = "boefjes.html"
@@ -86,7 +85,7 @@ class BoefjeListView(KATalogusView):
         return self.filter_katalogus(queryset)
 
 
-class NormalizerListView(KATalogusView):
+class NormalizerListView(BaseKATalogusView):
     """Showing only Normalizers in KAT-alogus"""
 
     template_name = "normalizers.html"

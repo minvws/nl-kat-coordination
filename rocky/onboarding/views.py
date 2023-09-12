@@ -341,24 +341,23 @@ class OnboardingClearanceLevelIntroductionView(
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
 
-    def get_boefje_cover_img(self, boefje_id):
-        return reverse("plugin_cover", kwargs={"plugin_id": boefje_id, "organization_code": self.organization.code})
-
     def get_boefjes_tiles(self):
         tiles = [
             {
-                "tile_image": self.get_boefje_cover_img("dns_zone"),
+                "id": "dns_zone",
                 "type": "boefje",
                 "scan_level": "l1",
                 "name": "DNS-Zone",
                 "description": "Fetch the parent DNS zone of a hostname",
+                "enabled": False,
             },
             {
-                "tile_image": self.get_boefje_cover_img("fierce"),
+                "id": "fierce",
                 "type": "boefje",
                 "scan_level": "l3",
                 "name": "Fierce",
                 "description": "Finds subdomains by brute force",
+                "enabled": False,
             },
         ]
         return tiles

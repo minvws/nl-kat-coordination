@@ -8,20 +8,22 @@
         <strong>{{ plugin.name }}</strong><span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
     </p>
     {% if plugin.description %}<p class="plugin-description">{{ plugin.description }}</p>{% endif %}
-    {% if plugin.scan_level != None %}
-        <div class="horizontal-view scan-intensity">
-            <ul class="level-indicator l{{ plugin.scan_level }}">
-                {% for i in "1234"|make_list %}<li></li>{% endfor %}
-            </ul>
+    {% if not show_meta %}
+        {% if plugin.type == "boefje" %}
+            <div class="horizontal-view scan-intensity">
+                <ul class="level-indicator l{{ plugin.scan_level }}">
+                    {% for i in "1234"|make_list %}<li></li>{% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <span class="plugin-author-link de-emphasized"><a target="_blank" href="https://openkat.nl">OpenKAT</a></span>
+        <div class="action-buttons">
+            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
+
+            {% if plugin.type == "boefje" %}
+                <a class="plugin-detail-link"
+                   href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "See details" %}</a>
+            {% endif %}
         </div>
     {% endif %}
-    <span class="plugin-author-link de-emphasized"><a target="_blank" href="https://openkat.nl">OpenKAT</a></span>
-    <div class="action-buttons">
-        {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
-
-        {% if plugin.scan_level != None %}
-            <a class="plugin-detail-link"
-               href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "See details" %}</a>
-        {% endif %}
-    </div>
 </div>
