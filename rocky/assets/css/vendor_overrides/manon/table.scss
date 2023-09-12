@@ -1,0 +1,10 @@
+/* Table overrides */
+
+table i.icon {
+  float: left;
+
+  &:before {
+    display: block;
+    line-height: 1.25;
+  }
+}
