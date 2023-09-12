@@ -49,7 +49,7 @@ class OrganizationMemberEditView(
         context["breadcrumbs"] = [
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
-                "text": "Members",
+                "text": _("Members"),
             },
             {
                 "url": reverse(
