@@ -1,5 +1,3 @@
-import uuid
-
 from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -18,7 +16,7 @@ class TaskDetailView(OctopoesView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["task_id"] = uuid.UUID(kwargs["task_id"]).hex
+        context["task_id"] = kwargs["task_id"]
         context["task"] = self.get_task(context["task_id"])
         return context
 
@@ -53,13 +51,13 @@ class NormalizerTaskJSONView(NormalizerMixin, TaskDetailView):
     def get_output_oois(self, task):
         try:
             return self.octopoes_api_connector.list_origins(
-                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at, task_id=uuid.UUID(task.id).hex
+                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at, task_id=task.id
             )[0].result
         except IndexError:
             return []
 
     def get(self, request, *args, **kwargs):
-        task_id = uuid.UUID(kwargs["task_id"]).hex
+        task_id = kwargs["task_id"]
         task = self.get_task(task_id)
         return JsonResponse(
             {

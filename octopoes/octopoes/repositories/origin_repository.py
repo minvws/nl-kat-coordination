@@ -2,6 +2,7 @@ from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
 from typing import Any, Dict, List, Optional
+from uuid import UUID
 
 from requests import HTTPError
 
@@ -34,7 +35,7 @@ class OriginRepository(Repository):
         self,
         valid_time: datetime,
         *,
-        task_id: Optional[str] = None,
+        task_id: Optional[UUID] = None,
         source: Optional[Reference] = None,
         result: Optional[Reference] = None,
         origin_type: Optional[OriginType] = None,
@@ -75,7 +76,7 @@ class XTDBOriginRepository(OriginRepository):
         self,
         valid_time: datetime,
         *,
-        task_id: Optional[str] = None,
+        task_id: Optional[UUID] = None,
         source: Optional[Reference] = None,
         result: Optional[Reference] = None,
         origin_type: Optional[OriginType] = None,
@@ -83,7 +84,7 @@ class XTDBOriginRepository(OriginRepository):
         where_parameters = {"type": Origin.__name__}
 
         if task_id:
-            where_parameters["task_id"] = task_id
+            where_parameters["task_id"] = str(task_id)
 
         if source:
             where_parameters["source"] = str(source)

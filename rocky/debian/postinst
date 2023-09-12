@@ -1,12 +1,6 @@
 #!/bin/bash -e
 
 set -e
-. /usr/share/debconf/confmodule
-
-adduser --home /etc/kat --no-create-home --system --group kat || true
-usermod -aG kat www-data
-
-chown -R root:kat /etc/kat
 
 # Set SECRET_KEY if empty
 key=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 64)
@@ -18,24 +12,11 @@ if [ ! -f /etc/kat/rocky.local.crt ]; then
         -keyout /etc/kat/rocky.local.key \
         -out /etc/kat/rocky.local.crt -sha256 \
         -days 365 -nodes -subj '/CN=rocky.local'
-
-    chown root:kat /etc/kat/rocky.local.key
-    chown root:kat /etc/kat/rocky.local.crt
-    chmod 640 /etc/kat/rocky.local.{key,crt}
 fi
-
-systemctl daemon-reload
-
-if [ "$1" = "upgrade" ]; then
-    systemctl daemon-reload
-
-    if systemctl is-active --quiet kat-rocky.service; then
-      systemctl restart kat-rocky.service
-    fi
-else
-    systemctl enable --now kat-rocky.service
-fi
-
-db_stop || true
 
 #DEBHELPER#
+
+chown -R root:kat /etc/kat
+chown root:kat /etc/kat/rocky.local.key
+chown root:kat /etc/kat/rocky.local.crt
+chmod 640 /etc/kat/rocky.local.{key,crt}

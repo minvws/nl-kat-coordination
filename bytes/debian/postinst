@@ -1,24 +1,13 @@
 #!/bin/bash
 set -e
-. /usr/share/debconf/confmodule
-
-adduser --home /etc/kat --no-create-home --system --group kat || true
-
-chown -R root:kat /etc/kat
-chown kat:kat /var/log/kat-bytes
-chown kat:kat /var/lib/kat-bytes
 
 key=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 64)
 bytes_password=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
 sed -i "s/BYTES_SECRET= *\$/BYTES_SECRET=${key}/" /etc/kat/bytes.conf
 sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=${bytes_password}/" /etc/kat/bytes.conf
 
-if [ "$1" = "upgrade" ]; then
-    systemctl daemon-reload
-
-    if systemctl is-active --quiet kat-bytes.service; then
-        systemctl restart kat-bytes.service
-    fi
-fi
-
 #DEBHELPER#
+
+chown -R root:kat /etc/kat
+chown kat:kat /var/log/kat-bytes
+chown kat:kat /var/lib/kat-bytes

@@ -1,28 +1,6 @@
 #!/bin/bash
 set -e
-. /usr/share/debconf/confmodule
-
-adduser --home /etc/kat --no-create-home --system --group kat || true
-usermod -aG docker kat || true
-
-chown -R root:kat /etc/kat
-
-db_stop || true
-
-if [ "$1" = "upgrade" ]; then
-    systemctl daemon-reload
-
-    if systemctl is-active --quiet kat-boefjes.service; then
-        systemctl restart kat-boefjes.service
-    fi
-
-    if systemctl is-active --quiet kat-normalizers.service; then
-        systemctl restart kat-normalizers.service
-    fi
-
-    if systemctl is-active --quiet kat-katalogus.service; then
-        systemctl restart kat-katalogus.service
-    fi
-fi
 
 #DEBHELPER#
+
+chown -R root:kat /etc/kat
