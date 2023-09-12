@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-11 14:16+0000\n"
+"POT-Creation-Date: 2023-09-12 15:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1741,7 +1741,9 @@ msgid "Boefje '{boefje_name}' enabled."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
-msgid "Your clearance level has not yet been set. Contact your administrator."
+msgid ""
+"Your clearance level is not set. Go to your profile page to see your "
+"clearance or contact the administrator to set a clearance level."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py

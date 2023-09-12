@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-04 15:31+0000\n"
+"POT-Creation-Date: 2023-09-12 15:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1854,7 +1854,8 @@ msgid ""
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "No por a aumenta e nivel di autorisashon di %s pa L%s. B'a haya un nivel di "
-"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un autorisashon mas haltu."
+"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un "
+"autorisashon mas haltu."
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -1902,8 +1903,12 @@ msgid "Boefje '{boefje_name}' enabled."
 msgstr "Boefje '{boefje_name}' aktivá."
 
 #: katalogus/views/plugin_enable_disable.py
-msgid "Your clearance level has not yet been set. Contact your administrator."
-msgstr "Bo nivel di autorisashon ainda no a wordu establesí. Toma kontakto ku bo administrator."
+msgid ""
+"Your clearance level is not set. Go to your profile page to see your "
+"clearance or contact the administrator to set a clearance level."
+msgstr ""
+"Bo nivel di autorisashon no ta establésí. Bai na bo página di perfil pa wak "
+"bo autorisashon òf kontakta e administradó pa establésí un nivel di autorisashon."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "To enable {} you need at least a clearance level of L{}. "
@@ -5435,8 +5440,9 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un nivel di autorashon di L%s. "
-"Tuma kontakto ku bo administrator pa haña un nivel di autorisashon mas halto."
+"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un "
+"nivel di autorashon di L%s. Tuma kontakto ku bo administrator pa haña un "
+"nivel di autorisashon mas halto."
 
 #: rocky/views/ooi_list.py
 #, python-format
