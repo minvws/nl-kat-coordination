@@ -6,9 +6,9 @@ from types import SimpleNamespace
 from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
+from scheduler import storage
 from scheduler.config import settings
 from scheduler.connectors import services
-from scheduler.repositories import sqlalchemy, stores
 
 
 class AppContext:
@@ -42,20 +42,20 @@ class AppContext:
 
         # Services
         katalogus_service = services.Katalogus(
-            host=self.config.host_katalogus,
+            host=str(self.config.host_katalogus),
             source=f"scheduler/{scheduler.__version__}",
             cache_ttl=self.config.katalogus_cache_ttl,
         )
 
         bytes_service = services.Bytes(
-            host=self.config.host_bytes,
+            host=str(self.config.host_bytes),
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
             source=f"scheduler/{scheduler.__version__}",
         )
 
         octopoes_service = services.Octopoes(
-            host=self.config.host_octopoes,
+            host=str(self.config.host_octopoes),
             source=f"scheduler/{scheduler.__version__}",
             orgs=katalogus_service.get_organisations(),
             timeout=self.config.octopoes_request_timeout,
@@ -71,13 +71,14 @@ class AppContext:
             }
         )
 
-        # Repositories
-        if not self.config.db_uri.startswith("postgresql"):
-            raise Exception("PostgreSQL is the only supported database backend")
-
-        datastore = sqlalchemy.SQLAlchemy(self.config.db_uri)
-        self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
-        self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
+        # Datastores, SimpleNamespace allows us to use dot notation
+        dbconn = storage.DBConn(str(self.config.db_uri))
+        self.datastores: SimpleNamespace = SimpleNamespace(
+            **{
+                storage.TaskStore.name: storage.TaskStore(dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
+            }
+        )
 
         # Metrics collector registry
         self.metrics_registry: CollectorRegistry = CollectorRegistry()
@@ -89,8 +90,8 @@ class AppContext:
         ).info(
             {
                 "pq_maxsize": str(self.config.pq_maxsize),
-                "pq_populate_grace_period": str(self.config.pq_populate_grace_period),
-                "pq_populate_max_random_objects": str(self.config.pq_populate_max_random_objects),
+                "pq_grace_period": str(self.config.pq_grace_period),
+                "pq_max_random_objects": str(self.config.pq_max_random_objects),
                 "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
                 "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
             }

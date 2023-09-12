@@ -16,4 +16,4 @@ class ServiceHealth(BaseModel):
     externals: Dict[str, bool] = {}
 
 
-ServiceHealth.update_forward_refs()
+ServiceHealth.model_rebuild()

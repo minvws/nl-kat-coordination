@@ -1,5 +1,5 @@
 {% load i18n %}
 {% load static %}
 
-<a href="{% url 'ooi_list' organization_code %}?ooi_type={{ value.ooi_type }}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
- " title="{% blocktranslate trimmed with type=value.ooi_type %} Only show objects of type {{ type }} {% endblocktranslate %}">{{ value.ooi_type }}</a>
+<a href="{% ooi_url 'ooi_list' '' organization_code ooi_type=value.ooi_type query=mandatory_fields %} "
+   title="{% blocktranslate trimmed with type=value.ooi_type %} Only show objects of type {{ type }} {% endblocktranslate %}">{{ value.ooi_type }}</a>
