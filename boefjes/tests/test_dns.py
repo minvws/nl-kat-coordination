@@ -216,12 +216,12 @@ class DnsTest(TestCase):
         ]
 
         meta = NormalizerMeta(
-            id="",
+            id="72c7d302-0d6f-407a-aaec-9ffcad0ee7c6",
             normalizer=Normalizer(id="kat_dns_normalize"),
             raw_data=RawDataMeta(
-                id="",
+                id="3b8397ba-50e4-476e-834a-2fa2595a43a5",
                 boefje_meta=BoefjeMeta(
-                    id="1234",
+                    id="10535bba-2715-42f9-be47-ccd985b59eea",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
                     input_ooi="Hostname|internet|www.example.nl",
@@ -242,12 +242,12 @@ class DnsTest(TestCase):
 
     def test_parse_record_null_mx_record(self):
         meta = NormalizerMeta(
-            id="",
+            id="d7d65462-5ced-4a57-a1d7-c6d2edf38354",
             normalizer=Normalizer(id="kat_dns_normalize"),
             raw_data=RawDataMeta(
-                id="",
+                id="94fe3b47-fb41-4ad7-b2de-1bfe63460c98",
                 boefje_meta=BoefjeMeta(
-                    id="1234",
+                    id="f1e72e47-c11f-47e9-953a-52e3b6833eaf",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
                     input_ooi="Hostname|internet|english.example.nl",
@@ -364,12 +364,12 @@ class DnsTest(TestCase):
         )
 
         meta = NormalizerMeta(
-            id="",
+            id="a2a85d54-a6ce-495d-b7a5-23c1a79f4cec",
             normalizer=Normalizer(id="kat_dns_normalize"),
             raw_data=RawDataMeta(
-                id="",
+                id="ac481bc2-a524-4dcc-91a4-28ed9c2c142b",
                 boefje_meta=BoefjeMeta(
-                    id="1234",
+                    id="0671b9ac-1624-4c09-a94a-4f9edbc40064",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
                     input_ooi="Hostname|internet|www.example.com",
@@ -448,12 +448,12 @@ class DnsTest(TestCase):
         )
 
         meta = NormalizerMeta(
-            id="",
+            id="ee8374bb-e79f-4083-9ce9-add4f96006f2",
             normalizer=Normalizer(id="kat_dns_zone_normalize"),
             raw_data=RawDataMeta(
-                id="",
+                id="2147da2a-921c-4c51-aef3-fa82d8d6e089",
                 boefje_meta=BoefjeMeta(
-                    id="1234",
+                    id="ff1f0d62-a2e0-480f-8b11-5fb24974edce",
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
                     input_ooi="DnsZone|internet|sub.example.nl",

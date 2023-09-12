@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 from typing import Any, Callable, Dict, Iterable, List, NewType, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 from pydantic.datetime_parse import StrBytesIntFloat, parse_datetime
@@ -45,7 +46,7 @@ class MimeType(BaseModel):
 
 
 class Job(BaseModel):
-    id: str
+    id: UUID
     started_at: TimezoneAwareDatetime
     ended_at: TimezoneAwareDatetime
 
@@ -72,7 +73,7 @@ class BoefjeMeta(Job):
 class RawDataMeta(BaseModel):
     """Represents only the metadata of a RawData object, without its raw value. Used as an API response model."""
 
-    id: str
+    id: UUID
     boefje_meta: BoefjeMeta
     mime_types: List[MimeType] = Field(default_factory=list)
 
