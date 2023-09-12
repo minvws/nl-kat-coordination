@@ -158,7 +158,7 @@ class BoefjeScheduler(Scheduler):
             for item in items:
                 self.ctx.datastores.pq_store.remove(
                     scheduler_id=self.scheduler_id,
-                    item_id=item.id.hex,
+                    item_id=item.id,
                 )
 
                 if item.hash is None:

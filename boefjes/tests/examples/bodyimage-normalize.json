@@ -1,9 +1,9 @@
 {
-  "id": "dns-lookup-job",
+  "id": "312b968d-0453-48fd-8e7b-ecfcb757dc7e",
   "raw_data": {
-    "id": "webpage-analysis-job",
+    "id": "e20e3de6-4305-4344-bfcf-a8b9ecc76ccd",
     "boefje_meta": {
-      "id": "dns-lookup-job",
+      "id": "a8d1830b-3e2e-4dab-928e-4493a9710ff1",
       "boefje": {
         "id": "webpage-analysis"
       },
