@@ -1,5 +1,3 @@
-import uuid
-
 from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -53,7 +51,7 @@ class NormalizerTaskJSONView(NormalizerMixin, TaskDetailView):
     def get_output_oois(self, task):
         try:
             return self.octopoes_api_connector.list_origins(
-                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at, task_id=uuid.UUID(task.id)
+                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at, task_id=task.id
             )[0].result
         except IndexError:
             return []
