@@ -14,12 +14,7 @@
         </li>
         {% if not ooi|is_finding and not ooi|is_finding_type %}
             <li {% if view == "scan_profile_detail" %}aria-current="page"{% endif %}>
-                {% if scan_profile %}
-                    <a href="{% url 'scan_profile_detail' scan_profile.id organization.code %}?ooi_id={{ ooi_id }}{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
-                     ">{% translate "Clearance level" %} ({{ scan_profile.get_scan_level }}</a>
-                {% endif %}
-                <a href="{% ooi_url 'scan_profile_detail' ooi.primary_key organization.code %}&{% include "partials/elements/href_querystring_from_list.html" with list=mandatory_fields %}
-                 ">{% translate "Clearance level" %} ({{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }})</a>
+                <a href="{% ooi_url 'scan_profile_detail' ooi.primary_key organization.code query=mandatory_fields %}">{% translate "Clearance level" %} ({{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }})</a>
             </li>
             <li {% if view == "ooi_findings" %}aria-current="page"{% endif %}>
                 <a href="{% ooi_url 'ooi_findings' ooi.primary_key organization.code query=mandatory_fields %}">{% translate "Findings" %}</a>

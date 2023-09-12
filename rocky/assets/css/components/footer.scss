@@ -1,0 +1,28 @@
+/* Footer - Styling */
+
+body > footer {
+	border-top: 1px solid #cccccc;
+
+	ul {
+		flex-direction: row;
+		display: flex;
+		padding: 0;
+		gap: 1.5rem;
+
+		li {
+			list-style: none;
+		}
+	}
+
+	a {
+		&:visited {
+			color: var(--footer-link-visited-text-color);
+			text-decoration: var(--footer-link-visited-text-decoration);
+
+			&:hover {
+				color: var(--footer-link-visited-hover-text-color);
+				text-decoration: var(--footer-link-visited-hovertext-decoration);
+			}
+		}
+	}
+}

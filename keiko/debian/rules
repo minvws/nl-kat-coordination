@@ -24,8 +24,11 @@ override_dh_virtualenv:
 	dh_virtualenv $(DH_VENV_ARGS)
 	$(DH_VENV_DIR)/bin/python -m pip install gunicorn==20.1.0
 
-	# remove pip to prevent mutation of venv
+# remove pip to prevent mutation of venv
 	$(DH_VENV_DIR)/bin/python -m pip uninstall --yes pip
 
 override_dh_gencontrol:
 	dh_gencontrol -- -Vpython=`py3versions -d`
+
+execute_after_dh_install:
+	dh_installsysusers

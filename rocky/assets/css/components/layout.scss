@@ -1,0 +1,8 @@
+/* Layout */
+
+/* Temporary fix until we figure out what to do with nested divs */
+section div {
+	display: flex;
+	flex-direction: column;
+	gap: var(--section-content-block-gap);
+}

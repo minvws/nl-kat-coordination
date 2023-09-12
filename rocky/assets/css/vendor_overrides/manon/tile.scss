@@ -1,0 +1,30 @@
+/* Tiles - Variables */
+%tile-style-overrides {
+  > a {
+    color: var(--link-text-color, initial);
+  }
+
+  > p {
+    font-size: var(--tile-font-size);
+  }
+}
+
+.tile,
+.tiles,
+ul.tiles {
+  @extend %tile-style-overrides;
+
+  > div,
+  > li {
+    @extend %tile-style-overrides;
+  }
+}
+
+.tiles.images-cover {
+  > div,
+  li {
+    img {
+      border-radius: var(--tile-border-radius) var(--tile-border-radius) 0 0;
+    }
+  }
+}
