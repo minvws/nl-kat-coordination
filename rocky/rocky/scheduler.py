@@ -17,6 +17,7 @@ class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
+    name: Optional[str] = Field(default=None)
     version: Optional[str] = Field(default=None)
 
 
