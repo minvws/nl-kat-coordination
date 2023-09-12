@@ -77,6 +77,7 @@ class DjangoSettings(BaseSettings):
     KEIKO_API: str = Field("")
     BYTES_API: str = Field("")
     OCTOPOES_API: str = Field("")
+    KATALOGUS_API: str = Field("")
 
     BYTES_USERNAME: str = Field("")
     BYTES_PASSWORD: str = Field("")
