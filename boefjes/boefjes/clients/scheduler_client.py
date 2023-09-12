@@ -42,7 +42,7 @@ class TaskStatus(Enum):
 
 
 class Task(BaseModel):
-    id: str
+    id: uuid.UUID
     scheduler_id: str
     type: str
     p_item: QueuePrioritizedItem
@@ -58,10 +58,10 @@ class SchedulerClientInterface:
     def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
         raise NotImplementedError()
 
-    def patch_task(self, task_id: str, status: TaskStatus) -> None:
+    def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
         raise NotImplementedError()
 
-    def get_task(self, task_id: str) -> Task:
+    def get_task(self, task_id: uuid.UUID) -> Task:
         raise NotImplementedError()
 
     def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:

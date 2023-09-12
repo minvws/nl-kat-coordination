@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Optional, Type
+from uuid import UUID
 
 from pydantic import BaseModel, Field, root_validator
 
@@ -18,7 +19,7 @@ class BoefjeMetaFilter(BaseModel):
 class NormalizerMetaFilter(BaseModel):
     organization: Optional[str]
     normalizer_id: Optional[str]
-    raw_id: Optional[str]
+    raw_id: Optional[UUID]
     limit: int = 1
     offset: int = 0
     descending: bool = True
@@ -26,7 +27,7 @@ class NormalizerMetaFilter(BaseModel):
 
 class RawDataFilter(BaseModel):
     organization: Optional[str]
-    boefje_meta_id: Optional[str]
+    boefje_meta_id: Optional[UUID]
     normalized: Optional[bool]
     mime_types: List[MimeType] = Field(default_factory=list)
     limit: int = 1
@@ -52,7 +53,7 @@ class MetaDataRepository:
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         raise NotImplementedError()
 
-    def get_boefje_meta_by_id(self, boefje_meta_id: str) -> BoefjeMeta:
+    def get_boefje_meta_by_id(self, boefje_meta_id: UUID) -> BoefjeMeta:
         raise NotImplementedError()
 
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
@@ -61,16 +62,16 @@ class MetaDataRepository:
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
         raise NotImplementedError()
 
-    def get_normalizer_meta_by_id(self, normalizer_meta_id: str) -> NormalizerMeta:
+    def get_normalizer_meta_by_id(self, normalizer_meta_id: UUID) -> NormalizerMeta:
         raise NotImplementedError()
 
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
         raise NotImplementedError()
 
-    def save_raw(self, raw: RawData) -> str:
+    def save_raw(self, raw: RawData) -> UUID:
         raise NotImplementedError()
 
-    def get_raw_by_id(self, raw_id: str) -> RawData:
+    def get_raw_by_id(self, raw_id: UUID) -> RawData:
         raise NotImplementedError()
 
     def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
