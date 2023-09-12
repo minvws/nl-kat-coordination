@@ -83,9 +83,13 @@ class PluginEnableDisableView(SinglePluginView):
                 "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
             ).format(self.organization_member.acknowledged_clearance_level)
 
-            if self.organization_member.trusted_clearance_level < 0:
+            if (
+                self.organization_member.trusted_clearance_level < 0
+                or self.organization_member.acknowledged_clearance_level < 0
+            ):
                 member_clearance_level_text = _(
-                    "Your clearance level has not yet been set. Contact your administrator."
+                    "Your clearance level is not set. Go to your profile page to see your clearance "
+                    "or contact the administrator to set a clearance level."
                 )
 
             messages.add_message(
