@@ -39,7 +39,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["types_display"] = self.get_ooi_types_display()
+        context["active_filters"] = self.show_active_filters()
         context["object_type_filters"] = self.get_ooi_type_filters()
         context["observed_at"] = self.get_observed_at()
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
@@ -56,6 +56,20 @@ class OOIListView(BaseOOIListView, OctopoesView):
         ]
 
         return context
+
+    def show_active_filters(self):
+        active_filters = {_("All objects"): ""}
+        ooi_type = self.request.GET.getlist("ooi_type", [])
+        clearance_level = self.request.GET.getlist("clearance_level", [])
+        clearance_type = self.request.GET.getlist("clearance_type", [])
+        if not ooi_type and not clearance_level and not clearance_type:
+            return active_filters
+        active_filters = {
+            _("OOI types: "): ", ".join(ooi_type),
+            _("Clearance level: "): ", ".join(clearance_level),
+            _("Clearance type: "): ", ".join(clearance_type),
+        }
+        return active_filters
 
     def get(self, request: HttpRequest, status=200, *args, **kwargs) -> HttpResponse:
         """Override the response status in case submitting a form returns an error message"""
