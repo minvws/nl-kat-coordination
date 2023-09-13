@@ -134,6 +134,7 @@ INSTALLED_APPS = [
     "django_password_validators.password_history",
     "rest_framework",
     "tagulous",
+    "compressor",
     # "drf_standardized_errors",
 ]
 
@@ -273,8 +274,18 @@ LANGUAGES = [
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = env.path("STATIC_ROOT", BASE_DIR / "static")
 STATICFILES_DIRS = (BASE_DIR / "assets",)
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
+
+COMPRESS_OFFLINE = True
+
+# FIXME: For testing
+COMPRESS_ENABLED = True
 
 LOGIN_URL = "two_factor:login"
 LOGIN_REDIRECT_URL = "crisis_room"
