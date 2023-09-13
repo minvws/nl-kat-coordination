@@ -12,8 +12,8 @@ from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 def test_save_boefje_meta(meta_repository: SQLMetaDataRepository) -> None:
     boefje_meta = get_boefje_meta()
-    second_boefje_meta = get_boefje_meta(str(uuid.uuid4()), boefje_id=boefje_meta.boefje.id, input_ooi=None)
-    third_boefje_meta = get_boefje_meta(str(uuid.uuid4()), boefje_id="kat-test-2", input_ooi=boefje_meta.input_ooi)
+    second_boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id=boefje_meta.boefje.id, input_ooi=None)
+    third_boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id="kat-test-2", input_ooi=boefje_meta.input_ooi)
 
     second_boefje_meta.started_at = boefje_meta.started_at + timedelta(hours=5)
     third_boefje_meta.started_at = boefje_meta.started_at - timedelta(hours=5)

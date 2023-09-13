@@ -1,6 +1,7 @@
 import typing
 from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Union
+from uuid import UUID
 
 import requests
 from requests.exceptions import HTTPError
@@ -85,7 +86,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def get_boefje_meta_by_id(self, boefje_meta_id: str) -> BoefjeMeta:
+    def get_boefje_meta_by_id(self, boefje_meta_id: UUID) -> BoefjeMeta:
         response = self._session.get(f"/bytes/boefje_meta/{boefje_meta_id}", headers=self.headers)
         self._verify_response(response)
 
@@ -107,7 +108,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def get_normalizer_meta_by_id(self, normalizer_meta_id: str) -> NormalizerMeta:
+    def get_normalizer_meta_by_id(self, normalizer_meta_id: UUID) -> NormalizerMeta:
         response = self._session.get(f"/bytes/normalizer_meta/{normalizer_meta_id}", headers=self.headers)
         self._verify_response(response)
 
@@ -123,7 +124,7 @@ class BytesAPIClient:
         return [NormalizerMeta.parse_obj(normalizer_meta) for normalizer_meta in normalizer_meta_json]
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Optional[List[str]] = None) -> str:
+    def save_raw(self, boefje_meta_id: UUID, raw: bytes, mime_types: Optional[List[str]] = None) -> str:
         if not mime_types:
             mime_types = []
 
@@ -131,7 +132,7 @@ class BytesAPIClient:
         headers.update(self.headers)
 
         response = self._session.post(
-            "/bytes/raw", raw, headers=headers, params={"mime_types": mime_types, "boefje_meta_id": boefje_meta_id}
+            "/bytes/raw", raw, headers=headers, params={"mime_types": mime_types, "boefje_meta_id": str(boefje_meta_id)}
         )
 
         self._verify_response(response)
@@ -140,7 +141,7 @@ class BytesAPIClient:
         return str(raw_id)
 
     @retry_with_login
-    def get_raw(self, raw_id: str) -> bytes:
+    def get_raw(self, raw_id: UUID) -> bytes:
         response = self._session.get(f"/bytes/raw/{raw_id}", headers=self.headers, stream=True)
         self._verify_response(response)
 
