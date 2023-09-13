@@ -4,7 +4,7 @@ table i.icon,
 table span.icon {
   float: left;
 
-  &:before {
+  &::before {
     display: block;
     line-height: 1.25;
   }
