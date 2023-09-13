@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-13 11:46+0000\n"
+"POT-Creation-Date: 2023-09-13 13:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1608,6 +1608,7 @@ msgid "Object list"
 msgstr "Lista di opheto"
 
 #: katalogus/templates/partials/objects_to_scan.html
+#, python-format
 msgid ""
 "This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
@@ -1629,29 +1630,32 @@ msgid ""
 "else again. This means that all other enabled Boefjes will use this higher "
 "clearance level aswel."
 msgstr ""
-"<span>Advertensia nivel di skan:</span> Skan OOI's ku nivel di authorisashon mas abou "
-"lo resulta ku OpenKAT mester subi e nivel di authorisashon pa e OOI, no solamente "
-"pa e skan aki for di awor i adelante, te ora manualmente e wordu pone na algu "
-"otro atrobe. Esaki ta nifika ku tur otro Boefjes aktivo lo huza e nivel di authorisashon aki tambe."
-
+"<span>Advertensia nivel di skan:</span> Skan OOI's ku nivel di authorisashon "
+"mas abou lo resulta ku OpenKAT mester subi e nivel di authorisashon pa e "
+"OOI, no solamente pa e skan aki for di awor i adelante, te ora manualmente e "
+"wordu pone na algu otro atrobe. Esaki ta nifika ku tur otro Boefjes aktivo "
+"lo huza e nivel di authorisashon aki tambe."
 
 #: katalogus/templates/partials/objects_to_scan.html
+#, python-format
 msgid ""
 "You currently don't have any objects that meet the scan level of %(name)s. "
 "Add objects with a complying clearance level, or alter the clearance level "
 "of existing objects."
 msgstr ""
-"Na e momento aki bo no tin ophetonan ku ta kwarda ku e nivel di autorisashon di %(name)s. "
-"Añadi ophetonan ku un nivel di authorisashon adequa, òf kambia e nivel di authorisashon "
-"di ophetonan eksistente."
+"Na e momento aki bo no tin ophetonan ku ta kwarda ku e nivel di autorisashon "
+"di %(name)s. Añadi ophetonan ku un nivel di authorisashon adequa, òf kambia "
+"e nivel di authorisashon di ophetonan eksistente."
 
 #: katalogus/templates/partials/objects_to_scan.html
+#, python-format
 msgid ""
 "You currently don't have scannable objects for %(name)s. Add objects to use "
 "this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
-"Na e momento aki bo no tin ophetonan pa skan pa %(name)s. Añadi ophetonan pa uza "
-"e Boefje. E Boefje aki ta dispuesto di skan ophetonan di e sigiente tiponan:"
+"Na e momento aki bo no tin ophetonan pa skan pa %(name)s. Añadi ophetonan pa "
+"uza e Boefje. E Boefje aki ta dispuesto di skan ophetonan di e sigiente "
+"tiponan:"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "The form could not be initialized."
@@ -4159,6 +4163,7 @@ msgid "Currently there are no findings for OOI"
 msgstr "Aktualmente no a diskubri nada pa OOI"
 
 #: rocky/templates/oois/ooi_list.html
+#, python-format
 msgid ""
 "An overview of objects found for organization <strong>%(organization_name)s</"
 "strong>. Objects can be added manually or by running Boefjes. Click an "

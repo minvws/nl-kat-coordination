@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-13 11:46+0000\n"
+"POT-Creation-Date: 2023-09-13 13:04+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1621,6 +1621,7 @@ msgid "Object list"
 msgstr "Objectenlijst"
 
 #: katalogus/templates/partials/objects_to_scan.html
+#, python-format
 msgid ""
 "This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
@@ -1642,11 +1643,11 @@ msgid ""
 "else again. This means that all other enabled Boefjes will use this higher "
 "clearance level aswel."
 msgstr ""
-"<span>Waarschuwingsscanniveau:</span> Het scannen van OOI's met een lager vrijwaring niveau "
-"leidt ertoe dat OpenKAT het vrijwaring niveau op die OOI verhoogt, niet alleen "
-"voor deze scan maar vanaf nu, totdat het handmatig weer op iets "
-"anders wordt ingesteld. Dit betekent dat alle andere ingeschakelde Boefjes ook dit hogere "
-"vrijwaring niveau zullen gebruiken."
+"<span>Waarschuwingsscanniveau:</span> Het scannen van OOI's met een lager "
+"vrijwaring niveau leidt ertoe dat OpenKAT het vrijwaring niveau op die OOI "
+"verhoogt, niet alleen voor deze scan maar vanaf nu, totdat het handmatig "
+"weer op iets anders wordt ingesteld. Dit betekent dat alle andere "
+"ingeschakelde Boefjes ook dit hogere vrijwaring niveau zullen gebruiken."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
@@ -1660,12 +1661,14 @@ msgstr ""
 "vrijwaring niveau van bestaande objecten."
 
 #: katalogus/templates/partials/objects_to_scan.html
+#, python-format
 msgid ""
 "You currently don't have scannable objects for %(name)s. Add objects to use "
 "this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
 "U heeft momenteel geen scanbare objecten voor %(name)s. Voeg objecten toe om "
-"dit Boefje te gebruiken. Dit boefje kan objecten scannen van de volgende soorten:"
+"dit Boefje te gebruiken. Dit boefje kan objecten scannen van de volgende "
+"soorten:"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "The form could not be initialized."
@@ -4164,14 +4167,16 @@ msgid "Currently there are no findings for OOI"
 msgstr "Er zijn geen bevindingen voor het object"
 
 #: rocky/templates/oois/ooi_list.html
+#, python-format
 msgid ""
 "An overview of objects found for organization <strong>%(organization_name)s</"
 "strong>. Objects can be added manually or by running Boefjes. Click an "
 "object for additional information."
 msgstr ""
-"Een overzicht van gevonden objecten voor organisatie <strong>%(organization_name)s</strong>. "
-"Objecten kunnen handmatig worden toegevoegd of door Boefjes uit te voeren. "
-"Klik op een object voor meer informatie."
+"Een overzicht van gevonden objecten voor organisatie "
+"<strong>%(organization_name)s</strong>. Objecten kunnen handmatig worden "
+"toegevoegd of door Boefjes uit te voeren. Klik op een object voor meer "
+"informatie."
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
