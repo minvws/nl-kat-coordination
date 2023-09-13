@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-07 12:52+0000\n"
+"POT-Creation-Date: 2023-09-13 11:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1567,73 +1567,50 @@ msgid "Object list"
 msgstr "Lista di opheto"
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, python-format
 msgid ""
-"This boefje will only scan objects with a corresponding clearance level of "
+"This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
-"this boefje to scan an OOI with a lower clearance level than "
+"this Boefje to scan an OOI with a lower clearance level than "
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
-"E boefje aki ta skan solamente ophetonan ku un nivél di autorisashon di "
+"E Boefje aki ta skan solamente ophetonan ku un nivél di autorisashon di "
 "<strong>L%(scan_level)s</strong> òf mas haltu. No tin indemnizashon pa e "
-"boefje pa skan un OOI ku un nivél di autorisashon mas abou ku "
+"Boefje pa skan un OOI ku un nivél di autorisashon mas abou ku "
 "<strong>L%(scan_level)s</strong>. Uza e filter pa mustra OOI's ku un nivél "
 "di autorisashon mas abou."
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid ""
-"\n"
-"          <span>Warning scan level:</span>\n"
-"          Scanning OOI's with a lower clearance level will result in OpenKAT "
-"increasing the clearance level on that OOI,\n"
-"          not only for this scan but from now on out, until it manually gets "
-"set to something else again.\n"
-"          This means that all other enabled Boefjes will use this higher "
-"clearance level aswel.\n"
-"        "
+"<span>Warning scan level:</span> Scanning OOI's with a lower clearance level "
+"will result in OpenKAT increasing the clearance level on that OOI, not only "
+"for this scan but from now on out, until it manually gets set to something "
+"else again. This means that all other enabled Boefjes will use this higher "
+"clearance level aswel."
 msgstr ""
-"\n"
-"          <span>Advertensia nivel di skan:</span>\n"
-"          Skèn OOI's ku nivel di authorisashon mas abou lo resulta ku "
-"OpenKAT mester subi e nivel di authorisashon pa e OOI,\n"
-"          no solamente pa e skan aki for di awor i adelante, te ora "
-"manualmente e wordu pone na algu otro atrobe.\n"
-"          Esaki ta nifika ku tur otro Boefjes aktivo lo huza e nivel di "
-"authorisashon  aki tambe.\n"
-"        "
+"<span>Advertensia nivel di skan:</span> Skan OOI's ku nivel di authorisashon mas abou "
+"lo resulta ku OpenKAT mester subi e nivel di authorisashon pa e OOI, no solamente "
+"pa e skan aki for di awor i adelante, te ora manualmente e wordu pone na algu "
+"otro atrobe. Esaki ta nifika ku tur otro Boefjes aktivo lo huza e nivel di authorisashon aki tambe."
+
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, python-format
 msgid ""
-"\n"
-"          You currently don't have any objects that meet the scan level of "
-"%(name)s.\n"
-"          Add objects with a complying clearance level, or alter the "
-"clearance level of existing objects.\n"
-"        "
+"You currently don't have any objects that meet the scan level of %(name)s. "
+"Add objects with a complying clearance level, or alter the clearance level "
+"of existing objects."
 msgstr ""
-"\n"
-"              Na e momento aki bo no tin ophetonan ku ta kwarda ku e nivel "
-"di autorisashon di %(name)s. \n"
-"              Añadi ophetonan ku un nivel di authorisashon adequa, òf kambia "
-"e nivel di authorisashon di ophetonan eksistente.\n"
-"            "
+"Na e momento aki bo no tin ophetonan ku ta kwarda ku e nivel di autorisashon di %(name)s. "
+"Añadi ophetonan ku un nivel di authorisashon adequa, òf kambia e nivel di authorisashon "
+"di ophetonan eksistente."
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, python-format
 msgid ""
-"\n"
-"          You currently don't have scannable objects for %(name)s.\n"
-"          Add objects to use this boefje. This boefje is able to scan "
-"objects of the following types:\n"
-"        "
+"You currently don't have scannable objects for %(name)s. Add objects to use "
+"this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
-"\n"
-"              Na e momento aki bo no tin ophetonan pa skan pa %(name)s. \n"
-"              Añadi ophetonan pa uza e boefje. E boefje aki ta dispuesto di "
-"skan ophetonan di e sigiente tiponan:\n"
-"            "
+"Na e momento aki bo no tin ophetonan pa skan pa %(name)s. Añadi ophetonan pa uza "
+"e Boefje. E Boefje aki ta dispuesto di skan ophetonan di e sigiente tiponan:"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "The form could not be initialized."
@@ -1854,7 +1831,8 @@ msgid ""
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "No por a aumenta e nivel di autorisashon di %s pa L%s. B'a haya un nivel di "
-"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un autorisashon mas haltu."
+"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un "
+"autorisashon mas haltu."
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -3163,12 +3141,12 @@ msgid "Clearance Level"
 msgstr "Nivél di Autorisashon"
 
 #: tools/forms/ooi.py
-msgid "Show objects that don't meet the Boefjes scan level"
-msgstr "Mustra ophetonan ku no tin nivel di skan pa Boefjes"
+msgid "Show objects that don't meet the Boefjes scan level."
+msgstr "Mustra ophetonan ku no tin nivel di skan pa Boefjes."
 
 #: tools/forms/ooi.py
-msgid "Show Boefjes that exceed the objects clearance level"
-msgstr "Mustra Boefjes ku ku a surpasa OOI's su nivel di autorisashon"
+msgid "Show Boefjes that exceed the objects clearance level."
+msgstr "Mustra Boefjes ku ku a surpasa OOI's su nivel di autorisashon."
 
 #: tools/forms/ooi_form.py
 msgid "option"
@@ -3568,7 +3546,7 @@ msgid "Indemnifications"
 msgstr "Indemnizashon"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/findings/finding_list.html rocky/templates/header.html
+#: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/oois/ooi_page_tabs.html
@@ -3632,14 +3610,19 @@ msgid "Finding"
 msgstr "Diskubrimentu"
 
 #: rocky/templates/findings/finding_list.html
+msgid "Findings @ "
+msgstr "Diskubrimentu @ "
+
+#: rocky/templates/findings/finding_list.html
 #, python-format
 msgid ""
-"An overview of all findings OpenKAT found on %(date)s. Each finding relates "
-"to an object. Click a finding for additional information."
+"An overview of all findings OpenKAT found for organization "
+"<strong>%(organization_name)s</strong>. Each finding relates to an object. "
+"Click a finding for additional information."
 msgstr ""
-"Un relato general di tur diskubrimentu OpenKAT á enkontrá riba %(date)s. "
-"Kada diskubrimentu ta relatá na un opheto. Klék un diskubrimentu pa "
-"informashon adishonál."
+"Un resumen di tur diskubrimentunan ku OpenKAT a hanja pa e organisashon "
+"<strong>%(organization_name)s</strong>. Kada diskubrimentu ta relacioná ku "
+"un opheto. Klik riba un diskubrimentu pa mas informashon."
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -4128,11 +4111,13 @@ msgstr "Aktualmente no a diskubri nada pa OOI"
 
 #: rocky/templates/oois/ooi_list.html
 msgid ""
-"An overview of your object list. Objects can be added manually or by running "
-"boefjes. </br> Click an object for additional information."
+"An overview of objects found for organization <strong>%(organization_name)s</"
+"strong>. Objects can be added manually or by running Boefjes. Click an "
+"object for additional information."
 msgstr ""
-"Un bista general di bo lista di ophetonan. Ophetonan por wòrdu añadí "
-"manualmente òf dor di ehekutá boefjes. </br> Klik riba un opheto pa mas "
+"Un resumen di ophetonan ku a wòrdu hanja pa e organisashon "
+"<strong>%(organization_name)s</strong>. Ophetonan por wòrdu agrega "
+"manualmente òf dor di eksekutá Boefjes. Klik riba un opheto pa mas "
 "informashon."
 
 #: rocky/templates/oois/ooi_list.html
@@ -4581,8 +4566,8 @@ msgid "Reproduction"
 msgstr "Reprodusí"
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html
-msgid "Please enable plugin to start scanning"
-msgstr "Por fabor sende plugin prome ku kuminsa start ku skan"
+msgid "Please enable plugin to start scanning."
+msgstr "Por fabor sende plugin prome ku kuminsa start ku skan."
 
 #: rocky/templates/partials/form/field_input.html
 #: rocky/templates/partials/form/field_input_checkbox.html
@@ -5427,8 +5412,9 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un nivel di autorashon di L%s. "
-"Tuma kontakto ku bo administrator pa haña un nivel di autorisashon mas halto."
+"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un "
+"nivel di autorashon di L%s. Tuma kontakto ku bo administrator pa haña un "
+"nivel di autorisashon mas halto."
 
 #: rocky/views/ooi_list.py
 #, python-format
