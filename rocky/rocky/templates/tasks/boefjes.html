@@ -35,19 +35,29 @@
                                 {% for task in object_list %}
                                     <tr id="{{ task.id }}">
                                         <td>
-                                            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.id }}</a>
+                                            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.boefje.id %}">
+                                                {% if not task.p_item.data.boefje.name %}
+                                                    {{ task.p_item.data.boefje.id }}
+                                                {% else %}
+                                                    {{ task.p_item.data.boefje.name }}
+                                                {% endif %}
+                                            </a>
                                         </td>
-                                        {% if task.status.value == "completed" %}
-                                            <td class="confirmation">
-                                                <span class="icon ti-check"></span>{{ task.status.value|capfirst }}
-                                            </td>
-                                        {% elif task.status.value == "failed" %}
-                                            <td class="warning">
-                                                <span class="icon ti-circle-x"></span>{{ task.status.value|capfirst }}
-                                            </td>
-                                        {% else %}
-                                            <td>{{ task.status.value|capfirst }}</td>
-                                        {% endif %}
+                                        <td class="nowrap">
+                                            {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                                <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                                <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% elif task.status.value == "cancelled" %}
+                                                <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% elif task.status.value == "failed" %}
+                                                <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% elif task.status.value == "completed" %}
+                                                <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% else %}
+                                                <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% endif %}
+                                        </td>
                                         <td>{{ task.created_at }}</td>
                                         {% if task.p_item.data.input_ooi %}
                                             <td>
