@@ -42,7 +42,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
         self.pq.push(p_item=item)
 
-        item_db = self.pq_store.get(self.pq.pq_id, item.id.hex)
+        item_db = self.pq_store.get(self.pq.pq_id, item.id)
         self.assertIsNotNone(item_db)
         self.assertEqual(item.id, item_db.id)
 
@@ -61,7 +61,7 @@ class PriorityQueueTestCase(unittest.TestCase):
             self.pq.push(p_item=item)
 
         self.assertEqual(0, self.pq.qsize())
-        item_db = self.pq_store.get(self.pq.pq_id, item.id.hex)
+        item_db = self.pq_store.get(self.pq.pq_id, item.id)
         self.assertIsNone(item_db)
 
     def test_push_incorrect_p_item_type(self):

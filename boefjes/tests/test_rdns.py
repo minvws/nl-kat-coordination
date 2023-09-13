@@ -6,12 +6,12 @@ from octopoes.models.ooi.dns.zone import Hostname
 from tests.stubs import get_dummy_data
 
 rdns_meta = NormalizerMeta(
-    id="",
+    id="3fad4212-3647-4a28-b82a-fcd397762ccf",
     normalizer=Normalizer(id="kat_dns_zone_normalize"),
     raw_data=RawDataMeta(
-        id="",
+        id="7e014b7d-01f4-439c-9ab3-b39cb148ef23",
         boefje_meta=BoefjeMeta(
-            id="1234",
+            id="2a527933-4b43-4585-9d5e-55dc365ad08b",
             boefje=Boefje(id="rdns"),
             organization="_dev",
             input_ooi="IPAddressV4|internet|192.0.2.1",

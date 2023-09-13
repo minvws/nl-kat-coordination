@@ -32,8 +32,10 @@
                     {% endblocktranslate %}
                 </p>
                 <div id="id_boefjes" class="column-4 plugins tiles images-cover">
-                    {% include "partials/boefje_tile_static.html" %}
+                    {% for boefje in boefjes %}
+                        {% include "partials/plugin_tile.html" with plugin=boefje show_meta="no" %}
 
+                    {% endfor %}
                 </div>
                 <div class="column-4">
                     <div role="group">

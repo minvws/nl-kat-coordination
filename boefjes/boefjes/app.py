@@ -124,7 +124,7 @@ class SchedulerWorkerManager(WorkerManager):
                 logger.info("Patching scheduler task[id=%s] to %s", p_item.data.id, TaskStatus.FAILED.value)
 
                 try:
-                    self.scheduler_client.patch_task(str(p_item.id), TaskStatus.FAILED)
+                    self.scheduler_client.patch_task(p_item.id, TaskStatus.FAILED)
                     logger.info(
                         "Set task status to %s in the scheduler for task[id=%s]", TaskStatus.FAILED, p_item.data.id
                     )
@@ -171,7 +171,7 @@ class SchedulerWorkerManager(WorkerManager):
 
             if task.status is TaskStatus.DISPATCHED:
                 try:
-                    self.scheduler_client.patch_task(str(task.id), TaskStatus.FAILED)
+                    self.scheduler_client.patch_task(task.id, TaskStatus.FAILED)
                     logger.warning("Set status to failed in the scheduler for task[id=%s]", handling_task_id)
                 except HTTPError:
                     logger.exception("Could not patch scheduler task to failed")
@@ -245,7 +245,7 @@ def _start_working(
             raise
         finally:
             try:
-                scheduler_client.patch_task(str(p_item.id), status)  # Note: implicitly, we have p_item.id == task_id
+                scheduler_client.patch_task(p_item.id, status)  # Note: implicitly, we have p_item.id == task_id
                 logger.info("Set status to %s in the scheduler for task[id=%s]", status, p_item.data.id)
             except HTTPError:
                 logger.exception("Could not patch scheduler task to %s", status.value)
