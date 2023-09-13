@@ -18,6 +18,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     input_ = boefje_meta.arguments["input"]
 
     for path, details in results.items():
+        if details["content"] is None:
+            continue
         url_original = URL(
             raw=f'{input_["ip_service"]["service"]["name"]}://{input_["hostname"]["name"]}/{path}',
             network=Network(name=input_["hostname"]["network"]["name"]).reference,

@@ -28,9 +28,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
             session.mount(uri, ForcedIPHTTPSAdapter(dest_ip=ip))
         else:
             addr = ipaddress.ip_address(ip)
-            if addr.version == 6:
-                # IPv6 addresses need to be wrapped in brackets
-                netloc = f"[{ip}]"
+            netloc = f"[{ip}]" if addr.version == 6 else ip
 
             uri = f"{scheme}://{netloc}/{path}"
 
@@ -38,10 +36,10 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
         # if the response is 200, return the content
         if response.status_code == 200:
-            results[path] = {"content": response.content.decode(), "url": response.url, "ip": ip}
+            results[path] = {"content": response.content.decode(), "url": response.url, "ip": ip, "status": 200}
         # if the response is 301, we need to follow the location header to the correct security txt,
         # we can not force the ip anymore
-        elif response.status_code == 301:
+        elif response.status_code in [302, 307, 308]:
             uri = response.headers["Location"]
             response = requests.get(uri, stream=True)
             ip = response.raw._connection.sock.getpeername()[0]
@@ -49,7 +47,10 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
                 "content": response.content.decode(),
                 "url": response.url,
                 "ip": str(ip),
+                "status": response.status_code,
             }
+        else:
+            results[path] = {"content": None, "url": None, "ip": None, "status": response.status_code}
     return [(set(), json.dumps(results))]
 
 
