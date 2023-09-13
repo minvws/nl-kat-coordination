@@ -284,9 +284,6 @@ STATICFILES_FINDERS = [
 
 COMPRESS_OFFLINE = True
 
-# FIXME: For testing
-COMPRESS_ENABLED = True
-
 LOGIN_URL = "two_factor:login"
 LOGIN_REDIRECT_URL = "crisis_room"
 
