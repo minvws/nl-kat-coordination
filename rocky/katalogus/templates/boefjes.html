@@ -9,24 +9,19 @@
     <main id="main-content" tabindex="-1" class="katalogus">
         <section>
             {% include "partials/katalogus_header.html" %}
-            {% include "partials/plugins_navigation.html" with active="all" %}
+            {% include "partials/plugins_navigation.html" with active="boefjes" %}
 
             <div class="fifty-fifty">
                 <div>
-                    <h2>{% translate "All plugins" %}</h2>
+                    <h2>Boefjes</h2>
                     <p>
                         {% blocktranslate trimmed %}
-                            Plugins gather data, objects and insight. Each plugin has its own focus area
-                            and strengths and may be able to work with other plugins to gain even more insights.
+                            Boefjes gather factual information, such as by calling an
+                            external scanning tool like nmap or using a database like shodan.
                         {% endblocktranslate %}
                     </p>
                     <p class="emphasized">
-                        <strong>{{ object_list|length }}</strong>
-                        {% blocktranslate count counter=object_list|length %}
-                            Plugin available
-                        {% plural %}
-                            Plugins available
-                        {% endblocktranslate %}
+                        <strong>{{ object_list|length }}</strong> Boefje{{ object_list|pluralize:"s" }} {% translate "available" %}
                     </p>
                 </div>
             </div>
