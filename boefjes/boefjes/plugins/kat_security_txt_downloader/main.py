@@ -39,7 +39,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
             results[path] = {"content": response.content.decode(), "url": response.url, "ip": ip, "status": 200}
         # if the response is 301, we need to follow the location header to the correct security txt,
         # we can not force the ip anymore
-        elif response.status_code in [302, 307, 308]:
+        elif response.status_code in [301, 302, 307, 308]:
             uri = response.headers["Location"]
             response = requests.get(uri, stream=True)
             ip = response.raw._connection.sock.getpeername()[0]
