@@ -13,6 +13,11 @@ from tests.mocks import scheduler as mock_scheduler
 from tests.utils import functions
 
 
+def compile_query_postgres(query):
+    from sqlalchemy.dialects import postgresql
+    return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
+
+
 class FilterTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
@@ -102,14 +107,21 @@ class FilterTestCase(unittest.TestCase):
             query = filters.apply_filter(models.TaskDB, query, f_req)
             print(query.all())
 
-        values = p_item.data.get("id")
+        value_id = p_item.data.get("id")
+        value_name = p_item.data.get("name")
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
                     column="p_item",
                     field="data__id",
                     operator="==",
-                    value=values,
+                    value=value_id,
+                ),
+                filters.Filter(
+                    column="p_item",
+                    field="data__name",
+                    operator="==",
+                    value=value_name,
                 )
             ],
         )
@@ -117,5 +129,6 @@ class FilterTestCase(unittest.TestCase):
         with self.dbconn.session.begin() as session:
             query = session.query(models.TaskDB)
             query = filters.apply_filter(models.TaskDB, query, f_req)
-            print(query.all())
+            compiled_query = compile_query_postgres(query)
+            print(compiled_query)
             breakpoint()
