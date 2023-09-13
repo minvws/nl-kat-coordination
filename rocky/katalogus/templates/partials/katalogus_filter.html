@@ -2,16 +2,13 @@
 
 {% load i18n %}
 
-{% block title %}
-    {{ total_plugins }} {% translate "Available plugins" %}
-{% endblock title %}
 {% block filter_form %}
     <form novalidate method="get" class="help">
-        {% csrf_token %}
         {% include "partials/form/fieldset.html" with fields=form %}
 
-        <fieldset>
-            <button type="submit">{% translate "Update List" %}</button>
-        </fieldset>
+        <div class="button-container">
+            <button type="submit">{% translate "Filter plugins" %}</button>
+            <a href="{{ request.path }}" class="button ghost">{% translate "Clear filter" %}</a>
+        </div>
     </form>
 {% endblock filter_form %}

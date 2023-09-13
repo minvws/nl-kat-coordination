@@ -27,7 +27,7 @@ class PluginEnableDisableView(SinglePluginView):
             messages.add_message(
                 self.request,
                 messages.WARNING,
-                _("Boefje '{boefje_name}' disabled.").format(boefje_name=self.plugin.name),
+                _("{} '{}' disabled.").format(self.plugin.type.title(), self.plugin.name),
             )
             return HttpResponseRedirect(request.POST.get("current_url"))
 
@@ -37,9 +37,7 @@ class PluginEnableDisableView(SinglePluginView):
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _("Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?").format(
-                    boefje_name=self.plugin.name
-                ),
+                _("Failed fetching settings for {}. Is the Katalogus up?").format(self.plugin.name),
             )
             return redirect(
                 reverse(
@@ -56,9 +54,7 @@ class PluginEnableDisableView(SinglePluginView):
             messages.add_message(
                 self.request,
                 messages.INFO,
-                _("Before enabling, please set the required settings for boefje '{boefje_name}'.").format(
-                    boefje_name=self.plugin.name
-                ),
+                _("Before enabling, please set the required settings for '{}'.").format(self.plugin.name),
             )
             return redirect(
                 reverse(
@@ -73,7 +69,9 @@ class PluginEnableDisableView(SinglePluginView):
 
         self.katalogus_client.enable_boefje(self.plugin)
         messages.add_message(
-            self.request, messages.SUCCESS, _("Boefje '{boefje_name}' enabled.").format(boefje_name=self.plugin.name)
+            self.request,
+            messages.SUCCESS,
+            _("{} '{}' enabled.").format(self.plugin.type.title(), self.plugin.name),
         )
 
         return HttpResponseRedirect(request.POST.get("current_url"))
