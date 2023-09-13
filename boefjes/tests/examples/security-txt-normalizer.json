@@ -9,19 +9,19 @@
         "version": null
       },
       "organization": "_dev",
-      "input_ooi": "Website|internet|8.8.8.8|tcp|443|https|internet|example.nl",
+      "input_ooi": "Website|internet|192.0.2.0|tcp|443|https|internet|example.com",
       "arguments": {
         "input": {
           "object_type": "Website",
-          "scan_profile": "scan_profile_type='declared' reference=Reference('Website|internet|8.8.8.8|tcp|443|https|internet|example.nl') level=<ScanLevel.L2: 2>",
-          "primary_key": "Website|internet|8.8.8.8|tcp|443|https|internet|example.nl",
+          "scan_profile": "scan_profile_type='declared' reference=Reference('Website|internet|192.0.2.0|tcp|443|https|internet|example.com') level=<ScanLevel.L2: 2>",
+          "primary_key": "Website|internet|192.0.2.0|tcp|443|https|internet|example.com",
           "ip_service": {
             "ip_port": {
               "address": {
                 "network": {
                   "name": "internet"
                 },
-                "address": "8.8.8.8"
+                "address": "192.0.2.0"
               },
               "protocol": "tcp",
               "port": "443"
@@ -34,7 +34,7 @@
             "network": {
               "name": "internet"
             },
-            "name": "example.nl"
+            "name": "example.com"
           },
           "certificate": "None"
         }

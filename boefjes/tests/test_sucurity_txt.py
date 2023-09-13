@@ -2,6 +2,11 @@ from unittest import TestCase
 
 from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_security_txt_downloader.normalize import run
+from octopoes.models import Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPPort, Network
+from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from tests.stubs import get_dummy_data
 
 
@@ -18,24 +23,22 @@ class SecurityTXTTest(TestCase):
             )
         )
 
-        expected = (
-            "[URL(object_type='URL', scan_profile=None, "
-            "primary_key='URL|internet|https://example.nl/.well-known/security.txt', "
-            "network=Reference('Network|internet'), raw=AnyUrl('https://example.nl/.well-known/security.txt', "
-            "scheme='https', host='example.nl', tld='nl', host_type='domain', "
-            "path='/.well-known/security.txt'), web_url=None), URL(object_type='URL', "
-            "scan_profile=None, primary_key='URL|internet|https://example.nl/.well-known/security.txt', "
-            "network=Reference('Network|internet'), raw=AnyUrl('https://example.nl/.well-known/security.txt', "
-            "scheme='https', host='example.nl', tld='nl', host_type='domain', "
-            "path='/.well-known/security.txt'), web_url=None), SecurityTXT(object_type='SecurityTXT', "
-            "scan_profile=None, primary_key='SecurityTXT|internet|8.8.8.8|tcp|443|https|internet|example.nl|"
-            "internet|https://example.nl/.well-known/security.txt', website=Reference('Website|"
-            "internet|8.8.8.8|tcp|443|https|internet|example.nl'), "
-            "url=Reference('URL|internet|https://example.nl/.well-known/security.txt'), "
-            "redirects_to=None, security_txt='This is the content')]"
+        expected = []
+        expected.append(
+            URL(raw="https://example.com/.well-known/security.txt", network=Network(name="internet").reference)
+        )
+        url = URL(raw="https://example.com/.well-known/security.txt", network=Network(name="internet").reference)
+        expected.append(url)
+        expected.append(
+            SecurityTXT(
+                website=Reference.from_str("Website|internet|192.0.2.0|tcp|443|https|internet|example.com"),
+                url=url.reference,
+                security_txt="This is the content",
+                redirects_to=None,
+            )
         )
 
-        self.assertEqual(expected, str(oois))
+        self.assertEqual(expected, oois)
 
     def test_security_txt_different_website(self):
         meta = NormalizerMeta.parse_raw(get_dummy_data("security-txt-normalizer.json"))
@@ -47,44 +50,36 @@ class SecurityTXTTest(TestCase):
             )
         )
 
-        expected = (
-            "[URL(object_type='URL', scan_profile=None, "
-            "primary_key='URL|internet|https://example.nl/.well-known/security.txt', "
-            "network=Reference('Network|internet'), raw=AnyUrl('https://example.nl/.well-known/security.txt', "
-            "scheme='https', host='example.nl', tld='nl', host_type='domain', "
-            "path='/.well-known/security.txt'), web_url=None), URL(object_type='URL', scan_profile=None, "
-            "primary_key='URL|internet|https://www.example.nl/.well-known/security.txt', "
-            "network=Reference('Network|internet'), "
-            "raw=AnyUrl('https://www.example.nl/.well-known/security.txt', "
-            "scheme='https', host='www.example.nl', tld='nl', host_type='domain', "
-            "path='/.well-known/security.txt'), web_url=None), Hostname(object_type='Hostname', "
-            "scan_profile=None, primary_key='Hostname|internet|www.example.nl', "
-            "network=Reference('Network|internet'), name='www.example.nl', dns_zone=None, "
-            "registered_domain=None), IPAddressV4(object_type='IPAddressV4', scan_profile=None, "
-            "primary_key='IPAddressV4|internet|1.8.8.8', address=IPv4Address('1.8.8.8'), "
-            "network=Reference('Network|internet'), netblock=None), Service(object_type='Service', "
-            "scan_profile=None, primary_key='Service|https', name='https'), IPPort(object_type='IPPort', "
-            "scan_profile=None, primary_key='IPPort|internet|1.8.8.8|tcp|443', "
-            "address=Reference('IPAddressV4|internet|1.8.8.8'), protocol=<Protocol.TCP: 'tcp'>, port=443, "
-            "state=None), IPService(object_type='IPService', scan_profile=None, "
-            "primary_key='IPService|internet|1.8.8.8|tcp|443|https', "
-            "ip_port=Reference('IPPort|internet|1.8.8.8|tcp|443'), service=Reference('Service|https')), "
-            "Website(object_type='Website', scan_profile=None, "
-            "primary_key='Website|internet|1.8.8.8|tcp|443|https|internet|www.example.nl', "
-            "ip_service=Reference('IPService|internet|1.8.8.8|tcp|443|https'), "
-            "hostname=Reference('Hostname|internet|www.example.nl'), certificate=None), "
-            "SecurityTXT(object_type='SecurityTXT', scan_profile=None, "
-            "primary_key='SecurityTXT|internet|1.8.8.8|tcp|443|https|internet|www.example.nl|internet|"
-            "https://www.example.nl/.well-known/security.txt', "
-            "website=Reference('Website|internet|1.8.8.8|tcp|443|https|internet|www.example.nl'), "
-            "url=Reference('URL|internet|https://www.example.nl/.well-known/security.txt'), "
-            "redirects_to=None, security_txt='This is the content'), SecurityTXT(object_type='SecurityTXT', "
-            "scan_profile=None, primary_key='SecurityTXT|internet|8.8.8.8|tcp|443|https|internet|example.nl|"
-            "internet|https://example.nl/.well-known/security.txt', "
-            "website=Reference('Website|internet|8.8.8.8|tcp|443|https|internet|example.nl'), "
-            "url=Reference('URL|internet|https://example.nl/.well-known/security.txt'), "
-            "redirects_to=Reference('SecurityTXT|internet|1.8.8.8|tcp|443|https|internet|www.example.nl|"
-            "internet|https://www.example.nl/.well-known/security.txt'), security_txt=None)]"
+        expected = []
+        url_original = URL(
+            raw="https://example.com/.well-known/security.txt", network=Network(name="internet").reference
         )
-
-        self.assertEqual(expected, str(oois))
+        expected.append(url_original)
+        url = URL(raw="https://www.example.com/.well-known/security.txt", network=Network(name="internet").reference)
+        expected.append(url)
+        expected.append(Hostname(name="www.example.com", network=Network(name="internet").reference))
+        ip = IPAddressV4(address="192.0.2.1", network=Network(name="internet").reference)
+        expected.append(ip)
+        expected.append(Service(name="https"))
+        port = IPPort(address=ip.reference, port=443, protocol="tcp")
+        expected.append(port)
+        ip_service = IPService(ip_port=port.reference, service=Service(name="https").reference)
+        expected.append(ip_service)
+        website = Website(
+            ip_service=ip_service.reference,
+            hostname=Hostname(name="www.example.com", network=Network(name="internet").reference).reference,
+        )
+        expected.append(website)
+        security_txt = SecurityTXT(
+            website=website.reference, url=url.reference, security_txt="This is the content", redirects_to=None
+        )
+        expected.append(security_txt)
+        expected.append(
+            SecurityTXT(
+                website=Reference.from_str("Website|internet|192.0.2.0|tcp|443|https|internet|example.com"),
+                url=url_original.reference,
+                security_txt=None,
+                redirects_to=security_txt.reference,
+            )
+        )
+        self.assertEqual(expected, oois)
