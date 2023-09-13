@@ -4004,6 +4004,10 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+#: rocky/templates/organizations/organization_member_list.html
+msgid "New"
+msgstr ""
+
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
 msgstr ""

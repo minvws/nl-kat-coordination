@@ -4446,6 +4446,12 @@ msgstr "Super gebruiker"
 msgid "Active"
 msgstr "Actief"
 
+#: rocky/templates/organizations/organization_member_list.html
+#, fuzzy
+#| msgid "new"
+msgid "New"
+msgstr "Nieuw"
+
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
 msgstr "Upload een csv-bestand met leden voor organisatie"

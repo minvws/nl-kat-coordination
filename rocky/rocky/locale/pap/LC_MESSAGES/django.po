@@ -4437,6 +4437,12 @@ msgstr "Super usario"
 msgid "Active"
 msgstr "Aktivá"
 
+#: rocky/templates/organizations/organization_member_list.html
+#, fuzzy
+#| msgid "new"
+msgid "New"
+msgstr "Nobo"
+
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
 msgstr "Subi un archivo csv ku miembronan pa e organisashon"
