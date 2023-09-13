@@ -9,24 +9,18 @@
     <main id="main-content" tabindex="-1" class="katalogus">
         <section>
             {% include "partials/katalogus_header.html" %}
-            {% include "partials/plugins_navigation.html" with active="all" %}
+            {% include "partials/plugins_navigation.html" with active="normalizers" %}
 
             <div class="fifty-fifty">
                 <div>
-                    <h2>{% translate "All plugins" %}</h2>
+                    <h2>Normalizers</h2>
                     <p>
                         {% blocktranslate trimmed %}
-                            Plugins gather data, objects and insight. Each plugin has its own focus area
-                            and strengths and may be able to work with other plugins to gain even more insights.
+                            Normalizers analyze the information and turn it into objects for the data model in Octopoes.
                         {% endblocktranslate %}
                     </p>
                     <p class="emphasized">
-                        <strong>{{ object_list|length }}</strong>
-                        {% blocktranslate count counter=object_list|length %}
-                            Plugin available
-                        {% plural %}
-                            Plugins available
-                        {% endblocktranslate %}
+                        <strong>{{ object_list|length }}</strong> Normalizer{{ object_list|pluralize:"s" }} {% translate "available" %}
                     </p>
                 </div>
             </div>

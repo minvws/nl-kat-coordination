@@ -483,6 +483,14 @@ def get_boefjes_data() -> Dict:
     return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
+def get_normalizers_data() -> Dict:
+    return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
+
+
+def get_plugins_data() -> Dict:
+    return get_boefjes_data() + get_normalizers_data()
+
+
 @pytest.fixture()
 def mock_mixins_katalogus(mocker):
     return mocker.patch("katalogus.views.mixins.get_katalogus")

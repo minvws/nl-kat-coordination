@@ -1,7 +1,7 @@
 from django.urls import path
 
 from katalogus.views.change_clearance_level import ChangeClearanceLevel
-from katalogus.views.katalogus import KATalogusView
+from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_detail import PluginCoverImgView, PluginDetailView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
@@ -25,6 +25,21 @@ urlpatterns = [
         "settings/migrate/confirmation/<to_organization>/",
         ConfirmCloneSettingsView.as_view(),
         name="confirm_clone_settings",
+    ),
+    path(
+        "plugins/boefjes/",
+        BoefjeListView.as_view(),
+        name="boefjes_list",
+    ),
+    path(
+        "plugins/normalizers/",
+        NormalizerListView.as_view(),
+        name="normalizers_list",
+    ),
+    path(
+        "plugins/about-plugins/",
+        AboutPluginsView.as_view(),
+        name="about_plugins",
     ),
     path(
         "plugins/<plugin_type>/<plugin_id>/",
