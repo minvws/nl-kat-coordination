@@ -56,6 +56,23 @@ def latex_escape(text: Any) -> str:
     return text.translate(LATEX_SPECIAL_CHARS)
 
 
+def to_text(text: Any) -> str:
+    if not isinstance(text, str):
+        text = str(text)
+
+    return text.replace("_", " ").capitalize()
+
+
+def format_object(obj: Any) -> str:
+    if isinstance(obj, str):
+        return obj.replace("_", " ").capitalize()
+
+    if isinstance(obj, list):
+        return ", ".join([format_object(item) for item in obj])
+
+    return obj
+
+
 def baretext(text: str) -> str:
     """Remove non-alphanumeric characters from a string."""
     return "".join(filter(str.isalnum, text)).lower()
@@ -95,6 +112,8 @@ def generate_report(
         variable_end_string="}@@",
     )
     env.filters["latex_escape"] = latex_escape
+    env.filters["to_text"] = to_text
+    env.filters["format_object"] = format_object
     template = env.get_template(f"{template_name}/template.tex")
 
     if not template.filename:

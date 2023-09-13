@@ -121,10 +121,17 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
 
     def get(self, request, *args, **kwargs):
         severities = self.get_severities()
+        muted_findings = request.GET.get("muted_findings", "non-muted")
+
+        exclude_muted = muted_findings == "non-muted"
+        only_muted = muted_findings == "muted"
+
         findings = FindingList(
             self.octopoes_api_connector,
             self.get_observed_at(),
             severities,
+            exclude_muted=exclude_muted,
+            only_muted=only_muted,
         )
 
         reports_service = ReportsService(keiko_client)
@@ -139,6 +146,8 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
                     self.get_observed_at().date(),
                     severities,
                     origin=f"{request.scheme}://{request.get_host()}",
+                    exclude_muted=exclude_muted,
+                    only_muted=only_muted,
                 ),
             )
         except GeneratingReportFailed:

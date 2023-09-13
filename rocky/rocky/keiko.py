@@ -96,17 +96,23 @@ class FindingReportQuery(ReportQuery):
         severities: Iterable[RiskLevelSeverity],
         language: str = "nl",
         origin: str = "",
+        exclude_muted: bool = False,
+        only_muted: bool = False,
     ):
         self.organization = organization
         self.observed_at = observed_at
         self.severities = severities
         self.language = language
         self.origin = origin
+        self.exclude_muted = exclude_muted
+        self.only_muted = only_muted
 
     def to_dict(self) -> Dict:
         return {
             "observed_at": str(self.observed_at),
             "severities": [severity.value for severity in self.severities],
+            "exclude_muted": self.exclude_muted,
+            "only_muted": self.only_muted,
         }
 
     def to_url(self) -> str:

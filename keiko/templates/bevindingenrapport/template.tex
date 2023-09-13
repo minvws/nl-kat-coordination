@@ -120,7 +120,7 @@ De volgende filters zijn van toepassing op deze bevindingen:
 
 \begin{longtable}{ p{.25\textwidth}  p{.75\textwidth} }
         {% for name, filter in filters.items() %}
-            @@{ name|latex_escape }@@ & @@{ filter|latex_escape }@@ \\
+            @@{ name | to_text | latex_escape }@@ & @@{ filter |  format_object | latex_escape }@@ \\
         {% endfor %}
 \end{longtable}
 
