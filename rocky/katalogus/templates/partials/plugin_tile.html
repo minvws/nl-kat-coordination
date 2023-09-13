@@ -4,20 +4,26 @@
 <div role="group" id="plugin_{{ plugin.id|slugify }}">
     <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
          alt="boefje placeholder image" />
-    <div class="horizontal-view scan-intensity">
-        <span class="de-emphasized">{% translate "Scan level:" %}</span>
-        <ul class="level-indicator l{{ plugin.scan_level }}">
-            {% for i in "1234"|make_list %}<li></li>{% endfor %}
-        </ul>
-    </div>
-    <p>
-        <strong>{{ plugin.name }}</strong>
+    <p class="plugin-title">
+        <strong>{{ plugin.name }}</strong><span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
     </p>
-    <p>{{ plugin.description }}</p>
-    <span class="de-emphasized">{% translate "Publisher:" %} OpenKAT</span>
-    <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "See details" %}</a>
-    <div class="action-buttons">
-        {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
+    {% if plugin.description %}<p class="plugin-description">{{ plugin.description }}</p>{% endif %}
+    {% if not show_meta %}
+        {% if plugin.type == "boefje" %}
+            <div class="horizontal-view scan-intensity">
+                <ul class="level-indicator l{{ plugin.scan_level }}">
+                    {% for i in "1234"|make_list %}<li></li>{% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <span class="plugin-author-link de-emphasized"><a target="_blank" href="https://openkat.nl">OpenKAT</a></span>
+        <div class="action-buttons">
+            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
-    </div>
+            {% if plugin.type == "boefje" %}
+                <a class="plugin-detail-link"
+                   href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "See details" %}</a>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
