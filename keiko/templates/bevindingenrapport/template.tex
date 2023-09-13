@@ -124,12 +124,14 @@ De volgende filters zijn van toepassing op deze bevindingen:
         {% endfor %}
 \end{longtable}
 
-{% if report_url.startswith('http') %}
-\noindent Kopieer \href{@@{ report_url }@@}{deze link} om dit rapport te reproduceren.
-{% else %}
-\noindent Gebruik de volgende URL om dit rapport te reproduceren:
+{% if report_url %}
+    {% if report_url.startswith('http') %}
+    \noindent Kopieer \href{@@{ report_url }@@}{deze link} om dit rapport te reproduceren.
+    {% else %}
+    \noindent Gebruik de volgende URL om dit rapport te reproduceren:
 
-\{uw OpenKAT domein\} \url{@@{ report_url }@@}
+    \{uw OpenKAT domein\} \url{@@{ report_url }@@}
+    {% endif %}
 {% endif %}
 
 \bgroup{}

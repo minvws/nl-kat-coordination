@@ -59,3 +59,4 @@ class DataShape(DataShapeBase):
     report_source_type: str
     report_source_value: str
     filters: dict
+    report_url: Optional[str]

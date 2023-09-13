@@ -175,7 +175,7 @@ class ReportsService:
         report_data["report_source_type"] = source_type
         report_data["report_source_value"] = source_value
         report_data["filters"] = filters.to_dict()
-        report_data["report_url"] = filters.to_url()
+        report_data["report_url"] = filters.to_url() if settings.ROCKY_REPORT_PERMALINKS else None
 
         report_id = self.keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
 
