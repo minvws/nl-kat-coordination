@@ -33,10 +33,6 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
     context_object_name = "ooi_list"
     ooi_types = get_collapsed_types().difference({Finding, FindingType})
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.filtered_ooi_types = self.get_filtered_ooi_types()
-
     def get_queryset(self) -> OOIList:
         scan_levels = DEFAULT_SCAN_LEVEL_FILTER
         selected_clearance_level = self.request.GET.getlist("clearance_level")
@@ -64,9 +60,7 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         if not selected_clearance_types:
             selected_clearance_types = [choice for choice, _ in CLEARANCE_TYPE_CHOICES]
 
-        context["clearance_level_filter_form"] = ClearanceFilterForm(
-            selected_clearance_levels, selected_clearance_types
-        )
+        context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
 
         return context
 

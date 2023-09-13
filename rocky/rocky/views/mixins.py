@@ -277,15 +277,11 @@ class MultipleOOIMixin(OctopoesView):
             scan_profile_type=scan_profile_type,
         )
 
-    def get_filtered_ooi_types(self):
-        return self.request.GET.getlist("ooi_type", [])
-
     def get_ooi_type_filters(self):
         ooi_type_filters = [
             {
                 "label": ooi_class.get_ooi_type(),
                 "value": ooi_class.get_ooi_type(),
-                "checked": not self.filtered_ooi_types or ooi_class.get_ooi_type() in self.filtered_ooi_types,
             }
             for ooi_class in get_collapsed_types()
         ]
@@ -293,11 +289,19 @@ class MultipleOOIMixin(OctopoesView):
         ooi_type_filters = sorted(ooi_type_filters, key=lambda filter_: filter_["label"])
         return ooi_type_filters
 
-    def get_ooi_types_display(self):
-        if not self.filtered_ooi_types or len(self.filtered_ooi_types) == len(get_collapsed_types()):
-            return _("All")
-
-        return ", ".join(self.filtered_ooi_types)
+    def get_active_filters(self):
+        active_filters = {}
+        ooi_type = self.request.GET.getlist("ooi_type", [])
+        clearance_level = self.request.GET.getlist("clearance_level", [])
+        clearance_type = self.request.GET.getlist("clearance_type", [])
+        if ooi_type:
+            active_filters[_("OOI types: ")] = ", ".join(ooi_type)
+        if clearance_level:
+            clearance_level = ["L" + str(level) for level in clearance_level]
+            active_filters[_("Clearance level: ")] = ", ".join(clearance_level)
+        if clearance_type:
+            active_filters[_("Clearance type: ")] = ", ".join(clearance_type)
+        return active_filters
 
 
 class ConnectorFormMixin:

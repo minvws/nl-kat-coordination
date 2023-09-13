@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from requests import RequestException
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
+from tools.forms.ooi_form import OOITypeMultiCheckboxForm
 from tools.models import Indemnification
 from tools.view_helpers import get_mandatory_fields
 
@@ -39,8 +40,8 @@ class OOIListView(BaseOOIListView, OctopoesView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["active_filters"] = self.show_active_filters()
-        context["object_type_filters"] = self.get_ooi_type_filters()
+        context["active_filters"] = self.get_active_filters()
+        context["object_type_filters"] = OOITypeMultiCheckboxForm(self.request.GET)
         context["observed_at"] = self.get_observed_at()
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["select_oois_form"] = SelectOOIForm(
@@ -56,20 +57,6 @@ class OOIListView(BaseOOIListView, OctopoesView):
         ]
 
         return context
-
-    def show_active_filters(self):
-        active_filters = {_("All objects"): ""}
-        ooi_type = self.request.GET.getlist("ooi_type", [])
-        clearance_level = self.request.GET.getlist("clearance_level", [])
-        clearance_type = self.request.GET.getlist("clearance_type", [])
-        if not ooi_type and not clearance_level and not clearance_type:
-            return active_filters
-        active_filters = {
-            _("OOI types: "): ", ".join(ooi_type),
-            _("Clearance level: "): ", ".join(clearance_level),
-            _("Clearance type: "): ", ".join(clearance_type),
-        }
-        return active_filters
 
     def get(self, request: HttpRequest, status=200, *args, **kwargs) -> HttpResponse:
         """Override the response status in case submitting a form returns an error message"""
@@ -226,7 +213,7 @@ class OOIListExportView(BaseOOIListView):
     def get(self, request, *args, **kwargs):
         file_type = request.GET.get("file_type")
         observed_at = self.get_observed_at()
-        filters = self.get_ooi_types_display()
+        filters = self.get_active_filters()
 
         queryset = self.get_queryset()
         ooi_list = queryset[: OOIList.HARD_LIMIT]
