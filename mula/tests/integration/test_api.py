@@ -583,7 +583,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
 
     def test_patch_task_not_found(self):
         # Patch a task that does not exist
-        response = self.client.patch(f"/tasks/{uuid.uuid4().hex}", json={"status": "completed"})
+        response = self.client.patch(f"/tasks/{uuid.uuid4()}", json={"status": "completed"})
         self.assertEqual(404, response.status_code)
         self.assertEqual("task not found", response.json().get("detail"))
 

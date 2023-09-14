@@ -94,6 +94,7 @@ def test_ooi_pdf_report(rf, client_member, mock_organization_view_octopoes, mock
     mock_datetime = mocker.patch("rocky.keiko.datetime")
     mock_mixin_datetime = mocker.patch("rocky.views.mixins.datetime")
     mock_datetime.now().strftime.return_value = dt_in_filename
+    mock_mixin_datetime.now().date.return_value = "2010-10-10"
     mock_mixin_datetime.now().strftime.return_value = dt_in_filename
 
     # Setup Keiko mock

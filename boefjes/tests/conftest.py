@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from multiprocessing import Manager
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
+from uuid import UUID
 
 import pytest
 from pydantic import parse_raw_as
@@ -51,7 +52,7 @@ class MockSchedulerClient(SchedulerClientInterface):
             if WorkerManager.Queue.BOEFJES.value in queue:
                 p_item = parse_raw_as(QueuePrioritizedItem, self.boefje_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
-                self._tasks[str(p_item.id)] = self._task_from_id(str(p_item.id))
+                self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
 
             if WorkerManager.Queue.NORMALIZERS.value in queue:
@@ -61,22 +62,22 @@ class MockSchedulerClient(SchedulerClientInterface):
         except IndexError:
             raise self.raise_on_empty_queue
 
-    def patch_task(self, task_id: str, status: TaskStatus) -> None:
+    def patch_task(self, task_id: UUID, status: TaskStatus) -> None:
         with self.log_path.open("a") as f:
             f.write(f"{task_id},{status.value}\n")
 
-        task = self._task_from_id(task_id) if task_id not in self._tasks else self._tasks[task_id]
+        task = self._task_from_id(task_id) if task_id not in self._tasks else self._tasks[str(task_id)]
         task.status = status
-        self._tasks[task_id] = task
+        self._tasks[str(task_id)] = task
 
     def get_all_patched_tasks(self) -> List[Tuple[str, ...]]:
         with self.log_path.open() as f:
             return [tuple(x.strip().split(",")) for x in f]
 
-    def get_task(self, task_id: str) -> Task:
-        return self._task_from_id(task_id) if task_id not in self._tasks else self._tasks[task_id]
+    def get_task(self, task_id: UUID) -> Task:
+        return self._task_from_id(task_id) if task_id not in self._tasks else self._tasks[str(task_id)]
 
-    def _task_from_id(self, task_id: str):
+    def _task_from_id(self, task_id: UUID):
         return Task(
             id=task_id,
             scheduler_id="test",
@@ -98,7 +99,7 @@ class MockHandler(Handler):
         self.exception = exception
 
     def handle(self, item: Union[BoefjeMeta, NormalizerMeta]):
-        if item.id == "9071c9fd-2b9f-440f-a524-ef1ca4824fd4":
+        if str(item.id) == "9071c9fd-2b9f-440f-a524-ef1ca4824fd4":
             raise self.exception()
 
         time.sleep(self.sleep_time)
