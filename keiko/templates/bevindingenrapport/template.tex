@@ -116,6 +116,23 @@ niet vertrouwelijk en kan openbaar worden gedeeld.
 
 \section{Samenvatting}
 Dit zijn de bevindingen van een OpenKAT-analyse op @@{ valid_time.astimezone().strftime("%Y-%m-%d %H:%m:%S %Z") }@@. % chktex 36 chktex 18
+De volgende filters zijn van toepassing op deze bevindingen:
+
+\begin{longtable}{ p{.25\textwidth}  p{.75\textwidth} }
+        {% for name, filter in filters.items() %}
+            @@{ name | to_text | latex_escape }@@ & @@{ filter |  format_object | latex_escape }@@ \\
+        {% endfor %}
+\end{longtable}
+
+{% if report_url %}
+    {% if report_url.startswith('http') %}
+    \noindent Kopieer \href{@@{ report_url }@@}{deze link} om dit rapport te reproduceren.
+    {% else %}
+    \noindent Gebruik de volgende URL om dit rapport te reproduceren:
+
+    \{uw OpenKAT domein\} \url{@@{ report_url }@@}
+    {% endif %}
+{% endif %}
 
 \bgroup{}
 \def\arraystretch{1.2}

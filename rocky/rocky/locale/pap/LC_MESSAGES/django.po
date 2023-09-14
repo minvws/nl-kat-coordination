@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-13 11:31+0000\n"
+"POT-Creation-Date: 2023-09-14 08:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1547,11 +1547,17 @@ msgid "Object list"
 msgstr "Lista di opheto"
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "This boefje will only scan objects with a corresponding clearance level "
+#| "of <strong>L%(scan_level)s</strong> or higher. There is no "
+#| "indemnification for this boefje to scan an OOI with a lower clearance "
+#| "level than <strong>L%(scan_level)s</strong>. Use the filter to show OOI's "
+#| "with a lower clearance level."
 msgid ""
-"This boefje will only scan objects with a corresponding clearance level of "
+"This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
-"this boefje to scan an OOI with a lower clearance level than "
+"this Boefje to scan an OOI with a lower clearance level than "
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
@@ -1562,16 +1568,23 @@ msgstr ""
 "di autorisashon mas abou."
 
 #: katalogus/templates/partials/objects_to_scan.html
+#, fuzzy
+#| msgid ""
+#| "\n"
+#| "          <span>Warning scan level:</span>\n"
+#| "          Scanning OOI's with a lower clearance level will result in "
+#| "OpenKAT increasing the clearance level on that OOI,\n"
+#| "          not only for this scan but from now on out, until it manually "
+#| "gets set to something else again.\n"
+#| "          This means that all other enabled Boefjes will use this higher "
+#| "clearance level aswel.\n"
+#| "        "
 msgid ""
-"\n"
-"          <span>Warning scan level:</span>\n"
-"          Scanning OOI's with a lower clearance level will result in OpenKAT "
-"increasing the clearance level on that OOI,\n"
-"          not only for this scan but from now on out, until it manually gets "
-"set to something else again.\n"
-"          This means that all other enabled Boefjes will use this higher "
-"clearance level aswel.\n"
-"        "
+"<span>Warning scan level:</span> Scanning OOI's with a lower clearance level "
+"will result in OpenKAT increasing the clearance level on that OOI, not only "
+"for this scan but from now on out, until it manually gets set to something "
+"else again. This means that all other enabled Boefjes will use this higher "
+"clearance level aswel."
 msgstr ""
 "\n"
 "          <span>Advertensia nivel di skan:</span>\n"
@@ -1584,14 +1597,18 @@ msgstr ""
 "        "
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "          You currently don't have any objects that meet the scan level "
+#| "of %(name)s.\n"
+#| "          Add objects with a complying clearance level, or alter the "
+#| "clearance level of existing objects.\n"
+#| "        "
 msgid ""
-"\n"
-"          You currently don't have any objects that meet the scan level of "
-"%(name)s.\n"
-"          Add objects with a complying clearance level, or alter the "
-"clearance level of existing objects.\n"
-"        "
+"You currently don't have any objects that meet the scan level of %(name)s. "
+"Add objects with a complying clearance level, or alter the clearance level "
+"of existing objects."
 msgstr ""
 "\n"
 "              Na e momento aki bo no tin ophetonan ku ta kwarda ku e nivel "
@@ -1601,13 +1618,16 @@ msgstr ""
 "            "
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "          You currently don't have scannable objects for %(name)s.\n"
+#| "          Add objects to use this boefje. This boefje is able to scan "
+#| "objects of the following types:\n"
+#| "        "
 msgid ""
-"\n"
-"          You currently don't have scannable objects for %(name)s.\n"
-"          Add objects to use this boefje. This boefje is able to scan "
-"objects of the following types:\n"
-"        "
+"You currently don't have scannable objects for %(name)s. Add objects to use "
+"this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
 "\n"
 "              Na e momento aki bo no tin ophetonan pa skan pa %(name)s. \n"
@@ -3152,11 +3172,15 @@ msgid "Clearance Level"
 msgstr "Nivél di Autorisashon"
 
 #: tools/forms/ooi.py
-msgid "Show objects that don't meet the Boefjes scan level"
+#, fuzzy
+#| msgid "Show objects that don't meet the Boefjes scan level"
+msgid "Show objects that don't meet the Boefjes scan level."
 msgstr "Mustra ophetonan ku no tin nivel di skan pa Boefjes"
 
 #: tools/forms/ooi.py
-msgid "Show Boefjes that exceed the objects clearance level"
+#, fuzzy
+#| msgid "Show Boefjes that exceed the objects clearance level"
+msgid "Show Boefjes that exceed the objects clearance level."
 msgstr "Mustra Boefjes ku ku a surpasa OOI's su nivel di autorisashon"
 
 #: tools/forms/ooi_form.py
@@ -3557,7 +3581,7 @@ msgid "Indemnifications"
 msgstr "Indemnizashon"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/findings/finding_list.html rocky/templates/header.html
+#: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/oois/ooi_page_tabs.html
@@ -3621,10 +3645,20 @@ msgid "Finding"
 msgstr "Diskubrimentu"
 
 #: rocky/templates/findings/finding_list.html
-#, python-format
+#, fuzzy
+#| msgid "Findings"
+msgid "Findings @ "
+msgstr "Diskubrimentu"
+
+#: rocky/templates/findings/finding_list.html
+#, fuzzy, python-format
+#| msgid ""
+#| "An overview of all findings OpenKAT found on %(date)s. Each finding "
+#| "relates to an object. Click a finding for additional information."
 msgid ""
-"An overview of all findings OpenKAT found on %(date)s. Each finding relates "
-"to an object. Click a finding for additional information."
+"An overview of all findings OpenKAT found for organization "
+"<strong>%(organization_name)s</strong>. Each finding relates to an object. "
+"Click a finding for additional information."
 msgstr ""
 "Un relato general di tur diskubrimentu OpenKAT á enkontrá riba %(date)s. "
 "Kada diskubrimentu ta relatá na un opheto. Klék un diskubrimentu pa "
@@ -4116,9 +4150,14 @@ msgid "Currently there are no findings for OOI"
 msgstr "Aktualmente no a diskubri nada pa OOI"
 
 #: rocky/templates/oois/ooi_list.html
+#, fuzzy, python-format
+#| msgid ""
+#| "An overview of your object list. Objects can be added manually or by "
+#| "running boefjes. </br> Click an object for additional information."
 msgid ""
-"An overview of your object list. Objects can be added manually or by running "
-"boefjes. </br> Click an object for additional information."
+"An overview of objects found for organization <strong>%(organization_name)s</"
+"strong>. Objects can be added manually or by running Boefjes. Click an "
+"object for additional information."
 msgstr ""
 "Un bista general di bo lista di ophetonan. Ophetonan por wòrdu añadí "
 "manualmente òf dor di ehekutá boefjes. </br> Klik riba un opheto pa mas "
@@ -4576,7 +4615,9 @@ msgid "Reproduction"
 msgstr "Reprodusí"
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html
-msgid "Please enable plugin to start scanning"
+#, fuzzy
+#| msgid "Please enable plugin to start scanning"
+msgid "Please enable plugin to start scanning."
 msgstr "Por fabor sende plugin prome ku kuminsa start ku skan"
 
 #: rocky/templates/partials/form/field_input.html

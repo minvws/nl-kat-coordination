@@ -11,12 +11,11 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Findings" %}</h1>
+                <h1>{% translate "Findings @ " %}{{ valid_time|date }}</h1>
                 <p>
-                    {% blocktranslate trimmed with observed_at|date as date %}
-                        An overview of all findings OpenKAT found on {{ date }}.
-                        Each finding relates to an object.
-                        Click a finding for additional information.
+                    {% blocktranslate trimmed with organization.name as organization_name %}
+                        An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
+                        Each finding relates to an object. Click a finding for additional information.
                     {% endblocktranslate %}
                 </p>
                 {{ object_type_filters }}
