@@ -748,8 +748,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         mock_is_task_allowed_to_run.return_value = True
-        mock_is_task_running.return_value = schedulers.errors.TaskStalledError()
         mock_has_grace_period_passed.return_value = True
+        mock_is_task_running.side_effect = schedulers.errors.TaskStalledError()
+        self.mock_get_latest_task_by_hash.return_value = task_db
         mock_is_item_on_queue_by_hash.return_value = False
         mock_get_tasks_by_hash.return_value = None
 
@@ -765,9 +766,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
-        # Assert: task should be in datastore, and dispatched
+        # Assert: task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""

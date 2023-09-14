@@ -554,18 +554,20 @@ class BoefjeScheduler(Scheduler):
                 )
                 return
         except TaskStalledError:
+            # Update task in datastore to be failed
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
+            task_db.status = TaskStatus.FAILED
+            self.ctx.datastores.task_store.update_task(task_db)
+
             self.logger.warning(
-                "Task is stalled, will push task to queue anyway: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                "Prior task has stalled (%s), will push new task to queue %s "
+                "[organisation_id=%s, scheduler_id=%s, caller=%s]",
+                task_db.id,
                 task,
                 self.organisation.id,
                 self.scheduler_id,
                 caller,
             )
-            breakpoint()
-            # Update task in datastore to be failed
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-            task_db.status = TaskStatus.FAILED
-            self.ctx.datastores.task_store.update_task(task_db)
         except Exception as exc_running:
             self.logger.warning(
                 "Could not check if task is running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
