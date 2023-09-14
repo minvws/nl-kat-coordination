@@ -9,6 +9,7 @@ class TestModel(pydantic.BaseModel):
     type: ClassVar[str] = "test-model"
     id: str
     name: str
+    count: int = 0
     child: Any = None
 
 

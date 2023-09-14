@@ -1,5 +1,6 @@
 import json
 import unittest
+import uuid
 from types import SimpleNamespace
 from unittest import mock
 
@@ -8,8 +9,6 @@ from scheduler.storage import filters
 from sqlalchemy import select
 
 from tests.factories import OrganisationFactory
-from tests.mocks import queue as mock_queue
-from tests.mocks import scheduler as mock_scheduler
 from tests.utils import functions
 
 
@@ -37,24 +36,11 @@ class FilterTestCase(unittest.TestCase):
         # Organisation
         self.organisation = OrganisationFactory()
 
-        # Queue and Scheduler
-        queue = mock_queue.MockPriorityQueue(
-            pq_id=self.organisation.id,
-            maxsize=10,
-            item_type=functions.TestModel,
-            allow_priority_updates=True,
-            pq_store=self.mock_ctx.datastores.pq_store,
-        )
-
-        self.scheduler = mock_scheduler.MockScheduler(
-            ctx=self.mock_ctx,
-            scheduler_id=self.organisation.id,
-            queue=queue,
-        )
-
     def tearDown(self):
+        models.Base.metadata.drop_all(self.dbconn.engine)
         self.dbconn.engine.dispose()
 
+    @unittest.skip("Not implemented")
     def test_filter(self):
         # Add tasks
         p_item = functions.create_p_item(self.organisation.id, 0)
@@ -82,7 +68,6 @@ class FilterTestCase(unittest.TestCase):
 
             print(session.execute(query1).all())
             print(query2.all())
-            breakpoint()
 
     def test_apply_filter(self):
         # Add tasks
@@ -132,3 +117,267 @@ class FilterTestCase(unittest.TestCase):
             compiled_query = compile_query_postgres(query)
             print(compiled_query)
             breakpoint()
+
+    def test_apply_filter_json_eq(self):
+        # Arrange
+        first_p_item = functions.create_p_item(self.organisation.id, 0)
+        first_task = functions.create_task(first_p_item)
+        self.mock_ctx.datastores.task_store.create_task(first_task)
+
+        second_p_item = functions.create_p_item(self.organisation.id, 0)
+        second_task = functions.create_task(second_p_item)
+        self.mock_ctx.datastores.task_store.create_task(second_task)
+
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__id",
+                    operator="eq",
+                    value=first_p_item.data.get("id"),
+                )
+            ],
+        )
+
+        # Act
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            results = query.all()
+
+            # Assert
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].p_item["data"]["id"], first_p_item.data.get("id"))
+
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__id",
+                    operator="==",
+                    value=first_p_item.data.get("id"),
+                )
+            ],
+        )
+
+        # Act
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            results = query.all()
+
+            # Assert
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].p_item["data"]["id"], first_p_item.data.get("id"))
+
+    def test_apply_filter_json_ne(self):
+        # Arrange
+        first_p_item = functions.create_p_item(self.organisation.id, 0)
+        first_task = functions.create_task(first_p_item)
+        self.mock_ctx.datastores.task_store.create_task(first_task)
+
+        second_p_item = functions.create_p_item(self.organisation.id, 0)
+        second_task = functions.create_task(second_p_item)
+        self.mock_ctx.datastores.task_store.create_task(second_task)
+
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__id",
+                    operator="ne",
+                    value=first_p_item.data.get("id"),
+                )
+            ],
+        )
+
+        # Act
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            results = query.all()
+
+            # Assert
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].p_item["data"]["id"], second_p_item.data.get("id"))
+
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__id",
+                    operator="!=",
+                    value=first_p_item.data.get("id"),
+                )
+            ],
+        )
+
+        # Act
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            results = query.all()
+
+            # Assert
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].p_item["data"]["id"], second_p_item.data.get("id"))
+
+    def test_apply_filter_json_is(self):
+        pass
+
+    def test_apply_filter_json_is_not(self):
+        pass
+
+    def test_apply_filter_json_gt(self):
+        # Arrange
+        first_p_item = functions.create_p_item(
+            self.organisation.id, 0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+        )
+        first_task = functions.create_task(first_p_item)
+        self.mock_ctx.datastores.task_store.create_task(first_task)
+
+        second_p_item = functions.create_p_item(
+            self.organisation.id, 0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+        )
+        second_task = functions.create_task(second_p_item)
+        self.mock_ctx.datastores.task_store.create_task(second_task)
+
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__count",
+                    operator="gt",
+                    value=first_p_item.data.get("count"),
+                )
+            ],
+        )
+
+        # Act
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            results = query.all()
+
+            # Assert
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].p_item["data"]["id"], second_p_item.data.get("id"))
+
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__count",
+                    operator=">",
+                    value=first_p_item.data.get("count"),
+                )
+            ],
+        )
+
+        # Act
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            results = query.all()
+
+            # Assert
+            self.assertEqual(len(results), 1)
+            self.assertEqual(results[0].p_item["data"]["id"], second_p_item.data.get("id"))
+
+    def test_apply_filter_json_gte(self):
+        # Arrange
+        first_p_item = functions.create_p_item(
+            self.organisation.id, 0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+        )
+        first_task = functions.create_task(first_p_item)
+        self.mock_ctx.datastores.task_store.create_task(first_task)
+
+        second_p_item = functions.create_p_item(
+            self.organisation.id, 0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+        )
+        second_task = functions.create_task(second_p_item)
+        self.mock_ctx.datastores.task_store.create_task(second_task)
+
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__count",
+                    operator="gte",
+                    value=first_p_item.data.get("count"),
+                )
+            ],
+        )
+
+        # Act
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            results = query.all()
+
+            # Assert
+            self.assertEqual(len(results), 2)
+            self.assertEqual(results[0].p_item["data"]["id"], first_p_item.data.get("id"))
+            self.assertEqual(results[1].p_item["data"]["id"], second_p_item.data.get("id"))
+
+        f_req = filters.FilterRequest(
+            filters=[
+                filters.Filter(
+                    column="p_item",
+                    field="data__count",
+                    operator=">=",
+                    value=first_p_item.data.get("count"),
+                )
+            ],
+        )
+
+        # Act
+        with self.dbconn.session.begin() as session:
+            query = session.query(models.TaskDB)
+            query = filters.apply_filter(models.TaskDB, query, f_req)
+            results = query.all()
+
+            # Assert
+            self.assertEqual(len(results), 2)
+            self.assertEqual(results[0].p_item["data"]["id"], first_p_item.data.get("id"))
+            self.assertEqual(results[1].p_item["data"]["id"], second_p_item.data.get("id"))
+
+    def test_apply_filter_json_lt(self):
+        pass
+
+    def test_apply_filter_json_lte(self):
+        pass
+
+    def test_apply_filter_json_like(self):
+        pass
+
+    def test_apply_filter_json_not_like(self):
+        pass
+
+    def test_apply_filter_json_ilike(self):
+        pass
+
+    def test_apply_filter_json_not_ilike(self):
+        pass
+
+    def test_apply_filter_json_in(self):
+        pass
+
+    def test_apply_filter_json_not_in(self):
+        pass
+
+    def test_apply_filter_json_contains(self):
+        pass
+
+    def test_apply_filter_json_any(self):
+        pass
+
+    def test_apply_filter_json_match(self):
+        pass
+
+    def test_apply_filter_json_starts_with(self):
+        pass
