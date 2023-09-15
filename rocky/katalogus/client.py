@@ -168,17 +168,17 @@ def parse_boefje(boefje: Dict) -> Boefje:
 
     consumes = set()
     produces = set()
-    for consume in boefje.get("consumes", []):
+    for type_name in boefje.get("consumes", []):
         try:
-            consumes.add(type_by_name(consume))
+            consumes.add(type_by_name(type_name))
         except StopIteration:
-            logger.warning("Unknown OOI type %s for boefje consumes %s", consume, boefje["id"])
+            logger.warning("Unknown OOI type %s for boefje consumes %s", type_name, boefje["id"])
 
-    for produce in boefje.get("produces", []):
+    for type_name in boefje.get("produces", []):
         try:
-            produces.add(type_by_name(produce))
+            produces.add(type_by_name(type_name))
         except StopIteration:
-            logger.warning("Unknown OOI type %s for boefje produces %s", produce, boefje["id"])
+            logger.warning("Unknown OOI type %s for boefje produces %s", type_name, boefje["id"])
 
     return Boefje(
         id=boefje["id"],
