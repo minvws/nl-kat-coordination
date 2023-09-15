@@ -166,8 +166,19 @@ class KATalogusClientV1:
 def parse_boefje(boefje: Dict) -> Boefje:
     scan_level = SCAN_LEVEL(boefje["scan_level"])
 
-    consumes = {type_by_name(consumes) for consumes in boefje.get("consumes", [])}
-    produces = {type_by_name(produces) for produces in boefje.get("produces", [])}
+    consumes = set()
+    produces = set()
+    for consume in boefje.get("consumes", []):
+        try:
+            consumes.add(type_by_name(consume))
+        except StopIteration:
+            logger.warning("Unknown OOI type %s for boefje consumes %s", consume, boefje["id"])
+
+    for produce in boefje.get("produces", []):
+        try:
+            produces.add(type_by_name(produce))
+        except StopIteration:
+            logger.warning("Unknown OOI type %s for boefje produces %s", produce, boefje["id"])
 
     return Boefje(
         id=boefje["id"],
