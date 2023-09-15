@@ -40,7 +40,7 @@ def AuthRequiredMiddleware(get_response):
             # check if path starts with anything in excluded_prefix
             or any([request.path.startswith(prefix) for prefix in excluded_prefix])
         ):
-            return redirect(login_path)
+            return redirect(f"{login_path}?next={request.path}")
 
         # When 2fa is enabled, check if user is verified, otherwise redirect to 2fa setup page
         if (
