@@ -8,7 +8,7 @@
         ],
         "produces": [
             "Finding",
-            "CVEFindinsgType"
+            "CVEFindingType"
         ],
         "environment_keys": [],
         "scan_level": 3
