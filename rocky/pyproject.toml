@@ -53,6 +53,7 @@ opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
 opentelemetry-instrumentation-django = "^0.40b0"
 opentelemetry-instrumentation-psycopg2 = "^0.40b0"
 opentelemetry-instrumentation-requests = "^0.40b0"
+granian = "^0.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
