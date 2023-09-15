@@ -48,7 +48,7 @@
     ],
     "options": null,
     "produces": [
-      "Certificate"
+      "X509Certificate"
     ]
   },
   {
