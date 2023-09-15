@@ -166,11 +166,8 @@ class KATalogusClientV1:
 def parse_boefje(boefje: Dict) -> Boefje:
     scan_level = SCAN_LEVEL(boefje["scan_level"])
 
-    consumes = set()
-    produces = set()
-    with contextlib.suppress(StopIteration):
-        consumes.add(type_by_name(boefje["consumes"]))
-        produces.add(type_by_name(boefje["produces"]))
+    consumes = {type_by_name(consumes) for consumes in boefje.get("consumes", [])}
+    produces = {type_by_name(produces) for produces in boefje.get("produces", [])}
 
     return Boefje(
         id=boefje["id"],
