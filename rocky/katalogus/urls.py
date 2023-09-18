@@ -10,7 +10,7 @@ from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 
 urlpatterns = [
     path("", KATalogusView.as_view(), name="katalogus"),
-    path("view/<view>/", KATalogusView.as_view(), name="katalogus"),
+    path("view/<view_type>/", KATalogusView.as_view(), name="katalogus"),
     path(
         "settings/",
         KATalogusSettingsView.as_view(),
@@ -27,12 +27,12 @@ urlpatterns = [
         name="confirm_clone_settings",
     ),
     path(
-        "plugins/boefjes/",
+        "plugins/boefjes/<view_type>/",
         BoefjeListView.as_view(),
         name="boefjes_list",
     ),
     path(
-        "plugins/normalizers/",
+        "plugins/normalizers/<view_type>/",
         NormalizerListView.as_view(),
         name="normalizers_list",
     ),
