@@ -42,6 +42,8 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         if selected_clearance_type is not None:
             scan_profile_types = {ScanProfileType(s) for s in selected_clearance_type}
 
+        self.filtered_ooi_types = self.request.GET.getlist("ooi_type", [])
+
         return self.get_list(self.get_observed_at(), scan_level=scan_levels, scan_profile_type=scan_profile_types)
 
     def get_context_data(self, **kwargs):
