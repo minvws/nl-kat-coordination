@@ -70,6 +70,7 @@ from octopoes.models.ooi.web import (
     HTTPResource,
     ImageMetadata,
     IPAddressHTTPURL,
+    SecurityTXT,
     Website,
 )
 
@@ -125,6 +126,7 @@ WebType = Union[
     RESTAPI,
     APIDesignRule,
     APIDesignRuleResult,
+    SecurityTXT,
 ]
 EmailSecurityType = Union[
     DNSSPFRecord,
