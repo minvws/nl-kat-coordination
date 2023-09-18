@@ -82,3 +82,8 @@ Empty queue
 `openkat-empty-job-queue.sh
 <https://raw.githubusercontent.com/minvws/nl-kat-coordination/main/scripts/installation/openkat-empty-job-queue.sh>`__
 stops your OpenKAT processes, empties the job queue and starts all processes.
+
+Backup
+------
+
+TobiasBDO contributed `two backup and restorescripts <https://github.com/tobiasBDO/backup-openkat/tree/master`_ included as part of his answer to `the question how to backup XTDB <https://github.com/minvws/nl-kat-coordination/issues/1757>`_ properly.
