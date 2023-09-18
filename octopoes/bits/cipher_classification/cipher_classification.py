@@ -19,7 +19,9 @@ def get_severity_and_reasons(cipher_suite, protocol: str) -> List[Tuple[str, str
         data = [{k.strip(): v.strip() for k, v in row.items() if k} for row in reader]
 
     # Filter the data for the provided cipher suite
-    cipher_suite_data = [row for row in data if row["Cipher suite"] == cipher_suite and row["Protocol"] == protocol]
+    cipher_suite_data = [
+        row for row in data if row["Cipher suite"] == cipher_suite and row["Protocol version"] == protocol
+    ]
 
     # If the cipher suite is not found, return an empty list
     if not cipher_suite_data:
