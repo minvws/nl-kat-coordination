@@ -57,14 +57,23 @@ class Comparator:
         "not_in": lambda x, y: x.not_in(y),
 
         "contains": lambda x, y: x.contains(y),
-        "any": lambda x, y: x.any(y),
-
         "match": lambda x, y: x.match(y),
         "starts_with": lambda x, y: x.startswith(y),
 
+        # Contains; returns true if the left hand side value contains all the
+        # elements of the right hand side
         "@>": lambda x, y: x.op('@>')(y),
+
+        # Contained by; returns true if the right hand side value contains all
+        # the elements of the left hand side
         "<@": lambda x, y: x.op('<@')(y),
+
+        # Contains key; returns true if the JSON object contains the specified
+        # key
         "@?": lambda x, y: x.op('@?')(y),
+
+        # Matches query; used by full text search in combination with tsquery
+        # and tsvector data types
         "@@": lambda x, y: x.op('@@')(y),
     }
 

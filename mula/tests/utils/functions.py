@@ -10,6 +10,7 @@ class TestModel(pydantic.BaseModel):
     id: str
     name: str
     count: int = 0
+    categories: list[str] = []
     child: Any = None
 
 
