@@ -1,0 +1,53 @@
+{
+  "id": "bbd94d02-43d4-409a-9c09-d4283952f9c1",
+  "raw_data": {
+    "id": "bbd94d02-43d4-409a-9c09-d4283952f9c1",
+    "boefje_meta": {
+      "id": "bbd94d02-43d4-409a-9c09-d4283952f9c1",
+      "boefje": {
+        "id": "sec",
+        "version": null
+      },
+      "organization": "_dev",
+      "input_ooi": "Website|internet|192.0.2.0|tcp|443|https|internet|example.com",
+      "arguments": {
+        "input": {
+          "object_type": "Website",
+          "scan_profile": "scan_profile_type='declared' reference=Reference('Website|internet|192.0.2.0|tcp|443|https|internet|example.com') level=<ScanLevel.L2: 2>",
+          "primary_key": "Website|internet|192.0.2.0|tcp|443|https|internet|example.com",
+          "ip_service": {
+            "ip_port": {
+              "address": {
+                "network": {
+                  "name": "internet"
+                },
+                "address": "192.0.2.0"
+              },
+              "protocol": "tcp",
+              "port": "443"
+            },
+            "service": {
+              "name": "https"
+            }
+          },
+          "hostname": {
+            "network": {
+              "name": "internet"
+            },
+            "name": "example.com"
+          },
+          "certificate": "None"
+        }
+      }
+    },
+    "mime_types": [
+      {
+        "value": "boefje/sec"
+      }
+    ]
+  },
+  "normalizer": {
+    "id": "kat_sec.normalize",
+    "version": null
+  }
+}

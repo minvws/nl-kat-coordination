@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-13 11:46+0000\n"
+"POT-Creation-Date: 2023-09-12 15:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1786,6 +1786,16 @@ msgstr ""
 msgid "{} '{}' enabled."
 msgstr ""
 
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
+"Your clearance level is not set. Go to your profile page to see your "
+"clearance or contact the administrator to set a clearance level."
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid "To enable {} you need at least a clearance level of L{}. "
+msgstr ""
+
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
 msgstr ""
@@ -3405,7 +3415,7 @@ msgstr ""
 
 #: rocky/templates/graph-d3.html
 msgid ""
-"Click a circle top collapse / expand the tree, click the text to view the "
+"Click a circle to collapse / expand the tree, click the text to view the "
 "tree from that OOI and hover over the text to see details."
 msgstr ""
 
