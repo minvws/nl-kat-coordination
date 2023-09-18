@@ -140,19 +140,23 @@ def default_field_options(field: ModelField) -> Dict[str, Union[str, bool]]:
     }
 
 
-class ClearanceFilterForm(BaseRockyForm):
+class ClearanceLevelFilterForm(BaseRockyForm):
     clearance_level = forms.CharField(
         label="Filter by clearance level",
         widget=CheckboxGroup(toggle_all_button=True, choices=SCAN_LEVEL.choices),
         required=False,
     )
 
+
+class ClearanceTypeFilterForm(BaseRockyForm):
     clearance_type = forms.CharField(
         label="Filter by clearance type",
         widget=CheckboxGroup(toggle_all_button=True, choices=CLEARANCE_TYPE_CHOICES),
         required=False,
     )
 
+
+class ClearanceFilterForm(ClearanceTypeFilterForm, ClearanceLevelFilterForm):
     def __init__(self, clearance_level: List[str], selected_clearance_types: List[str], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["clearance_level"].initial = clearance_level

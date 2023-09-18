@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="reports">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "OOI Report" %}</h1>
+                    <p class="emphasized">
+                        {% blocktranslate trimmed %}
+                            Select from the list which OOI you want to include in the report.
+                            Pay attention that the filters will be included in the report.
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+                <div class="horizontal-view toolbar">
+                    <button form="generate_ooi_report" type="submit" class="button">{% translate "Generate Report" %}</button>
+                </div>
+            </div>
+            {% translate "Filter" as filter_title %}
+            {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
+
+            <form id="generate_ooi_report"
+                  method="post"
+                  action="{% url 'generate_report' organization.code 'ooi_report' %}"
+                  class="inline">
+                {% csrf_token %}
+                <table>
+                    <thead>
+                        <th>
+                            <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                        </th>
+                        <th>OOI</th>
+                        <th>{% translate "OOI-Type" %}</th>
+                        <th>{% translate "Clearance level" %}</th>
+                    </thead>
+                    <tbody>
+                        {% for object in object_list %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="ooi" value={{ object.primary_key }}>
+                                </td>
+                                <td>{{ object.human_readable }}</td>
+                                <td>{{ object.ooi_type }}</td>
+                                <td>
+                                    {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
+
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}
