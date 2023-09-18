@@ -178,7 +178,7 @@ TEMPLATES = [
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
             ],
-            "builtins": ["tools.templatetags.ooi_extra"],
+            "builtins": ["tools.templatetags.ooi_extra", "tools.templatetags.querystrings"],
         },
     },
 ]

@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load static %}
 
-{% if view.kwargs.view == "tableview" %}
+{% if request.GET.view == "table" %}
     <div class="horizontal-scroll">
         <table class="plugins">
             <caption>{% translate "Plugins overview:" %}</caption>
