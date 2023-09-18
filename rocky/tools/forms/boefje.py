@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Union
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from katalogus.client import Plugin
+from katalogus.client import Boefje
 
 from tools.forms.base import BaseRockyForm, CheckboxGroup, Choices, ChoicesGroups
 from tools.forms.settings import Choice
@@ -17,7 +17,7 @@ class CheckboxGroupBoefjeTiles(CheckboxGroup):
 
     def __init__(self):
         super().__init__()
-        self.boefjes: List[Plugin] = self.attrs.get("boefjes", [])
+        self.boefjes: List[Boefje] = self.attrs.get("boefjes", [])
         self.organization = self.attrs.get(
             "organization",
         )
@@ -41,7 +41,7 @@ class SelectBoefjeForm(BaseRockyForm):
 
     def __init__(
         self,
-        boefjes: List[Plugin],
+        boefjes: List[Boefje],
         organization: Organization,
         *args,
         **kwargs,
@@ -69,8 +69,8 @@ class SelectBoefjeForm(BaseRockyForm):
         self.fields["boefje"].widget.boefjes = self.boefjes
         self.fields["boefje"].widget.organization = self.organization
 
-    def _get_choices(self, boefjes: List[Plugin]) -> Union[Choices, ChoicesGroups]:
+    def _get_choices(self, boefjes: List[Boefje]) -> Union[Choices, ChoicesGroups]:
         return [("Boefje", [self._choice_from_boefje(item["boefje"]) for item in boefjes])]
 
-    def _choice_from_boefje(self, boefje: Plugin) -> Choice:
+    def _choice_from_boefje(self, boefje: Boefje) -> Choice:
         return boefje.id, boefje.name

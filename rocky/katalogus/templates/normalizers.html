@@ -1,0 +1,33 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="katalogus">
+        <section>
+            {% include "partials/katalogus_header.html" %}
+            {% include "partials/plugins_navigation.html" with active="normalizers" %}
+
+            <div class="fifty-fifty">
+                <div>
+                    <h2>Normalizers</h2>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Normalizers analyze the information and turn it into objects for the data model in Octopoes.
+                        {% endblocktranslate %}
+                    </p>
+                    <p class="emphasized">
+                        <strong>{{ object_list|length }}</strong> Normalizer{{ object_list|pluralize:"s" }} {% translate "available" %}
+                    </p>
+                </div>
+            </div>
+            {% include "partials/katalogus_filter.html" with form=form %}
+            {% include "partials/katalogus_toolbar.html" %}
+            {% include "partials/plugins.html" %}
+
+        </section>
+    </main>
+{% endblock content %}

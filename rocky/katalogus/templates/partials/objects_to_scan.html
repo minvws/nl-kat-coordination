@@ -6,8 +6,8 @@
         <h2>{{ form_title }}</h2>
         <p>
             {% blocktranslate trimmed with scan_level=plugin.scan_level %}
-                This boefje will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
-                or higher. There is no indemnification for this boefje to scan an OOI with a lower clearance level than <strong>L{{ scan_level }}</strong>. Use the filter to show OOI's with a lower clearance level.
+                This Boefje will only scan objects with a corresponding clearance level of <strong>L{{ scan_level }}</strong>
+                or higher. There is no indemnification for this Boefje to scan an OOI with a lower clearance level than <strong>L{{ scan_level }}</strong>. Use the filter to show OOI's with a lower clearance level.
             {% endblocktranslate %}
         </p>
         <form method="get" class="inline">
@@ -27,27 +27,27 @@
             <p class="warning"
                role="group"
                aria-label="{% translate "scan level warning" %}">
-                {% blocktranslate %}
-          <span>Warning scan level:</span>
-          Scanning OOI's with a lower clearance level will result in OpenKAT increasing the clearance level on that OOI,
-          not only for this scan but from now on out, until it manually gets set to something else again.
-          This means that all other enabled Boefjes will use this higher clearance level aswel.
-        {% endblocktranslate %}
+                {% blocktranslate trimmed %}
+                    <span>Warning scan level:</span>
+                    Scanning OOI's with a lower clearance level will result in OpenKAT increasing the clearance level on that OOI,
+                    not only for this scan but from now on out, until it manually gets set to something else again.
+                    This means that all other enabled Boefjes will use this higher clearance level aswel.
+                {% endblocktranslate %}
             </p>
         {% endif %}
         {% if select_oois_form.fields.ooi.choices %}
             {% include "partials/form/checkbox_group_table_form.html" with checkbox_group_table_form=select_oois_form btn_text="Start scan" plugin_enabled=plugin.enabled key="boefje_id" value=plugin.id action="scan" checkbox_group_table_filter_form=select_ooi_filter_form unique_id="" %}
 
         {% elif has_consumable_oois %}
-            {% blocktranslate with name=plugin.name%}
-          You currently don't have any objects that meet the scan level of {{ name }}.
-          Add objects with a complying clearance level, or alter the clearance level of existing objects.
-        {% endblocktranslate %}
+            {% blocktranslate trimmed with name=plugin.name %}
+                You currently don't have any objects that meet the scan level of {{ name }}.
+                Add objects with a complying clearance level, or alter the clearance level of existing objects.
+            {% endblocktranslate %}
         {% else %}
-            {% blocktranslate with name=plugin.name%}
-          You currently don't have scannable objects for {{ name }}.
-          Add objects to use this boefje. This boefje is able to scan objects of the following types:
-        {% endblocktranslate %}
+            {% blocktranslate trimmed with name=plugin.name %}
+                You currently don't have scannable objects for {{ name }}.
+                Add objects to use this Boefje. This Boefje is able to scan objects of the following types:
+            {% endblocktranslate %}
             <p>
                 {% for ooi in plugin.consumes %}
                     <a href="{% url "ooi_add" ooi_type=ooi organization_code=organization.code %}">{{ ooi }}</a>

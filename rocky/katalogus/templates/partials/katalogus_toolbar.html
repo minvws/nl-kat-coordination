@@ -1,8 +1,10 @@
 {% load i18n %}
 
-<div class="horizontal-view horizontal-scroll toolbar">
-    <a href="{% url "katalogus" organization.code %}"
-       class="button icon ti-layout-grid {% if view == 'table' %}ghost{% endif %}">{% translate "Gridview" %}</a>
-    <a href="{% url "katalogus" organization_code=organization.code view="table" %}"
-       class="button icon ti-menu-2 {% if view != 'table' %}ghost{% endif %}">{% translate "Tableview" %}</a>
-</div>
+{% if object_list %}
+    <div class="horizontal-view horizontal-scroll toolbar">
+        <a href="{% url 'katalogus' organization_code=organization.code view="gridview" %}"
+           class="button icon ti-layout-grid {% if view.kwargs.view == "tableview" %}ghost{% endif %}">{% translate "Gridview" %}</a>
+        <a href="{% url 'katalogus' organization_code=organization.code view="tableview" %}"
+           class="button icon ti-menu-2 {% if view.kwargs.view != "tableview" %}ghost{% endif %}">{% translate "Tableview" %}</a>
+    </div>
+{% endif %}

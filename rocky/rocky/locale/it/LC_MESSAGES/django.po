@@ -1265,6 +1265,40 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
+#: katalogus/templates/about_plugins.html
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "About plugins"
+msgstr ""
+
+#: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
+msgid ""
+"Plugins gather data, objects and insight. Each plugin has its own focus area "
+"and strengths and may be able to work with other plugins to gain even more "
+"insights."
+msgstr ""
+
+#: katalogus/templates/about_plugins.html katalogus/templates/boefjes.html
+msgid ""
+"Boefjes gather factual information, such as by calling an external scanning "
+"tool like nmap or using a database like shodan."
+msgstr ""
+
+#: katalogus/templates/about_plugins.html katalogus/templates/normalizers.html
+msgid ""
+"Normalizers analyze the information and turn it into objects for the data "
+"model in Octopoes."
+msgstr ""
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"Bits are business rules that look for insight within the current dataset and "
+"search for specific insight and draw conclusions."
+msgstr ""
+
+#: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
+msgid "available"
+msgstr ""
+
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
 msgid "scan level warning"
@@ -1345,51 +1379,24 @@ msgstr ""
 msgid "Clone"
 msgstr ""
 
-#: katalogus/templates/katalogus.html katalogus/views/change_clearance_level.py
-#: katalogus/views/katalogus.py katalogus/views/katalogus_settings.py
-#: katalogus/views/plugin_detail.py katalogus/views/plugin_settings_add.py
-#: katalogus/views/plugin_settings_delete.py
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-msgid "KAT-alogus"
+#: katalogus/templates/katalogus.html
+msgid "All plugins"
 msgstr ""
 
 #: katalogus/templates/katalogus.html
 msgid ""
 "\n"
-"                An overview of all available boefjes.\n"
-"                Boefjes can be used to scan for vulnerablilities and "
-"security issues within specified objects.\n"
-"                Each boefje has his own focus area and strengths.\n"
-"              "
-msgstr ""
+"                            Plugin available\n"
+"                        "
+msgid_plural ""
+"\n"
+"                            Plugins available\n"
+"                        "
+msgstr[0] ""
+msgstr[1] ""
 
-#: katalogus/templates/katalogus.html
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
-msgstr ""
-
-#: katalogus/templates/katalogus.html rocky/templates/scan.html
-msgid "Boefjes overview:"
-msgstr ""
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje name"
-msgstr ""
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje description"
-msgstr ""
-
-#: katalogus/templates/katalogus.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Actions"
-msgstr ""
-
-#: katalogus/templates/katalogus.html
-#: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-msgid "See details"
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
@@ -1422,13 +1429,17 @@ msgid "Value"
 msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-#: onboarding/templates/partials/boefje_tile_static.html
 msgid "Scan level:"
 msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Publisher"
+msgstr ""
+
+#: katalogus/templates/partials/boefje_tile.html
+#: katalogus/templates/partials/plugin_tile.html
+#: katalogus/templates/partials/plugins.html
+msgid "See details"
 msgstr ""
 
 #: katalogus/templates/partials/enable_disable_plugin.html
@@ -1445,12 +1456,33 @@ msgid "You don't have permission to enable "
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
-msgid "Available plugins"
+msgid "Filter plugins"
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Update List"
+msgid "Clear filter"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
+#: katalogus/views/katalogus_settings.py katalogus/views/plugin_detail.py
+#: katalogus/views/plugin_settings_add.py
+#: katalogus/views/plugin_settings_delete.py
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+msgid "KAT-alogus"
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_header.html
+msgid "An overview of all available plugins."
+msgstr ""
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/templates/plugin_settings_list.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Settings"
 msgstr ""
 
 #: katalogus/templates/partials/katalogus_toolbar.html
@@ -1471,45 +1503,35 @@ msgstr ""
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"This boefje will only scan objects with a corresponding clearance level of "
+"This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
-"this boefje to scan an OOI with a lower clearance level than "
+"this Boefje to scan an OOI with a lower clearance level than "
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid ""
-"\n"
-"          <span>Warning scan level:</span>\n"
-"          Scanning OOI's with a lower clearance level will result in OpenKAT "
-"increasing the clearance level on that OOI,\n"
-"          not only for this scan but from now on out, until it manually gets "
-"set to something else again.\n"
-"          This means that all other enabled Boefjes will use this higher "
-"clearance level aswel.\n"
-"        "
+"<span>Warning scan level:</span> Scanning OOI's with a lower clearance level "
+"will result in OpenKAT increasing the clearance level on that OOI, not only "
+"for this scan but from now on out, until it manually gets set to something "
+"else again. This means that all other enabled Boefjes will use this higher "
+"clearance level aswel."
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"\n"
-"          You currently don't have any objects that meet the scan level of "
-"%(name)s.\n"
-"          Add objects with a complying clearance level, or alter the "
-"clearance level of existing objects.\n"
-"        "
+"You currently don't have any objects that meet the scan level of %(name)s. "
+"Add objects with a complying clearance level, or alter the clearance level "
+"of existing objects."
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"\n"
-"          You currently don't have scannable objects for %(name)s.\n"
-"          Add objects to use this boefje. This boefje is able to scan "
-"objects of the following types:\n"
-"        "
+"You currently don't have scannable objects for %(name)s. Add objects to use "
+"this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_settings_required.html
@@ -1527,8 +1549,48 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: katalogus/templates/partials/plugin_tile.html
-msgid "Publisher:"
+#: katalogus/templates/partials/plugins.html
+msgid "Plugins overview:"
+msgstr ""
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin name"
+msgstr ""
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin type"
+msgstr ""
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin description"
+msgstr ""
+
+#: katalogus/templates/partials/plugins.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Actions"
+msgstr ""
+
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "Plugins Navigation"
+msgstr ""
+
+#: katalogus/templates/partials/plugins_navigation.html rocky/views/mixins.py
+msgid "All"
+msgstr ""
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: tools/forms/boefje.py rocky/templates/scan.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Boefjes"
+msgstr ""
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Normalizers"
 msgstr ""
 
 #: katalogus/templates/plugin_detail.html
@@ -1627,13 +1689,6 @@ msgid " Details"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py tools/view_helpers.py
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Settings"
-msgstr ""
-
-#: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
 msgstr ""
 
@@ -1667,10 +1722,6 @@ msgstr ""
 
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
-msgstr ""
-
-#: katalogus/views/katalogus.py
-msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
 msgstr ""
 
 #: katalogus/views/katalogus_settings.py
@@ -1720,24 +1771,19 @@ msgid "Please select an OOI to start scan."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' disabled."
+msgid "{} '{}' disabled."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
+msgid "Failed fetching settings for {}. Is the Katalogus up?"
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid ""
-"Before enabling, please set the required settings for boefje '{boefje_name}'."
+msgid "Before enabling, please set the required settings for '{}'."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' enabled."
+msgid "{} '{}' enabled."
 msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
@@ -2512,22 +2558,9 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: tools/forms/boefje.py rocky/templates/scan.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Boefjes"
-msgstr ""
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
-msgstr ""
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Normalizers"
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
@@ -2817,11 +2850,11 @@ msgid "Clearance Level"
 msgstr ""
 
 #: tools/forms/ooi.py
-msgid "Show objects that don't meet the Boefjes scan level"
+msgid "Show objects that don't meet the Boefjes scan level."
 msgstr ""
 
 #: tools/forms/ooi.py
-msgid "Show Boefjes that exceed the objects clearance level"
+msgid "Show Boefjes that exceed the objects clearance level."
 msgstr ""
 
 #: tools/forms/ooi_form.py
@@ -3202,7 +3235,7 @@ msgid "Indemnifications"
 msgstr ""
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/findings/finding_list.html rocky/templates/header.html
+#: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/oois/ooi_page_tabs.html
@@ -3266,10 +3299,15 @@ msgid "Finding"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+msgid "Findings @ "
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 #, python-format
 msgid ""
-"An overview of all findings OpenKAT found on %(date)s. Each finding relates "
-"to an object. Click a finding for additional information."
+"An overview of all findings OpenKAT found for organization "
+"<strong>%(organization_name)s</strong>. Each finding relates to an object. "
+"Click a finding for additional information."
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -3377,7 +3415,7 @@ msgstr ""
 
 #: rocky/templates/graph-d3.html
 msgid ""
-"Click a circle top collapse / expand the tree, click the text to view the "
+"Click a circle to collapse / expand the tree, click the text to view the "
 "tree from that OOI and hover over the text to see details."
 msgstr ""
 
@@ -3727,9 +3765,11 @@ msgid "Currently there are no findings for OOI"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
+#, python-format
 msgid ""
-"An overview of your object list. Objects can be added manually or by running "
-"boefjes. </br> Click an object for additional information."
+"An overview of objects found for organization <strong>%(organization_name)s</"
+"strong>. Objects can be added manually or by running Boefjes. Click an "
+"object for additional information."
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
@@ -4014,6 +4054,10 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+#: rocky/templates/organizations/organization_member_list.html
+msgid "New"
+msgstr ""
+
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
 msgstr ""
@@ -4148,7 +4192,7 @@ msgid "Reproduction"
 msgstr ""
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html
-msgid "Please enable plugin to start scanning"
+msgid "Please enable plugin to start scanning."
 msgstr ""
 
 #: rocky/templates/partials/form/field_input.html
@@ -4387,6 +4431,10 @@ msgstr ""
 msgid "Blocked status"
 msgstr ""
 
+#: rocky/templates/partials/organization_member_list_filters.html
+msgid "Update List"
+msgstr ""
+
 #: rocky/templates/partials/organization_properties_table.html
 msgid "Organization name"
 msgstr ""
@@ -4501,6 +4549,10 @@ msgstr ""
 
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
+msgstr ""
+
+#: rocky/templates/scan.html
+msgid "Boefjes overview:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
@@ -4881,10 +4933,6 @@ msgstr ""
 #: rocky/views/mixins.py
 msgid ""
 "Can not parse observed_at parameter, falling back to showing current object"
-msgstr ""
-
-#: rocky/views/mixins.py
-msgid "All"
 msgstr ""
 
 #: rocky/views/ooi_add.py
