@@ -69,7 +69,6 @@ class PluginEnableDisableView(SinglePluginView):
 
         if self.organization_member.has_clearance(self.plugin.scan_level.value):
             self.katalogus_client.enable_boefje(self.plugin)
-            self.katalogus_client.enable_boefje(self.plugin)
             messages.add_message(
                 self.request,
                 messages.SUCCESS,
