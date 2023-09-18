@@ -30,10 +30,34 @@ class PluginCoverImgView(OrganizationView):
         return file
 
 
-class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
-    """Detail view for a specific plugin. Shows plugin settings and consumable oois for scanning."""
+class PluginDetailView(TemplateView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    template_name = "plugin_detail.html"
+        context["plugin"] = self.plugin.dict()
+        # context["scan_history_form_fields"] = [
+        #     "scan_history_from",
+        #     "scan_history_to",
+        #     "scan_history_status",
+        #     "scan_history_search",
+        #     "scan_history_page",
+
+        return context
+
+
+class NormalizerDetailView(PluginDetailView):
+    template_name = "normalizer_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
+class BoefjeDetailView(PluginSettingsListView, BoefjeMixin, PluginDetailView):
+    """Detail view for a boefje plugin. Shows plugin settings and consumable oois for scanning."""
+
+    template_name = "boefje_detail.html"
     scan_history_limit = 10
     limit_ooi_list = 9999
 
@@ -80,7 +104,6 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
             context["select_oois_form"] = SelectOOIForm(
                 oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
-        context["plugin"] = self.plugin.dict()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
@@ -88,24 +111,14 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
             },
             {
                 "url": reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin.type,
                         "plugin_id": self.plugin.id,
                     },
                 ),
                 "text": self.plugin.name,
             },
-        ]
-
-        context["scan_history"] = self.get_scan_history()
-        context["scan_history_form_fields"] = [
-            "scan_history_from",
-            "scan_history_to",
-            "scan_history_status",
-            "scan_history_search",
-            "scan_history_page",
         ]
 
         return context
@@ -151,7 +164,6 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
                             "change_clearance_level",
                             kwargs={
                                 "organization_code": self.organization.code,
-                                "plugin_type": self.plugin.type,
                                 "plugin_id": plugin_id,
                                 "scan_level": self.plugin.scan_level.value,
                             },

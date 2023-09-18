@@ -1,6 +1,6 @@
 import pytest
 from account.views import AccountView
-from katalogus.views.plugin_detail import PluginDetailView
+from katalogus.views.boefje_detail import BoefjeDetailView
 from pytest_django.asserts import assertContains, assertNotContains
 
 from octopoes.models.pagination import Paginated
@@ -57,7 +57,7 @@ def test_plugin_settings_list_perms(
     mocker,
     lazy_task_list_with_boefje,
 ):
-    mock_scheduler_client = mocker.patch("katalogus.views.plugin_detail.scheduler")
+    mock_scheduler_client = mocker.patch("katalogus.views.boefje_detail.scheduler")
     mock_scheduler_client.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](count=1, items=[network])
@@ -66,8 +66,8 @@ def test_plugin_settings_list_perms(
 
     member = request.getfixturevalue(member)
 
-    response = PluginDetailView.as_view()(
-        setup_request(rf.get("plugin_detail"), member.user),
+    response = BoefjeDetailView.as_view()(
+        setup_request(rf.get("boefje_detail"), member.user),
         organization_code=member.organization.code,
         plugin_type="boefje",
         plugin_id="test-plugin",
@@ -91,7 +91,7 @@ def test_plugin_settings_list_perms_2(
     mocker,
     lazy_task_list_with_boefje,
 ):
-    mock_scheduler_client = mocker.patch("katalogus.views.plugin_detail.scheduler")
+    mock_scheduler_client = mocker.patch("katalogus.views.boefje_detail.scheduler")
     mock_scheduler_client.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](count=1, items=[network])
@@ -100,8 +100,8 @@ def test_plugin_settings_list_perms_2(
 
     member = request.getfixturevalue(member)
 
-    response = PluginDetailView.as_view()(
-        setup_request(rf.get("plugin_detail"), member.user),
+    response = BoefjeDetailView.as_view()(
+        setup_request(rf.get("boefje_detail"), member.user),
         organization_code=member.organization.code,
         plugin_type="boefje",
         plugin_id="test-plugin",

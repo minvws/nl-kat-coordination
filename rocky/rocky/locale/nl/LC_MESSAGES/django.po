@@ -655,7 +655,7 @@ msgid "Failure mode"
 msgstr "Foutmodus"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/plugin_detail.html tools/forms/finding_type.py
+#: katalogus/templates/boefje_detail.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
@@ -1585,7 +1585,7 @@ msgstr "Filters wissen"
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
-#: katalogus/views/katalogus_settings.py katalogus/views/plugin_detail.py
+#: katalogus/views/katalogus_settings.py katalogus/views/boefje_detail.py
 #: katalogus/views/plugin_settings_add.py
 #: katalogus/views/plugin_settings_delete.py
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
@@ -1729,29 +1729,29 @@ msgstr "Boefjes"
 msgid "Normalizers"
 msgstr "Normalizers"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Scan level"
 msgstr "Vrijwaringsniveau"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Consumes"
 msgstr "Consumeren"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s is able to scan the following object types:"
 msgstr "%(plugin_name)s is in staat om het volgende object types te scannen:"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s does not need any input objects."
 msgstr "%(plugin_name)s heeft geen invoerobjecten nodig."
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Produces"
 msgstr "Produceren"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s can produce the following output:"
 msgstr "%(plugin_name)s kan het volgende produceren:"
@@ -1878,7 +1878,7 @@ msgstr "Nee"
 msgid "Session has terminated, please select OOIs again."
 msgstr "Sessie is verlopen, selecteer nogmaals OOIs."
 
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
+#: katalogus/views/change_clearance_level.py katalogus/views/boefje_detail.py
 msgid "Scanning successfully scheduled."
 msgstr "Scan met success ingepland."
 
@@ -1932,7 +1932,7 @@ msgstr ""
 "niveau bevestigd van L%s. Accepteer eerst het vrijwaring niveau op uw "
 "profiel pagina om verder te gaan."
 
-#: katalogus/views/plugin_detail.py
+#: katalogus/views/boefje_detail.py
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
@@ -1940,7 +1940,7 @@ msgstr ""
 "Sommige geselecteerde OOI's vereisen een hoger vrijwaring niveau om scans "
 "uit te voeren.U bent niet gemachtigd om het vrijwaring niveau te wijzigen."
 
-#: katalogus/views/plugin_detail.py
+#: katalogus/views/boefje_detail.py
 msgid "Please select an OOI to start scan."
 msgstr "Selecteer een OOI om de scan te starten."
 

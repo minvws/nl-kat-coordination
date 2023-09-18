@@ -81,7 +81,7 @@
                         </td>
                         <td>
                             {% if scan.type == "boefje" %}
-                                <a href="{% url "plugin_detail" organization.code scan.type scan.p_item.data.boefje.id %}">{{ scan.p_item.data.boefje.id }}</a>
+                                <a href="{% url "boefje_detail" organization.code scan.type scan.p_item.data.boefje.id %}">{{ scan.p_item.data.boefje.id }}</a>
                             {% elif scan.type == "normalizer" %}
                                 {{ scan.p_item.data.normalizer.id }}
                             {% else %}

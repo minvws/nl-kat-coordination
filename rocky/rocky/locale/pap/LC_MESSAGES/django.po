@@ -646,7 +646,7 @@ msgid "Failure mode"
 msgstr "Failure mode"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/plugin_detail.html tools/forms/finding_type.py
+#: katalogus/templates/boefje_detail.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
@@ -1572,7 +1572,7 @@ msgstr "Kita filters"
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
-#: katalogus/views/katalogus_settings.py katalogus/views/plugin_detail.py
+#: katalogus/views/katalogus_settings.py katalogus/views/boefje_detail.py
 #: katalogus/views/plugin_settings_add.py
 #: katalogus/views/plugin_settings_delete.py
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
@@ -1716,29 +1716,29 @@ msgstr "Boefjes"
 msgid "Normalizers"
 msgstr "Normalizers"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Scan level"
 msgstr "Nivél di skan"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Consumes"
 msgstr "Ta konsumí"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s is able to scan the following object types:"
 msgstr "%(plugin_name)s ta dispuesto di skan e siguinte tipo di ophetonan:"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s does not need any input objects."
 msgstr "%(plugin_name)s no ta nesesitá ningun ophetonan di entrada."
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Produces"
 msgstr "Ta Produsí"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s can produce the following output:"
 msgstr "%(plugin_name)s por produsi lo sigiente:"
@@ -1863,7 +1863,7 @@ msgstr "Nò"
 msgid "Session has terminated, please select OOIs again."
 msgstr "Seshon a wòrdu tèrminá. Por fabor selekta OOIs dinobo."
 
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
+#: katalogus/views/change_clearance_level.py katalogus/views/boefje_detail.py
 msgid "Scanning successfully scheduled."
 msgstr "Skèn a start ku èxito."
 
@@ -1917,7 +1917,7 @@ msgstr ""
 "nivel di autorisashon di L%s. Por fabor, akseptá e nivel di autorisashon "
 "promé riba bo página di perfil pa por sigui."
 
-#: katalogus/views/plugin_detail.py
+#: katalogus/views/boefje_detail.py
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
@@ -1925,7 +1925,7 @@ msgstr ""
 "Algun OOI selektá ta nesesitá un aumentu di nivel di autorisashon pa hasi "
 "skaneonan. Bo no tin e permiso pa kambia nivel di autorisashon."
 
-#: katalogus/views/plugin_detail.py
+#: katalogus/views/boefje_detail.py
 msgid "Please select an OOI to start scan."
 msgstr "Por fabor, selekshoná un OOI pa kuminsá skan."
 

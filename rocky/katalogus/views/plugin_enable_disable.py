@@ -41,7 +41,7 @@ class PluginEnableDisableView(SinglePluginView):
             )
             return redirect(
                 reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
                         "plugin_id": self.plugin.id,

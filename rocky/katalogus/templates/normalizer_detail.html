@@ -1,0 +1,18 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="two-thirds-one-third">
+                <div>
+                    <h1>Hello World: {{ plugin.name }}</h1>
+                </div>
+            </div>
+        </section>
+    </main>
+{% endblock content %}
