@@ -248,6 +248,9 @@ class OrganizationMember(models.Model):
     def has_perms(self, perm_list: Iterable[str]) -> bool:
         return all(self.has_perm(perm) for perm in perm_list)
 
+    def has_clearance(self, scan_level: int) -> bool:
+        return self.acknowledged_clearance_level >= scan_level
+
     class Meta:
         unique_together = ["user", "organization"]
 
