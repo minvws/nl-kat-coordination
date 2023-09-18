@@ -9,8 +9,6 @@ from django.views.generic.edit import FormView
 from pydantic import ValidationError
 from tools.forms.base import BaseRockyForm, ObservedAtForm
 from tools.forms.ooi_form import ClearanceFilterForm, OOIForm
-from tools.forms.settings import CLEARANCE_TYPE_CHOICES
-from tools.models import SCAN_LEVEL
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 
@@ -52,14 +50,6 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.get_observed_at()
         context["total_oois"] = len(self.object_list)
-
-        selected_clearance_levels = self.request.GET.getlist("clearance_level")
-        if not selected_clearance_levels:
-            selected_clearance_levels = [choice for choice, _ in SCAN_LEVEL.choices]
-        selected_clearance_types = self.request.GET.getlist("clearance_type")
-        if not selected_clearance_types:
-            selected_clearance_types = [choice for choice, _ in CLEARANCE_TYPE_CHOICES]
-
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
 
         return context
