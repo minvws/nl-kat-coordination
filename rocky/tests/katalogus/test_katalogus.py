@@ -3,6 +3,7 @@ from django.core.exceptions import PermissionDenied
 from katalogus.client import KATalogusClientV1, parse_plugin
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
+from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from pytest_django.asserts import assertContains, assertNotContains
 
 from rocky.health import ServiceHealth
@@ -260,3 +261,113 @@ def test_katalogus_client(mocker):
     assert not client.health().healthy
     assert client.health().additional == 2
     assert client.health().results == []
+
+
+def test_enable_disable_plugin_no_clearance(rf, redteam_member, mocker):
+    redteam_member.trusted_clearance_level = -1
+    redteam_member.acknowledged_clearance_level = -1
+    redteam_member.save()
+
+    plugin = get_boefjes_data()[0]
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_response = mocker.MagicMock()
+    mock_requests.Session().get.return_value = mock_response
+    mock_response.json.return_value = plugin
+
+    request = setup_request(
+        rf.post(
+            "plugin_enable_disable",
+        ),
+        redteam_member.user,
+    )
+
+    response = PluginEnableDisableView.as_view()(
+        setup_request(request, redteam_member.user),
+        organization_code=redteam_member.organization.code,
+        plugin_type=plugin["type"],
+        plugin_id=plugin["id"],
+        plugin_state=False,
+    )
+
+    # redirects back to KAT-alogus
+    assert response.status_code == 302
+
+    assert (
+        list(request._messages).pop().message
+        == "To enable "
+        + plugin["name"].title()
+        + " you need at least a clearance level of L"
+        + str(plugin["scan_level"])
+        + ". "
+        "Your clearance level is not set. Go to your profile page to see your clearance "
+        "or contact the administrator to set a clearance level."
+    )
+
+
+def test_enable_disable_plugin_no_clearance_other_text(rf, redteam_member, mocker):
+    redteam_member.trusted_clearance_level = 1
+    redteam_member.acknowledged_clearance_level = 1
+    redteam_member.save()
+
+    plugin = get_boefjes_data()[0]
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_response = mocker.MagicMock()
+    mock_requests.Session().get.return_value = mock_response
+    mock_response.json.return_value = plugin
+
+    request = setup_request(
+        rf.post(
+            "plugin_enable_disable",
+        ),
+        redteam_member.user,
+    )
+
+    response = PluginEnableDisableView.as_view()(
+        setup_request(request, redteam_member.user),
+        organization_code=redteam_member.organization.code,
+        plugin_type=plugin["type"],
+        plugin_id=plugin["id"],
+        plugin_state=False,
+    )
+
+    # redirects back to KAT-alogus
+    assert response.status_code == 302
+
+    assert (
+        list(request._messages).pop().message
+        == "To enable "
+        + plugin["name"].title()
+        + " you need at least a clearance level of L"
+        + str(plugin["scan_level"])
+        + ". Your clearance level is L"
+        + str(redteam_member.acknowledged_clearance_level)
+        + ". Contact your administrator to get a higher clearance level."
+    )
+
+
+def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
+    plugin = get_boefjes_data()[0]
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_response = mocker.MagicMock()
+    mock_requests.Session().get.return_value = mock_response
+    mock_response.json.return_value = plugin
+
+    request = setup_request(
+        rf.post(
+            "plugin_enable_disable",
+        ),
+        redteam_member.user,
+    )
+
+    response = PluginEnableDisableView.as_view()(
+        setup_request(request, redteam_member.user),
+        organization_code=redteam_member.organization.code,
+        plugin_type=plugin["type"],
+        plugin_id=plugin["id"],
+        plugin_state=False,
+    )
+
+    # redirects back to KAT-alogus
+    assert response.status_code == 302
+
+    assert list(request._messages).pop().message == "Boefje '" + plugin["name"] + "' enabled."
