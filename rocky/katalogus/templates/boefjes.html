@@ -1,0 +1,34 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="katalogus">
+        <section>
+            {% include "partials/katalogus_header.html" %}
+            {% include "partials/plugins_navigation.html" with active="boefjes" %}
+
+            <div class="fifty-fifty">
+                <div>
+                    <h2>Boefjes</h2>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Boefjes gather factual information, such as by calling an
+                            external scanning tool like nmap or using a database like shodan.
+                        {% endblocktranslate %}
+                    </p>
+                    <p class="emphasized">
+                        <strong>{{ object_list|length }}</strong> Boefje{{ object_list|pluralize:"s" }} {% translate "available" %}
+                    </p>
+                </div>
+            </div>
+            {% include "partials/katalogus_filter.html" with form=form %}
+            {% include "partials/katalogus_toolbar.html" %}
+            {% include "partials/plugins.html" %}
+
+        </section>
+    </main>
+{% endblock content %}

@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from typing import Dict, List, Optional, Set, Type, Union
+from uuid import UUID
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -136,7 +137,7 @@ class OctopoesAPIConnector:
         valid_time: Optional[datetime] = None,
         source: Optional[Reference] = None,
         result: Optional[Reference] = None,
-        task_id: Optional[str] = None,
+        task_id: Optional[UUID] = None,
         origin_type: Optional[OriginType] = None,
     ) -> List[Origin]:
         res = self.session.get(
@@ -145,7 +146,7 @@ class OctopoesAPIConnector:
                 "valid_time": valid_time,
                 "source": source,
                 "result": result,
-                "task_id": task_id,
+                "task_id": str(task_id) if task_id else None,
                 "origin_type": origin_type,
             },
         )

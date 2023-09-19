@@ -1,0 +1,7 @@
+{
+  ".well-known/security.txt": {
+    "content": "This is the content",
+    "url": "https://www.example.com/.well-known/security.txt",
+    "ip": "192.0.2.1"
+  }
+}

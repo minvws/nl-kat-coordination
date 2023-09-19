@@ -145,7 +145,6 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organi
     assertContains(response, "OOI clearance for " + ooi_id)
     assertContains(response, "Introduction")
     assertContains(response, "How to know required clearance level")
-    assertContains(response, "Scan level:")
     assertContains(response, "Fierce")
     assertContains(response, "DNS-Zone")
     assertContains(response, "Skip onboarding")

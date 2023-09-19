@@ -17,6 +17,7 @@
 @import "vendor_overrides/manon/form-radio";
 @import "vendor_overrides/manon/form-fieldset-required";
 @import "vendor_overrides/manon/link";
+@import "vendor_overrides/manon/table";
 @import "vendor_overrides/manon/tile";
 
 /* Theme */
@@ -42,7 +43,7 @@
 @import "components/input-link";
 @import "components/language";
 @import "components/layout";
-@import "components/member-states";
+@import "components/table-state-icons";
 @import "components/messages";
 @import "components/notifications";
 @import "components/ooi-summary";
@@ -54,7 +55,6 @@
 @import "components/select";
 @import "components/stepper";
 @import "components/table";
-@import "components/tiles";
 @import "components/toolbar";
 @import "components/tree-tables";
 @import "components/user-icon";

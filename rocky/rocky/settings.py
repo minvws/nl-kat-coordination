@@ -47,6 +47,7 @@ BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
 KEIKO_API = env.url("KEIKO_API", "").geturl()
 # Report generation timeout in seconds
 KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
+ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
@@ -276,7 +277,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
 STATICFILES_DIRS = (BASE_DIR / "assets",)
 
-LOGIN_URL = "two_factor:login"
+LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
 
 # Default primary key field type

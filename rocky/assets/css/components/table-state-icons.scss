@@ -1,0 +1,50 @@
+table td .icon {
+  &::before {
+    position: static;
+    font-family: var(--icon-font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  &.neutral {
+    &::before {
+      content: "\ea91"; // $ti-icon-dots-circle-horizontal
+      color: var(--color-alert-informative);
+    }
+  }
+
+  &.positive {
+    &::before {
+      content: "\ea67"; // $ti-icon-circle-check
+      color: var(--color-alert-positive);
+    }
+  }
+
+  &.negative {
+    &::before {
+      content: "\ea6a"; // $ti-icon-circle-x
+      color: var(--color-alert-negative);
+    }
+  }
+
+  &.running {
+    &::before {
+      content: "\ed27"; // $ti-icon-circle-dashed (should become ti-icon-progress, when we have it)
+      color: var(--color-alert-informative);
+    }
+  }
+
+  &.queued {
+    &::before {
+      content: "\ea70"; // $ti-icon-clock
+      color: var(--color-alert-warning);
+    }
+  }
+
+  &.cancelled {
+    &::before {
+      content: "\ea05"; // $ti-icon-alert-circle
+      color: var(--color-alert-negative);
+    }
+  }
+}

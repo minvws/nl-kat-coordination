@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-07 12:52+0000\n"
+"POT-Creation-Date: 2023-09-12 15:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1344,6 +1344,49 @@ msgstr "Opshonnan súrtí"
 msgid "This field is required."
 msgstr "E vèld aki ta obligatorio"
 
+#: katalogus/templates/about_plugins.html
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "About plugins"
+msgstr "Tokante plug-innan"
+
+#: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
+msgid ""
+"Plugins gather data, objects and insight. Each plugin has its own focus area "
+"and strengths and may be able to work with other plugins to gain even more "
+"insights."
+msgstr ""
+"Plugins ta reuni informashon, obhetonan i komprènhenshon. Kada plugin tin su "
+"mes área di enfoke i fortalezanan i por ta kapás pa traha ku otro plugins pa "
+"hanja ainda mas komprènhenshon."
+
+#: katalogus/templates/about_plugins.html katalogus/templates/boefjes.html
+msgid ""
+"Boefjes gather factual information, such as by calling an external scanning "
+"tool like nmap or using a database like shodan."
+msgstr ""
+"Boefjes ta reuni informashon faktuál, huzando tools manera nmap òf usando un "
+"base di datos manera shodan."
+
+#: katalogus/templates/about_plugins.html katalogus/templates/normalizers.html
+msgid ""
+"Normalizers analyze the information and turn it into objects for the data "
+"model in Octopoes."
+msgstr ""
+"Normalizers ta analisá informashon i konvértí esaki den ophetonan pa e "
+"modelo di datonan den Octopoes."
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"Bits are business rules that look for insight within the current dataset and "
+"search for specific insight and draw conclusions."
+msgstr ""
+"Bits ta reglanan di negoshi ku ta buska bista den e dataset aktual i ta "
+"buska bista spesífiko i trese konklushonnan."
+
+#: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
+msgid "available"
+msgstr "disponibel"
+
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
 msgid "scan level warning"
@@ -1435,58 +1478,31 @@ msgstr ""
 msgid "Clone"
 msgstr "Kopia"
 
-#: katalogus/templates/katalogus.html katalogus/views/change_clearance_level.py
-#: katalogus/views/katalogus.py katalogus/views/katalogus_settings.py
-#: katalogus/views/plugin_detail.py katalogus/views/plugin_settings_add.py
-#: katalogus/views/plugin_settings_delete.py
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-msgid "KAT-alogus"
-msgstr "KAT-alogus"
+#: katalogus/templates/katalogus.html
+msgid "All plugins"
+msgstr "Tur plug-ins"
 
 #: katalogus/templates/katalogus.html
 msgid ""
 "\n"
-"                An overview of all available boefjes.\n"
-"                Boefjes can be used to scan for vulnerablilities and "
-"security issues within specified objects.\n"
-"                Each boefje has his own focus area and strengths.\n"
-"              "
-msgstr ""
+"                            Plugin available\n"
+"                        "
+msgid_plural ""
 "\n"
-"                Un relato generál di tur boefjes ku tin.\n"
-"                Boefjes por wordu úza pa investigashón pa ophetonan "
-"specífiko vulnerabel i ku problemanan di siguridát.\n"
-"                Kada boefje tin su mes área di enfoké i fortalesanan.\n"
-"              "
+"                            Plugins available\n"
+"                        "
+msgstr[0] ""
+"\n"
+"                        Plug-in disponibel\n"
+"                        "
+msgstr[1] ""
+"\n"
+"                        Plug-ins disponibel\n"
+"                      "
 
-#: katalogus/templates/katalogus.html
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
 msgstr "KAT-alogus Settings"
-
-#: katalogus/templates/katalogus.html rocky/templates/scan.html
-msgid "Boefjes overview:"
-msgstr "Relato general di Boefjes:"
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje name"
-msgstr "Nòmber di Boefje"
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje description"
-msgstr "Boefje informashon"
-
-#: katalogus/templates/katalogus.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Actions"
-msgstr "Akshonnan"
-
-#: katalogus/templates/katalogus.html
-#: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-msgid "See details"
-msgstr "Habri detayes"
 
 #: katalogus/templates/katalogus_settings.html
 msgid ""
@@ -1520,14 +1536,18 @@ msgid "Value"
 msgstr "Balor"
 
 #: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-#: onboarding/templates/partials/boefje_tile_static.html
 msgid "Scan level:"
 msgstr "Nivél di skan:"
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Publisher"
 msgstr "Editora"
+
+#: katalogus/templates/partials/boefje_tile.html
+#: katalogus/templates/partials/plugin_tile.html
+#: katalogus/templates/partials/plugins.html
+msgid "See details"
+msgstr "Habri detayes"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "Enable"
@@ -1543,13 +1563,34 @@ msgid "You don't have permission to enable "
 msgstr "Bo no tin permiso pa aktivá "
 
 #: katalogus/templates/partials/katalogus_filter.html
-msgid "Available plugins"
-msgstr "Plugins disponibel"
+msgid "Filter plugins"
+msgstr "Filtro di plug-in"
 
 #: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Update List"
-msgstr "Update Lista"
+msgid "Clear filter"
+msgstr "Kita filters"
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
+#: katalogus/views/katalogus_settings.py katalogus/views/plugin_detail.py
+#: katalogus/views/plugin_settings_add.py
+#: katalogus/views/plugin_settings_delete.py
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+msgid "KAT-alogus"
+msgstr "KAT-alogus"
+
+#: katalogus/templates/partials/katalogus_header.html
+msgid "An overview of all available plugins."
+msgstr "Un bista general di tur plug-innan disponibel."
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/templates/plugin_settings_list.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Settings"
+msgstr "Settings"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Gridview"
@@ -1569,71 +1610,52 @@ msgstr "Lista di opheto"
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"This boefje will only scan objects with a corresponding clearance level of "
+"This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
-"this boefje to scan an OOI with a lower clearance level than "
+"this Boefje to scan an OOI with a lower clearance level than "
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
-"E boefje aki ta skan solamente ophetonan ku un nivél di autorisashon di "
+"E Boefje aki ta skan solamente ophetonan ku un nivél di autorisashon di "
 "<strong>L%(scan_level)s</strong> òf mas haltu. No tin indemnizashon pa e "
-"boefje pa skan un OOI ku un nivél di autorisashon mas abou ku "
+"Boefje pa skan un OOI ku un nivél di autorisashon mas abou ku "
 "<strong>L%(scan_level)s</strong>. Uza e filter pa mustra OOI's ku un nivél "
 "di autorisashon mas abou."
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid ""
-"\n"
-"          <span>Warning scan level:</span>\n"
-"          Scanning OOI's with a lower clearance level will result in OpenKAT "
-"increasing the clearance level on that OOI,\n"
-"          not only for this scan but from now on out, until it manually gets "
-"set to something else again.\n"
-"          This means that all other enabled Boefjes will use this higher "
-"clearance level aswel.\n"
-"        "
+"<span>Warning scan level:</span> Scanning OOI's with a lower clearance level "
+"will result in OpenKAT increasing the clearance level on that OOI, not only "
+"for this scan but from now on out, until it manually gets set to something "
+"else again. This means that all other enabled Boefjes will use this higher "
+"clearance level aswel."
 msgstr ""
-"\n"
-"          <span>Advertensia nivel di skan:</span>\n"
-"          Skèn OOI's ku nivel di authorisashon mas abou lo resulta ku "
-"OpenKAT mester subi e nivel di authorisashon pa e OOI,\n"
-"          no solamente pa e skan aki for di awor i adelante, te ora "
-"manualmente e wordu pone na algu otro atrobe.\n"
-"          Esaki ta nifika ku tur otro Boefjes aktivo lo huza e nivel di "
-"authorisashon  aki tambe.\n"
-"        "
+"<span>Advertensia nivel di skan:</span> Skan OOI's ku nivel di authorisashon "
+"mas abou lo resulta ku OpenKAT mester subi e nivel di authorisashon pa e "
+"OOI, no solamente pa e skan aki for di awor i adelante, te ora manualmente e "
+"wordu pone na algu otro atrobe. Esaki ta nifika ku tur otro Boefjes aktivo "
+"lo huza e nivel di authorisashon aki tambe."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"\n"
-"          You currently don't have any objects that meet the scan level of "
-"%(name)s.\n"
-"          Add objects with a complying clearance level, or alter the "
-"clearance level of existing objects.\n"
-"        "
+"You currently don't have any objects that meet the scan level of %(name)s. "
+"Add objects with a complying clearance level, or alter the clearance level "
+"of existing objects."
 msgstr ""
-"\n"
-"              Na e momento aki bo no tin ophetonan ku ta kwarda ku e nivel "
-"di autorisashon di %(name)s. \n"
-"              Añadi ophetonan ku un nivel di authorisashon adequa, òf kambia "
-"e nivel di authorisashon di ophetonan eksistente.\n"
-"            "
+"Na e momento aki bo no tin ophetonan ku ta kwarda ku e nivel di autorisashon "
+"di %(name)s. Añadi ophetonan ku un nivel di authorisashon adequa, òf kambia "
+"e nivel di authorisashon di ophetonan eksistente."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"\n"
-"          You currently don't have scannable objects for %(name)s.\n"
-"          Add objects to use this boefje. This boefje is able to scan "
-"objects of the following types:\n"
-"        "
+"You currently don't have scannable objects for %(name)s. Add objects to use "
+"this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
-"\n"
-"              Na e momento aki bo no tin ophetonan pa skan pa %(name)s. \n"
-"              Añadi ophetonan pa uza e boefje. E boefje aki ta dispuesto di "
-"skan ophetonan di e sigiente tiponan:\n"
-"            "
+"Na e momento aki bo no tin ophetonan pa skan pa %(name)s. Añadi ophetonan pa "
+"uza e Boefje. E Boefje aki ta dispuesto di skan ophetonan di e sigiente "
+"tiponan:"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "The form could not be initialized."
@@ -1650,9 +1672,49 @@ msgstr "Settings requeri"
 msgid "Add"
 msgstr "Añadí"
 
-#: katalogus/templates/partials/plugin_tile.html
-msgid "Publisher:"
-msgstr "Editora:"
+#: katalogus/templates/partials/plugins.html
+msgid "Plugins overview:"
+msgstr "Resumen di Plug-innan:"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin name"
+msgstr "Nombre di Plug-in"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin type"
+msgstr "Tipo di Plug-in"
+
+#: katalogus/templates/partials/plugins.html
+msgid "Plugin description"
+msgstr "Deskripshon di Plug-in"
+
+#: katalogus/templates/partials/plugins.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Actions"
+msgstr "Akshonnan"
+
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "Plugins Navigation"
+msgstr "Navegashon di Plug-innan"
+
+#: katalogus/templates/partials/plugins_navigation.html rocky/views/mixins.py
+msgid "All"
+msgstr "Tur"
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: tools/forms/boefje.py rocky/templates/scan.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Boefjes"
+msgstr "Boefjes"
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Normalizers"
+msgstr "Normalizers"
 
 #: katalogus/templates/plugin_detail.html
 msgid "Scan level"
@@ -1774,13 +1836,6 @@ msgid " Details"
 msgstr "Detayes"
 
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py tools/view_helpers.py
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Settings"
-msgstr "Settings"
-
-#: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
 msgstr "Relato di settings:"
 
@@ -1816,12 +1871,6 @@ msgstr "Skèn a start ku èxito."
 msgid "Change clearance level"
 msgstr "Kambia nivél di autorisashon"
 
-#: katalogus/views/katalogus.py
-msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-msgstr ""
-"Carga di plug-in den KATalogus a falla. Fabor kontrolá e registro di "
-"KATalogus."
-
 #: katalogus/views/katalogus_settings.py
 msgid "Settings from {} to {} successfully cloned."
 msgstr "Ajustenan di {} pa {} a wordu di kloon ku éksito."
@@ -1854,7 +1903,8 @@ msgid ""
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
 "No por a aumenta e nivel di autorisashon di %s pa L%s. B'a haya un nivel di "
-"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un autorisashon mas haltu."
+"autorisashon di L%s. Tuma kontakto ku bo administradó pa haña un "
+"autorisashon mas haltu."
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -1880,26 +1930,32 @@ msgid "Please select an OOI to start scan."
 msgstr "Por fabor, selekshoná un OOI pa kuminsá skan."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_name}' desaktivá."
+msgid "{} '{}' disabled."
+msgstr "{} '{}' desaktivá."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
-msgstr ""
-"Faya den buskamentu di ajustenan pa boefje {boefje_name}. Katalogus ta sende?"
+msgid "Failed fetching settings for {}. Is the Katalogus up?"
+msgstr "No por a enkontra e ajustamentunan pa {}. Katalogus ta disponibel?"
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
+msgid "Before enabling, please set the required settings for '{}'."
+msgstr "Promé ku aktivá, por fabor pone e ajustamentunan necesario pa '{}'."
+
+#: katalogus/views/plugin_enable_disable.py
+msgid "{} '{}' enabled."
+msgstr "{} '{}' aktiva."
+
+#: katalogus/views/plugin_enable_disable.py
 msgid ""
-"Before enabling, please set the required settings for boefje '{boefje_name}'."
-msgstr "Pone e settings nan ku mester prome ku activá boefje '{boefje_name}'."
+"Your clearance level is not set. Go to your profile page to see your "
+"clearance or contact the administrator to set a clearance level."
+msgstr ""
+"Bo nivel di autorisashon no ta establésí. Bai na bo página di perfil pa wak "
+"bo autorisashon òf kontakta e administradó pa establésí un nivel di autorisashon."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_name}' aktivá."
+msgid "To enable {} you need at least a clearance level of L{}. "
+msgstr "Pa aktivá {} bo mester tin mínimo un nivel di autorisashon di L{}."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
@@ -2834,13 +2890,6 @@ msgstr ""
 "abilidát specifikó ku lo juda pa generá bo rapòrt. Tin tres tipo di plugins."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: tools/forms/boefje.py rocky/templates/scan.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Boefjes"
-msgstr "Boefjes"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
@@ -2848,12 +2897,6 @@ msgstr ""
 "Skèn ophetonan pa data. Kada boefje tin un intesidát score pa skan pa "
 "prevení scannan invasivo riba opheto kaminda bo no tin autorisashon pa hasi "
 "esaki."
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Normalizers"
-msgstr "Normalizers"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -3163,12 +3206,12 @@ msgid "Clearance Level"
 msgstr "Nivél di Autorisashon"
 
 #: tools/forms/ooi.py
-msgid "Show objects that don't meet the Boefjes scan level"
-msgstr "Mustra ophetonan ku no tin nivel di skan pa Boefjes"
+msgid "Show objects that don't meet the Boefjes scan level."
+msgstr "Mustra ophetonan ku no tin nivel di skan pa Boefjes."
 
 #: tools/forms/ooi.py
-msgid "Show Boefjes that exceed the objects clearance level"
-msgstr "Mustra Boefjes ku ku a surpasa OOI's su nivel di autorisashon"
+msgid "Show Boefjes that exceed the objects clearance level."
+msgstr "Mustra Boefjes ku ku a surpasa OOI's su nivel di autorisashon."
 
 #: tools/forms/ooi_form.py
 msgid "option"
@@ -3568,7 +3611,7 @@ msgid "Indemnifications"
 msgstr "Indemnizashon"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/findings/finding_list.html rocky/templates/header.html
+#: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/oois/ooi_page_tabs.html
@@ -3632,14 +3675,19 @@ msgid "Finding"
 msgstr "Diskubrimentu"
 
 #: rocky/templates/findings/finding_list.html
+msgid "Findings @ "
+msgstr "Diskubrimentu @ "
+
+#: rocky/templates/findings/finding_list.html
 #, python-format
 msgid ""
-"An overview of all findings OpenKAT found on %(date)s. Each finding relates "
-"to an object. Click a finding for additional information."
+"An overview of all findings OpenKAT found for organization "
+"<strong>%(organization_name)s</strong>. Each finding relates to an object. "
+"Click a finding for additional information."
 msgstr ""
-"Un relato general di tur diskubrimentu OpenKAT á enkontrá riba %(date)s. "
-"Kada diskubrimentu ta relatá na un opheto. Klék un diskubrimentu pa "
-"informashon adishonál."
+"Un resumen di tur diskubrimentunan ku OpenKAT a hanja pa e organisashon "
+"<strong>%(organization_name)s</strong>. Kada diskubrimentu ta relacioná ku "
+"un opheto. Klik riba un diskubrimentu pa mas informashon."
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -3746,7 +3794,7 @@ msgstr "E vèld aki ta obligatorio"
 
 #: rocky/templates/graph-d3.html
 msgid ""
-"Click a circle top collapse / expand the tree, click the text to view the "
+"Click a circle to collapse / expand the tree, click the text to view the "
 "tree from that OOI and hover over the text to see details."
 msgstr ""
 "Click e sírkulo top collapse / expande e mapa, click e teksto pa habri e "
@@ -4127,12 +4175,15 @@ msgid "Currently there are no findings for OOI"
 msgstr "Aktualmente no a diskubri nada pa OOI"
 
 #: rocky/templates/oois/ooi_list.html
+#, python-format
 msgid ""
-"An overview of your object list. Objects can be added manually or by running "
-"boefjes. </br> Click an object for additional information."
+"An overview of objects found for organization <strong>%(organization_name)s</"
+"strong>. Objects can be added manually or by running Boefjes. Click an "
+"object for additional information."
 msgstr ""
-"Un bista general di bo lista di ophetonan. Ophetonan por wòrdu añadí "
-"manualmente òf dor di ehekutá boefjes. </br> Klik riba un opheto pa mas "
+"Un resumen di ophetonan ku a wòrdu hanja pa e organisashon "
+"<strong>%(organization_name)s</strong>. Ophetonan por wòrdu agrega "
+"manualmente òf dor di eksekutá Boefjes. Klik riba un opheto pa mas "
 "informashon."
 
 #: rocky/templates/oois/ooi_list.html
@@ -4437,6 +4488,12 @@ msgstr "Super usario"
 msgid "Active"
 msgstr "Aktivá"
 
+#: rocky/templates/organizations/organization_member_list.html
+#, fuzzy
+#| msgid "new"
+msgid "New"
+msgstr "Nobo"
+
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
 msgstr "Subi un archivo csv ku miembronan pa e organisashon"
@@ -4581,8 +4638,8 @@ msgid "Reproduction"
 msgstr "Reprodusí"
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html
-msgid "Please enable plugin to start scanning"
-msgstr "Por fabor sende plugin prome ku kuminsa start ku skan"
+msgid "Please enable plugin to start scanning."
+msgstr "Por fabor sende plugin prome ku kuminsa start ku skan."
 
 #: rocky/templates/partials/form/field_input.html
 #: rocky/templates/partials/form/field_input_checkbox.html
@@ -4827,6 +4884,10 @@ msgstr "Muestra di tiponan di status"
 msgid "Blocked status"
 msgstr "Status blòkiá"
 
+#: rocky/templates/partials/organization_member_list_filters.html
+msgid "Update List"
+msgstr "Update Lista"
+
 #: rocky/templates/partials/organization_properties_table.html
 msgid "Organization name"
 msgstr "Nòmber di Organisashon"
@@ -4942,6 +5003,10 @@ msgstr "Perfil"
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
 msgstr "Bai na e kontenido"
+
+#: rocky/templates/scan.html
+msgid "Boefjes overview:"
+msgstr "Relato general di Boefjes:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
@@ -5379,10 +5444,6 @@ msgid ""
 msgstr ""
 "No por parse e parametro observed_at, regresando na munstra e opheto aktual"
 
-#: rocky/views/mixins.py
-msgid "All"
-msgstr "Tur"
-
 #: rocky/views/ooi_add.py
 msgid "Type select"
 msgstr "Selektá tipo"
@@ -5427,8 +5488,9 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
-"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un nivel di autorashon di L%s. "
-"Tuma kontakto ku bo administrator pa haña un nivel di autorisashon mas halto."
+"No por a subi e nivel di autorisashon na L%s. Confiansa tabata duna pa un "
+"nivel di autorashon di L%s. Tuma kontakto ku bo administrator pa haña un "
+"nivel di autorisashon mas halto."
 
 #: rocky/views/ooi_list.py
 #, python-format

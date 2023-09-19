@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<form class="inline column help" method="post">
+<form class="inline" method="post">
     {% csrf_token %}
     {% if checkbox_group_table_form %}
         {% include "partials/form/form_errors.html" with form=field %}
